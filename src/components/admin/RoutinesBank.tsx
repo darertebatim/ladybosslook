@@ -6,17 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
-import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, Sparkles, Gift, Calendar, Flame, CalendarIcon } from 'lucide-react';
+import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles, Gift, Calendar, Flame, CalendarIcon } from 'lucide-react';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
 import EmojiPicker from '@/components/app/EmojiPicker';
 import { ImageUploader } from '@/components/admin/ImageUploader';
 import { AITextGenerator } from '@/components/admin/AITextGenerator';
-import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
@@ -57,6 +58,17 @@ interface RoutineBankItem {
   updated_at: string;
 }
 
+interface RoutineBankSection {
+  id: string;
+  routine_id: string;
+  title: string;
+  content: string | null;
+  image_url: string | null;
+  section_order: number;
+  is_active: boolean;
+  created_at: string;
+}
+
 interface RoutineBankTask {
   id: string;
   routine_id: string;
@@ -74,6 +86,16 @@ interface TaskBankItem {
   emoji: string;
   category: string;
   is_active: boolean;
+}
+
+// Local state for sections while editing
+interface LocalSection {
+  id: string;
+  title: string;
+  content: string;
+  image_url: string;
+  section_order: number;
+  isNew?: boolean;
 }
 
 // Local state for tasks while editing
@@ -96,6 +118,12 @@ export default function RoutinesBank() {
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const [taskSearchOpen, setTaskSearchOpen] = useState(false);
   const [taskSearch, setTaskSearch] = useState('');
+  const [addingTaskToSection, setAddingTaskToSection] = useState<string | null>(null); // section_id or 'uncategorized'
+  const [dialogTab, setDialogTab] = useState<'basic' | 'sections'>('basic');
+
+  // Section editor state
+  const [sectionDialogOpen, setSectionDialogOpen] = useState(false);
+  const [editingSection, setEditingSection] = useState<LocalSection | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -115,6 +143,7 @@ export default function RoutinesBank() {
     end_date: null as Date | null,
     end_after_days: null as number | null,
   });
+  const [localSections, setLocalSections] = useState<LocalSection[]>([]);
   const [localTasks, setLocalTasks] = useState<LocalTask[]>([]);
 
   // Fetch categories
@@ -180,7 +209,8 @@ export default function RoutinesBank() {
 
   // Create routine
   const createRoutine = useMutation({
-    mutationFn: async (data: { formData: typeof formData; tasks: LocalTask[] }) => {
+    mutationFn: async (data: { formData: typeof formData; sections: LocalSection[]; tasks: LocalTask[] }) => {
+      // Create routine
       const { data: newRoutine, error } = await supabase
         .from('routines_bank')
         .insert({
@@ -203,14 +233,38 @@ export default function RoutinesBank() {
         .single();
       if (error) throw error;
 
-      // Insert tasks (flat, no sections)
+      // Create sections and build id mapping
+      const sectionIdMap: Record<string, string> = {};
+      if (data.sections.length > 0) {
+        const sectionRecords = data.sections.map((s, idx) => ({
+          routine_id: newRoutine.id,
+          title: s.title,
+          content: s.content || null,
+          image_url: s.image_url || null,
+          section_order: idx,
+        }));
+        const { data: insertedSections, error: secError } = await supabase
+          .from('routines_bank_sections')
+          .insert(sectionRecords)
+          .select();
+        if (secError) throw secError;
+        
+        // Map local temp ids to real ids
+        data.sections.forEach((s, idx) => {
+          if (insertedSections && insertedSections[idx]) {
+            sectionIdMap[s.id] = insertedSections[idx].id;
+          }
+        });
+      }
+
+      // Insert tasks with mapped section_id
       if (data.tasks.length > 0) {
         const taskRecords = data.tasks.map((t, idx) => ({
           routine_id: newRoutine.id,
           task_id: t.task_id,
           title: t.title,
           emoji: t.emoji,
-          section_id: null,
+          section_id: t.section_id ? sectionIdMap[t.section_id] || null : null,
           task_order: idx,
           schedule_days: t.schedule_days?.length ? t.schedule_days : [],
           drip_day: t.drip_day,
@@ -230,7 +284,8 @@ export default function RoutinesBank() {
 
   // Update routine
   const updateRoutine = useMutation({
-    mutationFn: async (data: { id: string; formData: typeof formData; tasks: LocalTask[] }) => {
+    mutationFn: async (data: { id: string; formData: typeof formData; sections: LocalSection[]; tasks: LocalTask[] }) => {
+      // Update routine basic info
       const { error } = await supabase
         .from('routines_bank')
         .update({
@@ -252,16 +307,41 @@ export default function RoutinesBank() {
         .eq('id', data.id);
       if (error) throw error;
 
-      // Delete old tasks and recreate
+      // Delete old sections and tasks
       await supabase.from('routines_bank_tasks').delete().eq('routine_id', data.id);
+      await supabase.from('routines_bank_sections').delete().eq('routine_id', data.id);
 
+      // Recreate sections
+      const sectionIdMap: Record<string, string> = {};
+      if (data.sections.length > 0) {
+        const sectionRecords = data.sections.map((s, idx) => ({
+          routine_id: data.id,
+          title: s.title,
+          content: s.content || null,
+          image_url: s.image_url || null,
+          section_order: idx,
+        }));
+        const { data: insertedSections, error: secError } = await supabase
+          .from('routines_bank_sections')
+          .insert(sectionRecords)
+          .select();
+        if (secError) throw secError;
+        
+        data.sections.forEach((s, idx) => {
+          if (insertedSections && insertedSections[idx]) {
+            sectionIdMap[s.id] = insertedSections[idx].id;
+          }
+        });
+      }
+
+      // Recreate tasks
       if (data.tasks.length > 0) {
         const taskRecords = data.tasks.map((t, idx) => ({
           routine_id: data.id,
           task_id: t.task_id,
           title: t.title,
           emoji: t.emoji,
-          section_id: null,
+          section_id: t.section_id ? sectionIdMap[t.section_id] || null : null,
           task_order: idx,
           schedule_days: t.schedule_days?.length ? t.schedule_days : [],
           drip_day: t.drip_day,
@@ -323,26 +403,41 @@ export default function RoutinesBank() {
     },
   });
 
-  // Fetch tasks for a routine when editing (no sections)
+  // Fetch sections and tasks for a routine when editing
   const fetchRoutineData = async (routineId: string) => {
-    const { data: tasksRes, error } = await supabase
-      .from('routines_bank_tasks')
-      .select('*')
-      .eq('routine_id', routineId)
-      .order('task_order', { ascending: true });
+    const [sectionsRes, tasksRes] = await Promise.all([
+      supabase
+        .from('routines_bank_sections')
+        .select('*')
+        .eq('routine_id', routineId)
+        .order('section_order', { ascending: true }),
+      supabase
+        .from('routines_bank_tasks')
+        .select('*')
+        .eq('routine_id', routineId)
+        .order('task_order', { ascending: true }),
+    ]);
 
-    const tasks: LocalTask[] = (tasksRes || []).map(t => ({
+    const sections: LocalSection[] = (sectionsRes.data || []).map(s => ({
+      id: s.id,
+      title: s.title,
+      content: s.content || '',
+      image_url: s.image_url || '',
+      section_order: s.section_order,
+    }));
+
+    const tasks: LocalTask[] = (tasksRes.data || []).map(t => ({
       id: t.id,
       task_id: t.task_id,
       title: t.title,
       emoji: t.emoji,
-      section_id: null,
+      section_id: t.section_id,
       task_order: t.task_order,
       schedule_days: (t as any).schedule_days || [],
       drip_day: (t as any).drip_day ?? null,
     }));
 
-    return { tasks };
+    return { sections, tasks };
   };
 
   const openNewDialog = () => {
@@ -364,7 +459,9 @@ export default function RoutinesBank() {
       end_date: null,
       end_after_days: null,
     });
+    setLocalSections([]);
     setLocalTasks([]);
+    setDialogTab('basic');
     setDialogOpen(true);
   };
 
@@ -387,17 +484,21 @@ export default function RoutinesBank() {
       end_date: (routine as any).end_date ? new Date((routine as any).end_date) : null,
       end_after_days: (routine as any).end_after_days ?? null,
     });
-    const { tasks } = await fetchRoutineData(routine.id);
+    const { sections, tasks } = await fetchRoutineData(routine.id);
+    setLocalSections(sections);
     setLocalTasks(tasks);
+    setDialogTab('basic');
     setDialogOpen(true);
   };
 
   const closeDialog = () => {
     setDialogOpen(false);
     setEditingRoutine(null);
+    setLocalSections([]);
     setLocalTasks([]);
     setTaskSearchOpen(false);
     setTaskSearch('');
+    setAddingTaskToSection(null);
   };
 
   const handleSave = () => {
@@ -406,9 +507,9 @@ export default function RoutinesBank() {
       return;
     }
     if (editingRoutine) {
-      updateRoutine.mutate({ id: editingRoutine.id, formData, tasks: localTasks });
+      updateRoutine.mutate({ id: editingRoutine.id, formData, sections: localSections, tasks: localTasks });
     } else {
-      createRoutine.mutate({ formData, tasks: localTasks });
+      createRoutine.mutate({ formData, sections: localSections, tasks: localTasks });
     }
   };
 
@@ -418,45 +519,118 @@ export default function RoutinesBank() {
     }
   };
 
-  // Task management (flat, no sections)
-  const addTask = (task: TaskBankItem) => {
+  // Section management
+  const addSection = () => {
+    const newSection: LocalSection = {
+      id: crypto.randomUUID(),
+      title: 'New Section',
+      content: '',
+      image_url: '',
+      section_order: localSections.length,
+      isNew: true,
+    };
+    setLocalSections([...localSections, newSection]);
+    openSectionEditor(newSection);
+  };
+
+  const openSectionEditor = (section: LocalSection) => {
+    setEditingSection({ ...section });
+    setSectionDialogOpen(true);
+  };
+
+  const saveSectionEdit = () => {
+    if (!editingSection) return;
+    if (!editingSection.title.trim()) {
+      toast.error('Section title is required');
+      return;
+    }
+    setLocalSections(localSections.map(s => 
+      s.id === editingSection.id ? { ...editingSection, isNew: false } : s
+    ));
+    setSectionDialogOpen(false);
+    setEditingSection(null);
+  };
+
+  const deleteSection = (sectionId: string) => {
+    // Move tasks from this section to uncategorized
+    setLocalTasks(localTasks.map(t => 
+      t.section_id === sectionId ? { ...t, section_id: null } : t
+    ));
+    setLocalSections(localSections.filter(s => s.id !== sectionId));
+  };
+
+  const moveSectionUp = (index: number) => {
+    if (index <= 0) return;
+    const newSections = [...localSections];
+    [newSections[index - 1], newSections[index]] = [newSections[index], newSections[index - 1]];
+    setLocalSections(newSections);
+  };
+
+  const moveSectionDown = (index: number) => {
+    if (index >= localSections.length - 1) return;
+    const newSections = [...localSections];
+    [newSections[index], newSections[index + 1]] = [newSections[index + 1], newSections[index]];
+    setLocalSections(newSections);
+  };
+
+  // Task management
+  const addTaskToSection = (task: TaskBankItem, sectionId: string | null) => {
     const newTask: LocalTask = {
       id: crypto.randomUUID(),
       task_id: task.id,
       title: task.title,
       emoji: task.emoji,
-      section_id: null,
-      task_order: localTasks.length,
+      section_id: sectionId,
+      task_order: localTasks.filter(t => t.section_id === sectionId).length,
       schedule_days: [],
       drip_day: formData.schedule_type === 'challenge' ? localTasks.length + 1 : null,
     };
     setLocalTasks([...localTasks, newTask]);
     setTaskSearchOpen(false);
     setTaskSearch('');
+    setAddingTaskToSection(null);
   };
 
   const removeTask = (taskId: string) => {
     setLocalTasks(localTasks.filter(t => t.id !== taskId));
   };
 
-  const moveTaskUp = (index: number) => {
-    if (index <= 0) return;
-    const newTasks = [...localTasks];
-    [newTasks[index - 1], newTasks[index]] = [newTasks[index], newTasks[index - 1]];
-    setLocalTasks(newTasks);
+  const moveTaskUp = (taskId: string, sectionId: string | null) => {
+    const sectionTasks = localTasks.filter(t => t.section_id === sectionId);
+    const idx = sectionTasks.findIndex(t => t.id === taskId);
+    if (idx <= 0) return;
+    
+    const taskToMove = sectionTasks[idx];
+    const taskAbove = sectionTasks[idx - 1];
+    
+    setLocalTasks(localTasks.map(t => {
+      if (t.id === taskToMove.id) return { ...t, task_order: taskAbove.task_order };
+      if (t.id === taskAbove.id) return { ...t, task_order: taskToMove.task_order };
+      return t;
+    }));
   };
 
-  const moveTaskDown = (index: number) => {
-    if (index >= localTasks.length - 1) return;
-    const newTasks = [...localTasks];
-    [newTasks[index], newTasks[index + 1]] = [newTasks[index + 1], newTasks[index]];
-    setLocalTasks(newTasks);
+  const moveTaskDown = (taskId: string, sectionId: string | null) => {
+    const sectionTasks = localTasks.filter(t => t.section_id === sectionId);
+    const idx = sectionTasks.findIndex(t => t.id === taskId);
+    if (idx >= sectionTasks.length - 1) return;
+    
+    const taskToMove = sectionTasks[idx];
+    const taskBelow = sectionTasks[idx + 1];
+    
+    setLocalTasks(localTasks.map(t => {
+      if (t.id === taskToMove.id) return { ...t, task_order: taskBelow.task_order };
+      if (t.id === taskBelow.id) return { ...t, task_order: taskToMove.task_order };
+      return t;
+    }));
   };
 
   const getCategoryInfo = (cat: string) => {
     const found = routineCategories.find(c => c.slug === cat);
     return found ? { value: found.slug, label: found.name, icon: found.icon || '📋' } : { value: cat, label: cat, icon: '📋' };
   };
+
+  const totalTaskCount = localTasks.length;
 
   const filteredRoutines = selectedCategory === 'all' 
     ? routines 
@@ -465,6 +639,21 @@ export default function RoutinesBank() {
   const filteredTaskBank = taskBank.filter(t => 
     t.title.toLowerCase().includes(taskSearch.toLowerCase())
   );
+
+  // Get tasks for a specific section
+  const getTasksForSection = (sectionId: string | null) => {
+    return localTasks
+      .filter(t => t.section_id === sectionId)
+      .sort((a, b) => a.task_order - b.task_order);
+  };
+
+  const uncategorizedTasks = getTasksForSection(null);
+
+  const getSectionTaskCount = (sectionId: string) => {
+    return localTasks.filter(t => t.section_id === sectionId).length;
+  };
+
+  const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const renderTaskScheduleConfig = (task: LocalTask) => {
     if (formData.schedule_type === 'challenge') {
@@ -496,7 +685,7 @@ export default function RoutinesBank() {
             Rituals Bank
           </CardTitle>
           <CardDescription>
-            Create and manage ritual templates
+            Create and manage ritual templates with rich sections
           </CardDescription>
         </div>
         <Button onClick={openNewDialog} className="gap-2">
@@ -534,7 +723,7 @@ export default function RoutinesBank() {
           <div className="space-y-2">
             {filteredRoutines.map((routine) => {
               const catInfo = getCategoryInfo(routine.category);
-              const stats = taskCounts[routine.id] || { count: 0 };
+              const stats = taskCounts[routine.id] || { count: 0, duration: 0 };
               return (
                 <div
                   key={routine.id}
@@ -568,34 +757,58 @@ export default function RoutinesBank() {
                     </div>
                   </div>
                   <button
-                    onClick={(e) => { e.stopPropagation(); toggleWelcomePopup.mutate({ id: routine.id, is_welcome_popup: !routine.is_welcome_popup }); }}
-                    className={cn("p-2 transition-all", routine.is_welcome_popup ? "text-violet-500" : "text-muted-foreground opacity-0 group-hover:opacity-100")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleWelcomePopup.mutate({ id: routine.id, is_welcome_popup: !routine.is_welcome_popup });
+                    }}
+                    className={cn(
+                      "p-2 transition-all",
+                      routine.is_welcome_popup ? "text-violet-500" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                    )}
                     title={routine.is_welcome_popup ? "Remove as welcome popup" : "Set as welcome popup"}
                   >
                     <Gift className={cn("h-4 w-4", routine.is_welcome_popup && "fill-violet-500")} />
                   </button>
                   <button
-                    onClick={(e) => { e.stopPropagation(); togglePopular.mutate({ id: routine.id, is_popular: !routine.is_popular }); }}
-                    className={cn("p-2 transition-all", routine.is_popular ? "text-amber-500" : "text-muted-foreground opacity-0 group-hover:opacity-100")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      togglePopular.mutate({ id: routine.id, is_popular: !routine.is_popular });
+                    }}
+                    className={cn(
+                      "p-2 transition-all",
+                      routine.is_popular ? "text-amber-500" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                    )}
                     title={routine.is_popular ? "Remove from popular" : "Mark as popular"}
                   >
                     <Star className={cn("h-4 w-4", routine.is_popular && "fill-amber-500")} />
                   </button>
                   <button
-                    onClick={(e) => { e.stopPropagation(); toggleActive.mutate({ id: routine.id, is_active: !routine.is_active }); }}
-                    className={cn("p-2 transition-all", !routine.is_active ? "text-muted-foreground" : "text-muted-foreground opacity-0 group-hover:opacity-100")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleActive.mutate({ id: routine.id, is_active: !routine.is_active });
+                    }}
+                    className={cn(
+                      "p-2 transition-all",
+                      !routine.is_active ? "text-muted-foreground" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                    )}
                     title={routine.is_active ? "Deactivate" : "Activate"}
                   >
                     {routine.is_active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </button>
                   <button
-                    onClick={(e) => { e.stopPropagation(); openEditDialog(routine); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEditDialog(routine);
+                    }}
                     className="p-2 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={(e) => { e.stopPropagation(); handleDelete(routine.id); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(routine.id);
+                    }}
                     className="p-2 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -613,20 +826,23 @@ export default function RoutinesBank() {
           <DialogHeader>
             <DialogTitle>{editingRoutine ? 'Edit Ritual' : 'New Ritual'}</DialogTitle>
             <DialogDescription>
-              {editingRoutine ? 'Update ritual details and actions' : 'Create a new ritual template'}
+              {editingRoutine ? 'Update ritual details and sections' : 'Create a new ritual template'}
             </DialogDescription>
           </DialogHeader>
           
-          <Tabs defaultValue="details" className="flex-1 flex flex-col min-h-0">
-            <TabsList className="w-full grid grid-cols-2 shrink-0">
-              <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="content">Content & Actions</TabsTrigger>
+          <Tabs value={dialogTab} onValueChange={(v) => setDialogTab(v as 'basic' | 'sections')} className="flex-1 flex flex-col min-h-0">
+            <TabsList className="w-fit">
+              <TabsTrigger value="basic">Basic Info</TabsTrigger>
+              <TabsTrigger value="sections">
+                Sections & Tasks
+                {localSections.length > 0 && (
+                  <span className="ml-1 text-xs bg-muted px-1.5 rounded">{localSections.length}</span>
+                )}
+              </TabsTrigger>
             </TabsList>
 
-            {/* Tab 1: Details */}
-            <TabsContent value="details" className="flex-1 min-h-0 mt-2">
-              <ScrollArea className="h-full pr-4" style={{ maxHeight: 'calc(85vh - 260px)' }}>
-                <div className="space-y-4 py-2">
+            <TabsContent value="basic" className="flex-1 min-h-0 overflow-auto mt-0" style={{ maxHeight: 'calc(85vh - 240px)' }}>
+              <div className="space-y-4 py-2 pr-4">
                   {/* Title */}
                   <div className="space-y-2">
                     <Label htmlFor="title">Title *</Label>
@@ -727,6 +943,29 @@ export default function RoutinesBank() {
                       onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
                       placeholder="https://youtube.com/watch?v=... or https://example.com/video.mp4"
                     />
+                    {formData.video_url && (
+                      <p className="text-xs text-muted-foreground">Video will appear below the cover image on the ritual page.</p>
+                    )}
+                  </div>
+
+                  {/* Description */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="description">Description</Label>
+                      <AITextGenerator
+                        context={`${formData.title} - ${formData.subtitle}`}
+                        fieldType="description"
+                        onGenerate={(text) => setFormData({ ...formData, description: text })}
+                        disabled={!formData.title.trim()}
+                      />
+                    </div>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      placeholder="Optional description..."
+                      className="min-h-[100px]"
+                    />
                   </div>
 
                   {/* Schedule Type */}
@@ -781,15 +1020,21 @@ export default function RoutinesBank() {
                         ))}
                       </div>
 
+                      {/* Date picker */}
                       {formData.start_mode === 'date' && (
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
-                              className={cn("w-full justify-start text-left font-normal", !formData.challenge_start_date && "text-muted-foreground")}
+                              className={cn(
+                                "w-full justify-start text-left font-normal",
+                                !formData.challenge_start_date && "text-muted-foreground"
+                              )}
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
-                              {formData.challenge_start_date ? format(formData.challenge_start_date, 'PPP') : <span>Pick a start date</span>}
+                              {formData.challenge_start_date
+                                ? format(formData.challenge_start_date, 'PPP')
+                                : <span>Pick a start date</span>}
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-auto p-0" align="start">
@@ -803,6 +1048,7 @@ export default function RoutinesBank() {
                         </Popover>
                       )}
 
+                      {/* Weekday picker */}
                       {formData.start_mode === 'weekday' && (
                         <div className="flex gap-1.5 justify-center">
                           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
@@ -851,15 +1097,21 @@ export default function RoutinesBank() {
                       ))}
                     </div>
 
+                    {/* End date picker */}
                     {formData.end_mode === 'date' && (
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
                             variant="outline"
-                            className={cn("w-full justify-start text-left font-normal", !formData.end_date && "text-muted-foreground")}
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !formData.end_date && "text-muted-foreground"
+                            )}
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {formData.end_date ? format(formData.end_date, 'PPP') : <span>Pick an end date</span>}
+                            {formData.end_date
+                              ? format(formData.end_date, 'PPP')
+                              : <span>Pick an end date</span>}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
@@ -873,6 +1125,7 @@ export default function RoutinesBank() {
                       </Popover>
                     )}
 
+                    {/* After X days input */}
                     {formData.end_mode === 'after_days' && (
                       <div className="flex items-center gap-2">
                         <Input
@@ -887,131 +1140,337 @@ export default function RoutinesBank() {
                       </div>
                     )}
                   </div>
+
+                  {/* Summary stats */}
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground border-t pt-4">
+                    <span className="flex items-center gap-1">
+                      <FileText className="h-4 w-4" />
+                      {localSections.length} section{localSections.length !== 1 ? 's' : ''}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Layers className="h-4 w-4" />
+                      {localTasks.length} action{localTasks.length !== 1 ? 's' : ''}
+                    </span>
+                  </div>
                 </div>
-              </ScrollArea>
             </TabsContent>
 
-            {/* Tab 2: Content & Actions */}
-            <TabsContent value="content" className="flex-1 min-h-0 mt-2">
-              <ScrollArea className="h-full pr-4" style={{ maxHeight: 'calc(85vh - 260px)' }}>
-                <div className="space-y-4 py-2">
-                  {/* Description - Rich Text Editor */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label>Description</Label>
-                      <AITextGenerator
-                        context={`${formData.title} - ${formData.subtitle}`}
-                        fieldType="description"
-                        onGenerate={(text) => setFormData({ ...formData, description: text })}
-                        disabled={!formData.title.trim()}
-                      />
-                    </div>
-                    <RichTextEditor
-                      value={formData.description}
-                      onChange={(value) => setFormData({ ...formData, description: value })}
-                      placeholder="Write your ritual description... Add images, formatting, and rich content like a blog post."
-                    />
-                  </div>
-
-                  {/* Actions (flat task list) */}
-                  <div className="space-y-2 border-t pt-4">
-                    <div className="flex items-center justify-between">
-                      <Label className="flex items-center gap-1">
-                        <Layers className="h-4 w-4" />
-                        Actions ({localTasks.length})
-                      </Label>
-                    </div>
-
-                    <div className="space-y-1">
-                      {localTasks.map((task, idx) => (
-                        <div key={task.id} className="rounded bg-background border">
-                          <div className="flex items-center gap-2 p-2">
-                            <div className="flex flex-col">
-                              <button
-                                type="button"
-                                onClick={() => moveTaskUp(idx)}
-                                disabled={idx === 0}
-                                className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                              >
-                                <ChevronUp className="h-3 w-3" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => moveTaskDown(idx)}
-                                disabled={idx === localTasks.length - 1}
-                                className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                              >
-                                <ChevronDown className="h-3 w-3" />
-                              </button>
-                            </div>
-                            <TaskIcon iconName={task.emoji} size={16} />
-                            <span className="flex-1 text-sm truncate">{task.title}</span>
-                            {renderTaskScheduleConfig(task)}
+            <TabsContent value="sections" className="flex-1 min-h-0 overflow-auto mt-0" style={{ maxHeight: 'calc(85vh - 240px)' }}>
+              <div className="space-y-4 py-2 pr-4">
+                {/* Sections */}
+                {localSections.map((section, sIdx) => {
+                    const sectionTasks = getTasksForSection(section.id);
+                    const sectionTaskCount = getSectionTaskCount(section.id);
+                    return (
+                      <div key={section.id} className="border rounded-lg overflow-hidden">
+                        {/* Section Header */}
+                        <div className="flex items-center gap-2 p-3 bg-muted/50 border-b">
+                          <div className="flex flex-col">
                             <button
                               type="button"
-                              onClick={() => removeTask(task.id)}
-                              className="p-1 text-destructive hover:bg-destructive/10 rounded"
+                              onClick={() => moveSectionUp(sIdx)}
+                              disabled={sIdx === 0}
+                              className="text-muted-foreground hover:text-foreground disabled:opacity-30"
                             >
-                              <X className="h-3 w-3" />
+                              <ChevronUp className="h-3 w-3" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveSectionDown(sIdx)}
+                              disabled={sIdx === localSections.length - 1}
+                              className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                            >
+                              <ChevronDown className="h-3 w-3" />
                             </button>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Add task picker */}
-                    {taskSearchOpen ? (
-                      <div className="border rounded p-2 space-y-2 bg-muted/30">
-                        <div className="relative">
-                          <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            placeholder="Search actions..."
-                            value={taskSearch}
-                            onChange={(e) => setTaskSearch(e.target.value)}
-                            className="pl-8 h-8 text-sm"
-                            autoFocus
-                          />
-                        </div>
-                        <ScrollArea className="h-32">
-                          <div className="space-y-1">
-                            {filteredTaskBank.map((task) => (
-                              <button
-                                key={task.id}
-                                type="button"
-                                onClick={() => addTask(task)}
-                                className="w-full flex items-center gap-2 p-1.5 rounded hover:bg-accent text-left text-xs"
-                              >
-                                <TaskIcon iconName={task.emoji} size={14} />
-                                <span className="flex-1 truncate">{task.title}</span>
-                              </button>
-                            ))}
+                          <div className="flex-1">
+                            <h4 className="font-medium text-sm">{section.title}</h4>
+                            {section.content && (
+                              <p className="text-xs text-muted-foreground line-clamp-1">{section.content}</p>
+                            )}
                           </div>
-                        </ScrollArea>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => { setTaskSearchOpen(false); setTaskSearch(''); }}
-                          className="w-full h-7"
-                        >
-                          Cancel
-                        </Button>
+                          <span className="text-xs text-muted-foreground">
+                            {sectionTasks.length} task{sectionTasks.length !== 1 ? 's' : ''}
+                          </span>
+                          {section.image_url && (
+                            <Image className="h-4 w-4 text-muted-foreground" />
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => openSectionEditor(section)}
+                            className="p-1 hover:bg-accent rounded"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => deleteSection(section.id)}
+                            className="p-1 hover:bg-destructive/10 rounded text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+
+                        {/* Section Tasks */}
+                        <div className="p-2 space-y-1">
+                          {sectionTasks.length === 0 ? (
+                            <p className="text-center text-muted-foreground text-xs py-2">No tasks in this section</p>
+                          ) : (
+                            sectionTasks.map((task, tIdx) => (
+                              <div key={task.id} className="rounded bg-background border">
+                                <div className="flex items-center gap-2 p-2">
+                                  <div className="flex flex-col">
+                                    <button
+                                      type="button"
+                                      onClick={() => moveTaskUp(task.id, section.id)}
+                                      disabled={tIdx === 0}
+                                      className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                                    >
+                                      <ChevronUp className="h-3 w-3" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => moveTaskDown(task.id, section.id)}
+                                      disabled={tIdx === sectionTasks.length - 1}
+                                      className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                                    >
+                                      <ChevronDown className="h-3 w-3" />
+                                    </button>
+                                  </div>
+                                  <TaskIcon iconName={task.emoji} size={16} />
+                                  <span className="flex-1 text-sm truncate">{task.title}</span>
+                                  {renderTaskScheduleConfig(task)}
+                                  {/* Move to section dropdown */}
+                                  <Select
+                                    value=""
+                                    onValueChange={(targetSectionId) => {
+                                      const newSectionId = targetSectionId === '_uncategorized' ? null : targetSectionId;
+                                      setLocalTasks(localTasks.map(t =>
+                                        t.id === task.id ? { ...t, section_id: newSectionId } : t
+                                      ));
+                                    }}
+                                  >
+                                    <SelectTrigger className="w-[100px] h-7 text-xs">
+                                      <span className="text-muted-foreground">Move to...</span>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="_uncategorized" className="text-xs">
+                                        Uncategorized
+                                      </SelectItem>
+                                      {localSections.filter(s => s.id !== section.id).map((s) => (
+                                        <SelectItem key={s.id} value={s.id} className="text-xs">
+                                          {s.title}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <button
+                                    type="button"
+                                    onClick={() => removeTask(task.id)}
+                                    className="p-1 text-destructive hover:bg-destructive/10 rounded"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                          
+                          {/* Add task to section */}
+                          {addingTaskToSection === section.id ? (
+                            <div className="border rounded p-2 space-y-2 bg-muted/30">
+                              <div className="relative">
+                                <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                  placeholder="Search actions..."
+                                  value={taskSearch}
+                                  onChange={(e) => setTaskSearch(e.target.value)}
+                                  className="pl-8 h-8 text-sm"
+                                  autoFocus
+                                />
+                              </div>
+                              <ScrollArea className="h-32">
+                                <div className="space-y-1">
+                                  {filteredTaskBank.map((task) => (
+                                    <button
+                                      key={task.id}
+                                      type="button"
+                                      onClick={() => addTaskToSection(task, section.id)}
+                                    className="w-full flex items-center gap-2 p-1.5 rounded hover:bg-accent text-left text-xs"
+                                    >
+                                      <TaskIcon iconName={task.emoji} size={14} />
+                                      <span className="flex-1 truncate">{task.title}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </ScrollArea>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setAddingTaskToSection(null);
+                                  setTaskSearch('');
+                                }}
+                                className="w-full h-7"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setAddingTaskToSection(section.id)}
+                              className="w-full h-7 text-xs gap-1"
+                            >
+                              <Plus className="h-3 w-3" />
+                              Add Task
+                            </Button>
+                          )}
+                        </div>
                       </div>
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setTaskSearchOpen(true)}
-                        className="w-full gap-1"
-                      >
-                        <Plus className="h-3 w-3" />
-                        Add Action
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </ScrollArea>
+                    );
+                  })}
+
+                  {/* Add Section Button */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addSection}
+                    className="w-full gap-2"
+                  >
+                    <FolderPlus className="h-4 w-4" />
+                    Add Section
+                  </Button>
+
+                  {/* Uncategorized Tasks */}
+                  {(uncategorizedTasks.length > 0 || localSections.length === 0) && (
+                    <div className="border rounded-lg overflow-hidden border-dashed">
+                      <div className="flex items-center gap-2 p-3 bg-muted/30 border-b border-dashed">
+                        <h4 className="font-medium text-sm text-muted-foreground flex-1">
+                          {localSections.length === 0 ? 'Tasks' : 'Uncategorized Tasks'}
+                        </h4>
+                        <span className="text-xs text-muted-foreground">
+                          {uncategorizedTasks.length} task{uncategorizedTasks.length !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      <div className="p-2 space-y-1">
+                        {uncategorizedTasks.map((task, tIdx) => (
+                          <div key={task.id} className="rounded bg-background border">
+                            <div className="flex items-center gap-2 p-2">
+                              <div className="flex flex-col">
+                                <button
+                                  type="button"
+                                  onClick={() => moveTaskUp(task.id, null)}
+                                  disabled={tIdx === 0}
+                                  className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                                >
+                                  <ChevronUp className="h-3 w-3" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => moveTaskDown(task.id, null)}
+                                  disabled={tIdx === uncategorizedTasks.length - 1}
+                                  className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                                >
+                                  <ChevronDown className="h-3 w-3" />
+                                </button>
+                              </div>
+                              <TaskIcon iconName={task.emoji} size={16} />
+                              <span className="flex-1 text-sm truncate">{task.title}</span>
+                              {renderTaskScheduleConfig(task)}
+                              {/* Move to section dropdown */}
+                              {localSections.length > 0 && (
+                                <Select
+                                  value=""
+                                  onValueChange={(sectionId) => {
+                                    setLocalTasks(localTasks.map(t =>
+                                      t.id === task.id ? { ...t, section_id: sectionId } : t
+                                    ));
+                                  }}
+                                >
+                                  <SelectTrigger className="w-[100px] h-7 text-xs">
+                                    <span className="text-muted-foreground">Move to...</span>
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {localSections.map((s) => (
+                                      <SelectItem key={s.id} value={s.id} className="text-xs">
+                                        {s.title}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => removeTask(task.id)}
+                                className="p-1 text-destructive hover:bg-destructive/10 rounded"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                        
+                        {/* Add uncategorized task */}
+                        {addingTaskToSection === 'uncategorized' ? (
+                          <div className="border rounded p-2 space-y-2 bg-muted/30">
+                            <div className="relative">
+                              <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                placeholder="Search actions..."
+                                value={taskSearch}
+                                onChange={(e) => setTaskSearch(e.target.value)}
+                                className="pl-8 h-8 text-sm"
+                                autoFocus
+                              />
+                            </div>
+                            <ScrollArea className="h-32">
+                              <div className="space-y-1">
+                                {filteredTaskBank.map((task) => (
+                                  <button
+                                    key={task.id}
+                                    type="button"
+                                    onClick={() => addTaskToSection(task, null)}
+                                    className="w-full flex items-center gap-2 p-1.5 rounded hover:bg-accent text-left text-xs"
+                                  >
+                                    <TaskIcon iconName={task.emoji} size={14} />
+                                    <span className="flex-1 truncate">{task.title}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </ScrollArea>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setAddingTaskToSection(null);
+                                setTaskSearch('');
+                              }}
+                              className="w-full h-7"
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setAddingTaskToSection('uncategorized')}
+                            className="w-full h-7 text-xs gap-1"
+                          >
+                            <Plus className="h-3 w-3" />
+                            Add Action
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                )}
+              </div>
             </TabsContent>
           </Tabs>
 
@@ -1020,6 +1479,63 @@ export default function RoutinesBank() {
             <Button onClick={handleSave} disabled={createRoutine.isPending || updateRoutine.isPending}>
               {editingRoutine ? 'Save Changes' : 'Create Ritual'}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Section Editor Dialog */}
+      <Dialog open={sectionDialogOpen} onOpenChange={setSectionDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{editingSection?.isNew ? 'New Section' : 'Edit Section'}</DialogTitle>
+            <DialogDescription>
+              Add descriptive content to introduce this part of the ritual
+            </DialogDescription>
+          </DialogHeader>
+          
+          {editingSection && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="section-title">Title *</Label>
+                <Input
+                  id="section-title"
+                  value={editingSection.title}
+                  onChange={(e) => setEditingSection({ ...editingSection, title: e.target.value })}
+                  placeholder="e.g., Get Moving"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="section-content">Content</Label>
+                  <AITextGenerator
+                    context={`Section "${editingSection.title}" in routine "${formData.title}"`}
+                    fieldType="section_content"
+                    onGenerate={(text) => setEditingSection({ ...editingSection, content: text })}
+                    disabled={!editingSection.title.trim()}
+                  />
+                </div>
+                <Textarea
+                  id="section-content"
+                  value={editingSection.content}
+                  onChange={(e) => setEditingSection({ ...editingSection, content: e.target.value })}
+                  placeholder="Describe what this section is about and why it's important..."
+                  className="min-h-[120px]"
+                />
+              </div>
+
+              <ImageUploader
+                label="Section Image (optional)"
+                value={editingSection.image_url}
+                onChange={(url) => setEditingSection({ ...editingSection, image_url: url })}
+                folder="routine-sections"
+              />
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSectionDialogOpen(false)}>Cancel</Button>
+            <Button onClick={saveSectionEdit}>Save Section</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

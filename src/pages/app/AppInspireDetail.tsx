@@ -1,8 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
-import { format } from 'date-fns';
-import DOMPurify from 'dompurify';
+import { format, addDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
@@ -28,19 +27,26 @@ const colorGradients: Record<string, string> = {
   mint: 'from-teal-300 to-teal-500',
 };
 
+// Helper to check if string is emoji
 const isEmoji = (str: string) => 
   /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]/u.test(str);
 
+// Convert a video URL to an embeddable format
 const getEmbedUrl = (url: string): { type: 'embed' | 'mp4'; src: string } | null => {
   if (!url) return null;
+  // YouTube
   const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/);
   if (ytMatch) return { type: 'embed', src: `https://www.youtube.com/embed/${ytMatch[1]}` };
+  // Vimeo
   const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
   if (vimeoMatch) return { type: 'embed', src: `https://player.vimeo.com/video/${vimeoMatch[1]}` };
+  // Direct MP4
   if (url.match(/\.(mp4|webm|mov)(\?|$)/i)) return { type: 'mp4', src: url };
+  // Fallback: try as embed
   return { type: 'embed', src: url };
 };
 
+// Convert RoutineBankTask to RoutinePlanTask format for preview sheet
 function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask & { schedule_days?: number[] | null; drip_day?: number | null; repeat_pattern?: string | null; repeat_days?: number[] | null } {
   return {
     id: task.id,
@@ -54,11 +60,13 @@ function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask & { sc
     linked_playlist_id: task.linked_playlist_id || null,
     pro_link_type: task.pro_link_type as RoutinePlanTask['pro_link_type'] || null,
     pro_link_value: task.pro_link_value || null,
+    // Include goal fields
     goal_enabled: task.goal_enabled ?? false,
     goal_target: task.goal_target ?? null,
     goal_type: task.goal_type ?? null,
     goal_unit: task.goal_unit ?? null,
     linked_playlist: null,
+    // Pass through schedule fields and per-task repeat settings
     schedule_days: task.schedule_days,
     drip_day: task.drip_day,
     repeat_pattern: task.repeat_pattern || 'daily',
@@ -76,9 +84,11 @@ export default function AppInspireDetail() {
   const { data: addedRoutineIds = [] } = useUserAddedBankRoutines();
   const addRoutineFromBank = useAddRoutineFromBank();
   
+  // Check if routine was already added
   const isAlreadyAdded = planId ? addedRoutineIds.includes(planId) : false;
   const isAdded = isAlreadyAdded || justAdded;
 
+  // Compute effective start date label + details
   const startInfo = useMemo(() => {
     if (!routine) return { label: 'Starts today', emoji: '🚀', isFuture: false };
     const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -91,7 +101,11 @@ export default function AppInspireDetail() {
       today.setHours(0, 0, 0, 0);
       if (d <= today) return { label: 'Ready to start today!', emoji: '🚀', isFuture: false };
       const diffDays = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-      return { label: `Starts ${format(d, 'MMM d')} · in ${diffDays} day${diffDays !== 1 ? 's' : ''}`, emoji: '📅', isFuture: true };
+      return { 
+        label: `Starts ${format(d, 'MMM d')} · in ${diffDays} day${diffDays !== 1 ? 's' : ''}`, 
+        emoji: '📅', 
+        isFuture: true 
+      };
     }
     if (startDow != null) {
       return { label: `Starts next ${WEEKDAY_NAMES[startDow]}`, emoji: '📅', isFuture: true };
@@ -99,6 +113,7 @@ export default function AppInspireDetail() {
     return { label: 'Ready to start today!', emoji: '🚀', isFuture: false };
   }, [routine]);
 
+  // Compute end date info
   const endInfo = useMemo(() => {
     if (!routine) return null;
     const endMode = (routine as any).end_mode as string | null;
@@ -125,6 +140,7 @@ export default function AppInspireDetail() {
 
   const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
     if (!planId) return;
+    
     try {
       await addRoutineFromBank.mutateAsync({ 
         routineId: planId, 
@@ -165,19 +181,23 @@ export default function AppInspireDetail() {
   const color = routine.color || 'purple';
   const gradient = colorGradients[color] || colorGradients.purple;
   const routineIcon = routine.emoji && isEmoji(routine.emoji) ? routine.emoji : '✨';
+
+  // Convert tasks for preview sheet
   const previewTasks = routine.tasks?.map(convertToRoutinePlanTask) || [];
 
-  // Sanitize description HTML
-  const sanitizedDescription = routine.description 
-    ? DOMPurify.sanitize(routine.description, { ADD_TAGS: ['img'], ADD_ATTR: ['src', 'alt', 'style'] })
-    : '';
-
-  // Check if description has actual content (not just empty tags)
-  const hasDescription = sanitizedDescription && sanitizedDescription.replace(/<[^>]*>/g, '').trim().length > 0;
+  // Group tasks by section
+  const tasksBySection: Record<string, RoutineBankTask[]> = {};
+  routine.tasks?.forEach(task => {
+    const sectionId = task.section_id || 'unsorted';
+    if (!tasksBySection[sectionId]) {
+      tasksBySection[sectionId] = [];
+    }
+    tasksBySection[sectionId].push(task);
+  });
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
-      {/* Fixed Header */}
+      {/* Fixed Header - Back button only */}
       <header 
         className="fixed top-0 left-0 right-0 z-50 flex items-center px-4"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
@@ -190,7 +210,7 @@ export default function AppInspireDetail() {
         className="flex-1 overflow-y-auto overscroll-contain"
         style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
       >
-        {/* Hero Image */}
+        {/* Hero Image - Square with title overlay */}
         <div 
           className="relative w-full"
           style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
@@ -200,12 +220,17 @@ export default function AppInspireDetail() {
             gradient
           )}>
             {routine.cover_image_url ? (
-              <img src={routine.cover_image_url} alt={routine.title} className="w-full h-full object-cover" />
+              <img
+                src={routine.cover_image_url}
+                alt={routine.title}
+                className="w-full h-full object-cover"
+              />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="text-8xl opacity-30">{routineIcon}</span>
               </div>
             )}
+            {/* Title overlay at bottom */}
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent pt-16 pb-4 px-4">
               <h1 className="text-2xl font-bold text-white leading-tight drop-shadow-lg">
                 {routine.title}
@@ -221,10 +246,22 @@ export default function AppInspireDetail() {
           return (
             <div className="px-4 pt-4">
               {video.type === 'mp4' ? (
-                <video src={video.src} controls playsInline className="w-full rounded-xl" style={{ maxHeight: '240px' }} />
+                <video
+                  src={video.src}
+                  controls
+                  playsInline
+                  className="w-full rounded-xl"
+                  style={{ maxHeight: '240px' }}
+                />
               ) : (
                 <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
-                  <iframe src={video.src} className="absolute inset-0 w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title="Ritual video" />
+                  <iframe
+                    src={video.src}
+                    className="absolute inset-0 w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title="Ritual video"
+                  />
                 </div>
               )}
             </div>
@@ -261,7 +298,9 @@ export default function AppInspireDetail() {
               <span className="text-lg">{startInfo.emoji}</span>
               <span className={cn(
                 'text-sm font-medium',
-                startInfo.isFuture ? 'text-amber-800 dark:text-amber-300' : 'text-emerald-800 dark:text-emerald-300'
+                startInfo.isFuture 
+                  ? 'text-amber-800 dark:text-amber-300'
+                  : 'text-emerald-800 dark:text-emerald-300'
               )}>
                 {startInfo.label}
               </span>
@@ -278,20 +317,122 @@ export default function AppInspireDetail() {
             )}
           </div>
 
-          {/* Rich Description (blog-style HTML) */}
-          {hasDescription && (
+          {/* Description */}
+          {routine.description && (
             <div className="mt-5">
-              <div 
-                className="prose prose-sm dark:prose-invert max-w-none text-foreground
-                  prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground
-                  prose-img:rounded-xl prose-img:w-full prose-a:text-primary"
-                dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
-              />
+              <p className="text-foreground leading-relaxed">{routine.description}</p>
             </div>
           )}
 
-          {/* Flat Actions List */}
-          {routine.tasks && routine.tasks.length > 0 && (
+          {/* Tasks by Section */}
+          {routine.sections && routine.sections.length > 0 ? (
+            <div className="mt-6 space-y-6">
+              {routine.sections.map((section) => {
+                const sectionTasks = tasksBySection[section.id] || [];
+                return (
+                  <div key={section.id}>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
+                      {section.title}
+                    </h3>
+                    {section.content && (
+                      <p className="text-sm text-foreground mb-3">{section.content}</p>
+                    )}
+                    {section.image_url && (
+                      <img
+                        src={section.image_url}
+                        alt={section.title}
+                        className="w-full h-40 object-cover rounded-xl mb-3"
+                      />
+                    )}
+                    {sectionTasks.length > 0 && (
+                      <div className="space-y-3">
+                        {sectionTasks.map((task) => {
+                          const bgColor = TASK_COLORS[(task.color as TaskColor) || 'mint'] || TASK_COLORS.mint;
+                          const repeatLabel = task.repeat_pattern && task.repeat_pattern !== 'none' 
+                            ? task.repeat_pattern === 'daily' ? 'Daily' 
+                              : task.repeat_pattern === 'weekly' ? 'Weekly' 
+                              : task.repeat_pattern === 'monthly' ? 'Monthly'
+                              : task.repeat_pattern === 'weekend' ? 'Weekends' : ''
+                            : 'Once';
+                          return (
+                            <div
+                              key={task.id}
+                              className="rounded-xl border border-border/50 overflow-hidden"
+                              style={{ backgroundColor: bgColor }}
+                            >
+                              <div className="flex items-center gap-3 p-3">
+                                <span className="text-2xl shrink-0">
+                                  {task.emoji && isEmoji(task.emoji) ? task.emoji : '📝'}
+                                </span>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-black truncate">{task.title}</p>
+                                  <p className="text-xs text-black/70 truncate">
+                                    {task.category || 'General'}
+                                    <span className="ml-1">• {repeatLabel}</span>
+                                  </p>
+                                </div>
+                              </div>
+                              {task.description && (
+                                <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
+                                  <p className="text-xs text-black/80 leading-relaxed">
+                                    {task.description}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              {/* Unsectioned tasks */}
+              {(tasksBySection['unsorted']?.length ?? 0) > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">Actions</h3>
+                  <div className="space-y-3">
+                    {tasksBySection['unsorted'].map((task) => {
+                      const bgColor = TASK_COLORS[(task.color as TaskColor) || 'mint'] || TASK_COLORS.mint;
+                      const repeatLabel = task.repeat_pattern && task.repeat_pattern !== 'none' 
+                        ? task.repeat_pattern === 'daily' ? 'Daily' 
+                          : task.repeat_pattern === 'weekly' ? 'Weekly' 
+                          : task.repeat_pattern === 'monthly' ? 'Monthly'
+                          : task.repeat_pattern === 'weekend' ? 'Weekends' : ''
+                        : 'Once';
+                      return (
+                        <div
+                          key={task.id}
+                          className="rounded-xl border border-border/50 overflow-hidden"
+                          style={{ backgroundColor: bgColor }}
+                        >
+                          <div className="flex items-center gap-3 p-3">
+                            <span className="text-2xl shrink-0">
+                              {task.emoji && isEmoji(task.emoji) ? task.emoji : '📝'}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-black truncate">{task.title}</p>
+                              <p className="text-xs text-black/70 truncate">
+                                {task.category || 'General'}
+                                <span className="ml-1">• {repeatLabel}</span>
+                              </p>
+                            </div>
+                          </div>
+                          {task.description && (
+                            <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
+                              <p className="text-xs text-black/80 leading-relaxed">
+                                {task.description}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : routine.tasks && routine.tasks.length > 0 ? (
             <div className="mt-6">
               <h2 className="text-lg font-semibold text-foreground mb-3">What's Included</h2>
               <div className="space-y-3">
@@ -333,7 +474,7 @@ export default function AppInspireDetail() {
                 })}
               </div>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
 

@@ -119,6 +119,9 @@ serve(async (req) => {
       "add_tasks_to_ritual",
       "delete_ritual_task",
       "generate_ritual_cover",
+      "add_sections_to_ritual",
+      "update_ritual_section",
+      "delete_ritual_section",
     ];
 
     const allTools = getToolDefinitions(currentPage);
@@ -323,6 +326,12 @@ async function executeToolAction(supabase: any, fnName: string, args: any): Prom
         return await deleteRitualTask(supabase, args);
       case "generate_ritual_cover":
         return await generateRitualCover(supabase, args);
+      case "add_sections_to_ritual":
+        return await addSectionsToRitual(supabase, args);
+      case "update_ritual_section":
+        return await updateRitualSection(supabase, args);
+      case "delete_ritual_section":
+        return await deleteRitualSection(supabase, args);
       default:
         return { success: false, error: `Unknown tool: ${fnName}` };
     }
@@ -1091,13 +1100,15 @@ async function fetchContext(supabase: any, currentPage?: string) {
       { data: breathingExercises },
       { data: actionSubtasks },
       { data: ritualTasks },
+      { data: ritualSections },
     ] = await Promise.all([
       supabase.from("routine_categories").select("id, name, slug, icon").eq("is_active", true).order("display_order"),
       supabase.from("admin_task_bank").select("id, title, emoji, category, color, description, time_period").eq("is_active", true).order("sort_order").limit(20),
       supabase.from("routines_bank").select("id, title, emoji, category, color, description").eq("is_active", true).order("sort_order").limit(50),
       supabase.from("breathing_exercises").select("id, name, emoji, category, description").eq("is_active", true).order("sort_order").limit(10),
       supabase.from("admin_task_bank_subtasks").select("id, task_id, title, order_index").order("order_index").limit(200),
-      supabase.from("routines_bank_tasks").select("id, routine_id, title, emoji, duration_minutes, task_order").order("task_order").limit(200),
+      supabase.from("routines_bank_tasks").select("id, routine_id, title, emoji, duration_minutes, task_order, section_id, section_title").order("task_order").limit(200),
+      supabase.from("routines_bank_sections").select("id, routine_id, title, content, section_order, image_url").order("section_order").limit(200),
     ]);
 
     context.categories = categories || [];
@@ -1106,6 +1117,7 @@ async function fetchContext(supabase: any, currentPage?: string) {
     context.breathingExercises = breathingExercises || [];
     context.actionSubtasks = actionSubtasks || [];
     context.ritualTasks = ritualTasks || [];
+    context.ritualSections = ritualSections || [];
   }
 
   if (currentPage === "routines") {
@@ -1173,9 +1185,11 @@ ${context.existingActions?.slice(0, 20).map((a: any) => {
 
 ### Existing Rituals (${context.existingRituals?.length || 0} active)
 ${context.existingRituals?.map((r: any) => {
+  const sections = (context.ritualSections || []).filter((s: any) => s.routine_id === r.id);
   const tasks = (context.ritualTasks || []).filter((t: any) => t.routine_id === r.id);
-  const taskText = tasks.length ? `\n    Tasks: ${tasks.map((t: any) => `"${t.emoji || '✅'} ${t.title}" (ID:${t.id})`).join(', ')}` : '';
-  return `- ID: "${r.id}" | ${r.emoji || "🌟"} ${r.title} [${r.category}] color:${r.color || 'none'}${r.description ? `\n    Description: "${r.description.substring(0, 120)}..."` : ''}${taskText}`;
+  const sectionText = sections.length ? `\n    Sections: ${sections.map((s: any) => `"${s.title}" (ID:${s.id}${s.content ? `, content: "${s.content.substring(0, 80)}..."` : ''})`).join(', ')}` : '';
+  const taskText = tasks.length ? `\n    Tasks: ${tasks.map((t: any) => `"${t.emoji || '✅'} ${t.title}" (ID:${t.id}${t.section_id ? `, section:${t.section_id}` : ''})`).join(', ')}` : '';
+  return `- ID: "${r.id}" | ${r.emoji || "🌟"} ${r.title} [${r.category}] color:${r.color || 'none'}${sectionText}${taskText}`;
 }).join("\n") || "None"}
 
 ### Existing Breathing Exercises (${context.breathingExercises?.length || 0} active)
@@ -1192,27 +1206,32 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 - "Add subtasks to action X" → add_subtasks_to_action
 - "Remove subtask Y" → delete_subtask
 - **"Delete action X"** → delete_action_from_bank (deletes the action and its subtasks)
-- **"Delete ritual X"** → delete_ritual_from_bank (deletes the ritual and its tasks)
+- **"Delete ritual X"** → delete_ritual_from_bank (deletes the ritual, its tasks, and sections)
 - **"Delete breathing exercise X"** → delete_breathing_exercise
 - **"Add tasks to ritual X"** → add_tasks_to_ritual (adds new tasks to an existing ritual)
 - **"Remove task Y from ritual"** → delete_ritual_task (removes a specific task from a ritual)
 - **"Generate a cover for ritual X"** → generate_ritual_cover (generates a Simora-style pastel cover image using AI and uploads it)
+- **"Add sections to ritual X"** → add_sections_to_ritual (adds descriptive sections with content to organize a ritual)
+- **"Update section Y"** → update_ritual_section (update a section's title, content, or image)
+- **"Delete section Y"** → delete_ritual_section (removes a section from a ritual)
 
 ### SUBTASKS EXPLAINED:
 - **Subtasks** are smaller steps/checklist items that belong to an ACTION (admin_task_bank item).
 - Each action can have multiple subtasks (e.g., "Workout" → subtasks: "20 leg rises", "10 heel touches", "1 min plank").
 - Use add_subtasks_to_action to add them, delete_subtask to remove one.
 
-### RITUAL DESCRIPTION (BLOG-STYLE):
-- The ritual "description" field supports RICH HTML content — treat it like a blog post.
-- When the user provides long descriptions, multiple paragraphs, or detailed content, put ALL of it into the description field as HTML.
-- Use HTML tags: <h2>, <h3> for headings, <p> for paragraphs, <ul>/<ol> for lists, <strong>/<em> for emphasis, <img> for images.
-- Do NOT use sections — they are deprecated. All content goes into the description field.
-- Example: description: "<h2>Why This Ritual?</h2><p>This ritual helps you...</p><h2>What You'll Need</h2><ul><li>A quiet space</li></ul>"
+### RITUAL SECTIONS EXPLAINED:
+- **Sections** are content groups within a ritual. They have a TITLE and CONTENT (rich text / long description).
+- Sections organize the ritual's information into logical blocks (e.g., "Why This Ritual?", "What You'll Need", "How It Works", "Tips & Tricks").
+- Each section can hold a long description/content paragraph — this is where detailed text goes.
+- Tasks can be assigned to sections via section_id so they appear grouped under that section.
+- When the user gives you a LONG description with multiple paragraphs or topics, SPLIT them into separate sections. Do NOT put everything into the ritual's single description field.
+- The ritual's own "description" field should be a SHORT summary (1-2 sentences max).
+- The existing sections for each ritual are listed above in "Existing Rituals".
 
 ### RITUAL TASKS EXPLAINED:
 - **Ritual tasks** are the individual activities within a RITUAL (routines_bank item).
-- Tasks are a flat ordered list (no section grouping).
+- Each ritual can have multiple tasks grouped by sections.
 - The existing tasks for each ritual are listed above in the "Existing Rituals" section.
 - Use add_tasks_to_ritual to add new tasks, delete_ritual_task to remove one.
 
@@ -1233,7 +1252,13 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 14. When user asks to add tasks to an existing ritual → use add_tasks_to_ritual. Match the ritual by title to find its ID.
 15. When user asks to remove a task from a ritual → use delete_ritual_task with the task's ID from context.
 16. When user says "generate cover", "create cover image", "make a cover" for a ritual → use generate_ritual_cover.
-17. **RICH DESCRIPTION**: When the user provides long content for a ritual, put it ALL into the description field as rich HTML. Do NOT truncate or summarize — include everything formatted with proper HTML tags.
+17. **SECTIONS FOR LONG CONTENT**: When the user provides a long description, multiple paragraphs, or detailed content for a ritual:
+    - Use the ritual's "description" field for a SHORT 1-2 sentence summary only.
+    - Create SECTIONS using add_sections_to_ritual (or include them in create_ritual_in_bank) for each content block/paragraph/topic.
+    - Split naturally by topic: introduction, benefits, instructions, tips, etc.
+    - Each section gets a descriptive title and the full paragraph as its "content" field.
+18. When user asks to add/update sections on an existing ritual → use add_sections_to_ritual or update_ritual_section.
+19. When user asks to delete a section → use delete_ritual_section with the section's ID from context.
 `;
   } else if (currentPage === "routines") {
     prompt += `
@@ -1324,13 +1349,13 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "create_ritual_in_bank",
-          description: "Create a complete ritual in the Rituals Bank with tasks. The description field supports rich HTML (blog-style). This IMMEDIATELY creates it in the database.",
+          description: "Create a complete ritual in the Rituals Bank with optional sections and tasks. This IMMEDIATELY creates it in the database.",
           parameters: {
             type: "object",
             properties: {
               title: { type: "string", description: "Ritual title" },
               subtitle: { type: "string", description: "Short subtitle" },
-              description: { type: "string", description: "Rich HTML description (blog-style). Use HTML tags for formatting: h2, h3, p, ul, ol, strong, em, img." },
+              description: { type: "string", description: "Description of the ritual" },
               category: { type: "string", description: "Category slug" },
               emoji: { type: "string", description: "Single emoji" },
               color: { type: "string", description: "Hex color" },
@@ -1626,6 +1651,69 @@ function getToolDefinitions(currentPage?: string) {
         },
       },
     });
+
+    // Section management tools
+    tools.push(
+      {
+        type: "function",
+        function: {
+          name: "add_sections_to_ritual",
+          description: "Add content sections to an existing ritual. Use when the user provides long descriptions, multiple paragraphs, or detailed content that should be organized into sections. Each section has a title and content (rich text body).",
+          parameters: {
+            type: "object",
+            properties: {
+              ritual_id: { type: "string", description: "The ID of the ritual to add sections to (from context)" },
+              sections: {
+                type: "array",
+                description: "Sections to add, each with a title and content paragraph",
+                items: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string", description: "Section heading (e.g., 'Why This Ritual?', 'What You'll Need', 'How It Works')" },
+                    content: { type: "string", description: "The full paragraph/text content for this section. Can be long and detailed." },
+                    image_url: { type: "string", description: "Optional image URL for the section" },
+                  },
+                  required: ["title", "content"],
+                },
+              },
+            },
+            required: ["ritual_id", "sections"],
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "update_ritual_section",
+          description: "Update an existing section's title, content, or image. Use the section's ID from context.",
+          parameters: {
+            type: "object",
+            properties: {
+              id: { type: "string", description: "The section ID to update (from context)" },
+              title: { type: "string", description: "New section title" },
+              content: { type: "string", description: "New section content (full text)" },
+              image_url: { type: "string", description: "New image URL" },
+              section_order: { type: "number", description: "New order position" },
+            },
+            required: ["id"],
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "delete_ritual_section",
+          description: "Delete a section from a ritual. Tasks in the section will be unlinked (not deleted). Use the section's ID from context.",
+          parameters: {
+            type: "object",
+            properties: {
+              id: { type: "string", description: "The section ID to delete (from context)" },
+            },
+            required: ["id"],
+          },
+        },
+      },
+    );
   }
 
   // Existing form-fill tools for other pages
