@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
+import { useAllActiveTasks } from '@/hooks/useTaskPlanner';
 import { ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -95,6 +96,8 @@ export function RoutinePreviewSheet({
   const [showEditSheet, setShowEditSheet] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const { isSubscribed, isLoading: subLoading } = useSubscription();
+  const { data: allExistingTasks = [] } = useAllActiveTasks();
+  const MAX_FREE_ACTIONS = 6;
 
   // Sync selectedTaskIds when tasks change (e.g., when data loads async)
   useEffect(() => {
@@ -215,7 +218,8 @@ export function RoutinePreviewSheet({
   };
 
   const handleSave = () => {
-    if (!isFree && tasks.length > 1 && !isSubscribed) {
+    const wouldExceedLimit = !isSubscribed && (allExistingTasks.length + selectedTaskIds.size) > MAX_FREE_ACTIONS;
+    if (!isFree && !isSubscribed && (tasks.length > 1 || wouldExceedLimit)) {
       setShowPaywall(true);
       return;
     }
