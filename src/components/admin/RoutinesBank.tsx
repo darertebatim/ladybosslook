@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -959,12 +960,10 @@ export default function RoutinesBank() {
                         disabled={!formData.title.trim()}
                       />
                     </div>
-                    <Textarea
-                      id="description"
+                    <RichTextEditor
                       value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="Optional description..."
-                      className="min-h-[100px]"
+                      onChange={(value) => setFormData({ ...formData, description: value })}
+                      placeholder="Write your ritual description..."
                     />
                   </div>
 
