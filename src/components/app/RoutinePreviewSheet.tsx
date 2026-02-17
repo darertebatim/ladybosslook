@@ -215,7 +215,7 @@ export function RoutinePreviewSheet({
   };
 
   const handleSave = () => {
-    if (!isFree && !isSubscribed) {
+    if (!isFree && tasks.length > 1 && !isSubscribed) {
       setShowPaywall(true);
       return;
     }
