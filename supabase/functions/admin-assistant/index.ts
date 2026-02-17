@@ -20,6 +20,40 @@ interface RequestBody {
 
 const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isValidUUID(value: string): boolean {
+  return UUID_REGEX.test(value);
+}
+
+async function resolveRitualId(supabase: any, idOrTitle: string): Promise<{ id: string; title: string } | null> {
+  if (isValidUUID(idOrTitle)) {
+    const { data } = await supabase.from("routines_bank").select("id, title").eq("id", idOrTitle).single();
+    return data;
+  }
+  // Fallback: search by title (case-insensitive)
+  const { data } = await supabase.from("routines_bank").select("id, title").ilike("title", idOrTitle).limit(1).single();
+  return data;
+}
+
+async function resolveActionId(supabase: any, idOrTitle: string): Promise<{ id: string; title: string } | null> {
+  if (isValidUUID(idOrTitle)) {
+    const { data } = await supabase.from("admin_task_bank").select("id, title").eq("id", idOrTitle).single();
+    return data;
+  }
+  const { data } = await supabase.from("admin_task_bank").select("id, title").ilike("title", idOrTitle).limit(1).single();
+  return data;
+}
+
+async function resolveBreathingId(supabase: any, idOrName: string): Promise<{ id: string; name: string } | null> {
+  if (isValidUUID(idOrName)) {
+    const { data } = await supabase.from("breathing_exercises").select("id, name").eq("id", idOrName).single();
+    return data;
+  }
+  const { data } = await supabase.from("breathing_exercises").select("id, name").ilike("name", idOrName).limit(1).single();
+  return data;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -436,6 +470,11 @@ async function updateActionInBank(supabase: any, args: any) {
     return { success: false, error: "Missing action ID", action: "update_action_in_bank" };
   }
 
+  const resolved = await resolveActionId(supabase, args.id);
+  if (!resolved) {
+    return { success: false, error: `Action not found: "${args.id}". Use the exact UUID from context.`, action: "update_action_in_bank" };
+  }
+
   const updates: Record<string, any> = {};
   if (args.title !== undefined) updates.title = args.title;
   if (args.emoji !== undefined) updates.emoji = args.emoji;
@@ -451,7 +490,7 @@ async function updateActionInBank(supabase: any, args: any) {
 
   const { data, error } = await supabase.from("admin_task_bank")
     .update(updates)
-    .eq("id", args.id)
+    .eq("id", resolved.id)
     .select("id, title, emoji, category")
     .single();
 
@@ -473,6 +512,11 @@ async function updateRitualInBank(supabase: any, args: any) {
     return { success: false, error: "Missing ritual ID", action: "update_ritual_in_bank" };
   }
 
+  const resolved = await resolveRitualId(supabase, args.id);
+  if (!resolved) {
+    return { success: false, error: `Ritual not found: "${args.id}". Use the exact UUID from context.`, action: "update_ritual_in_bank" };
+  }
+
   const updates: Record<string, any> = {};
   if (args.title !== undefined) updates.title = args.title;
   if (args.subtitle !== undefined) updates.subtitle = args.subtitle;
@@ -484,11 +528,9 @@ async function updateRitualInBank(supabase: any, args: any) {
   if (args.is_popular !== undefined) updates.is_popular = args.is_popular;
   if (args.is_active !== undefined) updates.is_active = args.is_active;
 
-  console.log(`[update_ritual] ID: ${args.id}, updates:`, JSON.stringify(updates));
-
   const { data, error } = await supabase.from("routines_bank")
     .update(updates)
-    .eq("id", args.id)
+    .eq("id", resolved.id)
     .select("id, title, emoji, category, color")
     .single();
 
@@ -496,8 +538,6 @@ async function updateRitualInBank(supabase: any, args: any) {
     console.error("Update ritual error:", error);
     return { success: false, error: error.message, action: "update_ritual_in_bank" };
   }
-
-  console.log(`[update_ritual] Result:`, JSON.stringify(data));
 
   return {
     success: true,
@@ -510,6 +550,11 @@ async function updateRitualInBank(supabase: any, args: any) {
 async function updateBreathingExercise(supabase: any, args: any) {
   if (!args.id) {
     return { success: false, error: "Missing exercise ID", action: "update_breathing_exercise" };
+  }
+
+  const resolved = await resolveBreathingId(supabase, args.id);
+  if (!resolved) {
+    return { success: false, error: `Breathing exercise not found: "${args.id}". Use the exact UUID from context.`, action: "update_breathing_exercise" };
   }
 
   const updates: Record<string, any> = {};
@@ -528,7 +573,7 @@ async function updateBreathingExercise(supabase: any, args: any) {
 
   const { data, error } = await supabase.from("breathing_exercises")
     .update(updates)
-    .eq("id", args.id)
+    .eq("id", resolved.id)
     .select("id, name, emoji, category")
     .single();
 
@@ -609,21 +654,20 @@ async function deleteActionFromBank(supabase: any, args: any) {
     return { success: false, error: "Missing action ID", action: "delete_action_from_bank" };
   }
 
-  // First get the action name for confirmation message
-  const { data: action } = await supabase.from("admin_task_bank")
-    .select("title")
-    .eq("id", args.id)
-    .single();
+  const resolved = await resolveActionId(supabase, args.id);
+  if (!resolved) {
+    return { success: false, error: `Action not found: "${args.id}". Make sure to use the exact UUID from context.`, action: "delete_action_from_bank" };
+  }
 
   // Delete subtasks first
   await supabase.from("admin_task_bank_subtasks")
     .delete()
-    .eq("task_id", args.id);
+    .eq("task_id", resolved.id);
 
   // Delete the action
   const { error } = await supabase.from("admin_task_bank")
     .delete()
-    .eq("id", args.id);
+    .eq("id", resolved.id);
 
   if (error) {
     console.error("Delete action error:", error);
@@ -633,7 +677,7 @@ async function deleteActionFromBank(supabase: any, args: any) {
   return {
     success: true,
     action: "delete_action_from_bank",
-    message: `Deleted action "${action?.title || args.id}"`,
+    message: `Deleted action "${resolved.title}"`,
   };
 }
 
@@ -642,24 +686,23 @@ async function deleteRitualFromBank(supabase: any, args: any) {
     return { success: false, error: "Missing ritual ID", action: "delete_ritual_from_bank" };
   }
 
-  // Get the ritual name
-  const { data: ritual } = await supabase.from("routines_bank")
-    .select("title")
-    .eq("id", args.id)
-    .single();
+  const resolved = await resolveRitualId(supabase, args.id);
+  if (!resolved) {
+    return { success: false, error: `Ritual not found: "${args.id}". Make sure to use the exact UUID from context.`, action: "delete_ritual_from_bank" };
+  }
 
   // Delete tasks, sections, then the ritual
   await supabase.from("routines_bank_tasks")
     .delete()
-    .eq("routine_id", args.id);
+    .eq("routine_id", resolved.id);
 
   await supabase.from("routines_bank_sections")
     .delete()
-    .eq("routine_id", args.id);
+    .eq("routine_id", resolved.id);
 
   const { error } = await supabase.from("routines_bank")
     .delete()
-    .eq("id", args.id);
+    .eq("id", resolved.id);
 
   if (error) {
     console.error("Delete ritual error:", error);
@@ -669,7 +712,7 @@ async function deleteRitualFromBank(supabase: any, args: any) {
   return {
     success: true,
     action: "delete_ritual_from_bank",
-    message: `Deleted ritual "${ritual?.title || args.id}" and all its tasks/sections`,
+    message: `Deleted ritual "${resolved.title}" and all its tasks/sections`,
   };
 }
 
@@ -678,14 +721,14 @@ async function deleteBreathingExerciseAction(supabase: any, args: any) {
     return { success: false, error: "Missing exercise ID", action: "delete_breathing_exercise" };
   }
 
-  const { data: exercise } = await supabase.from("breathing_exercises")
-    .select("name")
-    .eq("id", args.id)
-    .single();
+  const resolved = await resolveBreathingId(supabase, args.id);
+  if (!resolved) {
+    return { success: false, error: `Breathing exercise not found: "${args.id}". Make sure to use the exact UUID from context.`, action: "delete_breathing_exercise" };
+  }
 
   const { error } = await supabase.from("breathing_exercises")
     .delete()
-    .eq("id", args.id);
+    .eq("id", resolved.id);
 
   if (error) {
     console.error("Delete breathing error:", error);
@@ -695,7 +738,7 @@ async function deleteBreathingExerciseAction(supabase: any, args: any) {
   return {
     success: true,
     action: "delete_breathing_exercise",
-    message: `Deleted breathing exercise "${exercise?.name || args.id}"`,
+    message: `Deleted breathing exercise "${resolved.name}"`,
   };
 }
 
@@ -709,10 +752,16 @@ async function addTasksToRitual(supabase: any, args: any) {
     return { success: false, error: "No tasks provided", action: "add_tasks_to_ritual" };
   }
 
+  const resolved = await resolveRitualId(supabase, args.ritual_id);
+  if (!resolved) {
+    return { success: false, error: `Ritual not found: "${args.ritual_id}". Use the exact UUID from context.`, action: "add_tasks_to_ritual" };
+  }
+  const ritualId = resolved.id;
+
   // Get current max task_order
   const { data: existing } = await supabase.from("routines_bank_tasks")
     .select("task_order")
-    .eq("routine_id", args.ritual_id)
+    .eq("routine_id", ritualId)
     .order("task_order", { ascending: false })
     .limit(1);
 
@@ -721,7 +770,7 @@ async function addTasksToRitual(supabase: any, args: any) {
   const inserted = [];
   for (const task of args.tasks) {
     const { data, error } = await supabase.from("routines_bank_tasks").insert({
-      routine_id: args.ritual_id,
+      routine_id: ritualId,
       section_id: task.section_id || null,
       section_title: task.section_title || null,
       title: task.title,
@@ -778,9 +827,15 @@ async function addSectionsToRitual(supabase: any, args: any) {
     return { success: false, error: "No sections provided", action: "add_sections_to_ritual" };
   }
 
+  const resolved = await resolveRitualId(supabase, args.ritual_id);
+  if (!resolved) {
+    return { success: false, error: `Ritual not found: "${args.ritual_id}". Use the exact UUID from context.`, action: "add_sections_to_ritual" };
+  }
+  const ritualId = resolved.id;
+
   const { data: existing } = await supabase.from("routines_bank_sections")
     .select("section_order")
-    .eq("routine_id", args.ritual_id)
+    .eq("routine_id", ritualId)
     .order("section_order", { ascending: false })
     .limit(1);
 
@@ -789,7 +844,7 @@ async function addSectionsToRitual(supabase: any, args: any) {
   const inserted = [];
   for (const sec of args.sections) {
     const { data, error } = await supabase.from("routines_bank_sections").insert({
-      routine_id: args.ritual_id,
+      routine_id: ritualId,
       title: sec.title,
       content: sec.content || null,
       image_url: sec.image_url || null,
@@ -878,10 +933,15 @@ async function generateRitualCover(supabase: any, args: any) {
     return { success: false, error: "LOVABLE_API_KEY not configured", action: "generate_ritual_cover" };
   }
 
+  const resolved = await resolveRitualId(supabase, args.ritual_id);
+  if (!resolved) {
+    return { success: false, error: `Ritual not found: "${args.ritual_id}". Use the exact UUID from context.`, action: "generate_ritual_cover" };
+  }
+
   // Fetch the ritual details
   const { data: ritual, error: fetchError } = await supabase.from("routines_bank")
     .select("id, title, subtitle, description, category, emoji")
-    .eq("id", args.ritual_id)
+    .eq("id", resolved.id)
     .single();
 
   if (fetchError || !ritual) {
@@ -891,7 +951,7 @@ async function generateRitualCover(supabase: any, args: any) {
   // Fetch ritual tasks for icon context
   const { data: tasks } = await supabase.from("routines_bank_tasks")
     .select("title, emoji")
-    .eq("routine_id", args.ritual_id)
+    .eq("routine_id", resolved.id)
     .order("task_order")
     .limit(6);
 
@@ -968,7 +1028,7 @@ Clean cover illustration only.`;
     // Upload to storage
     const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
     const imageBuffer = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
-    const fileName = `ritual-${args.ritual_id}-${Date.now()}.png`;
+    const fileName = `ritual-${resolved.id}-${Date.now()}.png`;
 
     const { error: uploadError } = await supabase.storage
       .from("routine-covers")
@@ -986,7 +1046,7 @@ Clean cover illustration only.`;
     // Update the ritual with the cover URL
     const { error: updateError } = await supabase.from("routines_bank")
       .update({ cover_image_url: publicUrl })
-      .eq("id", args.ritual_id);
+      .eq("id", resolved.id);
 
     if (updateError) {
       console.error("Update ritual cover error:", updateError);
@@ -1044,7 +1104,7 @@ async function fetchContext(supabase: any, currentPage?: string) {
     ] = await Promise.all([
       supabase.from("routine_categories").select("id, name, slug, icon").eq("is_active", true).order("display_order"),
       supabase.from("admin_task_bank").select("id, title, emoji, category, color, description, time_period").eq("is_active", true).order("sort_order").limit(20),
-      supabase.from("routines_bank").select("id, title, emoji, category, color, description").eq("is_active", true).order("sort_order").limit(10),
+      supabase.from("routines_bank").select("id, title, emoji, category, color, description").eq("is_active", true).order("sort_order").limit(50),
       supabase.from("breathing_exercises").select("id, name, emoji, category, description").eq("is_active", true).order("sort_order").limit(10),
       supabase.from("admin_task_bank_subtasks").select("id, task_id, title, order_index").order("order_index").limit(200),
       supabase.from("routines_bank_tasks").select("id, routine_id, title, emoji, duration_minutes, task_order, section_id, section_title").order("task_order").limit(200),
