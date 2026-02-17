@@ -76,6 +76,7 @@ const NotificationAnalytics = lazy(() => import("@/pages/admin/NotificationAnaly
 const PushNotifications = lazy(() => import("@/pages/admin/PushNotifications"));
 const Subscriptions = lazy(() => import("@/pages/admin/Subscriptions"));
 const BrandDesign = lazy(() => import("@/pages/admin/BrandDesign"));
+const Onboarding = lazy(() => import("@/pages/admin/Onboarding"));
 
 // Lazy load marketing/landing pages
 const Programs = lazy(() => import("@/pages/Programs"));
@@ -297,6 +298,7 @@ const App = () => (
                       <Route path="tools" element={<ProtectedRoute requiredPage="tools"><Tools /></ProtectedRoute>} />
                       <Route path="tools/tasks" element={<ProtectedRoute requiredPage="tools"><TasksBank /></ProtectedRoute>} />
                       <Route path="tools/notifications" element={<ProtectedRoute requiredPage="tools"><NotificationAnalytics /></ProtectedRoute>} />
+                      <Route path="onboarding" element={<ProtectedRoute requiredPage="tools"><Onboarding /></ProtectedRoute>} />
                       <Route path="app" element={<ProtectedRoute requiredPage="system"><AppTest /></ProtectedRoute>} />
                     </Route>
                   )}
