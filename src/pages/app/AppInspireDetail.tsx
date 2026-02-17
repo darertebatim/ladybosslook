@@ -508,6 +508,7 @@ export default function AppInspireDetail() {
           endAfterDays={(routine as any).end_after_days || null}
           onSave={handleSaveRoutine}
           isSaving={addRoutineFromBank.isPending}
+          isFree={(routine as any).is_free ?? false}
         />
       )}
     </div>

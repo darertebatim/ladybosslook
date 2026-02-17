@@ -67,6 +67,7 @@ interface RoutinePreviewSheetProps {
   endAfterDays?: number | null;
   onSave: (selectedTaskIds: string[], editedTasks: EditedTask[]) => void;
   isSaving?: boolean;
+  isFree?: boolean;
 }
 
 export function RoutinePreviewSheet({
@@ -83,6 +84,7 @@ export function RoutinePreviewSheet({
   endAfterDays,
   onSave,
   isSaving,
+  isFree,
 }: RoutinePreviewSheetProps) {
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(
     new Set(tasks.map(t => t.id))
@@ -213,7 +215,7 @@ export function RoutinePreviewSheet({
   };
 
   const handleSave = () => {
-    if (!isSubscribed) {
+    if (!isFree && !isSubscribed) {
       setShowPaywall(true);
       return;
     }

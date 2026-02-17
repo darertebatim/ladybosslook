@@ -52,6 +52,7 @@ interface RoutineBankItem {
   emoji: string;
   is_active: boolean;
   is_popular: boolean;
+  is_free: boolean;
   is_welcome_popup: boolean;
   sort_order: number;
   schedule_type: string;
@@ -402,6 +403,15 @@ export default function RoutinesBank() {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['welcome-popup-ritual'] });
     },
+  });
+
+  // Toggle free
+  const toggleFree = useMutation({
+    mutationFn: async ({ id, is_free }: { id: string; is_free: boolean }) => {
+      const { error } = await supabase.from('routines_bank').update({ is_free } as any).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['routines-bank'] }),
   });
 
   // Fetch sections and tasks for a routine when editing
@@ -804,6 +814,19 @@ export default function RoutinesBank() {
                       )}
                     </div>
                   </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFree.mutate({ id: routine.id, is_free: !routine.is_free });
+                    }}
+                    className={cn(
+                      "p-2 transition-all",
+                      routine.is_free ? "text-green-500" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                    )}
+                    title={routine.is_free ? "Remove free access" : "Mark as free"}
+                  >
+                    <span className={cn("text-xs font-bold", routine.is_free && "text-green-500")}>FREE</span>
+                  </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
