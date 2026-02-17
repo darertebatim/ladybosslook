@@ -18,7 +18,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       [{ 'header': [1, 2, 3, false] }],
       ['bold', 'italic', 'underline'],
       [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      ['link'],
+      ['link', 'image'],
       ['clean']
     ],
   };
@@ -27,7 +27,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     'header',
     'bold', 'italic', 'underline',
     'list', 'bullet',
-    'link'
+    'link', 'image'
   ];
 
   return (
