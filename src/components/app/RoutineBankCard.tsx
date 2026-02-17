@@ -136,6 +136,13 @@ export function RoutineBankCard({
         <h3 className="absolute bottom-2.5 left-2.5 right-2.5 font-semibold text-sm text-white line-clamp-2 drop-shadow-lg">
           {routine.title}
         </h3>
+
+        {/* Free badge */}
+        {routine.is_free && (
+          <Badge className="absolute top-2 left-2 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+            FREE
+          </Badge>
+        )}
       </div>
       
       {/* Category badge - Below image */}
