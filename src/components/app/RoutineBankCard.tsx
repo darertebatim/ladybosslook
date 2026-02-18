@@ -139,11 +139,11 @@ export function RoutineBankCard({
 
         {/* Free / Plus badge */}
         {routine.is_free ? (
-          <Badge className="absolute top-2 left-2 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+          <Badge className="absolute top-1.5 left-1.5 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
             FREE
           </Badge>
         ) : (
-          <Badge className="absolute top-2 left-2 bg-amber-200 text-amber-700 text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
+          <Badge className="absolute top-1.5 left-1.5 bg-amber-200 text-amber-700 text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
             <Crown className="w-2.5 h-2.5" />
             PLUS
           </Badge>
