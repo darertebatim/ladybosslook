@@ -84,13 +84,39 @@ export function BadgeCelebration({
 
       if (type === 'action') {
         setActionMessage(getRandomActionMessage());
+        
+        // Small confetti burst from bottom corners for action completion
+        const burst = () => {
+          confetti({
+            particleCount: 15,
+            angle: 60,
+            spread: 50,
+            startVelocity: 25,
+            origin: { x: 0, y: 1 },
+            colors: ['#2DD4BF', '#34D399', '#6EE7B7', '#A7F3D0', '#FFD700', '#FFA500'],
+            gravity: 1.2,
+            ticks: 80,
+          });
+          confetti({
+            particleCount: 15,
+            angle: 120,
+            spread: 50,
+            startVelocity: 25,
+            origin: { x: 1, y: 1 },
+            colors: ['#2DD4BF', '#34D399', '#6EE7B7', '#A7F3D0', '#FFD700', '#FFA500'],
+            gravity: 1.2,
+            ticks: 80,
+          });
+        };
+        burst();
+        setTimeout(burst, 300);
       }
 
       // Auto-dismiss toasts after delay
       if (type === 'silver' || type === 'almostGold' || type === 'action') {
         const timer = setTimeout(() => {
           onClose();
-        }, type === 'action' ? 2500 : 4000);
+        }, type === 'action' ? 3000 : 4000);
         return () => clearTimeout(timer);
       }
 
@@ -178,16 +204,15 @@ export function BadgeCelebration({
           style={{ bottom: 'calc(80px + env(safe-area-inset-bottom, 0px) + 16px)' }}
           onClick={onClose}
         >
-          <div className="bg-gradient-to-r from-orange-500 to-amber-400 rounded-2xl p-4 shadow-xl flex items-center gap-3">
+          <div className="bg-black/75 backdrop-blur-md rounded-2xl p-4 shadow-2xl flex items-center gap-3 border border-white/10">
             <div className="relative shrink-0">
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
+              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
                 <img 
                   src={BADGE_IMAGES.bronze} 
                   alt="Action complete" 
                   className="w-[120%] h-[120%] object-cover"
                 />
               </div>
-              <Sparkles className="absolute -top-1 -right-1 h-3.5 w-3.5 text-white/80 animate-pulse" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-white font-semibold text-base">
