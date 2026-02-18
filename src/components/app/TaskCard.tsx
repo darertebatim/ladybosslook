@@ -258,7 +258,7 @@ export const TaskCard = memo(function TaskCard({
           {/* Main row */}
           <div className="flex items-center gap-2">
             {/* Icon - use 3D emoji if available, else Lucide icon */}
-            <div className={cn("w-10 h-10 flex items-center justify-center shrink-0", isAnimating && "animate-emoji-bounce")}>
+            <div className={cn("w-10 h-10 flex items-center justify-center shrink-0", isAnimating && "animate-emoji-bounce [animation-delay:0.8s]")}>
               {hasTaskEmoji ? (
                 <FluentEmoji emoji={task.emoji} size={32} />
               ) : (
@@ -267,7 +267,7 @@ export const TaskCard = memo(function TaskCard({
             </div>
 
             {/* Content */}
-            <div className="flex-1 min-w-0">
+            <div className={cn("flex-1 min-w-0", isAnimating && "animate-ripple-wave [animation-delay:0.6s]")}>
               {/* Top line: Time + Goal (if applicable) */}
               <div className="flex items-center gap-2">
                 <span className="text-[13px] text-black/80">{formatTime(task)}</span>
@@ -401,12 +401,12 @@ export const TaskCard = memo(function TaskCard({
       {/* Main row */}
       <div className="flex items-center gap-2">
         {/* Icon - emoji display like Me+ */}
-        <div className={cn("w-10 h-10 flex items-center justify-center shrink-0", isAnimating && "animate-emoji-bounce")}>
+        <div className={cn("w-10 h-10 flex items-center justify-center shrink-0", isAnimating && "animate-emoji-bounce [animation-delay:0.8s]")}>
           <TaskIcon iconName={task.emoji} size={32} className="text-black/80" />
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
+        <div className={cn("flex-1 min-w-0", isAnimating && "animate-ripple-wave [animation-delay:0.6s]")}>
           {/* Top line: subtask count + time/goal */}
           <div className="flex items-center gap-2">
             {hasSubtasks && (
