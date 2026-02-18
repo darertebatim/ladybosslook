@@ -21,8 +21,7 @@ export type OnboardingStepType =
   | 'paywall'
   | 'before-after'
   | 'science-backed'
-  | 'rating'
-  | 'home-screen';
+  | 'rating';
 
 export interface OnboardingOption {
   label: string;
@@ -53,14 +52,12 @@ export interface OnboardingStep {
   secondaryButtonLabel?: string;
   statHighlight?: string;
   illustrationLabel?: string;
-  illustrationImage?: string;
   testimonials?: TestimonialCard[];
   pricingTiers?: PricingTier[];
   beforeItems?: string[];
   afterItems?: string[];
   summaryBars?: { label: string; value: number; status: string }[];
   statBadges?: { label: string; value: string }[];
-  checklistItems?: string[];
 }
 
 export interface OnboardingFlow {
