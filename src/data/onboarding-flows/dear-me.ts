@@ -48,8 +48,9 @@ export const dearMeFlow: OnboardingFlow = {
       secondaryButtonLabel: 'Already a member? Sign in.',
       illustrationImage: welcomeImg,
       statBadges: [
-        { label: 'Featured', value: '⭐' },
-        { label: "Users' Favorite", value: '❤️' },
+        { label: 'Featured app', value: '⭐' },
+        { label: "Users' choice", value: '❤️' },
+        { label: 'Favorite app', value: '🏆' },
       ],
     },
     // 2 - Greeting 1
@@ -565,12 +566,14 @@ export const dearMeFlow: OnboardingFlow = {
         'Unfinished goals',
         'Bad habits',
         'Anxiety and depression',
+        'Comparing yourself to others',
       ],
       afterItems: [
         'A structured day',
         'Goals achieved',
         'Habits that stick',
         'Peace of mind',
+        'Brand new life',
       ],
     },
     // 50 - Home screen (destination)
