@@ -310,8 +310,8 @@ export const TaskCard = memo(function TaskCard({
                 className={cn(
                   'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
                   goalReached
-                    ? 'bg-emerald-500 text-white shadow-md'
-                    : 'border-2 border-foreground/30 bg-white/60',
+                    ? 'bg-teal-400 text-white shadow-md'
+                    : 'border-2 border-black bg-white',
                   isAnimating && 'scale-110'
                 )}
               >
@@ -323,8 +323,8 @@ export const TaskCard = memo(function TaskCard({
                 className={cn(
                   'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
                   goalReached
-                    ? 'bg-emerald-500 text-white shadow-md'
-                    : 'border-2 border-foreground/30 bg-white/60',
+                    ? 'bg-teal-400 text-white shadow-md'
+                    : 'border-2 border-black bg-white',
                   isAnimating && 'scale-110'
                 )}
               >
@@ -338,8 +338,8 @@ export const TaskCard = memo(function TaskCard({
                 className={cn(
                   'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
                   isCompleted
-                    ? 'bg-emerald-500 text-white shadow-md'
-                    : 'border-2 border-foreground/30 bg-white/60',
+                    ? 'bg-teal-400 text-white shadow-md'
+                    : 'border-2 border-black bg-white',
                   isAnimating && 'scale-110'
                 )}
               >
@@ -446,8 +446,8 @@ export const TaskCard = memo(function TaskCard({
             className={cn(
               'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
               goalReached
-                ? 'bg-emerald-500 text-white shadow-md'
-                : 'border-2 border-foreground/30 bg-white/60',
+                ? 'bg-teal-400 text-white shadow-md'
+                : 'border-2 border-black bg-white',
               isAnimating && 'scale-110'
             )}
           >
@@ -463,10 +463,10 @@ export const TaskCard = memo(function TaskCard({
             className={cn(
               'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
               goalReached
-                ? 'bg-emerald-500 text-white shadow-md'
+                ? 'bg-teal-400 text-white shadow-md'
                 : isWater 
                   ? 'border-2 border-sky-400 bg-sky-100'
-                  : 'border-2 border-foreground/30 bg-white/60',
+                  : 'border-2 border-black bg-white',
               isAnimating && 'scale-110'
             )}
           >
@@ -484,8 +484,8 @@ export const TaskCard = memo(function TaskCard({
             className={cn(
               'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
               isCompleted
-                ? 'bg-emerald-500 text-white shadow-md'
-                : 'border-2 border-foreground/30 bg-white/60',
+                ? 'bg-teal-400 text-white shadow-md'
+                : 'border-2 border-black bg-white',
               isAnimating && 'scale-110'
             )}
           >
