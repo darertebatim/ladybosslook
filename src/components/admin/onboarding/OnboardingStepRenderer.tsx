@@ -1,75 +1,87 @@
+import { useState, useEffect, useCallback } from 'react';
 import { OnboardingStep } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface Props {
   step: OnboardingStep;
+  onNext: () => void;
+  onMilestone?: (type: 'review' | 'notification' | 'discount-paywall') => void;
 }
 
-export function OnboardingStepRenderer({ step }: Props) {
+export function OnboardingStepRenderer({ step, onNext, onMilestone }: Props) {
   switch (step.type) {
     case 'welcome':
-      return <WelcomeScreen step={step} />;
+      return <WelcomeScreen step={step} onNext={onNext} />;
     case 'greeting':
-      return <GreetingScreen step={step} />;
+      return <GreetingScreen step={step} onNext={onNext} />;
     case 'multi-select':
-      return <MultiSelectScreen step={step} />;
+      return <MultiSelectScreen step={step} onNext={onNext} />;
     case 'single-select':
-      return <SingleSelectScreen step={step} />;
+      return <SingleSelectScreen step={step} onNext={onNext} />;
     case 'single-select-descriptions':
-      return <SingleSelectDescScreen step={step} />;
+      return <SingleSelectDescScreen step={step} onNext={onNext} />;
     case 'yes-no':
-      return <YesNoScreen step={step} />;
+      return <YesNoScreen step={step} onNext={onNext} />;
     case 'do-you-want':
-      return <DoYouWantScreen step={step} />;
+      return <DoYouWantScreen step={step} onNext={onNext} />;
     case 'info-stat':
-      return <InfoStatScreen step={step} />;
+      return <InfoStatScreen step={step} onNext={onNext} />;
     case 'motivational':
-      return <MotivationalScreen step={step} />;
+      return <MotivationalScreen step={step} onNext={onNext} />;
     case 'notification-permission':
-      return <NotificationScreen step={step} />;
+      return <NotificationScreen step={step} onNext={onNext} onMilestone={onMilestone} />;
     case 'results-chart':
-      return <ResultsChartScreen step={step} />;
+      return <ResultsChartScreen step={step} onNext={onNext} />;
     case 'habit-loop':
-      return <HabitLoopScreen step={step} />;
+      return <HabitLoopScreen step={step} onNext={onNext} />;
     case 'loading-testimonials':
-      return <LoadingTestimonialsScreen step={step} />;
+      return <LoadingTestimonialsScreen step={step} onNext={onNext} />;
     case 'personal-summary':
-      return <PersonalSummaryScreen step={step} />;
+      return <PersonalSummaryScreen step={step} onNext={onNext} />;
     case 'first-habit':
-      return <FirstHabitScreen step={step} />;
+      return <FirstHabitScreen step={step} onNext={onNext} />;
     case 'breathing-prep':
-      return <BreathingPrepScreen step={step} />;
+      return <BreathingPrepScreen step={step} onNext={onNext} />;
     case 'breathing':
-      return <BreathingScreen step={step} />;
+      return <BreathingScreen step={step} onNext={onNext} />;
     case 'breathing-done':
-      return <BreathingDoneScreen step={step} />;
+      return <BreathingDoneScreen step={step} onNext={onNext} />;
     case 'streak':
-      return <StreakScreen step={step} />;
+      return <StreakScreen step={step} onNext={onNext} />;
     case 'paywall':
-      return <PaywallScreen step={step} />;
+      return <PaywallScreen step={step} onNext={onNext} />;
     case 'before-after':
-      return <BeforeAfterScreen step={step} />;
+      return <BeforeAfterScreen step={step} onNext={onNext} />;
     case 'science-backed':
-      return <ScienceBackedScreen step={step} />;
+      return <ScienceBackedScreen step={step} onNext={onNext} />;
     case 'rating':
-      return <RatingScreen step={step} />;
+      return <RatingScreen step={step} onNext={onNext} onMilestone={onMilestone} />;
+    case 'discount-offer':
+      return <DiscountOfferScreen step={step} onNext={onNext} />;
+    case 'welcome-aboard':
+      return <WelcomeAboardScreen step={step} onNext={onNext} />;
     default:
-      return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown step type: {step.type}</div>;
+      return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }
 }
 
-// Shared components
-function NavyButton({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+// ─── Shared ────────────────────────────────────────────────────
+
+function NavyButton({ children, className = '', onClick, disabled }: { children: React.ReactNode; className?: string; onClick?: () => void; disabled?: boolean }) {
   return (
-    <button className={`w-full py-3.5 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm ${className}`}>
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`w-full py-3.5 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all ${disabled ? 'opacity-40' : ''} ${className}`}
+    >
       {children}
     </button>
   );
 }
 
-function SecondaryButton({ children }: { children: React.ReactNode }) {
+function SecondaryButton({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) {
   return (
-    <button className="w-full py-3 text-sm text-gray-500 font-medium">
+    <button onClick={onClick} className="w-full py-3 text-sm text-gray-500 font-medium active:opacity-60">
       {children}
     </button>
   );
@@ -86,15 +98,16 @@ function IllustrationPlaceholder({ label, className = '' }: { label: string; cla
 function ScreenWrapper({ children, bg = 'bg-white' }: { children: React.ReactNode; bg?: string }) {
   return (
     <ScrollArea className={`h-full ${bg}`}>
-      <div className="flex flex-col h-full min-h-[700px] px-5 py-6">
+      <div className="flex flex-col h-full min-h-[700px] px-5 pt-2 pb-6">
         {children}
       </div>
     </ScrollArea>
   );
 }
 
-// Screen implementations
-function WelcomeScreen({ step }: Props) {
+// ─── Screens ───────────────────────────────────────────────────
+
+function WelcomeScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
       <IllustrationPlaceholder label="App hero illustration" className="h-48 mb-6" />
@@ -108,46 +121,70 @@ function WelcomeScreen({ step }: Props) {
         ))}
       </div>
       <div className="mt-auto space-y-2">
-        <NavyButton>{step.buttonLabel}</NavyButton>
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
         <SecondaryButton>{step.secondaryButtonLabel}</SecondaryButton>
       </div>
     </ScreenWrapper>
   );
 }
 
-function GreetingScreen({ step }: Props) {
+function GreetingScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
       <IllustrationPlaceholder label={step.illustrationLabel || 'Mascot'} className="h-56 mb-8" />
       <h1 className="text-2xl font-bold text-[#1a1f3d] text-center">{step.title}</h1>
       <p className="text-base text-gray-500 text-center mt-2 mb-8">{step.subtitle}</p>
       <div className="mt-auto">
-        <NavyButton>{step.buttonLabel}</NavyButton>
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
     </ScreenWrapper>
   );
 }
 
-function MultiSelectScreen({ step }: Props) {
+function MultiSelectScreen({ step, onNext }: Props) {
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+
+  const toggle = (i: number) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      next.has(i) ? next.delete(i) : next.add(i);
+      return next;
+    });
+  };
+
   return (
     <ScreenWrapper>
       <h1 className="text-xl font-bold text-[#1a1f3d] mb-5">{step.title}</h1>
       <div className="space-y-3 mb-6">
         {step.options?.map((opt, i) => (
-          <button key={i} className="w-full flex items-center gap-3 p-4 rounded-2xl border border-gray-200 bg-white text-left hover:border-indigo-300 transition-colors">
+          <button
+            key={i}
+            onClick={() => toggle(i)}
+            className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
+              selected.has(i) ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+            }`}
+          >
             {opt.emoji && <span className="text-xl">{opt.emoji}</span>}
-            <span className="text-sm font-medium text-[#1a1f3d]">{opt.label}</span>
+            <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
+            {selected.has(i) && <span className="text-indigo-500 text-sm">✓</span>}
           </button>
         ))}
       </div>
       <div className="mt-auto">
-        <NavyButton>{step.buttonLabel}</NavyButton>
+        <NavyButton onClick={onNext} disabled={selected.size === 0}>{step.buttonLabel}</NavyButton>
       </div>
     </ScreenWrapper>
   );
 }
 
-function SingleSelectScreen({ step }: Props) {
+function SingleSelectScreen({ step, onNext }: Props) {
+  const [picked, setPicked] = useState<number | null>(null);
+
+  const select = (i: number) => {
+    setPicked(i);
+    setTimeout(onNext, 400);
+  };
+
   return (
     <ScreenWrapper>
       {step.subtitle ? (
@@ -160,7 +197,13 @@ function SingleSelectScreen({ step }: Props) {
       )}
       <div className="space-y-3">
         {step.options?.map((opt, i) => (
-          <button key={i} className="w-full flex items-center gap-3 p-4 rounded-2xl border border-gray-200 bg-white text-left hover:border-indigo-300 transition-colors">
+          <button
+            key={i}
+            onClick={() => select(i)}
+            className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
+              picked === i ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+            }`}
+          >
             {opt.emoji && <span className="text-lg">{opt.emoji}</span>}
             <span className="text-sm font-medium text-[#1a1f3d]">{opt.label}</span>
           </button>
@@ -170,13 +213,26 @@ function SingleSelectScreen({ step }: Props) {
   );
 }
 
-function SingleSelectDescScreen({ step }: Props) {
+function SingleSelectDescScreen({ step, onNext }: Props) {
+  const [picked, setPicked] = useState<number | null>(null);
+
+  const select = (i: number) => {
+    setPicked(i);
+    setTimeout(onNext, 400);
+  };
+
   return (
     <ScreenWrapper>
       <h1 className="text-xl font-bold text-[#1a1f3d] mb-5">{step.title}</h1>
       <div className="space-y-3">
         {step.options?.map((opt, i) => (
-          <button key={i} className="w-full p-4 rounded-2xl border border-gray-200 bg-white text-left hover:border-indigo-300 transition-colors">
+          <button
+            key={i}
+            onClick={() => select(i)}
+            className={`w-full p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
+              picked === i ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+            }`}
+          >
             <span className="text-sm font-semibold text-[#1a1f3d]">{opt.label}</span>
             {opt.description && <p className="text-xs text-gray-400 mt-1">{opt.description}</p>}
           </button>
@@ -186,48 +242,48 @@ function SingleSelectDescScreen({ step }: Props) {
   );
 }
 
-function YesNoScreen({ step }: Props) {
+function YesNoScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
       <h1 className="text-xl font-bold text-[#1a1f3d] mb-4">{step.title}</h1>
       <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="h-40 mb-4" />
       <p className="text-base text-[#1a1f3d] font-medium text-center mb-8">{step.description}</p>
       <div className="mt-auto flex gap-3">
-        <button className="flex-1 py-3.5 rounded-2xl border border-gray-200 text-sm font-semibold text-gray-600">No</button>
-        <button className="flex-1 py-3.5 rounded-2xl bg-[#1a1f3d] text-white text-sm font-semibold">Yes</button>
+        <button onClick={onNext} className="flex-1 py-3.5 rounded-2xl border border-gray-200 text-sm font-semibold text-gray-600 active:scale-[0.97]">No</button>
+        <button onClick={onNext} className="flex-1 py-3.5 rounded-2xl bg-[#1a1f3d] text-white text-sm font-semibold active:scale-[0.97]">Yes</button>
       </div>
     </ScreenWrapper>
   );
 }
 
-function DoYouWantScreen({ step }: Props) {
+function DoYouWantScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
       <p className="text-sm text-gray-400 mb-2">{step.title}</p>
       <h1 className="text-xl font-bold text-[#1a1f3d] mb-5">{step.subtitle}</h1>
       <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="h-48 mb-8" />
       <div className="mt-auto space-y-3">
-        <NavyButton>{step.buttonLabel}</NavyButton>
-        <SecondaryButton>{step.secondaryButtonLabel}</SecondaryButton>
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
+        <SecondaryButton onClick={onNext}>{step.secondaryButtonLabel}</SecondaryButton>
       </div>
     </ScreenWrapper>
   );
 }
 
-function InfoStatScreen({ step }: Props) {
+function InfoStatScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper bg="bg-[#fdf8f4]">
       <IllustrationPlaceholder label={step.illustrationLabel || 'Statistic'} className="h-36 mb-6" />
       <h1 className="text-xl font-bold text-[#1a1f3d] mb-3">{step.statHighlight}</h1>
       <p className="text-sm text-gray-500 mb-8 leading-relaxed">{step.description}</p>
       <div className="mt-auto">
-        <NavyButton>{step.buttonLabel}</NavyButton>
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
     </ScreenWrapper>
   );
 }
 
-function MotivationalScreen({ step }: Props) {
+function MotivationalScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper bg="bg-[#fdf8f4]">
       {step.illustrationLabel && <IllustrationPlaceholder label={step.illustrationLabel} className="h-44 mb-6" />}
@@ -236,40 +292,50 @@ function MotivationalScreen({ step }: Props) {
         <p className="text-sm text-gray-500 leading-relaxed">{step.description}</p>
       </div>
       <div className="mt-auto">
-        <NavyButton>{step.buttonLabel}</NavyButton>
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
     </ScreenWrapper>
   );
 }
 
-function NotificationScreen({ step }: Props) {
+function NotificationScreen({ step, onNext, onMilestone }: Props) {
+  const handleAllow = () => {
+    onMilestone?.('notification');
+    onNext();
+  };
+
   return (
     <ScreenWrapper>
       <IllustrationPlaceholder label="Bell notification icon" className="h-40 mb-6" />
       <h1 className="text-xl font-bold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
       {step.subtitle && (
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 my-4 text-center">
+        <div className="bg-white rounded-2xl border border-gray-200 p-4 my-4 text-center shadow-sm">
           <p className="text-sm font-semibold text-[#1a1f3d] mb-1">{step.subtitle}</p>
           <p className="text-xs text-gray-400">Notifications may include alerts, sounds, and icon badges.</p>
           <div className="flex gap-2 mt-3">
-            <button className="flex-1 py-2 text-xs font-medium text-blue-500">Don't Allow</button>
-            <button className="flex-1 py-2 text-xs font-semibold text-blue-500">Allow</button>
+            <button onClick={onNext} className="flex-1 py-2 text-xs font-medium text-blue-500 active:opacity-60">Don't Allow</button>
+            <button onClick={handleAllow} className="flex-1 py-2 text-xs font-semibold text-blue-500 active:opacity-60">Allow</button>
           </div>
         </div>
       )}
       <div className="mt-auto space-y-2">
-        <NavyButton>{step.buttonLabel}</NavyButton>
-        <SecondaryButton>{step.secondaryButtonLabel}</SecondaryButton>
+        <NavyButton onClick={handleAllow}>{step.buttonLabel}</NavyButton>
+        <SecondaryButton onClick={onNext}>{step.secondaryButtonLabel}</SecondaryButton>
       </div>
     </ScreenWrapper>
   );
 }
 
-function ResultsChartScreen({ step }: Props) {
+function ResultsChartScreen({ step, onNext }: Props) {
+  const [animated, setAnimated] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setAnimated(true), 300);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <ScreenWrapper>
       <h1 className="text-xl font-bold text-[#1a1f3d] mb-4">{step.title}</h1>
-      {/* Chart placeholder */}
       <div className="bg-gradient-to-tr from-indigo-50 to-purple-50 rounded-2xl p-5 mb-4 h-48 flex flex-col justify-end">
         <div className="flex justify-between text-xs text-gray-400 mb-2">
           <span>Your expectation</span>
@@ -277,7 +343,11 @@ function ResultsChartScreen({ step }: Props) {
         </div>
         <div className="flex items-end gap-1 h-24">
           {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="flex-1 bg-indigo-200 rounded-t" style={{ height: `${Math.min(100, 15 + i * 8)}%` }} />
+            <div
+              key={i}
+              className="flex-1 bg-indigo-300 rounded-t transition-all duration-700 ease-out"
+              style={{ height: animated ? `${Math.min(100, 15 + i * 8)}%` : '4%' }}
+            />
           ))}
         </div>
         <div className="flex justify-between text-xs text-gray-400 mt-2">
@@ -291,13 +361,13 @@ function ResultsChartScreen({ step }: Props) {
       </div>
       <p className="text-xs text-gray-400 leading-relaxed mb-6">{step.description}</p>
       <div className="mt-auto">
-        <NavyButton>{step.buttonLabel}</NavyButton>
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
     </ScreenWrapper>
   );
 }
 
-function HabitLoopScreen({ step }: Props) {
+function HabitLoopScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
       <h1 className="text-xl font-bold text-[#1a1f3d] mb-2">{step.title}</h1>
@@ -305,7 +375,7 @@ function HabitLoopScreen({ step }: Props) {
       {step.illustrationLabel ? (
         <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 mb-4 h-44 flex items-center justify-center">
           <div className="relative w-32 h-32">
-            <div className="absolute inset-0 rounded-full border-4 border-dashed border-amber-300" />
+            <div className="absolute inset-0 rounded-full border-4 border-dashed border-amber-300 animate-spin" style={{ animationDuration: '20s' }} />
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 text-xs font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded">Cue</div>
             <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 text-xs font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded">Craving</div>
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-2 text-xs font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded">Response</div>
@@ -318,24 +388,53 @@ function HabitLoopScreen({ step }: Props) {
       )}
       <p className="text-xs text-gray-500 leading-relaxed mb-6">{step.description}</p>
       <div className="mt-auto">
-        <NavyButton>{step.buttonLabel}</NavyButton>
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
     </ScreenWrapper>
   );
 }
 
-function LoadingTestimonialsScreen({ step }: Props) {
+function LoadingTestimonialsScreen({ step, onNext }: Props) {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    setProgress(0);
+    const interval = setInterval(() => {
+      setProgress(p => {
+        if (p >= 100) {
+          clearInterval(interval);
+          setTimeout(onNext, 500);
+          return 100;
+        }
+        return p + 2;
+      });
+    }, 80);
+    return () => clearInterval(interval);
+  }, [step.id]);
+
+  const circumference = 2 * Math.PI * 40;
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
+
   return (
     <ScreenWrapper bg="bg-[#fdf8f4]">
       <h1 className="text-xl font-bold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
       <p className="text-sm text-gray-400 text-center mb-6">{step.subtitle}</p>
-      {/* Progress ring */}
       <div className="flex justify-center mb-6">
-        <div className="w-24 h-24 rounded-full border-4 border-gray-200 border-t-indigo-500 flex items-center justify-center">
-          <span className="text-sm font-bold text-[#1a1f3d]">72%</span>
-        </div>
+        <svg width="96" height="96" className="-rotate-90">
+          <circle cx="48" cy="48" r="40" stroke="#e5e7eb" strokeWidth="6" fill="none" />
+          <circle
+            cx="48" cy="48" r="40"
+            stroke="#6366f1"
+            strokeWidth="6"
+            fill="none"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            className="transition-all duration-100"
+          />
+        </svg>
+        <span className="absolute mt-8 text-lg font-bold text-[#1a1f3d]">{progress}%</span>
       </div>
-      {/* Testimonial cards */}
       <div className="space-y-3">
         {step.testimonials?.map((t, i) => (
           <div key={i} className="bg-white rounded-xl p-3 flex gap-3 items-start shadow-sm">
@@ -353,7 +452,10 @@ function LoadingTestimonialsScreen({ step }: Props) {
   );
 }
 
-function PersonalSummaryScreen({ step }: Props) {
+function PersonalSummaryScreen({ step, onNext }: Props) {
+  const [animated, setAnimated] = useState(false);
+  useEffect(() => { setTimeout(() => setAnimated(true), 300); }, []);
+
   return (
     <ScreenWrapper>
       <h1 className="text-xl font-bold text-[#1a1f3d] mb-5">{step.title}</h1>
@@ -365,7 +467,10 @@ function PersonalSummaryScreen({ step }: Props) {
               <span className="text-xs text-gray-400">{bar.status}</span>
             </div>
             <div className="w-full bg-gray-100 rounded-full h-2.5">
-              <div className="bg-gradient-to-r from-red-400 to-orange-400 h-2.5 rounded-full" style={{ width: `${bar.value}%` }} />
+              <div
+                className="bg-gradient-to-r from-red-400 to-orange-400 h-2.5 rounded-full transition-all duration-1000 ease-out"
+                style={{ width: animated ? `${bar.value}%` : '0%' }}
+              />
             </div>
           </div>
         ))}
@@ -380,13 +485,13 @@ function PersonalSummaryScreen({ step }: Props) {
         ))}
       </div>
       <div className="mt-auto">
-        <NavyButton>{step.buttonLabel}</NavyButton>
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
     </ScreenWrapper>
   );
 }
 
-function FirstHabitScreen({ step }: Props) {
+function FirstHabitScreen({ step, onNext }: Props) {
   const days = ['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'];
   return (
     <ScreenWrapper>
@@ -408,40 +513,74 @@ function FirstHabitScreen({ step }: Props) {
         </div>
       </div>
       <div className="mt-auto">
-        <NavyButton>{step.buttonLabel}</NavyButton>
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
     </ScreenWrapper>
   );
 }
 
-function BreathingPrepScreen({ step }: Props) {
+function BreathingPrepScreen({ step, onNext }: Props) {
+  useEffect(() => {
+    const t = setTimeout(onNext, 3000);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <ScreenWrapper bg="bg-[#1a1f3d]">
       <div className="flex-1 flex flex-col items-center justify-center">
-        <IllustrationPlaceholder label={step.illustrationLabel || 'Meditation'} className="h-48 w-48 mb-8 bg-gradient-to-br from-indigo-400/30 to-purple-400/30" />
+        <div className="w-48 h-48 mb-8 rounded-full bg-gradient-to-br from-indigo-400/30 to-purple-400/30 flex items-center justify-center animate-pulse">
+          <span className="text-indigo-200 text-xs">{step.illustrationLabel}</span>
+        </div>
         <h1 className="text-2xl font-bold text-white text-center">{step.title}</h1>
       </div>
     </ScreenWrapper>
   );
 }
 
-function BreathingScreen({ step }: Props) {
+function BreathingScreen({ step, onNext }: Props) {
+  const [phase, setPhase] = useState<'in' | 'hold' | 'out'>('in');
+  const [count, setCount] = useState(3);
+  const [cycles, setCycles] = useState(0);
+
+  useEffect(() => {
+    if (cycles >= 3) { onNext(); return; }
+    
+    const timer = setInterval(() => {
+      setCount(prev => {
+        if (prev <= 1) {
+          setPhase(p => {
+            if (p === 'in') return 'hold';
+            if (p === 'hold') return 'out';
+            setCycles(c => c + 1);
+            return 'in';
+          });
+          return 3;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cycles]);
+
+  const phaseLabel = phase === 'in' ? 'Breathe in' : phase === 'hold' ? 'Hold' : 'Breathe out';
+  const scale = phase === 'in' ? 'scale-110' : phase === 'out' ? 'scale-90' : 'scale-100';
+
   return (
     <ScreenWrapper bg="bg-[#1a1f3d]">
-      <p className="text-sm text-gray-300 text-center mt-4">{step.title}</p>
+      <p className="text-sm text-gray-300 text-center mt-4">{cycles + 1} breath{cycles > 0 ? 's' : ''}</p>
       <div className="flex-1 flex flex-col items-center justify-center">
-        <div className="w-40 h-40 rounded-full border-4 border-indigo-400/50 flex items-center justify-center mb-4">
+        <div className={`w-40 h-40 rounded-full border-4 border-indigo-400/50 flex items-center justify-center mb-4 transition-transform duration-1000 ${scale}`}>
           <div className="w-28 h-28 rounded-full bg-indigo-400/20 flex items-center justify-center">
-            <span className="text-4xl font-bold text-white">{step.description}</span>
+            <span className="text-4xl font-bold text-white">{count}</span>
           </div>
         </div>
-        <p className="text-lg font-semibold text-white">{step.subtitle}</p>
+        <p className="text-lg font-semibold text-white">{phaseLabel}</p>
       </div>
     </ScreenWrapper>
   );
 }
 
-function BreathingDoneScreen({ step }: Props) {
+function BreathingDoneScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
       <h1 className="text-xl font-bold text-[#1a1f3d] mb-2">{step.title}</h1>
@@ -455,14 +594,17 @@ function BreathingDoneScreen({ step }: Props) {
         </div>
       </div>
       <div className="mt-auto">
-        <NavyButton>{step.buttonLabel}</NavyButton>
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
     </ScreenWrapper>
   );
 }
 
-function StreakScreen({ step }: Props) {
+function StreakScreen({ step, onNext }: Props) {
   const days = ['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'];
+  const [showStreak, setShowStreak] = useState(false);
+  useEffect(() => { setTimeout(() => setShowStreak(true), 400); }, []);
+
   return (
     <ScreenWrapper>
       <p className="text-sm text-gray-400 mb-2">Today</p>
@@ -474,26 +616,37 @@ function StreakScreen({ step }: Props) {
           </div>
         ))}
       </div>
-      <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 text-center mb-4">
+      <div className={`bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 text-center mb-4 transition-all duration-700 ${showStreak ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}`}>
         <p className="text-xs font-bold text-amber-600 uppercase tracking-wide">{step.title}</p>
         <p className="text-4xl font-black text-[#1a1f3d] mt-2">{step.statHighlight}</p>
         <p className="text-sm font-semibold text-[#1a1f3d] mt-1">{step.subtitle}</p>
       </div>
       <p className="text-xs text-gray-400 leading-relaxed mb-6">{step.description}</p>
       <div className="mt-auto">
-        <NavyButton>{step.buttonLabel}</NavyButton>
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
     </ScreenWrapper>
   );
 }
 
-function PaywallScreen({ step }: Props) {
+function PaywallScreen({ step, onNext }: Props) {
+  const [selectedTier, setSelectedTier] = useState(
+    step.pricingTiers?.findIndex(t => t.badge) ?? 0
+  );
+
   return (
     <ScreenWrapper>
+      <button onClick={onNext} className="self-end text-gray-400 text-lg mb-2 active:opacity-60">✕</button>
       <h1 className="text-xl font-bold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
       <div className="space-y-3 mb-4">
         {step.pricingTiers?.map((tier, i) => (
-          <div key={i} className={`relative rounded-2xl border-2 p-4 ${i === 1 ? 'border-indigo-500 bg-indigo-50/50' : 'border-gray-200'}`}>
+          <button
+            key={i}
+            onClick={() => setSelectedTier(i)}
+            className={`relative w-full rounded-2xl border-2 p-4 text-left transition-all active:scale-[0.98] ${
+              i === selectedTier ? 'border-indigo-500 bg-indigo-50/50' : 'border-gray-200'
+            }`}
+          >
             {tier.badge && (
               <span className="absolute -top-2.5 right-3 bg-indigo-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">{tier.badge}</span>
             )}
@@ -504,19 +657,19 @@ function PaywallScreen({ step }: Props) {
               </div>
               <p className="text-sm font-bold text-[#1a1f3d]">{tier.perWeek}</p>
             </div>
-          </div>
+          </button>
         ))}
       </div>
       <p className="text-sm font-semibold text-[#1a1f3d] text-center mb-4">{step.subtitle}</p>
       <div className="mt-auto">
-        <NavyButton>{step.buttonLabel}</NavyButton>
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
       <p className="text-[10px] text-gray-300 text-center mt-3">Terms & Conditions · Privacy Policy</p>
     </ScreenWrapper>
   );
 }
 
-function BeforeAfterScreen({ step }: Props) {
+function BeforeAfterScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
       <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
@@ -544,23 +697,22 @@ function BeforeAfterScreen({ step }: Props) {
         </div>
       </div>
       <div className="mt-auto">
-        <NavyButton>{step.buttonLabel}</NavyButton>
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
     </ScreenWrapper>
   );
 }
 
-function ScienceBackedScreen({ step }: Props) {
+function ScienceBackedScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      {step.subtitle && (
+      {step.subtitle ? (
         <>
           <h1 className="text-lg font-bold text-[#1a1f3d] mb-3">{step.title}</h1>
           <IllustrationPlaceholder label={step.illustrationLabel || step.subtitle} className="h-36 mb-4" />
           <p className="text-xs text-gray-500 leading-relaxed mb-4">{step.description}</p>
         </>
-      )}
-      {!step.subtitle && (
+      ) : (
         <>
           <h1 className="text-xl font-bold text-[#1a1f3d] mb-4">{step.title}</h1>
           <p className="text-sm text-gray-500 leading-relaxed mb-6">{step.description}</p>
@@ -572,13 +724,20 @@ function ScienceBackedScreen({ step }: Props) {
         </>
       )}
       <div className="mt-auto">
-        <NavyButton>{step.buttonLabel}</NavyButton>
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
     </ScreenWrapper>
   );
 }
 
-function RatingScreen({ step }: Props) {
+function RatingScreen({ step, onNext, onMilestone }: Props) {
+  const [rating, setRating] = useState(0);
+
+  const handleRate = () => {
+    onMilestone?.('review');
+    onNext();
+  };
+
   return (
     <ScreenWrapper bg="bg-[#fdf8f4]">
       <div className="flex-1 flex flex-col items-center justify-center">
@@ -588,13 +747,66 @@ function RatingScreen({ step }: Props) {
         <p className="text-sm text-gray-500 text-center mb-4">{step.description}</p>
         <div className="flex gap-1 mb-6">
           {[1, 2, 3, 4, 5].map(s => (
-            <span key={s} className="text-2xl text-amber-400">★</span>
+            <button key={s} onClick={() => setRating(s)} className="text-2xl active:scale-110 transition-transform">
+              <span className={s <= rating ? 'text-amber-400' : 'text-gray-300'}>★</span>
+            </button>
           ))}
         </div>
       </div>
       <div className="mt-auto space-y-2">
-        <NavyButton>{step.buttonLabel}</NavyButton>
-        <SecondaryButton>{step.secondaryButtonLabel}</SecondaryButton>
+        <NavyButton onClick={handleRate}>{step.buttonLabel}</NavyButton>
+        <SecondaryButton onClick={onNext}>{step.secondaryButtonLabel}</SecondaryButton>
+      </div>
+    </ScreenWrapper>
+  );
+}
+
+function DiscountOfferScreen({ step, onNext }: Props) {
+  return (
+    <ScreenWrapper bg="bg-gradient-to-b from-amber-50 to-white">
+      <button onClick={onNext} className="self-end text-gray-400 text-lg mb-2 active:opacity-60">✕</button>
+      <div className="flex-1 flex flex-col items-center justify-center">
+        <div className="text-5xl mb-4">🎁</div>
+        <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
+        <p className="text-sm text-gray-500 text-center mb-2">{step.subtitle}</p>
+        <p className="text-xs text-gray-400 text-center mb-6">{step.description}</p>
+        {step.pricingTiers?.map((tier, i) => (
+          <div key={i} className="w-full rounded-2xl border-2 border-amber-400 bg-amber-50 p-4 mb-4 relative">
+            {tier.badge && (
+              <span className="absolute -top-2.5 right-3 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">{tier.badge}</span>
+            )}
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm font-semibold text-[#1a1f3d]">{tier.label}</p>
+                <p className="text-xs text-gray-400">{tier.total}</p>
+              </div>
+              <p className="text-sm font-bold text-amber-600">{tier.perWeek}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-auto space-y-2">
+        <button className="w-full py-3.5 rounded-2xl bg-amber-500 text-white font-semibold text-sm active:scale-[0.98]">
+          {step.buttonLabel}
+        </button>
+        <SecondaryButton onClick={onNext}>{step.secondaryButtonLabel}</SecondaryButton>
+      </div>
+    </ScreenWrapper>
+  );
+}
+
+function WelcomeAboardScreen({ step, onNext }: Props) {
+  return (
+    <ScreenWrapper bg="bg-gradient-to-b from-indigo-50 to-white">
+      <div className="flex-1 flex flex-col items-center justify-center">
+        <div className="text-6xl mb-4">🎉</div>
+        <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
+        <p className="text-lg font-semibold text-indigo-500 text-center mb-2">{step.subtitle}</p>
+        <p className="text-sm text-gray-500 text-center mb-6">{step.description}</p>
+        <IllustrationPlaceholder label={step.illustrationLabel || 'Celebration'} className="w-40 h-40" />
+      </div>
+      <div className="mt-auto">
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
     </ScreenWrapper>
   );

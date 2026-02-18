@@ -520,5 +520,28 @@ export const dearMeFlow: OnboardingFlow = {
         'Peace of mind',
       ],
     },
+    // 50 - Discount Offer (shown after closing paywall)
+    {
+      id: 'discount-offer',
+      type: 'discount-offer',
+      title: 'Wait! 50% OFF just for you!',
+      subtitle: "We don't want you to miss out",
+      description: 'This exclusive offer expires soon. Start your journey to a better you at half the price!',
+      buttonLabel: 'Claim 50% off',
+      secondaryButtonLabel: 'No thanks',
+      pricingTiers: [
+        { label: '12 months', perWeek: '$0.38 / week', total: '$19.99 for a year', badge: '50% OFF' },
+      ],
+    },
+    // 51 - Welcome Aboard
+    {
+      id: 'welcome-aboard',
+      type: 'welcome-aboard',
+      title: "Welcome aboard! 🎉",
+      subtitle: "You're all set!",
+      description: "Your personalized plan is ready. Let's start building better habits together!",
+      buttonLabel: "Let's go!",
+      illustrationLabel: 'Celebration confetti',
+    },
   ],
 };
