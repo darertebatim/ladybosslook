@@ -9,13 +9,42 @@ import coinGold from '@/assets/coin-gold.png';
 import coinSilver from '@/assets/coin-silver.png';
 import coinBronze from '@/assets/coin-bronze.png';
 
-export type BadgeCelebrationLevel = 'silver' | 'gold' | 'almostGold';
+export type BadgeCelebrationLevel = 'silver' | 'gold' | 'almostGold' | 'action';
 
 const BADGE_IMAGES = {
   bronze: coinBronze,
   silver: coinSilver,
   gold: coinGold,
 };
+
+const ACTION_MESSAGES = [
+  "You absolutely crushed it! 👍",
+  "You're unstoppable! 💪",
+  "You're on fire right now! 🔥",
+  "Nailed it right on the head! 🎉",
+  "Way to go, superstar! ⭐",
+  "Keep that momentum going! 🚀",
+  "Look at you showing up! 🌟",
+  "That's the spirit! ✨",
+  "One step closer to your best self! 🏆",
+  "Small wins, big changes! 🎯",
+  "You're building something amazing! 💎",
+  "Consistency is your superpower! ⚡",
+  "Another one in the bag! 🎊",
+  "You make it look easy! 😎",
+  "Progress looks good on you! 💫",
+];
+
+let lastActionMessageIndex = -1;
+
+function getRandomActionMessage(): string {
+  let index: number;
+  do {
+    index = Math.floor(Math.random() * ACTION_MESSAGES.length);
+  } while (index === lastActionMessageIndex && ACTION_MESSAGES.length > 1);
+  lastActionMessageIndex = index;
+  return ACTION_MESSAGES[index];
+}
 
 interface BadgeCelebrationProps {
   type: BadgeCelebrationLevel | null;
@@ -46,16 +75,22 @@ export function BadgeCelebration({
   const [flyingBadge, setFlyingBadge] = useState(false);
   const badgeRef = useRef<HTMLImageElement>(null);
 
+  const [actionMessage, setActionMessage] = useState('');
+
   useEffect(() => {
     if (type) {
       setIsAnimating(true);
       haptic.success();
 
+      if (type === 'action') {
+        setActionMessage(getRandomActionMessage());
+      }
+
       // Auto-dismiss toasts after delay
-      if (type === 'silver' || type === 'almostGold') {
+      if (type === 'silver' || type === 'almostGold' || type === 'action') {
         const timer = setTimeout(() => {
           onClose();
-        }, 4000);
+        }, type === 'action' ? 2500 : 4000);
         return () => clearTimeout(timer);
       }
 
@@ -133,8 +168,32 @@ export function BadgeCelebration({
 
   if (!type) return null;
 
-  // Toast style for silver and almost-there
-  if (type === 'silver' || type === 'almostGold') {
+  // Toast style for action, silver, and almost-there
+  if (type === 'action' || type === 'silver' || type === 'almostGold') {
+    // Action celebration - simple motivational toast
+    if (type === 'action') {
+      return (
+        <div 
+          className="fixed left-4 right-4 z-[9999] animate-in slide-in-from-bottom-4 duration-300"
+          style={{ bottom: 'calc(80px + env(safe-area-inset-bottom, 0px) + 16px)' }}
+          onClick={onClose}
+        >
+          <div className="bg-gradient-to-r from-orange-500 to-amber-400 rounded-2xl p-4 shadow-xl flex items-center gap-3">
+            <div className="relative shrink-0">
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                <Sparkles className="h-6 w-6 text-white" />
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-white font-semibold text-base">
+                {actionMessage}
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div 
         className="fixed left-4 right-4 z-[9999] animate-in slide-in-from-bottom-4 duration-300"

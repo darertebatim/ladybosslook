@@ -48,8 +48,9 @@ export function useBadgeCelebration({
 }: UseBadgeCelebrationOptions) {
   const [celebrationType, setCelebrationType] = useState<BadgeCelebrationLevel | null>(null);
   
-  // Track previous badge level for transitions within same session
+  // Track previous badge level and completed count for transitions
   const prevBadgeLevelRef = useRef<BadgeLevel>(currentBadgeLevel);
+  const prevCompletedRef = useRef<number>(completedCount);
   const prevDateKeyRef = useRef<string>(dateKey);
   const initializedRef = useRef(false);
 
@@ -68,11 +69,16 @@ export function useBadgeCelebration({
     if (!initializedRef.current) {
       initializedRef.current = true;
       prevBadgeLevelRef.current = currentBadgeLevel;
+      prevCompletedRef.current = completedCount;
       return;
     }
 
     const prevLevel = prevBadgeLevelRef.current;
+    const prevCompleted = prevCompletedRef.current;
     const celebratedLevels = getCelebratedLevels(dateKey);
+    
+    // Only react to increases in completed count (not decreases from uncomplete)
+    const isNewCompletion = completedCount > prevCompleted;
     
     // Check for "almost gold" first (1 task away)
     if (
@@ -85,27 +91,35 @@ export function useBadgeCelebration({
       setCelebrationType('almostGold');
       saveCelebratedLevel(dateKey, 'almostGold');
       prevBadgeLevelRef.current = currentBadgeLevel;
+      prevCompletedRef.current = completedCount;
       return;
     }
     
-    // Skip if already celebrated this badge level today
-    if (celebratedLevels.has(currentBadgeLevel)) {
+    // Check for gold badge (100% progress)
+    if (currentBadgeLevel === 'gold' && prevLevel !== 'gold' && !celebratedLevels.has('gold')) {
+      setCelebrationType('gold');
+      saveCelebratedLevel(dateKey, 'gold');
       prevBadgeLevelRef.current = currentBadgeLevel;
+      prevCompletedRef.current = completedCount;
       return;
     }
 
     // Check for silver badge (50% progress)
-    if (currentBadgeLevel === 'silver' && prevLevel !== 'silver' && prevLevel !== 'gold') {
+    if (currentBadgeLevel === 'silver' && prevLevel !== 'silver' && prevLevel !== 'gold' && !celebratedLevels.has('silver')) {
       setCelebrationType('silver');
       saveCelebratedLevel(dateKey, 'silver');
+      prevBadgeLevelRef.current = currentBadgeLevel;
+      prevCompletedRef.current = completedCount;
+      return;
     }
-    // Check for gold badge (100% progress)
-    else if (currentBadgeLevel === 'gold' && prevLevel !== 'gold') {
-      setCelebrationType('gold');
-      saveCelebratedLevel(dateKey, 'gold');
+
+    // For any other completion, show action celebration
+    if (isNewCompletion) {
+      setCelebrationType('action');
     }
 
     prevBadgeLevelRef.current = currentBadgeLevel;
+    prevCompletedRef.current = completedCount;
   }, [currentBadgeLevel, completedCount, totalCount, dateKey]);
 
   const closeCelebration = useCallback(() => {

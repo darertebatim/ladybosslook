@@ -121,6 +121,9 @@ export default function AppTest() {
                 <CardTitle className="text-lg">🏅 Badge Celebrations</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
+                <Button onClick={() => setBadgeCelebrationType('action')} className="w-full justify-start" variant="outline">
+                  ✨ Action Completion Toast
+                </Button>
                 <Button onClick={() => setBadgeCelebrationType('silver')} className="w-full justify-start" variant="outline">
                   🥈 Silver Badge Toast (50%)
                 </Button>
