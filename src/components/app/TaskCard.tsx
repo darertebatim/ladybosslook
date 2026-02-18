@@ -10,6 +10,7 @@ import {
   useUncompleteTask,
 } from '@/hooks/useTaskPlanner';
 import { haptic } from '@/lib/haptics';
+import { showCompletionCelebration } from '@/lib/celebrationToasts';
 import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
 import { isToday, isBefore, startOfDay } from 'date-fns';
@@ -108,6 +109,7 @@ export const TaskCard = memo(function TaskCard({
       uncompleteTask.mutate({ taskId: task.id, date });
     } else {
       const result = await completeTask.mutateAsync({ taskId: task.id, date });
+      showCompletionCelebration();
       if (result.streakIncreased && onStreakIncrease) {
         // Stronger haptic for streak
         haptic.medium();
