@@ -1,9 +1,40 @@
 import { OnboardingFlow } from '@/types/onboarding';
 
+// Image imports
+import welcomeImg from '@/assets/onboarding/dear-me/welcome.png';
+import greeting1Img from '@/assets/onboarding/dear-me/greeting-1.png';
+import greeting2Img from '@/assets/onboarding/dear-me/greeting-2.png';
+import focusImg from '@/assets/onboarding/dear-me/focus.png';
+import desireGrowImg from '@/assets/onboarding/dear-me/desire-grow.png';
+import ynFocusImg from '@/assets/onboarding/dear-me/yn-focus.png';
+import ynTiredImg from '@/assets/onboarding/dear-me/yn-tired.png';
+import ynBusyImg from '@/assets/onboarding/dear-me/yn-busy.png';
+import dywRoutinesImg from '@/assets/onboarding/dear-me/dyw-routines.png';
+import dywProductiveImg from '@/assets/onboarding/dear-me/dyw-productive.png';
+import dywNoPressureImg from '@/assets/onboarding/dear-me/dyw-no-pressure.png';
+import ratingPromptImg from '@/assets/onboarding/dear-me/rating-prompt.png';
+import sleepStatImg from '@/assets/onboarding/dear-me/sleep-stat.png';
+import motivationalHereImg from '@/assets/onboarding/dear-me/motivational-here.png';
+import notificationImg from '@/assets/onboarding/dear-me/notification.png';
+import resultsChartImg from '@/assets/onboarding/dear-me/results-chart.png';
+import habitLoopImg from '@/assets/onboarding/dear-me/habit-loop.png';
+import focusStatImg from '@/assets/onboarding/dear-me/focus-stat.png';
+import adhdCbtImg from '@/assets/onboarding/dear-me/adhd-cbt.png';
+import loading1Img from '@/assets/onboarding/dear-me/loading-1.png';
+import personalSummaryImg from '@/assets/onboarding/dear-me/personal-summary.png';
+import breathingPrepImg from '@/assets/onboarding/dear-me/breathing-prep.png';
+import breathingImg from '@/assets/onboarding/dear-me/breathing.png';
+import paywall1Img from '@/assets/onboarding/dear-me/paywall-1.png';
+import paywall2Img from '@/assets/onboarding/dear-me/paywall-2.png';
+import motivationalFinalImg from '@/assets/onboarding/dear-me/motivational-final.png';
+import scienceBackedImg from '@/assets/onboarding/dear-me/science-backed.png';
+import beforeAfterImg from '@/assets/onboarding/dear-me/before-after.png';
+import homeScreenImg from '@/assets/onboarding/dear-me/home-screen.png';
+
 export const dearMeFlow: OnboardingFlow = {
   id: 'dear-me-v1',
   name: 'Dear Me Onboarding',
-  description: 'Full 49-screen onboarding flow from the Dear Me app',
+  description: 'Full 50-screen onboarding flow from the Dear Me app',
   appName: 'Dear Me',
   createdAt: '2025-01-01',
   steps: [
@@ -15,6 +46,7 @@ export const dearMeFlow: OnboardingFlow = {
       statHighlight: '25 million+',
       buttonLabel: 'Get started',
       secondaryButtonLabel: 'Already a member? Sign in.',
+      illustrationImage: welcomeImg,
       statBadges: [
         { label: 'Featured', value: '⭐' },
         { label: "Users' Favorite", value: '❤️' },
@@ -27,7 +59,7 @@ export const dearMeFlow: OnboardingFlow = {
       title: 'Hi there!',
       subtitle: 'Glad to have you here!',
       buttonLabel: 'Continue',
-      illustrationLabel: 'Mascot waving',
+      illustrationImage: greeting1Img,
     },
     // 3 - Greeting 2
     {
@@ -36,13 +68,14 @@ export const dearMeFlow: OnboardingFlow = {
       title: 'Come on,',
       subtitle: "Let's discover a better you together!",
       buttonLabel: 'Continue',
-      illustrationLabel: 'Mascot with sparkles',
+      illustrationImage: greeting2Img,
     },
     // 4 - Multi-select: Focus
     {
       id: 'focus',
       type: 'multi-select',
       title: 'What should we focus on?',
+      illustrationImage: focusImg,
       options: [
         { label: 'Stop my negative thoughts', emoji: '🧠' },
         { label: 'Beat my procrastination', emoji: '⏰' },
@@ -57,6 +90,7 @@ export const dearMeFlow: OnboardingFlow = {
       id: 'desire-to-grow',
       type: 'multi-select',
       title: "What's fueling your desire to grow?",
+      illustrationImage: desireGrowImg,
       options: [
         { label: 'Achieving my goal', emoji: '🎯' },
         { label: 'Feeling better', emoji: '😊' },
@@ -71,7 +105,7 @@ export const dearMeFlow: OnboardingFlow = {
       type: 'yes-no',
       title: 'Does this sound like you?',
       description: 'I struggle to focus and get things done.',
-      illustrationLabel: 'Person at desk distracted',
+      illustrationImage: ynFocusImg,
     },
     // 7 - Yes/No: Tired
     {
@@ -79,7 +113,7 @@ export const dearMeFlow: OnboardingFlow = {
       type: 'yes-no',
       title: 'Does this sound like you?',
       description: "I'm often too tired or unmotivated to do something productive.",
-      illustrationLabel: 'Person on couch',
+      illustrationImage: ynTiredImg,
     },
     // 8 - Yes/No: Busy
     {
@@ -87,7 +121,7 @@ export const dearMeFlow: OnboardingFlow = {
       type: 'yes-no',
       title: 'Does this sound like you?',
       description: "I'm busy most days, and it feels hard to keep up.",
-      illustrationLabel: 'Person overwhelmed',
+      illustrationImage: ynBusyImg,
     },
     // 9 - Do you want: Routines
     {
@@ -97,7 +131,7 @@ export const dearMeFlow: OnboardingFlow = {
       subtitle: 'Build healthy and sustainable routines?',
       buttonLabel: "Sure, let's go",
       secondaryButtonLabel: 'No',
-      illustrationLabel: 'Morning routine',
+      illustrationImage: dywRoutinesImg,
     },
     // 10 - Do you want: Productive
     {
@@ -107,7 +141,7 @@ export const dearMeFlow: OnboardingFlow = {
       subtitle: 'Be your most productive self?',
       buttonLabel: "Sure, let's go",
       secondaryButtonLabel: 'No',
-      illustrationLabel: 'Productivity chart',
+      illustrationImage: dywProductiveImg,
     },
     // 11 - Do you want: Without pressure
     {
@@ -117,7 +151,7 @@ export const dearMeFlow: OnboardingFlow = {
       subtitle: 'Build habits without pressure?',
       buttonLabel: "Sure, let's go",
       secondaryButtonLabel: 'No',
-      illustrationLabel: 'Relaxed person',
+      illustrationImage: dywNoPressureImg,
     },
     // 12 - Rating prompt
     {
@@ -127,6 +161,7 @@ export const dearMeFlow: OnboardingFlow = {
       description: "Help improve us by rating us, and we'll do our best to make your experience even better.",
       buttonLabel: 'Give us 5 stars',
       secondaryButtonLabel: 'Maybe later',
+      illustrationImage: ratingPromptImg,
     },
     // 13 - Rating with iOS dialog
     {
@@ -205,7 +240,7 @@ export const dearMeFlow: OnboardingFlow = {
       statHighlight: "Over 57% of users don't get enough quality sleep",
       description: "We'll help you create a calm bedtime routine, so you can unwind and rest better",
       buttonLabel: 'Continue',
-      illustrationLabel: 'Sleeping illustration',
+      illustrationImage: sleepStatImg,
     },
     // 20 - Stress level
     {
@@ -237,7 +272,7 @@ export const dearMeFlow: OnboardingFlow = {
       title: 'We are here with you.',
       description: "You don't have to figure everything out alone. We'll take this step by step together.",
       buttonLabel: 'Continue',
-      illustrationLabel: 'Supportive hands',
+      illustrationImage: motivationalHereImg,
     },
     // 23 - Notification permission
     {
@@ -246,8 +281,9 @@ export const dearMeFlow: OnboardingFlow = {
       title: 'Do you want to allow reminders to boost your success?',
       buttonLabel: 'Yes, please!',
       secondaryButtonLabel: 'Not now',
+      illustrationImage: notificationImg,
     },
-    // 24 - Notification iOS dialog (same screen with overlay)
+    // 24 - Notification iOS dialog
     {
       id: 'notification-dialog',
       type: 'notification-permission',
@@ -267,7 +303,7 @@ export const dearMeFlow: OnboardingFlow = {
         { label: 'Satisfied', description: "I'm content with my productivity level" },
       ],
     },
-    // 26-27 - Results chart (two variants, we show one with animation)
+    // 26-27 - Results chart
     {
       id: 'results-chart',
       type: 'results-chart',
@@ -275,6 +311,7 @@ export const dearMeFlow: OnboardingFlow = {
       description: "Reach a 37x a better you by improving your routine just 1% each day. A key insight from James Clear's Atomic Habits is that small routines drive continuous growth. By improving just 1% daily, you'll be 37x better by year's end.",
       statHighlight: '37x',
       buttonLabel: "Great, let's go",
+      illustrationImage: resultsChartImg,
     },
     // 28 - Habit Loop intro
     {
@@ -284,6 +321,7 @@ export const dearMeFlow: OnboardingFlow = {
       subtitle: 'Build Better Habits with the Habit Loop',
       description: 'Habits follow a loop: cue triggers craving, response leads to reward. Recognize your cues, act on your cravings, and reward positive habits to make lasting changes in your daily life.',
       buttonLabel: 'Continue',
+      illustrationImage: habitLoopImg,
     },
     // 29 - Habit Loop diagram
     {
@@ -323,7 +361,7 @@ export const dearMeFlow: OnboardingFlow = {
       statHighlight: 'Over 97% of users struggle to stay focused, too.',
       description: 'We help you create structure, regain focus, and breeze through your tasks.',
       buttonLabel: 'Continue',
-      illustrationLabel: 'Focus illustration',
+      illustrationImage: focusStatImg,
     },
     // 33 - ADHD / CBT
     {
@@ -333,7 +371,12 @@ export const dearMeFlow: OnboardingFlow = {
       subtitle: 'ADHD Brain vs Non-ADHD Brain',
       description: 'Boosts focus and minimizes distractions. Provides reminders to stay on track. Strengthens time management and planning skills.',
       buttonLabel: "Great, let's go",
-      illustrationLabel: 'Brain comparison',
+      illustrationImage: adhdCbtImg,
+      checklistItems: [
+        'Boosts focus and minimizes distractions',
+        'Provides reminders to stay on track',
+        'Strengthens time management and planning skills',
+      ],
     },
     // 34 - Loading with testimonials 1
     {
@@ -341,6 +384,7 @@ export const dearMeFlow: OnboardingFlow = {
       type: 'loading-testimonials',
       title: 'Welcome to your Dear Me journey',
       subtitle: 'Your personal plan is being created..',
+      illustrationImage: loading1Img,
       testimonials: [
         { name: 'Lisa M.', text: 'Really enjoying this app!' },
         { name: 'Jawad Z.', text: 'It makes my day so much better!' },
@@ -364,6 +408,7 @@ export const dearMeFlow: OnboardingFlow = {
       id: 'personal-summary',
       type: 'personal-summary',
       title: 'Here is your personal summary',
+      illustrationImage: personalSummaryImg,
       summaryBars: [
         { label: 'Fitness', value: 35, status: 'Could be better' },
         { label: 'Wellness', value: 30, status: 'Could be better' },
@@ -391,7 +436,7 @@ export const dearMeFlow: OnboardingFlow = {
       id: 'breathing-prep',
       type: 'breathing-prep',
       title: "Let's get ready!",
-      illustrationLabel: 'Person meditating',
+      illustrationImage: breathingPrepImg,
     },
     // 39 - Breathing exercise
     {
@@ -400,6 +445,7 @@ export const dearMeFlow: OnboardingFlow = {
       title: '1 breath',
       subtitle: 'Breathe in',
       description: '3',
+      illustrationImage: breathingImg,
     },
     // 40 - Breathing done
     {
@@ -429,30 +475,34 @@ export const dearMeFlow: OnboardingFlow = {
       description: "By dedicating yourself for just 21 days, you'll form a new habit that is here to last! Follow your streaks and aspire to reach your personal best!",
       buttonLabel: 'Continue',
     },
-    // 43-46 - Paywall variants
+    // 43 - Paywall 1
     {
       id: 'paywall-1',
       type: 'paywall',
       title: 'Be your most productive self',
       subtitle: 'Unlock unlimited habits & routines!',
       buttonLabel: 'Continue',
+      illustrationImage: paywall1Img,
       pricingTiers: [
         { label: '1 month', perWeek: '$4.24 / week', total: '$16.99 for 1 month' },
         { label: '12 months', perWeek: '$1.53 / week', total: '$79.99 for a year', badge: 'BEST VALUE' },
         { label: '3 months', perWeek: '$3.07 / week', total: '$39.99 for 3 months', badge: 'POPULAR' },
       ],
     },
+    // 44 - Paywall 2
     {
       id: 'paywall-2',
       type: 'paywall',
       title: 'Your Most Productive Self',
       subtitle: 'Unlock unlimited habits & routines!',
       buttonLabel: 'Continue',
+      illustrationImage: paywall2Img,
       pricingTiers: [
         { label: '1 Month', perWeek: '$4.20 / week', total: '$16.99' },
         { label: '3 Months', perWeek: '$3.07 / week', total: '$39.99', badge: 'Popular' },
       ],
     },
+    // 45 - Paywall 3 (half price after closing)
     {
       id: 'paywall-3',
       type: 'paywall',
@@ -465,6 +515,7 @@ export const dearMeFlow: OnboardingFlow = {
         { label: '12 months', perWeek: '$0.76 / week', total: '$39.99 for a year', badge: 'BEST VALUE' },
       ],
     },
+    // 46 - Paywall 4
     {
       id: 'paywall-4',
       type: 'paywall',
@@ -484,7 +535,7 @@ export const dearMeFlow: OnboardingFlow = {
       title: 'Your journey toward a better you has already begun.',
       description: 'Now let us walk you through the rest, one small step at a time.',
       buttonLabel: 'Continue',
-      illustrationLabel: 'Journey illustration',
+      illustrationImage: motivationalFinalImg,
     },
     // 48 - Science backed
     {
@@ -493,6 +544,7 @@ export const dearMeFlow: OnboardingFlow = {
       title: 'Lasting change starts with proven methods.',
       description: 'We built Dear Me on Cognitive Behavioral Therapy, a proven method that helps 87% of individuals working to improve their lives build better habits.',
       buttonLabel: 'Continue',
+      illustrationImage: scienceBackedImg,
       statBadges: [
         { label: 'HARVARD', value: '🏛️' },
         { label: 'JOHNS HOPKINS', value: '🏥' },
@@ -507,6 +559,7 @@ export const dearMeFlow: OnboardingFlow = {
       title: 'Time is now!',
       subtitle: 'Meet a better you.',
       buttonLabel: 'Continue',
+      illustrationImage: beforeAfterImg,
       beforeItems: [
         'An unorganized day',
         'Unfinished goals',
@@ -519,6 +572,13 @@ export const dearMeFlow: OnboardingFlow = {
         'Habits that stick',
         'Peace of mind',
       ],
+    },
+    // 50 - Home screen (destination)
+    {
+      id: 'home-screen',
+      type: 'home-screen',
+      title: 'Home',
+      illustrationImage: homeScreenImg,
     },
   ],
 };
