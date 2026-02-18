@@ -103,7 +103,7 @@ export const TaskCard = memo(function TaskCard({
 
     // Animate
     setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 600);
+    setTimeout(() => setIsAnimating(false), 2500);
 
     if (isCompleted) {
       uncompleteTask.mutate({ taskId: task.id, date });
