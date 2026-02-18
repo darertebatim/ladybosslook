@@ -13,6 +13,7 @@ import {
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
+import { showCompletionCelebration } from '@/lib/celebrationToasts';
 import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
 import { isWaterTask } from '@/lib/waterTracking';
@@ -126,6 +127,7 @@ export const TaskDetailModal = ({
       uncompleteTask.mutate({ taskId: task.id, date });
     } else {
       const result = await completeTask.mutateAsync({ taskId: task.id, date });
+      showCompletionCelebration();
       if (result.streakIncreased && onStreakIncrease) {
         haptic.medium();
         onStreakIncrease();
