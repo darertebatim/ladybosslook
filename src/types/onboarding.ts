@@ -21,8 +21,9 @@ export type OnboardingStepType =
   | 'paywall'
   | 'before-after'
   | 'science-backed'
-  | 'rating';
-
+  | 'rating'
+  | 'discount-offer'
+  | 'welcome-aboard';
 export interface OnboardingOption {
   label: string;
   emoji?: string;
