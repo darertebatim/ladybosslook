@@ -204,9 +204,9 @@ export default {
 				'heartbeat': 'heartbeat 0.8s ease-in-out infinite',
 				'write': 'write 0.6s ease-in-out',
 				'fly-to-header': 'fly-to-header 0.6s ease-in-out forwards',
-				'seal-pop': 'seal-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
-				'emoji-bounce': 'emoji-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-				'particle-burst': 'particle-burst 0.6s ease-out forwards'
+				'seal-pop': 'seal-pop 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+				'emoji-bounce': 'emoji-bounce 2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+				'particle-burst': 'particle-burst 2.4s ease-out forwards'
 			},
 			backgroundImage: {
 				'gradient-hero': 'var(--gradient-hero)',
