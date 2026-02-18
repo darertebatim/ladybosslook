@@ -162,6 +162,17 @@ export default {
 					'85%': { transform: 'scale(1.1)' },
 					'100%': { transform: 'scale(1)' }
 				},
+				'emoji-bounce': {
+					'0%': { transform: 'scale(1) rotate(0deg)' },
+					'30%': { transform: 'scale(1.25) rotate(-8deg)' },
+					'60%': { transform: 'scale(0.9) rotate(5deg)' },
+					'100%': { transform: 'scale(1) rotate(0deg)' }
+				},
+				'particle-burst': {
+					'0%': { transform: 'scale(0)', opacity: '1' },
+					'50%': { transform: 'scale(1.8)', opacity: '0.6' },
+					'100%': { transform: 'scale(2.5)', opacity: '0' }
+				},
 				'fly-to-header': {
 					'0%': { 
 						transform: 'translate(0, 0) scale(1)',
@@ -193,7 +204,9 @@ export default {
 				'heartbeat': 'heartbeat 0.8s ease-in-out infinite',
 				'write': 'write 0.6s ease-in-out',
 				'fly-to-header': 'fly-to-header 0.6s ease-in-out forwards',
-				'seal-pop': 'seal-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
+				'seal-pop': 'seal-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+				'emoji-bounce': 'emoji-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+				'particle-burst': 'particle-burst 0.6s ease-out forwards'
 			},
 			backgroundImage: {
 				'gradient-hero': 'var(--gradient-hero)',
