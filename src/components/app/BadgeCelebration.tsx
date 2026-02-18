@@ -85,31 +85,29 @@ export function BadgeCelebration({
       if (type === 'action') {
         setActionMessage(getRandomActionMessage());
         
-        // Small confetti burst from bottom corners for action completion
-        const burst = () => {
-          confetti({
-            particleCount: 15,
-            angle: 60,
-            spread: 50,
-            startVelocity: 25,
-            origin: { x: 0, y: 1 },
-            colors: ['#2DD4BF', '#34D399', '#6EE7B7', '#A7F3D0', '#FFD700', '#FFA500'],
-            gravity: 1.2,
-            ticks: 80,
-          });
-          confetti({
-            particleCount: 15,
-            angle: 120,
-            spread: 50,
-            startVelocity: 25,
-            origin: { x: 1, y: 1 },
-            colors: ['#2DD4BF', '#34D399', '#6EE7B7', '#A7F3D0', '#FFD700', '#FFA500'],
-            gravity: 1.2,
-            ticks: 80,
-          });
+        // Rising stars effect - sparkles floating upward from the bottom
+        const starColors = ['#FFD700', '#FFA500', '#2DD4BF', '#34D399', '#FBBF24', '#F59E0B', '#A78BFA', '#818CF8'];
+        const launchStars = (delay: number) => {
+          setTimeout(() => {
+            confetti({
+              particleCount: 8,
+              spread: 70,
+              startVelocity: 30,
+              origin: { x: 0.3 + Math.random() * 0.4, y: 0.95 },
+              colors: starColors,
+              gravity: 0.4,
+              ticks: 120,
+              scalar: 1.2,
+              shapes: ['star'],
+              drift: (Math.random() - 0.5) * 0.5,
+            });
+          }, delay);
         };
-        burst();
-        setTimeout(burst, 300);
+        // Staggered star bursts for a magical rising effect
+        launchStars(0);
+        launchStars(150);
+        launchStars(350);
+        launchStars(550);
       }
 
       // Auto-dismiss toasts after delay
