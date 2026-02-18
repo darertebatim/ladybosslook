@@ -103,7 +103,7 @@ export const TaskCard = memo(function TaskCard({
 
     // Animate
     setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 300);
+    setTimeout(() => setIsAnimating(false), 600);
 
     if (isCompleted) {
       uncompleteTask.mutate({ taskId: task.id, date });
@@ -308,12 +308,9 @@ export const TaskCard = memo(function TaskCard({
             {isTimerGoal ? (
               <button
                 onClick={handleOpenTimer}
-                className={cn(
-                  'w-9 h-9 flex items-center justify-center shrink-0 transition-all duration-200',
-                  isAnimating && 'scale-110'
-                )}
+                className="w-9 h-9 flex items-center justify-center shrink-0"
               >
-                {goalReached ? <SealCheck className="w-9 h-9 text-teal-400" /> : (
+                {goalReached ? <SealCheck className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
                   <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center">
                     <Play className="h-4 w-4 ml-0.5" />
                   </span>
@@ -322,12 +319,9 @@ export const TaskCard = memo(function TaskCard({
             ) : (isCountGoal || isWater) ? (
               <button
                 onClick={handleOpenGoalInput}
-                className={cn(
-                  'w-9 h-9 flex items-center justify-center shrink-0 transition-all duration-200',
-                  isAnimating && 'scale-110'
-                )}
+                className="w-9 h-9 flex items-center justify-center shrink-0"
               >
-                {goalReached ? <SealCheck className="w-9 h-9 text-teal-400" /> : (
+                {goalReached ? <SealCheck className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
                   <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center">
                     {isWater ? <Droplets className="h-4 w-4 text-sky-500" /> : <Plus className="h-4 w-4" />}
                   </span>
@@ -336,12 +330,9 @@ export const TaskCard = memo(function TaskCard({
             ) : (
               <button
                 onClick={handleToggleComplete}
-                className={cn(
-                  'w-9 h-9 flex items-center justify-center shrink-0 transition-all duration-200',
-                  isAnimating && 'scale-110'
-                )}
+                className="w-9 h-9 flex items-center justify-center shrink-0"
               >
-                {isCompleted ? <SealCheck className="w-9 h-9 text-teal-400" /> : (
+                {isCompleted ? <SealCheck className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
                   <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
                 )}
               </button>
@@ -443,12 +434,9 @@ export const TaskCard = memo(function TaskCard({
         {isTimerGoal ? (
           <button
             onClick={handleOpenTimer}
-            className={cn(
-              'w-9 h-9 flex items-center justify-center shrink-0 transition-all duration-200',
-              isAnimating && 'scale-110'
-            )}
+            className="w-9 h-9 flex items-center justify-center shrink-0"
           >
-            {goalReached ? <SealCheck className="w-9 h-9 text-teal-400" /> : (
+            {goalReached ? <SealCheck className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
               <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center">
                 <Play className="h-5 w-5 text-foreground/70 ml-0.5" fill="currentColor" />
               </span>
@@ -457,12 +445,9 @@ export const TaskCard = memo(function TaskCard({
         ) : isCountGoal ? (
           <button
             onClick={handleOpenGoalInput}
-            className={cn(
-              'w-9 h-9 flex items-center justify-center shrink-0 transition-all duration-200',
-              isAnimating && 'scale-110'
-            )}
+            className="w-9 h-9 flex items-center justify-center shrink-0"
           >
-            {goalReached ? <SealCheck className="w-9 h-9 text-teal-400" /> : isWater ? (
+            {goalReached ? <SealCheck className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : isWater ? (
               <span className="w-9 h-9 rounded-full border-2 border-sky-400 bg-sky-100 flex items-center justify-center">
                 <Droplets className="h-5 w-5 text-sky-500" />
               </span>
@@ -475,12 +460,9 @@ export const TaskCard = memo(function TaskCard({
         ) : (
           <button
             onClick={handleToggleComplete}
-            className={cn(
-              'w-9 h-9 flex items-center justify-center shrink-0 transition-all duration-200',
-              isAnimating && 'scale-110'
-            )}
+            className="w-9 h-9 flex items-center justify-center shrink-0"
           >
-            {isCompleted ? <SealCheck className="w-9 h-9 text-teal-400" /> : (
+            {isCompleted ? <SealCheck className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
               <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
             )}
           </button>
