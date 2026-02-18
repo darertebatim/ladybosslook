@@ -405,6 +405,9 @@ export default function AppTest() {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setBadgeCelebrationType('action')} variant="outline">
+              ✨ Action Completion Toast
+            </Button>
             <Button onClick={() => setBadgeCelebrationType('silver')} variant="outline">
               🥈 Silver Badge Toast (50%)
             </Button>
