@@ -32,13 +32,14 @@ function saveCelebratedLevel(dateKey: string, level: string) {
 /**
  * Hook to manage badge celebration state and triggers
  * 
- * Tracks badge level transitions and triggers appropriate celebrations:
- * - none → bronze: No celebration (just starting)
- * - none/bronze → silver: Silver toast celebration
- * - silver → almostGold: "Almost there" toast (when 1 task away from gold)
- * - almostGold/silver → gold: Full-screen gold celebration
+ * Priority order (highest first):
+ * 1. Gold celebration (100% complete)
+ * 2. Almost Gold toast (1 task away from gold)
+ * 3. Silver toast (50% progress)
+ * 4. Action toast (any other completion)
  * 
- * Uses localStorage to persist celebrated levels so they don't re-show on navigation
+ * Uses localStorage to persist milestone celebrations so they don't re-show on navigation.
+ * Action celebrations are NOT persisted — they show on every completion.
  */
 export function useBadgeCelebration({
   currentBadgeLevel,
@@ -48,8 +49,7 @@ export function useBadgeCelebration({
 }: UseBadgeCelebrationOptions) {
   const [celebrationType, setCelebrationType] = useState<BadgeCelebrationLevel | null>(null);
   
-  // Track previous badge level and completed count for transitions
-  const prevBadgeLevelRef = useRef<BadgeLevel>(currentBadgeLevel);
+  // Track previous completed count to detect new completions
   const prevCompletedRef = useRef<number>(completedCount);
   const prevDateKeyRef = useRef<string>(dateKey);
   const initializedRef = useRef(false);
@@ -57,69 +57,63 @@ export function useBadgeCelebration({
   // Reset when date changes
   useEffect(() => {
     if (prevDateKeyRef.current !== dateKey) {
-      prevBadgeLevelRef.current = 'none';
       prevDateKeyRef.current = dateKey;
+      prevCompletedRef.current = 0;
       initializedRef.current = false;
     }
   }, [dateKey]);
 
-  // Check for badge level transitions
+  // Detect completions and determine which celebration to show
   useEffect(() => {
     // Skip on initial mount - don't celebrate existing state
     if (!initializedRef.current) {
       initializedRef.current = true;
-      prevBadgeLevelRef.current = currentBadgeLevel;
       prevCompletedRef.current = completedCount;
       return;
     }
 
-    const prevLevel = prevBadgeLevelRef.current;
     const prevCompleted = prevCompletedRef.current;
-    const celebratedLevels = getCelebratedLevels(dateKey);
-    
-    // Only react to increases in completed count (not decreases from uncomplete)
     const isNewCompletion = completedCount > prevCompleted;
-    
-    // Check for "almost gold" first (1 task away)
+    prevCompletedRef.current = completedCount;
+
+    if (!isNewCompletion) return;
+
+    const celebratedLevels = getCelebratedLevels(dateKey);
+
+    // Priority 1: Gold badge (100% progress)
     if (
-      currentBadgeLevel === 'silver' && 
-      totalCount > 0 && 
+      currentBadgeLevel === 'gold' &&
+      !celebratedLevels.has('gold')
+    ) {
+      setCelebrationType('gold');
+      saveCelebratedLevel(dateKey, 'gold');
+      return;
+    }
+
+    // Priority 2: Almost gold (1 task away)
+    if (
+      totalCount > 0 &&
       completedCount === totalCount - 1 &&
       !celebratedLevels.has('almostGold') &&
       !celebratedLevels.has('gold')
     ) {
       setCelebrationType('almostGold');
       saveCelebratedLevel(dateKey, 'almostGold');
-      prevBadgeLevelRef.current = currentBadgeLevel;
-      prevCompletedRef.current = completedCount;
-      return;
-    }
-    
-    // Check for gold badge (100% progress)
-    if (currentBadgeLevel === 'gold' && prevLevel !== 'gold' && !celebratedLevels.has('gold')) {
-      setCelebrationType('gold');
-      saveCelebratedLevel(dateKey, 'gold');
-      prevBadgeLevelRef.current = currentBadgeLevel;
-      prevCompletedRef.current = completedCount;
       return;
     }
 
-    // Check for silver badge (50% progress)
-    if (currentBadgeLevel === 'silver' && prevLevel !== 'silver' && prevLevel !== 'gold' && !celebratedLevels.has('silver')) {
+    // Priority 3: Silver badge (50% progress)
+    if (
+      currentBadgeLevel === 'silver' &&
+      !celebratedLevels.has('silver')
+    ) {
       setCelebrationType('silver');
       saveCelebratedLevel(dateKey, 'silver');
-      prevBadgeLevelRef.current = currentBadgeLevel;
-      prevCompletedRef.current = completedCount;
       return;
     }
 
-    // For any other completion, show action celebration
-    if (isNewCompletion) {
-      setCelebrationType('action');
-    }
-
-    prevBadgeLevelRef.current = currentBadgeLevel;
-    prevCompletedRef.current = completedCount;
+    // Priority 4: Action celebration (every other completion)
+    setCelebrationType('action');
   }, [currentBadgeLevel, completedCount, totalCount, dateKey]);
 
   const closeCelebration = useCallback(() => {

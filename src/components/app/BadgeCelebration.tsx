@@ -180,9 +180,14 @@ export function BadgeCelebration({
         >
           <div className="bg-gradient-to-r from-orange-500 to-amber-400 rounded-2xl p-4 shadow-xl flex items-center gap-3">
             <div className="relative shrink-0">
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                <Sparkles className="h-6 w-6 text-white" />
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
+                <img 
+                  src={BADGE_IMAGES.bronze} 
+                  alt="Action complete" 
+                  className="w-[120%] h-[120%] object-cover"
+                />
               </div>
+              <Sparkles className="absolute -top-1 -right-1 h-3.5 w-3.5 text-white/80 animate-pulse" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-white font-semibold text-base">
