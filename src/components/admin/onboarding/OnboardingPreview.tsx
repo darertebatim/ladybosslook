@@ -54,7 +54,10 @@ export function OnboardingPreview({ flow, onClose }: Props) {
           {/* Phone body */}
           <div className="w-[375px] h-[812px] bg-black rounded-[3rem] p-3 shadow-2xl">
             <div className="w-full h-full rounded-[2.4rem] overflow-hidden bg-white">
-              <OnboardingStepRenderer step={step} />
+              <OnboardingStepRenderer 
+                step={step} 
+                onNext={() => setCurrentStep(Math.min(flow.steps.length - 1, currentStep + 1))}
+              />
             </div>
           </div>
         </div>
