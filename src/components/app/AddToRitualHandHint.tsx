@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 const STORAGE_KEY = 'ritual_add_hint_dismissed';
+const SAVE_HINT_KEY = 'ritual_save_hint_dismissed';
 
 export function useAddToRitualHint() {
   const [showHint, setShowHint] = useState(false);
@@ -16,6 +17,25 @@ export function useAddToRitualHint() {
 
   const dismissHint = () => {
     localStorage.setItem(STORAGE_KEY, 'true');
+    setShowHint(false);
+  };
+
+  return { showHint, dismissHint };
+}
+
+export function useSaveRitualHint() {
+  const [showHint, setShowHint] = useState(false);
+
+  useEffect(() => {
+    const dismissed = localStorage.getItem(SAVE_HINT_KEY);
+    if (!dismissed) {
+      const t = setTimeout(() => setShowHint(true), 800);
+      return () => clearTimeout(t);
+    }
+  }, []);
+
+  const dismissHint = () => {
+    localStorage.setItem(SAVE_HINT_KEY, 'true');
     setShowHint(false);
   };
 
@@ -48,6 +68,37 @@ export function AddToRitualHandHint({ show }: AddToRitualHandHintProps) {
 
       <style>{`
         @keyframes handDownBounce {
+          0%   { transform: rotate(-30deg) translateY(0px); }
+          40%  { transform: rotate(-30deg) translateY(10px); }
+          55%  { transform: rotate(-30deg) translateY(5px); }
+          70%  { transform: rotate(-30deg) translateY(10px); }
+          100% { transform: rotate(-30deg) translateY(0px); }
+        }
+      `}</style>
+    </>
+  );
+}
+
+export function SaveRitualHandHint({ show }: AddToRitualHandHintProps) {
+  if (!show) return null;
+
+  return (
+    <>
+      <div
+        className="pointer-events-none fixed z-[200]"
+        style={{
+          bottom: 'max(24px, env(safe-area-inset-bottom))',
+          right: '24px',
+          filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
+          animation: 'saveHandBounce 1.4s ease-in-out infinite',
+          transform: 'rotate(-30deg)',
+        }}
+      >
+        <FluentEmoji emoji="👇" size={90} />
+      </div>
+
+      <style>{`
+        @keyframes saveHandBounce {
           0%   { transform: rotate(-30deg) translateY(0px); }
           40%  { transform: rotate(-30deg) translateY(10px); }
           55%  { transform: rotate(-30deg) translateY(5px); }

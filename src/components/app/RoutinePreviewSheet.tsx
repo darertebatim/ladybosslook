@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { SaveRitualHandHint, useSaveRitualHint } from '@/components/app/AddToRitualHandHint';
 import { Check, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -99,6 +100,7 @@ export function RoutinePreviewSheet({
   const [showActionLimit, setShowActionLimit] = useState(false);
   const { isSubscribed, isLoading: subLoading } = useSubscription();
   const { data: allExistingTasks = [] } = useAllActiveTasks();
+  const { showHint: showSaveHint, dismissHint: dismissSaveHint } = useSaveRitualHint();
   const MAX_FREE_ACTIONS = 6;
 
   // Sync selectedTaskIds when tasks change (e.g., when data loads async)
@@ -470,7 +472,7 @@ export function RoutinePreviewSheet({
               </div>
               
               <Button
-                onClick={handleSave}
+                onClick={() => { dismissSaveHint(); handleSave(); }}
                 disabled={selectedTaskIds.size === 0 || isSaving}
                 className="px-8"
               >
@@ -480,6 +482,8 @@ export function RoutinePreviewSheet({
           </div>
         </SheetContent>
       </Sheet>
+
+      <SaveRitualHandHint show={showSaveHint} />
 
       {/* Full Task Edit Sheet - uses the REAL AppTaskCreate component */}
       {editingTask && (
