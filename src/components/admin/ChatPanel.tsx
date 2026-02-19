@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Loader2, User, Mail, Calendar, BookOpen } from "lucide-react";
-import { format } from "date-fns";
+import { format, isToday, isYesterday } from "date-fns";
 
 interface Message {
   id: string;
@@ -392,20 +392,37 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
             </div>
           ) : (
             <>
-              {messages.map((msg) => (
-                <ChatMessage
-                  key={msg.id}
-                  content={msg.content}
-                  senderType={msg.sender_type}
-                  createdAt={msg.created_at}
-                  isRead={msg.is_read}
-                  isCurrentUser={msg.sender_type === 'admin'}
-                  attachmentUrl={msg.attachment_url}
-                  attachmentName={msg.attachment_name}
-                  attachmentType={msg.attachment_type}
-                  isBroadcast={msg.is_broadcast}
-                />
-              ))}
+              {messages.map((msg, idx) => {
+                const msgDate = new Date(msg.created_at);
+                const prevDate = idx > 0 ? new Date(messages[idx - 1].created_at) : null;
+                const showDateSeparator = !prevDate || 
+                  msgDate.toDateString() !== prevDate.toDateString();
+
+                return (
+                  <div key={msg.id}>
+                    {showDateSeparator && (
+                      <div className="flex justify-center my-3">
+                        <span className="text-xs text-muted-foreground bg-muted px-3 py-1 rounded-full">
+                          {isToday(msgDate) ? 'Today' : 
+                           isYesterday(msgDate) ? 'Yesterday' : 
+                           format(msgDate, 'MMM d, yyyy')}
+                        </span>
+                      </div>
+                    )}
+                    <ChatMessage
+                      content={msg.content}
+                      senderType={msg.sender_type}
+                      createdAt={msg.created_at}
+                      isRead={msg.is_read}
+                      isCurrentUser={msg.sender_type === 'admin'}
+                      attachmentUrl={msg.attachment_url}
+                      attachmentName={msg.attachment_name}
+                      attachmentType={msg.attachment_type}
+                      isBroadcast={msg.is_broadcast}
+                    />
+                  </div>
+                );
+              })}
               <div ref={messagesEndRef} />
             </>
           )}
