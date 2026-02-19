@@ -19,6 +19,7 @@ interface Conversation {
     email: string;
   };
   last_message?: string;
+  programs?: string[]; // enrolled program slugs
 }
 
 export default function Support() {
@@ -42,7 +43,7 @@ export default function Support() {
       // Fetch profiles and last messages for each conversation
       const conversationsWithDetails = await Promise.all(
         (convData || []).map(async (conv) => {
-          const [profileRes, lastMsgRes] = await Promise.all([
+          const [profileRes, lastMsgRes, enrollmentRes] = await Promise.all([
             supabase
               .from('profiles')
               .select('full_name, email')
@@ -54,13 +55,25 @@ export default function Support() {
               .eq('conversation_id', conv.id)
               .order('created_at', { ascending: false })
               .limit(1)
-              .maybeSingle()
+              .maybeSingle(),
+            supabase
+              .from('course_enrollments')
+              .select('program_slug')
+              .eq('user_id', conv.user_id)
+              .eq('status', 'active')
           ]);
+
+          const programs = [...new Set(
+            (enrollmentRes.data || [])
+              .map(e => e.program_slug)
+              .filter(Boolean) as string[]
+          )];
 
           return {
             ...conv,
             profiles: profileRes.data || undefined,
-            last_message: lastMsgRes.data?.content
+            last_message: lastMsgRes.data?.content,
+            programs,
           } as Conversation;
         })
       );

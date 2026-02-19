@@ -2,9 +2,8 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MessageCircle, Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 interface Conversation {
   id: string;
@@ -18,6 +17,7 @@ interface Conversation {
     email: string;
   };
   last_message?: string;
+  programs?: string[];
 }
 
 interface ChatConversationListProps {
@@ -27,6 +27,15 @@ interface ChatConversationListProps {
   loading?: boolean;
 }
 
+// Friendly labels for program slugs
+const PROGRAM_LABELS: Record<string, string> = {
+  'simora-plus': 'Simora+',
+};
+
+function getProgramLabel(slug: string): string {
+  return PROGRAM_LABELS[slug] || slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
 export function ChatConversationList({ 
   conversations, 
   selectedId, 
@@ -34,24 +43,24 @@ export function ChatConversationList({
   loading 
 }: ChatConversationListProps) {
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [selectedProgram, setSelectedProgram] = useState<string>("all");
+
+  // Collect all unique program slugs across conversations
+  const allPrograms = useMemo(() => {
+    const slugs = new Set<string>();
+    conversations.forEach(conv => {
+      conv.programs?.forEach(p => slugs.add(p));
+    });
+    return Array.from(slugs).sort();
+  }, [conversations]);
 
   const filteredConversations = conversations.filter(conv => {
     const matchesSearch = !search || 
       conv.profiles?.full_name?.toLowerCase().includes(search.toLowerCase()) ||
       conv.profiles?.email?.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = statusFilter === "all" || conv.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesProgram = selectedProgram === "all" || conv.programs?.includes(selectedProgram);
+    return matchesSearch && matchesProgram;
   });
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'open': return 'bg-green-500/10 text-green-600 border-green-500/20';
-      case 'pending': return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20';
-      case 'resolved': return 'bg-muted text-muted-foreground';
-      default: return 'bg-muted';
-    }
-  };
 
   return (
     <div className="flex flex-col h-full border-r">
@@ -66,17 +75,26 @@ export function ChatConversationList({
             className="pl-9"
           />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger>
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Chats</SelectItem>
-            <SelectItem value="open">Open</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="resolved">Resolved</SelectItem>
-          </SelectContent>
-        </Select>
+        {/* Program tag filters */}
+        <div className="flex flex-wrap gap-1.5">
+          <Badge
+            variant={selectedProgram === "all" ? "default" : "outline"}
+            className="cursor-pointer text-xs"
+            onClick={() => setSelectedProgram("all")}
+          >
+            All
+          </Badge>
+          {allPrograms.map(slug => (
+            <Badge
+              key={slug}
+              variant={selectedProgram === slug ? "default" : "outline"}
+              className="cursor-pointer text-xs"
+              onClick={() => setSelectedProgram(slug)}
+            >
+              {getProgramLabel(slug)}
+            </Badge>
+          ))}
+        </div>
       </div>
 
       {/* Conversation List */}
@@ -118,14 +136,21 @@ export function ChatConversationList({
                       {conv.last_message}
                     </p>
                   )}
+                  {/* Program tags */}
+                  {conv.programs && conv.programs.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {conv.programs.map(slug => (
+                        <Badge key={slug} variant="secondary" className="text-[10px] px-1.5 py-0">
+                          {getProgramLabel(slug)}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-col items-end gap-1">
                   <span className="text-[10px] text-muted-foreground whitespace-nowrap">
                     {format(new Date(conv.last_message_at), 'MMM d, h:mm a')}
                   </span>
-                  <Badge variant="outline" className={cn("text-[10px]", getStatusColor(conv.status))}>
-                    {conv.status}
-                  </Badge>
                 </div>
               </div>
             </button>
