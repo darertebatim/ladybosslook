@@ -170,8 +170,10 @@ export function RoutinePreviewSheet({
     // Priority: edited color > task.color > pro_link_type color > cycle color
     const defaultColor = task.color as TaskColor || getProLinkColor(task.pro_link_type, index);
     
-    // Use per-task repeat_pattern (from admin_task_bank), or edited override
-    const taskRepeatPattern = (task as any).repeat_pattern || 'daily';
+    // Use per-task repeat_pattern (from admin_task_bank), or derive from schedule_days
+    const scheduleDays = (task as any).schedule_days as number[] | null;
+    const taskRepeatPattern = (task as any).repeat_pattern 
+      || (scheduleDays && scheduleDays.length > 0 ? 'weekly' : 'daily');
     const repeatPattern = edited?.repeatPattern || taskRepeatPattern;
     
     return {
