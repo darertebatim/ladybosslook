@@ -20,7 +20,6 @@ export function resetActionLimitSoftSeen() {
 interface ActionLimitSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Called when user taps "I'll take the challenge" — show paywall */
   onTakeChallenge: () => void;
 }
 
@@ -37,101 +36,107 @@ export function ActionLimitSheet({ open, onOpenChange, onTakeChallenge }: Action
       <SheetContent
         side="bottom"
         className="p-0 border-0 overflow-hidden focus:outline-none [&>button]:hidden"
-        style={{ borderRadius: '28px 28px 0 0', height: '80vh' }}
+        style={{ borderRadius: '28px 28px 0 0', height: '82vh' }}
       >
-        {/* Full gradient background matching app theme */}
-        <div className="relative flex flex-col h-full overflow-hidden"
+        <div
+          className="relative flex flex-col h-full overflow-hidden"
           style={{
-            background: 'linear-gradient(175deg, hsl(250 60% 78%) 0%, hsl(265 55% 62%) 35%, hsl(275 60% 50%) 100%)',
+            background: 'linear-gradient(160deg, hsl(25 95% 58%) 0%, hsl(15 90% 50%) 45%, hsl(5 85% 43%) 100%)',
           }}
         >
-          {/* Subtle noise texture overlay */}
+          {/* Noise texture */}
           <div
-            className="absolute inset-0 opacity-[0.04] pointer-events-none"
+            className="absolute inset-0 opacity-[0.06] pointer-events-none"
             style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
             }}
           />
 
+          {/* Glow orbs */}
+          <div className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-white/15 blur-3xl pointer-events-none" />
+          <div className="absolute top-1/3 -left-20 w-56 h-56 rounded-full bg-yellow-300/20 blur-3xl pointer-events-none" />
+          <div className="absolute bottom-24 right-0 w-48 h-48 rounded-full bg-red-900/20 blur-2xl pointer-events-none" />
+
           {/* Drag handle */}
-          <div className="flex justify-center pt-4 pb-0 relative z-10">
-            <div className="w-9 h-1 rounded-full bg-white/40" />
+          <div className="flex justify-center pt-4 relative z-10">
+            <div className="w-10 h-[5px] rounded-full bg-white/30" />
           </div>
 
-          {/* Blurred circle decorations */}
-          <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-white/10 blur-3xl pointer-events-none" />
-          <div className="absolute bottom-32 -left-16 w-48 h-48 rounded-full bg-purple-300/20 blur-2xl pointer-events-none" />
-
-          {/* Emoji cluster — large, overlapping, sticker style */}
-          <div className="relative z-10 flex justify-center mt-10 mb-2">
-            <div className="relative w-72 h-28">
+          {/* Emoji cluster — centered row, large sticker style */}
+          <div className="relative z-10 flex justify-center items-end mt-10 mb-0 px-6">
+            <div className="flex items-end justify-center gap-0">
               {EMOJIS.map((emoji, i) => {
-                const offsets = [
-                  { left: '0%',  top: '10%',  rotate: '-12deg', scale: 1.05 },
-                  { left: '16%', top: '0%',   rotate: '5deg',   scale: 1.15 },
-                  { left: '32%', top: '8%',   rotate: '-6deg',  scale: 1.2  },
-                  { left: '48%', top: '0%',   rotate: '10deg',  scale: 1.1  },
-                  { left: '63%', top: '12%',  rotate: '-8deg',  scale: 1.0  },
-                  { left: '78%', top: '2%',   rotate: '7deg',   scale: 1.12 },
+                const transforms = [
+                  { rotate: '-14deg', scale: 0.88, y: 4 },
+                  { rotate: '6deg',  scale: 0.96, y: 0 },
+                  { rotate: '-5deg', scale: 1.08, y: -6 },
+                  { rotate: '8deg',  scale: 1.12, y: -8 },
+                  { rotate: '-7deg', scale: 0.94, y: 2 },
+                  { rotate: '11deg', scale: 0.85, y: 6 },
                 ];
-                const o = offsets[i];
+                const t = transforms[i];
                 return (
                   <div
                     key={i}
-                    className="absolute"
+                    className="relative"
                     style={{
-                      left: o.left,
-                      top: o.top,
-                      transform: `rotate(${o.rotate}) scale(${o.scale})`,
-                      filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.25))',
-                      zIndex: i + 1,
+                      transform: `rotate(${t.rotate}) scale(${t.scale}) translateY(${t.y}px)`,
+                      filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))',
+                      zIndex: i === 3 ? 10 : i,
+                      marginLeft: i === 0 ? 0 : '-6px',
                     }}
                   >
-                    <FluentEmoji emoji={emoji} size={52} />
+                    <FluentEmoji emoji={emoji} size={64} />
                   </div>
                 );
               })}
             </div>
           </div>
 
-          {/* Copy block */}
+          {/* Copy */}
           <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-7 text-center">
             <h2
-              className="text-white leading-tight mb-5"
-              style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.15 }}
+              className="text-white leading-tight mb-4"
+              style={{
+                fontSize: '2.1rem',
+                fontWeight: 900,
+                letterSpacing: '-0.03em',
+                lineHeight: 1.12,
+                textShadow: '0 2px 20px rgba(0,0,0,0.2)',
+              }}
             >
               You've got a great list going! Want to keep piling on?
             </h2>
             <p
-              className="text-white/70 leading-relaxed max-w-[280px]"
-              style={{ fontSize: '1rem', fontWeight: 400 }}
+              className="text-white/75 leading-relaxed max-w-[270px]"
+              style={{ fontSize: '1rem', fontWeight: 400, lineHeight: 1.6 }}
             >
               Committing to too many habits can lower the chance of success.
             </p>
           </div>
 
-          {/* CTA buttons */}
-          <div className="relative z-10 px-5 pb-10 space-y-2">
-            {/* Primary pill */}
+          {/* CTAs */}
+          <div className="relative z-10 px-5 pb-10 pt-2 flex flex-col gap-2">
             <button
               onClick={handleKeepSimple}
-              className="w-full font-bold text-lg transition-transform active:scale-[0.97]"
+              className="w-full font-bold text-lg transition-all active:scale-[0.97]"
               style={{
-                background: 'white',
-                color: 'hsl(265 55% 50%)',
+                background: 'rgba(255,255,255,0.97)',
+                color: 'hsl(15 90% 44%)',
                 borderRadius: 100,
                 padding: '18px 24px',
-                boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+                boxShadow: '0 6px 32px rgba(0,0,0,0.22), 0 1px 0 rgba(255,255,255,0.4) inset',
+                fontSize: '1.05rem',
+                letterSpacing: '-0.01em',
               }}
             >
               Keep it simple
             </button>
 
-            {/* Ghost text button */}
             <button
               onClick={handleChallenge}
-              className="w-full py-4 text-white/75 font-medium text-base transition-opacity active:opacity-50"
-              style={{ fontSize: '1rem', letterSpacing: '0.01em' }}
+              className="w-full py-4 font-semibold text-white/80 text-base transition-opacity active:opacity-50"
+              style={{ letterSpacing: '0.01em' }}
             >
               I'll take the challenge
             </button>
@@ -141,3 +146,4 @@ export function ActionLimitSheet({ open, onOpenChange, onTakeChallenge }: Action
     </Sheet>
   );
 }
+
