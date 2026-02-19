@@ -3,10 +3,6 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 const STORAGE_KEY = 'ritual_add_hint_dismissed';
 
-/**
- * Hook: tracks whether the hand hint should be shown.
- * Dismissed permanently in localStorage after first tap.
- */
 export function useAddToRitualHint() {
   const [showHint, setShowHint] = useState(false);
 
@@ -30,11 +26,6 @@ interface AddToRitualHandHintProps {
   show: boolean;
 }
 
-/**
- * Large 3D hand emoji floating above the "Add to my rituals" button,
- * pointing downward toward it, offset to the right of center.
- * Only shown to first-time users until they tap the button.
- */
 export function AddToRitualHandHint({ show }: AddToRitualHandHintProps) {
   if (!show) return null;
 
@@ -43,22 +34,25 @@ export function AddToRitualHandHint({ show }: AddToRitualHandHintProps) {
       <div
         className="pointer-events-none fixed z-[60]"
         style={{
-          bottom: 'calc(env(safe-area-inset-bottom) + 110px)',
-          right: '18%',
-          filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.30))',
+          bottom: 'calc(env(safe-area-inset-bottom) + 105px)',
+          /* shift left of center — right ~40% puts it just left of mid */
+          right: '40%',
+          filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
           animation: 'handDownBounce 1.4s ease-in-out infinite',
+          /* 60° tilt: tilted to the right pointing down-right */
+          transform: 'rotate(-30deg)',
         }}
       >
-        <FluentEmoji emoji="👇" size={180} />
+        <FluentEmoji emoji="👇" size={90} />
       </div>
 
       <style>{`
         @keyframes handDownBounce {
-          0%   { transform: translateY(0px); }
-          40%  { transform: translateY(14px); }
-          55%  { transform: translateY(8px); }
-          70%  { transform: translateY(14px); }
-          100% { transform: translateY(0px); }
+          0%   { transform: rotate(-30deg) translateY(0px); }
+          40%  { transform: rotate(-30deg) translateY(10px); }
+          55%  { transform: rotate(-30deg) translateY(5px); }
+          70%  { transform: rotate(-30deg) translateY(10px); }
+          100% { transform: rotate(-30deg) translateY(0px); }
         }
       `}</style>
     </>
