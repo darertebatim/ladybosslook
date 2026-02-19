@@ -88,79 +88,80 @@ export function RoutineBankCard({
   }
 
   return (
-    <button 
-      className={cn(
-        "overflow-hidden cursor-pointer transition-all active:scale-[0.98] w-full text-left",
-        className
+    <div className="relative">
+      {/* Free / Plus badge - outside card overflow */}
+      {routine.is_free ? (
+        <Badge className="absolute -top-2.5 -left-2 z-30 bg-green-500 hover:bg-green-500 text-white rounded-full text-xs px-2 py-0.5 shadow-sm">
+          FREE
+        </Badge>
+      ) : (
+        <Badge className="absolute -top-2.5 -left-2 z-30 bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-xs gap-1 shadow-sm">
+          <Crown className="h-3 w-3" />
+          PLUS
+        </Badge>
       )}
-      onClick={handleClick}
-    >
-      {/* Square Image Container */}
-      <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-lg border border-border/50">
-        {routine.cover_image_url ? (
-          <img
-            src={routine.cover_image_url}
-            alt={routine.title}
-            loading="lazy"
-            decoding="async"
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className={cn(
-            'w-full h-full bg-gradient-to-br flex items-center justify-center',
-            gradient
-          )}>
-            <FluentEmoji emoji={routineEmoji} size={72} className="opacity-40" />
+      <button 
+        className={cn(
+          "overflow-hidden cursor-pointer transition-all active:scale-[0.98] w-full text-left",
+          className
+        )}
+        onClick={handleClick}
+      >
+        {/* Square Image Container */}
+        <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-lg border border-border/50">
+          {routine.cover_image_url ? (
+            <img
+              src={routine.cover_image_url}
+              alt={routine.title}
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className={cn(
+              'w-full h-full bg-gradient-to-br flex items-center justify-center',
+              gradient
+            )}>
+              <FluentEmoji emoji={routineEmoji} size={72} className="opacity-40" />
+            </div>
+          )}
+          
+          {/* Bottom Gradient for Title Overlay */}
+          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+          
+          {/* Close/Dismiss button */}
+          {onDismiss && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                haptic.light();
+                onDismiss();
+              }}
+              className="absolute top-1.5 right-1.5 p-1 rounded-full bg-black/40 active:scale-95 transition-transform z-10"
+              aria-label="Dismiss suggestion"
+            >
+              <X className="h-3.5 w-3.5 text-white" />
+            </button>
+          )}
+          
+          {/* Title Overlay - Bottom */}
+          <h3 className="absolute bottom-2.5 left-2.5 right-2.5 font-semibold text-sm text-white line-clamp-2 drop-shadow-lg">
+            {routine.title}
+          </h3>
+        </div>
+        
+        {/* Category badge - Below image */}
+        {routine.category && routine.category !== 'general' && (
+          <div className="mt-2 px-0.5">
+            <Badge 
+              variant="secondary" 
+              className="rounded-full capitalize text-[11px] px-2 py-0.5 bg-muted/80 text-muted-foreground"
+            >
+              {routine.category}
+            </Badge>
           </div>
         )}
-        
-        {/* Bottom Gradient for Title Overlay */}
-        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-        
-        {/* Close/Dismiss button */}
-        {onDismiss && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              haptic.light();
-              onDismiss();
-            }}
-            className="absolute top-1.5 right-1.5 p-1 rounded-full bg-black/40 active:scale-95 transition-transform z-10"
-            aria-label="Dismiss suggestion"
-          >
-            <X className="h-3.5 w-3.5 text-white" />
-          </button>
-        )}
-        
-        {/* Title Overlay - Bottom */}
-        <h3 className="absolute bottom-2.5 left-2.5 right-2.5 font-semibold text-sm text-white line-clamp-2 drop-shadow-lg">
-          {routine.title}
-        </h3>
-
-        {/* Free / Plus badge */}
-        {routine.is_free ? (
-          <Badge className="absolute top-1.5 left-1.5 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
-            FREE
-          </Badge>
-        ) : (
-          <Badge className="absolute top-1.5 left-1.5 bg-amber-200 text-amber-700 text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
-            <Crown className="w-2.5 h-2.5" />
-            PLUS
-          </Badge>
-        )}
-      </div>
-      
-      {/* Category badge - Below image */}
-      {routine.category && routine.category !== 'general' && (
-        <div className="mt-2 px-0.5">
-          <Badge 
-            variant="secondary" 
-            className="rounded-full capitalize text-[11px] px-2 py-0.5 bg-muted/80 text-muted-foreground"
-          >
-            {routine.category}
-          </Badge>
-        </div>
-      )}
-    </button>
+      </button>
+    </div>
   );
 }
