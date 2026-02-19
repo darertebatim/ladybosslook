@@ -977,7 +977,7 @@ export default function RoutinesBank() {
             <TabsList className="w-fit">
               <TabsTrigger value="basic">Basic Info</TabsTrigger>
               <TabsTrigger value="sections">
-                Sections & Tasks
+                Sections & Actions
                 {localSections.length > 0 && (
                   <span className="ml-1 text-xs bg-muted px-1.5 rounded">{localSections.length}</span>
                 )}
@@ -1585,12 +1585,12 @@ export default function RoutinesBank() {
                         <div className="border rounded-lg overflow-hidden">
                           <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-950/20 border-b">
                             <span className="text-sm">☀️</span>
-                            <h4 className="font-medium text-sm flex-1">Daily tasks</h4>
+                            <h4 className="font-medium text-sm flex-1">Daily actions</h4>
                             <span className="text-xs text-muted-foreground">{dailyTasks.length}</span>
                           </div>
                           <div className="p-2 space-y-1">
                             {dailyTasks.length === 0 && (
-                              <p className="text-center text-muted-foreground text-xs py-2">No daily tasks</p>
+                              <p className="text-center text-muted-foreground text-xs py-2">No daily actions</p>
                             )}
                             {dailyTasks.map((task, tIdx) => renderTaskRow(task, tIdx, dailyTasks.length, null))}
                           </div>
@@ -1600,12 +1600,12 @@ export default function RoutinesBank() {
                         <div className="border rounded-lg overflow-hidden">
                           <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-950/20 border-b">
                             <span className="text-sm">📅</span>
-                            <h4 className="font-medium text-sm flex-1">Weekly tasks</h4>
+                            <h4 className="font-medium text-sm flex-1">Weekly actions</h4>
                             <span className="text-xs text-muted-foreground">{weeklyTasks.length}</span>
                           </div>
                           <div className="p-2 space-y-1">
                             {weeklyTasks.length === 0 && (
-                              <p className="text-center text-muted-foreground text-xs py-2">No weekly tasks</p>
+                              <p className="text-center text-muted-foreground text-xs py-2">No weekly actions</p>
                             )}
                             {weeklyTasks.map((task, tIdx) => renderTaskRow(task, tIdx, weeklyTasks.length, null))}
                           </div>
@@ -1615,12 +1615,12 @@ export default function RoutinesBank() {
                         <div className="border rounded-lg overflow-hidden">
                           <div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-950/20 border-b">
                             <span className="text-sm">📆</span>
-                            <h4 className="font-medium text-sm flex-1">Monthly tasks</h4>
+                            <h4 className="font-medium text-sm flex-1">Monthly actions</h4>
                             <span className="text-xs text-muted-foreground">{monthlyTasks.length}</span>
                           </div>
                           <div className="p-2 space-y-1">
                             {monthlyTasks.length === 0 && (
-                              <p className="text-center text-muted-foreground text-xs py-2">No monthly tasks</p>
+                              <p className="text-center text-muted-foreground text-xs py-2">No monthly actions</p>
                             )}
                             {monthlyTasks.map((task, tIdx) => renderTaskRow(task, tIdx, monthlyTasks.length, null))}
                           </div>
@@ -1630,12 +1630,12 @@ export default function RoutinesBank() {
                         <div className="border rounded-lg overflow-hidden">
                           <div className="flex items-center gap-2 p-3 bg-purple-50 dark:bg-purple-950/20 border-b">
                             <span className="text-sm">1️⃣</span>
-                            <h4 className="font-medium text-sm flex-1">One-time tasks</h4>
+                            <h4 className="font-medium text-sm flex-1">One-time actions</h4>
                             <span className="text-xs text-muted-foreground">{onceTasks.length}</span>
                           </div>
                           <div className="p-2 space-y-1">
                             {onceTasks.length === 0 && (
-                              <p className="text-center text-muted-foreground text-xs py-2">No one-time tasks</p>
+                              <p className="text-center text-muted-foreground text-xs py-2">No one-time actions</p>
                             )}
                             {onceTasks.map((task, tIdx) => renderTaskRow(task, tIdx, onceTasks.length, null))}
                           </div>
