@@ -47,6 +47,7 @@ export interface RoutineBankTask {
   // Schedule fields
   schedule_days?: number[] | null; // For weekly mode: weekday numbers (0=Sun..6=Sat)
   drip_day?: number | null; // For challenge mode: day number (1-based)
+  monthly_day?: number | null; // For monthly mode: day of month (1-31)
   // Fields from joined admin_task_bank
   pro_link_type?: string | null;
   pro_link_value?: string | null;
@@ -506,15 +507,31 @@ export function useAddRoutineFromBank() {
             }
           } else {
             // Normal rituals: use per-task repeat from bank, allow user edits to override
-            repeatPattern = edited?.repeatPattern || bankTask?.repeat_pattern || 'daily';
-            repeatDays = bankTask?.repeat_days || null;
-            // If a start date is configured, set scheduled_date so tasks don't appear before it
-            if (startDayOfWeek != null || (routine as any).challenge_start_date) {
-              scheduledDate = effectiveStartDate.toISOString().split('T')[0];
-            }
-            // One-time tasks need a scheduled_date to appear in the planner
-            if (repeatPattern === 'none' && !scheduledDate) {
-              scheduledDate = new Date().toISOString().split('T')[0];
+            const monthlyDay = (task as any).monthly_day as number | null;
+            
+            if (monthlyDay != null) {
+              // Monthly task: repeat on specific day of month
+              repeatPattern = 'monthly';
+              // Set scheduled_date to the next occurrence of this day
+              const now = new Date();
+              const year = now.getFullYear();
+              const month = now.getMonth();
+              const targetDate = new Date(year, month, monthlyDay);
+              if (targetDate < now) {
+                targetDate.setMonth(targetDate.getMonth() + 1);
+              }
+              scheduledDate = targetDate.toISOString().split('T')[0];
+            } else {
+              repeatPattern = edited?.repeatPattern || bankTask?.repeat_pattern || 'daily';
+              repeatDays = bankTask?.repeat_days || null;
+              // If a start date is configured, set scheduled_date so tasks don't appear before it
+              if (startDayOfWeek != null || (routine as any).challenge_start_date) {
+                scheduledDate = effectiveStartDate.toISOString().split('T')[0];
+              }
+              // One-time tasks need a scheduled_date to appear in the planner
+              if (repeatPattern === 'none' && !scheduledDate) {
+                scheduledDate = new Date().toISOString().split('T')[0];
+              }
             }
           }
 

@@ -110,6 +110,7 @@ interface LocalTask {
   task_order: number;
   schedule_days: number[];
   drip_day: number | null;
+  monthly_day: number | null;
 }
 
 export default function RoutinesBank() {
@@ -270,6 +271,7 @@ export default function RoutinesBank() {
           task_order: idx,
           schedule_days: t.schedule_days?.length ? t.schedule_days : [],
           drip_day: t.drip_day,
+          monthly_day: t.monthly_day,
         }));
         await supabase.from('routines_bank_tasks').insert(taskRecords);
       }
@@ -347,6 +349,7 @@ export default function RoutinesBank() {
           task_order: idx,
           schedule_days: t.schedule_days?.length ? t.schedule_days : [],
           drip_day: t.drip_day,
+          monthly_day: t.monthly_day,
         }));
         await supabase.from('routines_bank_tasks').insert(taskRecords);
       }
@@ -446,6 +449,7 @@ export default function RoutinesBank() {
       task_order: t.task_order,
       schedule_days: (t as any).schedule_days || [],
       drip_day: (t as any).drip_day ?? null,
+      monthly_day: (t as any).monthly_day ?? null,
     }));
 
     return { sections, tasks };
@@ -595,6 +599,7 @@ export default function RoutinesBank() {
       task_order: localTasks.filter(t => t.section_id === sectionId).length,
       schedule_days: [],
       drip_day: formData.schedule_type === 'challenge' ? localTasks.length + 1 : null,
+      monthly_day: null,
     };
     setLocalTasks([...localTasks, newTask]);
     setTaskSearchOpen(false);
@@ -684,12 +689,45 @@ export default function RoutinesBank() {
         </div>
       );
     }
-    // Normal mode: show weekday selector
+    // Normal mode: show Daily / Weekly / Monthly selector
     const days = task.schedule_days || [];
     const isWeekly = days.length > 0;
+    const isMonthly = task.monthly_day != null;
+    const currentMode = isMonthly ? 'monthly' : isWeekly ? 'weekly' : 'daily';
+
+    const cycleMode = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (currentMode === 'daily') {
+        // → Weekly
+        setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [1, 3, 5], monthly_day: null } : t));
+      } else if (currentMode === 'weekly') {
+        // → Monthly
+        setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [], monthly_day: 1 } : t));
+      } else {
+        // → Daily
+        setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [], monthly_day: null } : t));
+      }
+    };
+
     return (
       <div className="flex items-center gap-1">
-        {isWeekly ? (
+        {isMonthly ? (
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] text-muted-foreground">Day</span>
+            <Input
+              type="number"
+              min={1}
+              max={31}
+              value={task.monthly_day || 1}
+              onClick={(e) => e.stopPropagation()}
+              onChange={(e) => {
+                const val = Math.min(31, Math.max(1, parseInt(e.target.value) || 1));
+                setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, monthly_day: val } : t));
+              }}
+              className="w-12 h-6 text-xs text-center p-0"
+            />
+          </div>
+        ) : isWeekly ? (
           <div className="flex gap-0.5">
             {WEEKDAYS.map((day, idx) => (
               <button
@@ -718,17 +756,10 @@ export default function RoutinesBank() {
         )}
         <button
           type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (isWeekly) {
-              setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [] } : t));
-            } else {
-              setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [1, 3, 5] } : t));
-            }
-          }}
+          onClick={cycleMode}
           className="text-[9px] text-muted-foreground hover:text-foreground underline"
         >
-          {isWeekly ? '→ Daily' : '→ Weekly'}
+          {currentMode === 'daily' ? '→ Weekly' : currentMode === 'weekly' ? '→ Monthly' : '→ Daily'}
         </button>
       </div>
     );
@@ -1416,9 +1447,10 @@ export default function RoutinesBank() {
 
                   {/* Tasks grouped by schedule */}
                   {(() => {
-                    const dailyTasks = uncategorizedTasks.filter(t => !t.schedule_days || t.schedule_days.length === 0);
-                    const weeklyTasks = uncategorizedTasks.filter(t => t.schedule_days && t.schedule_days.length > 0);
-                    const showGroups = formData.schedule_type !== 'challenge' && (dailyTasks.length > 0 || weeklyTasks.length > 0 || localSections.length === 0);
+                     const dailyTasks = uncategorizedTasks.filter(t => (!t.schedule_days || t.schedule_days.length === 0) && t.monthly_day == null);
+                     const weeklyTasks = uncategorizedTasks.filter(t => t.schedule_days && t.schedule_days.length > 0);
+                     const monthlyTasks = uncategorizedTasks.filter(t => t.monthly_day != null);
+                     const showGroups = formData.schedule_type !== 'challenge' && (dailyTasks.length > 0 || weeklyTasks.length > 0 || monthlyTasks.length > 0 || localSections.length === 0);
 
                     if (!showGroups && uncategorizedTasks.length === 0 && localSections.length > 0) return null;
 
@@ -1489,11 +1521,11 @@ export default function RoutinesBank() {
                               </Button>
                             )}
                           </div>
-                        </div>
-                      );
+                         </div>
+                       );
                     }
 
-                    // Normal mode: group by Daily / Weekly
+                    // Normal mode: group by Daily / Weekly / Monthly
                     return (
                       <div className="space-y-3">
                         {/* Daily Tasks */}
@@ -1523,6 +1555,21 @@ export default function RoutinesBank() {
                               <p className="text-center text-muted-foreground text-xs py-2">No weekly tasks</p>
                             )}
                             {weeklyTasks.map((task, tIdx) => renderTaskRow(task, tIdx, weeklyTasks.length, null))}
+                          </div>
+                        </div>
+
+                        {/* Monthly Tasks */}
+                        <div className="border rounded-lg overflow-hidden">
+                          <div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-950/20 border-b">
+                            <span className="text-sm">📆</span>
+                            <h4 className="font-medium text-sm flex-1">Monthly tasks</h4>
+                            <span className="text-xs text-muted-foreground">{monthlyTasks.length}</span>
+                          </div>
+                          <div className="p-2 space-y-1">
+                            {monthlyTasks.length === 0 && (
+                              <p className="text-center text-muted-foreground text-xs py-2">No monthly tasks</p>
+                            )}
+                            {monthlyTasks.map((task, tIdx) => renderTaskRow(task, tIdx, monthlyTasks.length, null))}
                           </div>
                         </div>
 

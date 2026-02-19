@@ -2883,6 +2883,7 @@ export type Database = {
           duration_minutes: number | null
           emoji: string | null
           id: string
+          monthly_day: number | null
           routine_id: string
           schedule_days: number[] | null
           section_id: string | null
@@ -2897,6 +2898,7 @@ export type Database = {
           duration_minutes?: number | null
           emoji?: string | null
           id?: string
+          monthly_day?: number | null
           routine_id: string
           schedule_days?: number[] | null
           section_id?: string | null
@@ -2911,6 +2913,7 @@ export type Database = {
           duration_minutes?: number | null
           emoji?: string | null
           id?: string
+          monthly_day?: number | null
           routine_id?: string
           schedule_days?: number[] | null
           section_id?: string | null
