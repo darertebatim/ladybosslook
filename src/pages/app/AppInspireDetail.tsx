@@ -355,12 +355,16 @@ export default function AppInspireDetail() {
                       <div className="space-y-3">
                         {sectionTasks.map((task) => {
                           const bgColor = TASK_COLORS[(task.color as TaskColor) || 'mint'] || TASK_COLORS.mint;
-                          const repeatLabel = task.repeat_pattern && task.repeat_pattern !== 'none' 
-                            ? task.repeat_pattern === 'daily' ? 'Daily' 
-                              : task.repeat_pattern === 'weekly' ? 'Weekly' 
-                              : task.repeat_pattern === 'monthly' ? 'Monthly'
-                              : task.repeat_pattern === 'weekend' ? 'Weekends' : ''
-                            : 'Once';
+                          const repeatLabel = (() => {
+                            if (!task.repeat_pattern || task.repeat_pattern === 'none') return 'Once';
+                            if (task.repeat_pattern === 'weekly') return 'Weekly';
+                            if (task.repeat_pattern === 'monthly') return 'Monthly';
+                            if (task.repeat_pattern === 'weekend') return 'Weekends';
+                            // schedule_days present → weekly
+                            if (task.schedule_days && task.schedule_days.length > 0) return 'Weekly';
+                            if (task.repeat_pattern === 'daily') return 'Daily';
+                            return 'Once';
+                          })();
                           return (
                             <div
                               key={task.id}
@@ -401,12 +405,15 @@ export default function AppInspireDetail() {
                   <div className="space-y-3">
                     {tasksBySection['unsorted'].map((task) => {
                       const bgColor = TASK_COLORS[(task.color as TaskColor) || 'mint'] || TASK_COLORS.mint;
-                      const repeatLabel = task.repeat_pattern && task.repeat_pattern !== 'none' 
-                        ? task.repeat_pattern === 'daily' ? 'Daily' 
-                          : task.repeat_pattern === 'weekly' ? 'Weekly' 
-                          : task.repeat_pattern === 'monthly' ? 'Monthly'
-                          : task.repeat_pattern === 'weekend' ? 'Weekends' : ''
-                        : 'Once';
+                      const repeatLabel = (() => {
+                        if (!task.repeat_pattern || task.repeat_pattern === 'none') return 'Once';
+                        if (task.repeat_pattern === 'weekly') return 'Weekly';
+                        if (task.repeat_pattern === 'monthly') return 'Monthly';
+                        if (task.repeat_pattern === 'weekend') return 'Weekends';
+                        if (task.schedule_days && task.schedule_days.length > 0) return 'Weekly';
+                        if (task.repeat_pattern === 'daily') return 'Daily';
+                        return 'Once';
+                      })();
                       return (
                         <div
                           key={task.id}
@@ -438,48 +445,6 @@ export default function AppInspireDetail() {
                   </div>
                 </div>
               )}
-            </div>
-          ) : routine.tasks && routine.tasks.length > 0 ? (
-            <div className="mt-6">
-              <h2 className="text-lg font-semibold text-foreground mb-3">What's Included</h2>
-              <div className="space-y-3">
-                {routine.tasks.map((task) => {
-                  const bgColor = TASK_COLORS[(task.color as TaskColor) || 'mint'] || TASK_COLORS.mint;
-                  const repeatLabel = task.repeat_pattern && task.repeat_pattern !== 'none' 
-                    ? task.repeat_pattern === 'daily' ? 'Daily' 
-                      : task.repeat_pattern === 'weekly' ? 'Weekly' 
-                      : task.repeat_pattern === 'monthly' ? 'Monthly'
-                      : task.repeat_pattern === 'weekend' ? 'Weekends' : ''
-                    : 'Once';
-                  return (
-                    <div
-                      key={task.id}
-                      className="rounded-xl border border-border/50 overflow-hidden"
-                      style={{ backgroundColor: bgColor }}
-                    >
-                      <div className="flex items-center gap-3 p-3">
-                        <span className="text-2xl shrink-0">
-                          {task.emoji && isEmoji(task.emoji) ? task.emoji : '📝'}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-black truncate">{task.title}</p>
-                          <p className="text-xs text-black/70 truncate">
-                            {task.category || 'General'}
-                            <span className="ml-1">• {repeatLabel}</span>
-                          </p>
-                        </div>
-                      </div>
-                      {task.description && (
-                        <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
-                          <p className="text-xs text-black/80 leading-relaxed">
-                            {task.description}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
             </div>
           ) : null}
         </div>
