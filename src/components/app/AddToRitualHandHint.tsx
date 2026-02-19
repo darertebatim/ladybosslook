@@ -54,13 +54,10 @@ export function AddToRitualHandHint({ show }: AddToRitualHandHintProps) {
       <div
         className="pointer-events-none fixed z-[60]"
         style={{
-          bottom: 'calc(env(safe-area-inset-bottom) + 105px)',
-          /* point at the CalendarPlus icon — left side of button */
+          bottom: 'calc(env(safe-area-inset-bottom) + 185px)',
           left: '18%',
           filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
           animation: 'handDownBounce 1.4s ease-in-out infinite',
-          /* 60° tilt pointing down-right */
-          transform: 'rotate(-30deg)',
         }}
       >
         <FluentEmoji emoji="👇" size={90} />
@@ -68,11 +65,11 @@ export function AddToRitualHandHint({ show }: AddToRitualHandHintProps) {
 
       <style>{`
         @keyframes handDownBounce {
-          0%   { transform: rotate(-30deg) translateY(0px); }
-          40%  { transform: rotate(-30deg) translateY(10px); }
-          55%  { transform: rotate(-30deg) translateY(5px); }
-          70%  { transform: rotate(-30deg) translateY(10px); }
-          100% { transform: rotate(-30deg) translateY(0px); }
+          0%   { transform: translateY(0px); }
+          40%  { transform: translateY(10px); }
+          55%  { transform: translateY(5px); }
+          70%  { transform: translateY(10px); }
+          100% { transform: translateY(0px); }
         }
       `}</style>
     </>
