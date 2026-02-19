@@ -7,11 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallComparison, PaywallLimitedOffer, type PaywallProgramData } from '@/components/app/paywalls';
-import { Crown, Lock, Unlock, BookOpen, Wind, Droplets, Heart, Brain, Moon, Music, Timer, Sparkles, CalendarPlus, Check, Smartphone, RefreshCw } from 'lucide-react';
+import { Crown, Lock, Unlock, BookOpen, Wind, Droplets, Heart, Brain, Moon, Music, Timer, Sparkles, CalendarPlus, Check, Smartphone } from 'lucide-react';
 import { useDefaultPaywall, useSetDefaultPaywall, PaywallVariantId } from '@/hooks/useDefaultPaywall';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { ActionLimitSheet, resetActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 
 const PAYWALL_VARIANTS = [
   { id: 'classic', label: 'Classic', component: PaywallClassic },
@@ -101,7 +100,6 @@ function PlanFeaturesTab() {
 export default function Subscriptions() {
   const [selectedProgram, setSelectedProgram] = useState<string>('');
   const [mobilePreview, setMobilePreview] = useState<string | null>(null);
-  const [showActionLimitTest, setShowActionLimitTest] = useState(false);
   const { variant: defaultVariant } = useDefaultPaywall();
   const setDefaultPaywall = useSetDefaultPaywall();
 
@@ -133,32 +131,9 @@ export default function Subscriptions() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Subscriptions & Paywalls</h2>
-          <p className="text-muted-foreground">simora+ plan features and paywall previews</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            onClick={() => {
-              resetActionLimitSoftSeen();
-              toast.success('Action limit soft gate reset — will show again next time');
-            }}
-          >
-            <RefreshCw className="h-4 w-4" />
-            Reset soft gate
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowActionLimitTest(true)}
-          >
-            Preview action limit gate
-          </Button>
-        </div>
+      <div>
+        <h2 className="text-2xl font-bold">Subscriptions & Paywalls</h2>
+        <p className="text-muted-foreground">simora+ plan features and paywall previews</p>
       </div>
 
       <Tabs defaultValue="plan" className="space-y-6">
@@ -196,35 +171,35 @@ export default function Subscriptions() {
                 return (
                   <div key={id} className="space-y-2">
                     <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{label}</h3>
-                      {isDefault && (
-                        <Badge variant="default" className="text-[10px]">
-                          <Check className="h-3 w-3 mr-1" /> Default
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        className="text-muted-foreground hover:text-foreground p-1"
-                        onClick={() => setMobilePreview(id)}
-                        title="Mobile preview"
-                      >
-                        <Smartphone className="h-4 w-4" />
-                      </button>
-                      {!isDefault && (
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{label}</h3>
+                        {isDefault && (
+                          <Badge variant="default" className="text-[10px]">
+                            <Check className="h-3 w-3 mr-1" /> Default
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
                         <button
-                          className="text-xs text-primary hover:underline"
-                          onClick={() => {
-                            setDefaultPaywall.mutate(id as PaywallVariantId, {
-                              onSuccess: () => toast.success(`"${label}" set as default paywall`),
-                            });
-                          }}
+                          className="text-muted-foreground hover:text-foreground p-1"
+                          onClick={() => setMobilePreview(id)}
+                          title="Mobile preview"
                         >
-                          Set as default
+                          <Smartphone className="h-4 w-4" />
                         </button>
-                      )}
-                    </div>
+                        {!isDefault && (
+                          <button
+                            className="text-xs text-primary hover:underline"
+                            onClick={() => {
+                              setDefaultPaywall.mutate(id as PaywallVariantId, {
+                                onSuccess: () => toast.success(`"${label}" set as default paywall`),
+                              });
+                            }}
+                          >
+                            Set as default
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <div className="border rounded-2xl overflow-hidden bg-background shadow-sm" style={{ height: 620 }}>
                       <div className="h-full overflow-y-auto">
@@ -255,16 +230,6 @@ export default function Subscriptions() {
           </DialogContent>
         </Dialog>
       )}
-
-      {/* Action Limit Soft Gate Preview */}
-      <ActionLimitSheet
-        open={showActionLimitTest}
-        onOpenChange={setShowActionLimitTest}
-        onTakeChallenge={() => {
-          setShowActionLimitTest(false);
-          toast.info('Would show paywall here');
-        }}
-      />
     </div>
   );
 }
