@@ -20,7 +20,9 @@ import {
   Compass,
   Music,
   Users,
-  Headset
+  Headset,
+  Crown,
+  RefreshCw,
 } from 'lucide-react';
 
 // Import all testable components
@@ -34,6 +36,7 @@ import { AppUpdateBanner } from '@/components/app/AppUpdateBanner';
 import { BadgeCelebration, BadgeCelebrationLevel } from '@/components/app/BadgeCelebration';
 import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { StreakGoalSelection, StreakGoalValue } from '@/components/app/StreakGoalSelection';
+import { ActionLimitSheet, resetActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
@@ -56,6 +59,7 @@ export default function AppTest() {
   const [showPushOnboarding, setShowPushOnboarding] = useState(false);
   const [showPushPrompt, setShowPushPrompt] = useState(false);
   const [showCourseNotificationPrompt, setShowCourseNotificationPrompt] = useState(false);
+  const [showActionLimit, setShowActionLimit] = useState(false);
   
   // Badge celebration states
   const [badgeCelebrationType, setBadgeCelebrationType] = useState<BadgeCelebrationLevel | null>(null);
@@ -429,7 +433,41 @@ export default function AppTest() {
         </CardContent>
       </Card>
 
-      {/* Push Notifications */}
+      {/* Action Limit Soft Gate */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Crown className="h-5 w-5 text-violet-500" />
+            Action Limit Gate
+          </CardTitle>
+          <CardDescription>
+            Test the "6 action limit" soft gate shown the first time free users exceed their limit
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setShowActionLimit(true)} variant="outline">
+              <Crown className="h-4 w-4 mr-2" />
+              Preview Gate
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                resetActionLimitSoftSeen();
+                toast.success('Reset — gate will show as "first time" again');
+              }}
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Reset first-time flag
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            First time a free user hits 6 actions → soft gate. Every subsequent time → paywall directly.
+          </p>
+        </CardContent>
+      </Card>
+
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -701,6 +739,15 @@ export default function AppTest() {
         onSelectGoal={(goal) => {
           toast.success(`Streak goal set to ${goal} days!`);
           setShowStreakGoalSelection(false);
+        }}
+      />
+
+      <ActionLimitSheet
+        open={showActionLimit}
+        onOpenChange={setShowActionLimit}
+        onTakeChallenge={() => {
+          setShowActionLimit(false);
+          toast.info('Challenge accepted → paywall would open here');
         }}
       />
     </div>
