@@ -75,26 +75,31 @@ export function ChatConversationList({
             className="pl-9"
           />
         </div>
-        {/* Program tag filters */}
-        <div className="flex flex-wrap gap-1.5">
-          <Badge
-            variant={selectedProgram === "all" ? "default" : "outline"}
-            className="cursor-pointer text-xs"
-            onClick={() => setSelectedProgram("all")}
-          >
-            All
-          </Badge>
-          {allPrograms.map(slug => (
+        {/* Program tag filters - scrollable */}
+        {allPrograms.length > 0 && (
+          <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
             <Badge
-              key={slug}
-              variant={selectedProgram === slug ? "default" : "outline"}
-              className="cursor-pointer text-xs"
-              onClick={() => setSelectedProgram(slug)}
+              variant={selectedProgram === "all" ? "default" : "outline"}
+              className="cursor-pointer text-xs shrink-0"
+              onClick={() => setSelectedProgram("all")}
             >
-              {getProgramLabel(slug)}
+              All ({conversations.length})
             </Badge>
-          ))}
-        </div>
+            {allPrograms.map(slug => {
+              const count = conversations.filter(c => c.programs?.includes(slug)).length;
+              return (
+                <Badge
+                  key={slug}
+                  variant={selectedProgram === slug ? "default" : "outline"}
+                  className="cursor-pointer text-xs shrink-0"
+                  onClick={() => setSelectedProgram(slug)}
+                >
+                  {getProgramLabel(slug)} ({count})
+                </Badge>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Conversation List */}
@@ -136,15 +141,11 @@ export function ChatConversationList({
                       {conv.last_message}
                     </p>
                   )}
-                  {/* Program tags */}
+                  {/* Program tags - compact */}
                   {conv.programs && conv.programs.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-1.5">
-                      {conv.programs.map(slug => (
-                        <Badge key={slug} variant="secondary" className="text-[10px] px-1.5 py-0">
-                          {getProgramLabel(slug)}
-                        </Badge>
-                      ))}
-                    </div>
+                    <p className="text-[10px] text-muted-foreground truncate mt-1">
+                      {conv.programs.map(getProgramLabel).join(' · ')}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col items-end gap-1">
