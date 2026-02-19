@@ -1,0 +1,69 @@
+
+-- Ritual 1: Customize your best morning Ritual
+INSERT INTO routines_bank (id, title, subtitle, description, category, color, emoji, is_active, is_popular, is_free, sort_order, schedule_type)
+VALUES ('c1000001-0001-4000-a000-000000000001', 'Customize Your Best Morning Ritual', 'Wake up your body and brain for a great day', '<p>Do you want to wake up your body and brain then start a great day? Do you no longer want to be bothered by chaotic mornings? Do you want to manufacture a perfect Ritual with a touch of productivity and a boost of energy?</p><p>Then here comes an effective morning Ritual to follow and perk up your day! 🥳</p><ul><li>⏰ Wake up early in the morning, around 5.30 or 6.00.</li><li>🥛 Drink a glass of lukewarm water, as it is very effective in keeping skin healthy and glow.</li><li>🚿 Take a cold water shower and get fresh.</li><li>🏃 Go for a walk or practice yoga to activate your metabolism.</li><li>🙏 Offer prayer. Sending good wishes for your family, friends and yourself.</li><li>🍳 Have a healthy breakfast, along with a glass of tea or fresh juice.</li><li>👗 Pick up an attire, and get dressed.</li><li>💼 Go to work. Start your productive office life!</li></ul><p>Apart from these, here are some additional ideas that you can try out some days if you have vacant time:</p><ul><li>💗 Calling a loved one</li><li>💪 Listening to a motivational video</li><li>🧑‍🌾 Do some gardening</li><li>😁 Have some blue light therapy</li></ul><p>So, try practicing this morning regime for 2 weeks and notice the difference!</p>', 'MorningRoutines', 'peach', '⏰', true, false, true, 1, 'daily');
+
+INSERT INTO routines_bank_tasks (routine_id, title, emoji, task_order, schedule_days, is_once) VALUES
+('c1000001-0001-4000-a000-000000000001', 'Wake up early', '⏰', 0, '{}', false),
+('c1000001-0001-4000-a000-000000000001', 'Stretch', '🤸', 1, '{}', false),
+('c1000001-0001-4000-a000-000000000001', 'Pray', '🙏', 2, '{}', false),
+('c1000001-0001-4000-a000-000000000001', 'Healthy breakfast', '🍳', 3, '{}', false),
+('c1000001-0001-4000-a000-000000000001', 'Take a shower', '🚿', 4, '{}', false),
+('c1000001-0001-4000-a000-000000000001', 'Brush teeth', '🪥', 5, '{}', false),
+('c1000001-0001-4000-a000-000000000001', 'A skincare regimen', '✨', 6, '{}', false),
+('c1000001-0001-4000-a000-000000000001', 'Make up', '💄', 7, '{}', false),
+('c1000001-0001-4000-a000-000000000001', 'Blow hair', '💇', 8, '{}', false),
+('c1000001-0001-4000-a000-000000000001', 'Go to school', '🎒', 9, '{}', false),
+('c1000001-0001-4000-a000-000000000001', 'Drink water', '💧', 10, '{}', false),
+('c1000001-0001-4000-a000-000000000001', 'Get dressed', '👗', 11, '{}', false),
+('c1000001-0001-4000-a000-000000000001', 'Motivational video', '💪', 12, '{}', false);
+
+-- Ritual 2: Create an organized morning Ritual for city lady
+INSERT INTO routines_bank (id, title, subtitle, description, category, color, emoji, is_active, is_popular, is_free, sort_order, schedule_type)
+VALUES ('c1000001-0002-4000-a000-000000000001', 'Organized Morning Ritual For City Lady', 'A scientific morning Ritual for productivity', '<p>Do you repeatedly hit snooze, only to rush for work, neglecting your morning actions? Feeling flustered deciding between breakfast or yoga after waking? Does this morning chaos worsen your mood and impact your entire day?</p><p>An organized morning is crucial for productivity and emotional well-being throughout your day. A structured Ritual sets a focused and efficient tone, improving time management and reducing stress. This control enhances motivation, mood, and mental health. Scientific studies show that consistent morning Rituals boost cognitive function and decision-making skills, providing a competitive edge in work and life. Embrace an organized morning to transform your life and unlock your full potential!</p><p>So here''s a scientific morning Ritual that will help you start your day organically!</p><ul><li>⏰ <strong>Keep a fixed wake up time:</strong> Maintaining a fixed wake-up time promotes a consistent sleep pattern, resulting in increased energy, productivity, and overall well-being.</li><li>🧘 <strong>Yoga:</strong> Morning yoga invigorates the body and mind, enhancing flexibility, focus, and mental clarity, setting a positive tone for the day.</li><li>🚿 <strong>Take a shower:</strong> Take a quick shower and start the day with a glowing face.</li><li>🔍 <strong>Healthy breakfast:</strong> Make a breakfast that you like, and pay attention to the nutritional balance!</li><li>✉️ <strong>Check your email:</strong> Check to see if you have received any new emails and plan your schedule for the day.</li><li>🍱 <strong>Setting up lunch boxes:</strong> Prepare your lunch box, remember to eat well even if you are busy at work!</li><li>👍 <strong>Be grateful:</strong> Stay grateful for life, it''s full of good things, and so are you!</li></ul><p>I believe you will find that your mornings become more and more organized after adhering to this Ritual for a period of time, and your whole day will become energized as a result!</p>', 'MorningRoutines', 'sky', '🌅', true, false, true, 2, 'daily');
+
+INSERT INTO routines_bank_tasks (routine_id, title, emoji, task_order, schedule_days, is_once) VALUES
+('c1000001-0002-4000-a000-000000000001', 'Keep a fixed wake up time', '⏰', 0, '{}', false),
+('c1000001-0002-4000-a000-000000000001', 'Yoga', '🧘', 1, '{}', false),
+('c1000001-0002-4000-a000-000000000001', 'Take a shower', '🚿', 2, '{}', false),
+('c1000001-0002-4000-a000-000000000001', 'Healthy breakfast', '🍳', 3, '{}', false),
+('c1000001-0002-4000-a000-000000000001', 'Check your email', '✉️', 4, '{}', false),
+('c1000001-0002-4000-a000-000000000001', 'Setting up lunch boxes', '🍱', 5, '{}', false),
+('c1000001-0002-4000-a000-000000000001', 'Be grateful', '👍', 6, '{}', false);
+
+-- Ritual 3: Cozy Fall Morning Ritual
+INSERT INTO routines_bank (id, title, subtitle, description, category, color, emoji, is_active, is_popular, is_free, sort_order, schedule_type)
+VALUES ('c1000001-0003-4000-a000-000000000001', 'Cozy Fall Morning Ritual', 'Make the most out of the fall season', '<p>Fall is such a magical time of year. Back to school, cozy sweaters, crunchy leaves, and cool breezes. This fall morning Ritual is how we get ourselves ready for the day, keep ourselves productive, and make sure that we are really getting the most out of the fall season.</p><ul><li><strong>Wake up Slowly:</strong> Whether you are waking up to an alarm or naturally, do so slowly. No phone, no jumping out of bed, no email checking... Just sit and allow your mind and body to wake.</li><li><strong>Make Your Bed:</strong> This is really a great part of any morning Ritual, not just in the fall. We used to love bed rotting, but trust me, you will feel the power of making your bed in the morning after you''ve tried it a few times.</li><li><strong>Take a Relaxing Shower:</strong> Showering can make our body feel refreshed after allowing our minds to wake up in a comfortable way. Enjoy a good-smelling soap, a nice face wash, and some perfectly warm water.</li><li><strong>Make a Warm, Cozy Drink:</strong> Fall is the season of all things warm and cozy. Whether you are a tea or coffee kind of person, this is the perfect time for a cozy drink of your choice.</li><li><strong>Plans and Journals:</strong> Plans and journals can give us a moment to get organized and centered for the day. Enjoy the process of self-discovery and self-expression through journaling.</li><li><strong>Go for a Fall Walk:</strong> The crisp air and cool breeze of a fall morning walk are invigorating. It''s a good way to get some energy going and blood pumping first thing in the morning.</li></ul>', 'MorningRoutines', 'yellow', '🍂', true, false, true, 3, 'daily');
+
+INSERT INTO routines_bank_tasks (routine_id, title, emoji, task_order, schedule_days, is_once) VALUES
+('c1000001-0003-4000-a000-000000000001', 'Wake up slowly', '😌', 0, '{}', false),
+('c1000001-0003-4000-a000-000000000001', 'Make bed', '🛏️', 1, '{}', false),
+('c1000001-0003-4000-a000-000000000001', 'Take a shower', '🚿', 2, '{}', false),
+('c1000001-0003-4000-a000-000000000001', 'Make a warm and cozy drink', '☕', 3, '{}', false),
+('c1000001-0003-4000-a000-000000000001', 'Set daily plans', '📝', 4, '{}', false),
+('c1000001-0003-4000-a000-000000000001', 'Walks', '🚶', 5, '{}', false);
+
+-- Ritual 4: Office worker's power day breakers
+INSERT INTO routines_bank (id, title, subtitle, description, category, color, emoji, is_active, is_popular, is_free, sort_order, schedule_type)
+VALUES ('c1000001-0004-4000-a000-000000000001', 'Office Worker''s Power Day Breakers', 'Start your work day right', '<p>People often say, <em>The key to a successful day starts in the morning.</em> A well-organized morning can make your entire day energetic and productive. So, how can you effectively use your morning to kick off a great day? This Ritual might give you some inspiration!</p><ul><li>⏰ <strong>Wake up early:</strong> The first hours of your morning before work are crucial to how the day turns out. A healthy morning Ritual begins with waking up early; set your alarm to wake you up early enough.</li><li>🛏️ <strong>Make bed:</strong> One very productive thing to do in the morning is making your bed. From encouraging cleanliness, and improving your mood, to eventually helping you sleep better. The benefits are just enormous! Imagine being productive even before breakfast; that sense of satisfaction will drive you to complete more actions during the day.</li><li>💧 <strong>Drink water:</strong> Never underestimate the power of a glass of water in the morning. Your body often wakes up dehydrated after those hours of sleeping, and you will need to rehydrate after waking up. If you find it difficult, squeeze a couple of drops of lemon juice into the glass of water. This will gradually activate your body''s metabolism and, thereby, promote digestion.</li><li>🚿 <strong>Clean yourself:</strong> Remember to always brush your teeth and shower every morning. These healthy habits must be part of your daily Ritual as an office worker. Brushing removes bacteria and plaques that have built up overnight in your mouth. Having a shower makes you more alert and clean and also improves your circulation.</li><li>🍳 <strong>Healthy breakfast:</strong> A healthy breakfast empowers you with nutrients to start your day energized. Key nutrients to include in your breakfast menu are proteins, good fats, and fiber.</li><li>👔 <strong>Get dressed and go to work:</strong> After all of these, you are now sure to get dressed and leave early for a wonderful day at work!</li></ul><p>Start trying these methods tomorrow morning and wake up to a great day with an organized morning, you can do it!</p>', 'MorningRoutines', 'mint', '💼', true, false, true, 4, 'daily');
+
+INSERT INTO routines_bank_tasks (routine_id, title, emoji, task_order, schedule_days, is_once) VALUES
+('c1000001-0004-4000-a000-000000000001', 'Wake up early', '⏰', 0, '{}', false),
+('c1000001-0004-4000-a000-000000000001', 'Drink water', '💧', 1, '{}', false),
+('c1000001-0004-4000-a000-000000000001', 'Brush teeth', '🪥', 2, '{}', false),
+('c1000001-0004-4000-a000-000000000001', 'Healthy breakfast', '🍳', 3, '{}', false),
+('c1000001-0004-4000-a000-000000000001', 'Take a shower', '🚿', 4, '{}', false),
+('c1000001-0004-4000-a000-000000000001', 'Make bed', '🛏️', 5, '{}', false),
+('c1000001-0004-4000-a000-000000000001', 'Take vitamins', '💊', 6, '{}', false),
+('c1000001-0004-4000-a000-000000000001', 'Check weather', '🌤️', 7, '{}', false),
+('c1000001-0004-4000-a000-000000000001', 'Go to work', '💼', 8, '{}', false);
+
+-- Ritual 5: A Healthy Morning Start-pack
+INSERT INTO routines_bank (id, title, subtitle, description, category, color, emoji, is_active, is_popular, is_free, sort_order, schedule_type)
+VALUES ('c1000001-0005-4000-a000-000000000001', 'A Healthy Morning Start-Pack', 'Healthy ways to start your morning right', '<p>Your morning Ritual will determine the tone of your day, so it''s time to start planning accordingly. When you form healthy habitual behaviors for the morning, you set your day up for success. Here are some healthy ways to start your morning:</p><ul><li>🧘 <strong>Meditate:</strong> Incorporating some type of mindfulness practice like meditation into your daily morning Ritual can help ground you and train your mind and emotions, which then influences how you react to challenges throughout your day.</li><li>🛏️ <strong>Make your bed:</strong> It may seem like a waste of time, or unnecessary, but making your bed is a simple action you can take in the morning that makes you start your day feeling accomplished.</li><li>🤸 <strong>Move Your Body:</strong> Whether it''s a brisk walk with your pet, a simple yoga Ritual, a set of push-ups and sit-ups, or hitting the gym, starting your day with stretching energizes your mind and body for the day ahead.</li><li>🍳 <strong>Eat a nutritious breakfast:</strong> There''s no one universally good breakfast: It depends on your nutrition goals, preferences, and morning schedule. It also depends on how naturally hungry you are in the morning. If you can''t focus on an empty stomach, a simple breakfast you can prepare ahead of time (like overnight oats or egg white bites) will be key to starting your day.</li></ul><p>Try using the above methods to change your otherwise chaotic morning. A morning can brighten your day!</p>', 'MorningRoutines', 'lavender', '🌞', true, false, true, 5, 'daily');
+
+INSERT INTO routines_bank_tasks (routine_id, title, emoji, task_order, schedule_days, is_once) VALUES
+('c1000001-0005-4000-a000-000000000001', 'Move your body', '🤸', 0, '{}', false),
+('c1000001-0005-4000-a000-000000000001', 'Meditate', '🧘', 1, '{}', false),
+('c1000001-0005-4000-a000-000000000001', 'Make bed', '🛏️', 2, '{}', false),
+('c1000001-0005-4000-a000-000000000001', 'Eat a nutritious breakfast', '🍳', 3, '{}', false);
