@@ -35,11 +35,11 @@ export function AddToRitualHandHint({ show }: AddToRitualHandHintProps) {
         className="pointer-events-none fixed z-[60]"
         style={{
           bottom: 'calc(env(safe-area-inset-bottom) + 105px)',
-          /* shift left of center — right ~40% puts it just left of mid */
-          right: '40%',
+          /* point at the CalendarPlus icon — left side of button */
+          left: '18%',
           filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
           animation: 'handDownBounce 1.4s ease-in-out infinite',
-          /* 60° tilt: tilted to the right pointing down-right */
+          /* 60° tilt pointing down-right */
           transform: 'rotate(-30deg)',
         }}
       >
