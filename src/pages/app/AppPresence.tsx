@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart } from 'lucide-react';
 import { usePresenceStats } from '@/hooks/usePresenceStats';
 import { useUserPresence } from '@/hooks/useUserPresence';
-import { useUserStreak, useSetStreakGoal } from '@/hooks/useTaskPlanner';
+import { useUserStreak, useSetStreakGoal, useRecoverStreak } from '@/hooks/useTaskPlanner';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
+import { StreakRecoveryPrompt } from '@/components/app/StreakRecoveryPrompt';
 import { ACHIEVEMENTS, getAchievementStatus } from '@/lib/achievements';
 import { AchievementCard } from '@/components/app/AchievementCard';
 import { WeeklyPresenceGrid } from '@/components/app/WeeklyPresenceGrid';
@@ -25,9 +26,11 @@ const AppPresence = () => {
   const { data: streak } = useUserStreak();
   const { data: challenges } = useUserChallenges();
   const setStreakGoal = useSetStreakGoal();
+  const recoverStreak = useRecoverStreak();
   const [showGoalSelection, setShowGoalSelection] = useState(false);
   const [showGoalConfirmation, setShowGoalConfirmation] = useState(false);
   const [confirmedGoal, setConfirmedGoal] = useState(7);
+  const [showRecoveryPrompt, setShowRecoveryPrompt] = useState(false);
   
   const lastActiveDate = presence?.lastActiveDate ? new Date(presence.lastActiveDate) : null;
   const showedUpToday = presence?.showedUpToday || false;
@@ -39,6 +42,13 @@ const AppPresence = () => {
   
   // Check if user has a streak goal challenge active
   const hasStreakChallenge = streak?.streak_goal && streak.streak_goal > 0;
+
+  // Recovery: streak is broken if current_streak reset to 0 but longest_streak > 0
+  const streakRecoveryAvailable = streak && 
+    !!(streak as any).streak_recovery_used === false &&
+    streak.current_streak === 0 &&
+    streak.longest_streak > 0;
+  const previousStreakForRecovery = streak?.longest_streak || 0;
 
   return (
     <>
@@ -167,12 +177,15 @@ const AppPresence = () => {
               />
             </div>
             
-            {/* Streak Challenge Card - only show if user has a goal set */}
-            {hasStreakChallenge && (
+            {/* Streak Challenge Card - show if user has a goal set OR if streak was broken (recovery available) */}
+            {(hasStreakChallenge || streakRecoveryAvailable) && streak && (
               <StreakChallengeCard
                 currentStreak={streak.current_streak}
-                streakGoal={streak.streak_goal!}
+                streakGoal={streak.streak_goal || previousStreakForRecovery}
                 onLevelUp={() => setShowGoalSelection(true)}
+                canRecover={streakRecoveryAvailable}
+                previousStreak={previousStreakForRecovery}
+                onRecover={() => setShowRecoveryPrompt(true)}
               />
             )}
             
@@ -285,6 +298,19 @@ const AppPresence = () => {
         open={showGoalConfirmation}
         goal={confirmedGoal}
         onClose={() => setShowGoalConfirmation(false)}
+      />
+
+      {/* Streak Recovery Prompt */}
+      <StreakRecoveryPrompt
+        open={showRecoveryPrompt}
+        previousStreak={previousStreakForRecovery}
+        onRecover={() => {
+          recoverStreak.mutate(previousStreakForRecovery, {
+            onSuccess: () => setShowRecoveryPrompt(false),
+          });
+        }}
+        onDismiss={() => setShowRecoveryPrompt(false)}
+        isLoading={recoverStreak.isPending}
       />
     </>
   );

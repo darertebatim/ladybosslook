@@ -3435,6 +3435,8 @@ export type Database = {
           streak_goal: number | null
           streak_goal_completed_at: string | null
           streak_goal_set_at: string | null
+          streak_recovery_used: boolean
+          streak_recovery_used_at: string | null
           updated_at: string
           user_id: string
         }
@@ -3449,6 +3451,8 @@ export type Database = {
           streak_goal?: number | null
           streak_goal_completed_at?: string | null
           streak_goal_set_at?: string | null
+          streak_recovery_used?: boolean
+          streak_recovery_used_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -3463,6 +3467,8 @@ export type Database = {
           streak_goal?: number | null
           streak_goal_completed_at?: string | null
           streak_goal_set_at?: string | null
+          streak_recovery_used?: boolean
+          streak_recovery_used_at?: string | null
           updated_at?: string
           user_id?: string
         }

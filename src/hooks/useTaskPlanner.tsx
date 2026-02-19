@@ -1405,6 +1405,40 @@ export const useUndoSkip = () => {
 };
 
 /**
+ * Recover a broken streak (one-time per streak run)
+ */
+export const useRecoverStreak = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (previousStreak: number) => {
+      if (!user?.id) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('user_streaks')
+        .update({
+          current_streak: previousStreak,
+          streak_recovery_used: true,
+          streak_recovery_used_at: new Date().toISOString(),
+          last_completion_date: format(new Date(), 'yyyy-MM-dd'),
+        } as any)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
+      queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
+    },
+    onError: (error) => {
+      console.error('Recover streak error:', error);
+      toast({ title: 'Failed to recover streak', variant: 'destructive' });
+    },
+  });
+};
+
+/**
  * Set streak goal for the challenge
  */
 export const useSetStreakGoal = () => {
