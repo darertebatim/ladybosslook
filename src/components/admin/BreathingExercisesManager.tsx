@@ -15,7 +15,6 @@ import {
   useUpdateBreathingExercise,
   useDeleteBreathingExercise,
   BreathingExercise,
-  BREATHING_CATEGORIES,
 } from '@/hooks/useBreathingExercises';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -150,9 +149,6 @@ export function BreathingExercisesManager() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{exercise.name}</span>
-                    <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded capitalize">
-                      {exercise.category}
-                    </span>
                     {exercise.is_premium && (
                       <span className="text-xs text-amber-600 bg-amber-100 px-2 py-0.5 rounded flex items-center gap-0.5">
                         <Crown className="h-3 w-3" /> Plus
@@ -234,33 +230,13 @@ export function BreathingExercisesManager() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>Category</Label>
-                <Select
-                  value={formData.category}
-                  onValueChange={(v) => updateField('category', v as FormData['category'])}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {BREATHING_CATEGORIES.map((cat) => (
-                      <SelectItem key={cat.value} value={cat.value}>
-                        {cat.emoji} {cat.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Sort Order</Label>
-                <Input
-                  type="number"
-                  value={formData.sort_order}
-                  onChange={(e) => updateField('sort_order', parseInt(e.target.value) || 0)}
-                />
-              </div>
+            <div>
+              <Label>Sort Order</Label>
+              <Input
+                type="number"
+                value={formData.sort_order}
+                onChange={(e) => updateField('sort_order', parseInt(e.target.value) || 0)}
+              />
             </div>
 
             {/* Breathing timings */}

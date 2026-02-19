@@ -3,11 +3,9 @@ import { useSearchParams } from 'react-router-dom';
 import { Wind } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
-import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { 
   useBreathingExercises, 
   BreathingExercise,
-  BREATHING_CATEGORIES 
 } from '@/hooks/useBreathingExercises';
 import { BreathingExerciseCard } from '@/components/breathe/BreathingExerciseCard';
 import { BreathingExerciseScreen } from '@/components/breathe/BreathingExerciseScreen';
@@ -19,7 +17,6 @@ export default function AppBreathe() {
   const [searchParams] = useSearchParams();
   const { data: exercises, isLoading } = useBreathingExercises();
   
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedExercise, setSelectedExercise] = useState<BreathingExercise | null>(null);
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
 
@@ -35,20 +32,15 @@ export default function AppBreathe() {
       const exercise = exercises.find(e => e.id === exerciseId);
       if (exercise) {
         setSelectedExercise(exercise);
-        setSelectedCategory(exercise.category);
       }
     }
   }, [exerciseId, exercises]);
 
-  // Filter exercises by category (show all active when 'all' selected)
+  // Filter to active exercises only
   const filteredExercises = useMemo(() => {
     if (!exercises) return [];
-    const activeExercises = exercises.filter(e => e.is_active);
-    if (selectedCategory === 'all') {
-      return activeExercises;
-    }
-    return activeExercises.filter(e => e.category === selectedCategory);
-  }, [exercises, selectedCategory]);
+    return exercises.filter(e => e.is_active);
+  }, [exercises]);
 
   const handleExerciseClick = (exercise: BreathingExercise) => {
     setSelectedExercise(exercise);
@@ -85,26 +77,6 @@ export default function AppBreathe() {
           rightAction={startTour ? <TourHelpButton onClick={startTour} /> : undefined}
         />
         <AppHeaderSpacer />
-
-        {/* Category circles */}
-        <div className="px-4 py-4 tour-categories">
-          <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-hide">
-            {BREATHING_CATEGORIES.map((category) => (
-              <CategoryCircle
-                key={category.value}
-                name={category.label}
-                icon={category.icon}
-                emoji={category.emoji}
-                color={category.color}
-                isSelected={selectedCategory === category.value}
-                onClick={() => {
-                  setSelectedCategory(category.value);
-                  haptic.light();
-                }}
-              />
-            ))}
-          </div>
-        </div>
 
         {/* Exercise list */}
         <div className="px-4 pb-safe space-y-3">

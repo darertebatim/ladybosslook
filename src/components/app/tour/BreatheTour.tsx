@@ -17,15 +17,6 @@ export function BreatheTour({ isFirstVisit = false, onTourReady }: BreatheTourPr
       action: 'look',
     },
     {
-      id: 'categories',
-      target: '.tour-categories',
-      title: 'Filter by Goal',
-      description: 'Tap to filter: Calm, Focus, Energy, or Sleep. Each category has different rhythms.',
-      position: 'bottom',
-      action: 'tap',
-      condition: () => !!document.querySelector('.tour-categories'),
-    },
-    {
       id: 'exercises',
       target: '.tour-exercise-card',
       title: 'Start an Exercise',
