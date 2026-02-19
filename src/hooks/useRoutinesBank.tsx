@@ -506,14 +506,15 @@ export function useAddRoutineFromBank() {
             }
           } else {
             // Normal rituals: use per-task repeat from bank, allow user edits to override
-            const bankRepeat = bankTask?.repeat_pattern || 'daily';
-            // If bank says 'none' but there's no scheduled_date context, default to 'daily'
-            // (one-off tasks only make sense with a specific date)
-            repeatPattern = edited?.repeatPattern || (bankRepeat === 'none' ? 'daily' : bankRepeat);
+            repeatPattern = edited?.repeatPattern || bankTask?.repeat_pattern || 'daily';
             repeatDays = bankTask?.repeat_days || null;
             // If a start date is configured, set scheduled_date so tasks don't appear before it
             if (startDayOfWeek != null || (routine as any).challenge_start_date) {
               scheduledDate = effectiveStartDate.toISOString().split('T')[0];
+            }
+            // One-time tasks need a scheduled_date to appear in the planner
+            if (repeatPattern === 'none' && !scheduledDate) {
+              scheduledDate = new Date().toISOString().split('T')[0];
             }
           }
 
