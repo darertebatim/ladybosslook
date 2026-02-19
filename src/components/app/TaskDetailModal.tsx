@@ -329,7 +329,7 @@ export const TaskDetailModal = ({
                 onClose();
                 onEdit(task);
               }}
-              className="flex-1 gap-2 h-10 rounded-full border-2 border-black/30 bg-transparent hover:bg-white/30 text-black text-sm"
+              className="flex-1 gap-2 h-10 rounded-2xl border-0 bg-white/90 active:bg-white text-black text-sm shadow-sm"
             >
               <Pencil className="h-4 w-4" />
               Edit Action
@@ -343,7 +343,7 @@ export const TaskDetailModal = ({
                   onClose();
                   onSkip(task);
                 }}
-                className="gap-1.5 h-10 px-3 rounded-xl border-2 border-black/20 bg-white/50 hover:bg-white/70 text-black/70 text-sm"
+                className="gap-1.5 h-10 px-4 rounded-2xl border-0 bg-white/90 active:bg-white text-black text-sm shadow-sm"
               >
                 <FastForward className="h-4 w-4" />
                 Skip
@@ -352,14 +352,13 @@ export const TaskDetailModal = ({
             
             {onDelete && (
               <Button
-                variant="outline"
                 onClick={() => {
                   onClose();
                   onDelete(task);
                 }}
-                className="gap-1.5 h-10 px-3 rounded-xl border-2 border-red-300 bg-transparent hover:bg-red-50 text-red-500 text-sm"
+                className="gap-1.5 h-10 px-4 rounded-2xl border-0 bg-[#E07060] active:bg-[#d06050] hover:bg-[#d06050] text-white text-sm shadow-sm"
               >
-                <Trash2 className="h-4 w-4" strokeWidth={1.5} />
+                <Trash2 className="h-4 w-4" strokeWidth={2} />
                 Delete
               </Button>
             )}
