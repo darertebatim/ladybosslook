@@ -52,29 +52,42 @@ export function useBadgeCelebration({
   // Track previous completed count to detect new completions
   const prevCompletedRef = useRef<number>(completedCount);
   const prevDateKeyRef = useRef<string>(dateKey);
-  // Track how many times we've seen data to skip initial loads (mount + first async update)
-  const mountCountRef = useRef(0);
+  // Track whether the initial data has been established (not just mount renders)
+  const initializedRef = useRef(false);
+  // Track the timestamp of initialization to require a user action delay
+  const initTimeRef = useRef(0);
 
   // Reset when date changes
   useEffect(() => {
     if (prevDateKeyRef.current !== dateKey) {
       prevDateKeyRef.current = dateKey;
       prevCompletedRef.current = 0;
-      mountCountRef.current = 0;
+      initializedRef.current = false;
+      initTimeRef.current = 0;
     }
   }, [dateKey]);
 
   // Detect completions and determine which celebration to show
   useEffect(() => {
-    // Skip the first two renders (initial mount with default 0, then async data load)
-    // This prevents false celebrations when navigating back to home
-    if (mountCountRef.current < 2) {
-      mountCountRef.current += 1;
+    const prevCompleted = prevCompletedRef.current;
+    
+    // If not yet initialized, accept the current value as baseline without celebrating
+    if (!initializedRef.current) {
+      prevCompletedRef.current = completedCount;
+      // Mark initialized once we have a non-zero count or after first update
+      if (completedCount > 0 || prevCompleted > 0) {
+        initializedRef.current = true;
+        initTimeRef.current = Date.now();
+      }
+      return;
+    }
+
+    // Require at least 1 second after initialization to avoid false triggers from re-renders
+    if (Date.now() - initTimeRef.current < 1000) {
       prevCompletedRef.current = completedCount;
       return;
     }
 
-    const prevCompleted = prevCompletedRef.current;
     const isNewCompletion = completedCount > prevCompleted;
     prevCompletedRef.current = completedCount;
 
