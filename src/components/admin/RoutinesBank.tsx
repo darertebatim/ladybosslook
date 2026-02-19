@@ -111,6 +111,7 @@ interface LocalTask {
   schedule_days: number[];
   drip_day: number | null;
   monthly_day: number | null;
+  is_once: boolean;
 }
 
 export default function RoutinesBank() {
@@ -350,6 +351,7 @@ export default function RoutinesBank() {
           schedule_days: t.schedule_days?.length ? t.schedule_days : [],
           drip_day: t.drip_day,
           monthly_day: t.monthly_day,
+          is_once: t.is_once ?? false,
         }));
         await supabase.from('routines_bank_tasks').insert(taskRecords);
       }
@@ -450,6 +452,7 @@ export default function RoutinesBank() {
       schedule_days: (t as any).schedule_days || [],
       drip_day: (t as any).drip_day ?? null,
       monthly_day: (t as any).monthly_day ?? null,
+      is_once: (t as any).is_once ?? false,
     }));
 
     return { sections, tasks };
@@ -600,6 +603,7 @@ export default function RoutinesBank() {
       schedule_days: [],
       drip_day: formData.schedule_type === 'challenge' ? localTasks.length + 1 : null,
       monthly_day: null,
+      is_once: false,
     };
     setLocalTasks([...localTasks, newTask]);
     setTaskSearchOpen(false);
@@ -689,29 +693,35 @@ export default function RoutinesBank() {
         </div>
       );
     }
-    // Normal mode: show Daily / Weekly / Monthly selector
+    // Normal mode: show Daily / Weekly / Monthly / Once selector
     const days = task.schedule_days || [];
     const isWeekly = days.length > 0;
     const isMonthly = task.monthly_day != null;
-    const currentMode = isMonthly ? 'monthly' : isWeekly ? 'weekly' : 'daily';
+    const isOnce = task.is_once === true;
+    const currentMode = isOnce ? 'once' : isMonthly ? 'monthly' : isWeekly ? 'weekly' : 'daily';
 
     const cycleMode = (e: React.MouseEvent) => {
       e.stopPropagation();
       if (currentMode === 'daily') {
         // → Weekly
-        setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [1, 3, 5], monthly_day: null } : t));
+        setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [1, 3, 5], monthly_day: null, is_once: false } : t));
       } else if (currentMode === 'weekly') {
         // → Monthly
-        setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [], monthly_day: 1 } : t));
+        setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [], monthly_day: 1, is_once: false } : t));
+      } else if (currentMode === 'monthly') {
+        // → Once
+        setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [], monthly_day: null, is_once: true } : t));
       } else {
         // → Daily
-        setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [], monthly_day: null } : t));
+        setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [], monthly_day: null, is_once: false } : t));
       }
     };
 
     return (
       <div className="flex items-center gap-1">
-        {isMonthly ? (
+        {isOnce ? (
+          <span className="text-[10px] text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded">Once</span>
+        ) : isMonthly ? (
           <div className="flex items-center gap-1">
             <span className="text-[10px] text-muted-foreground">Day</span>
             <Input
@@ -759,7 +769,7 @@ export default function RoutinesBank() {
           onClick={cycleMode}
           className="text-[9px] text-muted-foreground hover:text-foreground underline"
         >
-          {currentMode === 'daily' ? '→ Weekly' : currentMode === 'weekly' ? '→ Monthly' : '→ Daily'}
+          {currentMode === 'daily' ? '→ Weekly' : currentMode === 'weekly' ? '→ Monthly' : currentMode === 'monthly' ? '→ Once' : '→ Daily'}
         </button>
       </div>
     );
@@ -1447,10 +1457,11 @@ export default function RoutinesBank() {
 
                   {/* Tasks grouped by schedule */}
                   {(() => {
-                     const dailyTasks = uncategorizedTasks.filter(t => (!t.schedule_days || t.schedule_days.length === 0) && t.monthly_day == null);
-                     const weeklyTasks = uncategorizedTasks.filter(t => t.schedule_days && t.schedule_days.length > 0);
-                     const monthlyTasks = uncategorizedTasks.filter(t => t.monthly_day != null);
-                     const showGroups = formData.schedule_type !== 'challenge' && (dailyTasks.length > 0 || weeklyTasks.length > 0 || monthlyTasks.length > 0 || localSections.length === 0);
+                     const dailyTasks = uncategorizedTasks.filter(t => (!t.schedule_days || t.schedule_days.length === 0) && t.monthly_day == null && !t.is_once);
+                     const weeklyTasks = uncategorizedTasks.filter(t => t.schedule_days && t.schedule_days.length > 0 && !t.is_once);
+                     const monthlyTasks = uncategorizedTasks.filter(t => t.monthly_day != null && !t.is_once);
+                     const onceTasks = uncategorizedTasks.filter(t => t.is_once === true);
+                     const showGroups = formData.schedule_type !== 'challenge' && (dailyTasks.length > 0 || weeklyTasks.length > 0 || monthlyTasks.length > 0 || onceTasks.length > 0 || localSections.length === 0);
 
                     if (!showGroups && uncategorizedTasks.length === 0 && localSections.length > 0) return null;
 
@@ -1570,6 +1581,21 @@ export default function RoutinesBank() {
                               <p className="text-center text-muted-foreground text-xs py-2">No monthly tasks</p>
                             )}
                             {monthlyTasks.map((task, tIdx) => renderTaskRow(task, tIdx, monthlyTasks.length, null))}
+                          </div>
+                        </div>
+
+                        {/* Once Tasks */}
+                        <div className="border rounded-lg overflow-hidden">
+                          <div className="flex items-center gap-2 p-3 bg-purple-50 dark:bg-purple-950/20 border-b">
+                            <span className="text-sm">1️⃣</span>
+                            <h4 className="font-medium text-sm flex-1">One-time tasks</h4>
+                            <span className="text-xs text-muted-foreground">{onceTasks.length}</span>
+                          </div>
+                          <div className="p-2 space-y-1">
+                            {onceTasks.length === 0 && (
+                              <p className="text-center text-muted-foreground text-xs py-2">No one-time tasks</p>
+                            )}
+                            {onceTasks.map((task, tIdx) => renderTaskRow(task, tIdx, onceTasks.length, null))}
                           </div>
                         </div>
 

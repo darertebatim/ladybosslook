@@ -70,7 +70,7 @@ function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask & { sc
     schedule_days: task.schedule_days,
     drip_day: task.drip_day,
     monthly_day: task.monthly_day,
-    repeat_pattern: task.monthly_day != null ? 'monthly' : (task.repeat_pattern || 'daily'),
+    repeat_pattern: (task as any).is_once ? 'none' : (task.monthly_day != null ? 'monthly' : (task.repeat_pattern || 'daily')),
     repeat_days: task.repeat_days || null,
   };
 }
