@@ -483,22 +483,38 @@ export default function AppInspireDetail() {
 
       {/* Sticky Add Button */}
       <div 
-        className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border relative"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}
+        className="fixed bottom-0 left-0 right-0 flex justify-center items-end relative"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}
       >
         {/* Animated hand hint for new users */}
         <AddToRitualHandHint show={showHint && !isAdded} />
 
-        <AddedToRoutineButton
-          isAdded={isAdded}
-          onAddClick={() => {
-            dismissHint();
-            handleAddClick();
-          }}
-          isLoading={addRoutineFromBank.isPending}
-          size="lg"
-          addText="Add to my rituals"
-        />
+        {isAdded ? (
+          /* Already added: show full-width "Go to Planner" */
+          <div className="w-full px-4">
+            <AddedToRoutineButton
+              isAdded={isAdded}
+              onAddClick={() => { dismissHint(); handleAddClick(); }}
+              isLoading={addRoutineFromBank.isPending}
+              size="lg"
+              addText="Add to my rituals"
+            />
+          </div>
+        ) : (
+          /* Not added: orange circle FAB with white + */
+          <button
+            onClick={() => { dismissHint(); handleAddClick(); }}
+            disabled={addRoutineFromBank.isPending}
+            aria-label="Add to my rituals"
+            className="w-16 h-16 rounded-full flex items-center justify-center shadow-xl active:scale-90 transition-transform disabled:opacity-60"
+            style={{ background: 'hsl(20, 85%, 55%)' }}
+          >
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <line x1="16" y1="6" x2="16" y2="26" stroke="white" strokeWidth="3.5" strokeLinecap="round"/>
+              <line x1="6" y1="16" x2="26" y2="16" stroke="white" strokeWidth="3.5" strokeLinecap="round"/>
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Preview Sheet */}
