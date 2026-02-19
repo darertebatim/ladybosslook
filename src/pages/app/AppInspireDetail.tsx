@@ -320,11 +320,15 @@ export default function AppInspireDetail() {
             )}
           </div>
 
-          {/* Description */}
+          {/* Description — rendered as rich HTML */}
           {routine.description && (
-            <div className="mt-5">
-              <p className="text-foreground leading-relaxed">{routine.description}</p>
-            </div>
+            <div
+              className="mt-5 text-foreground leading-relaxed prose prose-sm max-w-none
+                prose-headings:text-foreground prose-headings:font-semibold
+                prose-strong:text-foreground prose-a:text-primary
+                prose-ul:pl-5 prose-ol:pl-5"
+              dangerouslySetInnerHTML={{ __html: routine.description }}
+            />
           )}
 
           {/* Tasks by Section */}
