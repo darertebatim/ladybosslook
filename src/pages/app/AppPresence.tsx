@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { SEOHead } from '@/components/SEOHead';
 import { toast } from 'sonner';
+import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation';
 
 const AppPresence = () => {
   const navigate = useNavigate();
@@ -25,6 +26,8 @@ const AppPresence = () => {
   const { data: challenges } = useUserChallenges();
   const setStreakGoal = useSetStreakGoal();
   const [showGoalSelection, setShowGoalSelection] = useState(false);
+  const [showGoalConfirmation, setShowGoalConfirmation] = useState(false);
+  const [confirmedGoal, setConfirmedGoal] = useState(7);
   
   const lastActiveDate = presence?.lastActiveDate ? new Date(presence.lastActiveDate) : null;
   const showedUpToday = presence?.showedUpToday || false;
@@ -268,13 +271,20 @@ const AppPresence = () => {
           setStreakGoal.mutate(goal, {
             onSuccess: () => {
               setShowGoalSelection(false);
-              toast.success('New challenge accepted! Let\'s go! 🏆');
+              setConfirmedGoal(goal);
+              setShowGoalConfirmation(true);
             },
           });
         }}
         isLoading={setStreakGoal.isPending}
         minGoal={streak?.streak_goal || 0}
         isUpgrade={true}
+      />
+
+      <StreakGoalConfirmation
+        open={showGoalConfirmation}
+        goal={confirmedGoal}
+        onClose={() => setShowGoalConfirmation(false)}
       />
     </>
   );
