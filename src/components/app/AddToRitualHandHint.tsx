@@ -87,11 +87,11 @@ export function SaveRitualHandHint({ show }: AddToRitualHandHintProps) {
       <div
         className="pointer-events-none fixed z-[200]"
         style={{
-          bottom: 'max(24px, env(safe-area-inset-bottom))',
-          right: '24px',
+          bottom: 'calc(max(24px, env(safe-area-inset-bottom)) + 56px)',
+          right: '80px',
           filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
           animation: 'saveHandBounce 1.4s ease-in-out infinite',
-          transform: 'rotate(-30deg)',
+          transform: 'rotate(30deg)',
         }}
       >
         <FluentEmoji emoji="👇" size={90} />
@@ -99,11 +99,11 @@ export function SaveRitualHandHint({ show }: AddToRitualHandHintProps) {
 
       <style>{`
         @keyframes saveHandBounce {
-          0%   { transform: rotate(-30deg) translateY(0px); }
-          40%  { transform: rotate(-30deg) translateY(10px); }
-          55%  { transform: rotate(-30deg) translateY(5px); }
-          70%  { transform: rotate(-30deg) translateY(10px); }
-          100% { transform: rotate(-30deg) translateY(0px); }
+          0%   { transform: rotate(30deg) translateY(0px); }
+          40%  { transform: rotate(30deg) translateY(10px); }
+          55%  { transform: rotate(30deg) translateY(5px); }
+          70%  { transform: rotate(30deg) translateY(10px); }
+          100% { transform: rotate(30deg) translateY(0px); }
         }
       `}</style>
     </>
