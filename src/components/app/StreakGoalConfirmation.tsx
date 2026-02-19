@@ -7,19 +7,15 @@ interface StreakGoalConfirmationProps {
   onClose: () => void;
 }
 
-const MESSAGES: Record<number, { heading: string; sub: string }> = {
-  7:  { heading: "Small steps build big momentum. Even one is enough—just don't break the streak.", sub: "7 days. Let's see what you're made of." },
-  14: { heading: "Two weeks of showing up daily will change how you see yourself.", sub: "14 days. The habit starts now." },
-  30: { heading: "A month of consistency turns a decision into an identity.", sub: "30 days. This is where transformation begins." },
-  50: { heading: "50 days is where most people quit. You're already further than they'll ever get.", sub: "50 days. Legendary territory." },
+const MESSAGE = {
+  heading: "Great! Small steps build big momentum. Even one is enough—Just don't break the streak.",
+  sub: "Your streak challenge starts now. Show up daily.",
 };
-
-const DEFAULT_MSG = { heading: "Small steps build big momentum. Even one is enough—just don't break the streak.", sub: "You've got this. Don't stop." };
 
 export function StreakGoalConfirmation({ open, goal, onClose }: StreakGoalConfirmationProps) {
   if (!open) return null;
 
-  const msg = MESSAGES[goal] ?? DEFAULT_MSG;
+  const msg = MESSAGE;
 
   const handleClose = () => {
     haptic.light();
