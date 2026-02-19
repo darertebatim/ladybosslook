@@ -128,8 +128,8 @@ export const PlaylistCard = memo(function PlaylistCard({
           </div>
         )}
         
-        {/* Top-right: FREE badge */}
-        <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
+        {/* Top-left: FREE badge */}
+        <div className="absolute top-2 left-2 flex items-center gap-1 z-10">
           {isFree && !isLocked && (
             <Badge className="bg-green-500 hover:bg-green-600 rounded-full">
               FREE
@@ -137,9 +137,9 @@ export const PlaylistCard = memo(function PlaylistCard({
           )}
         </div>
 
-        
+        {/* Top-right: Category badge */}
         {category && (
-          <Badge variant="secondary" className="absolute top-2 left-2 rounded-full">
+          <Badge variant="secondary" className="absolute top-2 right-2 rounded-full z-10">
             {getCategoryLabel()}
           </Badge>
         )}
