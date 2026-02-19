@@ -7,7 +7,7 @@ import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, M
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { HomeMenu } from '@/components/app/HomeMenu';
 import { cn } from '@/lib/utils';
-import { useTasksForDate, useCompletionsForDate, useCompletedDates, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask, useSkipsForDate, useSetStreakGoal } from '@/hooks/useTaskPlanner';
+import { useTasksForDate, useCompletionsForDate, useCompletedDates, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask, useSkipsForDate, useSetStreakGoal, useRecoverStreak } from '@/hooks/useTaskPlanner';
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
 import { useNewHomeData } from '@/hooks/useNewHomeData';
 import { TaskCard } from '@/components/app/TaskCard';
@@ -18,6 +18,7 @@ import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { StreakGoalSelection } from '@/components/app/StreakGoalSelection';
 import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
 import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation';
+import { StreakRecoveryPrompt } from '@/components/app/StreakRecoveryPrompt';
 import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { ProgramEventCard } from '@/components/app/ProgramEventCard';
 import { PromoBanner } from '@/components/app/PromoBanner';
@@ -104,6 +105,8 @@ const AppHome = () => {
   const [showGoalConfirmation, setShowGoalConfirmation] = useState(false);
   const [confirmedGoal, setConfirmedGoal] = useState(7);
   const setStreakGoal = useSetStreakGoal();
+  const recoverStreak = useRecoverStreak();
+  const [showRecoveryPrompt, setShowRecoveryPrompt] = useState(false);
 
 
   // Gold streak celebration state - use localStorage to prevent re-showing on navigation
@@ -290,6 +293,19 @@ const AppHome = () => {
     supabase.from('user_streaks').update({ streak_goal_completed_at: new Date().toISOString() } as any).eq('user_id', streak.user_id).then(() => {});
     
     setShowStreakGoalCompletion(true);
+  }, [streak]);
+
+  // Auto-show recovery prompt when streak is broken and recovery hasn't been used
+  useEffect(() => {
+    if (!streak) return;
+    const recoveryUsed = !!(streak as any).streak_recovery_used;
+    if (recoveryUsed) return;
+    if (streak.current_streak !== 0) return;
+    if (streak.longest_streak <= 0) return;
+    const shownKey = 'simora_recovery_prompt_shown';
+    if (sessionStorage.getItem(shownKey) === 'true') return;
+    sessionStorage.setItem(shownKey, 'true');
+    setTimeout(() => setShowRecoveryPrompt(true), 1200);
   }, [streak]);
 
   // Popular routines for suggestions (filter out already-added ones)
@@ -1001,6 +1017,20 @@ const AppHome = () => {
             onSkip={() => setShowNotificationFlow(false)} 
           />
         )}
+
+        {/* Streak Recovery Prompt */}
+        <StreakRecoveryPrompt
+          open={showRecoveryPrompt}
+          previousStreak={streak?.longest_streak || 0}
+          onRecover={() => {
+            const prev = streak?.longest_streak || 0;
+            recoverStreak.mutate(prev, {
+              onSuccess: () => setShowRecoveryPrompt(false),
+            });
+          }}
+          onDismiss={() => setShowRecoveryPrompt(false)}
+          isLoading={recoverStreak.isPending}
+        />
 
         {/* New Interactive Home Tour */}
         <HomeTour 
