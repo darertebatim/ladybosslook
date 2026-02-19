@@ -481,14 +481,14 @@ export default function AppInspireDetail() {
         </div>
       </div>
 
+      {/* Animated hand hint for new users — outside footer so fixed positioning works */}
+      <AddToRitualHandHint show={showHint && !isAdded} />
+
       {/* Sticky Add Button */}
       <div 
-        className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border relative"
+        className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}
       >
-        {/* Animated hand hint for new users */}
-        <AddToRitualHandHint show={showHint && !isAdded} />
-
         <AddedToRoutineButton
           isAdded={isAdded}
           onAddClick={() => {
