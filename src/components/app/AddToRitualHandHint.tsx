@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 const STORAGE_KEY = 'ritual_add_hint_dismissed';
 
 /**
- * Animated hand pointer that floats above the "Add to my rituals" button,
- * shown only until the user taps it for the first time.
+ * Hook: tracks whether the hand hint should be shown.
+ * Dismissed permanently in localStorage after first tap.
  */
 export function useAddToRitualHint() {
   const [showHint, setShowHint] = useState(false);
@@ -12,7 +13,6 @@ export function useAddToRitualHint() {
   useEffect(() => {
     const dismissed = localStorage.getItem(STORAGE_KEY);
     if (!dismissed) {
-      // Small delay so the page renders first
       const t = setTimeout(() => setShowHint(true), 600);
       return () => clearTimeout(t);
     }
@@ -30,35 +30,37 @@ interface AddToRitualHandHintProps {
   show: boolean;
 }
 
+/**
+ * Large 3D hand emoji floating above the "Add to my rituals" button,
+ * pointing downward toward it, offset to the right of center.
+ * Only shown to first-time users until they tap the button.
+ */
 export function AddToRitualHandHint({ show }: AddToRitualHandHintProps) {
   if (!show) return null;
 
   return (
-    <div
-      className="pointer-events-none absolute inset-0 flex items-end justify-center"
-      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}
-    >
-      {/* Hand emoji with tap-bounce animation */}
+    <>
       <div
-        className="text-4xl select-none"
+        className="pointer-events-none fixed z-[60]"
         style={{
-          animation: 'handTap 1.1s ease-in-out infinite',
-          transformOrigin: 'bottom center',
-          filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.25))',
+          bottom: 'calc(env(safe-area-inset-bottom) + 110px)',
+          right: '18%',
+          filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.30))',
+          animation: 'handDownBounce 1.4s ease-in-out infinite',
         }}
       >
-        👆
+        <FluentEmoji emoji="👇" size={180} />
       </div>
 
       <style>{`
-        @keyframes handTap {
-          0%   { transform: translateY(0px) rotate(-10deg); opacity: 1; }
-          40%  { transform: translateY(-18px) rotate(-10deg); opacity: 1; }
-          55%  { transform: translateY(-10px) rotate(-10deg); opacity: 1; }
-          70%  { transform: translateY(-18px) rotate(-10deg); opacity: 1; }
-          100% { transform: translateY(0px) rotate(-10deg); opacity: 1; }
+        @keyframes handDownBounce {
+          0%   { transform: translateY(0px); }
+          40%  { transform: translateY(14px); }
+          55%  { transform: translateY(8px); }
+          70%  { transform: translateY(14px); }
+          100% { transform: translateY(0px); }
         }
       `}</style>
-    </div>
+    </>
   );
 }
