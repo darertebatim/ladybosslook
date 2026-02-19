@@ -442,6 +442,10 @@ export default function AppTest() {
               <Flame className="h-4 w-4 mr-2" />
               Streak Goal Selection
             </Button>
+            <Button onClick={() => { setConfirmedGoal(14); setShowGoalConfirmation(true); }} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              Goal Confirmation Banner
+            </Button>
           </div>
         </CardContent>
       </Card>
