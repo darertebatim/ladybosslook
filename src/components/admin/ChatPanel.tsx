@@ -299,12 +299,17 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
       ))}
       <Popover open={tagPopoverOpen} onOpenChange={setTagPopoverOpen}>
         <PopoverTrigger asChild>
-          <Button variant="ghost" size="sm" className={cn("gap-1", compact ? "h-5 px-1.5 text-[10px]" : "h-7 px-2 text-xs")}>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={cn("gap-1", compact ? "h-5 px-1.5 text-[10px]" : "h-7 px-2 text-xs")}
+            onClick={(e) => { e.stopPropagation(); setTagPopoverOpen(prev => !prev); }}
+          >
             <Tag className="h-3 w-3" />
             <Plus className="h-3 w-3" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-48 p-2" align="start">
+        <PopoverContent className="w-48 p-2 z-[9999]" align="start" sideOffset={5}>
           <div className="space-y-2">
             <Input
               placeholder="New tag..."
