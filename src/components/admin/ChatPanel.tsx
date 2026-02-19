@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -6,9 +7,10 @@ import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Loader2, User, Mail, Calendar, BookOpen } from "lucide-react";
+import { Loader2, User, Mail, Calendar, BookOpen, Tag, Plus, X } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
 
 interface Message {
@@ -64,6 +66,9 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [tags, setTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
+  const [tagPopoverOpen, setTagPopoverOpen] = useState(false);
 
   // Fetch messages when conversation changes
   useEffect(() => {
@@ -237,26 +242,80 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
     handleSendMessage(reply);
   };
 
-  const handleStatusChange = async (status: string) => {
-    if (!conversation) return;
+  // Fetch tags for current conversation
+  useEffect(() => {
+    if (!conversation) { setTags([]); return; }
+    const fetchTags = async () => {
+      const { data } = await supabase
+        .from('chat_conversation_tags')
+        .select('tag')
+        .eq('conversation_id', conversation.id);
+      setTags(data?.map(t => t.tag) || []);
+    };
+    fetchTags();
+  }, [conversation?.id]);
 
-    try {
-      const { error } = await supabase
-        .from('chat_conversations')
-        .update({ status })
-        .eq('id', conversation.id);
-
-      if (error) throw error;
-      toast({ title: "Status updated" });
-      onStatusChange?.();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to update status",
-        variant: "destructive"
-      });
-    }
+  const addTag = async (tag: string) => {
+    if (!conversation || !tag.trim() || tags.includes(tag.trim())) return;
+    const trimmed = tag.trim();
+    setTags(prev => [...prev, trimmed]);
+    setNewTag("");
+    setTagPopoverOpen(false);
+    await supabase.from('chat_conversation_tags').insert({
+      conversation_id: conversation.id,
+      tag: trimmed,
+    });
   };
+
+  const removeTag = async (tag: string) => {
+    if (!conversation) return;
+    setTags(prev => prev.filter(t => t !== tag));
+    await supabase.from('chat_conversation_tags')
+      .delete()
+      .eq('conversation_id', conversation.id)
+      .eq('tag', tag);
+  };
+
+  const SUGGESTED_TAGS = ['New', 'VIP', 'Urgent', 'Follow Up', 'Resolved', 'Waiting'];
+
+  const TagsUI = ({ compact = false }: { compact?: boolean }) => (
+    <div className="flex items-center gap-1.5 flex-wrap">
+      {tags.map(tag => (
+        <Badge key={tag} variant="secondary" className={cn("gap-1", compact ? "text-[10px] h-5" : "text-xs")}>
+          {tag}
+          <button onClick={(e) => { e.stopPropagation(); removeTag(tag); }} className="hover:text-destructive">
+            <X className="h-3 w-3" />
+          </button>
+        </Badge>
+      ))}
+      <Popover open={tagPopoverOpen} onOpenChange={setTagPopoverOpen}>
+        <PopoverTrigger asChild>
+          <Button variant="ghost" size="sm" className={cn("gap-1", compact ? "h-5 px-1.5 text-[10px]" : "h-7 px-2 text-xs")}>
+            <Tag className="h-3 w-3" />
+            <Plus className="h-3 w-3" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-48 p-2" align="start">
+          <div className="space-y-2">
+            <Input
+              placeholder="New tag..."
+              value={newTag}
+              onChange={e => setNewTag(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && addTag(newTag)}
+              className="h-7 text-xs"
+            />
+            <div className="flex flex-wrap gap-1">
+              {SUGGESTED_TAGS.filter(s => !tags.includes(s)).map(s => (
+                <Badge key={s} variant="outline" className="cursor-pointer text-[10px]" onClick={() => addTag(s)}>
+                  {s}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
 
   // User Info Panel Content
   const UserInfoContent = () => (
@@ -331,36 +390,18 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header - hidden on mobile since parent has header */}
         <div className="hidden lg:flex items-center justify-between p-3 border-b bg-muted/30">
-          <div>
+          <div className="flex-1 min-w-0">
             <h2 className="font-semibold">{conversation.profiles?.full_name || 'Unknown User'}</h2>
             <p className="text-xs text-muted-foreground">{conversation.profiles?.email}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Select value={conversation.status} onValueChange={handleStatusChange}>
-              <SelectTrigger className="w-28 h-9">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="open">Open</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="resolved">Resolved</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <TagsUI />
         </div>
 
-        {/* Mobile header with status */}
-        <div className="flex lg:hidden items-center justify-between px-3 py-2 border-b bg-muted/30">
-          <Select value={conversation.status} onValueChange={handleStatusChange}>
-            <SelectTrigger className="w-28 h-8 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="open">Open</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="resolved">Resolved</SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Mobile header with tags */}
+        <div className="flex lg:hidden items-center justify-between px-3 py-2 border-b bg-muted/30 gap-2">
+          <div className="flex-1 min-w-0 overflow-x-auto">
+            <TagsUI compact />
+          </div>
           
           {/* User Info Button - Sheet for mobile */}
           <Sheet>
