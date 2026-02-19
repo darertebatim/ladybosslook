@@ -13,6 +13,7 @@ import { ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
+import { ActionLimitSheet, hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 
 // Color cycle for variety in planner (used when no specific color is set)
 export const ROUTINE_COLOR_CYCLE: TaskColor[] = [
@@ -95,6 +96,7 @@ export function RoutinePreviewSheet({
   const [editingTaskIndex, setEditingTaskIndex] = useState<number>(0);
   const [showEditSheet, setShowEditSheet] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showActionLimit, setShowActionLimit] = useState(false);
   const { isSubscribed, isLoading: subLoading } = useSubscription();
   const { data: allExistingTasks = [] } = useAllActiveTasks();
   const MAX_FREE_ACTIONS = 6;
@@ -220,7 +222,13 @@ export function RoutinePreviewSheet({
   const handleSave = () => {
     const wouldExceedLimit = !isSubscribed && (allExistingTasks.length + selectedTaskIds.size) > MAX_FREE_ACTIONS;
     if (!isFree && !isSubscribed && (tasks.length > 1 || wouldExceedLimit)) {
-      setShowPaywall(true);
+      // First time hitting the limit → show soft "Keep it simple" gate
+      if (!hasSeenActionLimitSoft()) {
+        markActionLimitSoftSeen();
+        setShowActionLimit(true);
+      } else {
+        setShowPaywall(true);
+      }
       return;
     }
     const editedTasksList = Object.values(editedTasks);
@@ -487,6 +495,12 @@ export function RoutinePreviewSheet({
       <PaywallSheet
         open={showPaywall}
         onOpenChange={setShowPaywall}
+      />
+
+      <ActionLimitSheet
+        open={showActionLimit}
+        onOpenChange={setShowActionLimit}
+        onTakeChallenge={() => setShowPaywall(true)}
       />
     </>
   );

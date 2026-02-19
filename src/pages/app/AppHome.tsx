@@ -47,6 +47,7 @@ import { useGoldStreak, useGoldDatesThisWeek, useUpdateGoldStreak } from '@/hook
 import { useTodayMood } from '@/hooks/useMoodLogs';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
+import { ActionLimitSheet, hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
@@ -73,6 +74,7 @@ const AppHome = () => {
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
   const [showNotificationFlow, setShowNotificationFlow] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showActionLimit, setShowActionLimit] = useState(false);
   
   // Goal input state
   const [goalInputTask, setGoalInputTask] = useState<UserTask | null>(null);
@@ -177,7 +179,12 @@ const AppHome = () => {
   const handleFabClick = useCallback(() => {
     if (tasks.length >= MAX_FREE_ACTIONS_PER_DAY && !hasAccessToProgram('simora-plus')) {
       haptic.light();
-      setShowPaywall(true);
+      if (!hasSeenActionLimitSoft()) {
+        markActionLimitSoftSeen();
+        setShowActionLimit(true);
+      } else {
+        setShowPaywall(true);
+      }
       return;
     }
     setShowQuickStart(true);
@@ -838,6 +845,11 @@ const AppHome = () => {
 
         {/* Paywall for action limit */}
         <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
+        <ActionLimitSheet
+          open={showActionLimit}
+          onOpenChange={setShowActionLimit}
+          onTakeChallenge={() => setShowPaywall(true)}
+        />
 
         {/* Quick Start Sheet */}
         <TaskQuickStartSheet open={showQuickStart} onOpenChange={setShowQuickStart} onContinue={handleQuickStartContinue} />
