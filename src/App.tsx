@@ -66,7 +66,7 @@ const Communications = lazy(() => import("@/pages/admin/Communications"));
 const ProgramsAdmin = lazy(() => import("@/pages/admin/Programs"));
 const Payments = lazy(() => import("@/pages/admin/Payments"));
 const System = lazy(() => import("@/pages/admin/System"));
-const AppIconGenerator = lazy(() => import("@/pages/admin/AppIconGenerator"));
+
 const Support = lazy(() => import("@/pages/admin/Support"));
 const Community = lazy(() => import("@/pages/admin/Community"));
 const Tools = lazy(() => import("@/pages/admin/Tools"));
@@ -294,7 +294,7 @@ const App = () => (
                       <Route path="brand" element={<ProtectedRoute requiredPage="system"><BrandDesign /></ProtectedRoute>} />
                       <Route path="support" element={<ProtectedRoute requiredPage="support"><Support /></ProtectedRoute>} />
                       <Route path="system" element={<ProtectedRoute requiredPage="system"><System /></ProtectedRoute>} />
-                      <Route path="app-icon" element={<ProtectedRoute requiredPage="system"><AppIconGenerator /></ProtectedRoute>} />
+                      
                       <Route path="tools" element={<ProtectedRoute requiredPage="tools"><Tools /></ProtectedRoute>} />
                       <Route path="tools/tasks" element={<ProtectedRoute requiredPage="tools"><TasksBank /></ProtectedRoute>} />
                       <Route path="tools/notifications" element={<ProtectedRoute requiredPage="tools"><NotificationAnalytics /></ProtectedRoute>} />
