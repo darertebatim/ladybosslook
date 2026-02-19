@@ -302,9 +302,10 @@ export const TaskDetailModal = ({
           </div>
         )}
 
-        {/* Pro Task: Navigation button */}
-        {isProTask && proConfig && (
-          <div className="px-4 pb-2">
+        {/* Action buttons - compact like Me+ */}
+        <div className="px-4 pb-4 pt-1 space-y-2">
+          {/* Pro Task: Navigation button */}
+          {isProTask && proConfig && (
             <Button
               onClick={() => {
                 onClose();
@@ -318,41 +319,49 @@ export const TaskDetailModal = ({
               })()}
               {proConfig.badgeText}
             </Button>
-          </div>
-        )}
-
-        {/* Action buttons — Me+ card style, outside the colored box */}
-        <div className="bg-background rounded-b-3xl px-4 pt-3 pb-4">
-          <div className="flex gap-3 justify-center">
-            {/* Edit */}
-            <button
-              onClick={() => { onClose(); onEdit(task); }}
-              className="flex-1 flex flex-col items-center justify-center gap-2 bg-secondary rounded-2xl py-4 active:scale-95 transition-transform"
+          )}
+          
+          {/* Edit, Skip, and Delete buttons row */}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                onClose();
+                onEdit(task);
+              }}
+              className="flex-1 gap-2 h-10 rounded-full border-2 border-black/30 bg-transparent hover:bg-white/30 text-black text-sm"
             >
-              <Pencil className="h-6 w-6 text-foreground/80" strokeWidth={1.8} />
-              <span className="text-xs font-medium text-foreground/80">Edit</span>
-            </button>
-
-            {/* Skip */}
+              <Pencil className="h-4 w-4" />
+              Edit Action
+            </Button>
+            
+            {/* Skip button - show if not completed */}
             {!isCompleted && !goalReached && onSkip && (
-              <button
-                onClick={() => { onClose(); onSkip(task); }}
-                className="flex-1 flex flex-col items-center justify-center gap-2 bg-secondary rounded-2xl py-4 active:scale-95 transition-transform"
+              <Button
+                variant="outline"
+                onClick={() => {
+                  onClose();
+                  onSkip(task);
+                }}
+                className="gap-1.5 h-10 px-3 rounded-xl border-2 border-black/20 bg-white/50 hover:bg-white/70 text-black/70 text-sm"
               >
-                <FastForward className="h-6 w-6 text-foreground/80" strokeWidth={1.8} />
-                <span className="text-xs font-medium text-foreground/80">Skip</span>
-              </button>
+                <FastForward className="h-4 w-4" />
+                Skip
+              </Button>
             )}
-
-            {/* Delete */}
+            
             {onDelete && (
-              <button
-                onClick={() => { onClose(); onDelete(task); }}
-                className="flex-1 flex flex-col items-center justify-center gap-2 bg-destructive/90 rounded-2xl py-4 active:scale-95 transition-transform"
+              <Button
+                variant="outline"
+                onClick={() => {
+                  onClose();
+                  onDelete(task);
+                }}
+                className="gap-1.5 h-10 px-3 rounded-xl border-2 border-red-300 bg-transparent hover:bg-red-50 text-red-500 text-sm"
               >
-                <Trash2 className="h-6 w-6 text-destructive-foreground" strokeWidth={1.8} />
-                <span className="text-xs font-medium text-destructive-foreground">Delete</span>
-              </button>
+                <Trash2 className="h-4 w-4" strokeWidth={1.5} />
+                Delete
+              </Button>
             )}
           </div>
         </div>
