@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { AddToRitualHandHint, useAddToRitualHint } from '@/components/app/AddToRitualHandHint';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
@@ -80,6 +81,7 @@ export default function AppInspireDetail() {
   const navigate = useNavigate();
   const [showPreviewSheet, setShowPreviewSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
+  const { showHint, dismissHint } = useAddToRitualHint();
   
   const { data: routine, isLoading } = useRoutineBankDetail(planId);
   const { data: addedRoutineIds = [] } = useUserAddedBankRoutines();
@@ -481,12 +483,18 @@ export default function AppInspireDetail() {
 
       {/* Sticky Add Button */}
       <div 
-        className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border"
+        className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border relative"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}
       >
+        {/* Animated hand hint for new users */}
+        <AddToRitualHandHint show={showHint && !isAdded} />
+
         <AddedToRoutineButton
           isAdded={isAdded}
-          onAddClick={handleAddClick}
+          onAddClick={() => {
+            dismissHint();
+            handleAddClick();
+          }}
           isLoading={addRoutineFromBank.isPending}
           size="lg"
           addText="Add to my rituals"
