@@ -97,11 +97,17 @@ export const PlaylistCard = memo(function PlaylistCard({
 
   return (
     <div className={`relative ${tourClass}`}>
-      {/* PLUS badge - outside card overflow */}
+      {/* PLUS badge - outside card, top-left */}
       {requiresSubscription && (
         <Badge className="absolute -top-2.5 -left-2 z-30 bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-xs gap-1 shadow-sm">
           <Crown className="h-3 w-3" />
           PLUS
+        </Badge>
+      )}
+      {/* FREE badge - outside card, top-left (same style as PLUS) */}
+      {isFree && !isLocked && !requiresSubscription && (
+        <Badge className="absolute -top-2.5 -left-2 z-30 bg-green-500 hover:bg-green-500 text-white rounded-full text-xs shadow-sm">
+          FREE
         </Badge>
       )}
       <Card 
@@ -127,15 +133,6 @@ export const PlaylistCard = memo(function PlaylistCard({
             <Lock className="h-8 w-8 text-muted-foreground" />
           </div>
         )}
-        
-        {/* Top-left: FREE badge */}
-        <div className="absolute top-2 left-2 flex items-center gap-1 z-10">
-          {isFree && !isLocked && (
-            <Badge className="bg-green-500 hover:bg-green-600 rounded-full">
-              FREE
-            </Badge>
-          )}
-        </div>
 
         {/* Top-right: Category badge */}
         {category && (
