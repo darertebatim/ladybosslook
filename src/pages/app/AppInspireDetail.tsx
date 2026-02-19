@@ -47,7 +47,7 @@ const getEmbedUrl = (url: string): { type: 'embed' | 'mp4'; src: string } | null
 };
 
 // Convert RoutineBankTask to RoutinePlanTask format for preview sheet
-function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask & { schedule_days?: number[] | null; drip_day?: number | null; repeat_pattern?: string | null; repeat_days?: number[] | null } {
+function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask & { schedule_days?: number[] | null; drip_day?: number | null; monthly_day?: number | null; repeat_pattern?: string | null; repeat_days?: number[] | null } {
   return {
     id: task.id,
     plan_id: task.routine_id,
@@ -69,7 +69,8 @@ function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask & { sc
     // Pass through schedule fields and per-task repeat settings
     schedule_days: task.schedule_days,
     drip_day: task.drip_day,
-    repeat_pattern: task.repeat_pattern || 'daily',
+    monthly_day: task.monthly_day,
+    repeat_pattern: task.monthly_day != null ? 'monthly' : (task.repeat_pattern || 'daily'),
     repeat_days: task.repeat_days || null,
   };
 }
