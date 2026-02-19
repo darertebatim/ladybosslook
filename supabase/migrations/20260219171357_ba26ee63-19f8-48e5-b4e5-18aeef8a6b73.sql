@@ -1,0 +1,1 @@
+ALTER TABLE public.routines_bank_tasks ADD COLUMN is_once boolean NOT NULL DEFAULT false;

@@ -2883,6 +2883,7 @@ export type Database = {
           duration_minutes: number | null
           emoji: string | null
           id: string
+          is_once: boolean
           monthly_day: number | null
           routine_id: string
           schedule_days: number[] | null
@@ -2898,6 +2899,7 @@ export type Database = {
           duration_minutes?: number | null
           emoji?: string | null
           id?: string
+          is_once?: boolean
           monthly_day?: number | null
           routine_id: string
           schedule_days?: number[] | null
@@ -2913,6 +2915,7 @@ export type Database = {
           duration_minutes?: number | null
           emoji?: string | null
           id?: string
+          is_once?: boolean
           monthly_day?: number | null
           routine_id?: string
           schedule_days?: number[] | null
