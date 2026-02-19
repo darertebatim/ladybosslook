@@ -261,19 +261,28 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
     setTags(prev => [...prev, trimmed]);
     setNewTag("");
     setTagPopoverOpen(false);
-    await supabase.from('chat_conversation_tags').insert({
+    const { error } = await supabase.from('chat_conversation_tags').insert({
       conversation_id: conversation.id,
       tag: trimmed,
     });
+    if (error) {
+      console.error('Failed to add tag:', error);
+      setTags(prev => prev.filter(t => t !== trimmed));
+      toast({ title: "Error", description: "Failed to add tag", variant: "destructive" });
+    }
   };
 
   const removeTag = async (tag: string) => {
     if (!conversation) return;
     setTags(prev => prev.filter(t => t !== tag));
-    await supabase.from('chat_conversation_tags')
+    const { error } = await supabase.from('chat_conversation_tags')
       .delete()
       .eq('conversation_id', conversation.id)
       .eq('tag', tag);
+    if (error) {
+      console.error('Failed to remove tag:', error);
+      setTags(prev => [...prev, tag]);
+    }
   };
 
   const SUGGESTED_TAGS = ['New', 'VIP', 'Urgent', 'Follow Up', 'Resolved', 'Waiting'];
@@ -306,9 +315,14 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
             />
             <div className="flex flex-wrap gap-1">
               {SUGGESTED_TAGS.filter(s => !tags.includes(s)).map(s => (
-                <Badge key={s} variant="outline" className="cursor-pointer text-[10px]" onClick={() => addTag(s)}>
+                <button
+                  key={s}
+                  type="button"
+                  className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold cursor-pointer hover:bg-accent transition-colors"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); addTag(s); }}
+                >
                   {s}
-                </Badge>
+                </button>
               ))}
             </div>
           </div>
