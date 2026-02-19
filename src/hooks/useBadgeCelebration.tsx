@@ -52,22 +52,24 @@ export function useBadgeCelebration({
   // Track previous completed count to detect new completions
   const prevCompletedRef = useRef<number>(completedCount);
   const prevDateKeyRef = useRef<string>(dateKey);
-  const initializedRef = useRef(false);
+  // Track how many times we've seen data to skip initial loads (mount + first async update)
+  const mountCountRef = useRef(0);
 
   // Reset when date changes
   useEffect(() => {
     if (prevDateKeyRef.current !== dateKey) {
       prevDateKeyRef.current = dateKey;
       prevCompletedRef.current = 0;
-      initializedRef.current = false;
+      mountCountRef.current = 0;
     }
   }, [dateKey]);
 
   // Detect completions and determine which celebration to show
   useEffect(() => {
-    // Skip on initial mount - don't celebrate existing state
-    if (!initializedRef.current) {
-      initializedRef.current = true;
+    // Skip the first two renders (initial mount with default 0, then async data load)
+    // This prevents false celebrations when navigating back to home
+    if (mountCountRef.current < 2) {
+      mountCountRef.current += 1;
       prevCompletedRef.current = completedCount;
       return;
     }
