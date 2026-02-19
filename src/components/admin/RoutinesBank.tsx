@@ -128,6 +128,7 @@ export default function RoutinesBank() {
   // Section editor state
   const [sectionDialogOpen, setSectionDialogOpen] = useState(false);
   const [editingSection, setEditingSection] = useState<LocalSection | null>(null);
+  const [isGeneratingCover, setIsGeneratingCover] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -528,6 +529,36 @@ export default function RoutinesBank() {
       updateRoutine.mutate({ id: editingRoutine.id, formData, sections: localSections, tasks: localTasks });
     } else {
       createRoutine.mutate({ formData, sections: localSections, tasks: localTasks });
+    }
+  };
+
+  const handleGenerateCover = async () => {
+    if (!editingRoutine?.id) {
+      toast.error('Please save the ritual first before generating a cover');
+      return;
+    }
+    setIsGeneratingCover(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-routine-cover', {
+        body: {
+          planId: editingRoutine.id,
+          planTitle: formData.title,
+          planSubtitle: formData.subtitle,
+          planDescription: formData.description,
+          categoryName: formData.category || '',
+        },
+      });
+      if (error) throw error;
+      if (data?.coverUrl) {
+        setFormData(prev => ({ ...prev, cover_image_url: data.coverUrl }));
+        toast.success('Cover image generated successfully!');
+      } else {
+        throw new Error(data?.error || 'No image returned');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to generate cover image');
+    } finally {
+      setIsGeneratingCover(false);
     }
   };
 
@@ -1045,6 +1076,17 @@ export default function RoutinesBank() {
                     onChange={(url) => setFormData({ ...formData, cover_image_url: url })}
                     folder="routine-covers"
                   />
+                  <button
+                    type="button"
+                    onClick={handleGenerateCover}
+                    disabled={isGeneratingCover}
+                    className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 disabled:opacity-50 transition-colors mt-1"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    {isGeneratingCover ? 'Generating...' : 'Generate with AI'}
+                  </button>
+
+                  {/* Video URL */}
 
                   {/* Video URL */}
                   <div className="space-y-2">
