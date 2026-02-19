@@ -6,7 +6,6 @@ import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Loader2, User, Mail, Calendar, BookOpen } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
@@ -237,26 +236,6 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
     handleSendMessage(reply);
   };
 
-  const handleStatusChange = async (status: string) => {
-    if (!conversation) return;
-
-    try {
-      const { error } = await supabase
-        .from('chat_conversations')
-        .update({ status })
-        .eq('id', conversation.id);
-
-      if (error) throw error;
-      toast({ title: "Status updated" });
-      onStatusChange?.();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to update status",
-        variant: "destructive"
-      });
-    }
-  };
 
   // User Info Panel Content
   const UserInfoContent = () => (
@@ -335,33 +314,10 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
             <h2 className="font-semibold">{conversation.profiles?.full_name || 'Unknown User'}</h2>
             <p className="text-xs text-muted-foreground">{conversation.profiles?.email}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Select value={conversation.status} onValueChange={handleStatusChange}>
-              <SelectTrigger className="w-28 h-9">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="open">Open</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="resolved">Resolved</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </div>
 
-        {/* Mobile header with status */}
-        <div className="flex lg:hidden items-center justify-between px-3 py-2 border-b bg-muted/30">
-          <Select value={conversation.status} onValueChange={handleStatusChange}>
-            <SelectTrigger className="w-28 h-8 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="open">Open</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="resolved">Resolved</SelectItem>
-            </SelectContent>
-          </Select>
-          
+        {/* Mobile header */}
+        <div className="flex lg:hidden items-center justify-end px-3 py-2 border-b bg-muted/30">
           {/* User Info Button - Sheet for mobile */}
           <Sheet>
             <SheetTrigger asChild>
