@@ -6,114 +6,156 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Clean, minimal visual concepts for routine covers
-const categoryStyles: Record<string, { concept: string; colors: string }> = {
+// ============================================================
+// SIMORA VISUAL DNA SYSTEM
+// Soft + Safe + Powerful — Feminine Wellness Illustration Style
+// ============================================================
+
+const categoryVisualDNA: Record<string, { heroScene: string; floatingIcons: string; colors: string; mood: string }> = {
   morning: {
-    concept: 'Soft gradient sky at golden hour, gentle warm light, simple horizon line',
-    colors: 'warm peach, soft gold, cream white'
+    heroScene: 'gentle woman stretching with eyes closed in soft morning light, warm sunrise backdrop, peaceful expression',
+    floatingIcons: 'floating icons: glowing sun, coffee cup, water glass, small pink flower, alarm clock',
+    colors: 'warm sunrise gradient, soft peach, golden yellow, cream white, blush pink',
+    mood: 'calm morning energy, fresh start, uplifting daily ritual'
   },
   evening: {
-    concept: 'Calm twilight gradient, soft purple to deep blue transition, single moon',
-    colors: 'lavender, dusty rose, deep indigo'
-  },
-  wellness: {
-    concept: 'Smooth abstract curves suggesting calm water or gentle waves, soft light',
-    colors: 'sage green, soft white, warm beige'
-  },
-  mindfulness: {
-    concept: 'Single zen stone or ripple in still water, vast negative space',
-    colors: 'soft gray, pale blue, off-white'
-  },
-  productivity: {
-    concept: 'Clean geometric shapes, simple lines suggesting upward motion',
-    colors: 'navy blue, crisp white, subtle gold accent'
-  },
-  fitness: {
-    concept: 'Dynamic single brushstroke or abstract motion arc, energetic but simple',
-    colors: 'coral, warm orange, soft cream'
-  },
-  self_care: {
-    concept: 'Soft abstract petals or gentle organic curves, dreamy and light',
-    colors: 'blush pink, soft peach, cream'
-  },
-  creativity: {
-    concept: 'Simple color field with one bold accent element, artistic negative space',
-    colors: 'terracotta, mustard yellow, off-white'
+    heroScene: 'woman in peaceful relaxation, wrapped in soft blanket, moon glow through window',
+    floatingIcons: 'floating icons: crescent moon, small twinkling stars, candle flame, cozy journal, warm cup',
+    colors: 'soft lavender, dusty rose, muted indigo, warm blush, gentle purple',
+    mood: 'winding down energy, peaceful reflection, calming night ritual'
   },
   sleep: {
-    concept: 'Deep gradient fading to darkness, subtle stars, peaceful emptiness',
-    colors: 'midnight blue, soft silver, deep purple'
+    heroScene: 'woman resting peacefully with gentle smile, soft moon glow, dreamy clouds surrounding her',
+    floatingIcons: 'floating icons: crescent moon, small stars, fluffy cloud, soft pillow, small ZZZ',
+    colors: 'deep soft lavender, midnight blue, silver shimmer, pastel purple, dreamy blue',
+    mood: 'deeply calming, restorative, peaceful sleep energy'
   },
-  gratitude: {
-    concept: 'Warm light source with soft glow, simple and uplifting',
-    colors: 'warm amber, soft gold, cream'
+  mind: {
+    heroScene: 'gentle woman journaling in a peaceful corner, soft glowing heart above her head, calm expression',
+    floatingIcons: 'floating icons: open journal, pen, glowing heart, small star, soft thought bubble',
+    colors: 'lavender, soft lilac, warm blush pink, gentle purple accents, cream',
+    mood: 'inner reflection, emotional wellness, calm journaling energy'
   },
-  work: {
-    concept: 'Clean minimal lines, subtle grid or structure, professional calm',
-    colors: 'charcoal gray, soft white, muted blue'
+  body: {
+    heroScene: 'gentle confident woman in a soft yoga or wellness pose, sunrise backdrop, serene expression',
+    floatingIcons: 'floating icons: water bottle, fresh apple, small sun, movement swirl, green leaf',
+    colors: 'warm sunrise gradient, soft peach, golden yellow, pastel coral, warm cream',
+    mood: 'soft active energy, morning vitality, feminine strength'
   },
-  health: {
-    concept: 'Fresh, airy composition with soft organic shapes suggesting vitality',
-    colors: 'fresh green, soft white, warm yellow'
+  growth: {
+    heroScene: 'woman looking upward with calm confidence, soft light rays emerging above, empowered expression',
+    floatingIcons: 'floating icons: small glowing star, upward arrow, soft sparkles, open book, tiny delicate crown',
+    colors: 'soft blue, warm lavender, gentle purple, light gold accents, pastel sky',
+    mood: 'empowering growth energy, subtle magic, uplifting potential'
+  },
+  fitness: {
+    heroScene: 'woman in a soft confident wellness pose with gentle smile, feminine strength — not aggressive fitness',
+    floatingIcons: 'floating icons: small dumbbell, glowing heart, water bottle, yoga mat, small star',
+    colors: 'soft coral, warm peach, light blush, gentle orange gradient, cream',
+    mood: 'empowering feminine strength, soft active energy, joyful movement'
+  },
+  nutrition: {
+    heroScene: 'woman joyfully enjoying a colorful healthy meal, soft warm kitchen or garden backdrop',
+    floatingIcons: 'floating icons: fresh apple, colorful salad bowl, water bottle, small heart, green leaf',
+    colors: 'fresh sage green, soft yellow, warm cream, pastel pink accents, light coral',
+    mood: 'nourishing energy, vibrant health, joyful self-care'
+  },
+  cleaning: {
+    heroScene: 'woman in a bright organized peaceful home, soft natural light, calm satisfied expression',
+    floatingIcons: 'floating icons: small broom, sparkling star, pink flower, neatly stacked items, soft clean glow',
+    colors: 'fresh white, soft sage green, warm cream, light airy blue, blush pink',
+    mood: 'clean organized energy, fresh home, calm productivity'
+  },
+  self_care: {
+    heroScene: 'woman in a relaxing self-care moment, bath or skincare ritual, soft glow surrounding her',
+    floatingIcons: 'floating icons: rose petal, soft flower, heart, sparkle drops, small mirror',
+    colors: 'blush pink, soft peach, cream, warm rose, gentle lavender',
+    mood: 'nurturing self-love, soft luxurious energy, gentle self-compassion'
   }
 };
 
-const defaultStyle = {
-  concept: 'Soft abstract gradient with gentle curves, calming and minimal',
-  colors: 'soft purple, warm pink, cream white'
+const defaultDNA = {
+  heroScene: 'gentle confident woman in a peaceful wellness moment, soft warm environment, calm empowered expression',
+  floatingIcons: 'floating icons: glowing heart, small star, soft sparkle, green leaf, soft glow orb',
+  colors: 'lavender, pastel pink, soft blue, warm sunrise gradients, gentle purple, cream white',
+  mood: 'safe, soft, powerful — emotional wellness meets feminine strength'
 };
 
-function getCategoryStyle(categoryName: string): typeof defaultStyle {
-  const lowerName = categoryName.toLowerCase();
+function getCategoryDNA(categoryName: string, title: string): typeof defaultDNA {
+  const search = (categoryName + ' ' + title).toLowerCase();
   
-  for (const [key, style] of Object.entries(categoryStyles)) {
-    if (lowerName.includes(key) || key.includes(lowerName.split(' ')[0])) {
-      return style;
-    }
-  }
+  if (search.includes('morning') || search.includes('wake') || search.includes('sunrise') || search.includes('dawn')) return categoryVisualDNA.morning;
+  if (search.includes('sleep') || search.includes('night') || search.includes('bedtime') || search.includes('insomnia')) return categoryVisualDNA.sleep;
+  if (search.includes('evening') || search.includes('wind down') || search.includes('dusk') || search.includes('twilight')) return categoryVisualDNA.evening;
+  if (search.includes('mind') || search.includes('journal') || search.includes('meditat') || search.includes('mental') || search.includes('brain') || search.includes('thought')) return categoryVisualDNA.mind;
+  if (search.includes('fitness') || search.includes('workout') || search.includes('exercise') || search.includes('gym') || search.includes('strength')) return categoryVisualDNA.fitness;
+  if (search.includes('grow') || search.includes('goal') || search.includes('learn') || search.includes('produc') || search.includes('success')) return categoryVisualDNA.growth;
+  if (search.includes('food') || search.includes('nutrit') || search.includes('eat') || search.includes('meal') || search.includes('diet') || search.includes('healthy eating')) return categoryVisualDNA.nutrition;
+  if (search.includes('clean') || search.includes('organiz') || search.includes('home') || search.includes('tidy') || search.includes('house')) return categoryVisualDNA.cleaning;
+  if (search.includes('self care') || search.includes('selfcare') || search.includes('skin') || search.includes('beauty') || search.includes('spa')) return categoryVisualDNA.self_care;
+  if (search.includes('body') || search.includes('movement') || search.includes('stretch') || search.includes('yoga') || search.includes('pilates')) return categoryVisualDNA.body;
   
-  const words = lowerName.split(/[\s&]+/);
-  for (const word of words) {
-    if (categoryStyles[word]) return categoryStyles[word];
-  }
-  
-  return defaultStyle;
+  return defaultDNA;
 }
 
-function buildCreativePrompt(title: string, subtitle: string, description: string, categoryName: string): string {
-  const style = getCategoryStyle(categoryName);
+function buildSimoraPrompt(title: string, subtitle: string, description: string, categoryName: string): string {
+  const dna = getCategoryDNA(categoryName, title);
   
-  return `Create a MINIMAL, CLEAN cover image for a wellness app.
+  return `Square mobile app cover illustration for a wellness app called Simora.
 
-THEME: "${title}"
+RITUAL NAME: "${title}"${subtitle ? `\nSUBTITLE: "${subtitle}"` : ''}
 
-VISUAL DIRECTION:
-${style.concept}
+STYLE (CRITICAL — follow exactly):
+Soft pastel digital illustration.
+Feminine self-care aesthetic.
+Calming and uplifting mood.
+Clean modern wellness design.
+Friendly digital illustration with soft glow and sparkles.
+Think: Finch app + Fabulous app + Calm app — but MORE feminine, more emotionally warm and empowering.
 
-COLOR PALETTE:
-${style.colors}
+MAIN SCENE (CENTER HERO):
+${dna.heroScene}
 
-STYLE REQUIREMENTS:
-- EXTREMELY MINIMAL and CLEAN - lots of empty space
-- Soft, calming, premium aesthetic
-- Abstract or very simple imagery only
-- Maximum 1-2 visual elements
-- Smooth gradients and soft edges
-- High-end editorial magazine quality
-- Square format, perfectly balanced composition
-- Think Apple product photography meets meditation app
+FLOATING ICONS AROUND CENTER:
+${dna.floatingIcons}
+These small icons represent the ritual's actions and float gently around the main character.
 
-ABSOLUTELY FORBIDDEN:
-- Text, words, letters, typography of any kind
-- Busy or crowded compositions
-- Fantasy elements, magical effects, sparkles
-- Detailed illustrations or complex scenes
-- People, faces, hands, or body parts
-- Multiple objects or cluttered imagery
-- Harsh contrasts or neon colors
-- Cliché wellness imagery (lotus, chakras, yin-yang)
+CHARACTER DIRECTION (VERY IMPORTANT):
+- Gentle smiling woman, calm confident pose
+- Wellness lifestyle illustration style
+- Soft athletic or casual cozy outfit
+- Warm expression, soft body language
+- Empowering feminine energy
+- NOT aggressive fitness energy
+- NOT cold or corporate
+- She feels: safe, strong, and soft
 
-Create something that feels like a premium, calming, almost empty visual. Less is more.`;
+COLORS & BACKGROUND:
+${dna.colors}
+Dreamy pastel sky, soft sparkles, light nature elements.
+Minimal but warm and inviting environment.
+Smooth gradients, soft edges, premium glow.
+
+MOOD & FEELING:
+${dna.mood}
+Overall feeling: Safe + Soft + Powerful.
+This is a strength companion app — not a diet app, not a hardcore fitness app.
+Emotional wellness meets feminine self-improvement.
+
+COMPOSITION (LAYOUT):
+- Centered hero character or scene as main focal point
+- Small floating icons orbiting naturally around the center
+- Balanced clean layout with breathing room
+- Designed as a square mobile app ritual cover
+- High-end premium wellness app aesthetic — like a magazine cover for inner strength
+
+ABSOLUTELY FORBIDDEN — DO NOT INCLUDE:
+- NO text, words, letters, numbers, or typography of any kind (zero text in image)
+- NO strong neon colors or dark aggressive contrast
+- NO aggressive or masculine fitness energy
+- NO cluttered busy composition
+- NO generic cliché wellness imagery (no lotus flowers, no yin-yang, no chakras)
+- NO dark moods or negative energy`;
 }
 
 serve(async (req) => {
@@ -133,14 +175,15 @@ serve(async (req) => {
       throw new Error('Plan ID is required');
     }
 
-    const prompt = buildCreativePrompt(
-      planTitle || 'Wellness Routine',
+    const prompt = buildSimoraPrompt(
+      planTitle || 'Wellness Ritual',
       planSubtitle || '',
       planDescription || '',
       categoryName || ''
     );
 
-    console.log('Generating creative routine cover for:', planTitle);
+    console.log('Generating Simora-style cover for:', planTitle);
+    console.log('Category DNA matched for:', categoryName);
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -215,7 +258,7 @@ serve(async (req) => {
       console.error('Update error:', updateError);
     }
 
-    console.log('Creative cover generated:', publicUrl);
+    console.log('Simora cover generated successfully:', publicUrl);
 
     return new Response(
       JSON.stringify({ 
