@@ -660,35 +660,6 @@ export type Database = {
           },
         ]
       }
-      chat_conversation_tags: {
-        Row: {
-          conversation_id: string
-          created_at: string
-          id: string
-          tag: string
-        }
-        Insert: {
-          conversation_id: string
-          created_at?: string
-          id?: string
-          tag: string
-        }
-        Update: {
-          conversation_id?: string
-          created_at?: string
-          id?: string
-          tag?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "chat_conversation_tags_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "chat_conversations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       chat_conversations: {
         Row: {
           created_at: string
