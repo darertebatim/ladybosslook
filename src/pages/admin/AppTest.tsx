@@ -36,6 +36,7 @@ import { AppUpdateBanner } from '@/components/app/AppUpdateBanner';
 import { BadgeCelebration, BadgeCelebrationLevel } from '@/components/app/BadgeCelebration';
 import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { StreakGoalSelection, StreakGoalValue } from '@/components/app/StreakGoalSelection';
+import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation';
 import { ActionLimitSheet, resetActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 
 // Mock bottom nav items for testing
@@ -65,6 +66,8 @@ export default function AppTest() {
   const [badgeCelebrationType, setBadgeCelebrationType] = useState<BadgeCelebrationLevel | null>(null);
   const [showGoldStreakCelebration, setShowGoldStreakCelebration] = useState(false);
   const [showStreakGoalSelection, setShowStreakGoalSelection] = useState(false);
+  const [showGoalConfirmation, setShowGoalConfirmation] = useState(false);
+  const [confirmedGoal, setConfirmedGoal] = useState<7 | 14 | 30 | 50>(7);
 
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
@@ -140,6 +143,10 @@ export default function AppTest() {
                 <Button onClick={() => setShowGoldStreakCelebration(true)} className="w-full justify-start" variant="outline">
                   <Flame className="h-4 w-4 mr-2" />
                   Gold Streak Celebration
+                </Button>
+                <Button onClick={() => { setConfirmedGoal(14); setShowGoalConfirmation(true); }} className="w-full justify-start" variant="outline">
+                  <Flame className="h-4 w-4 mr-2" />
+                  Streak Goal Confirmation Banner
                 </Button>
                 <Button onClick={() => setShowStreakGoalSelection(true)} className="w-full justify-start" variant="outline">
                   <Flame className="h-4 w-4 mr-2" />
@@ -341,9 +348,15 @@ export default function AppTest() {
           open={showStreakGoalSelection}
           onClose={() => setShowStreakGoalSelection(false)}
           onSelectGoal={(goal) => {
-            toast.success(`Streak goal set to ${goal} days!`);
             setShowStreakGoalSelection(false);
+            setConfirmedGoal(goal);
+            setShowGoalConfirmation(true);
           }}
+        />
+        <StreakGoalConfirmation
+          open={showGoalConfirmation}
+          goal={confirmedGoal}
+          onClose={() => setShowGoalConfirmation(false)}
         />
       </div>
     );
@@ -737,8 +750,9 @@ export default function AppTest() {
         open={showStreakGoalSelection}
         onClose={() => setShowStreakGoalSelection(false)}
         onSelectGoal={(goal) => {
-          toast.success(`Streak goal set to ${goal} days!`);
           setShowStreakGoalSelection(false);
+          setConfirmedGoal(goal);
+          setShowGoalConfirmation(true);
         }}
       />
 

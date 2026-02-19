@@ -17,6 +17,7 @@ import { MonthCalendar } from '@/components/app/MonthCalendar';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { StreakGoalSelection } from '@/components/app/StreakGoalSelection';
 import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
+import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation';
 import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { ProgramEventCard } from '@/components/app/ProgramEventCard';
 import { PromoBanner } from '@/components/app/PromoBanner';
@@ -100,6 +101,8 @@ const AppHome = () => {
   // Streak goal selection state
   const [showGoalSelection, setShowGoalSelection] = useState(false);
   const [isStreakUpgrade, setIsStreakUpgrade] = useState(false);
+  const [showGoalConfirmation, setShowGoalConfirmation] = useState(false);
+  const [confirmedGoal, setConfirmedGoal] = useState(7);
   const setStreakGoal = useSetStreakGoal();
 
 
@@ -902,13 +905,20 @@ const AppHome = () => {
               onSuccess: () => {
                 setShowGoalSelection(false);
                 setIsStreakUpgrade(false);
-                toast.success(isStreakUpgrade ? 'New challenge accepted! Let\'s go! 🏆' : 'Challenge accepted! Let\'s do this! 🔥');
+                setConfirmedGoal(goal);
+                setShowGoalConfirmation(true);
               },
             });
           }}
           isLoading={setStreakGoal.isPending}
           minGoal={isStreakUpgrade ? (streak?.streak_goal || 0) : 0}
           isUpgrade={isStreakUpgrade}
+        />
+
+        <StreakGoalConfirmation
+          open={showGoalConfirmation}
+          goal={confirmedGoal}
+          onClose={() => setShowGoalConfirmation(false)}
         />
 
         {/* Badge celebration (silver/almost-there toasts + gold modal) */}
