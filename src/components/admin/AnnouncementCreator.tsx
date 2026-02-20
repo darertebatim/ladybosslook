@@ -28,6 +28,7 @@ const IN_APP_LINKS = [
   { value: '/app/player', label: '🎧 Audio Player' },
   { value: '/app/chat', label: '💬 Support Chat' },
   { value: '/app/profile', label: '👤 Profile' },
+  { value: '/app/rate', label: '⭐ Rate the App' },
   { value: 'custom', label: '✏️ Custom URL...' },
 ];
 

@@ -25,6 +25,7 @@ const ACTION_TYPES = [
   { value: 'join_session', label: 'Join Session', icon: Video },
   { value: 'view_materials', label: 'View Materials', icon: FileText },
   { value: 'external_link', label: 'External Link', icon: ExternalLink },
+  { value: 'rate_app', label: '⭐ Rate the App', icon: null },
 ];
 
 interface FeedChatComposerProps {
@@ -259,6 +260,8 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
         
         if (actionType === 'play_audio' && actionPlaylistId) {
           actionData.playlistId = actionPlaylistId;
+        } else if (actionType === 'rate_app') {
+          actionData.url = '/app/rate';
         } else if (['join_session', 'view_materials', 'external_link'].includes(actionType)) {
           actionData.url = actionUrl;
           if (actionType === 'join_session') {

@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Play, Video, FileText, ExternalLink } from 'lucide-react';
+import { Play, Video, FileText, ExternalLink, Star } from 'lucide-react';
 
 interface FeedActionButtonProps {
-  actionType: 'none' | 'play_audio' | 'join_session' | 'view_materials' | 'external_link';
+  actionType: 'none' | 'play_audio' | 'join_session' | 'view_materials' | 'external_link' | 'rate_app';
   actionData: Record<string, any>;
 }
 
@@ -37,6 +37,9 @@ export function FeedActionButton({ actionType, actionData }: FeedActionButtonPro
         if (actionData.url) {
           window.open(actionData.url, '_blank');
         }
+        break;
+      case 'rate_app':
+        navigate('/app/rate');
         break;
     }
   };
@@ -73,6 +76,13 @@ export function FeedActionButton({ actionType, actionData }: FeedActionButtonPro
             {label || 'Learn More'}
           </>
         );
+      case 'rate_app':
+        return (
+          <>
+            <Star className="h-4 w-4 mr-2" />
+            {label || 'Rate the App ⭐'}
+          </>
+        );
       default:
         return null;
     }
@@ -84,3 +94,4 @@ export function FeedActionButton({ actionType, actionData }: FeedActionButtonPro
     </Button>
   );
 }
+
