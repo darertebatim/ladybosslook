@@ -165,11 +165,11 @@ export default function Subscriptions() {
           {!programData ? (
             <p className="text-muted-foreground">No subscription programs with iOS product IDs found.</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
               {PAYWALL_VARIANTS.map(({ id, label, component: Component }) => {
                 const isDefault = id === defaultVariant;
                 return (
-                  <div key={id} className="space-y-2">
+                  <div key={id} className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{label}</h3>
@@ -201,9 +201,22 @@ export default function Subscriptions() {
                         )}
                       </div>
                     </div>
-                    <div className="border rounded-2xl overflow-hidden bg-background shadow-sm" style={{ height: 620 }}>
-                      <div className="h-full overflow-y-auto">
-                        <Component program={programData} preview />
+                    {/* iPhone 6.5" frame (414×896pt) scaled to fit grid */}
+                    <div className="flex justify-center">
+                      <div className="relative" style={{ width: 260, height: 563 }}>
+                        {/* Phone shell */}
+                        <div className="absolute inset-0 rounded-[2.8rem] border-[7px] border-foreground/80 bg-foreground/80 shadow-2xl overflow-hidden">
+                          {/* Notch */}
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-5 bg-foreground/80 rounded-b-2xl z-10" />
+                          {/* Screen */}
+                          <div className="absolute inset-0 rounded-[2.2rem] overflow-hidden bg-background">
+                            <div className="h-full overflow-y-auto overflow-x-hidden pt-5">
+                              <Component program={programData} preview />
+                            </div>
+                          </div>
+                          {/* Home indicator */}
+                          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-16 h-1 bg-foreground/30 rounded-full z-10" />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -216,16 +229,29 @@ export default function Subscriptions() {
 
       {/* Mobile Preview Dialog */}
       {programData && (
-        <Dialog open={!!mobilePreview} onOpenChange={(o) => !o && setMobilePreview(null)}>
-          <DialogContent className="max-w-[375px] h-[700px] p-0 rounded-[2.5rem] overflow-hidden border-[8px] border-foreground/80 [&>button]:hidden">
+      <Dialog open={!!mobilePreview} onOpenChange={(o) => !o && setMobilePreview(null)}>
+          {/* iPhone 6.5" shell: 414×896pt logical pixels */}
+          <DialogContent className="max-w-[414px] p-0 bg-transparent border-0 shadow-none [&>button]:hidden" style={{ width: 414, height: 896 }}>
             <VisuallyHidden><DialogTitle>Mobile Paywall Preview</DialogTitle></VisuallyHidden>
-            <div className="h-full overflow-y-auto bg-background">
-              {(() => {
-                const found = PAYWALL_VARIANTS.find(v => v.id === mobilePreview);
-                if (!found) return null;
-                const Comp = found.component;
-                return <Comp program={programData} preview onClose={() => setMobilePreview(null)} />;
-              })()}
+            <div className="relative w-full h-full">
+              {/* Phone shell */}
+              <div className="absolute inset-0 rounded-[3.5rem] border-[9px] border-foreground/85 bg-foreground/85 shadow-2xl overflow-hidden">
+                {/* Notch */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-foreground/85 rounded-b-3xl z-20" />
+                {/* Screen */}
+                <div className="absolute inset-0 rounded-[2.8rem] overflow-hidden bg-background">
+                  <div className="h-full overflow-y-auto overflow-x-hidden pt-7">
+                    {(() => {
+                      const found = PAYWALL_VARIANTS.find(v => v.id === mobilePreview);
+                      if (!found) return null;
+                      const Comp = found.component;
+                      return <Comp program={programData} preview onClose={() => setMobilePreview(null)} />;
+                    })()}
+                  </div>
+                </div>
+                {/* Home indicator */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-24 h-1.5 bg-foreground/25 rounded-full z-20" />
+              </div>
             </div>
           </DialogContent>
         </Dialog>
