@@ -10,7 +10,6 @@ import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallCo
 import { Crown, Lock, Unlock, BookOpen, Wind, Droplets, Heart, Brain, Moon, Music, Timer, Sparkles, CalendarPlus, Check, Smartphone } from 'lucide-react';
 import { useDefaultPaywall, useSetDefaultPaywall, PaywallVariantId } from '@/hooks/useDefaultPaywall';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
 
 const PAYWALL_VARIANTS = [
   { id: 'classic', label: 'Classic', component: PaywallClassic },
@@ -97,6 +96,66 @@ function PlanFeaturesTab() {
   );
 }
 
+/** Reusable iPhone 6.5" frame shell */
+function IPhoneFrame({ children, width = 300, onClose }: { children: React.ReactNode; width?: number; onClose?: () => void }) {
+  const height = Math.round(width * (896 / 414));
+  const borderRadius = Math.round(width * 0.106);
+  const padding = Math.round(width * 0.019);
+  const dynamicIslandW = Math.round(width * 0.217);
+  const dynamicIslandH = Math.round(width * 0.068);
+  const dynamicIslandTop = Math.round(width * 0.029);
+  const screenRadius = Math.round(borderRadius - padding - 2);
+  const paddingTop = Math.round(dynamicIslandH + dynamicIslandTop + 8);
+
+  return (
+    <div style={{
+      width, height, flexShrink: 0,
+      borderRadius,
+      background: '#1a1a1a',
+      boxShadow: '0 0 0 1px #2a2a2a, 0 30px 80px rgba(0,0,0,0.5)',
+      padding,
+      position: 'relative',
+    }}>
+      {/* Dynamic Island */}
+      <div style={{
+        position: 'absolute', top: dynamicIslandTop, left: '50%', transform: 'translateX(-50%)',
+        width: dynamicIslandW, height: dynamicIslandH,
+        background: '#1a1a1a', borderRadius: dynamicIslandH, zIndex: 20,
+      }} />
+      {/* Close button on frame */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute', top: dynamicIslandTop, right: 14, zIndex: 30,
+            color: 'rgba(255,255,255,0.5)', background: 'none', border: 'none', cursor: 'pointer',
+            fontSize: 18, lineHeight: 1,
+          }}
+        >
+          ✕
+        </button>
+      )}
+      {/* Screen */}
+      <div style={{
+        width: '100%', height: '100%',
+        borderRadius: screenRadius,
+        overflow: 'hidden',
+        background: '#fff',
+      }}>
+        <div style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', paddingTop }}>
+          {children}
+        </div>
+      </div>
+      {/* Home indicator */}
+      <div style={{
+        position: 'absolute', bottom: 14, left: '50%', transform: 'translateX(-50%)',
+        width: Math.round(width * 0.24), height: 4,
+        background: 'rgba(255,255,255,0.25)', borderRadius: 4, zIndex: 20,
+      }} />
+    </div>
+  );
+}
+
 export default function Subscriptions() {
   const [selectedProgram, setSelectedProgram] = useState<string>('');
   const [mobilePreview, setMobilePreview] = useState<string | null>(null);
@@ -128,6 +187,8 @@ export default function Subscriptions() {
     features: Array.isArray(activeProgram.features) ? activeProgram.features : [],
     trial_days: activeProgram.trial_days,
   } : null;
+
+  const mobileVariant = PAYWALL_VARIANTS.find(v => v.id === mobilePreview);
 
   return (
     <div className="space-y-6">
@@ -201,23 +262,10 @@ export default function Subscriptions() {
                         )}
                       </div>
                     </div>
-                    {/* iPhone 6.5" frame (414×896pt) scaled to fit grid */}
                     <div className="flex justify-center">
-                      <div className="relative" style={{ width: 260, height: 563 }}>
-                        {/* Phone shell */}
-                        <div className="absolute inset-0 rounded-[2.8rem] border-[7px] border-foreground/80 bg-foreground/80 shadow-2xl overflow-hidden">
-                          {/* Notch */}
-                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-5 bg-foreground/80 rounded-b-2xl z-10" />
-                          {/* Screen */}
-                          <div className="absolute inset-0 rounded-[2.2rem] overflow-hidden bg-background">
-                            <div className="h-full overflow-y-auto overflow-x-hidden pt-5">
-                              <Component program={programData} preview />
-                            </div>
-                          </div>
-                          {/* Home indicator */}
-                          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-16 h-1 bg-foreground/30 rounded-full z-10" />
-                        </div>
-                      </div>
+                      <IPhoneFrame width={300}>
+                        <Component program={programData} preview />
+                      </IPhoneFrame>
                     </div>
                   </div>
                 );
@@ -227,32 +275,21 @@ export default function Subscriptions() {
         </TabsContent>
       </Tabs>
 
-      {/* Mobile Preview Dialog */}
-      {programData && (
-      <Dialog open={!!mobilePreview} onOpenChange={(o) => !o && setMobilePreview(null)}>
-          {/* iPhone 6.5" shell: 414×896pt logical pixels */}
-          <DialogContent className="max-w-[414px] p-0 bg-transparent border-0 shadow-none [&>button]:hidden" style={{ width: 414, height: 896 }}>
+      {/* Mobile Preview Dialog — full-size iPhone 6.5" */}
+      {programData && mobileVariant && (
+        <Dialog open={!!mobilePreview} onOpenChange={(o) => !o && setMobilePreview(null)}>
+          <DialogContent
+            className="p-0 bg-transparent border-0 shadow-none [&>button]:hidden"
+            style={{ width: 'fit-content', maxWidth: 'none' }}
+          >
             <VisuallyHidden><DialogTitle>Mobile Paywall Preview</DialogTitle></VisuallyHidden>
-            <div className="relative w-full h-full">
-              {/* Phone shell */}
-              <div className="absolute inset-0 rounded-[3.5rem] border-[9px] border-foreground/85 bg-foreground/85 shadow-2xl overflow-hidden">
-                {/* Notch */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-foreground/85 rounded-b-3xl z-20" />
-                {/* Screen */}
-                <div className="absolute inset-0 rounded-[2.8rem] overflow-hidden bg-background">
-                  <div className="h-full overflow-y-auto overflow-x-hidden pt-7">
-                    {(() => {
-                      const found = PAYWALL_VARIANTS.find(v => v.id === mobilePreview);
-                      if (!found) return null;
-                      const Comp = found.component;
-                      return <Comp program={programData} preview onClose={() => setMobilePreview(null)} />;
-                    })()}
-                  </div>
-                </div>
-                {/* Home indicator */}
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-24 h-1.5 bg-foreground/25 rounded-full z-20" />
-              </div>
-            </div>
+            <IPhoneFrame width={390} onClose={() => setMobilePreview(null)}>
+              <mobileVariant.component
+                program={programData}
+                preview
+                onClose={() => setMobilePreview(null)}
+              />
+            </IPhoneFrame>
           </DialogContent>
         </Dialog>
       )}
