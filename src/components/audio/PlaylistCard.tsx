@@ -145,7 +145,7 @@ export const PlaylistCard = memo(function PlaylistCard({
         <h3 className="absolute bottom-2 left-2 right-2 font-semibold text-sm text-white line-clamp-2 drop-shadow-md z-10 flex items-center gap-1">
           {language && (
             language === 'persian'
-              ? <PersianFlag size={18} className="flex-shrink-0 rounded-sm" />
+              ? <PersianFlag size={14} />
               : LANG_FLAGS[language] && <span className="text-sm flex-shrink-0">{LANG_FLAGS[language]}</span>
           )}
           <span>{name}</span>
