@@ -23,16 +23,20 @@ export function useAddToRitualHint() {
   return { showHint, dismissHint };
 }
 
-export function useSaveRitualHint() {
+export function useSaveRitualHint(isSheetOpen: boolean) {
   const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
+    if (!isSheetOpen) {
+      setShowHint(false);
+      return;
+    }
     const dismissed = localStorage.getItem(SAVE_HINT_KEY);
     if (!dismissed) {
       const t = setTimeout(() => setShowHint(true), 800);
       return () => clearTimeout(t);
     }
-  }, []);
+  }, [isSheetOpen]);
 
   const dismissHint = () => {
     localStorage.setItem(SAVE_HINT_KEY, 'true');
@@ -58,6 +62,7 @@ export function AddToRitualHandHint({ show }: AddToRitualHandHintProps) {
           left: '18%',
           filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
           animation: 'handDownBounce 1.4s ease-in-out infinite',
+          transform: 'rotate(-45deg)',
         }}
       >
         <FluentEmoji emoji="👇" size={90} />
@@ -65,11 +70,11 @@ export function AddToRitualHandHint({ show }: AddToRitualHandHintProps) {
 
       <style>{`
         @keyframes handDownBounce {
-          0%   { transform: translateY(0px); }
-          40%  { transform: translateY(10px); }
-          55%  { transform: translateY(5px); }
-          70%  { transform: translateY(10px); }
-          100% { transform: translateY(0px); }
+          0%   { transform: rotate(-45deg) translateY(0px); }
+          40%  { transform: rotate(-45deg) translateY(10px); }
+          55%  { transform: rotate(-45deg) translateY(5px); }
+          70%  { transform: rotate(-45deg) translateY(10px); }
+          100% { transform: rotate(-45deg) translateY(0px); }
         }
       `}</style>
     </>
@@ -88,6 +93,7 @@ export function SaveRitualHandHint({ show }: AddToRitualHandHintProps) {
           right: '80px',
           filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
           animation: 'saveHandBounce 1.4s ease-in-out infinite',
+          transform: 'rotate(-45deg)',
         }}
       >
         <FluentEmoji emoji="👇" size={90} />
@@ -95,11 +101,11 @@ export function SaveRitualHandHint({ show }: AddToRitualHandHintProps) {
 
       <style>{`
         @keyframes saveHandBounce {
-          0%   { transform: translateY(0px); }
-          40%  { transform: translateY(10px); }
-          55%  { transform: translateY(5px); }
-          70%  { transform: translateY(10px); }
-          100% { transform: translateY(0px); }
+          0%   { transform: rotate(-45deg) translateY(0px); }
+          40%  { transform: rotate(-45deg) translateY(10px); }
+          55%  { transform: rotate(-45deg) translateY(5px); }
+          70%  { transform: rotate(-45deg) translateY(10px); }
+          100% { transform: rotate(-45deg) translateY(0px); }
         }
       `}</style>
     </>

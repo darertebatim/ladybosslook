@@ -100,7 +100,7 @@ export function RoutinePreviewSheet({
   const [showActionLimit, setShowActionLimit] = useState(false);
   const { isSubscribed, isLoading: subLoading } = useSubscription();
   const { data: allExistingTasks = [] } = useAllActiveTasks();
-  const { showHint: showSaveHint, dismissHint: dismissSaveHint } = useSaveRitualHint();
+  const { showHint: showSaveHint, dismissHint: dismissSaveHint } = useSaveRitualHint(open);
   const MAX_FREE_ACTIONS = 6;
 
   // Sync selectedTaskIds when tasks change (e.g., when data loads async)
