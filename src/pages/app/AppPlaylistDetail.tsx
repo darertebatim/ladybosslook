@@ -672,8 +672,8 @@ export default function AppPlaylistDetail() {
                 <Badge variant="secondary">{getCategoryLabel()}</Badge>
               )}
               {playlist.language === 'persian' ? (
-                <Badge variant="outline" className="text-sm flex items-center gap-1">
-                  <PersianFlag size={16} className="rounded-sm" /> فارسی
+                <Badge variant="outline" className="text-sm flex items-center gap-1 px-1.5">
+                  <PersianFlag size={20} className="rounded-sm" />
                 </Badge>
               ) : playlist.language && ({'american':'🇺🇸','turkish':'🇹🇷','spanish':'🇪🇸','all':'🌐'} as Record<string,string>)[playlist.language] && (
                 <Badge variant="outline" className="text-sm">
