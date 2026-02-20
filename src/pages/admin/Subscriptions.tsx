@@ -218,7 +218,7 @@ export default function Subscriptions() {
       {/* Mobile Preview Dialog */}
       {programData && (
         <Dialog open={!!mobilePreview} onOpenChange={(o) => !o && setMobilePreview(null)}>
-          <DialogContent className="max-w-[375px] h-[700px] p-0 rounded-[2.5rem] overflow-hidden border-[8px] border-foreground/80 [&>button]:hidden">
+          <DialogContent className="max-w-[414px] h-[896px] p-0 rounded-[2.5rem] overflow-hidden border-[8px] border-foreground/80 [&>button]:hidden">
             <VisuallyHidden><DialogTitle>Mobile Paywall Preview</DialogTitle></VisuallyHidden>
             <div className="h-full overflow-y-auto bg-background">
               {(() => {
