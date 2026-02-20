@@ -160,21 +160,16 @@ function Page1({
 
 // ── Page 2: Comparison ───────────────────────────────────────────────────────
 function Page2({ onNext, onClose }: { onNext: () => void; onClose?: () => void }) {
-  const ROW_H = 56; // px per row
-  const HEADER_H = 80; // px for VIP header cell
-  const totalGradientH = HEADER_H + comparisonRows.length * ROW_H;
-  const TABLE_COLS = '1fr 72px 64px';
-
   return (
     <div
-      className="flex flex-col h-full"
+      className="flex flex-col min-h-full"
       style={{
         background:
-          'radial-gradient(ellipse at 0% 0%, #fef9c3 0%, #fdf4ff 35%, #eff6ff 65%, #fce7f3 100%)',
+          'radial-gradient(ellipse at top left, #fef3c7 0%, #fdf4ff 30%, #eff6ff 60%, #fce7f3 100%)',
       }}
     >
-      {/* Header bar */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
           <X className="h-5 w-5" />
         </button>
@@ -187,103 +182,93 @@ function Page2({ onNext, onClose }: { onNext: () => void; onClose?: () => void }
         <div className="w-5" />
       </div>
 
-      {/* Main area — mascot + table */}
-      <div className="flex-1 flex flex-col justify-center px-5 py-2">
-        {/* Row: mascot left + badge centered-right */}
-        <div className="relative flex items-end mb-[-2px]">
-          {/* Mascot */}
-          <div className="w-28 shrink-0 z-10">
-            <img src={mascotHero} alt="mascot" className="w-full object-contain" />
-          </div>
+      {/* Headline */}
+      <div className="px-6 pt-2 pb-4">
+        <h2 className="text-2xl font-black text-foreground leading-tight">
+          Simora+ is the fastest way to your best routine yet.
+        </h2>
+      </div>
 
-          {/* 76% badge — sits above the VIP column (~center of table minus label col) */}
-          <div className="flex-1 flex justify-center pr-8">
-            <div
-              className="flex items-baseline gap-1 px-4 py-2 rounded-2xl text-white shadow-lg"
-              style={{
-                background: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%)',
-              }}
-            >
-              <span className="text-2xl font-black leading-none">76%</span>
-              <span className="text-[12px] leading-tight font-medium">
-                users'<br />choice
-              </span>
-            </div>
+      {/* Comparison table area */}
+      <div className="relative px-4 flex-1">
+        {/* Mascot top-left */}
+        <div className="absolute left-0 top-0 w-24 z-10">
+          <img src={mascotHero} alt="mascot" className="w-full object-contain" />
+        </div>
+
+        {/* 76% badge — above the VIP column */}
+        <div className="absolute left-1/2 -translate-x-8 -top-1 z-20">
+          <div
+            className="flex items-center gap-1 px-3 py-2 rounded-2xl text-white shadow-lg"
+            style={{ background: 'linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%)' }}
+          >
+            <span className="text-2xl font-black leading-none">76%</span>
+            <span className="text-[11px] leading-tight font-semibold">
+              users'<br />choice
+            </span>
           </div>
         </div>
 
-        {/* Table — no container, floats on gradient bg */}
-        <div className="relative overflow-visible">
-          {/* Continuous gradient VIP strip — absolute, behind cells */}
-          <div
-            className="absolute z-0 rounded-3xl"
-            style={{
-              background: 'linear-gradient(180deg, #f472b6 0%, #a855f7 50%, #7c3aed 100%)',
-              width: 72,
-              height: totalGradientH,
-              top: 0,
-              // position it over the VIP column (after the label col)
-              left: '50%',
-              transform: 'translateX(-50%) translateX(-16px)',
-            }}
-          />
-
+        {/* Table card */}
+        <div className="mt-14 rounded-3xl overflow-hidden bg-white shadow-md">
           {/* Header row */}
-          <div
-            className="relative z-10 grid items-center px-5"
-            style={{
-              gridTemplateColumns: '1fr 72px 64px',
-              height: HEADER_H,
-            }}
-          >
-            <span className="font-black text-lg text-foreground">Benefits</span>
+          <div className="grid grid-cols-[1fr_90px_60px] px-5 pt-4 pb-2 items-end">
+            <span className="font-black text-base text-foreground">Benefits</span>
 
-            {/* VIP header */}
-            <div className="flex flex-col items-center justify-center">
-              <span className="text-white text-sm font-black">✦</span>
-              <span
-                className="font-black italic text-xl leading-none"
-                style={{ color: '#fde68a' }}
+            {/* VIP column header — tall gradient pill */}
+            <div className="flex justify-center">
+              <div
+                className="w-16 rounded-2xl flex flex-col items-center justify-center py-4 gap-1 shadow-lg"
+                style={{
+                  background: 'linear-gradient(180deg, #ec4899 0%, #8b5cf6 60%, #7c3aed 100%)',
+                  minHeight: 70,
+                }}
               >
-                VIP
-              </span>
+                <span className="text-white text-base font-black">✦</span>
+                <span className="text-yellow-300 text-lg font-black italic tracking-tight">VIP</span>
+              </div>
             </div>
 
-            <span className="text-center font-bold text-base text-foreground">Free</span>
+            <span className="text-center font-bold text-base text-foreground pb-2">Free</span>
           </div>
 
           {/* Rows */}
           {comparisonRows.map((row, i) => (
             <div
               key={i}
-              className="relative z-10 grid items-center px-5 border-t border-gray-100"
-              style={{
-                gridTemplateColumns: '1fr 72px 64px',
-                height: ROW_H,
-              }}
+              className="grid grid-cols-[1fr_90px_60px] px-5 py-3.5 items-center border-t border-gray-100"
             >
-              <span className="text-base font-semibold text-foreground">{row.label}</span>
+              <span className="text-sm font-semibold text-foreground">{row.label}</span>
 
-              {/* VIP cell */}
+              {/* VIP cell — continues the gradient */}
               <div className="flex justify-center">
-                <Check className="h-5 w-5" style={{ color: '#fcd34d' }} strokeWidth={3} />
+                <div
+                  className="w-16 flex items-center justify-center py-3"
+                  style={{
+                    background: 'linear-gradient(180deg, #ec489918 0%, #8b5cf618 100%)',
+                  }}
+                >
+                  <Check className="h-5 w-5 text-yellow-500" strokeWidth={3} />
+                </div>
               </div>
 
               {/* Free cell */}
               <div className="flex justify-center">
                 {row.free ? (
-                  <Check className="h-5 w-5 text-gray-900" strokeWidth={3} />
+                  <Check className="h-5 w-5 text-gray-800" strokeWidth={3} />
                 ) : (
-                  <X className="h-5 w-5 text-red-500" strokeWidth={2.5} />
+                  <X className="h-5 w-5 text-red-400" strokeWidth={3} />
                 )}
               </div>
             </div>
           ))}
+
+          <div className="h-3" />
         </div>
       </div>
 
       {/* CTA */}
-      <div className="shrink-0 px-6 pb-6 pt-3">
+      <div className="px-6 py-6 mt-auto">
         <button
           onClick={onNext}
           className="w-full h-14 rounded-full font-bold text-white text-lg flex items-center justify-center gap-2 bg-gray-900"
