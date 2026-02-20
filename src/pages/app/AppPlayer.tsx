@@ -21,7 +21,7 @@ import { PersianFlag } from "@/components/ui/PersianFlag";
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
   { value: 'american', label: 'English', flag: '🇺🇸' },
-  { value: 'persian', label: 'فارسی', flag: null },
+  { value: 'persian', label: 'Persian', flag: null },
   { value: 'turkish', label: 'Türkçe', flag: '🇹🇷' },
   { value: 'spanish', label: 'Español', flag: '🇪🇸' },
 ];
