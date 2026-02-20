@@ -1,4 +1,5 @@
 import { Play, Pause, Headphones, X } from "lucide-react";
+import { CachedImage } from '@/components/ui/CachedImage';
 import { useNavigate } from "react-router-dom";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 import { cn } from "@/lib/utils";
@@ -52,7 +53,7 @@ export const MiniPlayer = () => {
         {/* Compact Cover Art - 44px */}
         <div className="relative h-11 w-11 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
           {currentTrack.coverImageUrl ? (
-            <img 
+            <CachedImage 
               src={currentTrack.coverImageUrl} 
               alt={currentTrack.title}
               loading="lazy"

@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Capacitor } from "@capacitor/core";
 import { format } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
+import { getCachedAudioPath } from "@/lib/audioCache";
 
 export interface TrackInfo {
   id: string;
@@ -284,10 +285,22 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       return;
     }
     
+    // Check for locally downloaded audio first (offline playback)
+    let fileUrl = track.fileUrl;
+    try {
+      const localPath = await getCachedAudioPath(track.id);
+      if (localPath) {
+        fileUrl = localPath;
+        console.log(`[AudioPlayer] Using cached audio for track ${track.id}`);
+      }
+    } catch {
+      // Fall back to streaming URL if cache check fails
+    }
+    
     // Load new track
     setCurrentTrack(track);
     currentTrackRef.current = track;
-    audio.src = track.fileUrl;
+    audio.src = fileUrl;
     audio.playbackRate = playbackRate;
     
     if (startPosition !== undefined) {

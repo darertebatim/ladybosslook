@@ -1,7 +1,9 @@
 import React, { Suspense, lazy, useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/hooks/useAuth";
@@ -188,6 +190,39 @@ const queryClient = new QueryClient({
   },
 });
 
+// Persist React Query cache to localStorage — survives app restarts
+// Only keys matching these prefixes are stored (avoids storing real-time / sensitive data)
+const PERSIST_QUERY_KEYS = [
+  'player-data',
+  'routines-bank',
+  'routine-categories',
+  'new-home-data',
+  'courses-data',
+  'planner-all-tasks',
+];
+
+const localStoragePersister = createSyncStoragePersister({
+  storage: window.localStorage,
+  key: 'lb-query-cache-v1',
+  // Only persist queries whose key starts with one of the allowed prefixes
+  serialize: (client) => {
+    const filtered = {
+      ...client,
+      clientState: {
+        ...client.clientState,
+        queries: client.clientState.queries.filter((q) =>
+          PERSIST_QUERY_KEYS.some((prefix) =>
+            Array.isArray(q.queryKey)
+              ? String(q.queryKey[0]).startsWith(prefix)
+              : String(q.queryKey).startsWith(prefix)
+          )
+        ),
+      },
+    };
+    return JSON.stringify(filtered);
+  },
+});
+
 // Native App Router - Registers deep linking navigation callback and refreshes tokens
 const NativeAppRedirect = () => {
   const navigate = useNavigate();
@@ -260,7 +295,21 @@ const CourseRedirect = () => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+  <PersistQueryClientProvider
+    client={queryClient}
+    persistOptions={{
+      persister: localStoragePersister,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      dehydrateOptions: {
+        shouldDehydrateQuery: (query) =>
+          PERSIST_QUERY_KEYS.some((prefix) =>
+            Array.isArray(query.queryKey)
+              ? String(query.queryKey[0]).startsWith(prefix)
+              : String(query.queryKey).startsWith(prefix)
+          ),
+      },
+    }}
+  >
     <HelmetProvider>
       <AuthProvider>
         <TooltipProvider>
@@ -403,7 +452,7 @@ const App = () => (
         </TooltipProvider>
       </AuthProvider>
     </HelmetProvider>
-  </QueryClientProvider>
+  </PersistQueryClientProvider>
 );
 
 export default App;

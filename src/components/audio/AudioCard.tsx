@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Headphones, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { CachedImage } from '@/components/ui/CachedImage';
 
 interface AudioCardProps {
   id: string;
@@ -57,7 +58,7 @@ export const AudioCard = memo(function AudioCard({
     >
       <div className="relative aspect-square">
         {coverImageUrl ? (
-          <img
+          <CachedImage
             src={coverImageUrl}
             alt={title}
             loading="lazy"

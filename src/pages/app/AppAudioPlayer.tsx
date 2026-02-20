@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Headphones, List, Lock, CheckCircle, Play, CalendarPlus, Check } from "lucide-react";
+import { ChevronLeft, Headphones, List, Lock, CheckCircle, Play, CalendarPlus, Check, Download, CheckCircle2 } from "lucide-react";
 import { BackButton } from "@/components/app/BackButton";
 import { AudioControls } from "@/components/audio/AudioControls";
 import { ProgressBar } from "@/components/audio/ProgressBar";
@@ -26,6 +26,8 @@ import { RoutinePreviewSheet, EditedTask } from "@/components/app/RoutinePreview
 import { useAddRoutinePlan, RoutinePlanTask } from "@/hooks/useRoutinePlans";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
+import { useAudioDownload } from "@/hooks/useAudioDownload";
+import { CachedImage } from "@/components/ui/CachedImage";
 
 export default function AppAudioPlayer() {
   const { audioId } = useParams();
@@ -64,6 +66,9 @@ export default function AppAudioPlayer() {
   // Audio routine hook (replaces bookmarks)
   const { data: existingTask, isLoading: isCheckingTask } = useExistingAudioTask(audioId);
   const addRoutinePlan = useAddRoutinePlan();
+
+  // Audio download (offline playback)
+  const { isDownloaded, isDownloading, getProgress, downloadTrack, deleteDownload, isNative } = useAudioDownload();
 
   // Fetch audio content
   const { data: audio, isLoading } = useQuery({
@@ -535,6 +540,49 @@ export default function AppAudioPlayer() {
             )}
           </div>
 
+          {/* Download Button (native only) */}
+          {audio && isNative && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 relative"
+              onClick={() => {
+                if (isDownloaded(audio.id)) {
+                  haptic.light();
+                  deleteDownload(audio.id);
+                } else {
+                  haptic.medium();
+                  downloadTrack({
+                    id: audio.id,
+                    title: audio.title,
+                    fileUrl: audio.file_url,
+                    coverImageUrl: coverImageUrl || undefined,
+                  });
+                }
+              }}
+              disabled={isDownloading(audio.id)}
+              title={isDownloaded(audio.id) ? "Remove download" : "Download for offline"}
+            >
+              {isDownloaded(audio.id) ? (
+                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+              ) : isDownloading(audio.id) ? (
+                <div className="relative h-5 w-5">
+                  <svg className="h-5 w-5 -rotate-90" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" strokeWidth="2" strokeOpacity="0.2" />
+                    <circle
+                      cx="10" cy="10" r="8" fill="none" stroke="currentColor" strokeWidth="2"
+                      strokeDasharray={`${2 * Math.PI * 8}`}
+                      strokeDashoffset={`${2 * Math.PI * 8 * (1 - getProgress(audio.id) / 100)}`}
+                      className="transition-all"
+                    />
+                  </svg>
+                </div>
+              ) : (
+                <Download className="h-5 w-5" />
+              )}
+            </Button>
+          )}
+
           {/* Add to Routine Button */}
           {audio && (
             <Button
@@ -682,7 +730,7 @@ export default function AppAudioPlayer() {
           {/* Cover Art - Constrained size */}
           <div className="w-full max-w-[220px] mx-auto rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] shrink-0">
             {coverImageUrl ? (
-              <img
+              <CachedImage
                 src={coverImageUrl}
                 alt={audio.title}
                 className="w-full h-full object-cover"
