@@ -1,4 +1,4 @@
-import persianFlagSrc from '@/assets/flag-persian.jpg';
+import persianFlagSrc from '@/assets/flag-persian.svg';
 
 interface PersianFlagProps {
   size?: number;
