@@ -129,7 +129,7 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
 
   return (
     <div 
-      className="w-full cursor-pointer"
+      className="w-full"
       style={{ perspective: '1000px' }}
     >
       <div 
@@ -138,12 +138,12 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
           transformStyle: 'preserve-3d',
           transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
         }}
-        onClick={handleFlip}
       >
         {/* Front of card - same style as RoutineBankCard */}
         <div 
-          className="relative w-full"
+          className="relative w-full cursor-pointer"
           style={{ backfaceVisibility: 'hidden' }}
+          onClick={handleFlip}
         >
           <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-md">
             {/* Background Image - no overlay, just like other ritual cards */}
