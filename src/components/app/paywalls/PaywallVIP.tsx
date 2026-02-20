@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Check, X, Loader2, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaywallProgramData } from './PaywallClassic';
+import mascotHero from '@/assets/paywall-mascot-hero.png';
 import beforeAfter from '@/assets/paywall-before-after.png';
 
 
@@ -15,12 +16,9 @@ interface PaywallVIPProps {
 }
 
 const features = [
-  { emoji: '📅', title: 'Smart ritual tracking', subtitle: 'for consistent, lasting results.' },
+  { emoji: '📅', title: 'Smart habit tracking', subtitle: 'for consistent, lasting results.' },
   { emoji: '🏅', title: 'Streak motivation system', subtitle: 'designed for your goals.' },
   { emoji: '📊', title: 'Self-Care Tools', subtitle: 'like trackers, journals, meditation & more.' },
-  { emoji: '🤗', title: 'Quality growth community', subtitle: 'support you every step of the way.' },
-  { emoji: '💡', title: 'Customized contents', subtitle: 'on routines, wellness, and life hacks.' },
-  { emoji: '🚫', title: 'No Ads', subtitle: '' },
 ];
 
 const comparisonRows = [
@@ -42,39 +40,49 @@ function Page1({
   trialDays?: number | null;
 }) {
   return (
-    <div className="flex flex-col min-h-full">
-      {/* Purple hero header */}
+    <div className="relative flex flex-col h-full min-h-screen">
+      {/* Purple hero — takes top half, owl bleeds into white */}
       <div
-        className="relative flex flex-col items-center px-6 pt-10 pb-10"
-        style={{ background: 'linear-gradient(160deg, #4b1fa8 0%, #7c3aed 50%, #9333ea 100%)' }}
+        className="relative flex flex-col items-center px-6 pt-10"
+        style={{ background: 'linear-gradient(160deg, #4b1fa8 0%, #7c3aed 55%, #9333ea 100%)' }}
       >
+        {/* Close */}
         <button
           onClick={onClose}
-          className="absolute left-4 top-4 text-white/70 hover:text-white"
+          className="absolute left-4 top-4 text-white/70 hover:text-white z-10"
         >
           <X className="h-5 w-5" />
         </button>
 
         {/* Brand badge */}
-        <div className="flex items-center gap-2 mb-5">
+        <div className="flex items-center gap-2 mb-4">
           <span className="text-white font-bold text-base tracking-wide">Simora+</span>
           <span className="bg-yellow-400 text-yellow-900 text-[10px] font-black px-2 py-0.5 rounded-md tracking-wider uppercase">
             VIP
           </span>
         </div>
 
-        {/* Headline — 3 lines */}
-        <h1 className="text-white text-[1.6rem] font-black text-center leading-snug">
-          Simora+ users are{' '}
-          <span className="text-yellow-400">4.2x</span> more likely to stay consistent and see real change!
+        {/* Headline — exactly 3 lines */}
+        <h1 className="text-white text-[1.55rem] font-black text-center leading-snug px-2 mb-4">
+          Simora+ users are <span className="text-yellow-400">4.2x</span> more likely to stay consistent and see real change!
         </h1>
+
+        {/* Owl mascot — full width, bleeds to bottom of purple section */}
+        <div className="w-full -mb-2">
+          <img
+            src={mascotHero}
+            alt="Simora+ mascot"
+            className="w-full object-cover object-top"
+            style={{ maxHeight: 260 }}
+          />
+        </div>
       </div>
 
-      {/* White body — scrollable */}
-      <div className="flex-1 bg-white px-6 py-6 flex flex-col">
+      {/* White scrollable body */}
+      <div className="flex-1 bg-white px-6 pt-6 pb-28 overflow-y-auto">
         <h2 className="text-2xl font-black text-foreground mb-5 text-center">What you get</h2>
 
-        <div className="space-y-5">
+        <div className="space-y-6">
           {features.map((f, i) => (
             <div key={i} className="flex items-start gap-4">
               <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center text-3xl shrink-0">
@@ -87,12 +95,10 @@ function Page1({
             </div>
           ))}
         </div>
+      </div>
 
-        <p className="text-center text-xl font-black text-foreground mt-8 mb-6">
-          Cancel anytime, no penalties or fees
-        </p>
-
-        {/* CTA — scrolls with content */}
+      {/* Fixed CTA at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 bg-white px-6 pb-6 pt-3">
         <button
           onClick={onNext}
           className="w-full h-14 rounded-full font-bold text-white text-lg flex items-center justify-center gap-2"
@@ -101,8 +107,7 @@ function Page1({
           Try for ${trialDays && trialDays > 0 ? '0.00' : 'free'}
           <ArrowRight className="h-5 w-5" />
         </button>
-
-        <div className="flex items-center justify-center gap-4 mt-4 mb-4 text-xs text-muted-foreground">
+        <div className="flex items-center justify-center gap-4 mt-3 text-xs text-muted-foreground">
           <Link to="/sms-terms" className="hover:underline">Terms</Link>
           <Link to="/privacy" className="hover:underline">Privacy</Link>
         </div>
@@ -110,6 +115,7 @@ function Page1({
     </div>
   );
 }
+
 
 // Page 2: Comparison
 function Page2({ onNext, onClose }: { onNext: () => void; onClose?: () => void }) {
