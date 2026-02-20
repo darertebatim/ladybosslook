@@ -19,6 +19,7 @@ import { useRoutinePlan, useAddRoutinePlan } from "@/hooks/useRoutinePlans";
 import { useQuickAddPlaylistTask } from "@/hooks/useTaskPlanner";
 import { RoutinePreviewSheet } from "@/components/app/RoutinePreviewSheet";
 import { AddedToRoutineButton } from "@/components/app/AddedToRoutineButton";
+import { PersianFlag } from "@/components/ui/PersianFlag";
 import { PlaylistTour } from "@/components/app/tour";
 import { useSubscription } from "@/hooks/useSubscription";
 import { PaywallSheet } from "@/components/app/PaywallSheet";
@@ -670,9 +671,13 @@ export default function AppPlaylistDetail() {
               {playlist.category && (
                 <Badge variant="secondary">{getCategoryLabel()}</Badge>
               )}
-              {playlist.language && ({'american':'🇺🇸','persian':'🇮🇷','turkish':'🇹🇷','spanish':'🇪🇸','all':'🌐'} as Record<string,string>)[playlist.language] && (
+              {playlist.language === 'persian' ? (
+                <Badge variant="outline" className="text-sm flex items-center gap-1">
+                  <PersianFlag size={16} className="rounded-sm" /> فارسی
+                </Badge>
+              ) : playlist.language && ({'american':'🇺🇸','turkish':'🇹🇷','spanish':'🇪🇸','all':'🌐'} as Record<string,string>)[playlist.language] && (
                 <Badge variant="outline" className="text-sm">
-                  {({'american':'🇺🇸','persian':'🇮🇷','turkish':'🇹🇷','spanish':'🇪🇸','all':'🌐'} as Record<string,string>)[playlist.language]}
+                  {({'american':'🇺🇸','turkish':'🇹🇷','spanish':'🇪🇸','all':'🌐'} as Record<string,string>)[playlist.language]}
                 </Badge>
               )}
               {playlist.is_free && <Badge className="bg-green-500">FREE</Badge>}

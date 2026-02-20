@@ -1,10 +1,10 @@
 import { CheckCircle2, BookOpen, Users, UserCheck, Headphones, Video, Calendar, Sparkles, Dumbbell, Waves, Heart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { PersianFlag } from '@/components/ui/PersianFlag';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
   american: '🇺🇸',
-  persian: '🇮🇷',
   turkish: '🇹🇷',
   spanish: '🇪🇸',
 };
@@ -70,10 +70,14 @@ export const ProgramCard = ({
 
       {/* Top Right: Language flag + Enrolled badge */}
       <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
-        {language && LANG_FLAGS[language] && (
-          <span className="text-sm bg-white/80 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
-            {LANG_FLAGS[language]}
-          </span>
+        {language && (
+          language === 'persian'
+            ? <PersianFlag size={24} className="rounded-full w-6 h-6 shadow-sm" />
+            : LANG_FLAGS[language] && (
+              <span className="text-sm bg-white/80 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
+                {LANG_FLAGS[language]}
+              </span>
+            )
         )}
         {isEnrolled && (
           <Badge className="bg-green-500 hover:bg-green-600 text-white text-xs rounded-full">

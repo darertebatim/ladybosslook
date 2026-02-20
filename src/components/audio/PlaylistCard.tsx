@@ -5,11 +5,11 @@ import { Clock, Music, Lock, CheckCircle2, ChevronRight, Crown } from "lucide-re
 import { useNavigate, useLocation } from "react-router-dom";
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { PersianFlag } from '@/components/ui/PersianFlag';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
   american: '🇺🇸',
-  persian: '🇮🇷',
   turkish: '🇹🇷',
   spanish: '🇪🇸',
 };
@@ -143,8 +143,10 @@ export const PlaylistCard = memo(function PlaylistCard({
         
         {/* Title Overlay with language flag */}
         <h3 className="absolute bottom-2 left-2 right-2 font-semibold text-sm text-white line-clamp-2 drop-shadow-md z-10 flex items-center gap-1">
-          {language && LANG_FLAGS[language] && (
-            <span className="text-sm flex-shrink-0">{LANG_FLAGS[language]}</span>
+          {language && (
+            language === 'persian'
+              ? <PersianFlag size={18} className="flex-shrink-0 rounded-sm" />
+              : LANG_FLAGS[language] && <span className="text-sm flex-shrink-0">{LANG_FLAGS[language]}</span>
           )}
           <span>{name}</span>
         </h3>
