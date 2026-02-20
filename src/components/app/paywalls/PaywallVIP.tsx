@@ -135,7 +135,7 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
       {/* Sticky CTA → goes to page 2 */}
       <div style={{ position: 'sticky', bottom: 0, background: 'linear-gradient(to top, #fff 80%, transparent)', paddingTop: 16, paddingBottom: 28, paddingLeft: 20, paddingRight: 20, zIndex: 10 }}>
         <button
-          onClick={() => !preview && setPage(2)}
+          onClick={() => setPage(2)}
           style={{ width: '100%', height: 56, borderRadius: 28, background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)', border: 'none', cursor: preview ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: '0 8px 24px rgba(109,40,217,0.35)' }}
         >
           <span style={{ color: '#fff', fontSize: 17, fontWeight: 700, letterSpacing: -0.2 }}>Try for $0.00</span>

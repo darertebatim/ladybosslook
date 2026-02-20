@@ -265,7 +265,7 @@ export default function Subscriptions() {
                       </div>
                     </div>
                     <div className="flex justify-center">
-                      <IPhoneFrame width={300}>
+                      <IPhoneFrame width={240}>
                         <Component program={programData} preview />
                       </IPhoneFrame>
                     </div>
