@@ -330,7 +330,7 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
           style={{ width: '100%', height: 56, borderRadius: 28, background: isPurchasing ? '#555' : '#0a0a0a', border: 'none', cursor: preview ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.25)' }}
         >
           <span style={{ color: '#fff', fontSize: 17, fontWeight: 700, letterSpacing: -0.2 }}>
-            {isPurchasing ? 'Processing…' : trialDays > 0 ? 'Start my free week' : 'Get simora+'}
+            {isPurchasing ? 'Processing…' : 'Continue'}
           </span>
           {!isPurchasing && <ArrowRight size={20} color="#fff" strokeWidth={2.5} />}
         </button>
