@@ -59,6 +59,117 @@ const EMOJI_CATEGORIES = {
 // All emojis flattened with duplicates removed
 const ALL_EMOJIS = [...new Set(Object.values(EMOJI_CATEGORIES).flat())];
 
+// Emoji name map for search
+const EMOJI_NAMES: Record<string, string[]> = {
+  '☀️': ['sun','sunny','weather'], '🎯': ['target','goal','dart'], '💪': ['muscle','strong','flex','gym'],
+  '❤️': ['heart','love','red'], '⭐': ['star','favorite'], '✨': ['sparkles','magic','shine'],
+  '📖': ['book','read','study'], '✏️': ['pencil','write','edit'], '☕': ['coffee','drink','morning'],
+  '💧': ['water','drop','hydrate'], '🕐': ['clock','time','hour'], '📅': ['calendar','date','schedule'],
+  '🔔': ['bell','notification','alert'], '✅': ['check','done','complete','tick'], '⭕': ['circle','ring'],
+  '🔥': ['fire','hot','flame'], '⚡': ['lightning','electric','fast'], '🌟': ['star','glow','shine'],
+  '💡': ['idea','light','bulb'], '🎉': ['party','celebrate','confetti'], '🏅': ['medal','award'],
+  '🎖️': ['medal','decoration','award'], '🏆': ['trophy','win','champion'], '🥇': ['gold','first','medal'],
+  '📌': ['pin','location','mark'], '🔗': ['link','chain'], '🔒': ['lock','secure','private'],
+  '🔓': ['unlock','open'], '💎': ['diamond','gem','precious'], '🪄': ['magic','wand','spell'],
+  '🧘': ['yoga','meditate','calm'], '🍎': ['apple','fruit','healthy'], '👶': ['baby','child','infant'],
+  '🛁': ['bath','tub','relax'], '🛏️': ['bed','sleep','rest'], '🧠': ['brain','mind','think'],
+  '🌸': ['flower','pink','cherry','blossom'], '🤲': ['hands','pray','open'], '🌿': ['plant','herb','green'],
+  '🌙': ['moon','night','sleep'], '🥗': ['salad','healthy','food'], '😊': ['smile','happy','face'],
+  '🍲': ['soup','stew','food'], '🌅': ['sunrise','morning','dawn'], '🌇': ['sunset','city','evening'],
+  '🌳': ['tree','nature','park'], '💨': ['wind','air','breath'], '🧘‍♀️': ['yoga','woman','meditate'],
+  '💆': ['massage','relax','spa'], '🏃': ['run','jog','exercise'], '🧖': ['spa','face','relax'],
+  '🩺': ['doctor','medical','health'], '💊': ['pill','medicine','drug'], '🫁': ['lungs','breath'],
+  '🫀': ['heart','cardiac'], '🦷': ['tooth','dental'], '👁️': ['eye','see','vision'],
+  '💤': ['sleep','zzz','tired'], '🥱': ['yawn','tired','sleepy'], '🧴': ['lotion','cream','skin'],
+  '🪥': ['toothbrush','clean','dental'], '🧹': ['broom','clean','sweep'], '🧼': ['soap','wash','clean'],
+  '🩹': ['bandaid','heal','wound'], '🌡️': ['thermometer','temperature','fever'],
+  '🥛': ['milk','drink','dairy'], '🍵': ['tea','drink','warm'], '🍯': ['honey','jar','sweet'],
+  '🥑': ['avocado','healthy','green'], '🥦': ['broccoli','vegetable','healthy'],
+  '🥕': ['carrot','vegetable','orange'], '🍇': ['grapes','fruit','purple'],
+  '🍓': ['strawberry','fruit','red'], '🫐': ['blueberry','fruit'], '🥝': ['kiwi','fruit','green'],
+  '🍌': ['banana','fruit','yellow'], '🥜': ['peanut','nut'], '🌰': ['chestnut','nut'],
+  '🍳': ['egg','cook','fry'], '🥚': ['egg','food'],
+  '💼': ['briefcase','work','business'], '🏢': ['office','building','work'],
+  '🧮': ['calculator','math','numbers'], '📊': ['chart','graph','data'],
+  '📋': ['clipboard','list','notes'], '💳': ['card','credit','pay'], '💵': ['money','cash','dollar'],
+  '📄': ['document','paper','file'], '📂': ['folder','files','organize'], '💻': ['laptop','computer','tech'],
+  '✉️': ['email','mail','letter'], '💬': ['chat','message','comment'], '📱': ['phone','mobile','app'],
+  '📈': ['chart','growth','trend'], '👥': ['people','group','team'], '👛': ['purse','wallet','money'],
+  '🖊️': ['pen','write'], '📝': ['notes','memo','write'], '🗂️': ['files','organize','folder'],
+  '🖥️': ['desktop','computer','monitor'], '⌨️': ['keyboard','type'], '🖨️': ['printer','print'],
+  '📎': ['paperclip','attach'], '📐': ['ruler','angle','measure'], '📏': ['ruler','measure'],
+  '🗄️': ['filing','cabinet','organize'], '📮': ['mailbox','post'], '🏷️': ['label','tag','price'],
+  '📑': ['documents','pages'], '🗓️': ['calendar','date','planner'], '🗒️': ['notebook','notes'],
+  '✒️': ['pen','nib','write'], '🔍': ['search','magnify','find'], '🧾': ['receipt','bill'],
+  '💰': ['money','bag','rich'], '🏦': ['bank','money','finance'], '📠': ['fax','machine'],
+  '🗃️': ['box','files','archive'], '📧': ['email','mail'],
+  '🚴': ['bike','cycle','exercise'], '📚': ['books','study','library'], '📷': ['camera','photo'],
+  '🚗': ['car','drive','vehicle'], '🐕': ['dog','pet','animal'], '🎮': ['game','controller','play'],
+  '🎁': ['gift','present','box'], '🥤': ['drink','cup','soda'], '🎧': ['headphones','music','audio'],
+  '🏠': ['home','house','building'], '🔑': ['key','lock','access'], '🧳': ['luggage','travel','bag'],
+  '🗺️': ['map','travel','navigate'], '🎵': ['music','note','song'], '🎨': ['art','paint','creative'],
+  '✈️': ['plane','travel','fly'], '🛍️': ['shopping','bag','buy'], '🛒': ['cart','shopping'],
+  '👕': ['shirt','clothing','wear'], '🎟️': ['ticket','event'], '📺': ['tv','television','watch'],
+  '🍽️': ['plate','food','eat'], '🍷': ['wine','drink','glass'], '🎸': ['guitar','music','rock'],
+  '🎹': ['piano','music','keys'], '🎤': ['microphone','sing','music'], '🎬': ['movie','film','camera'],
+  '🎭': ['theater','drama','arts'], '🎪': ['circus','tent','show'], '🏋️': ['weightlift','gym','strong'],
+  '🤸': ['gymnastics','flexible','exercise'], '⛹️': ['basketball','sport'], '🏊': ['swim','pool','water'],
+  '🚶': ['walk','person','stroll'], '🧗': ['climb','rock','sport'], '🏄': ['surf','wave','ocean'],
+  '🎣': ['fish','fishing','hobby'], '🛶': ['canoe','boat','paddle'], '⛷️': ['ski','snow','winter'],
+  '🎿': ['ski','slope','winter'], '🏕️': ['camp','tent','outdoor'], '⛺': ['tent','camp','outdoor'],
+  '🏖️': ['beach','sand','summer'], '🌊': ['wave','ocean','water'], '🚲': ['bicycle','bike','cycle'],
+  '🛵': ['scooter','motor','ride'], '🏍️': ['motorcycle','bike','ride'], '🚌': ['bus','transport'],
+  '🚂': ['train','rail','transport'], '🛳️': ['ship','cruise','travel'], '🎠': ['carousel','fun'],
+  '🎡': ['ferris','wheel','fun'], '🎢': ['rollercoaster','fun','ride'], '🏰': ['castle','palace'],
+  '🗼': ['tower','paris','eiffel'], '🗽': ['liberty','statue','new york'], '⛩️': ['shrine','japan','gate'],
+  '🕌': ['mosque','islam','prayer'], '🕍': ['synagogue','jewish'],
+  '👋': ['wave','hello','hi','bye'], '🤝': ['handshake','deal','meet'], '💑': ['couple','love','romance'],
+  '👨‍👩‍👧': ['family','parents','child'], '🎂': ['cake','birthday','celebrate'],
+  '🎊': ['confetti','party','celebrate'], '💝': ['heart','love','gift'], '📞': ['phone','call'],
+  '👭': ['friends','girls','together'], '🗣️': ['speak','talk','voice'],
+  '💌': ['love letter','mail','romance'], '🙏': ['pray','thanks','please'],
+  '🤗': ['hug','warm','friendly'], '😍': ['love','eyes','adore'], '🥳': ['party','celebrate','birthday'],
+  '👏': ['clap','applaud','bravo'], '🫂': ['hug','embrace','comfort'], '💐': ['flowers','bouquet'],
+  '🌹': ['rose','flower','love'], '🎀': ['bow','ribbon','gift'], '🍰': ['cake','slice','sweet'],
+  '🧁': ['cupcake','sweet','bake'], '🎈': ['balloon','party','celebrate'], '🪅': ['pinata','fiesta'],
+  '🎇': ['fireworks','sparkler','celebrate'], '🎆': ['fireworks','celebrate'], '💒': ['wedding','church'],
+  '👰': ['bride','wedding'], '🤵': ['groom','suit','wedding'], '👪': ['family','home'],
+  '🐶': ['dog','puppy','pet'], '🐱': ['cat','kitten','pet'], '🐭': ['mouse','rodent'],
+  '🐹': ['hamster','pet'], '🐰': ['rabbit','bunny','pet'], '🦊': ['fox','animal'],
+  '🐻': ['bear','animal'], '🐼': ['panda','bear','china'], '🐨': ['koala','australia'],
+  '🐯': ['tiger','cat','stripe'], '🦁': ['lion','king','animal'], '🐮': ['cow','milk','animal'],
+  '🐷': ['pig','oink','animal'], '🐸': ['frog','green','jump'], '🐵': ['monkey','ape','animal'],
+  '🐔': ['chicken','bird','farm'], '🐧': ['penguin','bird','cold'], '🐦': ['bird','tweet','fly'],
+  '🦅': ['eagle','bird','fly'], '🦉': ['owl','wise','night'], '🦋': ['butterfly','insect','beautiful'],
+  '🐛': ['caterpillar','worm','insect'], '🐝': ['bee','honey','insect'], '🐞': ['ladybug','insect','red'],
+  '🦀': ['crab','seafood','red'], '🐙': ['octopus','sea','tentacle'], '🐬': ['dolphin','sea','smart'],
+  '🐳': ['whale','ocean','big'], '🦈': ['shark','ocean','danger'], '🐊': ['crocodile','reptile'],
+  '🦕': ['dinosaur','dino','ancient'], '🦖': ['trex','dinosaur','ancient'], '🐢': ['turtle','slow','shell'],
+  '🐍': ['snake','reptile'], '🦎': ['lizard','reptile'], '🦩': ['flamingo','pink','bird'],
+  '🦚': ['peacock','colorful','bird'], '🐿️': ['squirrel','nut','animal'], '🦔': ['hedgehog','spiky'],
+  '🐾': ['paw','tracks','animal'],
+  '🌍': ['earth','world','globe'], '🌎': ['earth','americas','globe'], '🌏': ['earth','asia','globe'],
+  '🌕': ['moon','full','night'], '☁️': ['cloud','weather','sky'], '🌧️': ['rain','weather','cloud'],
+  '⛈️': ['storm','thunder','rain'], '🌈': ['rainbow','colorful','sky'], '❄️': ['snow','cold','winter'],
+  '🌺': ['flower','tropical','pink'], '🌻': ['sunflower','yellow','flower'], '🌼': ['daisy','flower','yellow'],
+  '🌷': ['tulip','flower','spring'], '🌱': ['sprout','grow','plant'], '🪴': ['plant','pot','indoor'],
+  '🌵': ['cactus','desert','plant'], '🍀': ['clover','lucky','green'], '🍁': ['maple','autumn','leaf'],
+  '🍂': ['autumn','leaf','fall'], '🍃': ['leaf','green','nature'], '🌾': ['wheat','grain','farm'],
+  '🪻': ['hyacinth','flower','purple'],
+  '⏰': ['alarm','clock','wake','time'], '🔧': ['wrench','tool','fix'], '🔨': ['hammer','build','tool'],
+  '🪛': ['screwdriver','tool','fix'], '🧲': ['magnet','attract'], '🪜': ['ladder','climb'],
+  '🧯': ['extinguisher','fire','safety'], '🛡️': ['shield','protect','defense'],
+  '🗡️': ['sword','weapon','blade'], '⚙️': ['gear','settings','mechanic'],
+  '🧪': ['test tube','science','lab'], '🔬': ['microscope','science','research'],
+  '🔭': ['telescope','star','space'], '📡': ['satellite','signal','antenna'],
+  '🛸': ['ufo','alien','space'], '🚀': ['rocket','space','launch'],
+  '🧩': ['puzzle','piece','solve'], '🎲': ['dice','game','random'], '♟️': ['chess','strategy','game'],
+  '🪁': ['slingshot','bow','toy'], '🧸': ['teddy','bear','toy'], '🪆': ['doll','matryoshka','russian'],
+  '🖼️': ['picture','frame','art'], '🪞': ['mirror','reflect'], '🪟': ['window','glass','view'],
+  '🛋️': ['sofa','couch','relax'], '🪑': ['chair','seat','sit'], '🚪': ['door','entrance','exit'],
+  '🪣': ['bucket','pail','water'],
+};
+
 interface EmojiPickerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -82,10 +193,11 @@ export function EmojiPicker({
     
     if (!search.trim()) return emojiList;
     
-    // Basic emoji search by matching characters
-    return emojiList.filter(emoji => 
-      emoji.toLowerCase().includes(search.toLowerCase())
-    );
+    const q = search.toLowerCase().trim();
+    return emojiList.filter(emoji => {
+      const names = EMOJI_NAMES[emoji] || [];
+      return names.some(name => name.includes(q));
+    });
   }, [search, activeCategory]);
 
   const handleSelect = (emoji: string) => {
