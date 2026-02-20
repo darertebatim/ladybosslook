@@ -16,11 +16,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useSubscription } from "@/hooks/useSubscription";
 import { PaywallSheet } from "@/components/app/PaywallSheet";
 import { haptic } from "@/lib/haptics";
+import { PersianFlag } from "@/components/ui/PersianFlag";
 
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
   { value: 'american', label: 'English', flag: '🇺🇸' },
-  { value: 'persian', label: 'فارسی', flag: '🇮🇷' },
+  { value: 'persian', label: 'فارسی', flag: null },
   { value: 'turkish', label: 'Türkçe', flag: '🇹🇷' },
   { value: 'spanish', label: 'Español', flag: '🇪🇸' },
 ];
@@ -378,7 +379,10 @@ export default function AppPlayer() {
           <Popover>
             <PopoverTrigger asChild>
               <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
-                <span className="text-sm">{selectedLang.flag}</span>
+                {selectedLang.value === 'persian'
+                  ? <PersianFlag size={18} className="rounded-sm" />
+                  : <span className="text-sm">{selectedLang.flag}</span>
+                }
               </button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-40 p-1">
@@ -393,7 +397,10 @@ export default function AppPlayer() {
                       : 'hover:bg-muted text-foreground'
                   )}
                 >
-                  <span>{lang.flag}</span>
+                  {lang.value === 'persian'
+                    ? <PersianFlag size={18} className="rounded-sm" />
+                    : <span>{lang.flag}</span>
+                  }
                   <span>{lang.label}</span>
                 </button>
               ))}
