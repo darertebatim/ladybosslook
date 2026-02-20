@@ -13,10 +13,9 @@ export function PersianFlag({ size = 20, className }: PersianFlagProps) {
     <img
       src={persianFlagSrc}
       alt="Persian"
-      width={size}
       height={size}
       className={className}
-      style={{ display: 'inline-block', borderRadius: 2, objectFit: 'cover', verticalAlign: 'middle' }}
+      style={{ display: 'inline-block', borderRadius: 2, objectFit: 'cover', verticalAlign: 'middle', height: size, width: 'auto' }}
     />
   );
 }
