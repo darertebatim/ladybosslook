@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallComparison, PaywallLimitedOffer, PaywallVIP, type PaywallProgramData } from '@/components/app/paywalls';
+import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallComparison, PaywallLimitedOffer, type PaywallProgramData } from '@/components/app/paywalls';
 import { Crown, Lock, Unlock, BookOpen, Wind, Droplets, Heart, Brain, Moon, Music, Timer, Sparkles, CalendarPlus, Check, Smartphone } from 'lucide-react';
 import { useDefaultPaywall, useSetDefaultPaywall, PaywallVariantId } from '@/hooks/useDefaultPaywall';
 import { toast } from 'sonner';
@@ -19,7 +19,6 @@ const PAYWALL_VARIANTS = [
   { id: 'bold', label: 'Bold (Dark)', component: PaywallBold },
   { id: 'comparison', label: 'Comparison', component: PaywallComparison },
   { id: 'limited-offer', label: 'Limited Offer (50% OFF)', component: PaywallLimitedOffer },
-  { id: 'vip', label: 'VIP (3-Page)', component: PaywallVIP },
 ] as const;
 
 const PLUS_FEATURES = [
@@ -218,7 +217,7 @@ export default function Subscriptions() {
       {/* Mobile Preview Dialog */}
       {programData && (
         <Dialog open={!!mobilePreview} onOpenChange={(o) => !o && setMobilePreview(null)}>
-          <DialogContent className="max-w-[414px] h-[896px] p-0 rounded-[2.5rem] overflow-hidden border-[8px] border-foreground/80 [&>button]:hidden">
+          <DialogContent className="max-w-[375px] h-[700px] p-0 rounded-[2.5rem] overflow-hidden border-[8px] border-foreground/80 [&>button]:hidden">
             <VisuallyHidden><DialogTitle>Mobile Paywall Preview</DialogTitle></VisuallyHidden>
             <div className="h-full overflow-y-auto bg-background">
               {(() => {
