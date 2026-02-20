@@ -4,10 +4,6 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 const STORAGE_KEY = 'ritual_add_hint_dismissed';
 const SAVE_HINT_KEY = 'ritual_save_hint_dismissed';
 
-// DEV RESET: remove these two lines once hints are verified
-localStorage.removeItem(STORAGE_KEY);
-localStorage.removeItem(SAVE_HINT_KEY);
-
 export function useAddToRitualHint() {
   const [showHint, setShowHint] = useState(false);
 
