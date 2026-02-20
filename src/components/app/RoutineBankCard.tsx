@@ -6,6 +6,7 @@ import { RoutineBankItem } from '@/hooks/useRoutinesBank';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { isEmoji } from '@/lib/fluentEmoji';
 import { X, Crown } from 'lucide-react';
+import { CachedImage } from '@/components/ui/CachedImage';
 
 interface RoutineBankCardProps {
   routine: RoutineBankItem;
@@ -110,7 +111,7 @@ export function RoutineBankCard({
         {/* Square Image Container */}
         <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-lg border border-border/50">
           {routine.cover_image_url ? (
-            <img
+            <CachedImage
               src={routine.cover_image_url}
               alt={routine.title}
               loading="lazy"

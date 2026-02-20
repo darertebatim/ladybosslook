@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { PersianFlag } from '@/components/ui/PersianFlag';
+import { CachedImage } from '@/components/ui/CachedImage';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
@@ -118,7 +119,7 @@ export const PlaylistCard = memo(function PlaylistCard({
       >
       <div className="relative aspect-square">
         {coverImageUrl ? (
-          <img src={coverImageUrl} alt={name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+          <CachedImage src={coverImageUrl} alt={name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
             <Music className="h-16 w-16 text-primary/40" />
