@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallComparison, PaywallLimitedOffer, type PaywallProgramData } from '@/components/app/paywalls';
+import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallComparison, PaywallLimitedOffer, PaywallVIP, type PaywallProgramData } from '@/components/app/paywalls';
 import { Crown, Lock, Unlock, BookOpen, Wind, Droplets, Heart, Brain, Moon, Music, Timer, Sparkles, CalendarPlus, Check, Smartphone } from 'lucide-react';
 import { useDefaultPaywall, useSetDefaultPaywall, PaywallVariantId } from '@/hooks/useDefaultPaywall';
 import { toast } from 'sonner';
@@ -18,7 +18,9 @@ const PAYWALL_VARIANTS = [
   { id: 'bold', label: 'Bold (Dark)', component: PaywallBold },
   { id: 'comparison', label: 'Comparison', component: PaywallComparison },
   { id: 'limited-offer', label: 'Limited Offer (50% OFF)', component: PaywallLimitedOffer },
+  { id: 'vip', label: 'simora+ Plus', component: PaywallVIP },
 ] as const;
+
 
 const PLUS_FEATURES = [
   {

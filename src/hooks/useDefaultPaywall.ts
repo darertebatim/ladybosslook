@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export type PaywallVariantId = 'classic' | 'gradient' | 'minimal' | 'bold' | 'comparison' | 'limited-offer';
+export type PaywallVariantId = 'classic' | 'gradient' | 'minimal' | 'bold' | 'comparison' | 'limited-offer' | 'vip';
 
 const APP_SETTING_KEY = 'default_paywall_variant';
 
