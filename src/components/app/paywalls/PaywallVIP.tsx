@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { Check, X, Loader2, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaywallProgramData } from './PaywallClassic';
-import mascotHero from '@/assets/paywall-mascot-hero.png';
-import mascotFlowers from '@/assets/paywall-mascot-flowers.png';
 import beforeAfter from '@/assets/paywall-before-after.png';
+
 
 interface PaywallVIPProps {
   program: PaywallProgramData;
@@ -47,7 +45,7 @@ function Page1({
     <div className="flex flex-col min-h-full">
       {/* Purple hero header */}
       <div
-        className="relative flex flex-col items-center px-6 pt-10 pb-8"
+        className="relative flex flex-col items-center px-6 pt-10 pb-10"
         style={{ background: 'linear-gradient(160deg, #4b1fa8 0%, #7c3aed 50%, #9333ea 100%)' }}
       >
         <button
@@ -58,54 +56,43 @@ function Page1({
         </button>
 
         {/* Brand badge */}
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-5">
           <span className="text-white font-bold text-base tracking-wide">Simora+</span>
           <span className="bg-yellow-400 text-yellow-900 text-[10px] font-black px-2 py-0.5 rounded-md tracking-wider uppercase">
-            PLUS
+            VIP
           </span>
         </div>
 
-        {/* Headline */}
-        <h1 className="text-white text-2xl font-black text-center leading-tight mb-5">
+        {/* Headline — 3 lines */}
+        <h1 className="text-white text-[1.6rem] font-black text-center leading-snug">
           Simora+ users are{' '}
-          <span className="text-yellow-400">4.2x</span> more likely to stay
-          consistent and see real change!
+          <span className="text-yellow-400">4.2x</span> more likely to stay consistent and see real change!
         </h1>
-
-        {/* Mascot */}
-        <div className="relative w-48 h-48">
-          <img src={mascotHero} alt="Simora+ mascot" className="w-full h-full object-contain" />
-        </div>
       </div>
 
-      {/* White body */}
+      {/* White body — scrollable */}
       <div className="flex-1 bg-white px-6 py-6 flex flex-col">
         <h2 className="text-2xl font-black text-foreground mb-5 text-center">What you get</h2>
 
         <div className="space-y-5">
           {features.map((f, i) => (
             <div key={i} className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center text-2xl shrink-0">
+              <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center text-3xl shrink-0">
                 {f.emoji}
               </div>
-              <div className="pt-1">
-                <p className="font-bold text-foreground text-base leading-tight">{f.title}</p>
+              <div className="pt-1.5">
+                <p className="font-bold text-foreground text-[17px] leading-tight">{f.title}</p>
                 {f.subtitle && <p className="text-muted-foreground text-sm mt-0.5">{f.subtitle}</p>}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Mascot 2 */}
-        <div className="flex justify-center my-6">
-          <img src={mascotFlowers} alt="mascot" className="w-48 object-contain" />
-        </div>
-
-        <p className="text-center text-xl font-black text-foreground mb-8">
+        <p className="text-center text-xl font-black text-foreground mt-8 mb-6">
           Cancel anytime, no penalties or fees
         </p>
 
-        {/* CTA */}
+        {/* CTA — scrolls with content */}
         <button
           onClick={onNext}
           className="w-full h-14 rounded-full font-bold text-white text-lg flex items-center justify-center gap-2"
@@ -115,7 +102,7 @@ function Page1({
           <ArrowRight className="h-5 w-5" />
         </button>
 
-        <div className="flex items-center justify-center gap-4 mt-4 text-xs text-muted-foreground">
+        <div className="flex items-center justify-center gap-4 mt-4 mb-4 text-xs text-muted-foreground">
           <Link to="/sms-terms" className="hover:underline">Terms</Link>
           <Link to="/privacy" className="hover:underline">Privacy</Link>
         </div>
@@ -157,10 +144,8 @@ function Page2({ onNext, onClose }: { onNext: () => void; onClose?: () => void }
 
       {/* Comparison table area */}
       <div className="relative px-4 flex-1">
-        {/* Mascot top-left */}
-        <div className="absolute left-2 top-0 w-20 z-10">
-          <img src={mascotHero} alt="mascot" className="w-full object-contain" />
-        </div>
+        {/* Spacer for badge positioning */}
+        <div className="w-20" />
 
         {/* 76% badge */}
         <div
