@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, X } from 'lucide-react';
+import { ArrowRight, X, Check } from 'lucide-react';
 import type { PaywallProgramData } from './PaywallClassic';
 import mascotHero from '@/assets/paywall-plus-mascot-hero.png';
 import mascotBottom from '@/assets/paywall-plus-mascot-bottom.png';
 import comparisonTable from '@/assets/paywall-plus-comparison-table.png';
+import beforeAfter from '@/assets/paywall-before-after.png';
 import emojiCalendar from '@/assets/emoji-calendar-3d.png';
 import emojiMedal from '@/assets/emoji-medal-3d.png';
 import emojiBooks from '@/assets/emoji-books-3d.png';
@@ -30,8 +31,19 @@ const FEATURES = [
 
 const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
 
+// Pricing constants
+const ANNUAL_PRICE = 99.99;
+const ANNUAL_ORIGINAL = 240;
+const ANNUAL_MONTHLY = (ANNUAL_PRICE / 12).toFixed(2);
+const ANNUAL_DISCOUNT = Math.round((1 - ANNUAL_PRICE / ANNUAL_ORIGINAL) * 100);
+
+const MONTHLY_PRICE = 13.99;
+const MONTHLY_ORIGINAL = 19.99;
+const MONTHLY_DISCOUNT = Math.round((1 - MONTHLY_PRICE / MONTHLY_ORIGINAL) * 100);
+
 export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }: PaywallVIPProps) {
-  const [page, setPage] = useState<1 | 2>(1);
+  const [page, setPage] = useState<1 | 2 | 3>(1);
+  const [selectedPlan, setSelectedPlan] = useState<'annual' | 'monthly'>('annual');
   const [isPurchasing, setIsPurchasing] = useState(false);
 
   const trialDays = program.trial_days || 7;
@@ -40,9 +52,10 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
     if (preview) return;
     setIsPurchasing(true);
     try {
-      const productId = program.annual_ios_product_id || program.ios_product_id!;
-      const plan = program.annual_ios_product_id ? 'annual' : 'monthly';
-      await onPurchase?.(productId, plan);
+      const productId = selectedPlan === 'annual'
+        ? (program.annual_ios_product_id || program.ios_product_id!)
+        : program.ios_product_id!;
+      await onPurchase?.(productId, selectedPlan);
     } finally {
       setIsPurchasing(false);
     }
@@ -150,7 +163,7 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
   );
 
   /* ═══════════════════ PAGE 2 ═══════════════════ */
-  return (
+  if (page === 2) return (
     <div style={{
       display: 'flex', flexDirection: 'column', minHeight: '100%', fontFamily: SF,
       background: `
@@ -180,17 +193,146 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
         </div>
       </div>
 
-      {/* Sticky CTA */}
+      {/* Sticky CTA → goes to page 3 */}
       <div style={{ position: 'sticky', bottom: 0, background: 'linear-gradient(to top, #fff 80%, transparent)', paddingTop: 20, paddingBottom: 28, paddingLeft: 20, paddingRight: 20, zIndex: 10 }}>
         <button
-          onClick={handlePurchase}
-          disabled={isPurchasing}
-          style={{ width: '100%', height: 56, borderRadius: 28, background: isPurchasing ? '#333' : '#0a0a0a', border: 'none', cursor: preview ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.25)' }}
+          onClick={() => setPage(3)}
+          style={{ width: '100%', height: 56, borderRadius: 28, background: '#0a0a0a', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.25)' }}
         >
           <span style={{ color: '#fff', fontSize: 17, fontWeight: 700, letterSpacing: -0.2 }}>
             {trialDays > 0 ? 'Start my free week' : 'Get simora+'}
           </span>
           <ArrowRight size={20} color="#fff" strokeWidth={2.5} />
+        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 10 }}>
+          <Link to="/sms-terms" style={{ fontSize: 11, color: '#8e8e93', textDecoration: 'none' }}>Terms</Link>
+          <Link to="/privacy" style={{ fontSize: 11, color: '#8e8e93', textDecoration: 'none' }}>Privacy</Link>
+        </div>
+      </div>
+    </div>
+  );
+
+  /* ═══════════════════ PAGE 3 ═══════════════════ */
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', background: '#fff', fontFamily: SF }}>
+      <div style={{ flex: 1 }}>
+        <Header />
+
+        {/* Headline */}
+        <div style={{ paddingLeft: 24, paddingRight: 24, paddingTop: 4, paddingBottom: 20, textAlign: 'center' }}>
+          <p style={{ fontSize: 24, fontWeight: 800, color: '#0a0a0a', lineHeight: 1.25, margin: 0, letterSpacing: -0.5 }}>
+            simora+ Plus is the best plan<br />for building lasting habits
+          </p>
+        </div>
+
+        {/* Before / After image */}
+        <div style={{ paddingLeft: 16, paddingRight: 16, marginBottom: 24 }}>
+          <img
+            src={beforeAfter}
+            alt="Before and after simora+"
+            style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20 }}
+          />
+        </div>
+
+        {/* Pricing cards */}
+        <div style={{ paddingLeft: 16, paddingRight: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+          {/* Annual card */}
+          <button
+            onClick={() => setSelectedPlan('annual')}
+            style={{
+              width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left',
+            }}
+          >
+            <div style={{
+              position: 'relative', borderRadius: 16, padding: '16px 16px',
+              border: selectedPlan === 'annual' ? '2px solid #7c3aed' : '2px solid #e5e7eb',
+              background: selectedPlan === 'annual' ? '#faf5ff' : '#fff',
+              transition: 'all 0.15s',
+            }}>
+              {/* Badge */}
+              <div style={{ position: 'absolute', top: -12, right: 14, background: 'linear-gradient(135deg, #7c3aed, #a855f7)', color: '#fff', fontSize: 12, fontWeight: 800, padding: '4px 10px', borderRadius: 20, letterSpacing: 0.3 }}>
+                {ANNUAL_DISCOUNT}% OFF
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{
+                    width: 20, height: 20, borderRadius: '50%', border: selectedPlan === 'annual' ? '6px solid #7c3aed' : '2px solid #d1d5db',
+                    background: '#fff', flexShrink: 0, transition: 'all 0.15s',
+                  }} />
+                  <div>
+                    <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#0a0a0a' }}>
+                      {trialDays > 0 ? `${trialDays}-day free trial` : 'Annual plan'}
+                    </p>
+                    <p style={{ margin: '2px 0 0', fontSize: 13, color: '#8e8e93' }}>
+                      ${ANNUAL_PRICE}/year{' '}
+                      <span style={{ textDecoration: 'line-through', color: '#c0c0c0' }}>(was ${ANNUAL_ORIGINAL}/year)</span>
+                    </p>
+                  </div>
+                </div>
+                <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#0a0a0a' }}>${ANNUAL_MONTHLY}<span style={{ fontSize: 12, fontWeight: 500, color: '#8e8e93' }}>/mo.</span></p>
+              </div>
+            </div>
+          </button>
+
+          {/* Monthly card */}
+          <button
+            onClick={() => setSelectedPlan('monthly')}
+            style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}
+          >
+            <div style={{
+              position: 'relative', borderRadius: 16, padding: '16px 16px',
+              border: selectedPlan === 'monthly' ? '2px solid #7c3aed' : '2px solid #e5e7eb',
+              background: selectedPlan === 'monthly' ? '#faf5ff' : '#fff',
+              transition: 'all 0.15s',
+            }}>
+              {/* Monthly discount badge */}
+              {selectedPlan === 'monthly' && (
+                <div style={{ position: 'absolute', top: -12, right: 14, background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#fff', fontSize: 12, fontWeight: 800, padding: '4px 10px', borderRadius: 20, letterSpacing: 0.3 }}>
+                  {MONTHLY_DISCOUNT}% OFF
+                </div>
+              )}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{
+                    width: 20, height: 20, borderRadius: '50%', border: selectedPlan === 'monthly' ? '6px solid #7c3aed' : '2px solid #d1d5db',
+                    background: '#fff', flexShrink: 0, transition: 'all 0.15s',
+                  }} />
+                  <div>
+                    <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#0a0a0a' }}>Monthly</p>
+                    <p style={{ margin: '2px 0 0', fontSize: 13, color: '#8e8e93' }}>
+                      ${MONTHLY_PRICE}/month{' '}
+                      <span style={{ textDecoration: 'line-through', color: '#c0c0c0' }}>(was ${MONTHLY_ORIGINAL}/mo)</span>
+                    </p>
+                  </div>
+                </div>
+                <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#0a0a0a' }}>${MONTHLY_PRICE}<span style={{ fontSize: 12, fontWeight: 500, color: '#8e8e93' }}>/mo.</span></p>
+              </div>
+            </div>
+          </button>
+
+        </div>
+
+        {/* Fine print */}
+        <p style={{ fontSize: 11, color: '#aeaeb2', textAlign: 'center', margin: '14px 20px 8px', lineHeight: 1.5 }}>
+          {trialDays > 0
+            ? `Your ${trialDays}-day free trial then ${selectedPlan === 'annual' ? `$${ANNUAL_PRICE}/year` : `$${MONTHLY_PRICE}/month`}. Cancel anytime.`
+            : `Cancel anytime. No penalties or fees.`}
+        </p>
+      </div>
+
+      {/* Sticky CTA */}
+      <div style={{ position: 'sticky', bottom: 0, background: 'linear-gradient(to top, #fff 80%, transparent)', paddingTop: 12, paddingBottom: 28, paddingLeft: 20, paddingRight: 20, zIndex: 10 }}>
+        <button
+          onClick={handlePurchase}
+          disabled={isPurchasing}
+          style={{ width: '100%', height: 56, borderRadius: 28, background: isPurchasing ? '#555' : '#0a0a0a', border: 'none', cursor: preview ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.25)' }}
+        >
+          <span style={{ color: '#fff', fontSize: 17, fontWeight: 700, letterSpacing: -0.2 }}>
+            {isPurchasing ? 'Processing…' : trialDays > 0 ? 'Start my free week' : 'Get simora+'}
+          </span>
+          {!isPurchasing && <ArrowRight size={20} color="#fff" strokeWidth={2.5} />}
         </button>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 10 }}>
           <Link to="/sms-terms" style={{ fontSize: 11, color: '#8e8e93', textDecoration: 'none' }}>Terms</Link>
