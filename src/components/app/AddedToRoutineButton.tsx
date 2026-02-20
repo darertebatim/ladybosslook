@@ -62,7 +62,7 @@ export const AddedToRoutineButton = ({
       case 'emotion':
         return "bg-white/20 text-white";
       case 'outline':
-        return "bg-[#F4ECFE] hover:bg-[#E8DCF8] text-foreground";
+        return "bg-urgency hover:bg-urgency/90 text-urgency-foreground border-0";
       default:
         return "bg-urgency hover:bg-urgency/90 text-urgency-foreground";
     }
