@@ -4,7 +4,7 @@ import { ArrowRight, X } from 'lucide-react';
 import type { PaywallProgramData } from './PaywallClassic';
 import mascotHero from '@/assets/paywall-plus-mascot-hero.png';
 import mascotBottom from '@/assets/paywall-plus-mascot-bottom.png';
-import comparisonTable from '@/assets/paywall-plus-comparison-table.png';
+
 import emojiCalendar from '@/assets/emoji-calendar-3d.png';
 import emojiMedal from '@/assets/emoji-medal-3d.png';
 import emojiBooks from '@/assets/emoji-books-3d.png';
@@ -150,6 +150,15 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
   );
 
   /* ═══════════════════ PAGE 2 ═══════════════════ */
+
+  const ROWS = [
+    { label: 'Growth driven habits', plus: true,  free: true  },
+    { label: 'Motivation system',    plus: true,  free: false },
+    { label: 'Growth community',     plus: true,  free: false },
+    { label: 'Smart reminders',      plus: true,  free: false },
+    { label: 'No ads',               plus: true,  free: false },
+  ];
+
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', minHeight: '100%', fontFamily: SF,
@@ -163,20 +172,67 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
       <div style={{ flex: 1 }}>
         <Header />
 
-        {/* Headline */}
-        <div style={{ paddingLeft: 24, paddingRight: 24, paddingTop: 8, paddingBottom: 24, textAlign: 'center' }}>
-          <p style={{ fontSize: 26, fontWeight: 800, color: '#0a0a0a', lineHeight: 1.25, margin: 0, letterSpacing: -0.5 }}>
+        {/* Headline — 2 lines */}
+        <div style={{ paddingLeft: 24, paddingRight: 24, paddingTop: 8, paddingBottom: 20, textAlign: 'center' }}>
+          <p style={{ fontSize: 28, fontWeight: 800, color: '#0a0a0a', lineHeight: 1.22, margin: 0, letterSpacing: -0.5 }}>
             simora+ Plus is the fastest way to your best routine yet.
           </p>
         </div>
 
-        {/* Comparison table screenshot — exact from Me+, used as-is */}
+        {/* Comparison table — coded, full width */}
         <div style={{ paddingLeft: 16, paddingRight: 16 }}>
-          <img
-            src={comparisonTable}
-            alt="simora+ vs Free comparison"
-            style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20 }}
-          />
+          <div style={{ borderRadius: 20, overflow: 'hidden', background: 'rgba(255,255,255,0.85)', boxShadow: '0 2px 24px rgba(0,0,0,0.08)', position: 'relative' }}>
+
+            {/* Mascot + 76% badge row */}
+            <div style={{ display: 'flex', alignItems: 'flex-end', paddingLeft: 16, paddingTop: 12, paddingBottom: 0, position: 'relative' }}>
+              <img src={mascotBottom} alt="" style={{ width: 80, height: 80, objectFit: 'contain', marginBottom: -4 }} />
+              {/* 76% badge above VIP column */}
+              <div style={{ position: 'absolute', right: 80, top: 8 }}>
+                <div style={{ background: '#6d28d9', borderRadius: 12, padding: '5px 12px', display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
+                  <span style={{ color: '#fff', fontSize: 18, fontWeight: 900 }}>76%</span>
+                  <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 10, fontWeight: 600, lineHeight: 1.2 }}>users'<br/>choice</span>
+                </div>
+                {/* Triangle pointer */}
+                <div style={{ width: 0, height: 0, borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '8px solid #6d28d9', marginLeft: 20 }} />
+              </div>
+            </div>
+
+            {/* Header row */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 80px 70px', borderBottom: '1px solid #f0f0f0' }}>
+              <div style={{ padding: '12px 16px', fontSize: 15, fontWeight: 700, color: '#0a0a0a' }}>Benefits</div>
+              {/* VIP column header — gradient pill */}
+              <div style={{
+                background: 'linear-gradient(160deg, #f472b6 0%, #a855f7 50%, #6d28d9 100%)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 0',
+                position: 'relative',
+              }}>
+                <span style={{ color: '#fde68a', fontSize: 16, fontWeight: 900, fontStyle: 'italic', letterSpacing: 0.5 }}>Plus</span>
+                <span style={{ color: '#fff', fontSize: 14, position: 'absolute', top: 8, right: 8 }}>✦</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 0', fontSize: 15, fontWeight: 700, color: '#0a0a0a' }}>Free</div>
+            </div>
+
+            {/* Data rows */}
+            {ROWS.map((row, i) => (
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 80px 70px', borderBottom: i < ROWS.length - 1 ? '1px solid #f0f0f0' : 'none' }}>
+                <div style={{ padding: '14px 16px', fontSize: 14, fontWeight: 500, color: '#1a1a1a', display: 'flex', alignItems: 'center' }}>{row.label}</div>
+                {/* VIP cell */}
+                <div style={{
+                  background: 'linear-gradient(160deg, #f472b6 0%, #a855f7 50%, #6d28d9 100%)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <span style={{ color: '#fde68a', fontSize: 18, fontWeight: 700 }}>✓</span>
+                </div>
+                {/* Free cell */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {row.free
+                    ? <span style={{ color: '#0a0a0a', fontSize: 18, fontWeight: 700 }}>✓</span>
+                    : <span style={{ color: '#ef4444', fontSize: 18, fontWeight: 700 }}>✕</span>
+                  }
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
