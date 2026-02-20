@@ -380,7 +380,7 @@ export default function AppPlayer() {
             <PopoverTrigger asChild>
               <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
                 {selectedLang.value === 'persian'
-                  ? <PersianFlag size={18} className="rounded-sm" />
+                  ? <PersianFlag size={14} />
                   : <span className="text-sm">{selectedLang.flag}</span>
                 }
               </button>
@@ -398,7 +398,7 @@ export default function AppPlayer() {
                   )}
                 >
                   {lang.value === 'persian'
-                    ? <PersianFlag size={18} className="rounded-sm" />
+                    ? <PersianFlag size={14} />
                     : <span>{lang.flag}</span>
                   }
                   <span>{lang.label}</span>

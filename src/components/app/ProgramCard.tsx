@@ -72,7 +72,7 @@ export const ProgramCard = ({
       <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
         {language && (
           language === 'persian'
-            ? <PersianFlag size={24} className="rounded-full w-6 h-6 shadow-sm" />
+            ? <PersianFlag size={14} className="shadow-sm" />
             : LANG_FLAGS[language] && (
               <span className="text-sm bg-white/80 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
                 {LANG_FLAGS[language]}
