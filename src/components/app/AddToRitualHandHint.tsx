@@ -62,7 +62,7 @@ export function AddToRitualHandHint({ show }: AddToRitualHandHintProps) {
       <div
         className="pointer-events-none fixed z-[60]"
         style={{
-          bottom: 'calc(env(safe-area-inset-bottom) + 185px)',
+          bottom: 'calc(env(safe-area-inset-bottom) + 100px)',
           left: '18%',
           filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
           animation: 'handDownBounce 1.4s ease-in-out infinite',
