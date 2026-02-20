@@ -4,6 +4,11 @@ import { ArrowRight, X } from 'lucide-react';
 import type { PaywallProgramData } from './PaywallClassic';
 import mascotHero from '@/assets/paywall-plus-mascot-hero.png';
 import mascotBottom from '@/assets/paywall-plus-mascot-bottom.png';
+import emojiCalendar from '@/assets/emoji-calendar-3d.png';
+import emojiMedal from '@/assets/emoji-medal-3d.png';
+import emojiBooks from '@/assets/emoji-books-3d.png';
+import emojiHug from '@/assets/emoji-hug-3d.png';
+import emojiBulb from '@/assets/emoji-bulb-3d.png';
 
 interface PaywallVIPProps {
   program: PaywallProgramData;
@@ -13,15 +18,15 @@ interface PaywallVIPProps {
   preview?: boolean;
 }
 
-// Fix 3: Use Unicode emoji text — works everywhere, renders as system emoji
 const FEATURES = [
-  { emoji: '📅', title: 'Smart habit tracking',      desc: 'for consistent, lasting results.' },
-  { emoji: '🏅', title: 'Streak motivation system',  desc: 'designed for your goals.' },
-  { emoji: '📚', title: 'Self-Care Tools',           desc: 'like trackers, journals, meditation & more.' },
-  { emoji: '🤗', title: 'Quality growth community',  desc: 'support you every step of the way.' },
-  { emoji: '💡', title: 'Customized contents',       desc: 'on routines, wellness, and life hacks.' },
-  { emoji: null,  title: 'No Ads',                   desc: '' },
+  { img: emojiCalendar, title: 'Smart habit tracking',     desc: 'for consistent, lasting results.' },
+  { img: emojiMedal,    title: 'Streak motivation system', desc: 'designed for your goals.' },
+  { img: emojiBooks,    title: 'Self-Care Tools',          desc: 'like trackers, journals, meditation & more.' },
+  { img: emojiHug,      title: 'Quality growth community', desc: 'support you every step of the way.' },
+  { img: emojiBulb,     title: 'Customized contents',      desc: 'on routines, wellness, and life hacks.' },
+  { img: null,          title: 'No Ads',                   desc: '' },
 ];
+
 
 export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }: PaywallVIPProps) {
   const [isPurchasing, setIsPurchasing] = useState(false);
@@ -127,7 +132,7 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0,
                 }}>
-                  {feature.emoji === null ? (
+                  {feature.img === null ? (
                     /* No Ads custom badge */
                     <div style={{ position: 'relative', width: 34, height: 34 }}>
                       <div style={{
@@ -144,7 +149,7 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
                       </div>
                     </div>
                   ) : (
-                    <span style={{ fontSize: 30, lineHeight: 1, userSelect: 'none' }}>{feature.emoji}</span>
+                    <img src={feature.img} alt={feature.title} style={{ width: 36, height: 36, objectFit: 'contain' }} />
                   )}
                 </div>
 
