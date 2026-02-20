@@ -163,6 +163,7 @@ function Page2({ onNext, onClose }: { onNext: () => void; onClose?: () => void }
   const ROW_H = 56; // px per row
   const HEADER_H = 80; // px for VIP header cell
   const totalGradientH = HEADER_H + comparisonRows.length * ROW_H;
+  const TABLE_COLS = '1fr 72px 64px';
 
   return (
     <div
@@ -211,8 +212,8 @@ function Page2({ onNext, onClose }: { onNext: () => void; onClose?: () => void }
           </div>
         </div>
 
-        {/* Table card */}
-        <div className="relative rounded-3xl bg-white shadow-lg overflow-visible">
+        {/* Table — no container, floats on gradient bg */}
+        <div className="relative overflow-visible">
           {/* Continuous gradient VIP strip — absolute, behind cells */}
           <div
             className="absolute z-0 rounded-3xl"
