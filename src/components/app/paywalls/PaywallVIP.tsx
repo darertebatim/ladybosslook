@@ -166,16 +166,16 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
         {/* Headline */}
         <div style={{ paddingLeft: 24, paddingRight: 24, paddingTop: 8, paddingBottom: 24, textAlign: 'center' }}>
           <p style={{ fontSize: 26, fontWeight: 800, color: '#0a0a0a', lineHeight: 1.25, margin: 0, letterSpacing: -0.5 }}>
-            simora+ Plus is the fastest way to your best routine yet.
+            simora+ Plus is the fastest<br />way to your best routine yet.
           </p>
         </div>
 
-        {/* Comparison table screenshot — exact from Me+, used as-is */}
-        <div style={{ paddingLeft: 16, paddingRight: 16 }}>
+        {/* Comparison table screenshot — full width, no side padding */}
+        <div style={{ paddingLeft: 0, paddingRight: 0 }}>
           <img
             src={comparisonTable}
             alt="simora+ vs Free comparison"
-            style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 20 }}
+            style={{ width: '100%', height: 'auto', display: 'block' }}
           />
         </div>
       </div>
