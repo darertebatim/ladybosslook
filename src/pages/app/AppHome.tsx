@@ -266,14 +266,17 @@ const AppHome = () => {
 
   useEffect(() => {
     if (!homeDataLoading && totalCompletions === 0 && hasAnyCompletionToday) {
-      triggerFirstCelebration();
+      // Delay to let seal-check mark animation play first
+      const timer = setTimeout(() => triggerFirstCelebration(), 1800);
+      return () => clearTimeout(timer);
     }
   }, [homeDataLoading, totalCompletions, hasAnyCompletionToday, triggerFirstCelebration]);
 
   // Fallback: when total completions count updates from 0 → 1
   useEffect(() => {
     if (prevTotalCompletions.current === 0 && totalCompletions === 1) {
-      triggerFirstCelebration();
+      const timer = setTimeout(() => triggerFirstCelebration(), 1800);
+      return () => clearTimeout(timer);
     }
     prevTotalCompletions.current = totalCompletions;
   }, [totalCompletions, triggerFirstCelebration]);
