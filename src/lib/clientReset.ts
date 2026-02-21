@@ -23,6 +23,13 @@ const CLIENT_RESET_KEYS = [
   // Any other onboarding/first-time flags
   'simora_onboarding_complete',
   'simora_planner_intro_seen',
+  
+  // Mood check-in banner
+  'mood-banner-dismissed',
+  
+  // Hand hint guidance
+  'ritual_add_hint_dismissed',
+  'ritual_save_hint_dismissed',
 ] as const;
 
 /**
@@ -67,6 +74,10 @@ export function fullClientReset(): void {
   // Clear tour prompt flags so banner re-appears
   localStorage.removeItem('simora_tour_prompt_shown');
   localStorage.removeItem('simora_tour_prompt_dismissed_at');
+  
+  // Clear badge celebration keys for today
+  const today = new Date().toISOString().split('T')[0];
+  localStorage.removeItem(`simora_celebrated_${today}`);
   
   // Set flags to force tour banner/popup to show immediately
   localStorage.setItem('simora_tours_just_reset', 'true');
