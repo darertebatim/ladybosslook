@@ -50,6 +50,7 @@ import { useTodayMood } from '@/hooks/useMoodLogs';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { ActionLimitSheet, hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
+import { MoodCheckInBanner } from '@/components/mood/MoodCheckInBanner';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
@@ -795,6 +796,8 @@ const AppHome = () => {
                 </div>
               ) : filteredTasks.length > 0 ? (
                 <div>
+                  {/* Mood Check-in Banner */}
+                  <MoodCheckInBanner />
                   {/* My Actions header - always show */}
                   <div className="flex items-center gap-2 mb-3">
                     <h2 className="text-sm font-semibold text-foreground tracking-wide">
