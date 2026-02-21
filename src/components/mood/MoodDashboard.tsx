@@ -160,7 +160,7 @@ export function MoodDashboard() {
         <div className="flex-1 flex flex-col justify-center px-4">
           {/* Title - always visible */}
           <div className="text-center mb-6">
-            <span className="text-lg font-medium text-foreground">
+            <span className="text-2xl font-bold text-foreground">
               How are you Feeling?
             </span>
           </div>
