@@ -95,40 +95,45 @@ export function useBadgeCelebration({
 
     const celebratedLevels = getCelebratedLevels(dateKey);
 
-    // Priority 1: Gold badge (100% progress)
-    if (
-      currentBadgeLevel === 'gold' &&
-      !celebratedLevels.has('gold')
-    ) {
-      setCelebrationType('gold');
-      saveCelebratedLevel(dateKey, 'gold');
-      return;
-    }
+    // Delay all celebrations to let the task mark animation play first
+    const timer = setTimeout(() => {
+      // Priority 1: Gold badge (100% progress)
+      if (
+        currentBadgeLevel === 'gold' &&
+        !celebratedLevels.has('gold')
+      ) {
+        setCelebrationType('gold');
+        saveCelebratedLevel(dateKey, 'gold');
+        return;
+      }
 
-    // Priority 2: Almost gold (1 task away)
-    if (
-      totalCount > 0 &&
-      completedCount === totalCount - 1 &&
-      !celebratedLevels.has('almostGold') &&
-      !celebratedLevels.has('gold')
-    ) {
-      setCelebrationType('almostGold');
-      saveCelebratedLevel(dateKey, 'almostGold');
-      return;
-    }
+      // Priority 2: Almost gold (1 task away)
+      if (
+        totalCount > 0 &&
+        completedCount === totalCount - 1 &&
+        !celebratedLevels.has('almostGold') &&
+        !celebratedLevels.has('gold')
+      ) {
+        setCelebrationType('almostGold');
+        saveCelebratedLevel(dateKey, 'almostGold');
+        return;
+      }
 
-    // Priority 3: Silver badge (50% progress)
-    if (
-      currentBadgeLevel === 'silver' &&
-      !celebratedLevels.has('silver')
-    ) {
-      setCelebrationType('silver');
-      saveCelebratedLevel(dateKey, 'silver');
-      return;
-    }
+      // Priority 3: Silver badge (50% progress)
+      if (
+        currentBadgeLevel === 'silver' &&
+        !celebratedLevels.has('silver')
+      ) {
+        setCelebrationType('silver');
+        saveCelebratedLevel(dateKey, 'silver');
+        return;
+      }
 
-    // Priority 4: Action celebration (every other completion)
-    setCelebrationType('action');
+      // Priority 4: Action celebration (every other completion)
+      setCelebrationType('action');
+    }, 1800);
+
+    return () => clearTimeout(timer);
   }, [currentBadgeLevel, completedCount, totalCount, dateKey]);
 
   const closeCelebration = useCallback(() => {
