@@ -124,37 +124,28 @@ export function MoodCelebrationSheet({
       <SheetContent 
         side="bottom" 
         className={cn(
-          "rounded-t-3xl border-0 px-5 pt-8 pb-6",
+          "rounded-t-3xl border-0 px-5 pt-6 pb-6",
           moodData.bgColor
         )}
         style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}
-        hideCloseButton
       >
-        {/* Close button - top right */}
-        <button
-          onClick={handleDone}
-          className="absolute right-4 top-4 w-8 h-8 rounded-full bg-foreground/10 flex items-center justify-center"
-        >
-          <span className="text-foreground/60 text-lg leading-none">✕</span>
-        </button>
-
         {/* Header: Emoji + Text */}
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex items-center gap-3 mb-5">
           <div className={cn(
             "w-14 h-14 rounded-full flex items-center justify-center shrink-0",
             moodData.bgColor.replace('100', '200')
           )}>
             <FluentEmoji emoji={moodData.emoji} size={36} />
           </div>
-          <h2 className="text-lg font-bold text-foreground leading-tight">
-            {moodData.celebrationText}
-          </h2>
+          <div>
+            <h2 className="text-lg font-bold text-foreground leading-tight">
+              {moodData.celebrationText}
+            </h2>
+            <p className="text-sm text-foreground/50 mt-0.5">
+              What would you like to do next?
+            </p>
+          </div>
         </div>
-
-        {/* Subheading */}
-        <p className="text-[22px] font-bold text-foreground/80 mb-5 leading-tight">
-          Something that may help you feel stronger
-        </p>
 
         {/* 2×2 Cards with illustrations */}
         <div className="grid grid-cols-2 gap-3 mb-4">
@@ -184,7 +175,7 @@ export function MoodCelebrationSheet({
         <Button
           variant="ghost"
           onClick={handleDone}
-          className="w-full h-11 rounded-full bg-foreground/8 text-foreground/50 hover:bg-foreground/12 text-sm font-medium"
+          className="w-full h-10 rounded-full text-foreground/40 hover:bg-foreground/5 text-sm"
         >
           Maybe later
         </Button>
