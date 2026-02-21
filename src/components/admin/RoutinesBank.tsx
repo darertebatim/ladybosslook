@@ -88,6 +88,7 @@ interface TaskBankItem {
   emoji: string;
   category: string;
   is_active: boolean;
+  repeat_pattern: string;
 }
 
 // Local state for sections while editing
@@ -204,7 +205,7 @@ export default function RoutinesBank() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('admin_task_bank')
-        .select('id, title, emoji, category, is_active')
+        .select('id, title, emoji, category, is_active, repeat_pattern')
         .eq('is_active', true)
         .order('title', { ascending: true });
       if (error) throw error;
@@ -634,7 +635,7 @@ export default function RoutinesBank() {
       schedule_days: [],
       drip_day: formData.schedule_type === 'challenge' ? localTasks.length + 1 : null,
       monthly_day: null,
-      is_once: false,
+      is_once: task.repeat_pattern === 'none',
     };
     setLocalTasks([...localTasks, newTask]);
     setTaskSearchOpen(false);
