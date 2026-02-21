@@ -279,7 +279,7 @@ const AppHome = () => {
 
     // Fast path: hasAnyCompletionToday flipped from false → true
     if (!prevHasCompletionToday.current && hasAnyCompletionToday && totalCompletions === 0) {
-      const timer = setTimeout(() => triggerFirstCelebration(), 1800);
+      const timer = setTimeout(() => triggerFirstCelebration(), 2800);
       prevHasCompletionToday.current = hasAnyCompletionToday;
       return () => clearTimeout(timer);
     }
@@ -287,7 +287,7 @@ const AppHome = () => {
 
     // Fallback: when total completions count updates from 0 → 1
     if (prevTotalCompletions.current === 0 && totalCompletions === 1) {
-      const timer = setTimeout(() => triggerFirstCelebration(), 1800);
+      const timer = setTimeout(() => triggerFirstCelebration(), 2800);
       prevTotalCompletions.current = totalCompletions;
       return () => clearTimeout(timer);
     }
@@ -436,6 +436,10 @@ const AppHome = () => {
   });
 
   const handleStreakIncrease = useCallback(() => {
+    // If user has never celebrated first action, don't open streak modal immediately —
+    // let triggerFirstCelebration handle it with proper delay after seal animation
+    const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated') === 'true';
+    if (!alreadyCelebrated) return;
     setShowStreakModal(true);
   }, []);
 
