@@ -3,11 +3,15 @@ import { Button } from '@/components/ui/button';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
-import { BookOpen, Wind, ListChecks, MessageCircle } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
 } from '@/components/ui/sheet';
+
+import journalImg from '@/assets/mood-card-journal.png';
+import breathingImg from '@/assets/mood-card-breathing.png';
+import planImg from '@/assets/mood-card-plan.png';
+import talkImg from '@/assets/mood-card-talk.png';
 
 interface MoodData {
   value: string;
@@ -55,8 +59,31 @@ const MOOD_CONFIG: Record<string, MoodData> = {
   },
 };
 
-// Calm Breathing exercise ID (passed as query param)
+// Calm Breathing exercise ID
 const CALM_BREATHING_ID = 'd5f63835-1fe7-4ae3-b4e2-543b64855a6b';
+
+const ACTIONS = [
+  {
+    label: 'Write in Journal',
+    image: journalImg,
+    routeKey: 'journal',
+  },
+  {
+    label: 'Calm Breathing',
+    image: breathingImg,
+    route: `/app/breathe?exercise=${CALM_BREATHING_ID}`,
+  },
+  {
+    label: 'Start My Plan',
+    image: planImg,
+    route: '/app/home',
+  },
+  {
+    label: 'Talk it Out',
+    image: talkImg,
+    route: '/app/channels',
+  },
+];
 
 interface MoodCelebrationSheetProps {
   open: boolean;
@@ -74,10 +101,14 @@ export function MoodCelebrationSheet({
   const navigate = useNavigate();
   const moodData = mood ? MOOD_CONFIG[mood] : null;
 
-  const handleAction = (route: string) => {
+  const handleAction = (action: typeof ACTIONS[number]) => {
     haptic.medium();
     onOpenChange(false);
-    navigate(route);
+    if (action.routeKey === 'journal') {
+      navigate(`/app/journal/new?mood=${mood}`);
+    } else if (action.route) {
+      navigate(action.route);
+    }
   };
 
   const handleDone = () => {
@@ -87,41 +118,6 @@ export function MoodCelebrationSheet({
   };
 
   if (!moodData) return null;
-
-  const actions = [
-    {
-      icon: BookOpen,
-      label: 'Write in Journal',
-      description: 'Express your thoughts',
-      route: `/app/journal/new?mood=${mood}`,
-      iconBg: 'bg-orange-100',
-      iconColor: 'text-orange-600',
-    },
-    {
-      icon: Wind,
-      label: 'Calm Breathing',
-      description: 'Take a moment to breathe',
-      route: `/app/breathe?exercise=${CALM_BREATHING_ID}`,
-      iconBg: 'bg-teal-100',
-      iconColor: 'text-teal-600',
-    },
-    {
-      icon: ListChecks,
-      label: 'Start My Plan',
-      description: 'Check off your rituals',
-      route: '/app/home',
-      iconBg: 'bg-blue-100',
-      iconColor: 'text-blue-600',
-    },
-    {
-      icon: MessageCircle,
-      label: 'Talk it Out',
-      description: 'Connect with community',
-      route: '/app/channels',
-      iconBg: 'bg-violet-100',
-      iconColor: 'text-violet-600',
-    },
-  ];
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -133,51 +129,44 @@ export function MoodCelebrationSheet({
         )}
         style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}
       >
-        {/* Emoji + Celebration Text */}
-        <div className="flex items-center gap-4 mb-5">
+        {/* Header: Emoji + Text */}
+        <div className="flex items-center gap-3 mb-5">
           <div className={cn(
-            "w-16 h-16 rounded-full flex items-center justify-center shrink-0",
+            "w-14 h-14 rounded-full flex items-center justify-center shrink-0",
             moodData.bgColor.replace('100', '200')
           )}>
-            <FluentEmoji emoji={moodData.emoji} size={40} />
+            <FluentEmoji emoji={moodData.emoji} size={36} />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-foreground leading-tight">
+            <h2 className="text-lg font-bold text-foreground leading-tight">
               {moodData.celebrationText}
             </h2>
-            <p className="text-sm text-foreground/60 mt-0.5">
+            <p className="text-sm text-foreground/50 mt-0.5">
               What would you like to do next?
             </p>
           </div>
         </div>
 
-        {/* 4 Action Cards - 2x2 Grid */}
+        {/* 2×2 Cards with illustrations */}
         <div className="grid grid-cols-2 gap-3 mb-4">
-          {actions.map((action) => (
+          {ACTIONS.map((action) => (
             <button
               key={action.label}
-              onClick={() => handleAction(action.route)}
+              onClick={() => handleAction(action)}
               className={cn(
-                "flex flex-col items-start gap-2 p-4 rounded-2xl",
-                "bg-background/80 backdrop-blur-sm",
-                "active:scale-[0.97] transition-all",
-                "text-left"
+                "flex flex-col items-center rounded-2xl p-3 pt-4",
+                "bg-background/90 backdrop-blur-sm",
+                "active:scale-[0.96] transition-all",
               )}
             >
-              <div className={cn(
-                "w-10 h-10 rounded-xl flex items-center justify-center",
-                action.iconBg
-              )}>
-                <action.icon className={cn("h-5 w-5", action.iconColor)} />
-              </div>
-              <div>
-                <span className="text-sm font-semibold text-foreground block leading-tight">
-                  {action.label}
-                </span>
-                <span className="text-xs text-foreground/50 leading-tight">
-                  {action.description}
-                </span>
-              </div>
+              <img 
+                src={action.image} 
+                alt={action.label}
+                className="w-20 h-20 object-contain mb-2"
+              />
+              <span className="text-sm font-semibold text-foreground text-center leading-tight">
+                {action.label}
+              </span>
             </button>
           ))}
         </div>
@@ -186,7 +175,7 @@ export function MoodCelebrationSheet({
         <Button
           variant="ghost"
           onClick={handleDone}
-          className="w-full h-11 rounded-full text-foreground/50 hover:bg-foreground/5 text-sm"
+          className="w-full h-10 rounded-full text-foreground/40 hover:bg-foreground/5 text-sm"
         >
           Maybe later
         </Button>
