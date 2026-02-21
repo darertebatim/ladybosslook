@@ -100,6 +100,9 @@ const AppHome = () => {
   // First action celebration - tracks if this is user's first ever completion (uses unified StreakCelebration)
   const [isFirstActionCelebration, setIsFirstActionCelebration] = useState(false);
   
+  // Second coach mark: "Tap to manage" - shown after first-action celebration closes
+  const [showTapCoachMark, setShowTapCoachMark] = useState(false);
+  
   // Streak goal selection state
   const [showGoalSelection, setShowGoalSelection] = useState(false);
   const [isStreakUpgrade, setIsStreakUpgrade] = useState(false);
@@ -842,6 +845,18 @@ const AppHome = () => {
                           </p>
                         </div>
                       </>
+                    ) : showTapCoachMark ? (
+                      <>
+                        {/* Dark overlay for "tap to manage" coach mark */}
+                        <div className="fixed inset-0 bg-black/60 z-[100] animate-fade-in" onClick={() => setShowTapCoachMark(false)} />
+                        
+                        <div className="relative z-[101]">
+                          <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                          <p className="text-center text-sm text-white/90 mt-5 mb-2 animate-fade-in font-medium">
+                            Tap on an action to edit, skip, or delete it 👆
+                          </p>
+                        </div>
+                      </>
                     ) : (
                       <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                     );
@@ -939,6 +954,11 @@ const AppHome = () => {
           open={showStreakModal} 
           onClose={() => {
             setShowStreakModal(false);
+            // After first-action celebration closes, show "tap to manage" coach mark
+            if (isFirstActionCelebration && localStorage.getItem('simora_tap_coach_shown') !== 'true') {
+              setTimeout(() => setShowTapCoachMark(true), 600);
+              localStorage.setItem('simora_tap_coach_shown', 'true');
+            }
             setIsFirstActionCelebration(false);
           }}
           isFirstAction={isFirstActionCelebration}
