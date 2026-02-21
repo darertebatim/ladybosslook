@@ -128,6 +128,10 @@ export function useBadgeCelebration({
     }
 
     // Priority 4: Action celebration - delay to let seal-check animation play first
+    // But skip if user hasn't had their first-action celebration yet (that takes priority)
+    const firstActionCelebrated = localStorage.getItem('simora_first_action_celebrated') === 'true';
+    if (!firstActionCelebrated) return;
+    
     const timer = setTimeout(() => {
       setCelebrationType('action');
     }, 1800);
