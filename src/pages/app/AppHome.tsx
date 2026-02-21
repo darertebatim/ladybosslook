@@ -825,14 +825,27 @@ const AppHome = () => {
                     </h2>
                     <span className="text-xs text-foreground/40 ml-auto">Hold to reorder</span>
                   </div>
-                  <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                   
-                  {/* First-action hint - show when user hasn't completed any task yet */}
-                  {localStorage.getItem('simora_first_action_celebrated') !== 'true' && completedTaskIds.size === 0 && (
-                    <p className="text-center text-sm text-muted-foreground mt-6 mb-2 animate-fade-in">
-                      Mark off your first action to start your journey! 💪
-                    </p>
-                  )}
+                  {/* Coach mark spotlight for first-ever action */}
+                  {(() => {
+                    const isFirstActionPending = localStorage.getItem('simora_first_action_celebrated') !== 'true' && completedTaskIds.size === 0;
+                    return isFirstActionPending ? (
+                      <>
+                        {/* Dark overlay behind everything */}
+                        <div className="fixed inset-0 bg-black/60 z-[100] pointer-events-none animate-fade-in" />
+                        
+                        {/* Spotlighted task card + hint */}
+                        <div className="relative z-[101]">
+                          <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                          <p className="text-center text-sm text-white/90 mt-5 mb-2 animate-fade-in font-medium">
+                            Mark off your first action to start your journey! 💪
+                          </p>
+                        </div>
+                      </>
+                    ) : (
+                      <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                    );
+                  })()}
                 </div>
               ) : null}
 
