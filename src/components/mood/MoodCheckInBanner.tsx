@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { useTodayMood } from '@/hooks/useMoodLogs';
 import { cn } from '@/lib/utils';
+import { getLocalDateStr } from '@/lib/localDate';
 import moodBannerImg from '@/assets/mood-banner.png';
 
 const DISMISS_KEY = 'mood-banner-dismissed';
@@ -11,13 +12,11 @@ const DISMISS_KEY = 'mood-banner-dismissed';
 function isDismissedToday(): boolean {
   const dismissed = localStorage.getItem(DISMISS_KEY);
   if (!dismissed) return false;
-  const today = new Date().toISOString().split('T')[0];
-  return dismissed === today;
+  return dismissed === getLocalDateStr();
 }
 
 function dismissToday() {
-  const today = new Date().toISOString().split('T')[0];
-  localStorage.setItem(DISMISS_KEY, today);
+  localStorage.setItem(DISMISS_KEY, getLocalDateStr());
 }
 
 export function MoodCheckInBanner() {
