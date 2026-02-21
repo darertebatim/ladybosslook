@@ -56,6 +56,7 @@ import { MoodCheckInBanner } from '@/components/mood/MoodCheckInBanner';
 import coinBronze from '@/assets/coin-bronze.png';
 import coinSilver from '@/assets/coin-silver.png';
 import coinGold from '@/assets/coin-gold.png';
+import emptyPlannerImg from '@/assets/empty-planner.png';
 
 const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
   bronze: coinBronze,
@@ -887,7 +888,21 @@ const AppHome = () => {
                     );
                   })()}
                 </div>
-              ) : null}
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 px-6 animate-fade-in">
+                  <img 
+                    src={emptyPlannerImg} 
+                    alt="Peaceful day" 
+                    className="w-32 h-32 mb-5 opacity-90"
+                  />
+                  <p className="text-lg font-semibold text-foreground mb-1">
+                    Your day is clear ✨
+                  </p>
+                  <p className="text-sm text-muted-foreground text-center max-w-[240px]">
+                    One small action is enough. Tap + to add something meaningful.
+                  </p>
+                </div>
+              )}
 
               {/* Popular Rituals Suggestions - only show rituals user hasn't added */}
               {suggestedRoutines.length > 0 && selectedTag === null && !showWelcomeCard && <div className="tour-suggested-ritual mt-6">
