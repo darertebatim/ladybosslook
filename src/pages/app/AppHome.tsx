@@ -826,6 +826,13 @@ const AppHome = () => {
                     <span className="text-xs text-foreground/40 ml-auto">Hold to reorder</span>
                   </div>
                   <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                  
+                  {/* First-action hint - show when user hasn't completed any task yet */}
+                  {localStorage.getItem('simora_first_action_celebrated') !== 'true' && completedTaskIds.size === 0 && (
+                    <p className="text-center text-sm text-muted-foreground mt-6 mb-2 animate-fade-in">
+                      Mark off your first action to start your journey! 💪
+                    </p>
+                  )}
                 </div>
               ) : null}
 
