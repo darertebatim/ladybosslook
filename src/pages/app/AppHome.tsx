@@ -261,25 +261,38 @@ const AppHome = () => {
     localStorage.setItem('simora_first_action_celebrated', 'true');
   }, []);
 
-  // Fast path: show immediately after the first completion is recorded (before home stats refetch)
+  // Track whether completions changed during this session (not on initial load)
   const prevTotalCompletions = useRef(totalCompletions);
+  const prevHasCompletionToday = useRef(hasAnyCompletionToday);
+  const initialLoadDone = useRef(false);
 
   useEffect(() => {
-    if (!homeDataLoading && totalCompletions === 0 && hasAnyCompletionToday) {
-      // Delay to let seal-check mark animation play first
+    if (homeDataLoading) return;
+    
+    // Skip the very first data load — only react to changes after mount
+    if (!initialLoadDone.current) {
+      initialLoadDone.current = true;
+      prevTotalCompletions.current = totalCompletions;
+      prevHasCompletionToday.current = hasAnyCompletionToday;
+      return;
+    }
+
+    // Fast path: hasAnyCompletionToday flipped from false → true
+    if (!prevHasCompletionToday.current && hasAnyCompletionToday && totalCompletions === 0) {
       const timer = setTimeout(() => triggerFirstCelebration(), 1800);
+      prevHasCompletionToday.current = hasAnyCompletionToday;
       return () => clearTimeout(timer);
     }
-  }, [homeDataLoading, totalCompletions, hasAnyCompletionToday, triggerFirstCelebration]);
+    prevHasCompletionToday.current = hasAnyCompletionToday;
 
-  // Fallback: when total completions count updates from 0 → 1
-  useEffect(() => {
+    // Fallback: when total completions count updates from 0 → 1
     if (prevTotalCompletions.current === 0 && totalCompletions === 1) {
       const timer = setTimeout(() => triggerFirstCelebration(), 1800);
+      prevTotalCompletions.current = totalCompletions;
       return () => clearTimeout(timer);
     }
     prevTotalCompletions.current = totalCompletions;
-  }, [totalCompletions, triggerFirstCelebration]);
+  }, [homeDataLoading, totalCompletions, hasAnyCompletionToday, triggerFirstCelebration]);
 
   // Detect streak goal completion — show celebration once
   useEffect(() => {
