@@ -812,8 +812,8 @@ const AppHome = () => {
                 </div>
               ) : filteredTasks.length > 0 ? (
                 <div>
-                  {/* Mood Check-in Banner */}
-                  <MoodCheckInBanner />
+                  {/* Mood Check-in Banner - hidden while welcome card is active */}
+                  {!showWelcomeCard && <MoodCheckInBanner />}
                   {/* My Actions header - always show */}
                   <div className="flex items-center gap-2 mb-3">
                     <h2 className="text-sm font-semibold text-foreground tracking-wide">
