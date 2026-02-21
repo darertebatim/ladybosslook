@@ -203,14 +203,23 @@ export async function scheduleHybridNotifications(
 export async function cancelAllHybridNotifications(): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
 
-  // Cancel a range of IDs that could be used
-  const idsToCancel = Array.from({ length: 100 }, (_, i) => DAILY_PN_BASE_ID + i);
+  // Cancel the full range of IDs that getNotificationId could produce (hash % 10000)
+  // We cancel in batches to avoid overwhelming the native bridge
+  const idsToCancel: { id: number }[] = [];
+  
+  // Cancel known managed IDs from current configs + a broad sweep of the hash range
+  // The hash produces IDs in 200000-209999, so we cancel all of them
+  for (let i = 0; i < 10000; i++) {
+    idsToCancel.push({ id: DAILY_PN_BASE_ID + i });
+  }
   
   try {
-    await LocalNotifications.cancel({
-      notifications: idsToCancel.map(id => ({ id })),
-    });
-    console.log('[HybridPN] Cancelled all hybrid notifications');
+    // Cancel in chunks of 500 to avoid native bridge limits
+    for (let i = 0; i < idsToCancel.length; i += 500) {
+      const chunk = idsToCancel.slice(i, i + 500);
+      await LocalNotifications.cancel({ notifications: chunk });
+    }
+    console.log('[HybridPN] Cancelled all hybrid notifications (full range)');
   } catch (err) {
     console.error('[HybridPN] Error cancelling all notifications:', err);
   }

@@ -22,6 +22,7 @@ import { useHybridNotificationScheduler } from '@/hooks/useHybridNotificationSch
 import { useProgramEventNotificationScheduler } from '@/hooks/useProgramEventNotificationScheduler';
 import { useSmartActionNudges } from '@/hooks/useSmartActionNudges';
 import { usePeriodNotifications } from '@/hooks/usePeriodNotifications';
+import { useNotificationCleanup } from '@/hooks/useNotificationCleanup';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
@@ -56,6 +57,9 @@ const NativeAppLayout = () => {
   
   // Track app returns (every open/resume increments return count)
   useTrackAppReturn(user?.id);
+  
+  // Comprehensive cleanup of stale/legacy local notifications (runs first, before schedulers)
+  useNotificationCleanup();
   
   // Legacy cleanup of old daily local notifications
   useLocalNotificationScheduler(user?.id);
