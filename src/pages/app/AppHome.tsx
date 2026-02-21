@@ -837,9 +837,15 @@ const AppHome = () => {
                         {/* Dark overlay behind everything */}
                         <div className="fixed inset-0 bg-black/60 z-[100] pointer-events-none animate-fade-in" />
                         
-                        {/* Spotlighted task card + hint */}
+                        {/* Spotlighted task card + hint — disable body tap so only checkbox works */}
                         <div className="relative z-[101]">
-                          <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                          <SortableTaskList tasks={filteredTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                          
+                          {/* Bouncing hand hint pointing at the checkbox */}
+                          <div className="absolute top-1/2 right-6 -translate-y-1/2 pointer-events-none" style={{ marginTop: '-16px' }}>
+                            <span className="text-3xl animate-bounce inline-block" style={{ transform: 'rotate(-45deg)' }}>👆</span>
+                          </div>
+                          
                           <p className="text-center text-sm text-white/90 mt-5 mb-2 animate-fade-in font-medium">
                             Mark off your first action to start your journey! 💪
                           </p>
