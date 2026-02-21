@@ -30,6 +30,9 @@ const CLIENT_RESET_KEYS = [
   // Hand hint guidance
   'ritual_add_hint_dismissed',
   'ritual_save_hint_dismissed',
+  
+  // Coach marks
+  'simora_tap_coach_shown',
 ] as const;
 
 /**
