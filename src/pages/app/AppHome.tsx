@@ -842,9 +842,27 @@ const AppHome = () => {
                           <SortableTaskList tasks={filteredTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                           
                           {/* Bouncing hand hint pointing at the checkbox */}
-                          <div className="absolute top-1/2 right-6 -translate-y-1/2 pointer-events-none" style={{ marginTop: '-16px' }}>
-                            <span className="text-3xl animate-bounce inline-block" style={{ transform: 'rotate(-45deg)' }}>👆</span>
+                          <div
+                            className="absolute right-4 pointer-events-none"
+                            style={{
+                              top: '50%',
+                              marginTop: '-50px',
+                              filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
+                              animation: 'coachHandBounce 1.4s ease-in-out infinite',
+                              transform: 'rotate(-45deg)',
+                            }}
+                          >
+                            <FluentEmoji emoji="👇" size={64} />
                           </div>
+                          <style>{`
+                            @keyframes coachHandBounce {
+                              0%   { transform: rotate(-45deg) translateY(0px); }
+                              40%  { transform: rotate(-45deg) translateY(10px); }
+                              55%  { transform: rotate(-45deg) translateY(5px); }
+                              70%  { transform: rotate(-45deg) translateY(10px); }
+                              100% { transform: rotate(-45deg) translateY(0px); }
+                            }
+                          `}</style>
                           
                           <p className="text-center text-sm text-white/90 mt-5 mb-2 animate-fade-in font-medium">
                             Mark off your first action to start your journey! 💪
