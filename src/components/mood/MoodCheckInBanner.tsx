@@ -42,6 +42,7 @@ export function MoodCheckInBanner() {
 
   const handleTap = () => {
     haptic.medium();
+    dismissToday();
     navigate('/app/mood');
   };
 
