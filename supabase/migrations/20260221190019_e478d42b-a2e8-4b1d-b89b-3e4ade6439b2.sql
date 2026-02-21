@@ -1,0 +1,1 @@
+UPDATE pn_config SET is_enabled = false;
