@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { getLocalDateStr } from '@/lib/localDate';
 
 // Types for Routines Bank
 export interface RoutineBankItem {
@@ -470,7 +471,7 @@ export function useAddRoutineFromBank() {
       } else if (endMode === 'after_days' && (routine as any).end_after_days) {
         const endDate = new Date(effectiveStartDate);
         endDate.setDate(endDate.getDate() + (routine as any).end_after_days);
-        repeatEndDate = endDate.toISOString().split('T')[0];
+        repeatEndDate = getLocalDateStr(endDate);
       }
 
       // Create user tasks
@@ -496,13 +497,13 @@ export function useAddRoutineFromBank() {
               repeatPattern = 'weekly';
               repeatDays = taskScheduleDays;
               // Set scheduled_date to the effective start date so tasks don't appear before it
-              scheduledDate = effectiveStartDate.toISOString().split('T')[0];
+              scheduledDate = getLocalDateStr(effectiveStartDate);
             } else if (dripDay) {
               // Sequential drip challenge
               repeatPattern = 'none';
               const taskDate = new Date(effectiveStartDate);
               taskDate.setDate(taskDate.getDate() + (dripDay - 1));
-              scheduledDate = taskDate.toISOString().split('T')[0];
+              scheduledDate = getLocalDateStr(taskDate);
             } else {
               repeatPattern = 'none';
             }
@@ -514,7 +515,7 @@ export function useAddRoutineFromBank() {
             if (isOnce) {
               // One-time task: no repeating
               repeatPattern = 'none';
-              scheduledDate = effectiveStartDate.toISOString().split('T')[0];
+              scheduledDate = getLocalDateStr(effectiveStartDate);
             } else if (monthlyDay != null) {
               // Monthly task: repeat on specific day of month
               repeatPattern = 'monthly';
@@ -525,15 +526,15 @@ export function useAddRoutineFromBank() {
               if (targetDate < now) {
                 targetDate.setMonth(targetDate.getMonth() + 1);
               }
-              scheduledDate = targetDate.toISOString().split('T')[0];
+              scheduledDate = getLocalDateStr(targetDate);
             } else {
               repeatPattern = edited?.repeatPattern || bankTask?.repeat_pattern || 'daily';
               repeatDays = bankTask?.repeat_days || null;
               if (startDayOfWeek != null || (routine as any).challenge_start_date) {
-                scheduledDate = effectiveStartDate.toISOString().split('T')[0];
+                scheduledDate = getLocalDateStr(effectiveStartDate);
               }
               if (repeatPattern === 'none' && !scheduledDate) {
-                scheduledDate = new Date().toISOString().split('T')[0];
+                scheduledDate = getLocalDateStr(new Date());
               }
             }
           }
