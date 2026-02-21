@@ -124,31 +124,29 @@ export function MoodCelebrationSheet({
       <SheetContent 
         side="bottom" 
         className={cn(
-          "rounded-t-3xl border-0 px-5 pt-6 pb-6",
+          "rounded-t-3xl border-0 px-5 pt-8 pb-6",
           moodData.bgColor
         )}
         style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}
       >
         {/* Header: Emoji + Text */}
-        <div className="flex items-center gap-3 mb-5">
+        <div className="flex flex-col items-center text-center mb-6">
           <div className={cn(
-            "w-14 h-14 rounded-full flex items-center justify-center shrink-0",
+            "w-16 h-16 rounded-full flex items-center justify-center mb-3",
             moodData.bgColor.replace('100', '200')
           )}>
-            <FluentEmoji emoji={moodData.emoji} size={36} />
+            <FluentEmoji emoji={moodData.emoji} size={40} />
           </div>
-          <div>
-            <h2 className="text-lg font-bold text-foreground leading-tight">
-              {moodData.celebrationText}
-            </h2>
-            <p className="text-sm text-foreground/50 mt-0.5">
-              What would you like to do next?
-            </p>
-          </div>
+          <p className="text-sm font-medium text-foreground/50 mb-1">
+            {moodData.celebrationText}
+          </p>
+          <h2 className="text-xl font-bold text-foreground leading-snug">
+            Something may Help you<br />feel Stronger
+          </h2>
         </div>
 
         {/* 2×2 Cards with illustrations */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="grid grid-cols-2 gap-3 mb-5">
           {ACTIONS.map((action) => (
             <button
               key={action.label}
@@ -162,7 +160,7 @@ export function MoodCelebrationSheet({
               <img 
                 src={action.image} 
                 alt={action.label}
-                className="w-20 h-20 object-contain mb-2"
+                className="w-24 h-24 object-contain mb-2"
               />
               <span className="text-sm font-semibold text-foreground text-center leading-tight">
                 {action.label}
