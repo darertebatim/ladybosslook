@@ -55,7 +55,7 @@ const MOOD_CONFIG: Record<string, MoodData> = {
   },
 };
 
-// Calm Breathing exercise ID
+// Calm Breathing exercise ID (passed as query param)
 const CALM_BREATHING_ID = 'd5f63835-1fe7-4ae3-b4e2-543b64855a6b';
 
 interface MoodCelebrationSheetProps {
@@ -101,7 +101,7 @@ export function MoodCelebrationSheet({
       icon: Wind,
       label: 'Calm Breathing',
       description: 'Take a moment to breathe',
-      route: `/app/breathe/${CALM_BREATHING_ID}`,
+      route: `/app/breathe?exercise=${CALM_BREATHING_ID}`,
       iconBg: 'bg-teal-100',
       iconColor: 'text-teal-600',
     },
