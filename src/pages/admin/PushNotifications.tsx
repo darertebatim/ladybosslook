@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getLocalDateStr } from '@/lib/localDate';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -512,8 +513,8 @@ function FullLogsTab() {
 
   // Summary stats
   const todayLogs = logs?.filter(l => {
-    const logDate = new Date(l.created_at).toISOString().split('T')[0];
-    return logDate === new Date().toISOString().split('T')[0];
+    const logDate = format(new Date(l.created_at), 'yyyy-MM-dd');
+    return logDate === getLocalDateStr();
   }) || [];
   
   const totalSentToday = todayLogs.reduce((sum, l) => sum + (l.sent_count || 0), 0);

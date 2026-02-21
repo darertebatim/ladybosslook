@@ -3,6 +3,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
 import { logLocalNotificationEvent } from '@/lib/localNotificationLogger';
+import { getLocalDateStr } from '@/lib/localDate';
 
 /**
  * Smart Action Nudges - Local Notification Scheduler
@@ -94,7 +95,7 @@ export function useSmartActionNudges(userId: string | undefined) {
       await LocalNotifications.cancel({ notifications: allIds });
 
       // Fetch user's active tasks AND today's completions in parallel
-      const todayStr = new Date().toISOString().split('T')[0];
+      const todayStr = getLocalDateStr();
       const [{ data: tasks }, { data: completions }] = await Promise.all([
         supabase
           .from('user_tasks')

@@ -1,3 +1,5 @@
+import { getLocalDateStr } from '@/lib/localDate';
+
 /**
  * Central utility for clearing all client-side localStorage flags.
  * Use this for "ultimate reset" to ensure new feature flags don't need manual updates.
@@ -79,7 +81,7 @@ export function fullClientReset(): void {
   localStorage.removeItem('simora_tour_prompt_dismissed_at');
   
   // Clear badge celebration keys for today
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateStr();
   localStorage.removeItem(`simora_celebrated_${today}`);
   
   // Set flags to force tour banner/popup to show immediately
