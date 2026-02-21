@@ -843,10 +843,11 @@ const AppHome = () => {
                           
                           {/* Bouncing hand hint pointing at the checkbox */}
                           <div
-                            className="absolute right-4 pointer-events-none"
+                            className="absolute pointer-events-none"
                             style={{
                               top: '50%',
-                              marginTop: '-50px',
+                              right: '52px',
+                              marginTop: '-80px',
                               filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
                               animation: 'coachHandBounce 1.4s ease-in-out infinite',
                               transform: 'rotate(-45deg)',
