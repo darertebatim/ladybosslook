@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
+import { useTodayMood } from '@/hooks/useMoodLogs';
+import { cn } from '@/lib/utils';
 import moodBannerImg from '@/assets/mood-banner.png';
 
 const DISMISS_KEY = 'mood-banner-dismissed';
@@ -20,15 +22,22 @@ function dismissToday() {
 
 export function MoodCheckInBanner() {
   const navigate = useNavigate();
+  const { data: todayMood } = useTodayMood();
   const [visible, setVisible] = useState(() => !isDismissedToday());
+  const [fading, setFading] = useState(false);
 
-  if (!visible) return null;
+  if (!visible || todayMood) return null;
+
+  const fadeOut = (cb: () => void) => {
+    setFading(true);
+    setTimeout(cb, 300);
+  };
 
   const handleDismiss = (e: React.MouseEvent) => {
     e.stopPropagation();
     haptic.light();
     dismissToday();
-    setVisible(false);
+    fadeOut(() => setVisible(false));
   };
 
   const handleTap = () => {
@@ -39,7 +48,10 @@ export function MoodCheckInBanner() {
   return (
     <button
       onClick={handleTap}
-      className="relative w-full rounded-2xl overflow-hidden active:scale-[0.98] transition-transform mb-4"
+      className={cn(
+        "relative w-full rounded-2xl overflow-hidden active:scale-[0.98] transition-all mb-4",
+        fading ? "animate-fade-out opacity-0" : "animate-fade-in"
+      )}
     >
       <img
         src={moodBannerImg}
