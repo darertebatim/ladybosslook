@@ -807,18 +807,24 @@ function PersonalSummaryScreen({ step, onNext, answers }: Props) {
         })}
       </div>
 
-      {/* Bottom stats */}
-      <div className="flex items-start justify-center gap-4 mb-5 px-2">
-        <div className="flex flex-col items-center text-center w-20">
-          <span className="text-lg">🏅</span>
-          <p className="text-[10px] text-gray-500 mt-1 leading-tight">{step.description}</p>
-        </div>
-        {step.statBadges?.map((b, i) => (
-          <div key={i} className="flex flex-col items-center text-center w-24">
-            <p className="text-xl font-extrabold text-[#1a1f3d]">{b.value}</p>
-            <p className="text-[10px] text-gray-500 leading-tight">{b.label}</p>
+      {/* Trust banner */}
+      <div className="bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 rounded-2xl p-4 mb-5 mx-1">
+        <div className="flex items-center justify-around">
+          <div className="flex flex-col items-center text-center">
+            <p className="text-2xl font-black text-[#1a1f3d]">30M+</p>
+            <p className="text-[10px] text-gray-500 leading-tight mt-0.5">Already<br/>organized</p>
           </div>
-        ))}
+          <div className="w-px h-10 bg-gray-200" />
+          <div className="flex flex-col items-center text-center">
+            <p className="text-2xl font-black text-[#1a1f3d]">94%</p>
+            <p className="text-[10px] text-gray-500 leading-tight mt-0.5">Meet their<br/>better self</p>
+          </div>
+          <div className="w-px h-10 bg-gray-200" />
+          <div className="flex flex-col items-center text-center">
+            <span className="text-xl">⭐</span>
+            <p className="text-[10px] text-gray-500 leading-tight mt-0.5">4.9 rated<br/>on App Store</p>
+          </div>
+        </div>
       </div>
 
       <div className="mt-auto">
