@@ -14,6 +14,7 @@ import meplusImg28 from '@/assets/onboarding/meplus-28.png';
 import meplusImg29 from '@/assets/onboarding/meplus-29.png';
 import meplusImg16 from '@/assets/onboarding/meplus-img-16.png';
 import meplusImg35Bg from '@/assets/onboarding/meplus-35-mascot-bg.png';
+import meplusImg32Paywall from '@/assets/onboarding/meplus-32-beforeafter.png';
 
 export const mePlusFlow: OnboardingFlow = {
   id: 'me-plus-v1',
@@ -399,14 +400,14 @@ export const mePlusFlow: OnboardingFlow = {
       type: 'paywall',
       title: 'Make your life organized and meet your best self',
       subtitle: 'No Payment Now!',
+      image: meplusImg32Paywall,
       pricingTiers: [
         { label: '1 month', perWeek: '$12.99/mo.', total: '$12.99/mo' },
         { label: '12 months', perWeek: '$4.99/mo.', total: '$59.99/yr', badge: '7-Day Free Trial' },
         { label: '3 months', perWeek: '$9.99/mo.', total: '$29.99/3mo', badge: 'Popular' },
       ],
       buttonLabel: 'Continue',
-      description: 'After your 7-day free trial, your Apple ID payment method will be automatically charged $59.99 for a year.',
-      illustrationLabel: 'Before/after woman illustration',
+      description: 'After your 7-day free trial, your Apple ID payment method will be automatically charged $59.99 for a year. Cancel the subscription at least 24 hours before the current subscription period.',
     },
 
     // ─── PDF2 Page 13: Dark Paywall (50% OFF) ────────────
