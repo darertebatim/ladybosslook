@@ -966,64 +966,47 @@ function PaywallScreen({ step, onNext }: Props) {
   const [selectedTier, setSelectedTier] = useState(
     step.pricingTiers?.findIndex(t => t.badge?.includes('Trial') || t.badge?.includes('Free')) ?? 1
   );
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const slides = step.images || (step.image ? [step.image] : []);
-
-  // Auto-swipe carousel
-  useEffect(() => {
-    if (slides.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentSlide(prev => (prev + 1) % slides.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [slides.length]);
 
   return (
     <ScreenWrapper>
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center justify-between mb-3">
         <button onClick={onNext} className="text-gray-400 text-lg active:opacity-60">✕</button>
         <button className="text-sm font-medium text-indigo-500 active:opacity-60">Restore</button>
       </div>
-      <h1 className="text-[20px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight">{step.title}</h1>
+      <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight">{step.title}</h1>
 
-      {/* Auto-swiping image carousel */}
-      {slides.length > 0 && (
-        <div className="relative mb-2 overflow-hidden -mx-5" style={{ maxHeight: 220 }}>
-          <div
-            className="flex transition-transform duration-700 ease-in-out"
-            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-          >
-            {slides.map((src, i) => (
-              <img key={i} src={src} alt="" className="w-full shrink-0 object-contain" style={{ maxHeight: 220 }} />
-            ))}
-          </div>
+      {/* Before/After image */}
+      {step.image && (
+        <div className="flex items-center justify-center mb-5">
+          <img src={step.image} alt="" className="w-full max-w-[300px] rounded-2xl object-contain" />
         </div>
       )}
 
       {/* Pricing tiers - centered 2-card layout */}
-      <div className="flex justify-center gap-2 mb-3">
+      <div className="flex justify-center gap-3 mb-4">
         {step.pricingTiers?.map((tier, i) => {
           const isSelected = i === selectedTier;
           return (
             <button
               key={i}
               onClick={() => setSelectedTier(i)}
-              className={`relative rounded-xl border-2 pt-4 pb-2 px-3 text-center transition-all active:scale-[0.97] w-[130px] ${
+              className={`relative rounded-2xl border-2 pt-5 pb-3 px-4 text-center transition-all active:scale-[0.97] w-[140px] ${
                 isSelected ? 'border-indigo-500 bg-indigo-50/60' : 'border-gray-200 bg-white'
               }`}
             >
               {tier.badge && (
-                <span className={`absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap text-[8px] font-bold px-2 py-0.5 rounded-full ${
+                <span className={`absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-bold px-2 py-0.5 rounded-full ${
                   tier.badge.includes('Trial') || tier.badge.includes('Free') ? 'bg-indigo-500 text-white' : 'bg-purple-200 text-purple-700'
                 }`}>{tier.badge}</span>
               )}
-              <p className="text-sm font-extrabold text-[#1a1f3d] leading-tight">{tier.label}</p>
-              <p className={`text-[10px] text-gray-400 mt-0.5 ${tier.perWeek?.includes('/mo.') && tier.label.startsWith('1') ? 'line-through' : ''}`}>{tier.perWeek}</p>
+              <p className="text-base font-extrabold text-[#1a1f3d] leading-tight">{tier.label.split(' ')[0]}</p>
+              <p className="text-[11px] text-[#1a1f3d] font-medium">{tier.label.split(' ').slice(1).join(' ')}</p>
+              <p className={`text-[11px] text-gray-400 mt-1 ${tier.perWeek?.includes('/mo.') && tier.label.startsWith('1') ? 'line-through' : ''}`}>{tier.perWeek}</p>
               {tier.discount && (
-                <span className="inline-block mt-0.5 text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-red-500 text-white">{tier.discount}</span>
+                <span className="inline-block mt-1 text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-500 text-white">{tier.discount}</span>
               )}
-              <div className="border-t border-gray-200 mt-1.5 pt-1.5">
-                <p className={`text-[11px] font-bold ${isSelected ? 'text-[#1a1f3d]' : 'text-gray-500'}`}>{tier.total}</p>
+              <div className="border-t border-gray-200 mt-2 pt-2">
+                <p className={`text-xs font-bold ${isSelected ? 'text-[#1a1f3d]' : 'text-gray-500'}`}>{tier.total}</p>
               </div>
             </button>
           );
@@ -1047,11 +1030,9 @@ function PaywallScreen({ step, onNext }: Props) {
           <span className="text-lg">→</span>
         </button>
       </div>
-      <div className="flex items-center justify-center gap-4 mt-3 text-[10px] text-gray-400">
-        <a href="/sms-terms" className="underline">Terms of Use</a>
-        <span>·</span>
-        <a href="/privacy" className="underline">Privacy Policy</a>
-      </div>
+      {step.description && (
+        <p className="text-[9px] text-gray-400 text-center mt-3 leading-snug">{step.description}</p>
+      )}
     </ScreenWrapper>
   );
 }

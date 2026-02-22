@@ -64,7 +64,6 @@ export interface OnboardingStep {
   statHighlight?: string;
   illustrationLabel?: string;
   image?: string;
-  images?: string[];
   testimonials?: TestimonialCard[];
   pricingTiers?: PricingTier[];
   beforeItems?: string[];
