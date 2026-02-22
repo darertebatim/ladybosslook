@@ -1,4 +1,5 @@
 import { OnboardingFlow } from '@/types/onboarding';
+import meplusWelcomeMascot from '@/assets/onboarding/meplus-welcome-mascot.png';
 import meplusImg9 from '@/assets/onboarding/meplus-9-brain.png';
 import meplusImg11 from '@/assets/onboarding/meplus-11-beforeafter.png';
 import meplusImg23 from '@/assets/onboarding/meplus-23-benefits.png';
@@ -25,14 +26,13 @@ export const mePlusFlow: OnboardingFlow = {
       type: 'welcome',
       title: 'Welcome to Me+!',
       subtitle: 'Every day, a gentle step towards my better self',
-      statHighlight: '4.9',
+      image: meplusWelcomeMascot,
       statBadges: [
-        { label: 'High-Rated App 2024', value: '⭐' },
+        { label: 'High-Rated App 2024', value: '4.9' },
         { label: "Users' choice", value: '31 Million' },
         { label: 'Incredible iPhone App by Apple 2023', value: '🍎' },
       ],
       buttonLabel: 'Continue',
-      illustrationLabel: 'Awards & laurel wreaths on yellow background',
     },
 
     // ─── PDF1 Page 2: Organized Life ──────────────────────

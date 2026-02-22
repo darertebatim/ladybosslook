@@ -130,22 +130,41 @@ function ScreenWrapper({ children, bg = 'bg-white' }: { children: React.ReactNod
 
 function WelcomeScreen({ step, onNext }: Props) {
   return (
-    <ScreenWrapper>
-      <IllustrationPlaceholder label="App hero illustration" className="h-48 mb-6" />
-      <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-3">{step.title}</h1>
-      <div className="flex justify-center mb-3">
-        <span className="text-3xl font-black text-[#1a1f3d]">{step.statHighlight}</span>
+    <ScrollArea className="h-full bg-gradient-to-b from-amber-100 via-amber-50 to-white">
+      <div className="flex flex-col h-full min-h-[700px]">
+        {/* Mascot hero */}
+        {step.image ? (
+          <div className="flex items-center justify-center pt-12 pb-4">
+            <img src={step.image} alt="" className="w-48 h-48 object-contain" />
+          </div>
+        ) : (
+          <div className="pt-[72px] px-5">
+            <IllustrationPlaceholder label="App hero illustration" className="h-48 mb-6" />
+          </div>
+        )}
+
+        {/* Award badges */}
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 px-8">
+          {step.statBadges?.map((b, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <span className="text-2xl">🏆</span>
+              <div className="text-center">
+                <p className="text-2xl font-black text-[#1a1f3d]">{b.value}</p>
+                <p className="text-xs font-medium text-[#1a1f3d]/70">{b.label}</p>
+              </div>
+              <span className="text-2xl">🏆</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Welcome text + button */}
+        <div className="px-5 pb-6 mt-auto">
+          <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
+          <p className="text-sm text-gray-500 text-center mb-6">{step.subtitle}</p>
+          <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
+        </div>
       </div>
-      <div className="flex gap-2 justify-center mb-8">
-        {step.statBadges?.map((b, i) => (
-          <span key={i} className="px-3 py-1.5 bg-amber-50 rounded-full text-xs font-medium text-amber-700">{b.value} {b.label}</span>
-        ))}
-      </div>
-      <div className="mt-auto space-y-2">
-        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
-        <SecondaryButton>{step.secondaryButtonLabel}</SecondaryButton>
-      </div>
-    </ScreenWrapper>
+    </ScrollArea>
   );
 }
 
