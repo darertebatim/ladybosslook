@@ -878,12 +878,21 @@ const AppHome = () => {
                         {/* Dark overlay for "tap to manage" coach mark */}
                         <div className="fixed inset-0 bg-black/60 z-[100] animate-fade-in" onClick={() => setShowTapCoachMark(false)} />
                         
-                        <div className="relative z-[101]">
-                          <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
-                          <p className="text-center text-sm text-white/90 mt-5 mb-2 animate-fade-in font-medium">
-                            Tap on an action to edit, skip, or delete it 👆
-                          </p>
-                        </div>
+                        {/* Only spotlight the FIRST action */}
+                        {filteredTasks.length > 0 && (
+                          <div className="relative z-[101]">
+                            <SortableTaskList tasks={[filteredTasks[0]]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                            <p className="text-center text-sm text-white/90 mt-5 mb-2 animate-fade-in font-medium">
+                              Tap on an action to edit, skip, or delete it 👆
+                            </p>
+                          </div>
+                        )}
+                        {/* Remaining tasks behind the overlay */}
+                        {filteredTasks.length > 1 && (
+                          <div className="relative z-[1]">
+                            <SortableTaskList tasks={filteredTasks.slice(1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                          </div>
+                        )}
                       </>
                     ) : (
                       <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
