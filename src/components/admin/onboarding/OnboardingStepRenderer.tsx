@@ -972,7 +972,7 @@ function PaywallImageCarousel({ images }: { images: string[] }) {
     return () => clearInterval(timer);
   }, [images.length]);
   return (
-    <div className="relative flex items-center justify-center mb-5 h-[200px] overflow-hidden">
+    <div className="relative flex items-center justify-center mb-5 overflow-hidden" style={{ aspectRatio: '1/1' }}>
       {images.map((src, i) => (
         <img
           key={i}
