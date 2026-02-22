@@ -1,20 +1,43 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { OnboardingFlow, OnboardingAnswers } from '@/types/onboarding';
 import { OnboardingStepRenderer } from './OnboardingStepRenderer';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { toast } from 'sonner';
+// Extra images used by renderer but not in step data
+import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
+import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
+import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
+import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
 
 interface Props {
   flow: OnboardingFlow;
   onClose: () => void;
 }
 
+function preloadImages(srcs: string[]) {
+  srcs.forEach(src => {
+    if (src) {
+      const img = new Image();
+      img.src = src;
+    }
+  });
+}
+
 export function OnboardingPreview({ flow, onClose }: Props) {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
   const step = flow.steps[currentStep];
+
+  // Preload ALL images on mount so every page is instant
+  useEffect(() => {
+    const stepImages = flow.steps
+      .map(s => s.image)
+      .filter(Boolean) as string[];
+    const extraImages = [meplusMascotBg, meplusPaywall2, meplusPaywall3, meplusCommunityFooter];
+    preloadImages([...stepImages, ...extraImages]);
+  }, [flow]);
 
   const handleAnswer = useCallback((stepId: string, answer: string | string[]) => {
     setAnswers(prev => ({ ...prev, [stepId]: answer }));
