@@ -421,19 +421,27 @@ function InfoStatScreen({ step, onNext }: Props) {
 }
 
 function MotivationalScreen({ step, onNext }: Props) {
+  // Extract leading stat (e.g. "92%") from description if present
+  const descMatch = step.description?.match(/^(\d+%)\s*(.*)/s);
+  
   return (
-    <ScreenWrapper bg="bg-[#fdf8f4]">
+    <ScreenWrapper>
+      <h1 className="text-xl font-bold text-[#1a1f3d] mb-4 leading-tight whitespace-pre-line">{step.title}</h1>
       {step.image ? (
-        <div className="flex items-center justify-center mb-6">
-          <img src={step.image} alt="" className="w-full max-w-[280px] object-contain" />
+        <div className="flex items-center justify-center mb-5">
+          <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
         </div>
       ) : step.illustrationLabel ? (
-        <IllustrationPlaceholder label={step.illustrationLabel} className="h-44 mb-6" />
+        <IllustrationPlaceholder label={step.illustrationLabel} className="h-44 mb-5" />
       ) : null}
-      <div className="flex-1 flex flex-col justify-center">
-        <h1 className="text-xl font-bold text-[#1a1f3d] mb-3">{step.title}</h1>
-        <p className="text-sm text-gray-500 leading-relaxed">{step.description}</p>
-      </div>
+      {descMatch ? (
+        <p className="text-[15px] text-gray-600 leading-relaxed text-center mb-4">
+          <span className="text-[#1a1f3d] font-extrabold text-2xl">{descMatch[1]}</span>{' '}
+          {descMatch[2]}
+        </p>
+      ) : step.description ? (
+        <p className="text-sm text-gray-500 leading-relaxed mb-4">{step.description}</p>
+      ) : null}
       <div className="mt-auto">
         <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
