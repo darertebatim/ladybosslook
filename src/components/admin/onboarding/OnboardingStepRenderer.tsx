@@ -130,32 +130,37 @@ function ScreenWrapper({ children, bg = 'bg-white' }: { children: React.ReactNod
 
 function WelcomeScreen({ step, onNext }: Props) {
   return (
-    <div className="h-full relative overflow-hidden">
-      {/* Full-screen mascot image */}
-      {step.image ? (
-        <img src={step.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
-      ) : (
-        <div className="absolute inset-0 bg-amber-50" />
+    <div className="h-full relative overflow-hidden bg-gradient-to-b from-purple-400 via-purple-300 to-purple-100">
+      {/* Mascot image — top 55% */}
+      {step.image && (
+        <div className="absolute inset-x-0 top-0 h-[58%]">
+          <img src={step.image} alt="" className="w-full h-full object-cover object-bottom" />
+          {/* Soft blend into bottom area */}
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-purple-100 to-transparent" />
+        </div>
       )}
-      {/* Gradient overlay from bottom */}
-      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent" style={{ top: '40%' }} />
-      {/* Content overlay at bottom */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center px-5 pb-6">
+
+      {/* Bottom content area */}
+      <div className="absolute inset-x-0 bottom-0 h-[46%] bg-gradient-to-b from-purple-100 via-white to-white flex flex-col items-center justify-end px-6 pb-5">
         {/* Award badges */}
-        <div className="flex flex-col items-center gap-3 mb-6">
+        <div className="flex flex-col items-center gap-2.5 mb-4 w-full">
           {step.statBadges?.map((b, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <span className="text-lg">🏆</span>
+            <div key={i} className="flex items-center justify-center gap-2">
+              <span className="text-sm">🏆</span>
               <div className="text-center">
-                <p className="text-xl font-black text-[#1a1f3d]">{b.value}</p>
-                <p className="text-[10px] font-medium text-[#1a1f3d]/60">{b.label}</p>
+                <p className="text-lg font-black text-[#1a1f3d] leading-tight">{b.value}</p>
+                <p className="text-[10px] font-medium text-[#1a1f3d]/50 leading-tight">{b.label}</p>
               </div>
-              <span className="text-lg">🏆</span>
+              <span className="text-sm">🏆</span>
             </div>
           ))}
         </div>
-        <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
-        <p className="text-sm text-gray-500 text-center mb-5">{step.subtitle}</p>
+
+        {/* Welcome text */}
+        <h1 className="text-[22px] font-bold text-[#1a1f3d] text-center mb-1 leading-tight">{step.title}</h1>
+        <p className="text-xs text-gray-400 text-center mb-4 leading-relaxed">{step.subtitle}</p>
+
+        {/* CTA */}
         <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
     </div>
