@@ -980,21 +980,21 @@ function PaywallScreen({ step, onNext }: Props) {
 
   return (
     <ScreenWrapper>
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-1">
         <button onClick={onNext} className="text-gray-400 text-lg active:opacity-60">✕</button>
         <button className="text-sm font-medium text-indigo-500 active:opacity-60">Restore</button>
       </div>
-      <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight">{step.title}</h1>
+      <h1 className="text-[20px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight">{step.title}</h1>
 
       {/* Auto-swiping image carousel */}
       {slides.length > 0 && (
-        <div className="relative mb-3 overflow-hidden -mx-5">
+        <div className="relative mb-2 overflow-hidden -mx-5" style={{ maxHeight: 220 }}>
           <div
             className="flex transition-transform duration-700 ease-in-out"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
             {slides.map((src, i) => (
-              <img key={i} src={src} alt="" className="w-full shrink-0 object-contain" />
+              <img key={i} src={src} alt="" className="w-full shrink-0 object-contain" style={{ maxHeight: 220 }} />
             ))}
           </div>
         </div>
