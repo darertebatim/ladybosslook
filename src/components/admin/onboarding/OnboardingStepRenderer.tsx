@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { OnboardingStep } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 
 interface Props {
@@ -186,7 +187,7 @@ function MultiSelectScreen({ step, onNext }: Props) {
                 selected.has(i) ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
               }`}
             >
-              {opt.emoji && <span className="text-xl">{opt.emoji}</span>}
+              {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
               <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
               {selected.has(i) && <span className="text-indigo-500 text-sm">✓</span>}
             </button>
@@ -211,7 +212,7 @@ function MultiSelectScreen({ step, onNext }: Props) {
               selected.has(i) ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
             }`}
           >
-            {opt.emoji && <span className="text-xl">{opt.emoji}</span>}
+            {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
             <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
             {selected.has(i) && <span className="text-indigo-500 text-sm">✓</span>}
           </button>
@@ -227,10 +228,10 @@ function MultiSelectScreen({ step, onNext }: Props) {
 function BottomSheetWrapper({ children, bgImage }: { children: React.ReactNode; bgImage?: string }) {
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
-      {/* Background image area */}
-      <div className="h-[200px] shrink-0 relative">
+      {/* Background image area - taller to show more */}
+      <div className="h-[240px] shrink-0 relative">
         {bgImage ? (
-          <img src={bgImage} alt="" className="w-full h-full object-cover" />
+          <img src={bgImage} alt="" className="w-full h-full object-cover object-top" />
         ) : (
           <div className="w-full h-full bg-gradient-to-b from-purple-400 to-purple-300" />
         )}
@@ -269,7 +270,7 @@ function SingleSelectScreen({ step, onNext }: Props) {
                 picked === i ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
               }`}
             >
-              {opt.emoji && <span className="text-lg">{opt.emoji}</span>}
+              {opt.emoji && <FluentEmoji emoji={opt.emoji} size={28} />}
               <span className="text-sm font-medium text-[#1a1f3d]">{opt.label}</span>
             </button>
           ))}
@@ -297,7 +298,7 @@ function SingleSelectScreen({ step, onNext }: Props) {
               picked === i ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
             }`}
           >
-            {opt.emoji && <span className="text-lg">{opt.emoji}</span>}
+            {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
             <span className="text-sm font-medium text-[#1a1f3d]">{opt.label}</span>
           </button>
         ))}
