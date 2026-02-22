@@ -445,44 +445,27 @@ function MotivationalScreen({ step, onNext }: Props) {
   const isFullScreenBg = step.image && !step.description;
 
   if (isFullScreenBg) {
-    // Check if title contains "build momentum" — use overlay style; otherwise image-then-text layout
-    const hasBuildMomentum = /build momentum/i.test(step.title || '');
-
-    if (hasBuildMomentum) {
-      const titleParts = step.title?.split(/(build momentum)/i) || [step.title];
-      return (
-        <div className="flex flex-col h-full relative overflow-hidden">
-          <img src={step.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="relative z-10 h-full">
-            <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] text-[20px] font-extrabold text-white text-center leading-snug drop-shadow-lg">
-              {titleParts.map((part, i) =>
-                /build momentum/i.test(part) ? (
-                  <span key={i} className="text-yellow-300 font-extrabold">{part}</span>
-                ) : (
-                  <span key={i}>{part}</span>
-                )
-              )}
-            </h1>
-            <button
-              onClick={onNext}
-              className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[70%] py-4 rounded-full bg-[#1a1f3d] text-white font-bold text-base active:scale-95 transition-transform shadow-xl"
-            >
-              {step.buttonLabel}
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    // Default full-screen bg: image on top, title below
+    // Parse title to highlight "build momentum" in yellow
+    const titleParts = step.title?.split(/(build momentum)/i) || [step.title];
     return (
-      <div className="flex flex-col h-full">
-        <div className="flex-1 relative overflow-hidden">
-          <img src={step.image} alt="" className="w-full h-full object-cover" />
-        </div>
-        <div className="px-6 pt-5 pb-6 text-center">
-          <h1 className="text-[22px] font-extrabold text-[#1a1f3d] leading-snug mb-5">{step.title}</h1>
-          <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
+      <div className="flex flex-col h-full relative overflow-hidden">
+        <img src={step.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="relative z-10 h-full">
+          <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] text-[20px] font-extrabold text-white text-center leading-snug drop-shadow-lg">
+            {titleParts.map((part, i) =>
+              /build momentum/i.test(part) ? (
+                <span key={i} className="text-yellow-300 font-extrabold">{part}</span>
+              ) : (
+                <span key={i}>{part}</span>
+              )
+            )}
+          </h1>
+          <button
+            onClick={onNext}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[70%] py-4 rounded-full bg-[#1a1f3d] text-white font-bold text-base active:scale-95 transition-transform shadow-xl"
+          >
+            {step.buttonLabel}
+          </button>
         </div>
       </div>
     );
