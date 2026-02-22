@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { X, Check, Loader2, Sparkles } from 'lucide-react';
+import { X, Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -13,14 +13,12 @@ interface WelcomeRitualCardProps {
   onDismiss?: () => void;
 }
 
-type Phase = 'picking' | 'confirming' | 'done';
-
 export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCardProps) {
   const [dismissed, setDismissed] = useState(false);
   const [showFullscreen, setShowFullscreen] = useState(false);
   const [animatingIn, setAnimatingIn] = useState(false);
   const [selectedActions, setSelectedActions] = useState<Set<string>>(new Set());
-  const [phase, setPhase] = useState<Phase>('picking');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: welcomeRitualInfo, isLoading: welcomeLoading } = useWelcomePopupRitual();
   const { data: welcomeRitual, isLoading: ritualLoading } = useRoutineBankDetail(welcomeRitualInfo?.id);
@@ -60,6 +58,13 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
     setShowFullscreen(true);
   };
 
+  const handleCloseFullscreen = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setAnimatingIn(false);
+    // Wait for exit animation
+    setTimeout(() => setShowFullscreen(false), 300);
+  };
+
   const handleDismissFullscreen = (e: React.MouseEvent) => {
     e.stopPropagation();
     setAnimatingIn(false);
@@ -73,7 +78,7 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
 
   const toggleAction = (actionId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (alreadyAddedActions.has(actionId) || phase !== 'picking') return;
+    if (alreadyAddedActions.has(actionId)) return;
     haptic.light();
     setSelectedActions(prev => {
       const next = new Set(prev);
@@ -85,40 +90,23 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
 
   const handleContinue = async () => {
     if (selectedActions.size === 0 || !welcomeRitualInfo?.id) return;
-
-    // Phase 1: Show "Adding..." with checkmark animations
-    setPhase('confirming');
+    setIsSubmitting(true);
     haptic.light();
-
     try {
       await addRoutine.mutateAsync({
         routineId: welcomeRitualInfo.id,
         selectedTaskIds: Array.from(selectedActions),
       });
-
       haptic.success();
       localStorage.setItem('simora_welcome_card_action_added', 'true');
       localStorage.setItem('simora_welcome_card_dismissed', 'true');
-
-      // Phase 2: Show "Done!" briefly
-      setPhase('done');
-
-      // Phase 3: After 1.5s, fade out the fullscreen overlay to reveal planner
-      setTimeout(() => {
-        setAnimatingIn(false);
-      }, 1500);
-
-      // Phase 4: After 2s, fully dismiss and notify parent
-      setTimeout(() => {
-        setShowFullscreen(false);
-        setDismissed(true);
-        onActionAdded?.();
-        onDismiss?.();
-      }, 2000);
-
+      onActionAdded?.();
+      setDismissed(true);
+      onDismiss?.();
     } catch (error) {
       console.error('Failed to add actions:', error);
-      setPhase('picking');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -128,149 +116,110 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
   const title = welcomeRitualInfo.title || 'Your day is open';
   const subtitle = welcomeRitualInfo.subtitle || 'Tap to pick your first actions';
 
-  // Get only selected action names for the confirmation phase
-  const selectedActionNames = displayActions
-    .filter(a => selectedActions.has(a.id))
-    .map(a => ({ title: a.title, emoji: a.emoji || '✨' }));
-
   return (
     <>
-      {/* ── Fullscreen action picker ── */}
+      {/* ── Fullscreen action picker (Me+ style) ── */}
       {showFullscreen && (
         <div
           className={cn(
             "fixed inset-0 z-[9999] flex flex-col transition-all duration-300",
-            animatingIn ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+            animatingIn ? "opacity-100 scale-100" : "opacity-0 scale-95"
           )}
           style={{
             background: 'linear-gradient(160deg, #a855f7 0%, #7c3aed 40%, #6d28d9 100%)',
           }}
         >
-          {/* Close button — only during picking */}
-          {phase === 'picking' && (
-            <div className="flex justify-end px-4 pt-[max(16px,env(safe-area-inset-top))]">
-              <button
-                onClick={handleDismissFullscreen}
-                className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm"
-              >
-                <X className="w-5 h-5 text-white" />
-              </button>
-            </div>
-          )}
+          {/* Close button */}
+          <div className="flex justify-end px-4 pt-[max(16px,env(safe-area-inset-top))]">
+            <button
+              onClick={handleDismissFullscreen}
+              className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm"
+            >
+              <X className="w-5 h-5 text-white" />
+            </button>
+          </div>
 
-          {phase === 'picking' && (
-            <>
-              {/* Title */}
-              <div className="px-6 pt-2 pb-4 text-center">
-                <h2 className="text-[28px] font-bold text-white leading-tight">
-                  Choose a simple and wholesome action to start right away!
-                </h2>
-                <p className="text-yellow-300 font-semibold text-base mt-3">
-                  (Select all that apply)
-                </p>
+          {/* Big bold title — matching Me+ */}
+          <div className="px-6 pt-2 pb-4 text-center">
+            <h2 className="text-[28px] font-bold text-white leading-tight">
+              Choose a simple and wholesome action to start right away!
+            </h2>
+            <p className="text-yellow-300 font-semibold text-base mt-3">
+              (Select all that apply)
+            </p>
+          </div>
+
+          {/* Scrollable white action cards */}
+          <div className="flex-1 overflow-y-auto px-5 pb-4 space-y-3">
+            {ritualLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-7 h-7 animate-spin text-white/70" />
               </div>
-
-              {/* Scrollable action cards */}
-              <div className="flex-1 overflow-y-auto px-5 pb-4 space-y-3">
-                {ritualLoading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <Loader2 className="w-7 h-7 animate-spin text-white/70" />
-                  </div>
-                ) : (
-                  displayActions.map((action, index) => {
-                    const isAlreadyAdded = alreadyAddedActions.has(action.id);
-                    const isSelected = selectedActions.has(action.id);
-                    const emoji = action.emoji || '✨';
-
-                    return (
-                      <button
-                        key={action.id}
-                        onClick={(e) => toggleAction(action.id, e)}
-                        disabled={isAlreadyAdded}
-                        className={cn(
-                          "flex items-center gap-4 w-full px-5 py-4 rounded-2xl bg-white/90 backdrop-blur-sm transition-all active:scale-[0.97]",
-                          isSelected && "ring-2 ring-yellow-400 ring-offset-2 ring-offset-purple-600 bg-white",
-                          isAlreadyAdded && "opacity-50"
-                        )}
-                      >
-                        <span className="text-3xl shrink-0">
-                          {emoji.length <= 2 ? emoji : <FluentEmoji emoji={emoji} size={36} />}
-                        </span>
-                        <span className={cn(
-                          "flex-1 text-left font-semibold text-[17px] text-gray-900",
-                          isAlreadyAdded && "line-through opacity-60"
-                        )}>
-                          {action.title}
-                        </span>
-                        <div className={cn(
-                          "shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all border-2",
-                          isSelected
-                            ? "bg-purple-600 border-purple-600 text-white scale-110"
-                            : isAlreadyAdded
-                              ? "bg-emerald-500 border-emerald-500 text-white"
-                              : "bg-transparent border-gray-300"
-                        )}>
-                          {(isAlreadyAdded || isSelected) && <Check className="w-5 h-5" />}
-                        </div>
-                      </button>
-                    );
-                  })
-                )}
+            ) : displayActions.length === 0 ? (
+              <div className="text-center py-12 text-white/70 text-sm">
+                No actions available yet
               </div>
+            ) : (
+              displayActions.map((action, index) => {
+                const isAlreadyAdded = alreadyAddedActions.has(action.id);
+                const isSelected = selectedActions.has(action.id);
+                const emoji = action.emoji || '✨';
 
-              {/* Continue button */}
-              <div className="px-5 pb-[max(20px,env(safe-area-inset-bottom))] pt-3">
-                <button
-                  onClick={handleContinue}
-                  disabled={selectedActions.size === 0}
-                  className={cn(
-                    "w-full h-14 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2",
-                    selectedActions.size > 0
-                      ? "bg-white text-purple-700 active:scale-[0.97] shadow-lg shadow-purple-900/30"
-                      : "bg-white/20 text-white/50"
-                  )}
-                >
-                  Continue{selectedActions.size > 0 && ` (${selectedActions.size})`}
-                </button>
-              </div>
-            </>
-          )}
-
-          {/* ── Confirming phase: animated checklist ── */}
-          {phase === 'confirming' && (
-            <div className="flex-1 flex flex-col items-center justify-center px-8 animate-fade-in">
-              <Loader2 className="w-10 h-10 text-white animate-spin mb-6" />
-              <h2 className="text-2xl font-bold text-white mb-6">Adding to your planner...</h2>
-              <div className="w-full max-w-sm space-y-3">
-                {selectedActionNames.map((action, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 bg-white/20 rounded-xl px-4 py-3 animate-fade-in"
-                    style={{ animationDelay: `${i * 200}ms`, animationFillMode: 'both' }}
+                return (
+                  <button
+                    key={action.id}
+                    onClick={(e) => toggleAction(action.id, e)}
+                    disabled={isAlreadyAdded}
+                    className={cn(
+                      "flex items-center gap-4 w-full px-5 py-4 rounded-2xl bg-white/90 backdrop-blur-sm transition-all active:scale-[0.97]",
+                      isSelected && "ring-2 ring-yellow-400 ring-offset-2 ring-offset-purple-600 bg-white",
+                      isAlreadyAdded && "opacity-50"
+                    )}
                   >
-                    <span className="text-2xl">
-                      {action.emoji.length <= 2 ? action.emoji : <FluentEmoji emoji={action.emoji} size={28} />}
+                    <span className="text-3xl shrink-0">
+                      {emoji.length <= 2 ? emoji : <FluentEmoji emoji={emoji} size={36} />}
                     </span>
-                    <span className="flex-1 text-white font-medium text-[15px]">{action.title}</span>
-                    <Check className="w-5 h-5 text-emerald-300" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+                    <span className={cn(
+                      "flex-1 text-left font-semibold text-[17px] text-gray-900",
+                      isAlreadyAdded && "line-through opacity-60"
+                    )}>
+                      {action.title}
+                    </span>
+                    <div className={cn(
+                      "shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all border-2",
+                      isSelected
+                        ? "bg-purple-600 border-purple-600 text-white scale-110"
+                        : isAlreadyAdded
+                          ? "bg-emerald-500 border-emerald-500 text-white"
+                          : "bg-transparent border-gray-300"
+                    )}>
+                      {(isAlreadyAdded || isSelected) && <Check className="w-5 h-5" />}
+                    </div>
+                  </button>
+                );
+              })
+            )}
+          </div>
 
-          {/* ── Done phase: success message ── */}
-          {phase === 'done' && (
-            <div className="flex-1 flex flex-col items-center justify-center px-8 animate-scale-in">
-              <div className="w-20 h-20 rounded-full bg-emerald-400 flex items-center justify-center mb-5">
-                <Check className="w-10 h-10 text-white" />
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-2">You're all set!</h2>
-              <p className="text-white/80 text-center text-base">
-                {selectedActions.size} action{selectedActions.size > 1 ? 's' : ''} added to your planner ✨
-              </p>
-            </div>
-          )}
+          {/* Continue button */}
+          <div className="px-5 pb-[max(20px,env(safe-area-inset-bottom))] pt-3">
+            <button
+              onClick={handleContinue}
+              disabled={selectedActions.size === 0 || isSubmitting}
+              className={cn(
+                "w-full h-14 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2",
+                selectedActions.size > 0
+                  ? "bg-white text-purple-700 active:scale-[0.97] shadow-lg shadow-purple-900/30"
+                  : "bg-white/20 text-white/50"
+              )}
+            >
+              {isSubmitting ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>Continue{selectedActions.size > 0 && ` (${selectedActions.size})`}</>
+              )}
+            </button>
+          </div>
         </div>
       )}
 
