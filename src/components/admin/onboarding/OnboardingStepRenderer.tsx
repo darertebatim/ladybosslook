@@ -988,26 +988,15 @@ function PaywallScreen({ step, onNext }: Props) {
 
       {/* Auto-swiping image carousel */}
       {slides.length > 0 && (
-        <div className="relative mb-4 overflow-hidden rounded-2xl -mx-5" style={{ maxHeight: 240 }}>
+        <div className="relative mb-3 overflow-hidden -mx-5">
           <div
             className="flex transition-transform duration-700 ease-in-out"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
             {slides.map((src, i) => (
-              <img key={i} src={src} alt="" className="w-full shrink-0 object-contain" style={{ maxHeight: 240 }} />
+              <img key={i} src={src} alt="" className="w-full shrink-0 object-contain" />
             ))}
           </div>
-          {/* Dots */}
-          {slides.length > 1 && (
-            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
-              {slides.map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-1.5 rounded-full transition-all ${i === currentSlide ? 'w-4 bg-indigo-500' : 'w-1.5 bg-gray-300'}`}
-                />
-              ))}
-            </div>
-          )}
         </div>
       )}
 
