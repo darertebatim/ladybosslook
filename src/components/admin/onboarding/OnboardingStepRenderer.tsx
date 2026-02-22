@@ -446,7 +446,7 @@ function MotivationalScreen({ step, onNext }: Props) {
     return (
       <div className="flex flex-col h-full relative overflow-hidden">
         <img src={step.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="relative z-10 flex flex-col h-full justify-end px-6 pb-8">
+        <div className="relative z-10 flex flex-col h-full items-center justify-center px-6 pb-8">
           <h1 className="text-[20px] font-extrabold text-white text-center leading-snug drop-shadow-lg mb-5">
             {titleParts.map((part, i) =>
               /build momentum/i.test(part) ? (
