@@ -964,40 +964,72 @@ function StreakScreen({ step, onNext }: Props) {
 
 function PaywallScreen({ step, onNext }: Props) {
   const [selectedTier, setSelectedTier] = useState(
-    step.pricingTiers?.findIndex(t => t.badge) ?? 0
+    step.pricingTiers?.findIndex(t => t.badge?.includes('Trial') || t.badge?.includes('Free')) ?? 1
   );
 
   return (
     <ScreenWrapper>
-      <button onClick={onNext} className="self-end text-gray-400 text-lg mb-2 active:opacity-60">✕</button>
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
-      <div className="space-y-3 mb-4">
-        {step.pricingTiers?.map((tier, i) => (
-          <button
-            key={i}
-            onClick={() => setSelectedTier(i)}
-            className={`relative w-full rounded-2xl border-2 p-4 text-left transition-all active:scale-[0.98] ${
-              i === selectedTier ? 'border-indigo-500 bg-indigo-50/50' : 'border-gray-200'
-            }`}
-          >
-            {tier.badge && (
-              <span className="absolute -top-2.5 right-3 bg-indigo-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">{tier.badge}</span>
-            )}
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-sm font-semibold text-[#1a1f3d]">{tier.label}</p>
-                <p className="text-xs text-gray-400">{tier.total}</p>
+      <div className="flex items-center justify-between mb-3">
+        <button onClick={onNext} className="text-gray-400 text-lg active:opacity-60">✕</button>
+        <button className="text-sm font-medium text-indigo-500 active:opacity-60">Restore</button>
+      </div>
+      <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight">{step.title}</h1>
+
+      {/* Before/After image */}
+      {step.image && (
+        <div className="flex items-center justify-center mb-5">
+          <img src={step.image} alt="" className="w-full max-w-[300px] rounded-2xl object-contain" />
+        </div>
+      )}
+
+      {/* Pricing tiers - 3-column card layout */}
+      <div className="grid grid-cols-3 gap-2 mb-4">
+        {step.pricingTiers?.map((tier, i) => {
+          const isSelected = i === selectedTier;
+          return (
+            <button
+              key={i}
+              onClick={() => setSelectedTier(i)}
+              className={`relative rounded-2xl border-2 pt-5 pb-3 px-2 text-center transition-all active:scale-[0.97] ${
+                isSelected ? 'border-indigo-500 bg-indigo-50/60' : 'border-gray-200 bg-white'
+              }`}
+            >
+              {tier.badge && (
+                <span className={`absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                  tier.badge.includes('Trial') || tier.badge.includes('Free') ? 'bg-indigo-500 text-white' : 'bg-purple-200 text-purple-700'
+                }`}>{tier.badge}</span>
+              )}
+              <p className="text-base font-extrabold text-[#1a1f3d] leading-tight">{tier.label.split(' ')[0]}</p>
+              <p className="text-[11px] text-[#1a1f3d] font-medium">{tier.label.split(' ').slice(1).join(' ')}</p>
+              <p className="text-[11px] text-gray-400 mt-1">{tier.perWeek}</p>
+              <div className="border-t border-gray-200 mt-2 pt-2">
+                <p className={`text-xs font-bold ${isSelected ? 'text-[#1a1f3d]' : 'text-gray-500'}`}>{tier.total}</p>
               </div>
-              <p className="text-sm font-bold text-[#1a1f3d]">{tier.perWeek}</p>
-            </div>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
-      <p className="text-sm font-semibold text-[#1a1f3d] text-center mb-4">{step.subtitle}</p>
+
+      {/* No payment badge */}
+      {step.subtitle && (
+        <div className="flex items-center justify-center gap-1.5 mb-3">
+          <span className="text-green-500 text-base">✅</span>
+          <p className="text-sm font-semibold text-[#1a1f3d]">{step.subtitle}</p>
+        </div>
+      )}
+
       <div className="mt-auto">
-        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
+        <button
+          onClick={onNext}
+          className="w-full py-4 rounded-full bg-[#1a1f3d] text-white font-bold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+        >
+          {step.buttonLabel}
+          <span className="text-lg">→</span>
+        </button>
       </div>
-      <p className="text-[10px] text-gray-300 text-center mt-3">Terms & Conditions · Privacy Policy</p>
+      {step.description && (
+        <p className="text-[9px] text-gray-400 text-center mt-3 leading-snug">{step.description}</p>
+      )}
     </ScreenWrapper>
   );
 }
