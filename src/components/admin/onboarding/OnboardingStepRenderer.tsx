@@ -3,6 +3,7 @@ import { OnboardingStep } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
+import SealCheck from '@/components/app/SealCheck';
 
 interface Props {
   step: OnboardingStep;
@@ -184,12 +185,12 @@ function MultiSelectScreen({ step, onNext }: Props) {
               key={i}
               onClick={() => toggle(i)}
               className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
-                selected.has(i) ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+                selected.has(i) ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
               }`}
             >
               {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
               <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
-              {selected.has(i) && <span className="text-indigo-500 text-sm">✓</span>}
+              {selected.has(i) && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
             </button>
           ))}
         </div>
@@ -209,12 +210,12 @@ function MultiSelectScreen({ step, onNext }: Props) {
             key={i}
             onClick={() => toggle(i)}
             className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
-              selected.has(i) ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+              selected.has(i) ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
             }`}
           >
             {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
             <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
-            {selected.has(i) && <span className="text-indigo-500 text-sm">✓</span>}
+            {selected.has(i) && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
           </button>
         ))}
       </div>
@@ -267,11 +268,12 @@ function SingleSelectScreen({ step, onNext }: Props) {
               key={i}
               onClick={() => select(i)}
               className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
-                picked === i ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+                picked === i ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
               }`}
             >
               {opt.emoji && <FluentEmoji emoji={opt.emoji} size={28} />}
-              <span className="text-sm font-medium text-[#1a1f3d]">{opt.label}</span>
+              <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
+              {picked === i && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
             </button>
           ))}
         </div>
@@ -295,11 +297,12 @@ function SingleSelectScreen({ step, onNext }: Props) {
             key={i}
             onClick={() => select(i)}
             className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
-              picked === i ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+              picked === i ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
             }`}
           >
             {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
-            <span className="text-sm font-medium text-[#1a1f3d]">{opt.label}</span>
+            <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
+            {picked === i && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
           </button>
         ))}
       </div>
