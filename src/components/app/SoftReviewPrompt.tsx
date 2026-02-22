@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { X, Star, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
-import { StarRating } from './StarRating';
 
 interface SoftReviewPromptProps {
   isOpen: boolean;
@@ -14,11 +14,10 @@ interface SoftReviewPromptProps {
  * Soft Review Prompt Component
  * 
  * A custom pre-review dialog that appears BEFORE the native iOS App Store review.
- * Shows star rating UI - tapping any star triggers the native review flow.
+ * This allows users to decline gracefully without triggering the native flow.
  */
 export function SoftReviewPrompt({ isOpen, onClose, onAccept }: SoftReviewPromptProps) {
   const [isAnimating, setIsAnimating] = useState(true);
-  const [selectedRating, setSelectedRating] = useState(0);
 
   if (!isOpen) return null;
 
@@ -32,16 +31,14 @@ export function SoftReviewPrompt({ isOpen, onClose, onAccept }: SoftReviewPrompt
     }, 200);
   };
 
-  const handleRate = (rating: number) => {
-    setSelectedRating(rating);
+  const handleYes = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     haptic.success();
-    // Brief delay to show the selected stars, then trigger native review
+    setIsAnimating(false);
     setTimeout(() => {
-      setIsAnimating(false);
-      setTimeout(() => {
-        onAccept();
-      }, 200);
-    }, 400);
+      onAccept();
+    }, 200);
   };
 
   return (
@@ -52,7 +49,7 @@ export function SoftReviewPrompt({ isOpen, onClose, onAccept }: SoftReviewPrompt
       {/* Backdrop */}
       <div 
         className={cn(
-          'absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-200',
+          'absolute inset-0 bg-black/60 transition-opacity duration-200',
           isAnimating ? 'opacity-100' : 'opacity-0'
         )}
       />
@@ -60,7 +57,7 @@ export function SoftReviewPrompt({ isOpen, onClose, onAccept }: SoftReviewPrompt
       {/* Dialog */}
       <div 
         className={cn(
-          'relative bg-white rounded-3xl p-6 pt-8 max-w-[300px] w-full shadow-2xl transition-all duration-200',
+          'relative bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl transition-all duration-200',
           isAnimating 
             ? 'opacity-100 scale-100 translate-y-0' 
             : 'opacity-0 scale-95 translate-y-4'
@@ -70,45 +67,48 @@ export function SoftReviewPrompt({ isOpen, onClose, onAccept }: SoftReviewPrompt
         {/* Close button */}
         <button
           onClick={handleNotNow}
-          className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
           aria-label="Close"
         >
-          <X className="w-4 h-4 text-gray-400" />
+          <X className="w-5 h-5 text-gray-400" />
         </button>
 
         {/* Content */}
-        <div className="text-center">
-          {/* App icon */}
-          <div className="inline-flex items-center justify-center mb-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-100 to-violet-200 flex items-center justify-center shadow-sm">
-              <span className="text-3xl">💜</span>
+        <div className="text-center pt-2">
+          {/* Heart icon with stars */}
+          <div className="relative inline-flex items-center justify-center mb-4">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
+              <Heart className="w-8 h-8 text-orange-500 fill-orange-500" />
             </div>
+            <Star className="absolute -top-1 -right-1 w-5 h-5 text-amber-400 fill-amber-400" />
+            <Star className="absolute -bottom-1 -left-1 w-4 h-4 text-amber-400 fill-amber-400" />
           </div>
 
-          <h2 className="text-lg font-bold text-gray-900 mb-1.5">
-            Enjoying Me+?
+          <h2 className="text-xl font-bold text-gray-900 mb-2">
+            Enjoying Simora?
           </h2>
           
-          <p className="text-gray-500 text-sm mb-5">
-            Tap a star to rate it on the App Store.
+          <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+            Your feedback helps us improve and reach{'\n'}
+            more people who could benefit.
           </p>
 
-          {/* Star Rating */}
-          <div className="mb-4">
-            <StarRating 
-              rating={selectedRating} 
-              onRate={handleRate} 
-              size="lg" 
-            />
+          {/* Action buttons */}
+          <div className="space-y-3">
+            <Button
+              onClick={handleYes}
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500 text-white font-semibold py-3 rounded-xl h-auto"
+            >
+              Yes, I'll Rate It! ⭐
+            </Button>
+            
+            <button
+              onClick={handleNotNow}
+              className="w-full text-gray-400 text-sm font-medium py-2 hover:text-gray-600 transition-colors"
+            >
+              Not Now
+            </button>
           </div>
-
-          {/* Not Now button */}
-          <button
-            onClick={handleNotNow}
-            className="w-full text-gray-900 text-base font-semibold py-3 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
-          >
-            Not Now
-          </button>
         </div>
       </div>
     </div>
