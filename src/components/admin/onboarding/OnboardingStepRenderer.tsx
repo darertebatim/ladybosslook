@@ -1001,30 +1001,30 @@ function PaywallScreen({ step, onNext }: Props) {
       )}
 
       {/* Pricing tiers - centered 2-card layout */}
-      <div className="flex justify-center gap-3 mb-4">
+      <div className="flex justify-center gap-2 mb-3">
         {step.pricingTiers?.map((tier, i) => {
           const isSelected = i === selectedTier;
           return (
             <button
               key={i}
               onClick={() => setSelectedTier(i)}
-              className={`relative rounded-2xl border-2 pt-5 pb-3 px-4 text-center transition-all active:scale-[0.97] w-[140px] ${
+              className={`relative rounded-xl border-2 pt-4 pb-2 px-3 text-center transition-all active:scale-[0.97] w-[130px] ${
                 isSelected ? 'border-indigo-500 bg-indigo-50/60' : 'border-gray-200 bg-white'
               }`}
             >
               {tier.badge && (
-                <span className={`absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                <span className={`absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap text-[8px] font-bold px-2 py-0.5 rounded-full ${
                   tier.badge.includes('Trial') || tier.badge.includes('Free') ? 'bg-indigo-500 text-white' : 'bg-purple-200 text-purple-700'
                 }`}>{tier.badge}</span>
               )}
-              <p className="text-base font-extrabold text-[#1a1f3d] leading-tight">{tier.label.split(' ')[0]}</p>
-              <p className="text-[11px] text-[#1a1f3d] font-medium">{tier.label.split(' ').slice(1).join(' ')}</p>
-              <p className={`text-[11px] text-gray-400 mt-1 ${tier.perWeek?.includes('/mo.') && tier.label.startsWith('1') ? 'line-through' : ''}`}>{tier.perWeek}</p>
+              <p className="text-sm font-extrabold text-[#1a1f3d] leading-tight">{tier.label.split(' ')[0]}</p>
+              <p className="text-[10px] text-[#1a1f3d] font-medium">{tier.label.split(' ').slice(1).join(' ')}</p>
+              <p className={`text-[10px] text-gray-400 mt-0.5 ${tier.perWeek?.includes('/mo.') && tier.label.startsWith('1') ? 'line-through' : ''}`}>{tier.perWeek}</p>
               {tier.discount && (
-                <span className="inline-block mt-1 text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-500 text-white">{tier.discount}</span>
+                <span className="inline-block mt-0.5 text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-red-500 text-white">{tier.discount}</span>
               )}
-              <div className="border-t border-gray-200 mt-2 pt-2">
-                <p className={`text-xs font-bold ${isSelected ? 'text-[#1a1f3d]' : 'text-gray-500'}`}>{tier.total}</p>
+              <div className="border-t border-gray-200 mt-1.5 pt-1.5">
+                <p className={`text-[11px] font-bold ${isSelected ? 'text-[#1a1f3d]' : 'text-gray-500'}`}>{tier.total}</p>
               </div>
             </button>
           );
