@@ -7,6 +7,8 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 import appIcon from '@/assets/app-icon.png';
 import SealCheck from '@/components/app/SealCheck';
+import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
+import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
 
 interface Props {
   step: OnboardingStep;
@@ -963,6 +965,26 @@ function StreakScreen({ step, onNext }: Props) {
   );
 }
 
+function PaywallImageCarousel({ images }: { images: string[] }) {
+  const [current, setCurrent] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => setCurrent(c => (c + 1) % images.length), 3000);
+    return () => clearInterval(timer);
+  }, [images.length]);
+  return (
+    <div className="relative flex items-center justify-center mb-5 h-[200px] overflow-hidden">
+      {images.map((src, i) => (
+        <img
+          key={i}
+          src={src}
+          alt=""
+          className={`absolute w-full max-w-[300px] rounded-2xl object-contain transition-opacity duration-700 ${i === current ? 'opacity-100' : 'opacity-0'}`}
+        />
+      ))}
+    </div>
+  );
+}
+
 function PaywallScreen({ step, onNext }: Props) {
   const [selectedTier, setSelectedTier] = useState(
     step.pricingTiers?.findIndex(t => t.badge?.includes('Trial') || t.badge?.includes('Free')) ?? 1
@@ -992,11 +1014,9 @@ function PaywallScreen({ step, onNext }: Props) {
       </div>
       <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight">{step.title}</h1>
 
-      {/* Before/After image */}
+      {/* Auto-rotating before/after images */}
       {step.image && (
-        <div className="flex items-center justify-center mb-5">
-          <img src={step.image} alt="" className="w-full max-w-[300px] rounded-2xl object-contain" />
-        </div>
+        <PaywallImageCarousel images={[step.image, meplusPaywall2, meplusPaywall3]} />
       )}
 
       {/* Pricing tiers - compact centered 2-card layout */}
