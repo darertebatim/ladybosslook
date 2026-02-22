@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { X, Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
@@ -46,6 +46,10 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
 
   const handleDismiss = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isFlipped) {
+      setIsFlipped(false);
+      return;
+    }
     setDismissed(true);
     localStorage.setItem('simora_welcome_card_dismissed', 'true');
     onDismiss?.();
@@ -56,8 +60,12 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
     setIsFlipped(true);
   };
 
-  const handleCloseFlip = () => {
+  const handleClose = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsFlipped(false);
+    setDismissed(true);
+    localStorage.setItem('simora_welcome_card_dismissed', 'true');
+    onDismiss?.();
   };
 
   const toggleAction = (actionId: string, e: React.MouseEvent) => {
@@ -109,78 +117,20 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
 
   return (
     <>
-      {/* Spotlight overlay - 80% black when flipped */}
+      {/* Fullscreen overlay when flipped — covers header, FAB, nav, everything */}
       {isFlipped && (
-        <div 
-          className="fixed inset-0 bg-black/80 z-40 animate-fade-in"
-          onClick={handleCloseFlip}
-        />
-      )}
-      
-      <div 
-        className={cn("w-full", isFlipped && "relative z-50")}
-        style={{ perspective: '1000px' }}
-      >
-        <div 
-          className="relative w-full transition-transform duration-500"
-          style={{ 
-            transformStyle: 'preserve-3d',
-            transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-          }}
-        >
-          {/* Front of card */}
-          <div 
-            className="relative w-full cursor-pointer"
-            style={{ backfaceVisibility: 'hidden' }}
-            onClick={handleFlip}
-          >
-            <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-md">
-              {welcomeRitual?.cover_image_url ? (
-                <img 
-                  src={welcomeRitual.cover_image_url} 
-                  alt={title} 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center">
-                  <FluentEmoji emoji={welcomeRitualInfo.emoji || '✨'} size={96} className="opacity-40" />
-                </div>
-              )}
-              
-              <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-              
-              <button
-                onClick={handleDismiss}
-                className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center hover:bg-black/50 transition-colors z-10"
-              >
-                <X className="w-4 h-4 text-white" />
-              </button>
-              
-              <div className="absolute bottom-3 left-3 right-3">
-                <h3 className="font-bold text-lg text-white drop-shadow-lg leading-tight">
-                  {title}
-                </h3>
-                <p className="text-white/90 text-sm mt-1 drop-shadow">
-                  {subtitle}
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Back of card - taller than square */}
-          <div 
-            className="absolute top-0 left-0 w-full"
-            style={{ 
-              backfaceVisibility: 'hidden',
-              transform: 'rotateY(180deg)',
-            }}
-          >
-            <div className="relative w-full rounded-2xl overflow-hidden shadow-md bg-gradient-to-br from-violet-50 to-purple-100 dark:from-violet-950/30 dark:to-purple-900/20">
+        <div className="fixed inset-0 z-[9999] flex flex-col bg-black/80 animate-fade-in">
+          {/* Scrollable action picker card */}
+          <div className="flex-1 flex flex-col px-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] overflow-hidden">
+            {/* Spacer to push card down a bit */}
+            <div className="h-4 shrink-0" />
+            
+            <div className="flex-1 flex flex-col rounded-2xl overflow-hidden bg-gradient-to-br from-violet-50 to-purple-100 dark:from-violet-950/30 dark:to-purple-900/20 shadow-2xl max-h-[85vh]">
               {/* Header */}
-              <div className="px-4 pt-4 pb-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-bold text-base text-foreground">
+              <div className="px-4 pt-4 pb-2 shrink-0">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <h3 className="font-bold text-[17px] text-foreground leading-snug">
                       Choose a simple and wholesome action to start right away!
                     </h3>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -188,16 +138,16 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
                     </p>
                   </div>
                   <button
-                    onClick={(e) => { e.stopPropagation(); handleCloseFlip(); }}
-                    className="shrink-0 ml-2 w-7 h-7 rounded-full bg-black/10 dark:bg-white/10 flex items-center justify-center hover:bg-black/20 dark:hover:bg-white/20 transition-colors"
+                    onClick={handleClose}
+                    className="shrink-0 w-7 h-7 rounded-full bg-black/10 dark:bg-white/10 flex items-center justify-center"
                   >
                     <X className="w-4 h-4 text-foreground/70" />
                   </button>
                 </div>
               </div>
               
-              {/* Actions list */}
-              <div className="px-3 pb-3 space-y-2 max-h-[60vh] overflow-y-auto">
+              {/* Scrollable actions list */}
+              <div className="flex-1 overflow-y-auto px-3 pb-2 space-y-2">
                 {ritualLoading ? (
                   <div className="flex items-center justify-center py-8">
                     <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
@@ -211,7 +161,6 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
                     const isAlreadyAdded = alreadyAddedActions.has(action.id);
                     const isSelected = selectedActions.has(action.id);
                     const emoji = action.emoji || '✨';
-                    const actionTitle = action.title;
                     const actionColor = (action as RoutineBankTask).color as TaskColor || COLOR_CYCLE[index % COLOR_CYCLE.length];
                     const bgColor = TASK_COLORS[actionColor] || TASK_COLORS.mint;
                     
@@ -234,7 +183,7 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
                           "flex-1 text-left font-medium text-[15px] text-black truncate",
                           isAlreadyAdded && "line-through opacity-70"
                         )}>
-                          {actionTitle}
+                          {action.title}
                         </span>
                         <div className={cn(
                           "shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-all border-2",
@@ -244,11 +193,7 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
                               ? "bg-emerald-500 border-emerald-500 text-white"
                               : "bg-white/60 border-black/20"
                         )}>
-                          {isAlreadyAdded ? (
-                            <Check className="w-4 h-4" />
-                          ) : isSelected ? (
-                            <Check className="w-4 h-4" />
-                          ) : null}
+                          {(isAlreadyAdded || isSelected) && <Check className="w-4 h-4" />}
                         </div>
                       </button>
                     );
@@ -256,8 +201,8 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
                 )}
               </div>
               
-              {/* Continue button */}
-              <div className="px-3 pb-4 pt-2">
+              {/* Continue button - sticky at bottom */}
+              <div className="px-3 pb-4 pt-2 shrink-0">
                 <button
                   onClick={handleContinue}
                   disabled={selectedActions.size === 0 || isSubmitting}
@@ -276,9 +221,48 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
                 </button>
               </div>
             </div>
+            
+            <div className="h-4 shrink-0" />
           </div>
         </div>
-      </div>
+      )}
+      
+      {/* Front card — inline in the page */}
+      {!isFlipped && (
+        <div className="w-full cursor-pointer" onClick={handleFlip}>
+          <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-md">
+            {welcomeRitual?.cover_image_url ? (
+              <img 
+                src={welcomeRitual.cover_image_url} 
+                alt={title} 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center">
+                <FluentEmoji emoji={welcomeRitualInfo.emoji || '✨'} size={96} className="opacity-40" />
+              </div>
+            )}
+            
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+            
+            <button
+              onClick={handleDismiss}
+              className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center hover:bg-black/50 transition-colors z-10"
+            >
+              <X className="w-4 h-4 text-white" />
+            </button>
+            
+            <div className="absolute bottom-3 left-3 right-3">
+              <h3 className="font-bold text-lg text-white drop-shadow-lg leading-tight">
+                {title}
+              </h3>
+              <p className="text-white/90 text-sm mt-1 drop-shadow">
+                {subtitle}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
