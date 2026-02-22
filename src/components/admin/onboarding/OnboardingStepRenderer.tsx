@@ -437,7 +437,38 @@ function InfoStatScreen({ step, onNext }: Props) {
 }
 
 function MotivationalScreen({ step, onNext }: Props) {
-  // Extract leading stat (e.g. "92%") from description if present
+  // Full-screen background mode when image is present and no description (page 35 style)
+  const isFullScreenBg = step.image && !step.description;
+
+  if (isFullScreenBg) {
+    // Parse title to highlight "build momentum" in yellow
+    const titleParts = step.title?.split(/(build momentum)/i) || [step.title];
+    return (
+      <div className="flex flex-col h-full relative overflow-hidden">
+        <img src={step.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="relative z-10 flex flex-col h-full px-6 pt-16 pb-8">
+          <h1 className="text-[28px] font-extrabold text-white text-center leading-tight drop-shadow-lg">
+            {titleParts.map((part, i) =>
+              /build momentum/i.test(part) ? (
+                <span key={i} className="text-yellow-300 font-extrabold">{part}</span>
+              ) : (
+                <span key={i}>{part}</span>
+              )
+            )}
+          </h1>
+          <div className="flex-1" />
+          <button
+            onClick={onNext}
+            className="w-[70%] mx-auto py-4 rounded-full bg-[#1a1f3d] text-white font-bold text-base active:scale-95 transition-transform shadow-xl"
+          >
+            {step.buttonLabel}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Default motivational with stat + description
   const descMatch = step.description?.match(/^(\d+%)\s*(.*)/s);
   
   return (

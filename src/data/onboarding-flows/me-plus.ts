@@ -13,6 +13,7 @@ import meplusImg27 from '@/assets/onboarding/meplus-27.png';
 import meplusImg28 from '@/assets/onboarding/meplus-28.png';
 import meplusImg29 from '@/assets/onboarding/meplus-29.png';
 import meplusImg16 from '@/assets/onboarding/meplus-img-16.png';
+import meplusImg35Bg from '@/assets/onboarding/meplus-35-mascot-bg.png';
 
 export const mePlusFlow: OnboardingFlow = {
   id: 'me-plus-v1',
@@ -446,8 +447,8 @@ export const mePlusFlow: OnboardingFlow = {
       id: 'mp-35',
       type: 'motivational',
       title: 'Tailored to your personality, Simora helps you build momentum with simple mini habits',
+      image: meplusImg35Bg,
       buttonLabel: 'Get Started!',
-      illustrationLabel: 'Mascot (chicken) on purple mountain background with clipboard and pencil',
     },
 
     // ─── PDF2 Page 16: Task Select (purple bg) ────────────
