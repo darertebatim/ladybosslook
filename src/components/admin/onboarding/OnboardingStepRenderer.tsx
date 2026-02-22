@@ -9,6 +9,7 @@ import appIcon from '@/assets/app-icon.png';
 import SealCheck from '@/components/app/SealCheck';
 import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
 import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
+import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
 
 interface Props {
   step: OnboardingStep;
@@ -614,43 +615,120 @@ function LoadingTestimonialsScreen({ step, onNext }: Props) {
     return () => clearInterval(interval);
   }, [step.id]);
 
-  const circumference = 2 * Math.PI * 40;
-  const strokeDashoffset = circumference - (progress / 100) * circumference;
+  // Extended testimonials for marquee rows
+  const row1 = [
+    { name: 'NightVain', text: 'Love it ❤️ Love it ❤️ Love it', stars: 5 },
+    { name: 'Sarah_M', text: 'Changed my daily routine completely!', stars: 5 },
+    { name: 'JohnDoe42', text: 'So helpful for productivity', stars: 4 },
+    { name: 'MindfulAmy', text: 'Best habit app I\'ve tried', stars: 5 },
+  ];
+  const row2 = [
+    { name: 'hdbdhdbdhdjcj', text: 'Helps me get things done', stars: 5 },
+    { name: 'BestUser', text: 'Best app ever ⭐', stars: 5 },
+    { name: 'WellnessGal', text: 'My mornings are so much better', stars: 5 },
+    { name: 'ProductivePete', text: 'Finally sticking to my goals', stars: 4 },
+  ];
+
+  // Heart SVG path
+  const heartPath = 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z';
 
   return (
-    <ScreenWrapper bg="bg-[#fdf8f4]">
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
-      <p className="text-sm text-gray-400 text-center mb-6">{step.subtitle}</p>
-      <div className="flex justify-center mb-6">
-        <svg width="96" height="96" className="-rotate-90">
-          <circle cx="48" cy="48" r="40" stroke="#e5e7eb" strokeWidth="6" fill="none" />
-          <circle
-            cx="48" cy="48" r="40"
-            stroke="#6366f1"
-            strokeWidth="6"
-            fill="none"
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
-            className="transition-all duration-100"
-          />
-        </svg>
-        <span className="absolute mt-8 text-lg font-bold text-[#1a1f3d]">{progress}%</span>
+    <div className="h-full flex flex-col bg-[#f8f5ff] overflow-hidden relative">
+      {/* Top section */}
+      <div className="flex flex-col items-center pt-14 pb-4 px-6">
+        {/* Heart-shaped progress */}
+        <div className="relative w-28 h-28 mb-4">
+          <svg viewBox="0 0 24 24" className="w-full h-full">
+            <defs>
+              <clipPath id="heartClip">
+                <path d={heartPath} />
+              </clipPath>
+            </defs>
+            {/* Background heart */}
+            <path d={heartPath} fill="none" stroke="#e0d4f5" strokeWidth="0.8" />
+            <path d={heartPath} fill="#f0eafc" />
+            {/* Progress fill from bottom */}
+            <rect
+              x="0" y={24 - (progress / 100) * 24}
+              width="24" height={(progress / 100) * 24}
+              fill="#7c5cbf"
+              clipPath="url(#heartClip)"
+              className="transition-all duration-100"
+            />
+            {/* Heart outline on top */}
+            <path d={heartPath} fill="none" stroke="#c4b0e8" strokeWidth="0.5" />
+          </svg>
+          <span className="absolute inset-0 flex items-center justify-center text-lg font-bold text-[#1a1f3d]">
+            {progress}%
+          </span>
+        </div>
+
+        <h1 className="text-xl font-extrabold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
+        <p className="text-base font-bold text-purple-500 text-center mb-1">
+          Millions of users
+        </p>
+        <p className="text-sm font-semibold text-[#1a1f3d] text-center">have chosen Simora</p>
       </div>
-      <div className="space-y-3">
-        {step.testimonials?.map((t, i) => (
-          <div key={i} className="bg-white rounded-xl p-3 flex gap-3 items-start shadow-sm">
-            <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-500 shrink-0">
-              {t.name[0]}
+
+      {/* Scrolling testimonials */}
+      <div className="flex-1 flex flex-col justify-center gap-3 overflow-hidden px-0">
+        {/* Row 1 - moves right */}
+        <div className="flex gap-3 animate-[marqueeRight_20s_linear_infinite]" style={{ width: 'max-content' }}>
+          {[...row1, ...row1].map((t, i) => (
+            <div key={i} className="bg-white rounded-xl p-3 shadow-sm min-w-[200px] shrink-0">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center text-[10px] font-bold text-purple-600">
+                  {t.name[0]}
+                </div>
+                <span className="text-xs font-semibold text-[#1a1f3d]">{t.name}</span>
+              </div>
+              <div className="flex gap-0.5 mb-1">
+                {Array.from({ length: t.stars }).map((_, s) => (
+                  <span key={s} className="text-amber-400 text-[10px]">★</span>
+                ))}
+              </div>
+              <p className="text-[11px] text-gray-500">{t.text}</p>
             </div>
-            <div>
-              <p className="text-xs font-semibold text-[#1a1f3d]">{t.name}</p>
-              <p className="text-xs text-gray-400 mt-0.5">{t.text}</p>
+          ))}
+        </div>
+
+        {/* Row 2 - moves left */}
+        <div className="flex gap-3 animate-[marqueeLeft_22s_linear_infinite]" style={{ width: 'max-content' }}>
+          {[...row2, ...row2].map((t, i) => (
+            <div key={i} className="bg-white rounded-xl p-3 shadow-sm min-w-[200px] shrink-0">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center text-[10px] font-bold text-purple-600">
+                  {t.name[0]}
+                </div>
+                <span className="text-xs font-semibold text-[#1a1f3d]">{t.name}</span>
+              </div>
+              <div className="flex gap-0.5 mb-1">
+                {Array.from({ length: t.stars }).map((_, s) => (
+                  <span key={s} className="text-amber-400 text-[10px]">★</span>
+                ))}
+              </div>
+              <p className="text-[11px] text-gray-500">{t.text}</p>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </ScreenWrapper>
+
+      {/* Community footer image */}
+      <div className="shrink-0 mt-auto">
+        <img src={meplusCommunityFooter} alt="" className="w-full object-cover object-top h-[140px]" />
+      </div>
+
+      <style>{`
+        @keyframes marqueeRight {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0%); }
+        }
+        @keyframes marqueeLeft {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
+        }
+      `}</style>
+    </div>
   );
 }
 
