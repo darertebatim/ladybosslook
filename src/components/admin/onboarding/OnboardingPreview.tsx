@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { OnboardingFlow } from '@/types/onboarding';
+import { OnboardingFlow, OnboardingAnswers } from '@/types/onboarding';
 import { OnboardingStepRenderer } from './OnboardingStepRenderer';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -13,7 +13,12 @@ interface Props {
 
 export function OnboardingPreview({ flow, onClose }: Props) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [answers, setAnswers] = useState<OnboardingAnswers>({});
   const step = flow.steps[currentStep];
+
+  const handleAnswer = useCallback((stepId: string, answer: string | string[]) => {
+    setAnswers(prev => ({ ...prev, [stepId]: answer }));
+  }, []);
 
   const goNext = useCallback(() => {
     if (currentStep < flow.steps.length - 1) {
@@ -115,6 +120,8 @@ export function OnboardingPreview({ flow, onClose }: Props) {
                   step={step}
                   onNext={goNext}
                   onMilestone={handleMilestone}
+                  onAnswer={handleAnswer}
+                  answers={answers}
                 />
               </div>
             </div>
