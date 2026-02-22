@@ -648,7 +648,9 @@ export default function RoutinesBank() {
   };
 
   const moveTaskUp = (taskId: string, sectionId: string | null) => {
-    const sectionTasks = localTasks.filter(t => t.section_id === sectionId);
+    const sectionTasks = localTasks
+      .filter(t => t.section_id === sectionId)
+      .sort((a, b) => a.task_order - b.task_order);
     const idx = sectionTasks.findIndex(t => t.id === taskId);
     if (idx <= 0) return;
     
@@ -663,7 +665,9 @@ export default function RoutinesBank() {
   };
 
   const moveTaskDown = (taskId: string, sectionId: string | null) => {
-    const sectionTasks = localTasks.filter(t => t.section_id === sectionId);
+    const sectionTasks = localTasks
+      .filter(t => t.section_id === sectionId)
+      .sort((a, b) => a.task_order - b.task_order);
     const idx = sectionTasks.findIndex(t => t.id === taskId);
     if (idx >= sectionTasks.length - 1) return;
     
