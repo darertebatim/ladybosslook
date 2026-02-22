@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, FlaskConical } from 'lucide-react';
 import { dearMeFlow } from '@/data/onboarding-flows/dear-me';
+import { mePlusFlow } from '@/data/onboarding-flows/me-plus';
 import { OnboardingFlowCard } from '@/components/admin/onboarding/OnboardingFlowCard';
 import { OnboardingPreview } from '@/components/admin/onboarding/OnboardingPreview';
 
 export default function Onboarding() {
   const [previewFlowId, setPreviewFlowId] = useState<string | null>(null);
-  const flows = [dearMeFlow];
+  const flows = [dearMeFlow, mePlusFlow];
   const previewFlow = flows.find(f => f.id === previewFlowId);
 
   return (
