@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import confetti from 'canvas-confetti';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -1194,6 +1195,35 @@ function WelcomeAboardScreen({ step, onNext }: Props) {
 // ─── New Me+ Screens ──────────────────────────────────────
 
 function ContractScreen({ step, onNext }: Props) {
+  const [signed, setSigned] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const handleConfirm = () => {
+    if (!signed) return;
+    setShowCelebration(true);
+    // Fire confetti
+    const myConfetti = confetti.create(undefined, { resize: true, useWorker: true });
+    myConfetti({ particleCount: 80, spread: 70, origin: { y: 0.3 } });
+    setTimeout(() => {
+      myConfetti({ particleCount: 50, spread: 90, origin: { y: 0.4 } });
+    }, 300);
+    // Auto-advance after 2.5s
+    setTimeout(onNext, 2500);
+  };
+
+  if (showCelebration) {
+    return (
+      <ScreenWrapper bg="bg-white">
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center">
+            Start 7-day <span className="text-3xl font-black">Free</span> Trial!
+          </h1>
+        </div>
+      </ScreenWrapper>
+    );
+  }
+
   return (
     <ScreenWrapper bg="bg-[#f5f0ff]">
       <div className="text-4xl mb-2">💜</div>
@@ -1203,12 +1233,25 @@ function ContractScreen({ step, onNext }: Props) {
           <li key={i} className="text-base font-medium text-[#1a1f3d]">• {opt.label}</li>
         ))}
       </ul>
-      <div className="bg-gray-100 rounded-2xl p-4 mb-2 h-28 flex items-center justify-center">
-        <p className="text-sm text-gray-400">Sign your name using finger:</p>
+      <div
+        className={`bg-gray-100 rounded-2xl p-4 mb-2 h-28 flex items-center justify-center cursor-pointer transition-all ${signed ? 'border-2 border-green-400 bg-green-50' : ''}`}
+        onClick={() => setSigned(true)}
+      >
+        {signed ? (
+          <p className="text-2xl font-bold text-[#1a1f3d] italic" style={{ fontFamily: 'cursive' }}>Signed ✓</p>
+        ) : (
+          <p className="text-sm text-gray-400">Tap here to sign</p>
+        )}
       </div>
       <p className="text-xs text-gray-400 text-center mb-4">*Your signature will not be recorded</p>
       <div className="mt-auto">
-        <button onClick={onNext} className="mx-auto block px-10 py-3 rounded-full bg-[#1a1f3d] text-white font-semibold text-sm">{step.buttonLabel}</button>
+        <button
+          onClick={handleConfirm}
+          disabled={!signed}
+          className={`mx-auto block px-10 py-3 rounded-full text-white font-semibold text-sm transition-opacity ${signed ? 'bg-[#1a1f3d]' : 'bg-gray-300 opacity-50 cursor-not-allowed'}`}
+        >
+          {step.buttonLabel}
+        </button>
       </div>
     </ScreenWrapper>
   );
