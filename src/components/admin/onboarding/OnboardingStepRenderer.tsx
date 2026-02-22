@@ -607,34 +607,75 @@ function PersonalSummaryScreen({ step, onNext }: Props) {
   const [animated, setAnimated] = useState(false);
   useEffect(() => { setTimeout(() => setAnimated(true), 300); }, []);
 
+  const categoryIcons: Record<string, string> = {
+    'Self-control': '📵',
+    'Concentration': '🧘',
+    'Productivity': '✅',
+    'Energy': '☕',
+  };
+
+  const isGood = (status: string) => status.includes('track');
+
   return (
     <ScreenWrapper>
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
-      <div className="space-y-4 mb-6">
-        {step.summaryBars?.map((bar, i) => (
-          <div key={i}>
-            <div className="flex justify-between text-sm mb-1">
-              <span className="font-medium text-[#1a1f3d]">{bar.label}</span>
-              <span className="text-xs text-gray-400">{bar.status}</span>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-6 whitespace-pre-line">{step.title}</h1>
+
+      {/* 2×2 Circle Grid */}
+      <div className="grid grid-cols-2 gap-4 mb-6 px-2">
+        {step.summaryBars?.map((bar, i) => {
+          const good = isGood(bar.status);
+          const ringColor = good ? '#2db87f' : '#e8734a';
+          const bgColor = good ? '#e8f5ee' : '#fce8e0';
+          const badgeBg = good ? '#2db87f' : '#e8734a';
+          const circumference = 2 * Math.PI * 54;
+          const offset = circumference - (bar.value / 100) * circumference;
+
+          return (
+            <div key={i} className="flex flex-col items-center gap-2">
+              <div className="relative w-[120px] h-[120px]">
+                <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="54" fill={bgColor} stroke="#e5e7eb" strokeWidth="4" />
+                  <circle
+                    cx="60" cy="60" r="54"
+                    fill="none"
+                    stroke={ringColor}
+                    strokeWidth="5"
+                    strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={animated ? offset : circumference}
+                    style={{ transition: 'stroke-dashoffset 1.2s ease-out' }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-2xl">{categoryIcons[bar.label] || '📊'}</span>
+                  <span className="text-xs font-bold text-[#1a1f3d] mt-1">{bar.label}</span>
+                </div>
+              </div>
+              <span
+                className="text-[11px] font-semibold text-white px-3 py-1 rounded-full"
+                style={{ backgroundColor: badgeBg }}
+              >
+                {good ? '✓ ' : ''}{bar.status}
+              </span>
             </div>
-            <div className="w-full bg-gray-100 rounded-full h-2.5">
-              <div
-                className="bg-gradient-to-r from-red-400 to-orange-400 h-2.5 rounded-full transition-all duration-1000 ease-out"
-                style={{ width: animated ? `${bar.value}%` : '0%' }}
-              />
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
-      <p className="text-sm font-semibold text-[#1a1f3d] text-center mb-4">{step.description}</p>
-      <div className="flex gap-2 justify-center mb-6">
+
+      {/* Bottom stats */}
+      <div className="flex items-start justify-center gap-4 mb-5 px-2">
+        <div className="flex flex-col items-center text-center w-20">
+          <span className="text-lg">🏅</span>
+          <p className="text-[10px] text-gray-500 mt-1 leading-tight">{step.description}</p>
+        </div>
         {step.statBadges?.map((b, i) => (
-          <div key={i} className="bg-indigo-50 rounded-xl px-3 py-2 text-center">
-            <p className="text-xs text-gray-400">{b.label}</p>
-            <p className="text-xs font-semibold text-indigo-600">{b.value}</p>
+          <div key={i} className="flex flex-col items-center text-center w-24">
+            <p className="text-xl font-extrabold text-[#1a1f3d]">{b.value}</p>
+            <p className="text-[10px] text-gray-500 leading-tight">{b.label}</p>
           </div>
         ))}
       </div>
+
       <div className="mt-auto">
         <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
