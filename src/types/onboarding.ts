@@ -49,6 +49,7 @@ export interface PricingTier {
   perWeek: string;
   total: string;
   badge?: string;
+  discount?: string;
 }
 
 export interface OnboardingStep {
