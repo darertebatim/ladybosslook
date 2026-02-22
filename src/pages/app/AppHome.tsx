@@ -239,17 +239,14 @@ const AppHome = () => {
     }
   }, [isNewUser, startedAsNewUser, homeDataLoading]);
   
-  // Auto-reset welcome card dismissal if user truly has no tasks
-  // This handles the case when admin resets user data - the welcome card should reappear
+  // Auto-reset welcome card dismissal ONLY on explicit admin reset (force flag)
   useEffect(() => {
-    if (dataIsNewUser && welcomeCardDismissed) {
-      // User has 0 tasks but card was dismissed - likely an admin reset
-      // Clear the dismissal so the card shows again
+    if (forceNewUser && welcomeCardDismissed) {
       setWelcomeCardDismissed(false);
       localStorage.removeItem('simora_welcome_card_dismissed');
       localStorage.removeItem('simora_welcome_card_action_added');
     }
-  }, [dataIsNewUser, welcomeCardDismissed]);
+  }, [forceNewUser, welcomeCardDismissed]);
   
   // Show welcome card if user started as new user this session (even after adding tasks)
   const showWelcomeCard = (startedAsNewUser ?? isNewUser) && !welcomeCardDismissed;
