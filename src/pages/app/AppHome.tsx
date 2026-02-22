@@ -48,6 +48,7 @@ import { useBadgeCelebration } from '@/hooks/useBadgeCelebration';
 import { useGoldStreak, useGoldDatesThisWeek, useUpdateGoldStreak } from '@/hooks/useGoldStreak';
 import { useTodayMood } from '@/hooks/useMoodLogs';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useAppReview } from '@/hooks/useAppReview';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { ActionLimitSheet, hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 import { MoodCheckInBanner } from '@/components/mood/MoodCheckInBanner';
@@ -455,6 +456,7 @@ const AppHome = () => {
     setTimerTask(task);
   }, []);
 
+  const { maybeRequestReview } = useAppReview();
 
 
 
@@ -1043,7 +1045,13 @@ const AppHome = () => {
         {/* Badge celebration (silver/almost-there toasts + gold modal) */}
         <BadgeCelebration
           type={badgeCelebrationType}
-          onClose={closeBadgeCelebration}
+          onClose={() => {
+            const wassilver = badgeCelebrationType === 'silver';
+            closeBadgeCelebration();
+            if (wassilver) {
+              maybeRequestReview();
+            }
+          }}
           onCollectGold={closeBadgeCelebration}
           onGoldCollected={() => {
             // Check if already shown today to prevent re-showing on navigation
