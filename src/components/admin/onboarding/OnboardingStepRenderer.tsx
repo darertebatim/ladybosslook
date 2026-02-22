@@ -144,13 +144,25 @@ function WelcomeScreen({ step, onNext }: Props) {
         </div>
       )}
 
-      {/* Bottom sheet with rounded top — raised higher */}
-      <div className="absolute inset-x-0 bottom-0 h-[48%] bg-white rounded-t-[28px] flex flex-col items-center justify-end px-6 pb-5 pt-7 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-        <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight">{step.title}</h1>
-        <p className="text-[17px] font-semibold text-[#1a1f3d] text-center mb-6 leading-relaxed max-w-[260px] whitespace-pre-line">{step.subtitle}</p>
+      {/* Bottom sheet with rounded top */}
+      <div className="absolute inset-x-0 bottom-0 h-[48%] bg-white rounded-t-[28px] flex flex-col items-center justify-end px-6 pb-5 pt-7 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-hidden">
+        {/* Sparkles scattered in the white space */}
+        <div className="absolute top-6 left-8 text-amber-300/60 animate-pulse" style={{ animationDelay: '0s', animationDuration: '2.5s' }}>✦</div>
+        <div className="absolute top-10 right-12 text-purple-300/50 animate-pulse text-xs" style={{ animationDelay: '0.8s', animationDuration: '3s' }}>✦</div>
+        <div className="absolute top-16 left-[45%] text-amber-200/40 animate-pulse text-[10px]" style={{ animationDelay: '1.5s', animationDuration: '2.8s' }}>✧</div>
+        <div className="absolute top-8 right-[30%] text-purple-200/50 animate-pulse text-[8px]" style={{ animationDelay: '0.4s', animationDuration: '3.2s' }}>✦</div>
+        <div className="absolute top-20 left-16 text-amber-300/30 animate-pulse text-[11px]" style={{ animationDelay: '2s', animationDuration: '2.6s' }}>✧</div>
+
+        {/* Floating feathers */}
+        <div className="absolute top-4 right-[22%] animate-[floatFeather1_4s_ease-in-out_infinite] text-amber-300/50 text-sm" style={{ transform: 'rotate(25deg)' }}>🪶</div>
+        <div className="absolute top-12 left-[20%] animate-[floatFeather2_5s_ease-in-out_infinite] text-amber-200/40 text-xs" style={{ animationDelay: '1.2s', transform: 'rotate(-15deg)' }}>🪶</div>
+        <div className="absolute top-5 left-[60%] animate-[floatFeather3_4.5s_ease-in-out_infinite] text-amber-300/35 text-[10px]" style={{ animationDelay: '2.5s', transform: 'rotate(40deg)' }}>🪶</div>
+
+        <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight relative z-10">{step.title}</h1>
+        <p className="text-[17px] font-semibold text-[#1a1f3d] text-center mb-6 leading-relaxed max-w-[260px] whitespace-pre-line relative z-10">{step.subtitle}</p>
         <button
           onClick={onNext}
-          className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 relative z-10"
         >
           {step.buttonLabel}
           <span className="text-base">→</span>
