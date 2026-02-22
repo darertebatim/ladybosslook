@@ -446,8 +446,8 @@ function MotivationalScreen({ step, onNext }: Props) {
     return (
       <div className="flex flex-col h-full relative overflow-hidden">
         <img src={step.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="relative z-10 flex flex-col h-full items-center justify-center px-6 pb-8">
-          <h1 className="text-[20px] font-extrabold text-white text-center leading-snug drop-shadow-lg mb-5">
+        <div className="relative z-10 h-full">
+          <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] text-[20px] font-extrabold text-white text-center leading-snug drop-shadow-lg">
             {titleParts.map((part, i) =>
               /build momentum/i.test(part) ? (
                 <span key={i} className="text-yellow-300 font-extrabold">{part}</span>
@@ -456,10 +456,9 @@ function MotivationalScreen({ step, onNext }: Props) {
               )
             )}
           </h1>
-          <div className="flex-1" />
           <button
             onClick={onNext}
-            className="w-[70%] mx-auto py-4 rounded-full bg-[#1a1f3d] text-white font-bold text-base active:scale-95 transition-transform shadow-xl"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[70%] py-4 rounded-full bg-[#1a1f3d] text-white font-bold text-base active:scale-95 transition-transform shadow-xl"
           >
             {step.buttonLabel}
           </button>
