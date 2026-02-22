@@ -201,7 +201,7 @@ function MultiSelectScreen({ step, onNext }: Props) {
   if (hasBg) {
     return (
       <BottomSheetWrapper bgImage={meplusMascotBg}>
-        <h1 className="text-xl font-bold text-[#1a1f3d] mb-5">{step.title}</h1>
+        <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
         <div className="space-y-3 mb-6">
           {step.options?.map((opt, i) => (
             <button
@@ -226,7 +226,7 @@ function MultiSelectScreen({ step, onNext }: Props) {
 
   return (
     <ScreenWrapper>
-      <h1 className="text-xl font-bold text-[#1a1f3d] mb-5">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
       <div className="space-y-3 mb-6">
         {step.options?.map((opt, i) => (
           <button
@@ -284,7 +284,7 @@ function SingleSelectScreen({ step, onNext }: Props) {
   if (hasBg) {
     return (
       <BottomSheetWrapper bgImage={meplusMascotBg}>
-        <h1 className="text-xl font-bold text-[#1a1f3d] mb-5">{step.title}</h1>
+        <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
         <div className="space-y-3">
           {step.options?.map((opt, i) => (
             <button
@@ -308,11 +308,11 @@ function SingleSelectScreen({ step, onNext }: Props) {
     <ScreenWrapper>
       {step.subtitle ? (
         <>
-          <h1 className="text-xl font-bold text-[#1a1f3d] mb-1">{step.title}</h1>
+          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
           <p className="text-base text-gray-500 mb-5">{step.subtitle}</p>
         </>
       ) : (
-        <h1 className="text-xl font-bold text-[#1a1f3d] mb-5">{step.title}</h1>
+        <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
       )}
       <div className="space-y-3">
         {step.options?.map((opt, i) => (
@@ -343,7 +343,7 @@ function SingleSelectDescScreen({ step, onNext }: Props) {
 
   return (
     <ScreenWrapper>
-      <h1 className="text-xl font-bold text-[#1a1f3d] mb-5">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
       <div className="space-y-3">
         {step.options?.map((opt, i) => (
           <button
@@ -387,7 +387,7 @@ function YesNoScreen({ step, onNext }: Props) {
 function DoYouWantScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-4">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4">{step.title}</h1>
       {step.image ? (
         <div className="flex-1 flex items-center justify-center">
           <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
@@ -411,7 +411,7 @@ function InfoStatScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper bg="bg-[#fdf8f4]">
       <IllustrationPlaceholder label={step.illustrationLabel || 'Statistic'} className="h-36 mb-6" />
-      <h1 className="text-xl font-bold text-[#1a1f3d] mb-3">{step.statHighlight}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-3">{step.statHighlight}</h1>
       <p className="text-sm text-gray-500 mb-8 leading-relaxed">{step.description}</p>
       <div className="mt-auto">
         <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
@@ -426,7 +426,7 @@ function MotivationalScreen({ step, onNext }: Props) {
   
   return (
     <ScreenWrapper>
-      <h1 className="text-xl font-bold text-[#1a1f3d] mb-4 leading-tight whitespace-pre-line">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight whitespace-pre-line">{step.title}</h1>
       {step.image ? (
         <div className="flex items-center justify-center mb-5">
           <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
@@ -458,7 +458,7 @@ function NotificationScreen({ step, onNext, onMilestone }: Props) {
   return (
     <ScreenWrapper>
       <IllustrationPlaceholder label="Bell notification icon" className="h-40 mb-6" />
-      <h1 className="text-xl font-bold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
       {step.subtitle && (
         <div className="bg-white rounded-2xl border border-gray-200 p-4 my-4 text-center shadow-sm">
           <p className="text-sm font-semibold text-[#1a1f3d] mb-1">{step.subtitle}</p>
@@ -486,7 +486,7 @@ function ResultsChartScreen({ step, onNext }: Props) {
 
   return (
     <ScreenWrapper>
-      <h1 className="text-xl font-bold text-[#1a1f3d] mb-4">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4">{step.title}</h1>
       <div className="bg-gradient-to-tr from-indigo-50 to-purple-50 rounded-2xl p-5 mb-4 h-48 flex flex-col justify-end">
         <div className="flex justify-between text-xs text-gray-400 mb-2">
           <span>Your expectation</span>
@@ -521,7 +521,7 @@ function ResultsChartScreen({ step, onNext }: Props) {
 function HabitLoopScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <h1 className="text-xl font-bold text-[#1a1f3d] mb-2">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
       {step.subtitle && <p className="text-base font-semibold text-[#1a1f3d] mb-3">{step.subtitle}</p>}
       {step.illustrationLabel ? (
         <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 mb-4 h-44 flex items-center justify-center">
@@ -568,7 +568,7 @@ function LoadingTestimonialsScreen({ step, onNext }: Props) {
 
   return (
     <ScreenWrapper bg="bg-[#fdf8f4]">
-      <h1 className="text-xl font-bold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
       <p className="text-sm text-gray-400 text-center mb-6">{step.subtitle}</p>
       <div className="flex justify-center mb-6">
         <svg width="96" height="96" className="-rotate-90">
@@ -609,7 +609,7 @@ function PersonalSummaryScreen({ step, onNext }: Props) {
 
   return (
     <ScreenWrapper>
-      <h1 className="text-xl font-bold text-[#1a1f3d] mb-5">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
       <div className="space-y-4 mb-6">
         {step.summaryBars?.map((bar, i) => (
           <div key={i}>
@@ -646,7 +646,7 @@ function FirstHabitScreen({ step, onNext }: Props) {
   const days = ['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'];
   return (
     <ScreenWrapper>
-      <h1 className="text-xl font-bold text-[#1a1f3d] mb-4">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4">{step.title}</h1>
       <p className="text-sm text-gray-400 mb-3">Today</p>
       <div className="flex gap-1 mb-5">
         {days.map((d, i) => (
@@ -734,7 +734,7 @@ function BreathingScreen({ step, onNext }: Props) {
 function BreathingDoneScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <h1 className="text-xl font-bold text-[#1a1f3d] mb-2">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
       <p className="text-sm text-gray-400 mb-5">{step.description}</p>
       <p className="text-sm text-gray-400 mb-3">Today</p>
       <div className="bg-green-50 rounded-2xl p-4 flex items-center gap-3 mb-6 border border-green-200">
@@ -788,7 +788,7 @@ function PaywallScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
       <button onClick={onNext} className="self-end text-gray-400 text-lg mb-2 active:opacity-60">✕</button>
-      <h1 className="text-xl font-bold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
       <div className="space-y-3 mb-4">
         {step.pricingTiers?.map((tier, i) => (
           <button
@@ -823,7 +823,7 @@ function PaywallScreen({ step, onNext }: Props) {
 function BeforeAfterScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
       <p className="text-lg font-semibold text-[#1a1f3d] text-center mb-5">{step.subtitle}</p>
       {step.image ? (
         <div className="flex-1 flex items-center justify-center mb-6">
@@ -865,7 +865,7 @@ function ScienceBackedScreen({ step, onNext }: Props) {
     <ScreenWrapper>
       {step.subtitle ? (
         <>
-          <h1 className="text-xl font-bold text-[#1a1f3d] mb-4 leading-tight">{step.title}</h1>
+          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight">{step.title}</h1>
           {step.image ? (
             <div className="flex items-center justify-center mb-5">
               <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
@@ -912,7 +912,7 @@ function ScienceBackedScreen({ step, onNext }: Props) {
         </>
       ) : (
         <>
-          <h1 className="text-xl font-bold text-[#1a1f3d] mb-4">{step.title}</h1>
+          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4">{step.title}</h1>
           <p className="text-sm text-gray-500 leading-relaxed mb-6">{step.description}</p>
           <div className="flex flex-wrap gap-2 justify-center mb-6">
             {step.statBadges?.map((b, i) => (
@@ -940,7 +940,7 @@ function RatingScreen({ step, onNext, onMilestone }: Props) {
     <ScreenWrapper bg="bg-[#fdf8f4]">
       <div className="flex-1 flex flex-col items-center justify-center">
         <div className="text-5xl mb-4">⭐</div>
-        <h1 className="text-xl font-bold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
+        <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
         {step.subtitle && <p className="text-sm text-gray-400 text-center mb-2">{step.subtitle}</p>}
         <p className="text-sm text-gray-500 text-center mb-4">{step.description}</p>
         <div className="flex gap-1 mb-6">
@@ -1016,7 +1016,7 @@ function ContractScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper bg="bg-[#f5f0ff]">
       <div className="text-4xl mb-2">💜</div>
-      <h1 className="text-2xl font-bold text-[#1a1f3d] mb-4">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4">{step.title}</h1>
       <ul className="space-y-3 mb-6">
         {step.options?.map((opt, i) => (
           <li key={i} className="text-base font-medium text-[#1a1f3d]">• {opt.label}</li>
@@ -1036,7 +1036,7 @@ function ContractScreen({ step, onNext }: Props) {
 function DistressGridScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-5 whitespace-pre-line">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5 whitespace-pre-line">{step.title}</h1>
       {step.image ? (
         <div className="flex-1 flex items-center justify-center mb-6">
           <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
@@ -1060,7 +1060,7 @@ function DistressGridScreen({ step, onNext }: Props) {
 function ADHDInfoScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <h1 className="text-xl font-bold text-[#1a1f3d] mb-4">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4">{step.title}</h1>
       {step.image ? (
         <div className="flex items-center justify-center mb-4">
           <img src={step.image} alt="" className="w-full max-w-[280px] object-contain rounded-2xl" />
@@ -1158,7 +1158,7 @@ function CountdownPaywallScreen({ step, onNext }: Props) {
     <ScreenWrapper>
       <button onClick={onNext} className="self-start text-gray-400 text-lg mb-1">✕</button>
       <span className="self-end text-sm text-gray-400 -mt-6 mb-2">Restore</span>
-      <h1 className="text-xl font-bold text-[#1a1f3d] text-center mb-3">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-3">{step.title}</h1>
       <IllustrationPlaceholder label={step.illustrationLabel || 'Before/After'} className="h-40 mb-4" />
       <div className="space-y-2 mb-3">
         {step.pricingTiers?.map((tier, i) => (
@@ -1189,7 +1189,7 @@ function DarkPaywallScreen({ step, onNext }: Props) {
       <button onClick={onNext} className="self-start text-gray-500 text-lg mb-1">✕</button>
       <span className="self-end text-sm text-gray-400 -mt-6 mb-2">Restore</span>
       <p className="text-sm text-gray-400 text-center mb-1">{step.title}</p>
-      <h1 className="text-xl font-bold text-white text-center mb-3">{step.subtitle}</h1>
+      <h1 className="text-2xl font-extrabold text-white text-center mb-3">{step.subtitle}</h1>
       <IllustrationPlaceholder label={step.illustrationLabel || 'Before/After'} className="h-32 mb-3" />
       <div className="bg-gradient-to-r from-pink-500 to-red-400 rounded-2xl px-6 py-4 mb-4 text-center">
         <p className="text-3xl font-black text-white">{step.statHighlight}</p>
@@ -1218,7 +1218,7 @@ function TaskSelectPurpleScreen({ step, onNext }: Props) {
 
   return (
     <ScreenWrapper bg="bg-gradient-to-b from-purple-500 to-purple-700">
-      <h1 className="text-xl font-bold text-white text-center mb-1">{step.title}</h1>
+      <h1 className="text-2xl font-extrabold text-white text-center mb-1">{step.title}</h1>
       <p className="text-sm text-yellow-300 text-center mb-4">{step.subtitle}</p>
       <div className="space-y-3 mb-4">
         {step.options?.map((opt, i) => (
