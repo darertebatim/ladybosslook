@@ -23,7 +23,16 @@ export type OnboardingStepType =
   | 'science-backed'
   | 'rating'
   | 'discount-offer'
-  | 'welcome-aboard';
+  | 'welcome-aboard'
+  | 'contract'
+  | 'distress-grid'
+  | 'adhd-info'
+  | 'lucky-draw'
+  | 'super-prize'
+  | 'countdown-paywall'
+  | 'dark-paywall'
+  | 'task-select-purple'
+  | 'confetti-message';
 export interface OnboardingOption {
   label: string;
   emoji?: string;
