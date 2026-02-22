@@ -5,4 +5,5 @@ export { PaywallBold } from './PaywallBold';
 export { PaywallComparison } from './PaywallComparison';
 export { PaywallLimitedOffer } from './PaywallLimitedOffer';
 export { PaywallVIP } from './PaywallVIP';
+export { PaywallOnboarding } from './PaywallOnboarding';
 
