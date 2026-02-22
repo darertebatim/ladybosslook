@@ -1347,7 +1347,7 @@ function ContractScreen({ step, onNext }: Props) {
           <li key={i} className="text-base font-medium text-[#1a1f3d]">• {opt.label}</li>
         ))}
       </ul>
-      <div className="bg-gray-100 rounded-2xl p-3 mb-2">
+      <div className="relative bg-gray-100 rounded-2xl p-3 mb-2">
         <p className="text-xs text-gray-500 mb-1 font-medium">Sign your name using finger:</p>
         <canvas
           ref={canvasRef}
@@ -1362,6 +1362,14 @@ function ContractScreen({ step, onNext }: Props) {
           onTouchMove={draw}
           onTouchEnd={stopDraw}
         />
+        {/* Finger hint pointing to signature area */}
+        {!signed && (
+          <div className="absolute -top-2 right-4 pointer-events-none z-10" style={{ filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))' }}>
+            <div style={{ animation: 'coachHandBounce 1.4s ease-in-out infinite', transform: 'rotate(-45deg)' }}>
+              <FluentEmoji emoji="👇" size={48} />
+            </div>
+          </div>
+        )}
       </div>
       <p className="text-xs text-gray-400 text-center mb-4">*Your signature will not be recorded</p>
       <div className="mt-auto">
@@ -1373,6 +1381,13 @@ function ContractScreen({ step, onNext }: Props) {
           {step.buttonLabel}
         </button>
       </div>
+      <style>{`
+        @keyframes coachHandBounce {
+          0%   { transform: rotate(-45deg) translateY(0px); }
+          40%  { transform: rotate(-45deg) translateY(10px); }
+          100% { transform: rotate(-45deg) translateY(0px); }
+        }
+      `}</style>
     </ScreenWrapper>
   );
 }
