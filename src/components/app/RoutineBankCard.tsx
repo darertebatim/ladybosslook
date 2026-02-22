@@ -103,13 +103,23 @@ export function RoutineBankCard({
       )}
       <button 
         className={cn(
-          "overflow-hidden cursor-pointer transition-all active:scale-[0.98] w-full text-left",
+          "overflow-hidden cursor-pointer transition-all active:scale-[0.98] w-full text-left rounded-2xl shadow-lg border border-border/50",
           className
         )}
         onClick={handleClick}
       >
+        {/* Title Header Section */}
+        <div className={cn(
+          'px-3 py-3 rounded-t-2xl',
+          bgColor
+        )}>
+          <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
+            {routine.title}
+          </h3>
+        </div>
+
         {/* Square Image Container */}
-        <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-lg border border-border/50">
+        <div className="relative aspect-square w-full overflow-hidden rounded-b-2xl">
           {routine.cover_image_url ? (
             <CachedImage
               src={routine.cover_image_url}
@@ -127,9 +137,6 @@ export function RoutineBankCard({
             </div>
           )}
           
-          {/* Bottom Gradient for Title Overlay */}
-          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-          
           {/* Close/Dismiss button */}
           {onDismiss && (
             <button
@@ -144,24 +151,7 @@ export function RoutineBankCard({
               <X className="h-3.5 w-3.5 text-white" />
             </button>
           )}
-          
-          {/* Title Overlay - Bottom */}
-          <h3 className="absolute bottom-2.5 left-2.5 right-2.5 font-semibold text-sm text-white line-clamp-2 drop-shadow-lg">
-            {routine.title}
-          </h3>
         </div>
-        
-        {/* Category badge - Below image */}
-        {routine.category && routine.category !== 'general' && (
-          <div className="mt-2 px-0.5">
-            <Badge 
-              variant="secondary" 
-              className="rounded-full capitalize text-[11px] px-2 py-0.5 bg-muted/80 text-muted-foreground"
-            >
-              {routine.category}
-            </Badge>
-          </div>
-        )}
       </button>
     </div>
   );
