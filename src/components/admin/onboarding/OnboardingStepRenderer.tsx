@@ -131,22 +131,17 @@ function ScreenWrapper({ children, bg = 'bg-white' }: { children: React.ReactNod
 function WelcomeScreen({ step, onNext }: Props) {
   return (
     <div className="h-full relative overflow-hidden bg-gradient-to-b from-purple-400 via-purple-300 to-purple-100">
-      {/* Mascot image — top 55% */}
+      {/* Mascot image — top area, centered on face */}
       {step.image && (
-        <div className="absolute inset-x-0 top-0 h-[58%]">
-          <img src={step.image} alt="" className="w-full h-full object-cover object-bottom" />
-          {/* Soft blend into bottom area */}
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-purple-100 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-[65%]">
+          <img src={step.image} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 40%' }} />
         </div>
       )}
 
-      {/* Bottom content area */}
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-b from-purple-100 via-white to-white flex flex-col items-center justify-end px-6 pb-5 pt-6">
-        {/* Welcome text */}
+      {/* Bottom sheet with rounded top */}
+      <div className="absolute inset-x-0 bottom-0 bg-white rounded-t-[28px] flex flex-col items-center justify-end px-6 pb-5 pt-7 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
         <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight">{step.title}</h1>
         <p className="text-sm text-gray-400 text-center mb-6 leading-relaxed max-w-[240px]">{step.subtitle}</p>
-
-        {/* CTA with arrow */}
         <button
           onClick={onNext}
           className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
