@@ -130,115 +130,33 @@ function ScreenWrapper({ children, bg = 'bg-white' }: { children: React.ReactNod
 // ─── Screens ───────────────────────────────────────────────────
 
 function WelcomeScreen({ step, onNext }: Props) {
-  // Laurel leaf SVG path for reuse
-  const LaurelBranch = ({ flip = false }: { flip?: boolean }) => (
-    <svg
-      width="48" height="80" viewBox="0 0 48 80"
-      className={`text-green-500 ${flip ? 'scale-x-[-1]' : ''}`}
-      fill="currentColor"
-    >
-      <ellipse cx="18" cy="14" rx="10" ry="6" transform="rotate(-30 18 14)" opacity="0.85" />
-      <ellipse cx="14" cy="28" rx="10" ry="6" transform="rotate(-15 14 28)" opacity="0.8" />
-      <ellipse cx="12" cy="42" rx="10" ry="6" transform="rotate(0 12 42)" opacity="0.75" />
-      <ellipse cx="14" cy="56" rx="10" ry="6" transform="rotate(15 14 56)" opacity="0.7" />
-      <ellipse cx="18" cy="68" rx="9" ry="5" transform="rotate(25 18 68)" opacity="0.65" />
-      <rect x="22" y="8" width="3" height="68" rx="1.5" opacity="0.5" transform="rotate(2 24 40)" />
-    </svg>
-  );
-
   return (
-    <div className="h-full relative overflow-hidden bg-gradient-to-b from-[#e8eaf6] via-[#edeef8] to-white">
+    <div className="h-full relative overflow-hidden bg-gradient-to-b from-purple-400 via-purple-300 to-purple-100">
       {/* App icon top-left */}
       <div className="absolute top-3 left-4 z-10">
         <img src={appIcon} alt="Simora" className="w-10 h-10 rounded-xl shadow-md" />
       </div>
 
-      {/* Mascot image — top area */}
-      {step.image ? (
-        <div className="absolute inset-x-0 top-0 h-[55%]">
+      {/* Mascot image — top area, centered on mouth */}
+      {step.image && (
+        <div className="absolute inset-x-0 top-0 h-[58%]">
           <img src={step.image} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 45%' }} />
         </div>
-      ) : (
-        <div className="absolute inset-x-0 top-0 h-[55%] bg-gradient-to-b from-[#d1d5f0] to-transparent" />
       )}
 
-      {/* Bottom sheet */}
-      <div className="absolute inset-x-0 bottom-0 h-[50%] bg-white rounded-t-[28px] flex flex-col items-center px-6 pb-5 pt-6 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-        {/* Title */}
-        <h1 className="text-lg font-bold text-[#1a1f3d] text-center leading-snug mb-1">
-          {step.title}
-        </h1>
-
-        {/* Stat highlight with laurel leaves */}
-        {step.statHighlight && (
-          <div className="flex items-center justify-center gap-1 my-1">
-            <LaurelBranch />
-            <span className="text-[32px] font-black text-[#1a1f3d] leading-none">
-              {step.statHighlight}
-            </span>
-            <LaurelBranch flip />
-          </div>
-        )}
-
-        {/* 5 stars */}
-        <div className="flex items-center gap-0.5 mb-3">
-          {[1, 2, 3, 4, 5].map(i => (
-            <svg key={i} width="20" height="20" viewBox="0 0 20 20" fill="#f5b100">
-              <path d="M10 1.5l2.47 5.01 5.53.8-4 3.9.94 5.49L10 14.27 5.06 16.7 6 11.21l-4-3.9 5.53-.8z" />
-            </svg>
-          ))}
-        </div>
-
-        {/* Stat badges row */}
-        {step.statBadges && step.statBadges.length > 0 && (
-          <div className="flex items-center justify-center gap-4 mb-4">
-            {step.statBadges.map((badge, i) => (
-              <div key={i} className="flex flex-col items-center gap-0.5">
-                <div className="flex items-center gap-1">
-                  <LaurelSmall />
-                  <span className="text-[11px] font-semibold text-gray-500 text-center leading-tight">{badge.label}</span>
-                  <LaurelSmall flip />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        {/* Get Started button */}
+      {/* Bottom sheet with rounded top — raised higher */}
+      <div className="absolute inset-x-0 bottom-0 h-[48%] bg-white rounded-t-[28px] flex flex-col items-center justify-end px-6 pb-5 pt-7 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+        <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight">{step.title}</h1>
+        <p className="text-[17px] font-semibold text-[#1a1f3d] text-center mb-6 leading-relaxed max-w-[260px] whitespace-pre-line">{step.subtitle}</p>
         <button
           onClick={onNext}
-          className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-[15px] active:scale-[0.98] transition-all"
+          className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
         >
-          {step.buttonLabel || 'Get started'}
+          {step.buttonLabel}
+          <span className="text-base">→</span>
         </button>
-
-        {/* Already a member */}
-        {step.secondaryButtonLabel && (
-          <button onClick={onNext} className="mt-3 text-sm text-gray-500 font-medium">
-            Already a member? <span className="text-green-600 font-semibold">Sign in.</span>
-          </button>
-        )}
       </div>
     </div>
-  );
-}
-
-function LaurelSmall({ flip = false }: { flip?: boolean }) {
-  return (
-    <svg
-      width="20" height="28" viewBox="0 0 20 28"
-      className={`text-gray-400 ${flip ? 'scale-x-[-1]' : ''}`}
-      fill="currentColor"
-    >
-      <ellipse cx="8" cy="5" rx="5" ry="3" transform="rotate(-25 8 5)" opacity="0.7" />
-      <ellipse cx="6" cy="12" rx="5" ry="3" transform="rotate(-10 6 12)" opacity="0.6" />
-      <ellipse cx="6" cy="19" rx="5" ry="3" transform="rotate(10 6 19)" opacity="0.5" />
-      <ellipse cx="8" cy="25" rx="4" ry="2.5" transform="rotate(20 8 25)" opacity="0.4" />
-      <rect x="10" y="3" width="1.5" height="23" rx="0.75" opacity="0.35" />
-    </svg>
   );
 }
 
