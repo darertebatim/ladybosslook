@@ -1001,7 +1001,10 @@ function PaywallScreen({ step, onNext }: Props) {
               )}
               <p className="text-base font-extrabold text-[#1a1f3d] leading-tight">{tier.label.split(' ')[0]}</p>
               <p className="text-[11px] text-[#1a1f3d] font-medium">{tier.label.split(' ').slice(1).join(' ')}</p>
-              <p className="text-[11px] text-gray-400 mt-1 line-through">{tier.perWeek}</p>
+              <p className={`text-[11px] text-gray-400 mt-1 ${tier.perWeek?.includes('/mo.') && tier.label.startsWith('1') ? 'line-through' : ''}`}>{tier.perWeek}</p>
+              {tier.discount && (
+                <span className="inline-block mt-1 text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-500 text-white">{tier.discount}</span>
+              )}
               <div className="border-t border-gray-200 mt-2 pt-2">
                 <p className={`text-xs font-bold ${isSelected ? 'text-[#1a1f3d]' : 'text-gray-500'}`}>{tier.total}</p>
               </div>

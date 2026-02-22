@@ -402,8 +402,8 @@ export const mePlusFlow: OnboardingFlow = {
       subtitle: 'No Payment Now!',
       image: meplusImg32Paywall,
       pricingTiers: [
-        { label: '1 month', perWeek: '$19.99/mo.', total: '$13.99/mo', badge: '7-Day Free Trial' },
-        { label: '12 months', perWeek: '$8.33/mo.', total: '$99.99/yr', badge: '7-Day Free Trial' },
+        { label: '1 month', perWeek: '$19.99/mo.', total: '$13.99/mo', badge: '7-Day Free Trial', discount: '40% OFF' },
+        { label: '12 months', perWeek: '$8.33/mo.', total: '$99.99/yr', badge: '7-Day Free Trial', discount: '59% OFF' },
       ],
       buttonLabel: 'Continue',
       description: 'After your 7-day free trial, your Apple ID payment method will be automatically charged $59.99 for a year. Cancel the subscription at least 24 hours before the current subscription period.',
