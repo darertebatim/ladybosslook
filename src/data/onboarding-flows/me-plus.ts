@@ -1,4 +1,5 @@
 import { OnboardingFlow } from '@/types/onboarding';
+import meplusImg11 from '@/assets/onboarding/meplus-11-beforeafter.png';
 import meplusImg18 from '@/assets/onboarding/meplus-18.png';
 import meplusImg19 from '@/assets/onboarding/meplus-19.png';
 import meplusImg20 from '@/assets/onboarding/meplus-20.png';
@@ -147,22 +148,8 @@ export const mePlusFlow: OnboardingFlow = {
       type: 'before-after',
       title: 'Move Now! Become the',
       subtitle: 'Best Version of Yourself',
-      beforeItems: [
-        'An unorganized day',
-        'Unfinished goals',
-        'Bad habits',
-        'Anxiety and depression',
-        "Envy other people's life",
-      ],
-      afterItems: [
-        'A structured day',
-        'Goals achieved',
-        'Healthy habits',
-        'Mindfulness',
-        'Brand new life',
-      ],
+      image: meplusImg11,
       buttonLabel: 'Continue',
-      illustrationLabel: 'Before: sad person with rain. After: happy person with sun.',
     },
 
     // ─── PDF1 Page 12: Distraction ────────────────────────

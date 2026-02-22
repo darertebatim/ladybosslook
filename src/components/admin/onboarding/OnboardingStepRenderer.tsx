@@ -119,7 +119,7 @@ function IllustrationPlaceholder({ label, className = '' }: { label: string; cla
 function ScreenWrapper({ children, bg = 'bg-white' }: { children: React.ReactNode; bg?: string }) {
   return (
     <ScrollArea className={`h-full ${bg}`}>
-      <div className="flex flex-col h-full min-h-[700px] px-5 pt-2 pb-6">
+      <div className="flex flex-col h-full min-h-[700px] px-5 pt-14 pb-6">
         {children}
       </div>
     </ScrollArea>
@@ -782,29 +782,35 @@ function BeforeAfterScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
       <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
-      <p className="text-lg font-semibold text-[#1a1f3d] text-center mb-6">{step.subtitle}</p>
-      <div className="flex gap-3 mb-6">
-        <div className="flex-1 bg-red-50 rounded-2xl p-4">
-          <p className="text-xs font-bold text-red-400 uppercase mb-3">Before</p>
-          <ul className="space-y-2">
-            {step.beforeItems?.map((item, i) => (
-              <li key={i} className="text-xs text-gray-600 flex items-start gap-1.5">
-                <span className="text-red-400 mt-0.5">✗</span> {item}
-              </li>
-            ))}
-          </ul>
+      <p className="text-lg font-semibold text-[#1a1f3d] text-center mb-5">{step.subtitle}</p>
+      {step.image ? (
+        <div className="flex-1 flex items-center justify-center mb-6">
+          <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
         </div>
-        <div className="flex-1 bg-green-50 rounded-2xl p-4">
-          <p className="text-xs font-bold text-green-500 uppercase mb-3">After</p>
-          <ul className="space-y-2">
-            {step.afterItems?.map((item, i) => (
-              <li key={i} className="text-xs text-gray-600 flex items-start gap-1.5">
-                <span className="text-green-500 mt-0.5">✓</span> {item}
-              </li>
-            ))}
-          </ul>
+      ) : (
+        <div className="flex gap-3 mb-6">
+          <div className="flex-1 bg-red-50 rounded-2xl p-4">
+            <p className="text-xs font-bold text-red-400 uppercase mb-3">Before</p>
+            <ul className="space-y-2">
+              {step.beforeItems?.map((item, i) => (
+                <li key={i} className="text-xs text-gray-600 flex items-start gap-1.5">
+                  <span className="text-red-400 mt-0.5">✗</span> {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="flex-1 bg-green-50 rounded-2xl p-4">
+            <p className="text-xs font-bold text-green-500 uppercase mb-3">After</p>
+            <ul className="space-y-2">
+              {step.afterItems?.map((item, i) => (
+                <li key={i} className="text-xs text-gray-600 flex items-start gap-1.5">
+                  <span className="text-green-500 mt-0.5">✓</span> {item}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </div>
+      )}
       <div className="mt-auto">
         <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
