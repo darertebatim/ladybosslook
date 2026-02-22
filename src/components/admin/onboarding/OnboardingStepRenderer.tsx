@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRevenueCat } from '@/hooks/useRevenueCat';
 import confetti from 'canvas-confetti';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -966,12 +967,28 @@ function PaywallScreen({ step, onNext }: Props) {
   const [selectedTier, setSelectedTier] = useState(
     step.pricingTiers?.findIndex(t => t.badge?.includes('Trial') || t.badge?.includes('Free')) ?? 1
   );
+  const { handlePurchase, handleRestore, isPurchasing, isRestoring } = useRevenueCat();
+
+  const onSubscribe = async () => {
+    const tier = step.pricingTiers?.[selectedTier];
+    if (!tier) return;
+    // Map tier index to product IDs — annual is index 1
+    const plan = selectedTier === 1 ? 'annual' : 'monthly';
+    const productId = plan === 'annual' ? 'simora_plus_annual' : 'simora_plus_monthly';
+    await handlePurchase(productId, plan);
+  };
 
   return (
     <ScreenWrapper>
       <div className="flex items-center justify-between mb-3">
         <button onClick={onNext} className="text-gray-400 text-lg active:opacity-60">✕</button>
-        <button className="text-sm font-medium text-indigo-500 active:opacity-60">Restore</button>
+        <button
+          onClick={handleRestore}
+          disabled={isRestoring}
+          className="text-sm font-medium text-indigo-500 active:opacity-60"
+        >
+          {isRestoring ? 'Restoring...' : 'Restore'}
+        </button>
       </div>
       <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight">{step.title}</h1>
 
@@ -982,7 +999,7 @@ function PaywallScreen({ step, onNext }: Props) {
         </div>
       )}
 
-      {/* Pricing tiers - centered 2-card layout */}
+      {/* Pricing tiers - compact centered 2-card layout */}
       <div className="flex justify-center gap-3 mb-4">
         {step.pricingTiers?.map((tier, i) => {
           const isSelected = i === selectedTier;
@@ -990,7 +1007,7 @@ function PaywallScreen({ step, onNext }: Props) {
             <button
               key={i}
               onClick={() => setSelectedTier(i)}
-              className={`relative rounded-2xl border-2 pt-5 pb-3 px-4 text-center transition-all active:scale-[0.97] w-[140px] ${
+              className={`relative rounded-2xl border-2 pt-5 pb-3 px-3 text-center transition-all active:scale-[0.97] w-[140px] ${
                 isSelected ? 'border-indigo-500 bg-indigo-50/60' : 'border-gray-200 bg-white'
               }`}
             >
@@ -999,13 +1016,12 @@ function PaywallScreen({ step, onNext }: Props) {
                   tier.badge.includes('Trial') || tier.badge.includes('Free') ? 'bg-indigo-500 text-white' : 'bg-purple-200 text-purple-700'
                 }`}>{tier.badge}</span>
               )}
-              <p className="text-base font-extrabold text-[#1a1f3d] leading-tight">{tier.label.split(' ')[0]}</p>
-              <p className="text-[11px] text-[#1a1f3d] font-medium">{tier.label.split(' ').slice(1).join(' ')}</p>
-              <p className={`text-[11px] text-gray-400 mt-1 ${tier.perWeek?.includes('/mo.') && tier.label.startsWith('1') ? 'line-through' : ''}`}>{tier.perWeek}</p>
+              <p className="text-sm font-extrabold text-[#1a1f3d] leading-tight">{tier.label}</p>
+              <p className={`text-[11px] text-gray-400 mt-0.5 ${tier.perWeek?.includes('/mo.') && tier.label.startsWith('1') ? 'line-through' : ''}`}>{tier.perWeek}</p>
               {tier.discount && (
                 <span className="inline-block mt-1 text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-500 text-white">{tier.discount}</span>
               )}
-              <div className="border-t border-gray-200 mt-2 pt-2">
+              <div className="border-t border-gray-200 mt-1.5 pt-1.5">
                 <p className={`text-xs font-bold ${isSelected ? 'text-[#1a1f3d]' : 'text-gray-500'}`}>{tier.total}</p>
               </div>
             </button>
@@ -1023,16 +1039,19 @@ function PaywallScreen({ step, onNext }: Props) {
 
       <div className="mt-auto">
         <button
-          onClick={onNext}
-          className="w-full py-4 rounded-full bg-[#1a1f3d] text-white font-bold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          onClick={onSubscribe}
+          disabled={isPurchasing}
+          className="w-full py-4 rounded-full bg-[#1a1f3d] text-white font-bold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-60"
         >
-          {step.buttonLabel}
-          <span className="text-lg">→</span>
+          {isPurchasing ? 'Processing...' : step.buttonLabel}
+          {!isPurchasing && <span className="text-lg">→</span>}
         </button>
       </div>
-      {step.description && (
-        <p className="text-[9px] text-gray-400 text-center mt-3 leading-snug">{step.description}</p>
-      )}
+      <div className="flex items-center justify-center gap-3 mt-3">
+        <a href="/sms-terms" target="_blank" className="text-[10px] text-gray-400 underline">Terms</a>
+        <span className="text-[10px] text-gray-300">·</span>
+        <a href="/privacy" target="_blank" className="text-[10px] text-gray-400 underline">Privacy</a>
+      </div>
     </ScreenWrapper>
   );
 }
