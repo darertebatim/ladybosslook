@@ -373,10 +373,12 @@ function DoYouWantScreen({ step, onNext }: Props) {
         <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="flex-1" />
       )}
       <div className="mt-auto flex gap-3 pt-6">
-        <SecondaryButton onClick={onNext}>{step.secondaryButtonLabel}</SecondaryButton>
-        <div className="flex-1">
-          <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
-        </div>
+        <button onClick={onNext} className="px-8 py-3.5 rounded-full border border-gray-300 text-sm font-medium text-[#1a1f3d] active:scale-[0.98] transition-all">
+          {step.secondaryButtonLabel}
+        </button>
+        <button onClick={onNext} className="flex-1 py-3.5 rounded-full bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all">
+          {step.buttonLabel}
+        </button>
       </div>
     </ScreenWrapper>
   );
