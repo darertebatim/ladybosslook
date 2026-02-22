@@ -110,7 +110,7 @@ export function RoutineBankCard({
       >
         {/* Title Header Section */}
         <div className={cn(
-          'px-3 py-3 rounded-t-2xl',
+          'px-3 py-3 rounded-t-2xl h-[3.75rem] flex items-start',
           bgColor
         )}>
           <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
