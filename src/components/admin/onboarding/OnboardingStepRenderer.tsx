@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { OnboardingStep } from '@/types/onboarding';
+import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
@@ -10,24 +10,26 @@ interface Props {
   step: OnboardingStep;
   onNext: () => void;
   onMilestone?: (type: 'review' | 'notification' | 'discount-paywall') => void;
+  onAnswer?: (stepId: string, answer: string | string[]) => void;
+  answers?: OnboardingAnswers;
 }
 
-export function OnboardingStepRenderer({ step, onNext, onMilestone }: Props) {
+export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, answers }: Props) {
   switch (step.type) {
     case 'welcome':
       return <WelcomeScreen step={step} onNext={onNext} />;
     case 'greeting':
       return <GreetingScreen step={step} onNext={onNext} />;
     case 'multi-select':
-      return <MultiSelectScreen step={step} onNext={onNext} />;
+      return <MultiSelectScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'single-select':
-      return <SingleSelectScreen step={step} onNext={onNext} />;
+      return <SingleSelectScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'single-select-descriptions':
-      return <SingleSelectDescScreen step={step} onNext={onNext} />;
+      return <SingleSelectDescScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'yes-no':
-      return <YesNoScreen step={step} onNext={onNext} />;
+      return <YesNoScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'do-you-want':
-      return <DoYouWantScreen step={step} onNext={onNext} />;
+      return <DoYouWantScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'info-stat':
       return <InfoStatScreen step={step} onNext={onNext} />;
     case 'motivational':
@@ -41,7 +43,7 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone }: Props) {
     case 'loading-testimonials':
       return <LoadingTestimonialsScreen step={step} onNext={onNext} />;
     case 'personal-summary':
-      return <PersonalSummaryScreen step={step} onNext={onNext} />;
+      return <PersonalSummaryScreen step={step} onNext={onNext} answers={answers} />;
     case 'first-habit':
       return <FirstHabitScreen step={step} onNext={onNext} />;
     case 'breathing-prep':
@@ -185,13 +187,16 @@ function GreetingScreen({ step, onNext }: Props) {
   );
 }
 
-function MultiSelectScreen({ step, onNext }: Props) {
+function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
   const [selected, setSelected] = useState<Set<number>>(new Set());
 
   const toggle = (i: number) => {
     setSelected(prev => {
       const next = new Set(prev);
       next.has(i) ? next.delete(i) : next.add(i);
+      // Report selected labels
+      const labels = Array.from(next).map(idx => step.options?.[idx]?.label || '');
+      onAnswer?.(step.id, labels);
       return next;
     });
   };
@@ -270,11 +275,13 @@ function BottomSheetWrapper({ children, bgImage }: { children: React.ReactNode; 
   );
 }
 
-function SingleSelectScreen({ step, onNext }: Props) {
+function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
   const [picked, setPicked] = useState<number | null>(null);
 
   const select = (i: number) => {
     setPicked(i);
+    const label = step.options?.[i]?.label || '';
+    onAnswer?.(step.id, label);
     setTimeout(onNext, 400);
   };
 
@@ -333,11 +340,12 @@ function SingleSelectScreen({ step, onNext }: Props) {
   );
 }
 
-function SingleSelectDescScreen({ step, onNext }: Props) {
+function SingleSelectDescScreen({ step, onNext, onAnswer }: Props) {
   const [picked, setPicked] = useState<number | null>(null);
 
   const select = (i: number) => {
     setPicked(i);
+    onAnswer?.(step.id, step.options?.[i]?.label || '');
     setTimeout(onNext, 400);
   };
 
@@ -362,7 +370,11 @@ function SingleSelectDescScreen({ step, onNext }: Props) {
   );
 }
 
-function YesNoScreen({ step, onNext }: Props) {
+function YesNoScreen({ step, onNext, onAnswer }: Props) {
+  const handleAnswer = (val: string) => {
+    onAnswer?.(step.id, val);
+    onNext();
+  };
   return (
     <ScrollArea className="h-full bg-white">
       <div className="flex flex-col h-full min-h-[700px] px-5 pt-14 pb-6">
@@ -376,15 +388,19 @@ function YesNoScreen({ step, onNext }: Props) {
           )}
         </div>
         <div className="mt-auto flex gap-3">
-          <NavyButton onClick={onNext} className="flex-1">No</NavyButton>
-          <NavyButton onClick={onNext} className="flex-1">Yes</NavyButton>
+          <NavyButton onClick={() => handleAnswer('No')} className="flex-1">No</NavyButton>
+          <NavyButton onClick={() => handleAnswer('Yes')} className="flex-1">Yes</NavyButton>
         </div>
       </div>
     </ScrollArea>
   );
 }
 
-function DoYouWantScreen({ step, onNext }: Props) {
+function DoYouWantScreen({ step, onNext, onAnswer }: Props) {
+  const handleChoice = (val: string) => {
+    onAnswer?.(step.id, val);
+    onNext();
+  };
   return (
     <ScreenWrapper>
       <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4">{step.title}</h1>
@@ -396,10 +412,10 @@ function DoYouWantScreen({ step, onNext }: Props) {
         <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="flex-1" />
       )}
       <div className="mt-auto flex gap-3 pt-6">
-        <button onClick={onNext} className="px-8 py-3.5 rounded-full border border-gray-300 text-sm font-medium text-[#1a1f3d] active:scale-[0.98] transition-all">
+        <button onClick={() => handleChoice('No')} className="px-8 py-3.5 rounded-full border border-gray-300 text-sm font-medium text-[#1a1f3d] active:scale-[0.98] transition-all">
           {step.secondaryButtonLabel}
         </button>
-        <button onClick={onNext} className="flex-1 py-3.5 rounded-full bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all">
+        <button onClick={() => handleChoice('Yes')} className="flex-1 py-3.5 rounded-full bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all">
           {step.buttonLabel}
         </button>
       </div>
@@ -603,9 +619,103 @@ function LoadingTestimonialsScreen({ step, onNext }: Props) {
   );
 }
 
-function PersonalSummaryScreen({ step, onNext }: Props) {
+/**
+ * Compute dynamic scores for 4 categories based on user answers from previous questions.
+ * Maps Me+ survey questions (mp-5 through mp-21) to Self-control, Concentration, Productivity, Energy.
+ */
+function computeSummaryFromAnswers(answers: Record<string, string | string[]>) {
+  // Each category starts at 70 and gets adjusted based on answers
+  const scores = { 'Self-control': 70, 'Concentration': 70, 'Productivity': 70, 'Energy': 70 };
+
+  // mp-5: Sleep duration → Energy
+  const sleep = answers['mp-5'] as string;
+  if (sleep?.includes('6-8')) scores['Energy'] += 15;
+  else if (sleep?.includes('8-10')) scores['Energy'] += 10;
+  else if (sleep?.includes('Less than 6')) scores['Energy'] -= 15;
+  else if (sleep?.includes('More than 10')) scores['Energy'] -= 5;
+
+  // mp-6: Wake up time → Self-control, Energy
+  const wake = answers['mp-6'] as string;
+  if (wake?.includes('0-10')) { scores['Self-control'] += 10; scores['Energy'] += 5; }
+  else if (wake?.includes('10-20')) { scores['Self-control'] += 5; }
+  else if (wake?.includes('More than 30')) { scores['Self-control'] -= 10; scores['Energy'] -= 5; }
+
+  // mp-7: Energy level → Energy
+  const energy = answers['mp-7'] as string;
+  if (energy?.includes('High')) scores['Energy'] += 15;
+  else if (energy?.includes('Medium')) scores['Energy'] += 0;
+  else if (energy?.includes('Low')) scores['Energy'] -= 15;
+
+  // mp-8: Lifestyle satisfaction → Productivity, Self-control
+  const lifestyle = answers['mp-8'] as string;
+  if (lifestyle?.includes('Completely')) { scores['Productivity'] += 10; scores['Self-control'] += 10; }
+  else if (lifestyle?.includes('Slightly')) { scores['Productivity'] += 5; }
+  else if (lifestyle?.includes('Not at all')) { scores['Productivity'] -= 10; scores['Self-control'] -= 5; }
+
+  // mp-10: Better life goals → adjusts related category
+  const goals = answers['mp-10'] as string;
+  if (goals?.includes('productive')) scores['Productivity'] += 5;
+  if (goals?.includes('disciplined')) scores['Self-control'] += 5;
+  if (goals?.includes('mindfulness')) scores['Concentration'] += 5;
+  if (goals?.includes('active')) scores['Energy'] += 5;
+
+  // mp-12: Distraction → Concentration
+  const distract = answers['mp-12'] as string;
+  if (distract?.includes('Easily')) scores['Concentration'] -= 15;
+  else if (distract?.includes('Sometimes')) scores['Concentration'] -= 5;
+  else if (distract?.includes('Rarely')) scores['Concentration'] += 5;
+  else if (distract?.includes('Stay focused')) scores['Concentration'] += 15;
+
+  // mp-13: Procrastination → Self-control, Productivity
+  const procrastinate = answers['mp-13'] as string;
+  if (procrastinate?.includes('easily keep')) { scores['Self-control'] += 10; scores['Productivity'] += 5; }
+  else if (procrastinate?.includes('time to time')) { scores['Self-control'] -= 5; }
+  else if (procrastinate?.includes('change it')) { scores['Self-control'] -= 10; scores['Productivity'] -= 5; }
+
+  // mp-14: Support system → Self-control
+  const support = answers['mp-14'] as string;
+  if (support?.includes('Very strong')) scores['Self-control'] += 5;
+  else if (support?.includes('Weak')) scores['Self-control'] -= 5;
+
+  // mp-15: Motivation → Productivity
+  const motivation = answers['mp-15'] as string;
+  if (motivation?.includes('goals')) scores['Productivity'] += 5;
+  if (motivation?.includes('health')) scores['Energy'] += 5;
+
+  // mp-17: Organization blockers (multi-select) → multiple categories
+  const blockers = answers['mp-17'] as string[];
+  if (Array.isArray(blockers)) {
+    if (blockers.some(b => b.includes('ADHD'))) { scores['Concentration'] -= 10; scores['Self-control'] -= 5; }
+    if (blockers.some(b => b.includes('motivation'))) scores['Energy'] -= 5;
+    if (blockers.some(b => b.includes('No daily plan'))) scores['Productivity'] -= 5;
+    if (blockers.some(b => b.includes('nothing holding'))) { scores['Self-control'] += 5; scores['Productivity'] += 5; }
+  }
+
+  // mp-18 to mp-21: Yes/No questions lower scores if "Yes" (relating to struggles)
+  if (answers['mp-18'] === 'Yes') { scores['Self-control'] -= 5; scores['Energy'] -= 5; } // anxious
+  if (answers['mp-19'] === 'Yes') { scores['Productivity'] -= 5; }                         // not enough time
+  if (answers['mp-20'] === 'Yes') { scores['Concentration'] -= 10; }                       // concentrating
+  if (answers['mp-21'] === 'Yes') { scores['Productivity'] -= 5; scores['Self-control'] -= 5; } // end of day regret
+
+  // Clamp all scores between 25 and 95
+  const clamp = (v: number) => Math.max(25, Math.min(95, v));
+  
+  return [
+    { label: 'Self-control', value: clamp(scores['Self-control']), status: scores['Self-control'] >= 65 ? '✓ Right on track' : 'Could be better' },
+    { label: 'Concentration', value: clamp(scores['Concentration']), status: scores['Concentration'] >= 65 ? '✓ Right on track' : 'Could be better' },
+    { label: 'Productivity', value: clamp(scores['Productivity']), status: scores['Productivity'] >= 65 ? '✓ Right on track' : 'Could be better' },
+    { label: 'Energy', value: clamp(scores['Energy']), status: scores['Energy'] >= 65 ? '✓ Right on track' : 'Could be better' },
+  ];
+}
+
+function PersonalSummaryScreen({ step, onNext, answers }: Props) {
   const [animated, setAnimated] = useState(false);
   useEffect(() => { setTimeout(() => setAnimated(true), 300); }, []);
+
+  // Compute dynamic scores from user answers, fallback to static data
+  const bars = answers && Object.keys(answers).length > 0
+    ? computeSummaryFromAnswers(answers)
+    : step.summaryBars || [];
 
   const categoryIcons: Record<string, string> = {
     'Self-control': '📵',
@@ -622,7 +732,7 @@ function PersonalSummaryScreen({ step, onNext }: Props) {
 
       {/* 2×2 Circle Grid */}
       <div className="grid grid-cols-2 gap-4 mb-6 px-2">
-        {step.summaryBars?.map((bar, i) => {
+        {bars.map((bar, i) => {
           const good = isGood(bar.status);
           const ringColor = good ? '#2db87f' : '#e8734a';
           const bgColor = good ? '#e8f5ee' : '#fce8e0';

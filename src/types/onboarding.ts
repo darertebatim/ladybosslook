@@ -71,6 +71,8 @@ export interface OnboardingStep {
   statBadges?: { label: string; value: string }[];
 }
 
+export type OnboardingAnswers = Record<string, string | string[]>;
+
 export interface OnboardingFlow {
   id: string;
   name: string;
