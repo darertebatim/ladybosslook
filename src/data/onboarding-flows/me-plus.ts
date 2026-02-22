@@ -12,6 +12,7 @@ import meplusImg22Grid from '@/assets/onboarding/meplus-22-grid.png';
 import meplusImg27 from '@/assets/onboarding/meplus-27.png';
 import meplusImg28 from '@/assets/onboarding/meplus-28.png';
 import meplusImg29 from '@/assets/onboarding/meplus-29.png';
+import meplusImg16 from '@/assets/onboarding/meplus-img-16.png';
 
 export const mePlusFlow: OnboardingFlow = {
   id: 'me-plus-v1',
@@ -212,9 +213,10 @@ export const mePlusFlow: OnboardingFlow = {
     // ─── PDF1 Page 16: Good Habits Chart ──────────────────
     {
       id: 'mp-16',
-      type: 'results-chart',
+      type: 'science-backed',
       title: 'Build Good Habits and Have More Great Days!',
       subtitle: '30 day Timeline',
+      image: meplusImg16,
       statHighlight: '86%',
       description: 'Good habits will help you reach your goals, develop both personally and professionally, and feel fulfilled. According to the statistics, 86% of Simora users responded that building good habits makes them happier and have more great days.',
       buttonLabel: 'Continue',

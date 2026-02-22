@@ -866,27 +866,41 @@ function ScienceBackedScreen({ step, onNext }: Props) {
             <IllustrationPlaceholder label={step.illustrationLabel || step.subtitle} className="h-36 mb-4" />
           )}
           
-          {/* Stats section with badge icons */}
-          <div className="space-y-4 mb-4">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                <span className="text-lg">🎓</span>
+          {/* Stats section */}
+          {step.statHighlight ? (
+            <div className="space-y-4 mb-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                  <span className="text-lg">🏅</span>
+                </div>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  <span className="text-[#1a1f3d] font-extrabold text-xl">{step.statHighlight}</span>{' '}
+                  {step.description}
+                </p>
               </div>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                <span className="text-[#1a1f3d] font-extrabold text-xl">3X</span>{' '}
-                times more successful than other to achieve the goal by behavioral science
-              </p>
             </div>
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                <span className="text-lg">🏅</span>
+          ) : (
+            <div className="space-y-4 mb-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                  <span className="text-lg">🎓</span>
+                </div>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  <span className="text-[#1a1f3d] font-extrabold text-xl">3X</span>{' '}
+                  times more successful than other to achieve the goal by behavioral science
+                </p>
               </div>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                <span className="text-[#1a1f3d] font-extrabold text-xl">96%</span>{' '}
-                of Simora users have accomplished at least one goal and built healthy habits.
-              </p>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                  <span className="text-lg">🏅</span>
+                </div>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  <span className="text-[#1a1f3d] font-extrabold text-xl">96%</span>{' '}
+                  of Simora users have accomplished at least one goal and built healthy habits.
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </>
       ) : (
         <>
