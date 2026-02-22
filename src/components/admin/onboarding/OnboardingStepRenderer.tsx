@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { OnboardingStep } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 
 interface Props {
   step: OnboardingStep;
@@ -170,6 +171,34 @@ function MultiSelectScreen({ step, onNext }: Props) {
     });
   };
 
+  const hasBg = !!step.illustrationLabel;
+
+  if (hasBg) {
+    return (
+      <BottomSheetWrapper bgImage={meplusMascotBg}>
+        <h1 className="text-xl font-bold text-[#1a1f3d] mb-5">{step.title}</h1>
+        <div className="space-y-3 mb-6">
+          {step.options?.map((opt, i) => (
+            <button
+              key={i}
+              onClick={() => toggle(i)}
+              className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+                selected.has(i) ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+              }`}
+            >
+              {opt.emoji && <span className="text-xl">{opt.emoji}</span>}
+              <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
+              {selected.has(i) && <span className="text-indigo-500 text-sm">✓</span>}
+            </button>
+          ))}
+        </div>
+        <div className="mt-auto">
+          <NavyButton onClick={onNext} disabled={selected.size === 0}>{step.buttonLabel}</NavyButton>
+        </div>
+      </BottomSheetWrapper>
+    );
+  }
+
   return (
     <ScreenWrapper>
       <h1 className="text-xl font-bold text-[#1a1f3d] mb-5">{step.title}</h1>
@@ -195,6 +224,27 @@ function MultiSelectScreen({ step, onNext }: Props) {
   );
 }
 
+function BottomSheetWrapper({ children, bgImage }: { children: React.ReactNode; bgImage?: string }) {
+  return (
+    <div className="h-full flex flex-col relative overflow-hidden">
+      {/* Background image area */}
+      <div className="h-[200px] shrink-0 relative">
+        {bgImage ? (
+          <img src={bgImage} alt="" className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-b from-purple-400 to-purple-300" />
+        )}
+      </div>
+      {/* White bottom sheet */}
+      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 overflow-y-auto">
+        <div className="px-5 pt-6 pb-6 flex flex-col min-h-full">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SingleSelectScreen({ step, onNext }: Props) {
   const [picked, setPicked] = useState<number | null>(null);
 
@@ -202,6 +252,31 @@ function SingleSelectScreen({ step, onNext }: Props) {
     setPicked(i);
     setTimeout(onNext, 400);
   };
+
+  // Check if this step has an illustrationLabel (Me+ style with background)
+  const hasBg = !!step.illustrationLabel;
+
+  if (hasBg) {
+    return (
+      <BottomSheetWrapper bgImage={meplusMascotBg}>
+        <h1 className="text-xl font-bold text-[#1a1f3d] mb-5">{step.title}</h1>
+        <div className="space-y-3">
+          {step.options?.map((opt, i) => (
+            <button
+              key={i}
+              onClick={() => select(i)}
+              className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+                picked === i ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+              }`}
+            >
+              {opt.emoji && <span className="text-lg">{opt.emoji}</span>}
+              <span className="text-sm font-medium text-[#1a1f3d]">{opt.label}</span>
+            </button>
+          ))}
+        </div>
+      </BottomSheetWrapper>
+    );
+  }
 
   return (
     <ScreenWrapper>
@@ -262,7 +337,7 @@ function SingleSelectDescScreen({ step, onNext }: Props) {
 
 function YesNoScreen({ step, onNext }: Props) {
   return (
-    <ScreenWrapper>
+    <BottomSheetWrapper bgImage={meplusMascotBg}>
       <h1 className="text-xl font-bold text-[#1a1f3d] mb-4">{step.title}</h1>
       <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="h-40 mb-4" />
       <p className="text-base text-[#1a1f3d] font-medium text-center mb-8">{step.description}</p>
@@ -270,7 +345,7 @@ function YesNoScreen({ step, onNext }: Props) {
         <button onClick={onNext} className="flex-1 py-3.5 rounded-2xl border border-gray-200 text-sm font-semibold text-gray-600 active:scale-[0.97]">No</button>
         <button onClick={onNext} className="flex-1 py-3.5 rounded-2xl bg-[#1a1f3d] text-white text-sm font-semibold active:scale-[0.97]">Yes</button>
       </div>
-    </ScreenWrapper>
+    </BottomSheetWrapper>
   );
 }
 
