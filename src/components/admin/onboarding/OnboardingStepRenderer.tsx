@@ -341,22 +341,19 @@ function SingleSelectDescScreen({ step, onNext }: Props) {
 
 function YesNoScreen({ step, onNext }: Props) {
   return (
-    <ScreenWrapper>
-      <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
-      {/* 4:5 image card with quote overlay */}
-      <div className="relative rounded-2xl overflow-hidden mb-6" style={{ aspectRatio: '4/5' }}>
-        <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-full" />
-        {step.description && (
-          <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-white/90 to-transparent p-4">
-            <p className="text-sm font-semibold text-[#1a1f3d] leading-snug">"{step.description}"</p>
-          </div>
-        )}
+    <ScrollArea className="h-full bg-white">
+      <div className="flex flex-col h-full min-h-[700px] px-5 pt-14 pb-6">
+        <h1 className="text-[22px] font-bold text-[#1a1f3d] text-center mb-5 leading-tight">{step.title}</h1>
+        {/* 4:5 image card */}
+        <div className="relative rounded-2xl overflow-hidden mb-6" style={{ aspectRatio: '4/5' }}>
+          <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-full" />
+        </div>
+        <div className="mt-auto flex gap-3">
+          <NavyButton onClick={onNext} className="flex-1">No</NavyButton>
+          <NavyButton onClick={onNext} className="flex-1">Yes</NavyButton>
+        </div>
       </div>
-      <div className="mt-auto flex gap-3">
-        <NavyButton onClick={onNext} className="flex-1">No</NavyButton>
-        <NavyButton onClick={onNext} className="flex-1">Yes</NavyButton>
-      </div>
-    </ScreenWrapper>
+    </ScrollArea>
   );
 }
 
