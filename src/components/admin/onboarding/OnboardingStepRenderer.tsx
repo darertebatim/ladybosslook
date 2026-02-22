@@ -3,6 +3,10 @@ import { OnboardingStep } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
+import meplusImg18 from '@/assets/onboarding/meplus-18.png';
+import meplusImg19 from '@/assets/onboarding/meplus-19.png';
+import meplusImg20 from '@/assets/onboarding/meplus-20.png';
+import meplusImg21 from '@/assets/onboarding/meplus-21.png';
 import SealCheck from '@/components/app/SealCheck';
 
 interface Props {
@@ -945,17 +949,24 @@ function ContractScreen({ step, onNext }: Props) {
 }
 
 function DistressGridScreen({ step, onNext }: Props) {
+  const gridImages = [meplusImg18, meplusImg19, meplusImg20, meplusImg21];
   return (
     <ScreenWrapper>
       <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-6 whitespace-pre-line">{step.title}</h1>
       <div className="grid grid-cols-2 gap-3 mb-6">
         {step.options?.map((opt, i) => (
-          <div key={i} className="rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 aspect-square flex flex-col items-center justify-center p-3 relative">
-            <IllustrationPlaceholder label={opt.label} className="w-full h-full" />
-            <div className="absolute bottom-2 right-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-lg font-bold">⊘</span>
+          <div key={i} className="rounded-2xl overflow-hidden aspect-square relative">
+            <img src={gridImages[i]} alt={opt.label} className="w-full h-full object-cover" />
+            {/* Darkened overlay */}
+            <div className="absolute inset-0 bg-black/30" />
+            {/* ⊘ ban icon */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full border-[4px] border-red-500 flex items-center justify-center bg-red-500/20">
+                <div className="w-8 h-[4px] bg-red-500 rounded-full -rotate-45" />
+              </div>
             </div>
-            <p className="absolute bottom-2 left-2 text-xs font-bold text-white bg-black/50 px-2 py-0.5 rounded">{opt.label}</p>
+            {/* Label */}
+            <p className="absolute bottom-2 left-2 right-2 text-xs font-bold text-white text-center">{opt.label}</p>
           </div>
         ))}
       </div>
