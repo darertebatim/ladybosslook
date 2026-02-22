@@ -857,15 +857,36 @@ function ScienceBackedScreen({ step, onNext }: Props) {
     <ScreenWrapper>
       {step.subtitle ? (
         <>
-          <h1 className="text-lg font-bold text-[#1a1f3d] mb-3">{step.title}</h1>
+          <h1 className="text-xl font-bold text-[#1a1f3d] mb-4 leading-tight">{step.title}</h1>
           {step.image ? (
-            <div className="flex items-center justify-center mb-4">
-              <img src={step.image} alt="" className="w-full max-w-[280px] object-contain" />
+            <div className="flex items-center justify-center mb-5">
+              <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
             </div>
           ) : (
             <IllustrationPlaceholder label={step.illustrationLabel || step.subtitle} className="h-36 mb-4" />
           )}
-          <p className="text-xs text-gray-500 leading-relaxed mb-4">{step.description}</p>
+          
+          {/* Stats section with badge icons */}
+          <div className="space-y-4 mb-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                <span className="text-lg">🎓</span>
+              </div>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                <span className="text-[#1a1f3d] font-extrabold text-xl">3X</span>{' '}
+                times more successful than other to achieve the goal by behavioral science
+              </p>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                <span className="text-lg">🏅</span>
+              </div>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                <span className="text-[#1a1f3d] font-extrabold text-xl">96%</span>{' '}
+                of Simora users have accomplished at least one goal and built healthy habits.
+              </p>
+            </div>
+          </div>
         </>
       ) : (
         <>
