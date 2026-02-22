@@ -346,7 +346,11 @@ function YesNoScreen({ step, onNext }: Props) {
         <h1 className="text-[22px] font-bold text-[#1a1f3d] text-center mb-5 leading-tight">{step.title}</h1>
         {/* 4:5 image card */}
         <div className="relative rounded-2xl overflow-hidden mb-6" style={{ aspectRatio: '4/5' }}>
-          <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-full" />
+          {step.image ? (
+            <img src={step.image} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-full" />
+          )}
         </div>
         <div className="mt-auto flex gap-3">
           <NavyButton onClick={onNext} className="flex-1">No</NavyButton>
@@ -362,7 +366,11 @@ function DoYouWantScreen({ step, onNext }: Props) {
     <ScreenWrapper>
       <p className="text-sm text-gray-400 mb-2">{step.title}</p>
       <h1 className="text-xl font-bold text-[#1a1f3d] mb-5">{step.subtitle}</h1>
-      <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="h-48 mb-8" />
+      {step.image ? (
+        <img src={step.image} alt="" className="h-48 mb-8 rounded-2xl object-contain mx-auto" />
+      ) : (
+        <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="h-48 mb-8" />
+      )}
       <div className="mt-auto space-y-3">
         <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
         <SecondaryButton onClick={onNext}>{step.secondaryButtonLabel}</SecondaryButton>
