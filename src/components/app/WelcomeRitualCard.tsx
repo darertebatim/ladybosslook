@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { X, Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
@@ -18,6 +18,7 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
   const [isFlipped, setIsFlipped] = useState(false);
   const [selectedActions, setSelectedActions] = useState<Set<string>>(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAddingAnimation, setShowAddingAnimation] = useState(false);
   
   const { data: welcomeRitualInfo, isLoading: welcomeLoading } = useWelcomePopupRitual();
   const { data: welcomeRitual, isLoading: ritualLoading } = useRoutineBankDetail(welcomeRitualInfo?.id);
@@ -91,6 +92,9 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
     haptic.light();
     
     try {
+      // Show "adding" animation
+      setShowAddingAnimation(true);
+      
       await addRoutine.mutateAsync({
         routineId: welcomeRitualInfo.id,
         selectedTaskIds: Array.from(selectedActions),
@@ -99,11 +103,23 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
       haptic.success();
       localStorage.setItem('simora_welcome_card_action_added', 'true');
       localStorage.setItem('simora_welcome_card_dismissed', 'true');
-      onActionAdded?.();
+
+      // Wait so user sees "Adding to your planner..." message
+      await new Promise(r => setTimeout(r, 1500));
+      
+      // Dismiss card & overlay
+      setIsFlipped(false);
+      setShowAddingAnimation(false);
       setDismissed(true);
-      onDismiss?.();
+      
+      // Small delay before triggering callbacks so planner renders
+      setTimeout(() => {
+        onActionAdded?.();
+        onDismiss?.();
+      }, 600);
     } catch (error) {
       console.error('Failed to add actions:', error);
+      setShowAddingAnimation(false);
     } finally {
       setIsSubmitting(false);
     }
@@ -119,110 +135,121 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
     <>
       {/* Fullscreen overlay when flipped — covers header, FAB, nav, everything */}
       {isFlipped && (
-        <div className="fixed inset-0 z-[9999] flex flex-col bg-black/80 animate-fade-in">
-          {/* Scrollable action picker card */}
-          <div className="flex-1 flex flex-col px-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] overflow-hidden">
-            {/* Spacer to push card down a bit */}
-            <div className="h-4 shrink-0" />
-            
-            <div className="flex-1 flex flex-col rounded-2xl overflow-hidden bg-gradient-to-br from-violet-50 to-purple-100 dark:from-violet-950/30 dark:to-purple-900/20 shadow-2xl max-h-[85vh]">
-              {/* Header */}
-              <div className="px-4 pt-4 pb-2 shrink-0">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1">
-                    <h3 className="font-bold text-[17px] text-foreground leading-snug">
-                      Choose a simple and wholesome action to start right away!
-                    </h3>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      (select all that apply)
-                    </p>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 animate-fade-in">
+          {/* Centered action picker card */}
+          <div 
+            className="w-full max-w-md mx-4 flex flex-col rounded-2xl overflow-hidden bg-gradient-to-br from-violet-50 to-purple-100 dark:from-violet-950/30 dark:to-purple-900/20 shadow-2xl max-h-[85vh] animate-scale-in"
+            style={{ animationDuration: '0.4s' }}
+          >
+            {showAddingAnimation ? (
+              /* Adding animation state */
+              <div className="flex-1 flex flex-col items-center justify-center py-16 px-6 gap-4 animate-fade-in">
+                <Loader2 className="w-10 h-10 animate-spin text-purple-500" />
+                <p className="text-lg font-semibold text-foreground text-center">
+                  Adding to your planner…
+                </p>
+                <p className="text-sm text-muted-foreground text-center">
+                  {selectedActions.size} action{selectedActions.size > 1 ? 's' : ''} selected
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Header */}
+                <div className="px-5 pt-6 pb-3 shrink-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <h3 className="font-bold text-[22px] leading-tight text-foreground text-center">
+                        Choose a simple and wholesome action to start right away!
+                      </h3>
+                      <p className="text-sm text-muted-foreground mt-2 text-center">
+                        (select all that apply)
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleClose}
+                      className="shrink-0 w-7 h-7 rounded-full bg-black/10 dark:bg-white/10 flex items-center justify-center"
+                    >
+                      <X className="w-4 h-4 text-foreground/70" />
+                    </button>
                   </div>
+                </div>
+                
+                {/* Scrollable actions list */}
+                <div className="flex-1 overflow-y-auto px-3 pb-2 space-y-2">
+                  {ritualLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
+                    </div>
+                  ) : displayActions.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground text-sm">
+                      No actions available yet
+                    </div>
+                  ) : (
+                    displayActions.map((action, index) => {
+                      const isAlreadyAdded = alreadyAddedActions.has(action.id);
+                      const isSelected = selectedActions.has(action.id);
+                      const emoji = action.emoji || '✨';
+                      const actionColor = (action as RoutineBankTask).color as TaskColor || COLOR_CYCLE[index % COLOR_CYCLE.length];
+                      const bgColor = TASK_COLORS[actionColor] || TASK_COLORS.mint;
+                      
+                      return (
+                        <button
+                          key={action.id}
+                          onClick={(e) => toggleAction(action.id, e)}
+                          disabled={isAlreadyAdded}
+                          className={cn(
+                            "flex items-center gap-3 w-full p-3 rounded-xl transition-all active:scale-[0.98]",
+                            isSelected && "ring-2 ring-foreground ring-offset-1",
+                            isAlreadyAdded && "opacity-50"
+                          )}
+                          style={{ backgroundColor: bgColor }}
+                        >
+                          <span className="text-2xl shrink-0">
+                            {emoji.length <= 2 ? emoji : <FluentEmoji emoji={emoji} size={28} />}
+                          </span>
+                          <span className={cn(
+                            "flex-1 text-left font-medium text-[15px] text-black truncate",
+                            isAlreadyAdded && "line-through opacity-70"
+                          )}>
+                            {action.title}
+                          </span>
+                          <div className={cn(
+                            "shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-all border-2",
+                            isSelected 
+                              ? "bg-foreground border-foreground text-background" 
+                              : isAlreadyAdded
+                                ? "bg-emerald-500 border-emerald-500 text-white"
+                                : "bg-white/60 border-black/20"
+                          )}>
+                            {(isAlreadyAdded || isSelected) && <Check className="w-4 h-4" />}
+                          </div>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+                
+                {/* Continue button - sticky at bottom */}
+                <div className="px-3 pb-4 pt-2 shrink-0">
                   <button
-                    onClick={handleClose}
-                    className="shrink-0 w-7 h-7 rounded-full bg-black/10 dark:bg-white/10 flex items-center justify-center"
+                    onClick={handleContinue}
+                    disabled={selectedActions.size === 0 || isSubmitting}
+                    className={cn(
+                      "w-full h-12 rounded-2xl font-semibold text-base transition-all flex items-center justify-center gap-2",
+                      selectedActions.size > 0
+                        ? "bg-foreground text-background active:scale-[0.98]"
+                        : "bg-black/10 dark:bg-white/10 text-foreground/40"
+                    )}
                   >
-                    <X className="w-4 h-4 text-foreground/70" />
+                    {isSubmitting ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>Continue{selectedActions.size > 0 && ` (${selectedActions.size})`}</>
+                    )}
                   </button>
                 </div>
-              </div>
-              
-              {/* Scrollable actions list */}
-              <div className="flex-1 overflow-y-auto px-3 pb-2 space-y-2">
-                {ritualLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
-                  </div>
-                ) : displayActions.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground text-sm">
-                    No actions available yet
-                  </div>
-                ) : (
-                  displayActions.map((action, index) => {
-                    const isAlreadyAdded = alreadyAddedActions.has(action.id);
-                    const isSelected = selectedActions.has(action.id);
-                    const emoji = action.emoji || '✨';
-                    const actionColor = (action as RoutineBankTask).color as TaskColor || COLOR_CYCLE[index % COLOR_CYCLE.length];
-                    const bgColor = TASK_COLORS[actionColor] || TASK_COLORS.mint;
-                    
-                    return (
-                      <button
-                        key={action.id}
-                        onClick={(e) => toggleAction(action.id, e)}
-                        disabled={isAlreadyAdded}
-                        className={cn(
-                          "flex items-center gap-3 w-full p-3 rounded-xl transition-all active:scale-[0.98]",
-                          isSelected && "ring-2 ring-foreground ring-offset-1",
-                          isAlreadyAdded && "opacity-50"
-                        )}
-                        style={{ backgroundColor: bgColor }}
-                      >
-                        <span className="text-2xl shrink-0">
-                          {emoji.length <= 2 ? emoji : <FluentEmoji emoji={emoji} size={28} />}
-                        </span>
-                        <span className={cn(
-                          "flex-1 text-left font-medium text-[15px] text-black truncate",
-                          isAlreadyAdded && "line-through opacity-70"
-                        )}>
-                          {action.title}
-                        </span>
-                        <div className={cn(
-                          "shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-all border-2",
-                          isSelected 
-                            ? "bg-foreground border-foreground text-background" 
-                            : isAlreadyAdded
-                              ? "bg-emerald-500 border-emerald-500 text-white"
-                              : "bg-white/60 border-black/20"
-                        )}>
-                          {(isAlreadyAdded || isSelected) && <Check className="w-4 h-4" />}
-                        </div>
-                      </button>
-                    );
-                  })
-                )}
-              </div>
-              
-              {/* Continue button - sticky at bottom */}
-              <div className="px-3 pb-4 pt-2 shrink-0">
-                <button
-                  onClick={handleContinue}
-                  disabled={selectedActions.size === 0 || isSubmitting}
-                  className={cn(
-                    "w-full h-12 rounded-2xl font-semibold text-base transition-all flex items-center justify-center gap-2",
-                    selectedActions.size > 0
-                      ? "bg-foreground text-background active:scale-[0.98]"
-                      : "bg-black/10 dark:bg-white/10 text-foreground/40"
-                  )}
-                >
-                  {isSubmitting ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <>Continue{selectedActions.size > 0 && ` (${selectedActions.size})`}</>
-                  )}
-                </button>
-              </div>
-            </div>
-            
-            <div className="h-4 shrink-0" />
+              </>
+            )}
           </div>
         </div>
       )}
