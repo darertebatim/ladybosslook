@@ -341,15 +341,22 @@ function SingleSelectDescScreen({ step, onNext }: Props) {
 
 function YesNoScreen({ step, onNext }: Props) {
   return (
-    <BottomSheetWrapper bgImage={meplusMascotBg}>
-      <h1 className="text-xl font-bold text-[#1a1f3d] mb-4">{step.title}</h1>
-      <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="h-40 mb-4" />
-      <p className="text-base text-[#1a1f3d] font-medium text-center mb-8">{step.description}</p>
-      <div className="mt-auto flex gap-3">
-        <button onClick={onNext} className="flex-1 py-3.5 rounded-2xl border border-gray-200 text-sm font-semibold text-gray-600 active:scale-[0.97]">No</button>
-        <button onClick={onNext} className="flex-1 py-3.5 rounded-2xl bg-[#1a1f3d] text-white text-sm font-semibold active:scale-[0.97]">Yes</button>
+    <ScreenWrapper>
+      <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
+      {/* 4:5 image card with quote overlay */}
+      <div className="relative rounded-2xl overflow-hidden mb-6" style={{ aspectRatio: '4/5' }}>
+        <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-full" />
+        {step.description && (
+          <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-white/90 to-transparent p-4">
+            <p className="text-sm font-semibold text-[#1a1f3d] leading-snug">"{step.description}"</p>
+          </div>
+        )}
       </div>
-    </BottomSheetWrapper>
+      <div className="mt-auto flex gap-3">
+        <NavyButton onClick={onNext} className="flex-1">No</NavyButton>
+        <NavyButton onClick={onNext} className="flex-1">Yes</NavyButton>
+      </div>
+    </ScreenWrapper>
   );
 }
 
