@@ -15,6 +15,8 @@ import meplusImg29 from '@/assets/onboarding/meplus-29.png';
 import meplusImg16 from '@/assets/onboarding/meplus-img-16.png';
 import meplusImg35Bg from '@/assets/onboarding/meplus-35-mascot-bg.png';
 import meplusImg32Paywall from '@/assets/onboarding/meplus-32-beforeafter.png';
+import paywallSlide2 from '@/assets/onboarding/paywall-slide-2.png';
+import paywallSlide3 from '@/assets/onboarding/paywall-slide-3.png';
 
 export const mePlusFlow: OnboardingFlow = {
   id: 'me-plus-v1',
@@ -401,6 +403,7 @@ export const mePlusFlow: OnboardingFlow = {
       title: 'Make your life organized and meet your best self',
       subtitle: 'No Payment Now!',
       image: meplusImg32Paywall,
+      images: [meplusImg32Paywall, paywallSlide2, paywallSlide3],
       pricingTiers: [
         { label: '1 month', perWeek: '$19.99/mo.', total: '$13.99/mo', badge: '7-Day Free Trial', discount: '40% OFF' },
         { label: '12 months', perWeek: '$8.33/mo.', total: '$99.99/yr', badge: '7-Day Free Trial', discount: '59% OFF' },

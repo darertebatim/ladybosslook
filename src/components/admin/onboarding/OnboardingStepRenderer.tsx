@@ -966,6 +966,17 @@ function PaywallScreen({ step, onNext }: Props) {
   const [selectedTier, setSelectedTier] = useState(
     step.pricingTiers?.findIndex(t => t.badge?.includes('Trial') || t.badge?.includes('Free')) ?? 1
   );
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const slides = step.images || (step.image ? [step.image] : []);
+
+  // Auto-swipe carousel
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % slides.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [slides.length]);
 
   return (
     <ScreenWrapper>
@@ -975,10 +986,28 @@ function PaywallScreen({ step, onNext }: Props) {
       </div>
       <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight">{step.title}</h1>
 
-      {/* Before/After image */}
-      {step.image && (
-        <div className="flex items-center justify-center mb-5">
-          <img src={step.image} alt="" className="w-full max-w-[300px] rounded-2xl object-contain" />
+      {/* Auto-swiping image carousel */}
+      {slides.length > 0 && (
+        <div className="relative mb-5 overflow-hidden rounded-2xl" style={{ height: 180 }}>
+          <div
+            className="flex transition-transform duration-700 ease-in-out h-full"
+            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+          >
+            {slides.map((src, i) => (
+              <img key={i} src={src} alt="" className="w-full h-full object-contain shrink-0" />
+            ))}
+          </div>
+          {/* Dots */}
+          {slides.length > 1 && (
+            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
+              {slides.map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-1.5 rounded-full transition-all ${i === currentSlide ? 'w-4 bg-indigo-500' : 'w-1.5 bg-gray-300'}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 

@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useDefaultPaywall, PaywallVariantId } from '@/hooks/useDefaultPaywall';
-import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallComparison, PaywallLimitedOffer, PaywallVIP, type PaywallProgramData } from '@/components/app/paywalls';
+import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallComparison, PaywallLimitedOffer, PaywallVIP, PaywallOnboarding, type PaywallProgramData } from '@/components/app/paywalls';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
 import { PurchaseCelebration } from '@/components/app/PurchaseCelebration';
@@ -15,6 +15,7 @@ const VARIANT_MAP: Record<PaywallVariantId, React.ComponentType<any>> = {
   comparison: PaywallComparison,
   'limited-offer': PaywallLimitedOffer,
   vip: PaywallVIP,
+  onboarding: PaywallOnboarding,
 };
 
 
