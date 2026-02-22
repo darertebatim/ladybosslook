@@ -165,7 +165,8 @@ function WelcomeScreen({ step, onNext }: Props) {
         <div className="absolute top-5 left-[60%] animate-[floatFeather3_4.5s_ease-in-out_infinite] text-amber-300/35 text-[10px]" style={{ animationDelay: '2.5s', transform: 'rotate(40deg)' }}>🪶</div>
 
         <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight relative z-10">{step.title}</h1>
-        <p className="text-[17px] font-semibold text-[#1a1f3d] text-center mb-6 leading-relaxed max-w-[260px] whitespace-pre-line relative z-10">{step.subtitle}</p>
+        <p className="text-[17px] font-semibold text-[#1a1f3d] text-center mb-4 leading-relaxed max-w-[260px] whitespace-pre-line relative z-10">{step.subtitle}</p>
+        <img src={appIcon} alt="Simora" className="w-14 h-14 rounded-2xl shadow-lg mb-4 relative z-10" />
         <button
           onClick={onNext}
           className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 relative z-10"
