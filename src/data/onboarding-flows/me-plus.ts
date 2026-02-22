@@ -15,17 +15,17 @@ import meplusImg29 from '@/assets/onboarding/meplus-29.png';
 
 export const mePlusFlow: OnboardingFlow = {
   id: 'me-plus-v1',
-  name: 'Me+ Onboarding',
-  description: 'Full 38-screen Me+ onboarding with surveys, paywalls, and gamification',
-  appName: 'Me+',
+  name: 'Simora Onboarding',
+  description: 'Full 38-screen Simora onboarding with surveys, paywalls, and gamification',
+  appName: 'Simora',
   createdAt: '2026-02-22',
   steps: [
     // ─── PDF1 Page 1: Welcome ─────────────────────────────
     {
       id: 'mp-1',
       type: 'welcome',
-      title: 'Welcome to Me+!',
-      subtitle: 'Every day, a gentle step towards my better self',
+      title: 'Welcome to Simora!',
+      subtitle: 'Every day, a gentle step\ntowards my better self',
       image: meplusWelcomeMascot,
       statBadges: [
         { label: 'High-Rated App 2024', value: '4.9' },
@@ -59,7 +59,7 @@ export const mePlusFlow: OnboardingFlow = {
     {
       id: 'mp-4',
       type: 'greeting',
-      title: 'Millions of Happiness Seekers Achieve Their Goals with Me+',
+      title: 'Millions of Happiness Seekers Achieve Their Goals with Simora',
       subtitle: 'Discover the life-changing benefits of many small things.',
       buttonLabel: 'Continue',
       illustrationLabel: '4.9 Ratings App 2024 badge with laurel wreath + review card from LovingLeslie',
@@ -126,7 +126,7 @@ export const mePlusFlow: OnboardingFlow = {
       title: 'Build Good Habits Based on Behavior Science',
       subtitle: 'Brain Diagram',
       image: meplusImg9,
-      description: '3X times more successful than other to achieve the goal by behavioral science. 96% of Me+ users have accomplished at least one goal and built healthy habits.',
+      description: '3X times more successful than other to achieve the goal by behavioral science. 96% of Simora users have accomplished at least one goal and built healthy habits.',
       buttonLabel: 'Continue',
     },
 
@@ -216,7 +216,7 @@ export const mePlusFlow: OnboardingFlow = {
       title: 'Build Good Habits and Have More Great Days!',
       subtitle: '30 day Timeline',
       statHighlight: '86%',
-      description: 'Good habits will help you reach your goals, develop both personally and professionally, and feel fulfilled. According to the statistics, 86% of Me+ users responded that building good habits makes them happier and have more great days.',
+      description: 'Good habits will help you reach your goals, develop both personally and professionally, and feel fulfilled. According to the statistics, 86% of Simora users responded that building good habits makes them happier and have more great days.',
       buttonLabel: 'Continue',
     },
 
@@ -272,7 +272,7 @@ export const mePlusFlow: OnboardingFlow = {
     {
       id: 'mp-22',
       type: 'distress-grid',
-      title: 'Me+ Is Here for You!\nSay goodbye to distress.',
+      title: 'Simora Is Here for You!\nSay goodbye to distress.',
       image: meplusImg22Grid,
       buttonLabel: 'Continue',
     },
@@ -281,8 +281,8 @@ export const mePlusFlow: OnboardingFlow = {
     {
       id: 'mp-23',
       type: 'motivational',
-      title: 'Me+ Is Here for You!\nSay goodbye to distress.',
-      description: '92% of Me+ users claim fabulous improvement and meet the better self as Me+ science-based program.',
+      title: 'Simora Is Here for You!\nSay goodbye to distress.',
+      description: '92% of Simora users claim fabulous improvement and meet the better self as Simora science-based program.',
       image: meplusImg23,
       buttonLabel: 'Continue',
     },
@@ -291,7 +291,7 @@ export const mePlusFlow: OnboardingFlow = {
     {
       id: 'mp-24',
       type: 'adhd-info',
-      title: 'Cognitive behavioral therapy for ADHD users, Me+ is a real help',
+      title: 'Cognitive behavioral therapy for ADHD users, Simora is a real help',
       image: meplusImg24,
       options: [
         { label: 'Keep focus on one thing easily', emoji: '✅' },
@@ -306,7 +306,7 @@ export const mePlusFlow: OnboardingFlow = {
       id: 'mp-25',
       type: 'loading-testimonials',
       title: 'Creating your personal journey...',
-      subtitle: 'Millions of users have chosen Me+',
+      subtitle: 'Millions of users have chosen Simora',
       testimonials: [
         { name: 'NightVain', text: 'Love it ❤️ Love it ❤️ Love it' },
         { name: 'hdbdhdbdhdjcj', text: 'Helps me get things done' },
@@ -443,7 +443,7 @@ export const mePlusFlow: OnboardingFlow = {
     {
       id: 'mp-35',
       type: 'motivational',
-      title: 'Tailored to your personality, Me+ helps you build momentum with simple mini habits',
+      title: 'Tailored to your personality, Simora helps you build momentum with simple mini habits',
       buttonLabel: 'Get Started!',
       illustrationLabel: 'Mascot (chicken) on purple mountain background with clipboard and pencil',
     },
@@ -470,7 +470,7 @@ export const mePlusFlow: OnboardingFlow = {
       id: 'mp-37',
       type: 'lucky-draw',
       title: 'LUCKY DRAW',
-      subtitle: 'Unlock All MePlus Features',
+      subtitle: 'Unlock All Simora Features',
       buttonLabel: 'SPIN',
       illustrationLabel: 'Spin wheel with segments: JACKPOT, 20% OFF, NICE TRY, 10% OFF, 15% OFF',
     },
