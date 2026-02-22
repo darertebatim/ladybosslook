@@ -364,16 +364,19 @@ function YesNoScreen({ step, onNext }: Props) {
 function DoYouWantScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <p className="text-sm text-gray-400 mb-2">{step.title}</p>
-      <h1 className="text-xl font-bold text-[#1a1f3d] mb-5">{step.subtitle}</h1>
+      <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-4">{step.title}</h1>
       {step.image ? (
-        <img src={step.image} alt="" className="h-48 mb-8 rounded-2xl object-contain mx-auto" />
+        <div className="flex-1 flex items-center justify-center">
+          <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
+        </div>
       ) : (
-        <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="h-48 mb-8" />
+        <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="flex-1" />
       )}
-      <div className="mt-auto space-y-3">
-        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
+      <div className="mt-auto flex gap-3 pt-6">
         <SecondaryButton onClick={onNext}>{step.secondaryButtonLabel}</SecondaryButton>
+        <div className="flex-1">
+          <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
+        </div>
       </div>
     </ScreenWrapper>
   );
