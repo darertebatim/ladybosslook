@@ -141,27 +141,19 @@ function WelcomeScreen({ step, onNext }: Props) {
       )}
 
       {/* Bottom content area */}
-      <div className="absolute inset-x-0 bottom-0 h-[46%] bg-gradient-to-b from-purple-100 via-white to-white flex flex-col items-center justify-end px-6 pb-5">
-        {/* Award badges */}
-        <div className="flex flex-col items-center gap-2.5 mb-4 w-full">
-          {step.statBadges?.map((b, i) => (
-            <div key={i} className="flex items-center justify-center gap-2">
-              <span className="text-sm">🏆</span>
-              <div className="text-center">
-                <p className="text-lg font-black text-[#1a1f3d] leading-tight">{b.value}</p>
-                <p className="text-[10px] font-medium text-[#1a1f3d]/50 leading-tight">{b.label}</p>
-              </div>
-              <span className="text-sm">🏆</span>
-            </div>
-          ))}
-        </div>
-
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-b from-purple-100 via-white to-white flex flex-col items-center justify-end px-6 pb-5 pt-6">
         {/* Welcome text */}
-        <h1 className="text-[22px] font-bold text-[#1a1f3d] text-center mb-1 leading-tight">{step.title}</h1>
-        <p className="text-xs text-gray-400 text-center mb-4 leading-relaxed">{step.subtitle}</p>
+        <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight">{step.title}</h1>
+        <p className="text-sm text-gray-400 text-center mb-6 leading-relaxed max-w-[240px]">{step.subtitle}</p>
 
-        {/* CTA */}
-        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
+        {/* CTA with arrow */}
+        <button
+          onClick={onNext}
+          className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+        >
+          {step.buttonLabel}
+          <span className="text-base">→</span>
+        </button>
       </div>
     </div>
   );
