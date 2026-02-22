@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
 import { Sparkles, Trophy } from 'lucide-react';
+import { SoftReviewPrompt } from './SoftReviewPrompt';
+import { useAppReview } from '@/hooks/useAppReview';
 
 import coinGold from '@/assets/coin-gold.png';
 import coinSilver from '@/assets/coin-silver.png';
@@ -73,7 +75,9 @@ export function BadgeCelebration({
 }: BadgeCelebrationProps) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [flyingBadge, setFlyingBadge] = useState(false);
+  const [showReviewPrompt, setShowReviewPrompt] = useState(false);
   const badgeRef = useRef<HTMLImageElement>(null);
+  const { maybeRequestReview, canRequestReview: canReview } = useAppReview();
 
   const [actionMessage, setActionMessage] = useState('');
 
@@ -113,6 +117,10 @@ export function BadgeCelebration({
       // Auto-dismiss toasts after delay
       if (type === 'silver' || type === 'almostGold' || type === 'action') {
         const timer = setTimeout(() => {
+          // After silver toast, trigger review prompt if eligible
+          if (type === 'silver' && canReview()) {
+            setShowReviewPrompt(true);
+          }
           onClose();
         }, type === 'action' ? 3000 : 4000);
         return () => clearTimeout(timer);
@@ -190,7 +198,25 @@ export function BadgeCelebration({
     }, 600);
   };
 
-  if (!type) return null;
+  const handleAcceptReview = async () => {
+    setShowReviewPrompt(false);
+    await maybeRequestReview();
+  };
+
+  const handleDeclineReview = () => {
+    setShowReviewPrompt(false);
+  };
+
+  // If no celebration type, still render review prompt if open
+  if (!type) {
+    return (
+      <SoftReviewPrompt
+        isOpen={showReviewPrompt}
+        onClose={handleDeclineReview}
+        onAccept={handleAcceptReview}
+      />
+    );
+  }
 
   // Toast style for action, silver, and almost-there
   if (type === 'action' || type === 'silver' || type === 'almostGold') {
