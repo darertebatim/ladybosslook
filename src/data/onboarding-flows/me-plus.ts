@@ -1,5 +1,6 @@
 import { OnboardingFlow } from '@/types/onboarding';
 import meplusWelcomeMascot from '@/assets/onboarding/meplus-welcome-mascot.png';
+import meplusDiscoverMascot from '@/assets/onboarding/meplus-discover-mascot.png';
 import meplusImg9 from '@/assets/onboarding/meplus-9-brain.png';
 import meplusImg11 from '@/assets/onboarding/meplus-11-beforeafter.png';
 import meplusImg23 from '@/assets/onboarding/meplus-23-benefits.png';
@@ -38,34 +39,13 @@ export const mePlusFlow: OnboardingFlow = {
       buttonLabel: 'Continue',
     },
 
-    // ─── PDF1 Page 2: Organized Life ──────────────────────
+    // ─── Page 2: Discover mascot full-page ──────────────────
     {
       id: 'mp-2',
-      type: 'greeting',
-      title: 'Get a More Organized Life, and Stay Disciplined',
-      subtitle: 'Make you healthier, happier, and more productive.',
+      type: 'motivational',
+      title: "Let's Discover a Better You Together!",
+      image: meplusDiscoverMascot,
       buttonLabel: 'Continue',
-      illustrationLabel: 'Phone mockup showing schedule with tasks (Drink coffee, Healthy breakfast, Apply a face mask)',
-    },
-
-    // ─── PDF1 Page 3: Structure Day ───────────────────────
-    {
-      id: 'mp-3',
-      type: 'greeting',
-      title: 'Structure Your Day and Make Goals Achievable!',
-      subtitle: 'Start a preset plan for a productive day!',
-      buttonLabel: 'Continue',
-      illustrationLabel: 'Phone mockup showing Discover page with routine cards',
-    },
-
-    // ─── PDF1 Page 4: Millions of Users ───────────────────
-    {
-      id: 'mp-4',
-      type: 'greeting',
-      title: 'Millions of Happiness Seekers Achieve Their Goals with Simora',
-      subtitle: 'Discover the life-changing benefits of many small things.',
-      buttonLabel: 'Continue',
-      illustrationLabel: '4.9 Ratings App 2024 badge with laurel wreath + review card from LovingLeslie',
     },
 
     // ─── PDF1 Page 5: Sleep duration ──────────────────────
