@@ -232,7 +232,7 @@ function BottomSheetWrapper({ children, bgImage }: { children: React.ReactNode; 
       {/* Background image area - taller to show more */}
       <div className="h-[240px] shrink-0 relative">
         {bgImage ? (
-          <img src={bgImage} alt="" className="w-full h-full object-cover object-center" />
+          <img src={bgImage} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
         ) : (
           <div className="w-full h-full bg-gradient-to-b from-purple-400 to-purple-300" />
         )}
