@@ -947,18 +947,20 @@ function ContractScreen({ step, onNext }: Props) {
 function DistressGridScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-6 whitespace-pre-line">{step.title}</h1>
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        {step.options?.map((opt, i) => (
-          <div key={i} className="rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 aspect-square flex flex-col items-center justify-center p-3 relative">
-            <IllustrationPlaceholder label={opt.label} className="w-full h-full" />
-            <div className="absolute bottom-2 right-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-lg font-bold">⊘</span>
+      <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-5 whitespace-pre-line">{step.title}</h1>
+      {step.image ? (
+        <div className="flex-1 flex items-center justify-center mb-6">
+          <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          {step.options?.map((opt, i) => (
+            <div key={i} className="rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 aspect-square flex items-center justify-center p-3">
+              <IllustrationPlaceholder label={opt.label} className="w-full h-full" />
             </div>
-            <p className="absolute bottom-2 left-2 text-xs font-bold text-white bg-black/50 px-2 py-0.5 rounded">{opt.label}</p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
       <div className="mt-auto">
         <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>

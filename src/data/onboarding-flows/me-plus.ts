@@ -3,6 +3,7 @@ import meplusImg18 from '@/assets/onboarding/meplus-18.png';
 import meplusImg19 from '@/assets/onboarding/meplus-19.png';
 import meplusImg20 from '@/assets/onboarding/meplus-20.png';
 import meplusImg21 from '@/assets/onboarding/meplus-21.png';
+import meplusImg22Grid from '@/assets/onboarding/meplus-22-grid.png';
 import meplusImg27 from '@/assets/onboarding/meplus-27.png';
 import meplusImg28 from '@/assets/onboarding/meplus-28.png';
 import meplusImg29 from '@/assets/onboarding/meplus-29.png';
@@ -282,14 +283,8 @@ export const mePlusFlow: OnboardingFlow = {
       id: 'mp-22',
       type: 'distress-grid',
       title: 'Me+ Is Here for You!\nSay goodbye to distress.',
-      options: [
-        { label: 'Unorganized', emoji: '🚫' },
-        { label: 'Not enough time', emoji: '🚫' },
-        { label: 'Easily Distracted', emoji: '🚫' },
-        { label: 'Depression', emoji: '🚫' },
-      ],
+      image: meplusImg22Grid,
       buttonLabel: 'Continue',
-      illustrationLabel: '2x2 grid: messy closet, overwhelmed at desk, distracted person, depressed in bed - each with red ❌',
     },
 
     // ─── PDF2 Page 3: Benefits ────────────────────────────
