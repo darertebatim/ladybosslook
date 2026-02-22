@@ -1230,17 +1230,56 @@ function ContractScreen({ step, onNext }: Props) {
   const [signed, setSigned] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isDrawing = useRef(false);
+  const hasStrokes = useRef(false);
+
+  const getPos = (e: React.TouchEvent | React.MouseEvent) => {
+    const canvas = canvasRef.current!;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    if ('touches' in e) {
+      return { x: (e.touches[0].clientX - rect.left) * scaleX, y: (e.touches[0].clientY - rect.top) * scaleY };
+    }
+    return { x: ((e as React.MouseEvent).clientX - rect.left) * scaleX, y: ((e as React.MouseEvent).clientY - rect.top) * scaleY };
+  };
+
+  const startDraw = (e: React.TouchEvent | React.MouseEvent) => {
+    e.preventDefault();
+    isDrawing.current = true;
+    const ctx = canvasRef.current?.getContext('2d');
+    if (!ctx) return;
+    const pos = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+  };
+
+  const draw = (e: React.TouchEvent | React.MouseEvent) => {
+    if (!isDrawing.current) return;
+    e.preventDefault();
+    const ctx = canvasRef.current?.getContext('2d');
+    if (!ctx) return;
+    const pos = getPos(e);
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#1a1f3d';
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    hasStrokes.current = true;
+    if (!signed) setSigned(true);
+  };
+
+  const stopDraw = () => { isDrawing.current = false; };
 
   const handleConfirm = () => {
     if (!signed) return;
     setShowCelebration(true);
-    // Fire confetti
     const myConfetti = confetti.create(undefined, { resize: true, useWorker: true });
     myConfetti({ particleCount: 80, spread: 70, origin: { y: 0.3 } });
     setTimeout(() => {
       myConfetti({ particleCount: 50, spread: 90, origin: { y: 0.4 } });
     }, 300);
-    // Auto-advance after 2.5s
     setTimeout(onNext, 2500);
   };
 
@@ -1265,15 +1304,21 @@ function ContractScreen({ step, onNext }: Props) {
           <li key={i} className="text-base font-medium text-[#1a1f3d]">• {opt.label}</li>
         ))}
       </ul>
-      <div
-        className={`bg-gray-100 rounded-2xl p-4 mb-2 h-28 flex items-center justify-center cursor-pointer transition-all ${signed ? 'border-2 border-green-400 bg-green-50' : ''}`}
-        onClick={() => setSigned(true)}
-      >
-        {signed ? (
-          <p className="text-2xl font-bold text-[#1a1f3d] italic" style={{ fontFamily: 'cursive' }}>Signed ✓</p>
-        ) : (
-          <p className="text-sm text-gray-400">Tap here to sign</p>
-        )}
+      <div className="bg-gray-100 rounded-2xl p-3 mb-2">
+        <p className="text-xs text-gray-500 mb-1 font-medium">Sign your name using finger:</p>
+        <canvas
+          ref={canvasRef}
+          width={500}
+          height={200}
+          className="w-full h-24 rounded-xl bg-white touch-none cursor-crosshair"
+          onMouseDown={startDraw}
+          onMouseMove={draw}
+          onMouseUp={stopDraw}
+          onMouseLeave={stopDraw}
+          onTouchStart={startDraw}
+          onTouchMove={draw}
+          onTouchEnd={stopDraw}
+        />
       </div>
       <p className="text-xs text-gray-400 text-center mb-4">*Your signature will not be recorded</p>
       <div className="mt-auto">
