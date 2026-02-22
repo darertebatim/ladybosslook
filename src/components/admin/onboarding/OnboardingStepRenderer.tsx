@@ -988,13 +988,13 @@ function PaywallScreen({ step, onNext }: Props) {
 
       {/* Auto-swiping image carousel */}
       {slides.length > 0 && (
-        <div className="relative mb-5 overflow-hidden rounded-2xl -mx-5" style={{ height: 200 }}>
+        <div className="relative mb-4 overflow-hidden rounded-2xl -mx-5">
           <div
-            className="flex transition-transform duration-700 ease-in-out h-full"
+            className="flex transition-transform duration-700 ease-in-out"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
             {slides.map((src, i) => (
-              <img key={i} src={src} alt="" className="w-full h-full object-cover shrink-0" />
+              <img key={i} src={src} alt="" className="w-full shrink-0 object-contain" />
             ))}
           </div>
           {/* Dots */}
