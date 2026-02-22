@@ -955,18 +955,23 @@ function DistressGridScreen({ step, onNext }: Props) {
       <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-6 whitespace-pre-line">{step.title}</h1>
       <div className="grid grid-cols-2 gap-3 mb-6">
         {step.options?.map((opt, i) => (
-          <div key={i} className="rounded-2xl overflow-hidden aspect-square relative">
-            <img src={gridImages[i]} alt={opt.label} className="w-full h-full object-cover" />
+          <div key={i} className="rounded-2xl overflow-hidden relative">
+            {/* Show bottom portion of 4:5 image as square */}
+            <div className="aspect-square overflow-hidden">
+              <img src={gridImages[i]} alt={opt.label} className="w-full h-[125%] object-cover object-bottom" />
+            </div>
             {/* Darkened overlay */}
-            <div className="absolute inset-0 bg-black/30" />
-            {/* ⊘ ban icon */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-14 h-14 rounded-full border-[4px] border-red-500 flex items-center justify-center bg-red-500/20">
-                <div className="w-8 h-[4px] bg-red-500 rounded-full -rotate-45" />
+            <div className="absolute inset-0 bg-black/20" />
+            {/* ⊘ ban icon — bottom right */}
+            <div className="absolute bottom-8 right-3">
+              <div className="w-12 h-12 rounded-full border-[3.5px] border-red-500 flex items-center justify-center bg-red-500/20">
+                <div className="w-7 h-[3.5px] bg-red-500 rounded-full -rotate-45" />
               </div>
             </div>
-            {/* Label */}
-            <p className="absolute bottom-2 left-2 right-2 text-xs font-bold text-white text-center">{opt.label}</p>
+            {/* Label at bottom */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-3 pt-4 pb-2">
+              <p className="text-xs font-bold text-white">{opt.label}</p>
+            </div>
           </div>
         ))}
       </div>
