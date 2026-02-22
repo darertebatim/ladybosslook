@@ -395,7 +395,13 @@ function InfoStatScreen({ step, onNext }: Props) {
 function MotivationalScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper bg="bg-[#fdf8f4]">
-      {step.illustrationLabel && <IllustrationPlaceholder label={step.illustrationLabel} className="h-44 mb-6" />}
+      {step.image ? (
+        <div className="flex items-center justify-center mb-6">
+          <img src={step.image} alt="" className="w-full max-w-[280px] object-contain" />
+        </div>
+      ) : step.illustrationLabel ? (
+        <IllustrationPlaceholder label={step.illustrationLabel} className="h-44 mb-6" />
+      ) : null}
       <div className="flex-1 flex flex-col justify-center">
         <h1 className="text-xl font-bold text-[#1a1f3d] mb-3">{step.title}</h1>
         <p className="text-sm text-gray-500 leading-relaxed">{step.description}</p>
@@ -824,7 +830,13 @@ function ScienceBackedScreen({ step, onNext }: Props) {
       {step.subtitle ? (
         <>
           <h1 className="text-lg font-bold text-[#1a1f3d] mb-3">{step.title}</h1>
-          <IllustrationPlaceholder label={step.illustrationLabel || step.subtitle} className="h-36 mb-4" />
+          {step.image ? (
+            <div className="flex items-center justify-center mb-4">
+              <img src={step.image} alt="" className="w-full max-w-[280px] object-contain" />
+            </div>
+          ) : (
+            <IllustrationPlaceholder label={step.illustrationLabel || step.subtitle} className="h-36 mb-4" />
+          )}
           <p className="text-xs text-gray-500 leading-relaxed mb-4">{step.description}</p>
         </>
       ) : (
@@ -978,7 +990,13 @@ function ADHDInfoScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
       <h1 className="text-xl font-bold text-[#1a1f3d] mb-4">{step.title}</h1>
-      <IllustrationPlaceholder label={step.illustrationLabel || 'Brain comparison'} className="h-40 mb-4" />
+      {step.image ? (
+        <div className="flex items-center justify-center mb-4">
+          <img src={step.image} alt="" className="w-full max-w-[280px] object-contain rounded-2xl" />
+        </div>
+      ) : (
+        <IllustrationPlaceholder label={step.illustrationLabel || 'Brain comparison'} className="h-40 mb-4" />
+      )}
       <div className="bg-gray-50 rounded-2xl p-4 mb-4">
         <p className="text-sm font-bold text-[#1a1f3d] mb-3">Me+ can help ADHD:</p>
         <ul className="space-y-2">

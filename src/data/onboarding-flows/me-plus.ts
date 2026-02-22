@@ -1,5 +1,8 @@
 import { OnboardingFlow } from '@/types/onboarding';
+import meplusImg9 from '@/assets/onboarding/meplus-9-brain.png';
 import meplusImg11 from '@/assets/onboarding/meplus-11-beforeafter.png';
+import meplusImg23 from '@/assets/onboarding/meplus-23-benefits.png';
+import meplusImg24 from '@/assets/onboarding/meplus-24-adhd.png';
 import meplusImg18 from '@/assets/onboarding/meplus-18.png';
 import meplusImg19 from '@/assets/onboarding/meplus-19.png';
 import meplusImg20 from '@/assets/onboarding/meplus-20.png';
@@ -122,7 +125,7 @@ export const mePlusFlow: OnboardingFlow = {
       type: 'science-backed',
       title: 'Build Good Habits Based on Behavior Science',
       subtitle: 'Brain Diagram',
-      illustrationLabel: 'Brain diagram showing Goal Directed System (Pre-frontal cortex), Motivation Controller, Habit System (Basal ganglia), Energy System',
+      image: meplusImg9,
       description: '3X times more successful than other to achieve the goal by behavioral science. 96% of Me+ users have accomplished at least one goal and built healthy habits.',
       buttonLabel: 'Continue',
     },
@@ -280,8 +283,8 @@ export const mePlusFlow: OnboardingFlow = {
       type: 'motivational',
       title: 'Me+ Is Here for You!\nSay goodbye to distress.',
       description: '92% of Me+ users claim fabulous improvement and meet the better self as Me+ science-based program.',
+      image: meplusImg23,
       buttonLabel: 'Continue',
-      illustrationLabel: 'Happy woman surrounded by: More Productive (hourglass), More Organized (checklist), More Energetic (lightbulb), More Self-control (flag)',
     },
 
     // ─── PDF2 Page 4: ADHD Info ───────────────────────────
@@ -289,13 +292,13 @@ export const mePlusFlow: OnboardingFlow = {
       id: 'mp-24',
       type: 'adhd-info',
       title: 'Cognitive behavioral therapy for ADHD users, Me+ is a real help',
+      image: meplusImg24,
       options: [
         { label: 'Keep focus on one thing easily', emoji: '✅' },
         { label: 'Structure the day and make life organized', emoji: '✅' },
         { label: 'Reduce anxiety and depression and keep calm', emoji: '✅' },
       ],
       buttonLabel: 'Continue',
-      illustrationLabel: "ADHD's Brain vs Normal Brain - two brain scans side by side",
     },
 
     // ─── PDF2 Page 5: Loading/Testimonials ────────────────
