@@ -982,15 +982,15 @@ function PaywallScreen({ step, onNext }: Props) {
         </div>
       )}
 
-      {/* Pricing tiers - 3-column card layout */}
-      <div className="grid grid-cols-3 gap-2 mb-4">
+      {/* Pricing tiers - centered 2-card layout */}
+      <div className="flex justify-center gap-3 mb-4">
         {step.pricingTiers?.map((tier, i) => {
           const isSelected = i === selectedTier;
           return (
             <button
               key={i}
               onClick={() => setSelectedTier(i)}
-              className={`relative rounded-2xl border-2 pt-5 pb-3 px-2 text-center transition-all active:scale-[0.97] ${
+              className={`relative rounded-2xl border-2 pt-5 pb-3 px-4 text-center transition-all active:scale-[0.97] w-[140px] ${
                 isSelected ? 'border-indigo-500 bg-indigo-50/60' : 'border-gray-200 bg-white'
               }`}
             >
@@ -1001,7 +1001,7 @@ function PaywallScreen({ step, onNext }: Props) {
               )}
               <p className="text-base font-extrabold text-[#1a1f3d] leading-tight">{tier.label.split(' ')[0]}</p>
               <p className="text-[11px] text-[#1a1f3d] font-medium">{tier.label.split(' ').slice(1).join(' ')}</p>
-              <p className="text-[11px] text-gray-400 mt-1">{tier.perWeek}</p>
+              <p className="text-[11px] text-gray-400 mt-1 line-through">{tier.perWeek}</p>
               <div className="border-t border-gray-200 mt-2 pt-2">
                 <p className={`text-xs font-bold ${isSelected ? 'text-[#1a1f3d]' : 'text-gray-500'}`}>{tier.total}</p>
               </div>
