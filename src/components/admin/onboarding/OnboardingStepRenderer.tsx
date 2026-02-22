@@ -988,13 +988,13 @@ function PaywallScreen({ step, onNext }: Props) {
 
       {/* Auto-swiping image carousel */}
       {slides.length > 0 && (
-        <div className="relative mb-5 overflow-hidden rounded-2xl" style={{ height: 180 }}>
+        <div className="relative mb-5 overflow-hidden rounded-2xl -mx-5" style={{ height: 200 }}>
           <div
             className="flex transition-transform duration-700 ease-in-out h-full"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
             {slides.map((src, i) => (
-              <img key={i} src={src} alt="" className="w-full h-full object-contain shrink-0" />
+              <img key={i} src={src} alt="" className="w-full h-full object-cover shrink-0" />
             ))}
           </div>
           {/* Dots */}
@@ -1059,9 +1059,11 @@ function PaywallScreen({ step, onNext }: Props) {
           <span className="text-lg">→</span>
         </button>
       </div>
-      {step.description && (
-        <p className="text-[9px] text-gray-400 text-center mt-3 leading-snug">{step.description}</p>
-      )}
+      <div className="flex items-center justify-center gap-4 mt-3 text-[10px] text-gray-400">
+        <a href="/sms-terms" className="underline">Terms of Use</a>
+        <span>·</span>
+        <a href="/privacy" className="underline">Privacy Policy</a>
+      </div>
     </ScreenWrapper>
   );
 }
