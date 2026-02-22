@@ -1017,8 +1017,7 @@ function PaywallScreen({ step, onNext }: Props) {
                   tier.badge.includes('Trial') || tier.badge.includes('Free') ? 'bg-indigo-500 text-white' : 'bg-purple-200 text-purple-700'
                 }`}>{tier.badge}</span>
               )}
-              <p className="text-sm font-extrabold text-[#1a1f3d] leading-tight">{tier.label.split(' ')[0]}</p>
-              <p className="text-[10px] text-[#1a1f3d] font-medium">{tier.label.split(' ').slice(1).join(' ')}</p>
+              <p className="text-sm font-extrabold text-[#1a1f3d] leading-tight">{tier.label}</p>
               <p className={`text-[10px] text-gray-400 mt-0.5 ${tier.perWeek?.includes('/mo.') && tier.label.startsWith('1') ? 'line-through' : ''}`}>{tier.perWeek}</p>
               {tier.discount && (
                 <span className="inline-block mt-0.5 text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-red-500 text-white">{tier.discount}</span>
