@@ -3,6 +3,7 @@ import { OnboardingStep } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
+import appIcon from '@/assets/app-icon.png';
 import SealCheck from '@/components/app/SealCheck';
 
 interface Props {
@@ -131,17 +132,22 @@ function ScreenWrapper({ children, bg = 'bg-white' }: { children: React.ReactNod
 function WelcomeScreen({ step, onNext }: Props) {
   return (
     <div className="h-full relative overflow-hidden bg-gradient-to-b from-purple-400 via-purple-300 to-purple-100">
-      {/* Mascot image — top area, centered on face */}
+      {/* App icon top-left */}
+      <div className="absolute top-3 left-4 z-10">
+        <img src={appIcon} alt="Simora" className="w-10 h-10 rounded-xl shadow-md" />
+      </div>
+
+      {/* Mascot image — top area, centered on mouth */}
       {step.image && (
-        <div className="absolute inset-x-0 top-0 h-[65%]">
-          <img src={step.image} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 40%' }} />
+        <div className="absolute inset-x-0 top-0 h-[58%]">
+          <img src={step.image} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 45%' }} />
         </div>
       )}
 
-      {/* Bottom sheet with rounded top */}
-      <div className="absolute inset-x-0 bottom-0 bg-white rounded-t-[28px] flex flex-col items-center justify-end px-6 pb-5 pt-7 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-        <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight">{step.title}</h1>
-        <p className="text-sm text-gray-400 text-center mb-6 leading-relaxed max-w-[240px]">{step.subtitle}</p>
+      {/* Bottom sheet with rounded top — raised higher */}
+      <div className="absolute inset-x-0 bottom-0 h-[48%] bg-white rounded-t-[28px] flex flex-col items-center justify-end px-6 pb-5 pt-7 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+        <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight">{step.title}</h1>
+        <p className="text-[17px] font-semibold text-[#1a1f3d] text-center mb-6 leading-relaxed max-w-[260px] whitespace-pre-line">{step.subtitle}</p>
         <button
           onClick={onNext}
           className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
