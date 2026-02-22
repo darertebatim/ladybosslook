@@ -130,41 +130,35 @@ function ScreenWrapper({ children, bg = 'bg-white' }: { children: React.ReactNod
 
 function WelcomeScreen({ step, onNext }: Props) {
   return (
-    <ScrollArea className="h-full bg-gradient-to-b from-amber-100 via-amber-50 to-white">
-      <div className="flex flex-col h-full min-h-[700px]">
-        {/* Mascot hero */}
-        {step.image ? (
-          <div className="flex items-center justify-center pt-12 pb-4">
-            <img src={step.image} alt="" className="w-48 h-48 object-contain" />
-          </div>
-        ) : (
-          <div className="pt-[72px] px-5">
-            <IllustrationPlaceholder label="App hero illustration" className="h-48 mb-6" />
-          </div>
-        )}
-
+    <div className="h-full relative overflow-hidden">
+      {/* Full-screen mascot image */}
+      {step.image ? (
+        <img src={step.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+      ) : (
+        <div className="absolute inset-0 bg-amber-50" />
+      )}
+      {/* Gradient overlay from bottom */}
+      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent" style={{ top: '40%' }} />
+      {/* Content overlay at bottom */}
+      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center px-5 pb-6">
         {/* Award badges */}
-        <div className="flex-1 flex flex-col items-center justify-center gap-4 px-8">
+        <div className="flex flex-col items-center gap-3 mb-6">
           {step.statBadges?.map((b, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <span className="text-2xl">🏆</span>
+            <div key={i} className="flex items-center gap-2">
+              <span className="text-lg">🏆</span>
               <div className="text-center">
-                <p className="text-2xl font-black text-[#1a1f3d]">{b.value}</p>
-                <p className="text-xs font-medium text-[#1a1f3d]/70">{b.label}</p>
+                <p className="text-xl font-black text-[#1a1f3d]">{b.value}</p>
+                <p className="text-[10px] font-medium text-[#1a1f3d]/60">{b.label}</p>
               </div>
-              <span className="text-2xl">🏆</span>
+              <span className="text-lg">🏆</span>
             </div>
           ))}
         </div>
-
-        {/* Welcome text + button */}
-        <div className="px-5 pb-6 mt-auto">
-          <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
-          <p className="text-sm text-gray-500 text-center mb-6">{step.subtitle}</p>
-          <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
-        </div>
+        <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
+        <p className="text-sm text-gray-500 text-center mb-5">{step.subtitle}</p>
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
       </div>
-    </ScrollArea>
+    </div>
   );
 }
 
