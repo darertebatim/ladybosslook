@@ -409,39 +409,6 @@ export const mePlusFlow: OnboardingFlow = {
       description: 'After your 7-day free trial, your Apple ID payment method will be automatically charged $59.99 for a year. Cancel the subscription at least 24 hours before the current subscription period.',
     },
 
-    // ─── PDF2 Page 13: Dark Paywall (50% OFF) ────────────
-    {
-      id: 'mp-33',
-      type: 'dark-paywall',
-      title: 'Make your life organized and meet your best self',
-      subtitle: 'Move Now and Meet Better Self',
-      statHighlight: '50% OFF',
-      pricingTiers: [
-        { label: '1 month', perWeek: '$12.99/mo.', total: '$12.99/mo' },
-        { label: '12 months', perWeek: '$4.99/mo.', total: '$59.99/yr', badge: '7-Day Free Trial' },
-        { label: '3 months', perWeek: '$9.99/mo.', total: '$29.99/3mo' },
-      ],
-      buttonLabel: 'Continue',
-      description: 'After your 7-day free trial, your Apple ID payment method will be automatically charged $59.99 for a year.',
-      illustrationLabel: 'Dark background with before/after illustrations',
-    },
-
-    // ─── PDF2 Page 14: Countdown Paywall ──────────────────
-    {
-      id: 'mp-34',
-      type: 'countdown-paywall',
-      title: 'Make your life organized and meet your best self',
-      statHighlight: '50% OFF',
-      pricingTiers: [
-        { label: '1 month', perWeek: '$12.99/mo.', total: '$12.99/mo' },
-        { label: '12 months', perWeek: '$2.49/mo.', total: '$29.99/yr', badge: '50% OFF' },
-        { label: '12 months', perWeek: '$4.99/mo.', total: '$59.99/yr', badge: 'Original Price' },
-      ],
-      buttonLabel: 'Continue',
-      description: 'Your Apple ID payment method will be automatically charged $29.99 for a year. Cancel the subscription at least 24 hours before.',
-      illustrationLabel: 'Before/after woman with battery icons',
-    },
-
     // ─── PDF2 Page 15: Get Started (purple) ───────────────
     {
       id: 'mp-35',
@@ -449,46 +416,6 @@ export const mePlusFlow: OnboardingFlow = {
       title: 'Tailored to your personality, Simora helps you build momentum with simple mini habits',
       image: meplusImg35Bg,
       buttonLabel: 'Get Started!',
-    },
-
-    // ─── PDF2 Page 16: Task Select (purple bg) ────────────
-    {
-      id: 'mp-36',
-      type: 'task-select-purple',
-      title: 'Choose a simple and wholesome task to start right away!',
-      subtitle: '(Select all that apply)',
-      options: [
-        { label: 'Take a deep breath', emoji: '😯' },
-        { label: 'Brush teeth', emoji: '🪥' },
-        { label: 'Wash face', emoji: '💆' },
-        { label: 'Stretch', emoji: '💪' },
-        { label: 'Get out of bed', emoji: '🛏️' },
-        { label: 'Do 1 thing that brings me joy', emoji: '🥰' },
-      ],
-      buttonLabel: 'Continue',
-    },
-
-    // ─── PDF2 Page 17: Lucky Draw ─────────────────────────
-    {
-      id: 'mp-37',
-      type: 'lucky-draw',
-      title: 'LUCKY DRAW',
-      subtitle: 'Unlock All Simora Features',
-      buttonLabel: 'SPIN',
-      illustrationLabel: 'Spin wheel with segments: JACKPOT, 20% OFF, NICE TRY, 10% OFF, 15% OFF',
-    },
-
-    // ─── PDF2 Page 18: Super Prize ────────────────────────
-    {
-      id: 'mp-38',
-      type: 'super-prize',
-      title: 'SUPER PRIZE',
-      subtitle: 'Congrats! You are so lucky!',
-      statHighlight: '50% OFF',
-      description: 'Unlock all premium features\nOnly $1.67/month\nTotal $19.99/year ($39.99/year)',
-      buttonLabel: 'Continue',
-      secondaryButtonLabel: 'Restore',
-      illustrationLabel: 'Purple ticket with 50% OFF',
     },
   ],
 };
