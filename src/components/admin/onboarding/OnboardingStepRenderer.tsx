@@ -599,14 +599,19 @@ function HabitLoopScreen({ step, onNext }: Props) {
 
 function LoadingTestimonialsScreen({ step, onNext }: Props) {
   const [progress, setProgress] = useState(0);
+  const hasFired = useRef(false);
 
   useEffect(() => {
     setProgress(0);
+    hasFired.current = false;
     const interval = setInterval(() => {
       setProgress(p => {
         if (p >= 100) {
           clearInterval(interval);
-          setTimeout(onNext, 500);
+          if (!hasFired.current) {
+            hasFired.current = true;
+            setTimeout(onNext, 500);
+          }
           return 100;
         }
         return p + 2;
