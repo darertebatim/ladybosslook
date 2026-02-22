@@ -62,6 +62,7 @@ export interface OnboardingStep {
   secondaryButtonLabel?: string;
   statHighlight?: string;
   illustrationLabel?: string;
+  image?: string;
   testimonials?: TestimonialCard[];
   pricingTiers?: PricingTier[];
   beforeItems?: string[];

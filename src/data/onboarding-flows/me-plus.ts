@@ -1,4 +1,11 @@
 import { OnboardingFlow } from '@/types/onboarding';
+import meplusImg18 from '@/assets/onboarding/meplus-18.png';
+import meplusImg19 from '@/assets/onboarding/meplus-19.png';
+import meplusImg20 from '@/assets/onboarding/meplus-20.png';
+import meplusImg21 from '@/assets/onboarding/meplus-21.png';
+import meplusImg27 from '@/assets/onboarding/meplus-27.png';
+import meplusImg28 from '@/assets/onboarding/meplus-28.png';
+import meplusImg29 from '@/assets/onboarding/meplus-29.png';
 
 export const mePlusFlow: OnboardingFlow = {
   id: 'me-plus-v1',
@@ -243,8 +250,7 @@ export const mePlusFlow: OnboardingFlow = {
       id: 'mp-18',
       type: 'yes-no',
       title: 'Do you relate to the statement below?',
-      description: '"I feel anxious when I have a lot to do and don\'t know where to start."',
-      illustrationLabel: 'Woman overwhelmed in front of messy closet',
+      image: meplusImg18,
     },
 
     // ─── PDF1 Page 19: Yes/No Not enough time ─────────────
@@ -252,8 +258,7 @@ export const mePlusFlow: OnboardingFlow = {
       id: 'mp-19',
       type: 'yes-no',
       title: 'Do you relate to the statement below?',
-      description: 'I always feel like there is not enough time.',
-      illustrationLabel: 'Woman with hands on face at desk with clock and papers',
+      image: meplusImg19,
     },
 
     // ─── PDF1 Page 20: Yes/No Concentrating ───────────────
@@ -261,8 +266,7 @@ export const mePlusFlow: OnboardingFlow = {
       id: 'mp-20',
       type: 'yes-no',
       title: 'Do you relate to the statement below?',
-      description: "I have trouble concentrating on one thing. There's always something else to distract me.",
-      illustrationLabel: 'Person in bed distracted by thought bubbles of items',
+      image: meplusImg20,
     },
 
     // ─── PDF2 Page 1: Yes/No End of day regret ────────────
@@ -270,8 +274,7 @@ export const mePlusFlow: OnboardingFlow = {
       id: 'mp-21',
       type: 'yes-no',
       title: 'Do you relate to the statement below?',
-      description: 'At the end of the day, I regret that I could have done more things.',
-      illustrationLabel: 'Woman lying awake in bed at 2:00 AM',
+      image: meplusImg21,
     },
 
     // ─── PDF2 Page 2: Distress Grid ───────────────────────
@@ -353,7 +356,7 @@ export const mePlusFlow: OnboardingFlow = {
       title: 'Do you want to organize your day?',
       buttonLabel: "Sure! Let's go!",
       secondaryButtonLabel: 'No',
-      illustrationLabel: 'Split image: tired woman (low battery) vs energetic woman on phone (full battery)',
+      image: meplusImg27,
     },
 
     // ─── PDF2 Page 8: Do you want - habits ────────────────
@@ -363,7 +366,7 @@ export const mePlusFlow: OnboardingFlow = {
       title: 'Do you want to build good habits?',
       buttonLabel: "Sure! Let's go!",
       secondaryButtonLabel: 'No',
-      illustrationLabel: 'Split image: messy woman with clothes vs organized woman with hanging clothes',
+      image: meplusImg28,
     },
 
     // ─── PDF2 Page 9: Do you want - best version ─────────
@@ -373,7 +376,7 @@ export const mePlusFlow: OnboardingFlow = {
       title: 'Do you want to be the best version of yourself?',
       buttonLabel: "Sure! Let's go!",
       secondaryButtonLabel: 'No',
-      illustrationLabel: 'Split image: sad woman in rain vs happy woman with hearts',
+      image: meplusImg29,
     },
 
     // ─── PDF2 Page 10: Well done confetti ─────────────────
