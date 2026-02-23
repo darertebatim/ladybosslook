@@ -17,11 +17,10 @@ export default function Communications() {
       </div>
 
       <Tabs defaultValue="updates">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="updates">Updates</TabsTrigger>
           <TabsTrigger value="broadcasts">Broadcasts</TabsTrigger>
           <TabsTrigger value="push">Push Only</TabsTrigger>
-          <TabsTrigger value="promo">Promo</TabsTrigger>
           <TabsTrigger value="email-gen">Email Gen</TabsTrigger>
           <TabsTrigger value="banners">Banners</TabsTrigger>
           <TabsTrigger value="mailchimp">Mailchimp</TabsTrigger>
