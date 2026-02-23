@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { dearMeFlow } from '@/data/onboarding-flows/dear-me';
+import { mePlusFlow } from '@/data/onboarding-flows/me-plus';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +14,7 @@ import { Trash2, Plus, ExternalLink, Sparkles, Loader2, Pencil, Users, Copy } fr
 import { format } from 'date-fns';
 import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 
-type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner' | 'rate';
+type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
 type AspectRatio = '3:1' | '16:9' | '1:1';
 type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player' | 'all';
@@ -247,7 +249,7 @@ export function PromoBannerManager() {
   // Create banner mutation
   const createMutation = useMutation({
     mutationFn: async () => {
-      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise'].includes(destinationType);
+      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding'].includes(destinationType);
       const needsCustomUrl = ['custom_url', 'external_url'].includes(destinationType);
       const { error } = await supabase.from('promo_banners').insert({
         cover_image_url: coverImageUrl,
@@ -286,7 +288,7 @@ export function PromoBannerManager() {
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!editingBanner) return;
-      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise'].includes(destinationType);
+      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding'].includes(destinationType);
       const needsCustomUrl = ['custom_url', 'external_url'].includes(destinationType);
       const { error } = await supabase.from('promo_banners').update({
         cover_image_url: coverImageUrl,
@@ -450,6 +452,10 @@ export function PromoBannerManager() {
         return banner.custom_url || 'Custom URL';
       case 'external_url':
         return banner.custom_url || 'External URL';
+      case 'onboarding':
+        const onboardingFlows = [dearMeFlow, mePlusFlow];
+        const obFlow = onboardingFlows.find(f => f.id === banner.destination_id);
+        return obFlow ? `🎯 ${obFlow.name}` : 'Unknown Flow';
       default:
         return 'Unknown';
     }
@@ -672,12 +678,13 @@ export function PromoBannerManager() {
                     <SelectItem value="rate">⭐ Rate App</SelectItem>
                     <SelectItem value="custom_url">🔗 Custom URL (in-app)</SelectItem>
                     <SelectItem value="external_url">🌐 External URL (opens browser)</SelectItem>
+                    <SelectItem value="onboarding">🎯 Onboarding Flow</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Destination ID - for types that need specific selection */}
-              {['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise'].includes(destinationType) && (
+              {['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding'].includes(destinationType) && (
                 <div className="space-y-2">
                   <Label>
                     {destinationType === 'routine' && 'Select Ritual Plan'}
@@ -685,6 +692,7 @@ export function PromoBannerManager() {
                     {destinationType === 'tasks' && 'Select Action Template'}
                     {destinationType === 'routines_hub' && 'Select Ritual from Bank'}
                     {destinationType === 'breathe_exercise' && 'Select Breathing Exercise'}
+                    {destinationType === 'onboarding' && 'Select Onboarding Flow'}
                   </Label>
                   <Select value={destinationId} onValueChange={setDestinationId}>
                     <SelectTrigger>
@@ -705,6 +713,9 @@ export function PromoBannerManager() {
                       ))}
                       {destinationType === 'breathe_exercise' && breathingExercises?.map(e => (
                         <SelectItem key={e.id} value={e.id}>{e.emoji || '🫁'} {e.name}</SelectItem>
+                      ))}
+                      {destinationType === 'onboarding' && [dearMeFlow, mePlusFlow].map(f => (
+                        <SelectItem key={f.id} value={f.id}>🎯 {f.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

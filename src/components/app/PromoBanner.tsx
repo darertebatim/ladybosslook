@@ -10,7 +10,7 @@ type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'pla
 interface PromoBannerData {
   id: string;
   cover_image_url: string;
-  destination_type: 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner' | 'rate';
+  destination_type: 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding';
   destination_id: string | null;
   custom_url: string | null;
   display_frequency: 'once' | 'daily' | 'weekly';
@@ -381,6 +381,11 @@ export function PromoBanner({
         break;
       case 'rate':
         navigate('/app/rate');
+        break;
+      case 'onboarding':
+        if (activeBanner.destination_id) {
+          navigate(`/app/onboarding/${activeBanner.destination_id}`);
+        }
         break;
     }
   };
