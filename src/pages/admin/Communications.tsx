@@ -6,7 +6,6 @@ import { PushNotificationsHistory } from '@/components/admin/PushNotificationsHi
 import { HomeBannerManager } from '@/components/admin/HomeBannerManager';
 import { MailchimpTagManager } from '@/components/admin/MailchimpTagManager';
 import { EmailGenerator } from '@/components/admin/EmailGenerator';
-import { PromoBannerManager } from '@/components/admin/PromoBannerManager';
 import { UpdateNotificationSender } from '@/components/admin/UpdateNotificationSender';
 
 export default function Communications() {
