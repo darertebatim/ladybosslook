@@ -303,7 +303,7 @@ export function PromoBanner({
         break;
       case 'playlist':
         if (activeBanner.destination_id) {
-          navigate(`/app/playlist/${activeBanner.destination_id}`);
+          navigate(`/app/player/playlist/${activeBanner.destination_id}`);
         }
         break;
       case 'journal':
