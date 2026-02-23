@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player' | 'all';
+type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player';
 
 interface PromoBannerData {
   id: string;
@@ -22,7 +22,7 @@ interface PromoBannerData {
   exclude_playlists: string[];
   include_tools: string[];
   exclude_tools: string[];
-  display_location: DisplayLocation;
+  display_location: string[];
   target_playlist_ids: string[];
 }
 
@@ -195,14 +195,14 @@ export function PromoBanner({
         return false;
       }
       
-      // Location filter - banner must be for this location or 'all'
-      const bannerLocation = banner.display_location || 'home';
-      if (bannerLocation !== 'all' && bannerLocation !== location) {
+      // Location filter - banner's display_location array must include this location
+      const bannerLocations = banner.display_location || ['home_top'];
+      if (!bannerLocations.includes(location)) {
         return false;
       }
       
       // For player location: check playlist targeting
-      if (location === 'player' && banner.target_playlist_ids?.length > 0) {
+      if (location === 'player' && bannerLocations.includes('player') && banner.target_playlist_ids?.length > 0) {
         if (!currentPlaylistId || !banner.target_playlist_ids.includes(currentPlaylistId)) {
           return false;
         }

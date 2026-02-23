@@ -2247,7 +2247,7 @@ export type Database = {
           destination_id: string | null
           destination_type: string
           display_frequency: string
-          display_location: string
+          display_location: string[]
           ends_at: string | null
           exclude_playlists: string[] | null
           exclude_programs: string[] | null
@@ -2271,7 +2271,7 @@ export type Database = {
           destination_id?: string | null
           destination_type: string
           display_frequency?: string
-          display_location?: string
+          display_location?: string[]
           ends_at?: string | null
           exclude_playlists?: string[] | null
           exclude_programs?: string[] | null
@@ -2295,7 +2295,7 @@ export type Database = {
           destination_id?: string | null
           destination_type?: string
           display_frequency?: string
-          display_location?: string
+          display_location?: string[]
           ends_at?: string | null
           exclude_playlists?: string[] | null
           exclude_programs?: string[] | null

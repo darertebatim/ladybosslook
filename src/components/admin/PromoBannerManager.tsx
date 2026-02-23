@@ -11,13 +11,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { Trash2, Plus, ExternalLink, Sparkles, Loader2, Pencil, Users, Copy } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
 import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 
 type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
 type AspectRatio = '3:1' | '16:9' | '1:1';
-type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player' | 'all';
+type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player';
+
+const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
+  { value: 'home_top', label: '🏠 Home - Above Actions' },
+  { value: 'home_rituals', label: '🏠 Home - After Rituals' },
+  { value: 'explore', label: '🔍 Explore Page' },
+  { value: 'listen', label: '🎧 Listen Page' },
+  { value: 'player', label: '▶️ Audio Player' },
+];
 
 interface PromoBanner {
   id: string;
@@ -39,7 +48,7 @@ interface PromoBanner {
   exclude_playlists: string[];
   include_tools: string[];
   exclude_tools: string[];
-  display_location: DisplayLocation;
+  display_location: string[];
   target_playlist_ids: string[];
 }
 
@@ -67,7 +76,7 @@ export function PromoBannerManager() {
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('3:1');
   
   // Display location state
-  const [displayLocation, setDisplayLocation] = useState<DisplayLocation>('home_top');
+  const [displayLocations, setDisplayLocations] = useState<DisplayLocation[]>(['home_top']);
   const [targetPlaylistIds, setTargetPlaylistIds] = useState<string[]>([]);
   
   // Audience targeting state
@@ -269,7 +278,7 @@ export function PromoBannerManager() {
         exclude_playlists: excludePlaylists,
         include_tools: includeTools,
         exclude_tools: excludeTools,
-        display_location: displayLocation,
+        display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
       });
       if (error) throw error;
@@ -308,7 +317,7 @@ export function PromoBannerManager() {
         exclude_playlists: excludePlaylists,
         include_tools: includeTools,
         exclude_tools: excludeTools,
-        display_location: displayLocation,
+        display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
       }).eq('id', editingBanner.id);
       if (error) throw error;
@@ -376,7 +385,7 @@ export function PromoBannerManager() {
     setIncludeTools([]);
     setExcludeTools([]);
     // Reset location
-    setDisplayLocation('home_top');
+    setDisplayLocations(['home_top']);
     setTargetPlaylistIds([]);
   };
 
@@ -401,7 +410,7 @@ export function PromoBannerManager() {
     setIncludeTools(banner.include_tools || []);
     setExcludeTools(banner.exclude_tools || []);
     // Load location
-    setDisplayLocation((banner.display_location as DisplayLocation) || 'home_top');
+    setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
     setTargetPlaylistIds(banner.target_playlist_ids || []);
   };
 
@@ -579,29 +588,33 @@ export function PromoBannerManager() {
                 )}
               </div>
 
-              {/* Display Location */}
+              {/* Display Locations */}
               <div className="space-y-2">
-                <Label>Display Location</Label>
-                <Select value={displayLocation} onValueChange={(v) => setDisplayLocation(v as DisplayLocation)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="home_top">🏠 Home - Above Actions</SelectItem>
-                    <SelectItem value="home_rituals">🏠 Home - After Rituals</SelectItem>
-                    <SelectItem value="explore">🔍 Explore Page</SelectItem>
-                    <SelectItem value="listen">🎧 Listen Page</SelectItem>
-                    <SelectItem value="player">▶️ Audio Player</SelectItem>
-                    <SelectItem value="all">📍 All Locations</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>Display Locations</Label>
+                <div className="space-y-2">
+                  {DISPLAY_LOCATION_OPTIONS.map(opt => (
+                    <label key={opt.value} className="flex items-center gap-2 cursor-pointer">
+                      <Checkbox
+                        checked={displayLocations.includes(opt.value)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setDisplayLocations(prev => [...prev, opt.value]);
+                          } else {
+                            setDisplayLocations(prev => prev.filter(l => l !== opt.value));
+                          }
+                        }}
+                      />
+                      <span className="text-sm">{opt.label}</span>
+                    </label>
+                  ))}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  Where in the app this banner should appear
+                  Select one or more locations where this banner should appear
                 </p>
               </div>
 
               {/* Target Playlists - only show when location is 'player' */}
-              {displayLocation === 'player' && (
+              {displayLocations.includes('player') && (
                 <div className="space-y-2">
                   <Label>Target Playlists (optional)</Label>
                   <p className="text-xs text-muted-foreground">
@@ -917,7 +930,7 @@ export function PromoBannerManager() {
                       setExcludePlaylists(banner.exclude_playlists || []);
                       setIncludeTools(banner.include_tools || []);
                       setExcludeTools(banner.exclude_tools || []);
-                      setDisplayLocation((banner.display_location as DisplayLocation) || 'home_top');
+                      setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
                       setTargetPlaylistIds(banner.target_playlist_ids || []);
                       setEditingBanner(null);
                       setIsCreating(true);

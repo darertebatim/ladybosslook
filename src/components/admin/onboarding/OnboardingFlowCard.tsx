@@ -28,7 +28,9 @@ export function OnboardingFlowCard({ flow, onPreview, isDefault, onSetDefault }:
             )}
           </div>
           <p className="text-sm text-muted-foreground mt-0.5">{flow.description}</p>
-          <p className="text-xs text-muted-foreground mt-1">{flow.steps.length} screens · {flow.appName}</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {flow.steps.length} screens · {flow.appName} · <span className="font-mono text-[10px] bg-muted px-1.5 py-0.5 rounded">ID: {flow.id}</span>
+          </p>
         </div>
         <div className="flex items-center gap-1">
           {!isDefault && onSetDefault && (
