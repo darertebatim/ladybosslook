@@ -1,135 +1,105 @@
 
-# Persistent Offline Caching Plan
 
-## The Problem
+# Onboarding in the Native App -- Via Promo Banners + Default Flow Setting
 
-Every time a user opens the app or navigates between tabs, the following content is re-downloaded from Supabase/CDN:
-- Audio files (streamed fresh each time)
-- Playlist covers & ritual covers (images fetched every session)
-- Actions & Routines bank data (DB queries every 2–5 minutes)
-- All other app data (playlists, tasks, home data)
+## Overview
 
-React Query already holds data in RAM for 15 minutes — but when the app is closed and reopened, everything starts fresh again. On iOS, the WKWebView image cache is also subject to OS memory pressure and can be wiped at any time.
-
-This plan adds **three layers of persistent caching** that survive app restarts:
+Instead of building a separate banner system, we'll leverage the **existing Promo Banner infrastructure** to trigger onboarding flows. We'll also add a "Set as Default" option in the Onboarding Lab so admins can choose which flow users see.
 
 ---
 
-## Layer 1 — React Query Persistent Cache (Data: Tasks, Routines, Playlists, Home)
+## What Changes
 
-**What it does**: Saves React Query's in-memory cache to `localStorage` (or `IndexedDB`) so when the app reopens, data is available instantly — no spinner, no loading state.
+### 1. Add `onboarding` as a Promo Banner Destination Type
 
-**How**: Use `@tanstack/query-persist-client-core` + `createSyncStoragePersister` to automatically serialize/deserialize the query cache on app open/close.
+**Files:** `src/components/admin/PromoBannerManager.tsx`, `src/components/app/PromoBanner.tsx`
 
-**What gets cached persistently**:
-- `player-data` — all playlists and playlist items
-- `routines-bank` — all rituals/routines bank items
-- `routine-categories` — category list
-- `new-home-data` — home page stats
-- `courses-data` — enrollment info
-- `planner-all-tasks` — user's task list
+- Add `'onboarding'` to the `DestinationType` union type in both files
+- In the admin form, when `onboarding` is selected as destination, show a dropdown to pick which onboarding flow (e.g., "Simora Onboarding", "Dear Me Onboarding") -- the flow ID becomes the `destination_id`
+- In the user-facing `PromoBanner`, add an `'onboarding'` case that navigates to `/app/onboarding/{destination_id}`
+- This means you can already use the existing audience targeting (exclude Simora Plus users, target new users, etc.) with no extra work
 
-**Cache expiry**: Each query keeps its existing `staleTime` (2–5 min). Stale data shows instantly while fresh data loads in background. Persisted cache expires after 24 hours automatically.
+### 2. Create the User-Facing Onboarding Page
 
-**Files to change**:
-- `src/App.tsx` — wrap `QueryClientProvider` with `PersistQueryClientProvider`, configure `createSyncStoragePersister`
+**New file:** `src/pages/app/AppOnboarding.tsx`
 
----
+- A full-screen page at route `/app/onboarding/:flowId`
+- Renders the onboarding steps using the existing `OnboardingStepRenderer` -- same screens, animations, and logic as the admin preview
+- No phone frame or admin sidebar -- just the clean full-screen experience
+- Close/back button at the top to return to `/app/home`
+- Saves progress to `localStorage` (`simora_onboarding_progress_{flowId}`) so users can resume
+- On completion, sets `simora_onboarding_completed_{flowId}` and navigates back to home
+- Preloads all images on mount (same approach already built in the admin preview)
 
-## Layer 2 — Image Caching with Capacitor Filesystem (Native Only)
+**Route registration:** `src/App.tsx`
 
-**What it does**: On native iOS/Android, download cover images to the app's private storage the first time they are seen. On subsequent visits, load from device — no network request at all.
+- Add `/app/onboarding/:flowId` wrapped in `ProtectedRoute`
 
-**Images to cache**:
-- Playlist cover images (`cover_image_url` on `audio_playlists`)
-- Ritual/routine cover images (`cover_image_url` on `routines_bank`)
-- Audio track cover images (`cover_image_url` on `audio_content`)
+### 3. Default Onboarding Flow Setting in Onboarding Lab
 
-**How**:
-1. Create `src/lib/imageCache.ts` — a utility using `@capacitor/filesystem` with `Directory.Cache`:
-   - `getCachedImage(url)` — checks if image exists locally, returns local `file://` URI if yes
-   - `cacheImage(url)` — fetches image bytes and writes to `Directory.Cache/images/<hash>.jpg`
-   - `clearImageCache()` — admin utility to wipe cached images
-2. Create `src/components/ui/CachedImage.tsx` — a drop-in replacement for `<img>` that transparently uses the cache on native, falls back to normal `<img>` on web.
-3. Replace `<img src={coverImageUrl}>` in: `PlaylistCard.tsx`, `AudioCard.tsx`, `MiniPlayer.tsx`, and the ritual card components with `<CachedImage>`.
+**Files:** `src/pages/admin/Onboarding.tsx`, `src/components/admin/onboarding/OnboardingFlowCard.tsx`
 
-**Cache key**: MD5/hash of the URL string stored as filename (e.g. `images/a1b2c3.jpg`). This means if the URL changes (admin updates cover), the old cache is ignored and new image is downloaded.
+**New hook:** `src/hooks/useDefaultOnboarding.ts`
 
-**Admin delete scenario**: If you delete a cover in the admin panel and the URL changes, new image downloads automatically. If the same URL is reused (unlikely), admin can clear cache from Profile settings.
+- Follows the exact same pattern as `useDefaultPaywall.ts` -- stores the chosen flow ID in the `app_settings` table under the key `default_onboarding_flow`
+- Provides `useDefaultOnboarding()` to read and `useSetDefaultOnboarding()` to write
 
----
+**Admin UI changes:**
 
-## Layer 3 — Audio File Download for Offline Playback (Native Only)
-
-**What it does**: Lets users download individual audio tracks to play without internet, exactly like Spotify's "download" feature.
-
-**How**:
-1. Create `src/lib/audioCache.ts` — utility using `@capacitor/filesystem` with `Directory.Data` (permanent, never auto-cleared by OS):
-   - `isAudioCached(trackId)` — checks if file exists
-   - `downloadAudio(track, onProgress)` — fetches audio file with progress, saves to `audio/<trackId>.mp3`
-   - `getCachedAudioPath(trackId)` — returns `file://` URI for local playback
-   - `deleteAudio(trackId)` — removes downloaded file
-   - `getDownloadedTracks()` — returns list of all downloaded track IDs
-
-2. Update `AudioPlayerContext.tsx`:
-   - In `playTrack()`, check `isAudioCached(track.id)` first
-   - If cached: use local `file://` path instead of `track.fileUrl`
-   - If not cached: stream as today (no change for non-downloaded tracks)
-
-3. Add Download UI in `AppAudioPlayer.tsx` (the full-screen player):
-   - Download icon button next to share/other controls
-   - Shows progress ring while downloading
-   - Shows "Downloaded" checkmark when complete
-   - Long-press to delete download
-
-4. Create `src/hooks/useAudioDownload.ts` — React hook wrapping `audioCache.ts`:
-   - `downloadTrack(track)` — triggers download with toast progress
-   - `isDownloaded(trackId)` — reactive boolean
-   - `deleteDownload(trackId)` — removes and shows toast
-   - `downloadedTracks` — Set of all downloaded IDs (loaded from filesystem on init)
-
-5. Add "Downloads" section in `AppProfile.tsx` showing downloaded tracks with size info and delete option.
+- Each `OnboardingFlowCard` gets a "Set as Default" button (or a star/badge indicator if it's already the default)
+- The currently active default flow shows a highlighted badge like "Active Default"
+- When creating a promo banner with destination `onboarding`, the `destination_id` defaults to the current default flow (but can be overridden)
 
 ---
 
-## What Does NOT Need Caching (Already Efficient)
+## How It All Fits Together
 
-- **Journal entries, mood logs, fasting data** — user-specific, changes constantly, should always be fresh
-- **Feed posts & chat messages** — real-time, must stay live
-- **Task completions** — changes daily, 30-second stale time is correct
-- **Emojis (FluentEmoji)** — already served as static assets from CDN with long HTTP cache headers; browser/WebView cache handles this correctly and the OS rarely clears static asset cache
-
----
-
-## Implementation Order
-
-1. **Layer 1 first** (React Query persist) — highest impact, touches all data, no UI change needed
-2. **Layer 2 second** (image cache) — visual improvement, straightforward component swap
-3. **Layer 3 last** (audio download) — most complex, adds new UI
+1. Admin goes to **Onboarding Lab** and marks "Simora Onboarding" as the default flow
+2. Admin goes to **Promo Banners** and creates a banner with:
+   - Destination: `Onboarding`
+   - Flow: Simora Onboarding (auto-selected from default)
+   - Audience: Exclude Simora Plus subscribers (already supported)
+   - Frequency: Once
+   - Location: Home Top
+3. New user signs up, sees the banner on Home, taps it
+4. Full-screen onboarding opens, user goes through all steps
+5. On completion, banner won't show again (frequency = once)
 
 ---
 
 ## Technical Details
 
-### New dependencies needed
-- `@tanstack/query-persist-client-core` — React Query's official persistence adapter
-- `@tanstack/query-sync-storage-persister` — localStorage persister for React Query
-
-### Capacitor Filesystem directories
-```text
-Directory.Cache   → Images (OS can clear if low storage — acceptable)
-Directory.Data    → Audio downloads (permanent, user controls deletion)
+### New `DestinationType` Value
+```
+'onboarding' added to the union in both PromoBannerManager.tsx and PromoBanner.tsx
 ```
 
-### Cache invalidation strategy
-- **Data cache**: Invalidated automatically when mutations run (existing `queryClient.invalidateQueries` calls already handle this)
-- **Image cache**: URL-based key — if admin changes image URL, new image is downloaded automatically
-- **Audio cache**: User explicitly downloads/deletes; admin cannot force re-download (by design — user owns their downloads)
+### New Hook (follows useDefaultPaywall pattern exactly)
+```
+Key: 'default_onboarding_flow'
+Table: app_settings
+Value: flow ID string (e.g., 'me-plus-v1')
+```
 
-### Size estimates
-- Playlist/ritual covers: ~50–100 images × ~50–100KB = 5–10MB total
-- One audio track: typically 30–80MB (varies by length)
-- React Query persist cache: < 1MB (just JSON data, no binary)
+### New Route
+```
+/app/onboarding/:flowId -> AppOnboarding.tsx (ProtectedRoute)
+```
 
-### Web fallback
-All caching is wrapped in `isNativeApp()` checks. On web (browser), the app behaves exactly as today — browser HTTP cache handles images, React Query persist uses localStorage.
+### localStorage Keys
+```
+simora_onboarding_progress_{flowId} -> current step index
+simora_onboarding_completed_{flowId} -> "true" when finished
+```
+
+### Files Created
+- `src/pages/app/AppOnboarding.tsx` -- full-screen onboarding page
+- `src/hooks/useDefaultOnboarding.ts` -- default flow setting hook
+
+### Files Modified
+- `src/components/admin/PromoBannerManager.tsx` -- add 'onboarding' destination type + flow picker
+- `src/components/app/PromoBanner.tsx` -- add 'onboarding' navigation case
+- `src/pages/admin/Onboarding.tsx` -- add default flow toggle
+- `src/components/admin/onboarding/OnboardingFlowCard.tsx` -- add default badge/button
+- `src/App.tsx` -- register new route
+
