@@ -349,6 +349,7 @@ const App = () => (
                       <Route path="tools/tasks" element={<ProtectedRoute requiredPage="tools"><TasksBank /></ProtectedRoute>} />
                       <Route path="tools/notifications" element={<ProtectedRoute requiredPage="tools"><NotificationAnalytics /></ProtectedRoute>} />
                       <Route path="onboarding" element={<ProtectedRoute requiredPage="tools"><Onboarding /></ProtectedRoute>} />
+                      <Route path="banners" element={<ProtectedRoute requiredPage="communications"><Banners /></ProtectedRoute>} />
                       <Route path="app" element={<ProtectedRoute requiredPage="system"><AppTest /></ProtectedRoute>} />
                     </Route>
                   )}

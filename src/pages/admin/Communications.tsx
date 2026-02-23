@@ -40,10 +40,6 @@ export default function Communications() {
           <PushNotificationsHistory />
         </TabsContent>
 
-        <TabsContent value="promo" className="space-y-6">
-          <PromoBannerManager />
-        </TabsContent>
-
         <TabsContent value="email-gen" className="space-y-6">
           <EmailGenerator />
         </TabsContent>

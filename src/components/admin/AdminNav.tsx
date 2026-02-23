@@ -16,6 +16,7 @@ const menuItems = [
   { title: 'Channels', url: '/admin/channels', icon: Newspaper, pageSlug: 'community' },
   { title: 'Communications', url: '/admin/communications', icon: Send, pageSlug: 'communications' },
   { title: 'Push', url: '/admin/pn', icon: Bell, pageSlug: 'communications' },
+  { title: 'Banners', url: '/admin/banners', icon: Image, pageSlug: 'communications' },
   { title: 'Programs', url: '/admin/programs', icon: UserCog, pageSlug: 'programs' },
   { title: 'Payments', url: '/admin/payments', icon: CreditCard, pageSlug: 'payments' },
   { title: 'Subscriptions', url: '/admin/subscriptions', icon: Sparkles, pageSlug: 'payments' },
