@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player';
+type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player' | 'programs' | 'channels';
 
 interface PromoBannerData {
   id: string;

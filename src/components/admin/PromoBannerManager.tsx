@@ -18,7 +18,7 @@ import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
 type AspectRatio = '3:1' | '16:9' | '1:1';
-type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player';
+type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player' | 'programs' | 'channels';
 
 const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
   { value: 'home_top', label: '🏠 Home - Above Actions' },
@@ -26,6 +26,8 @@ const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
   { value: 'explore', label: '🔍 Explore Page' },
   { value: 'listen', label: '🎧 Listen Page' },
   { value: 'player', label: '▶️ Audio Player' },
+  { value: 'programs', label: '📚 Programs Page' },
+  { value: 'channels', label: '📢 Channels Page' },
 ];
 
 interface PromoBanner {
