@@ -157,7 +157,7 @@ function PagesEditor({ reflectionId }: { reflectionId: string }) {
   }
 
   const addPage = () => {
-    setPages([...pages, { page_order: pages.length, type: 'question', content: '' }]);
+    setPages([...pages, { page_order: pages.length, type: 'question', content: '', description: '' }]);
   };
 
   const removePage = (idx: number) => {
