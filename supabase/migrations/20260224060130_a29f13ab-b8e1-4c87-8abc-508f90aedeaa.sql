@@ -1,0 +1,1 @@
+ALTER TABLE public.reflections ADD COLUMN cover_color text DEFAULT '#f5d0e0';
