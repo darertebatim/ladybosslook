@@ -102,13 +102,8 @@ export const PlaylistCard = memo(function PlaylistCard({
       >
         {/* Title Header Section */}
         <div className="px-3 py-3 rounded-t-2xl h-[3.75rem] flex items-start bg-muted/50">
-          <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug flex items-center gap-1">
-            {language && (
-              language === 'persian'
-                ? <PersianFlag size={14} />
-                : LANG_FLAGS[language] && <span className="text-sm flex-shrink-0">{LANG_FLAGS[language]}</span>
-            )}
-            <span>{name}</span>
+          <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
+            {name}
           </h3>
         </div>
 
@@ -147,6 +142,11 @@ export const PlaylistCard = memo(function PlaylistCard({
                   <Clock className="h-3 w-3" />
                   {formatDuration(totalDuration)}
                 </span>
+                {language && language !== 'all' && (
+                  language === 'persian'
+                    ? <PersianFlag size={10} />
+                    : LANG_FLAGS[language] && <span className="text-[10px] flex-shrink-0 leading-none">{LANG_FLAGS[language]}</span>
+                )}
               </div>
               {(!isLocked || isFree) && progressPercentage > 0 && (
                 <span className="flex items-center gap-0.5 font-medium">
