@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useReflections, Reflection } from '@/hooks/useReflections';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, BookOpen } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AppReflections() {
