@@ -67,6 +67,14 @@ export default function Tools() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="reflections">
+          <Card>
+            <CardContent className="pt-6">
+              <ReflectionsManager />
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
