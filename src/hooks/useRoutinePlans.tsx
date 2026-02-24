@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { getLocalDateStr } from '@/lib/localDate';
+import type { ProLinkType } from '@/lib/proTaskTypes';
 
 // Types
 export interface RoutineCategory {
@@ -60,7 +61,7 @@ export interface RoutinePlanTask {
   linked_playlist_id: string | null;
   tag?: string | null; // Category tag for filtering
   // Pro Task fields
-  pro_link_type: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | null;
+  pro_link_type: ProLinkType | null;
   pro_link_value: string | null;
   // Goal fields
   goal_enabled?: boolean;
@@ -361,7 +362,7 @@ export function useAddRoutinePlan() {
         scheduledTime?: string | null;
         tag?: string | null;
         linked_playlist_id?: string | null;
-        pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | null;
+        pro_link_type?: ProLinkType | null;
         pro_link_value?: string | null;
       }[];
       syntheticTasks?: RoutinePlanTask[];

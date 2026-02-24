@@ -15,10 +15,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
 import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 
-type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding';
+type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
 type AspectRatio = '3:1' | '16:9' | '1:1';
-type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player' | 'programs' | 'channels';
+type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player' | 'programs' | 'channels' | 'watch';
 
 const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
   { value: 'home_top', label: '🏠 Home - Above Actions' },
@@ -28,6 +28,7 @@ const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
   { value: 'player', label: '▶️ Audio Player' },
   { value: 'programs', label: '📚 Programs Page' },
   { value: 'channels', label: '📢 Channels Page' },
+  { value: 'watch', label: '📺 Watch Page' },
 ];
 
 interface PromoBanner {
@@ -467,6 +468,10 @@ export function PromoBannerManager() {
         const onboardingFlows = [dearMeFlow, mePlusFlow];
         const obFlow = onboardingFlows.find(f => f.id === banner.destination_id);
         return obFlow ? `🎯 ${obFlow.name}` : 'Unknown Flow';
+      case 'watch':
+        return 'Watch Page';
+      case 'video_playlist':
+        return banner.destination_id || 'Video Playlist';
       default:
         return 'Unknown';
     }
@@ -694,12 +699,14 @@ export function PromoBannerManager() {
                     <SelectItem value="custom_url">🔗 Custom URL (in-app)</SelectItem>
                     <SelectItem value="external_url">🌐 External URL (opens browser)</SelectItem>
                     <SelectItem value="onboarding">🎯 Onboarding Flow</SelectItem>
+                    <SelectItem value="watch">📺 Watch Page</SelectItem>
+                    <SelectItem value="video_playlist">🎬 Video Playlist (specific)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Destination ID - for types that need specific selection */}
-              {['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding'].includes(destinationType) && (
+              {['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType) && (
                 <div className="space-y-2">
                   <Label>
                     {destinationType === 'routine' && 'Select Ritual Plan'}
@@ -708,6 +715,7 @@ export function PromoBannerManager() {
                     {destinationType === 'routines_hub' && 'Select Ritual from Bank'}
                     {destinationType === 'breathe_exercise' && 'Select Breathing Exercise'}
                     {destinationType === 'onboarding' && 'Select Onboarding Flow'}
+                    {destinationType === 'video_playlist' && 'Select Video Playlist'}
                   </Label>
                   <Select value={destinationId} onValueChange={setDestinationId}>
                     <SelectTrigger>
@@ -731,6 +739,9 @@ export function PromoBannerManager() {
                       ))}
                       {destinationType === 'onboarding' && [dearMeFlow, mePlusFlow].map(f => (
                         <SelectItem key={f.id} value={f.id}>🎯 {f.name}</SelectItem>
+                      ))}
+                      {destinationType === 'video_playlist' && playlists?.map(p => (
+                        <SelectItem key={p.id} value={p.id}>🎬 {p.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

@@ -14,11 +14,13 @@ import {
   Smile,
   Timer,
   Scale,
-  Brain
+  Brain,
+  Video,
+  Clapperboard
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
-export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection';
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | 'video' | 'video_playlist';
 
 export interface ProLinkConfig {
   value: ProLinkType;
@@ -243,6 +245,32 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Link to a reflection exercise',
     requiresValue: true,
   },
+  video: {
+    value: 'video',
+    label: 'Video',
+    icon: Clapperboard,
+    badgeText: 'Watch',
+    color: 'sky',
+    gradientClass: 'bg-gradient-to-br from-sky-100 to-blue-100 dark:from-sky-900/40 dark:to-blue-900/40',
+    iconColorClass: 'text-sky-600 dark:text-sky-400',
+    badgeColorClass: 'bg-sky-500/20 text-sky-700 dark:text-sky-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Link to a specific video',
+    requiresValue: true,
+  },
+  video_playlist: {
+    value: 'video_playlist',
+    label: 'Video Playlist',
+    icon: Video,
+    badgeText: 'Watch',
+    color: 'sky',
+    gradientClass: 'bg-gradient-to-br from-sky-100 to-cyan-100 dark:from-sky-900/40 dark:to-cyan-900/40',
+    iconColorClass: 'text-sky-600 dark:text-sky-400',
+    badgeColorClass: 'bg-sky-500/20 text-sky-700 dark:text-sky-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Link to a video playlist',
+    requiresValue: true,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
@@ -254,6 +282,10 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return `/app/player/playlist/${linkValue}`;
     case 'audio':
       return `/app/player/${linkValue}`;
+    case 'video':
+      return `/app/watch/video/${linkValue}`;
+    case 'video_playlist':
+      return `/app/watch/${linkValue}`;
     case 'journal':
       return '/app/journal/new';
     case 'breathe':

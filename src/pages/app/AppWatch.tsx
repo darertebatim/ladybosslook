@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { Input } from "@/components/ui/input";
-import { Search, X, Clock, Video } from "lucide-react";
+import { Search, X, Clock, Video, CalendarPlus } from "lucide-react";
 import { VideoPlaylistCard } from "@/components/video/VideoPlaylistCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isNativeApp } from "@/lib/platform";
@@ -12,6 +12,10 @@ import { useEnrollments } from "@/hooks/useAppData";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PersianFlag } from "@/components/ui/PersianFlag";
+import { AddedToRoutineButton } from "@/components/app/AddedToRoutineButton";
+import { useExistingProTask } from "@/hooks/usePlaylistRoutine";
+import { useAddRoutinePlan, RoutinePlanTask } from "@/hooks/useRoutinePlans";
+import { haptic } from "@/lib/haptics";
 
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
@@ -41,6 +45,33 @@ export default function AppWatch() {
   const [preferredLanguage, setPreferredLanguage] = useState(() => localStorage.getItem('watch-language') || 'all');
   const handleLanguageChange = useCallback((lang: string) => { setPreferredLanguage(lang); localStorage.setItem('watch-language', lang); }, []);
   const selectedLang = LANGUAGE_OPTIONS.find(l => l.value === preferredLanguage) || LANGUAGE_OPTIONS[0];
+
+  // Add to rituals - synthetic "Watch Videos" task
+  const { data: isWatchAdded } = useExistingProTask('route', '/app/watch');
+  const addPlanMutation = useAddRoutinePlan();
+  const handleAddWatchToRituals = useCallback(() => {
+    haptic.medium();
+    const syntheticTask: RoutinePlanTask = {
+      id: 'synthetic-watch-task',
+      plan_id: 'synthetic-watch-task',
+      title: 'Watch Videos',
+      description: null,
+      icon: '📺',
+      color: 'sky',
+      task_order: 0,
+      is_active: true,
+      created_at: new Date().toISOString(),
+      linked_playlist_id: null,
+      pro_link_type: 'route',
+      pro_link_value: '/app/watch',
+      linked_playlist: null,
+    };
+    addPlanMutation.mutate({
+      planId: 'synthetic-watch-task',
+      syntheticTasks: [syntheticTask],
+      editedTasks: [],
+    });
+  }, [addPlanMutation]);
 
   const { data: playlists, isLoading: playlistsLoading } = useQuery({
     queryKey: ['video-playlists-app'],
@@ -164,7 +195,14 @@ export default function AppWatch() {
           ) : (
             <>
               <h1 className="text-xl font-bold">Watch</h1>
-              <button onClick={() => setShowSearch(true)} className="p-2 -mr-2"><Search className="h-5 w-5 text-muted-foreground" /></button>
+              <div className="flex items-center gap-1">
+                <AddedToRoutineButton
+                  isAdded={!!isWatchAdded}
+                  onAddClick={handleAddWatchToRituals}
+                  iconOnly
+                />
+                <button onClick={() => setShowSearch(true)} className="p-2 -mr-2"><Search className="h-5 w-5 text-muted-foreground" /></button>
+              </div>
             </>
           )}
         </div>
