@@ -79,31 +79,37 @@ export default function AppBreathe() {
         <AppHeaderSpacer />
 
         {/* Exercise list */}
-        <div className="px-4 pb-safe space-y-3">
+        <div className="px-4 pb-safe">
           {isLoading ? (
-            // Loading skeletons
-            [...Array(4)].map((_, i) => (
-              <Skeleton 
-                key={i} 
-                className="h-24 rounded-2xl" 
-              />
-            ))
+            <div className="space-y-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex items-center gap-4">
+                  <Skeleton className="h-20 w-20 rounded-2xl shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-full" />
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : filteredExercises.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
                 <Wind className="h-8 w-8 text-muted-foreground" />
               </div>
-              <p className="text-muted-foreground">No exercises in this category yet</p>
+              <p className="text-muted-foreground">No exercises available yet</p>
             </div>
           ) : (
-            filteredExercises.map((exercise, index) => (
-              <BreathingExerciseCard
-                key={exercise.id}
-                exercise={exercise}
-                onClick={() => handleExerciseClick(exercise)}
-                className={index === 0 ? 'tour-exercise-card' : undefined}
-              />
-            ))
+            <div className="divide-y divide-border">
+              {filteredExercises.map((exercise, index) => (
+                <BreathingExerciseCard
+                  key={exercise.id}
+                  exercise={exercise}
+                  onClick={() => handleExerciseClick(exercise)}
+                  className={index === 0 ? 'tour-exercise-card' : undefined}
+                />
+              ))}
+            </div>
           )}
         </div>
       </div>

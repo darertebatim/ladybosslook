@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { CalendarPlus, Check, Crown } from 'lucide-react';
+import { Crown } from 'lucide-react';
 import { BreathingExercise } from '@/hooks/useBreathingExercises';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
+import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
@@ -25,19 +26,11 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
   const { isSubscribed } = useSubscription();
   
   const isLocked = exercise.is_premium && !isSubscribed;
+  const isPremium = exercise.is_premium;
   
-  // Check if this specific exercise is already added
   const { data: existingTask } = useExistingProTask('breathe', exercise.id);
-  const isAdded = existingTask || justAdded;
+  const isAdded = !!existingTask || justAdded;
 
-  // Calculate total cycle duration
-  const cycleDuration = 
-    exercise.inhale_seconds + 
-    exercise.inhale_hold_seconds + 
-    exercise.exhale_seconds + 
-    exercise.exhale_hold_seconds;
-
-  // Create a synthetic task for this specific exercise
   const syntheticTask: RoutinePlanTask = {
     id: `breathe-${exercise.id}`,
     plan_id: 'synthetic-breathe',
@@ -48,12 +41,17 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
     created_at: new Date().toISOString(),
     linked_playlist_id: null,
     pro_link_type: 'breathe',
-    pro_link_value: exercise.id, // Link to specific exercise
-    tag: 'pro', // Pro-linked tasks use 'pro' category
+    pro_link_value: exercise.id,
+    tag: 'pro',
   };
 
-  const handleAddToRoutine = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Don't trigger card click
+  const handleExerciseClick = () => {
+    if (isLocked) { haptic.light(); setShowPaywall(true); return; }
+    onClick();
+  };
+
+  const handleAddToRituals = () => {
+    if (isLocked) { haptic.light(); setShowPaywall(true); return; }
     haptic.light();
     setShowRoutineSheet(true);
   };
@@ -64,7 +62,7 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
         planId: 'synthetic-breathe',
         selectedTaskIds,
         editedTasks,
-        syntheticTasks: [syntheticTask], // Pass the synthetic task for on-the-fly creation
+        syntheticTasks: [syntheticTask],
       });
       toast.success(`${exercise.name} added to your rituals!`);
       setShowRoutineSheet(false);
@@ -77,78 +75,48 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
 
   return (
     <>
-      <button
-        onClick={() => {
-          if (isLocked) { haptic.light(); setShowPaywall(true); return; }
-          onClick();
-        }}
-        className={cn(
-          'relative w-full text-left p-4 rounded-2xl transition-all',
-          'bg-card border border-border shadow-sm',
-          'hover:shadow-md active:scale-[0.98]',
-          className
-        )}
-      >
-        {isLocked && (
-          <div className="absolute -top-3 -left-2 z-10 inline-flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-200 px-2.5 py-1 rounded-full shadow-sm">
-            <Crown className="h-4 w-4" /> PLUS
-          </div>
-        )}
-        <div className="flex items-start gap-3">
-          {/* Emoji */}
-          <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} className="flex-shrink-0" />
-          
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground text-lg">{exercise.name}</h3>
-            <p className="text-muted-foreground text-sm line-clamp-2 mt-0.5">
-              {exercise.description}
-            </p>
-            
-            {/* Timing info */}
-            <div className="flex items-center gap-2 mt-2">
-              <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                {cycleDuration}s cycle
-              </span>
-              {exercise.inhale_hold_seconds > 0 && (
-                <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                  with holds
-                </span>
-              )}
+      <div className={cn("w-full flex items-center gap-4 py-4", className)}>
+        <button
+          onClick={handleExerciseClick}
+          className="flex-1 flex items-center gap-4 text-left transition-transform active:scale-[0.98] min-w-0"
+        >
+          {/* Emoji avatar */}
+          <div className="relative shrink-0">
+            <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center">
+              <FluentEmoji emoji={exercise.emoji || '🌬️'} size={40} />
             </div>
+            {isPremium && (
+              <span className="absolute -top-2.5 -left-2 flex items-center gap-0.5 bg-amber-200 text-amber-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+                <Crown className="h-2.5 w-2.5" />
+                PLUS
+              </span>
+            )}
           </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-base leading-tight">{exercise.name}</p>
+            {exercise.description && (
+              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{exercise.description}</p>
+            )}
+          </div>
+        </button>
 
-          {/* Add to routine / Lock button */}
-          {isLocked ? (
-            <button
-              onClick={(e) => { e.stopPropagation(); haptic.light(); setShowPaywall(true); }}
-              className="flex-shrink-0 p-2 rounded-full bg-amber-100 hover:bg-amber-200 transition-colors"
-              aria-label="Unlock with simora+"
-            >
-              <FluentEmoji emoji="🔒" size={24} />
-            </button>
-          ) : (
-            <button
-              onClick={handleAddToRoutine}
-              className={cn(
-                "tour-add-to-routine flex-shrink-0 p-2.5 rounded-full transition-colors",
-                isAdded 
-                  ? "bg-success hover:bg-success/90" 
-                  : "bg-foreground hover:bg-foreground/90"
-              )}
-              aria-label={isAdded ? "Added to rituals" : "Add to rituals"}
-            >
-              {isAdded ? (
-                <Check className="h-5 w-5 text-white" />
-              ) : (
-                <CalendarPlus className="h-5 w-5 text-background" />
-              )}
-            </button>
-          )}
-        </div>
-      </button>
+        {/* Calendar+ / Lock button */}
+        {isLocked ? (
+          <button
+            onClick={() => { haptic.light(); setShowPaywall(true); }}
+            className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0"
+          >
+            <span className="text-lg">🔒</span>
+          </button>
+        ) : (
+          <AddedToRoutineButton
+            isAdded={isAdded}
+            onAddClick={handleAddToRituals}
+            iconOnly
+          />
+        )}
+      </div>
 
-      {/* Routine Preview Sheet */}
       <RoutinePreviewSheet
         open={showRoutineSheet}
         onOpenChange={setShowRoutineSheet}
@@ -158,7 +126,6 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
         isSaving={addRoutinePlan.isPending}
       />
 
-      {/* Paywall */}
       <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
     </>
   );
