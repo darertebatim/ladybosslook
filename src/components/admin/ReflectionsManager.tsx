@@ -113,7 +113,7 @@ export function ReflectionsManager() {
                 onChange={(url) => setEditing({ ...editing, cover_image_url: url })}
                 label="Cover Image (square)"
               />
-              <div className="flex gap-6">
+              <div className="flex gap-6 flex-wrap">
                 <div className="flex items-center gap-2">
                   <Switch checked={editing.is_active ?? true} onCheckedChange={(v) => setEditing({ ...editing, is_active: v })} />
                   <Label>Active</Label>
@@ -121,6 +121,10 @@ export function ReflectionsManager() {
                 <div className="flex items-center gap-2">
                   <Switch checked={editing.is_featured ?? false} onCheckedChange={(v) => setEditing({ ...editing, is_featured: v })} />
                   <Label>Featured</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch checked={editing.is_free ?? true} onCheckedChange={(v) => setEditing({ ...editing, is_free: v })} />
+                  <Label>Free</Label>
                 </div>
               </div>
               <div>
