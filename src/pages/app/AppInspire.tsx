@@ -5,19 +5,12 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { RoutineBankCard } from '@/components/app/RoutineBankCard';
-import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import {
   useRoutineBankCategories,
   useRoutinesBank,
   usePopularRoutinesBank,
   useFeaturedRoutinesBank,
-  useAddRoutineFromBank,
-  RoutineBankTask,
 } from '@/hooks/useRoutinesBank';
-import { toast } from 'sonner';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
-import { useQueryClient } from '@tanstack/react-query';
 import { RitualsTour, TourHelpButton } from '@/components/app/tour';
 
 export default function AppInspire() {
@@ -26,8 +19,6 @@ export default function AppInspire() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>('popular');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<TaskTemplate | null>(null);
-  const [previewSheetOpen, setPreviewSheetOpen] = useState(false);
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
 
   const handleTourReady = useCallback((tourStart: () => void) => {
@@ -38,152 +29,28 @@ export default function AppInspire() {
   const { data: featuredRoutines } = useFeaturedRoutinesBank();
   const { data: popularRoutines, isLoading: popularLoading } = usePopularRoutinesBank();
   const { data: filteredRoutines, isLoading: routinesLoading } = useRoutinesBank(
-    selectedCategory && selectedCategory !== 'popular' && selectedCategory !== 'all-routines' && selectedCategory !== 'all-tasks'
+    selectedCategory && selectedCategory !== 'popular' && selectedCategory !== 'all'
       ? selectedCategory
       : undefined
   );
-  const { data: taskTemplates, isLoading: templatesLoading } = useTaskTemplates();
-  const addRoutineFromBank = useAddRoutineFromBank();
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-  const [isSavingTemplate, setIsSavingTemplate] = useState(false);
 
-  // Determine which routines to display based on selected category
   const displayRoutines = useMemo(() => {
     if (selectedCategory === 'popular') {
       return popularRoutines;
     }
-    if (selectedCategory === 'all-routines') {
-      // Show all routines
+    if (selectedCategory === 'all') {
       return filteredRoutines;
     }
-    if (selectedCategory === 'all-tasks') {
-      // Don't show routines for all-tasks view
-      return [];
-    }
-    // Category-specific routines
     return filteredRoutines;
   }, [selectedCategory, filteredRoutines, popularRoutines]);
 
   const isLoading = categoriesLoading || popularLoading || (selectedCategory && selectedCategory !== 'popular' && routinesLoading);
 
-  // Filter task templates by selected category slug or popular
-  const filteredTaskTemplates = useMemo(() => {
-    if (!taskTemplates) return [];
-    if (selectedCategory === 'popular') {
-      return taskTemplates.filter(t => t.is_popular);
-    }
-    if (selectedCategory === 'all-tasks') {
-      // Show all task templates
-      return taskTemplates;
-    }
-    if (selectedCategory === 'all-routines') {
-      // Don't show tasks for all-routines view
-      return [];
-    }
-    if (!selectedCategory) return taskTemplates;
-    // Compare against the category slug stored in admin_task_bank
-    return taskTemplates.filter(t => t.category === selectedCategory);
-  }, [taskTemplates, selectedCategory]);
-
-  // Filter by search query
   const searchedRoutines = displayRoutines?.filter(routine => 
     !searchQuery || 
     routine.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     routine.subtitle?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  // Convert TaskTemplate to RoutinePlanTask for the preview sheet
-  const syntheticTask: RoutinePlanTask | null = selectedTemplate ? {
-    id: selectedTemplate.id,
-    plan_id: `synthetic-task-${selectedTemplate.id}`,
-    title: selectedTemplate.title,
-    description: selectedTemplate.description || null,
-    icon: selectedTemplate.emoji || '✨',
-    color: selectedTemplate.color as TaskColor,
-    task_order: 0,
-    is_active: true,
-    created_at: new Date().toISOString(),
-    linked_playlist_id: selectedTemplate.linked_playlist_id || null,
-    pro_link_type: selectedTemplate.pro_link_type as RoutinePlanTask['pro_link_type'] || null,
-    pro_link_value: selectedTemplate.pro_link_value || null,
-    linked_playlist: null,
-  } : null;
-
-  const handleAddTemplate = (template: TaskTemplate) => {
-    setSelectedTemplate(template);
-    setPreviewSheetOpen(true);
-  };
-
-  const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
-    if (!selectedTemplate) return;
-    if (!user) {
-      toast.error('Please sign in to add rituals');
-      return;
-    }
-
-    try {
-      setIsSavingTemplate(true);
-      
-      // Get the edited task data (there's only one for a single template)
-      const editedTask = editedTasks.find(t => t.id === selectedTemplate.id);
-      
-      // Determine pro_link fields
-      const proLinkType = editedTask?.pro_link_type ?? selectedTemplate.pro_link_type ?? 
-        (selectedTemplate.linked_playlist_id ? 'playlist' : null);
-      const proLinkValue = editedTask?.pro_link_value ?? selectedTemplate.pro_link_value ?? 
-        selectedTemplate.linked_playlist_id ?? null;
-      
-      // Get current max order_index
-      const { data: existingTasks } = await supabase
-        .from('user_tasks')
-        .select('order_index')
-        .eq('user_id', user.id)
-        .order('order_index', { ascending: false })
-        .limit(1);
-      
-      const startOrderIndex = (existingTasks?.[0]?.order_index ?? -1) + 1;
-      
-      // Create the user task directly
-      const { error } = await supabase
-        .from('user_tasks')
-        .insert({
-          user_id: user.id,
-          title: editedTask?.title || selectedTemplate.title,
-          emoji: editedTask?.icon || selectedTemplate.emoji || '✨',
-          color: editedTask?.color || selectedTemplate.color || 'mint',
-          repeat_pattern: editedTask?.repeatPattern || 'daily',
-          scheduled_time: editedTask?.scheduledTime || null,
-          tag: editedTask?.tag ?? selectedTemplate.category ?? null,
-          linked_playlist_id: proLinkType === 'playlist' ? proLinkValue : null,
-          pro_link_type: proLinkType,
-          pro_link_value: proLinkValue,
-          is_active: true,
-          order_index: startOrderIndex,
-          // Copy goal settings from template
-          goal_enabled: selectedTemplate.goal_enabled ?? false,
-          goal_target: selectedTemplate.goal_target ?? null,
-          goal_type: selectedTemplate.goal_type ?? null,
-          goal_unit: selectedTemplate.goal_unit ?? null,
-        });
-      
-      if (error) throw error;
-      
-      // Invalidate queries to refresh planner
-      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
-      
-      toast.success('Action added to your rituals! ✨');
-      setPreviewSheetOpen(false);
-      setSelectedTemplate(null);
-    } catch (error) {
-      console.error('Error adding action:', error);
-      toast.error('Failed to add action');
-    } finally {
-      setIsSavingTemplate(false);
-    }
-  };
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
@@ -213,7 +80,6 @@ export default function AppInspire() {
           </div>
         </div>
 
-        {/* Search Bar */}
         {showSearch && (
           <div className="px-4 pb-2 animate-in slide-in-from-top duration-200">
             <Input
@@ -251,15 +117,8 @@ export default function AppInspire() {
                     name="All Rituals"
                     icon="Sparkles"
                     color="purple"
-                    isSelected={selectedCategory === 'all-routines'}
-                    onClick={() => setSelectedCategory('all-routines')}
-                  />
-                  <CategoryCircle
-                    name="All Actions"
-                    icon="ListTodo"
-                    color="blue"
-                    isSelected={selectedCategory === 'all-tasks'}
-                    onClick={() => setSelectedCategory('all-tasks')}
+                    isSelected={selectedCategory === 'all'}
+                    onClick={() => setSelectedCategory('all')}
                   />
                   {categories.filter(c => c.slug !== 'pro').map((category) => (
                     <CategoryCircle
@@ -288,16 +147,14 @@ export default function AppInspire() {
             </div>
           )}
 
-          {/* Routines Grid - only show if there are routines */}
+          {/* Routines Grid */}
           {searchedRoutines && searchedRoutines.length > 0 && (
-            <div className="mt-5 px-4 w-full max-w-full overflow-hidden">
+            <div className="mt-5 px-4 w-full max-w-full overflow-hidden pb-8">
               <h2 className="text-sm font-semibold text-muted-foreground mb-3">
                 {selectedCategory === 'popular'
                   ? 'POPULAR RITUALS'
-                  : selectedCategory === 'all-routines'
+                  : selectedCategory === 'all'
                   ? 'ALL RITUALS'
-                  : selectedCategory === 'all-tasks'
-                  ? 'ALL ACTIONS'
                   : categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'RITUALS'
                 }
               </h2>
@@ -320,62 +177,8 @@ export default function AppInspire() {
               )}
             </div>
           )}
-
-          {/* Task Ideas Section - hide for all-routines since they focus on routines only */}
-          {taskTemplates && taskTemplates.length > 0 && selectedCategory !== 'all-routines' && (
-            <div className="mt-8 px-4 w-full max-w-full overflow-hidden pb-8 tour-actions-section">
-              <div className="tour-actions-section-header flex items-center gap-2 mb-3">
-                <ListTodo className="w-4 h-4 text-primary" />
-                <h2 className="text-sm font-semibold text-muted-foreground">
-                  {selectedCategory === 'popular' 
-                    ? 'POPULAR ACTIONS'
-                    : selectedCategory === 'all-tasks'
-                    ? 'ALL ACTIONS'
-                    : `${categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'CATEGORY'} ACTIONS`
-                  }
-                </h2>
-              </div>
-
-              {/* Task Templates List */}
-              {templatesLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-                </div>
-              ) : filteredTaskTemplates.length > 0 ? (
-                <div className="space-y-2">
-                  {filteredTaskTemplates.map((template) => (
-                    <TaskTemplateCard
-                      key={template.id}
-                      template={template}
-                      onAdd={() => handleAddTemplate(template)}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">No actions in this category</p>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
-
-      {/* Routine Preview Sheet for editing task before adding */}
-      {syntheticTask && selectedTemplate && (
-        <RoutinePreviewSheet
-          open={previewSheetOpen}
-          onOpenChange={(open) => {
-            setPreviewSheetOpen(open);
-            if (!open) setSelectedTemplate(null);
-          }}
-          tasks={[syntheticTask]}
-          routineTitle={selectedTemplate.title}
-          defaultTag={categories?.find(c => c.slug === selectedTemplate.category)?.name || null}
-          onSave={handleSaveRoutine}
-          isSaving={isSavingTemplate}
-        />
-      )}
 
       {/* Feature Tour */}
       <RitualsTour isFirstVisit={true} onTourReady={handleTourReady} />
