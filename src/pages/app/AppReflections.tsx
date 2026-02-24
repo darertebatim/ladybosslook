@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useReflections, Reflection } from '@/hooks/useReflections';
-import { ArrowLeft, BookOpen, CalendarPlus } from 'lucide-react';
+import { ArrowLeft, BookOpen, Crown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
+import { useSubscription } from '@/hooks/useSubscription';
+import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 
@@ -28,6 +30,7 @@ const SYNTHETIC_REFLECTION_TASK: RoutinePlanTask = {
 export default function AppReflections() {
   const navigate = useNavigate();
   const { data: reflections, isLoading } = useReflections();
+  const { isSubscribed } = useSubscription();
 
   // Add to rituals state (page-level)
   const { data: existingPageTask } = useExistingProTask('reflection');
@@ -116,7 +119,7 @@ export default function AppReflections() {
         ) : (
           <div className="divide-y divide-border">
             {all.map((r) => (
-              <ReflectionRow key={r.id} reflection={r} />
+              <ReflectionRow key={r.id} reflection={r} isSubscribed={isSubscribed} />
             ))}
           </div>
         )}
@@ -153,13 +156,17 @@ export default function AppReflections() {
   );
 }
 
-function ReflectionRow({ reflection }: { reflection: Reflection }) {
+function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; isSubscribed: boolean }) {
   const navigate = useNavigate();
   const { data: existingTask } = useExistingProTask('reflection', reflection.id);
   const addRoutinePlan = useAddRoutinePlan();
   const [showSheet, setShowSheet] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const isAdded = !!existingTask || justAdded;
+
+  const isPremium = !reflection.is_free;
+  const isLocked = isPremium && !isSubscribed;
 
   const syntheticTask: RoutinePlanTask = {
     id: `synthetic-reflection-${reflection.id}`,
@@ -176,23 +183,51 @@ function ReflectionRow({ reflection }: { reflection: Reflection }) {
     pro_link_value: reflection.id,
   };
 
+  const handleReflectionClick = () => {
+    if (isLocked) {
+      haptic.light();
+      setShowPaywall(true);
+      return;
+    }
+    navigate(`/app/reflections/${reflection.id}`);
+  };
+
+  const handleAddToRituals = () => {
+    if (isLocked) {
+      haptic.light();
+      setShowPaywall(true);
+      return;
+    }
+    haptic.light();
+    setShowSheet(true);
+  };
+
   return (
     <>
       <div className="w-full flex items-center gap-4 py-4">
         <button
-          onClick={() => navigate(`/app/reflections/${reflection.id}`)}
+          onClick={handleReflectionClick}
           className="flex-1 flex items-center gap-4 text-left transition-transform active:scale-[0.98] min-w-0"
         >
-          {reflection.cover_image_url ? (
-            <img
-              src={reflection.cover_image_url}
-              alt={reflection.title}
-              className="h-24 w-24 rounded-2xl object-cover shrink-0"
-              loading="lazy"
-            />
-          ) : (
-            <div className="h-24 w-24 rounded-2xl bg-muted flex items-center justify-center text-3xl shrink-0">📝</div>
-          )}
+          {/* Cover with PLUS badge */}
+          <div className="relative shrink-0">
+            {reflection.cover_image_url ? (
+              <img
+                src={reflection.cover_image_url}
+                alt={reflection.title}
+                className="h-24 w-24 rounded-2xl object-cover"
+                loading="lazy"
+              />
+            ) : (
+              <div className="h-24 w-24 rounded-2xl bg-muted flex items-center justify-center text-3xl">📝</div>
+            )}
+            {isPremium && (
+              <span className="absolute -top-2.5 -left-2 flex items-center gap-0.5 bg-amber-200 text-amber-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+                <Crown className="h-2.5 w-2.5" />
+                PLUS
+              </span>
+            )}
+          </div>
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-base leading-tight">{reflection.title}</p>
             {reflection.subtitle && (
@@ -200,14 +235,22 @@ function ReflectionRow({ reflection }: { reflection: Reflection }) {
             )}
           </div>
         </button>
-        <AddedToRoutineButton
-          isAdded={isAdded}
-          onAddClick={() => {
-            haptic.light();
-            setShowSheet(true);
-          }}
-          iconOnly
-        />
+
+        {/* Calendar+ button: locked emoji for premium, normal for free */}
+        {isLocked ? (
+          <button
+            onClick={handleAddToRituals}
+            className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0"
+          >
+            <span className="text-lg">🔒</span>
+          </button>
+        ) : (
+          <AddedToRoutineButton
+            isAdded={isAdded}
+            onAddClick={handleAddToRituals}
+            iconOnly
+          />
+        )}
       </div>
 
       <RoutinePreviewSheet
@@ -233,6 +276,8 @@ function ReflectionRow({ reflection }: { reflection: Reflection }) {
         }}
         isSaving={addRoutinePlan.isPending}
       />
+
+      <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
     </>
   );
 }
