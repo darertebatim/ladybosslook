@@ -155,7 +155,7 @@ export interface UpdateTaskInput extends Partial<CreateTaskInput> {
   order_index?: number;
   is_urgent?: boolean;
   linked_playlist_id?: string | null;
-  pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | null;
+  pro_link_type?: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | null;
   pro_link_value?: string | null;
   time_period?: TimePeriod | null;
 }

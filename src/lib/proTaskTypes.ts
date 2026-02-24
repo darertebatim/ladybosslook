@@ -230,6 +230,20 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Open the weight logger',
     requiresValue: false,
   },
+  },
+  reflection: {
+    value: 'reflection',
+    label: 'Reflection',
+    icon: Brain,
+    badgeText: 'Reflect',
+    color: 'teal',
+    gradientClass: 'bg-gradient-to-br from-teal-100 to-cyan-100 dark:from-teal-900/40 dark:to-cyan-900/40',
+    iconColorClass: 'text-teal-600 dark:text-teal-400',
+    badgeColorClass: 'bg-teal-500/20 text-teal-700 dark:text-teal-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Link to a reflection exercise',
+    requiresValue: true,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
@@ -267,6 +281,8 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return '/app/fasting';
     case 'weight':
       return '/app/fasting?weight=1';
+    case 'reflection':
+      return linkValue ? `/app/reflections/${linkValue}` : '/app/reflections';
     default:
       return '/app/home';
   }
