@@ -62,6 +62,8 @@ const AppRate = lazy(() => import("@/pages/app/AppRate"));
 const AppOnboarding = lazy(() => import("@/pages/app/AppOnboarding"));
 const AppReflections = lazy(() => import("@/pages/app/AppReflections"));
 const AppReflectionFlow = lazy(() => import("@/pages/app/AppReflectionFlow"));
+const AppReflectionNotes = lazy(() => import("@/pages/app/AppReflectionNotes"));
+const AppReflectionNoteDetail = lazy(() => import("@/pages/app/AppReflectionNoteDetail"));
 
 const Users = lazy(() => import("@/pages/admin/Users"));
 const Enrollment = lazy(() => import("@/pages/admin/Enrollment"));
@@ -406,6 +408,7 @@ const App = () => (
                   <Route path="/app/channels/new" element={<ProtectedRoute><AppChannelPost /></ProtectedRoute>} />
                   <Route path="/app/rate" element={<ProtectedRoute><AppRate /></ProtectedRoute>} />
                   <Route path="/app/onboarding/:flowId" element={<ProtectedRoute><AppOnboarding /></ProtectedRoute>} />
+                  <Route path="/app/reflections/notes/:reflectionId" element={<ProtectedRoute><AppReflectionNoteDetail /></ProtectedRoute>} />
                   <Route path="/app/reflections/:reflectionId" element={<ProtectedRoute><AppReflectionFlow /></ProtectedRoute>} />
                   {/* Redirect old feed post route */}
                   <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
@@ -433,6 +436,7 @@ const App = () => (
                     <Route path="feed" element={<Navigate to="/app/channels" replace />} />
                     <Route path="journal" element={<AppJournal />} />
                     <Route path="reflections" element={<AppReflections />} />
+                    <Route path="reflections/notes" element={<AppReflectionNotes />} />
                     <Route path="rituals" element={<AppInspire />} />
                     <Route path="rituals/:planId" element={<AppInspireDetail />} />
                     {/* Redirects for backward compatibility with older app versions */}
