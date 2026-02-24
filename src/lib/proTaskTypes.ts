@@ -230,7 +230,6 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Open the weight logger',
     requiresValue: false,
   },
-  },
   reflection: {
     value: 'reflection',
     label: 'Reflection',
