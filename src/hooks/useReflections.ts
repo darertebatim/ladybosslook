@@ -11,6 +11,7 @@ export interface Reflection {
   cover_image_url: string | null;
   is_active: boolean;
   is_featured: boolean;
+  is_free: boolean;
   sort_order: number;
   created_at: string;
   updated_at: string;
