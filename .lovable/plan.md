@@ -1,84 +1,166 @@
 
 
-# Dedicated Video Player Component for iOS App
+# Video Player System: Admin Dashboard + App Page
 
 ## Overview
-Build a new `AppVideoPlayer` component -- a full-screen, iOS-optimized video player sheet that handles YouTube, Vimeo, and direct MP4/WebM files from Supabase storage. It will support both landscape (16:9) and vertical (9:16) video orientations, with native-feeling controls and smooth iOS interactions.
+Build a complete video management system mirroring the existing audio player architecture. This includes new database tables, an admin dashboard for managing video playlists/content, and an app-side video browsing page with the `AppVideoPlayer` component already built.
 
-## What Gets Built
+## Audio Features to Replicate for Video
 
-### 1. New Component: `src/components/app/AppVideoPlayer.tsx`
-A full-screen bottom sheet (100vh) video player with:
+Based on the existing audio system, here are all the features that will be carried over:
 
-- **Dark background** for immersive viewing (black bg, white text)
-- **Auto-detection** of video type using existing `videoUtils.ts` helpers
-- **Orientation-aware layout:**
-  - Landscape videos (YouTube, Vimeo, horizontal MP4): standard 16:9 aspect ratio, centered vertically
-  - Vertical videos (9:16 MP4/shorts): tall container that fills most of the screen height
-- **Direct MP4 support** via native `<video>` tag with `playsInline`, `controls`, and `webkit-playsinline` for proper iOS behavior
-- **YouTube/Vimeo** via optimized iframes with `playsinline=1`, `rel=0`, `modestbranding=1`
-- **Playback speed toggle** (1x / 1.5x / 2x) for direct video files
-- **Loading spinner** while video/iframe loads
-- **Fallback button** ("Watch on YouTube/Vimeo") if embed fails
-- **Close button** (X) in top-left corner, overlaying the dark background
-- **Title bar** below the video showing the video title and optional description
-- **Safe area padding** (`pb-safe`) for iPhone home indicator
+1. **Playlists/Albums** -- Create, edit, delete video playlists (collections)
+2. **Program Linking** -- Connect video playlists to programs for access control
+3. **Free / Premium toggle** -- Mark playlists as free or requiring enrollment
+4. **Requires Subscription (Simora+)** -- Gate content behind subscription
+5. **Available on Mobile toggle** -- Control iOS app visibility
+6. **Language flags** -- US, IR, TR, ES, All multilanguage support
+7. **Categories** -- Tutorial, Course, Podcast, Workshop, Motivation, etc.
+8. **Cover images** -- Upload or AI-generate covers
+9. **AI description improvement** -- Improve descriptions with AI
+10. **Sort order** -- Control display order
+11. **Hidden/Visible toggle** -- Hide playlists without deleting
+12. **Track management** -- Add, reorder, remove videos within playlists
+13. **Drip scheduling** -- Delay content availability by days
+14. **Progress tracking** -- Track user video watch progress
+15. **Video upload** -- Upload MP4 files to Supabase storage
+16. **Display mode** -- Tracks only, Modules only, or Both
 
-### 2. Update `src/lib/videoUtils.ts`
-Add a helper to detect video orientation:
-```text
-isVerticalVideo(url: string): boolean
-```
-- YouTube Shorts URLs return true
-- TikTok/Instagram Reels return true
-- Direct files: defaults to horizontal (can be overridden via prop)
+## Database Schema
 
-### 3. Integrate Into Existing Consumers
-Replace video rendering in these locations to use the new player:
+### New Tables
 
-- **`SupplementViewer.tsx`** -- Video type modules open `AppVideoPlayer` instead of inline iframe
-- **`FeedMessage.tsx`** -- Tapping a video thumbnail opens `AppVideoPlayer` instead of inline embed
-- **`HomeBanner.tsx`** -- Video banners open `AppVideoPlayer` on tap
+**`video_content`** -- Individual video files (mirrors `audio_content`)
+- `id` (uuid, PK)
+- `title` (text, required)
+- `description` (text)
+- `file_url` (text, required) -- direct MP4 URL or YouTube/Vimeo link
+- `thumbnail_url` (text) -- video thumbnail
+- `duration_seconds` (integer, default 0)
+- `file_size_mb` (numeric)
+- `video_type` (text) -- 'direct', 'youtube', 'vimeo'
+- `is_vertical` (boolean, default false)
+- `is_free` (boolean, default true)
+- `program_slug` (text)
+- `sort_order` (integer, default 0)
+- `published_at` (timestamptz)
+- `created_at`, `updated_at` (timestamptz)
 
-Each integration point will show a thumbnail/preview card. Tapping it opens the full-screen player.
+**`video_playlists`** -- Video collections (mirrors `audio_playlists`)
+- `id` (uuid, PK)
+- `name` (text, required)
+- `description` (text)
+- `cover_image_url` (text)
+- `category` (text) -- 'tutorial', 'course', 'podcast', 'workshop', 'motivation', 'vlog'
+- `program_slug` (text)
+- `is_free` (boolean, default true)
+- `requires_subscription` (boolean, default false)
+- `available_on_mobile` (boolean, default true)
+- `is_hidden` (boolean, default false)
+- `language` (text, default 'american')
+- `sort_order` (integer, default 0)
+- `display_mode` (text, default 'tracks')
+- `created_at` (timestamptz)
 
-## Technical Details
+**`video_playlist_items`** -- Junction table (mirrors `audio_playlist_items`)
+- `id` (uuid, PK)
+- `playlist_id` (uuid, FK -> video_playlists)
+- `video_id` (uuid, FK -> video_content)
+- `sort_order` (integer, default 0)
+- `drip_delay_days` (integer, default 0)
+- `created_at` (timestamptz)
 
-### AppVideoPlayer Props
-```text
-interface AppVideoPlayerProps {
-  isOpen: boolean;
-  onClose: () => void;
-  url: string;
-  title?: string;
-  description?: string;
-  isVertical?: boolean;  // override auto-detection
-}
-```
+**`video_progress`** -- User watch progress (mirrors `audio_progress`)
+- `id` (uuid, PK)
+- `user_id` (uuid, FK -> auth.users, not a direct FK)
+- `video_id` (uuid, FK -> video_content)
+- `current_position_seconds` (integer, default 0)
+- `completed` (boolean, default false)
+- `last_watched_at` (timestamptz)
+- `created_at`, `updated_at` (timestamptz)
+- Unique constraint on (user_id, video_id)
 
-### iOS-Specific Handling
-- Uses `playsInline` and `webkit-playsinline` attributes on `<video>` to prevent automatic fullscreen on iOS
-- Dark status bar area with safe area insets
-- `overscroll-contain` to prevent pull-to-close conflicts
-- `touch-action: none` on video container to prevent scroll interference
-- Hardware-accelerated animations for sheet open/close
+### Storage
+- New bucket: `video_files` (public) for direct MP4 uploads
+- Reuse `playlist-covers` for video playlist covers
 
-### Direct Video Player Features
-- Native `<video>` element with built-in controls
-- Speed button overlay (cycles 1x -> 1.5x -> 2x)
-- Error state with retry button and "Open in Browser" fallback
-- Loading state with spinner
+### RLS Policies
+- video_content: read for all authenticated users
+- video_playlists: read for all authenticated users
+- video_playlist_items: read for all authenticated users
+- video_progress: users can read/write their own records
+- Admin full access via role check
 
-### Vertical Video Layout
-- For vertical content: container uses `aspect-[9/16]` with `max-h-[75vh]` centered in the sheet
-- For horizontal content: standard `aspect-video` (16:9) with full width
+## Admin Dashboard
 
-### Files to Create
-- `src/components/app/AppVideoPlayer.tsx` -- the main player component
+### New Page: `/admin/video` 
+Mirrors `/admin/audio` with:
 
-### Files to Modify
-- `src/lib/videoUtils.ts` -- add `isVerticalVideo()` helper
-- `src/components/app/SupplementViewer.tsx` -- delegate video rendering to AppVideoPlayer
-- `src/components/feed/FeedMessage.tsx` -- open AppVideoPlayer on video tap
-- `src/components/app/HomeBanner.tsx` -- open AppVideoPlayer on banner video tap
+**VideoPlaylistManager** component:
+- Create/Edit/Delete video playlists
+- All the same fields as audio playlists (name, description, category, program link, free/premium, subscription, mobile visibility, language, sort order, cover image)
+- AI cover generation and description improvement (reuse existing edge functions)
+- Toggle hidden/visible
+- Manage Videos button (opens VideoTracksManager)
+- Table view with cover, name, video count, status badges
+
+**VideoManager** component:
+- Upload video files (MP4) or paste YouTube/Vimeo URLs
+- Assign to playlist on upload
+- Edit title, description, playlist assignment
+- Delete videos
+- List view with duration, type badge, file size
+
+**VideoTracksManager** dialog:
+- Reorder videos within a playlist
+- Set drip delay days per video
+- Quick schedule templates
+
+### Admin Nav Update
+- Add "Video" item after "Audio" in the sidebar navigation
+
+## App Page
+
+### New Page: `/app/watch`
+Mirrors `/app/player` (the Listen page) with:
+
+- Header with "Watch" title and search
+- Category circles (Tutorial, Course, Podcast, Workshop, Motivation, Vlog)
+- Progress filter pills (All, In Progress, Completed)
+- Language selector (same flags)
+- Continue Watching section
+- Video playlist grid (2 columns, same card style as audio)
+- Tapping a playlist goes to `/app/watch/playlist/:playlistId`
+
+### New Page: `/app/watch/playlist/:playlistId`
+Video playlist detail page:
+- List of videos with thumbnails
+- Drip lock indicators
+- Tapping a video opens AppVideoPlayer (already built)
+- Progress tracking per video
+
+### Bottom Navigation Update
+- Add a "Watch" tab to the app's bottom navigation bar
+
+## Files to Create
+- `src/pages/admin/Video.tsx` -- Admin video page
+- `src/components/admin/VideoManager.tsx` -- Video upload & management
+- `src/components/admin/VideoPlaylistManager.tsx` -- Video playlist CRUD
+- `src/components/admin/VideoTracksManager.tsx` -- Video ordering within playlists
+- `src/pages/app/AppWatch.tsx` -- App video browsing page
+- `src/pages/app/AppVideoPlaylistDetail.tsx` -- Video playlist detail
+- `src/components/video/VideoPlaylistCard.tsx` -- Video playlist card component
+
+## Files to Modify
+- `src/App.tsx` -- Add admin and app routes
+- `src/components/admin/AdminNav.tsx` -- Add Video nav item
+- `src/components/app/BottomNav.tsx` (or equivalent) -- Add Watch tab
+- Database migration for new tables, RLS policies, and storage bucket
+
+## Implementation Order
+1. Database migration (tables + RLS + storage bucket)
+2. Admin: VideoPlaylistManager + VideoManager + VideoTracksManager
+3. Admin page + route + nav item
+4. App: VideoPlaylistCard + AppWatch + AppVideoPlaylistDetail
+5. App routes + bottom nav integration
 
