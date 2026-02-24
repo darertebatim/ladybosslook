@@ -1,0 +1,1 @@
+ALTER TABLE public.reflection_pages ADD COLUMN description text;
