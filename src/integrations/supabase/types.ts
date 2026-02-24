@@ -3831,6 +3831,194 @@ export type Database = {
         }
         Relationships: []
       }
+      video_content: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_seconds: number
+          file_size_mb: number | null
+          file_url: string
+          id: string
+          is_free: boolean
+          is_vertical: boolean
+          program_slug: string | null
+          published_at: string | null
+          sort_order: number
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          video_type: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number
+          file_size_mb?: number | null
+          file_url: string
+          id?: string
+          is_free?: boolean
+          is_vertical?: boolean
+          program_slug?: string | null
+          published_at?: string | null
+          sort_order?: number
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          video_type?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number
+          file_size_mb?: number | null
+          file_url?: string
+          id?: string
+          is_free?: boolean
+          is_vertical?: boolean
+          program_slug?: string | null
+          published_at?: string | null
+          sort_order?: number
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          video_type?: string
+        }
+        Relationships: []
+      }
+      video_playlist_items: {
+        Row: {
+          created_at: string
+          drip_delay_days: number
+          id: string
+          playlist_id: string
+          sort_order: number
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          drip_delay_days?: number
+          id?: string
+          playlist_id: string
+          sort_order?: number
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          drip_delay_days?: number
+          id?: string
+          playlist_id?: string
+          sort_order?: number
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_playlist_items_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "video_playlists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_playlist_items_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "video_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_playlists: {
+        Row: {
+          available_on_mobile: boolean
+          category: string | null
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          display_mode: string
+          id: string
+          is_free: boolean
+          is_hidden: boolean
+          language: string
+          name: string
+          program_slug: string | null
+          requires_subscription: boolean
+          sort_order: number
+        }
+        Insert: {
+          available_on_mobile?: boolean
+          category?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          display_mode?: string
+          id?: string
+          is_free?: boolean
+          is_hidden?: boolean
+          language?: string
+          name: string
+          program_slug?: string | null
+          requires_subscription?: boolean
+          sort_order?: number
+        }
+        Update: {
+          available_on_mobile?: boolean
+          category?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          display_mode?: string
+          id?: string
+          is_free?: boolean
+          is_hidden?: boolean
+          language?: string
+          name?: string
+          program_slug?: string | null
+          requires_subscription?: boolean
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      video_progress: {
+        Row: {
+          completed: boolean
+          created_at: string
+          current_position_seconds: number
+          id: string
+          last_watched_at: string
+          updated_at: string
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          current_position_seconds?: number
+          id?: string
+          last_watched_at?: string
+          updated_at?: string
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          current_position_seconds?: number
+          id?: string
+          last_watched_at?: string
+          updated_at?: string
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_progress_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "video_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       weight_logs: {
         Row: {
           created_at: string
