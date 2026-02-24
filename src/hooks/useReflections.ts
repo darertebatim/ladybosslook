@@ -22,6 +22,7 @@ export interface ReflectionPage {
   page_order: number;
   type: 'question' | 'message';
   content: string;
+  description: string | null;
   created_at: string;
 }
 
