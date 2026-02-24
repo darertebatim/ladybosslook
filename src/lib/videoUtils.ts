@@ -78,3 +78,14 @@ export function getVideoPlatformLabel(videoType: VideoType): string {
     default: return 'Video';
   }
 }
+
+export function isVerticalVideo(url: string): boolean {
+  if (!url) return false;
+  // YouTube Shorts
+  if (/youtube\.com\/shorts\//i.test(url)) return true;
+  // Instagram Reels
+  if (/instagram\.com\/(reel|reels)\//i.test(url)) return true;
+  // TikTok
+  if (/tiktok\.com/i.test(url)) return true;
+  return false;
+}

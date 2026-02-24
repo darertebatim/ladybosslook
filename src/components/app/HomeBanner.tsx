@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { X, Play, ExternalLink, Megaphone } from 'lucide-react';
+import { X, Play, Megaphone, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { detectVideoType, extractYouTubeId, getVideoEmbedUrl, getVideoPlatformLabel } from '@/lib/videoUtils';
+import { detectVideoType, extractYouTubeId } from '@/lib/videoUtils';
 import { BUILD_INFO } from '@/lib/buildInfo';
+import { AppVideoPlayer } from '@/components/app/AppVideoPlayer';
 
 function isVersionLessThan(v1: string, v2: string): boolean {
   const parts1 = v1.split('.').map(p => parseInt(p, 10) || 0);
@@ -44,7 +45,7 @@ export function HomeBanner() {
     }
     return new Set();
   });
-  const [expandedVideoId, setExpandedVideoId] = useState<string | null>(null);
+  const [videoPlayerId, setVideoPlayerId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -106,7 +107,6 @@ export function HomeBanner() {
     <div className="px-4 py-2 space-y-3">
       {visibleBanners.map((banner) => {
         const videoType = banner.video_url ? detectVideoType(banner.video_url) : null;
-        const isVideoExpanded = expandedVideoId === banner.id;
 
         return (
           <div
@@ -122,102 +122,38 @@ export function HomeBanner() {
               <X className="h-4 w-4 text-white" />
             </button>
 
-            {/* Video Section */}
+            {/* Video Thumbnail - tap to open player */}
             {banner.video_url && videoType && (
-              <div className="w-full">
-                {/* YouTube with embed */}
-                {videoType === 'youtube' && (
-                  <>
-                    {isVideoExpanded ? (
-                      <div className="relative aspect-video">
-                        <iframe
-                          src={getVideoEmbedUrl(banner.video_url, 'youtube', true) || ''}
-                          title={banner.title}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          className="absolute inset-0 w-full h-full"
-                        />
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setExpandedVideoId(banner.id)}
-                        className="relative w-full aspect-video group"
-                      >
-                        <img
-                          src={`https://img.youtube.com/vi/${extractYouTubeId(banner.video_url)}/maxresdefault.jpg`}
-                          alt={banner.title}
-                          className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                          onError={(e) => {
-                            const youtubeId = extractYouTubeId(banner.video_url!);
-                            if (youtubeId) {
-                              (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
-                            }
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-colors">
-                          <div className="bg-white/90 text-foreground rounded-full p-3 shadow-lg">
-                            <Play className="h-6 w-6 fill-current" />
-                          </div>
-                        </div>
-                      </button>
-                    )}
-                  </>
-                )}
-
-                {/* Vimeo with embed */}
-                {videoType === 'vimeo' && (
-                  <>
-                    {isVideoExpanded ? (
-                      <div className="relative aspect-video">
-                        <iframe
-                          src={getVideoEmbedUrl(banner.video_url, 'vimeo', true) || ''}
-                          title={banner.title}
-                          allow="autoplay; fullscreen; picture-in-picture"
-                          allowFullScreen
-                          className="absolute inset-0 w-full h-full"
-                        />
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setExpandedVideoId(banner.id)}
-                        className="relative w-full aspect-video bg-muted flex items-center justify-center group"
-                      >
-                        <div className="text-center">
-                          <div className="bg-white/90 text-foreground rounded-full p-3 mx-auto mb-2 shadow-lg">
-                            <Play className="h-6 w-6 fill-current" />
-                          </div>
-                          <span className="text-sm text-muted-foreground">Play Vimeo Video</span>
-                        </div>
-                      </button>
-                    )}
-                  </>
-                )}
-
-                {/* Direct MP4/video file */}
-                {videoType === 'direct' && (
-                  <video
-                    src={banner.video_url}
-                    controls
-                    playsInline
-                    className="w-full aspect-video object-cover"
-                  />
-                )}
-
-                {/* Instagram/TikTok - external link */}
-                {(videoType === 'instagram' || videoType === 'tiktok') && (
-                  <div className="p-4">
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => window.open(banner.video_url!, '_blank')}
-                    >
-                      <Play className="h-4 w-4 mr-2" />
-                      Watch on {getVideoPlatformLabel(videoType)}
-                      <ExternalLink className="h-3 w-3 ml-2" />
-                    </Button>
+              <>
+                <button
+                  onClick={() => setVideoPlayerId(banner.id)}
+                  className="relative w-full aspect-video group active:scale-[0.98] transition-transform"
+                >
+                  {videoType === 'youtube' ? (
+                    <img
+                      src={`https://img.youtube.com/vi/${extractYouTubeId(banner.video_url)}/hqdefault.jpg`}
+                      alt={banner.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-muted flex items-center justify-center">
+                      <Play className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-active:bg-black/40 transition-colors">
+                    <div className="bg-white/90 text-foreground rounded-full p-3 shadow-lg">
+                      <Play className="h-6 w-6 fill-current" />
+                    </div>
                   </div>
-                )}
-              </div>
+                </button>
+                <AppVideoPlayer
+                  isOpen={videoPlayerId === banner.id}
+                  onClose={() => setVideoPlayerId(null)}
+                  url={banner.video_url}
+                  title={banner.title}
+                  description={banner.description || undefined}
+                />
+              </>
             )}
 
             {/* Content */}
