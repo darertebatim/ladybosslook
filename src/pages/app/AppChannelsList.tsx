@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Megaphone, Users, GraduationCap, MessageSquare, ChevronRight, Headset, Sparkles } from 'lucide-react';
+import { Loader2, Megaphone, Users, GraduationCap, MessageSquare, ChevronRight, Headset } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -97,37 +97,31 @@ export default function AppChannelsList() {
               Your community spaces
             </p>
           </div>
-          {/* Quick actions */}
-          <div className="flex gap-1.5 pb-0.5">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-xl bg-background/60"
-              onClick={() => navigate('/app/rituals')}
-            >
-              <Sparkles className="h-4 w-4" />
-            </Button>
-            {canAccessAdminPage('support') && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 rounded-xl bg-background/60"
-                onClick={() => navigate('/app/support', { state: { from: '/app/channels' } })}
-              >
-                <Headset className="h-4 w-4" />
-              </Button>
-            )}
-            {canAccessAdminPage('community') && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 rounded-xl bg-background/60"
-                onClick={() => navigate('/app/channels/new', { state: { from: '/app/channels' } })}
-              >
-                <Megaphone className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+          {/* Admin quick actions */}
+          {(canAccessAdminPage('support') || canAccessAdminPage('community')) && (
+            <div className="flex gap-1.5 pb-0.5">
+              {canAccessAdminPage('support') && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 rounded-xl bg-background/60"
+                  onClick={() => navigate('/app/support', { state: { from: '/app/channels' } })}
+                >
+                  <Headset className="h-4 w-4" />
+                </Button>
+              )}
+              {canAccessAdminPage('community') && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 rounded-xl bg-background/60"
+                  onClick={() => navigate('/app/channels/new', { state: { from: '/app/channels' } })}
+                >
+                  <Megaphone className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </header>
 
