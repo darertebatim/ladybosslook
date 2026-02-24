@@ -84,6 +84,15 @@ export const wellnessTools: ToolConfig[] = [
     description: 'Courses & coaching',
   },
   {
+    id: 'reflections',
+    name: 'Reflections',
+    icon: 'Brain',
+    bgColor: 'bg-[#CCFBF1]',
+    iconColor: 'text-teal-600',
+    route: '/app/reflections',
+    description: 'Guided prompts',
+  },
+  {
     id: 'profile',
     name: 'My Profile',
     icon: 'User',
@@ -156,13 +165,14 @@ export const comingSoonTools: ToolConfig[] = [
     comingSoon: true,
   },
   {
-    id: 'reflections',
+    id: 'reflections-coming',
     name: 'Reflections',
     icon: 'PenLine',
     bgColor: 'bg-[#F1F5F9]',
     iconColor: 'text-slate-600',
     route: '/app/reflections',
     description: 'Guided prompts',
+    hidden: true,
   },
   {
     id: 'tests',
