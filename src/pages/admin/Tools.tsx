@@ -4,7 +4,8 @@ import { BreathingExercisesManager } from '@/components/admin/BreathingExercises
 import { RoutineManagement } from '@/components/admin/RoutineManagement';
 import TasksBank from '@/pages/admin/TasksBank';
 import RoutinesBank from '@/components/admin/RoutinesBank';
-import { Wind, Sparkles, ListTodo, Layers } from 'lucide-react';
+import { ReflectionsManager } from '@/components/admin/ReflectionsManager';
+import { Wind, Sparkles, ListTodo, Layers, PenLine } from 'lucide-react';
 
 export default function Tools() {
   return (
