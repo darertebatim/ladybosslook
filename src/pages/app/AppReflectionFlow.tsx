@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useReflectionPages, useSaveReflectionResponse } from '@/hooks/useReflections';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from 'sonner';
 
 export default function AppReflectionFlow() {
   const { reflectionId } = useParams<{ reflectionId: string }>();
@@ -29,27 +30,33 @@ export default function AppReflectionFlow() {
   const handleNext = async () => {
     if (!page || !reflectionId) return;
 
-    // Save response for question pages
-    if (page.type === 'question') {
-      await saveResponse.mutateAsync({
-        reflectionId,
-        pageId: page.id,
-        responseText: answers[page.id] || '',
-        isCompleted: isLast,
-      });
-    } else if (isLast) {
-      // Save a marker for the last page even if it's a message
-      await saveResponse.mutateAsync({
-        reflectionId,
-        pageId: page.id,
-        isCompleted: true,
-      });
-    }
+    try {
+      // Save response for question pages
+      if (page.type === 'question') {
+        await saveResponse.mutateAsync({
+          reflectionId,
+          pageId: page.id,
+          responseText: answers[page.id] || '',
+          isCompleted: isLast,
+        });
+      } else if (isLast) {
+        // Save a marker for the last page even if it's a message
+        await saveResponse.mutateAsync({
+          reflectionId,
+          pageId: page.id,
+          isCompleted: true,
+        });
+      }
 
-    if (isLast) {
-      navigate(-1);
-    } else {
-      setCurrentIndex((i) => i + 1);
+      if (isLast) {
+        toast.success('Reflection completed ✨');
+        navigate(-1);
+      } else {
+        setCurrentIndex((i) => i + 1);
+      }
+    } catch (error) {
+      console.error('Failed to save reflection response:', error);
+      toast.error('Failed to save. Please try again.');
     }
   };
 
@@ -63,7 +70,7 @@ export default function AppReflectionFlow() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="h-full bg-background flex items-center justify-center">
         <Skeleton className="h-8 w-8 rounded-full" />
       </div>
     );
@@ -71,7 +78,7 @@ export default function AppReflectionFlow() {
 
   if (!pages || pages.length === 0) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+      <div className="h-full bg-background flex flex-col items-center justify-center p-6">
         <p className="text-muted-foreground">This reflection has no pages yet.</p>
         <button onClick={() => navigate(-1)} className="mt-4 text-primary underline">Go back</button>
       </div>
@@ -79,10 +86,15 @@ export default function AppReflectionFlow() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div
+      className="h-[100dvh] bg-background flex flex-col overflow-hidden"
+    >
       {/* Top bar: back + progress */}
-      <div className="px-4 pt-4 pb-2 flex items-center gap-3">
-        <button onClick={handleBack} className="shrink-0">
+      <div
+        className="px-4 pb-2 flex items-center gap-3 shrink-0"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
+      >
+        <button onClick={handleBack} className="shrink-0 active:scale-95 transition-transform p-1">
           <ArrowLeft className="h-6 w-6" />
         </button>
         <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
@@ -94,7 +106,7 @@ export default function AppReflectionFlow() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-center px-6 py-8">
+      <div className="flex-1 flex flex-col justify-center px-6 py-8 overflow-y-auto overscroll-contain">
         <p className="text-2xl font-bold leading-snug">{page?.content}</p>
 
         {page?.type === 'question' && (
@@ -109,7 +121,10 @@ export default function AppReflectionFlow() {
       </div>
 
       {/* FAB */}
-      <div className="p-6 flex justify-end">
+      <div
+        className="p-6 flex justify-end shrink-0"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}
+      >
         <button
           onClick={handleNext}
           disabled={saveResponse.isPending}
