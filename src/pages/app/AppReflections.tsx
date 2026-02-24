@@ -45,11 +45,15 @@ export default function AppReflections() {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <div className="px-4 pt-4 pb-2">
-        <div className="flex items-center justify-between mb-2">
+      <header
+        className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <div className="flex items-center justify-between pt-1 pb-2 px-4">
           <button onClick={() => navigate(-1)} className="active:scale-95 transition-transform">
             <ArrowLeft className="h-6 w-6" />
           </button>
+          <h1 className="text-lg font-semibold">Reflection</h1>
           <div className="flex items-center gap-1">
             <AddedToRoutineButton
               isAdded={isPageAdded}
@@ -67,7 +71,10 @@ export default function AppReflections() {
             </button>
           </div>
         </div>
-        <h1 className="text-2xl font-bold">Reflection</h1>
+      </header>
+      <div style={{ height: 'calc(56px + env(safe-area-inset-top, 0px))' }} />
+
+      <div className="px-4 pt-2 pb-2">
         <p className="text-muted-foreground text-sm">Find ways to be happier & healthier</p>
       </div>
 
