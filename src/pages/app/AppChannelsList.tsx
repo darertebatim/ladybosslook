@@ -353,6 +353,30 @@ export default function AppChannelsList() {
           </div>
         )}
       </div>
+
+      {/* Add to Rituals Sheet */}
+      <RoutinePreviewSheet
+        open={showRoutineSheet}
+        onOpenChange={setShowRoutineSheet}
+        tasks={[SYNTHETIC_CHANNEL_TASK]}
+        onConfirm={async (selectedTaskIds, editedTasks) => {
+          try {
+            await addRoutinePlan.mutateAsync({
+              planId: 'synthetic-channel',
+              selectedTaskIds,
+              editedTasks,
+              syntheticTasks: [SYNTHETIC_CHANNEL_TASK],
+            });
+            setJustAdded(true);
+            haptic.success();
+            toast.success('Added to your rituals!');
+            setShowRoutineSheet(false);
+          } catch {
+            toast.error('Failed to add to rituals');
+          }
+        }}
+        isLoading={addRoutinePlan.isPending}
+      />
     </div>
   );
 }
