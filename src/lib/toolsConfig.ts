@@ -84,6 +84,15 @@ export const wellnessTools: ToolConfig[] = [
     description: 'Courses & coaching',
   },
   {
+    id: 'reflections',
+    name: 'Reflections',
+    icon: 'Brain',
+    bgColor: 'bg-[#CCFBF1]',
+    iconColor: 'text-teal-600',
+    route: '/app/reflections',
+    description: 'Guided prompts',
+  },
+  {
     id: 'profile',
     name: 'My Profile',
     icon: 'User',
