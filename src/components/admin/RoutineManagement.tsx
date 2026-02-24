@@ -206,6 +206,7 @@ function CategoriesManager() {
       icon: '📁',
       color: 'yellow',
       display_order: (categories?.length || 0) + 1,
+      task_display_order: (categories?.length || 0) + 1,
       is_active: true,
     });
     setIsDialogOpen(true);
