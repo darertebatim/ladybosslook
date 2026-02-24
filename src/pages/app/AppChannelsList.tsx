@@ -126,31 +126,37 @@ export default function AppChannelsList() {
               Your community spaces
             </p>
           </div>
-          {/* Admin quick actions */}
-          {(canAccessAdminPage('support') || canAccessAdminPage('community')) && (
-            <div className="flex gap-1.5 pb-0.5">
-              {canAccessAdminPage('support') && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9 rounded-xl bg-background/60"
-                  onClick={() => navigate('/app/support', { state: { from: '/app/channels' } })}
-                >
-                  <Headset className="h-4 w-4" />
-                </Button>
-              )}
-              {canAccessAdminPage('community') && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9 rounded-xl bg-background/60"
-                  onClick={() => navigate('/app/channels/new', { state: { from: '/app/channels' } })}
-                >
-                  <Megaphone className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          )}
+          {/* Actions: Add to rituals + Admin */}
+          <div className="flex gap-1.5 pb-0.5">
+            <AddedToRoutineButton
+              isAdded={isAddedToRituals}
+              onAddClick={() => {
+                haptic.light();
+                setShowRoutineSheet(true);
+              }}
+              iconOnly
+            />
+            {canAccessAdminPage('support') && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-xl bg-background/60"
+                onClick={() => navigate('/app/support', { state: { from: '/app/channels' } })}
+              >
+                <Headset className="h-4 w-4" />
+              </Button>
+            )}
+            {canAccessAdminPage('community') && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-xl bg-background/60"
+                onClick={() => navigate('/app/channels/new', { state: { from: '/app/channels' } })}
+              >
+                <Megaphone className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
       </header>
 
