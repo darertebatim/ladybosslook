@@ -142,6 +142,11 @@ export const PlaylistCard = memo(function PlaylistCard({
                   <Clock className="h-3 w-3" />
                   {formatDuration(totalDuration)}
                 </span>
+                {language && language !== 'all' && (
+                  language === 'persian'
+                    ? <PersianFlag size={10} />
+                    : LANG_FLAGS[language] && <span className="text-[10px] flex-shrink-0 leading-none">{LANG_FLAGS[language]}</span>
+                )}
               </div>
               {(!isLocked || isFree) && progressPercentage > 0 && (
                 <span className="flex items-center gap-0.5 font-medium">

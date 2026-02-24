@@ -16,7 +16,7 @@ export function PersianFlag({ size = 20, className }: PersianFlagProps) {
       className={className}
       style={{
         display: 'inline-block',
-        width: size * 1.5,
+        width: size,
         height: size,
         borderRadius: 2,
         objectFit: 'cover',
