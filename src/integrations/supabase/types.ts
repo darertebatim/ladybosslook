@@ -2475,6 +2475,7 @@ export type Database = {
       }
       reflections: {
         Row: {
+          cover_color: string | null
           cover_image_url: string | null
           created_at: string
           id: string
@@ -2487,6 +2488,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          cover_color?: string | null
           cover_image_url?: string | null
           created_at?: string
           id?: string
@@ -2499,6 +2501,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          cover_color?: string | null
           cover_image_url?: string | null
           created_at?: string
           id?: string
