@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Megaphone, Users, GraduationCap, MessageSquare, ChevronRight, Headset } from 'lucide-react';
+import { Loader2, Megaphone, Users, GraduationCap, MessageSquare, ChevronRight, Headset, Sparkles } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
