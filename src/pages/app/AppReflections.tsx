@@ -35,7 +35,25 @@ export default function AppReflections() {
           <h2 className="text-sm font-semibold text-muted-foreground mb-2">For you</h2>
           <div className="flex gap-3 overflow-x-auto pb-2">
             {featured.map((r) => (
-              <ReflectionCard key={r.id} reflection={r} onClick={() => navigate(`/app/reflections/${r.id}`)} />
+              <button
+                key={r.id}
+                onClick={() => navigate(`/app/reflections/${r.id}`)}
+                className="w-full rounded-2xl overflow-hidden text-left transition-transform active:scale-[0.97] relative min-h-[140px] flex items-end"
+                style={{ backgroundColor: '#f5d0e0' }}
+              >
+                <div className="p-4 pr-28 z-10">
+                  <p className="font-bold text-base leading-tight">{r.title}</p>
+                  {r.subtitle && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{r.subtitle}</p>}
+                </div>
+                {r.cover_image_url && (
+                  <img
+                    src={r.cover_image_url}
+                    alt=""
+                    className="absolute right-0 bottom-0 h-full w-32 object-cover object-center"
+                    loading="lazy"
+                  />
+                )}
+              </button>
             ))}
           </div>
         </div>
@@ -43,17 +61,23 @@ export default function AppReflections() {
 
       {/* All */}
       <div className="px-4 mt-6">
-        <h2 className="text-sm font-semibold text-muted-foreground mb-2">All</h2>
+        <h2 className="text-sm font-semibold text-muted-foreground mb-3">All</h2>
         {isLoading ? (
-          <div className="grid grid-cols-2 gap-3">
-            {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="aspect-square rounded-xl" />
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-4">
+                <Skeleton className="h-24 w-24 rounded-2xl shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
+              </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="divide-y divide-border">
             {all.map((r) => (
-              <ReflectionCard key={r.id} reflection={r} onClick={() => navigate(`/app/reflections/${r.id}`)} />
+              <ReflectionRow key={r.id} reflection={r} onClick={() => navigate(`/app/reflections/${r.id}`)} />
             ))}
           </div>
         )}
@@ -65,26 +89,26 @@ export default function AppReflections() {
   );
 }
 
-function ReflectionCard({ reflection, onClick }: { reflection: Reflection; onClick: () => void }) {
+function ReflectionRow({ reflection, onClick }: { reflection: Reflection; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="rounded-xl overflow-hidden bg-card border text-left transition-transform active:scale-[0.97]"
+      className="w-full flex items-center gap-4 py-4 text-left transition-transform active:scale-[0.98]"
     >
       {reflection.cover_image_url ? (
         <img
           src={reflection.cover_image_url}
           alt={reflection.title}
-          className="w-full aspect-square object-cover"
+          className="h-24 w-24 rounded-2xl object-cover shrink-0"
           loading="lazy"
         />
       ) : (
-        <div className="w-full aspect-square bg-muted flex items-center justify-center text-3xl">📝</div>
+        <div className="h-24 w-24 rounded-2xl bg-muted flex items-center justify-center text-3xl shrink-0">📝</div>
       )}
-      <div className="p-2">
-        <p className="font-semibold text-sm leading-tight line-clamp-1">{reflection.title}</p>
+      <div className="flex-1 min-w-0">
+        <p className="font-semibold text-base leading-tight">{reflection.title}</p>
         {reflection.subtitle && (
-          <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{reflection.subtitle}</p>
+          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{reflection.subtitle}</p>
         )}
       </div>
     </button>
