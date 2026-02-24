@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Megaphone, Users, GraduationCap, MessageSquare, ChevronRight, Headset } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -14,6 +15,27 @@ import { useSupportChatSummary } from '@/hooks/useSupportChatSummary';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
+import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
+import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
+import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
+import { haptic } from '@/lib/haptics';
+import { toast } from 'sonner';
+
+const SYNTHETIC_CHANNEL_TASK: RoutinePlanTask = {
+  id: 'synthetic-channel-task',
+  plan_id: 'synthetic-channel',
+  title: 'Check Community Channels',
+  icon: '📣',
+  color: '#6366f1',
+  task_order: 0,
+  is_active: true,
+  created_at: new Date().toISOString(),
+  linked_playlist_id: null,
+  tag: 'pro',
+  pro_link_type: 'channel',
+  pro_link_value: null,
+};
 
 // Helper to check if cover is an emoji
 const isEmojiCover = (url: string | null) => url?.startsWith('emoji:');
@@ -61,6 +83,13 @@ export default function AppChannelsList() {
   const { unreadCount: coachUnreadCount } = useUnreadChat(hasCoachAccess ? 'coach' : 'support');
   const { data: coachSummary } = useSupportChatSummary(hasCoachAccess ? 'coach' : 'support');
 
+  // Add to rituals state
+  const { data: existingTask } = useExistingProTask('channel');
+  const addRoutinePlan = useAddRoutinePlan();
+  const [showRoutineSheet, setShowRoutineSheet] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
+  const isAddedToRituals = !!existingTask || justAdded;
+
   // Subscribe to real-time updates for all channels
   useFeedRealtime();
 
@@ -97,31 +126,37 @@ export default function AppChannelsList() {
               Your community spaces
             </p>
           </div>
-          {/* Admin quick actions */}
-          {(canAccessAdminPage('support') || canAccessAdminPage('community')) && (
-            <div className="flex gap-1.5 pb-0.5">
-              {canAccessAdminPage('support') && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9 rounded-xl bg-background/60"
-                  onClick={() => navigate('/app/support', { state: { from: '/app/channels' } })}
-                >
-                  <Headset className="h-4 w-4" />
-                </Button>
-              )}
-              {canAccessAdminPage('community') && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9 rounded-xl bg-background/60"
-                  onClick={() => navigate('/app/channels/new', { state: { from: '/app/channels' } })}
-                >
-                  <Megaphone className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          )}
+          {/* Actions: Add to rituals + Admin */}
+          <div className="flex gap-1.5 pb-0.5">
+            <AddedToRoutineButton
+              isAdded={isAddedToRituals}
+              onAddClick={() => {
+                haptic.light();
+                setShowRoutineSheet(true);
+              }}
+              iconOnly
+            />
+            {canAccessAdminPage('support') && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-xl bg-background/60"
+                onClick={() => navigate('/app/support', { state: { from: '/app/channels' } })}
+              >
+                <Headset className="h-4 w-4" />
+              </Button>
+            )}
+            {canAccessAdminPage('community') && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-xl bg-background/60"
+                onClick={() => navigate('/app/channels/new', { state: { from: '/app/channels' } })}
+              >
+                <Megaphone className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -318,6 +353,31 @@ export default function AppChannelsList() {
           </div>
         )}
       </div>
+
+      {/* Add to Rituals Sheet */}
+      <RoutinePreviewSheet
+        open={showRoutineSheet}
+        onOpenChange={setShowRoutineSheet}
+        tasks={[SYNTHETIC_CHANNEL_TASK]}
+        routineTitle="Community Channels"
+        onSave={async (selectedTaskIds, editedTasks) => {
+          try {
+            await addRoutinePlan.mutateAsync({
+              planId: 'synthetic-channel',
+              selectedTaskIds,
+              editedTasks,
+              syntheticTasks: [SYNTHETIC_CHANNEL_TASK],
+            });
+            setJustAdded(true);
+            haptic.success();
+            toast.success('Added to your rituals!');
+            setShowRoutineSheet(false);
+          } catch {
+            toast.error('Failed to add to rituals');
+          }
+        }}
+        isSaving={addRoutinePlan.isPending}
+      />
     </div>
   );
 }
