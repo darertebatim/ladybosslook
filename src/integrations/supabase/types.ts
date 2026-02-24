@@ -2439,6 +2439,7 @@ export type Database = {
         Row: {
           content: string
           created_at: string
+          description: string | null
           id: string
           page_order: number
           reflection_id: string
@@ -2447,6 +2448,7 @@ export type Database = {
         Insert: {
           content: string
           created_at?: string
+          description?: string | null
           id?: string
           page_order?: number
           reflection_id: string
@@ -2455,6 +2457,7 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
+          description?: string | null
           id?: string
           page_order?: number
           reflection_id?: string
