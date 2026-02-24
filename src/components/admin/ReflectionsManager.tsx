@@ -25,6 +25,7 @@ interface PageDraft {
   page_order: number;
   type: string;
   content: string;
+  description?: string;
 }
 
 export function ReflectionsManager() {
