@@ -57,6 +57,7 @@ interface RoutineCategory {
   icon: string;
   color: string;
   display_order: number;
+  task_display_order: number;
   is_active: boolean;
 }
 
@@ -143,6 +144,7 @@ function CategoriesManager() {
     icon: '📁',
     color: 'yellow',
     display_order: 0,
+    task_display_order: 0,
     is_active: true,
   });
 
@@ -205,6 +207,7 @@ function CategoriesManager() {
       icon: '📁',
       color: 'yellow',
       display_order: (categories?.length || 0) + 1,
+      task_display_order: (categories?.length || 0) + 1,
       is_active: true,
     });
     setIsDialogOpen(true);
@@ -218,6 +221,7 @@ function CategoriesManager() {
       icon: cat.icon,
       color: cat.color,
       display_order: cat.display_order,
+      task_display_order: cat.task_display_order ?? 0,
       is_active: cat.is_active,
     });
     setIsDialogOpen(true);
@@ -268,7 +272,8 @@ function CategoriesManager() {
                 <TableHead>Name</TableHead>
                 <TableHead>Slug</TableHead>
                 <TableHead>Color</TableHead>
-                <TableHead>Order</TableHead>
+                <TableHead>Ritual Order</TableHead>
+                <TableHead>Action Order</TableHead>
                 <TableHead>Active</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -283,6 +288,7 @@ function CategoriesManager() {
                     <div className={`w-6 h-6 rounded ${TASK_COLOR_CLASSES[cat.color as TaskColor] || 'bg-gray-200'}`} />
                   </TableCell>
                   <TableCell>{cat.display_order}</TableCell>
+                  <TableCell>{cat.task_display_order ?? 0}</TableCell>
                   <TableCell>{cat.is_active ? 'Yes' : 'No'}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
@@ -356,20 +362,28 @@ function CategoriesManager() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Display Order</Label>
+                <Label>Ritual Order</Label>
                 <Input
                   type="number"
                   value={formData.display_order}
                   onChange={(e) => setFormData(prev => ({ ...prev, display_order: parseInt(e.target.value) || 0 }))}
                 />
               </div>
-              <div className="flex items-center gap-2 pt-6">
-                <Switch
-                  checked={formData.is_active}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
+              <div>
+                <Label>Action Order</Label>
+                <Input
+                  type="number"
+                  value={formData.task_display_order}
+                  onChange={(e) => setFormData(prev => ({ ...prev, task_display_order: parseInt(e.target.value) || 0 }))}
                 />
-                <Label>Active</Label>
               </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={formData.is_active}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
+              />
+              <Label>Active</Label>
             </div>
           </div>
           <DialogFooter>

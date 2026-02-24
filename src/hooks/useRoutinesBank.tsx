@@ -78,6 +78,7 @@ export interface RoutineBankCategory {
   color: string;
   icon: string;
   emoji?: string;
+  task_display_order?: number;
 }
 
 // Fetch categories directly from routine_categories table (admin-managed)
@@ -87,7 +88,7 @@ export function useRoutineBankCategories() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('routine_categories')
-        .select('slug, name, icon, color, display_order')
+        .select('slug, name, icon, color, display_order, task_display_order')
         .eq('is_active', true)
         .order('display_order', { ascending: true });
 
@@ -103,9 +104,10 @@ export function useRoutineBankCategories() {
       return sorted.map(cat => ({
         slug: cat.slug,
         name: cat.name,
-        icon: cat.icon || 'Sparkles',  // icon column stores emoji
+        icon: cat.icon || 'Sparkles',
         color: cat.color || 'purple',
-        emoji: cat.icon,  // same as icon for FluentEmoji
+        emoji: cat.icon,
+        task_display_order: cat.task_display_order ?? 0,
       })) as RoutineBankCategory[];
     },
     staleTime: 1000 * 60 * 5,
