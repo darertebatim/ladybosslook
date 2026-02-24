@@ -152,7 +152,7 @@ function PagesEditor({ reflectionId }: { reflectionId: string }) {
 
   // Initialize pages from DB once
   if (existingPages && !initialized) {
-    setPages(existingPages.map((p) => ({ id: p.id, page_order: p.page_order, type: p.type, content: p.content })));
+    setPages(existingPages.map((p) => ({ id: p.id, page_order: p.page_order, type: p.type, content: p.content, description: p.description || '' })));
     setInitialized(true);
   }
 
