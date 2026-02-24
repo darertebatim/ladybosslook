@@ -212,6 +212,7 @@ function PagesEditor({ reflectionId }: { reflectionId: string }) {
             placeholder="Description (optional)…"
             className="min-h-[40px] text-sm"
           />
+        </div>
       ))}
 
       {pages.length > 0 && (
