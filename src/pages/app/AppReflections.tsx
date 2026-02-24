@@ -14,9 +14,17 @@ export default function AppReflections() {
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <div className="px-4 pt-4 pb-2">
-        <button onClick={() => navigate(-1)} className="mb-2">
-          <ArrowLeft className="h-6 w-6" />
-        </button>
+        <div className="flex items-center justify-between mb-2">
+          <button onClick={() => navigate(-1)} className="active:scale-95 transition-transform">
+            <ArrowLeft className="h-6 w-6" />
+          </button>
+          <button
+            onClick={() => navigate('/app/reflections/notes')}
+            className="active:scale-95 transition-transform p-1"
+          >
+            <BookOpen className="h-5 w-5" />
+          </button>
+        </div>
         <h1 className="text-2xl font-bold">Reflection</h1>
         <p className="text-muted-foreground text-sm">Find ways to be happier & healthier</p>
       </div>

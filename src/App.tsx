@@ -436,6 +436,7 @@ const App = () => (
                     <Route path="feed" element={<Navigate to="/app/channels" replace />} />
                     <Route path="journal" element={<AppJournal />} />
                     <Route path="reflections" element={<AppReflections />} />
+                    <Route path="reflections/notes" element={<AppReflectionNotes />} />
                     <Route path="rituals" element={<AppInspire />} />
                     <Route path="rituals/:planId" element={<AppInspireDetail />} />
                     {/* Redirects for backward compatibility with older app versions */}
