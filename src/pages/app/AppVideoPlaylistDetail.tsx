@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState, useCallback } from "react";
+import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Play, CheckCircle2, Circle, Video, Clock, Lock } from "lucide-react";
+import { Play, CheckCircle2, Circle, Lock } from "lucide-react";
 import { BackButton } from "@/components/app/BackButton";
 import { AppVideoPlayer } from "@/components/app/AppVideoPlayer";
 import { useEnrollments } from "@/hooks/useAppData";
@@ -16,9 +16,8 @@ import { cn } from "@/lib/utils";
 export default function AppVideoPlaylistDetail() {
   const { playlistId } = useParams();
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [playerOpen, setPlayerOpen] = useState(false);
-  const [selectedVideo, setSelectedVideo] = useState<{ url: string; title: string; description?: string; isVertical?: boolean } | null>(null);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
 
   const { data: playlist, isLoading: plLoading } = useQuery({
     queryKey: ['video-playlist', playlistId],
@@ -77,12 +76,25 @@ export default function AppVideoPlaylistDetail() {
   const completedCount = tracks?.filter(t => getProgress(t.video_content?.id || '').completed).length || 0;
   const overallProgress = totalTracks > 0 ? (completedCount / totalTracks) * 100 : 0;
 
-  const handlePlay = (track: any) => {
+  // Build playlist items for auto-play
+  const playlistItems = tracks?.map(t => ({
+    url: t.video_content?.file_url || '',
+    title: t.video_content?.title,
+    description: t.video_content?.description || undefined,
+    isVertical: t.video_content?.is_vertical || false,
+  })) || [];
+
+  const currentVideo = playlistItems[currentVideoIndex];
+
+  const handlePlay = (index: number) => {
     if (!hasAccess) return;
-    const vc = track.video_content;
-    setSelectedVideo({ url: vc.file_url, title: vc.title, description: vc.description, isVertical: vc.is_vertical });
+    setCurrentVideoIndex(index);
     setPlayerOpen(true);
   };
+
+  const handleVideoChange = useCallback((newIndex: number) => {
+    setCurrentVideoIndex(newIndex);
+  }, []);
 
   const formatDuration = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
 
@@ -141,7 +153,7 @@ export default function AppVideoPlaylistDetail() {
             return (
               <button
                 key={track.id}
-                onClick={() => handlePlay(track)}
+                onClick={() => handlePlay(i)}
                 disabled={locked}
                 className={cn(
                   "w-full flex items-center gap-3 p-3 rounded-xl border transition-colors text-left",
@@ -180,15 +192,18 @@ export default function AppVideoPlaylistDetail() {
         </div>
       </div>
 
-      {/* Video Player */}
-      {selectedVideo && (
+      {/* Video Player with auto-play */}
+      {currentVideo && (
         <AppVideoPlayer
           isOpen={playerOpen}
-          onClose={() => { setPlayerOpen(false); setSelectedVideo(null); }}
-          url={selectedVideo.url}
-          title={selectedVideo.title}
-          description={selectedVideo.description}
-          isVertical={selectedVideo.isVertical}
+          onClose={() => setPlayerOpen(false)}
+          url={currentVideo.url}
+          title={currentVideo.title}
+          description={currentVideo.description}
+          isVertical={currentVideo.isVertical}
+          playlist={playlistItems}
+          currentIndex={currentVideoIndex}
+          onVideoChange={handleVideoChange}
         />
       )}
     </div>
