@@ -2480,6 +2480,7 @@ export type Database = {
           id: string
           is_active: boolean
           is_featured: boolean
+          is_free: boolean
           sort_order: number
           subtitle: string | null
           title: string
@@ -2491,6 +2492,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_featured?: boolean
+          is_free?: boolean
           sort_order?: number
           subtitle?: string | null
           title: string
@@ -2502,6 +2504,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_featured?: boolean
+          is_free?: boolean
           sort_order?: number
           subtitle?: string | null
           title?: string
