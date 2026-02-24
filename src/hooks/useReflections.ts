@@ -224,7 +224,7 @@ export function useSaveReflectionPages() {
       pages,
     }: {
       reflectionId: string;
-      pages: { id?: string; page_order: number; type: string; content: string }[];
+      pages: { id?: string; page_order: number; type: string; content: string; description?: string }[];
     }) => {
       // Delete all existing pages then re-insert
       await supabase.from('reflection_pages' as any).delete().eq('reflection_id', reflectionId);
@@ -234,6 +234,7 @@ export function useSaveReflectionPages() {
           page_order: p.page_order,
           type: p.type,
           content: p.content,
+          description: p.description || null,
         }));
         const { error } = await supabase.from('reflection_pages' as any).insert(rows as any);
         if (error) throw error;

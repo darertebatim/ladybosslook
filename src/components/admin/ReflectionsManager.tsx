@@ -25,6 +25,7 @@ interface PageDraft {
   page_order: number;
   type: string;
   content: string;
+  description?: string;
 }
 
 export function ReflectionsManager() {
@@ -151,12 +152,12 @@ function PagesEditor({ reflectionId }: { reflectionId: string }) {
 
   // Initialize pages from DB once
   if (existingPages && !initialized) {
-    setPages(existingPages.map((p) => ({ id: p.id, page_order: p.page_order, type: p.type, content: p.content })));
+    setPages(existingPages.map((p) => ({ id: p.id, page_order: p.page_order, type: p.type, content: p.content, description: p.description || '' })));
     setInitialized(true);
   }
 
   const addPage = () => {
-    setPages([...pages, { page_order: pages.length, type: 'question', content: '' }]);
+    setPages([...pages, { page_order: pages.length, type: 'question', content: '', description: '' }]);
   };
 
   const removePage = (idx: number) => {
@@ -204,6 +205,12 @@ function PagesEditor({ reflectionId }: { reflectionId: string }) {
             onChange={(e) => updatePage(idx, 'content', e.target.value)}
             placeholder={page.type === 'question' ? 'Enter the question…' : 'Enter the message text…'}
             className="min-h-[60px]"
+          />
+          <Textarea
+            value={page.description || ''}
+            onChange={(e) => updatePage(idx, 'description', e.target.value)}
+            placeholder="Description (optional)…"
+            className="min-h-[40px] text-sm"
           />
         </div>
       ))}
