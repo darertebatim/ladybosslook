@@ -287,6 +287,7 @@ function CategoriesManager() {
                     <div className={`w-6 h-6 rounded ${TASK_COLOR_CLASSES[cat.color as TaskColor] || 'bg-gray-200'}`} />
                   </TableCell>
                   <TableCell>{cat.display_order}</TableCell>
+                  <TableCell>{cat.task_display_order ?? 0}</TableCell>
                   <TableCell>{cat.is_active ? 'Yes' : 'No'}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
