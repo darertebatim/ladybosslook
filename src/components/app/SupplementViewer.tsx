@@ -1,10 +1,11 @@
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Loader2, FileText, Video, ChevronLeft, ChevronRight, Check, X } from "lucide-react";
+import { ExternalLink, Loader2, FileText, ChevronLeft, ChevronRight, Check, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { isNativeApp } from "@/lib/platform";
 import { Browser } from "@capacitor/browser";
 import { cn } from "@/lib/utils";
+import { AppVideoPlayer } from "@/components/app/AppVideoPlayer";
 
 interface Module {
   id: string;
@@ -38,54 +39,13 @@ interface SupplementViewerProps {
   moduleContext?: ModuleContext;
 }
 
-const extractYouTubeId = (url: string): string | null => {
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/,
-    /youtube\.com\/embed\/([^&\s]+)/,
-    /youtube\.com\/shorts\/([^&\s]+)/,
-  ];
-  
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match) return match[1];
-  }
-  return null;
-};
-
-const extractVimeoId = (url: string): string | null => {
-  const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-  return match ? match[1] : null;
-};
-
-const getVideoEmbedUrl = (url: string): string | null => {
-  const youtubeId = extractYouTubeId(url);
-  if (youtubeId) {
-    const params = new URLSearchParams({
-      playsinline: '1',
-      rel: '0',
-      modestbranding: '1',
-    });
-    return `https://www.youtube.com/embed/${youtubeId}?${params.toString()}`;
-  }
-  
-  const vimeoId = extractVimeoId(url);
-  if (vimeoId) {
-    return `https://player.vimeo.com/video/${vimeoId}?playsinline=1`;
-  }
-  
-  return null;
-};
-
-const getVideoPlatformName = (url: string): string => {
-  if (extractYouTubeId(url)) return 'YouTube';
-  if (extractVimeoId(url)) return 'Vimeo';
-  return 'External Site';
-};
+// Video helpers removed — now using AppVideoPlayer
 
 export function SupplementViewer({ isOpen, onClose, supplement, moduleContext }: SupplementViewerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [videoError, setVideoError] = useState(false);
   const [showCompletedFeedback, setShowCompletedFeedback] = useState(false);
+  const [showVideoPlayer, setShowVideoPlayer] = useState(false);
 
   // Reset states when supplement changes
   useEffect(() => {
@@ -153,55 +113,24 @@ export function SupplementViewer({ isOpen, onClose, supplement, moduleContext }:
 
   const renderContent = () => {
     if (supplement.type === 'video') {
-      const embedUrl = getVideoEmbedUrl(supplement.url);
-      const platformName = getVideoPlatformName(supplement.url);
-      
-      if (!embedUrl || videoError) {
-        return (
-          <div className="flex flex-col items-center justify-center py-12 space-y-4 bg-muted rounded-2xl">
-            <Video className="h-16 w-16 text-muted-foreground" />
-            <p className="text-center text-muted-foreground px-4">
-              Tap below to watch the video
-            </p>
-            <Button 
-              size="lg" 
-              onClick={handleOpenExternal}
-              className="gap-2 rounded-full px-6"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Watch on {platformName}
-            </Button>
-          </div>
-        );
-      }
-
       return (
-        <div className="space-y-3">
-          <div className="relative w-full pt-[56.25%] bg-muted rounded-2xl overflow-hidden">
-            {isLoading && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            )}
-            <iframe
-              src={embedUrl}
-              className="absolute top-0 left-0 w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              onLoad={() => setIsLoading(false)}
-              onError={() => setVideoError(true)}
-            />
-          </div>
+        <>
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleOpenExternal}
-            className="w-full text-xs text-muted-foreground hover:text-foreground gap-1"
+            size="lg"
+            onClick={() => setShowVideoPlayer(true)}
+            className="w-full gap-2 rounded-full"
           >
-            <ExternalLink className="h-3 w-3" />
-            Having trouble? Open on {platformName}
+            <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" /></svg>
+            Watch Video
           </Button>
-        </div>
+          <AppVideoPlayer
+            isOpen={showVideoPlayer}
+            onClose={() => setShowVideoPlayer(false)}
+            url={supplement.url}
+            title={supplement.title}
+            description={supplement.description}
+          />
+        </>
       );
     }
 

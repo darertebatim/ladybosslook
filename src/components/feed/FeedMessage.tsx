@@ -1,5 +1,6 @@
 import { memo, useState } from 'react';
 import { FeedPost, useDeleteUserPost } from '@/hooks/useFeed';
+import { AppVideoPlayer } from '@/components/app/AppVideoPlayer';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
 import { Pin, CheckCheck, ExternalLink, Reply, Trash2, Loader2 } from 'lucide-react';
@@ -35,6 +36,7 @@ export const FeedMessage = memo(function FeedMessage({
   const { user } = useAuth();
   const deletePost = useDeleteUserPost();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   
   const isVoiceMessage = post.post_type === 'voice_message' || post.audio_url;
   
@@ -248,62 +250,43 @@ export const FeedMessage = memo(function FeedMessage({
             </div>
           )}
 
-          {/* Video embed */}
+          {/* Video - tap to open player */}
           {post.video_url && (
-            <div className="aspect-video rounded-xl overflow-hidden bg-muted mt-2">
-              {(() => {
-                const videoType = detectVideoType(post.video_url);
-                const embedUrl = getVideoEmbedUrl(post.video_url, videoType);
-                
-                if (videoType === 'youtube' || videoType === 'vimeo') {
+            <>
+              <button
+                onClick={() => setShowVideoPlayer(true)}
+                className="w-full aspect-video rounded-xl overflow-hidden bg-muted mt-2 relative group active:scale-[0.98] transition-transform"
+              >
+                {(() => {
+                  const vType = detectVideoType(post.video_url);
+                  if (vType === 'youtube') {
+                    const id = post.video_url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^&\n?#]+)/)?.[1];
+                    return id ? (
+                      <img src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`} alt="" className="w-full h-full object-cover" />
+                    ) : null;
+                  }
+                  if (vType === 'direct') {
+                    return <video src={post.video_url} className="w-full h-full object-cover" muted preload="metadata" />;
+                  }
                   return (
-                    <iframe
-                      src={embedUrl || post.video_url}
-                      className="w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
+                    <div className="flex items-center justify-center h-full text-muted-foreground">
+                      <ExternalLink className="h-8 w-8" />
+                    </div>
                   );
-                } else if (videoType === 'instagram') {
-                  return (
-                    <a 
-                      href={post.video_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center h-full bg-gradient-to-br from-primary via-primary/80 to-primary/60 text-primary-foreground"
-                    >
-                      <div className="text-center">
-                        <ExternalLink className="h-8 w-8 mx-auto mb-2" />
-                        <span className="font-medium">View on Instagram</span>
-                      </div>
-                    </a>
-                  );
-                } else if (videoType === 'tiktok') {
-                  return (
-                    <a 
-                      href={post.video_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center h-full bg-foreground text-background"
-                    >
-                      <div className="text-center">
-                        <ExternalLink className="h-8 w-8 mx-auto mb-2" />
-                        <span className="font-medium">View on TikTok</span>
-                      </div>
-                    </a>
-                  );
-                } else {
-                  // Direct video (MP4, WebM, etc.)
-                  return (
-                    <video 
-                      src={post.video_url} 
-                      controls 
-                      className="w-full h-full object-contain"
-                    />
-                  );
-                }
-              })()}
-            </div>
+                })()}
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                  <div className="bg-white/90 rounded-full p-3 shadow-lg">
+                    <svg className="h-6 w-6 text-foreground fill-current" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" /></svg>
+                  </div>
+                </div>
+              </button>
+              <AppVideoPlayer
+                isOpen={showVideoPlayer}
+                onClose={() => setShowVideoPlayer(false)}
+                url={post.video_url}
+                title={post.title || undefined}
+              />
+            </>
           )}
 
           {/* Action button */}

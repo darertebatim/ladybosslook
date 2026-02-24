@@ -1,0 +1,221 @@
+import { useState, useRef, useEffect } from 'react';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { X, Loader2, ExternalLink, Gauge } from 'lucide-react';
+import { detectVideoType, extractYouTubeId, extractVimeoId, getVideoPlatformLabel, isVerticalVideo } from '@/lib/videoUtils';
+import { isNativeApp } from '@/lib/platform';
+import { Browser } from '@capacitor/browser';
+
+interface AppVideoPlayerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  url: string;
+  title?: string;
+  description?: string;
+  isVertical?: boolean;
+}
+
+const SPEEDS = [1, 1.5, 2] as const;
+
+export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVertical: isVerticalOverride }: AppVideoPlayerProps) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [speedIndex, setSpeedIndex] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const videoType = detectVideoType(url);
+  const vertical = isVerticalOverride ?? isVerticalVideo(url);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setHasError(false);
+    setSpeedIndex(0);
+  }, [url]);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = SPEEDS[speedIndex];
+    }
+  }, [speedIndex]);
+
+  const handleOpenExternal = async () => {
+    if (isNativeApp()) {
+      await Browser.open({ url });
+    } else {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  const cycleSpeed = () => {
+    setSpeedIndex((prev) => (prev + 1) % SPEEDS.length);
+  };
+
+  const getEmbedUrl = (): string | null => {
+    if (videoType === 'youtube') {
+      const id = extractYouTubeId(url);
+      if (!id) return null;
+      const params = new URLSearchParams({
+        autoplay: '1',
+        playsinline: '1',
+        rel: '0',
+        modestbranding: '1',
+      });
+      return `https://www.youtube.com/embed/${id}?${params.toString()}`;
+    }
+    if (videoType === 'vimeo') {
+      const id = extractVimeoId(url);
+      if (!id) return null;
+      return `https://player.vimeo.com/video/${id}?autoplay=1&playsinline=1`;
+    }
+    return null;
+  };
+
+  const renderPlayer = () => {
+    // Direct video file
+    if (videoType === 'direct') {
+      if (hasError) {
+        return (
+          <div className="flex flex-col items-center justify-center gap-4 py-12">
+            <p className="text-white/60 text-sm">Failed to load video</p>
+            <div className="flex gap-3">
+              <Button variant="outline" size="sm" onClick={() => setHasError(false)} className="rounded-full border-white/20 text-white bg-white/10">
+                Retry
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleOpenExternal} className="rounded-full border-white/20 text-white bg-white/10 gap-1">
+                <ExternalLink className="h-3 w-3" /> Open in Browser
+              </Button>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="relative w-full flex items-center justify-center">
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <Loader2 className="h-8 w-8 animate-spin text-white/70" />
+            </div>
+          )}
+          <video
+            ref={videoRef}
+            src={url}
+            controls
+            playsInline
+            // @ts-ignore webkit attribute
+            webkit-playsinline="true"
+            autoPlay
+            onLoadedData={() => setIsLoading(false)}
+            onError={() => setHasError(true)}
+            className={vertical
+              ? "aspect-[9/16] max-h-[75vh] w-auto mx-auto rounded-xl"
+              : "aspect-video w-full rounded-xl"
+            }
+            style={{ touchAction: 'none' }}
+          />
+          {/* Speed toggle */}
+          {!isLoading && (
+            <button
+              onClick={cycleSpeed}
+              className="absolute top-3 right-3 z-20 flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-black/60 backdrop-blur-sm text-white text-xs font-medium active:scale-95 transition-transform"
+            >
+              <Gauge className="h-3.5 w-3.5" />
+              {SPEEDS[speedIndex]}x
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // YouTube / Vimeo embed
+    if (videoType === 'youtube' || videoType === 'vimeo') {
+      const embedUrl = getEmbedUrl();
+
+      if (!embedUrl || hasError) {
+        return (
+          <div className="flex flex-col items-center justify-center gap-4 py-12">
+            <p className="text-white/60 text-sm">Couldn't load video embed</p>
+            <Button variant="outline" size="sm" onClick={handleOpenExternal} className="rounded-full border-white/20 text-white bg-white/10 gap-1">
+              <ExternalLink className="h-3 w-3" /> Watch on {getVideoPlatformLabel(videoType)}
+            </Button>
+          </div>
+        );
+      }
+
+      return (
+        <div className="relative w-full">
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <Loader2 className="h-8 w-8 animate-spin text-white/70" />
+            </div>
+          )}
+          <div className={vertical
+            ? "aspect-[9/16] max-h-[75vh] w-auto mx-auto rounded-xl overflow-hidden"
+            : "aspect-video w-full rounded-xl overflow-hidden"
+          }>
+            <iframe
+              src={embedUrl}
+              title={title || 'Video'}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+              onLoad={() => setIsLoading(false)}
+              onError={() => setHasError(true)}
+            />
+          </div>
+        </div>
+      );
+    }
+
+    // Instagram / TikTok - external only
+    if (videoType === 'instagram' || videoType === 'tiktok') {
+      return (
+        <div className="flex flex-col items-center justify-center gap-4 py-16">
+          <p className="text-white/60 text-sm">This video is hosted externally</p>
+          <Button variant="outline" size="sm" onClick={handleOpenExternal} className="rounded-full border-white/20 text-white bg-white/10 gap-1">
+            <ExternalLink className="h-3 w-3" /> Watch on {getVideoPlatformLabel(videoType)}
+          </Button>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent
+        side="bottom"
+        className="h-[100dvh] rounded-none p-0 bg-black border-none flex flex-col"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 left-3 z-30 p-2 rounded-full bg-white/10 backdrop-blur-sm active:scale-95 transition-transform"
+          style={{ marginTop: 'env(safe-area-inset-top)' }}
+          aria-label="Close video player"
+        >
+          <X className="h-5 w-5 text-white" />
+        </button>
+
+        {/* Video area - centered */}
+        <div className="flex-1 flex items-center justify-center px-4 overflow-hidden overscroll-contain">
+          {renderPlayer()}
+        </div>
+
+        {/* Title bar */}
+        {(title || description) && (
+          <div className="px-4 pb-4 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
+            {title && <h3 className="text-white font-semibold text-base">{title}</h3>}
+            {description && <p className="text-white/60 text-sm mt-0.5 line-clamp-2">{description}</p>}
+          </div>
+        )}
+
+        {/* Bottom safe area fallback if no title */}
+        {!title && !description && (
+          <div style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} />
+        )}
+      </SheetContent>
+    </Sheet>
+  );
+}
