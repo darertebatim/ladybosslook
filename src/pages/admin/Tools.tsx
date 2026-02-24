@@ -33,6 +33,10 @@ export default function Tools() {
             <Wind className="h-4 w-4" />
             Breathing
           </TabsTrigger>
+          <TabsTrigger value="reflections" className="flex items-center gap-2">
+            <PenLine className="h-4 w-4" />
+            Reflections
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="routines">
