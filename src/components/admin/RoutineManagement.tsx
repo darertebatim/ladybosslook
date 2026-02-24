@@ -378,12 +378,11 @@ function CategoriesManager() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-                <Switch
-                  checked={formData.is_active}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
-                />
-                <Label>Active</Label>
-              </div>
+              <Switch
+                checked={formData.is_active}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
+              />
+              <Label>Active</Label>
             </div>
           </div>
           <DialogFooter>
