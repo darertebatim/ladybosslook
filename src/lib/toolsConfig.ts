@@ -165,13 +165,14 @@ export const comingSoonTools: ToolConfig[] = [
     comingSoon: true,
   },
   {
-    id: 'reflections',
+    id: 'reflections-coming',
     name: 'Reflections',
     icon: 'PenLine',
     bgColor: 'bg-[#F1F5F9]',
     iconColor: 'text-slate-600',
     route: '/app/reflections',
     description: 'Guided prompts',
+    hidden: true,
   },
   {
     id: 'tests',
