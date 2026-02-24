@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import { Loader2, Trash2, Plus, Pencil, List, Eye, EyeOff, Upload, X, Sparkles, RefreshCw, Wand2 } from "lucide-react";
 import { VideoTracksManager } from "./VideoTracksManager";
 import { usePrograms } from "@/hooks/usePrograms";
+import { useMediaCategories } from "@/hooks/useMediaCategories";
+import { CategorySelect } from "./CategorySelect";
 import { Switch } from "@/components/ui/switch";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -103,20 +105,7 @@ const PlaylistForm = ({ formData, setFormData, onSubmit, onCancel, isSubmitting,
       </div>
     </div>
 
-    <div>
-      <Label>Category *</Label>
-      <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
-        <SelectTrigger><SelectValue /></SelectTrigger>
-        <SelectContent>
-          <SelectItem value="tutorial">📖 Tutorial</SelectItem>
-          <SelectItem value="course">🎓 Course</SelectItem>
-          <SelectItem value="podcast">🎙️ Podcast</SelectItem>
-          <SelectItem value="workshop">🔧 Workshop</SelectItem>
-          <SelectItem value="motivation">🔥 Motivation</SelectItem>
-          <SelectItem value="vlog">📹 Vlog</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+    <CategorySelect value={formData.category} onChange={(v) => setFormData({ ...formData, category: v })} type="video" />
 
     <div>
       <Label>Display Mode *</Label>

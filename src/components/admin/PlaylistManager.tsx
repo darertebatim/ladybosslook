@@ -18,6 +18,7 @@ import { Loader2, Trash2, Plus, Pencil, List, Layers, Eye, EyeOff, Upload, X, Sp
 import { PlaylistTracksManager } from "./PlaylistTracksManager";
 import { PlaylistModulesManager } from "./PlaylistModulesManager";
 import { usePrograms } from "@/hooks/usePrograms";
+import { CategorySelect } from "./CategorySelect";
 import { Switch } from "@/components/ui/switch";
 import {
   Table,
@@ -193,28 +194,7 @@ const PlaylistForm = ({
       </div>
     </div>
 
-    <div>
-      <Label htmlFor="playlist_category">Category *</Label>
-      <Select
-        value={formData.category}
-        onValueChange={(value: 'audiobook' | 'course' | 'podcast' | 'meditate' | 'workout' | 'soundscape' | 'affirmations') => 
-          setFormData({ ...formData, category: value })
-        }
-      >
-        <SelectTrigger>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="audiobook">📚 Audiobook</SelectItem>
-          <SelectItem value="course">📖 Course</SelectItem>
-          <SelectItem value="podcast">🎙️ Podcast</SelectItem>
-          <SelectItem value="meditate">🧘 Meditate</SelectItem>
-          <SelectItem value="workout">💪 Workout</SelectItem>
-          <SelectItem value="soundscape">🌊 Soundscape</SelectItem>
-          <SelectItem value="affirmations">✨ Affirmations</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+    <CategorySelect value={formData.category} onChange={(v) => setFormData({ ...formData, category: v as any })} type="audio" />
 
     <div>
       <Label htmlFor="playlist_display_mode">Display Mode *</Label>

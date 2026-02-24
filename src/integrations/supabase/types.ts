@@ -1459,6 +1459,39 @@ export type Database = {
           },
         ]
       }
+      media_categories: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          is_active: boolean
+          label: string
+          slug: string
+          sort_order: number
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          is_active?: boolean
+          label: string
+          slug: string
+          sort_order?: number
+          type: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          slug?: string
+          sort_order?: number
+          type?: string
+        }
+        Relationships: []
+      }
       module_progress: {
         Row: {
           created_at: string | null
