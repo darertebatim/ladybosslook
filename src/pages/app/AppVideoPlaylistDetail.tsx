@@ -12,6 +12,9 @@ import { AppVideoPlayer } from "@/components/app/AppVideoPlayer";
 import { useEnrollments } from "@/hooks/useAppData";
 import { useSubscription } from "@/hooks/useSubscription";
 import { cn } from "@/lib/utils";
+import { AddedToRoutineButton } from "@/components/app/AddedToRoutineButton";
+import { useExistingVideoPlaylistTask, useQuickAddVideoPlaylistTask } from "@/hooks/useVideoRoutine";
+import { haptic } from "@/lib/haptics";
 
 export default function AppVideoPlaylistDetail() {
   const { playlistId } = useParams();
@@ -57,6 +60,15 @@ export default function AppVideoPlaylistDetail() {
 
   const { data: enrollments } = useEnrollments();
   const { hasAccessToProgram } = useSubscription();
+
+  // Add to rituals
+  const { data: existingTask } = useExistingVideoPlaylistTask(playlistId);
+  const addPlaylistTask = useQuickAddVideoPlaylistTask();
+  const handleAddToRituals = useCallback(() => {
+    if (!playlist) return;
+    haptic.medium();
+    addPlaylistTask.mutate({ id: playlist.id, name: playlist.name, cover_image_url: playlist.cover_image_url });
+  }, [playlist, addPlaylistTask]);
 
   const hasAccess = playlist?.is_free
     ? true
@@ -113,10 +125,16 @@ export default function AppVideoPlaylistDetail() {
     <div className="flex flex-col h-full bg-background overflow-hidden">
       {/* Fixed header with back button */}
       <div
-        className="fixed top-0 left-0 right-0 z-50 flex items-center px-4 h-12"
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 h-12"
         style={{ paddingTop: 'env(safe-area-inset-top)', height: 'calc(48px + env(safe-area-inset-top))' }}
       >
         <BackButton />
+        <AddedToRoutineButton
+          isAdded={!!existingTask}
+          onAddClick={handleAddToRituals}
+          isLoading={addPlaylistTask.isPending}
+          iconOnly
+        />
       </div>
 
       {/* Spacer for fixed header */}
