@@ -329,26 +329,23 @@ export function PromoBanner({
         break;
       case 'tasks':
         if (activeBanner.destination_id) {
-          // Navigate to task creation with pre-selected template
-          navigate(`/app/tasks/create?template=${activeBanner.destination_id}`);
+          navigate(`/app/home/new?template=${activeBanner.destination_id}`);
+        } else {
+          navigate('/app/home');
         }
         break;
       case 'routines_hub':
         if (activeBanner.destination_id) {
-          navigate(`/app/rituals/bank/${activeBanner.destination_id}`);
+          navigate(`/app/rituals/${activeBanner.destination_id}`);
         } else {
           navigate('/app/rituals');
         }
         break;
       case 'tasks_bank':
-        navigate('/app/tasks/bank');
+        navigate('/app/home');
         break;
       case 'breathe_exercise':
-        if (activeBanner.destination_id) {
-          navigate(`/app/breathe/${activeBanner.destination_id}`);
-        } else {
-          navigate('/app/breathe');
-        }
+        navigate('/app/breathe');
         break;
       case 'emotion':
         navigate('/app/emotion');
