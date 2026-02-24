@@ -1,11 +1,10 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, Heart, Loader2, Sparkles, ListTodo } from 'lucide-react';
+import { Search, Heart, Loader2, Sparkles } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { RoutineBankCard } from '@/components/app/RoutineBankCard';
-import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import {
   useRoutineBankCategories,
@@ -15,8 +14,6 @@ import {
   useAddRoutineFromBank,
   RoutineBankTask,
 } from '@/hooks/useRoutinesBank';
-import { useTaskTemplates, useCreateTask, TaskTemplate, TaskColor } from '@/hooks/useTaskPlanner';
-import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
