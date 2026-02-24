@@ -13,11 +13,12 @@ import {
   Headphones,
   Smile,
   Timer,
-  Scale
+  Scale,
+  Brain
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
-export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight';
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection';
 
 export interface ProLinkConfig {
   value: ProLinkType;
