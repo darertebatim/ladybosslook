@@ -82,26 +82,30 @@ export default function AppReflections() {
       {featured.length > 0 && (
         <div className="px-4 mt-4">
           <h2 className="text-sm font-semibold text-muted-foreground mb-2">For you</h2>
-          <div className="flex gap-3 overflow-x-auto pb-2">
+          <div className="flex flex-col gap-3">
             {featured.map((r) => (
               <button
                 key={r.id}
                 onClick={() => navigate(`/app/reflections/${r.id}`)}
-                className="w-full rounded-2xl overflow-hidden text-left transition-transform active:scale-[0.97] relative min-h-[140px] flex items-end"
+                className="w-full rounded-2xl overflow-hidden text-left transition-transform active:scale-[0.97] relative"
                 style={{ backgroundColor: '#f5d0e0' }}
               >
-                <div className="p-4 pr-28 z-10">
-                  <p className="font-bold text-base leading-tight">{r.title}</p>
-                  {r.subtitle && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{r.subtitle}</p>}
+                <div className="flex items-center">
+                  <div className="flex-1 p-4">
+                    <p className="font-bold text-base leading-tight text-foreground">{r.title}</p>
+                    {r.subtitle && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{r.subtitle}</p>}
+                  </div>
+                  {r.cover_image_url && (
+                    <div className="w-28 h-28 shrink-0">
+                      <img
+                        src={r.cover_image_url}
+                        alt=""
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
                 </div>
-                {r.cover_image_url && (
-                  <img
-                    src={r.cover_image_url}
-                    alt=""
-                    className="absolute right-0 bottom-0 h-full w-32 object-cover object-center"
-                    loading="lazy"
-                  />
-                )}
               </button>
             ))}
           </div>
