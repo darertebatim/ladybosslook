@@ -39,7 +39,7 @@ export function ReflectionsManager() {
 
   const openCreate = () => {
     setIsNew(true);
-    setEditing({ title: '', subtitle: '', cover_image_url: '', is_active: true, is_featured: false, sort_order: 0 });
+    setEditing({ title: '', subtitle: '', cover_image_url: '', is_active: true, is_featured: false, is_free: true, sort_order: 0 });
   };
 
   const openEdit = (r: Reflection) => {
