@@ -1,0 +1,1 @@
+ALTER TABLE public.routine_categories ADD COLUMN task_display_order integer NOT NULL DEFAULT 0;

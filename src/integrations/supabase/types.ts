@@ -2525,6 +2525,7 @@ export type Database = {
           is_active: boolean
           name: string
           slug: string
+          task_display_order: number
         }
         Insert: {
           color?: string
@@ -2535,6 +2536,7 @@ export type Database = {
           is_active?: boolean
           name: string
           slug: string
+          task_display_order?: number
         }
         Update: {
           color?: string
@@ -2545,6 +2547,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           slug?: string
+          task_display_order?: number
         }
         Relationships: []
       }
