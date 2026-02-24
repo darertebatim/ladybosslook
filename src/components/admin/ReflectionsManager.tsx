@@ -113,6 +113,23 @@ export function ReflectionsManager() {
                 onChange={(url) => setEditing({ ...editing, cover_image_url: url })}
                 label="Cover Image (square)"
               />
+              <div>
+                <Label>Cover Color</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="color"
+                    value={editing.cover_color || '#ffffff'}
+                    onChange={(e) => setEditing({ ...editing, cover_color: e.target.value })}
+                    className="w-10 h-10 rounded border cursor-pointer"
+                  />
+                  <Input
+                    value={editing.cover_color || '#ffffff'}
+                    onChange={(e) => setEditing({ ...editing, cover_color: e.target.value })}
+                    className="w-32"
+                    placeholder="#ffffff"
+                  />
+                </div>
+              </div>
               <div className="flex gap-6 flex-wrap">
                 <div className="flex items-center gap-2">
                   <Switch checked={editing.is_active ?? true} onCheckedChange={(v) => setEditing({ ...editing, is_active: v })} />
