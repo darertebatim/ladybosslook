@@ -40,7 +40,21 @@ export const TaskQuickStartSheet = ({
   const [showIdeas, setShowIdeas] = useState(false);
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
   const { data: templates = [] } = useTaskTemplates();
-  const { data: categories = [] } = useRoutineBankCategories();
+  const { data: rawCategories = [] } = useRoutineBankCategories();
+  
+  // Sort categories by task_display_order (0 = end of line)
+  const categories = useMemo(() => {
+    return [...rawCategories].sort((a, b) => {
+      if (a.slug === 'pro') return 1;
+      if (b.slug === 'pro') return -1;
+      const aOrder = a.task_display_order || 0;
+      const bOrder = b.task_display_order || 0;
+      if (aOrder === 0 && bOrder === 0) return 0;
+      if (aOrder === 0) return 1;
+      if (bOrder === 0) return -1;
+      return aOrder - bOrder;
+    });
+  }, [rawCategories]);
 
   const handleTourReady = useCallback((tourStart: () => void) => {
     setStartTour(() => tourStart);
