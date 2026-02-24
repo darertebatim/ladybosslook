@@ -220,6 +220,7 @@ function CategoriesManager() {
       icon: cat.icon,
       color: cat.color,
       display_order: cat.display_order,
+      task_display_order: cat.task_display_order ?? 0,
       is_active: cat.is_active,
     });
     setIsDialogOpen(true);
