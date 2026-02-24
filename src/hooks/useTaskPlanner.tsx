@@ -35,7 +35,7 @@ export interface UserTask {
   updated_at: string;
   linked_playlist_id: string | null;
   // Pro Task fields
-  pro_link_type: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | null;
+  pro_link_type: 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | null;
   pro_link_value: string | null;
   // Goal tracking fields
   goal_enabled: boolean;
