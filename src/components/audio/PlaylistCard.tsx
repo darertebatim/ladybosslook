@@ -169,12 +169,6 @@ export const PlaylistCard = memo(function PlaylistCard({
             </div>
           )}
 
-          {/* Subscription lock icon */}
-          {requiresSubscription && !isSubscribed && (
-            <div className="absolute bottom-8 right-2 p-1.5 rounded-full bg-amber-100 z-10">
-              <FluentEmoji emoji="🔒" size={18} />
-            </div>
-          )}
         </div>
 
         {/* Enroll CTA for locked playlists */}
