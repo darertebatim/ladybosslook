@@ -22,7 +22,16 @@ export default function AppActions() {
   const [previewSheetOpen, setPreviewSheetOpen] = useState(false);
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
 
-  const { data: categories } = useRoutineBankCategories();
+  const { data: rawCategories } = useRoutineBankCategories();
+  // Sort categories by task_display_order for the actions page
+  const categories = useMemo(() => {
+    if (!rawCategories) return rawCategories;
+    return [...rawCategories].sort((a, b) => {
+      if (a.slug === 'pro') return 1;
+      if (b.slug === 'pro') return -1;
+      return (a.task_display_order ?? 0) - (b.task_display_order ?? 0);
+    });
+  }, [rawCategories]);
   const { data: taskTemplates, isLoading: templatesLoading } = useTaskTemplates();
   const { user } = useAuth();
   const queryClient = useQueryClient();
