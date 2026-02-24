@@ -206,7 +206,12 @@ function PagesEditor({ reflectionId }: { reflectionId: string }) {
             placeholder={page.type === 'question' ? 'Enter the question…' : 'Enter the message text…'}
             className="min-h-[60px]"
           />
-        </div>
+          <Textarea
+            value={page.description || ''}
+            onChange={(e) => updatePage(idx, 'description', e.target.value)}
+            placeholder="Description (optional)…"
+            className="min-h-[40px] text-sm"
+          />
       ))}
 
       {pages.length > 0 && (
