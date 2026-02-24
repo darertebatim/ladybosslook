@@ -109,7 +109,7 @@ export default function AppReflectionFlow() {
       <div className="flex-1 flex flex-col px-6 py-6 overflow-y-auto overscroll-contain">
         <p className="text-xl font-bold leading-snug">{page?.content}</p>
         {page?.description && (
-          <p className="mt-3 text-base text-muted-foreground leading-relaxed">{page.description}</p>
+          <p className="mt-4 text-sm text-foreground leading-relaxed whitespace-pre-line">{page.description}</p>
         )}
 
         {page?.type === 'question' && (
