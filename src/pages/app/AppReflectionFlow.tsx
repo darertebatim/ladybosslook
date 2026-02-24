@@ -107,7 +107,7 @@ export default function AppReflectionFlow() {
 
       {/* Content */}
       <div className="flex-1 flex flex-col px-6 py-6 overflow-y-auto overscroll-contain">
-        <p className="text-xl font-medium leading-snug">{page?.content}</p>
+        <p className="text-2xl font-medium leading-snug">{page?.content}</p>
 
         {page?.type === 'question' && (
           <textarea
