@@ -143,6 +143,7 @@ function CategoriesManager() {
     icon: '📁',
     color: 'yellow',
     display_order: 0,
+    task_display_order: 0,
     is_active: true,
   });
 
