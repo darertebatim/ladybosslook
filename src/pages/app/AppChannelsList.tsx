@@ -83,6 +83,13 @@ export default function AppChannelsList() {
   const { unreadCount: coachUnreadCount } = useUnreadChat(hasCoachAccess ? 'coach' : 'support');
   const { data: coachSummary } = useSupportChatSummary(hasCoachAccess ? 'coach' : 'support');
 
+  // Add to rituals state
+  const { data: existingTask } = useExistingProTask('channel');
+  const addRoutinePlan = useAddRoutinePlan();
+  const [showRoutineSheet, setShowRoutineSheet] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
+  const isAddedToRituals = !!existingTask || justAdded;
+
   // Subscribe to real-time updates for all channels
   useFeedRealtime();
 
