@@ -361,14 +361,23 @@ function CategoriesManager() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Display Order</Label>
+                <Label>Ritual Order</Label>
                 <Input
                   type="number"
                   value={formData.display_order}
                   onChange={(e) => setFormData(prev => ({ ...prev, display_order: parseInt(e.target.value) || 0 }))}
                 />
               </div>
-              <div className="flex items-center gap-2 pt-6">
+              <div>
+                <Label>Action Order</Label>
+                <Input
+                  type="number"
+                  value={formData.task_display_order}
+                  onChange={(e) => setFormData(prev => ({ ...prev, task_display_order: parseInt(e.target.value) || 0 }))}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
                 <Switch
                   checked={formData.is_active}
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
