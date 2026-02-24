@@ -1,0 +1,1 @@
+ALTER TABLE public.reflections ALTER COLUMN cover_color SET DEFAULT '#ffffff';
