@@ -98,7 +98,12 @@ export function useRoutineBankCategories() {
       const sorted = (data || []).sort((a, b) => {
         if (a.slug === 'pro') return 1;
         if (b.slug === 'pro') return -1;
-        return (a.display_order || 0) - (b.display_order || 0);
+        const aOrder = a.display_order || 0;
+        const bOrder = b.display_order || 0;
+        if (aOrder === 0 && bOrder === 0) return 0;
+        if (aOrder === 0) return 1;
+        if (bOrder === 0) return -1;
+        return aOrder - bOrder;
       });
 
       return sorted.map(cat => ({
