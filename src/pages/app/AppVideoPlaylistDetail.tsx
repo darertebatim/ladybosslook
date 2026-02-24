@@ -76,7 +76,6 @@ export default function AppVideoPlaylistDetail() {
   const completedCount = tracks?.filter(t => getProgress(t.video_content?.id || '').completed).length || 0;
   const overallProgress = totalTracks > 0 ? (completedCount / totalTracks) * 100 : 0;
 
-  // Build playlist items for auto-play
   const playlistItems = tracks?.map(t => ({
     url: t.video_content?.file_url || '',
     title: t.video_content?.title,
@@ -100,95 +99,104 @@ export default function AppVideoPlaylistDetail() {
 
   if (plLoading || trLoading) {
     return (
-      <div className="flex flex-col h-full bg-background">
+      <div className="flex flex-col h-full bg-background overflow-hidden">
         <div className="p-4 space-y-4" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}>
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-32 w-full rounded-xl" />
+          <Skeleton className="aspect-[3/4] w-full rounded-xl" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full bg-background overflow-y-auto overscroll-contain">
-      {/* Header */}
-      <div className="relative" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-        {playlist?.cover_image_url ? (
-          <div className="relative h-48 overflow-hidden">
-            <img src={playlist.cover_image_url} alt="" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-          </div>
-        ) : (
-          <div className="h-32 bg-gradient-to-br from-primary/20 to-primary/5" />
-        )}
-        <div className="absolute top-2 left-2" style={{ marginTop: 'env(safe-area-inset-top)' }}>
-          <BackButton />
-        </div>
+    <div className="flex flex-col h-full bg-background overflow-hidden">
+      {/* Fixed header with back button */}
+      <div
+        className="fixed top-0 left-0 right-0 z-50 flex items-center px-4 h-12"
+        style={{ paddingTop: 'env(safe-area-inset-top)', height: 'calc(48px + env(safe-area-inset-top))' }}
+      >
+        <BackButton />
       </div>
 
-      <div className="px-4 -mt-8 relative z-10 space-y-4 pb-safe">
-        <div>
-          <h1 className="text-2xl font-bold">{playlist?.name}</h1>
-          {playlist?.description && <p className="text-sm text-muted-foreground mt-1">{playlist.description}</p>}
-        </div>
+      {/* Spacer for fixed header */}
+      <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
-        {/* Progress */}
-        <div className="space-y-2">
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{completedCount} of {totalTracks} completed</span>
-            <span>{Math.round(overallProgress)}%</span>
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto overscroll-contain">
+        {/* Cover - portrait aspect for vertical video content */}
+        {playlist?.cover_image_url ? (
+          <div className="relative aspect-[3/4] w-full overflow-hidden mx-4 rounded-2xl" style={{ maxHeight: '50vh' }}>
+            <img src={playlist.cover_image_url} alt="" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
           </div>
-          <Progress value={overallProgress} className="h-2" />
-        </div>
+        ) : (
+          <div className="mx-4 aspect-[3/4] rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5" style={{ maxHeight: '40vh' }} />
+        )}
 
-        {/* Video List */}
-        <div className="space-y-2 pb-4">
-          {tracks?.map((track, i) => {
-            const vc = track.video_content;
-            if (!vc) return null;
-            const { pct, completed } = getProgress(vc.id);
-            const locked = !hasAccess;
+        <div className="px-4 mt-4 space-y-4 pb-safe">
+          <div>
+            <h1 className="text-2xl font-bold">{playlist?.name}</h1>
+            {playlist?.description && <p className="text-sm text-muted-foreground mt-1">{playlist.description}</p>}
+          </div>
 
-            return (
-              <button
-                key={track.id}
-                onClick={() => handlePlay(i)}
-                disabled={locked}
-                className={cn(
-                  "w-full flex items-center gap-3 p-3 rounded-xl border transition-colors text-left",
-                  locked ? "opacity-50 cursor-not-allowed" : "hover:bg-muted/50 active:scale-[0.99]",
-                  completed && "bg-primary/5 border-primary/20"
-                )}
-              >
-                {/* Thumbnail / Index */}
-                <div className="relative w-16 h-12 rounded-lg overflow-hidden bg-muted flex-shrink-0 flex items-center justify-center">
-                  {vc.thumbnail_url ? (
-                    <img src={vc.thumbnail_url} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-lg font-bold text-muted-foreground">{i + 1}</span>
+          {/* Progress */}
+          <div className="space-y-2">
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>{completedCount} of {totalTracks} completed</span>
+              <span>{Math.round(overallProgress)}%</span>
+            </div>
+            <Progress value={overallProgress} className="h-2" />
+          </div>
+
+          {/* Video List - portrait thumbnails */}
+          <div className="space-y-2 pb-4">
+            {tracks?.map((track, i) => {
+              const vc = track.video_content;
+              if (!vc) return null;
+              const { pct, completed } = getProgress(vc.id);
+              const locked = !hasAccess;
+
+              return (
+                <button
+                  key={track.id}
+                  onClick={() => handlePlay(i)}
+                  disabled={locked}
+                  className={cn(
+                    "w-full flex items-center gap-3 p-3 rounded-xl border transition-colors text-left",
+                    locked ? "opacity-50 cursor-not-allowed" : "hover:bg-muted/50 active:scale-[0.99]",
+                    completed && "bg-primary/5 border-primary/20"
                   )}
-                  {locked && <div className="absolute inset-0 bg-background/60 flex items-center justify-center"><Lock className="h-4 w-4" /></div>}
-                  {!locked && !completed && <div className="absolute inset-0 bg-black/30 flex items-center justify-center"><Play className="h-5 w-5 text-white fill-white" /></div>}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate">{vc.title}</p>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                    {vc.duration_seconds > 0 && <span>{formatDuration(vc.duration_seconds)}</span>}
-                    <Badge variant="outline" className="text-[9px] px-1 py-0">{vc.video_type}</Badge>
+                >
+                  {/* Portrait thumbnail */}
+                  <div className="relative w-14 h-[4.5rem] rounded-lg overflow-hidden bg-muted flex-shrink-0 flex items-center justify-center">
+                    {vc.thumbnail_url ? (
+                      <img src={vc.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-lg font-bold text-muted-foreground">{i + 1}</span>
+                    )}
+                    {locked && <div className="absolute inset-0 bg-background/60 flex items-center justify-center"><Lock className="h-4 w-4" /></div>}
+                    {!locked && !completed && <div className="absolute inset-0 bg-black/30 flex items-center justify-center"><Play className="h-4 w-4 text-white fill-white" /></div>}
                   </div>
-                  {pct > 0 && !completed && (
-                    <Progress value={pct} className="h-1 mt-1.5" />
-                  )}
-                </div>
 
-                <div className="flex-shrink-0">
-                  {completed ? <CheckCircle2 className="h-5 w-5 text-primary" /> : <Circle className="h-5 w-5 text-muted-foreground/30" />}
-                </div>
-              </button>
-            );
-          })}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm truncate">{vc.title}</p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                      {vc.duration_seconds > 0 && <span>{formatDuration(vc.duration_seconds)}</span>}
+                      <Badge variant="outline" className="text-[9px] px-1 py-0">{vc.video_type}</Badge>
+                    </div>
+                    {pct > 0 && !completed && (
+                      <Progress value={pct} className="h-1 mt-1.5" />
+                    )}
+                  </div>
+
+                  <div className="flex-shrink-0">
+                    {completed ? <CheckCircle2 className="h-5 w-5 text-primary" /> : <Circle className="h-5 w-5 text-muted-foreground/30" />}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 

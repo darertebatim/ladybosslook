@@ -66,11 +66,8 @@ export const VideoPlaylistCard = memo(function VideoPlaylistCard({
       )}
 
       <button className="overflow-hidden cursor-pointer transition-all active:scale-[0.98] w-full text-left rounded-2xl shadow-lg border border-border/50" onClick={handleClick}>
-        <div className="px-3 py-3 rounded-t-2xl h-[3.75rem] flex items-start bg-muted/50">
-          <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">{name}</h3>
-        </div>
-
-        <div className="relative aspect-square w-full overflow-hidden">
+        {/* Portrait cover image (4:5 aspect ratio for vertical video) */}
+        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-t-2xl">
           {coverImageUrl ? (
             <CachedImage src={coverImageUrl} alt={name} loading="lazy" className="w-full h-full object-cover" />
           ) : (
@@ -85,7 +82,9 @@ export const VideoPlaylistCard = memo(function VideoPlaylistCard({
             </div>
           )}
 
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2.5 pb-2 pt-6">
+          {/* Bottom gradient overlay with info */}
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-2.5 pb-2.5 pt-10">
+            <h3 className="font-bold text-sm text-white line-clamp-2 leading-snug mb-1.5">{name}</h3>
             <div className="flex items-center justify-between text-[11px] text-white/90">
               <div className="flex items-center gap-2">
                 <span className="flex items-center gap-0.5"><Video className="h-3 w-3" />{trackCount}</span>
@@ -102,6 +101,7 @@ export const VideoPlaylistCard = memo(function VideoPlaylistCard({
             </div>
           </div>
 
+          {/* Progress bar */}
           {(!isLocked || isFree) && progress > 0 && (
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20">
               <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progress}%` }} />
