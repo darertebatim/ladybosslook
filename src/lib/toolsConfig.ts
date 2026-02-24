@@ -163,8 +163,6 @@ export const comingSoonTools: ToolConfig[] = [
     iconColor: 'text-slate-600',
     route: '/app/reflections',
     description: 'Guided prompts',
-    comingSoon: true,
-    hidden: true,
   },
   {
     id: 'tests',

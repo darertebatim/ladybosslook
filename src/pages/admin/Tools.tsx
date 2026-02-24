@@ -4,7 +4,8 @@ import { BreathingExercisesManager } from '@/components/admin/BreathingExercises
 import { RoutineManagement } from '@/components/admin/RoutineManagement';
 import TasksBank from '@/pages/admin/TasksBank';
 import RoutinesBank from '@/components/admin/RoutinesBank';
-import { Wind, Sparkles, ListTodo, Layers } from 'lucide-react';
+import { ReflectionsManager } from '@/components/admin/ReflectionsManager';
+import { Wind, Sparkles, ListTodo, Layers, PenLine } from 'lucide-react';
 
 export default function Tools() {
   return (
@@ -31,6 +32,10 @@ export default function Tools() {
           <TabsTrigger value="breathing" className="flex items-center gap-2">
             <Wind className="h-4 w-4" />
             Breathing
+          </TabsTrigger>
+          <TabsTrigger value="reflections" className="flex items-center gap-2">
+            <PenLine className="h-4 w-4" />
+            Reflections
           </TabsTrigger>
         </TabsList>
 
@@ -59,6 +64,14 @@ export default function Tools() {
             </CardHeader>
             <CardContent>
               <BreathingExercisesManager />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="reflections">
+          <Card>
+            <CardContent className="pt-6">
+              <ReflectionsManager />
             </CardContent>
           </Card>
         </TabsContent>

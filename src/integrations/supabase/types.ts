@@ -2435,6 +2435,77 @@ export type Database = {
         }
         Relationships: []
       }
+      reflection_pages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          page_order: number
+          reflection_id: string
+          type: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          page_order?: number
+          reflection_id: string
+          type?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          page_order?: number
+          reflection_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reflection_pages_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "reflections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reflections: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          is_featured: boolean
+          sort_order: number
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          sort_order?: number
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       routine_categories: {
         Row: {
           color: string
@@ -3334,6 +3405,51 @@ export type Database = {
           weekly_summary?: boolean
         }
         Relationships: []
+      }
+      user_reflection_responses: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          page_id: string
+          reflection_id: string
+          response_text: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          page_id: string
+          reflection_id: string
+          response_text?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          page_id?: string
+          reflection_id?: string
+          response_text?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_reflection_responses_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "reflection_pages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_reflection_responses_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "reflections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
