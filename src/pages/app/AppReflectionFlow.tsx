@@ -1,0 +1,123 @@
+import { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useReflectionPages, useSaveReflectionResponse } from '@/hooks/useReflections';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+
+export default function AppReflectionFlow() {
+  const { reflectionId } = useParams<{ reflectionId: string }>();
+  const navigate = useNavigate();
+  const { data: pages, isLoading } = useReflectionPages(reflectionId);
+  const saveResponse = useSaveReflectionResponse();
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const totalPages = pages?.length || 0;
+  const page = pages?.[currentIndex];
+  const isLast = currentIndex === totalPages - 1;
+  const progress = totalPages > 0 ? ((currentIndex + 1) / totalPages) * 100 : 0;
+
+  // Auto-focus textarea on question pages
+  useEffect(() => {
+    if (page?.type === 'question') {
+      setTimeout(() => textareaRef.current?.focus(), 200);
+    }
+  }, [currentIndex, page?.type]);
+
+  const handleNext = async () => {
+    if (!page || !reflectionId) return;
+
+    // Save response for question pages
+    if (page.type === 'question') {
+      await saveResponse.mutateAsync({
+        reflectionId,
+        pageId: page.id,
+        responseText: answers[page.id] || '',
+        isCompleted: isLast,
+      });
+    } else if (isLast) {
+      // Save a marker for the last page even if it's a message
+      await saveResponse.mutateAsync({
+        reflectionId,
+        pageId: page.id,
+        isCompleted: true,
+      });
+    }
+
+    if (isLast) {
+      navigate(-1);
+    } else {
+      setCurrentIndex((i) => i + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex((i) => i - 1);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Skeleton className="h-8 w-8 rounded-full" />
+      </div>
+    );
+  }
+
+  if (!pages || pages.length === 0) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+        <p className="text-muted-foreground">This reflection has no pages yet.</p>
+        <button onClick={() => navigate(-1)} className="mt-4 text-primary underline">Go back</button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Top bar: back + progress */}
+      <div className="px-4 pt-4 pb-2 flex items-center gap-3">
+        <button onClick={handleBack} className="shrink-0">
+          <ArrowLeft className="h-6 w-6" />
+        </button>
+        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+          <div
+            className="h-full bg-foreground rounded-full transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 flex flex-col justify-center px-6 py-8">
+        <p className="text-2xl font-bold leading-snug">{page?.content}</p>
+
+        {page?.type === 'question' && (
+          <textarea
+            ref={textareaRef}
+            value={answers[page.id] || ''}
+            onChange={(e) => setAnswers((prev) => ({ ...prev, [page.id]: e.target.value }))}
+            placeholder="Type your answer…"
+            className="mt-6 w-full bg-transparent border-0 border-b-2 border-muted-foreground/20 focus:border-primary outline-none resize-none text-base min-h-[120px] placeholder:text-muted-foreground/50 transition-colors"
+          />
+        )}
+      </div>
+
+      {/* FAB */}
+      <div className="p-6 flex justify-end">
+        <button
+          onClick={handleNext}
+          disabled={saveResponse.isPending}
+          className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg active:scale-95 transition-transform disabled:opacity-50"
+        >
+          {isLast ? <Check className="h-6 w-6" /> : <ArrowRight className="h-6 w-6" />}
+        </button>
+      </div>
+    </div>
+  );
+}
