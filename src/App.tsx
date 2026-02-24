@@ -47,6 +47,7 @@ const AppJournalEntry = lazy(() => import("@/pages/app/AppJournalEntry"));
 const AppTaskCreate = lazy(() => import("@/pages/app/AppTaskCreate"));
 const AppInspire = lazy(() => import("@/pages/app/AppInspire"));
 const AppInspireDetail = lazy(() => import("@/pages/app/AppInspireDetail"));
+const AppActions = lazy(() => import("@/pages/app/AppActions"));
 const AppBreathe = lazy(() => import("@/pages/app/AppBreathe"));
 const AppWater = lazy(() => import("@/pages/app/AppWater"));
 const AppPeriod = lazy(() => import("@/pages/app/AppPeriod"));
