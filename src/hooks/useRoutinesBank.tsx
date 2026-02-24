@@ -78,6 +78,7 @@ export interface RoutineBankCategory {
   color: string;
   icon: string;
   emoji?: string;
+  task_display_order?: number;
 }
 
 // Fetch categories directly from routine_categories table (admin-managed)
