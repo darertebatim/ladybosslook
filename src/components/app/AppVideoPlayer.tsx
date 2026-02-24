@@ -1,10 +1,17 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { X, Loader2, ExternalLink, Gauge } from 'lucide-react';
+import { X, Loader2, ExternalLink, Gauge, SkipForward } from 'lucide-react';
 import { detectVideoType, extractYouTubeId, extractVimeoId, getVideoPlatformLabel, isVerticalVideo } from '@/lib/videoUtils';
 import { isNativeApp } from '@/lib/platform';
 import { Browser } from '@capacitor/browser';
+
+interface VideoItem {
+  url: string;
+  title?: string;
+  description?: string;
+  isVertical?: boolean;
+}
 
 interface AppVideoPlayerProps {
   isOpen: boolean;
@@ -13,11 +20,17 @@ interface AppVideoPlayerProps {
   title?: string;
   description?: string;
   isVertical?: boolean;
+  /** Playlist of all videos for auto-play next */
+  playlist?: VideoItem[];
+  /** Index of the current video in the playlist */
+  currentIndex?: number;
+  /** Called when auto-play advances to next video */
+  onVideoChange?: (index: number) => void;
 }
 
 const SPEEDS = [1, 1.5, 2] as const;
 
-export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVertical: isVerticalOverride }: AppVideoPlayerProps) {
+export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVertical: isVerticalOverride, playlist, currentIndex, onVideoChange }: AppVideoPlayerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [speedIndex, setSpeedIndex] = useState(0);
@@ -25,6 +38,8 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
 
   const videoType = detectVideoType(url);
   const vertical = isVerticalOverride ?? isVerticalVideo(url);
+
+  const hasNext = playlist && currentIndex !== undefined && currentIndex < playlist.length - 1;
 
   useEffect(() => {
     setIsLoading(true);
@@ -37,6 +52,18 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
       videoRef.current.playbackRate = SPEEDS[speedIndex];
     }
   }, [speedIndex]);
+
+  const playNext = useCallback(() => {
+    if (hasNext && onVideoChange) {
+      onVideoChange(currentIndex! + 1);
+    }
+  }, [hasNext, onVideoChange, currentIndex]);
+
+  const handleVideoEnded = useCallback(() => {
+    if (hasNext) {
+      playNext();
+    }
+  }, [hasNext, playNext]);
 
   const handleOpenExternal = async () => {
     if (isNativeApp()) {
@@ -71,7 +98,6 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
   };
 
   const renderPlayer = () => {
-    // Direct video file
     if (videoType === 'direct') {
       if (hasError) {
         return (
@@ -106,6 +132,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
             autoPlay
             onLoadedData={() => setIsLoading(false)}
             onError={() => setHasError(true)}
+            onEnded={handleVideoEnded}
             className={vertical
               ? "aspect-[9/16] max-h-[75vh] w-auto mx-auto rounded-xl"
               : "aspect-video w-full rounded-xl"
@@ -126,7 +153,6 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
       );
     }
 
-    // YouTube / Vimeo embed
     if (videoType === 'youtube' || videoType === 'vimeo') {
       const embedUrl = getEmbedUrl();
 
@@ -166,7 +192,6 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
       );
     }
 
-    // Instagram / TikTok - external only
     if (videoType === 'instagram' || videoType === 'tiktok') {
       return (
         <div className="flex flex-col items-center justify-center gap-4 py-16">
@@ -203,16 +228,31 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
           {renderPlayer()}
         </div>
 
-        {/* Title bar */}
-        {(title || description) && (
-          <div className="px-4 pb-4 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
-            {title && <h3 className="text-white font-semibold text-base">{title}</h3>}
-            {description && <p className="text-white/60 text-sm mt-0.5 line-clamp-2">{description}</p>}
+        {/* Title bar + Next button */}
+        <div className="px-4 pb-4 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              {title && <h3 className="text-white font-semibold text-base">{title}</h3>}
+              {description && <p className="text-white/60 text-sm mt-0.5 line-clamp-2">{description}</p>}
+              {playlist && currentIndex !== undefined && (
+                <p className="text-white/40 text-xs mt-1">{currentIndex + 1} / {playlist.length}</p>
+              )}
+            </div>
+            {hasNext && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={playNext}
+                className="text-white/80 hover:text-white hover:bg-white/10 gap-1 flex-shrink-0"
+              >
+                Next <SkipForward className="h-4 w-4" />
+              </Button>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Bottom safe area fallback if no title */}
-        {!title && !description && (
+        {!title && !description && !playlist && (
           <div style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} />
         )}
       </SheetContent>
