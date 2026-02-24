@@ -57,6 +57,7 @@ interface RoutineCategory {
   icon: string;
   color: string;
   display_order: number;
+  task_display_order: number;
   is_active: boolean;
 }
 
