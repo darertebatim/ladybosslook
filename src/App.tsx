@@ -440,6 +440,7 @@ const App = () => (
                     <Route path="reflections/notes" element={<AppReflectionNotes />} />
                     <Route path="rituals" element={<AppInspire />} />
                     <Route path="rituals/:planId" element={<AppInspireDetail />} />
+                    <Route path="actions" element={<AppActions />} />
                     {/* Redirects for backward compatibility with older app versions */}
                     <Route path="routines" element={<Navigate to="/app/rituals" replace />} />
                     <Route path="routines/:planId" element={<RoutineRedirect />} />
