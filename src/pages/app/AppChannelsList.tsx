@@ -359,7 +359,8 @@ export default function AppChannelsList() {
         open={showRoutineSheet}
         onOpenChange={setShowRoutineSheet}
         tasks={[SYNTHETIC_CHANNEL_TASK]}
-        onConfirm={async (selectedTaskIds, editedTasks) => {
+        routineTitle="Community Channels"
+        onSave={async (selectedTaskIds, editedTasks) => {
           try {
             await addRoutinePlan.mutateAsync({
               planId: 'synthetic-channel',
@@ -375,7 +376,7 @@ export default function AppChannelsList() {
             toast.error('Failed to add to rituals');
           }
         }}
-        isLoading={addRoutinePlan.isPending}
+        isSaving={addRoutinePlan.isPending}
       />
     </div>
   );
