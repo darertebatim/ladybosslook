@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Megaphone, Users, GraduationCap, MessageSquare, ChevronRight, Headset } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -14,6 +15,38 @@ import { useSupportChatSummary } from '@/hooks/useSupportChatSummary';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
+import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
+import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
+import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
+import { haptic } from '@/lib/haptics';
+import { toast } from 'sonner';
+
+const SYNTHETIC_CHANNEL_TASK: RoutinePlanTask = {
+  id: 'synthetic-channel-task',
+  plan_id: 'synthetic-channel',
+  title: 'Check Community Channels',
+  icon: '📣',
+  color: '#6366f1',
+  sort_order: 0,
+  repeat_pattern: 'daily',
+  repeat_interval: 1,
+  repeat_days: null,
+  category: 'pro',
+  tag: 'pro',
+  pro_link_type: 'channel',
+  pro_link_value: null,
+  description: null,
+  duration_minutes: null,
+  goal_enabled: false,
+  goal_target: null,
+  goal_type: null,
+  goal_unit: null,
+  is_active: true,
+  linked_playlist_id: null,
+  reminder_enabled: false,
+  time_period: null,
+};
 
 // Helper to check if cover is an emoji
 const isEmojiCover = (url: string | null) => url?.startsWith('emoji:');
