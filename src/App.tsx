@@ -35,6 +35,8 @@ const AppStore = lazy(() => import("@/pages/app/AppStore"));
 const AppCourseDetail = lazy(() => import("@/pages/app/AppCourseDetail"));
 const AppProfile = lazy(() => import("@/pages/app/AppProfile"));
 const AppPlayer = lazy(() => import("@/pages/app/AppPlayer"));
+const AppWatch = lazy(() => import("@/pages/app/AppWatch"));
+const AppVideoPlaylistDetail = lazy(() => import("@/pages/app/AppVideoPlaylistDetail"));
 const AppPlaylistDetail = lazy(() => import("@/pages/app/AppPlaylistDetail"));
 const AppAudioPlayer = lazy(() => import("@/pages/app/AppAudioPlayer"));
 const AppChat = lazy(() => import("@/pages/app/AppChat"));
@@ -69,6 +71,7 @@ const AppReflectionNoteDetail = lazy(() => import("@/pages/app/AppReflectionNote
 const Users = lazy(() => import("@/pages/admin/Users"));
 const Enrollment = lazy(() => import("@/pages/admin/Enrollment"));
 const Audio = lazy(() => import("@/pages/admin/Audio"));
+const VideoAdmin = lazy(() => import("@/pages/admin/VideoAdmin"));
 const Communications = lazy(() => import("@/pages/admin/Communications"));
 const ProgramsAdmin = lazy(() => import("@/pages/admin/Programs"));
 const Payments = lazy(() => import("@/pages/admin/Payments"));
@@ -339,6 +342,7 @@ const App = () => (
                       <Route path="users" element={<ProtectedRoute requiredPage="users"><Users /></ProtectedRoute>} />
                       <Route path="enrollment" element={<ProtectedRoute requiredPage="enrollment"><Enrollment /></ProtectedRoute>} />
                       <Route path="audio" element={<ProtectedRoute requiredPage="audio"><Audio /></ProtectedRoute>} />
+                      <Route path="video" element={<ProtectedRoute requiredPage="audio"><VideoAdmin /></ProtectedRoute>} />
                       <Route path="channels" element={<ProtectedRoute requiredPage="community"><Community /></ProtectedRoute>} />
                       
                       <Route path="communications" element={<ProtectedRoute requiredPage="communications"><Communications /></ProtectedRoute>} />
@@ -429,6 +433,8 @@ const App = () => (
                     <Route path="player" element={<AppPlayer />} />
                     <Route path="player/playlist/:playlistId" element={<AppPlaylistDetail />} />
                     <Route path="player/:audioId" element={<AppAudioPlayer />} />
+                    <Route path="watch" element={<AppWatch />} />
+                    <Route path="watch/playlist/:playlistId" element={<AppVideoPlaylistDetail />} />
                     <Route path="chat" element={<AppChat />} />
                     <Route path="coach-chat" element={<AppCoachChat />} />
                     <Route path="channels" element={<AppChannelsList />} />
