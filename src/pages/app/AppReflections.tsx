@@ -88,7 +88,7 @@ export default function AppReflections() {
                 key={r.id}
                 onClick={() => navigate(`/app/reflections/${r.id}`)}
                 className="w-full rounded-2xl overflow-hidden text-left transition-transform active:scale-[0.97] relative"
-                style={{ backgroundColor: r.cover_color || '#f5d0e0' }}
+                style={{ backgroundColor: r.cover_color || '#ffffff' }}
               >
                 <div className="flex items-center">
                   <div className="flex-1 p-4">
