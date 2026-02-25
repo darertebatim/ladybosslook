@@ -65,7 +65,7 @@ export const VideoPlaylistCard = memo(function VideoPlaylistCard({
         <Badge className="absolute -top-2.5 -left-2 z-30 bg-green-500 hover:bg-green-500 text-white rounded-full text-xs shadow-sm">FREE</Badge>
       )}
 
-      <button className="overflow-hidden cursor-pointer transition-all active:scale-[0.98] w-full text-left rounded-2xl shadow-lg border border-border/50" onClick={handleClick}>
+      <button className="overflow-hidden cursor-pointer transition-all active:scale-[0.98] w-full text-left rounded-2xl shadow-lg" onClick={handleClick}>
         {/* Portrait cover image (4:5 aspect ratio for vertical video) */}
         <div className="relative aspect-[4/5] w-full overflow-hidden rounded-t-2xl">
           {coverImageUrl ? (
