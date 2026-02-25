@@ -1,58 +1,61 @@
 
 
-## Calm-Style Animated Background for Watch Page
+## Redesign Watch Page to Match Calm's Premium Night Sky
 
-Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
+The current implementation has the right idea (dark hero + clouds) but falls short of Calm's polished look because:
+- Category circles use bright pastel backgrounds that clash with the dark sky
+- Cloud effects are barely visible
+- No stars or depth layers in the sky
+- Text labels in the hero aren't properly styled for dark backgrounds
 
-### What You'll Get
+### Changes
 
-- A deep dark blue gradient background on the Watch page header area
-- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
-- Subtle lightning flashes that pulse periodically
-- All text updated to white/light colors for contrast
-- Lightweight implementation using CSS keyframes (no extra dependencies)
+**1. Update CategoryCircle for dark contexts** (`src/components/app/CategoryCircle.tsx`)
+- Add a `variant` prop: `"light"` (default, current pastel look) and `"dark"` (for Watch page)
+- Dark variant uses translucent white backgrounds (`bg-white/15`) with white icons and white text labels
+- Selected state uses a brighter `bg-white/30` with a white ring instead of the primary ring
 
-### Design Details
+**2. Overhaul the Watch page hero** (`src/pages/app/AppWatch.tsx`)
+- Add a **starfield layer**: Scatter ~40 tiny white dots (CSS pseudo-elements or small divs) with varying opacity and a gentle twinkle animation across the sky area
+- Make **cloud layers more visible**: Increase opacity from 0.15-0.25 to 0.3-0.5, use brighter blue-white tones (closer to `rgba(150,180,220,0.5)`)
+- Add a subtle **bottom glow/horizon**: A warm subtle glow near the bottom of the hero simulating moonlight or distant light
+- Pass `variant="dark"` to CategoryCircle components
+- Smooth the hero-to-content transition with a subtle inner shadow on the rounded content area
 
-- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
-- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
-- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
-- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
-- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
+**3. Add starfield twinkle animation** (`tailwind.config.ts`)
+- Add `star-twinkle` keyframe: gentle opacity pulse between 0.3 and 1.0 over 3-5 seconds
+- Register `animate-star-twinkle` utility
 
-### Technical Approach
-
-**Files to modify:**
-
-1. **`src/pages/app/AppWatch.tsx`**
-   - Replace the header `bg-[#E8F4FE]` with the dark gradient
-   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
-   - Add a lightning flash overlay div
-   - Update all text classes to white variants (`text-white`, `text-white/60`)
-   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
-   - Extend the gradient into the page background behind the content area
-
-2. **`tailwind.config.ts`**
-   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
-   - Register corresponding animation utilities
-
-### Visual Structure
+### Visual Result
 
 ```text
 +----------------------------------+
-|  [dark blue gradient header]     |
-|  ~~~ cloud layer 1 (slow) ~~~   |
-|  ~~~ cloud layer 2 (slower) ~~~ |
+|  *  .    *       .    *  .       |  <-- scattered stars (tiny white dots)
+|     .  *    .  *    .            |
+|  ~~~ brighter cloud layer ~~~    |
+|     ~~~ second cloud ~~~         |
 |  * lightning flash (periodic) *  |
 |                                  |
-|  Watch          [icons]          |
-|  [categories row]                |
-|  [filters]              [lang]   |
-+----------------------------------+
-|  [normal white content area]     |
-|  [playlist cards grid]           |
+|  Watch              [+] [Q]     |  <-- white text
+|                                  |
+|  (O) All  (O) Tutorial  ...     |  <-- dark translucent circles, white icons
+|                                  |
+|  [All] [In Progress] [Done] [G] |  <-- white/translucent pills
+|__________________________________|
+/  rounded white content area    /
+|  ALL PLAYLISTS                  |
+|  [card] [card]                  |
 +----------------------------------+
 ```
 
-The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
+### Files to Modify
 
+1. **`src/components/app/CategoryCircle.tsx`** -- Add `variant` prop with dark mode styles
+2. **`src/pages/app/AppWatch.tsx`** -- Add starfield, boost cloud visibility, use dark category variant
+3. **`tailwind.config.ts`** -- Add `star-twinkle` keyframe and animation
+
+### Technical Notes
+
+- Stars are rendered as a grid of tiny `div` elements with randomized positions and animation delays (no images needed)
+- All effects remain pure CSS -- no video files, no canvas, no WebGL
+- Performance stays smooth on mobile since we're using GPU-accelerated `opacity` and `transform` animations only
