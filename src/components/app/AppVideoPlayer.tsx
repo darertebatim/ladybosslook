@@ -257,6 +257,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
   };
 
   return (
+    <>
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent
         side="bottom"
@@ -319,60 +320,61 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
           <div style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} />
         )}
       </SheetContent>
-
-      {/* Routine Preview Sheet for individual video */}
-      {videoId && title && (
-        <RoutinePreviewSheet
-          open={showRoutineSheet}
-          onOpenChange={setShowRoutineSheet}
-          tasks={[{
-            id: `synthetic-video-${videoId}`,
-            plan_id: `synthetic-video-${videoId}`,
-            title: title,
-            icon: '🎬',
-            color: 'sky',
-            task_order: 0,
-            is_active: true,
-            created_at: new Date().toISOString(),
-            linked_playlist_id: null,
-            pro_link_type: 'video',
-            pro_link_value: videoId,
-            linked_playlist: null,
-            tag: 'pro',
-          } as RoutinePlanTask]}
-          routineTitle={title}
-          onSave={async (selectedTaskIds, editedTasks) => {
-            try {
-              await addRoutinePlan.mutateAsync({
-                planId: `synthetic-video-${videoId}`,
-                selectedTaskIds,
-                editedTasks,
-                syntheticTasks: [{
-                  id: `synthetic-video-${videoId}`,
-                  plan_id: `synthetic-video-${videoId}`,
-                  title: title,
-                  icon: '🎬',
-                  color: 'sky',
-                  task_order: 0,
-                  is_active: true,
-                  created_at: new Date().toISOString(),
-                  linked_playlist_id: null,
-                  pro_link_type: 'video',
-                  pro_link_value: videoId,
-                  linked_playlist: null,
-                  tag: 'pro',
-                } as RoutinePlanTask],
-              });
-              toast.success('Added to your rituals! 🎬');
-              setShowRoutineSheet(false);
-            } catch (error) {
-              console.error('Failed to add ritual:', error);
-              toast.error('Failed to add to ritual');
-            }
-          }}
-          isSaving={addRoutinePlan.isPending}
-        />
-      )}
     </Sheet>
+
+    {/* Routine Preview Sheet - rendered outside video player Sheet to avoid nesting issues */}
+    {videoId && title && (
+      <RoutinePreviewSheet
+        open={showRoutineSheet}
+        onOpenChange={setShowRoutineSheet}
+        tasks={[{
+          id: `synthetic-video-${videoId}`,
+          plan_id: `synthetic-video-${videoId}`,
+          title: title,
+          icon: '🎬',
+          color: 'sky',
+          task_order: 0,
+          is_active: true,
+          created_at: new Date().toISOString(),
+          linked_playlist_id: null,
+          pro_link_type: 'video',
+          pro_link_value: videoId,
+          linked_playlist: null,
+          tag: 'pro',
+        } as RoutinePlanTask]}
+        routineTitle={title}
+        onSave={async (selectedTaskIds, editedTasks) => {
+          try {
+            await addRoutinePlan.mutateAsync({
+              planId: `synthetic-video-${videoId}`,
+              selectedTaskIds,
+              editedTasks,
+              syntheticTasks: [{
+                id: `synthetic-video-${videoId}`,
+                plan_id: `synthetic-video-${videoId}`,
+                title: title,
+                icon: '🎬',
+                color: 'sky',
+                task_order: 0,
+                is_active: true,
+                created_at: new Date().toISOString(),
+                linked_playlist_id: null,
+                pro_link_type: 'video',
+                pro_link_value: videoId,
+                linked_playlist: null,
+                tag: 'pro',
+              } as RoutinePlanTask],
+            });
+            toast.success('Added to your rituals! 🎬');
+            setShowRoutineSheet(false);
+          } catch (error) {
+            console.error('Failed to add ritual:', error);
+            toast.error('Failed to add to ritual');
+          }
+        }}
+        isSaving={addRoutinePlan.isPending}
+      />
+    )}
+    </>
   );
 }
