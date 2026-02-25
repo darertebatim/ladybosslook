@@ -180,7 +180,7 @@ export default {
 					'75%': { transform: 'scaleX(1.01) scaleY(0.99)' },
 					'100%': { transform: 'scaleX(1) scaleY(1)' }
 				},
-				'fly-to-header': {
+			'fly-to-header': {
 					'0%': { 
 						transform: 'translate(0, 0) scale(1)',
 						opacity: '1'
@@ -193,7 +193,21 @@ export default {
 						transform: 'translate(var(--fly-x, 0), var(--fly-y, 0)) scale(0.25)',
 						opacity: '0'
 					}
-				}
+				},
+				'cloud-drift-1': {
+					'0%, 100%': { transform: 'translateX(0) scale(1)' },
+					'50%': { transform: 'translateX(30px) scale(1.05)' },
+				},
+				'cloud-drift-2': {
+					'0%, 100%': { transform: 'translateX(0) scale(1.02)' },
+					'50%': { transform: 'translateX(-25px) scale(0.98)' },
+				},
+				'lightning-flash': {
+					'0%, 95%, 100%': { opacity: '0' },
+					'96%': { opacity: '0.15' },
+					'97%': { opacity: '0' },
+					'98%': { opacity: '0.08' },
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
