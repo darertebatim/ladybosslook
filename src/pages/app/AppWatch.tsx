@@ -186,7 +186,7 @@ export default function AppWatch() {
   if (isLoading) {
     return (
       <div className="flex flex-col h-full bg-background overflow-hidden">
-        <div className="fixed top-0 left-0 right-0 z-50 bg-[#E8F4FE] dark:bg-sky-950/90 rounded-b-3xl shadow-sm" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <div className="fixed top-0 left-0 right-0 z-50 rounded-b-3xl shadow-sm overflow-hidden" style={{ paddingTop: 'env(safe-area-inset-top)', background: 'linear-gradient(180deg, #0a1628 0%, #1a2744 100%)' }}>
           <div className="h-12 flex items-center px-4"><Skeleton className="h-6 w-24" /></div>
           <div className="px-4 pb-3 flex gap-4"><Skeleton className="w-16 h-16 rounded-full" /><Skeleton className="w-16 h-16 rounded-full" /><Skeleton className="w-16 h-16 rounded-full" /></div>
         </div>
@@ -198,26 +198,36 @@ export default function AppWatch() {
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
-      <div className="fixed top-0 left-0 right-0 z-50 bg-[#E8F4FE] dark:bg-sky-950/90 rounded-b-3xl shadow-sm" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      <div className="fixed top-0 left-0 right-0 z-50 rounded-b-3xl shadow-lg overflow-hidden" style={{ paddingTop: 'env(safe-area-inset-top)', background: 'linear-gradient(180deg, #0a1628 0%, #1a2744 100%)' }}>
+        {/* Animated cloud layers */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-[20%] -left-[20%] w-[80%] h-[60%] rounded-full animate-cloud-drift-1 opacity-20" style={{ background: 'radial-gradient(ellipse, rgba(100,140,200,0.4) 0%, transparent 70%)' }} />
+          <div className="absolute top-[40%] -right-[10%] w-[70%] h-[50%] rounded-full animate-cloud-drift-2 opacity-15" style={{ background: 'radial-gradient(ellipse, rgba(120,160,220,0.35) 0%, transparent 70%)' }} />
+          <div className="absolute top-[10%] left-[30%] w-[50%] h-[40%] rounded-full animate-cloud-drift-1 opacity-10" style={{ background: 'radial-gradient(ellipse, rgba(150,180,240,0.3) 0%, transparent 70%)', animationDelay: '-7s' }} />
+        </div>
+        {/* Lightning flash overlay */}
+        <div className="absolute inset-0 pointer-events-none animate-lightning-flash bg-white/20 rounded-b-3xl" />
+
+        <div className="relative z-10">
         <div className="h-12 flex items-center justify-between px-4">
           {showSearch ? (
             <div className="flex-1 flex items-center gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search videos..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-9" autoFocus />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
+                <Input placeholder="Search videos..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-9 bg-white/10 border-white/20 text-white placeholder:text-white/40" autoFocus />
               </div>
-              <button onClick={() => { setShowSearch(false); setSearchQuery(''); }} className="p-2 -mr-2"><X className="h-5 w-5 text-muted-foreground" /></button>
+              <button onClick={() => { setShowSearch(false); setSearchQuery(''); }} className="p-2 -mr-2"><X className="h-5 w-5 text-white/60" /></button>
             </div>
           ) : (
             <>
-              <h1 className="text-xl font-bold">Watch</h1>
+              <h1 className="text-xl font-bold text-white">Watch</h1>
               <div className="flex items-center gap-1">
                 <AddedToRoutineButton
                   isAdded={!!isWatchAdded}
                   onAddClick={handleAddWatchToRituals}
                   iconOnly
                 />
-                <button onClick={() => setShowSearch(true)} className="p-2 -mr-2"><Search className="h-5 w-5 text-muted-foreground" /></button>
+                <button onClick={() => setShowSearch(true)} className="p-2 -mr-2"><Search className="h-5 w-5 text-white/60" /></button>
               </div>
             </>
           )}
@@ -235,14 +245,14 @@ export default function AppWatch() {
         <div className="px-4 pb-3 flex items-center justify-between">
           <div className="flex gap-2">
             {(['all', 'in_progress', 'completed'] as const).map((f) => (
-              <button key={f} onClick={() => setProgressFilter(f)} className={cn('px-3 py-1.5 rounded-full text-xs font-medium transition-colors', progressFilter === f ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground')}>
+              <button key={f} onClick={() => setProgressFilter(f)} className={cn('px-3 py-1.5 rounded-full text-xs font-medium transition-colors', progressFilter === f ? 'bg-white text-[#0a1628]' : 'bg-white/10 text-white/70')}>
                 {f === 'all' ? 'All' : f === 'in_progress' ? 'In Progress' : 'Completed'}
               </button>
             ))}
           </div>
           <Popover>
             <PopoverTrigger asChild>
-              <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+              <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium bg-white/10 text-white/70">
                 {selectedLang.value === 'persian' ? <PersianFlag size={14} /> : <span className="text-sm">{selectedLang.flag}</span>}
               </button>
             </PopoverTrigger>
@@ -254,6 +264,7 @@ export default function AppWatch() {
               ))}
             </PopoverContent>
           </Popover>
+        </div>
         </div>
       </div>
 
