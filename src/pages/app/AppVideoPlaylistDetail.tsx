@@ -18,6 +18,7 @@ import { useExistingVideoPlaylistTask } from "@/hooks/useVideoRoutine";
 import { useAddRoutinePlan, RoutinePlanTask } from "@/hooks/useRoutinePlans";
 import { haptic } from "@/lib/haptics";
 import { toast } from "sonner";
+import heroStormVideo from "@/assets/watch-hero-storm.mp4";
 
 export default function AppVideoPlaylistDetail() {
   const { playlistId } = useParams();
@@ -149,24 +150,31 @@ export default function AppVideoPlaylistDetail() {
 
   if (plLoading || trLoading) {
     return (
-      <div className="flex flex-col h-full bg-background overflow-hidden">
+      <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
         <div className="p-4 space-y-4" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}>
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="aspect-[3/4] w-full rounded-xl" />
+          <Skeleton className="h-8 w-48 bg-white/10" />
+          <Skeleton className="h-4 w-full bg-white/10" />
+          <Skeleton className="aspect-[3/4] w-full rounded-xl bg-white/10" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full bg-background overflow-hidden">
-      {/* Fixed header with back button */}
+    <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
+      {/* Hero Video Background */}
+      <div className="fixed top-0 left-0 right-0 z-0 h-[350px] overflow-hidden">
+        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-40" src={heroStormVideo} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 30%, rgba(19,34,64,0.5) 60%, #132240 100%)' }} />
+        <div className="absolute inset-0 bg-white/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
+      </div>
+
+      {/* Fixed header */}
       <div
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 h-12"
         style={{ paddingTop: 'env(safe-area-inset-top)', height: 'calc(48px + env(safe-area-inset-top))' }}
       >
-        <BackButton />
+        <BackButton className="text-white" />
         <AddedToRoutineButton
           isAdded={!!existingTask}
           onAddClick={handleAddToRituals}
@@ -179,33 +187,33 @@ export default function AppVideoPlaylistDetail() {
       <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
       {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto overscroll-contain">
-        {/* Cover - portrait aspect for vertical video content */}
+      <div className="flex-1 overflow-y-auto overscroll-contain relative z-10">
+        {/* Cover */}
         {playlist?.cover_image_url ? (
           <div className="relative aspect-[3/4] w-full overflow-hidden mx-4 rounded-2xl" style={{ maxHeight: '50vh' }}>
             <img src={playlist.cover_image_url} alt="" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#132240] via-transparent to-transparent" />
           </div>
         ) : (
-          <div className="mx-4 aspect-[3/4] rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5" style={{ maxHeight: '40vh' }} />
+          <div className="mx-4 aspect-[3/4] rounded-2xl bg-white/5" style={{ maxHeight: '40vh' }} />
         )}
 
         <div className="px-4 mt-4 space-y-4 pb-safe">
           <div>
-            <h1 className="text-2xl font-bold">{playlist?.name}</h1>
-            {playlist?.description && <p className="text-sm text-muted-foreground mt-1">{playlist.description}</p>}
+            <h1 className="text-2xl font-bold text-white">{playlist?.name}</h1>
+            {playlist?.description && <p className="text-sm text-white/60 mt-1">{playlist.description}</p>}
           </div>
 
           {/* Progress */}
           <div className="space-y-2">
-            <div className="flex justify-between text-xs text-muted-foreground">
+            <div className="flex justify-between text-xs text-white/50">
               <span>{completedCount} of {totalTracks} completed</span>
               <span>{Math.round(overallProgress)}%</span>
             </div>
-            <Progress value={overallProgress} className="h-2" />
+            <Progress value={overallProgress} className="h-2 bg-white/10" />
           </div>
 
-          {/* Video List - portrait thumbnails */}
+          {/* Video List */}
           <div className="space-y-2 pb-4">
             {tracks?.map((track, i) => {
               const vc = track.video_content;
@@ -219,35 +227,35 @@ export default function AppVideoPlaylistDetail() {
                   onClick={() => handlePlay(i)}
                   disabled={locked}
                   className={cn(
-                    "w-full flex items-center gap-3 p-3 rounded-xl border transition-colors text-left",
-                    locked ? "opacity-50 cursor-not-allowed" : "hover:bg-muted/50 active:scale-[0.99]",
-                    completed && "bg-primary/5 border-primary/20"
+                    "w-full flex items-center gap-3 p-3 rounded-xl border border-white/10 transition-colors text-left",
+                    locked ? "opacity-50 cursor-not-allowed" : "hover:bg-white/10 active:scale-[0.99]",
+                    completed && "bg-white/5 border-white/20"
                   )}
                 >
                   {/* Portrait thumbnail */}
-                  <div className="relative w-14 h-[4.5rem] rounded-lg overflow-hidden bg-muted flex-shrink-0 flex items-center justify-center">
+                  <div className="relative w-14 h-[4.5rem] rounded-lg overflow-hidden bg-white/10 flex-shrink-0 flex items-center justify-center">
                     {vc.thumbnail_url ? (
                       <img src={vc.thumbnail_url} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-lg font-bold text-muted-foreground">{i + 1}</span>
+                      <span className="text-lg font-bold text-white/40">{i + 1}</span>
                     )}
-                    {locked && <div className="absolute inset-0 bg-background/60 flex items-center justify-center"><Lock className="h-4 w-4" /></div>}
+                    {locked && <div className="absolute inset-0 bg-black/60 flex items-center justify-center"><Lock className="h-4 w-4 text-white/70" /></div>}
                     {!locked && !completed && <div className="absolute inset-0 bg-black/30 flex items-center justify-center"><Play className="h-4 w-4 text-white fill-white" /></div>}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">{vc.title}</p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                    <p className="font-medium text-sm truncate text-white">{vc.title}</p>
+                    <div className="flex items-center gap-2 text-xs text-white/50 mt-0.5">
                       {vc.duration_seconds > 0 && <span>{formatDuration(vc.duration_seconds)}</span>}
-                      <Badge variant="outline" className="text-[9px] px-1 py-0">{vc.video_type}</Badge>
+                      <Badge variant="outline" className="text-[9px] px-1 py-0 border-white/20 text-white/50">{vc.video_type}</Badge>
                     </div>
                     {pct > 0 && !completed && (
-                      <Progress value={pct} className="h-1 mt-1.5" />
+                      <Progress value={pct} className="h-1 mt-1.5 bg-white/10" />
                     )}
                   </div>
 
                   <div className="flex-shrink-0">
-                    {completed ? <CheckCircle2 className="h-5 w-5 text-primary" /> : <Circle className="h-5 w-5 text-muted-foreground/30" />}
+                    {completed ? <CheckCircle2 className="h-5 w-5 text-sky-400" /> : <Circle className="h-5 w-5 text-white/20" />}
                   </div>
                 </button>
               );
