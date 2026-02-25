@@ -153,7 +153,7 @@ export const PlaylistCard = memo(function PlaylistCard({
               </Badge>
             )}
             {isFree && !isLocked && !requiresSubscription && (
-              <Badge className="bg-white/20 hover:bg-white/20 text-white rounded-full text-[10px] px-1.5 py-0 shadow-sm h-4">
+              <Badge className="bg-white hover:bg-white text-[#132240] rounded-full text-[10px] px-1.5 py-0 shadow-sm h-4 font-semibold">
                 FREE
               </Badge>
             )}
