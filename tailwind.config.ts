@@ -202,13 +202,17 @@ export default {
 					'0%, 100%': { transform: 'translateX(0) scale(1.05)' },
 					'50%': { transform: 'translateX(-40px) scale(1)' },
 				},
-				'lightning-flash': {
-					'0%, 90%, 100%': { opacity: '0' },
-					'92%': { opacity: '0.15' },
-					'94%': { opacity: '0' },
-					'96%': { opacity: '0.1' },
-					'98%': { opacity: '0' },
-				},
+			'lightning-flash': {
+				'0%, 90%, 100%': { opacity: '0' },
+				'92%': { opacity: '0.15' },
+				'94%': { opacity: '0' },
+				'96%': { opacity: '0.1' },
+				'98%': { opacity: '0' },
+			},
+			'star-twinkle': {
+				'0%, 100%': { opacity: '0.3' },
+				'50%': { opacity: '1' },
+			},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -232,7 +236,8 @@ export default {
 				'ripple-wave': 'ripple-wave 1.2s ease-out',
 				'cloud-drift-1': 'cloud-drift-1 20s ease-in-out infinite',
 				'cloud-drift-2': 'cloud-drift-2 25s ease-in-out infinite',
-				'lightning-flash': 'lightning-flash 8s ease-in-out infinite',
+			'lightning-flash': 'lightning-flash 8s ease-in-out infinite',
+			'star-twinkle': 'star-twinkle 4s ease-in-out infinite',
 			},
 			backgroundImage: {
 				'gradient-hero': 'var(--gradient-hero)',
