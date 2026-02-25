@@ -130,6 +130,7 @@ export default function AppVideoPlaylistDetail() {
     title: t.video_content?.title,
     description: t.video_content?.description || undefined,
     isVertical: t.video_content?.is_vertical || false,
+    videoId: t.video_content?.id,
   })) || [];
 
   const currentVideo = playlistItems[currentVideoIndex];
@@ -264,6 +265,7 @@ export default function AppVideoPlaylistDetail() {
           title={currentVideo.title}
           description={currentVideo.description}
           isVertical={currentVideo.isVertical}
+          videoId={currentVideo.videoId}
           playlist={playlistItems}
           currentIndex={currentVideoIndex}
           onVideoChange={handleVideoChange}
