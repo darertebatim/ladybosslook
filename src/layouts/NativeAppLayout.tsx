@@ -181,7 +181,12 @@ const NativeAppLayout = () => {
 
       {/* Bottom Navigation - hidden on chat page for full-screen experience */}
       {!isOnChatPage && (
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-lg pb-safe">
+      <nav className={cn(
+        "fixed bottom-0 left-0 right-0 z-50 shadow-lg pb-safe",
+        location.pathname.startsWith('/app/watch')
+          ? "bg-[#132240]/80 backdrop-blur-xl border-t border-white/10"
+          : "bg-background border-t"
+      )}>
         <div className="grid grid-cols-5 pt-1.5 pb-1.5">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path || 
@@ -199,11 +204,13 @@ const NativeAppLayout = () => {
                 )}
               >
                 <div className="relative flex flex-col items-center">
-                  <Icon 
-                    className={cn(
-                      'h-6 w-6',
-                      isActive ? 'text-foreground' : 'text-muted-foreground'
-                    )}
+                    <Icon 
+                      className={cn(
+                        'h-6 w-6',
+                        location.pathname.startsWith('/app/watch')
+                          ? (isActive ? 'text-white' : 'text-white/50')
+                          : (isActive ? 'text-foreground' : 'text-muted-foreground')
+                      )}
                     strokeWidth={isActive ? 2.5 : 1.5}
                   />
                   
@@ -224,15 +231,15 @@ const NativeAppLayout = () => {
                   
                   {/* Active indicator dot */}
                   {isActive && (
-                    <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-foreground" />
+                    <span className={cn("absolute -bottom-1 w-1 h-1 rounded-full", location.pathname.startsWith('/app/watch') ? "bg-white" : "bg-foreground")} />
                   )}
                 </div>
                 
                 <span className={cn(
                   'text-[10px]',
-                  isActive 
-                    ? 'text-foreground font-semibold' 
-                    : 'text-muted-foreground font-medium'
+                  location.pathname.startsWith('/app/watch')
+                    ? (isActive ? 'text-white font-semibold' : 'text-white/50 font-medium')
+                    : (isActive ? 'text-foreground font-semibold' : 'text-muted-foreground font-medium')
                 )}>
                   {item.label}
                 </span>
