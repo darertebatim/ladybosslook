@@ -17,6 +17,8 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { PaywallSheet } from "@/components/app/PaywallSheet";
 import { haptic } from "@/lib/haptics";
 import { PersianFlag } from "@/components/ui/PersianFlag";
+import heroStormVideo from "@/assets/watch-hero-storm.mp4";
+import { WatchCategoryPill } from "@/components/video/WatchCategoryPill";
 
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
@@ -201,8 +203,8 @@ export default function AppPlayer() {
 
     if (items.length === 0) {
       return (
-        <div className="text-center py-12 text-muted-foreground">
-          <p>No playlists found</p>
+        <div className="text-center py-12 text-white/60">
+          <p className="text-base">No playlists found</p>
         </div>
       );
     }
@@ -238,189 +240,171 @@ export default function AppPlayer() {
   // Show skeleton while loading
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full bg-background overflow-hidden">
-        {/* Fixed Header Skeleton */}
-        <div 
-          className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
-          style={{ paddingTop: 'env(safe-area-inset-top)' }}
-        >
-          <div className="h-12 flex items-center justify-between px-4">
-            <Skeleton className="h-6 w-24" />
-            <Skeleton className="h-6 w-6 rounded-full" />
-          </div>
-          <div className="px-4 pb-3">
-            <div className="flex gap-4 overflow-x-auto py-2">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="flex flex-col items-center gap-1.5">
-                  <Skeleton className="w-16 h-16 rounded-full" />
-                  <Skeleton className="h-3 w-12" />
-                </div>
-              ))}
-            </div>
+      <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
+        <div className="fixed top-0 left-0 right-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+          <div className="h-12 flex items-center px-4"><Skeleton className="h-6 w-24 bg-white/10" /></div>
+          <div className="px-4 pb-3 flex gap-2">
+            {[...Array(4)].map((_, i) => <Skeleton key={i} className="w-16 h-8 rounded-full bg-white/10" />)}
           </div>
           <div className="px-4 pb-3 flex gap-2">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-7 w-20 rounded-full" />
-            ))}
+            {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-7 w-20 rounded-full bg-white/10" />)}
           </div>
         </div>
-        
-        {/* Header Spacer */}
         <div style={{ height: 'calc(160px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
-        
-        <div className="flex-1 overflow-y-auto overscroll-contain p-4">
-          <PlayerSkeleton />
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="grid grid-cols-2 gap-4">
+            {[...Array(4)].map((_, i) => <Skeleton key={i} className="aspect-square rounded-2xl bg-white/10" />)}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full bg-background overflow-hidden">
-      {/* Fixed Header */}
-      <div 
-        className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}
-      >
-        {/* Header Row */}
-        <div className="h-12 flex items-center justify-between px-4">
-          {showSearch ? (
-            <div className="flex-1 flex items-center gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search audio..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 h-9"
-                  autoFocus
-                />
-              </div>
-              <button 
-                onClick={() => { setShowSearch(false); setSearchQuery(""); }}
-                className="p-2 -mr-2"
-              >
-                <X className="h-5 w-5 text-muted-foreground" />
-              </button>
-            </div>
-          ) : (
-            <>
-              <h1 className="text-xl font-bold">Listen</h1>
-              <div className="flex items-center">
-                {startTour && (
-                  <TourHelpButton onClick={startTour} />
-                )}
-                <button onClick={() => setShowSearch(true)} className="tour-player-search p-2 -mr-2">
-                  <Search className="h-5 w-5 text-muted-foreground" />
+    <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
+      {/* Hero Video Background */}
+      <div className="fixed top-0 left-0 right-0 z-0 h-[420px] overflow-hidden">
+        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-50" src={heroStormVideo} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 30%, rgba(19,34,64,0.5) 60%, #132240 100%)' }} />
+        <div className="absolute inset-0 bg-white/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
+      </div>
+
+      {/* Glass Header */}
+      <div className="fixed top-0 left-0 right-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <div className="relative z-10">
+          {/* Title bar */}
+          <div className="h-12 flex items-center justify-between px-4">
+            {showSearch ? (
+              <div className="flex-1 flex items-center gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
+                  <Input
+                    placeholder="Search audio..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9 h-9 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus-visible:ring-white/20"
+                    autoFocus
+                  />
+                </div>
+                <button onClick={() => { setShowSearch(false); setSearchQuery(""); }} className="p-2 -mr-2">
+                  <X className="h-5 w-5 text-white/70" />
                 </button>
               </div>
-            </>
-          )}
-        </div>
-
-        {/* Category Circles */}
-        <div className="tour-player-categories px-4 pb-3">
-          <div className="flex gap-3 overflow-x-auto py-2 scrollbar-hide">
-            {availableCategories.map((cat) => {
-              const config = categoryConfig[cat] || { name: cat, icon: 'Sparkles', color: 'purple' };
-              const isSoundscapeLocked = cat === 'soundscape' && !hasSoundscapeAccess;
-              return (
-                <div key={cat} className="relative">
-                  {isSoundscapeLocked && (
-                    <div className="absolute -top-2 -left-1 z-10 flex items-center gap-0.5 bg-amber-200 text-amber-700 text-[8px] font-bold px-1.5 py-0.5 rounded-full">
-                      <Crown className="h-2.5 w-2.5" /> PLUS
-                    </div>
-                  )}
-                  <CategoryCircle
-                    name={config.name}
-                    icon={config.icon}
-                    color={config.color}
-                    isSelected={selectedCategory === cat}
-                    onClick={() => {
-                      if (isSoundscapeLocked) {
-                        haptic.light();
-                        setShowPaywall(true);
-                      } else {
-                        setSelectedCategory(cat);
-                      }
-                    }}
-                  />
-                  {isSoundscapeLocked && (
-                    <div className="absolute -bottom-0.5 -right-0.5 z-10 w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center">
-                      <FluentEmoji emoji="🔒" size={12} />
-                    </div>
-                  )}
+            ) : (
+              <>
+                <h1 className="text-xl font-bold text-white tracking-tight">Listen</h1>
+                <div className="flex items-center">
+                  {startTour && <TourHelpButton onClick={startTour} />}
+                  <button onClick={() => setShowSearch(true)} className="tour-player-search p-2 -mr-2">
+                    <Search className="h-5 w-5 text-white/70" />
+                  </button>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Progress Filter Pills + Language Selector */}
-        <div className="tour-player-progress-filter px-4 pb-3 flex items-center justify-between">
-          <div className="flex gap-2">
-            {(['all', 'in_progress', 'completed'] as const).map((filter) => (
-              <button
-                key={filter}
-                onClick={() => setProgressFilter(filter)}
-                className={cn(
-                  'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
-                  progressFilter === filter
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-muted-foreground'
-                )}
-              >
-                {filter === 'all' ? 'All' : filter === 'in_progress' ? 'In Progress' : 'Completed'}
-              </button>
-            ))}
+              </>
+            )}
           </div>
 
-          {/* Language Selector */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
-                {selectedLang.value === 'persian'
-                  ? <PersianFlag size={14} />
-                  : <span className="text-sm">{selectedLang.flag}</span>
-                }
-              </button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-40 p-1">
-              {LANGUAGE_OPTIONS.map((lang) => (
+          {/* Category pills */}
+          <div className="tour-player-categories px-4 pb-2">
+            <div className="flex gap-2 overflow-x-auto py-1.5 scrollbar-hide">
+              {availableCategories.map((cat) => {
+                const config = categoryConfig[cat] || { name: cat, icon: 'Sparkles', color: 'purple' };
+                const isSoundscapeLocked = cat === 'soundscape' && !hasSoundscapeAccess;
+                return (
+                  <div key={cat} className="relative">
+                    {isSoundscapeLocked && (
+                      <div className="absolute -top-2 -left-1 z-10 flex items-center gap-0.5 bg-amber-200 text-amber-700 text-[8px] font-bold px-1.5 py-0.5 rounded-full">
+                        <Crown className="h-2.5 w-2.5" /> PLUS
+                      </div>
+                    )}
+                    <WatchCategoryPill
+                      name={config.name}
+                      isSelected={selectedCategory === cat}
+                      onClick={() => {
+                        if (isSoundscapeLocked) {
+                          haptic.light();
+                          setShowPaywall(true);
+                        } else {
+                          setSelectedCategory(cat);
+                        }
+                      }}
+                    />
+                    {isSoundscapeLocked && (
+                      <div className="absolute -bottom-0.5 -right-0.5 z-10 w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center">
+                        <FluentEmoji emoji="🔒" size={12} />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Filters row */}
+          <div className="tour-player-progress-filter px-4 pb-3 flex items-center justify-between">
+            <div className="flex gap-2">
+              {(['all', 'in_progress', 'completed'] as const).map((filter) => (
                 <button
-                  key={lang.value}
-                  onClick={() => handleLanguageChange(lang.value)}
+                  key={filter}
+                  onClick={() => setProgressFilter(filter)}
                   className={cn(
-                    'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors',
-                    preferredLanguage === lang.value
-                      ? 'bg-primary/10 text-primary font-medium'
-                      : 'hover:bg-muted text-foreground'
+                    'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
+                    progressFilter === filter
+                      ? 'bg-white/20 text-white backdrop-blur-sm'
+                      : 'text-white/50 hover:text-white/70'
                   )}
                 >
-                  {lang.value === 'persian'
-                    ? <PersianFlag size={14} />
-                    : <span>{lang.flag}</span>
-                  }
-                  <span>{lang.label}</span>
+                  {filter === 'all' ? 'All' : filter === 'in_progress' ? 'In Progress' : 'Completed'}
                 </button>
               ))}
-            </PopoverContent>
-          </Popover>
+            </div>
+
+            {/* Language Selector */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium bg-white/10 text-white/70 backdrop-blur-sm">
+                  {selectedLang.value === 'persian'
+                    ? <PersianFlag size={14} />
+                    : <span className="text-sm">{selectedLang.flag}</span>
+                  }
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-40 p-1 bg-[#1a2d4a]/95 backdrop-blur-xl border-white/10">
+                {LANGUAGE_OPTIONS.map((lang) => (
+                  <button
+                    key={lang.value}
+                    onClick={() => handleLanguageChange(lang.value)}
+                    className={cn(
+                      'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors',
+                      preferredLanguage === lang.value
+                        ? 'bg-white/15 text-white font-medium'
+                        : 'text-white/70 hover:bg-white/10'
+                    )}
+                  >
+                    {lang.value === 'persian'
+                      ? <PersianFlag size={14} />
+                      : <span>{lang.flag}</span>
+                    }
+                    <span>{lang.label}</span>
+                  </button>
+                ))}
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </div>
 
-      {/* Header Spacer - accounts for header + categories + filter pills */}
-      <div style={{ height: 'calc(210px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
+      {/* Header Spacer */}
+      <div style={{ height: 'calc(190px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto overscroll-contain">
+      <div className="flex-1 overflow-y-auto overscroll-contain relative z-10">
         <div className="p-4 pb-safe space-y-6">
           {/* Continue Learning Section */}
           {progressFilter === "all" && selectedCategory === "all" && !searchQuery && continueListening.length > 0 && (
             <div className="space-y-3 tour-continue-listening">
               <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-semibold">Continue Learning</h2>
+                <Clock className="h-5 w-5 text-sky-400" />
+                <h2 className="text-lg font-semibold text-white">Continue Learning</h2>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {continueListening.slice(0, 4).map((playlist) => {
@@ -451,7 +435,7 @@ export default function AppPlayer() {
 
           {/* All Playlists Section */}
           <div className="space-y-3 tour-playlists">
-            <h2 className="tour-playlists-header text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            <h2 className="tour-playlists-header text-sm font-semibold text-white/70 uppercase tracking-wider">
               {selectedCategory === 'all' ? 'All Playlists' : categoryConfig[selectedCategory]?.name || selectedCategory}
             </h2>
             

@@ -25,6 +25,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { PaywallSheet } from "@/components/app/PaywallSheet";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import heroStormVideo from "@/assets/watch-hero-storm.mp4";
 export default function AppPlaylistDetail() {
   const { playlistId } = useParams();
   const { user } = useAuth();
@@ -569,27 +570,20 @@ export default function AppPlaylistDetail() {
 
   if (playlistLoading || tracksLoading) {
     return (
-      <div className="flex flex-col h-full bg-background overflow-hidden">
-        {/* Fixed Header */}
-        <div 
-          className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
-          style={{ paddingTop: 'env(safe-area-inset-top)' }}
-        >
+      <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
+        <div className="fixed top-0 left-0 right-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
           <div className="pt-3 pb-2 px-4">
-            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-8 w-20 bg-white/10" />
           </div>
         </div>
-        
-        {/* Header spacer */}
         <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
-        
         <div className="flex-1 overflow-y-auto overscroll-contain">
           <div className="p-4 space-y-4 pb-safe">
-            <Skeleton className="h-32 w-32" />
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-32 w-32 bg-white/10" />
+            <Skeleton className="h-8 w-3/4 bg-white/10" />
+            <Skeleton className="h-12 w-full bg-white/10" />
             {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} className="h-16 w-full" />
+              <Skeleton key={i} className="h-16 w-full bg-white/10" />
             ))}
           </div>
         </div>
@@ -599,19 +593,16 @@ export default function AppPlaylistDetail() {
 
   if (!playlist) {
     return (
-      <div className="flex flex-col h-full bg-background overflow-hidden">
-        <div 
-          className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
-          style={{ paddingTop: 'env(safe-area-inset-top)' }}
-        >
+      <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
+        <div className="fixed top-0 left-0 right-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
           <div className="pt-1 pb-2 px-4 flex items-center gap-1">
-            <BackButton to="/app/player" label="Library" />
+            <BackButton to="/app/player" label="Library" className="text-white" />
           </div>
         </div>
         <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-muted-foreground mb-4">Playlist not found</p>
+            <p className="text-white/60 mb-4">Playlist not found</p>
             <Button onClick={() => navigate('/app/player')}>Back to Library</Button>
           </div>
         </div>
@@ -624,21 +615,24 @@ export default function AppPlaylistDetail() {
 
   return (
     <>
-    <div className="flex flex-col h-full bg-background overflow-hidden">
-      {/* Fixed Header with safe area + visual padding */}
-      <div 
-        className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
+    <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
+      {/* Hero Video Background */}
+      <div className="fixed top-0 left-0 right-0 z-0 h-[350px] overflow-hidden">
+        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-40" src={heroStormVideo} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 30%, rgba(19,34,64,0.5) 60%, #132240 100%)' }} />
+        <div className="absolute inset-0 bg-white/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
+      </div>
+
+      {/* Fixed Header */}
+      <div
+        className="fixed top-0 left-0 right-0 z-50"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="pt-1 pb-2 px-4 flex items-center justify-between">
-          <BackButton to={cameFromPlanner ? '/app/home' : '/app/player'} label={cameFromPlanner ? 'Home' : 'Library'} />
+          <BackButton to={cameFromPlanner ? '/app/home' : '/app/player'} label={cameFromPlanner ? 'Home' : 'Library'} className="text-white" />
           {startTour && (
-            <button
-              onClick={startTour}
-              className="h-9 w-9 flex items-center justify-center rounded-full"
-              aria-label="Start page tour"
-            >
-              <HelpCircle className="h-5 w-5 text-muted-foreground" />
+            <button onClick={startTour} className="h-9 w-9 flex items-center justify-center rounded-full" aria-label="Start page tour">
+              <HelpCircle className="h-5 w-5 text-white/60" />
             </button>
           )}
         </div>
@@ -648,7 +642,7 @@ export default function AppPlaylistDetail() {
       <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto overscroll-contain">
+      <div className="flex-1 overflow-y-auto overscroll-contain relative z-10">
         {/* Playlist Info */}
         <div className="p-4 space-y-4">
         <div className="flex gap-4">
@@ -660,8 +654,8 @@ export default function AppPlaylistDetail() {
                 className="w-full h-full object-cover" 
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                <Music className="h-12 w-12 text-primary/40" />
+              <div className="w-full h-full bg-white/5 flex items-center justify-center">
+                <Music className="h-12 w-12 text-white/30" />
               </div>
             )}
           </div>
@@ -669,14 +663,14 @@ export default function AppPlaylistDetail() {
           <div className="flex-1 space-y-2">
             <div className="flex gap-2 flex-nowrap items-center overflow-x-auto">
               {playlist.category && (
-                <Badge variant="secondary">{getCategoryLabel()}</Badge>
+                <Badge variant="secondary" className="bg-white/10 text-white/80 border-0">{getCategoryLabel()}</Badge>
               )}
               {playlist.language === 'persian' ? (
-                <Badge variant="outline" className="text-sm flex items-center gap-1 px-1.5">
+                <Badge variant="outline" className="text-sm flex items-center gap-1 px-1.5 border-white/20 text-white/70">
                   <PersianFlag size={14} />
                 </Badge>
               ) : playlist.language && ({'american':'🇺🇸','turkish':'🇹🇷','spanish':'🇪🇸','all':'🌐'} as Record<string,string>)[playlist.language] && (
-                <Badge variant="outline" className="text-sm">
+                <Badge variant="outline" className="text-sm border-white/20 text-white/70">
                   {({'american':'🇺🇸','turkish':'🇹🇷','spanish':'🇪🇸','all':'🌐'} as Record<string,string>)[playlist.language]}
                 </Badge>
               )}
@@ -689,9 +683,9 @@ export default function AppPlaylistDetail() {
               )}
               {!hasAccess && !playlist.is_free && !playlist.requires_subscription && <Badge variant="destructive">Locked</Badge>}
             </div>
-            <h1 className="text-2xl font-bold">{playlist.name}</h1>
+            <h1 className="text-2xl font-bold text-white">{playlist.name}</h1>
             {playlist.description && (
-              <p className="text-sm text-muted-foreground">{playlist.description}</p>
+              <p className="text-sm text-white/60">{playlist.description}</p>
             )}
           </div>
         </div>
@@ -700,12 +694,12 @@ export default function AppPlaylistDetail() {
         {hasAccess && totalItems > 0 && (
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">
+              <span className="text-white/50">
                 {completedCount}/{totalItems} {showModules ? 'modules' : 'tracks'} completed
               </span>
-              <span className="font-medium">{Math.round(overallProgress)}%</span>
+              <span className="font-medium text-white">{Math.round(overallProgress)}%</span>
             </div>
-            <Progress value={overallProgress} className="h-2" />
+            <Progress value={overallProgress} className="h-2 bg-white/10" />
           </div>
         )}
 
@@ -730,9 +724,9 @@ export default function AppPlaylistDetail() {
 
         {!hasAccess && playlist.is_free && (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 p-4 bg-primary/10 rounded-lg">
-              <Music className="h-5 w-5 text-primary" />
-              <p className="text-sm text-foreground">
+            <div className="flex items-center gap-2 p-4 bg-white/10 rounded-lg">
+              <Music className="h-5 w-5 text-sky-400" />
+              <p className="text-sm text-white">
                 This playlist is free! Tap below to start listening.
               </p>
             </div>
@@ -749,9 +743,9 @@ export default function AppPlaylistDetail() {
 
         {!hasAccess && !playlist.is_free && playlist.requires_subscription && (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 p-4 bg-amber-50 dark:bg-amber-950/30 rounded-lg">
-              <Crown className="h-5 w-5 text-amber-600" />
-              <p className="text-sm text-foreground">
+            <div className="flex items-center gap-2 p-4 bg-amber-900/30 rounded-lg">
+              <Crown className="h-5 w-5 text-amber-400" />
+              <p className="text-sm text-white">
                 This content is part of <strong>Simora+</strong>. Subscribe to unlock.
               </p>
             </div>
@@ -768,9 +762,9 @@ export default function AppPlaylistDetail() {
 
         {!hasAccess && !playlist.is_free && !playlist.requires_subscription && (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 p-4 bg-muted rounded-lg">
-              <Lock className="h-5 w-5 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 p-4 bg-white/10 rounded-lg">
+              <Lock className="h-5 w-5 text-white/50" />
+              <p className="text-sm text-white/60">
                 Enroll to access this content
               </p>
             </div>
@@ -790,7 +784,7 @@ export default function AppPlaylistDetail() {
       {/* Course Modules */}
       {hasAccess && showModules && modules && modules.length > 0 && (
         <div className="px-4 pb-4 space-y-2">
-          <h2 className="text-lg font-semibold mb-3">Course Modules</h2>
+          <h2 className="text-lg font-semibold mb-3 text-white">Course Modules</h2>
           {modules.map((module, index) => {
             const { isAvailable, countdownText } = getContentAvailability(module.drip_delay_days || 0);
             const progress = getModuleProgress(module.id, module.audio_id);
@@ -799,68 +793,69 @@ export default function AppPlaylistDetail() {
               <div
                 key={module.id}
                 onClick={() => handleModuleClick(module, index)}
-                className={`flex items-center gap-3 p-3 rounded-lg border ${
+                className={cn(
+                  "flex items-center gap-3 p-3 rounded-lg border border-white/10",
                   !isAvailable 
-                    ? 'opacity-60 bg-muted/30 cursor-not-allowed' 
-                    : 'cursor-pointer hover:bg-accent'
-                }`}
+                    ? 'opacity-60 bg-white/5 cursor-not-allowed' 
+                    : 'cursor-pointer hover:bg-white/10'
+                )}
               >
                 {/* Status icon */}
                 <div className="flex-shrink-0 w-8 text-center">
                   {!isAvailable ? (
-                    <Lock className="h-5 w-5 text-muted-foreground mx-auto" />
+                    <Lock className="h-5 w-5 text-white/40 mx-auto" />
                   ) : progress.viewed ? (
-                    <CheckCircle2 className="h-5 w-5 text-green-500 mx-auto" />
+                    <CheckCircle2 className="h-5 w-5 text-sky-400 mx-auto" />
                   ) : (
-                    <span className="text-sm text-muted-foreground">{index + 1}</span>
+                    <span className="text-sm text-white/50">{index + 1}</span>
                   )}
                 </div>
 
                 {/* Type icon */}
-                <div className="flex-shrink-0 text-muted-foreground">
+                <div className="flex-shrink-0 text-white/50">
                   {getModuleIcon(module.type)}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-medium text-sm truncate">{module.title}</h3>
-                    <Badge variant="outline" className="flex-shrink-0 text-[10px] px-1.5 py-0">
+                    <h3 className="font-medium text-sm truncate text-white">{module.title}</h3>
+                    <Badge variant="outline" className="flex-shrink-0 text-[10px] px-1.5 py-0 border-white/20 text-white/50">
                       {module.type.toUpperCase()}
                     </Badge>
                   </div>
                   {!isAvailable && countdownText ? (
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-white/40">
                       {countdownText}
                     </p>
                   ) : module.description ? (
-                    <p className="text-xs text-muted-foreground truncate">{module.description}</p>
+                    <p className="text-xs text-white/40 truncate">{module.description}</p>
                   ) : null}
                 </div>
 
                 {/* Duration for audio modules */}
                 {module.type === 'audio' && module.audio_content && (
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground flex-shrink-0">
+                  <div className="flex items-center gap-1 text-xs text-white/50 flex-shrink-0">
                     <Clock className="h-3 w-3" />
                     <span>{formatDuration(module.audio_content.duration_seconds)}</span>
                   </div>
                 )}
 
                 {isAvailable && (
-                  <Button variant="ghost" size="icon" className="flex-shrink-0">
+                  <Button variant="ghost" size="icon" className="flex-shrink-0 text-white/70 hover:bg-white/10">
                     <Play className="h-4 w-4" />
                   </Button>
                 )}
               </div>
             );
           })}
-          {showTracks && <Separator className="my-6" />}
+          {showTracks && <Separator className="my-6 bg-white/10" />}
         </div>
       )}
 
       {/* Track List */}
       {showTracks && tracks && tracks.length > 0 && (
         <div className="px-4 pb-4 space-y-2 tour-track-list">
-          <h2 className="tour-track-list-header text-lg font-semibold mb-3">Tracks</h2>
+          <h2 className="tour-track-list-header text-lg font-semibold mb-3 text-white">Tracks</h2>
           {tracks.map((item, index) => {
             const track = item.audio_content;
             const progress = getTrackProgress(track.id);
@@ -870,23 +865,24 @@ export default function AppPlaylistDetail() {
               <div
                 key={item.id}
                 onClick={() => handleTrackClick(track.id, item.drip_delay_days || 0)}
-                className={`flex items-center gap-3 p-3 rounded-lg border ${
+                className={cn(
+                  "flex items-center gap-3 p-3 rounded-lg border border-white/10",
                   !isAvailable 
-                    ? 'opacity-60 bg-muted/30 cursor-not-allowed' 
+                    ? 'opacity-60 bg-white/5 cursor-not-allowed' 
                     : hasAccess 
-                      ? 'cursor-pointer hover:bg-accent' 
+                      ? 'cursor-pointer hover:bg-white/10' 
                       : 'opacity-60'
-                }`}
+                )}
               >
                 {/* Track number / status icon */}
                 <div className="flex-shrink-0 w-8 text-center">
                   {!isAvailable ? (
-                    <Lock className="h-5 w-5 text-muted-foreground mx-auto" />
+                    <Lock className="h-5 w-5 text-white/40 mx-auto" />
                   ) : progress.completed ? (
-                    <CheckCircle2 className="h-5 w-5 text-green-500 mx-auto" />
+                    <CheckCircle2 className="h-5 w-5 text-sky-400 mx-auto" />
                   ) : progress.percentage > 0 ? (
                     <div className="relative h-5 w-5 mx-auto">
-                      <Circle className="h-5 w-5 text-muted-foreground" />
+                      <Circle className="h-5 w-5 text-white/30" />
                       <div 
                         className="absolute inset-0 rounded-full border-2 border-primary"
                         style={{
@@ -895,33 +891,33 @@ export default function AppPlaylistDetail() {
                       />
                     </div>
                   ) : (
-                    <span className="text-sm text-muted-foreground">{index + 1}</span>
+                    <span className="text-sm text-white/50">{index + 1}</span>
                   )}
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-sm truncate">{track.title}</h3>
+                  <h3 className="font-medium text-sm truncate text-white">{track.title}</h3>
                   {!isAvailable && countdownText ? (
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-white/40">
                       {countdownText}
                     </p>
                   ) : track.description ? (
-                    <p className="text-xs text-muted-foreground truncate">{track.description}</p>
+                    <p className="text-xs text-white/40 truncate">{track.description}</p>
                   ) : null}
                   {isAvailable && progress.percentage > 0 && !progress.completed && (
                     <div className="mt-1">
-                      <Progress value={progress.percentage} className="h-1" />
+                      <Progress value={progress.percentage} className="h-1 bg-white/10" />
                     </div>
                   )}
                 </div>
 
-                <div className="flex items-center gap-1 text-xs text-muted-foreground flex-shrink-0">
+                <div className="flex items-center gap-1 text-xs text-white/50 flex-shrink-0">
                   <Clock className="h-3 w-3" />
                   <span>{formatDuration(track.duration_seconds)}</span>
                 </div>
 
                 {isAvailable && hasAccess && (
-                  <Button variant="ghost" size="icon" className="flex-shrink-0">
+                  <Button variant="ghost" size="icon" className="flex-shrink-0 text-white/70 hover:bg-white/10">
                     <Play className="h-4 w-4" />
                   </Button>
                 )}
