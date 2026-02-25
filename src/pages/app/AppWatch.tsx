@@ -217,8 +217,7 @@ export default function AppWatch() {
 
       {/* Glass Header */}
       <div className="fixed top-0 left-0 right-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-        {/* Glass morphism backdrop */}
-        <div className="absolute inset-0 backdrop-blur-xl" style={{ background: 'rgba(10, 22, 40, 0.5)', borderBottom: '1px solid rgba(255,255,255,0.08)' }} />
+        {/* Fully transparent - no backdrop */}
         
         <div className="relative z-10">
           {/* Title bar */}
