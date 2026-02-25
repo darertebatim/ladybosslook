@@ -200,25 +200,24 @@ export default function AppWatch() {
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ background: 'linear-gradient(180deg, #0a1628 0%, #132240 40%, #162a4d 70%, #1a3358 100%)' }}>
       {/* Hero Video Background - behind the header */}
-      <div className="fixed top-0 left-0 right-0 z-0 h-[340px] overflow-hidden">
+      <div className="fixed top-0 left-0 right-0 z-0 h-[420px] overflow-hidden">
         <video
           autoPlay
           muted
           loop
           playsInline
-          className="w-full h-full object-cover opacity-40"
+          className="w-full h-full object-cover opacity-50"
           src={heroStormVideo}
         />
-        {/* Gradient fade at bottom of video */}
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 40%, #0a1628 100%)' }} />
+        {/* Smooth gradient fade from video into page background */}
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 30%, rgba(10,22,40,0.4) 60%, #0a1628 100%)' }} />
         {/* Lightning flash overlay */}
         <div className="absolute inset-0 bg-white/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
       </div>
 
       {/* Glass Header */}
       <div className="fixed top-0 left-0 right-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-        {/* Glass morphism backdrop */}
-        <div className="absolute inset-0 backdrop-blur-xl" style={{ background: 'rgba(10, 22, 40, 0.5)', borderBottom: '1px solid rgba(255,255,255,0.08)' }} />
+        {/* Fully transparent header - no backdrop */}
         
         <div className="relative z-10">
           {/* Title bar */}
@@ -336,11 +335,11 @@ export default function AppWatch() {
 
           {/* All Playlists */}
           <div className="space-y-3">
-            <h2 className="text-xs font-semibold text-white/40 uppercase tracking-wider">
+            <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wider">
               {selectedCategory === 'all' ? 'All Playlists' : categoryConfig[selectedCategory]?.name || selectedCategory}
             </h2>
             {filtered.length === 0 ? (
-              <div className="text-center py-12 text-white/40"><p>No playlists found</p></div>
+              <div className="text-center py-12 text-white/60"><p className="text-base">No playlists found</p></div>
             ) : (
               <div className="grid grid-cols-2 gap-4">
                 {filtered.map((p) => {
