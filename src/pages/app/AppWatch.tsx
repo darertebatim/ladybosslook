@@ -4,7 +4,6 @@ import { Search, X, Clock, Video, CalendarPlus } from "lucide-react";
 import { VideoPlaylistCard } from "@/components/video/VideoPlaylistCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isNativeApp } from "@/lib/platform";
-import { CategoryCircle } from "@/components/app/CategoryCircle";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +17,8 @@ import { useAddRoutinePlan, RoutinePlanTask } from "@/hooks/useRoutinePlans";
 import { RoutinePreviewSheet, EditedTask } from "@/components/app/RoutinePreviewSheet";
 import { haptic } from "@/lib/haptics";
 import { toast } from "sonner";
+import heroStormVideo from "@/assets/watch-hero-storm.mp4";
+import { WatchCategoryPill } from "@/components/video/WatchCategoryPill";
 
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
@@ -49,7 +50,7 @@ export default function AppWatch() {
   const selectedLang = LANGUAGE_OPTIONS.find(l => l.value === preferredLanguage) || LANGUAGE_OPTIONS[0];
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
 
-  // Add to rituals - synthetic "Watch Videos" task
+  // Add to rituals
   const { data: isWatchAdded } = useExistingProTask('route', '/app/watch');
   const addPlanMutation = useAddRoutinePlan();
 
@@ -185,85 +186,145 @@ export default function AppWatch() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full bg-background overflow-hidden">
-        <div className="fixed top-0 left-0 right-0 z-50 bg-[#E8F4FE] dark:bg-sky-950/90 rounded-b-3xl shadow-sm" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-          <div className="h-12 flex items-center px-4"><Skeleton className="h-6 w-24" /></div>
-          <div className="px-4 pb-3 flex gap-4"><Skeleton className="w-16 h-16 rounded-full" /><Skeleton className="w-16 h-16 rounded-full" /><Skeleton className="w-16 h-16 rounded-full" /></div>
+      <div className="flex flex-col h-full overflow-hidden" style={{ background: 'linear-gradient(180deg, #0a1628 0%, #152238 40%, #1a2d4a 100%)' }}>
+        <div className="fixed top-0 left-0 right-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+          <div className="h-12 flex items-center px-4"><Skeleton className="h-6 w-24 bg-white/10" /></div>
+          <div className="px-4 pb-3 flex gap-4"><Skeleton className="w-16 h-8 rounded-full bg-white/10" /><Skeleton className="w-16 h-8 rounded-full bg-white/10" /><Skeleton className="w-16 h-8 rounded-full bg-white/10" /></div>
         </div>
         <div style={{ height: 'calc(160px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
-        <div className="flex-1 overflow-y-auto p-4"><div className="grid grid-cols-2 gap-4">{[...Array(4)].map((_, i) => <Skeleton key={i} className="aspect-square rounded-lg" />)}</div></div>
+        <div className="flex-1 overflow-y-auto p-4"><div className="grid grid-cols-2 gap-4">{[...Array(4)].map((_, i) => <Skeleton key={i} className="aspect-square rounded-2xl bg-white/10" />)}</div></div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full bg-background overflow-hidden">
-      <div className="fixed top-0 left-0 right-0 z-50 bg-[#E8F4FE] dark:bg-sky-950/90 rounded-b-3xl shadow-sm" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-        <div className="h-12 flex items-center justify-between px-4">
-          {showSearch ? (
-            <div className="flex-1 flex items-center gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search videos..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-9" autoFocus />
+    <div className="flex flex-col h-full overflow-hidden" style={{ background: 'linear-gradient(180deg, #0a1628 0%, #132240 40%, #162a4d 70%, #1a3358 100%)' }}>
+      {/* Hero Video Background - behind the header */}
+      <div className="fixed top-0 left-0 right-0 z-0 h-[340px] overflow-hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover opacity-40"
+          src={heroStormVideo}
+        />
+        {/* Gradient fade at bottom of video */}
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 40%, #0a1628 100%)' }} />
+        {/* Lightning flash overlay */}
+        <div className="absolute inset-0 bg-white/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
+      </div>
+
+      {/* Glass Header */}
+      <div className="fixed top-0 left-0 right-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        {/* Glass morphism backdrop */}
+        <div className="absolute inset-0 backdrop-blur-xl" style={{ background: 'rgba(10, 22, 40, 0.5)', borderBottom: '1px solid rgba(255,255,255,0.08)' }} />
+        
+        <div className="relative z-10">
+          {/* Title bar */}
+          <div className="h-12 flex items-center justify-between px-4">
+            {showSearch ? (
+              <div className="flex-1 flex items-center gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
+                  <Input
+                    placeholder="Search videos..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9 h-9 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus-visible:ring-white/20"
+                    autoFocus
+                  />
+                </div>
+                <button onClick={() => { setShowSearch(false); setSearchQuery(''); }} className="p-2 -mr-2">
+                  <X className="h-5 w-5 text-white/70" />
+                </button>
               </div>
-              <button onClick={() => { setShowSearch(false); setSearchQuery(''); }} className="p-2 -mr-2"><X className="h-5 w-5 text-muted-foreground" /></button>
+            ) : (
+              <>
+                <h1 className="text-xl font-bold text-white tracking-tight">Watch</h1>
+                <div className="flex items-center gap-1">
+                  <AddedToRoutineButton isAdded={!!isWatchAdded} onAddClick={handleAddWatchToRituals} iconOnly />
+                  <button onClick={() => setShowSearch(true)} className="p-2 -mr-2">
+                    <Search className="h-5 w-5 text-white/70" />
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Category pills - horizontal scroll */}
+          <div className="px-4 pb-2">
+            <div className="flex gap-2 overflow-x-auto py-1.5 scrollbar-hide">
+              {categories.map((cat) => {
+                const config = categoryConfig[cat] || { name: cat, icon: 'Sparkles', color: 'purple' };
+                return (
+                  <WatchCategoryPill
+                    key={cat}
+                    name={config.name}
+                    isSelected={selectedCategory === cat}
+                    onClick={() => setSelectedCategory(cat)}
+                  />
+                );
+              })}
             </div>
-          ) : (
-            <>
-              <h1 className="text-xl font-bold">Watch</h1>
-              <div className="flex items-center gap-1">
-                <AddedToRoutineButton
-                  isAdded={!!isWatchAdded}
-                  onAddClick={handleAddWatchToRituals}
-                  iconOnly
-                />
-                <button onClick={() => setShowSearch(true)} className="p-2 -mr-2"><Search className="h-5 w-5 text-muted-foreground" /></button>
-              </div>
-            </>
-          )}
-        </div>
-
-        <div className="px-4 pb-3">
-          <div className="flex gap-3 overflow-x-auto py-2 scrollbar-hide">
-            {categories.map((cat) => {
-              const config = categoryConfig[cat] || { name: cat, icon: 'Sparkles', color: 'purple' };
-              return <CategoryCircle key={cat} name={config.name} icon={config.icon} color={config.color} isSelected={selectedCategory === cat} onClick={() => setSelectedCategory(cat)} />;
-            })}
           </div>
-        </div>
 
-        <div className="px-4 pb-3 flex items-center justify-between">
-          <div className="flex gap-2">
-            {(['all', 'in_progress', 'completed'] as const).map((f) => (
-              <button key={f} onClick={() => setProgressFilter(f)} className={cn('px-3 py-1.5 rounded-full text-xs font-medium transition-colors', progressFilter === f ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground')}>
-                {f === 'all' ? 'All' : f === 'in_progress' ? 'In Progress' : 'Completed'}
-              </button>
-            ))}
-          </div>
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
-                {selectedLang.value === 'persian' ? <PersianFlag size={14} /> : <span className="text-sm">{selectedLang.flag}</span>}
-              </button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-40 p-1">
-              {LANGUAGE_OPTIONS.map((l) => (
-                <button key={l.value} onClick={() => handleLanguageChange(l.value)} className={cn('w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors', preferredLanguage === l.value ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted')}>
-                  {l.value === 'persian' ? <PersianFlag size={14} /> : <span>{l.flag}</span>} <span>{l.label}</span>
+          {/* Filters row */}
+          <div className="px-4 pb-3 flex items-center justify-between">
+            <div className="flex gap-2">
+              {(['all', 'in_progress', 'completed'] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setProgressFilter(f)}
+                  className={cn(
+                    'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
+                    progressFilter === f
+                      ? 'bg-white/20 text-white backdrop-blur-sm'
+                      : 'text-white/50 hover:text-white/70'
+                  )}
+                >
+                  {f === 'all' ? 'All' : f === 'in_progress' ? 'In Progress' : 'Completed'}
                 </button>
               ))}
-            </PopoverContent>
-          </Popover>
+            </div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium bg-white/10 text-white/70 backdrop-blur-sm">
+                  {selectedLang.value === 'persian' ? <PersianFlag size={14} /> : <span className="text-sm">{selectedLang.flag}</span>}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-40 p-1 bg-[#1a2d4a]/95 backdrop-blur-xl border-white/10">
+                {LANGUAGE_OPTIONS.map((l) => (
+                  <button
+                    key={l.value}
+                    onClick={() => handleLanguageChange(l.value)}
+                    className={cn(
+                      'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors',
+                      preferredLanguage === l.value ? 'bg-white/15 text-white font-medium' : 'text-white/70 hover:bg-white/10'
+                    )}
+                  >
+                    {l.value === 'persian' ? <PersianFlag size={14} /> : <span>{l.flag}</span>} <span>{l.label}</span>
+                  </button>
+                ))}
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </div>
 
-      <div style={{ height: 'calc(210px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
+      {/* Spacer for fixed header */}
+      <div style={{ height: 'calc(190px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
-      <div className="flex-1 overflow-y-auto overscroll-contain">
+      {/* Content area */}
+      <div className="flex-1 overflow-y-auto overscroll-contain relative z-10">
         <div className="p-4 pb-safe space-y-6">
+          {/* Continue Watching */}
           {progressFilter === 'all' && selectedCategory === 'all' && !searchQuery && continueWatching.length > 0 && (
             <div className="space-y-3">
-              <div className="flex items-center gap-2"><Clock className="h-5 w-5 text-primary" /><h2 className="text-lg font-semibold">Continue Watching</h2></div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-sky-400" />
+                <h2 className="text-lg font-semibold text-white">Continue Watching</h2>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 {continueWatching.slice(0, 4).map((p) => {
                   const s = getStats(p.id);
@@ -273,12 +334,13 @@ export default function AppWatch() {
             </div>
           )}
 
+          {/* All Playlists */}
           <div className="space-y-3">
-            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            <h2 className="text-xs font-semibold text-white/40 uppercase tracking-wider">
               {selectedCategory === 'all' ? 'All Playlists' : categoryConfig[selectedCategory]?.name || selectedCategory}
             </h2>
             {filtered.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground"><p>No playlists found</p></div>
+              <div className="text-center py-12 text-white/40"><p>No playlists found</p></div>
             ) : (
               <div className="grid grid-cols-2 gap-4">
                 {filtered.map((p) => {
