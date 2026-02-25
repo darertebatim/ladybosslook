@@ -193,7 +193,22 @@ export default {
 						transform: 'translate(var(--fly-x, 0), var(--fly-y, 0)) scale(0.25)',
 						opacity: '0'
 					}
-				}
+				},
+				'cloud-drift-1': {
+					'0%, 100%': { transform: 'translateX(0) scale(1)' },
+					'50%': { transform: 'translateX(30px) scale(1.05)' },
+				},
+				'cloud-drift-2': {
+					'0%, 100%': { transform: 'translateX(0) scale(1.05)' },
+					'50%': { transform: 'translateX(-40px) scale(1)' },
+				},
+				'lightning-flash': {
+					'0%, 90%, 100%': { opacity: '0' },
+					'92%': { opacity: '0.15' },
+					'94%': { opacity: '0' },
+					'96%': { opacity: '0.1' },
+					'98%': { opacity: '0' },
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -214,7 +229,10 @@ export default {
 				'seal-pop': 'seal-pop 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
 				'emoji-bounce': 'emoji-bounce 2s cubic-bezier(0.34, 1.56, 0.64, 1)',
 				'particle-burst': 'particle-burst 2.4s ease-out forwards',
-				'ripple-wave': 'ripple-wave 1.2s ease-out'
+				'ripple-wave': 'ripple-wave 1.2s ease-out',
+				'cloud-drift-1': 'cloud-drift-1 20s ease-in-out infinite',
+				'cloud-drift-2': 'cloud-drift-2 25s ease-in-out infinite',
+				'lightning-flash': 'lightning-flash 8s ease-in-out infinite',
 			},
 			backgroundImage: {
 				'gradient-hero': 'var(--gradient-hero)',
