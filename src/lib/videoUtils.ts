@@ -63,6 +63,14 @@ export function getVideoEmbedUrl(url: string, videoType: VideoType, autoplay = f
       const id = extractVimeoId(url);
       return id ? `https://player.vimeo.com/video/${id}${autoplay ? '?autoplay=1' : ''}` : null;
     }
+    case 'instagram': {
+      // Extract Instagram post/reel shortcode and use embed URL
+      const match = url.match(/instagram\.com\/(?:reel|p|reels)\/([^/?#]+)/i);
+      if (match) {
+        return `https://www.instagram.com/p/${match[1]}/embed/`;
+      }
+      return null;
+    }
     default:
       return null;
   }

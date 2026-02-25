@@ -15,7 +15,9 @@ import { PersianFlag } from "@/components/ui/PersianFlag";
 import { AddedToRoutineButton } from "@/components/app/AddedToRoutineButton";
 import { useExistingProTask } from "@/hooks/usePlaylistRoutine";
 import { useAddRoutinePlan, RoutinePlanTask } from "@/hooks/useRoutinePlans";
+import { RoutinePreviewSheet, EditedTask } from "@/components/app/RoutinePreviewSheet";
 import { haptic } from "@/lib/haptics";
+import { toast } from "sonner";
 
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
@@ -45,33 +47,47 @@ export default function AppWatch() {
   const [preferredLanguage, setPreferredLanguage] = useState(() => localStorage.getItem('watch-language') || 'all');
   const handleLanguageChange = useCallback((lang: string) => { setPreferredLanguage(lang); localStorage.setItem('watch-language', lang); }, []);
   const selectedLang = LANGUAGE_OPTIONS.find(l => l.value === preferredLanguage) || LANGUAGE_OPTIONS[0];
+  const [showRoutineSheet, setShowRoutineSheet] = useState(false);
 
   // Add to rituals - synthetic "Watch Videos" task
   const { data: isWatchAdded } = useExistingProTask('route', '/app/watch');
   const addPlanMutation = useAddRoutinePlan();
+
+  const syntheticWatchTask: RoutinePlanTask = {
+    id: 'synthetic-watch-task',
+    plan_id: 'synthetic-watch-task',
+    title: 'Watch Videos',
+    description: null,
+    icon: '📺',
+    color: 'sky',
+    task_order: 0,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    linked_playlist_id: null,
+    pro_link_type: 'route',
+    pro_link_value: '/app/watch',
+    linked_playlist: null,
+  };
+
   const handleAddWatchToRituals = useCallback(() => {
     haptic.medium();
-    const syntheticTask: RoutinePlanTask = {
-      id: 'synthetic-watch-task',
-      plan_id: 'synthetic-watch-task',
-      title: 'Watch Videos',
-      description: null,
-      icon: '📺',
-      color: 'sky',
-      task_order: 0,
-      is_active: true,
-      created_at: new Date().toISOString(),
-      linked_playlist_id: null,
-      pro_link_type: 'route',
-      pro_link_value: '/app/watch',
-      linked_playlist: null,
-    };
-    addPlanMutation.mutate({
-      planId: 'synthetic-watch-task',
-      syntheticTasks: [syntheticTask],
-      editedTasks: [],
-    });
-  }, [addPlanMutation]);
+    setShowRoutineSheet(true);
+  }, []);
+
+  const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
+    try {
+      await addPlanMutation.mutateAsync({
+        planId: 'synthetic-watch-task',
+        syntheticTasks: [syntheticWatchTask],
+        editedTasks,
+      });
+      setShowRoutineSheet(false);
+      toast.success('Added to your rituals! 📺');
+    } catch (error) {
+      console.error('Failed to add ritual:', error);
+      toast.error('Failed to add to rituals');
+    }
+  };
 
   const { data: playlists, isLoading: playlistsLoading } = useQuery({
     queryKey: ['video-playlists-app'],
@@ -274,6 +290,15 @@ export default function AppWatch() {
           </div>
         </div>
       </div>
+
+      <RoutinePreviewSheet
+        open={showRoutineSheet}
+        onOpenChange={setShowRoutineSheet}
+        tasks={[syntheticWatchTask]}
+        routineTitle="Watch Videos"
+        onSave={handleSaveRoutine}
+        isSaving={addPlanMutation.isPending}
+      />
     </div>
   );
 }
