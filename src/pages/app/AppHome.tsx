@@ -577,9 +577,9 @@ const AppHome = () => {
     <>
       <SEOHead title="Home - LadyBoss" description="Your personal dashboard and planner" />
       
-      <div className="flex flex-col h-full overflow-hidden bg-[#132240]">
-        {/* Fixed header with integrated week strip - Calm dark style */}
-        <header className="tour-header fixed top-0 left-0 right-0 z-50 bg-[#132240] rounded-b-xl shadow-sm" style={{
+      <div className="flex flex-col h-full overflow-hidden bg-background">
+        {/* Fixed header with integrated week strip - Me+ style */}
+        <header className="tour-header fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-xl shadow-sm" style={{
         paddingTop: 'max(12px, env(safe-area-inset-top))'
       }}>
           {/* Title bar - three column layout for balanced centering */}
@@ -593,18 +593,18 @@ const AppHome = () => {
             <div className="flex justify-center justify-self-center relative z-10">
               {showCalendar ? (
                 <div className="flex items-center gap-1">
-                  <button onClick={handlePrevMonth} className="p-2.5 -m-1 rounded-full hover:bg-white/20 active:bg-white/30 transition-colors">
-                    <ChevronLeft className="h-5 w-5 text-white" />
+                  <button onClick={handlePrevMonth} className="p-2.5 -m-1 rounded-full hover:bg-white/50 active:bg-white/70 transition-colors">
+                    <ChevronLeft className="h-5 w-5" />
                   </button>
-                  <h1 className="text-lg font-bold text-white min-w-[140px] text-center">
+                  <h1 className="text-lg font-bold text-foreground min-w-[140px] text-center">
                     {format(currentMonth, 'MMMM yyyy')}
                   </h1>
-                  <button onClick={handleNextMonth} className="p-2.5 -m-1 rounded-full hover:bg-white/20 active:bg-white/30 transition-colors">
-                    <ChevronRight className="h-5 w-5 text-white" />
+                  <button onClick={handleNextMonth} className="p-2.5 -m-1 rounded-full hover:bg-white/50 active:bg-white/70 transition-colors">
+                    <ChevronRight className="h-5 w-5" />
                   </button>
                 </div>
               ) : (
-                <h1 className="text-lg font-bold text-white flex items-center gap-1">
+                <h1 className="text-lg font-bold text-foreground flex items-center gap-1">
                   {isToday(selectedDate) ? 'Today' : format(selectedDate, 'MMM d')}
                   <Star className="h-3 w-3 text-red-500 fill-red-500" />
                 </h1>
@@ -649,7 +649,7 @@ const AppHome = () => {
                 <div className={cn("transition-opacity duration-200", showCalendar ? "opacity-100" : "opacity-0")}>
                   {/* Weekday headers for expanded view */}
                   <div className="flex mb-1">
-                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => <div key={day} className="flex-1 text-center text-[11px] text-white/50 font-medium leading-tight">
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => <div key={day} className="flex-1 text-center text-[11px] text-foreground/50 font-medium leading-tight">
                         {day}
                       </div>)}
                   </div>
@@ -678,9 +678,9 @@ const AppHome = () => {
                   
                   return <button key={day.toISOString()} onClick={() => setSelectedDate(day)} className="flex-1 flex justify-center">
                         {/* Pill wraps around both day name and number for selected */}
-                        <div className={cn('flex flex-col items-center px-1 py-0.5 rounded-full transition-all', isSelected && 'bg-white/20')}>
-                          {/* Day name - selected is white, others are white/50 */}
-                          <span className={cn('text-[11px] font-medium leading-tight', isSelected ? 'text-white' : 'text-white/50')}>
+                        <div className={cn('flex flex-col items-center px-1 py-0.5 rounded-full transition-all', isSelected && 'bg-chip-lavender')}>
+                          {/* Day name - selected is black, others are grey */}
+                          <span className={cn('text-[11px] font-medium leading-tight', isSelected ? 'text-foreground' : 'text-[#C6C1CF]')}>
                             {format(day, 'EEE')}
                           </span>
                           
@@ -688,11 +688,11 @@ const AppHome = () => {
                           <div className={cn(
                             'w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5 overflow-hidden',
                             !hasBadge && (isSelected 
-                              ? 'bg-white text-[#132240]'
+                              ? 'bg-white text-foreground dark:bg-white dark:text-foreground'
                               : isTodayDate 
-                                ? 'bg-white/20 text-white/70' 
-                                : 'text-white/50'),
-                            hasBadge && isSelected && "ring-2 ring-white ring-offset-1 ring-offset-white/20"
+                                ? 'bg-violet-200/70 text-[#C6C1CF] dark:bg-violet-800/50 dark:text-violet-300' 
+                                : 'text-[#C6C1CF]'),
+                            hasBadge && isSelected && "ring-2 ring-white ring-offset-1 ring-offset-chip-lavender"
                           )}>
                             {hasBadge ? (
                               <img 
@@ -702,7 +702,7 @@ const AppHome = () => {
                               />
                             ) : (
                               <>
-                                {hasProgramEvents && <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5", isSelected ? "text-indigo-300 fill-indigo-300" : "text-indigo-400 fill-indigo-400")} />}
+                                {hasProgramEvents && <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />}
                                 <span className="relative z-10">{format(day, 'd')}</span>
                               </>
                             )}
@@ -718,7 +718,7 @@ const AppHome = () => {
             <div className="flex items-center justify-center pt-2 pb-2">
               {/* Center: Drag handle - larger tap area */}
               <button onClick={handleToggleCalendar} className="flex-1 flex justify-center py-2 -my-2">
-                <div className="w-12 h-1.5 rounded-full bg-white/25" />
+                <div className="w-12 h-1.5 rounded-full bg-foreground/25" />
               </button>
               
               {/* Right: Today button - more prominent */}
@@ -726,7 +726,7 @@ const AppHome = () => {
               setSelectedDate(new Date());
               setCurrentMonth(startOfMonth(new Date()));
               haptic.light();
-            }} className="absolute right-2 flex items-center gap-0.5 px-3 py-1.5 text-sm font-semibold text-white bg-white/20 rounded-full shadow-sm active:scale-95 transition-transform">
+            }} className="absolute right-2 flex items-center gap-0.5 px-3 py-1.5 text-sm font-semibold text-violet-700 bg-violet-200 dark:bg-violet-700 dark:text-violet-100 rounded-full shadow-sm active:scale-95 transition-transform">
                   <ChevronLeft className="h-3.5 w-3.5" />
                   Today
                 </button>}
@@ -771,8 +771,8 @@ const AppHome = () => {
               {/* Program Events Section - only show when "All" tag is selected */}
               {programEvents.length > 0 && selectedTag === null && <div className="mb-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <CalendarDays className="h-4 w-4 text-indigo-300" />
-                    <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wide">
+                    <CalendarDays className="h-4 w-4 text-indigo-500" />
+                    <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
                       Program Events
                     </h2>
                   </div>
@@ -810,13 +810,13 @@ const AppHome = () => {
               {!isNewUser && filteredTasks.length === 0 && (selectedTag !== null || programEvents.length === 0) ? (
                 <div className="text-center py-12">
                   <div className="text-4xl mb-3">✨</div>
-                  <p className="text-white/60 mb-2">
+                  <p className="text-muted-foreground mb-2">
                     {selectedTag ? `No ${selectedTag} actions for this day` : 'Your day is open'}
                   </p>
-                  <p className="text-xs text-white/40 mb-4">
+                  <p className="text-xs text-muted-foreground/70 mb-4">
                     One small action is enough
                   </p>
-                  <button onClick={() => setShowQuickStart(true)} className="text-violet-300 font-medium">
+                  <button onClick={() => setShowQuickStart(true)} className="text-violet-600 font-medium">
                     Add your first action
                   </button>
                 </div>
@@ -826,10 +826,10 @@ const AppHome = () => {
                   {!showWelcomeCard && <MoodCheckInBanner />}
                   {/* My Actions header - always show */}
                   <div className="flex items-center gap-2 mb-3">
-                    <h2 className="text-sm font-semibold text-white tracking-wide">
+                    <h2 className="text-sm font-semibold text-foreground tracking-wide">
                       My actions
                     </h2>
-                    <span className="text-xs text-white/40 ml-auto">Hold to reorder</span>
+                    <span className="text-xs text-foreground/40 ml-auto">Hold to reorder</span>
                   </div>
                   
                   {/* Coach mark spotlight for first-ever action */}
@@ -906,10 +906,10 @@ const AppHome = () => {
                     alt="Peaceful day" 
                     className="w-32 h-32 mb-5 opacity-90"
                   />
-                  <p className="text-lg font-semibold text-white mb-1">
+                  <p className="text-lg font-semibold text-foreground mb-1">
                     Your day is clear ✨
                   </p>
-                  <p className="text-sm text-white/60 text-center max-w-[240px]">
+                  <p className="text-sm text-muted-foreground text-center max-w-[240px]">
                     One small action is enough. Tap + to add something meaningful.
                   </p>
                 </div>
@@ -918,8 +918,8 @@ const AppHome = () => {
               {/* Popular Rituals Suggestions - only show rituals user hasn't added */}
               {suggestedRoutines.length > 0 && selectedTag === null && !showWelcomeCard && <div className="tour-suggested-ritual mt-6">
                   <div className="flex items-center gap-2 mb-3">
-                    <Sparkles className="h-4 w-4 text-violet-300" />
-                    <h2 className="text-sm font-semibold text-white/70 tracking-wide">
+                    <Sparkles className="h-4 w-4 text-violet-500" />
+                    <h2 className="text-sm font-semibold text-foreground/70 tracking-wide">
                       Try a ritual
                     </h2>
                   </div>
@@ -955,10 +955,10 @@ const AppHome = () => {
 
         {/* Fixed Bottom Dashboard - only show if user has active programs */}
         {activeRounds.length > 0 && (
-          <div className="tour-programs-carousel fixed bottom-0 left-0 right-0 z-40 rounded-t shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.3)] bg-[#1a2d4d] rounded-none" style={{
+          <div className="tour-programs-carousel fixed bottom-0 left-0 right-0 z-40 rounded-t shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)] bg-primary-foreground rounded-none" style={{
             paddingBottom: 'max(64px, calc(52px + env(safe-area-inset-bottom)))'
           }}>
-            <div className="px-1 py-1 bg-[#1a2d4d]">
+            <div className="px-1 py-1 bg-primary-foreground">
               <ActiveRoundsCarousel activeRounds={activeRounds} nextSessionMap={nextSessionMap} />
             </div>
           </div>

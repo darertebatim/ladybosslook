@@ -183,7 +183,7 @@ const NativeAppLayout = () => {
       {!isOnChatPage && (
       <nav className={cn(
         "fixed bottom-0 left-0 right-0 z-50 shadow-lg pb-safe",
-        (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player') || location.pathname === '/app/home')
+        (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
           ? "bg-[#132240]/80 backdrop-blur-xl border-t border-white/10"
           : "bg-background border-t"
       )}>
@@ -207,7 +207,7 @@ const NativeAppLayout = () => {
                     <Icon 
                       className={cn(
                         'h-6 w-6',
-                         (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player') || location.pathname === '/app/home')
+                         (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
                           ? (isActive ? 'text-white' : 'text-white/50')
                           : (isActive ? 'text-foreground' : 'text-muted-foreground')
                       )}
@@ -231,13 +231,13 @@ const NativeAppLayout = () => {
                   
                   {/* Active indicator dot */}
                   {isActive && (
-                    <span className={cn("absolute -bottom-1 w-1 h-1 rounded-full", (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player') || location.pathname === '/app/home') ? "bg-white" : "bg-foreground")} />
+                    <span className={cn("absolute -bottom-1 w-1 h-1 rounded-full", (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player')) ? "bg-white" : "bg-foreground")} />
                   )}
                 </div>
                 
                 <span className={cn(
                   'text-[10px]',
-                  (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player') || location.pathname === '/app/home')
+                  (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
                     ? (isActive ? 'text-white font-semibold' : 'text-white/50 font-medium')
                     : (isActive ? 'text-foreground font-semibold' : 'text-muted-foreground font-medium')
                 )}>
