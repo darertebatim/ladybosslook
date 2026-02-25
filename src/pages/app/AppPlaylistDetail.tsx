@@ -710,8 +710,8 @@ export default function AppPlaylistDetail() {
 
         {/* Continue Button */}
         {hasAccess && totalItems > 0 && (
-          <div className="flex flex-col gap-2 w-full">
-            <Button onClick={handleContinue} size="lg" className="w-full tour-continue-btn bg-white text-[#132240] hover:bg-white/90 active:bg-white/80">
+          <div className="flex items-center gap-2 w-full">
+            <Button onClick={handleContinue} size="lg" className="flex-1 tour-continue-btn bg-white text-[#132240] hover:bg-white/90 active:bg-white/80">
               <Play className="h-5 w-5 mr-1" />
               {getNextPlayableItem() ? 'Continue' : 'Play'}
             </Button>
@@ -720,8 +720,8 @@ export default function AppPlaylistDetail() {
                 isAdded={!!existingTask}
                 onAddClick={handleAddToRoutine}
                 isLoading={quickAddTask.isPending}
-                size="lg"
-                variant="outline"
+                iconOnly
+                className="h-12 w-12"
               />
             </div>
           </div>
