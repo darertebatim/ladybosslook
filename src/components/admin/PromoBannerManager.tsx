@@ -276,6 +276,9 @@ export function PromoBannerManager() {
     mutationFn: async () => {
       const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType);
       const needsCustomUrl = ['custom_url', 'external_url'].includes(destinationType);
+      if (needsDestinationId && !destinationId) {
+        throw new Error(`Please select a ${destinationType.replace('_', ' ')} before saving`);
+      }
       const { error } = await supabase.from('promo_banners').insert({
         cover_image_url: coverImageUrl,
         destination_type: destinationType,
@@ -315,6 +318,9 @@ export function PromoBannerManager() {
       if (!editingBanner) return;
       const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType);
       const needsCustomUrl = ['custom_url', 'external_url'].includes(destinationType);
+      if (needsDestinationId && !destinationId) {
+        throw new Error(`Please select a ${destinationType.replace('_', ' ')} before saving`);
+      }
       const { error } = await supabase.from('promo_banners').update({
         cover_image_url: coverImageUrl,
         destination_type: destinationType,
