@@ -192,12 +192,49 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
       );
     }
 
-    if (videoType === 'instagram' || videoType === 'tiktok') {
+    if (videoType === 'instagram') {
+      const match = url.match(/instagram\.com\/(?:reel|p|reels)\/([^/?#]+)/i);
+      const embedUrl = match ? `https://www.instagram.com/p/${match[1]}/embed/` : null;
+      
+      if (embedUrl) {
+        return (
+          <div className="relative w-full">
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center z-10">
+                <Loader2 className="h-8 w-8 animate-spin text-white/70" />
+              </div>
+            )}
+            <div className="aspect-[9/16] max-h-[75vh] w-auto mx-auto rounded-xl overflow-hidden bg-black">
+              <iframe
+                src={embedUrl}
+                title={title || 'Instagram'}
+                allowFullScreen
+                className="w-full h-full border-0"
+                onLoad={() => setIsLoading(false)}
+                onError={() => setHasError(true)}
+              />
+            </div>
+          </div>
+        );
+      }
+
+      // Fallback to external link
       return (
         <div className="flex flex-col items-center justify-center gap-4 py-16">
           <p className="text-white/60 text-sm">This video is hosted externally</p>
           <Button variant="outline" size="sm" onClick={handleOpenExternal} className="rounded-full border-white/20 text-white bg-white/10 gap-1">
-            <ExternalLink className="h-3 w-3" /> Watch on {getVideoPlatformLabel(videoType)}
+            <ExternalLink className="h-3 w-3" /> Watch on Instagram
+          </Button>
+        </div>
+      );
+    }
+
+    if (videoType === 'tiktok') {
+      return (
+        <div className="flex flex-col items-center justify-center gap-4 py-16">
+          <p className="text-white/60 text-sm">This video is hosted externally</p>
+          <Button variant="outline" size="sm" onClick={handleOpenExternal} className="rounded-full border-white/20 text-white bg-white/10 gap-1">
+            <ExternalLink className="h-3 w-3" /> Watch on TikTok
           </Button>
         </div>
       );

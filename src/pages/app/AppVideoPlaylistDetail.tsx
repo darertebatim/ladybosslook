@@ -13,14 +13,18 @@ import { useEnrollments } from "@/hooks/useAppData";
 import { useSubscription } from "@/hooks/useSubscription";
 import { cn } from "@/lib/utils";
 import { AddedToRoutineButton } from "@/components/app/AddedToRoutineButton";
-import { useExistingVideoPlaylistTask, useQuickAddVideoPlaylistTask } from "@/hooks/useVideoRoutine";
+import { RoutinePreviewSheet, EditedTask } from "@/components/app/RoutinePreviewSheet";
+import { useExistingVideoPlaylistTask } from "@/hooks/useVideoRoutine";
+import { useAddRoutinePlan, RoutinePlanTask } from "@/hooks/useRoutinePlans";
 import { haptic } from "@/lib/haptics";
+import { toast } from "sonner";
 
 export default function AppVideoPlaylistDetail() {
   const { playlistId } = useParams();
   const { user } = useAuth();
   const [playerOpen, setPlayerOpen] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [showRoutineSheet, setShowRoutineSheet] = useState(false);
 
   const { data: playlist, isLoading: plLoading } = useQuery({
     queryKey: ['video-playlist', playlistId],
@@ -61,14 +65,47 @@ export default function AppVideoPlaylistDetail() {
   const { data: enrollments } = useEnrollments();
   const { hasAccessToProgram } = useSubscription();
 
-  // Add to rituals
+  // Add to rituals via RoutinePreviewSheet
   const { data: existingTask } = useExistingVideoPlaylistTask(playlistId);
-  const addPlaylistTask = useQuickAddVideoPlaylistTask();
+  const addRoutinePlan = useAddRoutinePlan();
+
+  const syntheticPlaylistTask: RoutinePlanTask | null = playlist ? {
+    id: `video-playlist-${playlist.id}`,
+    plan_id: `synthetic-video-playlist-${playlist.id}`,
+    title: `Watch ${playlist.name}`,
+    description: null,
+    icon: '📺',
+    color: 'sky',
+    task_order: 0,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    linked_playlist_id: null,
+    pro_link_type: 'video_playlist',
+    pro_link_value: playlist.id,
+    linked_playlist: null,
+  } : null;
+
   const handleAddToRituals = useCallback(() => {
     if (!playlist) return;
     haptic.medium();
-    addPlaylistTask.mutate({ id: playlist.id, name: playlist.name, cover_image_url: playlist.cover_image_url });
-  }, [playlist, addPlaylistTask]);
+    setShowRoutineSheet(true);
+  }, [playlist]);
+
+  const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
+    if (!syntheticPlaylistTask) return;
+    try {
+      await addRoutinePlan.mutateAsync({
+        planId: syntheticPlaylistTask.plan_id,
+        syntheticTasks: [syntheticPlaylistTask],
+        editedTasks,
+      });
+      setShowRoutineSheet(false);
+      toast.success('Added to your rituals! 📺');
+    } catch (error) {
+      console.error('Failed to add ritual:', error);
+      toast.error('Failed to add to rituals');
+    }
+  };
 
   const hasAccess = playlist?.is_free
     ? true
@@ -132,7 +169,7 @@ export default function AppVideoPlaylistDetail() {
         <AddedToRoutineButton
           isAdded={!!existingTask}
           onAddClick={handleAddToRituals}
-          isLoading={addPlaylistTask.isPending}
+          isLoading={addRoutinePlan.isPending}
           iconOnly
         />
       </div>
@@ -230,6 +267,18 @@ export default function AppVideoPlaylistDetail() {
           playlist={playlistItems}
           currentIndex={currentVideoIndex}
           onVideoChange={handleVideoChange}
+        />
+      )}
+
+      {/* Routine Preview Sheet */}
+      {syntheticPlaylistTask && (
+        <RoutinePreviewSheet
+          open={showRoutineSheet}
+          onOpenChange={setShowRoutineSheet}
+          tasks={[syntheticPlaylistTask]}
+          routineTitle={playlist?.name || 'Video Playlist'}
+          onSave={handleSaveRoutine}
+          isSaving={addRoutinePlan.isPending}
         />
       )}
     </div>
