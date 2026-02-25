@@ -200,17 +200,17 @@ export default function AppWatch() {
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ background: 'linear-gradient(180deg, #0a1628 0%, #132240 40%, #162a4d 70%, #1a3358 100%)' }}>
       {/* Hero Video Background - behind the header */}
-      <div className="fixed top-0 left-0 right-0 z-0 h-[340px] overflow-hidden">
+      <div className="fixed top-0 left-0 right-0 z-0 h-[520px] overflow-hidden">
         <video
           autoPlay
           muted
           loop
           playsInline
-          className="w-full h-full object-cover opacity-40"
+          className="w-full h-full object-cover opacity-50"
           src={heroStormVideo}
         />
-        {/* Gradient fade at bottom of video */}
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 40%, #0a1628 100%)' }} />
+        {/* Smooth gradient fade into body - starts early and fades gradually */}
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 30%, rgba(10,22,40,0.3) 50%, rgba(10,22,40,0.7) 70%, #0a1628 90%, #132240 100%)' }} />
         {/* Lightning flash overlay */}
         <div className="absolute inset-0 bg-white/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
       </div>
