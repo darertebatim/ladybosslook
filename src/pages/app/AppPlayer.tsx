@@ -402,7 +402,7 @@ export default function AppPlayer() {
       <div style={{ height: 'calc(190px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto overscroll-contain relative z-10" onScroll={handleScroll}>
+      <div className="flex-1 overflow-y-auto overscroll-contain relative z-10" onScroll={handleScroll} style={{ maskImage: 'linear-gradient(to bottom, transparent 0px, black 24px)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0px, black 24px)' }}>
         <div className="p-4 pb-safe space-y-6">
           {/* Continue Learning Section */}
           {progressFilter === "all" && selectedCategory === "all" && !searchQuery && continueListening.length > 0 && (
