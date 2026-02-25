@@ -215,7 +215,7 @@ export default function AppPlayer() {
     }
 
     return (
-      <div className="grid grid-cols-2 gap-4">
+      <div className="flex flex-col gap-3">
         {items.map((playlist) => {
           const stats = getPlaylistStats(playlist.id);
           return (
@@ -411,7 +411,7 @@ export default function AppPlayer() {
                 <Clock className="h-5 w-5 text-sky-400" />
                 <h2 className="text-lg font-semibold text-white">Continue Learning</h2>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-3">
                 {continueListening.slice(0, 4).map((playlist) => {
                   const stats = getPlaylistStats(playlist.id);
                   return (
