@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
 import { useAudioDownload } from "@/hooks/useAudioDownload";
 import { CachedImage } from "@/components/ui/CachedImage";
+import heroStormVideo from "@/assets/watch-hero-storm.mp4";
 
 export default function AppAudioPlayer() {
   const { audioId } = useParams();
@@ -416,27 +417,22 @@ export default function AppAudioPlayer() {
 
   if (isLoading) {
     return (
-      <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
-        {/* Fixed Header Skeleton */}
+      <div className="h-[100dvh] flex flex-col overflow-hidden" style={{ background: '#132240' }}>
         <div 
-          className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-xl rounded-b-3xl shadow-sm"
+          className="fixed top-0 left-0 right-0 z-50"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="pt-3 pb-2 px-4 flex items-center gap-3">
-            <Skeleton className="h-10 w-10 rounded-full" />
-            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-10 w-10 rounded-full bg-white/10" />
+            <Skeleton className="h-5 w-32 bg-white/10" />
           </div>
         </div>
-        
-        {/* Header Spacer */}
         <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
-        
         <div className="flex-1 flex flex-col items-center justify-center p-4">
-          <Skeleton className="aspect-square w-full max-w-[220px] rounded-2xl mb-6" />
-          <Skeleton className="h-6 w-3/4 mb-2" />
-          <Skeleton className="h-4 w-1/2 mb-8" />
+          <Skeleton className="aspect-square w-full max-w-[220px] rounded-2xl mb-6 bg-white/10" />
+          <Skeleton className="h-6 w-3/4 mb-2 bg-white/10" />
+          <Skeleton className="h-4 w-1/2 mb-8 bg-white/10" />
         </div>
-        
         <div className="pb-safe" />
       </div>
     );
@@ -444,36 +440,31 @@ export default function AppAudioPlayer() {
 
   if (!audio) {
     return (
-      <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
-        {/* Fixed Header */}
+      <div className="h-[100dvh] flex flex-col overflow-hidden" style={{ background: '#132240' }}>
         <div 
-          className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-xl rounded-b-3xl shadow-sm"
+          className="fixed top-0 left-0 right-0 z-50"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="pt-1 pb-2 px-4">
-            <BackButton to="/app/player" label="Library" />
+            <BackButton to="/app/player" label="Library" className="text-white" />
           </div>
         </div>
-        
-        {/* Header Spacer */}
         <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
-        
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center">
-            <p className="text-muted-foreground mb-4">Audio not found</p>
-            <Button onClick={() => navigate('/app/player')}>
+            <p className="text-white/60 mb-4">Audio not found</p>
+            <Button onClick={() => navigate('/app/player')} className="bg-white text-[#132240] hover:bg-white/90">
               Back to Library
             </Button>
           </div>
         </div>
-        
         <div className="pb-safe" />
       </div>
     );
   }
 
   return (
-    <div className="h-[100dvh] bg-background relative overflow-hidden flex flex-col">
+    <div className="h-[100dvh] relative overflow-hidden flex flex-col" style={{ background: '#132240' }}>
       {/* Track Completion Celebration */}
       <TrackCompletionCelebration
         isOpen={showCelebration}
@@ -487,21 +478,28 @@ export default function AppAudioPlayer() {
         isPlaylistComplete={isPlaylistComplete}
       />
 
-      {/* Blurred Background with Cover Art */}
+      {/* Storm Video Background */}
+      <div className="fixed inset-0 z-0 h-[420px] overflow-hidden">
+        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-40" src={heroStormVideo} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 30%, rgba(19,34,64,0.5) 60%, #132240 100%)' }} />
+        <div className="absolute inset-0 bg-white/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
+      </div>
+
+      {/* Blurred Cover Art Overlay */}
       {coverImageUrl && (
-        <div className="fixed inset-0 z-0">
+        <div className="fixed inset-0 z-[1]">
           <img
             src={coverImageUrl}
             alt=""
-            className="w-full h-full object-cover scale-110 blur-3xl opacity-30 dark:opacity-20"
+            className="w-full h-full object-cover scale-110 blur-3xl opacity-15"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(19,34,64,0.3) 0%, rgba(19,34,64,0.7) 50%, #132240 100%)' }} />
         </div>
       )}
 
       {/* Fixed Header */}
       <div 
-        className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-xl rounded-b-3xl shadow-sm"
+        className="fixed top-0 left-0 right-0 z-50"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="pt-1 pb-2 px-4 flex items-center gap-1">
@@ -514,9 +512,9 @@ export default function AppAudioPlayer() {
                 navigate('/app/player');
               }
             }}
-            className="flex items-center gap-0.5 min-h-[44px] min-w-[44px] px-1 -ml-1 text-primary hover:bg-transparent active:opacity-70 transition-opacity"
+            className="flex items-center gap-0.5 min-h-[44px] min-w-[44px] px-1 -ml-1 text-white hover:bg-transparent active:opacity-70 transition-opacity"
           >
-            <ChevronLeft className="h-7 w-7 shrink-0" />
+            <ChevronLeft className="h-7 w-7 shrink-0 text-white" />
           </button>
           
           <div className="flex-1 min-w-0 flex items-center gap-2">
@@ -526,15 +524,15 @@ export default function AppAudioPlayer() {
                   const navPlaylistId = isModuleMode ? contextPlaylistId : playlistInfo?.playlist_id;
                   if (navPlaylistId) navigate(`/app/player/playlist/${navPlaylistId}`);
                 }}
-                className="text-sm font-medium hover:text-primary transition-colors truncate"
+                className="text-sm font-medium text-white hover:text-white/80 transition-colors truncate"
               >
                 {isModuleMode ? modulePlaylistInfo?.name : playlistInfo?.audio_playlists.name}
               </button>
             ) : (
-              <span className="text-sm font-medium">Now Playing</span>
+              <span className="text-sm font-medium text-white">Now Playing</span>
             )}
             {currentTrackIndex >= 0 && (
-              <span className="text-xs text-muted-foreground shrink-0">
+              <span className="text-xs text-white/50 shrink-0">
                 • {currentTrackIndex + 1}/{isModuleMode ? modulePlaylist?.length : playlistTracks?.length}
               </span>
             )}
@@ -545,7 +543,7 @@ export default function AppAudioPlayer() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 relative"
+              className="h-10 w-10 relative text-white hover:bg-white/10"
               onClick={() => {
                 if (isDownloaded(audio.id)) {
                   haptic.light();
@@ -564,7 +562,7 @@ export default function AppAudioPlayer() {
               title={isDownloaded(audio.id) ? "Remove download" : "Download for offline"}
             >
               {isDownloaded(audio.id) ? (
-                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
               ) : isDownloading(audio.id) ? (
                 <div className="relative h-5 w-5">
                   <svg className="h-5 w-5 -rotate-90" viewBox="0 0 20 20">
@@ -588,7 +586,7 @@ export default function AppAudioPlayer() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10"
+              className="h-10 w-10 text-white hover:bg-white/10"
               onClick={() => {
                 if (existingTask) {
                   haptic.light();
@@ -602,7 +600,7 @@ export default function AppAudioPlayer() {
               title={existingTask ? "Go to planner" : "Add to my rituals"}
             >
               {existingTask ? (
-                <Check className="h-5 w-5 text-emerald-600" />
+                <Check className="h-5 w-5 text-emerald-400" />
               ) : (
                 <CalendarPlus className="h-5 w-5" />
               )}
@@ -614,8 +612,8 @@ export default function AppAudioPlayer() {
             (!isModuleMode && playlistTracks && playlistTracks.length > 1)) && (
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full shrink-0">
-                  <List className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="rounded-full shrink-0 text-white hover:bg-white/10">
+                  <List className="h-5 w-5 text-white" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="bottom" className="h-[70vh]">
@@ -725,7 +723,7 @@ export default function AppAudioPlayer() {
       <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
       {/* Main Content - Centered vertically */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-3 overflow-hidden">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-3 overflow-hidden" style={{ zIndex: 2 }}>
         <div className="max-w-md w-full flex flex-col gap-3">
           {/* Cover Art - Constrained size */}
           <div className="w-full max-w-[220px] mx-auto rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] shrink-0">
@@ -744,13 +742,12 @@ export default function AppAudioPlayer() {
 
           {/* Title & Description - Compact */}
           <div className="text-center shrink-0">
-            <h1 className="text-lg font-bold leading-tight line-clamp-2">{audio.title}</h1>
+            <h1 className="text-lg font-bold leading-tight line-clamp-2 text-white">{audio.title}</h1>
             {audio.description && (
-              <p className="text-muted-foreground text-sm line-clamp-1 mt-1">{audio.description}</p>
+              <p className="text-white/50 text-sm line-clamp-1 mt-1">{audio.description}</p>
             )}
-            {/* Completed Badge */}
             {isTrackCompleted && (
-              <Badge variant="secondary" className="mt-2 gap-1 bg-green-500/10 text-green-600 border-green-500/20">
+              <Badge variant="secondary" className="mt-2 gap-1 bg-emerald-500/20 text-emerald-300 border-emerald-500/30">
                 <CheckCircle className="h-3 w-3" />
                 Completed
               </Badge>
@@ -793,11 +790,11 @@ export default function AppAudioPlayer() {
               onClick={() => navigate(`/app/player/${nextTrack.id}`)}
               className={cn(
                 "w-full mt-2 p-3 rounded-xl",
-                "bg-muted/30 hover:bg-muted/50 transition-colors",
-                "border border-border/30"
+                "bg-white/10 hover:bg-white/15 transition-colors",
+                "border border-white/10"
               )}
             >
-              <p className="text-xs text-muted-foreground mb-2 text-left">Up Next</p>
+              <p className="text-xs text-white/50 mb-2 text-left">Up Next</p>
               <div className="flex items-center gap-3">
                 {nextTrack.coverImageUrl ? (
                   <img
@@ -806,19 +803,19 @@ export default function AppAudioPlayer() {
                     className="h-10 w-10 rounded-lg object-cover"
                   />
                 ) : (
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Play className="h-4 w-4 text-primary" />
+                  <div className="h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center">
+                    <Play className="h-4 w-4 text-white/50" />
                   </div>
                 )}
                 <div className="flex-1 min-w-0 text-left">
-                  <p className="text-sm font-medium truncate">{nextTrack.title}</p>
+                  <p className="text-sm font-medium truncate text-white">{nextTrack.title}</p>
                   {nextTrack.duration && (
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-white/50">
                       {formatDuration(nextTrack.duration)}
                     </p>
                   )}
                 </div>
-                <Play className="h-4 w-4 text-muted-foreground" />
+                <Play className="h-4 w-4 text-white/50" />
               </div>
             </button>
           )}
