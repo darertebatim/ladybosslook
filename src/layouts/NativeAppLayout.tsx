@@ -181,34 +181,37 @@ const NativeAppLayout = () => {
 
       {/* Bottom Navigation - hidden on chat page for full-screen experience */}
       {!isOnChatPage && (
+      <div className="fixed bottom-0 left-0 right-0 z-50 pb-safe flex justify-center px-4 pb-2">
       <nav className={cn(
-        "fixed bottom-0 left-0 right-0 z-50 shadow-lg pb-safe",
+        "w-full max-w-md rounded-2xl shadow-2xl",
         (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
-          ? "bg-[#132240]/80 backdrop-blur-xl border-t border-white/10"
-          : "bg-background border-t"
+          ? "bg-[#132240]/70 backdrop-blur-2xl border border-white/15 shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+          : "bg-background/75 backdrop-blur-2xl border border-border/50 shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
       )}>
-        <div className="grid grid-cols-5 pt-1.5 pb-1.5">
+        <div className="grid grid-cols-5 py-2 px-1">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path || 
               (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
             const Icon = item.icon;
             const showChatBadge = item.path === '/app/chat' && unreadCount > 0;
+            const isMediaRoute = location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player');
             
             return (
               <Link
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-0.5 min-h-[44px] transition-colors',
+                  'flex flex-col items-center justify-center gap-0.5 min-h-[44px] transition-all rounded-xl',
+                  isActive && (isMediaRoute ? 'bg-white/10' : 'bg-foreground/5'),
                   item.tourClass
                 )}
               >
                 <div className="relative flex flex-col items-center">
                     <Icon 
                       className={cn(
-                        'h-6 w-6',
-                         (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
-                          ? (isActive ? 'text-white' : 'text-white/50')
+                        'h-5 w-5',
+                        isMediaRoute
+                          ? (isActive ? 'text-white' : 'text-white/40')
                           : (isActive ? 'text-foreground' : 'text-muted-foreground')
                       )}
                     strokeWidth={isActive ? 2.5 : 1.5}
@@ -228,17 +231,12 @@ const NativeAppLayout = () => {
                   {item.showBadge && !showChatBadge && !item.badgeCount && (
                     <span className="absolute -top-0.5 -right-0.5 bg-primary w-2 h-2 rounded-full" />
                   )}
-                  
-                  {/* Active indicator dot */}
-                  {isActive && (
-                    <span className={cn("absolute -bottom-1 w-1 h-1 rounded-full", (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player')) ? "bg-white" : "bg-foreground")} />
-                  )}
                 </div>
                 
                 <span className={cn(
                   'text-[10px]',
-                  (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
-                    ? (isActive ? 'text-white font-semibold' : 'text-white/50 font-medium')
+                  isMediaRoute
+                    ? (isActive ? 'text-white font-semibold' : 'text-white/40 font-medium')
                     : (isActive ? 'text-foreground font-semibold' : 'text-muted-foreground font-medium')
                 )}>
                   {item.label}
@@ -248,6 +246,7 @@ const NativeAppLayout = () => {
           })}
         </div>
       </nav>
+      </div>
       )}
 
       {/* Full-screen Push Notification Onboarding */}
