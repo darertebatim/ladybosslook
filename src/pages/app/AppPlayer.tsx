@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Search, X, Clock, LayoutGrid, Brain, Dumbbell, Waves, Heart, BookOpen, GraduationCap, Podcast, Globe, Crown } from "lucide-react";
@@ -61,6 +61,11 @@ export default function AppPlayer() {
   const selectedLang = LANGUAGE_OPTIONS.find(l => l.value === preferredLanguage) || LANGUAGE_OPTIONS[0];
 
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
+  const [scrollY, setScrollY] = useState(0);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    setScrollY(e.currentTarget.scrollTop);
+  }, []);
 
   const handleTourReady = useCallback((tourStart: () => void) => {
     setStartTour(() => tourStart);
@@ -263,7 +268,7 @@ export default function AppPlayer() {
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
       {/* Hero Video Background */}
-      <div className="fixed top-0 left-0 right-0 z-0 h-[420px] overflow-hidden">
+      <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 h-[420px] overflow-hidden" style={{ transform: `translateY(${-scrollY * 0.4}px)` }}>
         <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-50" src={heroStormVideo} />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 30%, rgba(19,34,64,0.5) 60%, #132240 100%)' }} />
         <div className="absolute inset-0 bg-white/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
@@ -397,7 +402,7 @@ export default function AppPlayer() {
       <div style={{ height: 'calc(190px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto overscroll-contain relative z-10">
+      <div className="flex-1 overflow-y-auto overscroll-contain relative z-10" onScroll={handleScroll}>
         <div className="p-4 pb-safe space-y-6">
           {/* Continue Learning Section */}
           {progressFilter === "all" && selectedCategory === "all" && !searchQuery && continueListening.length > 0 && (

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,6 +44,11 @@ export default function AppPlaylistDetail() {
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
+  const [scrollY, setScrollY] = useState(0);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    setScrollY(e.currentTarget.scrollTop);
+  }, []);
 
   const handleTourReady = useCallback((tourStart: () => void) => {
     setStartTour(() => tourStart);
@@ -617,7 +622,7 @@ export default function AppPlaylistDetail() {
     <>
     <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
       {/* Hero Video Background */}
-      <div className="fixed top-0 left-0 right-0 z-0 h-[350px] overflow-hidden">
+      <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 h-[350px] overflow-hidden" style={{ transform: `translateY(${-scrollY * 0.4}px)` }}>
         <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-40" src={heroStormVideo} />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 30%, rgba(19,34,64,0.5) 60%, #132240 100%)' }} />
         <div className="absolute inset-0 bg-white/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
@@ -642,7 +647,7 @@ export default function AppPlaylistDetail() {
       <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto overscroll-contain relative z-10">
+      <div className="flex-1 overflow-y-auto overscroll-contain relative z-10" onScroll={handleScroll}>
         {/* Playlist Info */}
         <div className="p-4 space-y-4">
         <div className="flex gap-4">
