@@ -5,6 +5,12 @@ import { X, Loader2, ExternalLink, Gauge, SkipForward } from 'lucide-react';
 import { detectVideoType, extractYouTubeId, extractVimeoId, getVideoPlatformLabel, isVerticalVideo } from '@/lib/videoUtils';
 import { isNativeApp } from '@/lib/platform';
 import { Browser } from '@capacitor/browser';
+import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
+import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
+import { useExistingVideoTask } from '@/hooks/useVideoRoutine';
+import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
+import { haptic } from '@/lib/haptics';
+import { toast } from 'sonner';
 
 interface VideoItem {
   url: string;
@@ -20,6 +26,8 @@ interface AppVideoPlayerProps {
   title?: string;
   description?: string;
   isVertical?: boolean;
+  /** Video ID for ritual linking */
+  videoId?: string;
   /** Playlist of all videos for auto-play next */
   playlist?: VideoItem[];
   /** Index of the current video in the playlist */
@@ -30,7 +38,7 @@ interface AppVideoPlayerProps {
 
 const SPEEDS = [1, 1.5, 2] as const;
 
-export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVertical: isVerticalOverride, playlist, currentIndex, onVideoChange }: AppVideoPlayerProps) {
+export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVertical: isVerticalOverride, videoId, playlist, currentIndex, onVideoChange }: AppVideoPlayerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [speedIndex, setSpeedIndex] = useState(0);
@@ -38,6 +46,11 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
 
   const videoType = detectVideoType(url);
   const vertical = isVerticalOverride ?? isVerticalVideo(url);
+
+  // Add to rituals for individual video
+  const [showRoutineSheet, setShowRoutineSheet] = useState(false);
+  const { data: existingTask } = useExistingVideoTask(videoId);
+  const addRoutinePlan = useAddRoutinePlan();
 
   const hasNext = playlist && currentIndex !== undefined && currentIndex < playlist.length - 1;
 
@@ -275,16 +288,29 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
                 <p className="text-white/40 text-xs mt-1">{currentIndex + 1} / {playlist.length}</p>
               )}
             </div>
-            {hasNext && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={playNext}
-                className="text-white/80 hover:text-white hover:bg-white/10 gap-1 flex-shrink-0"
-              >
-                Next <SkipForward className="h-4 w-4" />
-              </Button>
-            )}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {videoId && (
+                <AddedToRoutineButton
+                  isAdded={!!existingTask}
+                  onAddClick={() => {
+                    haptic.medium();
+                    setShowRoutineSheet(true);
+                  }}
+                  iconOnly
+                  className="text-white hover:text-white"
+                />
+              )}
+              {hasNext && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={playNext}
+                  className="text-white/80 hover:text-white hover:bg-white/10 gap-1"
+                >
+                  Next <SkipForward className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -293,6 +319,60 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
           <div style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} />
         )}
       </SheetContent>
+
+      {/* Routine Preview Sheet for individual video */}
+      {videoId && title && (
+        <RoutinePreviewSheet
+          open={showRoutineSheet}
+          onOpenChange={setShowRoutineSheet}
+          tasks={[{
+            id: `synthetic-video-${videoId}`,
+            plan_id: `synthetic-video-${videoId}`,
+            title: title,
+            icon: '🎬',
+            color: 'sky',
+            task_order: 0,
+            is_active: true,
+            created_at: new Date().toISOString(),
+            linked_playlist_id: null,
+            pro_link_type: 'video',
+            pro_link_value: videoId,
+            linked_playlist: null,
+            tag: 'pro',
+          } as RoutinePlanTask]}
+          routineTitle={title}
+          onSave={async (selectedTaskIds, editedTasks) => {
+            try {
+              await addRoutinePlan.mutateAsync({
+                planId: `synthetic-video-${videoId}`,
+                selectedTaskIds,
+                editedTasks,
+                syntheticTasks: [{
+                  id: `synthetic-video-${videoId}`,
+                  plan_id: `synthetic-video-${videoId}`,
+                  title: title,
+                  icon: '🎬',
+                  color: 'sky',
+                  task_order: 0,
+                  is_active: true,
+                  created_at: new Date().toISOString(),
+                  linked_playlist_id: null,
+                  pro_link_type: 'video',
+                  pro_link_value: videoId,
+                  linked_playlist: null,
+                  tag: 'pro',
+                } as RoutinePlanTask],
+              });
+              toast.success('Added to your rituals! 🎬');
+              setShowRoutineSheet(false);
+            } catch (error) {
+              console.error('Failed to add ritual:', error);
+              toast.error('Failed to add to ritual');
+            }
+          }}
+          isSaving={addRoutinePlan.isPending}
+        />
+      )}
     </Sheet>
   );
 }
