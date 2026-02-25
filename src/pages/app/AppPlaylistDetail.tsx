@@ -679,7 +679,7 @@ export default function AppPlaylistDetail() {
                   {({'american':'🇺🇸','turkish':'🇹🇷','spanish':'🇪🇸','all':'🌐'} as Record<string,string>)[playlist.language]}
                 </Badge>
               )}
-              {playlist.is_free && <Badge className="bg-green-500">FREE</Badge>}
+              {playlist.is_free && <Badge className="bg-white/20 text-white hover:bg-white/20">FREE</Badge>}
               {playlist.requires_subscription && (
                 <Badge className="bg-amber-200 text-amber-700 gap-1">
                   <Crown className="h-3 w-3" />
@@ -711,7 +711,7 @@ export default function AppPlaylistDetail() {
         {/* Continue Button */}
         {hasAccess && totalItems > 0 && (
           <div className="flex flex-col gap-2 w-full">
-            <Button onClick={handleContinue} size="lg" className="w-full tour-continue-btn">
+            <Button onClick={handleContinue} size="lg" className="w-full tour-continue-btn bg-white text-[#132240] hover:bg-white/90 active:bg-white/80">
               <Play className="h-5 w-5 mr-1" />
               {getNextPlayableItem() ? 'Continue' : 'Play'}
             </Button>
@@ -736,7 +736,7 @@ export default function AppPlaylistDetail() {
               </p>
             </div>
             <Button 
-              className="w-full" 
+              className="w-full bg-white text-[#132240] hover:bg-white/90 active:bg-white/80" 
               size="lg"
               onClick={() => activatePlaylistMutation.mutate()}
               disabled={activatePlaylistMutation.isPending}
@@ -755,7 +755,7 @@ export default function AppPlaylistDetail() {
               </p>
             </div>
             <Button 
-              className="w-full gap-2" 
+              className="w-full gap-2 bg-white text-[#132240] hover:bg-white/90 active:bg-white/80" 
               size="lg"
               onClick={() => setShowPaywall(true)}
             >
@@ -775,7 +775,7 @@ export default function AppPlaylistDetail() {
             </div>
             {playlist.program_slug && (
               <Button 
-                className="w-full" 
+                className="w-full bg-white text-[#132240] hover:bg-white/90 active:bg-white/80" 
                 size="lg"
                 onClick={() => navigate(`/app/programs/${playlist.program_slug}`)}
               >

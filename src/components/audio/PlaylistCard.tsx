@@ -81,34 +81,17 @@ export const PlaylistCard = memo(function PlaylistCard({
   const tourClass = isFree && !isLocked ? 'tour-free-playlist' : isLocked ? 'tour-locked-playlist' : '';
 
   return (
-    <div className={`relative ${tourClass}`}>
-      {/* PLUS badge - outside card, top-left */}
-      {requiresSubscription && (
-        <Badge className="absolute -top-2.5 -left-2 z-30 bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-xs gap-1 shadow-sm">
-          <Crown className="h-3 w-3" />
-          PLUS
-        </Badge>
+    <button
+      className={cn(
+        "relative w-full text-left rounded-2xl overflow-hidden cursor-pointer transition-all active:scale-[0.98]",
+        "bg-white/10 backdrop-blur-sm",
+        tourClass
       )}
-      {/* FREE badge */}
-      {isFree && !isLocked && !requiresSubscription && (
-        <Badge className="absolute -top-2.5 -left-2 z-30 bg-green-500 hover:bg-green-500 text-white rounded-full text-xs shadow-sm">
-          FREE
-        </Badge>
-      )}
-
-      <button
-        className="overflow-hidden cursor-pointer transition-all active:scale-[0.98] w-full text-left rounded-2xl shadow-lg border border-border/50"
-        onClick={handleClick}
-      >
-        {/* Title Header Section */}
-        <div className="px-3 py-3 rounded-t-2xl h-[3.75rem] flex items-start bg-muted/50">
-          <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
-            {name}
-          </h3>
-        </div>
-
-        {/* Square Image Container */}
-        <div className="relative aspect-square w-full overflow-hidden">
+      onClick={handleClick}
+    >
+      <div className="flex gap-3 p-3">
+        {/* Square thumbnail */}
+        <div className="relative h-24 w-24 flex-shrink-0 rounded-xl overflow-hidden">
           {coverImageUrl ? (
             <CachedImage
               src={coverImageUrl}
@@ -118,67 +101,87 @@ export const PlaylistCard = memo(function PlaylistCard({
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-              <Music className="h-16 w-16 text-primary/40" />
+            <div className="w-full h-full bg-white/10 flex items-center justify-center">
+              <Music className="h-8 w-8 text-white/30" />
             </div>
           )}
 
-          {/* Lock overlay */}
+          {/* Lock icon on thumbnail */}
           {isLocked && !isFree && (
-            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-              <Lock className="h-8 w-8 text-muted-foreground" />
+            <div className="absolute bottom-1.5 left-1.5">
+              <div className="w-6 h-6 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                <Lock className="h-3 w-3 text-white/80" />
+              </div>
             </div>
           )}
 
-          {/* Bottom info bar */}
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2.5 pb-2 pt-6">
-            <div className="flex items-center justify-between text-[11px] text-white/90">
-              <div className="flex items-center gap-2">
-                <span className="flex items-center gap-0.5">
-                  <Music className="h-3 w-3" />
-                  {trackCount}
-                </span>
-                <span className="flex items-center gap-0.5">
-                  <Clock className="h-3 w-3" />
-                  {formatDuration(totalDuration)}
-                </span>
-                {language && language !== 'all' && (
-                  language === 'persian'
-                    ? <PersianFlag size={10} />
-                    : LANG_FLAGS[language] && <span className="text-[10px] flex-shrink-0 leading-none">{LANG_FLAGS[language]}</span>
-                )}
-              </div>
-              {(!isLocked || isFree) && progressPercentage > 0 ? (
-                <span className="flex items-center gap-0.5 font-medium">
-                  <CheckCircle2 className="h-3 w-3" />
-                  {Math.round(progressPercentage)}%
-                </span>
-              ) : (requiresSubscription && !isSubscribed) ? (
-                <FluentEmoji emoji="🔒" size={14} />
-              ) : null}
-            </div>
-          </div>
-
-          {/* Progress bar */}
+          {/* Progress bar on thumbnail */}
           {(!isLocked || isFree) && progressPercentage > 0 && (
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20">
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
               <div 
                 className="h-full bg-primary transition-all duration-300"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
           )}
-
         </div>
 
-        {/* Enroll CTA for locked playlists */}
-        {isLocked && !isFree && programSlug && (
-          <div className="flex items-center justify-center gap-1.5 py-2.5 px-3 bg-foreground text-background text-xs font-medium rounded-b-2xl">
-            <span>Tap to enroll</span>
-            <ChevronRight className="h-3.5 w-3.5" />
+        {/* Content */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+          {/* Meta line: category + duration */}
+          <div className="flex items-center gap-1.5 text-[11px] text-white/50">
+            {category && (
+              <span className="capitalize">{category}</span>
+            )}
+            {category && totalDuration > 0 && <span>·</span>}
+            {totalDuration > 0 && (
+              <span>{formatDuration(totalDuration)}</span>
+            )}
           </div>
-        )}
-      </button>
-    </div>
+
+          {/* Title */}
+          <h3 className="font-bold text-sm text-white line-clamp-2 leading-snug">
+            {name}
+          </h3>
+
+          {/* Badges row */}
+          <div className="flex items-center gap-1.5 mt-0.5">
+            {requiresSubscription && (
+              <Badge className="bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-[10px] px-1.5 py-0 gap-0.5 shadow-sm h-4">
+                <Crown className="h-2.5 w-2.5" />
+                PLUS
+              </Badge>
+            )}
+            {isFree && !isLocked && !requiresSubscription && (
+              <Badge className="bg-white/20 hover:bg-white/20 text-white rounded-full text-[10px] px-1.5 py-0 shadow-sm h-4">
+                FREE
+              </Badge>
+            )}
+            {language && language !== 'all' && (
+              language === 'persian'
+                ? <PersianFlag size={10} />
+                : LANG_FLAGS[language] && <span className="text-[10px] flex-shrink-0 leading-none">{LANG_FLAGS[language]}</span>
+            )}
+            {(!isLocked || isFree) && progressPercentage > 0 && (
+              <span className="flex items-center gap-0.5 text-[10px] text-white/70 font-medium">
+                <CheckCircle2 className="h-3 w-3" />
+                {Math.round(progressPercentage)}%
+              </span>
+            )}
+            {(requiresSubscription && !isSubscribed) && (
+              <FluentEmoji emoji="🔒" size={12} />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Enroll CTA for locked playlists */}
+      {isLocked && !isFree && programSlug && (
+        <div className="flex items-center justify-center gap-1.5 py-2 px-3 bg-white/10 text-white text-xs font-medium">
+          <span>Tap to enroll</span>
+          <ChevronRight className="h-3.5 w-3.5" />
+        </div>
+      )}
+    </button>
   );
 });
