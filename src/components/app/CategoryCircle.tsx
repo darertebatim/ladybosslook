@@ -5,10 +5,11 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 interface CategoryCircleProps {
   name: string;
   icon: string;
-  emoji?: string; // Optional emoji for 3D display
+  emoji?: string;
   color: string;
   isSelected?: boolean;
   onClick?: () => void;
+  variant?: 'light' | 'dark';
 }
 
 const colorMap: Record<string, { bg: string; text: string }> = {
@@ -24,9 +25,10 @@ const colorMap: Record<string, { bg: string; text: string }> = {
   rose: { bg: 'bg-rose-100', text: 'text-rose-600' },
 };
 
-export function CategoryCircle({ name, icon, emoji, color, isSelected, onClick }: CategoryCircleProps) {
+export function CategoryCircle({ name, icon, emoji, color, isSelected, onClick, variant = 'light' }: CategoryCircleProps) {
   const IconComponent = (LucideIcons as any)[icon] || LucideIcons.Sparkles;
   const colors = colorMap[color] || colorMap.yellow;
+  const isDark = variant === 'dark';
 
   return (
     <button
@@ -36,19 +38,24 @@ export function CategoryCircle({ name, icon, emoji, color, isSelected, onClick }
       <div
         className={cn(
           'w-12 h-12 rounded-full flex items-center justify-center transition-all',
-          colors.bg,
-          isSelected && 'ring-2 ring-primary ring-offset-2'
+          isDark
+            ? isSelected
+              ? 'bg-white/25 ring-2 ring-white/50 ring-offset-2 ring-offset-transparent'
+              : 'bg-white/12 backdrop-blur-sm'
+            : cn(colors.bg, isSelected && 'ring-2 ring-primary ring-offset-2')
         )}
       >
         {emoji ? (
           <FluentEmoji emoji={emoji} size={22} />
         ) : (
-          <IconComponent className={cn('w-5 h-5', colors.text)} />
+          <IconComponent className={cn('w-5 h-5', isDark ? 'text-white' : colors.text)} />
         )}
       </div>
       <span className={cn(
         'text-[11px] text-center font-medium max-w-[56px] truncate',
-        isSelected ? 'text-primary' : 'text-muted-foreground'
+        isDark
+          ? isSelected ? 'text-white' : 'text-white/70'
+          : isSelected ? 'text-primary' : 'text-muted-foreground'
       )}>
         {name}
       </span>
