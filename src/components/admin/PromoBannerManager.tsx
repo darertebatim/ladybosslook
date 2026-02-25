@@ -274,7 +274,7 @@ export function PromoBannerManager() {
   // Create banner mutation
   const createMutation = useMutation({
     mutationFn: async () => {
-      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding'].includes(destinationType);
+      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType);
       const needsCustomUrl = ['custom_url', 'external_url'].includes(destinationType);
       const { error } = await supabase.from('promo_banners').insert({
         cover_image_url: coverImageUrl,
@@ -313,7 +313,7 @@ export function PromoBannerManager() {
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!editingBanner) return;
-      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding'].includes(destinationType);
+      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType);
       const needsCustomUrl = ['custom_url', 'external_url'].includes(destinationType);
       const { error } = await supabase.from('promo_banners').update({
         cover_image_url: coverImageUrl,

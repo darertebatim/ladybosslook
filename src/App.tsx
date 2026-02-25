@@ -37,6 +37,7 @@ const AppProfile = lazy(() => import("@/pages/app/AppProfile"));
 const AppPlayer = lazy(() => import("@/pages/app/AppPlayer"));
 const AppWatch = lazy(() => import("@/pages/app/AppWatch"));
 const AppVideoPlaylistDetail = lazy(() => import("@/pages/app/AppVideoPlaylistDetail"));
+const AppVideoDetail = lazy(() => import("@/pages/app/AppVideoDetail"));
 const AppPlaylistDetail = lazy(() => import("@/pages/app/AppPlaylistDetail"));
 const AppAudioPlayer = lazy(() => import("@/pages/app/AppAudioPlayer"));
 const AppChat = lazy(() => import("@/pages/app/AppChat"));
@@ -435,6 +436,7 @@ const App = () => (
                     <Route path="player/:audioId" element={<AppAudioPlayer />} />
                     <Route path="watch" element={<AppWatch />} />
                     <Route path="watch/playlist/:playlistId" element={<AppVideoPlaylistDetail />} />
+                    <Route path="watch/video/:videoId" element={<AppVideoDetail />} />
                     <Route path="chat" element={<AppChat />} />
                     <Route path="coach-chat" element={<AppCoachChat />} />
                     <Route path="channels" element={<AppChannelsList />} />

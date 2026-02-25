@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player' | 'programs' | 'channels';
+type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player' | 'programs' | 'channels' | 'watch';
 
 interface PromoBannerData {
   id: string;
@@ -389,7 +389,7 @@ export function PromoBanner({
         break;
       case 'video_playlist':
         if (activeBanner.destination_id) {
-          navigate(`/app/watch/${activeBanner.destination_id}`);
+          navigate(`/app/watch/playlist/${activeBanner.destination_id}`);
         } else {
           navigate('/app/watch');
         }
