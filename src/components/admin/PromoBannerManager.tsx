@@ -133,7 +133,20 @@ export function PromoBannerManager() {
     },
   });
 
-  // Fetch task templates for destination selector
+  // Fetch video playlists for destination selector
+  const { data: videoPlaylists } = useQuery({
+    queryKey: ['video-playlists-for-promo'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('video_playlists')
+        .select('id, name')
+        .eq('is_hidden', false)
+        .order('name');
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const { data: taskTemplates } = useQuery({
     queryKey: ['task-templates-for-promo'],
     queryFn: async () => {
@@ -740,7 +753,7 @@ export function PromoBannerManager() {
                       {destinationType === 'onboarding' && [dearMeFlow, mePlusFlow].map(f => (
                         <SelectItem key={f.id} value={f.id}>🎯 {f.name}</SelectItem>
                       ))}
-                      {destinationType === 'video_playlist' && playlists?.map(p => (
+                      {destinationType === 'video_playlist' && videoPlaylists?.map(p => (
                         <SelectItem key={p.id} value={p.id}>🎬 {p.name}</SelectItem>
                       ))}
                     </SelectContent>
