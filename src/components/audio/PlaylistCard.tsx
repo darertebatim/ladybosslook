@@ -129,7 +129,7 @@ export const PlaylistCard = memo(function PlaylistCard({
         {/* Content */}
         <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
           {/* Meta line: category + duration */}
-          <div className="flex items-center gap-1.5 text-[11px] text-white/50">
+          <div className="flex items-center gap-1.5 text-[11px] text-white/70">
             {category && (
               <span className="capitalize">{category}</span>
             )}
