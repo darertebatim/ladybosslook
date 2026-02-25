@@ -478,14 +478,7 @@ export default function AppAudioPlayer() {
         isPlaylistComplete={isPlaylistComplete}
       />
 
-      {/* Storm Video Background */}
-      <div className="fixed inset-0 z-0 h-[420px] overflow-hidden">
-        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-40" src={heroStormVideo} />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 30%, rgba(19,34,64,0.5) 60%, #132240 100%)' }} />
-        <div className="absolute inset-0 bg-white/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
-      </div>
-
-      {/* Blurred Cover Art Overlay */}
+      {/* Blurred Cover Art Background */}
       {coverImageUrl && (
         <div className="fixed inset-0 z-[1]">
           <img
