@@ -119,16 +119,15 @@ export const ProgressBar = ({
             "w-full rounded-full transition-all duration-200",
             isGlass 
               ? "h-2 bg-white/20 backdrop-blur-sm group-hover:h-3" 
-              : "h-2 bg-secondary group-hover:h-3"
+              : "h-2 bg-white/20 group-hover:h-3"
           )}
         >
-          {/* Progress fill with gradient */}
           <div
             className={cn(
               "h-full rounded-full transition-all duration-100",
               isGlass 
                 ? "bg-gradient-to-r from-white/80 to-white shadow-[0_0_10px_rgba(255,255,255,0.3)]" 
-                : "bg-primary"
+                : "bg-white"
             )}
             style={{ width: `${displayProgress}%` }}
           />
@@ -143,7 +142,7 @@ export const ProgressBar = ({
             isDragging && "opacity-100 scale-110",
             isGlass 
               ? "w-5 h-5 bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)]" 
-              : "w-5 h-5 bg-primary"
+              : "w-5 h-5 bg-white"
           )}
           style={{ 
             left: `${displayProgress}%`, 
@@ -155,10 +154,10 @@ export const ProgressBar = ({
       {/* Time labels */}
       <div className={cn(
         "flex justify-between text-sm font-medium",
-        isGlass ? "text-white/80" : "text-muted-foreground"
+        isGlass ? "text-white/80" : "text-white/80"
       )}>
         <span>{formatTime(currentTime)}</span>
-        <span className="text-muted-foreground/60">-{formatTime(Math.max(0, duration - currentTime))}</span>
+        <span className="text-white/50">-{formatTime(Math.max(0, duration - currentTime))}</span>
       </div>
     </div>
   );

@@ -111,12 +111,12 @@ export const AudioControls = ({
         onClick={handleSkipBack}
         className={cn(
           "flex flex-col items-center gap-1 p-3 rounded-2xl",
-          "bg-secondary/50 hover:bg-secondary transition-colors",
+          "hover:bg-white/10 transition-colors",
           "active:scale-95"
         )}
       >
-        <RotateCcw className="h-6 w-6" />
-        <span className="text-xs text-muted-foreground font-medium">10s</span>
+        <RotateCcw className="h-6 w-6 text-white" />
+        <span className="text-xs text-white/60 font-medium">10s</span>
       </button>
 
       {/* Play/Pause - Large Central Button */}
@@ -124,7 +124,7 @@ export const AudioControls = ({
         onClick={handlePlayPause}
         className={cn(
           "h-20 w-20 rounded-full flex items-center justify-center",
-          "bg-primary text-primary-foreground",
+          "bg-white text-[#132240]",
           "shadow-lg hover:shadow-xl transition-all",
           "active:scale-95 hover:scale-105"
         )}
@@ -141,12 +141,12 @@ export const AudioControls = ({
         onClick={handleSkipForward}
         className={cn(
           "flex flex-col items-center gap-1 p-3 rounded-2xl",
-          "bg-secondary/50 hover:bg-secondary transition-colors",
+          "hover:bg-white/10 transition-colors",
           "active:scale-95"
         )}
       >
-        <RotateCw className="h-6 w-6" />
-        <span className="text-xs text-muted-foreground font-medium">10s</span>
+        <RotateCw className="h-6 w-6 text-white" />
+        <span className="text-xs text-white/60 font-medium">10s</span>
       </button>
 
       {/* Speed Button */}
@@ -154,12 +154,12 @@ export const AudioControls = ({
         onClick={handleRateChange}
         className={cn(
           "flex flex-col items-center gap-1 p-3 rounded-2xl min-w-[52px]",
-          "bg-secondary/50 hover:bg-secondary transition-colors",
+          "hover:bg-white/10 transition-colors",
           "active:scale-95"
         )}
       >
-        <span className="text-sm font-bold">{playbackRate}x</span>
-        <span className="text-xs text-muted-foreground font-medium">Speed</span>
+        <span className="text-sm font-bold text-white">{playbackRate}x</span>
+        <span className="text-xs text-white/60 font-medium">Speed</span>
       </button>
     </div>
   );
