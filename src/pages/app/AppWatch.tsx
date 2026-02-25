@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Search, X, Clock, Video, CalendarPlus } from "lucide-react";
 import { VideoPlaylistCard } from "@/components/video/VideoPlaylistCard";
@@ -185,112 +185,64 @@ export default function AppWatch() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full overflow-y-auto overscroll-contain" style={{ background: 'linear-gradient(180deg, #0a1628 0%, #1a2744 60%, hsl(var(--background)) 60%)' }}>
-        <div style={{ paddingTop: 'env(safe-area-inset-top)' }} className="min-h-[45vh] flex flex-col justify-end px-4 pb-4">
-          <Skeleton className="h-6 w-24 bg-white/10 mb-4" />
-          <div className="flex gap-4"><Skeleton className="w-16 h-16 rounded-full bg-white/10" /><Skeleton className="w-16 h-16 rounded-full bg-white/10" /><Skeleton className="w-16 h-16 rounded-full bg-white/10" /></div>
+      <div className="flex flex-col h-full bg-background overflow-hidden">
+        <div className="fixed top-0 left-0 right-0 z-50 bg-[#E8F4FE] dark:bg-sky-950/90 rounded-b-3xl shadow-sm" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+          <div className="h-12 flex items-center px-4"><Skeleton className="h-6 w-24" /></div>
+          <div className="px-4 pb-3 flex gap-4"><Skeleton className="w-16 h-16 rounded-full" /><Skeleton className="w-16 h-16 rounded-full" /><Skeleton className="w-16 h-16 rounded-full" /></div>
         </div>
-        <div className="bg-background rounded-t-3xl p-4 flex-1"><div className="grid grid-cols-2 gap-4">{[...Array(4)].map((_, i) => <Skeleton key={i} className="aspect-square rounded-lg" />)}</div></div>
+        <div style={{ height: 'calc(160px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
+        <div className="flex-1 overflow-y-auto p-4"><div className="grid grid-cols-2 gap-4">{[...Array(4)].map((_, i) => <Skeleton key={i} className="aspect-square rounded-lg" />)}</div></div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto overscroll-contain" style={{ background: 'linear-gradient(180deg, #0a1628 0%, #1a2744 50%, hsl(var(--background)) 50%)' }}>
-      {/* === HERO SKY AREA === */}
-      <div className="relative min-h-[48vh] flex flex-col overflow-hidden" style={{ paddingTop: 'env(safe-area-inset-top)', background: 'linear-gradient(180deg, #050c1a 0%, #0a1628 25%, #142040 55%, #1e3050 80%, #243352 100%)' }}>
-        {/* Starfield layer */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {Array.from({ length: 45 }).map((_, i) => {
-            const top = `${(i * 17 + 3) % 85}%`;
-            const left = `${(i * 23 + 7) % 95}%`;
-            const size = i % 3 === 0 ? 2 : 1;
-            const delay = `${(i * 0.7) % 4}s`;
-            const duration = `${3 + (i % 3)}s`;
-            return (
-              <div
-                key={`star-${i}`}
-                className="absolute rounded-full bg-white animate-star-twinkle"
-                style={{
-                  top,
-                  left,
-                  width: size,
-                  height: size,
-                  animationDelay: delay,
-                  animationDuration: duration,
-                  opacity: 0.4 + (i % 5) * 0.12,
-                }}
-              />
-            );
-          })}
-        </div>
-
-        {/* Animated cloud layers — brighter and more visible */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-[5%] -left-[30%] w-[110%] h-[70%] rounded-full animate-cloud-drift-1" style={{ background: 'radial-gradient(ellipse at center, rgba(120,160,220,0.45) 0%, rgba(80,130,190,0.2) 40%, transparent 70%)' }} />
-          <div className="absolute top-[20%] -right-[25%] w-[100%] h-[65%] rounded-full animate-cloud-drift-2" style={{ background: 'radial-gradient(ellipse at center, rgba(140,175,230,0.4) 0%, rgba(100,150,210,0.15) 40%, transparent 70%)' }} />
-          <div className="absolute top-[10%] left-[5%] w-[70%] h-[55%] rounded-full animate-cloud-drift-1" style={{ background: 'radial-gradient(ellipse at center, rgba(160,190,240,0.35) 0%, transparent 55%)', animationDelay: '-7s' }} />
-          <div className="absolute bottom-[15%] -left-[15%] w-[80%] h-[45%] rounded-full animate-cloud-drift-2" style={{ background: 'radial-gradient(ellipse at center, rgba(130,170,225,0.3) 0%, transparent 60%)', animationDelay: '-12s' }} />
-        </div>
-
-        {/* Horizon glow — warm subtle light at bottom of sky */}
-        <div className="absolute bottom-0 left-0 right-0 h-[30%] pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 100% at 50% 100%, rgba(100,140,200,0.15) 0%, transparent 70%)' }} />
-
-        {/* Lightning flash overlay */}
-        <div className="absolute inset-0 pointer-events-none animate-lightning-flash bg-white/15 rounded-b-3xl" />
-        {/* Subtle lightning bolt line */}
-        <div className="absolute top-[18%] left-[42%] w-px h-[22%] pointer-events-none animate-lightning-flash opacity-50" style={{ background: 'linear-gradient(180deg, transparent 0%, rgba(200,220,255,0.7) 30%, rgba(180,200,240,0.3) 60%, transparent 100%)', filter: 'blur(1px)', animationDelay: '-2s' }} />
-
-        {/* Top bar: title + icons */}
-        <div className="relative z-10 h-12 flex items-center justify-between px-4 mt-1">
+    <div className="flex flex-col h-full bg-background overflow-hidden">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-[#E8F4FE] dark:bg-sky-950/90 rounded-b-3xl shadow-sm" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <div className="h-12 flex items-center justify-between px-4">
           {showSearch ? (
             <div className="flex-1 flex items-center gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
-                <Input placeholder="Search videos..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-9 bg-white/10 border-white/20 text-white placeholder:text-white/40" autoFocus />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="Search videos..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-9" autoFocus />
               </div>
-              <button onClick={() => { setShowSearch(false); setSearchQuery(''); }} className="p-2 -mr-2"><X className="h-5 w-5 text-white/60" /></button>
+              <button onClick={() => { setShowSearch(false); setSearchQuery(''); }} className="p-2 -mr-2"><X className="h-5 w-5 text-muted-foreground" /></button>
             </div>
           ) : (
             <>
-              <h1 className="text-2xl font-bold text-white tracking-tight">Watch</h1>
+              <h1 className="text-xl font-bold">Watch</h1>
               <div className="flex items-center gap-1">
                 <AddedToRoutineButton
                   isAdded={!!isWatchAdded}
                   onAddClick={handleAddWatchToRituals}
                   iconOnly
                 />
-                <button onClick={() => setShowSearch(true)} className="p-2 -mr-2"><Search className="h-5 w-5 text-white/60" /></button>
+                <button onClick={() => setShowSearch(true)} className="p-2 -mr-2"><Search className="h-5 w-5 text-muted-foreground" /></button>
               </div>
             </>
           )}
         </div>
 
-        {/* Spacer pushes controls to bottom of hero */}
-        <div className="flex-1" />
-
-        {/* Categories row */}
-        <div className="relative z-10 px-4 pb-2">
+        <div className="px-4 pb-3">
           <div className="flex gap-3 overflow-x-auto py-2 scrollbar-hide">
             {categories.map((cat) => {
               const config = categoryConfig[cat] || { name: cat, icon: 'Sparkles', color: 'purple' };
-              return <CategoryCircle key={cat} name={config.name} icon={config.icon} color={config.color} isSelected={selectedCategory === cat} onClick={() => setSelectedCategory(cat)} variant="dark" />;
+              return <CategoryCircle key={cat} name={config.name} icon={config.icon} color={config.color} isSelected={selectedCategory === cat} onClick={() => setSelectedCategory(cat)} />;
             })}
           </div>
         </div>
 
-        {/* Filter row */}
-        <div className="relative z-10 px-4 pb-4 flex items-center justify-between">
+        <div className="px-4 pb-3 flex items-center justify-between">
           <div className="flex gap-2">
             {(['all', 'in_progress', 'completed'] as const).map((f) => (
-              <button key={f} onClick={() => setProgressFilter(f)} className={cn('px-3 py-1.5 rounded-full text-xs font-medium transition-colors', progressFilter === f ? 'bg-white text-[#0a1628]' : 'bg-white/10 text-white/70 backdrop-blur-sm')}>
+              <button key={f} onClick={() => setProgressFilter(f)} className={cn('px-3 py-1.5 rounded-full text-xs font-medium transition-colors', progressFilter === f ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground')}>
                 {f === 'all' ? 'All' : f === 'in_progress' ? 'In Progress' : 'Completed'}
               </button>
             ))}
           </div>
           <Popover>
             <PopoverTrigger asChild>
-              <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium bg-white/10 text-white/70 backdrop-blur-sm">
+              <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
                 {selectedLang.value === 'persian' ? <PersianFlag size={14} /> : <span className="text-sm">{selectedLang.flag}</span>}
               </button>
             </PopoverTrigger>
@@ -305,8 +257,9 @@ export default function AppWatch() {
         </div>
       </div>
 
-      {/* === CONTENT AREA with rounded top === */}
-      <div className="bg-background rounded-t-3xl -mt-4 relative z-10">
+      <div style={{ height: 'calc(210px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
+
+      <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="p-4 pb-safe space-y-6">
           {progressFilter === 'all' && selectedCategory === 'all' && !searchQuery && continueWatching.length > 0 && (
             <div className="space-y-3">
