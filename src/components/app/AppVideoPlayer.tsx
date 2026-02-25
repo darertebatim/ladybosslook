@@ -51,6 +51,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const { data: existingTask } = useExistingVideoTask(videoId);
   const addRoutinePlan = useAddRoutinePlan();
+  const syntheticTaskId = videoId ? `synthetic-video-${videoId}` : null;
 
   const hasNext = playlist && currentIndex !== undefined && currentIndex < playlist.length - 1;
 
@@ -323,13 +324,14 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
     </Sheet>
 
     {/* Routine Preview Sheet - rendered outside video player Sheet to avoid nesting issues */}
-    {videoId && title && (
+    {videoId && title && syntheticTaskId && (
       <RoutinePreviewSheet
+        key={syntheticTaskId}
         open={showRoutineSheet}
         onOpenChange={setShowRoutineSheet}
         tasks={[{
-          id: `synthetic-video-${videoId}`,
-          plan_id: `synthetic-video-${videoId}`,
+          id: syntheticTaskId,
+          plan_id: syntheticTaskId,
           title: title,
           icon: '🎬',
           color: 'sky',
@@ -344,14 +346,18 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
         } as RoutinePlanTask]}
         routineTitle={title}
         onSave={async (selectedTaskIds, editedTasks) => {
+          const effectiveSelectedTaskIds = selectedTaskIds.includes(syntheticTaskId)
+            ? selectedTaskIds
+            : [syntheticTaskId];
+
           try {
             await addRoutinePlan.mutateAsync({
-              planId: `synthetic-video-${videoId}`,
-              selectedTaskIds,
+              planId: syntheticTaskId,
+              selectedTaskIds: effectiveSelectedTaskIds,
               editedTasks,
               syntheticTasks: [{
-                id: `synthetic-video-${videoId}`,
-                plan_id: `synthetic-video-${videoId}`,
+                id: syntheticTaskId,
+                plan_id: syntheticTaskId,
                 title: title,
                 icon: '🎬',
                 color: 'sky',
