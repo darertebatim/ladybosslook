@@ -50,13 +50,13 @@ export function PaywallMascot({ program, onPurchase, onRestore, onClose, preview
         <button onClick={onRestore} className="text-sm text-white/60 hover:underline">Restore</button>
       </div>
       {/* Mascot Hero */}
-      <div className="relative h-52 overflow-hidden flex items-center justify-center">
+      <div className="relative h-52 overflow-hidden">
         <img
           src={mascotImage}
           alt="Simora mascot"
-          className="h-full object-contain"
+          className="w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[hsl(230,20%,8%)] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[hsl(230,20%,8%)] to-transparent" />
       </div>
 
       <div className="flex-1 px-6 pt-4 pb-4 flex flex-col">
