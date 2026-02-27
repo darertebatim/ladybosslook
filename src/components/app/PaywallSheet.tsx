@@ -12,6 +12,7 @@ const VARIANT_MAP: Record<PaywallVariantId, React.ComponentType<any>> = {
   gradient: PaywallGradient,
   minimal: PaywallMinimal,
   bold: PaywallBold,
+  mascot: PaywallMascot,
   comparison: PaywallComparison,
   'limited-offer': PaywallLimitedOffer,
   vip: PaywallVIP,
