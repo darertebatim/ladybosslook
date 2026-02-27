@@ -16,6 +16,7 @@ const PAYWALL_VARIANTS = [
   { id: 'gradient', label: 'Gradient', component: PaywallGradient },
   { id: 'minimal', label: 'Minimal', component: PaywallMinimal },
   { id: 'bold', label: 'Bold (Dark)', component: PaywallBold },
+  { id: 'mascot', label: 'Mascot (Dark)', component: PaywallMascot },
   { id: 'comparison', label: 'Comparison', component: PaywallComparison },
   { id: 'limited-offer', label: 'Limited Offer (50% OFF)', component: PaywallLimitedOffer },
   { id: 'vip', label: 'simora+ Plus', component: PaywallVIP },
