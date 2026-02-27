@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, X } from 'lucide-react';
+import { Check, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaywallProgramData } from './PaywallClassic';
 import appIcon from '@/assets/app-icon.png';
@@ -71,6 +71,30 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
         <p className="text-center text-sm opacity-70 mt-1">
           Short guided practices to fit your busy day
         </p>
+
+        {/* Features */}
+        <div className="mt-6 space-y-3">
+          {(() => {
+            const DEFAULT_FEATURES = [
+              'Unlimited access to all guided audio programs',
+              'Premium daily rituals & wellness routines',
+              'Exclusive meditation & breathwork sessions',
+              'Advanced progress tracking & insights',
+              'New content added regularly',
+            ];
+            const features = program.features && program.features.length > 0
+              ? program.features
+              : DEFAULT_FEATURES;
+            return features.map((feature, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                  <Check className="h-3 w-3 text-primary" />
+                </div>
+                <span className="text-sm">{feature}</span>
+              </div>
+            ));
+          })()}
+        </div>
 
         <div className="flex-1" />
 
