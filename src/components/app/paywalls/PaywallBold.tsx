@@ -162,10 +162,16 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
           onClick={handlePurchase}
           disabled={isPurchasing}
         >
-          {isPurchasing ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Continue'}
+          {isPurchasing ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Try 7 Days Free'}
         </Button>
 
-        <div className="flex items-center justify-center gap-4 mt-3 text-xs opacity-50">
+        <p className="text-center text-[10px] opacity-40 mt-2">
+          {selectedPlan === 'annual'
+            ? `7-day free trial, then $${annualPrice.toFixed(2)}/year. Cancel anytime.`
+            : `7-day free trial, then $${monthlyPrice.toFixed(2)}/month. Cancel anytime.`}
+        </p>
+
+        <div className="flex items-center justify-center gap-4 mt-2 text-xs opacity-50">
           <Link to="/sms-terms" className="hover:underline">Terms</Link>
           <Link to="/privacy" className="hover:underline">Privacy</Link>
         </div>
