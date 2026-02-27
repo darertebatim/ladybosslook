@@ -54,7 +54,7 @@ export function PaywallMascot({ program, onPurchase, onRestore, onClose, preview
         <img
           src={mascotImage}
           alt="Simora mascot"
-          className="w-full h-full object-cover object-center"
+          className="w-full h-full object-cover object-[center_35%]"
         />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[hsl(230,20%,8%)] to-transparent" />
       </div>
