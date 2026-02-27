@@ -93,16 +93,28 @@ export function PaywallGradient({ program, onPurchase, onRestore, onClose, previ
 
       {/* Features */}
       <div className="flex-1 px-6 mt-6">
-        {program.features && program.features.length > 0 && (
-          <div className="space-y-3">
-            {program.features.map((feature, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <Check className="h-4 w-4 text-primary shrink-0" />
-                <span className="text-sm text-foreground">{feature}</span>
-              </div>
-            ))}
-          </div>
-        )}
+        {(() => {
+          const DEFAULT_FEATURES = [
+            'Unlimited access to all guided audio programs',
+            'Premium daily rituals & wellness routines',
+            'Exclusive meditation & breathwork sessions',
+            'Advanced progress tracking & insights',
+            'New content added regularly',
+          ];
+          const features = program.features && program.features.length > 0
+            ? program.features
+            : DEFAULT_FEATURES;
+          return (
+            <div className="space-y-3">
+              {features.map((feature, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <Check className="h-4 w-4 text-primary shrink-0" />
+                  <span className="text-sm text-foreground">{feature}</span>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
       </div>
 
       {/* Price Display */}
