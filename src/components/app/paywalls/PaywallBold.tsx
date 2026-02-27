@@ -69,18 +69,18 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
           {program.title}
         </h2>
         <p className="text-center text-sm opacity-70 mt-1">
-          Short guided practices to fit your busy day
+          Unlocks premium wellness features including:
         </p>
 
         {/* Features */}
         <div className="mt-6 space-y-3">
           {(() => {
             const DEFAULT_FEATURES = [
-              'Unlimited access to all guided audio programs',
-              'Premium daily rituals & wellness routines',
-              'Exclusive meditation & breathwork sessions',
-              'Advanced progress tracking & insights',
-              'New content added regularly',
+              'Unlimited daily planner actions',
+              'Unlimited rituals to your planner',
+              'Exclusive audio playlists',
+              'Emotion tracking & reflections',
+              'Premium breathing exercises',
             ];
             const features = program.features && program.features.length > 0
               ? program.features
