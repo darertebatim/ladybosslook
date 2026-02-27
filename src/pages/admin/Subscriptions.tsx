@@ -265,10 +265,10 @@ export default function Subscriptions() {
                         )}
                       </div>
                     </div>
-                    <div className="flex justify-center">
-                      <IPhoneFrame width={240}>
+                    <div className="rounded-xl border overflow-hidden bg-background" style={{ height: 520 }}>
+                      <div className="h-full overflow-y-auto">
                         <Component program={programData} preview />
-                      </IPhoneFrame>
+                      </div>
                     </div>
                   </div>
                 );
