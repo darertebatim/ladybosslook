@@ -82,18 +82,30 @@ export function PaywallClassic({ program, onPurchase, onRestore, onClose, previe
         )}
 
         {/* Features */}
-        {program.features && program.features.length > 0 && (
-          <div className="mt-6 space-y-3">
-            {program.features.map((feature, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="h-5 w-5 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
-                  <Check className="h-3 w-3 text-primary" />
+        {(() => {
+          const DEFAULT_FEATURES = [
+            'Unlimited access to all guided audio programs',
+            'Premium daily rituals & wellness routines',
+            'Exclusive meditation & breathwork sessions',
+            'Advanced progress tracking & insights',
+            'New content added regularly',
+          ];
+          const features = program.features && program.features.length > 0
+            ? program.features
+            : DEFAULT_FEATURES;
+          return (
+            <div className="mt-6 space-y-3">
+              {features.map((feature, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="h-5 w-5 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+                    <Check className="h-3 w-3 text-primary" />
+                  </div>
+                  <span className="text-sm text-foreground">{feature}</span>
                 </div>
-                <span className="text-sm text-foreground">{feature}</span>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          );
+        })()}
 
         <div className="flex-1" />
 
