@@ -65,9 +65,21 @@ const AppStore = () => {
   });
 
   // Combine free programs + waitlist programs for Browse Programs
+  // Combine free programs + waitlist programs for Browse Programs
+  // Waitlist slugs override free/IAP programs to show as waitlist-only
+  const waitlistSlugs = useMemo(() => new Set(waitlistPrograms.map((p: any) => p.slug)), [waitlistPrograms]);
+  
   const allBrowsePrograms = useMemo(() => {
     const freeSlugs = new Set(freePrograms.map(p => p.slug));
-    const waitlistMapped = waitlistPrograms
+    
+    // Mark existing free programs that are also waitlist
+    const markedFree = freePrograms.map(p => ({
+      ...p,
+      _isWaitlist: waitlistSlugs.has(p.slug),
+    }));
+    
+    // Add waitlist programs not already in free list
+    const waitlistOnly = waitlistPrograms
       .filter((p: any) => !freeSlugs.has(p.slug))
       .map((p: any) => ({
         title: p.title,
@@ -77,13 +89,13 @@ const AppStore = () => {
         type: p.type,
         language: p.language,
         isFree: false,
-        priceAmount: 0,
+        priceAmount: 999, // non-zero to avoid FREE badge
         is_free_on_ios: false,
         ios_product_id: undefined,
-        _isWaitlist: true, // marker
+        _isWaitlist: true,
       }));
-    return [...freePrograms, ...waitlistMapped];
-  }, [freePrograms, waitlistPrograms]);
+    return [...markedFree, ...waitlistOnly];
+  }, [freePrograms, waitlistPrograms, waitlistSlugs]);
 
   // Fetch reflections, breathing, and audio playlists for explore sections
   const { data: reflections } = useReflections();
