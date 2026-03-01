@@ -108,7 +108,7 @@ export default function AppInspire() {
                 <div className="flex gap-2 px-4 pb-2">
                   <CategoryCircle
                     name="All Rituals"
-                    icon="Sparkles"
+                    icon="Wand2"
                     color="purple"
                     isSelected={selectedCategory === 'all'}
                     onClick={() => setSelectedCategory('all')}
