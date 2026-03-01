@@ -398,50 +398,6 @@ const AppStore = () => {
               </section>
             )}
 
-            {/* Online Programs Waitlist Section */}
-            {!searchQuery && filteredWaitlistPrograms.length > 0 && (
-              <section>
-                <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-sm font-semibold text-foreground">Online Programs</h2>
-                </div>
-                <div className="space-y-3">
-                  {filteredWaitlistPrograms.map((program: any) => (
-                    <div key={program.slug} className="flex gap-3 items-center p-3 rounded-2xl border border-border/50 bg-card">
-                      <div className="h-16 w-16 shrink-0 rounded-xl overflow-hidden bg-muted">
-                        {program.cover_image_url ? (
-                          <CachedImage src={program.cover_image_url} alt={program.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <FluentEmoji emoji="📚" size={28} />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold line-clamp-1">{program.title}</p>
-                        {program.description && (
-                          <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{program.description?.replace(/<[^>]*>/g, '').slice(0, 80)}</p>
-                        )}
-                      </div>
-                      <Button
-                        size="sm"
-                        variant={userWaitlist.includes(program.slug) ? 'secondary' : 'default'}
-                        className="shrink-0 gap-1.5 text-xs rounded-full"
-                        disabled={joiningWaitlist === program.slug}
-                        onClick={() => handleJoinWaitlist(program.slug, program.title)}
-                      >
-                        {joiningWaitlist === program.slug ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : userWaitlist.includes(program.slug) ? (
-                          <><CheckCircle2 className="h-3 w-3" /> Joined</>
-                        ) : (
-                          <><Bell className="h-3 w-3" /> Waitlist</>
-                        )}
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
 
             {/* Meditate Section */}
             {!searchQuery && meditatePlaylists.length > 0 && (
