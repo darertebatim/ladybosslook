@@ -47,7 +47,7 @@ export function CategoryCircle({ name, icon, emoji, color, isSelected, onClick }
         )}
       </div>
       <span className={cn(
-        'text-[11px] text-center font-medium max-w-[56px] truncate',
+        'text-[11px] text-center font-medium max-w-[56px] line-clamp-2 leading-tight',
         isSelected ? 'text-primary' : 'text-muted-foreground'
       )}>
         {name}
