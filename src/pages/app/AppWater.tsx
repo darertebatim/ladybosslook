@@ -183,6 +183,30 @@ const AppWater = () => {
     return format(selectedDate, 'EEE, MMM d');
   };
 
+  const { isSubscribed, isLoading: subLoading } = useSubscription();
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  // Subscription gate
+  if (!subLoading && !isSubscribed) {
+    return (
+      <>
+        <div className="fixed inset-0 z-10 flex flex-col items-center justify-center bg-gradient-to-b from-sky-200 to-sky-50 px-6 text-center">
+          <BackButtonCircle />
+          <Droplets className="h-16 w-16 text-sky-400 mb-4" />
+          <h2 className="text-xl font-bold mb-2">Water Tracker is a Plus feature</h2>
+          <p className="text-muted-foreground mb-6">Upgrade to Simora Plus to track your hydration with daily goals and reminders.</p>
+          <button
+            onClick={() => { haptic.light(); setShowPaywall(true); }}
+            className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold"
+          >
+            Unlock with Plus
+          </button>
+        </div>
+        <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
+      </>
+    );
+  }
+
   // Loading state
   if (tasksLoading) {
     return (
