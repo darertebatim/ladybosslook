@@ -680,9 +680,9 @@ export function LeadsManager() {
         user_id: searchResults.profile.id,
         program_slug: program.slug,
         program_title: program.title,
-        price_amount: program.price_amount ?? 0,
-        payment_type: program.payment_type ?? 'one_time',
-        deposit_price: program.deposit_price ?? null,
+        price_amount: Math.round((program.priceAmount ?? 0) * 100),
+        payment_type: program.paymentType ?? 'one_time',
+        deposit_price: program.depositPrice ? Math.round(program.depositPrice * 100) : null,
         added_by: currentUser?.id ?? null,
       }, { onConflict: 'user_id,program_slug' });
 
