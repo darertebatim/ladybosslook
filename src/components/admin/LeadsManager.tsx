@@ -682,7 +682,7 @@ export function LeadsManager() {
         program_title: program.title,
         price_amount: Math.round((program.priceAmount ?? 0) * 100),
         payment_type: program.paymentType ?? 'one_time',
-        deposit_price: program.depositPrice ? Math.round(program.depositPrice * 100) : null,
+        deposit_price: null,
         added_by: currentUser?.id ?? null,
       }, { onConflict: 'user_id,program_slug' });
 
