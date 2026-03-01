@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Menu, Compass, Music, Users, MessageCircle,
-  BookOpen, Wind, Droplets, HeartHandshake, Heart, Wand2, GraduationCap, User, HelpCircle, LogOut, Zap
+  BookOpen, Wind, Droplets, HeartHandshake, Heart, CalendarPlus, GraduationCap, User, HelpCircle, LogOut, Zap
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { haptic } from '@/lib/haptics';
