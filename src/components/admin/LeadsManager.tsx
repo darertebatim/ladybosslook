@@ -107,6 +107,9 @@ export function LeadsManager() {
   const [deletingSubscription, setDeletingSubscription] = useState<string | null>(null);
   const [coachAccessLoading, setCoachAccessLoading] = useState(false);
   const [hasCoachAccess, setHasCoachAccess] = useState(false);
+  const [isCartDialogOpen, setIsCartDialogOpen] = useState(false);
+  const [selectedCartProgram, setSelectedCartProgram] = useState('');
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { toast } = useToast();
   const { programs, isLoading: programsLoading } = usePrograms();
   const queryClient = useQueryClient();
@@ -663,6 +666,47 @@ export function LeadsManager() {
     }
   };
 
+  const handleAddToCart = async () => {
+    if (!searchResults?.profile?.id || !selectedCartProgram) return;
+
+    setIsAddingToCart(true);
+    try {
+      const program = programs.find(p => p.slug === selectedCartProgram);
+      if (!program) throw new Error('Program not found');
+
+      const currentUser = (await supabase.auth.getUser()).data.user;
+
+      const { error } = await supabase.from('cart_items').upsert({
+        user_id: searchResults.profile.id,
+        program_slug: program.slug,
+        program_title: program.title,
+        price_amount: Math.round((program.priceAmount ?? 0) * 100),
+        payment_type: program.paymentType ?? 'one_time',
+        deposit_price: null,
+        added_by: currentUser?.id ?? null,
+      }, { onConflict: 'user_id,program_slug' });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Added to Cart',
+        description: `${program.title} added to ${searchResults.profile.email}'s cart`,
+      });
+
+      setIsCartDialogOpen(false);
+      setSelectedCartProgram('');
+    } catch (error: any) {
+      console.error('Add to cart error:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to add to cart',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
+
   const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -780,6 +824,62 @@ export function LeadsManager() {
                               disabled={isEnrolling || !selectedCourse}
                             >
                               {isEnrolling ? 'Enrolling...' : 'Enroll User'}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+
+                      <Dialog open={isCartDialogOpen} onOpenChange={setIsCartDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <ShoppingCart className="h-4 w-4 mr-2" />
+                            Add to Cart
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Add Program to Cart</DialogTitle>
+                            <DialogDescription>
+                              Add a program to {searchResults.profile.email}'s cart
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="cart-program">Select Program *</Label>
+                              <Select
+                                value={selectedCartProgram}
+                                onValueChange={setSelectedCartProgram}
+                                disabled={isAddingToCart || programsLoading}
+                              >
+                                <SelectTrigger id="cart-program">
+                                  <SelectValue placeholder="Choose a program..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {programs.filter(p => !p.isFree).map((program) => (
+                                    <SelectItem key={program.slug} value={program.slug}>
+                                      {program.title} — {program.price}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <DialogFooter>
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setIsCartDialogOpen(false);
+                                setSelectedCartProgram('');
+                              }}
+                              disabled={isAddingToCart}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              onClick={handleAddToCart}
+                              disabled={isAddingToCart || !selectedCartProgram}
+                            >
+                              {isAddingToCart ? 'Adding...' : 'Add to Cart'}
                             </Button>
                           </DialogFooter>
                         </DialogContent>
