@@ -16,7 +16,7 @@ import { RitualsTour, TourHelpButton } from '@/components/app/tour';
 export default function AppInspire() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>('popular');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
@@ -107,18 +107,18 @@ export default function AppInspire() {
               <ScrollArea className="w-full tour-ritual-categories">
                 <div className="flex gap-2 px-4 pb-2">
                   <CategoryCircle
-                    name="Popular"
-                    icon="Star"
-                    color="yellow"
-                    isSelected={selectedCategory === 'popular'}
-                    onClick={() => setSelectedCategory('popular')}
-                  />
-                  <CategoryCircle
                     name="All Rituals"
                     icon="Sparkles"
                     color="purple"
                     isSelected={selectedCategory === 'all'}
                     onClick={() => setSelectedCategory('all')}
+                  />
+                  <CategoryCircle
+                    name="Popular"
+                    icon="Star"
+                    color="yellow"
+                    isSelected={selectedCategory === 'popular'}
+                    onClick={() => setSelectedCategory('popular')}
                   />
                   {categories.filter(c => c.slug !== 'pro').map((category) => (
                     <CategoryCircle
