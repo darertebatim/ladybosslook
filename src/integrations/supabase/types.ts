@@ -1904,6 +1904,7 @@ export type Database = {
           date_of_birth: string | null
           email: string
           full_name: string | null
+          gender: string | null
           goals: string[] | null
           id: string
           last_active_date: string | null
@@ -1931,6 +1932,7 @@ export type Database = {
           date_of_birth?: string | null
           email: string
           full_name?: string | null
+          gender?: string | null
           goals?: string[] | null
           id: string
           last_active_date?: string | null
@@ -1958,6 +1960,7 @@ export type Database = {
           date_of_birth?: string | null
           email?: string
           full_name?: string | null
+          gender?: string | null
           goals?: string[] | null
           id?: string
           last_active_date?: string | null
