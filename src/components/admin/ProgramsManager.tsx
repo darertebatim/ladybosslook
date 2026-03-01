@@ -90,6 +90,7 @@ export function ProgramsManager() {
     annual_stripe_price_id: '',
     annual_ios_product_id: '',
     annual_android_product_id: '',
+    show_in_app_waitlist: false,
   });
 
   // Fetch playlists for dropdown
