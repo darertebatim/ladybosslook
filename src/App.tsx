@@ -337,6 +337,7 @@ const App = () => (
                   <Route path="/landing" element={<Landing />} />
                   <Route path="/asac" element={<AssertLanding />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/cart" element={<CartPage />} />
                   
                   {/* Admin Routes */}
                   {!isNativeApp() && (

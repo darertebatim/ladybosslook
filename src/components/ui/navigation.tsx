@@ -121,6 +121,7 @@ const Navigation = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
+            <CartIcon />
             <AuthButtons />
           </div>
 
