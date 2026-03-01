@@ -129,6 +129,7 @@ const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const SendTestEmail = lazy(() => import("@/pages/SendTestEmail"));
 const AppSupport = lazy(() => import("@/pages/AppSupport"));
 const AppMarketing = lazy(() => import("@/pages/AppMarketing"));
+const CartPage = lazy(() => import("@/pages/CartPage"));
 
 // Eagerly imported (small, always needed)
 import CalendarRedirect from "@/components/CalendarRedirect";
@@ -336,6 +337,7 @@ const App = () => (
                   <Route path="/landing" element={<Landing />} />
                   <Route path="/asac" element={<AssertLanding />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/cart" element={<CartPage />} />
                   
                   {/* Admin Routes */}
                   {!isNativeApp() && (

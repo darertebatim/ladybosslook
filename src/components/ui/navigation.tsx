@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Smartphone } from 'lucide-react';
+import { Menu, X, Smartphone, ShoppingCart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useCart } from '@/hooks/useCart';
 import { Link } from 'react-router-dom';
 
 const NAV_ITEMS = [
@@ -34,6 +35,22 @@ const NavLinks = ({ mobile, onClose }: { mobile?: boolean; onClose?: () => void 
     ))}
   </>
 );
+
+const CartIcon = () => {
+  const { cartCount } = useCart();
+  const { user } = useAuth();
+  if (!user || cartCount === 0) return null;
+  return (
+    <Link to="/cart" className="relative">
+      <Button variant="ghost" size="icon">
+        <ShoppingCart size={20} />
+        <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+          {cartCount}
+        </span>
+      </Button>
+    </Link>
+  );
+};
 
 const AuthButtons = ({ mobile, onClose }: { mobile?: boolean; onClose?: () => void }) => {
   const { isAdmin, user, signOut } = useAuth();
@@ -104,6 +121,7 @@ const Navigation = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
+            <CartIcon />
             <AuthButtons />
           </div>
 

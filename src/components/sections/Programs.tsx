@@ -1,11 +1,16 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ArrowRight, Star, Clock, Users } from 'lucide-react';
+import { ArrowRight, Star, Clock, Users, ShoppingCart, Check } from 'lucide-react';
 import { usePrograms } from '@/hooks/usePrograms';
-import { Link } from 'react-router-dom';
+import { useCart } from '@/hooks/useCart';
+import { useAuth } from '@/hooks/useAuth';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Programs = () => {
   const { programs, isLoading } = usePrograms();
+  const { addToCart, isInCart, isAdding } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   
   // Get only popular programs
   const popularPrograms = programs.filter(p => p.popular);
@@ -131,13 +136,30 @@ const Programs = () => {
                     </span>
                   </div>
                   
-                  <Button 
-                    className="w-full bg-primary hover:bg-primary-dark group-hover:shadow-glow transition-all duration-300"
-                    onClick={() => window.location.href = program.link}
-                  >
-                    Enroll Now
-                    <ArrowRight size={16} className="ml-2" />
-                  </Button>
+                  {isInCart(program.slug) ? (
+                    <Link to="/cart">
+                      <Button className="w-full gap-2" variant="secondary">
+                        <Check size={16} /> In Cart
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button 
+                      className="w-full bg-primary hover:bg-primary-dark group-hover:shadow-glow transition-all duration-300 gap-2"
+                      onClick={() => {
+                        if (!user) { navigate('/auth?redirect=/programs'); return; }
+                        addToCart({
+                          slug: program.slug,
+                          title: program.title,
+                          price_amount: Math.round(program.priceAmount * 100),
+                          payment_type: program.paymentType,
+                        });
+                      }}
+                      disabled={isAdding || program.isFree}
+                    >
+                      <ShoppingCart size={16} />
+                      Add to Cart
+                    </Button>
+                  )}
                 </div>
               </div>
             </Card>

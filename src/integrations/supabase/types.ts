@@ -660,6 +660,57 @@ export type Database = {
           },
         ]
       }
+      cart_items: {
+        Row: {
+          added_by: string | null
+          created_at: string
+          deposit_price: number | null
+          id: string
+          payment_type: string
+          price_amount: number
+          program_slug: string
+          program_title: string
+          user_id: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string
+          deposit_price?: number | null
+          id?: string
+          payment_type: string
+          price_amount: number
+          program_slug: string
+          program_title: string
+          user_id: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string
+          deposit_price?: number | null
+          id?: string
+          payment_type?: string
+          price_amount?: number
+          program_slug?: string
+          program_title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_added_by_fkey"
+            columns: ["added_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_conversation_tags: {
         Row: {
           conversation_id: string
