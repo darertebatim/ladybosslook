@@ -126,8 +126,6 @@ const AppPeriod = () => {
     return monthLogs.find(log => log.date === dateStr) || null;
   }, [selectedDate, monthLogs]);
 
-  const { isSubscribed, isLoading: subLoading } = useSubscription();
-  const [showPaywall, setShowPaywall] = useState(false);
 
   // Subscription gate
   if (!subLoading && !isSubscribed) {
