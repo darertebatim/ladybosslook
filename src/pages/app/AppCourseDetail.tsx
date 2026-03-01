@@ -67,6 +67,44 @@ const AppCourseDetail = () => {
   } catch {
     // Provider not available, ignore
   }
+  // Waitlist state for waitlist-only programs
+  const [joiningWaitlist, setJoiningWaitlist] = useState(false);
+  
+  // Check if user is on waitlist
+  const { data: isOnWaitlist = false, refetch: refetchWaitlist } = useQuery({
+    queryKey: ['user-waitlist-check', slug, user?.id],
+    queryFn: async () => {
+      if (!user?.id || !slug) return false;
+      const { data } = await supabase
+        .from('program_waitlist')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('program_slug', slug)
+        .maybeSingle();
+      return !!data;
+    },
+    enabled: !!user?.id && !!slug,
+  });
+
+  const handleToggleWaitlist = async () => {
+    if (!user?.id || !slug) return;
+    setJoiningWaitlist(true);
+    try {
+      if (isOnWaitlist) {
+        await supabase.from('program_waitlist').delete().eq('user_id', user.id).eq('program_slug', slug);
+        toast.success('Removed from waitlist');
+      } else {
+        await supabase.from('program_waitlist').insert({ user_id: user.id, program_slug: slug });
+        toast.success("You're on the waitlist! We'll notify you when it's available.");
+      }
+      refetchWaitlist();
+    } catch {
+      toast.error('Something went wrong');
+    } finally {
+      setJoiningWaitlist(false);
+    }
+  };
+
   const { data: enrollment, isLoading: enrollmentLoading } = useQuery({
     queryKey: ['course-enrollment', slug, roundId],
     queryFn: async () => {
