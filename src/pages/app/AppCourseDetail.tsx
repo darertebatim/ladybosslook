@@ -1106,7 +1106,31 @@ const AppCourseDetail = () => {
 
                   {/* Purchase / Enrollment Section */}
                   <div className="border-t pt-6">
-                    {program.ios_product_id ? (
+                    {/* Waitlist-only program (show_in_app_waitlist but not free/IAP) */}
+                    {(program as any).show_in_app_waitlist && !program.ios_product_id && !(program.payment_type === 'free' || program.price_amount === 0) ? (
+                      <>
+                        <Button 
+                          size="lg" 
+                          className="w-full gap-2"
+                          variant={isOnWaitlist ? 'secondary' : 'default'}
+                          onClick={handleToggleWaitlist}
+                          disabled={joiningWaitlist}
+                        >
+                          {joiningWaitlist ? (
+                            <><Loader2 className="h-4 w-4 animate-spin" /> Processing...</>
+                          ) : isOnWaitlist ? (
+                            <><CheckCircle2 className="h-5 w-5" /> On Waitlist</>
+                          ) : (
+                            <><Bell className="h-5 w-5" /> Join Waitlist</>
+                          )}
+                        </Button>
+                        <p className="text-xs text-center text-muted-foreground mt-4">
+                          {isOnWaitlist 
+                            ? "We'll notify you when registration opens" 
+                            : "Get notified when this program becomes available"}
+                        </p>
+                      </>
+                    ) : program.ios_product_id ? (
                       /* IAP Subscription Plan Picker - shown on both native and web */
                       <IAPPlanPicker program={program} />
                     ) : program.stripe_price_id && program.price_amount > 0 ? (
@@ -1180,7 +1204,7 @@ const AppCourseDetail = () => {
                       </Button>
                     )}
 
-                    {!program.ios_product_id && !program.stripe_price_id && (
+                    {!program.ios_product_id && !program.stripe_price_id && !(program as any).show_in_app_waitlist && (
                       <p className="text-xs text-center text-muted-foreground mt-4">
                         Free enrollment • Instant access
                       </p>
