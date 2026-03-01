@@ -1118,7 +1118,7 @@ const AppCourseDetail = () => {
                             </p>
                             <div className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 mt-1">
                               <Clock className="h-3 w-3 text-muted-foreground" />
-                              <span className="text-xs font-medium text-amber-700 dark:text-amber-300">Registration opening soon</span>
+                              <span className="text-xs font-medium text-muted-foreground">Registration opening soon</span>
                             </div>
                           </div>
                         )}
