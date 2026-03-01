@@ -431,7 +431,8 @@ const App = () => (
                     <Route path="programs" element={<AppPrograms />} />
                     <Route path="explore" element={<AppStore />} />
                     <Route path="browse" element={<Navigate to="/app/explore" replace />} />
-                    <Route path="browse-programs" element={<AppBrowsePrograms />} />
+                    <Route path="academy" element={<AppBrowsePrograms />} />
+                    <Route path="browse-programs" element={<Navigate to="/app/academy" replace />} />
                     <Route path="programs/:slug" element={<AppCourseDetail />} />
                     <Route path="programs/:slug/:roundId" element={<AppCourseDetail />} />
                     {/* Backward compat redirects for old /app/course/ URLs */}
