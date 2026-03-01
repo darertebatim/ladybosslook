@@ -113,13 +113,6 @@ export default function AppInspire() {
                     isSelected={selectedCategory === 'all'}
                     onClick={() => setSelectedCategory('all')}
                   />
-                  <CategoryCircle
-                    name="Popular"
-                    icon="Star"
-                    color="yellow"
-                    isSelected={selectedCategory === 'popular'}
-                    onClick={() => setSelectedCategory('popular')}
-                  />
                   {categories.filter(c => c.slug !== 'pro').map((category) => (
                     <CategoryCircle
                       key={category.slug}
@@ -141,6 +134,13 @@ export default function AppInspire() {
                       onClick={() => setSelectedCategory('pro')}
                     />
                   )}
+                  <CategoryCircle
+                    name="Popular"
+                    icon="Star"
+                    color="yellow"
+                    isSelected={selectedCategory === 'popular'}
+                    onClick={() => setSelectedCategory('popular')}
+                  />
                 </div>
                 <ScrollBar orientation="horizontal" className="invisible" />
               </ScrollArea>
