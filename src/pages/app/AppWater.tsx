@@ -185,8 +185,6 @@ const AppWater = () => {
     return format(selectedDate, 'EEE, MMM d');
   };
 
-  const { isSubscribed, isLoading: subLoading } = useSubscription();
-  const [showPaywall, setShowPaywall] = useState(false);
 
   // Subscription gate
   if (!subLoading && !isSubscribed) {
