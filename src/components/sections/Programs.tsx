@@ -1,8 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ArrowRight, Star, Clock, Users } from 'lucide-react';
+import { ArrowRight, Star, Clock, Users, ShoppingCart, Check } from 'lucide-react';
 import { usePrograms } from '@/hooks/usePrograms';
-import { Link } from 'react-router-dom';
+import { useCart } from '@/hooks/useCart';
+import { useAuth } from '@/hooks/useAuth';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Programs = () => {
   const { programs, isLoading } = usePrograms();
