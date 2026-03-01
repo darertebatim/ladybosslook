@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 import { CachedImage } from '@/components/ui/CachedImage';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import heroStormVideo from '@/assets/watch-hero-storm.mp4';
