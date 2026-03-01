@@ -37,6 +37,7 @@ interface ProgramCatalog {
   ios_product_id?: string | null;
   android_product_id?: string | null;
   cover_image_url?: string | null;
+  show_in_app_waitlist?: boolean;
 }
 
 export function ProgramsManager() {
@@ -89,6 +90,7 @@ export function ProgramsManager() {
     annual_stripe_price_id: '',
     annual_ios_product_id: '',
     annual_android_product_id: '',
+    show_in_app_waitlist: false,
   });
 
   // Fetch playlists for dropdown
@@ -164,6 +166,7 @@ export function ProgramsManager() {
       annual_stripe_price_id: '',
       annual_ios_product_id: '',
       annual_android_product_id: '',
+      show_in_app_waitlist: false,
     });
     setEditingId(null);
     setShowForm(false);
@@ -249,6 +252,7 @@ export function ProgramsManager() {
       annual_stripe_price_id: (program as any).annual_stripe_price_id || '',
       annual_ios_product_id: (program as any).annual_ios_product_id || '',
       annual_android_product_id: (program as any).annual_android_product_id || '',
+      show_in_app_waitlist: (program as any).show_in_app_waitlist || false,
     });
     setEditingId(program.id);
     setShowForm(true);
@@ -1072,6 +1076,19 @@ export function ProgramsManager() {
               {/* Platform Availability Section */}
               <div className="space-y-4 border-t pt-4">
                 <Label className="text-base font-semibold">Platform Availability</Label>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="show_in_app_waitlist"
+                    checked={formData.show_in_app_waitlist}
+                    onCheckedChange={(checked) => 
+                      setFormData({ ...formData, show_in_app_waitlist: checked as boolean })
+                    }
+                  />
+                  <Label htmlFor="show_in_app_waitlist" className="text-sm font-normal cursor-pointer">
+                    📱 Show as Waitlist in App (read-only showcase, no purchase)
+                  </Label>
+                </div>
                 
                 <div className="flex items-center space-x-2">
                   <Checkbox 
@@ -1179,6 +1196,9 @@ export function ProgramsManager() {
                         {program.is_active ? 'Active' : 'Inactive'}
                       </Badge>
                       <Badge variant="outline">{program.type}</Badge>
+                      {program.show_in_app_waitlist && (
+                        <Badge variant="outline" className="text-violet-600 border-violet-300">📱 Waitlist</Badge>
+                      )}
                     </div>
                     <div className="flex flex-col gap-1 text-sm text-muted-foreground">
                       <div className="flex items-center gap-4">

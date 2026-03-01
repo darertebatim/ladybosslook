@@ -2096,6 +2096,7 @@ export type Database = {
           payment_type: string
           price_amount: number
           requires_subscription: boolean
+          show_in_app_waitlist: boolean
           slug: string
           stripe_payment_link: string | null
           stripe_price_id: string | null
@@ -2142,6 +2143,7 @@ export type Database = {
           payment_type: string
           price_amount?: number
           requires_subscription?: boolean
+          show_in_app_waitlist?: boolean
           slug: string
           stripe_payment_link?: string | null
           stripe_price_id?: string | null
@@ -2188,6 +2190,7 @@ export type Database = {
           payment_type?: string
           price_amount?: number
           requires_subscription?: boolean
+          show_in_app_waitlist?: boolean
           slug?: string
           stripe_payment_link?: string | null
           stripe_price_id?: string | null
@@ -2351,6 +2354,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      program_waitlist: {
+        Row: {
+          created_at: string
+          id: string
+          program_slug: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          program_slug: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          program_slug?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       promo_banners: {
         Row: {
