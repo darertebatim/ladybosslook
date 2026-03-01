@@ -95,6 +95,40 @@ const AppCourseDetail = () => {
         toast.success('Removed from waitlist');
       } else {
         await supabase.from('program_waitlist').insert({ user_id: user.id, program_slug: slug });
+        
+        // Send a support chat message so admin can follow up
+        try {
+          // Find or create support conversation
+          let conversationId: string;
+          const { data: existing } = await supabase
+            .from('chat_conversations')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('inbox_type', 'support')
+            .maybeSingle();
+
+          if (existing) {
+            conversationId = existing.id;
+          } else {
+            const { data: created } = await supabase
+              .from('chat_conversations')
+              .insert({ user_id: user.id, inbox_type: 'support' })
+              .select('id')
+              .single();
+            conversationId = created!.id;
+          }
+
+          const programTitle = program?.title || slug;
+          await supabase.from('chat_messages').insert({
+            conversation_id: conversationId,
+            sender_id: user.id,
+            sender_type: 'user',
+            content: `Hi! I'm interested in the "${programTitle}" program and joined the waitlist. Could you send me more info or a registration link? 🙏`,
+          });
+        } catch (chatErr) {
+          console.error('Failed to send waitlist chat message:', chatErr);
+        }
+
         toast.success("You're on the waitlist! We'll notify you when it's available.");
       }
       refetchWaitlist();
