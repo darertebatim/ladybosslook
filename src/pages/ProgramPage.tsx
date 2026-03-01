@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Check, MessageCircle } from 'lucide-react';
+import { Loader2, Check, MessageCircle, ShoppingCart, Clock, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import Navigation from '@/components/ui/navigation';
 import Footer from '@/components/sections/Footer';
 import { SEOHead } from '@/components/SEOHead';
+import { useCart } from '@/hooks/useCart';
+import { useAuth } from '@/hooks/useAuth';
 import DOMPurify from 'dompurify';
 
 interface ProgramData {
@@ -24,26 +27,24 @@ interface ProgramData {
   is_active: boolean;
   stripe_payment_link: string | null;
   video_url: string | null;
+  cover_image_url: string | null;
 }
 
 const convertToEmbedUrl = (url: string): string => {
-  // Handle youtube.com/watch?v= format
   const watchMatch = url.match(/youtube\.com\/watch\?v=([^&]+)/);
   if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}`;
-  
-  // Handle youtu.be/ format
   const shortMatch = url.match(/youtu\.be\/([^?]+)/);
   if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
-  
-  // Handle vimeo
   const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
   if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
-  
   return url;
 };
 
 const ProgramPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { addToCart, isInCart, isAdding } = useCart();
   const [program, setProgram] = useState<ProgramData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -52,317 +53,206 @@ const ProgramPage = () => {
 
   useEffect(() => {
     const fetchProgram = async () => {
-      if (!slug) {
-        setNotFound(true);
-        setLoading(false);
-        return;
-      }
+      if (!slug) { setNotFound(true); setLoading(false); return; }
 
-      // Check if this is a payment redirect (slug ends with "pay")
       if (slug.endsWith('pay')) {
-        console.log('[ProgramPage] Detected payment redirect:', slug);
         setIsPaymentRedirect(true);
-        
-        // Extract actual slug by removing 'pay' suffix
         const actualSlug = slug.slice(0, -3);
-        console.log('[ProgramPage] Extracted slug for payment:', actualSlug);
-        
         try {
           const { data, error } = await supabase.functions.invoke('create-payment', {
-            body: {
-              program: actualSlug
-            }
+            body: { program: actualSlug },
           });
-
-          if (error) {
-            console.error('[ProgramPage] Payment creation error:', error);
-            setPaymentError('Error creating payment. Please try again.');
-            setLoading(false);
-            return;
-          }
-
-          if (data?.url) {
-            console.log('[ProgramPage] Redirecting to Stripe:', data.url);
-            window.location.href = data.url;
-          } else {
-            setPaymentError('Error creating payment. Please try again.');
-            setLoading(false);
-          }
-        } catch (error) {
-          console.error('[ProgramPage] Payment error:', error);
-          setPaymentError('Error creating payment. Please try again.');
-          setLoading(false);
-        }
-        
+          if (error || !data?.url) { setPaymentError('Error'); setLoading(false); return; }
+          window.location.href = data.url;
+        } catch { setPaymentError('Error'); setLoading(false); }
         return;
       }
 
-      console.log('[ProgramPage] Fetching program with slug:', slug);
-
-      // Fetch program data with case-insensitive slug matching
       const { data, error } = await supabase
         .from('program_catalog')
         .select('*')
         .ilike('slug', slug)
         .maybeSingle();
 
-      console.log('[ProgramPage] Query result:', { data, error });
-
-      if (error) {
-        console.error('[ProgramPage] Error fetching program:', error);
-        setNotFound(true);
-        setLoading(false);
-        return;
+      if (error || !data || !data.available_on_web || !data.is_active) {
+        setNotFound(true); setLoading(false); return;
       }
-
-      if (!data) {
-        console.log('[ProgramPage] No program found with slug:', slug);
-        setNotFound(true);
-        setLoading(false);
-        return;
-      }
-
-      if (!data.available_on_web) {
-        console.log('[ProgramPage] Program not available on web:', slug);
-        setNotFound(true);
-        setLoading(false);
-        return;
-      }
-
-      if (!data.is_active) {
-        console.log('[ProgramPage] Program not active:', slug);
-        setNotFound(true);
-        setLoading(false);
-        return;
-      }
-
-      console.log('[ProgramPage] Program loaded successfully:', data.title);
       setProgram(data as ProgramData);
       setLoading(false);
     };
-
     fetchProgram();
   }, [slug]);
 
-  const handlePayment = () => {
-    window.location.href = `/${slug}pay`;
+  const handleAddToCart = () => {
+    if (!user) { navigate(`/auth?redirect=/${slug}`); return; }
+    if (!program) return;
+    addToCart({
+      slug: program.slug,
+      title: program.title,
+      price_amount: program.price_amount,
+      payment_type: program.payment_type,
+      deposit_price: program.deposit_price,
+    });
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center px-4">
-        <div className="bg-card p-8 rounded-lg shadow-lg text-center">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
-          {isPaymentRedirect ? (
-            <>
-              <p className="text-xl font-semibold">Redirecting to secure checkout...</p>
-              <p className="text-sm text-muted-foreground mt-2">Please wait a moment</p>
-            </>
-          ) : (
-            <p className="text-xl font-semibold">Loading program...</p>
-          )}
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <Loader2 className="w-10 h-10 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground">{isPaymentRedirect ? 'Redirecting to checkout…' : 'Loading…'}</p>
         </div>
       </div>
     );
   }
 
-  if (paymentError) {
-    return <Navigate to="/404" replace />;
-  }
-
-  if (notFound || !program) {
-    return <Navigate to="/404" replace />;
-  }
+  if (paymentError || notFound || !program) return <Navigate to="/404" replace />;
 
   const isDeposit = program.payment_type === 'deposit';
   const isFree = program.payment_type === 'free';
   const displayPrice = isDeposit && program.deposit_price ? program.deposit_price : program.price_amount;
+  const inCart = isInCart(program.slug);
 
   return (
     <>
-      <SEOHead 
+      <SEOHead
         title={`${program.title} | Ladyboss Academy`}
-        description={program.description || `Learn more about ${program.title}`}
+        description={program.description ? program.description.replace(/<[^>]*>/g, '').slice(0, 155) : `Learn about ${program.title}`}
       />
       <div className="min-h-screen flex flex-col bg-background">
         <Navigation />
-        
-        <main className="flex-grow">
-          {/* Hero Section */}
-          <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-20 md:py-32">
-            <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-            <div className="container mx-auto px-4 relative z-10">
-              <div className="max-w-4xl mx-auto text-center">
-                <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-6 text-sm font-medium">
-                  {program.type}
-                </div>
-                <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent leading-tight">
-                  {program.title}
-                </h1>
-                
-                {/* Price Display */}
-                <div className="mb-10 flex flex-col items-center gap-3">
-                  {isFree ? (
-                    <div className="text-4xl font-bold text-green-600 bg-green-50 dark:bg-green-950 px-8 py-4 rounded-xl">
-                      FREE
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {program.original_price && program.original_price > program.price_amount && (
-                        <div className="text-xl text-muted-foreground line-through">
-                          Was ${(program.original_price / 100).toFixed(0)}
-                        </div>
-                      )}
-                      {isDeposit ? (
-                        <div className="bg-card border-2 border-orange-500/20 rounded-2xl p-6 shadow-lg">
-                          <div className="text-5xl font-bold text-orange-600 mb-2">
-                            ${(displayPrice / 100).toFixed(0)}
-                          </div>
-                          <div className="text-sm font-medium text-orange-600 mb-3">
-                            DEPOSIT ONLY
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            Full price: ${(program.price_amount / 100).toFixed(0)} • 
-                            Remaining balance: ${((program.price_amount - displayPrice) / 100).toFixed(0)}
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl p-6 border border-primary/20 shadow-lg">
-                          <div className="text-5xl font-bold text-primary">
-                            ${(displayPrice / 100).toFixed(0)}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
 
-                {/* CTA Button */}
-                <Button 
-                  onClick={isFree ? undefined : handlePayment}
-                  size="lg"
-                  className="text-lg px-12 py-7 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                  disabled={isFree}
-                >
-                  {isFree ? 'Sign In to Enroll' : isDeposit ? `Secure Your Spot - Pay $${(displayPrice / 100).toFixed(0)} Deposit` : 'Enroll Now'}
-                </Button>
+        <main className="flex-grow pt-20">
+          {/* Back link */}
+          <div className="container mx-auto px-4 py-4">
+            <Link to="/programs" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <ArrowLeft size={16} className="mr-1" /> All Programs
+            </Link>
+          </div>
 
-                {program.duration && (
-                  <p className="text-muted-foreground mt-6 text-lg flex items-center justify-center gap-2">
-                    <span className="w-2 h-2 bg-primary rounded-full" />
-                    {program.duration}
-                  </p>
+          {/* Two-column layout */}
+          <section className="container mx-auto px-4 pb-16">
+            <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+              {/* Left: Details */}
+              <div className="lg:col-span-2 space-y-8">
+                {/* Cover image */}
+                {program.cover_image_url && (
+                  <div className="aspect-video rounded-2xl overflow-hidden">
+                    <img src={program.cover_image_url} alt={program.title} className="w-full h-full object-cover" />
+                  </div>
                 )}
-              </div>
-            </div>
-          </section>
 
-          {/* Video Section */}
-          {program.video_url && (
-            <section className="py-12 bg-card/50">
-              <div className="container mx-auto px-4">
-                <div className="max-w-4xl mx-auto">
-                  <div className="aspect-video rounded-2xl overflow-hidden shadow-lg bg-muted">
-                    {program.video_url.includes('youtube') || program.video_url.includes('youtu.be') ? (
-                      <iframe 
-                        src={convertToEmbedUrl(program.video_url)}
-                        className="w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        title={`${program.title} video`}
-                      />
-                    ) : program.video_url.includes('vimeo') ? (
-                      <iframe 
-                        src={convertToEmbedUrl(program.video_url)}
-                        className="w-full h-full"
-                        allow="autoplay; fullscreen; picture-in-picture"
-                        allowFullScreen
-                        title={`${program.title} video`}
-                      />
-                    ) : (
-                      <video 
-                        src={program.video_url} 
-                        controls 
-                        className="w-full h-full object-cover"
-                        poster=""
-                      />
+                {/* Title & meta */}
+                <div>
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                    <span className="bg-primary/10 text-primary text-xs font-medium px-3 py-1 rounded-full capitalize">
+                      {program.type.replace('-', ' ')}
+                    </span>
+                    {program.duration && (
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Clock size={12} /> {program.duration}
+                      </span>
                     )}
                   </div>
+                  <h1 className="font-display text-3xl md:text-4xl font-bold">{program.title}</h1>
                 </div>
-              </div>
-            </section>
-          )}
 
-          {/* Description Section */}
-          {program.description && (
-            <section className="py-20 bg-card/50">
-              <div className="container mx-auto px-4">
-                <div className="max-w-4xl mx-auto">
-                  <div className="bg-card border rounded-2xl p-8 md:p-12 shadow-sm">
-                    <div 
-                      className="prose prose-lg prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground max-w-none"
-                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(program.description) }}
-                    />
+                {/* Video */}
+                {program.video_url && (
+                  <div className="aspect-video rounded-2xl overflow-hidden bg-muted">
+                    {program.video_url.includes('youtube') || program.video_url.includes('youtu.be') ? (
+                      <iframe src={convertToEmbedUrl(program.video_url)} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title={program.title} />
+                    ) : program.video_url.includes('vimeo') ? (
+                      <iframe src={convertToEmbedUrl(program.video_url)} className="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen title={program.title} />
+                    ) : (
+                      <video src={program.video_url} controls className="w-full h-full object-cover" />
+                    )}
                   </div>
-                </div>
-              </div>
-            </section>
-          )}
+                )}
 
-          {/* Features Section */}
-          {program.features && program.features.length > 0 && (
-            <section className="py-20">
-              <div className="container mx-auto px-4">
-                <div className="max-w-4xl mx-auto">
-                  <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">What's Included</h2>
-                    <p className="text-muted-foreground text-lg">Everything you need to succeed</p>
-                  </div>
-                  <div className="grid gap-4 md:gap-6">
-                    {program.features.map((feature, index) => (
-                      <div key={index} className="group flex items-start gap-4 bg-card border rounded-xl p-6 hover:border-primary/50 hover:shadow-lg transition-all duration-300">
-                        <div className="bg-primary/10 p-2 rounded-lg group-hover:bg-primary/20 transition-colors">
-                          <Check className="w-6 h-6 text-primary" />
+                {/* Description */}
+                {program.description && (
+                  <div
+                    className="prose prose-lg prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground max-w-none"
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(program.description) }}
+                  />
+                )}
+
+                {/* Features */}
+                {program.features?.length > 0 && (
+                  <div>
+                    <h2 className="font-display text-2xl font-bold mb-4">What's Included</h2>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {program.features.map((feature, i) => (
+                        <div key={i} className="flex items-start gap-3 bg-muted/50 rounded-lg p-4">
+                          <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                          <span className="text-sm">{feature}</span>
                         </div>
-                        <span className="text-lg flex-1 pt-1">{feature}</span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
-            </section>
-          )}
 
-          {/* Final CTA Section */}
-          <section className="py-20 bg-gradient-to-br from-primary/5 to-secondary/5 relative overflow-hidden">
-            <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-            <div className="container mx-auto px-4 relative z-10">
-              <div className="max-w-3xl mx-auto text-center">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Transform?</h2>
-                <p className="text-muted-foreground text-lg mb-8">
-                  Join hundreds of successful students who have already enrolled
-                </p>
-                <Button 
-                  onClick={isFree ? undefined : handlePayment}
-                  size="lg"
-                  className="text-lg px-12 py-7 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 mb-8"
-                  disabled={isFree}
-                >
-                  {isFree ? 'Sign In to Enroll' : isDeposit ? `Secure Your Spot - Pay $${(displayPrice / 100).toFixed(0)} Deposit` : 'Enroll Now'}
-                </Button>
-                <div className="flex flex-col items-center gap-4">
-                  <a 
-                    href="https://t.me/ladybosslook"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
-                  >
-                    <MessageCircle className="w-5 h-5" />
-                    Have questions? Chat with us on Telegram
-                  </a>
-                  <p className="text-sm text-muted-foreground">
-                    Secure payment powered by Stripe
-                  </p>
+              {/* Right: Sticky pricing card */}
+              <div className="lg:col-span-1">
+                <div className="lg:sticky lg:top-24">
+                  <Card className="p-6 space-y-5 border-2">
+                    {/* Price */}
+                    <div>
+                      {isFree ? (
+                        <div className="text-3xl font-bold text-green-600">FREE</div>
+                      ) : (
+                        <div className="space-y-1">
+                          {program.original_price && program.original_price > program.price_amount && (
+                            <div className="text-muted-foreground line-through text-lg">
+                              ${(program.original_price / 100).toFixed(0)}
+                            </div>
+                          )}
+                          {isDeposit ? (
+                            <>
+                              <div className="text-3xl font-bold text-foreground">
+                                ${(displayPrice / 100).toFixed(0)} <span className="text-sm font-medium text-muted-foreground">deposit</span>
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                Full price: ${(program.price_amount / 100).toFixed(0)} • Remaining: ${((program.price_amount - displayPrice) / 100).toFixed(0)}
+                              </p>
+                            </>
+                          ) : (
+                            <div className="text-3xl font-bold text-foreground">
+                              ${(displayPrice / 100).toFixed(0)}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Add to Cart / In Cart */}
+                    {inCart ? (
+                      <Link to="/cart" className="block">
+                        <Button variant="secondary" className="w-full gap-2" size="lg">
+                          <Check size={18} /> In Your Cart — View Cart
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Button className="w-full gap-2" size="lg" onClick={handleAddToCart} disabled={isAdding || isFree}>
+                        <ShoppingCart size={18} />
+                        {isFree ? 'Sign In to Enroll' : isDeposit ? `Add to Cart — $${(displayPrice / 100).toFixed(0)} Deposit` : 'Add to Cart'}
+                      </Button>
+                    )}
+
+                    <div className="pt-2 space-y-3 text-center">
+                      <a
+                        href="https://t.me/ladybosslook"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                      >
+                        <MessageCircle size={16} /> Questions? Chat on Telegram
+                      </a>
+                      <p className="text-xs text-muted-foreground">Secure payment via Stripe</p>
+                    </div>
+                  </Card>
                 </div>
               </div>
             </div>
