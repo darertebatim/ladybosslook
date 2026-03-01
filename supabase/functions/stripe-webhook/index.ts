@@ -289,15 +289,16 @@ serve(async (req) => {
             // Get current profile to check for null fields
             const { data: currentProfile } = await supabase
               .from('profiles')
-              .select('phone, city, state, country')
+              .select('full_name, phone, city, state, country')
               .eq('id', userId)
               .single();
 
             const updateData: any = {};
-            if (!currentProfile?.phone && profileUpdate.phone) updateData.phone = profileUpdate.phone;
-            if (!currentProfile?.city && profileUpdate.city) updateData.city = profileUpdate.city;
-            if (!currentProfile?.state && profileUpdate.state) updateData.state = profileUpdate.state;
-            if (!currentProfile?.country && profileUpdate.country) updateData.country = profileUpdate.country;
+            if ((!currentProfile?.full_name || currentProfile.full_name === '') && customerName) updateData.full_name = customerName;
+            if ((!currentProfile?.phone || currentProfile.phone === '') && profileUpdate.phone) updateData.phone = profileUpdate.phone;
+            if ((!currentProfile?.city || currentProfile.city === '') && profileUpdate.city) updateData.city = profileUpdate.city;
+            if ((!currentProfile?.state || currentProfile.state === '') && profileUpdate.state) updateData.state = profileUpdate.state;
+            if ((!currentProfile?.country || currentProfile.country === '') && profileUpdate.country) updateData.country = profileUpdate.country;
 
             if (Object.keys(updateData).length > 0) {
               const { error: profileError } = await supabase
