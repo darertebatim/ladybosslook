@@ -369,7 +369,7 @@ const AppBrowsePrograms = () => {
           {/* All / Not Enrolled Programs */}
           <div className="space-y-3">
             <h2 className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-              {searchQuery ? 'Results' : selectedType === 'all' ? 'All Programs' : TYPE_FILTERS.find(f => f.value === selectedType)?.label || 'Programs'}
+              {searchQuery ? 'Results' : selectedType === 'all' ? 'All Programs' : availableTypes.find(f => f.value === selectedType)?.label || 'Programs'}
             </h2>
 
             {notEnrolledPrograms.length === 0 && enrolledPrograms.length === 0 ? (
