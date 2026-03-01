@@ -666,6 +666,47 @@ export function LeadsManager() {
     }
   };
 
+  const handleAddToCart = async () => {
+    if (!searchResults?.profile?.id || !selectedCartProgram) return;
+
+    setIsAddingToCart(true);
+    try {
+      const program = programs.find(p => p.slug === selectedCartProgram);
+      if (!program) throw new Error('Program not found');
+
+      const currentUser = (await supabase.auth.getUser()).data.user;
+
+      const { error } = await supabase.from('cart_items').upsert({
+        user_id: searchResults.profile.id,
+        program_slug: program.slug,
+        program_title: program.title,
+        price_amount: program.price_amount ?? 0,
+        payment_type: program.payment_type ?? 'one_time',
+        deposit_price: program.deposit_price ?? null,
+        added_by: currentUser?.id ?? null,
+      }, { onConflict: 'user_id,program_slug' });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Added to Cart',
+        description: `${program.title} added to ${searchResults.profile.email}'s cart`,
+      });
+
+      setIsCartDialogOpen(false);
+      setSelectedCartProgram('');
+    } catch (error: any) {
+      console.error('Add to cart error:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to add to cart',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
+
   const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
