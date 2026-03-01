@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { useState, useMemo, useCallback } from 'react';
 import { useEnrollments, useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 import { ProgramCard } from '@/components/app/ProgramCard';
-import { Button } from '@/components/ui/button';
+import { ToolCard } from '@/components/app/ToolCard';
 import { ToolCard } from '@/components/app/ToolCard';
 import { Input } from '@/components/ui/input';
 import { wellnessTools, audioTools, getVisibleComingSoon } from '@/lib/toolsConfig';
