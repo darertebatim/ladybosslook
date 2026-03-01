@@ -422,31 +422,6 @@ const AppStore = () => {
               </section>
             )}
 
-            {/* Meditate Section */}
-            {!searchQuery && meditatePlaylists.length > 0 && (
-              <section>
-                <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-sm font-semibold text-foreground">Meditate</h2>
-                  <Link to="/app/player?category=meditate" className="text-xs text-primary font-medium flex items-center gap-0.5">
-                    All <ChevronRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
-                  {meditatePlaylists.map((playlist) => (
-                    <button
-                      key={playlist.id}
-                      onClick={() => navigate(`/app/player/playlist/${playlist.id}`, { state: { from: location.pathname } })}
-                      className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
-                    >
-                      <div className="h-32 w-32 rounded-2xl overflow-hidden bg-muted mb-1.5">
-                        {playlist.cover_image_url ? (
-                          <CachedImage src={playlist.cover_image_url} alt={playlist.name} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-indigo-100">
-                            <FluentEmoji emoji="🧘" size={36} />
-                          </div>
-            )}
-
             {/* Online Programs Waitlist Section */}
             {!searchQuery && filteredWaitlistPrograms.length > 0 && (
               <section>
@@ -491,6 +466,31 @@ const AppStore = () => {
                 </div>
               </section>
             )}
+
+            {/* Meditate Section */}
+            {!searchQuery && meditatePlaylists.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h2 className="text-sm font-semibold text-foreground">Meditate</h2>
+                  <Link to="/app/player?category=meditate" className="text-xs text-primary font-medium flex items-center gap-0.5">
+                    All <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                  {meditatePlaylists.map((playlist) => (
+                    <button
+                      key={playlist.id}
+                      onClick={() => navigate(`/app/player/playlist/${playlist.id}`, { state: { from: location.pathname } })}
+                      className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
+                    >
+                      <div className="h-32 w-32 rounded-2xl overflow-hidden bg-muted mb-1.5">
+                        {playlist.cover_image_url ? (
+                          <CachedImage src={playlist.cover_image_url} alt={playlist.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-indigo-100">
+                            <FluentEmoji emoji="🧘" size={36} />
+                          </div>
+                        )}
                       </div>
                       <p className="text-xs font-medium line-clamp-2 leading-tight">{playlist.name}</p>
                       {playlist.requires_subscription && (
