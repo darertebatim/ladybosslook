@@ -37,6 +37,7 @@ interface ProgramCatalog {
   ios_product_id?: string | null;
   android_product_id?: string | null;
   cover_image_url?: string | null;
+  show_in_app_waitlist?: boolean;
 }
 
 export function ProgramsManager() {
