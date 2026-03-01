@@ -1901,21 +1901,12 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
-          date_of_birth: string | null
           email: string
           full_name: string | null
-          goals: string[] | null
           id: string
           last_active_date: string | null
-          notification_preferences: Json | null
-          occupation: string | null
           phone: string | null
-          preferred_language: string | null
-          referral_source: string | null
-          relationship_status: string | null
           return_count: number | null
-          social_instagram: string | null
-          social_telegram: string | null
           state: string | null
           this_month_active_days: number | null
           timezone: string | null
@@ -1928,21 +1919,12 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
-          date_of_birth?: string | null
           email: string
           full_name?: string | null
-          goals?: string[] | null
           id: string
           last_active_date?: string | null
-          notification_preferences?: Json | null
-          occupation?: string | null
           phone?: string | null
-          preferred_language?: string | null
-          referral_source?: string | null
-          relationship_status?: string | null
           return_count?: number | null
-          social_instagram?: string | null
-          social_telegram?: string | null
           state?: string | null
           this_month_active_days?: number | null
           timezone?: string | null
@@ -1955,21 +1937,12 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
-          date_of_birth?: string | null
           email?: string
           full_name?: string | null
-          goals?: string[] | null
           id?: string
           last_active_date?: string | null
-          notification_preferences?: Json | null
-          occupation?: string | null
           phone?: string | null
-          preferred_language?: string | null
-          referral_source?: string | null
-          relationship_status?: string | null
           return_count?: number | null
-          social_instagram?: string | null
-          social_telegram?: string | null
           state?: string | null
           this_month_active_days?: number | null
           timezone?: string | null
