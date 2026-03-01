@@ -311,10 +311,10 @@ const AppBrowsePrograms = () => {
             )}
           </div>
 
-          {/* Type pills */}
-          {availableTypes.length > 2 && (
-            <div className="px-4 pb-3">
-              <div className="flex gap-2 overflow-x-auto py-1 scrollbar-hide">
+          {/* Type pills + Language filter row */}
+          <div className="px-4 pb-3">
+            <div className="flex items-center gap-2">
+              <div className="flex gap-2 overflow-x-auto py-1 scrollbar-hide flex-1">
                 {availableTypes.map((t) => (
                   <WatchCategoryPill
                     key={t.value}
@@ -324,8 +324,31 @@ const AppBrowsePrograms = () => {
                   />
                 ))}
               </div>
+              {/* Language popover */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="flex-shrink-0 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm">
+                    {selectedLang.flag ? selectedLang.flag : <PersianFlag size={14} />}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-40 p-1 bg-[#1e2d4a] border-white/10" align="end">
+                  {LANGUAGE_OPTIONS.map((lang) => (
+                    <button
+                      key={lang.value}
+                      onClick={() => handleLanguageChange(lang.value)}
+                      className={cn(
+                        "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/80 hover:bg-white/10 transition-colors",
+                        preferredLanguage === lang.value && "bg-white/10 text-white font-medium"
+                      )}
+                    >
+                      {lang.flag ? <span className="text-base">{lang.flag}</span> : <PersianFlag size={14} />}
+                      {lang.label}
+                    </button>
+                  ))}
+                </PopoverContent>
+              </Popover>
             </div>
-          )}
+          </div>
         </div>
       </div>
 
