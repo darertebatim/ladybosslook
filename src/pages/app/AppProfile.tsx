@@ -382,7 +382,7 @@ const AppProfile = () => {
           <button
             onClick={handleAvatarClick}
             disabled={isUploadingAvatar}
-            className="relative group"
+            className="relative"
           >
             <Avatar className="h-24 w-24 ring-4 ring-background/50 shadow-lg">
               {avatarUrl && <AvatarImage src={avatarUrl} alt="Profile photo" />}
@@ -390,8 +390,9 @@ const AppProfile = () => {
                 {initials}
               </AvatarFallback>
             </Avatar>
-            <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Camera className="h-6 w-6 text-white" />
+            {/* Small camera icon at bottom-right of avatar */}
+            <div className="absolute bottom-0 right-0 h-7 w-7 rounded-full bg-primary flex items-center justify-center shadow-md border-2 border-background">
+              <Camera className="h-3.5 w-3.5 text-primary-foreground" />
             </div>
             {isUploadingAvatar && (
               <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40">
@@ -402,13 +403,6 @@ const AppProfile = () => {
           <h2 className="font-bold text-lg mt-3">{p?.full_name || 'User'}</h2>
           <p className="text-sm text-muted-foreground">{user?.email}</p>
           {p?.bio && <p className="text-xs text-muted-foreground mt-1 px-8 text-center line-clamp-2">{p.bio}</p>}
-        </div>
-
-        {/* Stats */}
-        <div className="flex justify-center gap-3 pb-4 px-4">
-          <StatPill label="Programs" value={programCount} icon={BookOpen} />
-          <StatPill label="This Month" value={daysThisMonth} icon={CalendarIcon} />
-          <StatPill label="Credits" value={`$${creditBalance}`} icon={Wallet} />
         </div>
       </header>
 
