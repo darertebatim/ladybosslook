@@ -41,7 +41,7 @@ export function CategoryCircle({ name, icon, emoji, color, isSelected, onClick }
         )}
       >
         {emoji ? (
-          <FluentEmoji emoji={emoji} size={22} />
+          <FluentEmoji emoji={emoji} size={32} />
         ) : (
           <IconComponent className={cn('w-5 h-5', colors.text)} />
         )}
