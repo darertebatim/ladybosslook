@@ -258,23 +258,7 @@ const AppStore = () => {
                   Browse Programs
                 </h2>
 
-                {/* Category Filters - only show if multiple categories and not searching */}
-                {!searchQuery && availableCategories.length > 2 && (
-                  <div className="flex gap-3 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
-                    {availableCategories.map((category) => (
-                      <CategoryCircle
-                        key={category.id}
-                        name={category.name}
-                        icon={category.icon}
-                        color={category.color}
-                        isSelected={selectedCategory === (category.id === 'all' ? null : category.id)}
-                        onClick={() => setSelectedCategory(category.id === 'all' ? null : category.id)}
-                      />
-                    ))}
-                  </div>
-                )}
-
-                {/* Programs Grid */}
+                {/* Programs Horizontal Scroll */}
                 {filteredPrograms.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground text-sm">
@@ -282,13 +266,13 @@ const AppStore = () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
                     {filteredPrograms.map((program) => {
                       const enrolled = isEnrolled(program.slug);
                       const isEnrolling = enrollingSlug === program.slug;
                       
                       return (
-                        <div key={program.slug} className="relative">
+                        <div key={program.slug} className="relative shrink-0 w-36">
                           <ProgramCard
                             title={program.title}
                             image={program.image}
