@@ -24,13 +24,12 @@ const LANG_FLAGS: Record<string, string> = {
   spanish: '🇪🇸',
 };
 
-const TYPE_FILTERS = [
-  { value: 'all', label: 'All' },
-  { value: 'course', label: 'Course' },
-  { value: 'group-coaching', label: 'Coaching' },
-  { value: 'webinar', label: 'Webinar' },
-  { value: 'event', label: 'Event' },
-  { value: 'subscription', label: 'Club' },
+const LANGUAGE_OPTIONS = [
+  { value: 'all', label: 'All', flag: '🌐' },
+  { value: 'american', label: 'English', flag: '🇺🇸' },
+  { value: 'persian', label: 'Persian', flag: null },
+  { value: 'turkish', label: 'Türkçe', flag: '🇹🇷' },
+  { value: 'spanish', label: 'Español', flag: '🇪🇸' },
 ];
 
 const typeConfig: Record<string, { label: string; icon: typeof BookOpen }> = {
