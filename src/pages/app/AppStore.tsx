@@ -324,7 +324,7 @@ const AppStore = () => {
                             image={program.image}
                             type={program.type}
                             language={program.language}
-                            isFree={program.isFree || program.priceAmount === 0}
+                            isFree={!program._isWaitlist && (program.isFree || program.priceAmount === 0)}
                             isEnrolled={enrolled}
                             onClick={() => navigate(`/app/programs/${program.slug}`, { state: { from: location.pathname } })}
                           />
