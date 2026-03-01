@@ -16,7 +16,7 @@ import { RitualsTour, TourHelpButton } from '@/components/app/tour';
 export default function AppInspire() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>('popular');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
