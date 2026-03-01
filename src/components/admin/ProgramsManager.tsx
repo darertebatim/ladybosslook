@@ -179,7 +179,7 @@ export function ProgramsManager() {
       if (editingId) {
         const { error } = await supabase
           .from('program_catalog')
-          .update(formData)
+          .update(formData as any)
           .eq('id', editingId);
 
         if (error) throw error;
@@ -191,7 +191,7 @@ export function ProgramsManager() {
       } else {
         const { error } = await supabase
           .from('program_catalog')
-          .insert([formData]);
+          .insert([formData] as any);
 
         if (error) throw error;
 
