@@ -32,6 +32,7 @@ const PageLoader = () => (
 const AppHome = lazy(() => import("@/pages/app/AppHome"));
 const AppPrograms = lazy(() => import("@/pages/app/AppPrograms"));
 const AppStore = lazy(() => import("@/pages/app/AppStore"));
+const AppBrowsePrograms = lazy(() => import("@/pages/app/AppBrowsePrograms"));
 const AppCourseDetail = lazy(() => import("@/pages/app/AppCourseDetail"));
 const AppProfile = lazy(() => import("@/pages/app/AppProfile"));
 const AppPlayer = lazy(() => import("@/pages/app/AppPlayer"));
