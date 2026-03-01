@@ -1,33 +1,23 @@
 import { supabase } from '@/integrations/supabase/client';
 import { usePrograms } from '@/hooks/usePrograms';
 import { SEOHead } from '@/components/SEOHead';
-import { Search, X, Loader2 } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Search, X, Loader2, ChevronRight, Crown } from 'lucide-react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { useState, useMemo, useCallback } from 'react';
 import { useEnrollments, useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 import { ProgramCard } from '@/components/app/ProgramCard';
-import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { ToolCard } from '@/components/app/ToolCard';
 import { Input } from '@/components/ui/input';
 import { wellnessTools, audioTools, getVisibleComingSoon } from '@/lib/toolsConfig';
 import { PromoBanner } from '@/components/app/PromoBanner';
 import { ExploreTour, TourHelpButton } from '@/components/app/tour';
-
-// Category configuration for filtering programs
-const categoryConfig = [
-  { id: 'all', name: 'All', icon: 'LayoutGrid', color: 'purple' },
-  { id: 'course', name: 'Courses', icon: 'BookOpen', color: 'purple' },
-  { id: 'audiobook', name: 'Audiobook', icon: 'Headphones', color: 'orange' },
-  { id: 'meditate', name: 'Meditate', icon: 'Brain', color: 'indigo' },
-  { id: 'soundscape', name: 'Sounds', icon: 'Waves', color: 'teal' },
-  { id: 'workout', name: 'Workout', icon: 'Dumbbell', color: 'rose' },
-  { id: 'group-coaching', name: 'Coaching', icon: 'Users', color: 'pink' },
-  { id: '1o1-session', name: '1-on-1', icon: 'UserCheck', color: 'blue' },
-  { id: 'webinar', name: 'Webinar', icon: 'Video', color: 'green' },
-  { id: 'event', name: 'Events', icon: 'Calendar', color: 'rose' },
-];
+import { useReflections, type Reflection } from '@/hooks/useReflections';
+import { useBreathingExercises, type BreathingExercise } from '@/hooks/useBreathingExercises';
+import { useQuery } from '@tanstack/react-query';
+import { CachedImage } from '@/components/ui/CachedImage';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 const AppStore = () => {
   const navigate = useNavigate();
@@ -35,7 +25,6 @@ const AppStore = () => {
   const { user } = useAuth();
   const { programs, isLoading: programsLoading } = usePrograms();
   const [enrollingSlug, setEnrollingSlug] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
@@ -61,11 +50,25 @@ const AppStore = () => {
     );
   }, [programs]);
 
-  // Get available categories based on actual programs
-  const availableCategories = useMemo(() => {
-    const types = new Set(freePrograms.map(p => p.type as string).filter(Boolean));
-    return categoryConfig.filter(cat => cat.id === 'all' || types.has(cat.id));
-  }, [freePrograms]);
+  // Fetch reflections, breathing, and audio playlists for explore sections
+  const { data: reflections } = useReflections();
+  const { data: breathingExercises } = useBreathingExercises();
+  const { data: audioPlaylists } = useQuery({
+    queryKey: ['explore-audio-playlists'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_playlists')
+        .select('id, name, cover_image_url, category, is_free, is_hidden, requires_subscription')
+        .eq('is_hidden', false)
+        .in('category', ['meditate', 'soundscape'])
+        .order('sort_order', { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const meditatePlaylists = useMemo(() => audioPlaylists?.filter(p => p.category === 'meditate') || [], [audioPlaylists]);
+  const soundscapePlaylists = useMemo(() => audioPlaylists?.filter(p => p.category === 'soundscape') || [], [audioPlaylists]);
 
   // Filter tools by search
   const filteredWellnessTools = useMemo(() => {
@@ -86,13 +89,9 @@ const AppStore = () => {
     );
   }, [searchQuery]);
 
-  // Filter programs by category and search
+  // Filter programs by search only (no category filter anymore)
   const filteredPrograms = useMemo(() => {
     let result = freePrograms;
-    
-    if (selectedCategory) {
-      result = result.filter(p => p.type === selectedCategory);
-    }
     
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -103,7 +102,7 @@ const AppStore = () => {
     }
     
     return result;
-  }, [freePrograms, selectedCategory, searchQuery]);
+  }, [freePrograms, searchQuery]);
 
   // Check if any tools match search
   const hasToolMatches = filteredWellnessTools.length > 0 || filteredAudioTools.length > 0;
@@ -292,6 +291,148 @@ const AppStore = () => {
                     })}
                   </div>
                 )}
+              </section>
+            )}
+
+            {/* Reflections Section */}
+            {!searchQuery && reflections && reflections.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h2 className="text-sm font-semibold text-foreground">Reflections</h2>
+                  <Link to="/app/reflections" className="text-xs text-primary font-medium flex items-center gap-0.5">
+                    All <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                  {reflections.slice(0, 8).map((r) => (
+                    <button
+                      key={r.id}
+                      onClick={() => navigate(`/app/reflections/${r.id}`, { state: { from: location.pathname } })}
+                      className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
+                    >
+                      <div className="h-32 w-32 rounded-2xl overflow-hidden bg-muted mb-1.5">
+                        {r.cover_image_url ? (
+                          <CachedImage src={r.cover_image_url} alt={r.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: r.cover_color || '#f3f4f6' }}>
+                            <FluentEmoji emoji="🪞" size={36} />
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-xs font-medium line-clamp-2 leading-tight">{r.title}</p>
+                      {!r.is_free && (
+                        <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 font-semibold mt-0.5">
+                          <Crown className="h-2.5 w-2.5" /> PLUS
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Breathe Section */}
+            {!searchQuery && breathingExercises && breathingExercises.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h2 className="text-sm font-semibold text-foreground">Breathe</h2>
+                  <Link to="/app/breathe" className="text-xs text-primary font-medium flex items-center gap-0.5">
+                    All <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                  {breathingExercises.filter(e => e.is_active).slice(0, 8).map((exercise) => (
+                    <button
+                      key={exercise.id}
+                      onClick={() => navigate(`/app/breathe?exercise=${exercise.id}`, { state: { from: location.pathname } })}
+                      className="shrink-0 w-24 text-center transition-transform active:scale-[0.97]"
+                    >
+                      <div className="h-24 w-24 rounded-2xl bg-muted flex items-center justify-center mb-1.5">
+                        <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} />
+                      </div>
+                      <p className="text-xs font-medium line-clamp-2 leading-tight">{exercise.name}</p>
+                      {exercise.is_premium && (
+                        <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 font-semibold mt-0.5">
+                          <Crown className="h-2.5 w-2.5" /> PLUS
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Meditate Section */}
+            {!searchQuery && meditatePlaylists.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h2 className="text-sm font-semibold text-foreground">Meditate</h2>
+                  <Link to="/app/player?category=meditate" className="text-xs text-primary font-medium flex items-center gap-0.5">
+                    All <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                  {meditatePlaylists.map((playlist) => (
+                    <button
+                      key={playlist.id}
+                      onClick={() => navigate(`/app/player/playlist/${playlist.id}`, { state: { from: location.pathname } })}
+                      className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
+                    >
+                      <div className="h-32 w-32 rounded-2xl overflow-hidden bg-muted mb-1.5">
+                        {playlist.cover_image_url ? (
+                          <CachedImage src={playlist.cover_image_url} alt={playlist.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-indigo-100">
+                            <FluentEmoji emoji="🧘" size={36} />
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-xs font-medium line-clamp-2 leading-tight">{playlist.name}</p>
+                      {playlist.requires_subscription && (
+                        <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 font-semibold mt-0.5">
+                          <Crown className="h-2.5 w-2.5" /> PLUS
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Soundscapes Section */}
+            {!searchQuery && soundscapePlaylists.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h2 className="text-sm font-semibold text-foreground">Soundscapes</h2>
+                  <Link to="/app/player?category=soundscape" className="text-xs text-primary font-medium flex items-center gap-0.5">
+                    All <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                  {soundscapePlaylists.map((playlist) => (
+                    <button
+                      key={playlist.id}
+                      onClick={() => navigate(`/app/player/playlist/${playlist.id}`, { state: { from: location.pathname } })}
+                      className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
+                    >
+                      <div className="h-32 w-32 rounded-2xl overflow-hidden bg-muted mb-1.5">
+                        {playlist.cover_image_url ? (
+                          <CachedImage src={playlist.cover_image_url} alt={playlist.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-cyan-100">
+                            <FluentEmoji emoji="🌊" size={36} />
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-xs font-medium line-clamp-2 leading-tight">{playlist.name}</p>
+                      {playlist.requires_subscription && (
+                        <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 font-semibold mt-0.5">
+                          <Crown className="h-2.5 w-2.5" /> PLUS
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </section>
             )}
 
