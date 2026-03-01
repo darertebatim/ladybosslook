@@ -20,6 +20,8 @@ import { PeriodTour } from '@/components/app/tour';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
+import { useSubscription } from '@/hooks/useSubscription';
+import { PaywallSheet } from '@/components/app/PaywallSheet';
 
 const AppPeriod = () => {
   const navigate = useNavigate();

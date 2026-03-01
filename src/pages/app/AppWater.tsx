@@ -14,6 +14,8 @@ import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useSubscription } from '@/hooks/useSubscription';
+import { PaywallSheet } from '@/components/app/PaywallSheet';
 
 // Default water goal when no task exists
 const DEFAULT_WATER_GOAL = 64;
