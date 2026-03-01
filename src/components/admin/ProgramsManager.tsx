@@ -191,7 +191,7 @@ export function ProgramsManager() {
       } else {
         const { error } = await supabase
           .from('program_catalog')
-          .insert([formData]);
+          .insert([formData] as any);
 
         if (error) throw error;
 
