@@ -89,13 +89,9 @@ const AppStore = () => {
     );
   }, [searchQuery]);
 
-  // Filter programs by category and search
+  // Filter programs by search only (no category filter anymore)
   const filteredPrograms = useMemo(() => {
     let result = freePrograms;
-    
-    if (selectedCategory) {
-      result = result.filter(p => p.type === selectedCategory);
-    }
     
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -106,7 +102,7 @@ const AppStore = () => {
     }
     
     return result;
-  }, [freePrograms, selectedCategory, searchQuery]);
+  }, [freePrograms, searchQuery]);
 
   // Check if any tools match search
   const hasToolMatches = filteredWellnessTools.length > 0 || filteredAudioTools.length > 0;
