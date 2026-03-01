@@ -8,6 +8,9 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Programs = () => {
   const { programs, isLoading } = usePrograms();
+  const { addToCart, isInCart, isAdding } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   
   // Get only popular programs
   const popularPrograms = programs.filter(p => p.popular);
