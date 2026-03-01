@@ -1,58 +1,99 @@
 
 
-## Calm-Style Animated Background for Watch Page
+# Profile Page Redesign and Settings Separation
 
-Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
+## Overview
+Split the current 1500-line monolithic profile page into two distinct pages:
+1. **Profile Page** (`/app/profile`) -- A social-network-style profile with photo upload, bio, personal details
+2. **Settings Page** (`/app/settings`) -- All settings, notifications, password, calendar, downloads, account actions
 
-### What You'll Get
+## Database Changes
 
-- A deep dark blue gradient background on the Watch page header area
-- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
-- Subtle lightning flashes that pulse periodically
-- All text updated to white/light colors for contrast
-- Lightweight implementation using CSS keyframes (no extra dependencies)
+Add new columns to `profiles` table:
+- `country` already exists
+- `date_of_birth` already exists
+- `bio` already exists
+- `avatar_url` already exists
+- `occupation` already exists
+- `relationship_status` already exists
+- `preferred_language` already exists
+- `goals` already exists
+- `social_instagram` already exists
+- `social_telegram` already exists
+- `gender` already exists
 
-### Design Details
+All needed columns already exist. No migration needed.
 
-- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
-- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
-- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
-- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
-- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
+**Storage**: Create an `avatars` bucket (public) for profile photo uploads, with RLS policies allowing users to upload/update their own avatar.
 
-### Technical Approach
+## New Profile Page (`/app/profile`)
 
-**Files to modify:**
+Social-network style layout:
 
-1. **`src/pages/app/AppWatch.tsx`**
-   - Replace the header `bg-[#E8F4FE]` with the dark gradient
-   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
-   - Add a lightning flash overlay div
-   - Update all text classes to white variants (`text-white`, `text-white/60`)
-   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
-   - Extend the gradient into the page background behind the content area
+- **Hero section**: Large avatar (tappable to upload photo via camera/gallery), name, bio underneath
+- **Stats row**: Programs, This Month, Credits (keep existing)
+- **"Edit Profile" button** prominent at top
+- **Profile info cards** (always visible, not collapsed):
+  - Full name, email, phone
+  - Date of birth (date picker)
+  - Gender/Pronouns
+  - City, country
+  - Occupation, relationship status
+  - Preferred language
+  - Goals (tag-style multi-select)
+  - Bio (textarea)
+  - Instagram handle, Telegram handle
+- **Settings button**: Large prominent button linking to `/app/settings`
+- **My Programs section** (keep existing)
+- **Wallet and Orders** (keep existing)
 
-2. **`tailwind.config.ts`**
-   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
-   - Register corresponding animation utilities
+Edit mode: Tapping "Edit Profile" reveals inline editors for all fields; Save/Cancel buttons appear.
 
-### Visual Structure
+### Avatar Upload Flow
+- Tap avatar to pick image (Capacitor Camera plugin for native, file input for web)
+- Upload to `avatars` bucket at path `{user_id}/avatar.{ext}`
+- Save public URL to `profiles.avatar_url`
+- Show image in Avatar component with fallback to initials
 
+## New Settings Page (`/app/settings`)
+
+New file: `src/pages/app/AppSettings.tsx`
+
+Move these sections from profile:
+- Password change
+- Push Notifications (native only)
+- Notification Preferences
+- Calendar Sync (native only)
+- Downloaded Audio (native only)
+- Support / Contact
+- Admin Tools
+- Account Actions (sign out, restart tours, delete account)
+- Rate Simora (native only)
+
+Layout: Same collapsible accordion style as current profile. Header with back button and "Settings" title.
+
+## Routing
+
+Add new route in `App.tsx`:
 ```text
-+----------------------------------+
-|  [dark blue gradient header]     |
-|  ~~~ cloud layer 1 (slow) ~~~   |
-|  ~~~ cloud layer 2 (slower) ~~~ |
-|  * lightning flash (periodic) *  |
-|                                  |
-|  Watch          [icons]          |
-|  [categories row]                |
-|  [filters]              [lang]   |
-+----------------------------------+
-|  [normal white content area]     |
-|  [playlist cards grid]           |
-+----------------------------------+
+/app/settings -> AppSettings (full-screen, outside AppLayout like other tools)
 ```
 
-The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
+## File Changes
+
+1. **New: `supabase/migrations/..._create_avatars_bucket.sql`** -- Create avatars storage bucket + RLS policies
+2. **New: `src/pages/app/AppSettings.tsx`** -- Settings page with all settings sections moved from profile
+3. **Modified: `src/pages/app/AppProfile.tsx`** -- Complete rewrite as social-profile page with avatar upload, all profile fields, Settings button
+4. **Modified: `src/App.tsx`** -- Add `/app/settings` route
+5. **Modified: `src/components/app/HomeMenu.tsx`** -- Add Settings nav item
+
+## Technical Details
+
+- Avatar upload uses `@capacitor/camera` on native, `<input type="file">` on web
+- Profile fields use `as any` type casting for columns not yet in generated types (same pattern as existing gender field)
+- Date of birth uses the Shadcn date picker with popover
+- Goals uses a tag/chip input allowing multiple selections
+- Language selector: dropdown with common languages
+- Relationship status: dropdown (Single, In a relationship, Married, Prefer not to say)
+- All profile updates go through a single `handleSaveProfile` function that updates all fields at once
 
