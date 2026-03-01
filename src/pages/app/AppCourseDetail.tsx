@@ -1114,10 +1114,10 @@ const AppCourseDetail = () => {
                           <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 text-center space-y-1">
                             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Program Price</p>
                             <p className="text-2xl font-bold text-foreground">
-                              {program.currency === 'ILS' ? '₪' : '$'}{(program.price_amount / 100).toFixed(0)}
+                              {(program as any).currency === 'ILS' ? '₪' : '$'}{(program.price_amount / 100).toFixed(0)}
                             </p>
-                            <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 px-3 py-1 mt-1">
-                              <Clock className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+                            <div className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 mt-1">
+                              <Clock className="h-3 w-3 text-muted-foreground" />
                               <span className="text-xs font-medium text-amber-700 dark:text-amber-300">Registration opening soon</span>
                             </div>
                           </div>
