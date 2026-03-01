@@ -1,0 +1,102 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+
+export interface CartItem {
+  id: string;
+  user_id: string;
+  program_slug: string;
+  program_title: string;
+  price_amount: number;
+  payment_type: string;
+  deposit_price: number | null;
+  added_by: string | null;
+  created_at: string;
+}
+
+export const useCart = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const { data: cartItems = [], isLoading } = useQuery({
+    queryKey: ['cart-items', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('cart_items')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data as CartItem[];
+    },
+    enabled: !!user,
+  });
+
+  const addToCartMutation = useMutation({
+    mutationFn: async (program: {
+      slug: string;
+      title: string;
+      price_amount: number;
+      payment_type: string;
+      deposit_price?: number | null;
+    }) => {
+      if (!user) {
+        navigate(`/auth?redirect=${window.location.pathname}`);
+        throw new Error('Sign in required');
+      }
+      const { error } = await supabase.from('cart_items').upsert({
+        user_id: user.id,
+        program_slug: program.slug,
+        program_title: program.title,
+        price_amount: program.price_amount,
+        payment_type: program.payment_type,
+        deposit_price: program.deposit_price ?? null,
+      }, { onConflict: 'user_id,program_slug' });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cart-items'] });
+      toast.success('Added to cart', {
+        action: { label: 'View Cart', onClick: () => navigate('/cart') },
+      });
+    },
+    onError: (err: Error) => {
+      if (err.message !== 'Sign in required') {
+        toast.error('Could not add to cart');
+      }
+    },
+  });
+
+  const removeFromCartMutation = useMutation({
+    mutationFn: async (programSlug: string) => {
+      if (!user) return;
+      const { error } = await supabase
+        .from('cart_items')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('program_slug', programSlug);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cart-items'] });
+      toast.success('Removed from cart');
+    },
+  });
+
+  const isInCart = (programSlug: string) =>
+    cartItems.some((item) => item.program_slug === programSlug);
+
+  return {
+    cartItems,
+    cartCount: cartItems.length,
+    isLoading,
+    addToCart: addToCartMutation.mutate,
+    removeFromCart: removeFromCartMutation.mutate,
+    isInCart,
+    isAdding: addToCartMutation.isPending,
+  };
+};
