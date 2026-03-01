@@ -50,11 +50,25 @@ const AppStore = () => {
     );
   }, [programs]);
 
-  // Get available categories based on actual programs
-  const availableCategories = useMemo(() => {
-    const types = new Set(freePrograms.map(p => p.type as string).filter(Boolean));
-    return categoryConfig.filter(cat => cat.id === 'all' || types.has(cat.id));
-  }, [freePrograms]);
+  // Fetch reflections, breathing, and audio playlists for explore sections
+  const { data: reflections } = useReflections();
+  const { data: breathingExercises } = useBreathingExercises();
+  const { data: audioPlaylists } = useQuery({
+    queryKey: ['explore-audio-playlists'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_playlists')
+        .select('id, name, cover_image_url, category, is_free, is_hidden, requires_subscription')
+        .eq('is_hidden', false)
+        .in('category', ['meditate', 'soundscape'])
+        .order('sort_order', { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const meditatePlaylists = useMemo(() => audioPlaylists?.filter(p => p.category === 'meditate') || [], [audioPlaylists]);
+  const soundscapePlaylists = useMemo(() => audioPlaylists?.filter(p => p.category === 'soundscape') || [], [audioPlaylists]);
 
   // Filter tools by search
   const filteredWellnessTools = useMemo(() => {
