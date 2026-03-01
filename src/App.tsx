@@ -63,6 +63,7 @@ const AppFasting = lazy(() => import("@/pages/app/AppFasting"));
 const AppAdminSupport = lazy(() => import("@/pages/app/AppAdminSupport"));
 const AppChannelPost = lazy(() => import("@/pages/app/AppChannelPost"));
 const AppRate = lazy(() => import("@/pages/app/AppRate"));
+const AppSettings = lazy(() => import("@/pages/app/AppSettings"));
 const AppOnboarding = lazy(() => import("@/pages/app/AppOnboarding"));
 const AppReflections = lazy(() => import("@/pages/app/AppReflections"));
 const AppReflectionFlow = lazy(() => import("@/pages/app/AppReflectionFlow"));
