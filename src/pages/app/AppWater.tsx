@@ -40,6 +40,8 @@ const AppWater = () => {
   const createTask = useCreateTask();
   const queryClient = useQueryClient();
   const [isSavingRoutine, setIsSavingRoutine] = useState(false);
+  const { isSubscribed, isLoading: subLoading } = useSubscription();
+  const [showPaywall, setShowPaywall] = useState(false);
 
   // Find water task for today
   const waterTask = useMemo(() => {
