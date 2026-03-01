@@ -108,6 +108,7 @@ const AppProfile = () => {
   const [editedName, setEditedName] = useState('');
   const [editedPhone, setEditedPhone] = useState('');
   const [editedCity, setEditedCity] = useState('');
+  const [editedGender, setEditedGender] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   // Journal entries for monthly presence calculation
