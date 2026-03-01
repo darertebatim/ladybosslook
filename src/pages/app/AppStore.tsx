@@ -25,7 +25,6 @@ const AppStore = () => {
   const { user } = useAuth();
   const { programs, isLoading: programsLoading } = usePrograms();
   const [enrollingSlug, setEnrollingSlug] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
