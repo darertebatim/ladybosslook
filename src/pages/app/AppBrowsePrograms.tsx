@@ -1,15 +1,27 @@
 import { useMemo, useState, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Loader2, Search, X, GraduationCap, ChevronLeft } from 'lucide-react';
+import { Search, X, GraduationCap, ChevronLeft, ChevronRight, CheckCircle2, BookOpen, Users, UserCheck, Headphones, Video, Calendar, Sparkles, Dumbbell, Waves, Heart, Lock } from 'lucide-react';
 import { usePrograms } from '@/hooks/usePrograms';
 import { useEnrollments } from '@/hooks/useAppData';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ProgramCard } from '@/components/app/ProgramCard';
 import { SEOHead } from '@/components/SEOHead';
 import { Input } from '@/components/ui/input';
 import { WatchCategoryPill } from '@/components/video/WatchCategoryPill';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import { PersianFlag } from '@/components/ui/PersianFlag';
+import { CachedImage } from '@/components/ui/CachedImage';
+import { cn } from '@/lib/utils';
+import { haptic } from '@/lib/haptics';
+import heroStormVideo from '@/assets/watch-hero-storm.mp4';
+
+const LANG_FLAGS: Record<string, string> = {
+  all: '🌐',
+  american: '🇺🇸',
+  turkish: '🇹🇷',
+  spanish: '🇪🇸',
+};
 
 const TYPE_FILTERS = [
   { value: 'all', label: 'All' },
@@ -20,6 +32,108 @@ const TYPE_FILTERS = [
   { value: 'subscription', label: 'Club' },
 ];
 
+const typeConfig: Record<string, { label: string; icon: typeof BookOpen }> = {
+  'course': { label: 'Course', icon: BookOpen },
+  'group-coaching': { label: 'Coaching', icon: Users },
+  '1o1-session': { label: '1-on-1', icon: UserCheck },
+  'audiobook': { label: 'Audiobook', icon: Headphones },
+  'meditate': { label: 'Meditate', icon: Sparkles },
+  'workout': { label: 'Workout', icon: Dumbbell },
+  'soundscape': { label: 'Soundscape', icon: Waves },
+  'affirmations': { label: 'Affirmations', icon: Heart },
+  'webinar': { label: 'Webinar', icon: Video },
+  'event': { label: 'Event', icon: Calendar },
+  'subscription': { label: 'Club', icon: Sparkles },
+};
+
+// --- Horizontal Program Card (matches PlaylistCard style) ---
+interface AcademyProgramCardProps {
+  title: string;
+  image?: string;
+  type?: string;
+  language?: string;
+  isFree?: boolean;
+  isEnrolled?: boolean;
+  isWaitlist?: boolean;
+  onClick?: () => void;
+}
+
+const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, isWaitlist, onClick }: AcademyProgramCardProps) => {
+  const typeInfo = type ? typeConfig[type] : null;
+  const TypeIcon = typeInfo?.icon || Sparkles;
+
+  return (
+    <button
+      className={cn(
+        "relative w-full text-left rounded-2xl overflow-hidden cursor-pointer transition-all active:scale-[0.98]",
+        "bg-white/10 backdrop-blur-sm"
+      )}
+      onClick={() => { haptic.light(); onClick?.(); }}
+    >
+      <div className="flex gap-3 p-3">
+        {/* Square thumbnail */}
+        <div className="relative h-24 w-24 flex-shrink-0 rounded-xl overflow-hidden">
+          {image ? (
+            <CachedImage src={image} alt={title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-white/10 flex items-center justify-center">
+              <TypeIcon className="h-8 w-8 text-white/30" />
+            </div>
+          )}
+          {/* Lock icon for waitlist */}
+          {isWaitlist && !isEnrolled && (
+            <div className="absolute bottom-1.5 left-1.5">
+              <div className="w-6 h-6 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                <Lock className="h-3 w-3 text-white/80" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+          {/* Meta line */}
+          <div className="flex items-center gap-1.5 text-[11px] text-white/70">
+            {typeInfo && <span className="capitalize">{typeInfo.label}</span>}
+          </div>
+
+          {/* Title */}
+          <h3 className="font-bold text-sm text-white line-clamp-2 leading-snug">{title}</h3>
+
+          {/* Badges row */}
+          <div className="flex items-center gap-1.5 mt-0.5">
+            {isEnrolled && (
+              <Badge className="bg-green-500 hover:bg-green-500 text-white rounded-full text-[10px] px-1.5 py-0 gap-0.5 shadow-sm h-4">
+                <CheckCircle2 className="h-2.5 w-2.5" />
+                Enrolled
+              </Badge>
+            )}
+            {isFree && !isEnrolled && (
+              <Badge className="bg-white hover:bg-white text-[#132240] rounded-full text-[10px] px-1.5 py-0 shadow-sm h-4 font-semibold">
+                FREE
+              </Badge>
+            )}
+            {language && language !== 'all' && (
+              language === 'persian'
+                ? <PersianFlag size={10} />
+                : LANG_FLAGS[language] && <span className="text-[10px] flex-shrink-0 leading-none">{LANG_FLAGS[language]}</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Enroll CTA for waitlist */}
+      {isWaitlist && !isEnrolled && (
+        <div className="flex items-center justify-center gap-1.5 py-2 px-3 bg-white/10 text-white text-xs font-medium">
+          <span>Tap to enroll</span>
+          <ChevronRight className="h-3.5 w-3.5" />
+        </div>
+      )}
+    </button>
+  );
+};
+
+// --- Main Page ---
 const AppBrowsePrograms = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,6 +143,7 @@ const AppBrowsePrograms = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [selectedType, setSelectedType] = useState('all');
   const [scrollY, setScrollY] = useState(0);
+  const heroRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setScrollY(e.currentTarget.scrollTop);
@@ -83,7 +198,6 @@ const AppBrowsePrograms = () => {
     return [...markedFree, ...waitlistOnly];
   }, [freePrograms, waitlistPrograms, waitlistSlugs]);
 
-  // Available type filters based on actual data
   const availableTypes = useMemo(() => {
     const types = new Set(allPrograms.map((p: any) => p.type).filter(Boolean));
     return TYPE_FILTERS.filter(f => f.value === 'all' || types.has(f.value));
@@ -103,7 +217,6 @@ const AppBrowsePrograms = () => {
     return result;
   }, [allPrograms, searchQuery, selectedType]);
 
-  // Enrolled programs shown separately
   const enrolledPrograms = useMemo(() => {
     return filtered.filter((p: any) => isEnrolled(p.slug));
   }, [filtered, enrollments]);
@@ -114,7 +227,7 @@ const AppBrowsePrograms = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full overflow-hidden" style={{ background: '#1a1a2e' }}>
+      <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
         <div className="fixed top-0 left-0 right-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
           <div className="h-12 flex items-center px-4"><Skeleton className="h-6 w-32 bg-white/10" /></div>
           <div className="px-4 pb-3 flex gap-2">
@@ -122,23 +235,24 @@ const AppBrowsePrograms = () => {
           </div>
         </div>
         <div style={{ height: 'calc(130px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
-        <div className="flex-1 overflow-y-auto p-4">
-          <div className="grid grid-cols-2 gap-3">
-            {[...Array(6)].map((_, i) => <Skeleton key={i} className="aspect-square rounded-2xl bg-white/10" />)}
-          </div>
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          {[...Array(5)].map((_, i) => (
+            <Skeleton key={i} className="h-[108px] rounded-2xl bg-white/10" />
+          ))}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden" style={{ background: '#1a1a2e' }}>
+    <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
       <SEOHead title="Academy Programs - Simora" description="Browse all academy programs" />
 
-      {/* Gradient background */}
-      <div className="fixed top-0 left-0 right-0 z-0 h-[300px] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-900/40 via-indigo-900/20 to-[#1a1a2e]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-600/15 via-transparent to-transparent" />
+      {/* Hero Video Background */}
+      <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 h-[420px] overflow-hidden" style={{ transform: `translateY(${-scrollY * 0.4}px)` }}>
+        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-50" src={heroStormVideo} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 30%, rgba(19,34,64,0.5) 60%, #132240 100%)' }} />
+        <div className="absolute inset-0 bg-white/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
       </div>
 
       {/* Glass Header */}
@@ -165,8 +279,8 @@ const AppBrowsePrograms = () => {
             ) : (
               <>
                 <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => navigate(-1)} 
+                  <button
+                    onClick={() => navigate(-1)}
                     className="p-1.5 -ml-1 rounded-full bg-white/10 backdrop-blur-sm transition-transform active:scale-90"
                   >
                     <ChevronLeft className="h-4 w-4 text-white" />
@@ -214,12 +328,12 @@ const AppBrowsePrograms = () => {
           {/* Enrolled Programs */}
           {enrolledPrograms.length > 0 && selectedType === 'all' && !searchQuery && (
             <div className="space-y-3">
-              <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wider">
+              <h2 className="text-xs font-semibold text-white/50 uppercase tracking-wider">
                 Your Programs
               </h2>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-3">
                 {enrolledPrograms.map((program: any) => (
-                  <ProgramCard
+                  <AcademyProgramCard
                     key={program.slug}
                     title={program.title}
                     image={program.image}
@@ -227,6 +341,7 @@ const AppBrowsePrograms = () => {
                     language={program.language}
                     isFree={!program._isWaitlist && (program.isFree || program.priceAmount === 0)}
                     isEnrolled={true}
+                    isWaitlist={false}
                     onClick={() => navigate(`/app/programs/${program.slug}`, { state: { from: location.pathname } })}
                   />
                 ))}
@@ -236,7 +351,7 @@ const AppBrowsePrograms = () => {
 
           {/* All / Not Enrolled Programs */}
           <div className="space-y-3">
-            <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wider">
+            <h2 className="text-xs font-semibold text-white/50 uppercase tracking-wider">
               {searchQuery ? 'Results' : selectedType === 'all' ? 'All Programs' : TYPE_FILTERS.find(f => f.value === selectedType)?.label || 'Programs'}
             </h2>
 
@@ -250,9 +365,9 @@ const AppBrowsePrograms = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-3">
                 {notEnrolledPrograms.map((program: any) => (
-                  <ProgramCard
+                  <AcademyProgramCard
                     key={program.slug}
                     title={program.title}
                     image={program.image}
@@ -260,6 +375,7 @@ const AppBrowsePrograms = () => {
                     language={program.language}
                     isFree={!program._isWaitlist && (program.isFree || program.priceAmount === 0)}
                     isEnrolled={false}
+                    isWaitlist={program._isWaitlist}
                     onClick={() => navigate(`/app/programs/${program.slug}`, { state: { from: location.pathname } })}
                   />
                 ))}
