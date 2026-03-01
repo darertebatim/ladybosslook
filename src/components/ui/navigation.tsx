@@ -36,6 +36,22 @@ const NavLinks = ({ mobile, onClose }: { mobile?: boolean; onClose?: () => void 
   </>
 );
 
+const CartIcon = () => {
+  const { cartCount } = useCart();
+  const { user } = useAuth();
+  if (!user || cartCount === 0) return null;
+  return (
+    <Link to="/cart" className="relative">
+      <Button variant="ghost" size="icon">
+        <ShoppingCart size={20} />
+        <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+          {cartCount}
+        </span>
+      </Button>
+    </Link>
+  );
+};
+
 const AuthButtons = ({ mobile, onClose }: { mobile?: boolean; onClose?: () => void }) => {
   const { isAdmin, user, signOut } = useAuth();
   const buttonClass = mobile ? 'w-full' : '';
