@@ -579,6 +579,7 @@ const AppProfile = () => {
                 <InfoRow icon={Briefcase} value={p?.occupation} label="Occupation" />
                 <InfoRow icon={Heart} value={relationshipLabel && relationshipLabel !== 'Prefer not to say' ? relationshipLabel : undefined} label="Relationship" />
                 <InfoRow icon={Globe} value={languageLabel && languageLabel !== 'Not set' ? languageLabel : undefined} label="Second Language" />
+                <InfoRow icon={Globe} value={p?.timezone || undefined} label="Timezone" />
                 {p?.goals && p.goals.length > 0 && (
                   <div className="p-2.5 bg-muted/30 rounded-lg">
                     <p className="text-[10px] text-muted-foreground mb-1.5">Goals</p>
