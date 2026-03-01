@@ -1,13 +1,14 @@
 import { supabase } from '@/integrations/supabase/client';
 import { usePrograms } from '@/hooks/usePrograms';
 import { SEOHead } from '@/components/SEOHead';
-import { Search, X, Loader2, ChevronRight, Crown } from 'lucide-react';
+import { Search, X, Loader2, ChevronRight, Crown, Bell, CheckCircle2 } from 'lucide-react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { useState, useMemo, useCallback } from 'react';
 import { useEnrollments, useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 import { ProgramCard } from '@/components/app/ProgramCard';
+import { Button } from '@/components/ui/button';
 import { ToolCard } from '@/components/app/ToolCard';
 import { Input } from '@/components/ui/input';
 import { wellnessTools, audioTools, getVisibleComingSoon } from '@/lib/toolsConfig';
