@@ -204,7 +204,7 @@ const ProgramPage = () => {
                         <div className="text-3xl font-bold text-primary">FREE</div>
                       ) : (
                         <div className="space-y-1">
-                          {program.original_price && program.original_price > program.price_amount && (
+                          {program.original_price && program.original_price > 0 && program.original_price > program.price_amount && (
                             <div className="text-muted-foreground line-through text-lg">
                               ${(program.original_price / 100).toFixed(0)}
                             </div>
