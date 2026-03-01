@@ -108,6 +108,7 @@ const AppProfile = () => {
   const [editedName, setEditedName] = useState('');
   const [editedPhone, setEditedPhone] = useState('');
   const [editedCity, setEditedCity] = useState('');
+  const [editedGender, setEditedGender] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   // Journal entries for monthly presence calculation
@@ -370,6 +371,7 @@ const AppProfile = () => {
       setEditedName(profile.full_name || '');
       setEditedPhone(profile.phone || '');
       setEditedCity(profile.city || '');
+      setEditedGender((profile as any).gender || '');
     }
   }, [profile]);
 
@@ -384,7 +386,8 @@ const AppProfile = () => {
           full_name: editedName.trim(),
           phone: editedPhone.trim(),
           city: editedCity.trim(),
-        })
+          gender: editedGender.trim() || null,
+        } as any)
         .eq('id', user.id);
 
       if (error) throw error;
@@ -411,6 +414,7 @@ const AppProfile = () => {
     setEditedName(profile?.full_name || '');
     setEditedPhone(profile?.phone || '');
     setEditedCity(profile?.city || '');
+    setEditedGender((profile as any)?.gender || '');
     setIsEditingProfile(false);
   };
 
@@ -773,6 +777,21 @@ const AppProfile = () => {
                       <Label htmlFor="editCity" className="text-xs text-muted-foreground">City</Label>
                       <Input id="editCity" value={editedCity} onChange={(e) => setEditedCity(e.target.value)} placeholder="Your city" />
                     </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="editGender" className="text-xs text-muted-foreground">Gender / Pronouns</Label>
+                      <select
+                        id="editGender"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        value={editedGender}
+                        onChange={(e) => setEditedGender(e.target.value)}
+                      >
+                        <option value="">Prefer not to say</option>
+                        <option value="female">Female (She/Her)</option>
+                        <option value="male">Male (He/Him)</option>
+                        <option value="non-binary">Non-Binary (They/Them)</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
                   </>
                 ) : (
                   <>
@@ -794,7 +813,13 @@ const AppProfile = () => {
                         <span>{profile.city}</span>
                       </div>
                     )}
-                    {!profile?.full_name && !profile?.phone && !profile?.city && (
+                    {(profile as any)?.gender && (
+                      <div className="flex items-center gap-3 text-sm p-2 bg-muted/30 rounded-lg">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span className="capitalize">{(profile as any).gender === 'non-binary' ? 'Non-Binary (They/Them)' : (profile as any).gender === 'female' ? 'Female (She/Her)' : (profile as any).gender === 'male' ? 'Male (He/Him)' : (profile as any).gender}</span>
+                      </div>
+                    )}
+                    {!profile?.full_name && !profile?.phone && !profile?.city && !(profile as any)?.gender && (
                       <p className="text-sm text-muted-foreground p-2">Tap Edit to add your details</p>
                     )}
                   </>
