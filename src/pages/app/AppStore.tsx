@@ -371,7 +371,7 @@ const AppStore = () => {
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
                   {meditatePlaylists.map((playlist) => (
                     <button
                       key={playlist.id}
