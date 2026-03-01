@@ -1,19 +1,23 @@
 import { supabase } from '@/integrations/supabase/client';
 import { usePrograms } from '@/hooks/usePrograms';
 import { SEOHead } from '@/components/SEOHead';
-import { Search, X, Loader2 } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Search, X, Loader2, ChevronRight, Crown } from 'lucide-react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { useState, useMemo, useCallback } from 'react';
 import { useEnrollments, useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 import { ProgramCard } from '@/components/app/ProgramCard';
-import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { ToolCard } from '@/components/app/ToolCard';
 import { Input } from '@/components/ui/input';
 import { wellnessTools, audioTools, getVisibleComingSoon } from '@/lib/toolsConfig';
 import { PromoBanner } from '@/components/app/PromoBanner';
 import { ExploreTour, TourHelpButton } from '@/components/app/tour';
+import { useReflections, type Reflection } from '@/hooks/useReflections';
+import { useBreathingExercises, type BreathingExercise } from '@/hooks/useBreathingExercises';
+import { useQuery } from '@tanstack/react-query';
+import { CachedImage } from '@/components/ui/CachedImage';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 // Category configuration for filtering programs
 const categoryConfig = [
