@@ -63,6 +63,7 @@ const AppFasting = lazy(() => import("@/pages/app/AppFasting"));
 const AppAdminSupport = lazy(() => import("@/pages/app/AppAdminSupport"));
 const AppChannelPost = lazy(() => import("@/pages/app/AppChannelPost"));
 const AppRate = lazy(() => import("@/pages/app/AppRate"));
+const AppSettings = lazy(() => import("@/pages/app/AppSettings"));
 const AppOnboarding = lazy(() => import("@/pages/app/AppOnboarding"));
 const AppReflections = lazy(() => import("@/pages/app/AppReflections"));
 const AppReflectionFlow = lazy(() => import("@/pages/app/AppReflectionFlow"));
@@ -413,6 +414,7 @@ const App = () => (
                   <Route path="/app/support" element={<ProtectedRoute><AppAdminSupport /></ProtectedRoute>} />
                   <Route path="/app/channels/new" element={<ProtectedRoute><AppChannelPost /></ProtectedRoute>} />
                   <Route path="/app/rate" element={<ProtectedRoute><AppRate /></ProtectedRoute>} />
+                  <Route path="/app/settings" element={<ProtectedRoute><AppSettings /></ProtectedRoute>} />
                   <Route path="/app/onboarding/:flowId" element={<ProtectedRoute><AppOnboarding /></ProtectedRoute>} />
                   <Route path="/app/reflections/notes/:reflectionId" element={<ProtectedRoute><AppReflectionNoteDetail /></ProtectedRoute>} />
                   <Route path="/app/reflections/:reflectionId" element={<ProtectedRoute><AppReflectionFlow /></ProtectedRoute>} />
