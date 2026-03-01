@@ -210,13 +210,20 @@ const AppBrowsePrograms = () => {
 
   const availableTypes = useMemo(() => {
     const types = new Set(allPrograms.map((p: any) => p.type).filter(Boolean));
-    return TYPE_FILTERS.filter(f => f.value === 'all' || types.has(f.value));
+    const dynamicFilters = Array.from(types).map(t => {
+      const config = typeConfig[t];
+      return { value: t, label: config?.label || t };
+    });
+    return [{ value: 'all', label: 'All' }, ...dynamicFilters];
   }, [allPrograms]);
 
   const filtered = useMemo(() => {
     let result = allPrograms;
     if (selectedType !== 'all') {
       result = result.filter((p: any) => p.type === selectedType);
+    }
+    if (preferredLanguage !== 'all') {
+      result = result.filter((p: any) => p.language === preferredLanguage);
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -225,7 +232,7 @@ const AppBrowsePrograms = () => {
       );
     }
     return result;
-  }, [allPrograms, searchQuery, selectedType]);
+  }, [allPrograms, searchQuery, selectedType, preferredLanguage]);
 
   const enrolledPrograms = useMemo(() => {
     return filtered.filter((p: any) => isEnrolled(p.slug));
