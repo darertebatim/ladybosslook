@@ -252,6 +252,7 @@ export function ProgramsManager() {
       annual_stripe_price_id: (program as any).annual_stripe_price_id || '',
       annual_ios_product_id: (program as any).annual_ios_product_id || '',
       annual_android_product_id: (program as any).annual_android_product_id || '',
+      show_in_app_waitlist: (program as any).show_in_app_waitlist || false,
     });
     setEditingId(program.id);
     setShowForm(true);
