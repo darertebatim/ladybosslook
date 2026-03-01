@@ -107,6 +107,9 @@ export function LeadsManager() {
   const [deletingSubscription, setDeletingSubscription] = useState<string | null>(null);
   const [coachAccessLoading, setCoachAccessLoading] = useState(false);
   const [hasCoachAccess, setHasCoachAccess] = useState(false);
+  const [isCartDialogOpen, setIsCartDialogOpen] = useState(false);
+  const [selectedCartProgram, setSelectedCartProgram] = useState('');
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { toast } = useToast();
   const { programs, isLoading: programsLoading } = usePrograms();
   const queryClient = useQueryClient();
