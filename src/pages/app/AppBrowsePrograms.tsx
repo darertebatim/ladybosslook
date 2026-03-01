@@ -353,7 +353,7 @@ const AppBrowsePrograms = () => {
       </div>
 
       {/* Header Spacer */}
-      <div style={{ height: `calc(${availableTypes.length > 2 ? '120' : '80'}px + env(safe-area-inset-top, 0px))` }} className="shrink-0" />
+      <div style={{ height: 'calc(120px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
       {/* Scrollable Content */}
       <div
