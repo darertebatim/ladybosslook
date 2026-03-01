@@ -302,7 +302,7 @@ const AppStore = () => {
                   </div>
                 ) : (
                   <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
-                    {filteredPrograms.map((program) => {
+                    {filteredPrograms.map((program: any) => {
                       const enrolled = isEnrolled(program.slug);
                       const isEnrolling = enrollingSlug === program.slug;
                       
@@ -312,7 +312,7 @@ const AppStore = () => {
                             title={program.title}
                             image={program.image}
                             type={program.type}
-                            language={(program as any).language}
+                            language={program.language}
                             isFree={program.isFree || program.priceAmount === 0}
                             isEnrolled={enrolled}
                             onClick={() => navigate(`/app/programs/${program.slug}`, { state: { from: location.pathname } })}
