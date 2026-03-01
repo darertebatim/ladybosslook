@@ -129,7 +129,12 @@ const AppCourseDetail = () => {
           console.error('Failed to send waitlist chat message:', chatErr);
         }
 
-        toast.success("You're on the waitlist! We'll notify you when it's available.");
+        toast.success("You're on the waitlist! A message was sent to support.", {
+          action: {
+            label: 'View Chat',
+            onClick: () => navigate('/app/chat'),
+          },
+        });
       }
       refetchWaitlist();
     } catch {
