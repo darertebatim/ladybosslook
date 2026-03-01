@@ -504,7 +504,7 @@ const AppProfile = () => {
                 </div>
                 {/* Language */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Preferred Language</Label>
+                  <Label className="text-xs text-muted-foreground">Second Language</Label>
                   <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={editedFields.preferred_language} onChange={e => setEditedFields(prev => ({ ...prev, preferred_language: e.target.value }))}>
                     {LANGUAGE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
@@ -554,7 +554,7 @@ const AppProfile = () => {
                 <InfoRow icon={MapPin} value={[p?.city, p?.country].filter(Boolean).join(', ') || undefined} label="Location" />
                 <InfoRow icon={Briefcase} value={p?.occupation} label="Occupation" />
                 <InfoRow icon={Heart} value={relationshipLabel && relationshipLabel !== 'Prefer not to say' ? relationshipLabel : undefined} label="Relationship" />
-                <InfoRow icon={Globe} value={languageLabel && languageLabel !== 'Not set' ? languageLabel : undefined} label="Language" />
+                <InfoRow icon={Globe} value={languageLabel && languageLabel !== 'Not set' ? languageLabel : undefined} label="Second Language" />
                 {p?.goals && p.goals.length > 0 && (
                   <div className="p-2.5 bg-muted/30 rounded-lg">
                     <p className="text-[10px] text-muted-foreground mb-1.5">Goals</p>
