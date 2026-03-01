@@ -1106,8 +1106,8 @@ const AppCourseDetail = () => {
 
                   {/* Purchase / Enrollment Section */}
                   <div className="border-t pt-6">
-                    {/* Waitlist-only program (show_in_app_waitlist but not free/IAP) */}
-                    {(program as any).show_in_app_waitlist && !program.ios_product_id && !(program.payment_type === 'free' || program.price_amount === 0) ? (
+                    {/* Waitlist program - show_in_app_waitlist takes priority */}
+                    {(program as any).show_in_app_waitlist ? (
                       <>
                         <Button 
                           size="lg" 
