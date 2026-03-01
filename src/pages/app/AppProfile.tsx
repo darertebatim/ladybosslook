@@ -9,8 +9,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
 import {
   User, Mail, Phone, MapPin, Calendar as CalendarIcon, BookOpen, Wallet,
   Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight,
@@ -448,24 +446,54 @@ const AppProfile = () => {
                 {/* Date of Birth */}
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground">Date of Birth</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !editedFields.date_of_birth && "text-muted-foreground")}>
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {editedFields.date_of_birth ? format(editedFields.date_of_birth, 'PPP') : 'Pick a date'}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={editedFields.date_of_birth || undefined}
-                        onSelect={(date) => setEditedFields(prev => ({ ...prev, date_of_birth: date || null }))}
-                        disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
-                        initialFocus
-                        className={cn("p-3 pointer-events-auto")}
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <div className="flex gap-2">
+                    <select
+                      className="flex h-10 flex-1 rounded-md border border-input bg-background px-2 py-2 text-sm"
+                      value={editedFields.date_of_birth ? (editedFields.date_of_birth.getMonth() + 1).toString() : ''}
+                      onChange={e => {
+                        const month = parseInt(e.target.value);
+                        if (!month) { setEditedFields(prev => ({ ...prev, date_of_birth: null })); return; }
+                        const current = editedFields.date_of_birth || new Date(2000, 0, 1);
+                        setEditedFields(prev => ({ ...prev, date_of_birth: new Date(current.getFullYear(), month - 1, current.getDate()) }));
+                      }}
+                    >
+                      <option value="">Month</option>
+                      {Array.from({ length: 12 }, (_, i) => (
+                        <option key={i + 1} value={i + 1}>{format(new Date(2000, i, 1), 'MMM')}</option>
+                      ))}
+                    </select>
+                    <select
+                      className="flex h-10 w-[70px] rounded-md border border-input bg-background px-2 py-2 text-sm"
+                      value={editedFields.date_of_birth ? editedFields.date_of_birth.getDate().toString() : ''}
+                      onChange={e => {
+                        const day = parseInt(e.target.value);
+                        if (!day) return;
+                        const current = editedFields.date_of_birth || new Date(2000, 0, 1);
+                        setEditedFields(prev => ({ ...prev, date_of_birth: new Date(current.getFullYear(), current.getMonth(), day) }));
+                      }}
+                    >
+                      <option value="">Day</option>
+                      {Array.from({ length: 31 }, (_, i) => (
+                        <option key={i + 1} value={i + 1}>{i + 1}</option>
+                      ))}
+                    </select>
+                    <select
+                      className="flex h-10 w-[90px] rounded-md border border-input bg-background px-2 py-2 text-sm"
+                      value={editedFields.date_of_birth ? editedFields.date_of_birth.getFullYear().toString() : ''}
+                      onChange={e => {
+                        const year = parseInt(e.target.value);
+                        if (!year) return;
+                        const current = editedFields.date_of_birth || new Date(2000, 0, 1);
+                        setEditedFields(prev => ({ ...prev, date_of_birth: new Date(year, current.getMonth(), current.getDate()) }));
+                      }}
+                    >
+                      <option value="">Year</option>
+                      {Array.from({ length: 100 }, (_, i) => {
+                        const year = new Date().getFullYear() - i;
+                        return <option key={year} value={year}>{year}</option>;
+                      })}
+                    </select>
+                  </div>
                 </div>
                 {/* Gender */}
                 <div className="space-y-1.5">
@@ -549,6 +577,7 @@ const AppProfile = () => {
                 <InfoRow icon={Briefcase} value={p?.occupation} label="Occupation" />
                 <InfoRow icon={Heart} value={relationshipLabel && relationshipLabel !== 'Prefer not to say' ? relationshipLabel : undefined} label="Relationship" />
                 <InfoRow icon={Globe} value={languageLabel && languageLabel !== 'Not set' ? languageLabel : undefined} label="Second Language" />
+                <InfoRow icon={Globe} value={p?.timezone || undefined} label="Timezone" />
                 {p?.goals && p.goals.length > 0 && (
                   <div className="p-2.5 bg-muted/30 rounded-lg">
                     <p className="text-[10px] text-muted-foreground mb-1.5">Goals</p>
