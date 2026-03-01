@@ -414,6 +414,7 @@ const App = () => (
                   <Route path="/app/support" element={<ProtectedRoute><AppAdminSupport /></ProtectedRoute>} />
                   <Route path="/app/channels/new" element={<ProtectedRoute><AppChannelPost /></ProtectedRoute>} />
                   <Route path="/app/rate" element={<ProtectedRoute><AppRate /></ProtectedRoute>} />
+                  <Route path="/app/settings" element={<ProtectedRoute><AppSettings /></ProtectedRoute>} />
                   <Route path="/app/onboarding/:flowId" element={<ProtectedRoute><AppOnboarding /></ProtectedRoute>} />
                   <Route path="/app/reflections/notes/:reflectionId" element={<ProtectedRoute><AppReflectionNoteDetail /></ProtectedRoute>} />
                   <Route path="/app/reflections/:reflectionId" element={<ProtectedRoute><AppReflectionFlow /></ProtectedRoute>} />
