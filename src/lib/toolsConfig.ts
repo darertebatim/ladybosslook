@@ -12,6 +12,24 @@ export interface ToolConfig {
 
 export const wellnessTools: ToolConfig[] = [
   {
+    id: 'routines',
+    name: 'Rituals',
+    icon: 'CalendarPlus',
+    bgColor: 'bg-[#D1FAE5]',
+    iconColor: 'text-emerald-600',
+    route: '/app/rituals',
+    description: 'Daily rituals',
+  },
+  {
+    id: 'reflections',
+    name: 'Reflections',
+    icon: 'Brain',
+    bgColor: 'bg-[#CCFBF1]',
+    iconColor: 'text-teal-600',
+    route: '/app/reflections',
+    description: 'Guided prompts',
+  },
+  {
     id: 'journal',
     name: 'Journal',
     icon: 'BookOpen',
@@ -66,15 +84,6 @@ export const wellnessTools: ToolConfig[] = [
     description: 'Intermittent fasting',
   },
   {
-    id: 'routines',
-    name: 'Rituals',
-    icon: 'CalendarPlus',
-    bgColor: 'bg-[#D1FAE5]',
-    iconColor: 'text-emerald-600',
-    route: '/app/rituals',
-    description: 'Daily rituals',
-  },
-  {
     id: 'programs',
     name: 'My Programs',
     icon: 'GraduationCap',
@@ -82,15 +91,6 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-amber-600',
     route: '/app/programs',
     description: 'Courses & coaching',
-  },
-  {
-    id: 'reflections',
-    name: 'Reflections',
-    icon: 'Brain',
-    bgColor: 'bg-[#CCFBF1]',
-    iconColor: 'text-teal-600',
-    route: '/app/reflections',
-    description: 'Guided prompts',
   },
   {
     id: 'profile',
