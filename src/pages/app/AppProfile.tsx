@@ -386,7 +386,8 @@ const AppProfile = () => {
           full_name: editedName.trim(),
           phone: editedPhone.trim(),
           city: editedCity.trim(),
-        })
+          gender: editedGender.trim() || null,
+        } as any)
         .eq('id', user.id);
 
       if (error) throw error;
