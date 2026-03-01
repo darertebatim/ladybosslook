@@ -813,7 +813,13 @@ const AppProfile = () => {
                         <span>{profile.city}</span>
                       </div>
                     )}
-                    {!profile?.full_name && !profile?.phone && !profile?.city && (
+                    {(profile as any)?.gender && (
+                      <div className="flex items-center gap-3 text-sm p-2 bg-muted/30 rounded-lg">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span className="capitalize">{(profile as any).gender === 'non-binary' ? 'Non-Binary (They/Them)' : (profile as any).gender === 'female' ? 'Female (She/Her)' : (profile as any).gender === 'male' ? 'Male (He/Him)' : (profile as any).gender}</span>
+                      </div>
+                    )}
+                    {!profile?.full_name && !profile?.phone && !profile?.city && !(profile as any)?.gender && (
                       <p className="text-sm text-muted-foreground p-2">Tap Edit to add your details</p>
                     )}
                   </>
