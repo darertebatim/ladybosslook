@@ -51,6 +51,65 @@ const AppStore = () => {
     );
   }, [programs]);
 
+  // Fetch waitlist programs (show_in_app_waitlist = true, not already in freePrograms)
+  const { data: waitlistPrograms = [] } = useQuery({
+    queryKey: ['waitlist-programs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('program_catalog')
+        .select('slug, title, type, cover_image_url, description, language')
+        .eq('show_in_app_waitlist', true)
+        .eq('is_active', true) as any;
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Fetch user's waitlist entries
+  const { data: userWaitlist = [], refetch: refetchWaitlist } = useQuery({
+    queryKey: ['user-waitlist', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase
+        .from('program_waitlist')
+        .select('program_slug')
+        .eq('user_id', user.id);
+      if (error) throw error;
+      return (data || []).map((w: any) => w.program_slug);
+    },
+    enabled: !!user?.id,
+  });
+
+  const [joiningWaitlist, setJoiningWaitlist] = useState<string | null>(null);
+
+  const handleJoinWaitlist = async (slug: string, title: string) => {
+    if (!user?.id) {
+      toast.error('Please sign in first');
+      return;
+    }
+    setJoiningWaitlist(slug);
+    try {
+      if (userWaitlist.includes(slug)) {
+        await supabase.from('program_waitlist').delete().eq('user_id', user.id).eq('program_slug', slug);
+        toast.success('Removed from waitlist');
+      } else {
+        await supabase.from('program_waitlist').insert({ user_id: user.id, program_slug: slug });
+        toast.success(`You're on the waitlist for ${title}!`);
+      }
+      refetchWaitlist();
+    } catch {
+      toast.error('Something went wrong');
+    } finally {
+      setJoiningWaitlist(null);
+    }
+  };
+
+  // Filter waitlist programs that aren't already in freePrograms
+  const filteredWaitlistPrograms = useMemo(() => {
+    const freeSlugs = new Set(freePrograms.map(p => p.slug));
+    return waitlistPrograms.filter((p: any) => !freeSlugs.has(p.slug));
+  }, [waitlistPrograms, freePrograms]);
+
   // Fetch reflections, breathing, and audio playlists for explore sections
   const { data: reflections } = useReflections();
   const { data: breathingExercises } = useBreathingExercises();
