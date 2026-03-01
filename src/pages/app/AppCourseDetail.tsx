@@ -1108,7 +1108,21 @@ const AppCourseDetail = () => {
                   <div className="border-t pt-6">
                     {/* Waitlist program - show_in_app_waitlist takes priority */}
                     {(program as any).show_in_app_waitlist ? (
-                      <>
+                      <div className="space-y-4">
+                        {/* Price info card */}
+                        {program.price_amount > 0 && (
+                          <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 text-center space-y-1">
+                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Program Price</p>
+                            <p className="text-2xl font-bold text-foreground">
+                              {(program as any).currency === 'ILS' ? '₪' : '$'}{(program.price_amount / 100).toFixed(0)}
+                            </p>
+                            <div className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 mt-1">
+                              <Clock className="h-3 w-3 text-muted-foreground" />
+                              <span className="text-xs font-medium text-muted-foreground">Registration opening soon</span>
+                            </div>
+                          </div>
+                        )}
+
                         <Button 
                           size="lg" 
                           className="w-full gap-2"
@@ -1121,15 +1135,15 @@ const AppCourseDetail = () => {
                           ) : isOnWaitlist ? (
                             <><CheckCircle2 className="h-5 w-5" /> On Waitlist</>
                           ) : (
-                            <><Bell className="h-5 w-5" /> Join Waitlist</>
+                            <><BellRing className="h-5 w-5" /> Notify Me When Available</>
                           )}
                         </Button>
-                        <p className="text-xs text-center text-muted-foreground mt-4">
+                        <p className="text-xs text-center text-muted-foreground">
                           {isOnWaitlist 
-                            ? "We'll notify you when registration opens" 
-                            : "Get notified when this program becomes available"}
+                            ? "You're on the list! We'll notify you when registration opens." 
+                            : "Be the first to know when this program opens for enrollment."}
                         </p>
-                      </>
+                      </div>
                     ) : program.ios_product_id ? (
                       /* IAP Subscription Plan Picker - shown on both native and web */
                       <IAPPlanPicker program={program} />
