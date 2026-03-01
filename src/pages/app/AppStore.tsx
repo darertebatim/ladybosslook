@@ -436,43 +436,6 @@ const AppStore = () => {
               </section>
             )}
 
-            {/* Plus Tools Section - Period & Water */}
-            {!searchQuery && (
-              <section>
-                <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-sm font-semibold text-foreground">Plus Tools</h2>
-                </div>
-                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
-                  {/* Period */}
-                  <button
-                    onClick={() => navigate('/app/period', { state: { from: location.pathname } })}
-                    className="shrink-0 w-24 text-center transition-transform active:scale-[0.97]"
-                  >
-                    <div className="h-24 w-24 rounded-2xl bg-[#FCE4EC] flex items-center justify-center mb-1.5">
-                      <FluentEmoji emoji="🩸" size={36} />
-                    </div>
-                    <p className="text-xs font-medium line-clamp-2 leading-tight">Period Tracker</p>
-                    <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 font-semibold mt-0.5">
-                      <Crown className="h-2.5 w-2.5" /> PLUS
-                    </span>
-                  </button>
-                  {/* Water */}
-                  <button
-                    onClick={() => navigate('/app/water', { state: { from: location.pathname } })}
-                    className="shrink-0 w-24 text-center transition-transform active:scale-[0.97]"
-                  >
-                    <div className="h-24 w-24 rounded-2xl bg-[#D6E6FC] flex items-center justify-center mb-1.5">
-                      <FluentEmoji emoji="💧" size={36} />
-                    </div>
-                    <p className="text-xs font-medium line-clamp-2 leading-tight">Water Tracker</p>
-                    <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 font-semibold mt-0.5">
-                      <Crown className="h-2.5 w-2.5" /> PLUS
-                    </span>
-                  </button>
-                </div>
-              </section>
-            )}
-
             {/* No Results */}
             {searchQuery && !hasToolMatches && !hasProgramMatches && (
               <div className="text-center py-12">
