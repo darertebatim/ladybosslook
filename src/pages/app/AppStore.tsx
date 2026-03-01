@@ -1,14 +1,13 @@
 import { supabase } from '@/integrations/supabase/client';
 import { usePrograms } from '@/hooks/usePrograms';
 import { SEOHead } from '@/components/SEOHead';
-import { Search, X, Loader2, ChevronRight, Crown, Bell, CheckCircle2 } from 'lucide-react';
+import { Search, X, Loader2, ChevronRight, Crown } from 'lucide-react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { useState, useMemo, useCallback } from 'react';
 import { useEnrollments, useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 import { ProgramCard } from '@/components/app/ProgramCard';
-import { Button } from '@/components/ui/button';
 import { ToolCard } from '@/components/app/ToolCard';
 import { Input } from '@/components/ui/input';
 import { wellnessTools, audioTools, getVisibleComingSoon } from '@/lib/toolsConfig';
@@ -65,50 +64,26 @@ const AppStore = () => {
     },
   });
 
-  // Fetch user's waitlist entries
-  const { data: userWaitlist = [], refetch: refetchWaitlist } = useQuery({
-    queryKey: ['user-waitlist', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return [];
-      const { data, error } = await supabase
-        .from('program_waitlist')
-        .select('program_slug')
-        .eq('user_id', user.id);
-      if (error) throw error;
-      return (data || []).map((w: any) => w.program_slug);
-    },
-    enabled: !!user?.id,
-  });
-
-  const [joiningWaitlist, setJoiningWaitlist] = useState<string | null>(null);
-
-  const handleJoinWaitlist = async (slug: string, title: string) => {
-    if (!user?.id) {
-      toast.error('Please sign in first');
-      return;
-    }
-    setJoiningWaitlist(slug);
-    try {
-      if (userWaitlist.includes(slug)) {
-        await supabase.from('program_waitlist').delete().eq('user_id', user.id).eq('program_slug', slug);
-        toast.success('Removed from waitlist');
-      } else {
-        await supabase.from('program_waitlist').insert({ user_id: user.id, program_slug: slug });
-        toast.success(`You're on the waitlist for ${title}!`);
-      }
-      refetchWaitlist();
-    } catch {
-      toast.error('Something went wrong');
-    } finally {
-      setJoiningWaitlist(null);
-    }
-  };
-
-  // Filter waitlist programs that aren't already in freePrograms
-  const filteredWaitlistPrograms = useMemo(() => {
+  // Combine free programs + waitlist programs for Browse Programs
+  const allBrowsePrograms = useMemo(() => {
     const freeSlugs = new Set(freePrograms.map(p => p.slug));
-    return waitlistPrograms.filter((p: any) => !freeSlugs.has(p.slug));
-  }, [waitlistPrograms, freePrograms]);
+    const waitlistMapped = waitlistPrograms
+      .filter((p: any) => !freeSlugs.has(p.slug))
+      .map((p: any) => ({
+        title: p.title,
+        slug: p.slug,
+        description: p.description || '',
+        image: p.cover_image_url || '',
+        type: p.type,
+        language: p.language,
+        isFree: false,
+        priceAmount: 0,
+        is_free_on_ios: false,
+        ios_product_id: undefined,
+        _isWaitlist: true, // marker
+      }));
+    return [...freePrograms, ...waitlistMapped];
+  }, [freePrograms, waitlistPrograms]);
 
   // Fetch reflections, breathing, and audio playlists for explore sections
   const { data: reflections } = useReflections();
@@ -151,18 +126,18 @@ const AppStore = () => {
 
   // Filter programs by search only (no category filter anymore)
   const filteredPrograms = useMemo(() => {
-    let result = freePrograms;
+    let result = allBrowsePrograms;
     
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(p => 
+      result = result.filter((p: any) => 
         p.title.toLowerCase().includes(query) ||
         p.description?.toLowerCase().includes(query)
       );
     }
     
     return result;
-  }, [freePrograms, searchQuery]);
+  }, [allBrowsePrograms, searchQuery]);
 
   // Check if any tools match search
   const hasToolMatches = filteredWellnessTools.length > 0 || filteredAudioTools.length > 0;
@@ -311,7 +286,7 @@ const AppStore = () => {
 
 
             {/* Programs Section */}
-            {(!searchQuery || hasProgramMatches) && freePrograms.length > 0 && (
+            {(!searchQuery || hasProgramMatches) && allBrowsePrograms.length > 0 && (
               <section className="tour-programs-section">
                 <h2 className="tour-programs-section-header text-sm font-semibold text-foreground mb-2 px-1">
                   Browse Programs
@@ -326,7 +301,7 @@ const AppStore = () => {
                   </div>
                 ) : (
                   <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
-                    {filteredPrograms.map((program) => {
+                    {filteredPrograms.map((program: any) => {
                       const enrolled = isEnrolled(program.slug);
                       const isEnrolling = enrollingSlug === program.slug;
                       
@@ -336,7 +311,7 @@ const AppStore = () => {
                             title={program.title}
                             image={program.image}
                             type={program.type}
-                            language={(program as any).language}
+                            language={program.language}
                             isFree={program.isFree || program.priceAmount === 0}
                             isEnrolled={enrolled}
                             onClick={() => navigate(`/app/programs/${program.slug}`, { state: { from: location.pathname } })}
@@ -422,50 +397,6 @@ const AppStore = () => {
               </section>
             )}
 
-            {/* Online Programs Waitlist Section */}
-            {!searchQuery && filteredWaitlistPrograms.length > 0 && (
-              <section>
-                <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-sm font-semibold text-foreground">Online Programs</h2>
-                </div>
-                <div className="space-y-3">
-                  {filteredWaitlistPrograms.map((program: any) => (
-                    <div key={program.slug} className="flex gap-3 items-center p-3 rounded-2xl border border-border/50 bg-card">
-                      <div className="h-16 w-16 shrink-0 rounded-xl overflow-hidden bg-muted">
-                        {program.cover_image_url ? (
-                          <CachedImage src={program.cover_image_url} alt={program.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <FluentEmoji emoji="📚" size={28} />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold line-clamp-1">{program.title}</p>
-                        {program.description && (
-                          <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{program.description?.replace(/<[^>]*>/g, '').slice(0, 80)}</p>
-                        )}
-                      </div>
-                      <Button
-                        size="sm"
-                        variant={userWaitlist.includes(program.slug) ? 'secondary' : 'default'}
-                        className="shrink-0 gap-1.5 text-xs rounded-full"
-                        disabled={joiningWaitlist === program.slug}
-                        onClick={() => handleJoinWaitlist(program.slug, program.title)}
-                      >
-                        {joiningWaitlist === program.slug ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : userWaitlist.includes(program.slug) ? (
-                          <><CheckCircle2 className="h-3 w-3" /> Joined</>
-                        ) : (
-                          <><Bell className="h-3 w-3" /> Waitlist</>
-                        )}
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
 
             {/* Meditate Section */}
             {!searchQuery && meditatePlaylists.length > 0 && (
