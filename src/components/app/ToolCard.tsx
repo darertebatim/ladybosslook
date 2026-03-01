@@ -10,13 +10,13 @@ import { Crown } from 'lucide-react';
 import { 
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
-  GraduationCap, User, HeartHandshake, Wand2, LucideIcon
+  GraduationCap, User, HeartHandshake, CalendarPlus, LucideIcon
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle,
-  GraduationCap, User, HeartHandshake, Wand2
+  GraduationCap, User, HeartHandshake, CalendarPlus
 };
 
 // Tools that require simora+ subscription

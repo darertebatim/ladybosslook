@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, Heart, Loader2, Wand2 } from 'lucide-react';
+import { Search, Heart, Loader2, CalendarPlus } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
@@ -61,7 +61,7 @@ export default function AppInspire() {
       >
         <div className="flex items-center justify-between px-4 pt-3 pb-2">
           <div className="flex items-center gap-2">
-            <Wand2 className="w-6 h-6 text-primary" />
+            <CalendarPlus className="w-6 h-6 text-primary" />
             <h1 className="text-xl font-bold text-foreground">Rituals</h1>
           </div>
           <div className="flex items-center gap-1">
@@ -108,7 +108,7 @@ export default function AppInspire() {
                 <div className="flex gap-2 px-4 pb-2">
                   <CategoryCircle
                     name="All Rituals"
-                    icon="Wand2"
+                    icon="CalendarPlus"
                     color="purple"
                     isSelected={selectedCategory === 'all'}
                     onClick={() => setSelectedCategory('all')}
