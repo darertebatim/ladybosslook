@@ -371,6 +371,7 @@ const AppProfile = () => {
       setEditedName(profile.full_name || '');
       setEditedPhone(profile.phone || '');
       setEditedCity(profile.city || '');
+      setEditedGender((profile as any).gender || '');
     }
   }, [profile]);
 
