@@ -127,18 +127,18 @@ const AppStore = () => {
 
   // Filter programs by search only (no category filter anymore)
   const filteredPrograms = useMemo(() => {
-    let result = freePrograms;
+    let result = allBrowsePrograms;
     
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(p => 
+      result = result.filter((p: any) => 
         p.title.toLowerCase().includes(query) ||
         p.description?.toLowerCase().includes(query)
       );
     }
     
     return result;
-  }, [freePrograms, searchQuery]);
+  }, [allBrowsePrograms, searchQuery]);
 
   // Check if any tools match search
   const hasToolMatches = filteredWellnessTools.length > 0 || filteredAudioTools.length > 0;
