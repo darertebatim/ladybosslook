@@ -144,6 +144,16 @@ const AppBrowsePrograms = () => {
   const [selectedType, setSelectedType] = useState('all');
   const [scrollY, setScrollY] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
+  const [preferredLanguage, setPreferredLanguage] = useState(() => {
+    return localStorage.getItem('academy-language') || 'all';
+  });
+
+  const handleLanguageChange = useCallback((lang: string) => {
+    setPreferredLanguage(lang);
+    localStorage.setItem('academy-language', lang);
+  }, []);
+
+  const selectedLang = LANGUAGE_OPTIONS.find(l => l.value === preferredLanguage) || LANGUAGE_OPTIONS[0];
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setScrollY(e.currentTarget.scrollTop);
