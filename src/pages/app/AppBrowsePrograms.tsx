@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 import { CachedImage } from '@/components/ui/CachedImage';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import heroStormVideo from '@/assets/watch-hero-storm.mp4';
@@ -23,13 +24,12 @@ const LANG_FLAGS: Record<string, string> = {
   spanish: '🇪🇸',
 };
 
-const TYPE_FILTERS = [
-  { value: 'all', label: 'All' },
-  { value: 'course', label: 'Course' },
-  { value: 'group-coaching', label: 'Coaching' },
-  { value: 'webinar', label: 'Webinar' },
-  { value: 'event', label: 'Event' },
-  { value: 'subscription', label: 'Club' },
+const LANGUAGE_OPTIONS = [
+  { value: 'all', label: 'All', flag: '🌐' },
+  { value: 'american', label: 'English', flag: '🇺🇸' },
+  { value: 'persian', label: 'Persian', flag: null },
+  { value: 'turkish', label: 'Türkçe', flag: '🇹🇷' },
+  { value: 'spanish', label: 'Español', flag: '🇪🇸' },
 ];
 
 const typeConfig: Record<string, { label: string; icon: typeof BookOpen }> = {
@@ -144,6 +144,16 @@ const AppBrowsePrograms = () => {
   const [selectedType, setSelectedType] = useState('all');
   const [scrollY, setScrollY] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
+  const [preferredLanguage, setPreferredLanguage] = useState(() => {
+    return localStorage.getItem('academy-language') || 'all';
+  });
+
+  const handleLanguageChange = useCallback((lang: string) => {
+    setPreferredLanguage(lang);
+    localStorage.setItem('academy-language', lang);
+  }, []);
+
+  const selectedLang = LANGUAGE_OPTIONS.find(l => l.value === preferredLanguage) || LANGUAGE_OPTIONS[0];
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setScrollY(e.currentTarget.scrollTop);
@@ -200,13 +210,20 @@ const AppBrowsePrograms = () => {
 
   const availableTypes = useMemo(() => {
     const types = new Set(allPrograms.map((p: any) => p.type).filter(Boolean));
-    return TYPE_FILTERS.filter(f => f.value === 'all' || types.has(f.value));
+    const dynamicFilters = Array.from(types).map(t => {
+      const config = typeConfig[t];
+      return { value: t, label: config?.label || t };
+    });
+    return [{ value: 'all', label: 'All' }, ...dynamicFilters];
   }, [allPrograms]);
 
   const filtered = useMemo(() => {
     let result = allPrograms;
     if (selectedType !== 'all') {
       result = result.filter((p: any) => p.type === selectedType);
+    }
+    if (preferredLanguage !== 'all') {
+      result = result.filter((p: any) => p.language === preferredLanguage);
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -215,7 +232,7 @@ const AppBrowsePrograms = () => {
       );
     }
     return result;
-  }, [allPrograms, searchQuery, selectedType]);
+  }, [allPrograms, searchQuery, selectedType, preferredLanguage]);
 
   const enrolledPrograms = useMemo(() => {
     return filtered.filter((p: any) => isEnrolled(p.slug));
@@ -294,10 +311,10 @@ const AppBrowsePrograms = () => {
             )}
           </div>
 
-          {/* Type pills */}
-          {availableTypes.length > 2 && (
-            <div className="px-4 pb-3">
-              <div className="flex gap-2 overflow-x-auto py-1 scrollbar-hide">
+          {/* Type pills + Language filter row */}
+          <div className="px-4 pb-3">
+            <div className="flex items-center gap-2">
+              <div className="flex gap-2 overflow-x-auto py-1 scrollbar-hide flex-1">
                 {availableTypes.map((t) => (
                   <WatchCategoryPill
                     key={t.value}
@@ -307,13 +324,36 @@ const AppBrowsePrograms = () => {
                   />
                 ))}
               </div>
+              {/* Language popover */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="flex-shrink-0 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm">
+                    {selectedLang.flag ? selectedLang.flag : <PersianFlag size={14} />}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-40 p-1 bg-[#1e2d4a] border-white/10" align="end">
+                  {LANGUAGE_OPTIONS.map((lang) => (
+                    <button
+                      key={lang.value}
+                      onClick={() => handleLanguageChange(lang.value)}
+                      className={cn(
+                        "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/80 hover:bg-white/10 transition-colors",
+                        preferredLanguage === lang.value && "bg-white/10 text-white font-medium"
+                      )}
+                    >
+                      {lang.flag ? <span className="text-base">{lang.flag}</span> : <PersianFlag size={14} />}
+                      {lang.label}
+                    </button>
+                  ))}
+                </PopoverContent>
+              </Popover>
             </div>
-          )}
+          </div>
         </div>
       </div>
 
       {/* Header Spacer */}
-      <div style={{ height: `calc(${availableTypes.length > 2 ? '120' : '80'}px + env(safe-area-inset-top, 0px))` }} className="shrink-0" />
+      <div style={{ height: 'calc(120px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
       {/* Scrollable Content */}
       <div
@@ -352,7 +392,7 @@ const AppBrowsePrograms = () => {
           {/* All / Not Enrolled Programs */}
           <div className="space-y-3">
             <h2 className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-              {searchQuery ? 'Results' : selectedType === 'all' ? 'All Programs' : TYPE_FILTERS.find(f => f.value === selectedType)?.label || 'Programs'}
+              {searchQuery ? 'Results' : selectedType === 'all' ? 'All Programs' : availableTypes.find(f => f.value === selectedType)?.label || 'Programs'}
             </h2>
 
             {notEnrolledPrograms.length === 0 && enrolledPrograms.length === 0 ? (
