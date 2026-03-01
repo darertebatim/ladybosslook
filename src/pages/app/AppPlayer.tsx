@@ -49,9 +49,7 @@ export default function AppPlayer() {
   const [showPaywall, setShowPaywall] = useState(false);
   const { hasAccessToProgram } = useSubscription();
   const hasSoundscapeAccess = hasAccessToProgram('simora-plus');
-  const [preferredLanguage, setPreferredLanguage] = useState(() => {
-    return localStorage.getItem('player-language') || 'all';
-  });
+  const [preferredLanguage, setPreferredLanguage] = useState('all');
 
   const handleLanguageChange = useCallback((lang: string) => {
     setPreferredLanguage(lang);
