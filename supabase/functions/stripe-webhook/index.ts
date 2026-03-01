@@ -352,6 +352,40 @@ serve(async (req) => {
         console.log('[WEBHOOK] Skipping auto-enrollment: userId=', userId, 'programSlug=', programSlug);
       }
 
+      // Handle cart checkout: clear cart items and enroll for each program
+      if (session.metadata?.cart_checkout === 'true' && session.metadata?.user_id) {
+        const cartUserId = session.metadata.user_id;
+        const cartSlugs = session.metadata.program_slugs?.split(',') || [];
+        console.log('[WEBHOOK] Cart checkout detected, clearing cart for user:', cartUserId, 'slugs:', cartSlugs);
+        
+        // Enroll for each program in the cart
+        for (const cartSlug of cartSlugs) {
+          if (cartSlug && cartSlug !== programSlug) {
+            // Lookup program title for enrollment
+            const { data: cartProgram } = await supabase
+              .from('program_catalog')
+              .select('title')
+              .eq('slug', cartSlug)
+              .single();
+            if (cartProgram) {
+              await applyAutoEnrollment(supabase, cartUserId, cartSlug, cartProgram.title);
+            }
+          }
+        }
+
+        // Clear the user's cart
+        const { error: clearCartError } = await supabase
+          .from('cart_items')
+          .delete()
+          .eq('user_id', cartUserId);
+        
+        if (clearCartError) {
+          console.error('[WEBHOOK] Error clearing cart:', clearCartError);
+        } else {
+          console.log('[WEBHOOK] Cart cleared for user:', cartUserId);
+        }
+      }
+
       // Trigger Mailchimp subscription
       if (customerEmail) {
         await triggerMailchimpSubscription(supabase, { ...orderData, email: customerEmail }, programSlug);

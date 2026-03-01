@@ -196,3 +196,6 @@ verify_jwt = false
 
 [functions.revenuecat-webhook]
 verify_jwt = false
+
+[functions.create-cart-checkout]
+verify_jwt = false
