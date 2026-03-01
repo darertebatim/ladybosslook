@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Smartphone } from 'lucide-react';
+import { Menu, X, Smartphone, ShoppingCart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useCart } from '@/hooks/useCart';
 import { Link } from 'react-router-dom';
 
 const NAV_ITEMS = [
