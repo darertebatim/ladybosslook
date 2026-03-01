@@ -1196,7 +1196,9 @@ export function ProgramsManager() {
                         {program.is_active ? 'Active' : 'Inactive'}
                       </Badge>
                       <Badge variant="outline">{program.type}</Badge>
-                    </div>
+                      {program.show_in_app_waitlist && (
+                        <Badge variant="outline" className="text-violet-600 border-violet-300">📱 Waitlist</Badge>
+                      )}
                     <div className="flex flex-col gap-1 text-sm text-muted-foreground">
                       <div className="flex items-center gap-4">
                         <span>Slug: {program.slug}</span>
