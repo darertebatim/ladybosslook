@@ -29,7 +29,8 @@ const AppPeriod = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showDaySheet, setShowDaySheet] = useState(false);
   const [showSettingsSheet, setShowSettingsSheet] = useState(false);
-  const [startTour, setStartTour] = useState<(() => void) | null>(null);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const { isSubscribed, isLoading: subLoading } = useSubscription();
   
   const handleTourReady = useCallback((tourStart: () => void) => {
     setStartTour(() => tourStart);
