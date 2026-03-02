@@ -141,7 +141,7 @@ const AppCourses = () => {
       />
 
       <AppHeader 
-        title="Programs" 
+        title="My Programs" 
         subtitle={totalPrograms > 0 ? `${totalPrograms} enrolled` : undefined}
         rightAction={startTour ? <TourHelpButton onClick={startTour} /> : undefined}
       />
