@@ -686,7 +686,7 @@ const AppHome = () => {
                           
                           {/* Badge or Number */}
                           <div className={cn(
-                            'w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5 overflow-hidden',
+                            'w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5',
                             !hasBadge && (isSelected 
                               ? 'bg-white text-foreground dark:bg-white dark:text-foreground'
                               : isTodayDate 
