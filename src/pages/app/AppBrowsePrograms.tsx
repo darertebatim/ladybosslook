@@ -185,28 +185,45 @@ const AppBrowsePrograms = () => {
   const waitlistSlugs = useMemo(() => new Set(waitlistPrograms.map((p: any) => p.slug)), [waitlistPrograms]);
 
   const allPrograms = useMemo(() => {
-    const freeSlugs = new Set(freePrograms.map(p => p.slug));
-    const markedFree = freePrograms.map(p => ({
-      ...p,
-      _isWaitlist: waitlistSlugs.has(p.slug),
-    }));
-    const waitlistOnly = waitlistPrograms
-      .filter((p: any) => !freeSlugs.has(p.slug))
-      .map((p: any) => ({
-        title: p.title,
-        slug: p.slug,
-        description: p.description || '',
-        image: p.cover_image_url || '',
-        type: p.type,
-        language: p.language,
-        isFree: false,
-        priceAmount: 999,
-        is_free_on_ios: false,
-        ios_product_id: undefined,
-        _isWaitlist: true,
-      }));
-    return [...markedFree, ...waitlistOnly];
-  }, [freePrograms, waitlistPrograms, waitlistSlugs]);
+    const includedSlugs = new Set<string>();
+    const result: any[] = [];
+
+    // 1. Add all free/IAP programs
+    freePrograms.forEach(p => {
+      includedSlugs.add(p.slug);
+      result.push({ ...p, _isWaitlist: waitlistSlugs.has(p.slug) });
+    });
+
+    // 2. Add waitlist-only programs not already included
+    waitlistPrograms
+      .filter((p: any) => !includedSlugs.has(p.slug))
+      .forEach((p: any) => {
+        includedSlugs.add(p.slug);
+        result.push({
+          title: p.title,
+          slug: p.slug,
+          description: p.description || '',
+          image: p.cover_image_url || '',
+          type: p.type,
+          language: p.language,
+          isFree: false,
+          priceAmount: 999,
+          is_free_on_ios: false,
+          ios_product_id: undefined,
+          _isWaitlist: true,
+        });
+      });
+
+    // 3. Add enrolled programs not already included (paid programs the user has access to)
+    programs.forEach(p => {
+      if (!includedSlugs.has(p.slug) && enrollments.includes(p.slug)) {
+        includedSlugs.add(p.slug);
+        result.push({ ...p, _isWaitlist: false });
+      }
+    });
+
+    return result;
+  }, [freePrograms, waitlistPrograms, waitlistSlugs, programs, enrollments]);
 
   const availableTypes = useMemo(() => {
     const types = new Set(allPrograms.map((p: any) => p.type).filter(Boolean));
