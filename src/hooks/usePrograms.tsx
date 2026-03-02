@@ -50,6 +50,7 @@ export const usePrograms = () => {
         android_product_id: dbProgram.android_product_id || undefined,
         is_free_on_ios: dbProgram.is_free_on_ios || false,
         language: dbProgram.language || undefined,
+        show_in_app_waitlist: dbProgram.show_in_app_waitlist || false,
       })) as Program[];
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes

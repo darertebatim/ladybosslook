@@ -55,10 +55,10 @@ const AppCourses = () => {
   // Get enrolled program slugs
   const enrolledSlugs = new Set(enrollments?.map(e => e.program_slug) || []);
   
-  // Filter browse programs: only free/free-on-iOS programs that aren't enrolled
+  // Filter browse programs: free/free-on-iOS + waitlist programs that aren't enrolled
   const browsePrograms = programs.filter(p => 
     !enrolledSlugs.has(p.slug) && 
-    (p.isFree || p.priceAmount === 0 || p.is_free_on_ios === true)
+    (p.isFree || p.priceAmount === 0 || p.is_free_on_ios === true || (p as any).show_in_app_waitlist === true)
   );
 
   // Separate enrollments into active/upcoming and completed
@@ -141,7 +141,7 @@ const AppCourses = () => {
       />
 
       <AppHeader 
-        title="Programs" 
+        title="My Programs" 
         subtitle={totalPrograms > 0 ? `${totalPrograms} enrolled` : undefined}
         rightAction={startTour ? <TourHelpButton onClick={startTour} /> : undefined}
       />
@@ -262,7 +262,7 @@ const AppCourses = () => {
                 </Badge>
               </div>
               <Link 
-                to="/app/explore"
+                to="/app/academy"
                 className="text-[10px] text-primary font-medium flex items-center gap-0.5"
               >
                 View All
