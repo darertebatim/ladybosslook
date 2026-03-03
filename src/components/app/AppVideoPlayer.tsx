@@ -26,7 +26,7 @@ interface AppVideoPlayerProps {
   title?: string;
   description?: string;
   isVertical?: boolean;
-  /** Video ID for ritual linking */
+  /** Video ID for routine linking */
   videoId?: string;
   /** Playlist of all videos for auto-play next */
   playlist?: VideoItem[];
