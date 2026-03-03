@@ -19,7 +19,7 @@ interface AddedToRoutineButtonProps {
 }
 
 /**
- * A button that shows "Add to My Rituals" when not added, 
+ * A button that shows "Add to My Routines" when not added, 
  * and "Added — Go to Planner" + a re-add button when already added.
  */
 export const AddedToRoutineButton = ({
