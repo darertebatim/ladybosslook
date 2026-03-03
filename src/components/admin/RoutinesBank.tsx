@@ -283,10 +283,10 @@ export default function RoutinesBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
-      toast.success('Ritual created');
+      toast.success('Routine created');
       closeDialog();
     },
-    onError: (error) => toast.error('Failed to create ritual: ' + error.message),
+    onError: (error) => toast.error('Failed to create routine: ' + error.message),
   });
 
   // Update routine
