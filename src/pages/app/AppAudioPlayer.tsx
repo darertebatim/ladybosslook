@@ -590,7 +590,7 @@ export default function AppAudioPlayer() {
                 }
               }}
               disabled={isCheckingTask}
-              title={existingTask ? "Go to planner" : "Add to my rituals"}
+              title={existingTask ? "Go to planner" : "Add to my routines"}
             >
               {existingTask ? (
                 <Check className="h-5 w-5 text-emerald-400" />
