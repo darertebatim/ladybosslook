@@ -20,8 +20,8 @@ export function WelcomeRoutineCard({ onActionAdded, onDismiss }: WelcomeRoutineC
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAddingAnimation, setShowAddingAnimation] = useState(false);
   
-  const { data: welcomeRitualInfo, isLoading: welcomeLoading } = useWelcomePopupRitual();
-  const { data: welcomeRitual, isLoading: ritualLoading } = useRoutineBankDetail(welcomeRitualInfo?.id);
+  const { data: welcomeRoutineInfo, isLoading: welcomeLoading } = useWelcomePopupRoutine();
+  const { data: welcomeRoutine, isLoading: routineLoading } = useRoutineBankDetail(welcomeRoutineInfo?.id);
   const addRoutine = useAddRoutineFromBank();
   const { data: userTasks = [] } = useAllActiveTasks();
   const { data: templates = [] } = useTaskTemplates();
