@@ -468,7 +468,7 @@ export function PromoBannerManager() {
       case 'home':
         return 'Home Page';
       case 'inspire':
-        return 'Explore / Rituals';
+        return 'Explore / Routines';
       case 'emotion':
         return 'Emotion Tracker';
       case 'period':
