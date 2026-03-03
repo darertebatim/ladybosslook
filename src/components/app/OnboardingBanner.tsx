@@ -23,7 +23,7 @@ export function OnboardingBanner() {
     <button
       onClick={handleTap}
       className={cn(
-        "relative w-full rounded-2xl overflow-hidden active:scale-[0.98] transition-all mb-4 animate-fade-in"
+        "relative w-full rounded-2xl overflow-hidden active:scale-[0.98] transition-all mt-5 mb-4 animate-fade-in"
       )}
     >
       <img
