@@ -455,6 +455,7 @@ const App = () => (
                     <Route path="reflections" element={<AppReflections />} />
                     <Route path="reflections/notes" element={<AppReflectionNotes />} />
                     <Route path="routines" element={<AppInspire />} />
+                    <Route path="routines/category/:categorySlug" element={<AppRoutineCategory />} />
                     <Route path="routines/:planId" element={<AppInspireDetail />} />
                     <Route path="actions" element={<AppActions />} />
                     {/* Redirects for backward compatibility with older app versions */}
