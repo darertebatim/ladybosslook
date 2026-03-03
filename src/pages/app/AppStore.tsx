@@ -334,28 +334,43 @@ const AppStore = () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                  <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
                     {filteredPrograms.map((program: any) => {
                       const enrolled = isEnrolled(program.slug);
                       const isEnrolling = enrollingSlug === program.slug;
                       
                       return (
-                        <div key={program.slug} className="relative shrink-0 w-36">
-                          <ProgramCard
-                            title={program.title}
-                            image={program.image}
-                            type={program.type}
-                            language={program.language}
-                            isFree={!program._isWaitlist && (program.isFree || program.priceAmount === 0)}
-                            isEnrolled={enrolled}
-                            onClick={() => navigate(`/app/programs/${program.slug}`, { state: { from: location.pathname } })}
-                          />
+                        <button
+                          key={program.slug}
+                          onClick={() => navigate(`/app/programs/${program.slug}`, { state: { from: location.pathname } })}
+                          className="relative shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
+                        >
+                          <div className="h-32 w-32 rounded-2xl overflow-hidden bg-muted mb-1.5">
+                            {program.image ? (
+                              <CachedImage src={program.image} alt={program.title} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-primary/10">
+                                <Sparkles className="h-8 w-8 text-primary/40" />
+                              </div>
+                            )}
+                          </div>
+                          <p className="text-xs font-medium line-clamp-2 leading-tight">{program.title}</p>
+                          {enrolled && (
+                            <span className="inline-flex items-center gap-0.5 text-[10px] text-green-600 font-semibold mt-0.5">
+                              <CheckCircle2 className="h-2.5 w-2.5" /> Enrolled
+                            </span>
+                          )}
+                          {!enrolled && !program._isWaitlist && (program.isFree || program.priceAmount === 0) && (
+                            <span className="inline-flex items-center gap-0.5 text-[10px] text-primary font-semibold mt-0.5">
+                              FREE
+                            </span>
+                          )}
                           {isEnrolling && (
                             <div className="absolute inset-0 bg-background/80 backdrop-blur-sm rounded-2xl flex items-center justify-center">
                               <Loader2 className="h-6 w-6 animate-spin text-primary" />
                             </div>
                           )}
-                        </div>
+                        </button>
                       );
                     })}
                   </div>
