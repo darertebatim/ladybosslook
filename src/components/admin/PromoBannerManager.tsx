@@ -440,7 +440,7 @@ export function PromoBannerManager() {
     switch (banner.destination_type) {
       case 'routine':
         const routine = routines?.find(r => r.id === banner.destination_id);
-        return routine?.title || 'Unknown Ritual';
+        return routine?.title || 'Unknown Routine';
       case 'playlist':
         const playlist = playlists?.find(p => p.id === banner.destination_id);
         return playlist?.name || 'Unknown Playlist';
