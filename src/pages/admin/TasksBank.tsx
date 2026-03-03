@@ -87,7 +87,7 @@ export default function TasksBank() {
   const [newRoutineName, setNewRoutineName] = useState('');
   const [newRoutineCategory, setNewRoutineCategory] = useState('general');
 
-  // Add to existing ritual state
+  // Add to existing routine state
   const [addToRoutineOpen, setAddToRoutineOpen] = useState(false);
   const [selectedRoutineId, setSelectedRoutineId] = useState<string>('');
 
