@@ -100,10 +100,7 @@ export default function AppInspire() {
         <div className="pb-safe w-full max-w-full">
           {/* Categories - quick nav */}
           {categories && categories.length > 0 && (
-            <div className="mt-5">
-              <h2 className="text-sm font-semibold text-muted-foreground px-4 mb-3">
-                BROWSE CATEGORIES
-              </h2>
+            <div className="mt-4">
               <ScrollArea className="w-full tour-routine-categories">
                 <div className="flex gap-2 px-4 pb-2">
                   {nonEmptyCategories.filter(c => c.slug !== 'pro').map((category) => (
