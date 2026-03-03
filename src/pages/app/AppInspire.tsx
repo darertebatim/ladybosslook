@@ -48,10 +48,11 @@ export default function AppInspire() {
 
   const filteredPopular = popularRoutines?.filter(matchesSearch);
 
-  const scrollToCategory = (slug: string) => {
-    const el = document.getElementById(`routine-category-${slug}`);
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  // Only show categories that have routines
+  const nonEmptyCategories = useMemo(() => {
+    if (!categories || !allRoutines) return [];
+    return categories.filter(c => allRoutines.some(r => r.category === c.slug));
+  }, [categories, allRoutines]);
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
