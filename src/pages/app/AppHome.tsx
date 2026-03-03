@@ -816,7 +816,7 @@ const AppHome = () => {
                 </div>
               )}
 
-              {/* Welcome Ritual Card for New Users - stays until dismissed */}
+              {/* Welcome Routine Card for New Users - stays until dismissed */}
               {showWelcomeCard && (
                 <div className="py-4 tour-welcome-card">
                   <WelcomeRoutineCard onDismiss={() => {
