@@ -361,10 +361,10 @@ export default function RoutinesBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
-      toast.success('Ritual updated');
+      toast.success('Routine updated');
       closeDialog();
     },
-    onError: (error) => toast.error('Failed to update ritual: ' + error.message),
+    onError: (error) => toast.error('Failed to update routine: ' + error.message),
   });
 
   // Delete routine
