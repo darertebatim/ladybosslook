@@ -203,7 +203,7 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
     navigate(`/app/reflections/${reflection.id}`);
   };
 
-  const handleAddToRituals = () => {
+  const handleAddToRoutines = () => {
     if (isLocked) {
       haptic.light();
       setShowPaywall(true);
