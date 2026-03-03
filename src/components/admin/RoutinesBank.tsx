@@ -408,7 +408,7 @@ export default function RoutinesBank() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
-      queryClient.invalidateQueries({ queryKey: ['welcome-popup-ritual'] });
+      queryClient.invalidateQueries({ queryKey: ['welcome-popup-routine'] });
     },
   });
 
