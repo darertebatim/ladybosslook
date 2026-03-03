@@ -589,7 +589,7 @@ export default function TasksBank() {
   // Add actions to existing routine
   const addToExistingRoutine = useMutation({
     mutationFn: async () => {
-      if (!selectedRoutineId) throw new Error('No ritual selected');
+      if (!selectedRoutineId) throw new Error('No routine selected');
       if (selectedTasks.length === 0) throw new Error('No actions selected');
 
       // Get current max order for this routine
