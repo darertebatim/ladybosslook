@@ -1121,7 +1121,7 @@ export default function RoutinesBank() {
                     <RichTextEditor
                       value={formData.description}
                       onChange={(value) => setFormData({ ...formData, description: value })}
-                      placeholder="Write your ritual description..."
+                      placeholder="Write your routine description..."
                     />
                   </div>
 
