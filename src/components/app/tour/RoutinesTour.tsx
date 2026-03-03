@@ -11,8 +11,8 @@ export function RoutinesTour({ isFirstVisit = false, onTourReady }: RoutinesTour
   const steps = useMemo((): TourStep[] => [
     {
       id: 'welcome',
-      title: 'Your Rituals ✨',
-      description: 'These are ready-made rituals. Pick what feels right.',
+      title: 'Your Routines ✨',
+      description: 'These are ready-made routines. Pick what feels right.',
       position: 'center',
       action: 'look',
     },
