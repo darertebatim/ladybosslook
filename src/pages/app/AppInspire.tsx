@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, Heart, Loader2, CalendarPlus } from 'lucide-react';
+import { Search, Heart, Loader2, CalendarPlus, ChevronRight } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
@@ -9,14 +9,12 @@ import {
   useRoutineBankCategories,
   useRoutinesBank,
   usePopularRoutinesBank,
-  useFeaturedRoutinesBank,
 } from '@/hooks/useRoutinesBank';
 import { RoutinesTour, TourHelpButton } from '@/components/app/tour';
 
 export default function AppInspire() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
@@ -26,36 +24,39 @@ export default function AppInspire() {
   }, []);
 
   const { data: categories, isLoading: categoriesLoading } = useRoutineBankCategories();
-  const { data: featuredRoutines } = useFeaturedRoutinesBank();
+  const { data: allRoutines, isLoading: routinesLoading } = useRoutinesBank();
   const { data: popularRoutines, isLoading: popularLoading } = usePopularRoutinesBank();
-  const { data: filteredRoutines, isLoading: routinesLoading } = useRoutinesBank(
-    selectedCategory && selectedCategory !== 'popular' && selectedCategory !== 'all'
-      ? selectedCategory
-      : undefined
-  );
 
-  const displayRoutines = useMemo(() => {
-    if (selectedCategory === 'popular') {
-      return popularRoutines;
+  const isLoading = categoriesLoading || routinesLoading || popularLoading;
+
+  // Group routines by category
+  const routinesByCategory = useMemo(() => {
+    if (!allRoutines || !categories) return {};
+    const grouped: Record<string, typeof allRoutines> = {};
+    for (const cat of categories) {
+      grouped[cat.slug] = allRoutines.filter(r => r.category === cat.slug);
     }
-    if (selectedCategory === 'all') {
-      return filteredRoutines;
-    }
-    return filteredRoutines;
-  }, [selectedCategory, filteredRoutines, popularRoutines]);
+    return grouped;
+  }, [allRoutines, categories]);
 
-  const isLoading = categoriesLoading || popularLoading || (selectedCategory && selectedCategory !== 'popular' && routinesLoading);
+  // Filter by search
+  const matchesSearch = (routine: typeof allRoutines extends (infer T)[] | undefined ? T : never) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return routine.title.toLowerCase().includes(q) || routine.subtitle?.toLowerCase().includes(q);
+  };
 
-  const searchedRoutines = displayRoutines?.filter(routine => 
-    !searchQuery || 
-    routine.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    routine.subtitle?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredPopular = popularRoutines?.filter(matchesSearch);
+
+  const scrollToCategory = (slug: string) => {
+    const el = document.getElementById(`routine-category-${slug}`);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
       {/* Fixed Header */}
-      <header 
+      <header
         className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
@@ -65,9 +66,7 @@ export default function AppInspire() {
             <h1 className="text-xl font-bold text-foreground">Routines</h1>
           </div>
           <div className="flex items-center gap-1">
-            {startTour && (
-              <TourHelpButton onClick={startTour} />
-            )}
+            {startTour && <TourHelpButton onClick={startTour} />}
             <button
               onClick={() => setShowSearch(!showSearch)}
               className="p-2 rounded-full hover:bg-muted/50 transition-colors"
@@ -98,7 +97,7 @@ export default function AppInspire() {
 
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full">
         <div className="pb-safe w-full max-w-full">
-          {/* Categories */}
+          {/* Categories - quick nav */}
           {categories && categories.length > 0 && (
             <div className="mt-5">
               <h2 className="text-sm font-semibold text-muted-foreground px-4 mb-3">
@@ -106,13 +105,6 @@ export default function AppInspire() {
               </h2>
               <ScrollArea className="w-full tour-routine-categories">
                 <div className="flex gap-2 px-4 pb-2">
-                  <CategoryCircle
-                    name="All Routines"
-                    icon="CalendarPlus"
-                    color="purple"
-                    isSelected={selectedCategory === 'all'}
-                    onClick={() => setSelectedCategory('all')}
-                  />
                   {categories.filter(c => c.slug !== 'pro').map((category) => (
                     <CategoryCircle
                       key={category.slug}
@@ -120,8 +112,7 @@ export default function AppInspire() {
                       icon={category.icon}
                       emoji={category.emoji}
                       color={category.color}
-                      isSelected={selectedCategory === category.slug}
-                      onClick={() => setSelectedCategory(category.slug)}
+                      onClick={() => scrollToCategory(category.slug)}
                     />
                   ))}
                   {categories.find(c => c.slug === 'pro') && (
@@ -130,16 +121,14 @@ export default function AppInspire() {
                       icon={categories.find(c => c.slug === 'pro')!.icon}
                       emoji={categories.find(c => c.slug === 'pro')!.emoji}
                       color={categories.find(c => c.slug === 'pro')!.color}
-                      isSelected={selectedCategory === 'pro'}
-                      onClick={() => setSelectedCategory('pro')}
+                      onClick={() => scrollToCategory('pro')}
                     />
                   )}
                   <CategoryCircle
                     name="Popular"
                     icon="Star"
                     color="yellow"
-                    isSelected={selectedCategory === 'popular'}
-                    onClick={() => setSelectedCategory('popular')}
+                    onClick={() => scrollToCategory('popular')}
                   />
                 </div>
                 <ScrollBar orientation="horizontal" className="invisible" />
@@ -147,34 +136,96 @@ export default function AppInspire() {
             </div>
           )}
 
-          {/* Routines Grid */}
-          {searchedRoutines && searchedRoutines.length > 0 && (
-            <div className="mt-5 px-4 w-full max-w-full overflow-hidden pb-8">
-              <h2 className="text-sm font-semibold text-muted-foreground mb-3">
-                {selectedCategory === 'popular'
-                  ? 'POPULAR ROUTINES'
-                  : selectedCategory === 'all'
-                  ? 'ALL ROUTINES'
-                  : categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'ROUTINES'
-                }
-              </h2>
-
-              {isLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-3 w-full max-w-full">
-                  {searchedRoutines.map((routine, index) => (
-                     <RoutineBankCard
-                      key={routine.id}
-                      routine={routine}
-                      onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
-                      className={index === 0 ? 'tour-routine-card' : undefined}
-                    />
-                  ))}
-                </div>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <div className="space-y-6 mt-4 pb-8">
+              {/* Popular Section */}
+              {filteredPopular && filteredPopular.length > 0 && (
+                <section id="routine-category-popular">
+                  <div className="flex items-center justify-between mb-2 px-4">
+                    <h2 className="text-sm font-semibold text-foreground">Popular</h2>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide">
+                    {filteredPopular.map((routine, index) => (
+                      <div key={routine.id} className="shrink-0 w-40">
+                        <RoutineBankCard
+                          routine={routine}
+                          onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                          className={index === 0 ? 'tour-routine-card' : undefined}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
               )}
+
+              {/* Per-category sections */}
+              {categories?.filter(c => c.slug !== 'pro').map((category) => {
+                const catRoutines = routinesByCategory[category.slug]?.filter(matchesSearch) || [];
+                if (catRoutines.length === 0) return null;
+
+                return (
+                  <section key={category.slug} id={`routine-category-${category.slug}`}>
+                    <div className="flex items-center justify-between mb-2 px-4">
+                      <h2 className="text-sm font-semibold text-foreground">{category.name}</h2>
+                      {catRoutines.length > 4 && (
+                        <button
+                          onClick={() => navigate(`/app/routines/category/${category.slug}`, { state: { from: location.pathname } })}
+                          className="text-xs text-primary font-medium flex items-center gap-0.5"
+                        >
+                          All <ChevronRight className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide">
+                      {catRoutines.slice(0, 8).map((routine) => (
+                        <div key={routine.id} className="shrink-0 w-40">
+                          <RoutineBankCard
+                            routine={routine}
+                            onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                );
+              })}
+
+              {/* Pro category at the end */}
+              {categories?.find(c => c.slug === 'pro') && (() => {
+                const proRoutines = routinesByCategory['pro']?.filter(matchesSearch) || [];
+                if (proRoutines.length === 0) return null;
+                const proCat = categories.find(c => c.slug === 'pro')!;
+
+                return (
+                  <section id="routine-category-pro">
+                    <div className="flex items-center justify-between mb-2 px-4">
+                      <h2 className="text-sm font-semibold text-foreground">{proCat.name}</h2>
+                      {proRoutines.length > 4 && (
+                        <button
+                          onClick={() => navigate(`/app/routines/category/pro`, { state: { from: location.pathname } })}
+                          className="text-xs text-primary font-medium flex items-center gap-0.5"
+                        >
+                          All <ChevronRight className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide">
+                      {proRoutines.slice(0, 8).map((routine) => (
+                        <div key={routine.id} className="shrink-0 w-40">
+                          <RoutineBankCard
+                            routine={routine}
+                            onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                );
+              })()}
             </div>
           )}
         </div>
