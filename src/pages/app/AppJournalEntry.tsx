@@ -199,7 +199,6 @@ const AppJournalEntry = () => {
     );
   }
 
-  const showWritingPrompts = isNewEntry && !content.trim() && !isTextareaFocused;
   const canDelete = entryIdState;
 
   return (
