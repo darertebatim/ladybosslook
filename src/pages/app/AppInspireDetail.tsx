@@ -135,7 +135,7 @@ export default function AppInspireDetail() {
 
   const handleAddClick = () => {
     if (!routine?.tasks?.length) {
-      toast.error('No actions in this ritual');
+      toast.error('No actions in this routine');
       return;
     }
     setShowPreviewSheet(true);
