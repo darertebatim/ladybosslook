@@ -169,7 +169,7 @@ export default function AppInspire() {
               )}
 
               {/* Per-category sections */}
-              {categories?.filter(c => c.slug !== 'pro').map((category) => {
+              {nonEmptyCategories?.filter(c => c.slug !== 'pro').map((category) => {
                 const catRoutines = routinesByCategory[category.slug]?.filter(matchesSearch) || [];
                 if (catRoutines.length === 0) return null;
 
@@ -177,16 +177,14 @@ export default function AppInspire() {
                   <section key={category.slug} id={`routine-category-${category.slug}`}>
                     <div className="flex items-center justify-between mb-2 px-4">
                       <h2 className="text-sm font-semibold text-foreground">{category.name}</h2>
-                      {catRoutines.length > 4 && (
-                        <button
-                          onClick={() => navigate(`/app/routines/category/${category.slug}`, { state: { from: location.pathname } })}
-                          className="text-xs text-primary font-medium flex items-center gap-0.5"
-                        >
-                          All <ChevronRight className="h-3.5 w-3.5" />
-                        </button>
-                      )}
+                      <button
+                        onClick={() => navigate(`/app/routines/category/${category.slug}`, { state: { from: location.pathname } })}
+                        className="text-xs text-primary font-medium flex items-center gap-0.5"
+                      >
+                        All <ChevronRight className="h-3.5 w-3.5" />
+                      </button>
                     </div>
-                    <div className="flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide">
+                    <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
                       {catRoutines.slice(0, 8).map((routine) => (
                         <div key={routine.id} className="shrink-0 w-40">
                           <RoutineBankCard
