@@ -109,7 +109,7 @@ export default function TasksBank() {
     },
   });
 
-  // Fetch existing routines for "Add to Ritual" feature
+  // Fetch existing routines for "Add to Routine" feature
   const { data: existingRoutines = [] } = useQuery({
     queryKey: ['routines-bank-for-adding'],
     queryFn: async () => {
