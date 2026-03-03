@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, X, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 import type { PaywallProgramData } from './PaywallClassic';
 import mascotHero from '@/assets/paywall-plus-mascot-hero.png';
 import mascotBottom from '@/assets/paywall-plus-mascot-bottom.png';
