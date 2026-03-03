@@ -250,7 +250,7 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
         {/* Calendar+ button: locked emoji for premium, normal for free */}
         {isLocked ? (
           <button
-            onClick={handleAddToRituals}
+            onClick={handleAddToRoutines}
             className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0"
           >
             <span className="text-lg">🔒</span>
