@@ -3,19 +3,19 @@ import { StreakProgressBar } from './StreakProgressBar';
 import { cn } from '@/lib/utils';
 import type { UserChallenge } from '@/hooks/useUserChallenges';
 
-interface ChallengRitualCardProps {
+interface ChallengeRoutineCardProps {
   challenge: UserChallenge;
   className?: string;
 }
 
 /**
- * Challenge Ritual card for the Presence page.
+ * Challenge Routine card for the Presence page.
  * Shows the user's progress on an adopted challenge-type routine.
  */
-export const ChallengeRitualCard = ({ 
+export const ChallengeRoutineCard = ({ 
   challenge, 
   className,
-}: ChallengRitualCardProps) => {
+}: ChallengeRoutineCardProps) => {
   const isCompleted = challenge.completedDays >= challenge.totalDays;
   
   return (
