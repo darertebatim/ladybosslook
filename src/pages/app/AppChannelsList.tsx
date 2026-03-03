@@ -88,7 +88,7 @@ export default function AppChannelsList() {
   const addRoutinePlan = useAddRoutinePlan();
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
-  const isAddedToRituals = !!existingTask || justAdded;
+  const isAddedToRoutines = !!existingTask || justAdded;
 
   // Subscribe to real-time updates for all channels
   useFeedRealtime();
