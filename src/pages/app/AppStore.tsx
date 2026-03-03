@@ -506,21 +506,23 @@ const AppStore = () => {
                       onClick={() => navigate(`/app/player/playlist/${playlist.id}`, { state: { from: location.pathname } })}
                       className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
                     >
-                      <div className="h-32 w-32 rounded-2xl overflow-hidden bg-muted mb-1.5">
-                        {playlist.cover_image_url ? (
-                          <CachedImage src={playlist.cover_image_url} alt={playlist.name} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-cyan-100">
-                            <FluentEmoji emoji="🌊" size={36} />
+                      <div className="relative h-32 w-32 overflow-visible mb-1.5">
+                        <div className="h-full w-full rounded-2xl overflow-hidden bg-muted">
+                          {playlist.cover_image_url ? (
+                            <CachedImage src={playlist.cover_image_url} alt={playlist.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-cyan-100">
+                              <FluentEmoji emoji="🌊" size={36} />
+                            </div>
+                          )}
+                        </div>
+                        {playlist.requires_subscription && (
+                          <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                            <Crown className="h-2.5 w-2.5" /> PLUS
                           </div>
                         )}
                       </div>
                       <p className="text-xs font-medium line-clamp-2 leading-tight">{playlist.name}</p>
-                      {playlist.requires_subscription && (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 font-semibold mt-0.5">
-                          <Crown className="h-2.5 w-2.5" /> PLUS
-                        </span>
-                      )}
                     </button>
                   ))}
                 </div>
