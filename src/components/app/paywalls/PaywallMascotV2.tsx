@@ -16,7 +16,7 @@ interface PaywallMascotProps {
   preview?: boolean;
 }
 
-export function PaywallMascot({ program, onPurchase, onRestore, onClose, preview }: PaywallMascotProps) {
+export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, preview }: PaywallMascotProps) {
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>('annual');
   const [isPurchasing, setIsPurchasing] = useState(false);
 
