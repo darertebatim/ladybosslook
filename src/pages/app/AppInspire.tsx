@@ -181,7 +181,7 @@ export default function AppInspire() {
       </div>
 
       {/* Feature Tour */}
-      <RitualsTour isFirstVisit={true} onTourReady={handleTourReady} />
+      <RoutinesTour isFirstVisit={true} onTourReady={handleTourReady} />
     </div>
   );
 }

@@ -451,7 +451,7 @@ export default function AppInspireDetail() {
       </div>
 
       {/* Animated hand hint for new users — outside footer so fixed positioning works */}
-      <AddToRitualHandHint show={showHint && !isAdded} />
+      <AddToRoutineHandHint show={showHint && !isAdded} />
 
       {/* Sticky Add Button */}
       <div 

@@ -189,9 +189,9 @@ const AppPresence = () => {
               />
             )}
             
-            {/* Challenge Ritual Cards */}
+            {/* Challenge Routine Cards */}
             {challenges && challenges.length > 0 && challenges.map(challenge => (
-              <ChallengeRitualCard
+              <ChallengeRoutineCard
                 key={challenge.routineId}
                 challenge={challenge}
               />

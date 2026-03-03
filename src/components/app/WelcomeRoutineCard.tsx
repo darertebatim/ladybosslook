@@ -176,7 +176,7 @@ export function WelcomeRoutineCard({ onActionAdded, onDismiss }: WelcomeRoutineC
                 
                 {/* Scrollable actions list */}
                 <div className="flex-1 overflow-y-auto px-3 pb-2 space-y-2">
-                  {ritualLoading ? (
+                  {routineLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
                     </div>
