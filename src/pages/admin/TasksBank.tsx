@@ -981,10 +981,10 @@ export default function TasksBank() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Layers className="h-4 w-4" />
-              Create Ritual from Selection
+              Create Routine from Selection
             </DialogTitle>
             <DialogDescription>
-              Create a new ritual with {selectedTaskIds.size} selected action{selectedTaskIds.size !== 1 ? 's' : ''}
+              Create a new routine with {selectedTaskIds.size} selected action{selectedTaskIds.size !== 1 ? 's' : ''}
             </DialogDescription>
           </DialogHeader>
           
