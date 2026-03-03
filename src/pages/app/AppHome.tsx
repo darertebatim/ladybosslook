@@ -342,7 +342,7 @@ const AppHome = () => {
   const addedRoutineIdsSet = useMemo(() => new Set(addedRoutineIds), [addedRoutineIds]);
   const suggestedRoutines = useMemo(() => 
     popularRoutines.filter(r => !addedRoutineIdsSet.has(r.id) && !dismissedRoutineIds.has(r.id)).slice(0, 4), 
-    [popularRoutines, addedRoutineIdsSet, dismissedRitualIds]
+    [popularRoutines, addedRoutineIdsSet, dismissedRoutineIds]
   );
 
   // Generate week days
