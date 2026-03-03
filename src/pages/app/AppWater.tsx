@@ -156,7 +156,7 @@ const AppWater = () => {
       {
         onSuccess: () => {
           haptic.success();
-          toast.success('Water tracking added to your rituals!');
+          toast.success('Water tracking added to your routines!');
           setShowRoutineSheet(false);
           setLocalProgress(0);
           setIsSavingRoutine(false);
@@ -283,7 +283,7 @@ const AppWater = () => {
           {/* No routine notice */}
           {!waterTask && (
             <p className="mt-4 text-sm text-sky-600/80 text-center">
-              Add to ritual to track daily
+              Add to routine to track daily
             </p>
           )}
         </div>

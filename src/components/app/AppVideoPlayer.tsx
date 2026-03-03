@@ -26,7 +26,7 @@ interface AppVideoPlayerProps {
   title?: string;
   description?: string;
   isVertical?: boolean;
-  /** Video ID for ritual linking */
+  /** Video ID for routine linking */
   videoId?: string;
   /** Playlist of all videos for auto-play next */
   playlist?: VideoItem[];
@@ -47,7 +47,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
   const videoType = detectVideoType(url);
   const vertical = isVerticalOverride ?? isVerticalVideo(url);
 
-  // Add to rituals for individual video
+  // Add to routines for individual video
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const { data: existingTask } = useExistingVideoTask(videoId);
   const addRoutinePlan = useAddRoutinePlan();
@@ -371,11 +371,11 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
                 tag: 'pro',
               } as RoutinePlanTask],
             });
-            toast.success('Added to your rituals! 🎬');
+            toast.success('Added to your routines! 🎬');
             setShowRoutineSheet(false);
           } catch (error) {
-            console.error('Failed to add ritual:', error);
-            toast.error('Failed to add to ritual');
+            console.error('Failed to add routine:', error);
+            toast.error('Failed to add to routine');
           }
         }}
         isSaving={addRoutinePlan.isPending}

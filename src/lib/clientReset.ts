@@ -6,7 +6,7 @@ import { getLocalDateStr } from '@/lib/localDate';
  */
 
 // Tour feature keys
-const TOUR_FEATURES = ['home', 'rituals', 'breathe', 'journal', 'player', 'period', 'programs', 'round', 'explore', 'playlist', 'action-sheet'] as const;
+const TOUR_FEATURES = ['home', 'routines', 'breathe', 'journal', 'player', 'period', 'programs', 'round', 'explore', 'playlist', 'action-sheet'] as const;
 
 // All localStorage keys that should be cleared on reset
 const CLIENT_RESET_KEYS = [
@@ -30,8 +30,8 @@ const CLIENT_RESET_KEYS = [
   'mood-banner-dismissed',
   
   // Hand hint guidance
-  'ritual_add_hint_dismissed',
-  'ritual_save_hint_dismissed',
+  'routine_add_hint_dismissed',
+  'routine_save_hint_dismissed',
   
   // Coach marks
   'simora_tap_coach_shown',

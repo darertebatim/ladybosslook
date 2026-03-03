@@ -32,7 +32,7 @@ export default function AppReflections() {
   const { data: reflections, isLoading } = useReflections();
   const { isSubscribed } = useSubscription();
 
-  // Add to rituals state (page-level)
+  // Add to routines state (page-level)
   const { data: existingPageTask } = useExistingProTask('reflection');
   const addRoutinePlan = useAddRoutinePlan();
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
@@ -139,7 +139,7 @@ export default function AppReflections() {
         )}
       </div>
 
-      {/* Add to Rituals Sheet */}
+      {/* Add to Routines Sheet */}
       <RoutinePreviewSheet
         open={showRoutineSheet}
         onOpenChange={setShowRoutineSheet}
@@ -155,10 +155,10 @@ export default function AppReflections() {
             });
             setJustAdded(true);
             haptic.success();
-            toast.success('Added to your rituals!');
+            toast.success('Added to your routines!');
             setShowRoutineSheet(false);
           } catch {
-            toast.error('Failed to add to rituals');
+            toast.error('Failed to add to routines');
           }
         }}
         isSaving={addRoutinePlan.isPending}
@@ -203,7 +203,7 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
     navigate(`/app/reflections/${reflection.id}`);
   };
 
-  const handleAddToRituals = () => {
+  const handleAddToRoutines = () => {
     if (isLocked) {
       haptic.light();
       setShowPaywall(true);
@@ -250,7 +250,7 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
         {/* Calendar+ button: locked emoji for premium, normal for free */}
         {isLocked ? (
           <button
-            onClick={handleAddToRituals}
+            onClick={handleAddToRoutines}
             className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0"
           >
             <span className="text-lg">🔒</span>
@@ -258,7 +258,7 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
         ) : (
           <AddedToRoutineButton
             isAdded={isAdded}
-            onAddClick={handleAddToRituals}
+            onAddClick={handleAddToRoutines}
             iconOnly
           />
         )}
@@ -279,10 +279,10 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
             });
             setJustAdded(true);
             haptic.success();
-            toast.success('Added to your rituals!');
+            toast.success('Added to your routines!');
             setShowSheet(false);
           } catch {
-            toast.error('Failed to add to rituals');
+            toast.error('Failed to add to routines');
           }
         }}
         isSaving={addRoutinePlan.isPending}

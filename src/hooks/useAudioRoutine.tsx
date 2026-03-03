@@ -81,10 +81,10 @@ export function useQuickAddAudioTask() {
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: ["audio-routine-task", audio.id] });
       queryClient.invalidateQueries({ queryKey: ["planner-all-tasks"] });
-      toast.success("Added to your rituals! 🎧");
+      toast.success("Added to your routines! 🎧");
     },
     onError: () => {
-      toast.error("Failed to add to ritual");
+      toast.error("Failed to add to routine");
     },
   });
 }

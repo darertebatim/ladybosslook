@@ -83,12 +83,12 @@ export default function AppChannelsList() {
   const { unreadCount: coachUnreadCount } = useUnreadChat(hasCoachAccess ? 'coach' : 'support');
   const { data: coachSummary } = useSupportChatSummary(hasCoachAccess ? 'coach' : 'support');
 
-  // Add to rituals state
+  // Add to routines state
   const { data: existingTask } = useExistingProTask('channel');
   const addRoutinePlan = useAddRoutinePlan();
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
-  const isAddedToRituals = !!existingTask || justAdded;
+  const isAddedToRoutines = !!existingTask || justAdded;
 
   // Subscribe to real-time updates for all channels
   useFeedRealtime();
@@ -126,10 +126,10 @@ export default function AppChannelsList() {
               Your community spaces
             </p>
           </div>
-          {/* Actions: Add to rituals + Admin */}
+          {/* Actions: Add to routines + Admin */}
           <div className="flex gap-1.5 pb-0.5">
             <AddedToRoutineButton
-              isAdded={isAddedToRituals}
+              isAdded={isAddedToRoutines}
               onAddClick={() => {
                 haptic.light();
                 setShowRoutineSheet(true);
@@ -354,7 +354,7 @@ export default function AppChannelsList() {
         )}
       </div>
 
-      {/* Add to Rituals Sheet */}
+      {/* Add to Routines Sheet */}
       <RoutinePreviewSheet
         open={showRoutineSheet}
         onOpenChange={setShowRoutineSheet}
@@ -370,10 +370,10 @@ export default function AppChannelsList() {
             });
             setJustAdded(true);
             haptic.success();
-            toast.success('Added to your rituals!');
+            toast.success('Added to your routines!');
             setShowRoutineSheet(false);
           } catch {
-            toast.error('Failed to add to rituals');
+            toast.error('Failed to add to routines');
           }
         }}
         isSaving={addRoutinePlan.isPending}

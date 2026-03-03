@@ -19,7 +19,7 @@ interface AddedToRoutineButtonProps {
 }
 
 /**
- * A button that shows "Add to My Rituals" when not added, 
+ * A button that shows "Add to My Routines" when not added, 
  * and "Added — Go to Planner" + a re-add button when already added.
  */
 export const AddedToRoutineButton = ({
@@ -29,7 +29,7 @@ export const AddedToRoutineButton = ({
   className,
   size = 'default',
   variant = 'default',
-  addText = 'Add to My Rituals',
+  addText = 'Add to My Routines',
   iconOnly = false,
 }: AddedToRoutineButtonProps) => {
   const navigate = useNavigate();
@@ -98,7 +98,7 @@ export const AddedToRoutineButton = ({
           "rounded-xl bg-urgency text-urgency-foreground hover:bg-urgency/90 shrink-0",
           className
         )}
-        title="Add to My Rituals"
+        title="Add to My Routines"
       >
         <CalendarPlus className="h-5 w-5" />
       </Button>
@@ -129,7 +129,7 @@ export const AddedToRoutineButton = ({
           onClick={handleAddAgain}
           disabled={isLoading}
           className="h-10 w-10 rounded-full bg-urgency text-urgency-foreground hover:bg-urgency/90 shrink-0"
-          title="Add again to my rituals"
+          title="Add again to my routines"
         >
           <CalendarPlus className="h-4 w-4" />
         </Button>

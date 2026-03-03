@@ -75,7 +75,7 @@ export function HomeTour({
     // Banner step removed - announcements no longer part of tour
 
     // Conditionally add suggested rituals step
-    if (hasSuggestedRituals) {
+    if (hasSuggestedRoutines) {
       baseSteps.push({
         id: 'rituals',
         title: 'Suggested Rituals',
@@ -159,7 +159,7 @@ export function HomeTour({
     }
 
     return baseSteps;
-  }, [hasEnrolledPrograms, hasSuggestedRituals, hasWelcomeCard]);
+  }, [hasEnrolledPrograms, hasSuggestedRoutines, hasWelcomeCard]);
 
   const tour = useFeatureTour({
     feature: 'home',

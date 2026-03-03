@@ -283,10 +283,10 @@ export default function RoutinesBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
-      toast.success('Ritual created');
+      toast.success('Routine created');
       closeDialog();
     },
-    onError: (error) => toast.error('Failed to create ritual: ' + error.message),
+    onError: (error) => toast.error('Failed to create routine: ' + error.message),
   });
 
   // Update routine
@@ -361,10 +361,10 @@ export default function RoutinesBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
-      toast.success('Ritual updated');
+      toast.success('Routine updated');
       closeDialog();
     },
-    onError: (error) => toast.error('Failed to update ritual: ' + error.message),
+    onError: (error) => toast.error('Failed to update routine: ' + error.message),
   });
 
   // Delete routine
@@ -376,7 +376,7 @@ export default function RoutinesBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
-      toast.success('Ritual deleted');
+      toast.success('Routine deleted');
     },
   });
 
@@ -396,7 +396,7 @@ export default function RoutinesBank() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
-      queryClient.invalidateQueries({ queryKey: ['welcome-popup-ritual'] });
+      queryClient.invalidateQueries({ queryKey: ['welcome-popup-routine'] });
     },
   });
 
@@ -408,7 +408,7 @@ export default function RoutinesBank() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
-      queryClient.invalidateQueries({ queryKey: ['welcome-popup-ritual'] });
+      queryClient.invalidateQueries({ queryKey: ['welcome-popup-routine'] });
     },
   });
 
@@ -535,7 +535,7 @@ export default function RoutinesBank() {
 
   const handleGenerateCover = async () => {
     if (!editingRoutine?.id) {
-      toast.error('Please save the ritual first before generating a cover');
+      toast.error('Please save the routine first before generating a cover');
       return;
     }
     setIsGeneratingCover(true);
@@ -564,7 +564,7 @@ export default function RoutinesBank() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('Delete this ritual?')) {
+    if (confirm('Delete this routine?')) {
       deleteRoutine.mutate(id);
     }
   };
@@ -852,7 +852,7 @@ export default function RoutinesBank() {
           <div className="text-center py-8 text-muted-foreground">Loading...</div>
         ) : filteredRoutines.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            No rituals yet. Click "New Ritual" to create one.
+            No routines yet. Click "New Routine" to create one.
           </div>
         ) : (
           <div className="space-y-2">
@@ -972,9 +972,9 @@ export default function RoutinesBank() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-3xl max-h-[85vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>{editingRoutine ? 'Edit Ritual' : 'New Ritual'}</DialogTitle>
+            <DialogTitle>{editingRoutine ? 'Edit Routine' : 'New Routine'}</DialogTitle>
             <DialogDescription>
-              {editingRoutine ? 'Update ritual details and sections' : 'Create a new ritual template'}
+              {editingRoutine ? 'Update routine details and sections' : 'Create a new routine template'}
             </DialogDescription>
           </DialogHeader>
           
@@ -1103,7 +1103,7 @@ export default function RoutinesBank() {
                       placeholder="https://youtube.com/watch?v=... or https://example.com/video.mp4"
                     />
                     {formData.video_url && (
-                      <p className="text-xs text-muted-foreground">Video will appear below the cover image on the ritual page.</p>
+                      <p className="text-xs text-muted-foreground">Video will appear below the cover image on the routine page.</p>
                     )}
                   </div>
 
@@ -1121,7 +1121,7 @@ export default function RoutinesBank() {
                     <RichTextEditor
                       value={formData.description}
                       onChange={(value) => setFormData({ ...formData, description: value })}
-                      placeholder="Write your ritual description..."
+                      placeholder="Write your routine description..."
                     />
                   </div>
 
@@ -1680,7 +1680,7 @@ export default function RoutinesBank() {
           <DialogFooter className="pt-4 border-t">
             <Button variant="outline" onClick={closeDialog}>Cancel</Button>
             <Button onClick={handleSave} disabled={createRoutine.isPending || updateRoutine.isPending}>
-              {editingRoutine ? 'Save Changes' : 'Create Ritual'}
+              {editingRoutine ? 'Save Changes' : 'Create Routine'}
             </Button>
           </DialogFooter>
         </DialogContent>

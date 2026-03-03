@@ -22,7 +22,7 @@ type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'pla
 
 const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
   { value: 'home_top', label: '🏠 Home - Above Actions' },
-  { value: 'home_rituals', label: '🏠 Home - After Rituals' },
+  { value: 'home_rituals', label: '🏠 Home - After Routines' },
   { value: 'explore', label: '🔍 Explore Page' },
   { value: 'listen', label: '🎧 Listen Page' },
   { value: 'player', label: '▶️ Audio Player' },
@@ -440,7 +440,7 @@ export function PromoBannerManager() {
     switch (banner.destination_type) {
       case 'routine':
         const routine = routines?.find(r => r.id === banner.destination_id);
-        return routine?.title || 'Unknown Ritual';
+        return routine?.title || 'Unknown Routine';
       case 'playlist':
         const playlist = playlists?.find(p => p.id === banner.destination_id);
         return playlist?.name || 'Unknown Playlist';
@@ -449,7 +449,7 @@ export function PromoBannerManager() {
         return task ? `${task.emoji} ${task.title}` : 'Unknown Action';
       case 'routines_hub':
         const routineBank = routinesBank?.find(r => r.id === banner.destination_id);
-        return routineBank ? `${routineBank.emoji || '📋'} ${routineBank.title}` : 'Unknown Ritual';
+        return routineBank ? `${routineBank.emoji || '📋'} ${routineBank.title}` : 'Unknown Routine';
       case 'breathe_exercise':
         const exercise = breathingExercises?.find(e => e.id === banner.destination_id);
         return exercise ? `${exercise.emoji || '🫁'} ${exercise.name}` : 'Unknown Exercise';
@@ -468,7 +468,7 @@ export function PromoBannerManager() {
       case 'home':
         return 'Home Page';
       case 'inspire':
-        return 'Explore / Rituals';
+        return 'Explore / Routines';
       case 'emotion':
         return 'Emotion Tracker';
       case 'period':
@@ -697,9 +697,9 @@ export function PromoBannerManager() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="home">🏠 Home</SelectItem>
-                    <SelectItem value="inspire">✨ Explore / Rituals Hub</SelectItem>
-                    <SelectItem value="routine">📋 Ritual Plan (specific)</SelectItem>
-                    <SelectItem value="routines_hub">📚 Ritual Bank (specific)</SelectItem>
+                    <SelectItem value="inspire">✨ Explore / Routines Hub</SelectItem>
+                    <SelectItem value="routine">📋 Routine Plan (specific)</SelectItem>
+                    <SelectItem value="routines_hub">📚 Routine Bank (specific)</SelectItem>
                     <SelectItem value="tasks_bank">📝 Actions Bank Page</SelectItem>
                     <SelectItem value="tasks">☑️ Action Template (specific)</SelectItem>
                     <SelectItem value="planner">📅 Action Planner</SelectItem>
@@ -728,10 +728,10 @@ export function PromoBannerManager() {
               {['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType) && (
                 <div className="space-y-2">
                   <Label>
-                    {destinationType === 'routine' && 'Select Ritual Plan'}
+                    {destinationType === 'routine' && 'Select Routine Plan'}
                     {destinationType === 'playlist' && 'Select Playlist'}
                     {destinationType === 'tasks' && 'Select Action Template'}
-                    {destinationType === 'routines_hub' && 'Select Ritual from Bank'}
+                    {destinationType === 'routines_hub' && 'Select Routine from Bank'}
                     {destinationType === 'breathe_exercise' && 'Select Breathing Exercise'}
                     {destinationType === 'onboarding' && 'Select Onboarding Flow'}
                     {destinationType === 'video_playlist' && 'Select Video Playlist'}

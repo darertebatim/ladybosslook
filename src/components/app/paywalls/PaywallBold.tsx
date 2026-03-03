@@ -74,7 +74,7 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
           {(() => {
             const DEFAULT_FEATURES = [
               'Unlimited daily planner actions',
-              'Unlimited rituals to your planner',
+              'Unlimited routines to your planner',
               'Exclusive audio playlists',
               'Emotion tracking & reflections',
               'Premium breathing exercises',

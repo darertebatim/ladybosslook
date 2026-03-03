@@ -87,7 +87,7 @@ export default function TasksBank() {
   const [newRoutineName, setNewRoutineName] = useState('');
   const [newRoutineCategory, setNewRoutineCategory] = useState('general');
 
-  // Add to existing ritual state
+  // Add to existing routine state
   const [addToRoutineOpen, setAddToRoutineOpen] = useState(false);
   const [selectedRoutineId, setSelectedRoutineId] = useState<string>('');
 
@@ -109,7 +109,7 @@ export default function TasksBank() {
     },
   });
 
-  // Fetch existing routines for "Add to Ritual" feature
+  // Fetch existing routines for "Add to Routine" feature
   const { data: existingRoutines = [] } = useQuery({
     queryKey: ['routines-bank-for-adding'],
     queryFn: async () => {
@@ -575,21 +575,21 @@ export default function TasksBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
-      toast.success('Ritual created! Go to Rituals Bank to edit it.');
+      toast.success('Routine created! Go to Routines Bank to edit it.');
       setCreateRoutineOpen(false);
       setNewRoutineName('');
       setNewRoutineCategory('general');
       clearSelection();
     },
     onError: (error) => {
-      toast.error('Failed to create ritual: ' + error.message);
+      toast.error('Failed to create routine: ' + error.message);
     },
   });
 
   // Add actions to existing routine
   const addToExistingRoutine = useMutation({
     mutationFn: async () => {
-      if (!selectedRoutineId) throw new Error('No ritual selected');
+      if (!selectedRoutineId) throw new Error('No routine selected');
       if (selectedTasks.length === 0) throw new Error('No actions selected');
 
       // Get current max order for this routine
@@ -622,7 +622,7 @@ export default function TasksBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
-      toast.success(`${selectedTasks.length} action(s) added to ritual!`);
+      toast.success(`${selectedTasks.length} action(s) added to routine!`);
       setAddToRoutineOpen(false);
       setSelectedRoutineId('');
       clearSelection();
@@ -641,7 +641,7 @@ export default function TasksBank() {
             Actions Bank
           </CardTitle>
           <CardDescription>
-            Reusable action templates for ritual planning
+            Reusable action templates for routine planning
           </CardDescription>
         </div>
         <div className="flex items-center gap-2">
@@ -682,7 +682,7 @@ export default function TasksBank() {
                 className="gap-2"
               >
                 <FolderPlus className="h-4 w-4" />
-                Add to Ritual
+                Add to Routine
               </Button>
               <Button
                 size="sm"
@@ -690,7 +690,7 @@ export default function TasksBank() {
                 className="gap-2"
               >
                 <Layers className="h-4 w-4" />
-                Create Ritual
+                Create Routine
               </Button>
               <Button
                 size="sm"
@@ -981,16 +981,16 @@ export default function TasksBank() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Layers className="h-4 w-4" />
-              Create Ritual from Selection
+              Create Routine from Selection
             </DialogTitle>
             <DialogDescription>
-              Create a new ritual with {selectedTaskIds.size} selected action{selectedTaskIds.size !== 1 ? 's' : ''}
+              Create a new routine with {selectedTaskIds.size} selected action{selectedTaskIds.size !== 1 ? 's' : ''}
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="routineName">Ritual Name *</Label>
+              <Label htmlFor="routineName">Routine Name *</Label>
               <Input
                 id="routineName"
                 value={newRoutineName}
@@ -1045,31 +1045,31 @@ export default function TasksBank() {
               onClick={() => createRoutineFromSelection.mutate()}
               disabled={!newRoutineName.trim() || createRoutineFromSelection.isPending}
             >
-              Create Ritual
+              Create Routine
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Add to Existing Ritual Dialog */}
+      {/* Add to Existing Routine Dialog */}
       <Dialog open={addToRoutineOpen} onOpenChange={setAddToRoutineOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FolderPlus className="h-4 w-4" />
-              Add to Existing Ritual
+              Add to Existing Routine
             </DialogTitle>
             <DialogDescription>
-              Add {selectedTaskIds.size} action{selectedTaskIds.size !== 1 ? 's' : ''} to an existing ritual
+              Add {selectedTaskIds.size} action{selectedTaskIds.size !== 1 ? 's' : ''} to an existing routine
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Select Ritual *</Label>
+              <Label>Select Routine *</Label>
               <Select value={selectedRoutineId} onValueChange={setSelectedRoutineId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Choose a ritual..." />
+                  <SelectValue placeholder="Choose a routine..." />
                 </SelectTrigger>
                 <SelectContent>
                   {existingRoutines.map((routine) => (
@@ -1083,7 +1083,7 @@ export default function TasksBank() {
                 </SelectContent>
               </Select>
               {existingRoutines.length === 0 && (
-                <p className="text-xs text-muted-foreground">No rituals found. Create one first.</p>
+                <p className="text-xs text-muted-foreground">No routines found. Create one first.</p>
               )}
             </div>
 
@@ -1110,7 +1110,7 @@ export default function TasksBank() {
               onClick={() => addToExistingRoutine.mutate()}
               disabled={!selectedRoutineId || addToExistingRoutine.isPending}
             >
-              Add to Ritual
+              Add to Routine
             </Button>
           </DialogFooter>
         </DialogContent>

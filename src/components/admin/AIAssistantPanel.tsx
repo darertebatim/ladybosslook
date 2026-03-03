@@ -13,15 +13,15 @@ import { cn } from '@/lib/utils';
 const QUICK_ACTIONS: Record<string, Array<{ label: string; prompt: string }>> = {
   tools: [
     { label: 'Create 5 actions', prompt: 'Create 5 wellness actions for the Actions Bank (morning routine, meditation, gratitude, hydration, stretching)' },
-    { label: 'Create ritual', prompt: 'Create a "Morning Glow" ritual with sections and tasks for a calm morning start' },
+    { label: 'Create routine', prompt: 'Create a "Morning Glow" routine with sections and tasks for a calm morning start' },
     { label: 'Breathing exercise', prompt: 'Create a 4-7-8 relaxation breathing exercise' },
-    { label: 'Self-care bundle', prompt: 'Create a complete self-care ritual with 6 tasks covering body, mind, and soul' },
-    { label: '🎨 Generate covers', prompt: 'Generate Simora-style cover images for all rituals that don\'t have covers yet' },
+    { label: 'Self-care bundle', prompt: 'Create a complete self-care routine with 6 tasks covering body, mind, and soul' },
+    { label: '🎨 Generate covers', prompt: 'Generate Simora-style cover images for all routines that don\'t have covers yet' },
   ],
   default: [
     { label: 'Draft announcement', prompt: 'Help me write an announcement for my community' },
     { label: 'Session reminder', prompt: 'Write a session reminder for tomorrow\'s class' },
-    { label: 'Create ritual', prompt: 'Create a morning wellness ritual with 5 actions' },
+    { label: 'Create routine', prompt: 'Create a morning wellness routine with 5 actions' },
     { label: 'Push notification', prompt: 'Write a short push notification to engage users' },
   ],
 };

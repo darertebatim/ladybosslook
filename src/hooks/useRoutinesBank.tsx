@@ -450,7 +450,7 @@ export function useAddRoutineFromBank() {
 
       const startOrderIndex = (existingTasks?.[0]?.order_index ?? -1) + 1;
 
-      // Determine schedule type from ritual
+      // Determine schedule type from routine
       const scheduleType = (routine as any).schedule_type || 'daily';
       const startDayOfWeek = (routine as any).start_day_of_week as number | null;
       

@@ -252,7 +252,7 @@ function CategoriesManager() {
             <FolderOpen className="h-5 w-5 text-blue-500" />
             Categories
           </CardTitle>
-          <CardDescription>Organize rituals into categories</CardDescription>
+          <CardDescription>Organize routines into categories</CardDescription>
         </div>
         <Button onClick={handleOpenCreate} size="sm">
           <Plus className="h-4 w-4 mr-2" />
@@ -272,7 +272,7 @@ function CategoriesManager() {
                 <TableHead>Name</TableHead>
                 <TableHead>Slug</TableHead>
                 <TableHead>Color</TableHead>
-                <TableHead>Ritual Order</TableHead>
+                <TableHead>Routine Order</TableHead>
                 <TableHead>Action Order</TableHead>
                 <TableHead>Active</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -362,7 +362,7 @@ function CategoriesManager() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Ritual Order</Label>
+                <Label>Routine Order</Label>
                 <Input
                   type="number"
                   value={formData.display_order}
