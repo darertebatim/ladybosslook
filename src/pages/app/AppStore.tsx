@@ -473,7 +473,7 @@ const AppStore = () => {
             {!searchQuery && soundscapePlaylists.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-sm font-semibold text-foreground">Soundscapes</h2>
+                  <h2 className="text-sm font-semibold text-foreground">Sound Scapes</h2>
                   <Link to="/app/player?category=soundscape" className="text-xs text-primary font-medium flex items-center gap-0.5">
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
