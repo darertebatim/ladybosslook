@@ -110,7 +110,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
               </div>
             )}
           </div>
-          <span className="text-xs font-medium text-muted-foreground max-w-[56px] text-center leading-tight line-clamp-2">
+          <span className="text-[11px] font-medium text-muted-foreground max-w-[64px] text-center leading-tight line-clamp-2">
             {tool.name}
           </span>
         </button>
