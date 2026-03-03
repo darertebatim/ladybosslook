@@ -257,13 +257,6 @@ const AppJournalEntry = () => {
             <MoodSelector value={mood} onChange={handleMoodChange} />
           </div>
 
-          {/* Writing Prompts - Only for new empty entries */}
-          {showWritingPrompts && (
-            <div className="py-2">
-              <WritingPrompts onSelectPrompt={handlePromptSelect} />
-            </div>
-          )}
-
           {/* Content Textarea */}
           <Textarea
             ref={textareaRef}
