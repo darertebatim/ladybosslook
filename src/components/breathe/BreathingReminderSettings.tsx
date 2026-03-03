@@ -67,12 +67,12 @@ export const BreathingReminderSettings = ({ className }: BreathingReminderSettin
           });
         }
       }
-      toast.success('Breathing ritual added to your planner!');
+      toast.success('Breathing routine added to your planner!');
       setShowRoutineSheet(false);
       setJustAdded(true);
     } catch (error) {
-      console.error('Failed to add ritual:', error);
-      toast.error('Failed to add ritual');
+      console.error('Failed to add routine:', error);
+      toast.error('Failed to add routine');
     }
   };
 
