@@ -1066,10 +1066,10 @@ export default function TasksBank() {
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Select Ritual *</Label>
+              <Label>Select Routine *</Label>
               <Select value={selectedRoutineId} onValueChange={setSelectedRoutineId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Choose a ritual..." />
+                  <SelectValue placeholder="Choose a routine..." />
                 </SelectTrigger>
                 <SelectContent>
                   {existingRoutines.map((routine) => (
