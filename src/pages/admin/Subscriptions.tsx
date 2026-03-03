@@ -29,8 +29,8 @@ const PLUS_FEATURES = [
     category: 'Gating Logic',
     description: 'How simora+ restricts free users',
     items: [
-      { icon: Unlock, label: 'Browse all rituals', detail: 'Free users can view and explore all ritual templates', free: true },
-      { icon: Lock, label: 'Save rituals to planner', detail: 'Paywall opens when free user taps "Save" in Edit Ritual sheet', free: false },
+      { icon: Unlock, label: 'Browse all routines', detail: 'Free users can view and explore all routine templates', free: true },
+      { icon: Lock, label: 'Save routines to planner', detail: 'Paywall opens when free user taps "Save" in Edit Routine sheet', free: false },
       { icon: CalendarPlus, label: 'Max 6 actions per day', detail: 'Free users limited to 6 actions per day; simora+ unlocks unlimited', free: false },
     ],
   },

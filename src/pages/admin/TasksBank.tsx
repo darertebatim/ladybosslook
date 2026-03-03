@@ -1110,7 +1110,7 @@ export default function TasksBank() {
               onClick={() => addToExistingRoutine.mutate()}
               disabled={!selectedRoutineId || addToExistingRoutine.isPending}
             >
-              Add to Ritual
+              Add to Routine
             </Button>
           </DialogFooter>
         </DialogContent>
