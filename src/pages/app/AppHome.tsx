@@ -39,7 +39,7 @@ import { isWaterTask } from '@/lib/waterTracking';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { FastingStatusCard } from '@/components/app/FastingStatusCard';
 import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
-import { WelcomeRitualCard } from '@/components/app/WelcomeRitualCard';
+import { WelcomeRoutineCard } from '@/components/app/WelcomeRoutineCard';
 import { toast } from 'sonner';
 import { useWeeklyTaskCompletion, useDateRangeTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 import { BadgeCelebration } from '@/components/app/BadgeCelebration';

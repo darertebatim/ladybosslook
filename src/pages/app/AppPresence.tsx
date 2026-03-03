@@ -10,7 +10,7 @@ import { ACHIEVEMENTS, getAchievementStatus } from '@/lib/achievements';
 import { AchievementCard } from '@/components/app/AchievementCard';
 import { WeeklyPresenceGrid } from '@/components/app/WeeklyPresenceGrid';
 import { StreakChallengeCard } from '@/components/app/StreakChallengeCard';
-import { ChallengeRitualCard } from '@/components/app/ChallengeRitualCard';
+import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
 import { StreakGoalSelection, StreakGoalValue } from '@/components/app/StreakGoalSelection';
 import { BackButton } from '@/components/app/BackButton';
 import { Skeleton } from '@/components/ui/skeleton';

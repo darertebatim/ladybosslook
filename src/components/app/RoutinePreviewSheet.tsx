@@ -485,7 +485,7 @@ export function RoutinePreviewSheet({
         </SheetContent>
       </Sheet>
 
-      <SaveRitualHandHint show={showSaveHint} />
+      <SaveRoutineHandHint show={showSaveHint} />
 
       {/* Full Task Edit Sheet - uses the REAL AppTaskCreate component */}
       {editingTask && (

@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 
 export type TourFeature = 
   | 'home' 
-  | 'rituals' 
+  | 'rituals'
+  | 'routines' 
   | 'breathe' 
   | 'journal' 
   | 'player' 

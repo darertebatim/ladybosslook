@@ -11,7 +11,7 @@ import {
   usePopularRoutinesBank,
   useFeaturedRoutinesBank,
 } from '@/hooks/useRoutinesBank';
-import { RitualsTour, TourHelpButton } from '@/components/app/tour';
+import { RoutinesTour, TourHelpButton } from '@/components/app/tour';
 
 export default function AppInspire() {
   const navigate = useNavigate();

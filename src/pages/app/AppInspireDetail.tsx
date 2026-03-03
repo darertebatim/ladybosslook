@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { AddToRitualHandHint, useAddToRitualHint } from '@/components/app/AddToRitualHandHint';
+import { AddToRoutineHandHint, useAddToRoutineHint } from '@/components/app/AddToRoutineHandHint';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { format, addDays } from 'date-fns';

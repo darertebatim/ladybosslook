@@ -148,7 +148,7 @@ export function useRoutinesBank(categorySlug?: string) {
 // Fetch the welcome popup routine (the one marked as is_welcome_popup)
 export function useWelcomePopupRoutine() {
   return useQuery({
-    queryKey: ['welcome-popup-ritual'],
+    queryKey: ['welcome-popup-routine'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('routines_bank')
