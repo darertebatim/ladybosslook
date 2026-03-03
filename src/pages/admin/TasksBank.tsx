@@ -990,7 +990,7 @@ export default function TasksBank() {
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="routineName">Ritual Name *</Label>
+              <Label htmlFor="routineName">Routine Name *</Label>
               <Input
                 id="routineName"
                 value={newRoutineName}
