@@ -263,7 +263,7 @@ export default function AppInspireDetail() {
                     className="absolute inset-0 w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
-                    title="Ritual video"
+                    title="Routine video"
                   />
                 </div>
               )}
