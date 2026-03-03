@@ -29,7 +29,7 @@ export const AddedToRoutineButton = ({
   className,
   size = 'default',
   variant = 'default',
-  addText = 'Add to My Rituals',
+  addText = 'Add to My Routines',
   iconOnly = false,
 }: AddedToRoutineButtonProps) => {
   const navigate = useNavigate();
