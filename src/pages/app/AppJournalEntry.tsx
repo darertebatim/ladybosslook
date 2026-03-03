@@ -263,8 +263,8 @@ const AppJournalEntry = () => {
             placeholder="Start writing your thoughts..."
             value={content}
             onChange={(e) => handleContentChange(e.target.value)}
-            onFocus={() => setIsTextareaFocused(true)}
-            onBlur={() => setIsTextareaFocused(false)}
+
+
             className={cn(
               "min-h-[200px] resize-none border-0 px-0 focus-visible:ring-0 text-base leading-relaxed placeholder:text-muted-foreground/50",
               contentBilingualClassName
