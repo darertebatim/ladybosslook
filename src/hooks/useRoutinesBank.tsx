@@ -145,8 +145,8 @@ export function useRoutinesBank(categorySlug?: string) {
   });
 }
 
-// Fetch the welcome popup ritual (the one marked as is_welcome_popup)
-export function useWelcomePopupRitual() {
+// Fetch the welcome popup routine (the one marked as is_welcome_popup)
+export function useWelcomePopupRoutine() {
   return useQuery({
     queryKey: ['welcome-popup-ritual'],
     queryFn: async () => {
