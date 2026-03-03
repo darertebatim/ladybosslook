@@ -80,28 +80,42 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
     );
   }
 
-  // Compact size for Audio & Video section (3-column)
+  // Compact size for horizontal scroll icon cards
   if (size === 'compact') {
     return (
-      <button
-        onClick={handleClick}
-        disabled={tool.comingSoon}
-        className={cn(
-          'flex flex-col items-center gap-1.5',
-          'transition-transform active:scale-95',
-          tool.comingSoon && 'opacity-60'
-        )}
-      >
-        <div className={cn(
-          'w-12 h-12 rounded-xl flex items-center justify-center',
-          tool.bgColor
-        )}>
-          <IconComponent className={cn('h-5 w-5', tool.iconColor)} />
-        </div>
-        <span className="text-[11px] font-medium text-muted-foreground">
-          {tool.name}
-        </span>
-      </button>
+      <>
+        <button
+          onClick={handleClick}
+          disabled={tool.comingSoon}
+          className={cn(
+            'relative flex flex-col items-center gap-1.5 shrink-0',
+            'transition-transform active:scale-95',
+            tool.comingSoon && 'opacity-60',
+            className
+          )}
+        >
+          {isLocked && (
+            <div className="absolute -top-2 -left-1 z-10 inline-flex items-center gap-0.5 text-[8px] font-bold text-amber-700 bg-amber-200 px-1.5 py-0.5 rounded-full shadow-sm">
+              <Crown className="h-2.5 w-2.5" /> PLUS
+            </div>
+          )}
+          <div className={cn(
+            'w-14 h-14 rounded-2xl flex items-center justify-center relative',
+            tool.bgColor
+          )}>
+            <IconComponent className={cn('h-6 w-6', tool.iconColor)} />
+            {isLocked && (
+              <div className="absolute -bottom-1 -right-1 p-1 rounded-full bg-amber-100">
+                <FluentEmoji emoji="🔒" size={14} />
+              </div>
+            )}
+          </div>
+          <span className="text-xs font-medium text-muted-foreground max-w-[56px] text-center leading-tight line-clamp-2">
+            {tool.name}
+          </span>
+        </button>
+        <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
+      </>
     );
   }
 

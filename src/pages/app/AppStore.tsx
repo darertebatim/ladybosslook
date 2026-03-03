@@ -274,17 +274,33 @@ const AppStore = () => {
                 <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
                   Tools
                 </h2>
-                <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
-                  {filteredWellnessTools.map((tool) => (
-                    <ToolCard 
-                      key={tool.id} 
-                      tool={tool}
-                      size="compact"
-                      className={`tour-tool-${tool.id}`}
-                    />
-                  ))}
+                {/* Row 1: Free tools + audio */}
+                <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pb-3 scrollbar-hide">
+                  {filteredWellnessTools
+                    .filter(t => !['fasting', 'emotions', 'water', 'period'].includes(t.id))
+                    .map((tool) => (
+                      <ToolCard 
+                        key={tool.id} 
+                        tool={tool}
+                        size="compact"
+                        className={`tour-tool-${tool.id}`}
+                      />
+                    ))}
                   {filteredAudioTools
                     .filter(t => t.id === 'meditate' || t.id === 'soundscape')
+                    .map((tool) => (
+                      <ToolCard 
+                        key={tool.id} 
+                        tool={tool}
+                        size="compact"
+                        className={`tour-tool-${tool.id}`}
+                      />
+                    ))}
+                </div>
+                {/* Row 2: Plus tools */}
+                <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pt-1 pb-2 scrollbar-hide">
+                  {filteredWellnessTools
+                    .filter(t => ['fasting', 'emotions', 'water', 'period'].includes(t.id))
                     .map((tool) => (
                       <ToolCard 
                         key={tool.id} 
