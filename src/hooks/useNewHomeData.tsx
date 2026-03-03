@@ -173,7 +173,7 @@ export function useNewHomeData() {
     todayCompletedCount: query.data?.todayCompletedCount || 0,
     activeRounds: query.data?.activeRounds || [],
     completedRounds: query.data?.completedRounds || [],
-    nextSessionMap: query.data?.nextSessionMap || new Map<string, string>(),
+    nextSessionMap: query.data?.nextSessionMap instanceof Map ? query.data.nextSessionMap : new Map<string, string>(Object.entries(query.data?.nextSessionMap || {})),
     suggestedRoutine: query.data?.suggestedRoutine || null,
     periodSettings: query.data?.periodSettings || null,
     isNewUser: query.data?.isNewUser || false,
