@@ -274,21 +274,22 @@ const AppStore = () => {
                 <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
                   Tools
                 </h2>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
                   {filteredWellnessTools.map((tool) => (
                     <ToolCard 
                       key={tool.id} 
-                      tool={tool} 
+                      tool={tool}
+                      size="compact"
                       className={`tour-tool-${tool.id}`}
                     />
                   ))}
-                  {/* Audio tools - Meditate & Sounds */}
                   {filteredAudioTools
                     .filter(t => t.id === 'meditate' || t.id === 'soundscape')
                     .map((tool) => (
                       <ToolCard 
                         key={tool.id} 
-                        tool={tool} 
+                        tool={tool}
+                        size="compact"
                         className={`tour-tool-${tool.id}`}
                       />
                     ))}
