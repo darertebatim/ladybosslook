@@ -376,7 +376,7 @@ export default function RoutinesBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
-      toast.success('Ritual deleted');
+      toast.success('Routine deleted');
     },
   });
 
