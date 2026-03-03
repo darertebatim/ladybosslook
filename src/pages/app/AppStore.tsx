@@ -387,28 +387,30 @@ const AppStore = () => {
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
                   {reflections.slice(0, 8).map((r) => (
                     <button
                       key={r.id}
                       onClick={() => navigate(`/app/reflections/${r.id}`, { state: { from: location.pathname } })}
                       className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
                     >
-                      <div className="h-32 w-32 rounded-2xl overflow-hidden bg-muted mb-1.5">
-                        {r.cover_image_url ? (
-                          <CachedImage src={r.cover_image_url} alt={r.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: r.cover_color || '#f3f4f6' }}>
-                            <FluentEmoji emoji="🪞" size={36} />
+                      <div className="relative h-32 w-32 rounded-2xl overflow-visible mb-1.5">
+                        <div className="h-full w-full rounded-2xl overflow-hidden bg-muted">
+                          {r.cover_image_url ? (
+                            <CachedImage src={r.cover_image_url} alt={r.title} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: r.cover_color || '#f3f4f6' }}>
+                              <FluentEmoji emoji="🪞" size={36} />
+                            </div>
+                          )}
+                        </div>
+                        {!r.is_free && (
+                          <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                            <Crown className="h-2.5 w-2.5" /> PLUS
                           </div>
                         )}
                       </div>
                       <p className="text-xs font-medium line-clamp-2 leading-tight">{r.title}</p>
-                      {!r.is_free && (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 font-semibold mt-0.5">
-                          <Crown className="h-2.5 w-2.5" /> PLUS
-                        </span>
-                      )}
                     </button>
                   ))}
                 </div>
@@ -424,22 +426,24 @@ const AppStore = () => {
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
                   {breathingExercises.filter(e => e.is_active).slice(0, 8).map((exercise) => (
                     <button
                       key={exercise.id}
                       onClick={() => navigate(`/app/breathe?exercise=${exercise.id}`, { state: { from: location.pathname } })}
                       className="shrink-0 w-24 text-center transition-transform active:scale-[0.97]"
                     >
-                      <div className="h-24 w-24 rounded-2xl bg-muted flex items-center justify-center mb-1.5">
-                        <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} />
+                      <div className="relative h-24 w-24 overflow-visible mb-1.5">
+                        <div className="h-full w-full rounded-2xl bg-muted flex items-center justify-center">
+                          <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} />
+                        </div>
+                        {exercise.is_premium && (
+                          <div className="absolute -top-2.5 left-0 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                            <Crown className="h-2.5 w-2.5" /> PLUS
+                          </div>
+                        )}
                       </div>
                       <p className="text-xs font-medium line-clamp-2 leading-tight">{exercise.name}</p>
-                      {exercise.is_premium && (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 font-semibold mt-0.5">
-                          <Crown className="h-2.5 w-2.5" /> PLUS
-                        </span>
-                      )}
                     </button>
                   ))}
                 </div>
@@ -456,28 +460,30 @@ const AppStore = () => {
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
                   {meditatePlaylists.map((playlist) => (
                     <button
                       key={playlist.id}
                       onClick={() => navigate(`/app/player/playlist/${playlist.id}`, { state: { from: location.pathname } })}
                       className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
                     >
-                      <div className="h-32 w-32 rounded-2xl overflow-hidden bg-muted mb-1.5">
-                        {playlist.cover_image_url ? (
-                          <CachedImage src={playlist.cover_image_url} alt={playlist.name} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-indigo-100">
-                            <FluentEmoji emoji="🧘" size={36} />
+                      <div className="relative h-32 w-32 overflow-visible mb-1.5">
+                        <div className="h-full w-full rounded-2xl overflow-hidden bg-muted">
+                          {playlist.cover_image_url ? (
+                            <CachedImage src={playlist.cover_image_url} alt={playlist.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-indigo-100">
+                              <FluentEmoji emoji="🧘" size={36} />
+                            </div>
+                          )}
+                        </div>
+                        {playlist.requires_subscription && (
+                          <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                            <Crown className="h-2.5 w-2.5" /> PLUS
                           </div>
                         )}
                       </div>
                       <p className="text-xs font-medium line-clamp-2 leading-tight">{playlist.name}</p>
-                      {playlist.requires_subscription && (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 font-semibold mt-0.5">
-                          <Crown className="h-2.5 w-2.5" /> PLUS
-                        </span>
-                      )}
                     </button>
                   ))}
                 </div>
@@ -493,28 +499,30 @@ const AppStore = () => {
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
                   {soundscapePlaylists.map((playlist) => (
                     <button
                       key={playlist.id}
                       onClick={() => navigate(`/app/player/playlist/${playlist.id}`, { state: { from: location.pathname } })}
                       className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
                     >
-                      <div className="h-32 w-32 rounded-2xl overflow-hidden bg-muted mb-1.5">
-                        {playlist.cover_image_url ? (
-                          <CachedImage src={playlist.cover_image_url} alt={playlist.name} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-cyan-100">
-                            <FluentEmoji emoji="🌊" size={36} />
+                      <div className="relative h-32 w-32 overflow-visible mb-1.5">
+                        <div className="h-full w-full rounded-2xl overflow-hidden bg-muted">
+                          {playlist.cover_image_url ? (
+                            <CachedImage src={playlist.cover_image_url} alt={playlist.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-cyan-100">
+                              <FluentEmoji emoji="🌊" size={36} />
+                            </div>
+                          )}
+                        </div>
+                        {playlist.requires_subscription && (
+                          <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                            <Crown className="h-2.5 w-2.5" /> PLUS
                           </div>
                         )}
                       </div>
                       <p className="text-xs font-medium line-clamp-2 leading-tight">{playlist.name}</p>
-                      {playlist.requires_subscription && (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 font-semibold mt-0.5">
-                          <Crown className="h-2.5 w-2.5" /> PLUS
-                        </span>
-                      )}
                     </button>
                   ))}
                 </div>
