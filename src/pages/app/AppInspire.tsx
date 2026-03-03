@@ -106,31 +106,36 @@ export default function AppInspire() {
               </h2>
               <ScrollArea className="w-full tour-routine-categories">
                 <div className="flex gap-2 px-4 pb-2">
-                  {categories.filter(c => c.slug !== 'pro').map((category) => (
+                  {nonEmptyCategories.filter(c => c.slug !== 'pro').map((category) => (
                     <CategoryCircle
                       key={category.slug}
                       name={category.name}
                       icon={category.icon}
                       emoji={category.emoji}
                       color={category.color}
-                      onClick={() => scrollToCategory(category.slug)}
+                      onClick={() => navigate(`/app/routines/category/${category.slug}`, { state: { from: location.pathname } })}
                     />
                   ))}
-                  {categories.find(c => c.slug === 'pro') && (
+                  {nonEmptyCategories.find(c => c.slug === 'pro') && (
                     <CategoryCircle
-                      name={categories.find(c => c.slug === 'pro')!.name}
-                      icon={categories.find(c => c.slug === 'pro')!.icon}
-                      emoji={categories.find(c => c.slug === 'pro')!.emoji}
-                      color={categories.find(c => c.slug === 'pro')!.color}
-                      onClick={() => scrollToCategory('pro')}
+                      name={nonEmptyCategories.find(c => c.slug === 'pro')!.name}
+                      icon={nonEmptyCategories.find(c => c.slug === 'pro')!.icon}
+                      emoji={nonEmptyCategories.find(c => c.slug === 'pro')!.emoji}
+                      color={nonEmptyCategories.find(c => c.slug === 'pro')!.color}
+                      onClick={() => navigate(`/app/routines/category/pro`, { state: { from: location.pathname } })}
                     />
                   )}
-                  <CategoryCircle
-                    name="Popular"
-                    icon="Star"
-                    color="yellow"
-                    onClick={() => scrollToCategory('popular')}
-                  />
+                  {filteredPopular && filteredPopular.length > 0 && (
+                    <CategoryCircle
+                      name="Popular"
+                      icon="Star"
+                      color="yellow"
+                      onClick={() => {
+                        const el = document.getElementById('routine-category-popular');
+                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }}
+                    />
+                  )}
                 </div>
                 <ScrollBar orientation="horizontal" className="invisible" />
               </ScrollArea>
