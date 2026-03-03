@@ -139,7 +139,7 @@ export default function AppReflections() {
         )}
       </div>
 
-      {/* Add to Rituals Sheet */}
+      {/* Add to Routines Sheet */}
       <RoutinePreviewSheet
         open={showRoutineSheet}
         onOpenChange={setShowRoutineSheet}
