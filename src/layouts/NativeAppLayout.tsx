@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, MessageCircle, Compass, Music, Users, Headset } from 'lucide-react';
+import { Home, MessageCircle, Compass, Music, Users, Headset, CalendarPlus } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
@@ -154,6 +154,7 @@ const NativeAppLayout = () => {
     { path: '/app/explore', icon: Compass, label: 'Explore', tourClass: 'tour-nav-explore' },
     { path: '/app/player', icon: Music, label: 'Listen', tourClass: 'tour-nav-listen' },
     { path: '/app/channels', icon: Users, label: 'Channels', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
+    { path: '/app/routines', icon: CalendarPlus, label: 'Routines', tourClass: 'tour-nav-routines' },
     { path: '/app/chat', icon: Headset, label: 'Support', tourClass: 'tour-nav-support' },
   ];
 
@@ -187,7 +188,7 @@ const NativeAppLayout = () => {
           ? "bg-[#132240]/80 backdrop-blur-xl border-t border-white/10"
           : "bg-background border-t"
       )}>
-        <div className="grid grid-cols-5 pt-1.5 pb-1.5">
+        <div className="grid grid-cols-6 pt-1.5 pb-1.5">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path || 
               (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
