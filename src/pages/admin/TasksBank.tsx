@@ -1051,7 +1051,7 @@ export default function TasksBank() {
         </DialogContent>
       </Dialog>
 
-      {/* Add to Existing Ritual Dialog */}
+      {/* Add to Existing Routine Dialog */}
       <Dialog open={addToRoutineOpen} onOpenChange={setAddToRoutineOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
