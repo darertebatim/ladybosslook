@@ -173,7 +173,7 @@ export default function AppInspire() {
                 return (
                   <section key={category.slug} id={`routine-category-${category.slug}`}>
                     <div className="flex items-center justify-between mb-2 px-4">
-                      <h2 className="text-sm font-semibold text-foreground">{category.name}</h2>
+                      <h2 className="text-base font-bold text-foreground">{category.name}</h2>
                       <button
                         onClick={() => navigate(`/app/routines/category/${category.slug}`, { state: { from: location.pathname } })}
                         className="text-xs text-primary font-medium flex items-center gap-0.5"
