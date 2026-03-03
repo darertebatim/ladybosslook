@@ -334,13 +334,13 @@ const AppStore = () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-2">
-                    {filteredPrograms.slice(0, 5).map((program: any) => {
+                  <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                    {filteredPrograms.map((program: any) => {
                       const enrolled = isEnrolled(program.slug);
                       const isEnrolling = enrollingSlug === program.slug;
                       
                       return (
-                        <div key={program.slug} className="relative">
+                        <div key={program.slug} className="relative shrink-0 w-36">
                           <ProgramCard
                             title={program.title}
                             image={program.image}

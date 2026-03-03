@@ -1,8 +1,6 @@
-import { memo } from 'react';
-import { CheckCircle2, BookOpen, Users, UserCheck, Headphones, Video, Calendar, Sparkles, Dumbbell, Waves, Heart, Crown } from 'lucide-react';
+import { CheckCircle2, BookOpen, Users, UserCheck, Headphones, Video, Calendar, Sparkles, Dumbbell, Waves, Heart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { PersianFlag } from '@/components/ui/PersianFlag';
-import { CachedImage } from '@/components/ui/CachedImage';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
@@ -21,21 +19,21 @@ interface ProgramCardProps {
   onClick?: () => void;
 }
 
-const typeConfig: Record<string, { label: string; icon: typeof BookOpen }> = {
-  'course': { label: 'Course', icon: BookOpen },
-  'group-coaching': { label: 'Coaching', icon: Users },
-  '1o1-session': { label: '1-on-1', icon: UserCheck },
-  'audiobook': { label: 'Audiobook', icon: Headphones },
-  'meditate': { label: 'Meditate', icon: Sparkles },
-  'workout': { label: 'Workout', icon: Dumbbell },
-  'soundscape': { label: 'Soundscape', icon: Waves },
-  'affirmations': { label: 'Affirmations', icon: Heart },
-  'webinar': { label: 'Webinar', icon: Video },
-  'event': { label: 'Event', icon: Calendar },
-  'subscription': { label: 'Club', icon: Sparkles },
+const typeConfig: Record<string, { label: string; icon: typeof BookOpen; color: string }> = {
+  'course': { label: 'Course', icon: BookOpen, color: 'bg-purple-500' },
+  'group-coaching': { label: 'Coaching', icon: Users, color: 'bg-pink-500' },
+  '1o1-session': { label: '1-on-1', icon: UserCheck, color: 'bg-blue-500' },
+  'audiobook': { label: 'Audiobook', icon: Headphones, color: 'bg-amber-500' },
+  'meditate': { label: 'Meditate', icon: Sparkles, color: 'bg-teal-500' },
+  'workout': { label: 'Workout', icon: Dumbbell, color: 'bg-rose-500' },
+  'soundscape': { label: 'Soundscape', icon: Waves, color: 'bg-blue-400' },
+  'affirmations': { label: 'Affirmations', icon: Heart, color: 'bg-pink-400' },
+  'webinar': { label: 'Webinar', icon: Video, color: 'bg-green-500' },
+  'event': { label: 'Event', icon: Calendar, color: 'bg-rose-500' },
+  'subscription': { label: 'Club', icon: Sparkles, color: 'bg-violet-500' },
 };
 
-export const ProgramCard = memo(function ProgramCard({
+export const ProgramCard = ({
   title,
   image,
   type,
@@ -43,69 +41,79 @@ export const ProgramCard = memo(function ProgramCard({
   isFree,
   isEnrolled,
   onClick,
-}: ProgramCardProps) {
+}: ProgramCardProps) => {
   const typeInfo = type ? typeConfig[type] : null;
   const TypeIcon = typeInfo?.icon || Sparkles;
 
   return (
     <button
       onClick={onClick}
-      className="relative w-full text-left rounded-2xl overflow-hidden cursor-pointer transition-all active:scale-[0.98] bg-muted/50 border border-border/50"
+      className="relative rounded-2xl overflow-hidden w-full aspect-square active:scale-[0.98] transition-all duration-150 shadow-lg border border-border/50 group"
     >
-      <div className="flex gap-3 p-3">
-        {/* Square thumbnail */}
-        <div className="relative h-24 w-24 flex-shrink-0 rounded-xl overflow-hidden">
-          {image ? (
-            <CachedImage
-              src={image}
-              alt={title}
-              loading="lazy"
-              decoding="async"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-muted flex items-center justify-center">
-              <TypeIcon className="h-8 w-8 text-muted-foreground/30" />
-            </div>
-          )}
+      {/* Cover Image */}
+      {image ? (
+        <img
+          src={image}
+          alt={title}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      ) : (
+        <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center">
+          <TypeIcon className="h-16 w-16 text-primary/40" />
         </div>
+      )}
 
-        {/* Content */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-          {/* Meta line: type */}
-          {typeInfo && (
-            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-              <TypeIcon className="h-3 w-3" />
-              <span>{typeInfo.label}</span>
-            </div>
-          )}
+      {/* Full gradient overlay for depth */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
-          {/* Title */}
-          <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
-            {title}
-          </h3>
+      {/* Top Right: Language flag + Enrolled badge */}
+      <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
+        {language && (
+          language === 'persian'
+            ? <PersianFlag size={14} className="shadow-sm" />
+            : LANG_FLAGS[language] && (
+              <span className="text-sm bg-white/80 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
+                {LANG_FLAGS[language]}
+              </span>
+            )
+        )}
+        {isEnrolled && (
+          <Badge className="bg-green-500 hover:bg-green-600 text-white text-xs rounded-full">
+            <CheckCircle2 className="h-3 w-3 mr-1" />
+            Enrolled
+          </Badge>
+        )}
+      </div>
 
-          {/* Badges row */}
-          <div className="flex items-center gap-1.5 mt-0.5">
-            {isEnrolled && (
-              <Badge className="bg-green-500 hover:bg-green-500 text-white rounded-full text-[10px] px-1.5 py-0 gap-0.5 shadow-sm h-4">
-                <CheckCircle2 className="h-2.5 w-2.5" />
-                Enrolled
-              </Badge>
-            )}
-            {isFree && !isEnrolled && (
-              <Badge className="bg-primary hover:bg-primary text-primary-foreground rounded-full text-[10px] px-1.5 py-0 shadow-sm h-4 font-semibold">
-                FREE
-              </Badge>
-            )}
-            {language && language !== 'all' && (
-              language === 'persian'
-                ? <PersianFlag size={10} />
-                : LANG_FLAGS[language] && <span className="text-[10px] flex-shrink-0 leading-none">{LANG_FLAGS[language]}</span>
-            )}
-          </div>
-        </div>
+      {/* FREE Badge - Top Left */}
+      {isFree && !isEnrolled && (
+        <Badge className="absolute top-2 left-2 bg-primary hover:bg-primary text-primary-foreground text-xs rounded-full z-10">
+          FREE
+        </Badge>
+      )}
+
+      {/* Type Badge - Top Left (if not free) */}
+      {typeInfo && !isFree && !isEnrolled && (
+        <Badge className={`absolute top-2 left-2 ${typeInfo.color} text-white text-xs rounded-full z-10`}>
+          <TypeIcon className="h-3 w-3 mr-1" />
+          {typeInfo.label}
+        </Badge>
+      )}
+
+      {/* Title & Type Overlay - Bottom */}
+      <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
+        <h3 className="font-semibold text-white text-sm line-clamp-2 drop-shadow-md text-left">
+          {title}
+        </h3>
+        {typeInfo && (
+          <p className="text-xs text-white/70 mt-1 text-left flex items-center gap-1">
+            <TypeIcon className="h-3 w-3" />
+            {typeInfo.label}
+          </p>
+        )}
       </div>
     </button>
   );
-});
+};
