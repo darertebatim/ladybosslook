@@ -62,7 +62,7 @@ export default function AppInspire() {
         <div className="flex items-center justify-between px-4 pt-3 pb-2">
           <div className="flex items-center gap-2">
             <CalendarPlus className="w-6 h-6 text-primary" />
-            <h1 className="text-xl font-bold text-foreground">Rituals</h1>
+            <h1 className="text-xl font-bold text-foreground">Routines</h1>
           </div>
           <div className="flex items-center gap-1">
             {startTour && (
