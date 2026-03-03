@@ -91,7 +91,7 @@ export default function AppVideoPlaylistDetail() {
     linked_playlist: null,
   } : null;
 
-  const handleAddToRituals = useCallback(() => {
+  const handleAddToRoutines = useCallback(() => {
     if (!playlist) return;
     haptic.medium();
     setShowRoutineSheet(true);
