@@ -158,7 +158,7 @@ export default function AppInspireDetail() {
       setJustAdded(true);
       toast.success(`${selectedTaskIds.length} actions added!`);
     } catch (error) {
-      toast.error('Failed to add ritual');
+      toast.error('Failed to add routine');
     }
   };
 
