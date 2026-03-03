@@ -104,10 +104,10 @@ export default function AppInspire() {
               <h2 className="text-sm font-semibold text-muted-foreground px-4 mb-3">
                 BROWSE CATEGORIES
               </h2>
-              <ScrollArea className="w-full tour-ritual-categories">
+              <ScrollArea className="w-full tour-routine-categories">
                 <div className="flex gap-2 px-4 pb-2">
                   <CategoryCircle
-                    name="All Rituals"
+                    name="All Routines"
                     icon="CalendarPlus"
                     color="purple"
                     isSelected={selectedCategory === 'all'}
