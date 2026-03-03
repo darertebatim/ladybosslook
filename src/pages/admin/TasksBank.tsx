@@ -641,7 +641,7 @@ export default function TasksBank() {
             Actions Bank
           </CardTitle>
           <CardDescription>
-            Reusable action templates for ritual planning
+            Reusable action templates for routine planning
           </CardDescription>
         </div>
         <div className="flex items-center gap-2">
