@@ -144,10 +144,7 @@ const AppJournalEntry = () => {
     triggerAutoSave();
   };
 
-  const handlePromptSelect = (prompt: string) => {
-    setContent(prompt + '\n\n');
-    textareaRef.current?.focus();
-  };
+
 
   const handleDone = async () => {
     // Cancel any pending auto-save
