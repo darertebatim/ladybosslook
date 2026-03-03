@@ -690,7 +690,7 @@ export default function TasksBank() {
                 className="gap-2"
               >
                 <Layers className="h-4 w-4" />
-                Create Ritual
+                Create Routine
               </Button>
               <Button
                 size="sm"
