@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, MessageCircle, Compass, Music, Users, Headset } from 'lucide-react';
+import { Home, MessageCircle, Compass, Music, Users, Headset, CalendarPlus } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
