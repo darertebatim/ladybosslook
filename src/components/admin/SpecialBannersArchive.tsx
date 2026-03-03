@@ -33,7 +33,6 @@ const specialBanners: SpecialBanner[] = [
       'Hidden when Welcome card is active',
       'Tapping navigates to /app/onboarding',
       'Auto-dismisses after onboarding is completed',
-      'First-time Simora Plus users see the V2 paywall variant',
     ],
   },
 ];
