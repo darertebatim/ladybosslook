@@ -433,15 +433,17 @@ const AppStore = () => {
                       onClick={() => navigate(`/app/breathe?exercise=${exercise.id}`, { state: { from: location.pathname } })}
                       className="shrink-0 w-24 text-center transition-transform active:scale-[0.97]"
                     >
-                      <div className="h-24 w-24 rounded-2xl bg-muted flex items-center justify-center mb-1.5">
-                        <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} />
+                      <div className="relative h-24 w-24 overflow-visible mb-1.5">
+                        <div className="h-full w-full rounded-2xl bg-muted flex items-center justify-center">
+                          <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} />
+                        </div>
+                        {exercise.is_premium && (
+                          <div className="absolute -top-2.5 left-0 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                            <Crown className="h-2.5 w-2.5" /> PLUS
+                          </div>
+                        )}
                       </div>
                       <p className="text-xs font-medium line-clamp-2 leading-tight">{exercise.name}</p>
-                      {exercise.is_premium && (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-600 font-semibold mt-0.5">
-                          <Crown className="h-2.5 w-2.5" /> PLUS
-                        </span>
-                      )}
                     </button>
                   ))}
                 </div>
