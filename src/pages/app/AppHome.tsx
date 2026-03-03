@@ -844,8 +844,7 @@ const AppHome = () => {
                 </div>
               ) : filteredTasks.length > 0 ? (
                 <div>
-                  {/* Onboarding Banner - hidden while welcome card is active */}
-                  {!showWelcomeCard && <OnboardingBanner />}
+                  {/* Mood Check-in Banner - above actions, hidden while welcome card is active */}
                   {/* Mood Check-in Banner - hidden while welcome card is active */}
                   {!showWelcomeCard && <MoodCheckInBanner />}
                   {/* My Actions header - always show */}
