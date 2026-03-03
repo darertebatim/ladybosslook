@@ -133,10 +133,12 @@ const AppHome = () => {
     localStorage.getItem('simora_welcome_card_action_added') === 'true'
   );
   
-  // Dismissed individual ritual card IDs
-  const [dismissedRitualIds, setDismissedRitualIds] = useState<Set<string>>(() => {
+  // Dismissed individual routine card IDs
+  const [dismissedRoutineIds, setDismissedRoutineIds] = useState<Set<string>>(() => {
     try {
-      return new Set(JSON.parse(localStorage.getItem('simora_dismissed_ritual_ids') || '[]'));
+      const oldKey = localStorage.getItem('simora_dismissed_ritual_ids');
+      const newKey = localStorage.getItem('simora_dismissed_routine_ids');
+      return new Set(JSON.parse(newKey || oldKey || '[]'));
     } catch { return new Set(); }
   });
   
