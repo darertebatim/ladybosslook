@@ -81,7 +81,7 @@ export function AddToRoutineHandHint({ show }: AddToRoutineHandHintProps) {
   );
 }
 
-export function SaveRitualHandHint({ show }: AddToRitualHandHintProps) {
+export function SaveRoutineHandHint({ show }: AddToRoutineHandHintProps) {
   if (!show) return null;
 
   return (

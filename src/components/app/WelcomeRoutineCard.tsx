@@ -258,15 +258,15 @@ export function WelcomeRoutineCard({ onActionAdded, onDismiss }: WelcomeRoutineC
       {!isFlipped && (
         <div className="w-full cursor-pointer" onClick={handleFlip}>
           <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-md">
-            {welcomeRitual?.cover_image_url ? (
+            {welcomeRoutine?.cover_image_url ? (
               <img 
-                src={welcomeRitual.cover_image_url} 
+                src={welcomeRoutine.cover_image_url} 
                 alt={title} 
                 className="w-full h-full object-cover"
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center">
-                <FluentEmoji emoji={welcomeRitualInfo.emoji || '✨'} size={96} className="opacity-40" />
+                <FluentEmoji emoji={welcomeRoutineInfo.emoji || '✨'} size={96} className="opacity-40" />
               </div>
             )}
             

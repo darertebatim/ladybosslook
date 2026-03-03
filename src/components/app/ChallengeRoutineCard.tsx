@@ -25,7 +25,7 @@ export const ChallengeRoutineCard = ({
         <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
           <Trophy className="w-3.5 h-3.5 text-amber-600" />
         </div>
-        <h3 className="text-sm font-semibold text-gray-900">Challenge Ritual</h3>
+        <h3 className="text-sm font-semibold text-gray-900">Challenge Routine</h3>
       </div>
       
       {/* Challenge info */}

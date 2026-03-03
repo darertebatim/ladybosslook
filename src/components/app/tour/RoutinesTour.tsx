@@ -62,7 +62,7 @@ export function RoutinesTour({ isFirstVisit = false, onTourReady }: RoutinesTour
   ], []);
 
   const tour = useFeatureTour({
-    feature: 'rituals',
+    feature: 'routines',
     steps,
     triggerOnMount: false,
   });
