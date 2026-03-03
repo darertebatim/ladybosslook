@@ -622,7 +622,7 @@ export default function TasksBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
-      toast.success(`${selectedTasks.length} action(s) added to ritual!`);
+      toast.success(`${selectedTasks.length} action(s) added to routine!`);
       setAddToRoutineOpen(false);
       setSelectedRoutineId('');
       clearSelection();
