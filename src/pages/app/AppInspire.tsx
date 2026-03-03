@@ -100,10 +100,7 @@ export default function AppInspire() {
         <div className="pb-safe w-full max-w-full">
           {/* Categories - quick nav */}
           {categories && categories.length > 0 && (
-            <div className="mt-5">
-              <h2 className="text-sm font-semibold text-muted-foreground px-4 mb-3">
-                BROWSE CATEGORIES
-              </h2>
+            <div className="mt-4">
               <ScrollArea className="w-full tour-routine-categories">
                 <div className="flex gap-2 px-4 pb-2">
                   {nonEmptyCategories.filter(c => c.slug !== 'pro').map((category) => (
@@ -152,7 +149,7 @@ export default function AppInspire() {
               {filteredPopular && filteredPopular.length > 0 && (
                 <section id="routine-category-popular">
                   <div className="flex items-center justify-between mb-2 px-4">
-                    <h2 className="text-sm font-semibold text-foreground">Popular</h2>
+                    <h2 className="text-base font-bold text-foreground">Popular</h2>
                   </div>
                   <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
                     {filteredPopular.map((routine, index) => (
@@ -176,7 +173,7 @@ export default function AppInspire() {
                 return (
                   <section key={category.slug} id={`routine-category-${category.slug}`}>
                     <div className="flex items-center justify-between mb-2 px-4">
-                      <h2 className="text-sm font-semibold text-foreground">{category.name}</h2>
+                      <h2 className="text-base font-bold text-foreground">{category.name}</h2>
                       <button
                         onClick={() => navigate(`/app/routines/category/${category.slug}`, { state: { from: location.pathname } })}
                         className="text-xs text-primary font-medium flex items-center gap-0.5"
@@ -207,7 +204,7 @@ export default function AppInspire() {
                 return (
                   <section id="routine-category-pro">
                     <div className="flex items-center justify-between mb-2 px-4">
-                      <h2 className="text-sm font-semibold text-foreground">{proCat.name}</h2>
+                      <h2 className="text-base font-bold text-foreground">{proCat.name}</h2>
                       <button
                         onClick={() => navigate(`/app/routines/category/pro`, { state: { from: location.pathname } })}
                         className="text-xs text-primary font-medium flex items-center gap-0.5"
