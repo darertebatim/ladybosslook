@@ -85,7 +85,7 @@ export const MonthCalendar = ({
               >
                 <div
                   className={cn(
-                    'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative overflow-hidden',
+                    'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
                     !isCurrentMonth && 'text-muted-foreground/30',
                     isCurrentMonth && !isSelected && !isTodayDate && !hasBadge && 'hover:bg-muted/50',
                     isSelected && !hasBadge && 'bg-violet-600 text-white shadow-md',
@@ -93,22 +93,20 @@ export const MonthCalendar = ({
                     hasBadge && isSelected && 'ring-2 ring-violet-600 ring-offset-1'
                   )}
                 >
+                  {hasProgramEvents && isCurrentMonth && (
+                    <Star className={cn(
+                      "absolute -top-0.5 -right-0.5 h-3 w-3 z-20",
+                      isSelected ? "text-indigo-300 fill-indigo-300" : "text-indigo-500 fill-indigo-500"
+                    )} />
+                  )}
                   {hasBadge && isCurrentMonth ? (
                     <img 
                       src={BADGE_IMAGES[badgeLevel]} 
                       alt={`${badgeLevel} badge`}
-                      className="w-[140%] h-[140%] object-cover"
+                      className="w-[140%] h-[140%] object-cover overflow-hidden rounded-full"
                     />
                   ) : (
-                    <>
-                      {hasProgramEvents && isCurrentMonth && (
-                        <Star className={cn(
-                          "absolute -top-0.5 -right-0.5 h-3 w-3",
-                          isSelected ? "text-indigo-300 fill-indigo-300" : "text-indigo-500 fill-indigo-500"
-                        )} />
-                      )}
-                      <span className="relative z-10">{format(dateItem, 'd')}</span>
-                    </>
+                    <span className="relative z-10">{format(dateItem, 'd')}</span>
                   )}
                 </div>
               </button>
