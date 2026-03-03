@@ -515,7 +515,7 @@ export function useAddRoutineFromBank() {
               repeatPattern = 'none';
             }
           } else {
-            // Normal rituals: use per-task repeat from bank, allow user edits to override
+            // Normal routines: use per-task repeat from bank, allow user edits to override
             const monthlyDay = (task as any).monthly_day as number | null;
             const isOnce = (task as any).is_once === true;
             

@@ -336,9 +336,9 @@ export function PromoBanner({
         break;
       case 'routines_hub':
         if (activeBanner.destination_id) {
-          navigate(`/app/rituals/${activeBanner.destination_id}`);
+          navigate(`/app/routines/${activeBanner.destination_id}`);
         } else {
-          navigate('/app/rituals');
+          navigate('/app/routines');
         }
         break;
       case 'tasks_bank':

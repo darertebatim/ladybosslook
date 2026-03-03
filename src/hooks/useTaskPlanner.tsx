@@ -630,11 +630,11 @@ export const useQuickAddPlaylistTask = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['playlist-task-exists'] });
-      toast({ title: 'Added to your rituals! 🎧' });
+      toast({ title: 'Added to your routines! 🎧' });
     },
     onError: (error) => {
       console.error('Quick add playlist task error:', error);
-      toast({ title: 'Failed to add to rituals', variant: 'destructive' });
+      toast({ title: 'Failed to add to routines', variant: 'destructive' });
     },
   });
 };

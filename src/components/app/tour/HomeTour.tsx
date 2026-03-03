@@ -19,7 +19,7 @@ interface HomeTourProps {
 
 export function HomeTour({
   hasEnrolledPrograms = false,
-  hasSuggestedRituals = false,
+  hasSuggestedRoutines = false,
   hasWelcomeCard = false,
   isFirstOpen = false,
   forceShow = false,

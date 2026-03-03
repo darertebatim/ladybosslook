@@ -182,7 +182,7 @@ export default function AppVideoPlaylistDetail() {
         <BackButton className="text-white" />
         <AddedToRoutineButton
           isAdded={!!existingTask}
-          onAddClick={handleAddToRituals}
+          onAddClick={handleAddToRoutines}
           isLoading={addRoutinePlan.isPending}
           iconOnly
         />
