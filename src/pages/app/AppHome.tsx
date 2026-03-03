@@ -686,7 +686,7 @@ const AppHome = () => {
                           
                           {/* Badge or Number */}
                           <div className={cn(
-                            'w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5 overflow-hidden',
+                            'w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5',
                             !hasBadge && (isSelected 
                               ? 'bg-white text-foreground dark:bg-white dark:text-foreground'
                               : isTodayDate 
@@ -694,17 +694,17 @@ const AppHome = () => {
                                 : 'text-[#C6C1CF]'),
                             hasBadge && isSelected && "ring-2 ring-white ring-offset-1 ring-offset-chip-lavender"
                           )}>
+                            {hasProgramEvents && (
+                              <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5 z-20", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />
+                            )}
                             {hasBadge ? (
                               <img 
                                 src={BADGE_IMAGES[badgeLevel]} 
                                 alt={`${badgeLevel} badge`}
-                                className="w-[140%] h-[140%] object-cover"
+                                className="w-[140%] h-[140%] object-cover overflow-hidden rounded-full"
                               />
                             ) : (
-                              <>
-                                {hasProgramEvents && <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />}
-                                <span className="relative z-10">{format(day, 'd')}</span>
-                              </>
+                              <span className="relative z-10">{format(day, 'd')}</span>
                             )}
                           </div>
                         </div>
