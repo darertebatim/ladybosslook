@@ -2,7 +2,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay } from 'date-fns';
+import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay, subDays } from 'date-fns';
 import { Plus, Flame, CalendarDays, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Heart } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { HomeMenu } from '@/components/app/HomeMenu';
@@ -664,7 +664,26 @@ const AppHome = () => {
               style={{ gridTemplateRows: showCalendar ? '0fr' : '1fr' }}
             >
               <div className="min-h-0">
-                <div className={cn("flex mt-1 transition-opacity duration-200", showCalendar ? "opacity-0" : "opacity-100")}>
+                <div 
+                  className={cn("flex mt-1 transition-opacity duration-200", showCalendar ? "opacity-0" : "opacity-100")}
+                  onTouchStart={(e) => {
+                    const touch = e.touches[0];
+                    (e.currentTarget as any)._swipeStartX = touch.clientX;
+                  }}
+                  onTouchEnd={(e) => {
+                    const startX = (e.currentTarget as any)._swipeStartX;
+                    if (startX == null) return;
+                    const endX = e.changedTouches[0].clientX;
+                    const diff = startX - endX;
+                    if (Math.abs(diff) > 50) {
+                      // Swipe left = next week, swipe right = prev week
+                      const newDate = diff > 0 ? addDays(selectedDate, 7) : subDays(selectedDate, 7);
+                      setSelectedDate(newDate);
+                      setCurrentMonth(startOfMonth(newDate));
+                      haptic.light();
+                    }
+                  }}
+                >
                   {weekDays.map(day => {
                   const isSelected = isSameDay(day, selectedDate);
                   const isTodayDate = isToday(day);
