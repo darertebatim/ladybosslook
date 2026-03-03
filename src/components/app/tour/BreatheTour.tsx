@@ -26,10 +26,10 @@ export function BreatheTour({ isFirstVisit = false, onTourReady }: BreatheTourPr
       condition: () => !!document.querySelector('.tour-exercise-card'),
     },
     {
-      id: 'add-to-rituals',
+      id: 'add-to-routines',
       target: '.tour-add-to-routine',
-      title: 'Add to Rituals',
-      description: 'Tap the + button to add this breathing exercise to your Rituals (Planner) so you can repeat it daily.',
+      title: 'Add to Routines',
+      description: 'Tap the + button to add this breathing exercise to your Routines (Planner) so you can repeat it daily.',
       position: 'left',
       action: 'tap',
       condition: () => !!document.querySelector('.tour-add-to-routine'),

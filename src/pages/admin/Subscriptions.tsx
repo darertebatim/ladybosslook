@@ -52,7 +52,7 @@ const PLUS_FEATURES = [
     category: 'Content & Programs',
     description: 'Content access',
     items: [
-      { icon: Sparkles, label: 'Rituals Library', detail: 'Browse freely; saving to planner requires simora+', free: true },
+      { icon: Sparkles, label: 'Routines Library', detail: 'Browse freely; saving to planner requires simora+', free: true },
       { icon: Brain, label: 'Gated Playlists', detail: 'Playlists marked as gated require simora+', free: false },
       { icon: BookOpen, label: 'Guided Programs', detail: 'Courses & coaching content available to all', free: true },
     ],

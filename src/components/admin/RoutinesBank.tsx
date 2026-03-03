@@ -1680,7 +1680,7 @@ export default function RoutinesBank() {
           <DialogFooter className="pt-4 border-t">
             <Button variant="outline" onClick={closeDialog}>Cancel</Button>
             <Button onClick={handleSave} disabled={createRoutine.isPending || updateRoutine.isPending}>
-              {editingRoutine ? 'Save Changes' : 'Create Ritual'}
+              {editingRoutine ? 'Save Changes' : 'Create Routine'}
             </Button>
           </DialogFooter>
         </DialogContent>
