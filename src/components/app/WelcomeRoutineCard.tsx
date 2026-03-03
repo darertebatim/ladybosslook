@@ -86,7 +86,7 @@ export function WelcomeRoutineCard({ onActionAdded, onDismiss }: WelcomeRoutineC
   };
 
   const handleContinue = async () => {
-    if (selectedActions.size === 0 || !welcomeRitualInfo?.id) return;
+    if (selectedActions.size === 0 || !welcomeRoutineInfo?.id) return;
     
     setIsSubmitting(true);
     haptic.light();
