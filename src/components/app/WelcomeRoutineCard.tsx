@@ -126,10 +126,10 @@ export function WelcomeRoutineCard({ onActionAdded, onDismiss }: WelcomeRoutineC
   };
 
   if (dismissed) return null;
-  if (welcomeLoading || !welcomeRitualInfo) return null;
+  if (welcomeLoading || !welcomeRoutineInfo) return null;
   
-  const title = welcomeRitualInfo.title || 'Your day is open';
-  const subtitle = welcomeRitualInfo.subtitle || 'Tap to pick your first actions';
+  const title = welcomeRoutineInfo.title || 'Your day is open';
+  const subtitle = welcomeRoutineInfo.subtitle || 'Tap to pick your first actions';
 
   return (
     <>
