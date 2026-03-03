@@ -106,7 +106,7 @@ export const wellnessTools: ToolConfig[] = [
 export const audioTools: ToolConfig[] = [
   {
     id: 'meditate',
-    name: 'Meditate',
+    name: 'Guided Meditation',
     icon: 'Brain',
     bgColor: 'bg-[#E8E4F8]',
     iconColor: 'text-indigo-600',
