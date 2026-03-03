@@ -96,7 +96,7 @@ export function WelcomeRoutineCard({ onActionAdded, onDismiss }: WelcomeRoutineC
       setShowAddingAnimation(true);
       
       await addRoutine.mutateAsync({
-        routineId: welcomeRitualInfo.id,
+        routineId: welcomeRoutineInfo.id,
         selectedTaskIds: Array.from(selectedActions),
       });
       
