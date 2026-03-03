@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
-const STORAGE_KEY = 'ritual_add_hint_dismissed';
-const SAVE_HINT_KEY = 'ritual_save_hint_dismissed';
+const STORAGE_KEY = 'routine_add_hint_dismissed';
+const SAVE_HINT_KEY = 'routine_save_hint_dismissed';
 
-export function useAddToRitualHint() {
+export function useAddToRoutineHint() {
   const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
