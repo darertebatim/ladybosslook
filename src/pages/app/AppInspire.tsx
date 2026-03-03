@@ -84,7 +84,7 @@ export default function AppInspire() {
           <div className="px-4 pb-2 animate-in slide-in-from-top duration-200">
             <Input
               type="search"
-              placeholder="Search rituals..."
+              placeholder="Search routines..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-muted/50"
