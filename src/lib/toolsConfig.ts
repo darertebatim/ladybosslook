@@ -13,7 +13,7 @@ export interface ToolConfig {
 export const wellnessTools: ToolConfig[] = [
   {
     id: 'routines',
-    name: 'Routines',
+    name: 'Routine Bank',
     icon: 'CalendarPlus',
     bgColor: 'bg-[#D1FAE5]',
     iconColor: 'text-emerald-600',
@@ -22,7 +22,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'reflections',
-    name: 'Reflections',
+    name: 'Guided Reflections',
     icon: 'Brain',
     bgColor: 'bg-[#CCFBF1]',
     iconColor: 'text-teal-600',
@@ -31,7 +31,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'journal',
-    name: 'Journal',
+    name: 'Journal Writing',
     icon: 'BookOpen',
     bgColor: 'bg-[#FAE5C5]',
     iconColor: 'text-orange-600',
@@ -40,7 +40,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'breathe',
-    name: 'Breathe',
+    name: 'Breathe Practice',
     icon: 'Wind',
     bgColor: 'bg-[#D3F2EA]',
     iconColor: 'text-teal-600',
@@ -49,7 +49,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'water',
-    name: 'Water',
+    name: 'Water Tracker',
     icon: 'Droplets',
     bgColor: 'bg-[#D6E6FC]',
     iconColor: 'text-blue-600',
@@ -58,7 +58,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'emotions',
-    name: 'Emotions',
+    name: 'Emotion Check',
     icon: 'HeartHandshake',
     bgColor: 'bg-[#EDE9FE]',
     iconColor: 'text-violet-600',
@@ -67,7 +67,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'period',
-    name: 'Period',
+    name: 'Period Tracker',
     icon: 'Heart',
     bgColor: 'bg-[#FCE4EC]',
     iconColor: 'text-pink-600',
@@ -76,7 +76,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'fasting',
-    name: 'Fasting',
+    name: 'Fasting Timer',
     icon: 'Timer',
     bgColor: 'bg-[#FFE4C4]',
     iconColor: 'text-amber-600',
@@ -106,7 +106,7 @@ export const wellnessTools: ToolConfig[] = [
 export const audioTools: ToolConfig[] = [
   {
     id: 'meditate',
-    name: 'Meditate',
+    name: 'Guided Meditation',
     icon: 'Brain',
     bgColor: 'bg-[#E8E4F8]',
     iconColor: 'text-indigo-600',
@@ -124,7 +124,7 @@ export const audioTools: ToolConfig[] = [
   },
   {
     id: 'soundscape',
-    name: 'Soundscapes',
+    name: 'Sound Scapes',
     icon: 'Waves',
     bgColor: 'bg-[#D4F1F4]',
     iconColor: 'text-cyan-600',

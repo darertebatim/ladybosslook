@@ -298,7 +298,7 @@ const AppStore = () => {
                     ))}
                 </div>
                 {/* Row 2: Plus tools */}
-                <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pt-1 pb-2 scrollbar-hide">
+                <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
                   {filteredWellnessTools
                     .filter(t => ['fasting', 'emotions', 'water', 'period'].includes(t.id))
                     .map((tool) => (
@@ -319,7 +319,7 @@ const AppStore = () => {
               <section className="tour-programs-section">
                 <div className="flex items-center justify-between mb-2 px-1">
                   <h2 className="tour-programs-section-header text-sm font-semibold text-foreground">
-                    Browse Programs
+                    Academy Programs
                   </h2>
                   <Link to="/app/academy" className="text-xs text-primary font-medium flex items-center gap-0.5">
                     All <ChevronRight className="h-3.5 w-3.5" />
