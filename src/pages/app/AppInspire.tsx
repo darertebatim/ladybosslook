@@ -154,7 +154,7 @@ export default function AppInspire() {
                   <div className="flex items-center justify-between mb-2 px-4">
                     <h2 className="text-sm font-semibold text-foreground">Popular</h2>
                   </div>
-                  <div className="flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide">
+                  <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
                     {filteredPopular.map((routine, index) => (
                       <div key={routine.id} className="shrink-0 w-40">
                         <RoutineBankCard
