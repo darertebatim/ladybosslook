@@ -334,10 +334,11 @@ const AppStore = () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                  <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
                     {filteredPrograms.map((program: any) => {
                       const enrolled = isEnrolled(program.slug);
                       const isEnrolling = enrollingSlug === program.slug;
+                      const isFree = !enrolled && !program._isWaitlist && (program.isFree || program.priceAmount === 0);
                       
                       return (
                         <button
@@ -345,26 +346,28 @@ const AppStore = () => {
                           onClick={() => navigate(`/app/programs/${program.slug}`, { state: { from: location.pathname } })}
                           className="relative shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
                         >
-                          <div className="h-32 w-32 rounded-2xl overflow-hidden bg-muted mb-1.5">
-                            {program.image ? (
-                              <CachedImage src={program.image} alt={program.title} className="w-full h-full object-cover" />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center bg-primary/10">
-                                <Sparkles className="h-8 w-8 text-primary/40" />
+                          <div className="relative h-32 w-32 overflow-visible mb-1.5">
+                            <div className="h-full w-full rounded-2xl overflow-hidden bg-muted">
+                              {program.image ? (
+                                <CachedImage src={program.image} alt={program.title} className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-primary/10">
+                                  <Sparkles className="h-8 w-8 text-primary/40" />
+                                </div>
+                              )}
+                            </div>
+                            {enrolled && (
+                              <div className="absolute -top-2.5 left-1 z-10 bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                                <CheckCircle2 className="h-2.5 w-2.5" /> Enrolled
+                              </div>
+                            )}
+                            {isFree && (
+                              <div className="absolute -top-2.5 left-1 z-10 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+                                FREE
                               </div>
                             )}
                           </div>
                           <p className="text-xs font-medium line-clamp-2 leading-tight">{program.title}</p>
-                          {enrolled && (
-                            <span className="inline-flex items-center gap-0.5 text-[10px] text-green-600 font-semibold mt-0.5">
-                              <CheckCircle2 className="h-2.5 w-2.5" /> Enrolled
-                            </span>
-                          )}
-                          {!enrolled && !program._isWaitlist && (program.isFree || program.priceAmount === 0) && (
-                            <span className="inline-flex items-center gap-0.5 text-[10px] text-primary font-semibold mt-0.5">
-                              FREE
-                            </span>
-                          )}
                           {isEnrolling && (
                             <div className="absolute inset-0 bg-background/80 backdrop-blur-sm rounded-2xl flex items-center justify-center">
                               <Loader2 className="h-6 w-6 animate-spin text-primary" />
