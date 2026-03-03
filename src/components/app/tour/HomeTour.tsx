@@ -159,7 +159,7 @@ export function HomeTour({
     }
 
     return baseSteps;
-  }, [hasEnrolledPrograms, hasSuggestedRituals, hasWelcomeCard]);
+  }, [hasEnrolledPrograms, hasSuggestedRoutines, hasWelcomeCard]);
 
   const tour = useFeatureTour({
     feature: 'home',
