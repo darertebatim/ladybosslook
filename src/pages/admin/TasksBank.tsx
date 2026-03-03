@@ -582,7 +582,7 @@ export default function TasksBank() {
       clearSelection();
     },
     onError: (error) => {
-      toast.error('Failed to create ritual: ' + error.message);
+      toast.error('Failed to create routine: ' + error.message);
     },
   });
 
