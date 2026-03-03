@@ -575,7 +575,7 @@ export default function TasksBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
-      toast.success('Ritual created! Go to Rituals Bank to edit it.');
+      toast.success('Routine created! Go to Routines Bank to edit it.');
       setCreateRoutineOpen(false);
       setNewRoutineName('');
       setNewRoutineCategory('general');
