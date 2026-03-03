@@ -29,8 +29,18 @@ interface PaywallSheetProps {
 }
 
 export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
-  const { variant } = useDefaultPaywall();
+  const { variant: defaultVariant } = useDefaultPaywall();
   const { handlePurchase, handleRestore, showCelebration, purchasedPlan, dismissCelebration } = useRevenueCat();
+
+  // First-time users see 'mascot-v2', then the default variant on subsequent views
+  const PAYWALL_SEEN_KEY = 'paywall_seen_once';
+  const hasSeenBefore = localStorage.getItem(PAYWALL_SEEN_KEY) === 'true';
+  const variant = hasSeenBefore ? defaultVariant : ('mascot-v2' as PaywallVariantId);
+
+  // Mark as seen when paywall opens
+  if (open && !hasSeenBefore) {
+    localStorage.setItem(PAYWALL_SEEN_KEY, 'true');
+  }
 
   const { data: programData } = useQuery({
     queryKey: ['paywall-program', SIMORA_PLUS_SLUG],
