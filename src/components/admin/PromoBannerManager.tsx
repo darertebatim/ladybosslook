@@ -449,7 +449,7 @@ export function PromoBannerManager() {
         return task ? `${task.emoji} ${task.title}` : 'Unknown Action';
       case 'routines_hub':
         const routineBank = routinesBank?.find(r => r.id === banner.destination_id);
-        return routineBank ? `${routineBank.emoji || '📋'} ${routineBank.title}` : 'Unknown Ritual';
+        return routineBank ? `${routineBank.emoji || '📋'} ${routineBank.title}` : 'Unknown Routine';
       case 'breathe_exercise':
         const exercise = breathingExercises?.find(e => e.id === banner.destination_id);
         return exercise ? `${exercise.emoji || '🫁'} ${exercise.name}` : 'Unknown Exercise';
