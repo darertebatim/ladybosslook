@@ -27,7 +27,7 @@ export function WelcomeRoutineCard({ onActionAdded, onDismiss }: WelcomeRoutineC
   const { data: templates = [] } = useTaskTemplates();
   const popularTemplates = templates.filter(t => t.is_popular).slice(0, 6);
 
-  const actions = welcomeRitual?.tasks?.length ? welcomeRitual.tasks : [];
+  const actions = welcomeRoutine?.tasks?.length ? welcomeRoutine.tasks : [];
   const displayActions = actions.length > 0 ? actions : popularTemplates;
 
   const existingTaskTitles = useMemo(() => 
