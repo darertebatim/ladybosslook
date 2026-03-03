@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { SaveRitualHandHint, useSaveRitualHint } from '@/components/app/AddToRitualHandHint';
+import { SaveRoutineHandHint, useSaveRoutineHint } from '@/components/app/AddToRoutineHandHint';
 import { Check, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';

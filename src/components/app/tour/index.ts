@@ -4,7 +4,7 @@ export { TourWelcomePopup } from './TourWelcomePopup';
 export { TourBanner, resetTourPrompt } from './TourBanner';
 export { TourHelpButton } from './TourHelpButton';
 export { HomeTour } from './HomeTour';
-export { RitualsTour } from './RitualsTour';
+export { RoutinesTour } from './RoutinesTour';
 export { PlayerTour } from './PlayerTour';
 export { JournalTour } from './JournalTour';
 export { BreatheTour } from './BreatheTour';
