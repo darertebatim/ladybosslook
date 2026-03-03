@@ -22,7 +22,7 @@ type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'pla
 
 const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
   { value: 'home_top', label: '🏠 Home - Above Actions' },
-  { value: 'home_rituals', label: '🏠 Home - After Rituals' },
+  { value: 'home_rituals', label: '🏠 Home - After Routines' },
   { value: 'explore', label: '🔍 Explore Page' },
   { value: 'listen', label: '🎧 Listen Page' },
   { value: 'player', label: '▶️ Audio Player' },
