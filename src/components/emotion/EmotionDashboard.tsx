@@ -65,12 +65,12 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
         editedTasks,
         syntheticTasks: [SYNTHETIC_EMOTION_TASK],
       });
-      toast.success('Emotion check-in added to your rituals!');
+      toast.success('Emotion check-in added to your routines!');
       setShowRoutineSheet(false);
       setJustAdded(true);
     } catch (error) {
-      console.error('Failed to add ritual:', error);
-      toast.error('Failed to add ritual');
+      console.error('Failed to add routine:', error);
+      toast.error('Failed to add routine');
     }
   };
 
