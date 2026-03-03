@@ -936,12 +936,12 @@ const AppHome = () => {
                 </div>
               )}
 
-              {/* Popular Rituals Suggestions - only show rituals user hasn't added */}
-              {suggestedRoutines.length > 0 && selectedTag === null && !showWelcomeCard && <div className="tour-suggested-ritual mt-6">
+              {/* Popular Routine Suggestions - only show routines user hasn't added */}
+              {suggestedRoutines.length > 0 && selectedTag === null && !showWelcomeCard && <div className="tour-suggested-routine mt-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="h-4 w-4 text-violet-500" />
                     <h2 className="text-sm font-semibold text-foreground/70 tracking-wide">
-                      Try a ritual
+                      Try a routine
                     </h2>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -951,10 +951,10 @@ const AppHome = () => {
                         routine={routine} 
                         onClick={() => navigate(`/app/routines/${routine.id}`)}
                         onDismiss={() => {
-                          const dismissed = JSON.parse(localStorage.getItem('simora_dismissed_ritual_ids') || '[]');
+                          const dismissed = JSON.parse(localStorage.getItem('simora_dismissed_routine_ids') || '[]');
                           dismissed.push(routine.id);
-                          localStorage.setItem('simora_dismissed_ritual_ids', JSON.stringify(dismissed));
-                          setDismissedRitualIds(new Set(dismissed));
+                          localStorage.setItem('simora_dismissed_routine_ids', JSON.stringify(dismissed));
+                          setDismissedRoutineIds(new Set(dismissed));
                         }}
                       />
                     ))}
