@@ -314,8 +314,8 @@ export function FastingStatsSheet({ open, onOpenChange, sessions, onDeleteSessio
       setShowRoutineSheet(false);
       setJustAdded(true);
     } catch (error) {
-      console.error('Failed to add ritual:', error);
-      toast.error('Failed to add ritual');
+      console.error('Failed to add routine:', error);
+      toast.error('Failed to add routine');
     }
   };
 
