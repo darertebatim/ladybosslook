@@ -18,12 +18,12 @@ export function RoutinesTour({ isFirstVisit = false, onTourReady }: RoutinesTour
     },
     {
       id: 'categories',
-      target: '.tour-ritual-categories',
+      target: '.tour-routine-categories',
       title: 'Categories',
       description: 'Filter by type: morning, evening, focus, and more.',
       position: 'bottom',
       action: 'tap',
-      condition: () => !!document.querySelector('.tour-ritual-categories'),
+      condition: () => !!document.querySelector('.tour-routine-categories'),
     },
     {
       id: 'ritual-card',
