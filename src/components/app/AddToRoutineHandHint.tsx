@@ -23,7 +23,7 @@ export function useAddToRoutineHint() {
   return { showHint, dismissHint };
 }
 
-export function useSaveRitualHint(isSheetOpen: boolean) {
+export function useSaveRoutineHint(isSheetOpen: boolean) {
   const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
