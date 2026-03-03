@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, X, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 import type { PaywallProgramData } from './PaywallClassic';
 import mascotHero from '@/assets/paywall-plus-mascot-hero.png';
 import mascotBottom from '@/assets/paywall-plus-mascot-bottom.png';
@@ -114,7 +115,13 @@ export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, previ
           <p style={{ textAlign: 'center', fontSize: 22, fontWeight: 800, color: '#0a0a0a', margin: '0 0 20px', letterSpacing: -0.3 }}>What you get</p>
           <div style={{ paddingLeft: 20, paddingRight: 20 }}>
             {FEATURES.map((feature, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 22 }}>
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -24 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.15 + i * 0.1, duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
+                style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 22 }}
+              >
                 <div style={{ width: 58, height: 58, borderRadius: '50%', background: '#f3f3f5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   {feature.img === null ? (
                     <div style={{ position: 'relative', width: 34, height: 34 }}>
@@ -131,7 +138,7 @@ export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, previ
                   <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: '#0f0f0f', lineHeight: 1.2, letterSpacing: -0.2 }}>{feature.title}</p>
                   {feature.desc && <p style={{ margin: '3px 0 0', fontSize: 14, fontWeight: 400, color: '#8e8e93', lineHeight: 1.4 }}>{feature.desc}</p>}
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
 
