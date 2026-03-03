@@ -682,7 +682,7 @@ export default function TasksBank() {
                 className="gap-2"
               >
                 <FolderPlus className="h-4 w-4" />
-                Add to Ritual
+                Add to Routine
               </Button>
               <Button
                 size="sm"
