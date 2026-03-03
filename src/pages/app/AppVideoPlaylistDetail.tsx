@@ -71,7 +71,7 @@ export default function AppVideoPlaylistDetail() {
   const { data: enrollments } = useEnrollments();
   const { hasAccessToProgram } = useSubscription();
 
-  // Add to rituals via RoutinePreviewSheet
+  // Add to routines via RoutinePreviewSheet
   const { data: existingTask } = useExistingVideoPlaylistTask(playlistId);
   const addRoutinePlan = useAddRoutinePlan();
 
