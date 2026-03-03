@@ -85,7 +85,7 @@ export const MonthCalendar = ({
               >
                 <div
                   className={cn(
-                    'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
+                    'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative overflow-hidden',
                     !isCurrentMonth && 'text-muted-foreground/30',
                     isCurrentMonth && !isSelected && !isTodayDate && !hasBadge && 'hover:bg-muted/50',
                     isSelected && !hasBadge && 'bg-violet-600 text-white shadow-md',
