@@ -258,7 +258,7 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
         ) : (
           <AddedToRoutineButton
             isAdded={isAdded}
-            onAddClick={handleAddToRituals}
+            onAddClick={handleAddToRoutines}
             iconOnly
           />
         )}
