@@ -72,12 +72,26 @@ const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, 
     >
       <div className="flex gap-3 p-3">
         {/* Square thumbnail */}
-        <div className="relative h-24 w-24 flex-shrink-0 rounded-xl overflow-hidden">
-          {image ? (
-            <CachedImage src={image} alt={title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-white/10 flex items-center justify-center">
-              <TypeIcon className="h-8 w-8 text-white/30" />
+        <div className="relative h-24 w-24 flex-shrink-0 rounded-xl overflow-visible">
+          <div className="h-full w-full rounded-xl overflow-hidden">
+            {image ? (
+              <CachedImage src={image} alt={title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-white/10 flex items-center justify-center">
+                <TypeIcon className="h-8 w-8 text-white/30" />
+              </div>
+            )}
+          </div>
+          {/* Enrolled badge */}
+          {isEnrolled && (
+            <div className="absolute -top-2 -left-1 z-10 bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+              <CheckCircle2 className="h-2.5 w-2.5" /> Enrolled
+            </div>
+          )}
+          {/* FREE badge */}
+          {isFree && !isEnrolled && (
+            <div className="absolute -top-2 -left-1 z-10 bg-white text-[#132240] text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+              FREE
             </div>
           )}
           {/* Lock icon for waitlist */}
@@ -100,19 +114,8 @@ const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, 
           {/* Title */}
           <h3 className="font-bold text-sm text-white line-clamp-2 leading-snug">{title}</h3>
 
-          {/* Badges row */}
+          {/* Language flag */}
           <div className="flex items-center gap-1.5 mt-0.5">
-            {isEnrolled && (
-              <Badge className="bg-green-500 hover:bg-green-500 text-white rounded-full text-[10px] px-1.5 py-0 gap-0.5 shadow-sm h-4">
-                <CheckCircle2 className="h-2.5 w-2.5" />
-                Enrolled
-              </Badge>
-            )}
-            {isFree && !isEnrolled && (
-              <Badge className="bg-white hover:bg-white text-[#132240] rounded-full text-[10px] px-1.5 py-0 shadow-sm h-4 font-semibold">
-                FREE
-              </Badge>
-            )}
             {language && language !== 'all' && (
               language === 'persian'
                 ? <PersianFlag size={10} />
