@@ -47,7 +47,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
   const videoType = detectVideoType(url);
   const vertical = isVerticalOverride ?? isVerticalVideo(url);
 
-  // Add to rituals for individual video
+  // Add to routines for individual video
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const { data: existingTask } = useExistingVideoTask(videoId);
   const addRoutinePlan = useAddRoutinePlan();
