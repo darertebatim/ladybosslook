@@ -325,7 +325,7 @@ export function PromoBanner({
         navigate('/app/home');
         break;
       case 'inspire':
-        navigate('/app/rituals');
+        navigate('/app/routines');
         break;
       case 'tasks':
         if (activeBanner.destination_id) {
