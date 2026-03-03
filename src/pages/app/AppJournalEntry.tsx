@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useJournalEntry, useCreateJournalEntry, useUpdateJournalEntry, useDeleteJournalEntry } from '@/hooks/useJournal';
 import { MoodSelector } from '@/components/app/MoodSelector';
-import { WritingPrompts } from '@/components/app/WritingPrompts';
+
 import { JournalEntrySkeleton } from '@/components/app/skeletons/JournalSkeleton';
 import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
