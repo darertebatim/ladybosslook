@@ -298,7 +298,7 @@ const AppStore = () => {
                     ))}
                 </div>
                 {/* Row 2: Plus tools */}
-                <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pt-1 pb-2 scrollbar-hide">
+                <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
                   {filteredWellnessTools
                     .filter(t => ['fasting', 'emotions', 'water', 'period'].includes(t.id))
                     .map((tool) => (
