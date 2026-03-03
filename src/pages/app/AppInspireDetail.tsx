@@ -81,7 +81,7 @@ export default function AppInspireDetail() {
   const navigate = useNavigate();
   const [showPreviewSheet, setShowPreviewSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
-  const { showHint, dismissHint } = useAddToRitualHint();
+  const { showHint, dismissHint } = useAddToRoutineHint();
   
   const { data: routine, isLoading } = useRoutineBankDetail(planId);
   const { data: addedRoutineIds = [] } = useUserAddedBankRoutines();
