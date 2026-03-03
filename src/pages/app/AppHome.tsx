@@ -961,7 +961,7 @@ const AppHome = () => {
                   </div>
                 </div>}
 
-              {/* Tour Banner & Promo - always visible regardless of ritual cards */}
+              {/* Tour Banner & Promo - always visible regardless of routine cards */}
               {selectedTag === null && <>
                 <div id="tour-banner-slot" className="mt-4" />
                 <PromoBanner location="home_rituals" className="mt-4" />
