@@ -1103,7 +1103,7 @@ export default function RoutinesBank() {
                       placeholder="https://youtube.com/watch?v=... or https://example.com/video.mp4"
                     />
                     {formData.video_url && (
-                      <p className="text-xs text-muted-foreground">Video will appear below the cover image on the ritual page.</p>
+                      <p className="text-xs text-muted-foreground">Video will appear below the cover image on the routine page.</p>
                     )}
                   </div>
 
