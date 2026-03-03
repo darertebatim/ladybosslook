@@ -152,10 +152,10 @@ export default function AppInspire() {
             <div className="mt-5 px-4 w-full max-w-full overflow-hidden pb-8">
               <h2 className="text-sm font-semibold text-muted-foreground mb-3">
                 {selectedCategory === 'popular'
-                  ? 'POPULAR RITUALS'
+                  ? 'POPULAR ROUTINES'
                   : selectedCategory === 'all'
-                  ? 'ALL RITUALS'
-                  : categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'RITUALS'
+                  ? 'ALL ROUTINES'
+                  : categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'ROUTINES'
                 }
               </h2>
 
