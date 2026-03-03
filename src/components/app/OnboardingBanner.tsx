@@ -14,6 +14,8 @@ export function OnboardingBanner() {
 
   const handleTap = () => {
     haptic.medium();
+    // Reset progress so onboarding always starts from the beginning
+    localStorage.removeItem(ONBOARDING_PROGRESS_KEY);
     navigate('/app/onboarding/me-plus-v1');
   };
 
