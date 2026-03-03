@@ -6,7 +6,7 @@ import { TourBanner } from './TourBanner';
 
 interface HomeTourProps {
   hasEnrolledPrograms?: boolean;
-  hasSuggestedRituals?: boolean;
+  hasSuggestedRoutines?: boolean;
   hasWelcomeCard?: boolean;
   isFirstOpen?: boolean;
   /** Server indicates 0 completions - bypass localStorage flags */
