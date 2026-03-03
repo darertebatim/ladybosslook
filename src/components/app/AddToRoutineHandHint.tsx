@@ -46,11 +46,11 @@ export function useSaveRoutineHint(isSheetOpen: boolean) {
   return { showHint, dismissHint };
 }
 
-interface AddToRitualHandHintProps {
+interface AddToRoutineHandHintProps {
   show: boolean;
 }
 
-export function AddToRitualHandHint({ show }: AddToRitualHandHintProps) {
+export function AddToRoutineHandHint({ show }: AddToRoutineHandHintProps) {
   if (!show) return null;
 
   return (
