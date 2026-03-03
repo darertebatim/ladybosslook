@@ -23,6 +23,19 @@ const specialBanners: SpecialBanner[] = [
       'Tapping navigates to /app/mood',
     ],
   },
+  {
+    name: 'Simora Onboarding',
+    component: 'OnboardingBanner',
+    location: 'Home (above My Actions)',
+    description: 'Guides new users through the onboarding flow. Features the Simora mascot with a notepad illustration.',
+    conditions: [
+      'Shown only to users who haven\'t completed onboarding',
+      'Hidden when Welcome card is active',
+      'Tapping navigates to /app/onboarding',
+      'Auto-dismisses after onboarding is completed',
+      'First-time Simora Plus users see the V2 paywall variant',
+    ],
+  },
 ];
 
 export function SpecialBannersArchive() {
