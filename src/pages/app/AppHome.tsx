@@ -662,7 +662,7 @@ const AppHome = () => {
 
             {/* Week strip - Me+ style with badges + scroll arrows */}
             <div 
-              className={cn("grid overflow-hidden")} 
+              className={cn("grid", showCalendar ? "overflow-hidden" : "")} 
               style={{ gridTemplateRows: showCalendar ? '0fr' : '1fr' }}
             >
               <div className="min-h-0">
