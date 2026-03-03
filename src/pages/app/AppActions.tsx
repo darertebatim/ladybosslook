@@ -85,7 +85,7 @@ export default function AppActions() {
 
   const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
     if (!selectedTemplate || !user) {
-      if (!user) toast.error('Please sign in to add rituals');
+      if (!user) toast.error('Please sign in to add routines');
       return;
     }
 
