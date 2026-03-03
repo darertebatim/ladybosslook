@@ -1057,10 +1057,10 @@ export default function TasksBank() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FolderPlus className="h-4 w-4" />
-              Add to Existing Ritual
+              Add to Existing Routine
             </DialogTitle>
             <DialogDescription>
-              Add {selectedTaskIds.size} action{selectedTaskIds.size !== 1 ? 's' : ''} to an existing ritual
+              Add {selectedTaskIds.size} action{selectedTaskIds.size !== 1 ? 's' : ''} to an existing routine
             </DialogDescription>
           </DialogHeader>
           
