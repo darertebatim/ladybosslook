@@ -272,7 +272,7 @@ function CategoriesManager() {
                 <TableHead>Name</TableHead>
                 <TableHead>Slug</TableHead>
                 <TableHead>Color</TableHead>
-                <TableHead>Ritual Order</TableHead>
+                <TableHead>Routine Order</TableHead>
                 <TableHead>Action Order</TableHead>
                 <TableHead>Active</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
