@@ -28,8 +28,8 @@ export function RoutinesTour({ isFirstVisit = false, onTourReady }: RoutinesTour
     {
       id: 'ritual-card',
       target: '.tour-ritual-card',
-      title: 'Preview Any Ritual',
-      description: "Tap any ritual to see what's inside.",
+      title: 'Preview Any Routine',
+      description: "Tap any routine to see what's inside.",
       position: 'bottom',
       action: 'tap',
       condition: () => !!document.querySelector('.tour-ritual-card'),
