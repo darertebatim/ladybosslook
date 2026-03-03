@@ -2,12 +2,12 @@ import { useMemo, useEffect } from 'react';
 import { useFeatureTour, TourStep } from '@/hooks/useFeatureTour';
 import { TourOverlay } from './TourOverlay';
 
-interface RitualsTourProps {
+interface RoutinesTourProps {
   isFirstVisit?: boolean;
   onTourReady?: (startTour: () => void) => void;
 }
 
-export function RitualsTour({ isFirstVisit = false, onTourReady }: RitualsTourProps) {
+export function RoutinesTour({ isFirstVisit = false, onTourReady }: RoutinesTourProps) {
   const steps = useMemo((): TourStep[] => [
     {
       id: 'welcome',
