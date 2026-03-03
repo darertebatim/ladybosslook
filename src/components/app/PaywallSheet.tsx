@@ -17,6 +17,7 @@ const VARIANT_MAP: Record<PaywallVariantId, React.ComponentType<any>> = {
   'limited-offer': PaywallLimitedOffer,
   vip: PaywallVIP,
   onboarding: PaywallOnboarding,
+  'mascot-v2': PaywallMascotV2,
 };
 
 
