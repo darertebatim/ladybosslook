@@ -1045,7 +1045,7 @@ export default function TasksBank() {
               onClick={() => createRoutineFromSelection.mutate()}
               disabled={!newRoutineName.trim() || createRoutineFromSelection.isPending}
             >
-              Create Ritual
+              Create Routine
             </Button>
           </DialogFooter>
         </DialogContent>
