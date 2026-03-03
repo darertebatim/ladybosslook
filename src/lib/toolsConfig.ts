@@ -124,7 +124,7 @@ export const audioTools: ToolConfig[] = [
   },
   {
     id: 'soundscape',
-    name: 'Soundscapes',
+    name: 'Sound Scapes',
     icon: 'Waves',
     bgColor: 'bg-[#D4F1F4]',
     iconColor: 'text-cyan-600',
