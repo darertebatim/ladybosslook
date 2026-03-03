@@ -844,8 +844,7 @@ const AppHome = () => {
                 </div>
               ) : filteredTasks.length > 0 ? (
                 <div>
-                  {/* Onboarding Banner - hidden while welcome card is active */}
-                  {!showWelcomeCard && <OnboardingBanner />}
+                  {/* Mood Check-in Banner - above actions, hidden while welcome card is active */}
                   {/* Mood Check-in Banner - hidden while welcome card is active */}
                   {!showWelcomeCard && <MoodCheckInBanner />}
                   {/* My Actions header - always show */}
@@ -922,6 +921,8 @@ const AppHome = () => {
                       <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                     );
                   })()}
+                  {/* Onboarding Banner - below actions, hidden while welcome card is active */}
+                  {!showWelcomeCard && <OnboardingBanner />}
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 px-6 animate-fade-in">
