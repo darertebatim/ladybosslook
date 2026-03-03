@@ -39,7 +39,7 @@ const AppJournalEntry = () => {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [entryIdState, setEntryIdState] = useState<string | null>(isNewEntry ? null : entryId || null);
-  const [isTextareaFocused, setIsTextareaFocused] = useState(false);
+  
   
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
