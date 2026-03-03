@@ -1083,7 +1083,7 @@ export default function TasksBank() {
                 </SelectContent>
               </Select>
               {existingRoutines.length === 0 && (
-                <p className="text-xs text-muted-foreground">No rituals found. Create one first.</p>
+                <p className="text-xs text-muted-foreground">No routines found. Create one first.</p>
               )}
             </div>
 
