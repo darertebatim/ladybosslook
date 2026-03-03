@@ -85,7 +85,7 @@ export default function AppActions() {
 
   const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
     if (!selectedTemplate || !user) {
-      if (!user) toast.error('Please sign in to add rituals');
+      if (!user) toast.error('Please sign in to add routines');
       return;
     }
 
@@ -134,7 +134,7 @@ export default function AppActions() {
       queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
       
-      toast.success('Action added to your rituals! ✨');
+      toast.success('Action added to your routines! ✨');
       setPreviewSheetOpen(false);
       setSelectedTemplate(null);
     } catch (error) {
@@ -150,7 +150,7 @@ export default function AppActions() {
       <AppHeader
         title="Actions"
         showBack
-        backTo="/app/rituals"
+        backTo="/app/routines"
         rightAction={
           <button
             onClick={() => setShowSearch(!showSearch)}

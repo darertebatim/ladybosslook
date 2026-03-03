@@ -105,7 +105,7 @@ export const TaskQuickStartSheet = ({
   const handleBrowseAll = () => {
     haptic.light();
     onOpenChange(false);
-    navigate('/app/rituals');
+    navigate('/app/routines');
   };
 
   const handleClose = () => {
@@ -302,7 +302,7 @@ export const TaskQuickStartSheet = ({
                     <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
                       <BookOpen className="w-4 h-4 text-muted-foreground" />
                     </div>
-                    <span className="text-sm font-medium text-foreground">Browse All Rituals</span>
+                    <span className="text-sm font-medium text-foreground">Browse All Routines</span>
                   </button>
                 </div>
 

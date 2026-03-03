@@ -295,10 +295,10 @@ const NativeAppRedirect = () => {
   return null;
 };
 
-// Redirect component for old /app/routines/:planId routes
-const RoutineRedirect = () => {
+// Redirect component for old /app/rituals/:planId routes (backward compat)
+const RitualRedirect = () => {
   const { planId } = useParams();
-  return <Navigate to={`/app/rituals/${planId}`} replace />;
+  return <Navigate to={`/app/routines/${planId}`} replace />;
 };
 
 // Redirect component for old /app/course/:slug routes
@@ -453,12 +453,12 @@ const App = () => (
                     <Route path="journal" element={<AppJournal />} />
                     <Route path="reflections" element={<AppReflections />} />
                     <Route path="reflections/notes" element={<AppReflectionNotes />} />
-                    <Route path="rituals" element={<AppInspire />} />
-                    <Route path="rituals/:planId" element={<AppInspireDetail />} />
+                    <Route path="routines" element={<AppInspire />} />
+                    <Route path="routines/:planId" element={<AppInspireDetail />} />
                     <Route path="actions" element={<AppActions />} />
                     {/* Redirects for backward compatibility with older app versions */}
-                    <Route path="routines" element={<Navigate to="/app/rituals" replace />} />
-                    <Route path="routines/:planId" element={<RoutineRedirect />} />
+                    <Route path="rituals" element={<Navigate to="/app/routines" replace />} />
+                    <Route path="rituals/:planId" element={<RitualRedirect />} />
                     <Route path="profile" element={<AppProfile />} />
                     {/* Legacy routes - redirect to home */}
                   </Route>

@@ -71,7 +71,7 @@ export default function AppVideoPlaylistDetail() {
   const { data: enrollments } = useEnrollments();
   const { hasAccessToProgram } = useSubscription();
 
-  // Add to rituals via RoutinePreviewSheet
+  // Add to routines via RoutinePreviewSheet
   const { data: existingTask } = useExistingVideoPlaylistTask(playlistId);
   const addRoutinePlan = useAddRoutinePlan();
 
@@ -91,7 +91,7 @@ export default function AppVideoPlaylistDetail() {
     linked_playlist: null,
   } : null;
 
-  const handleAddToRituals = useCallback(() => {
+  const handleAddToRoutines = useCallback(() => {
     if (!playlist) return;
     haptic.medium();
     setShowRoutineSheet(true);
@@ -106,10 +106,10 @@ export default function AppVideoPlaylistDetail() {
         editedTasks,
       });
       setShowRoutineSheet(false);
-      toast.success('Added to your rituals! 📺');
+      toast.success('Added to your routines! 📺');
     } catch (error) {
-      console.error('Failed to add ritual:', error);
-      toast.error('Failed to add to rituals');
+      console.error('Failed to add routine:', error);
+      toast.error('Failed to add to routines');
     }
   };
 
@@ -182,7 +182,7 @@ export default function AppVideoPlaylistDetail() {
         <BackButton className="text-white" />
         <AddedToRoutineButton
           isAdded={!!existingTask}
-          onAddClick={handleAddToRituals}
+          onAddClick={handleAddToRoutines}
           isLoading={addRoutinePlan.isPending}
           iconOnly
         />

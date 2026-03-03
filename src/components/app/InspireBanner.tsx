@@ -48,7 +48,7 @@ export function InspireBanner({ routines }: InspireBannerProps) {
           return (
             <CarouselItem key={routine.id} className="pl-2 basis-[90%]">
               <button
-                onClick={() => navigate(`/app/rituals/${routine.id}`, { state: { from: location.pathname } })}
+                onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
                 className={cn(
                   'relative w-full h-36 rounded-2xl overflow-hidden',
                   'bg-gradient-to-br',

@@ -2,17 +2,17 @@ import { useMemo, useEffect } from 'react';
 import { useFeatureTour, TourStep } from '@/hooks/useFeatureTour';
 import { TourOverlay } from './TourOverlay';
 
-interface RitualsTourProps {
+interface RoutinesTourProps {
   isFirstVisit?: boolean;
   onTourReady?: (startTour: () => void) => void;
 }
 
-export function RitualsTour({ isFirstVisit = false, onTourReady }: RitualsTourProps) {
+export function RoutinesTour({ isFirstVisit = false, onTourReady }: RoutinesTourProps) {
   const steps = useMemo((): TourStep[] => [
     {
       id: 'welcome',
-      title: 'Your Rituals ✨',
-      description: 'These are ready-made rituals. Pick what feels right.',
+      title: 'Your Routines ✨',
+      description: 'These are ready-made routines. Pick what feels right.',
       position: 'center',
       action: 'look',
     },
@@ -28,8 +28,8 @@ export function RitualsTour({ isFirstVisit = false, onTourReady }: RitualsTourPr
     {
       id: 'ritual-card',
       target: '.tour-ritual-card',
-      title: 'Preview Any Ritual',
-      description: "Tap any ritual to see what's inside.",
+      title: 'Preview Any Routine',
+      description: "Tap any routine to see what's inside.",
       position: 'bottom',
       action: 'tap',
       condition: () => !!document.querySelector('.tour-ritual-card'),
@@ -46,7 +46,7 @@ export function RitualsTour({ isFirstVisit = false, onTourReady }: RitualsTourPr
     {
       id: 'add-action-btn',
       target: '.tour-action-add-btn',
-      title: 'Add to My Rituals',
+      title: 'Add to My Routines',
       description: 'Tap the + button to add any action to your daily planner. Customize time, repeat, and reminders.',
       position: 'left',
       action: 'tap',
@@ -62,7 +62,7 @@ export function RitualsTour({ isFirstVisit = false, onTourReady }: RitualsTourPr
   ], []);
 
   const tour = useFeatureTour({
-    feature: 'rituals',
+    feature: 'routines',
     steps,
     triggerOnMount: false,
   });

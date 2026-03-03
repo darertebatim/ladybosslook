@@ -298,7 +298,7 @@ export function PromoBanner({
     switch (activeBanner.destination_type) {
       case 'routine':
         if (activeBanner.destination_id) {
-          navigate(`/app/rituals/${activeBanner.destination_id}`);
+          navigate(`/app/routines/${activeBanner.destination_id}`);
         }
         break;
       case 'playlist':
@@ -325,7 +325,7 @@ export function PromoBanner({
         navigate('/app/home');
         break;
       case 'inspire':
-        navigate('/app/rituals');
+        navigate('/app/routines');
         break;
       case 'tasks':
         if (activeBanner.destination_id) {
@@ -336,9 +336,9 @@ export function PromoBanner({
         break;
       case 'routines_hub':
         if (activeBanner.destination_id) {
-          navigate(`/app/rituals/${activeBanner.destination_id}`);
+          navigate(`/app/routines/${activeBanner.destination_id}`);
         } else {
-          navigate('/app/rituals');
+          navigate('/app/routines');
         }
         break;
       case 'tasks_bank':

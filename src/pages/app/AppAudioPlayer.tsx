@@ -590,7 +590,7 @@ export default function AppAudioPlayer() {
                 }
               }}
               disabled={isCheckingTask}
-              title={existingTask ? "Go to planner" : "Add to my rituals"}
+              title={existingTask ? "Go to planner" : "Add to my routines"}
             >
               {existingTask ? (
                 <Check className="h-5 w-5 text-emerald-400" />
@@ -861,11 +861,11 @@ export default function AppAudioPlayer() {
                   tag: 'pro',
                 } as RoutinePlanTask],
               });
-              toast.success('Added to your rituals! 🎧');
+              toast.success('Added to your routines! 🎧');
               setShowRoutineSheet(false);
             } catch (error) {
-              console.error('Failed to add ritual:', error);
-              toast.error('Failed to add to ritual');
+              console.error('Failed to add routine:', error);
+              toast.error('Failed to add to routine');
             }
           }}
           isSaving={addRoutinePlan.isPending}

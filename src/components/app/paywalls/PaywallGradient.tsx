@@ -96,7 +96,7 @@ export function PaywallGradient({ program, onPurchase, onRestore, onClose, previ
         {(() => {
           const DEFAULT_FEATURES = [
             'Unlimited access to all guided audio programs',
-            'Premium daily rituals & wellness routines',
+            'Premium daily routines & wellness routines',
             'Exclusive meditation & breathwork sessions',
             'Advanced progress tracking & insights',
             'New content added regularly',

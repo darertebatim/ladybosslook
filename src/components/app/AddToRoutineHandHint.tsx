@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
-const STORAGE_KEY = 'ritual_add_hint_dismissed';
-const SAVE_HINT_KEY = 'ritual_save_hint_dismissed';
+const STORAGE_KEY = 'routine_add_hint_dismissed';
+const SAVE_HINT_KEY = 'routine_save_hint_dismissed';
 
-export function useAddToRitualHint() {
+export function useAddToRoutineHint() {
   const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export function useAddToRitualHint() {
   return { showHint, dismissHint };
 }
 
-export function useSaveRitualHint(isSheetOpen: boolean) {
+export function useSaveRoutineHint(isSheetOpen: boolean) {
   const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
@@ -46,11 +46,11 @@ export function useSaveRitualHint(isSheetOpen: boolean) {
   return { showHint, dismissHint };
 }
 
-interface AddToRitualHandHintProps {
+interface AddToRoutineHandHintProps {
   show: boolean;
 }
 
-export function AddToRitualHandHint({ show }: AddToRitualHandHintProps) {
+export function AddToRoutineHandHint({ show }: AddToRoutineHandHintProps) {
   if (!show) return null;
 
   return (
@@ -81,7 +81,7 @@ export function AddToRitualHandHint({ show }: AddToRitualHandHintProps) {
   );
 }
 
-export function SaveRitualHandHint({ show }: AddToRitualHandHintProps) {
+export function SaveRoutineHandHint({ show }: AddToRoutineHandHintProps) {
   if (!show) return null;
 
   return (

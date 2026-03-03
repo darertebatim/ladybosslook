@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { AddToRitualHandHint, useAddToRitualHint } from '@/components/app/AddToRitualHandHint';
+import { AddToRoutineHandHint, useAddToRoutineHint } from '@/components/app/AddToRoutineHandHint';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
@@ -81,7 +81,7 @@ export default function AppInspireDetail() {
   const navigate = useNavigate();
   const [showPreviewSheet, setShowPreviewSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
-  const { showHint, dismissHint } = useAddToRitualHint();
+  const { showHint, dismissHint } = useAddToRoutineHint();
   
   const { data: routine, isLoading } = useRoutineBankDetail(planId);
   const { data: addedRoutineIds = [] } = useUserAddedBankRoutines();
@@ -135,7 +135,7 @@ export default function AppInspireDetail() {
 
   const handleAddClick = () => {
     if (!routine?.tasks?.length) {
-      toast.error('No actions in this ritual');
+      toast.error('No actions in this routine');
       return;
     }
     setShowPreviewSheet(true);
@@ -158,7 +158,7 @@ export default function AppInspireDetail() {
       setJustAdded(true);
       toast.success(`${selectedTaskIds.length} actions added!`);
     } catch (error) {
-      toast.error('Failed to add ritual');
+      toast.error('Failed to add routine');
     }
   };
 
@@ -173,9 +173,9 @@ export default function AppInspireDetail() {
   if (!routine) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
-        <p className="text-muted-foreground">Ritual not found</p>
-        <Button variant="outline" onClick={() => navigate('/app/rituals')}>
-          Back to Rituals
+        <p className="text-muted-foreground">Routine not found</p>
+        <Button variant="outline" onClick={() => navigate('/app/routines')}>
+          Back to Routines
         </Button>
       </div>
     );
@@ -205,7 +205,7 @@ export default function AppInspireDetail() {
         className="fixed top-0 left-0 right-0 z-50 flex items-center px-4"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
       >
-        <BackButtonCircle to="/app/rituals" />
+        <BackButtonCircle to="/app/routines" />
       </header>
 
       {/* Scroll Container */}
@@ -263,7 +263,7 @@ export default function AppInspireDetail() {
                     className="absolute inset-0 w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
-                    title="Ritual video"
+                    title="Routine video"
                   />
                 </div>
               )}
@@ -451,7 +451,7 @@ export default function AppInspireDetail() {
       </div>
 
       {/* Animated hand hint for new users — outside footer so fixed positioning works */}
-      <AddToRitualHandHint show={showHint && !isAdded} />
+      <AddToRoutineHandHint show={showHint && !isAdded} />
 
       {/* Sticky Add Button */}
       <div 
@@ -466,7 +466,7 @@ export default function AppInspireDetail() {
           }}
           isLoading={addRoutineFromBank.isPending}
           size="lg"
-          addText="Add to my rituals"
+          addText="Add to my routines"
           className="bg-urgency text-urgency-foreground hover:bg-urgency/90"
         />
       </div>

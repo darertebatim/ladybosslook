@@ -1,93 +1,58 @@
 
-# Rename "Ritual" back to "Routine" — Full Project Rename
 
-## Summary
-Replace all user-facing "Ritual/Rituals" text with "Routine/Routines" across the entire app and admin, including URL routes (`/app/rituals` -> `/app/routines`), component names, file names, and display labels.
+## Calm-Style Animated Background for Watch Page
 
-## Scope
+Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
 
-**~63 files** with ~900+ occurrences need updating. Changes fall into 4 categories:
+### What You'll Get
 
----
+- A deep dark blue gradient background on the Watch page header area
+- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
+- Subtle lightning flashes that pulse periodically
+- All text updated to white/light colors for contrast
+- Lightweight implementation using CSS keyframes (no extra dependencies)
 
-## 1. Route Changes
+### Design Details
 
-**`src/App.tsx`**
-- Change route `path="rituals"` to `path="routines"`
-- Change route `path="rituals/:planId"` to `path="routines/:planId"`
-- Add backward-compat redirect: `/app/rituals` -> `/app/routines` (reverse the current redirect)
-- Update the `RoutineRedirect` component to point to `/app/routines/:planId`
+- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
+- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
+- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
+- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
+- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
 
-**All navigation references** (~13 files):
-- `src/lib/toolsConfig.ts`: route `/app/rituals` -> `/app/routines`, description `'Daily rituals'` -> `'Daily routines'`
-- `src/lib/proTaskTypes.ts`: `/app/rituals` -> `/app/routines`
-- `src/lib/localNotifications.ts`: `/app/rituals` -> `/app/routines`
-- `src/components/app/HomeMenu.tsx`: name `'Rituals'` -> `'Routines'`, route -> `/app/routines`
-- `src/components/app/PromoBanner.tsx`: all `/app/rituals` -> `/app/routines`
-- `src/components/app/InspireBanner.tsx`: navigate to `/app/routines/...`
-- `src/components/app/TaskQuickStartSheet.tsx`: navigate to `/app/routines`
-- `src/components/dashboard/SuggestedRoutineCard.tsx`: link to `/app/routines/...`
-- `src/components/dashboard/QuickActionsGrid.tsx`: label `'Rituals'` -> `'Routines'`, route -> `/app/routines`
-- `src/pages/app/AppActions.tsx`: `backTo="/app/routines"`
-- `src/pages/app/AppInspire.tsx`: navigate to `/app/routines/...`
-- `src/pages/app/AppInspireDetail.tsx`: navigate/link to `/app/routines`
+### Technical Approach
 
----
+**Files to modify:**
 
-## 2. UI Text (Headings, Buttons, Toasts, Tooltips)
+1. **`src/pages/app/AppWatch.tsx`**
+   - Replace the header `bg-[#E8F4FE]` with the dark gradient
+   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
+   - Add a lightning flash overlay div
+   - Update all text classes to white variants (`text-white`, `text-white/60`)
+   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
+   - Extend the gradient into the page background behind the content area
 
-Every user-visible string containing "ritual/rituals/Ritual/Rituals" becomes "routine/routines/Routine/Routines". Key files:
+2. **`tailwind.config.ts`**
+   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
+   - Register corresponding animation utilities
 
-- **Toast messages** (~10 files): e.g. `'Added to your rituals!'` -> `'Added to your routines!'`
-- **Button text**: `'Add to My Rituals'` -> `'Add to My Routines'`
-- **Page titles**: `'Edit Ritual'` -> `'Edit Routine'` in `RoutinePreviewSheet.tsx`
-- **Tour descriptions** (~5 tour files): `'Your Rituals'` -> `'Your Routines'`, etc.
-- **Admin labels** (`Tools.tsx`, `RoutinesBank.tsx`, `PromoBannerManager.tsx`, `AIAssistantPanel.tsx`): `'Rituals Bank'` -> `'Routines Bank'`, `'Ritual Plan'` -> `'Routine Plan'`, etc.
-- **Paywall text** (`PaywallGradient.tsx`): `'Premium daily rituals'` -> `'Premium daily routines'`
-- **Breathe/Journal/Emotion/Mood reminder settings**: toast and button text
-- **AppTaskCreate.tsx**: hint text `'daily ritual'` -> `'daily routine'`
-- **SpecialBannersArchive.tsx**: reference text (admin)
+### Visual Structure
 
----
+```text
++----------------------------------+
+|  [dark blue gradient header]     |
+|  ~~~ cloud layer 1 (slow) ~~~   |
+|  ~~~ cloud layer 2 (slower) ~~~ |
+|  * lightning flash (periodic) *  |
+|                                  |
+|  Watch          [icons]          |
+|  [categories row]                |
+|  [filters]              [lang]   |
++----------------------------------+
+|  [normal white content area]     |
+|  [playlist cards grid]           |
++----------------------------------+
+```
 
-## 3. Component & File Renames
+The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
 
-These files have "Ritual" in their name and should be renamed for consistency:
-
-| Current File | New File |
-|---|---|
-| `src/components/app/AddToRitualHandHint.tsx` | `AddToRoutineHandHint.tsx` |
-| `src/components/app/WelcomeRitualCard.tsx` | `WelcomeRoutineCard.tsx` |
-| `src/components/app/ChallengeRitualCard.tsx` | `ChallengeRoutineCard.tsx` |
-| `src/components/app/tour/RitualsTour.tsx` | `RoutinesTour.tsx` |
-
-Exported component/interface names inside these files will also be renamed (e.g. `WelcomeRitualCard` -> `WelcomeRoutineCard`), and all import paths updated in consuming files.
-
----
-
-## 4. Internal Code (Variables, Comments, Hooks)
-
-- `useWelcomePopupRitual` -> `useWelcomePopupRoutine` (in `useRoutinesBank.tsx`)
-- `useSaveRitualHint`, `SaveRitualHandHint`, `AddToRitualHandHint` -> `useSaveRoutineHint`, `SaveRoutineHandHint`, `AddToRoutineHandHint`
-- `dismissedRitualIds` state variable in `AppHome.tsx` -> `dismissedRoutineIds`
-- `hasSuggestedRituals` prop in `HomeTour.tsx` -> `hasSuggestedRoutines`
-- Query keys like `'welcome-popup-ritual'` -> `'welcome-popup-routine'`
-- localStorage keys like `'simora_dismissed_ritual_ids'` -> `'simora_dismissed_routine_ids'`
-- All code comments referencing "ritual" updated to "routine"
-- `'rituals'` tour feature key in `useFeatureTour.tsx` -> `'routines'`
-
----
-
-## Backward Compatibility
-
-- Add redirect: `/app/rituals` -> `/app/routines` and `/app/rituals/:planId` -> `/app/routines/:planId` (keeps old links/bookmarks working)
-- localStorage migration: read old key `simora_dismissed_ritual_ids` and migrate to new key on first load
-
----
-
-## What does NOT change
-
-- Database table/column names (e.g. `routines_bank`, `routine_plan_tasks`) -- these already say "routine"
-- Hook file names like `useRoutinesBank.tsx`, `useRoutinePlans.tsx` -- already correct
-- The `RoutinePreviewSheet.tsx` and `RoutineBankCard.tsx` file names -- already say "Routine"
-- Any Supabase edge functions or database schema

@@ -13,12 +13,12 @@ export interface ToolConfig {
 export const wellnessTools: ToolConfig[] = [
   {
     id: 'routines',
-    name: 'Rituals',
+    name: 'Routines',
     icon: 'CalendarPlus',
     bgColor: 'bg-[#D1FAE5]',
     iconColor: 'text-emerald-600',
-    route: '/app/rituals',
-    description: 'Daily rituals',
+    route: '/app/routines',
+    description: 'Daily routines',
   },
   {
     id: 'reflections',

@@ -11,7 +11,7 @@ import {
   usePopularRoutinesBank,
   useFeaturedRoutinesBank,
 } from '@/hooks/useRoutinesBank';
-import { RitualsTour, TourHelpButton } from '@/components/app/tour';
+import { RoutinesTour, TourHelpButton } from '@/components/app/tour';
 
 export default function AppInspire() {
   const navigate = useNavigate();
@@ -62,7 +62,7 @@ export default function AppInspire() {
         <div className="flex items-center justify-between px-4 pt-3 pb-2">
           <div className="flex items-center gap-2">
             <CalendarPlus className="w-6 h-6 text-primary" />
-            <h1 className="text-xl font-bold text-foreground">Rituals</h1>
+            <h1 className="text-xl font-bold text-foreground">Routines</h1>
           </div>
           <div className="flex items-center gap-1">
             {startTour && (
@@ -84,7 +84,7 @@ export default function AppInspire() {
           <div className="px-4 pb-2 animate-in slide-in-from-top duration-200">
             <Input
               type="search"
-              placeholder="Search rituals..."
+              placeholder="Search routines..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-muted/50"
@@ -104,10 +104,10 @@ export default function AppInspire() {
               <h2 className="text-sm font-semibold text-muted-foreground px-4 mb-3">
                 BROWSE CATEGORIES
               </h2>
-              <ScrollArea className="w-full tour-ritual-categories">
+              <ScrollArea className="w-full tour-routine-categories">
                 <div className="flex gap-2 px-4 pb-2">
                   <CategoryCircle
-                    name="All Rituals"
+                    name="All Routines"
                     icon="CalendarPlus"
                     color="purple"
                     isSelected={selectedCategory === 'all'}
@@ -152,10 +152,10 @@ export default function AppInspire() {
             <div className="mt-5 px-4 w-full max-w-full overflow-hidden pb-8">
               <h2 className="text-sm font-semibold text-muted-foreground mb-3">
                 {selectedCategory === 'popular'
-                  ? 'POPULAR RITUALS'
+                  ? 'POPULAR ROUTINES'
                   : selectedCategory === 'all'
-                  ? 'ALL RITUALS'
-                  : categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'RITUALS'
+                  ? 'ALL ROUTINES'
+                  : categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'ROUTINES'
                 }
               </h2>
 
@@ -166,11 +166,11 @@ export default function AppInspire() {
               ) : (
                 <div className="grid grid-cols-2 gap-3 w-full max-w-full">
                   {searchedRoutines.map((routine, index) => (
-                    <RoutineBankCard
+                     <RoutineBankCard
                       key={routine.id}
                       routine={routine}
-                      onClick={() => navigate(`/app/rituals/${routine.id}`, { state: { from: location.pathname } })}
-                      className={index === 0 ? 'tour-ritual-card' : undefined}
+                      onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                      className={index === 0 ? 'tour-routine-card' : undefined}
                     />
                   ))}
                 </div>
@@ -181,7 +181,7 @@ export default function AppInspire() {
       </div>
 
       {/* Feature Tour */}
-      <RitualsTour isFirstVisit={true} onTourReady={handleTourReady} />
+      <RoutinesTour isFirstVisit={true} onTourReady={handleTourReady} />
     </div>
   );
 }

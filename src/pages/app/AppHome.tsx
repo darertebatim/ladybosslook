@@ -39,7 +39,7 @@ import { isWaterTask } from '@/lib/waterTracking';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { FastingStatusCard } from '@/components/app/FastingStatusCard';
 import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
-import { WelcomeRitualCard } from '@/components/app/WelcomeRitualCard';
+import { WelcomeRoutineCard } from '@/components/app/WelcomeRoutineCard';
 import { toast } from 'sonner';
 import { useWeeklyTaskCompletion, useDateRangeTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 import { BadgeCelebration } from '@/components/app/BadgeCelebration';
@@ -133,10 +133,12 @@ const AppHome = () => {
     localStorage.getItem('simora_welcome_card_action_added') === 'true'
   );
   
-  // Dismissed individual ritual card IDs
-  const [dismissedRitualIds, setDismissedRitualIds] = useState<Set<string>>(() => {
+  // Dismissed individual routine card IDs
+  const [dismissedRoutineIds, setDismissedRoutineIds] = useState<Set<string>>(() => {
     try {
-      return new Set(JSON.parse(localStorage.getItem('simora_dismissed_ritual_ids') || '[]'));
+      const oldKey = localStorage.getItem('simora_dismissed_ritual_ids');
+      const newKey = localStorage.getItem('simora_dismissed_routine_ids');
+      return new Set(JSON.parse(newKey || oldKey || '[]'));
     } catch { return new Set(); }
   });
   
@@ -339,8 +341,8 @@ const AppHome = () => {
   } = useUserAddedBankRoutines();
   const addedRoutineIdsSet = useMemo(() => new Set(addedRoutineIds), [addedRoutineIds]);
   const suggestedRoutines = useMemo(() => 
-    popularRoutines.filter(r => !addedRoutineIdsSet.has(r.id) && !dismissedRitualIds.has(r.id)).slice(0, 4), 
-    [popularRoutines, addedRoutineIdsSet, dismissedRitualIds]
+    popularRoutines.filter(r => !addedRoutineIdsSet.has(r.id) && !dismissedRoutineIds.has(r.id)).slice(0, 4), 
+    [popularRoutines, addedRoutineIdsSet, dismissedRoutineIds]
   );
 
   // Generate week days
@@ -814,10 +816,10 @@ const AppHome = () => {
                 </div>
               )}
 
-              {/* Welcome Ritual Card for New Users - stays until dismissed */}
+              {/* Welcome Routine Card for New Users - stays until dismissed */}
               {showWelcomeCard && (
                 <div className="py-4 tour-welcome-card">
-                  <WelcomeRitualCard onDismiss={() => {
+                  <WelcomeRoutineCard onDismiss={() => {
                     setWelcomeCardDismissed(true);
                     setStartedAsNewUser(false);
                     localStorage.setItem('simora_welcome_card_dismissed', 'true');
@@ -934,12 +936,12 @@ const AppHome = () => {
                 </div>
               )}
 
-              {/* Popular Rituals Suggestions - only show rituals user hasn't added */}
-              {suggestedRoutines.length > 0 && selectedTag === null && !showWelcomeCard && <div className="tour-suggested-ritual mt-6">
+              {/* Popular Routine Suggestions - only show routines user hasn't added */}
+              {suggestedRoutines.length > 0 && selectedTag === null && !showWelcomeCard && <div className="tour-suggested-routine mt-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="h-4 w-4 text-violet-500" />
                     <h2 className="text-sm font-semibold text-foreground/70 tracking-wide">
-                      Try a ritual
+                      Try a routine
                     </h2>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -949,17 +951,17 @@ const AppHome = () => {
                         routine={routine} 
                         onClick={() => navigate(`/app/routines/${routine.id}`)}
                         onDismiss={() => {
-                          const dismissed = JSON.parse(localStorage.getItem('simora_dismissed_ritual_ids') || '[]');
+                          const dismissed = JSON.parse(localStorage.getItem('simora_dismissed_routine_ids') || '[]');
                           dismissed.push(routine.id);
-                          localStorage.setItem('simora_dismissed_ritual_ids', JSON.stringify(dismissed));
-                          setDismissedRitualIds(new Set(dismissed));
+                          localStorage.setItem('simora_dismissed_routine_ids', JSON.stringify(dismissed));
+                          setDismissedRoutineIds(new Set(dismissed));
                         }}
                       />
                     ))}
                   </div>
                 </div>}
 
-              {/* Tour Banner & Promo - always visible regardless of ritual cards */}
+              {/* Tour Banner & Promo - always visible regardless of routine cards */}
               {selectedTag === null && <>
                 <div id="tour-banner-slot" className="mt-4" />
                 <PromoBanner location="home_rituals" className="mt-4" />
@@ -1176,7 +1178,7 @@ const AppHome = () => {
           isFirstOpen={isFirstOpen}
           forceShow={serverIndicatesNewUser}
           hasEnrolledPrograms={activeRounds.length > 0}
-          hasSuggestedRituals={suggestedRoutines.length > 0}
+          hasSuggestedRoutines={suggestedRoutines.length > 0}
           hasWelcomeCard={showWelcomeCard}
           onTourReady={handleHomeTourReady}
         />

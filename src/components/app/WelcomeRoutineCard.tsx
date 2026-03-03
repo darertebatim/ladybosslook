@@ -3,31 +3,31 @@ import { X, Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask, useWelcomePopupRitual } from '@/hooks/useRoutinesBank';
+import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask, useWelcomePopupRoutine } from '@/hooks/useRoutinesBank';
 import { useTaskTemplates, TaskTemplate, TASK_COLORS, TaskColor, useAllActiveTasks } from '@/hooks/useTaskPlanner';
 
 const COLOR_CYCLE: TaskColor[] = ['peach', 'sky', 'pink', 'mint', 'lavender', 'lime', 'yellow'];
 
-interface WelcomeRitualCardProps {
+interface WelcomeRoutineCardProps {
   onActionAdded?: () => void;
   onDismiss?: () => void;
 }
 
-export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCardProps) {
+export function WelcomeRoutineCard({ onActionAdded, onDismiss }: WelcomeRoutineCardProps) {
   const [dismissed, setDismissed] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [selectedActions, setSelectedActions] = useState<Set<string>>(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAddingAnimation, setShowAddingAnimation] = useState(false);
   
-  const { data: welcomeRitualInfo, isLoading: welcomeLoading } = useWelcomePopupRitual();
-  const { data: welcomeRitual, isLoading: ritualLoading } = useRoutineBankDetail(welcomeRitualInfo?.id);
+  const { data: welcomeRoutineInfo, isLoading: welcomeLoading } = useWelcomePopupRoutine();
+  const { data: welcomeRoutine, isLoading: routineLoading } = useRoutineBankDetail(welcomeRoutineInfo?.id);
   const addRoutine = useAddRoutineFromBank();
   const { data: userTasks = [] } = useAllActiveTasks();
   const { data: templates = [] } = useTaskTemplates();
   const popularTemplates = templates.filter(t => t.is_popular).slice(0, 6);
 
-  const actions = welcomeRitual?.tasks?.length ? welcomeRitual.tasks : [];
+  const actions = welcomeRoutine?.tasks?.length ? welcomeRoutine.tasks : [];
   const displayActions = actions.length > 0 ? actions : popularTemplates;
 
   const existingTaskTitles = useMemo(() => 
@@ -86,7 +86,7 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
   };
 
   const handleContinue = async () => {
-    if (selectedActions.size === 0 || !welcomeRitualInfo?.id) return;
+    if (selectedActions.size === 0 || !welcomeRoutineInfo?.id) return;
     
     setIsSubmitting(true);
     haptic.light();
@@ -96,7 +96,7 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
       setShowAddingAnimation(true);
       
       await addRoutine.mutateAsync({
-        routineId: welcomeRitualInfo.id,
+        routineId: welcomeRoutineInfo.id,
         selectedTaskIds: Array.from(selectedActions),
       });
       
@@ -126,10 +126,10 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
   };
 
   if (dismissed) return null;
-  if (welcomeLoading || !welcomeRitualInfo) return null;
+  if (welcomeLoading || !welcomeRoutineInfo) return null;
   
-  const title = welcomeRitualInfo.title || 'Your day is open';
-  const subtitle = welcomeRitualInfo.subtitle || 'Tap to pick your first actions';
+  const title = welcomeRoutineInfo.title || 'Your day is open';
+  const subtitle = welcomeRoutineInfo.subtitle || 'Tap to pick your first actions';
 
   return (
     <>
@@ -176,7 +176,7 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
                 
                 {/* Scrollable actions list */}
                 <div className="flex-1 overflow-y-auto px-3 pb-2 space-y-2">
-                  {ritualLoading ? (
+                  {routineLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
                     </div>
@@ -258,15 +258,15 @@ export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCar
       {!isFlipped && (
         <div className="w-full cursor-pointer" onClick={handleFlip}>
           <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-md">
-            {welcomeRitual?.cover_image_url ? (
+            {welcomeRoutine?.cover_image_url ? (
               <img 
-                src={welcomeRitual.cover_image_url} 
+                src={welcomeRoutine.cover_image_url} 
                 alt={title} 
                 className="w-full h-full object-cover"
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center">
-                <FluentEmoji emoji={welcomeRitualInfo.emoji || '✨'} size={96} className="opacity-40" />
+                <FluentEmoji emoji={welcomeRoutineInfo.emoji || '✨'} size={96} className="opacity-40" />
               </div>
             )}
             
