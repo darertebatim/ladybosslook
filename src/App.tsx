@@ -295,10 +295,10 @@ const NativeAppRedirect = () => {
   return null;
 };
 
-// Redirect component for old /app/routines/:planId routes
-const RoutineRedirect = () => {
+// Redirect component for old /app/rituals/:planId routes (backward compat)
+const RitualRedirect = () => {
   const { planId } = useParams();
-  return <Navigate to={`/app/rituals/${planId}`} replace />;
+  return <Navigate to={`/app/routines/${planId}`} replace />;
 };
 
 // Redirect component for old /app/course/:slug routes
