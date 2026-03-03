@@ -116,7 +116,7 @@ export function RoutineStatisticsManager() {
           <CardContent>
             <div className="text-2xl font-bold">{totalAdoptions}</div>
             <p className="text-xs text-muted-foreground">
-              Rituals added by users
+              Routines added by users
             </p>
           </CardContent>
         </Card>
