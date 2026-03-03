@@ -660,28 +660,32 @@ const AppHome = () => {
               </div>
             </div>
 
-            {/* Week strip - Me+ style with badges + scroll arrows */}
+            {/* Week strip - Me+ style with badges */}
             <div 
-              className={cn("grid", showCalendar ? "overflow-hidden" : "")} 
+              className={cn("grid overflow-hidden")} 
               style={{ gridTemplateRows: showCalendar ? '0fr' : '1fr' }}
             >
               <div className="min-h-0">
-                <div className={cn("flex items-center mt-1 transition-opacity duration-200", showCalendar ? "opacity-0" : "opacity-100")}>
-                  {/* Previous week button */}
-                  <button
-                    onClick={() => {
-                      const newDate = subDays(selectedDate, 7);
+                <div 
+                  className={cn("flex mt-1 transition-opacity duration-200", showCalendar ? "opacity-0" : "opacity-100")}
+                  onTouchStart={(e) => {
+                    const touch = e.touches[0];
+                    (e.currentTarget as any)._swipeStartX = touch.clientX;
+                  }}
+                  onTouchEnd={(e) => {
+                    const startX = (e.currentTarget as any)._swipeStartX;
+                    if (startX == null) return;
+                    const endX = e.changedTouches[0].clientX;
+                    const diff = startX - endX;
+                    if (Math.abs(diff) > 50) {
+                      // Swipe left = next week, swipe right = prev week
+                      const newDate = diff > 0 ? addDays(selectedDate, 7) : subDays(selectedDate, 7);
                       setSelectedDate(newDate);
                       setCurrentMonth(startOfMonth(newDate));
                       haptic.light();
-                    }}
-                    className="p-1 -ml-1 rounded-full text-muted-foreground/60 active:scale-90 transition-transform shrink-0"
-                    aria-label="Previous week"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
-
-                  <div className="flex flex-1">
+                    }
+                  }}
+                >
                   {weekDays.map(day => {
                   const isSelected = isSameDay(day, selectedDate);
                   const isTodayDate = isToday(day);
@@ -727,21 +731,6 @@ const AppHome = () => {
                         </div>
                       </button>;
                 })}
-                  </div>
-
-                  {/* Next week button */}
-                  <button
-                    onClick={() => {
-                      const newDate = addDays(selectedDate, 7);
-                      setSelectedDate(newDate);
-                      setCurrentMonth(startOfMonth(newDate));
-                      haptic.light();
-                    }}
-                    className="p-1 -mr-1 rounded-full text-muted-foreground/60 active:scale-90 transition-transform shrink-0"
-                    aria-label="Next week"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
                 </div>
               </div>
             </div>
