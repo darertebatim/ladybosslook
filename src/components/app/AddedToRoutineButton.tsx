@@ -98,7 +98,7 @@ export const AddedToRoutineButton = ({
           "rounded-xl bg-urgency text-urgency-foreground hover:bg-urgency/90 shrink-0",
           className
         )}
-        title="Add to My Rituals"
+        title="Add to My Routines"
       >
         <CalendarPlus className="h-5 w-5" />
       </Button>
