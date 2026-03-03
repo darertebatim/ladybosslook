@@ -166,11 +166,11 @@ export default function AppInspire() {
               ) : (
                 <div className="grid grid-cols-2 gap-3 w-full max-w-full">
                   {searchedRoutines.map((routine, index) => (
-                    <RoutineBankCard
+                     <RoutineBankCard
                       key={routine.id}
                       routine={routine}
-                      onClick={() => navigate(`/app/rituals/${routine.id}`, { state: { from: location.pathname } })}
-                      className={index === 0 ? 'tour-ritual-card' : undefined}
+                      onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                      className={index === 0 ? 'tour-routine-card' : undefined}
                     />
                   ))}
                 </div>

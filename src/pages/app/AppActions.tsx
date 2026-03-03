@@ -150,7 +150,7 @@ export default function AppActions() {
       <AppHeader
         title="Actions"
         showBack
-        backTo="/app/rituals"
+        backTo="/app/routines"
         rightAction={
           <button
             onClick={() => setShowSearch(!showSearch)}
