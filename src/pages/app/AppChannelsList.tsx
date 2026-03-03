@@ -354,7 +354,7 @@ export default function AppChannelsList() {
         )}
       </div>
 
-      {/* Add to Rituals Sheet */}
+      {/* Add to Routines Sheet */}
       <RoutinePreviewSheet
         open={showRoutineSheet}
         onOpenChange={setShowRoutineSheet}
