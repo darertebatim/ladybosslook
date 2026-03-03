@@ -852,7 +852,7 @@ export default function RoutinesBank() {
           <div className="text-center py-8 text-muted-foreground">Loading...</div>
         ) : filteredRoutines.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            No rituals yet. Click "New Ritual" to create one.
+            No routines yet. Click "New Routine" to create one.
           </div>
         ) : (
           <div className="space-y-2">
