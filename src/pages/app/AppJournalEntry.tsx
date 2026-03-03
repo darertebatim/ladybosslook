@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useJournalEntry, useCreateJournalEntry, useUpdateJournalEntry, useDeleteJournalEntry } from '@/hooks/useJournal';
 import { MoodSelector } from '@/components/app/MoodSelector';
-import { WritingPrompts } from '@/components/app/WritingPrompts';
+
 import { JournalEntrySkeleton } from '@/components/app/skeletons/JournalSkeleton';
 import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
@@ -39,7 +39,7 @@ const AppJournalEntry = () => {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [entryIdState, setEntryIdState] = useState<string | null>(isNewEntry ? null : entryId || null);
-  const [isTextareaFocused, setIsTextareaFocused] = useState(false);
+  
   
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -144,10 +144,7 @@ const AppJournalEntry = () => {
     triggerAutoSave();
   };
 
-  const handlePromptSelect = (prompt: string) => {
-    setContent(prompt + '\n\n');
-    textareaRef.current?.focus();
-  };
+
 
   const handleDone = async () => {
     // Cancel any pending auto-save
@@ -202,7 +199,6 @@ const AppJournalEntry = () => {
     );
   }
 
-  const showWritingPrompts = isNewEntry && !content.trim() && !isTextareaFocused;
   const canDelete = entryIdState;
 
   return (
@@ -261,21 +257,14 @@ const AppJournalEntry = () => {
             <MoodSelector value={mood} onChange={handleMoodChange} />
           </div>
 
-          {/* Writing Prompts - Only for new empty entries */}
-          {showWritingPrompts && (
-            <div className="py-2">
-              <WritingPrompts onSelectPrompt={handlePromptSelect} />
-            </div>
-          )}
-
           {/* Content Textarea */}
           <Textarea
             ref={textareaRef}
             placeholder="Start writing your thoughts..."
             value={content}
             onChange={(e) => handleContentChange(e.target.value)}
-            onFocus={() => setIsTextareaFocused(true)}
-            onBlur={() => setIsTextareaFocused(false)}
+
+
             className={cn(
               "min-h-[200px] resize-none border-0 px-0 focus-visible:ring-0 text-base leading-relaxed placeholder:text-muted-foreground/50",
               contentBilingualClassName
