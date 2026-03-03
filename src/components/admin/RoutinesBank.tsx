@@ -972,9 +972,9 @@ export default function RoutinesBank() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-3xl max-h-[85vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>{editingRoutine ? 'Edit Ritual' : 'New Ritual'}</DialogTitle>
+            <DialogTitle>{editingRoutine ? 'Edit Routine' : 'New Routine'}</DialogTitle>
             <DialogDescription>
-              {editingRoutine ? 'Update ritual details and sections' : 'Create a new ritual template'}
+              {editingRoutine ? 'Update routine details and sections' : 'Create a new routine template'}
             </DialogDescription>
           </DialogHeader>
           
