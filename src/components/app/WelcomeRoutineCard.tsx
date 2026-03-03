@@ -8,12 +8,12 @@ import { useTaskTemplates, TaskTemplate, TASK_COLORS, TaskColor, useAllActiveTas
 
 const COLOR_CYCLE: TaskColor[] = ['peach', 'sky', 'pink', 'mint', 'lavender', 'lime', 'yellow'];
 
-interface WelcomeRitualCardProps {
+interface WelcomeRoutineCardProps {
   onActionAdded?: () => void;
   onDismiss?: () => void;
 }
 
-export function WelcomeRitualCard({ onActionAdded, onDismiss }: WelcomeRitualCardProps) {
+export function WelcomeRoutineCard({ onActionAdded, onDismiss }: WelcomeRoutineCardProps) {
   const [dismissed, setDismissed] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [selectedActions, setSelectedActions] = useState<Set<string>>(new Set());
