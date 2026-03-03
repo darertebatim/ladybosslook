@@ -535,7 +535,7 @@ export default function RoutinesBank() {
 
   const handleGenerateCover = async () => {
     if (!editingRoutine?.id) {
-      toast.error('Please save the ritual first before generating a cover');
+      toast.error('Please save the routine first before generating a cover');
       return;
     }
     setIsGeneratingCover(true);
