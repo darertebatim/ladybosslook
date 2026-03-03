@@ -370,10 +370,10 @@ export default function AppChannelsList() {
             });
             setJustAdded(true);
             haptic.success();
-            toast.success('Added to your rituals!');
+            toast.success('Added to your routines!');
             setShowRoutineSheet(false);
           } catch {
-            toast.error('Failed to add to rituals');
+            toast.error('Failed to add to routines');
           }
         }}
         isSaving={addRoutinePlan.isPending}

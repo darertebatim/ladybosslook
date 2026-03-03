@@ -75,8 +75,8 @@ export function ExploreTour({ isFirstVisit = false, onTourReady }: ExploreTourPr
     {
       id: 'tool-routines',
       target: '.tour-tool-routines',
-      title: 'Rituals ✨',
-      description: 'Browse and build daily rituals to structure your day.',
+      title: 'Routines ✨',
+      description: 'Browse and build daily routines to structure your day.',
       position: 'top',
       action: 'tap',
       condition: () => !!document.querySelector('.tour-tool-routines'),

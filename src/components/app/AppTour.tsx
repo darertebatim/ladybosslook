@@ -31,7 +31,7 @@ export const tourSteps: Step[] = [
   },
   {
     target: '.tour-nav-routines',
-    content: 'Explore ready-made rituals to build healthy habits. Morning, evening, focus time - we\'ve got you covered!',
+    content: 'Explore ready-made routines to build healthy habits. Morning, evening, focus time - we\'ve got you covered!',
     placement: 'top',
   },
   {

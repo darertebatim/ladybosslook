@@ -37,7 +37,7 @@ export function JournalTour({ isFirstVisit = false, onTourReady }: JournalTourPr
     {
       id: 'add-to-routine',
       target: '.tour-journal-add-routine',
-      title: 'Add to My Rituals',
+      title: 'Add to My Routines',
       description: 'Tap to add daily journaling to your planner. Get reminders to write each day.',
       position: 'top',
       action: 'tap',

@@ -564,7 +564,7 @@ export default function RoutinesBank() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('Delete this ritual?')) {
+    if (confirm('Delete this routine?')) {
       deleteRoutine.mutate(id);
     }
   };

@@ -129,7 +129,7 @@ export const AddedToRoutineButton = ({
           onClick={handleAddAgain}
           disabled={isLoading}
           className="h-10 w-10 rounded-full bg-urgency text-urgency-foreground hover:bg-urgency/90 shrink-0"
-          title="Add again to my rituals"
+          title="Add again to my routines"
         >
           <CalendarPlus className="h-4 w-4" />
         </Button>

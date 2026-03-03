@@ -26,13 +26,13 @@ export function RoutinesTour({ isFirstVisit = false, onTourReady }: RoutinesTour
       condition: () => !!document.querySelector('.tour-routine-categories'),
     },
     {
-      id: 'ritual-card',
-      target: '.tour-ritual-card',
+      id: 'routine-card',
+      target: '.tour-routine-card',
       title: 'Preview Any Routine',
       description: "Tap any routine to see what's inside.",
       position: 'bottom',
       action: 'tap',
-      condition: () => !!document.querySelector('.tour-ritual-card'),
+      condition: () => !!document.querySelector('.tour-routine-card'),
     },
     {
       id: 'actions-section',

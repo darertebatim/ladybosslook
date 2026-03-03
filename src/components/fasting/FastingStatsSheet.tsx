@@ -509,7 +509,7 @@ export function FastingStatsSheet({ open, onOpenChange, sessions, onDeleteSessio
                     Log weight
                   </Button>
 
-                  {/* Add to My Rituals */}
+                  {/* Add to My Routines */}
                   <div className="flex justify-center">
                     <AddedToRoutineButton
                       isAdded={!!isAdded}

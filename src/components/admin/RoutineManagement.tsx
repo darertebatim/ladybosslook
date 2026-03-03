@@ -362,7 +362,7 @@ function CategoriesManager() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Ritual Order</Label>
+                <Label>Routine Order</Label>
                 <Input
                   type="number"
                   value={formData.display_order}

@@ -279,10 +279,10 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
             });
             setJustAdded(true);
             haptic.success();
-            toast.success('Added to your rituals!');
+            toast.success('Added to your routines!');
             setShowSheet(false);
           } catch {
-            toast.error('Failed to add to rituals');
+            toast.error('Failed to add to routines');
           }
         }}
         isSaving={addRoutinePlan.isPending}

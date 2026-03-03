@@ -163,10 +163,10 @@ export function useQuickAddVideoTask() {
     onSuccess: (_, video) => {
       queryClient.invalidateQueries({ queryKey: ["video-routine-task", video.id] });
       queryClient.invalidateQueries({ queryKey: ["planner-all-tasks"] });
-      toast.success("Added to your rituals! 🎬");
+      toast.success("Added to your routines! 🎬");
     },
     onError: () => {
-      toast.error("Failed to add to ritual");
+      toast.error("Failed to add to routine");
     },
   });
 }

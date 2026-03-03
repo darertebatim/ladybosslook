@@ -371,11 +371,11 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
                 tag: 'pro',
               } as RoutinePlanTask],
             });
-            toast.success('Added to your rituals! 🎬');
+            toast.success('Added to your routines! 🎬');
             setShowRoutineSheet(false);
           } catch (error) {
-            console.error('Failed to add ritual:', error);
-            toast.error('Failed to add to ritual');
+            console.error('Failed to add routine:', error);
+            toast.error('Failed to add to routine');
           }
         }}
         isSaving={addRoutinePlan.isPending}

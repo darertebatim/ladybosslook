@@ -30,8 +30,8 @@ const CLIENT_RESET_KEYS = [
   'mood-banner-dismissed',
   
   // Hand hint guidance
-  'ritual_add_hint_dismissed',
-  'ritual_save_hint_dismissed',
+  'routine_add_hint_dismissed',
+  'routine_save_hint_dismissed',
   
   // Coach marks
   'simora_tap_coach_shown',
