@@ -173,9 +173,9 @@ export default function AppInspireDetail() {
   if (!routine) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
-        <p className="text-muted-foreground">Ritual not found</p>
-        <Button variant="outline" onClick={() => navigate('/app/rituals')}>
-          Back to Rituals
+        <p className="text-muted-foreground">Routine not found</p>
+        <Button variant="outline" onClick={() => navigate('/app/routines')}>
+          Back to Routines
         </Button>
       </div>
     );
