@@ -126,10 +126,10 @@ export default function AppChannelsList() {
               Your community spaces
             </p>
           </div>
-          {/* Actions: Add to rituals + Admin */}
+          {/* Actions: Add to routines + Admin */}
           <div className="flex gap-1.5 pb-0.5">
             <AddedToRoutineButton
-              isAdded={isAddedToRituals}
+              isAdded={isAddedToRoutines}
               onAddClick={() => {
                 haptic.light();
                 setShowRoutineSheet(true);
