@@ -52,6 +52,7 @@ import { useAppReview } from '@/hooks/useAppReview';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { ActionLimitSheet, hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 import { MoodCheckInBanner } from '@/components/mood/MoodCheckInBanner';
+import { OnboardingBanner } from '@/components/app/OnboardingBanner';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
@@ -843,6 +844,8 @@ const AppHome = () => {
                 </div>
               ) : filteredTasks.length > 0 ? (
                 <div>
+                  {/* Onboarding Banner - hidden while welcome card is active */}
+                  {!showWelcomeCard && <OnboardingBanner />}
                   {/* Mood Check-in Banner - hidden while welcome card is active */}
                   {!showWelcomeCard && <MoodCheckInBanner />}
                   {/* My Actions header - always show */}
