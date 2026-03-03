@@ -4,6 +4,7 @@ import { haptic } from '@/lib/haptics';
 import onboardingBannerImg from '@/assets/onboarding-banner.png';
 
 const ONBOARDING_COMPLETED_KEY = 'simora_onboarding_completed_me-plus-v1';
+const ONBOARDING_PROGRESS_KEY = 'simora_onboarding_progress_me-plus-v1';
 
 export function OnboardingBanner() {
   const navigate = useNavigate();
@@ -13,6 +14,8 @@ export function OnboardingBanner() {
 
   const handleTap = () => {
     haptic.medium();
+    // Reset progress so onboarding always starts from the beginning
+    localStorage.removeItem(ONBOARDING_PROGRESS_KEY);
     navigate('/app/onboarding/me-plus-v1');
   };
 
