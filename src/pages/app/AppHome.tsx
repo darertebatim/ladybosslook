@@ -713,6 +713,7 @@ const AppHome = () => {
               <div className="min-h-0 overflow-hidden">
                 <div 
                   ref={weekStripRef}
+                  onScroll={handleWeekStripScroll}
                   className={cn("flex mt-1 overflow-x-auto transition-opacity duration-200 snap-x snap-mandatory", showCalendar ? "opacity-0" : "opacity-100")}
                   style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
                 >
