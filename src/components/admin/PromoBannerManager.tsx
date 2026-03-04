@@ -712,6 +712,7 @@ export function PromoBannerManager() {
                     <SelectItem value="breathe_exercise">💨 Breathing Exercise (specific)</SelectItem>
                     <SelectItem value="water">💧 Water Tracking</SelectItem>
                     <SelectItem value="emotion">😊 Emotion Tracker</SelectItem>
+                    <SelectItem value="mood">🎭 Mood Check</SelectItem>
                     <SelectItem value="period">🌸 Period Tracker</SelectItem>
                     <SelectItem value="channels">💬 Feed / Channels</SelectItem>
                     <SelectItem value="chat">🗨️ Chat / Support</SelectItem>

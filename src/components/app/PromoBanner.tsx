@@ -350,6 +350,9 @@ export function PromoBanner({
       case 'emotion':
         navigate('/app/emotion');
         break;
+      case 'mood':
+        navigate('/app/mood');
+        break;
       case 'period':
         navigate('/app/period');
         break;
