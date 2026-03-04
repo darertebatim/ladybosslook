@@ -359,10 +359,15 @@ const AppHome = () => {
   // Auto-scroll to current week (middle section) when strip is visible
   useEffect(() => {
     if (!showCalendar && weekStripRef.current) {
-      const container = weekStripRef.current;
-      // Each day is 1/7 of container width, current week starts at day index 7
-      const scrollTarget = container.scrollWidth / 3; // scroll to middle third
-      container.scrollLeft = scrollTarget;
+      // Use requestAnimationFrame to ensure layout is computed
+      requestAnimationFrame(() => {
+        if (weekStripRef.current) {
+          const container = weekStripRef.current;
+          const dayWidth = container.scrollWidth / 21;
+          // Current week starts at index 7
+          container.scrollLeft = dayWidth * 7;
+        }
+      });
     }
   }, [showCalendar, selectedDate]);
 
