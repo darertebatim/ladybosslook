@@ -356,6 +356,16 @@ const AppHome = () => {
   // Ref for scrollable week strip to auto-scroll to current week
   const weekStripRef = useRef<HTMLDivElement>(null);
 
+  // Auto-scroll to current week (middle section) when strip is visible
+  useEffect(() => {
+    if (!showCalendar && weekStripRef.current) {
+      const container = weekStripRef.current;
+      // Each day is 1/7 of container width, current week starts at day index 7
+      const scrollTarget = container.scrollWidth / 3; // scroll to middle third
+      container.scrollLeft = scrollTarget;
+    }
+  }, [showCalendar, selectedDate]);
+
   // Calculate date range for completed dates query
   const dateRange = useMemo(() => {
     if (showCalendar) {
