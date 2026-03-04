@@ -61,6 +61,7 @@ export interface Achievement {
   icon: LucideIcon;
   emoji: string;
   color: string;
+  group: string; // Tier group - only show next locked award per group
   unlockCondition: (stats: PresenceStats) => boolean;
 }
 
