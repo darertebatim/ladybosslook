@@ -11,6 +11,7 @@ export default function AppReflectionFlow() {
   const navigate = useNavigate();
   const { data: pages, isLoading } = useReflectionPages(reflectionId);
   const saveResponse = useSaveReflectionResponse();
+  const { autoCompleteReflection } = useAutoCompleteProTask();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
