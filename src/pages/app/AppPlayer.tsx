@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
-import { Search, X, Clock, LayoutGrid, Brain, Dumbbell, Waves, Heart, BookOpen, GraduationCap, Podcast, Globe, Crown } from "lucide-react";
+import { Search, X, Clock, LayoutGrid, Brain, Dumbbell, Waves, Heart, BookOpen, GraduationCap, Podcast, Globe, Crown, ChevronRight } from "lucide-react";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import { PlaylistCard } from "@/components/audio/PlaylistCard";
 import { Skeleton } from "@/components/ui/skeleton";
