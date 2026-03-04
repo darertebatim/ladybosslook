@@ -96,12 +96,11 @@ export function usePresenceStats() {
           .eq('user_id', user.id)
           .not('completed_at', 'is', null) as any,
 
-        // Meditation audio progress: get audio IDs from meditation playlists, then sum progress
-        // Step 1: Get meditation playlist audio IDs
-        supabase
+        // Meditation: get audio IDs from meditation playlists
+        (supabase
           .from('audio_playlist_items')
           .select('audio_id, audio_playlists!inner(category)')
-          .eq('audio_playlists.category' as any, 'meditate') as any,
+          .eq('audio_playlists.category' as any, 'meditate') as any) as Promise<any>,
 
         // Habit stacking: most repeated single action (task with most completions)
         supabase
