@@ -242,7 +242,7 @@ const AppPresence = () => {
             <section className="bg-white rounded-2xl p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-orange-900/60">
-                  Achievements
+                  Awards
                 </h3>
                 <span className="text-xs text-orange-500 font-medium">
                   {unlocked.length}/{ACHIEVEMENTS.length} unlocked
