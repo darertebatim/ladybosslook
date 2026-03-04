@@ -346,15 +346,15 @@ const AppHome = () => {
     [popularRoutines, addedRoutineIdsSet, dismissedRoutineIds]
   );
 
-  // Generate week days
+  // Generate 3 weeks of days (prev, current, next) for scrollable strip
   const weekDays = useMemo(() => {
-    const weekStart = startOfWeek(selectedDate, {
-      weekStartsOn: 0
-    });
-    return Array.from({
-      length: 7
-    }, (_, i) => addDays(weekStart, i));
+    const currentWeekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
+    const prevWeekStart = subDays(currentWeekStart, 7);
+    return Array.from({ length: 21 }, (_, i) => addDays(prevWeekStart, i));
   }, [selectedDate]);
+
+  // Ref for scrollable week strip to auto-scroll to current week
+  const weekStripRef = useRef<HTMLDivElement>(null);
 
   // Calculate date range for completed dates query
   const dateRange = useMemo(() => {
