@@ -279,131 +279,66 @@ export function PromoBanner({
     });
   }, [banners, dismissedIds, location, currentPlaylistId, userEnrollments, userPlaylists, userTools]);
 
-  // Get first eligible banner
-  const activeBanner = eligibleBanners[0];
-
-  const handleDismiss = (e: React.MouseEvent) => {
+  const handleDismiss = (e: React.MouseEvent, banner: PromoBannerData) => {
     e.stopPropagation();
-    if (activeBanner) {
-      setDismissal(activeBanner.id);
-      setDismissedIds(prev => new Set([...prev, activeBanner.id]));
-    }
+    setDismissal(banner.id);
+    setDismissedIds(prev => new Set([...prev, banner.id]));
   };
 
-  const handleTap = () => {
-    if (!activeBanner) return;
-    
+  const handleTap = (banner: PromoBannerData) => {
     // Also dismiss the banner when tapped (not just when X is clicked)
-    setDismissal(activeBanner.id);
-    setDismissedIds(prev => new Set([...prev, activeBanner.id]));
+    setDismissal(banner.id);
+    setDismissedIds(prev => new Set([...prev, banner.id]));
 
-    switch (activeBanner.destination_type) {
+    switch (banner.destination_type) {
       case 'routine':
-        if (activeBanner.destination_id) {
-          navigate(`/app/routines/${activeBanner.destination_id}`);
-        }
+        if (banner.destination_id) navigate(`/app/routines/${banner.destination_id}`);
         break;
       case 'playlist':
-        if (activeBanner.destination_id) {
-          navigate(`/app/player/playlist/${activeBanner.destination_id}`);
-        }
+        if (banner.destination_id) navigate(`/app/player/playlist/${banner.destination_id}`);
         break;
-      case 'journal':
-        navigate('/app/journal');
-        break;
-      case 'programs':
-        navigate('/app/programs');
-        break;
-      case 'breathe':
-        navigate('/app/breathe');
-        break;
-      case 'water':
-        navigate('/app/water');
-        break;
-      case 'channels':
-        navigate('/app/channels');
-        break;
-      case 'home':
-        navigate('/app/home');
-        break;
-      case 'inspire':
-        navigate('/app/routines');
-        break;
+      case 'journal': navigate('/app/journal'); break;
+      case 'programs': navigate('/app/programs'); break;
+      case 'breathe': navigate('/app/breathe'); break;
+      case 'water': navigate('/app/water'); break;
+      case 'channels': navigate('/app/channels'); break;
+      case 'home': navigate('/app/home'); break;
+      case 'inspire': navigate('/app/routines'); break;
       case 'tasks':
-        if (activeBanner.destination_id) {
-          navigate(`/app/home/new?template=${activeBanner.destination_id}`);
-        } else {
-          navigate('/app/home');
-        }
+        navigate(banner.destination_id ? `/app/home/new?template=${banner.destination_id}` : '/app/home');
         break;
       case 'routines_hub':
-        if (activeBanner.destination_id) {
-          navigate(`/app/routines/${activeBanner.destination_id}`);
-        } else {
-          navigate('/app/routines');
-        }
+        navigate(banner.destination_id ? `/app/routines/${banner.destination_id}` : '/app/routines');
         break;
-      case 'tasks_bank':
-        navigate('/app/home');
-        break;
-      case 'breathe_exercise':
-        navigate('/app/breathe');
-        break;
-      case 'emotion':
-        navigate('/app/emotion');
-        break;
-      case 'mood':
-        navigate('/app/mood');
-        break;
-      case 'period':
-        navigate('/app/period');
-        break;
-      case 'chat':
-        navigate('/app/chat');
-        break;
-      case 'profile':
-        navigate('/app/profile');
-        break;
-      case 'planner':
-        navigate('/app/home'); // Planner is on home
-        break;
+      case 'tasks_bank': navigate('/app/home'); break;
+      case 'breathe_exercise': navigate('/app/breathe'); break;
+      case 'emotion': navigate('/app/emotion'); break;
+      case 'mood': navigate('/app/mood'); break;
+      case 'period': navigate('/app/period'); break;
+      case 'chat': navigate('/app/chat'); break;
+      case 'profile': navigate('/app/profile'); break;
+      case 'planner': navigate('/app/home'); break;
       case 'custom_url':
-        if (activeBanner.custom_url) {
-          if (activeBanner.custom_url.startsWith('http')) {
-            window.open(activeBanner.custom_url, '_blank');
-          } else {
-            navigate(activeBanner.custom_url);
-          }
+        if (banner.custom_url) {
+          banner.custom_url.startsWith('http') ? window.open(banner.custom_url, '_blank') : navigate(banner.custom_url);
         }
         break;
       case 'external_url':
-        if (activeBanner.custom_url) {
-          window.open(activeBanner.custom_url, '_blank');
-        }
+        if (banner.custom_url) window.open(banner.custom_url, '_blank');
         break;
-      case 'rate':
-        navigate('/app/rate');
-        break;
+      case 'rate': navigate('/app/rate'); break;
       case 'onboarding':
-        if (activeBanner.destination_id) {
-          navigate(`/app/onboarding/${activeBanner.destination_id}`);
-        }
+        if (banner.destination_id) navigate(`/app/onboarding/${banner.destination_id}`);
         break;
-      case 'watch':
-        navigate('/app/watch');
-        break;
+      case 'watch': navigate('/app/watch'); break;
       case 'video_playlist':
-        if (activeBanner.destination_id) {
-          navigate(`/app/watch/playlist/${activeBanner.destination_id}`);
-        } else {
-          navigate('/app/watch');
-        }
+        navigate(banner.destination_id ? `/app/watch/playlist/${banner.destination_id}` : '/app/watch');
         break;
     }
   };
   
-  const getAspectRatioClass = () => {
-    switch (activeBanner?.aspect_ratio) {
+  const getAspectRatioClass = (ratio?: string) => {
+    switch (ratio) {
       case '16:9': return 'aspect-video';
       case '1:1': return 'aspect-square';
       case '4:1': return 'aspect-[4/1]';
@@ -411,31 +346,31 @@ export function PromoBanner({
     }
   };
 
-  if (!activeBanner) return null;
+  if (eligibleBanners.length === 0) return null;
 
   return (
-    <div className={className || "px-4 py-2"}>
-      <div
-        className="relative w-full rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
-        onClick={handleTap}
-      >
-        {/* Banner Image */}
-        <img
-          src={activeBanner.cover_image_url}
-          alt="Promo"
-          className={`w-full ${getAspectRatioClass()} object-cover`}
-        />
-        
-        {/* Close Button - hidden for 'forever' banners */}
-        {activeBanner.display_frequency !== 'forever' && (
-          <button
-            onClick={handleDismiss}
-            className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 flex items-center justify-center active:scale-90 transition-transform"
-          >
-            <X className="h-4 w-4 text-white" />
-          </button>
-        )}
-      </div>
+    <div className={className || "px-4 py-2 space-y-2"}>
+      {eligibleBanners.map(banner => (
+        <div
+          key={banner.id}
+          className="relative w-full rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
+          onClick={() => handleTap(banner)}
+        >
+          <img
+            src={banner.cover_image_url}
+            alt="Promo"
+            className={`w-full ${getAspectRatioClass(banner.aspect_ratio)} object-cover`}
+          />
+          {banner.display_frequency !== 'forever' && (
+            <button
+              onClick={(e) => handleDismiss(e, banner)}
+              className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 flex items-center justify-center active:scale-90 transition-transform"
+            >
+              <X className="h-4 w-4 text-white" />
+            </button>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
