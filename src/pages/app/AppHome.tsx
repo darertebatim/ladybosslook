@@ -378,26 +378,27 @@ const AppHome = () => {
   }, [showCalendar, selectedDate]);
 
   // Detect scroll snap to different week and update selected date
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const handleWeekStripScroll = useCallback(() => {
     if (isAutoScrollingRef.current || !weekStripRef.current) return;
-    const container = weekStripRef.current;
-    const dayWidth = container.scrollWidth / 21;
-    const weekWidth = dayWidth * 7;
-    // Determine which week is currently visible (0, 1, or 2)
-    const currentWeekIdx = Math.round(container.scrollLeft / weekWidth);
-    
-    if (currentWeekIdx !== lastScrollWeekRef.current) {
-      lastScrollWeekRef.current = currentWeekIdx;
-      const dayOfWeek = selectedDate.getDay(); // 0=Sun ... 6=Sat
-      const diff = (currentWeekIdx - 1) * 7; // -7 for prev, +7 for next
-      if (diff !== 0) {
+    // Debounce: wait for scroll to settle
+    clearTimeout(scrollTimerRef.current);
+    scrollTimerRef.current = setTimeout(() => {
+      if (!weekStripRef.current) return;
+      const container = weekStripRef.current;
+      const dayWidth = container.scrollWidth / 21;
+      const weekWidth = dayWidth * 7;
+      const currentWeekIdx = Math.round(container.scrollLeft / weekWidth);
+      
+      if (currentWeekIdx !== 1) { // scrolled away from center week
+        const diff = (currentWeekIdx - 1) * 7;
         const newDate = addDays(selectedDate, diff);
         isAutoScrollingRef.current = true;
         setSelectedDate(newDate);
         setCurrentMonth(startOfMonth(newDate));
         haptic.light();
       }
-    }
+    }, 100);
   }, [selectedDate]);
 
   // Calculate date range for completed dates query
