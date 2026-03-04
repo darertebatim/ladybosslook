@@ -127,6 +127,10 @@ export default function RoutinesBank() {
   const [addingTaskToSection, setAddingTaskToSection] = useState<string | null>(null); // section_id or 'uncategorized'
   const [dialogTab, setDialogTab] = useState<'basic' | 'sections'>('basic');
 
+  // Create action sheet state
+  const [createActionSheetOpen, setCreateActionSheetOpen] = useState(false);
+  const [createActionSectionId, setCreateActionSectionId] = useState<string | null>(null);
+
   // Section editor state
   const [sectionDialogOpen, setSectionDialogOpen] = useState(false);
   const [editingSection, setEditingSection] = useState<LocalSection | null>(null);
