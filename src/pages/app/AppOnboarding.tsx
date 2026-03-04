@@ -27,7 +27,15 @@ function preloadImages(srcs: string[]) {
 export default function AppOnboarding() {
   const { flowId } = useParams<{ flowId: string }>();
   const navigate = useNavigate();
-  const flow = allFlows.find(f => f.id === flowId);
+  const { user } = useAuth();
+  const { isSubscribed } = useSubscription();
+  const rawFlow = allFlows.find(f => f.id === flowId);
+
+  // Filter out paywall steps for subscribed users
+  const flow = rawFlow ? {
+    ...rawFlow,
+    steps: isSubscribed ? rawFlow.steps.filter(s => s.type !== 'paywall') : rawFlow.steps,
+  } : undefined;
 
   // Restore progress from localStorage
   const progressKey = `simora_onboarding_progress_${flowId}`;
