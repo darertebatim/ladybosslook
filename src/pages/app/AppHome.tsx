@@ -800,7 +800,7 @@ const AppHome = () => {
 
         {/* Fixed spacer for header */}
         <div className="shrink-0" style={{
-        height: showCalendar ? 'calc(48px + 290px + max(12px, env(safe-area-inset-top)))' : 'calc(48px + 72px + max(12px, env(safe-area-inset-top)))'
+        height: showCalendar ? 'calc(40px + 280px + max(12px, env(safe-area-inset-top)))' : 'calc(40px + 62px + max(12px, env(safe-area-inset-top)))'
       }} />
 
         {/* Scroll container */}
