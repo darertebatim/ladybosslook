@@ -84,7 +84,7 @@ export function usePresenceStats() {
         supabase
           .from('audio_playlist_items')
           .select('audio_id, audio_playlists!inner(category)')
-          .eq('audio_playlists.category' as any, 'meditate'),
+          .eq('audio_playlists.category' as any, 'meditate') as any,
         supabase
           .from('task_completions')
           .select('task_id')
@@ -96,9 +96,13 @@ export function usePresenceStats() {
       const listeningSeconds = audioData.reduce((sum, p) => sum + (p.current_position_seconds || 0), 0);
       const completedTracks = audioData.filter(p => p.completed).length;
 
-      // Calculate meditation minutes
-      const meditationData = (meditationProgressResult.data as any[]) || [];
-      const meditationSeconds = meditationData.reduce((sum: number, p: any) => sum + (p.current_position_seconds || 0), 0);
+      // Calculate meditation minutes from audio progress filtered by meditation playlist audio IDs
+      const meditationAudioIds = new Set(
+        ((meditationPlaylistItems as any)?.data || []).map((item: any) => item.audio_id)
+      );
+      const meditationSeconds = audioData
+        .filter(p => meditationAudioIds.has((p as any).audio_id))
+        .reduce((sum, p) => sum + (p.current_position_seconds || 0), 0);
 
       // Calculate max single action completions (habit stacking)
       const taskCompletionsByTask = new Map<string, number>();
