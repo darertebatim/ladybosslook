@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useRef } from "react";
 import { Input } from "@/components/ui/input";
-import { Search, X, Clock, Video, CalendarPlus } from "lucide-react";
+import { Search, X, Clock, Video, CalendarPlus, ChevronRight } from "lucide-react";
 import { VideoPlaylistCard } from "@/components/video/VideoPlaylistCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isNativeApp } from "@/lib/platform";
