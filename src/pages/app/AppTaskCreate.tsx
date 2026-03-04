@@ -1812,6 +1812,10 @@ const AppTaskCreate = ({
                           // Show breathing exercise picker
                           setShowProLinkPicker(false);
                           setShowBreathingPicker(true);
+                        } else if (config.value === 'reflection') {
+                          // Show reflection picker
+                          setShowProLinkPicker(false);
+                          setShowReflectionPicker(true);
                         }
                       }}
                       className={cn(
