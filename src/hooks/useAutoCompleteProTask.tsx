@@ -277,6 +277,13 @@ export const useAutoCompleteProTask = () => {
     return autoComplete('mood');
   }, [autoComplete]);
 
+  /**
+   * Auto-complete reflection pro tasks for a specific reflection
+   */
+  const autoCompleteReflection = useCallback(async (reflectionId?: string): Promise<number> => {
+    return autoComplete('reflection', reflectionId);
+  }, [autoComplete]);
+
   return {
     autoComplete,
     autoCompleteJournal,
@@ -284,5 +291,6 @@ export const useAutoCompleteProTask = () => {
     autoCompleteBreathe,
     autoCompleteEmotion,
     autoCompleteMood,
+    autoCompleteReflection,
   };
 };
