@@ -348,13 +348,13 @@ export default function RoutinesBank() {
 
       // Recreate tasks
       if (data.tasks.length > 0) {
-        const taskRecords = data.tasks.map((t, idx) => ({
+        const taskRecords = data.tasks.map((t) => ({
           routine_id: data.id,
           task_id: t.task_id,
           title: t.title,
           emoji: t.emoji,
           section_id: t.section_id ? sectionIdMap[t.section_id] || null : null,
-          task_order: idx,
+          task_order: t.task_order,
           schedule_days: t.schedule_days?.length ? t.schedule_days : [],
           drip_day: t.drip_day,
           monthly_day: t.monthly_day,
