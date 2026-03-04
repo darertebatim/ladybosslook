@@ -197,42 +197,73 @@ const AppPresence = () => {
               />
             ))}
             
-            {/* All-Time Activity Stats */}
+            {/* Activity Stats with Links */}
             <section className="bg-white rounded-2xl p-4 shadow-sm">
               <h3 className="text-sm font-semibold text-orange-900/60 mb-3">
                 Activity Stats
               </h3>
-              <div className="grid grid-cols-2 gap-3">
-                <ActivityStatCard 
+              <div className="space-y-1">
+                <LinkedStatRow 
+                  icon={CheckCircle2}
+                  label="Tasks Completed"
+                  value={stats?.totalTaskCompletions || 0}
+                  iconColor="text-orange-500"
+                  iconBg="bg-orange-100"
+                  to="/app/home"
+                  isLoading={isLoading}
+                />
+                <LinkedStatRow 
                   icon={Headphones}
                   label="Listening"
                   value={`${stats?.listeningMinutes || 0} min`}
-                  iconColor="text-orange-500"
-                  iconBg="bg-orange-100"
+                  iconColor="text-sky-500"
+                  iconBg="bg-sky-100"
+                  to="/app/listen"
                   isLoading={isLoading}
                 />
-                <ActivityStatCard 
+                <LinkedStatRow 
                   icon={CheckCircle2}
                   label="Completed Tracks"
                   value={stats?.completedTracks || 0}
                   iconColor="text-amber-600"
                   iconBg="bg-amber-100"
+                  to="/app/listen"
                   isLoading={isLoading}
                 />
-                <ActivityStatCard 
+                <LinkedStatRow 
                   icon={BookHeart}
                   label="Journal Entries"
                   value={stats?.journalEntries || 0}
-                  iconColor="text-orange-600"
-                  iconBg="bg-orange-100"
+                  iconColor="text-rose-500"
+                  iconBg="bg-rose-100"
+                  to="/app/journal"
                   isLoading={isLoading}
                 />
-                <ActivityStatCard 
+                <LinkedStatRow 
                   icon={Wind}
                   label="Breathing Sessions"
                   value={stats?.breathingSessions || 0}
-                  iconColor="text-amber-500"
-                  iconBg="bg-amber-100"
+                  iconColor="text-teal-500"
+                  iconBg="bg-teal-100"
+                  to="/app/breathe"
+                  isLoading={isLoading}
+                />
+                <LinkedStatRow 
+                  icon={SmilePlus}
+                  label="Emotion Check-ins"
+                  value={stats?.emotionLogs || 0}
+                  iconColor="text-violet-500"
+                  iconBg="bg-violet-100"
+                  to="/app/emotion/history"
+                  isLoading={isLoading}
+                />
+                <LinkedStatRow 
+                  icon={Brain}
+                  label="Mood Check-ins"
+                  value="View"
+                  iconColor="text-indigo-500"
+                  iconBg="bg-indigo-100"
+                  to="/app/mood/history"
                   isLoading={isLoading}
                 />
               </div>
