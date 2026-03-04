@@ -52,6 +52,10 @@ export default function AppReflectionFlow() {
 
       if (isLast) {
         toast.success('Reflection completed ✨');
+        // Auto-complete any pro-linked tasks for this reflection
+        if (reflectionId) {
+          autoCompleteReflection(reflectionId);
+        }
         navigate(-1);
       } else {
         setCurrentIndex((i) => i + 1);
