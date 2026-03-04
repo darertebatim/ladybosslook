@@ -54,7 +54,7 @@ const AppPresence = () => {
     <>
       <SEOHead title="My Presence - LadyBoss" description="Your presence and achievements" />
       
-      <div className="flex flex-col h-full overflow-hidden bg-amber-50">
+      <div className="flex flex-col h-dvh overflow-hidden bg-amber-50">
         {/* Fixed Header - iOS standard with safe area */}
         <header 
           className="shrink-0 relative z-10"
