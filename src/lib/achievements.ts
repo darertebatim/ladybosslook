@@ -25,6 +25,10 @@ import {
   Award,
   Mountain,
   Gem,
+  Brain,
+  Repeat,
+  Layers,
+  TreePine,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -44,6 +48,10 @@ export interface PresenceStats {
   emotionLogs: number;
   totalTaskCompletions: number;
   fastingSessions: number;
+  reflectionCompletions: number;
+  meditationMinutes: number;
+  maxSingleActionCompletions: number;
+  habitsFormed: number;
 }
 
 export interface Achievement {
@@ -348,6 +356,46 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
 
   // ═══════════════════════════════════════════
+  // 🧘 GUIDED MEDITATION - 4 tiers
+  // ═══════════════════════════════════════════
+  {
+    id: 'first-meditation',
+    name: 'Inner Calm',
+    description: '10+ minutes of meditation',
+    icon: Brain,
+    emoji: '🧘',
+    color: 'bg-indigo-400',
+    unlockCondition: (s) => s.meditationMinutes >= 10,
+  },
+  {
+    id: 'mindful-hour',
+    name: 'Mindful Hour',
+    description: '60+ minutes of meditation',
+    icon: Brain,
+    emoji: '🕊️',
+    color: 'bg-indigo-500',
+    unlockCondition: (s) => s.meditationMinutes >= 60,
+  },
+  {
+    id: 'meditation-devotee',
+    name: 'Meditation Devotee',
+    description: '5+ hours of meditation',
+    icon: Brain,
+    emoji: '🪷',
+    color: 'bg-indigo-600',
+    unlockCondition: (s) => s.meditationMinutes >= 300,
+  },
+  {
+    id: 'enlightened',
+    name: 'Enlightened',
+    description: '10+ hours of meditation',
+    icon: Brain,
+    emoji: '✨',
+    color: 'bg-indigo-700',
+    unlockCondition: (s) => s.meditationMinutes >= 600,
+  },
+
+  // ═══════════════════════════════════════════
   // 📝 JOURNAL WRITING - 4 tiers
   // ═══════════════════════════════════════════
   {
@@ -385,6 +433,37 @@ export const ACHIEVEMENTS: Achievement[] = [
     emoji: '📚',
     color: 'bg-red-700',
     unlockCondition: (s) => s.journalEntries >= 100,
+  },
+
+  // ═══════════════════════════════════════════
+  // 🪞 GUIDED REFLECTIONS - 3 tiers
+  // ═══════════════════════════════════════════
+  {
+    id: 'first-reflection',
+    name: 'Mirror Moment',
+    description: 'Completed your first reflection',
+    icon: Sparkles,
+    emoji: '🪞',
+    color: 'bg-teal-400',
+    unlockCondition: (s) => s.reflectionCompletions >= 1,
+  },
+  {
+    id: 'deep-thinker',
+    name: 'Deep Thinker',
+    description: '10+ reflections completed',
+    icon: Sparkles,
+    emoji: '💭',
+    color: 'bg-teal-500',
+    unlockCondition: (s) => s.reflectionCompletions >= 10,
+  },
+  {
+    id: 'wisdom-seeker',
+    name: 'Wisdom Seeker',
+    description: '25+ reflections completed',
+    icon: Sparkles,
+    emoji: '🦉',
+    color: 'bg-teal-700',
+    unlockCondition: (s) => s.reflectionCompletions >= 25,
   },
 
   // ═══════════════════════════════════════════
@@ -490,6 +569,64 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
 
   // ═══════════════════════════════════════════
+  // 🔁 HABIT STACKING - 5 tiers
+  // ═══════════════════════════════════════════
+  {
+    id: 'repeat-player',
+    name: 'Repeat Player',
+    description: 'Completed one action 7 times',
+    icon: Repeat,
+    emoji: '🔁',
+    color: 'bg-emerald-400',
+    unlockCondition: (s) => s.maxSingleActionCompletions >= 7,
+  },
+  {
+    id: 'habit-builder',
+    name: 'Habit Builder',
+    description: 'Completed one action 14 times',
+    icon: Layers,
+    emoji: '🧱',
+    color: 'bg-emerald-500',
+    unlockCondition: (s) => s.maxSingleActionCompletions >= 14,
+  },
+  {
+    id: 'habit-locked-in',
+    name: 'Locked In',
+    description: 'Completed one action 30 times',
+    icon: Layers,
+    emoji: '🔒',
+    color: 'bg-emerald-600',
+    unlockCondition: (s) => s.maxSingleActionCompletions >= 30,
+  },
+  {
+    id: 'habit-second-nature',
+    name: 'Second Nature',
+    description: 'Completed one action 60 times',
+    icon: TreePine,
+    emoji: '🌳',
+    color: 'bg-emerald-700',
+    unlockCondition: (s) => s.maxSingleActionCompletions >= 60,
+  },
+  {
+    id: 'multi-habit',
+    name: 'Multi-Habit Master',
+    description: 'Built 3+ habits (7+ completions each)',
+    icon: Layers,
+    emoji: '🏗️',
+    color: 'bg-green-600',
+    unlockCondition: (s) => s.habitsFormed >= 3,
+  },
+  {
+    id: 'habit-architect',
+    name: 'Habit Architect',
+    description: 'Built 5+ habits (7+ completions each)',
+    icon: Crown,
+    emoji: '🏛️',
+    color: 'bg-green-700',
+    unlockCondition: (s) => s.habitsFormed >= 5,
+  },
+
+  // ═══════════════════════════════════════════
   // 🌟 SPECIAL COMBO MILESTONES
   // ═══════════════════════════════════════════
   {
@@ -507,6 +644,8 @@ export const ACHIEVEMENTS: Achievement[] = [
       if (s.listeningMinutes > 0) t++;
       if (s.emotionLogs > 0) t++;
       if (s.fastingSessions > 0) t++;
+      if (s.reflectionCompletions > 0) t++;
+      if (s.meditationMinutes > 0) t++;
       return t >= 3;
     },
   },
@@ -525,6 +664,8 @@ export const ACHIEVEMENTS: Achievement[] = [
       if (s.listeningMinutes > 0) t++;
       if (s.emotionLogs > 0) t++;
       if (s.fastingSessions > 0) t++;
+      if (s.reflectionCompletions > 0) t++;
+      if (s.meditationMinutes > 0) t++;
       return t >= 5;
     },
   },
@@ -545,6 +686,15 @@ export const ACHIEVEMENTS: Achievement[] = [
     emoji: '🌙',
     color: 'bg-indigo-700',
     unlockCondition: (s) => s.totalTaskCompletions >= 25 && s.breathingSessions >= 10,
+  },
+  {
+    id: 'inner-peace',
+    name: 'Inner Peace',
+    description: '30min meditation & 10+ reflections',
+    icon: Brain,
+    emoji: '🕊️',
+    color: 'bg-violet-500',
+    unlockCondition: (s) => s.meditationMinutes >= 30 && s.reflectionCompletions >= 10,
   },
 ];
 
