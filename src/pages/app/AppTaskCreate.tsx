@@ -381,6 +381,7 @@ const AppTaskCreate = ({
   const [showProLinkPicker, setShowProLinkPicker] = useState(false);
   const [showPlaylistPicker, setShowPlaylistPicker] = useState(false);
   const [showBreathingPicker, setShowBreathingPicker] = useState(false);
+  const [showReflectionPicker, setShowReflectionPicker] = useState(false);
   const [showGoalSettings, setShowGoalSettings] = useState(false);
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
   
