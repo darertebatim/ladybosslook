@@ -41,6 +41,7 @@ const categoryConfig: Record<string, { name: string; icon: string; color: string
 };
 
 export default function AppPlayer() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
