@@ -631,7 +631,7 @@ const AppHome = () => {
         paddingTop: 'max(12px, env(safe-area-inset-top))'
       }}>
           {/* Title bar - three column layout for balanced centering */}
-          <div className="grid grid-cols-[auto_1fr_auto] items-center px-4 h-12">
+          <div className="grid grid-cols-[auto_1fr_auto] items-center px-4 h-10">
             {/* Left: Menu button */}
             <div className="justify-self-start tour-menu-button">
               <HomeMenu onStartTour={startHomeTour || undefined} />
