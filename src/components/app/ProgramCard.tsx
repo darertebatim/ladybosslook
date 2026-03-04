@@ -87,12 +87,6 @@ export const ProgramCard = ({
         )}
       </div>
 
-      {/* FREE Badge - Top Left */}
-      {isFree && !isEnrolled && (
-        <Badge className="absolute top-2 left-2 bg-primary hover:bg-primary text-primary-foreground text-xs rounded-full z-10">
-          FREE
-        </Badge>
-      )}
 
       {/* Type Badge - Top Left (if not free) */}
       {typeInfo && !isFree && !isEnrolled && (
