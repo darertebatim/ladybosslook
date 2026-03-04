@@ -59,7 +59,7 @@ export function usePresenceStats() {
         supabase.from('app_return_events').select('id', { count: 'exact', head: true }).eq('user_id', user.id).gte('created_at', sevenDaysAgoStr),
         supabase.from('fasting_sessions' as any).select('id', { count: 'exact', head: true }).eq('user_id', user.id).not('ended_at', 'is', null),
         supabase.from('user_reflection_responses' as any).select('id', { count: 'exact', head: true }).eq('user_id', user.id).not('completed_at', 'is', null),
-        supabase.from('audio_playlist_items').select('audio_id, audio_playlists!inner(category)').eq('audio_playlists.category' as any, 'meditate'),
+        supabase.from('audio_playlist_items' as any).select('audio_id, audio_playlists!inner(category)').eq('audio_playlists.category', 'meditate'),
         supabase.from('task_completions').select('task_id').eq('user_id', user.id),
       ]) as any);
 
