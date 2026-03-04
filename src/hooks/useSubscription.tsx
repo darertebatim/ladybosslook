@@ -16,7 +16,7 @@ interface UserSubscription {
 export const useSubscription = () => {
   const { user } = useAuth();
 
-  const { data: subscriptions = [], isLoading } = useQuery({
+  const { data: subscriptions = [], isLoading: subsLoading } = useQuery({
     queryKey: ['user-subscriptions', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -40,13 +40,37 @@ export const useSubscription = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  // Check if user has ANY active subscription
-  const isSubscribed = subscriptions.length > 0;
+  // Also check course_enrollments for admin-enrolled users
+  const { data: enrolledSlugs = [], isLoading: enrollLoading } = useQuery({
+    queryKey: ['user-enrollment-slugs', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase
+        .from('course_enrollments')
+        .select('program_slug')
+        .eq('user_id', user.id)
+        .eq('status', 'active') as any;
+      if (error) throw error;
+      return ((data || []) as { program_slug: string | null }[])
+        .map(e => e.program_slug)
+        .filter(Boolean) as string[];
+    },
+    enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const isLoading = subsLoading || enrollLoading;
+
+  // Check if user has ANY active subscription or enrollment in a subscription program
+  const isSubscribed = subscriptions.length > 0 || enrolledSlugs.includes('simora-plus');
 
   // Check if user has access to a specific program's subscription content
   const hasAccessToProgram = (programSlug: string): boolean => {
     if (!programSlug) return false;
-    return subscriptions.some(sub => sub.program_slug === programSlug);
+    // Check user_subscriptions first
+    if (subscriptions.some(sub => sub.program_slug === programSlug)) return true;
+    // Fall back to course_enrollments (admin-enrolled users)
+    return enrolledSlugs.includes(programSlug);
   };
 
   // Get active subscription for a specific program
