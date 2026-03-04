@@ -38,8 +38,8 @@ const ALLOWED_TYPES = [
   'audio/webm', 'audio/mp4', 'audio/mpeg', 'audio/ogg'
 ];
 
-export function ChatInput({ onSend, disabled, placeholder = "Type a message...", uploading, onFocus, onBlur }: ChatInputProps) {
-  const [message, setMessage] = useState("");
+export function ChatInput({ onSend, disabled, placeholder = "Type a message...", uploading, onFocus, onBlur, initialMessage }: ChatInputProps) {
+  const [message, setMessage] = useState(initialMessage || "");
   const [attachment, setAttachment] = useState<Attachment | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
