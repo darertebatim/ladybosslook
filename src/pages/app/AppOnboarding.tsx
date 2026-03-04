@@ -66,7 +66,18 @@ export default function AppOnboarding() {
 
   const handleAnswer = useCallback((stepId: string, answer: string | string[]) => {
     setAnswers(prev => ({ ...prev, [stepId]: answer }));
-  }, []);
+    // Persist answer to Supabase
+    if (user && flowId) {
+      supabase.from('onboarding_answers').insert({
+        user_id: user.id,
+        flow_id: flowId,
+        step_id: stepId,
+        answer: Array.isArray(answer) ? answer : [answer],
+      } as any).then(({ error }) => {
+        if (error) console.warn('[Onboarding] Failed to persist answer:', error.message);
+      });
+    }
+  }, [user, flowId]);
 
   const goNext = useCallback(() => {
     if (!flow) return;
