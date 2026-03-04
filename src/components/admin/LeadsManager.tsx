@@ -30,7 +30,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { usePrograms } from '@/hooks/usePrograms';
+
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface PushSubscription {
@@ -111,7 +111,19 @@ export function LeadsManager() {
   const [selectedCartProgram, setSelectedCartProgram] = useState('');
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { toast } = useToast();
-  const { programs, isLoading: programsLoading } = usePrograms();
+  // Fetch ALL active programs for admin enrollment (not platform-filtered)
+  const { data: programs = [], isLoading: programsLoading } = useQuery({
+    queryKey: ['admin-all-programs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('program_catalog')
+        .select('title, slug, price_amount, payment_type')
+        .eq('is_active', true)
+        .order('title') as any;
+      if (error) throw error;
+      return data || [];
+    },
+  });
   const queryClient = useQueryClient();
 
   // Fetch available rounds for selected course
