@@ -451,7 +451,7 @@ const AppTaskCreate = ({
         .order('sort_order', { ascending: true });
       
       if (error) throw error;
-      return data as { id: string; title: string; subtitle: string | null; cover_image_url: string | null }[];
+      return data as unknown as { id: string; title: string; subtitle: string | null; cover_image_url: string | null }[];
     },
   });
 
