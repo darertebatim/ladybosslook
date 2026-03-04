@@ -41,7 +41,7 @@ export function usePresenceStats() {
           .eq('user_id', user.id),
         supabase
           .from('audio_progress')
-          .select('current_position_seconds, completed')
+          .select('audio_id, current_position_seconds, completed')
           .eq('user_id', user.id),
         supabase
           .from('journal_entries')
