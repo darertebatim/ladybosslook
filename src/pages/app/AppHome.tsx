@@ -688,7 +688,7 @@ const AppHome = () => {
           </div>
 
           {/* Calendar area - compact spacing */}
-          <div className="tour-calendar px-4 pt-0.5 pb-0.5">
+          <div className="tour-calendar px-4 pt-0 pb-0">
             {/* Calendar grid container - with weekday headers */}
             <div className="grid overflow-hidden" style={{
             gridTemplateRows: showCalendar ? '1fr' : '0fr'
