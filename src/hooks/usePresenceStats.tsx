@@ -27,6 +27,9 @@ export function usePresenceStats() {
         emotionResult,
         weeklyReturnsResult,
         fastingResult,
+        reflectionResult,
+        meditationProgressResult,
+        habitStackingResult,
       ] = await Promise.all([
         // Profile data (strength-first metrics)
         supabase
@@ -85,12 +88,48 @@ export function usePresenceStats() {
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id)
           .not('ended_at', 'is', null),
+
+        // Reflection completions (unique reflections completed)
+        supabase
+          .from('user_reflection_responses' as any)
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .not('completed_at', 'is', null),
+
+        // Meditation audio progress (category = meditate via audio_content join)
+        supabase
+          .from('audio_progress')
+          .select('current_position_seconds, audio_content!inner(category)')
+          .eq('user_id', user.id)
+          .eq('audio_content.category' as any, 'meditate' as any),
+
+        // Habit stacking: most repeated single action (task with most completions)
+        supabase
+          .from('task_completions')
+          .select('task_id')
+          .eq('user_id', user.id),
       ]);
 
       // Calculate listening minutes and completed tracks
       const audioData = audioProgressResult.data || [];
       const listeningSeconds = audioData.reduce((sum, p) => sum + (p.current_position_seconds || 0), 0);
       const completedTracks = audioData.filter(p => p.completed).length;
+
+      // Calculate meditation minutes
+      const meditationData = (meditationProgressResult.data as any[]) || [];
+      const meditationSeconds = meditationData.reduce((sum: number, p: any) => sum + (p.current_position_seconds || 0), 0);
+
+      // Calculate max single action completions (habit stacking)
+      const taskCompletionsByTask = new Map<string, number>();
+      const habitData = habitStackingResult.data || [];
+      habitData.forEach((c: any) => {
+        taskCompletionsByTask.set(c.task_id, (taskCompletionsByTask.get(c.task_id) || 0) + 1);
+      });
+      const maxSingleActionCompletions = taskCompletionsByTask.size > 0
+        ? Math.max(...taskCompletionsByTask.values())
+        : 0;
+      // Count how many actions have been repeated 7+ times
+      const habitsFormed = [...taskCompletionsByTask.values()].filter(v => v >= 7).length;
 
       const stats: PresenceStats = {
         // Presence metrics
@@ -108,6 +147,10 @@ export function usePresenceStats() {
         emotionLogs: emotionResult.count || 0,
         totalTaskCompletions: taskCompletionsResult.count || 0,
         fastingSessions: (fastingResult as any).count || 0,
+        reflectionCompletions: (reflectionResult as any).count || 0,
+        meditationMinutes: Math.floor(meditationSeconds / 60),
+        maxSingleActionCompletions,
+        habitsFormed,
       };
 
       const { unlocked, locked } = getAchievementStatus(stats);
