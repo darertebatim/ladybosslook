@@ -23,6 +23,7 @@ import { Capacitor } from '@capacitor/core';
 import { format, startOfMonth } from 'date-fns';
 import { useJournalEntries, JournalEntry } from '@/hooks/useJournal';
 import { cn } from '@/lib/utils';
+import { SubscriptionCard } from '@/components/app/SubscriptionManagement';
 
 // Stats Pill Component
 const StatPill = ({ label, value, icon: Icon }: { label: string; value: number | string; icon?: React.ComponentType<{ className?: string }> }) => (
@@ -427,6 +428,9 @@ const AppProfile = () => {
             <Settings className="h-4 w-4" />
           </Button>
         </div>
+
+        {/* Subscription Card */}
+        <SubscriptionCard />
 
         {/* Profile Info Card */}
         <Card className="rounded-2xl shadow-sm border-0 bg-card">
