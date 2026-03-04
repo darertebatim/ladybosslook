@@ -5,6 +5,9 @@ import { OnboardingStepRenderer } from '@/components/admin/onboarding/Onboarding
 import { ChevronLeft } from 'lucide-react';
 import { dearMeFlow } from '@/data/onboarding-flows/dear-me';
 import { mePlusFlow } from '@/data/onboarding-flows/me-plus';
+import { useAuth } from '@/hooks/useAuth';
+import { useSubscription } from '@/hooks/useSubscription';
+import { supabase } from '@/integrations/supabase/client';
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
 import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
@@ -24,7 +27,15 @@ function preloadImages(srcs: string[]) {
 export default function AppOnboarding() {
   const { flowId } = useParams<{ flowId: string }>();
   const navigate = useNavigate();
-  const flow = allFlows.find(f => f.id === flowId);
+  const { user } = useAuth();
+  const { isSubscribed } = useSubscription();
+  const rawFlow = allFlows.find(f => f.id === flowId);
+
+  // Filter out paywall steps for subscribed users
+  const flow = rawFlow ? {
+    ...rawFlow,
+    steps: isSubscribed ? rawFlow.steps.filter(s => s.type !== 'paywall') : rawFlow.steps,
+  } : undefined;
 
   // Restore progress from localStorage
   const progressKey = `simora_onboarding_progress_${flowId}`;
@@ -55,7 +66,18 @@ export default function AppOnboarding() {
 
   const handleAnswer = useCallback((stepId: string, answer: string | string[]) => {
     setAnswers(prev => ({ ...prev, [stepId]: answer }));
-  }, []);
+    // Persist answer to Supabase
+    if (user && flowId) {
+      supabase.from('onboarding_answers').insert({
+        user_id: user.id,
+        flow_id: flowId,
+        step_id: stepId,
+        answer: Array.isArray(answer) ? answer : [answer],
+      } as any).then(({ error }) => {
+        if (error) console.warn('[Onboarding] Failed to persist answer:', error.message);
+      });
+    }
+  }, [user, flowId]);
 
   const goNext = useCallback(() => {
     if (!flow) return;

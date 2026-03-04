@@ -1578,6 +1578,33 @@ export type Database = {
           },
         ]
       }
+      onboarding_answers: {
+        Row: {
+          answer: Json
+          created_at: string
+          flow_id: string
+          id: string
+          step_id: string
+          user_id: string
+        }
+        Insert: {
+          answer: Json
+          created_at?: string
+          flow_id: string
+          id?: string
+          step_id: string
+          user_id: string
+        }
+        Update: {
+          answer?: Json
+          created_at?: string
+          flow_id?: string
+          id?: string
+          step_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           amount: number

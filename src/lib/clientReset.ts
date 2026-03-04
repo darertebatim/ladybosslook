@@ -24,6 +24,7 @@ const CLIENT_RESET_KEYS = [
   
   // Any other onboarding/first-time flags
   'simora_onboarding_complete',
+  'simora_onboarding_banner_dismissed',
   'simora_planner_intro_seen',
   
   // Mood check-in banner
