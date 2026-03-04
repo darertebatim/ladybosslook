@@ -49,13 +49,21 @@ export default function AppMoodHistory() {
       />
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20">
         {/* Header */}
-        <header className="sticky top-0 z-10 px-4 py-3 flex items-center gap-3 bg-gradient-to-br from-amber-50/95 to-yellow-50/95 dark:from-amber-950/90 dark:to-yellow-950/90 backdrop-blur-sm">
-          <BackButton to="/app/mood" />
-          <h1 className="text-xl font-semibold flex-1">Mood History</h1>
+        <header 
+          className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-br from-amber-50/95 to-yellow-50/95 dark:from-amber-950/90 dark:to-yellow-950/90 backdrop-blur-sm"
+          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        >
+          <div className="px-4 py-3 flex items-center gap-3">
+            <BackButton to="/app/mood" />
+            <h1 className="text-xl font-semibold flex-1">Mood History</h1>
+          </div>
         </header>
 
+        {/* Spacer for fixed header */}
+        <div style={{ height: 'calc(52px + env(safe-area-inset-top, 0px))' }} />
+
         {/* Content */}
-        <div className="px-4 pb-8 space-y-4">
+        <div className="px-4 pb-safe space-y-4">
           {/* Calendar */}
           <MoodCalendar onDaySelect={handleDaySelect} />
 
