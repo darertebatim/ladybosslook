@@ -1646,9 +1646,14 @@ export default function RoutinesBank() {
                                 <Button type="button" variant="ghost" size="sm" onClick={() => { setAddingTaskToSection(null); setTaskSearch(''); }} className="w-full h-7">Cancel</Button>
                               </div>
                             ) : (
-                              <Button type="button" variant="ghost" size="sm" onClick={() => setAddingTaskToSection('uncategorized')} className="w-full h-7 text-xs gap-1">
-                                <Plus className="h-3 w-3" /> Add Action
-                              </Button>
+                              <div className="flex gap-1">
+                                <Button type="button" variant="ghost" size="sm" onClick={() => setAddingTaskToSection('uncategorized')} className="flex-1 h-7 text-xs gap-1">
+                                  <Plus className="h-3 w-3" /> Add Action
+                                </Button>
+                                <Button type="button" variant="outline" size="sm" onClick={() => openCreateActionSheet(null)} className="h-7 text-xs gap-1">
+                                  <Sparkles className="h-3 w-3" /> Create New
+                                </Button>
+                              </div>
                             )}
                           </div>
                          </div>
