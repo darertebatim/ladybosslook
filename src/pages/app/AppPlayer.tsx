@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
-import { Search, X, Clock, LayoutGrid, Brain, Dumbbell, Waves, Heart, BookOpen, GraduationCap, Podcast, Globe, Crown } from "lucide-react";
+import { Search, X, Clock, LayoutGrid, Brain, Dumbbell, Waves, Heart, BookOpen, GraduationCap, Podcast, Globe, Crown, ChevronRight } from "lucide-react";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import { PlaylistCard } from "@/components/audio/PlaylistCard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -41,6 +41,7 @@ const categoryConfig: Record<string, { name: string; icon: string; color: string
 };
 
 export default function AppPlayer() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -446,6 +447,17 @@ export default function AppPlayer() {
             <PromoBanner location="listen" className="mb-2" />
             
             {renderPlaylistGrid(filteredPlaylists)}
+
+            {/* CTA to support chat */}
+            <div className="pt-4 pb-2">
+              <p className="text-sm text-white/50">Not any playlists you want above?</p>
+              <button
+                onClick={() => navigate('/app/chat?draft=' + encodeURIComponent("Hi! I'd love to have a playlist for: "))}
+                className="text-sm text-blue-400 font-medium flex items-center gap-1 mt-1"
+              >
+                Tell us what you want <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
