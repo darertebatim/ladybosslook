@@ -40,6 +40,7 @@ const categoryConfig: Record<string, { name: string; icon: string; color: string
 };
 
 export default function AppWatch() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
