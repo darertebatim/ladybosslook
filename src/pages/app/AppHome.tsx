@@ -673,14 +673,14 @@ const AppHome = () => {
 
             {/* Week strip - horizontally scrollable 3-week strip */}
             <div 
-              className={cn("grid overflow-hidden")} 
-              style={{ gridTemplateRows: showCalendar ? '0fr' : '1fr' }}
+              className={cn("grid")} 
+              style={{ gridTemplateRows: showCalendar ? '0fr' : '1fr', overflow: showCalendar ? 'hidden' : 'visible' }}
             >
-              <div className="min-h-0">
+              <div className="min-h-0 overflow-hidden">
                 <div 
                   ref={weekStripRef}
-                  className={cn("flex mt-1 overflow-x-auto scrollbar-hide transition-opacity duration-200 snap-x snap-mandatory", showCalendar ? "opacity-0" : "opacity-100")}
-                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                  className={cn("flex mt-1 overflow-x-auto transition-opacity duration-200 snap-x snap-mandatory", showCalendar ? "opacity-0" : "opacity-100")}
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
                 >
                   {weekDays.map((day, idx) => {
                   const isSelected = isSameDay(day, selectedDate);
