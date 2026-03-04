@@ -107,6 +107,7 @@ export function usePresenceStats() {
         breathingSessions: breathingResult.count || 0,
         emotionLogs: emotionResult.count || 0,
         totalTaskCompletions: taskCompletionsResult.count || 0,
+        fastingSessions: (fastingResult as any).count || 0,
       };
 
       const { unlocked, locked } = getAchievementStatus(stats);
