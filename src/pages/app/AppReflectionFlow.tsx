@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useReflectionPages, useSaveReflectionResponse } from '@/hooks/useReflections';
+import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
@@ -10,6 +11,7 @@ export default function AppReflectionFlow() {
   const navigate = useNavigate();
   const { data: pages, isLoading } = useReflectionPages(reflectionId);
   const saveResponse = useSaveReflectionResponse();
+  const { autoCompleteReflection } = useAutoCompleteProTask();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -50,6 +52,10 @@ export default function AppReflectionFlow() {
 
       if (isLast) {
         toast.success('Reflection completed ✨');
+        // Auto-complete any pro-linked tasks for this reflection
+        if (reflectionId) {
+          autoCompleteReflection(reflectionId);
+        }
         navigate(-1);
       } else {
         setCurrentIndex((i) => i + 1);
