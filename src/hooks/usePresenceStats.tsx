@@ -16,7 +16,7 @@ export function usePresenceStats() {
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
       const sevenDaysAgoStr = sevenDaysAgo.toISOString();
 
-      // Fetch all data in parallel
+      // Fetch core data in parallel (batch 1)
       const [
         profileResult,
         streakResult,
@@ -24,85 +24,67 @@ export function usePresenceStats() {
         audioProgressResult,
         journalResult,
         breathingResult,
-        emotionResult,
-        weeklyReturnsResult,
-        fastingResult,
-        reflectionResult,
-        meditationProgressResult,
-        habitStackingResult,
       ] = await Promise.all([
-        // Profile data (strength-first metrics)
         supabase
           .from('profiles')
           .select('total_active_days, return_count, this_month_active_days')
           .eq('id', user.id)
           .single(),
-        
-        // Streak data
         supabase
           .from('user_streaks')
           .select('current_streak, longest_streak')
           .eq('user_id', user.id)
           .single(),
-        
-        // Total task completions count
         supabase
           .from('task_completions')
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id),
-        
-        // Audio progress for listening stats
         supabase
           .from('audio_progress')
           .select('current_position_seconds, completed')
           .eq('user_id', user.id),
-        
-        // Journal entries count
         supabase
           .from('journal_entries')
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id),
-        
-        // Breathing sessions count
         supabase
           .from('breathing_sessions')
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id),
-        
-        // Emotion logs count
+      ]);
+
+      // Fetch extended data in parallel (batch 2)
+      const [
+        emotionResult,
+        weeklyReturnsResult,
+        fastingResult,
+        reflectionResult,
+        meditationPlaylistItems,
+        habitStackingResult,
+      ] = await Promise.all([
         supabase
           .from('emotion_logs')
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id),
-        
-        // Weekly return events count
         supabase
           .from('app_return_events')
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id)
           .gte('created_at', sevenDaysAgoStr),
-        
-        // Fasting sessions count (completed only)
         supabase
           .from('fasting_sessions' as any)
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id)
-          .not('ended_at', 'is', null),
-
-        // Reflection completions (unique reflections completed)
+          .not('ended_at', 'is', null) as any,
         supabase
           .from('user_reflection_responses' as any)
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id)
           .not('completed_at', 'is', null) as any,
-
-        // Meditation: get audio IDs from meditation playlists
-        (supabase
+        supabase
           .from('audio_playlist_items')
           .select('audio_id, audio_playlists!inner(category)')
-          .eq('audio_playlists.category' as any, 'meditate') as any) as Promise<any>,
-
-        // Habit stacking: most repeated single action (task with most completions)
+          .eq('audio_playlists.category' as any, 'meditate'),
         supabase
           .from('task_completions')
           .select('task_id')
