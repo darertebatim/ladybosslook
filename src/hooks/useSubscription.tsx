@@ -35,9 +35,6 @@ export const useSubscription = () => {
         if (!sub.expires_at) return true; // No expiry = active
         return sub.expires_at > now;
       });
-
-      if (error) throw error;
-      return (data || []) as UserSubscription[];
     },
     enabled: !!user?.id,
     staleTime: 1000 * 60 * 5,
