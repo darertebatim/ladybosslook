@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player' | 'programs' | 'channels' | 'watch';
+type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch';
 
 interface PromoBannerData {
   id: string;
@@ -14,7 +14,7 @@ interface PromoBannerData {
   destination_id: string | null;
   custom_url: string | null;
   display_frequency: 'once' | 'daily' | 'weekly';
-  aspect_ratio: '3:1' | '16:9' | '1:1';
+  aspect_ratio: '3:1' | '4:1' | '16:9' | '1:1';
   target_type: 'all' | 'enrolled' | 'custom';
   include_programs: string[];
   exclude_programs: string[];
@@ -401,6 +401,7 @@ export function PromoBanner({
     switch (activeBanner?.aspect_ratio) {
       case '16:9': return 'aspect-video';
       case '1:1': return 'aspect-square';
+      case '4:1': return 'aspect-[4/1]';
       default: return 'aspect-[3/1]';
     }
   };
