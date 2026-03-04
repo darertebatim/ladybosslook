@@ -429,6 +429,9 @@ const AppProfile = () => {
           </Button>
         </div>
 
+        {/* Subscription Card */}
+        <SubscriptionCard />
+
         {/* Profile Info Card */}
         <Card className="rounded-2xl shadow-sm border-0 bg-card">
           <CardContent className="space-y-3 pt-4">
