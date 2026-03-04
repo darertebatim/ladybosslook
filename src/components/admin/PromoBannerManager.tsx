@@ -15,7 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
 import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 
-type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist';
+type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'mood' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
 type AspectRatio = '3:1' | '4:1' | '16:9' | '1:1';
 type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch';
@@ -712,6 +712,7 @@ export function PromoBannerManager() {
                     <SelectItem value="breathe_exercise">💨 Breathing Exercise (specific)</SelectItem>
                     <SelectItem value="water">💧 Water Tracking</SelectItem>
                     <SelectItem value="emotion">😊 Emotion Tracker</SelectItem>
+                    <SelectItem value="mood">🎭 Mood Check</SelectItem>
                     <SelectItem value="period">🌸 Period Tracker</SelectItem>
                     <SelectItem value="channels">💬 Feed / Channels</SelectItem>
                     <SelectItem value="chat">🗨️ Chat / Support</SelectItem>
