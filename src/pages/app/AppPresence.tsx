@@ -371,31 +371,39 @@ function StatCard({ icon: Icon, label, value, iconColor, isLoading }: StatCardPr
   );
 }
 
-// Activity stat card
-interface ActivityStatCardProps {
+// Linked stat row with navigation
+interface LinkedStatRowProps {
   icon: typeof Headphones;
   label: string;
   value: number | string;
   iconColor: string;
   iconBg: string;
+  to: string;
   isLoading?: boolean;
 }
 
-function ActivityStatCard({ icon: Icon, label, value, iconColor, iconBg, isLoading }: ActivityStatCardProps) {
+function LinkedStatRow({ icon: Icon, label, value, iconColor, iconBg, to, isLoading }: LinkedStatRowProps) {
+  const navigate = useNavigate();
   return (
-    <div className="flex items-center gap-3 bg-amber-50/50 rounded-xl p-3">
-      <div className={cn('p-2.5 rounded-xl', iconBg)}>
+    <button 
+      onClick={() => navigate(to)}
+      className="flex items-center gap-3 w-full rounded-xl p-3 active:scale-[0.98] transition-transform text-left hover:bg-amber-50/50"
+    >
+      <div className={cn('p-2.5 rounded-xl shrink-0', iconBg)}>
         <Icon className={cn('h-4 w-4', iconColor)} />
       </div>
       <div className="flex-1 min-w-0">
-        {isLoading ? (
-          <Skeleton className="h-5 w-12 mb-1" />
-        ) : (
-          <div className="text-base font-semibold text-orange-900">{value}</div>
-        )}
-        <div className="text-[10px] text-orange-700/60 truncate font-medium">{label}</div>
+        <div className="text-sm font-medium text-orange-900 truncate">{label}</div>
       </div>
-    </div>
+      <div className="flex items-center gap-1.5 shrink-0">
+        {isLoading ? (
+          <Skeleton className="h-5 w-10" />
+        ) : (
+          <span className="text-sm font-semibold text-orange-700">{value}</span>
+        )}
+        <ChevronRight className="h-4 w-4 text-orange-400" />
+      </div>
+    </button>
   );
 }
 
