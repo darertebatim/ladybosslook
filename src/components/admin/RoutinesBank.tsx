@@ -22,6 +22,7 @@ import { AITextGenerator } from '@/components/admin/AITextGenerator';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
+import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 
 const COLOR_OPTIONS = [
   { name: 'pink', hex: '#FFD6E8' },
