@@ -225,6 +225,17 @@ export default function AppInspire() {
                   </section>
                 );
               })()}
+
+              {/* CTA to support chat */}
+              <div className="px-4 pt-4 pb-2">
+                <p className="text-sm text-muted-foreground">Not any routines you want above?</p>
+                <button
+                  onClick={() => navigate('/app/chat')}
+                  className="text-sm text-primary font-medium flex items-center gap-1 mt-1"
+                >
+                  Tell us what you want <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           )}
         </div>
