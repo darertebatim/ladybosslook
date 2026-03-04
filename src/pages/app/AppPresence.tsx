@@ -245,7 +245,7 @@ const AppPresence = () => {
                   Awards
                 </h3>
                 <span className="text-xs text-orange-500 font-medium">
-                  {unlocked.length}/{ACHIEVEMENTS.length} unlocked
+                  {unlocked.length} unlocked
                 </span>
               </div>
               
