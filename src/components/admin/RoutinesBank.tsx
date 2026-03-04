@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +22,7 @@ import { AITextGenerator } from '@/components/admin/AITextGenerator';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
+import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 
 const COLOR_OPTIONS = [
   { name: 'pink', hex: '#FFD6E8' },
@@ -125,6 +126,10 @@ export default function RoutinesBank() {
   const [taskSearch, setTaskSearch] = useState('');
   const [addingTaskToSection, setAddingTaskToSection] = useState<string | null>(null); // section_id or 'uncategorized'
   const [dialogTab, setDialogTab] = useState<'basic' | 'sections'>('basic');
+
+  // Create action sheet state
+  const [createActionSheetOpen, setCreateActionSheetOpen] = useState(false);
+  const [createActionSectionId, setCreateActionSectionId] = useState<string | null>(null);
 
   // Section editor state
   const [sectionDialogOpen, setSectionDialogOpen] = useState(false);
@@ -641,6 +646,73 @@ export default function RoutinesBank() {
     setTaskSearchOpen(false);
     setTaskSearch('');
     setAddingTaskToSection(null);
+  };
+
+  // Create a new action in the bank and add it to the current routine
+  const createActionMutation = useMutation({
+    mutationFn: async (data: { formData: TaskFormData; sectionId: string | null }) => {
+      const taskData = {
+        title: data.formData.title,
+        emoji: data.formData.icon,
+        color: data.formData.color,
+        category: data.formData.tag || 'general',
+        repeat_pattern: data.formData.repeatEnabled ? data.formData.repeatPattern : 'none',
+        repeat_interval: data.formData.repeatInterval,
+        repeat_days: data.formData.repeatDays,
+        reminder_enabled: data.formData.reminderEnabled,
+        goal_enabled: data.formData.goalEnabled,
+        goal_type: data.formData.goalEnabled ? data.formData.goalType : null,
+        goal_target: data.formData.goalEnabled ? data.formData.goalTarget : null,
+        goal_unit: data.formData.goalEnabled ? data.formData.goalUnit : null,
+        pro_link_type: data.formData.proLinkType,
+        pro_link_value: data.formData.proLinkValue,
+        linked_playlist_id: data.formData.proLinkType === 'playlist' ? data.formData.proLinkValue : data.formData.linkedPlaylistId,
+        tag: data.formData.tag,
+        description: data.formData.description || null,
+        is_active: true,
+        is_popular: false,
+        time_period: data.formData.timePeriod || null,
+      };
+
+      const { data: newTask, error } = await supabase
+        .from('admin_task_bank')
+        .insert(taskData)
+        .select('id, title, emoji, category, is_active, repeat_pattern')
+        .single();
+      if (error) throw error;
+
+      // Insert subtasks
+      if (data.formData.subtasks && data.formData.subtasks.length > 0) {
+        const subtaskRecords = data.formData.subtasks.map((title, index) => ({
+          task_id: newTask.id,
+          title,
+          order_index: index,
+        }));
+        await supabase.from('admin_task_bank_subtasks').insert(subtaskRecords);
+      }
+
+      return { task: newTask as TaskBankItem, sectionId: data.sectionId };
+    },
+    onSuccess: ({ task, sectionId }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-task-bank-for-picker'] });
+      // Auto-add the new task to the routine
+      addTaskToSection(task, sectionId);
+      toast.success('Action created and added');
+      setCreateActionSheetOpen(false);
+    },
+    onError: (error) => {
+      toast.error('Failed to create action: ' + error.message);
+    },
+  });
+
+  const openCreateActionSheet = (sectionId: string | null) => {
+    setCreateActionSectionId(sectionId);
+    setCreateActionSheetOpen(true);
+  };
+
+  const handleCreateActionSave = (formData: TaskFormData) => {
+    createActionMutation.mutate({ formData, sectionId: createActionSectionId });
   };
 
   const removeTask = (taskId: string) => {
@@ -1574,9 +1646,14 @@ export default function RoutinesBank() {
                                 <Button type="button" variant="ghost" size="sm" onClick={() => { setAddingTaskToSection(null); setTaskSearch(''); }} className="w-full h-7">Cancel</Button>
                               </div>
                             ) : (
-                              <Button type="button" variant="ghost" size="sm" onClick={() => setAddingTaskToSection('uncategorized')} className="w-full h-7 text-xs gap-1">
-                                <Plus className="h-3 w-3" /> Add Action
-                              </Button>
+                              <div className="flex gap-1">
+                                <Button type="button" variant="ghost" size="sm" onClick={() => setAddingTaskToSection('uncategorized')} className="flex-1 h-7 text-xs gap-1">
+                                  <Plus className="h-3 w-3" /> Add Action
+                                </Button>
+                                <Button type="button" variant="outline" size="sm" onClick={() => openCreateActionSheet(null)} className="h-7 text-xs gap-1">
+                                  <Sparkles className="h-3 w-3" /> Create New
+                                </Button>
+                              </div>
                             )}
                           </div>
                          </div>
@@ -1666,9 +1743,14 @@ export default function RoutinesBank() {
                             <Button type="button" variant="ghost" size="sm" onClick={() => { setAddingTaskToSection(null); setTaskSearch(''); }} className="w-full h-7">Cancel</Button>
                           </div>
                         ) : (
-                          <Button type="button" variant="ghost" size="sm" onClick={() => setAddingTaskToSection('uncategorized')} className="w-full h-7 text-xs gap-1">
-                            <Plus className="h-3 w-3" /> Add Action
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button type="button" variant="ghost" size="sm" onClick={() => setAddingTaskToSection('uncategorized')} className="flex-1 h-7 text-xs gap-1">
+                              <Plus className="h-3 w-3" /> Add Action
+                            </Button>
+                            <Button type="button" variant="outline" size="sm" onClick={() => openCreateActionSheet(null)} className="h-7 text-xs gap-1">
+                              <Sparkles className="h-3 w-3" /> Create New
+                            </Button>
+                          </div>
                         )}
                       </div>
                     );
@@ -1752,6 +1834,36 @@ export default function RoutinesBank() {
           setEmojiPickerOpen(false);
         }}
         selectedEmoji={formData.emoji}
+      />
+
+      {/* Create Action Sheet */}
+      <AppTaskCreate
+        isSheet={true}
+        sheetOpen={createActionSheetOpen}
+        onSheetOpenChange={setCreateActionSheetOpen}
+        initialData={{
+          title: '',
+          description: null,
+          icon: '☀️',
+          color: 'mint',
+          scheduledDate: new Date(),
+          scheduledTime: null,
+          repeatEnabled: false,
+          repeatPattern: 'daily',
+          repeatInterval: 1,
+          repeatDays: [],
+          reminderEnabled: false,
+          reminderTime: '09:00',
+          tag: null,
+          subtasks: [],
+          proLinkType: null,
+          proLinkValue: null,
+          goalEnabled: false,
+          goalType: 'count',
+          goalTarget: 2,
+          goalUnit: 'times',
+        }}
+        onSaveSheet={handleCreateActionSave}
       />
     </Card>
   );
