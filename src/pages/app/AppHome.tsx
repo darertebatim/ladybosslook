@@ -779,7 +779,7 @@ const AppHome = () => {
             </div>
 
             {/* Calendar expand/collapse handle + Today button */}
-            <div className="flex items-center justify-center pt-2 pb-2">
+            <div className="flex items-center justify-center pt-1 pb-1">
               {/* Center: Drag handle - larger tap area */}
               <button onClick={handleToggleCalendar} className="flex-1 flex justify-center py-2 -my-2">
                 <div className="w-12 h-1.5 rounded-full bg-foreground/25" />
