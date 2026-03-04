@@ -27,6 +27,7 @@ interface ChatInputProps {
   uploading?: boolean;
   onFocus?: () => void;
   onBlur?: () => void;
+  initialMessage?: string;
 }
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
