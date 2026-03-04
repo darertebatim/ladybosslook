@@ -426,13 +426,15 @@ export function PromoBanner({
           className={`w-full ${getAspectRatioClass()} object-cover`}
         />
         
-        {/* Close Button */}
-        <button
-          onClick={handleDismiss}
-          className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 flex items-center justify-center active:scale-90 transition-transform"
-        >
-          <X className="h-4 w-4 text-white" />
-        </button>
+        {/* Close Button - hidden for 'forever' banners */}
+        {activeBanner.display_frequency !== 'forever' && (
+          <button
+            onClick={handleDismiss}
+            className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 flex items-center justify-center active:scale-90 transition-transform"
+          >
+            <X className="h-4 w-4 text-white" />
+          </button>
+        )}
       </div>
     </div>
   );
