@@ -53,16 +53,15 @@ export function usePresenceStats() {
           .eq('user_id', user.id),
       ]);
 
-      // Fetch extended data in parallel (batch 2 - use any to avoid deep type instantiation)
-      const batch2 = await Promise.all([
+      // Fetch extended data in parallel (batch 2)
+      const [emotionResult, weeklyReturnsResult, fastingResult, reflectionResult, meditationPlaylistItems, habitStackingResult]: any[] = await (Promise.all([
         supabase.from('emotion_logs').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('app_return_events').select('id', { count: 'exact', head: true }).eq('user_id', user.id).gte('created_at', sevenDaysAgoStr),
-        (supabase.from('fasting_sessions' as any).select('id', { count: 'exact', head: true }).eq('user_id', user.id).not('ended_at', 'is', null) as any),
-        (supabase.from('user_reflection_responses' as any).select('id', { count: 'exact', head: true }).eq('user_id', user.id).not('completed_at', 'is', null) as any),
-        (supabase.from('audio_playlist_items').select('audio_id, audio_playlists!inner(category)').eq('audio_playlists.category' as any, 'meditate') as any),
+        supabase.from('fasting_sessions' as any).select('id', { count: 'exact', head: true }).eq('user_id', user.id).not('ended_at', 'is', null),
+        supabase.from('user_reflection_responses' as any).select('id', { count: 'exact', head: true }).eq('user_id', user.id).not('completed_at', 'is', null),
+        supabase.from('audio_playlist_items').select('audio_id, audio_playlists!inner(category)').eq('audio_playlists.category' as any, 'meditate'),
         supabase.from('task_completions').select('task_id').eq('user_id', user.id),
-      ] as const);
-      const [emotionResult, weeklyReturnsResult, fastingResult, reflectionResult, meditationPlaylistItems, habitStackingResult] = batch2 as any[];
+      ]) as any);
 
       // Calculate listening minutes and completed tracks
       const audioData = audioProgressResult.data || [];
