@@ -44,12 +44,16 @@ export default function Auth() {
     prevKeyboardOpen.current = isKeyboardOpen;
   }, [isKeyboardOpen]);
 
+  // Read redirect param from URL (e.g. /auth?redirect=/cart)
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirectPath = searchParams.get('redirect') || '/app/home';
+
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
-      navigate('/app/home');
+      navigate(redirectPath);
     }
-  }, [user, navigate]);
+  }, [user, navigate, redirectPath]);
 
   // Show branded splash while checking auth state (prevents flash of login form)
   if (authLoading) {
