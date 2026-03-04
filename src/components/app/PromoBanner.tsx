@@ -14,7 +14,7 @@ interface PromoBannerData {
   destination_id: string | null;
   custom_url: string | null;
   display_frequency: 'once' | 'daily' | 'weekly';
-  aspect_ratio: '3:1' | '16:9' | '1:1';
+  aspect_ratio: '3:1' | '4:1' | '16:9' | '1:1';
   target_type: 'all' | 'enrolled' | 'custom';
   include_programs: string[];
   exclude_programs: string[];
