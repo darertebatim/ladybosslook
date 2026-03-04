@@ -13,7 +13,7 @@ interface PromoBannerData {
   destination_type: 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'mood' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist';
   destination_id: string | null;
   custom_url: string | null;
-  display_frequency: 'once' | 'daily' | 'weekly';
+  display_frequency: 'once' | 'daily' | 'weekly' | 'forever';
   aspect_ratio: '3:1' | '4:1' | '16:9' | '1:1';
   target_type: 'all' | 'enrolled' | 'custom';
   include_programs: string[];
@@ -54,6 +54,8 @@ function setDismissal(bannerId: string) {
 }
 
 function shouldShowBanner(banner: PromoBannerData): boolean {
+  if (banner.display_frequency === 'forever') return true;
+  
   const dismissals = getDismissals();
   const dismissedAt = dismissals[banner.id];
   
@@ -64,7 +66,7 @@ function shouldShowBanner(banner: PromoBannerData): boolean {
   
   switch (banner.display_frequency) {
     case 'once':
-      return false; // Never show again
+      return false;
     case 'daily':
       return hoursSinceDismissal >= 24;
     case 'weekly':
@@ -424,13 +426,15 @@ export function PromoBanner({
           className={`w-full ${getAspectRatioClass()} object-cover`}
         />
         
-        {/* Close Button */}
-        <button
-          onClick={handleDismiss}
-          className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 flex items-center justify-center active:scale-90 transition-transform"
-        >
-          <X className="h-4 w-4 text-white" />
-        </button>
+        {/* Close Button - hidden for 'forever' banners */}
+        {activeBanner.display_frequency !== 'forever' && (
+          <button
+            onClick={handleDismiss}
+            className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 flex items-center justify-center active:scale-90 transition-transform"
+          >
+            <X className="h-4 w-4 text-white" />
+          </button>
+        )}
       </div>
     </div>
   );
