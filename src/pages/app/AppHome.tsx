@@ -356,20 +356,49 @@ const AppHome = () => {
   // Ref for scrollable week strip to auto-scroll to current week
   const weekStripRef = useRef<HTMLDivElement>(null);
 
+  // Track which week index is currently scrolled to
+  const lastScrollWeekRef = useRef(1); // 0=prev, 1=current, 2=next
+  const isAutoScrollingRef = useRef(false);
+
   // Auto-scroll to current week (middle section) when strip is visible
   useEffect(() => {
     if (!showCalendar && weekStripRef.current) {
-      // Use requestAnimationFrame to ensure layout is computed
+      isAutoScrollingRef.current = true;
+      lastScrollWeekRef.current = 1;
       requestAnimationFrame(() => {
         if (weekStripRef.current) {
           const container = weekStripRef.current;
           const dayWidth = container.scrollWidth / 21;
-          // Current week starts at index 7
           container.scrollLeft = dayWidth * 7;
+          // Reset auto-scroll flag after scroll settles
+          setTimeout(() => { isAutoScrollingRef.current = false; }, 150);
         }
       });
     }
   }, [showCalendar, selectedDate]);
+
+  // Detect scroll snap to different week and update selected date
+  const handleWeekStripScroll = useCallback(() => {
+    if (isAutoScrollingRef.current || !weekStripRef.current) return;
+    const container = weekStripRef.current;
+    const dayWidth = container.scrollWidth / 21;
+    const weekWidth = dayWidth * 7;
+    // Determine which week is currently visible (0, 1, or 2)
+    const currentWeekIdx = Math.round(container.scrollLeft / weekWidth);
+    
+    if (currentWeekIdx !== lastScrollWeekRef.current) {
+      lastScrollWeekRef.current = currentWeekIdx;
+      const dayOfWeek = selectedDate.getDay(); // 0=Sun ... 6=Sat
+      const diff = (currentWeekIdx - 1) * 7; // -7 for prev, +7 for next
+      if (diff !== 0) {
+        const newDate = addDays(selectedDate, diff);
+        isAutoScrollingRef.current = true;
+        setSelectedDate(newDate);
+        setCurrentMonth(startOfMonth(newDate));
+        haptic.light();
+      }
+    }
+  }, [selectedDate]);
 
   // Calculate date range for completed dates query
   const dateRange = useMemo(() => {
