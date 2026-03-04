@@ -30,7 +30,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { usePrograms } from '@/hooks/usePrograms';
+
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface PushSubscription {
