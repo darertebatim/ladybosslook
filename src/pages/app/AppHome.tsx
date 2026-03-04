@@ -742,7 +742,7 @@ const AppHome = () => {
                     style={{ minWidth: 'calc(100% / 7)' }}
                   >
                         {/* Pill wraps around both day name and number for selected */}
-                        <div className={cn('flex flex-col items-center px-1 py-0.5 rounded-full transition-all', isSelected && 'bg-chip-lavender')}>
+                        <div className={cn('flex flex-col items-center px-1 py-0 rounded-full transition-all', isSelected && 'bg-chip-lavender')}>
                           {/* Day name - selected is black, others are grey */}
                           <span className={cn('text-[11px] font-medium leading-tight', isSelected ? 'text-foreground' : 'text-[#C6C1CF]')}>
                             {format(day, 'EEE')}
