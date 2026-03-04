@@ -356,20 +356,50 @@ const AppHome = () => {
   // Ref for scrollable week strip to auto-scroll to current week
   const weekStripRef = useRef<HTMLDivElement>(null);
 
+  // Track which week index is currently scrolled to
+  const lastScrollWeekRef = useRef(1); // 0=prev, 1=current, 2=next
+  const isAutoScrollingRef = useRef(false);
+
   // Auto-scroll to current week (middle section) when strip is visible
   useEffect(() => {
     if (!showCalendar && weekStripRef.current) {
-      // Use requestAnimationFrame to ensure layout is computed
+      isAutoScrollingRef.current = true;
+      lastScrollWeekRef.current = 1;
       requestAnimationFrame(() => {
         if (weekStripRef.current) {
           const container = weekStripRef.current;
           const dayWidth = container.scrollWidth / 21;
-          // Current week starts at index 7
           container.scrollLeft = dayWidth * 7;
+          // Reset auto-scroll flag after scroll settles
+          setTimeout(() => { isAutoScrollingRef.current = false; }, 150);
         }
       });
     }
   }, [showCalendar, selectedDate]);
+
+  // Detect scroll snap to different week and update selected date
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const handleWeekStripScroll = useCallback(() => {
+    if (isAutoScrollingRef.current || !weekStripRef.current) return;
+    // Debounce: wait for scroll to settle
+    clearTimeout(scrollTimerRef.current);
+    scrollTimerRef.current = setTimeout(() => {
+      if (!weekStripRef.current) return;
+      const container = weekStripRef.current;
+      const dayWidth = container.scrollWidth / 21;
+      const weekWidth = dayWidth * 7;
+      const currentWeekIdx = Math.round(container.scrollLeft / weekWidth);
+      
+      if (currentWeekIdx !== 1) { // scrolled away from center week
+        const diff = (currentWeekIdx - 1) * 7;
+        const newDate = addDays(selectedDate, diff);
+        isAutoScrollingRef.current = true;
+        setSelectedDate(newDate);
+        setCurrentMonth(startOfMonth(newDate));
+        haptic.light();
+      }
+    }, 100);
+  }, [selectedDate]);
 
   // Calculate date range for completed dates query
   const dateRange = useMemo(() => {
@@ -684,6 +714,7 @@ const AppHome = () => {
               <div className="min-h-0 overflow-hidden">
                 <div 
                   ref={weekStripRef}
+                  onScroll={handleWeekStripScroll}
                   className={cn("flex mt-1 overflow-x-auto transition-opacity duration-200 snap-x snap-mandatory", showCalendar ? "opacity-0" : "opacity-100")}
                   style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
                 >
