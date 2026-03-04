@@ -26,6 +26,7 @@ export function usePresenceStats() {
         breathingResult,
         emotionResult,
         weeklyReturnsResult,
+        fastingResult,
       ] = await Promise.all([
         // Profile data (strength-first metrics)
         supabase
@@ -77,6 +78,13 @@ export function usePresenceStats() {
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id)
           .gte('created_at', sevenDaysAgoStr),
+        
+        // Fasting sessions count (completed only)
+        supabase
+          .from('fasting_sessions' as any)
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .not('ended_at', 'is', null),
       ]);
 
       // Calculate listening minutes and completed tracks
