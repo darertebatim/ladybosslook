@@ -18,12 +18,13 @@ import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist';
 type DisplayFrequency = 'once' | 'daily' | 'weekly';
 type AspectRatio = '3:1' | '4:1' | '16:9' | '1:1';
-type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'listen' | 'player' | 'programs' | 'channels' | 'watch';
+type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch';
 
 const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
   { value: 'home_top', label: '🏠 Home - Above Actions' },
   { value: 'home_rituals', label: '🏠 Home - After Routines' },
-  { value: 'explore', label: '🔍 Explore Page' },
+  { value: 'explore', label: '🔍 Explore - Top' },
+  { value: 'explore_tools', label: '🔍 Explore - Under Tools' },
   { value: 'listen', label: '🎧 Listen Page' },
   { value: 'player', label: '▶️ Audio Player' },
   { value: 'programs', label: '📚 Programs Page' },
