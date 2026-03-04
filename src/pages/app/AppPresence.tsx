@@ -60,11 +60,25 @@ const AppPresence = () => {
           className="shrink-0 relative z-10"
           style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
         >
-          <div className="px-4 py-2">
+          <div className="px-4 py-2 flex items-center justify-between">
             <BackButton 
               to="/app"
               className="text-orange-700"
             />
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate('/app/profile')}
+                className="w-9 h-9 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
+              >
+                <User className="w-4.5 h-4.5 text-orange-700" />
+              </button>
+              <button
+                onClick={() => navigate('/app/settings')}
+                className="w-9 h-9 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
+              >
+                <Settings className="w-4.5 h-4.5 text-orange-700" />
+              </button>
+            </div>
           </div>
         </header>
         
