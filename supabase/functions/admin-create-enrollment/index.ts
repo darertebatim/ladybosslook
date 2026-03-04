@@ -263,6 +263,39 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Enrollment created successfully: ${enrollment.id}`);
 
+    // If this is a subscription program, also create user_subscriptions record
+    if (programSlug) {
+      const { data: programInfo } = await supabase
+        .from('program_catalog')
+        .select('requires_subscription, type')
+        .eq('slug', programSlug)
+        .single();
+
+      if (programInfo?.requires_subscription || programInfo?.type === 'subscription') {
+        console.log(`Creating user_subscriptions record for: ${programSlug}`);
+        const { error: subError } = await supabase
+          .from('user_subscriptions')
+          .upsert({
+            user_id: userId,
+            program_slug: programSlug,
+            status: 'active',
+            platform: 'admin',
+            product_id: null,
+            revenuecat_id: null,
+            expires_at: null,
+            updated_at: new Date().toISOString(),
+          }, {
+            onConflict: 'user_id,program_slug',
+          });
+
+        if (subError) {
+          console.error('Error creating user_subscription:', subError);
+        } else {
+          console.log(`✓ User subscription created for ${programSlug}`);
+        }
+      }
+    }
+
     // Apply Mailchimp tags based on program type
     let mailchimpTagged = false;
     let mailchimpError: string | null = null;
