@@ -13,7 +13,7 @@ interface PromoBannerData {
   destination_type: 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'mood' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist';
   destination_id: string | null;
   custom_url: string | null;
-  display_frequency: 'once' | 'daily' | 'weekly';
+  display_frequency: 'once' | 'daily' | 'weekly' | 'forever';
   aspect_ratio: '3:1' | '4:1' | '16:9' | '1:1';
   target_type: 'all' | 'enrolled' | 'custom';
   include_programs: string[];
