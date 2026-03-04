@@ -313,6 +313,8 @@ const AppStore = () => {
               </section>
             )}
 
+            {/* Promo Banner - Under Tools */}
+            <PromoBanner location="explore_tools" className="mb-2" />
 
             {/* Programs Section */}
             {(!searchQuery || hasProgramMatches) && allBrowsePrograms.length > 0 && (
