@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart } from 'lucide-react';
+import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart, ChevronRight, Droplets, SmilePlus, Moon, Brain } from 'lucide-react';
 import { usePresenceStats } from '@/hooks/usePresenceStats';
 import { useUserPresence } from '@/hooks/useUserPresence';
 import { useUserStreak, useSetStreakGoal, useRecoverStreak } from '@/hooks/useTaskPlanner';
@@ -197,42 +197,73 @@ const AppPresence = () => {
               />
             ))}
             
-            {/* All-Time Activity Stats */}
+            {/* Activity Stats with Links */}
             <section className="bg-white rounded-2xl p-4 shadow-sm">
               <h3 className="text-sm font-semibold text-orange-900/60 mb-3">
                 Activity Stats
               </h3>
-              <div className="grid grid-cols-2 gap-3">
-                <ActivityStatCard 
+              <div className="space-y-1">
+                <LinkedStatRow 
+                  icon={CheckCircle2}
+                  label="Tasks Completed"
+                  value={stats?.totalTaskCompletions || 0}
+                  iconColor="text-orange-500"
+                  iconBg="bg-orange-100"
+                  to="/app/home"
+                  isLoading={isLoading}
+                />
+                <LinkedStatRow 
                   icon={Headphones}
                   label="Listening"
                   value={`${stats?.listeningMinutes || 0} min`}
-                  iconColor="text-orange-500"
-                  iconBg="bg-orange-100"
+                  iconColor="text-sky-500"
+                  iconBg="bg-sky-100"
+                  to="/app/listen"
                   isLoading={isLoading}
                 />
-                <ActivityStatCard 
+                <LinkedStatRow 
                   icon={CheckCircle2}
                   label="Completed Tracks"
                   value={stats?.completedTracks || 0}
                   iconColor="text-amber-600"
                   iconBg="bg-amber-100"
+                  to="/app/listen"
                   isLoading={isLoading}
                 />
-                <ActivityStatCard 
+                <LinkedStatRow 
                   icon={BookHeart}
                   label="Journal Entries"
                   value={stats?.journalEntries || 0}
-                  iconColor="text-orange-600"
-                  iconBg="bg-orange-100"
+                  iconColor="text-rose-500"
+                  iconBg="bg-rose-100"
+                  to="/app/journal"
                   isLoading={isLoading}
                 />
-                <ActivityStatCard 
+                <LinkedStatRow 
                   icon={Wind}
                   label="Breathing Sessions"
                   value={stats?.breathingSessions || 0}
-                  iconColor="text-amber-500"
-                  iconBg="bg-amber-100"
+                  iconColor="text-teal-500"
+                  iconBg="bg-teal-100"
+                  to="/app/breathe"
+                  isLoading={isLoading}
+                />
+                <LinkedStatRow 
+                  icon={SmilePlus}
+                  label="Emotion Check-ins"
+                  value={stats?.emotionLogs || 0}
+                  iconColor="text-violet-500"
+                  iconBg="bg-violet-100"
+                  to="/app/emotion/history"
+                  isLoading={isLoading}
+                />
+                <LinkedStatRow 
+                  icon={Brain}
+                  label="Mood Check-ins"
+                  value="View"
+                  iconColor="text-indigo-500"
+                  iconBg="bg-indigo-100"
+                  to="/app/mood/history"
                   isLoading={isLoading}
                 />
               </div>
@@ -340,31 +371,39 @@ function StatCard({ icon: Icon, label, value, iconColor, isLoading }: StatCardPr
   );
 }
 
-// Activity stat card
-interface ActivityStatCardProps {
+// Linked stat row with navigation
+interface LinkedStatRowProps {
   icon: typeof Headphones;
   label: string;
   value: number | string;
   iconColor: string;
   iconBg: string;
+  to: string;
   isLoading?: boolean;
 }
 
-function ActivityStatCard({ icon: Icon, label, value, iconColor, iconBg, isLoading }: ActivityStatCardProps) {
+function LinkedStatRow({ icon: Icon, label, value, iconColor, iconBg, to, isLoading }: LinkedStatRowProps) {
+  const navigate = useNavigate();
   return (
-    <div className="flex items-center gap-3 bg-amber-50/50 rounded-xl p-3">
-      <div className={cn('p-2.5 rounded-xl', iconBg)}>
+    <button 
+      onClick={() => navigate(to)}
+      className="flex items-center gap-3 w-full rounded-xl p-3 active:scale-[0.98] transition-transform text-left hover:bg-amber-50/50"
+    >
+      <div className={cn('p-2.5 rounded-xl shrink-0', iconBg)}>
         <Icon className={cn('h-4 w-4', iconColor)} />
       </div>
       <div className="flex-1 min-w-0">
-        {isLoading ? (
-          <Skeleton className="h-5 w-12 mb-1" />
-        ) : (
-          <div className="text-base font-semibold text-orange-900">{value}</div>
-        )}
-        <div className="text-[10px] text-orange-700/60 truncate font-medium">{label}</div>
+        <div className="text-sm font-medium text-orange-900 truncate">{label}</div>
       </div>
-    </div>
+      <div className="flex items-center gap-1.5 shrink-0">
+        {isLoading ? (
+          <Skeleton className="h-5 w-10" />
+        ) : (
+          <span className="text-sm font-semibold text-orange-700">{value}</span>
+        )}
+        <ChevronRight className="h-4 w-4 text-orange-400" />
+      </div>
+    </button>
   );
 }
 
