@@ -54,6 +54,8 @@ function setDismissal(bannerId: string) {
 }
 
 function shouldShowBanner(banner: PromoBannerData): boolean {
+  if (banner.display_frequency === 'forever') return true;
+  
   const dismissals = getDismissals();
   const dismissedAt = dismissals[banner.id];
   
@@ -64,7 +66,7 @@ function shouldShowBanner(banner: PromoBannerData): boolean {
   
   switch (banner.display_frequency) {
     case 'once':
-      return false; // Never show again
+      return false;
     case 'daily':
       return hoursSinceDismissal >= 24;
     case 'weekly':

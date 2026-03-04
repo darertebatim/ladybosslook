@@ -805,6 +805,7 @@ export function PromoBannerManager() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="forever">Forever (always visible, can't dismiss)</SelectItem>
                     <SelectItem value="once">Once (never show again after dismiss)</SelectItem>
                     <SelectItem value="daily">Daily (show again after 24 hours)</SelectItem>
                     <SelectItem value="weekly">Weekly (show again after 7 days)</SelectItem>
