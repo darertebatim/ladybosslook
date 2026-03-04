@@ -346,15 +346,25 @@ const AppHome = () => {
     [popularRoutines, addedRoutineIdsSet, dismissedRoutineIds]
   );
 
-  // Generate week days
+  // Generate 3 weeks of days (prev, current, next) for scrollable strip
   const weekDays = useMemo(() => {
-    const weekStart = startOfWeek(selectedDate, {
-      weekStartsOn: 0
-    });
-    return Array.from({
-      length: 7
-    }, (_, i) => addDays(weekStart, i));
+    const currentWeekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
+    const prevWeekStart = subDays(currentWeekStart, 7);
+    return Array.from({ length: 21 }, (_, i) => addDays(prevWeekStart, i));
   }, [selectedDate]);
+
+  // Ref for scrollable week strip to auto-scroll to current week
+  const weekStripRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to current week (middle section) when strip is visible
+  useEffect(() => {
+    if (!showCalendar && weekStripRef.current) {
+      const container = weekStripRef.current;
+      // Each day is 1/7 of container width, current week starts at day index 7
+      const scrollTarget = container.scrollWidth / 3; // scroll to middle third
+      container.scrollLeft = scrollTarget;
+    }
+  }, [showCalendar, selectedDate]);
 
   // Calculate date range for completed dates query
   const dateRange = useMemo(() => {
@@ -661,33 +671,18 @@ const AppHome = () => {
               </div>
             </div>
 
-            {/* Week strip - Me+ style with badges */}
+            {/* Week strip - horizontally scrollable 3-week strip */}
             <div 
               className={cn("grid overflow-hidden")} 
               style={{ gridTemplateRows: showCalendar ? '0fr' : '1fr' }}
             >
               <div className="min-h-0">
                 <div 
-                  className={cn("flex mt-1 transition-opacity duration-200", showCalendar ? "opacity-0" : "opacity-100")}
-                  onTouchStart={(e) => {
-                    const touch = e.touches[0];
-                    (e.currentTarget as any)._swipeStartX = touch.clientX;
-                  }}
-                  onTouchEnd={(e) => {
-                    const startX = (e.currentTarget as any)._swipeStartX;
-                    if (startX == null) return;
-                    const endX = e.changedTouches[0].clientX;
-                    const diff = startX - endX;
-                    if (Math.abs(diff) > 50) {
-                      // Swipe left = next week, swipe right = prev week
-                      const newDate = diff > 0 ? addDays(selectedDate, 7) : subDays(selectedDate, 7);
-                      setSelectedDate(newDate);
-                      setCurrentMonth(startOfMonth(newDate));
-                      haptic.light();
-                    }
-                  }}
+                  ref={weekStripRef}
+                  className={cn("flex mt-1 overflow-x-auto scrollbar-hide transition-opacity duration-200 snap-x snap-mandatory", showCalendar ? "opacity-0" : "opacity-100")}
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
-                  {weekDays.map(day => {
+                  {weekDays.map((day, idx) => {
                   const isSelected = isSameDay(day, selectedDate);
                   const isTodayDate = isToday(day);
                   const dateStr = format(day, 'yyyy-MM-dd');
@@ -697,8 +692,19 @@ const AppHome = () => {
                   const dayStats = weeklyCompletion?.[dateStr];
                   const badgeLevel = dayStats?.badgeLevel || 'none';
                   const hasBadge = badgeLevel !== 'none';
+
+                  // Snap point at the start of each week (every 7 days)
+                  const isWeekStart = idx % 7 === 0;
                   
-                  return <button key={day.toISOString()} onClick={() => setSelectedDate(day)} className="flex-1 flex justify-center">
+                  return <button 
+                    key={day.toISOString()} 
+                    onClick={() => {
+                      setSelectedDate(day);
+                      setCurrentMonth(startOfMonth(day));
+                    }} 
+                    className={cn("flex justify-center", isWeekStart && "snap-start")}
+                    style={{ minWidth: 'calc(100% / 7)' }}
+                  >
                         {/* Pill wraps around both day name and number for selected */}
                         <div className={cn('flex flex-col items-center px-1 py-0.5 rounded-full transition-all', isSelected && 'bg-chip-lavender')}>
                           {/* Day name - selected is black, others are grey */}
