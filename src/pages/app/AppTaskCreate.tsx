@@ -440,6 +440,21 @@ const AppTaskCreate = ({
     },
   });
 
+  // Fetch reflections for linking
+  const { data: reflections = [] } = useQuery({
+    queryKey: ['linkable-reflections'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('reflections' as any)
+        .select('id, title, subtitle, cover_image_url')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return data as { id: string; title: string; subtitle: string | null; cover_image_url: string | null }[];
+    },
+  });
+
   // Fetch routine categories for tags (dynamic instead of hardcoded)
   const { data: routineCategories = [] } = useQuery({
     queryKey: ['routine-categories-for-tags'],
