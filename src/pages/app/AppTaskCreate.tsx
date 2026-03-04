@@ -1987,6 +1987,78 @@ const AppTaskCreate = ({
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Reflection Picker Sheet */}
+      <Sheet open={showReflectionPicker} onOpenChange={setShowReflectionPicker}>
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
+          <SheetHeader>
+            <SheetTitle>Select Reflection</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Choose a reflection exercise to link to this task.
+            </p>
+            
+            {/* Option for generic reflections page */}
+            <button
+              onClick={() => {
+                setProLinkType('reflection');
+                setProLinkValue(null);
+                setShowReflectionPicker(false);
+              }}
+              className={cn(
+                'w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/80',
+                proLinkType === 'reflection' && !proLinkValue && 'bg-teal-100 dark:bg-teal-900/30'
+              )}
+            >
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-100 to-cyan-100 dark:from-teal-900/40 dark:to-cyan-900/40 flex items-center justify-center">
+                <Brain className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="font-medium">Any Reflection</p>
+                <p className="text-xs text-muted-foreground">Open the Reflections page to choose</p>
+              </div>
+            </button>
+            
+            <div className="border-t pt-3">
+              <p className="text-xs text-muted-foreground mb-2">Or select a specific reflection:</p>
+            </div>
+            
+            <ScrollArea className="h-[40vh]">
+              <div className="space-y-2 pr-4">
+                {reflections.map((reflection) => (
+                  <button
+                    key={reflection.id}
+                    onClick={() => {
+                      setProLinkType('reflection');
+                      setProLinkValue(reflection.id);
+                      setShowReflectionPicker(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/80',
+                      proLinkValue === reflection.id && 'bg-teal-100 dark:bg-teal-900/30'
+                    )}
+                  >
+                    {reflection.cover_image_url ? (
+                      <img src={reflection.cover_image_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-100 to-cyan-100 dark:from-teal-900/40 dark:to-cyan-900/40 flex items-center justify-center">
+                        <Brain className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                      </div>
+                    )}
+                    <div className="flex-1 text-left">
+                      <p className="font-medium truncate">{reflection.title}</p>
+                      {reflection.subtitle && (
+                        <p className="text-xs text-muted-foreground truncate">{reflection.subtitle}</p>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </SheetContent>
+      </Sheet>
     </>
   );
 
