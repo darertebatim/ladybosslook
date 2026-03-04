@@ -349,7 +349,7 @@ export function PromoBanner({
   if (eligibleBanners.length === 0) return null;
 
   return (
-    <div className={className || "px-4 py-2 space-y-2"}>
+    <div className={`space-y-3 ${className || "px-4 py-2"}`}>
       {eligibleBanners.map(banner => (
         <div
           key={banner.id}
