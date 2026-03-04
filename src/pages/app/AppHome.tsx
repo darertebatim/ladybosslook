@@ -631,7 +631,7 @@ const AppHome = () => {
         paddingTop: 'max(12px, env(safe-area-inset-top))'
       }}>
           {/* Title bar - three column layout for balanced centering */}
-          <div className="grid grid-cols-[auto_1fr_auto] items-center px-4 h-12">
+          <div className="grid grid-cols-[auto_1fr_auto] items-center px-4 h-10">
             {/* Left: Menu button */}
             <div className="justify-self-start tour-menu-button">
               <HomeMenu onStartTour={startHomeTour || undefined} />
@@ -688,7 +688,7 @@ const AppHome = () => {
           </div>
 
           {/* Calendar area - compact spacing */}
-          <div className="tour-calendar px-4 pt-0.5 pb-0.5">
+          <div className="tour-calendar px-4 pt-0 pb-0">
             {/* Calendar grid container - with weekday headers */}
             <div className="grid overflow-hidden" style={{
             gridTemplateRows: showCalendar ? '1fr' : '0fr'
@@ -715,7 +715,7 @@ const AppHome = () => {
                 <div 
                   ref={weekStripRef}
                   onScroll={handleWeekStripScroll}
-                  className={cn("flex mt-1 overflow-x-auto transition-opacity duration-200 snap-x snap-mandatory", showCalendar ? "opacity-0" : "opacity-100")}
+                  className={cn("flex mt-0 overflow-x-auto transition-opacity duration-200 snap-x snap-mandatory", showCalendar ? "opacity-0" : "opacity-100")}
                   style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
                 >
                   {weekDays.map((day, idx) => {
@@ -742,7 +742,7 @@ const AppHome = () => {
                     style={{ minWidth: 'calc(100% / 7)' }}
                   >
                         {/* Pill wraps around both day name and number for selected */}
-                        <div className={cn('flex flex-col items-center px-1 py-0.5 rounded-full transition-all', isSelected && 'bg-chip-lavender')}>
+                        <div className={cn('flex flex-col items-center px-1 py-0 rounded-full transition-all', isSelected && 'bg-chip-lavender')}>
                           {/* Day name - selected is black, others are grey */}
                           <span className={cn('text-[11px] font-medium leading-tight', isSelected ? 'text-foreground' : 'text-[#C6C1CF]')}>
                             {format(day, 'EEE')}
