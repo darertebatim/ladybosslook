@@ -363,11 +363,6 @@ const AppStore = () => {
                                 <CheckCircle2 className="h-2.5 w-2.5" /> Enrolled
                               </div>
                             )}
-                            {isFree && (
-                              <div className="absolute -top-2.5 left-1 z-10 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
-                                FREE
-                              </div>
-                            )}
                           </div>
                           <p className="text-xs font-medium line-clamp-2 leading-tight">{program.title}</p>
                           {isEnrolling && (
