@@ -541,6 +541,7 @@ export function PromoBannerManager() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="3:1">3:1 Wide Banner (1200×400)</SelectItem>
+                    <SelectItem value="4:1">4:1 Ultra Wide (1600×400)</SelectItem>
                     <SelectItem value="16:9">16:9 Video Banner (1920×1080)</SelectItem>
                     <SelectItem value="1:1">1:1 Square Banner (1080×1080)</SelectItem>
                   </SelectContent>

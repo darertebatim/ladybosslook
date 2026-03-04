@@ -401,6 +401,7 @@ export function PromoBanner({
     switch (activeBanner?.aspect_ratio) {
       case '16:9': return 'aspect-video';
       case '1:1': return 'aspect-square';
+      case '4:1': return 'aspect-[4/1]';
       default: return 'aspect-[3/1]';
     }
   };
