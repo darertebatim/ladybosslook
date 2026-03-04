@@ -648,6 +648,73 @@ export default function RoutinesBank() {
     setAddingTaskToSection(null);
   };
 
+  // Create a new action in the bank and add it to the current routine
+  const createActionMutation = useMutation({
+    mutationFn: async (data: { formData: TaskFormData; sectionId: string | null }) => {
+      const taskData = {
+        title: data.formData.title,
+        emoji: data.formData.icon,
+        color: data.formData.color,
+        category: data.formData.tag || 'general',
+        repeat_pattern: data.formData.repeatEnabled ? data.formData.repeatPattern : 'none',
+        repeat_interval: data.formData.repeatInterval,
+        repeat_days: data.formData.repeatDays,
+        reminder_enabled: data.formData.reminderEnabled,
+        goal_enabled: data.formData.goalEnabled,
+        goal_type: data.formData.goalEnabled ? data.formData.goalType : null,
+        goal_target: data.formData.goalEnabled ? data.formData.goalTarget : null,
+        goal_unit: data.formData.goalEnabled ? data.formData.goalUnit : null,
+        pro_link_type: data.formData.proLinkType,
+        pro_link_value: data.formData.proLinkValue,
+        linked_playlist_id: data.formData.proLinkType === 'playlist' ? data.formData.proLinkValue : data.formData.linkedPlaylistId,
+        tag: data.formData.tag,
+        description: data.formData.description || null,
+        is_active: true,
+        is_popular: false,
+        time_period: data.formData.timePeriod || null,
+      };
+
+      const { data: newTask, error } = await supabase
+        .from('admin_task_bank')
+        .insert(taskData)
+        .select('id, title, emoji, category, is_active, repeat_pattern')
+        .single();
+      if (error) throw error;
+
+      // Insert subtasks
+      if (data.formData.subtasks && data.formData.subtasks.length > 0) {
+        const subtaskRecords = data.formData.subtasks.map((title, index) => ({
+          task_id: newTask.id,
+          title,
+          order_index: index,
+        }));
+        await supabase.from('admin_task_bank_subtasks').insert(subtaskRecords);
+      }
+
+      return { task: newTask as TaskBankItem, sectionId: data.sectionId };
+    },
+    onSuccess: ({ task, sectionId }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-task-bank-for-picker'] });
+      // Auto-add the new task to the routine
+      addTaskToSection(task, sectionId);
+      toast.success('Action created and added');
+      setCreateActionSheetOpen(false);
+    },
+    onError: (error) => {
+      toast.error('Failed to create action: ' + error.message);
+    },
+  });
+
+  const openCreateActionSheet = (sectionId: string | null) => {
+    setCreateActionSectionId(sectionId);
+    setCreateActionSheetOpen(true);
+  };
+
+  const handleCreateActionSave = (formData: TaskFormData) => {
+    createActionMutation.mutate({ formData, sectionId: createActionSectionId });
+  };
+
   const removeTask = (taskId: string) => {
     setLocalTasks(localTasks.filter(t => t.id !== taskId));
   };
