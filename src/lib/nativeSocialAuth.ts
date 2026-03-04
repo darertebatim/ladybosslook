@@ -104,21 +104,58 @@ export const nativeAppleSignIn = async (): Promise<{ error: any }> => {
 
 // Fallback for web browsers
 const browserGoogleSignIn = async (): Promise<{ error: any }> => {
+  // Preserve the redirect path so user returns to the page they were on (e.g. /cart)
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirectPath = searchParams.get('redirect') || '/app/home';
+  const redirectTo = `${window.location.origin}${redirectPath}`;
+
+  const isCustomDomain =
+    !window.location.hostname.includes('lovable.app') &&
+    !window.location.hostname.includes('lovableproject.com') &&
+    !window.location.hostname.includes('localhost');
+
+  if (isCustomDomain) {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo, skipBrowserRedirect: true },
+    });
+    if (!error && data?.url) {
+      window.location.href = data.url;
+    }
+    return { error };
+  }
+
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: {
-      redirectTo: 'https://ladybosslook.com/app/home',
-    },
+    options: { redirectTo },
   });
   return { error };
 };
 
 const browserAppleSignIn = async (): Promise<{ error: any }> => {
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirectPath = searchParams.get('redirect') || '/app/home';
+  const redirectTo = `${window.location.origin}${redirectPath}`;
+
+  const isCustomDomain =
+    !window.location.hostname.includes('lovable.app') &&
+    !window.location.hostname.includes('lovableproject.com') &&
+    !window.location.hostname.includes('localhost');
+
+  if (isCustomDomain) {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'apple',
+      options: { redirectTo, skipBrowserRedirect: true },
+    });
+    if (!error && data?.url) {
+      window.location.href = data.url;
+    }
+    return { error };
+  }
+
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'apple',
-    options: {
-      redirectTo: 'https://ladybosslook.com/app/home',
-    },
+    options: { redirectTo },
   });
   return { error };
 };
