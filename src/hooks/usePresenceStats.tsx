@@ -94,14 +94,14 @@ export function usePresenceStats() {
           .from('user_reflection_responses' as any)
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id)
-          .not('completed_at', 'is', null),
+          .not('completed_at', 'is', null) as any,
 
-        // Meditation audio progress (category = meditate via audio_content join)
+        // Meditation audio progress (join with audio_content for category filter)
         supabase
-          .from('audio_progress')
+          .from('audio_progress' as any)
           .select('current_position_seconds, audio_content!inner(category)')
           .eq('user_id', user.id)
-          .eq('audio_content.category' as any, 'meditate' as any),
+          .eq('audio_content.category', 'meditate') as any,
 
         // Habit stacking: most repeated single action (task with most completions)
         supabase
