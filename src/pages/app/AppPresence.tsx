@@ -169,9 +169,9 @@ const AppPresence = () => {
                 isLoading={isLoading}
               />
               <StatCard 
-                icon={Calendar}
-                label="All-time"
-                value={stats?.totalActiveDays || 0}
+                icon={CheckCircle2}
+                label="Actions"
+                value={stats?.totalTaskCompletions || 0}
                 iconColor="text-amber-600"
                 isLoading={isLoading}
               />
