@@ -1835,6 +1835,36 @@ export default function RoutinesBank() {
         }}
         selectedEmoji={formData.emoji}
       />
+
+      {/* Create Action Sheet */}
+      <AppTaskCreate
+        isSheet={true}
+        sheetOpen={createActionSheetOpen}
+        onSheetOpenChange={setCreateActionSheetOpen}
+        initialData={{
+          title: '',
+          description: null,
+          icon: '☀️',
+          color: 'mint',
+          scheduledDate: new Date(),
+          scheduledTime: null,
+          repeatEnabled: false,
+          repeatPattern: 'daily',
+          repeatInterval: 1,
+          repeatDays: [],
+          reminderEnabled: false,
+          reminderTime: '09:00',
+          tag: null,
+          subtasks: [],
+          proLinkType: null,
+          proLinkValue: null,
+          goalEnabled: false,
+          goalType: 'count',
+          goalTarget: 2,
+          goalUnit: 'times',
+        }}
+        onSaveSheet={handleCreateActionSave}
+      />
     </Card>
   );
 }
