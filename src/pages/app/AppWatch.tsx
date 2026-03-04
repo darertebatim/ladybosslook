@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Search, X, Clock, Video, CalendarPlus, ChevronRight } from "lucide-react";
 import { VideoPlaylistCard } from "@/components/video/VideoPlaylistCard";
