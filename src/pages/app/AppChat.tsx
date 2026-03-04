@@ -688,6 +688,7 @@ export default function AppChat() {
               disabled={sending}
               uploading={uploading}
               placeholder="Type a message..."
+              initialMessage={draftMessage}
             />
           </div>
         </div>
