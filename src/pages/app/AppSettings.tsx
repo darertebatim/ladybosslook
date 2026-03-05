@@ -455,51 +455,6 @@ const AppSettings = () => {
           </Collapsible>
         )}
 
-        {/* Downloads — native only */}
-        {isNativeDevice && (
-          <Collapsible open={openSections.has('downloads')} onOpenChange={() => toggleSection('downloads')}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Download className="h-4 w-4 text-primary" />
-                </div>
-                <span className="font-medium text-sm">Downloaded Audio</span>
-              </div>
-              <div className="flex items-center gap-2">
-                {downloadedTracks.size > 0 && <Badge variant="secondary" className="text-xs">{downloadedTracks.size}</Badge>}
-                <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('downloads') ? 'rotate-180' : ''}`} />
-              </div>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="mt-1">
-              <Card className="rounded-2xl shadow-sm border-0 bg-card">
-                <CardContent className="pt-4">
-                  {downloadedTracks.size === 0 ? (
-                    <div className="text-center py-6">
-                      <Download className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                      <p className="text-sm text-muted-foreground">No downloads yet</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {[...downloadedTracks].map(trackId => (
-                        <div key={trackId} className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium font-mono truncate">{trackId.slice(0, 8)}…</p>
-                            <p className="text-xs text-muted-foreground">
-                              {downloadFileSizes[trackId] ? `${downloadFileSizes[trackId].toFixed(1)} MB` : 'Calculating…'}
-                            </p>
-                          </div>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => deleteDownload(trackId)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </CollapsibleContent>
-          </Collapsible>
-        )}
 
         {/* Support */}
         <Collapsible open={openSections.has('support')} onOpenChange={() => toggleSection('support')}>

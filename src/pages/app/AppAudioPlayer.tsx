@@ -529,48 +529,6 @@ export default function AppAudioPlayer() {
             )}
           </div>
 
-          {/* Download Button (native only) */}
-          {audio && isNative && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-10 w-10 relative text-white hover:bg-white/10"
-              onClick={() => {
-                if (isDownloaded(audio.id)) {
-                  haptic.light();
-                  deleteDownload(audio.id);
-                } else {
-                  haptic.medium();
-                  downloadTrack({
-                    id: audio.id,
-                    title: audio.title,
-                    fileUrl: audio.file_url,
-                    coverImageUrl: coverImageUrl || undefined,
-                  });
-                }
-              }}
-              disabled={isDownloading(audio.id)}
-              title={isDownloaded(audio.id) ? "Remove download" : "Download for offline"}
-            >
-              {isDownloaded(audio.id) ? (
-                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
-              ) : isDownloading(audio.id) ? (
-                <div className="relative h-5 w-5">
-                  <svg className="h-5 w-5 -rotate-90" viewBox="0 0 20 20">
-                    <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" strokeWidth="2" strokeOpacity="0.2" />
-                    <circle
-                      cx="10" cy="10" r="8" fill="none" stroke="currentColor" strokeWidth="2"
-                      strokeDasharray={`${2 * Math.PI * 8}`}
-                      strokeDashoffset={`${2 * Math.PI * 8 * (1 - getProgress(audio.id) / 100)}`}
-                      className="transition-all"
-                    />
-                  </svg>
-                </div>
-              ) : (
-                <Download className="h-5 w-5" />
-              )}
-            </Button>
-          )}
 
           {/* Add to Routine Button */}
           {audio && (
