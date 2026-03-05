@@ -81,7 +81,7 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     .map((e: any) => e.program_rounds?.id)
     .filter((id: string | undefined): id is string => Boolean(id));
   
-  let nextSessionMap = new Map<string, string>();
+  let nextSessionMap: Record<string, string> = {};
   if (roundIds.length > 0) {
     const { data: sessions } = await supabase
       .from('program_sessions')
@@ -92,8 +92,8 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     
     if (sessions) {
       for (const session of sessions) {
-        if (!nextSessionMap.has(session.round_id)) {
-          nextSessionMap.set(session.round_id, session.session_date);
+        if (!nextSessionMap[session.round_id]) {
+          nextSessionMap[session.round_id] = session.session_date;
         }
       }
     }
