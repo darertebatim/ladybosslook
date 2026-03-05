@@ -116,8 +116,8 @@ const AppCourses = () => {
     const isEnrollmentUnseen = unseenEnrollments.has(enrollment.id);
     const isRoundUnseen = round?.id ? unseenRounds.has(round.id) : false;
     const hasNotification = isEnrollmentUnseen || isRoundUnseen;
-    const nextSessionDate = round?.id ? nextSessionMap.get(round.id) : null;
-    const nextContent = round?.id ? nextContentMap.get(round.id) : null;
+    const nextSessionDate = round?.id ? nextSessionMap[round.id] : null;
+    const nextContent = round?.id ? nextContentMap[round.id] : null;
     
     const onMarkViewed = () => {
       if (isEnrollmentUnseen && markEnrollmentViewed) {
