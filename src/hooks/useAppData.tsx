@@ -413,8 +413,8 @@ export function useCoursesData() {
   return {
     ...query,
     enrollments: query.data?.enrollments || [],
-    nextSessionMap: query.data?.nextSessionMap || new Map<string, string>(),
-    nextContentMap: query.data?.nextContentMap || new Map<string, { title: string; type: 'module' | 'track'; countdownText: string | null }>(),
+    nextSessionMap: query.data?.nextSessionMap || {},
+    nextContentMap: query.data?.nextContentMap || {},
   };
 }
 
