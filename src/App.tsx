@@ -243,7 +243,7 @@ const localStoragePersister = createSyncStoragePersister({
       return parsed;
     } catch (e) {
       console.error('[Cache] Failed to deserialize cache, clearing:', e);
-      window.localStorage.removeItem('lb-query-cache-v3');
+      window.localStorage.removeItem('lb-query-cache-v4');
       return { timestamp: 0, buster: '', clientState: { mutations: [], queries: [] } };
     }
   },
