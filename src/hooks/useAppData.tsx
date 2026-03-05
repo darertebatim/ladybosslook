@@ -284,7 +284,7 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
   }
   
   // Fetch next content (modules/tracks) for each playlist
-  let nextContentMap = new Map<string, NextContentInfo>();
+  let nextContentMap: Record<string, NextContentInfo> = {};
   if (playlistIds.length > 0) {
     // Fetch modules (playlist_supplements)
     const { data: modules } = await supabase
