@@ -1,4 +1,5 @@
 import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Capacitor } from '@capacitor/core';
 import { isNativeApp } from '@/lib/platform';
 import { TrackInfo } from '@/contexts/AudioPlayerContext';
 
@@ -37,7 +38,8 @@ export async function getCachedAudioPath(trackId: string): Promise<string | null
       path: getAudioPath(trackId),
       directory: Directory.Data,
     });
-    return result.uri || null;
+    // Convert file:// URI to a format the WebView can play
+    return result.uri ? Capacitor.convertFileSrc(result.uri) : null;
   } catch {
     return null;
   }
