@@ -340,11 +340,11 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
             countdownText = 'soon';
           }
           
-          nextContentMap.set(round.id, {
+          nextContentMap[round.id] = {
             title: mod.title,
             type: 'module',
             countdownText,
-          });
+          };
           break;
         }
       }
