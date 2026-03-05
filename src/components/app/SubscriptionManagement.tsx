@@ -5,8 +5,8 @@ import { ChevronRight, ChevronLeft, Crown, Sparkles, HelpCircle, X } from 'lucid
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
+import { CancelSubscriptionFlow } from '@/components/app/CancelSubscriptionFlow';
 import { format } from 'date-fns';
-import { Capacitor } from '@capacitor/core';
 import { cn } from '@/lib/utils';
 
 const PREMIUM_FEATURES = [
@@ -211,71 +211,64 @@ function HelpCenterSheet({
   platform?: string;
 }) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-
-  const handleCancel = async () => {
-    if (Capacitor.getPlatform() === 'ios') {
-      // Open iOS subscription settings
-      window.open('https://apps.apple.com/account/subscriptions', '_blank');
-    } else if (Capacitor.getPlatform() === 'android') {
-      window.open('https://play.google.com/store/account/subscriptions', '_blank');
-    } else {
-      // Web - direct to app store
-      window.open('https://apps.apple.com/account/subscriptions', '_blank');
-    }
-  };
+  const [showCancelFlow, setShowCancelFlow] = useState(false);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[400px] h-[85vh] p-0 rounded-2xl overflow-hidden border-0 [&>button]:hidden">
-        <VisuallyHidden><DialogTitle>Help Center</DialogTitle></VisuallyHidden>
-        <div className="h-full flex flex-col bg-[#F4ECFE] dark:bg-background">
-          {/* Header */}
-          <div className="shrink-0 flex items-center px-4 pt-4 pb-2">
-            <button onClick={() => onOpenChange(false)} className="p-1">
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <div className="w-7" />
-          </div>
+    <>
+      <Dialog open={open && !showCancelFlow} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-[400px] h-[85vh] p-0 rounded-2xl overflow-hidden border-0 [&>button]:hidden">
+          <VisuallyHidden><DialogTitle>Help Center</DialogTitle></VisuallyHidden>
+          <div className="h-full flex flex-col bg-[#F4ECFE] dark:bg-background">
+            {/* Header */}
+            <div className="shrink-0 flex items-center px-4 pt-4 pb-2">
+              <button onClick={() => onOpenChange(false)} className="p-1">
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <div className="w-7" />
+            </div>
 
-          <div className="flex-1 overflow-y-auto px-4 pb-6 space-y-4">
-            <h2 className="text-2xl font-bold">Any concerns about your membership?</h2>
+            <div className="flex-1 overflow-y-auto px-4 pb-6 space-y-4">
+              <h2 className="text-2xl font-bold">Any concerns about your membership?</h2>
 
-            <div className="bg-card rounded-2xl overflow-hidden shadow-sm">
-              {HELP_FAQ.map((item, i) => (
-                <div key={i}>
-                  <button
-                    className="w-full text-left p-4 flex items-center justify-between active:bg-muted/50 transition-colors"
-                    onClick={() => setExpandedIndex(expandedIndex === i ? null : i)}
-                  >
-                    <span className="text-sm font-medium pr-4">{item.q}</span>
-                    <ChevronRight className={cn(
-                      'h-4 w-4 text-muted-foreground flex-shrink-0 transition-transform',
-                      expandedIndex === i && 'rotate-90'
-                    )} />
-                  </button>
-                  {expandedIndex === i && (
-                    <div className="px-4 pb-4">
-                      <p className="text-sm text-muted-foreground">{item.a}</p>
-                    </div>
-                  )}
-                  {i < HELP_FAQ.length - 1 && <div className="mx-4 border-b border-border" />}
-                </div>
-              ))}
+              <div className="bg-card rounded-2xl overflow-hidden shadow-sm">
+                {HELP_FAQ.map((item, i) => (
+                  <div key={i}>
+                    <button
+                      className="w-full text-left p-4 flex items-center justify-between active:bg-muted/50 transition-colors"
+                      onClick={() => setExpandedIndex(expandedIndex === i ? null : i)}
+                    >
+                      <span className="text-sm font-medium pr-4">{item.q}</span>
+                      <ChevronRight className={cn(
+                        'h-4 w-4 text-muted-foreground flex-shrink-0 transition-transform',
+                        expandedIndex === i && 'rotate-90'
+                      )} />
+                    </button>
+                    {expandedIndex === i && (
+                      <div className="px-4 pb-4">
+                        <p className="text-sm text-muted-foreground">{item.a}</p>
+                      </div>
+                    )}
+                    {i < HELP_FAQ.length - 1 && <div className="mx-4 border-b border-border" />}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Cancel button */}
+            <div className="shrink-0 px-4 pb-6 pt-2">
+              <Button
+                variant="default"
+                className="w-full rounded-full h-12 text-sm font-semibold bg-foreground text-background hover:bg-foreground/90"
+                onClick={() => setShowCancelFlow(true)}
+              >
+                Cancel Subscription
+              </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
 
-          {/* Cancel button */}
-          <div className="shrink-0 px-4 pb-6 pt-2">
-            <Button
-              variant="default"
-              className="w-full rounded-full h-12 text-sm font-semibold bg-foreground text-background hover:bg-foreground/90"
-              onClick={handleCancel}
-            >
-              Cancel Subscription
-            </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+      <CancelSubscriptionFlow open={showCancelFlow} onOpenChange={setShowCancelFlow} />
+    </>
   );
 }
