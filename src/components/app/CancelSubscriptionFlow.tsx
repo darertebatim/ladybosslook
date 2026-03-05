@@ -21,11 +21,12 @@ const CANCEL_REASONS = [
 ];
 
 const BENEFITS_LOST = [
-  { emoji: '📋', text: 'Unlimited daily planner actions' },
-  { emoji: '🧘‍♀️', text: 'Guided Meditations & Audio' },
-  { emoji: '🎭', text: 'Emotion tracking & reflections' },
-  { emoji: '💧', text: 'Water & Period Trackers' },
-  { emoji: '🌬️', text: 'Premium breathing exercises' },
+  { emoji: '📅', text: 'Routine Planner' },
+  { emoji: '💃', text: 'Habit Tracker' },
+  { emoji: '🧠', text: 'Mood and Progress Tracker' },
+  { emoji: '🧘‍♀️', text: 'Self-Care Plans' },
+  { emoji: '📋', text: 'Self-Care Information' },
+  { emoji: '📊', text: 'Detailed Analytics' },
 ];
 
 interface CancelSubscriptionFlowProps {
@@ -56,7 +57,7 @@ export function CancelSubscriptionFlow({ open, onOpenChange }: CancelSubscriptio
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-[400px] h-[85vh] p-0 rounded-2xl overflow-hidden border-0 [&>button]:hidden">
+      <DialogContent className="max-w-[400px] h-[85vh] p-0 rounded-2xl overflow-hidden border-0 [&>button]:hidden flex flex-col">
         <VisuallyHidden><DialogTitle>Cancel Subscription</DialogTitle></VisuallyHidden>
         {step === 'survey' && (
           <SurveyStep

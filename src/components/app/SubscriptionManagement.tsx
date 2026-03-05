@@ -10,12 +10,12 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 const PREMIUM_FEATURES = [
-  { emoji: '🧘‍♀️', title: 'Guided Meditations', desc: 'Premium audio sessions for relaxation and mindfulness' },
-  { emoji: '📊', title: 'Period Tracker', desc: 'Track your cycle with smart predictions and reminders' },
-  { emoji: '💧', title: 'Water Tracker', desc: 'Stay hydrated with daily water intake tracking' },
-  { emoji: '🎭', title: 'Emotion Tracker', desc: 'Monitor your emotional well-being with detailed insights' },
-  { emoji: '🎧', title: 'Exclusive Audio Content', desc: 'Access premium playlists and audio programs' },
-  { emoji: '✨', title: 'Premium Features', desc: 'Unlock all current and future premium tools' },
+  { emoji: '📅', title: 'Routine Planner', desc: 'Customize daily routines tailored to your lifestyle and goals' },
+  { emoji: '💃', title: 'Habit Tracker', desc: 'Track and analyze your habits helping you stay consistent' },
+  { emoji: '🧠', title: 'Mood and Progress Tracker', desc: 'Monitor your progress to gain insights into your emotional well-being' },
+  { emoji: '🧘‍♀️', title: 'Self-Care Plans', desc: 'Access personalized self-care plans, exercise routines' },
+  { emoji: '📋', title: 'Self-Care Information', desc: 'Evidence-based self-care tips to improve your overall well-being' },
+  { emoji: '📊', title: 'Detailed Analytics', desc: 'In-depth analytics to better understand areas for improvement' },
 ];
 
 const HELP_FAQ = [
