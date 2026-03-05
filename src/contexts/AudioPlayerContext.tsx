@@ -281,7 +281,11 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       if (startPosition !== undefined) {
         audio.currentTime = startPosition;
       }
-      await audio.play();
+      try {
+        await audio.play();
+      } catch (e) {
+        console.warn('[AudioPlayer] Resume play failed:', e);
+      }
       return;
     }
     
@@ -307,7 +311,30 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       audio.currentTime = startPosition;
     }
     
-    await audio.play();
+    // On iOS, wait for the audio to be ready before playing
+    try {
+      await audio.play();
+    } catch (e) {
+      console.warn('[AudioPlayer] Initial play failed, waiting for canplaythrough:', e);
+      // Wait for audio to buffer enough, then retry
+      await new Promise<void>((resolve) => {
+        const onReady = () => {
+          audio.removeEventListener('canplaythrough', onReady);
+          resolve();
+        };
+        audio.addEventListener('canplaythrough', onReady, { once: true });
+        // Safety timeout so we don't wait forever
+        setTimeout(() => {
+          audio.removeEventListener('canplaythrough', onReady);
+          resolve();
+        }, 5000);
+      });
+      try {
+        await audio.play();
+      } catch (e2) {
+        console.error('[AudioPlayer] Play failed after canplaythrough:', e2);
+      }
+    }
   }, [currentTrack, playbackRate]);
 
   const pause = useCallback(() => {
