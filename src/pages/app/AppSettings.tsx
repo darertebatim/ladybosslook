@@ -27,7 +27,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { checkPermissionStatus, requestNotificationPermission, subscribeToPushNotifications, unsubscribeFromPushNotifications } from '@/lib/pushNotifications';
 import { resetAllTours } from '@/lib/clientReset';
 import { Capacitor } from '@capacitor/core';
-import { useAudioDownload } from '@/hooks/useAudioDownload';
+
 import { useQueryClient } from '@tanstack/react-query';
 
 const useShowNativeSettings = () => {
