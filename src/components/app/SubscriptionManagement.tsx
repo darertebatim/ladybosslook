@@ -5,8 +5,8 @@ import { ChevronRight, ChevronLeft, Crown, Sparkles, HelpCircle, X } from 'lucid
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
+import { CancelSubscriptionFlow } from '@/components/app/CancelSubscriptionFlow';
 import { format } from 'date-fns';
-import { Capacitor } from '@capacitor/core';
 import { cn } from '@/lib/utils';
 
 const PREMIUM_FEATURES = [
