@@ -99,7 +99,7 @@ export function ActiveRoundsCarousel({
             const isRoundUnseen = roundId ? unseenRounds.has(roundId) : false;
             const hasNotification = isEnrollmentUnseen || isRoundUnseen;
             return <CarouselItem key={enrollment.id} className="pl-3 basis-auto">
-                  <CompactRoundCard enrollment={enrollment} nextSessionDate={roundId ? nextSessionMap.get(roundId) : null} isUnseen={hasNotification} onView={() => {
+                  <CompactRoundCard enrollment={enrollment} nextSessionDate={roundId ? (nextSessionMap instanceof Map ? nextSessionMap.get(roundId) : nextSessionMap[roundId]) ?? null : null} isUnseen={hasNotification} onView={() => {
                 if (isEnrollmentUnseen && markEnrollmentViewed) {
                   markEnrollmentViewed(enrollment.id);
                 }

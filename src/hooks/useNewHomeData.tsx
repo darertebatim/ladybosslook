@@ -16,7 +16,7 @@ interface NewHomeData {
   todayCompletedCount: number;
   activeRounds: any[];
   completedRounds: any[];
-  nextSessionMap: Map<string, string>;
+  nextSessionMap: Record<string, string>;
   suggestedRoutine: any | null;
   periodSettings: any | null;
   isNewUser: boolean;
