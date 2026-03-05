@@ -350,7 +350,7 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
       }
       
       // If no module found, check tracks
-      if (!nextContentMap.has(round.id)) {
+      if (!nextContentMap[round.id]) {
         const playlistTracks = (tracks || []).filter(t => t.playlist_id === playlistId);
         for (const track of playlistTracks) {
           if (track.drip_delay_days === 0) continue;
