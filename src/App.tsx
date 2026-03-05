@@ -317,6 +317,9 @@ const CourseRedirect = () => {
   return <Navigate to={`/app/programs/${slug}${roundId ? `/${roundId}` : ''}`} replace />;
 };
 
+// Clear old cache key to prevent crash on app update
+try { window.localStorage.removeItem('lb-query-cache-v1'); } catch {}
+
 const App = () => (
   <PersistQueryClientProvider
     client={queryClient}
