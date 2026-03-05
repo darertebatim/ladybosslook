@@ -217,7 +217,7 @@ const PERSIST_QUERY_KEYS = [
 
 const localStoragePersister = createSyncStoragePersister({
   storage: window.localStorage,
-  key: 'lb-query-cache-v3',
+  key: 'lb-query-cache-v4',
   // Only persist queries whose key starts with one of the allowed prefixes
   serialize: (client) => {
     const filtered = {
