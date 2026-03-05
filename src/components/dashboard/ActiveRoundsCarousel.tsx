@@ -9,7 +9,7 @@ import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { haptic } from '@/lib/haptics';
 interface ActiveRoundsCarouselProps {
   activeRounds: any[];
-  nextSessionMap: Map<string, string>;
+  nextSessionMap: Record<string, string> | Map<string, string>;
 }
 const COLLAPSED_KEY = 'programsCarouselCollapsed';
 

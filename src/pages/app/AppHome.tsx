@@ -619,7 +619,7 @@ const AppHome = () => {
     completedTracks = 0,
     daysThisMonth = 0,
     activeRounds = [],
-    nextSessionMap = new Map()
+    nextSessionMap = {}
   } = homeData || {};
   return (
     <>
