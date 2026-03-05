@@ -305,7 +305,7 @@ const AppCourses = () => {
       )}
 
       {/* Feature Tour */}
-      <ProgramsTour isFirstVisit={true} hasPrograms={enrollments && enrollments.length > 0} onTourReady={handleTourReady} />
+      <ProgramsTour isFirstVisit={true} hasPrograms={filteredEnrollments.length > 0} onTourReady={handleTourReady} />
     </div>
   );
 };
