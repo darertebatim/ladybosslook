@@ -342,7 +342,11 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   }, []);
 
   const resume = useCallback(async () => {
-    await audioRef.current?.play();
+    try {
+      await audioRef.current?.play();
+    } catch (e) {
+      console.warn('[AudioPlayer] Resume failed:', e);
+    }
   }, []);
 
   const seek = useCallback((time: number) => {
