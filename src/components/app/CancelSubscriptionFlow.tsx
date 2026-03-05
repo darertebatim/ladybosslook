@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, X, Crown, Sparkles } from 'lucide-react';
+import { ChevronLeft, X } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { cn } from '@/lib/utils';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
+import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
 import cancelStep1 from '@/assets/cancel-step1-settings.png';
 import cancelStep2 from '@/assets/cancel-step2-account.png';
 import cancelStep3 from '@/assets/cancel-step3-subscriptions.png';
@@ -24,10 +25,25 @@ const BENEFITS_LOST = [
   { emoji: '📅', text: 'Routine Planner' },
   { emoji: '💃', text: 'Habit Tracker' },
   { emoji: '🧠', text: 'Mood and Progress Tracker' },
-  { emoji: '🧘‍♀️', text: 'Self-Care Plans' },
+  { emoji: '🧘', text: 'Self-Care Plans' },
   { emoji: '📋', text: 'Self-Care Information' },
   { emoji: '📊', text: 'Detailed Analytics' },
 ];
+
+function FluentEmoji({ emoji, size = 28 }: { emoji: string; size?: number }) {
+  const [useFallback, setUseFallback] = useState(false);
+  if (useFallback) return <span style={{ fontSize: size * 0.8 }}>{emoji}</span>;
+  return (
+    <img
+      src={getFluentEmojiUrl(emoji)}
+      alt=""
+      width={size}
+      height={size}
+      className="flex-shrink-0"
+      onError={() => setUseFallback(true)}
+    />
+  );
+}
 
 interface CancelSubscriptionFlowProps {
   open: boolean;
@@ -42,7 +58,6 @@ export function CancelSubscriptionFlow({ open, onOpenChange }: CancelSubscriptio
 
   const handleClose = () => {
     onOpenChange(false);
-    // Reset after close animation
     setTimeout(() => {
       setStep('survey');
       setSelectedReason(null);
@@ -119,7 +134,7 @@ function SurveyStep({
                   : 'hover:bg-muted/50'
               )}
             >
-              <span className="text-2xl flex-shrink-0">{reason.emoji}</span>
+              <FluentEmoji emoji={reason.emoji} size={28} />
               <span className="text-sm font-medium flex-1">{reason.text}</span>
               <div className={cn(
                 'h-5 w-5 rounded-full border-2 flex-shrink-0 transition-colors',
@@ -194,7 +209,7 @@ function RetentionStep({
         <div className="space-y-3 mb-6">
           {BENEFITS_LOST.map((b, i) => (
             <div key={i} className="flex items-center gap-3">
-              <span className="text-xl">{b.emoji}</span>
+              <FluentEmoji emoji={b.emoji} size={28} />
               <span className="text-sm font-medium flex-1">{b.text}</span>
               <span className="text-destructive text-lg">✕</span>
             </div>
