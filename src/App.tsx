@@ -319,6 +319,7 @@ const CourseRedirect = () => {
 
 // Clear old cache key to prevent crash on app update
 try { window.localStorage.removeItem('lb-query-cache-v1'); } catch {}
+try { window.localStorage.removeItem('lb-query-cache-v2'); } catch {}
 
 const App = () => (
   <PersistQueryClientProvider
