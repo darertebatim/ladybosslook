@@ -134,7 +134,7 @@ const AppCourses = () => {
     return { hasNotification, nextSessionDate, nextContent, onMarkViewed };
   };
 
-  const totalPrograms = (enrollments?.length || 0);
+  const totalPrograms = filteredEnrollments.length;
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
