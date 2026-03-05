@@ -213,8 +213,8 @@ interface NextContentInfo {
 
 interface CoursesDataExtended {
   enrollments: any[];
-  nextSessionMap: Map<string, string>;
-  nextContentMap: Map<string, NextContentInfo>;
+  nextSessionMap: Record<string, string>;
+  nextContentMap: Record<string, NextContentInfo>;
 }
 
 async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
