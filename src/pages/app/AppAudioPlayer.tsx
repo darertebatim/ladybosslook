@@ -68,8 +68,6 @@ export default function AppAudioPlayer() {
   const { data: existingTask, isLoading: isCheckingTask } = useExistingAudioTask(audioId);
   const addRoutinePlan = useAddRoutinePlan();
 
-  // Audio download (offline playback)
-  const { isDownloaded, isDownloading, getProgress, downloadTrack, deleteDownload, isNative } = useAudioDownload();
 
   // Fetch audio content
   const { data: audio, isLoading } = useQuery({
