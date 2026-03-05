@@ -21,11 +21,12 @@ const CANCEL_REASONS = [
 ];
 
 const BENEFITS_LOST = [
-  { emoji: '📋', text: 'Unlimited daily planner actions' },
-  { emoji: '🧘‍♀️', text: 'Guided Meditations & Audio' },
-  { emoji: '🎭', text: 'Emotion tracking & reflections' },
-  { emoji: '💧', text: 'Water & Period Trackers' },
-  { emoji: '🌬️', text: 'Premium breathing exercises' },
+  { emoji: '📅', text: 'Routine Planner' },
+  { emoji: '💃', text: 'Habit Tracker' },
+  { emoji: '🧠', text: 'Mood and Progress Tracker' },
+  { emoji: '🧘‍♀️', text: 'Self-Care Plans' },
+  { emoji: '📋', text: 'Self-Care Information' },
+  { emoji: '📊', text: 'Detailed Analytics' },
 ];
 
 interface CancelSubscriptionFlowProps {
