@@ -306,6 +306,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     // Helper to attempt play with retries
     const attemptPlay = async (url: string): Promise<boolean> => {
       audio.src = url;
+      audio.load(); // Required on iOS — explicitly start buffering
       audio.playbackRate = playbackRate;
       
       if (startPosition !== undefined) {
