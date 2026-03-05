@@ -52,8 +52,11 @@ const AppCourses = () => {
     );
   }
 
+  // Filter out simora-plus from enrolled programs (it's a subscription, not a program)
+  const filteredEnrollments = enrollments?.filter(e => e.program_slug !== 'simora-plus') || [];
+  
   // Get enrolled program slugs
-  const enrolledSlugs = new Set(enrollments?.map(e => e.program_slug) || []);
+  const enrolledSlugs = new Set(filteredEnrollments.map(e => e.program_slug));
   
   // Filter browse programs: free/free-on-iOS + waitlist programs that aren't enrolled
   const browsePrograms = programs.filter(p => 
