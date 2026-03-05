@@ -80,16 +80,6 @@ const AppSettings = () => {
     });
   }, []);
 
-  // Fetch download file sizes
-  useEffect(() => {
-    if (!isNativeDevice || downloadedTracks.size === 0) return;
-    const ids = [...downloadedTracks];
-    Promise.all(ids.map(id => getFileSize(id).then(size => ({ id, size })))).then(results => {
-      const sizes: Record<string, number> = {};
-      results.forEach(({ id, size }) => { sizes[id] = size; });
-      setDownloadFileSizes(sizes);
-    });
-  }, [downloadedTracks, isNativeDevice, getFileSize]);
 
   // Check notification / calendar status
   useEffect(() => {
