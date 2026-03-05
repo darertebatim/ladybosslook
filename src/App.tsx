@@ -217,7 +217,7 @@ const PERSIST_QUERY_KEYS = [
 
 const localStoragePersister = createSyncStoragePersister({
   storage: window.localStorage,
-  key: 'lb-query-cache-v3',
+  key: 'lb-query-cache-v4',
   // Only persist queries whose key starts with one of the allowed prefixes
   serialize: (client) => {
     const filtered = {
@@ -237,10 +237,13 @@ const localStoragePersister = createSyncStoragePersister({
   },
   deserialize: (cachedString) => {
     try {
-      return JSON.parse(cachedString);
+      const parsed = JSON.parse(cachedString);
+      // Safety: clear cache if it somehow contains data that will crash on access
+      // (e.g., Map objects serialized as empty objects)
+      return parsed;
     } catch (e) {
       console.error('[Cache] Failed to deserialize cache, clearing:', e);
-      window.localStorage.removeItem('lb-query-cache-v3');
+      window.localStorage.removeItem('lb-query-cache-v4');
       return { timestamp: 0, buster: '', clientState: { mutations: [], queries: [] } };
     }
   },
@@ -320,6 +323,7 @@ const CourseRedirect = () => {
 // Clear old cache key to prevent crash on app update
 try { window.localStorage.removeItem('lb-query-cache-v1'); } catch {}
 try { window.localStorage.removeItem('lb-query-cache-v2'); } catch {}
+try { window.localStorage.removeItem('lb-query-cache-v3'); } catch {}
 
 const App = () => (
   <PersistQueryClientProvider

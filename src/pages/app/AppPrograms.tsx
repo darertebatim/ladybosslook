@@ -78,12 +78,12 @@ const AppCourses = () => {
     const bRoundId = b.program_rounds?.id;
     
     // Get next session from map (actual scheduled sessions)
-    const aNextSession = aRoundId ? nextSessionMap.get(aRoundId) : null;
-    const bNextSession = bRoundId ? nextSessionMap.get(bRoundId) : null;
+    const aNextSession = aRoundId ? nextSessionMap[aRoundId] : null;
+    const bNextSession = bRoundId ? nextSessionMap[bRoundId] : null;
     
     // Check if program has actual content drip schedule
-    const aNextContent = aRoundId ? nextContentMap.get(aRoundId) : null;
-    const bNextContent = bRoundId ? nextContentMap.get(bRoundId) : null;
+    const aNextContent = aRoundId ? nextContentMap[aRoundId] : null;
+    const bNextContent = bRoundId ? nextContentMap[bRoundId] : null;
     
     // Priority scoring: programs with scheduled sessions get highest priority
     const aHasScheduledSession = !!aNextSession;
@@ -116,8 +116,8 @@ const AppCourses = () => {
     const isEnrollmentUnseen = unseenEnrollments.has(enrollment.id);
     const isRoundUnseen = round?.id ? unseenRounds.has(round.id) : false;
     const hasNotification = isEnrollmentUnseen || isRoundUnseen;
-    const nextSessionDate = round?.id ? nextSessionMap.get(round.id) : null;
-    const nextContent = round?.id ? nextContentMap.get(round.id) : null;
+    const nextSessionDate = round?.id ? nextSessionMap[round.id] : null;
+    const nextContent = round?.id ? nextContentMap[round.id] : null;
     
     const onMarkViewed = () => {
       if (isEnrollmentUnseen && markEnrollmentViewed) {

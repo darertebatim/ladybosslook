@@ -213,8 +213,8 @@ interface NextContentInfo {
 
 interface CoursesDataExtended {
   enrollments: any[];
-  nextSessionMap: Map<string, string>;
-  nextContentMap: Map<string, NextContentInfo>;
+  nextSessionMap: Record<string, string>;
+  nextContentMap: Record<string, NextContentInfo>;
 }
 
 async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
@@ -264,7 +264,7 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
     .filter((id): id is string => Boolean(id));
   
   // Fetch next upcoming session for each round
-  let nextSessionMap = new Map<string, string>();
+  let nextSessionMap: Record<string, string> = {};
   if (roundIds.length > 0) {
     const { data: sessions } = await supabase
       .from('program_sessions')
@@ -276,15 +276,15 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
     // Build map with first (soonest) session per round
     if (sessions) {
       for (const session of sessions) {
-        if (!nextSessionMap.has(session.round_id)) {
-          nextSessionMap.set(session.round_id, session.session_date);
+        if (!nextSessionMap[session.round_id]) {
+          nextSessionMap[session.round_id] = session.session_date;
         }
       }
     }
   }
   
   // Fetch next content (modules/tracks) for each playlist
-  let nextContentMap = new Map<string, NextContentInfo>();
+  let nextContentMap: Record<string, NextContentInfo> = {};
   if (playlistIds.length > 0) {
     // Fetch modules (playlist_supplements)
     const { data: modules } = await supabase
@@ -340,17 +340,17 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
             countdownText = 'soon';
           }
           
-          nextContentMap.set(round.id, {
+          nextContentMap[round.id] = {
             title: mod.title,
             type: 'module',
             countdownText,
-          });
+          };
           break;
         }
       }
       
       // If no module found, check tracks
-      if (!nextContentMap.has(round.id)) {
+      if (!nextContentMap[round.id]) {
         const playlistTracks = (tracks || []).filter(t => t.playlist_id === playlistId);
         for (const track of playlistTracks) {
           if (track.drip_delay_days === 0) continue;
@@ -372,11 +372,11 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
               countdownText = 'soon';
             }
             
-            nextContentMap.set(round.id, {
+            nextContentMap[round.id] = {
               title: (track.audio_content as any)?.title || 'New Track',
               type: 'track',
               countdownText,
-            });
+            };
             break;
           }
         }
@@ -413,8 +413,8 @@ export function useCoursesData() {
   return {
     ...query,
     enrollments: query.data?.enrollments || [],
-    nextSessionMap: query.data?.nextSessionMap || new Map<string, string>(),
-    nextContentMap: query.data?.nextContentMap || new Map<string, { title: string; type: 'module' | 'track'; countdownText: string | null }>(),
+    nextSessionMap: query.data?.nextSessionMap || {},
+    nextContentMap: query.data?.nextContentMap || {},
   };
 }
 
