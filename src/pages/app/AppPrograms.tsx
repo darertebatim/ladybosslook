@@ -66,14 +66,14 @@ const AppCourses = () => {
 
   // Separate enrollments into active/upcoming and completed
   // For rounds: check round.status; for self-paced: check enrollment.status
-  const activeRounds = enrollments?.filter(e => e.program_rounds && e.program_rounds.status !== 'completed') || [];
-  const completedRounds = enrollments?.filter(e => 
+  const activeRounds = filteredEnrollments.filter(e => e.program_rounds && e.program_rounds.status !== 'completed');
+  const completedRounds = filteredEnrollments.filter(e => 
     (e.program_rounds && e.program_rounds.status === 'completed') || 
     (!e.program_rounds && e.status === 'completed')
-  ) || [];
+  );
   
   // Self-paced enrollments that are still active (not completed)
-  const selfPacedEnrollments = enrollments?.filter(e => !e.program_rounds && e.status !== 'completed') || [];
+  const selfPacedEnrollments = filteredEnrollments.filter(e => !e.program_rounds && e.status !== 'completed');
 
   // Sort active rounds: prioritize those with actual scheduled sessions, then by nearest date
   const sortedActiveRounds = [...activeRounds].sort((a, b) => {
