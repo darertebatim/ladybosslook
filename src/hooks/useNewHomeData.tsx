@@ -103,8 +103,8 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
   activeRounds.sort((a: any, b: any) => {
     const aRoundId = a.program_rounds?.id;
     const bRoundId = b.program_rounds?.id;
-    const aNextSession = aRoundId ? nextSessionMap.get(aRoundId) : null;
-    const bNextSession = bRoundId ? nextSessionMap.get(bRoundId) : null;
+    const aNextSession = aRoundId ? nextSessionMap[aRoundId] : null;
+    const bNextSession = bRoundId ? nextSessionMap[bRoundId] : null;
 
     if (aNextSession && !bNextSession) return -1;
     if (!aNextSession && bNextSession) return 1;
