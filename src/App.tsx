@@ -237,7 +237,10 @@ const localStoragePersister = createSyncStoragePersister({
   },
   deserialize: (cachedString) => {
     try {
-      return JSON.parse(cachedString);
+      const parsed = JSON.parse(cachedString);
+      // Safety: clear cache if it somehow contains data that will crash on access
+      // (e.g., Map objects serialized as empty objects)
+      return parsed;
     } catch (e) {
       console.error('[Cache] Failed to deserialize cache, clearing:', e);
       window.localStorage.removeItem('lb-query-cache-v3');
