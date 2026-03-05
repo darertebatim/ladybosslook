@@ -52,8 +52,11 @@ const AppCourses = () => {
     );
   }
 
+  // Filter out simora-plus from enrolled programs (it's a subscription, not a program)
+  const filteredEnrollments = enrollments?.filter(e => e.program_slug !== 'simora-plus') || [];
+  
   // Get enrolled program slugs
-  const enrolledSlugs = new Set(enrollments?.map(e => e.program_slug) || []);
+  const enrolledSlugs = new Set(filteredEnrollments.map(e => e.program_slug));
   
   // Filter browse programs: free/free-on-iOS + waitlist programs that aren't enrolled
   const browsePrograms = programs.filter(p => 
@@ -63,14 +66,14 @@ const AppCourses = () => {
 
   // Separate enrollments into active/upcoming and completed
   // For rounds: check round.status; for self-paced: check enrollment.status
-  const activeRounds = enrollments?.filter(e => e.program_rounds && e.program_rounds.status !== 'completed') || [];
-  const completedRounds = enrollments?.filter(e => 
+  const activeRounds = filteredEnrollments.filter(e => e.program_rounds && e.program_rounds.status !== 'completed');
+  const completedRounds = filteredEnrollments.filter(e => 
     (e.program_rounds && e.program_rounds.status === 'completed') || 
     (!e.program_rounds && e.status === 'completed')
-  ) || [];
+  );
   
   // Self-paced enrollments that are still active (not completed)
-  const selfPacedEnrollments = enrollments?.filter(e => !e.program_rounds && e.status !== 'completed') || [];
+  const selfPacedEnrollments = filteredEnrollments.filter(e => !e.program_rounds && e.status !== 'completed');
 
   // Sort active rounds: prioritize those with actual scheduled sessions, then by nearest date
   const sortedActiveRounds = [...activeRounds].sort((a, b) => {
@@ -131,7 +134,7 @@ const AppCourses = () => {
     return { hasNotification, nextSessionDate, nextContent, onMarkViewed };
   };
 
-  const totalPrograms = (enrollments?.length || 0);
+  const totalPrograms = filteredEnrollments.length;
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
@@ -302,7 +305,7 @@ const AppCourses = () => {
       )}
 
       {/* Feature Tour */}
-      <ProgramsTour isFirstVisit={true} hasPrograms={enrollments && enrollments.length > 0} onTourReady={handleTourReady} />
+      <ProgramsTour isFirstVisit={true} hasPrograms={filteredEnrollments.length > 0} onTourReady={handleTourReady} />
     </div>
   );
 };

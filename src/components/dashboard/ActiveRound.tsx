@@ -75,7 +75,7 @@ export function ActiveRound() {
     enabled: !!user?.id,
   });
 
-  const activeEnrollments = queryResult?.enrollments;
+  const activeEnrollments = queryResult?.enrollments?.filter(e => e.program_slug !== 'simora-plus');
   const nextSessionMap = queryResult?.nextSessionMap || new Map<string, string>();
 
   if (isLoading) {
