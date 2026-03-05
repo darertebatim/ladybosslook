@@ -8,12 +8,13 @@ import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { CancelSubscriptionFlow } from '@/components/app/CancelSubscriptionFlow';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
 
 const PREMIUM_FEATURES = [
   { emoji: '📅', title: 'Routine Planner', desc: 'Customize daily routines tailored to your lifestyle and goals' },
   { emoji: '💃', title: 'Habit Tracker', desc: 'Track and analyze your habits helping you stay consistent' },
   { emoji: '🧠', title: 'Mood and Progress Tracker', desc: 'Monitor your progress to gain insights into your emotional well-being' },
-  { emoji: '🧘‍♀️', title: 'Self-Care Plans', desc: 'Access personalized self-care plans, exercise routines' },
+  { emoji: '🧘', title: 'Self-Care Plans', desc: 'Access personalized self-care plans, exercise routines' },
   { emoji: '📋', title: 'Self-Care Information', desc: 'Evidence-based self-care tips to improve your overall well-being' },
   { emoji: '📊', title: 'Detailed Analytics', desc: 'In-depth analytics to better understand areas for improvement' },
 ];
@@ -26,6 +27,21 @@ const HELP_FAQ = [
   { q: 'How can I get help with technical issues?', a: 'Contact us through the in-app chat or email support@simora.app for technical assistance.' },
   { q: 'Money-back policy', a: 'Refunds for in-app purchases are handled by Apple/Google. Contact their support for refund requests.' },
 ];
+
+function FluentEmoji({ emoji, size = 32 }: { emoji: string; size?: number }) {
+  const [useFallback, setUseFallback] = useState(false);
+  if (useFallback) return <span style={{ fontSize: size * 0.8 }}>{emoji}</span>;
+  return (
+    <img
+      src={getFluentEmojiUrl(emoji)}
+      alt=""
+      width={size}
+      height={size}
+      className="flex-shrink-0"
+      onError={() => setUseFallback(true)}
+    />
+  );
+}
 
 // Golden subscription card shown on profile
 export function SubscriptionCard() {
@@ -96,7 +112,7 @@ export function SubscriptionCard() {
         </div>
         <div className="flex items-center justify-between mt-2">
           <p className="text-white/90 text-xs">
-            {expiresAt ? `Expiration: ${format(new Date(expiresAt), 'yyyy-MM-dd')}` : 'Active · No expiry'}
+            {expiresAt ? `Expiration: ${format(new Date(expiresAt), 'yyyy-MM-dd')}` : 'Active Subscription'}
           </p>
           <div className="flex items-center gap-1">
             <span className="text-white text-xs font-semibold">Manage</span>
@@ -131,7 +147,7 @@ function ManageSubscriptionSheet({
   return (
     <>
       <Dialog open={open && !showHelp} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-[400px] h-[85vh] p-0 rounded-2xl overflow-hidden border-0 [&>button]:hidden">
+        <DialogContent className="max-w-[400px] h-[85vh] p-0 rounded-2xl overflow-hidden border-0 [&>button]:hidden flex flex-col">
           <VisuallyHidden><DialogTitle>Manage Subscription</DialogTitle></VisuallyHidden>
           <div className="h-full flex flex-col bg-[#F4ECFE] dark:bg-background">
             {/* Header */}
@@ -162,7 +178,7 @@ function ManageSubscriptionSheet({
                   <div className="h-full bg-white/70 rounded-full" style={{ width: '15%' }} />
                 </div>
                 <p className="text-white/90 text-xs mt-2">
-                  {expiresAt ? `Expiration Date: ${format(new Date(expiresAt), 'yyyy-MM-dd')}` : 'Active · No expiry'}
+                  {expiresAt ? `Expiration Date: ${format(new Date(expiresAt), 'yyyy-MM-dd')}` : 'Active Subscription'}
                 </p>
               </div>
 
@@ -172,7 +188,7 @@ function ManageSubscriptionSheet({
                 <div className="space-y-4">
                   {PREMIUM_FEATURES.map((f, i) => (
                     <div key={i} className="flex items-start gap-3">
-                      <span className="text-2xl flex-shrink-0">{f.emoji}</span>
+                      <FluentEmoji emoji={f.emoji} size={36} />
                       <div>
                         <p className="font-medium text-sm">{f.title}</p>
                         <p className="text-xs text-muted-foreground">{f.desc}</p>
@@ -216,7 +232,7 @@ function HelpCenterSheet({
   return (
     <>
       <Dialog open={open && !showCancelFlow} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-[400px] h-[85vh] p-0 rounded-2xl overflow-hidden border-0 [&>button]:hidden">
+        <DialogContent className="max-w-[400px] h-[85vh] p-0 rounded-2xl overflow-hidden border-0 [&>button]:hidden flex flex-col">
           <VisuallyHidden><DialogTitle>Help Center</DialogTitle></VisuallyHidden>
           <div className="h-full flex flex-col bg-[#F4ECFE] dark:bg-background">
             {/* Header */}
