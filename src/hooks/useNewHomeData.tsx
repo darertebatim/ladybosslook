@@ -71,8 +71,8 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
   );
   const todayCompletedCount = todayTasks.filter(t => completedTaskIds.has(t.id)).length;
 
-  // Process enrollments from RPC
-  const enrollments = d.active_enrollments || [];
+  // Process enrollments from RPC (exclude simora-plus subscription)
+  const enrollments = (d.active_enrollments || []).filter((e: any) => e.program_slug !== 'simora-plus');
   const activeRounds = enrollments.filter((e: any) => e.program_rounds?.status !== 'completed');
   const completedRounds = enrollments.filter((e: any) => e.program_rounds?.status === 'completed');
 
