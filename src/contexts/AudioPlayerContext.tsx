@@ -291,49 +291,64 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     
     // Check for locally downloaded audio first (offline playback)
     let fileUrl = track.fileUrl;
+    let usingCache = false;
     try {
       const localPath = await getCachedAudioPath(track.id);
       if (localPath) {
         fileUrl = localPath;
-        console.log(`[AudioPlayer] Using cached audio for track ${track.id}`);
+        usingCache = true;
+        console.log(`[AudioPlayer] Using cached audio for track ${track.id}:`, localPath);
       }
     } catch {
       // Fall back to streaming URL if cache check fails
     }
     
+    // Helper to attempt play with retries
+    const attemptPlay = async (url: string): Promise<boolean> => {
+      audio.src = url;
+      audio.playbackRate = playbackRate;
+      
+      if (startPosition !== undefined) {
+        audio.currentTime = startPosition;
+      }
+      
+      try {
+        await audio.play();
+        return true;
+      } catch (e) {
+        console.warn('[AudioPlayer] Play failed, waiting for canplaythrough:', e);
+        // Wait for audio to buffer enough, then retry
+        await new Promise<void>((resolve) => {
+          const onReady = () => {
+            audio.removeEventListener('canplaythrough', onReady);
+            resolve();
+          };
+          audio.addEventListener('canplaythrough', onReady, { once: true });
+          setTimeout(() => {
+            audio.removeEventListener('canplaythrough', onReady);
+            resolve();
+          }, 5000);
+        });
+        try {
+          await audio.play();
+          return true;
+        } catch (e2) {
+          console.error('[AudioPlayer] Play failed after canplaythrough:', e2);
+          return false;
+        }
+      }
+    };
+    
     // Load new track
     setCurrentTrack(track);
     currentTrackRef.current = track;
-    audio.src = fileUrl;
-    audio.playbackRate = playbackRate;
     
-    if (startPosition !== undefined) {
-      audio.currentTime = startPosition;
-    }
+    const success = await attemptPlay(fileUrl);
     
-    // On iOS, wait for the audio to be ready before playing
-    try {
-      await audio.play();
-    } catch (e) {
-      console.warn('[AudioPlayer] Initial play failed, waiting for canplaythrough:', e);
-      // Wait for audio to buffer enough, then retry
-      await new Promise<void>((resolve) => {
-        const onReady = () => {
-          audio.removeEventListener('canplaythrough', onReady);
-          resolve();
-        };
-        audio.addEventListener('canplaythrough', onReady, { once: true });
-        // Safety timeout so we don't wait forever
-        setTimeout(() => {
-          audio.removeEventListener('canplaythrough', onReady);
-          resolve();
-        }, 5000);
-      });
-      try {
-        await audio.play();
-      } catch (e2) {
-        console.error('[AudioPlayer] Play failed after canplaythrough:', e2);
-      }
+    // If cached audio failed, fall back to streaming URL
+    if (!success && usingCache) {
+      console.warn('[AudioPlayer] Cached audio failed, falling back to streaming URL');
+      await attemptPlay(track.fileUrl);
     }
   }, [currentTrack, playbackRate]);
 
