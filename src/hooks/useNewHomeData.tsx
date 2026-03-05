@@ -16,7 +16,7 @@ interface NewHomeData {
   todayCompletedCount: number;
   activeRounds: any[];
   completedRounds: any[];
-  nextSessionMap: Map<string, string>;
+  nextSessionMap: Record<string, string>;
   suggestedRoutine: any | null;
   periodSettings: any | null;
   isNewUser: boolean;
@@ -81,7 +81,7 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     .map((e: any) => e.program_rounds?.id)
     .filter((id: string | undefined): id is string => Boolean(id));
   
-  let nextSessionMap = new Map<string, string>();
+  let nextSessionMap: Record<string, string> = {};
   if (roundIds.length > 0) {
     const { data: sessions } = await supabase
       .from('program_sessions')
@@ -92,8 +92,8 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     
     if (sessions) {
       for (const session of sessions) {
-        if (!nextSessionMap.has(session.round_id)) {
-          nextSessionMap.set(session.round_id, session.session_date);
+        if (!nextSessionMap[session.round_id]) {
+          nextSessionMap[session.round_id] = session.session_date;
         }
       }
     }
@@ -103,8 +103,8 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
   activeRounds.sort((a: any, b: any) => {
     const aRoundId = a.program_rounds?.id;
     const bRoundId = b.program_rounds?.id;
-    const aNextSession = aRoundId ? nextSessionMap.get(aRoundId) : null;
-    const bNextSession = bRoundId ? nextSessionMap.get(bRoundId) : null;
+    const aNextSession = aRoundId ? nextSessionMap[aRoundId] : null;
+    const bNextSession = bRoundId ? nextSessionMap[bRoundId] : null;
 
     if (aNextSession && !bNextSession) return -1;
     if (!aNextSession && bNextSession) return 1;
@@ -173,7 +173,7 @@ export function useNewHomeData() {
     todayCompletedCount: query.data?.todayCompletedCount || 0,
     activeRounds: query.data?.activeRounds || [],
     completedRounds: query.data?.completedRounds || [],
-    nextSessionMap: query.data?.nextSessionMap instanceof Map ? query.data.nextSessionMap : new Map<string, string>(Object.entries(query.data?.nextSessionMap || {})),
+    nextSessionMap: query.data?.nextSessionMap || {},
     suggestedRoutine: query.data?.suggestedRoutine || null,
     periodSettings: query.data?.periodSettings || null,
     isNewUser: query.data?.isNewUser || false,
