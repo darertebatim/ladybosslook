@@ -372,11 +372,11 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
               countdownText = 'soon';
             }
             
-            nextContentMap.set(round.id, {
+            nextContentMap[round.id] = {
               title: (track.audio_content as any)?.title || 'New Track',
               type: 'track',
               countdownText,
-            });
+            };
             break;
           }
         }
