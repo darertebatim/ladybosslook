@@ -264,7 +264,7 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
     .filter((id): id is string => Boolean(id));
   
   // Fetch next upcoming session for each round
-  let nextSessionMap = new Map<string, string>();
+  let nextSessionMap: Record<string, string> = {};
   if (roundIds.length > 0) {
     const { data: sessions } = await supabase
       .from('program_sessions')
@@ -276,8 +276,8 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
     // Build map with first (soonest) session per round
     if (sessions) {
       for (const session of sessions) {
-        if (!nextSessionMap.has(session.round_id)) {
-          nextSessionMap.set(session.round_id, session.session_date);
+        if (!nextSessionMap[session.round_id]) {
+          nextSessionMap[session.round_id] = session.session_date;
         }
       }
     }
