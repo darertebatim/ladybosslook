@@ -1,4 +1,5 @@
 import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Capacitor } from '@capacitor/core';
 import { isNativeApp } from '@/lib/platform';
 import { TrackInfo } from '@/contexts/AudioPlayerContext';
 
