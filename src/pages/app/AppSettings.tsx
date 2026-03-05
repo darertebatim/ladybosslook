@@ -69,9 +69,6 @@ const AppSettings = () => {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  // Downloads
-  const { downloadedTracks, deleteDownload, getFileSize, isNative: isNativeDevice } = useAudioDownload();
-  const [downloadFileSizes, setDownloadFileSizes] = useState<Record<string, number>>({});
 
   // Accordion
   const [openSections, setOpenSections] = useState<Set<string>>(new Set());
