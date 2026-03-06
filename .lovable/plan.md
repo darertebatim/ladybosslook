@@ -1,58 +1,37 @@
 
 
-## Calm-Style Animated Background for Watch Page
+## Page Transition Animations for Onboarding
 
-Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
+Currently, steps swap instantly via React `key` remounting with no enter/exit animations. Here's the plan using **framer-motion** (already installed):
 
-### What You'll Get
+### What we'll add
 
-- A deep dark blue gradient background on the Watch page header area
-- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
-- Subtle lightning flashes that pulse periodically
-- All text updated to white/light colors for contrast
-- Lightweight implementation using CSS keyframes (no extra dependencies)
+**1. Page-level slide transition** (in `AppOnboarding.tsx`)
+- Wrap `OnboardingStepRenderer` in `<AnimatePresence mode="wait">` + `<motion.div>`
+- Track navigation direction (forward/back) to determine slide direction
+- **Forward**: slide in from right, exit to left (subtle, ~30px translateX + fade)
+- **Back**: slide in from left, exit to right
+- Duration: ~250ms with easeOut — fast enough to feel snappy
 
-### Design Details
+**2. Staggered content entrance** (in `OnboardingStepRenderer.tsx`)
+- Add a reusable `<StaggerContainer>` + `<StaggerItem>` wrapper using `motion.div` with `staggerChildren: 0.08`
+- Apply to key content elements within each screen type:
+  - **Titles**: fade-up (translateY 15px → 0)
+  - **Subtitles**: fade-up with slight delay
+  - **Option buttons/cards**: stagger fade-up one by one
+  - **CTA button**: fade-in last
+- Screens that already have custom animations (loading-testimonials, personalized-plan stagger) keep their existing logic
 
-- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
-- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
-- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
-- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
-- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
+**3. Exit animations**
+- Content fades out quickly (~150ms) when navigating away, handled by `AnimatePresence`'s exit prop
 
-### Technical Approach
+### Technical approach
 
-**Files to modify:**
+- `AppOnboarding.tsx`: Add `direction` state (1 or -1), update in `goNext`/`goBack`. Pass as `custom` prop to motion variants.
+- Create small `<PageTransition>` wrapper component for clean reuse
+- Create `<FadeUp>` utility component for individual element entrances
+- Apply `<FadeUp>` to titles, subtitles, options, and buttons across the ~20 screen types using a consistent pattern
 
-1. **`src/pages/app/AppWatch.tsx`**
-   - Replace the header `bg-[#E8F4FE]` with the dark gradient
-   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
-   - Add a lightning flash overlay div
-   - Update all text classes to white variants (`text-white`, `text-white/60`)
-   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
-   - Extend the gradient into the page background behind the content area
-
-2. **`tailwind.config.ts`**
-   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
-   - Register corresponding animation utilities
-
-### Visual Structure
-
-```text
-+----------------------------------+
-|  [dark blue gradient header]     |
-|  ~~~ cloud layer 1 (slow) ~~~   |
-|  ~~~ cloud layer 2 (slower) ~~~ |
-|  * lightning flash (periodic) *  |
-|                                  |
-|  Watch          [icons]          |
-|  [categories row]                |
-|  [filters]              [lang]   |
-+----------------------------------+
-|  [normal white content area]     |
-|  [playlist cards grid]           |
-+----------------------------------+
-```
-
-The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
+### Screens to update
+All screen components (`WelcomeScreen`, `MultiSelectScreen`, `SingleSelectScreen`, `YesNoScreen`, `MotivationalScreen`, `InfoStatScreen`, `PersonalizedPlanScreen`, etc.) — wrap their content children in `<FadeUp>` components with stagger delays.
 
