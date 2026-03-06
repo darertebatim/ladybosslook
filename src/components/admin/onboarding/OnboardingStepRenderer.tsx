@@ -480,21 +480,21 @@ function DoYouWantScreen({ step, onNext, onAnswer }: Props) {
   };
   return (
     <ScreenWrapper>
-      <FadeUp><h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4">{step.title}</h1></FadeUp>
+      <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1></FadeUp>
       <FadeUp delay={0.1}>
         {step.image ? (
           <div className="flex-1 flex items-center justify-center">
-            <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
+            <img src={step.image} alt="" className="w-full object-contain" />
           </div>
         ) : (
           <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="flex-1" />
         )}
       </FadeUp>
-      <FadeUp delay={0.2} className="mt-auto flex gap-3 pt-6">
-        <button onClick={() => handleChoice('No')} className="px-8 py-3.5 rounded-full border border-gray-300 text-sm font-medium text-[#1a1f3d] active:scale-[0.98] transition-all">
+      <FadeUp delay={0.2} className="mt-auto flex gap-3 pt-4">
+        <button onClick={() => handleChoice('No')} className="px-8 py-4 rounded-full border border-gray-300 text-base font-medium text-[#1a1f3d] active:scale-[0.98] transition-all">
           {step.secondaryButtonLabel}
         </button>
-        <button onClick={() => handleChoice('Yes')} className="flex-1 py-3.5 rounded-full bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all">
+        <button onClick={() => handleChoice('Yes')} className="flex-1 py-4 rounded-full bg-[#1a1f3d] text-white font-bold text-base active:scale-[0.98] transition-all">
           {step.buttonLabel}
         </button>
       </FadeUp>
