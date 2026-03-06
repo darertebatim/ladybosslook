@@ -115,10 +115,10 @@ export default function AppOnboarding() {
 
   const goNext = useCallback(() => {
     if (!flow) return;
+    setDirection(1);
     if (currentStep < flow.steps.length - 1) {
       setCurrentStep(prev => prev + 1);
     } else {
-      // Completed
       localStorage.setItem(completedKey, 'true');
       localStorage.removeItem(progressKey);
       navigate('/app/home');
@@ -126,6 +126,7 @@ export default function AppOnboarding() {
   }, [currentStep, flow, completedKey, progressKey, navigate]);
 
   const goBack = useCallback(() => {
+    setDirection(-1);
     if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
     } else {
