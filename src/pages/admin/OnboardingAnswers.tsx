@@ -58,32 +58,38 @@ export default function OnboardingAnswers() {
 
   const fetchAnswers = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    
+    // Fetch answers
+    const { data: rawData, error } = await supabase
       .from('onboarding_answers')
-      .select('*, profile:profiles!onboarding_answers_user_id_fkey(full_name, email)')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(1000);
 
     if (error) {
       console.error('Failed to fetch onboarding answers:', error);
-      // Fallback: fetch without join
-      const { data: rawData } = await supabase
-        .from('onboarding_answers')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(1000);
-      
-      setAnswers((rawData || []).map(r => ({
-        ...r,
-        answer: Array.isArray(r.answer) ? r.answer as string[] : [String(r.answer)],
-      })));
-    } else {
-      setAnswers((data || []).map((r: any) => ({
-        ...r,
-        answer: Array.isArray(r.answer) ? r.answer as string[] : [String(r.answer)],
-        profile: Array.isArray(r.profile) ? r.profile[0] : r.profile,
-      })));
+      setLoading(false);
+      return;
     }
+
+    const rows = (rawData || []).map(r => ({
+      ...r,
+      answer: Array.isArray(r.answer) ? r.answer as string[] : [String(r.answer)],
+    }));
+
+    // Fetch profiles for unique user_ids
+    const userIds = [...new Set(rows.map(r => r.user_id))];
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, email')
+      .in('id', userIds);
+
+    const profileMap = new Map((profiles || []).map(p => [p.id, p]));
+
+    setAnswers(rows.map(r => ({
+      ...r,
+      profile: profileMap.get(r.user_id) as any,
+    })));
     setLoading(false);
   };
 
