@@ -169,6 +169,7 @@ Deno.serve(async (req) => {
       'user_coach_access',
       'weight_logs',
       'subtask_completions',
+      'onboarding_answers',
       // orders intentionally kept for financial/legal compliance
     ];
 
