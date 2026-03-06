@@ -1271,14 +1271,14 @@ function PaywallScreen({ step, onNext }: Props) {
 function BeforeAfterScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
-      <p className="text-lg font-semibold text-[#1a1f3d] text-center mb-5">{step.subtitle}</p>
+      <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
+      <p className="text-lg font-semibold text-[#1a1f3d] text-center mb-3">{step.subtitle}</p>
       {step.image ? (
-        <div className="flex-1 flex items-center justify-center mb-6">
-          <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
+        <div className="flex-1 flex items-center justify-center mb-4">
+          <img src={step.image} alt="" className="w-full object-contain" />
         </div>
       ) : (
-        <div className="flex gap-3 mb-6">
+        <div className="flex gap-3 mb-4">
           <div className="flex-1 bg-red-50 rounded-2xl p-4">
             <p className="text-xs font-bold text-red-400 uppercase mb-3">Before</p>
             <ul className="space-y-2">
