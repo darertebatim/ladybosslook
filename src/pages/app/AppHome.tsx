@@ -81,6 +81,7 @@ const AppHome = () => {
   const [showNotificationFlow, setShowNotificationFlow] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showActionLimit, setShowActionLimit] = useState(false);
+  const [hasPromoBanner, setHasPromoBanner] = useState(false);
   
   // Goal input state
   const [goalInputTask, setGoalInputTask] = useState<UserTask | null>(null);
@@ -810,7 +811,7 @@ const AppHome = () => {
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
 
             {/* Promo Banner */}
-            <PromoBanner location="home_top" className="py-2" />
+            <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
 
             {/* Home Banners (announcements with videos/CTAs) */}
             <div className="tour-banner">
@@ -888,7 +889,7 @@ const AppHome = () => {
                 <div>
                   {/* Mood Check-in Banner - above actions, hidden while welcome card is active */}
                   {/* Mood Check-in Banner - hidden while welcome card is active */}
-                  {!showWelcomeCard && <MoodCheckInBanner />}
+                  {!showWelcomeCard && !hasPromoBanner && <MoodCheckInBanner />}
                   {/* My Actions header - always show */}
                   <div className="flex items-center gap-2 mb-3">
                     <h2 className="text-sm font-semibold text-foreground tracking-wide">

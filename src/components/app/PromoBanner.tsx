@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,6 +30,7 @@ interface PromoBannerProps {
   location?: DisplayLocation;
   currentPlaylistId?: string;
   className?: string;
+  onVisibilityChange?: (visible: boolean) => void;
 }
 
 const STORAGE_KEY = 'promo_banner_dismissals';
@@ -79,7 +80,8 @@ function shouldShowBanner(banner: PromoBannerData): boolean {
 export function PromoBanner({ 
   location = 'home_top', 
   currentPlaylistId,
-  className 
+  className,
+  onVisibilityChange
 }: PromoBannerProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -346,7 +348,13 @@ export function PromoBanner({
     }
   };
 
-  if (eligibleBanners.length === 0) return null;
+  const isVisible = eligibleBanners.length > 0;
+
+  useEffect(() => {
+    onVisibilityChange?.(isVisible);
+  }, [isVisible, onVisibilityChange]);
+
+  if (!isVisible) return null;
 
   // Show only the first eligible banner; once dismissed the next one appears
   const banner = eligibleBanners[0];
