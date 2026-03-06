@@ -1698,13 +1698,55 @@ function TaskSelectPurpleScreen({ step, onNext }: Props) {
 }
 
 function ConfettiMessageScreen({ step, onNext }: Props) {
-  useEffect(() => { const t = setTimeout(onNext, 2500); return () => clearTimeout(t); }, []);
+  useEffect(() => {
+    // Fire multiple confetti bursts for a grand celebration
+    const myConfetti = confetti.create(undefined, { resize: true, useWorker: true });
+    
+    // Initial big burst from center
+    myConfetti({ particleCount: 150, spread: 100, origin: { y: 0.35, x: 0.5 }, colors: ['#a855f7', '#f59e0b', '#ec4899', '#3b82f6', '#10b981', '#f43f5e'] });
+    
+    // Left burst
+    setTimeout(() => myConfetti({ particleCount: 80, angle: 60, spread: 55, origin: { x: 0, y: 0.5 }, colors: ['#fbbf24', '#a78bfa', '#f472b6'] }), 300);
+    // Right burst
+    setTimeout(() => myConfetti({ particleCount: 80, angle: 120, spread: 55, origin: { x: 1, y: 0.5 }, colors: ['#34d399', '#60a5fa', '#fb923c'] }), 300);
+    
+    // Second wave
+    setTimeout(() => myConfetti({ particleCount: 100, spread: 120, origin: { y: 0.4 }, colors: ['#fbbf24', '#a855f7', '#ec4899', '#3b82f6'] }), 700);
+    
+    // Stars and circles burst
+    setTimeout(() => myConfetti({ particleCount: 60, spread: 80, origin: { y: 0.3 }, shapes: ['circle'], colors: ['#fbbf24', '#f59e0b', '#fcd34d'] }), 1100);
+    
+    // Final shower
+    setTimeout(() => myConfetti({ particleCount: 120, spread: 160, origin: { y: 0.2 }, startVelocity: 30, colors: ['#a855f7', '#ec4899', '#fbbf24', '#34d399', '#60a5fa'] }), 1500);
+
+    const t = setTimeout(onNext, 3500);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
-    <ScreenWrapper bg="bg-[#f8f5ff]">
-      <div className="flex-1 flex flex-col items-center justify-center">
-        <h1 className="text-2xl font-bold text-[#1a1f3d] text-center">{step.title}</h1>
-        <p className="text-2xl font-bold text-[#1a1f3d] text-center">{step.subtitle}</p>
+    <div className="h-full flex flex-col items-center justify-center bg-[#f8f5ff] relative overflow-hidden min-h-[100dvh]">
+      {/* Floating emoji particles */}
+      {['🎉', '🥳', '✨', '🌟', '💫', '🎊', '⭐', '💜'].map((emoji, i) => (
+        <span
+          key={i}
+          className="absolute text-2xl animate-bounce opacity-60"
+          style={{
+            left: `${10 + i * 11}%`,
+            top: `${15 + (i % 3) * 25}%`,
+            animationDelay: `${i * 0.2}s`,
+            animationDuration: `${1.5 + (i % 3) * 0.5}s`,
+          }}
+        >
+          {emoji}
+        </span>
+      ))}
+
+      {/* Main text with scale-in animation */}
+      <div className="animate-scale-in text-center z-10">
+        <h1 className="text-3xl font-extrabold text-[#1a1f3d] mb-2">{step.title}</h1>
+        <p className="text-3xl font-extrabold text-[#1a1f3d]">{step.subtitle}</p>
+        <div className="mt-6 text-5xl animate-bounce">🎉</div>
       </div>
-    </ScreenWrapper>
+    </div>
   );
 }
