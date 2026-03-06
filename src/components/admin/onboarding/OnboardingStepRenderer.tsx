@@ -1610,13 +1610,13 @@ function DistressGridScreen({ step, onNext }: Props) {
 function ADHDInfoScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4">{step.title}</h1>
+      <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
       {step.image ? (
-        <div className="flex items-center justify-center mb-4">
-          <img src={step.image} alt="" className="w-full max-w-[280px] object-contain rounded-2xl" />
+        <div className="flex items-center justify-center mb-3">
+          <img src={step.image} alt="" className="w-full object-contain rounded-2xl" />
         </div>
       ) : (
-        <IllustrationPlaceholder label={step.illustrationLabel || 'Brain comparison'} className="h-40 mb-4" />
+        <IllustrationPlaceholder label={step.illustrationLabel || 'Brain comparison'} className="h-40 mb-3" />
       )}
       <div className="bg-gray-50 rounded-2xl p-4 mb-4">
         <p className="text-sm font-bold text-[#1a1f3d] mb-3"><span className="bg-[#e8e4ff] px-1.5 py-0.5 rounded font-extrabold">Simora</span> can help ADHD:</p>
