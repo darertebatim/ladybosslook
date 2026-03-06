@@ -1586,13 +1586,13 @@ function ContractScreen({ step, onNext }: Props) {
 function DistressGridScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5 whitespace-pre-line">{step.title}</h1>
+      <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 whitespace-pre-line">{step.title}</h1>
       {step.image ? (
-        <div className="flex-1 flex items-center justify-center mb-6">
-          <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
+        <div className="flex-1 flex items-center justify-center mb-4">
+          <img src={step.image} alt="" className="w-full object-contain" />
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-4">
           {step.options?.map((opt, i) => (
             <div key={i} className="rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 aspect-square flex items-center justify-center p-3">
               <IllustrationPlaceholder label={opt.label} className="w-full h-full" />
