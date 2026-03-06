@@ -236,12 +236,12 @@ function WelcomeScreen({ step, onNext }: Props) {
 function GreetingScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <IllustrationPlaceholder label={step.illustrationLabel || 'Mascot'} className="h-56 mb-8" />
-      <h1 className="text-2xl font-bold text-[#1a1f3d] text-center">{step.title}</h1>
-      <p className="text-base text-gray-500 text-center mt-2 mb-8">{step.subtitle}</p>
-      <div className="mt-auto">
+      <FadeUp><IllustrationPlaceholder label={step.illustrationLabel || 'Mascot'} className="h-56 mb-8" /></FadeUp>
+      <FadeUp delay={0.1}><h1 className="text-2xl font-bold text-[#1a1f3d] text-center">{step.title}</h1></FadeUp>
+      <FadeUp delay={0.15}><p className="text-base text-gray-500 text-center mt-2 mb-8">{step.subtitle}</p></FadeUp>
+      <FadeUp delay={0.25} className="mt-auto">
         <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
-      </div>
+      </FadeUp>
     </ScreenWrapper>
   );
 }
