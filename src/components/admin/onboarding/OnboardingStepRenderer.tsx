@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
+import { supabase } from '@/integrations/supabase/client';
 import confetti from 'canvas-confetti';
 import { motion } from 'framer-motion';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
