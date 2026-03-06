@@ -1918,40 +1918,50 @@ function PersonalizedPlanScreen({ step, onNext, answers }: { step: OnboardingSte
   }, [visibleCount, plan.length]);
 
   return (
-    <BottomSheetWrapper bgImage={meplusPlanMascot}>
-      <h1 className="text-[22px] font-extrabold text-[#1a1f3d] leading-snug mb-1">{step.title}</h1>
-      <p className="text-sm text-[#1a1f3d]/60 mb-5">{step.subtitle}</p>
+    <div className="h-full flex flex-col relative overflow-hidden">
+      {/* Background image area */}
+      <div className="h-[240px] shrink-0 relative">
+        <img src={meplusPlanMascot} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
+      </div>
+      {/* White bottom sheet */}
+      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto px-5 pt-6 pb-2">
+          <h1 className="text-[22px] font-extrabold text-[#1a1f3d] leading-snug mb-1">{step.title}</h1>
+          <p className="text-sm text-[#1a1f3d]/60 mb-5">{step.subtitle}</p>
 
-      <div className="space-y-3">
-        {plan.map((item, i) => (
-          <div
-            key={i}
-            className={`flex items-start gap-3 rounded-2xl bg-[#f4f2ff] p-3.5 transition-all duration-500 ${
-              i < visibleCount ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}
-          >
-            <FluentEmoji emoji={item.emoji} size={28} className="shrink-0 mt-0.5" />
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-[15px] font-bold text-[#1a1f3d]">{item.label}</span>
-                <span className="text-green-500 text-base">✓</span>
+          <div className="space-y-3">
+            {plan.map((item, i) => (
+              <div
+                key={i}
+                className={`flex items-start gap-3 rounded-2xl bg-[#f4f2ff] p-3.5 transition-all duration-500 ${
+                  i < visibleCount ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                }`}
+              >
+                <FluentEmoji emoji={item.emoji} size={28} className="shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[15px] font-bold text-[#1a1f3d]">{item.label}</span>
+                    <span className="text-green-500 text-base">✓</span>
+                  </div>
+                  <p className="text-xs text-[#1a1f3d]/50 leading-snug mt-0.5">{item.description}</p>
+                </div>
               </div>
-              <p className="text-xs text-[#1a1f3d]/50 leading-snug mt-0.5">{item.description}</p>
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      <div className="mt-4 flex items-start gap-2 rounded-xl bg-[#fff8e1] p-3">
-        <FluentEmoji emoji="✨" size={18} className="shrink-0 mt-0.5" />
-        <p className="text-[11px] text-[#1a1f3d]/60 leading-snug">
-          These features are coming soon — your answers help us prioritize what matters most to you.
-        </p>
-      </div>
+          <div className="mt-4 flex items-start gap-2 rounded-xl bg-[#fff8e1] p-3">
+            <FluentEmoji emoji="✨" size={18} className="shrink-0 mt-0.5" />
+            <p className="text-[11px] text-[#1a1f3d]/60 leading-snug">
+              These features are coming soon — your answers help us prioritize what matters most to you.
+            </p>
+          </div>
+        </div>
 
-      <div className="mt-5">
-        <NavyButton onClick={onNext}>{step.buttonLabel || 'Get Started!'}</NavyButton>
+        {/* Fixed button */}
+        <div className="shrink-0 px-5 pt-2 pb-6">
+          <NavyButton onClick={onNext}>{step.buttonLabel || 'Get Started!'}</NavyButton>
+        </div>
       </div>
-    </BottomSheetWrapper>
+    </div>
   );
 }
