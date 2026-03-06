@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { OnboardingAnswers } from '@/types/onboarding';
 import { OnboardingStepRenderer } from '@/components/admin/onboarding/OnboardingStepRenderer';
@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { getFluentEmojiUrl, getFluentEmojiUrlAlt, isEmoji } from '@/lib/fluentEmoji';
+import { AnimatePresence, motion } from 'framer-motion';
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
 import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
@@ -79,6 +80,7 @@ export default function AppOnboarding() {
     } catch { return 0; }
   });
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
+  const [direction, setDirection] = useState(1); // 1 = forward, -1 = back
 
   // Preload images on mount
   useEffect(() => {
@@ -113,10 +115,10 @@ export default function AppOnboarding() {
 
   const goNext = useCallback(() => {
     if (!flow) return;
+    setDirection(1);
     if (currentStep < flow.steps.length - 1) {
       setCurrentStep(prev => prev + 1);
     } else {
-      // Completed
       localStorage.setItem(completedKey, 'true');
       localStorage.removeItem(progressKey);
       navigate('/app/home');
@@ -124,6 +126,7 @@ export default function AppOnboarding() {
   }, [currentStep, flow, completedKey, progressKey, navigate]);
 
   const goBack = useCallback(() => {
+    setDirection(-1);
     if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
     } else {
@@ -171,16 +174,27 @@ export default function AppOnboarding() {
         </div>
       )}
 
-      {/* Step content - full screen */}
+      {/* Step content - full screen with slide transition */}
       <div className="flex-1 overflow-hidden">
-        <OnboardingStepRenderer
-          key={step.id}
-          step={step}
-          onNext={goNext}
-          onMilestone={handleMilestone}
-          onAnswer={handleAnswer}
-          answers={answers}
-        />
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div
+            key={step.id}
+            custom={direction}
+            initial={{ opacity: 0, x: direction * 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: direction * -40 }}
+            transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+            className="h-full"
+          >
+            <OnboardingStepRenderer
+              step={step}
+              onNext={goNext}
+              onMilestone={handleMilestone}
+              onAnswer={handleAnswer}
+              answers={answers}
+            />
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
 import confetti from 'canvas-confetti';
+import { motion } from 'framer-motion';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -137,6 +138,51 @@ function ScreenWrapper({ children, bg = 'bg-white', center = false }: { children
   );
 }
 
+// ─── Animation Wrappers ────────────────────────────────────────
+
+function FadeUp({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, delay, ease: [0.25, 0.1, 0.25, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function StaggerContainer({ children, className = '', staggerDelay = 0.06 }: { children: React.ReactNode; className?: string; staggerDelay?: number }) {
+  return (
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: {},
+        visible: { transition: { staggerChildren: staggerDelay } },
+      }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function StaggerItem({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return (
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: 12 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] } },
+      }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 // ─── Screens ───────────────────────────────────────────────────
 
 function WelcomeScreen({ step, onNext }: Props) {
@@ -164,10 +210,16 @@ function WelcomeScreen({ step, onNext }: Props) {
         <div className="absolute top-5 left-[60%] animate-[floatFeather3_4.5s_ease-in-out_infinite] text-amber-300/35 text-[10px]" style={{ animationDelay: '2.5s', transform: 'rotate(40deg)' }}>🪶</div>
 
         
-        <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight relative z-10">{step.title}</h1>
-        <p className="text-[17px] font-semibold text-[#1a1f3d] text-center mb-4 leading-relaxed max-w-[260px] whitespace-pre-line relative z-10">{step.subtitle}</p>
-        <img src={appIcon} alt="Simora" className="w-14 h-14 rounded-2xl shadow-lg mb-4 relative z-10" />
-        <div className="mt-auto w-full relative z-10">
+        <FadeUp delay={0.1} className="relative z-10">
+          <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight">{step.title}</h1>
+        </FadeUp>
+        <FadeUp delay={0.2} className="relative z-10">
+          <p className="text-[17px] font-semibold text-[#1a1f3d] text-center mb-4 leading-relaxed max-w-[260px] whitespace-pre-line">{step.subtitle}</p>
+        </FadeUp>
+        <FadeUp delay={0.3} className="relative z-10">
+          <img src={appIcon} alt="Simora" className="w-14 h-14 rounded-2xl shadow-lg mb-4 mx-auto" />
+        </FadeUp>
+        <FadeUp delay={0.4} className="mt-auto w-full relative z-10">
           <button
             onClick={onNext}
             className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
@@ -175,7 +227,7 @@ function WelcomeScreen({ step, onNext }: Props) {
             {step.buttonLabel}
             <span className="text-base">→</span>
           </button>
-        </div>
+        </FadeUp>
       </div>
     </div>
   );
@@ -184,12 +236,12 @@ function WelcomeScreen({ step, onNext }: Props) {
 function GreetingScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <IllustrationPlaceholder label={step.illustrationLabel || 'Mascot'} className="h-56 mb-8" />
-      <h1 className="text-2xl font-bold text-[#1a1f3d] text-center">{step.title}</h1>
-      <p className="text-base text-gray-500 text-center mt-2 mb-8">{step.subtitle}</p>
-      <div className="mt-auto">
+      <FadeUp><IllustrationPlaceholder label={step.illustrationLabel || 'Mascot'} className="h-56 mb-8" /></FadeUp>
+      <FadeUp delay={0.1}><h1 className="text-2xl font-bold text-[#1a1f3d] text-center">{step.title}</h1></FadeUp>
+      <FadeUp delay={0.15}><p className="text-base text-gray-500 text-center mt-2 mb-8">{step.subtitle}</p></FadeUp>
+      <FadeUp delay={0.25} className="mt-auto">
         <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
-      </div>
+      </FadeUp>
     </ScreenWrapper>
   );
 }
@@ -213,15 +265,43 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
   if (hasBg) {
     return (
       <BottomSheetWrapper bgImage={meplusMascotBg}>
-        <div className="min-h-[4.5em] flex items-start justify-center mb-5">
-          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center leading-snug">{step.title}</h1>
-        </div>
-        <div className="space-y-3 mb-6">
+        <FadeUp>
+          <div className="min-h-[4.5em] flex items-start justify-center mb-5">
+            <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center leading-snug">{step.title}</h1>
+          </div>
+        </FadeUp>
+        <StaggerContainer className="space-y-3 mb-6">
           {step.options?.map((opt, i) => (
+            <StaggerItem key={i}>
+              <button
+                onClick={() => toggle(i)}
+                className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+                  selected.has(i) ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
+                }`}
+              >
+                {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
+                <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
+                {selected.has(i) && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
+              </button>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+        <FadeUp delay={0.3} className="mt-auto">
+          <NavyButton onClick={onNext} disabled={selected.size === 0}>{step.buttonLabel}</NavyButton>
+        </FadeUp>
+      </BottomSheetWrapper>
+    );
+  }
+
+  return (
+    <ScreenWrapper>
+      <FadeUp><h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1></FadeUp>
+      <StaggerContainer className="space-y-3 mb-6">
+        {step.options?.map((opt, i) => (
+          <StaggerItem key={i}>
             <button
-              key={i}
               onClick={() => toggle(i)}
-              className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+              className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
                 selected.has(i) ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
               }`}
             >
@@ -229,36 +309,12 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
               <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
               {selected.has(i) && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
             </button>
-          ))}
-        </div>
-        <div className="mt-auto">
-          <NavyButton onClick={onNext} disabled={selected.size === 0}>{step.buttonLabel}</NavyButton>
-        </div>
-      </BottomSheetWrapper>
-    );
-  }
-
-  return (
-    <ScreenWrapper>
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
-      <div className="space-y-3 mb-6">
-        {step.options?.map((opt, i) => (
-          <button
-            key={i}
-            onClick={() => toggle(i)}
-            className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
-              selected.has(i) ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
-            }`}
-          >
-            {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
-            <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
-            {selected.has(i) && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
-          </button>
+          </StaggerItem>
         ))}
-      </div>
-      <div className="mt-auto">
+      </StaggerContainer>
+      <FadeUp delay={0.3} className="mt-auto">
         <NavyButton onClick={onNext} disabled={selected.size === 0}>{step.buttonLabel}</NavyButton>
-      </div>
+      </FadeUp>
     </ScreenWrapper>
   );
 }
@@ -300,53 +356,59 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
   if (hasBg) {
     return (
       <BottomSheetWrapper bgImage={meplusMascotBg}>
-        <div className="min-h-[4.5em] flex items-start justify-center mb-5">
-          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center leading-snug">{step.title}</h1>
-        </div>
-        <div className="space-y-3">
+        <FadeUp>
+          <div className="min-h-[4.5em] flex items-start justify-center mb-5">
+            <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center leading-snug">{step.title}</h1>
+          </div>
+        </FadeUp>
+        <StaggerContainer className="space-y-3">
           {step.options?.map((opt, i) => (
-            <button
-              key={i}
-              onClick={() => select(i)}
-              className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
-                picked === i ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
-              }`}
-            >
-              {opt.emoji && <FluentEmoji emoji={opt.emoji} size={28} />}
-              <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
-              {picked === i && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
-            </button>
+            <StaggerItem key={i}>
+              <button
+                onClick={() => select(i)}
+                className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+                  picked === i ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
+                }`}
+              >
+                {opt.emoji && <FluentEmoji emoji={opt.emoji} size={28} />}
+                <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
+                {picked === i && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
+              </button>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </BottomSheetWrapper>
     );
   }
 
   return (
     <ScreenWrapper>
-      {step.subtitle ? (
-        <>
-          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
-          <p className="text-base text-gray-500 mb-5">{step.subtitle}</p>
-        </>
-      ) : (
-        <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
-      )}
-      <div className="space-y-3">
+      <FadeUp>
+        {step.subtitle ? (
+          <>
+            <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
+            <p className="text-base text-gray-500 mb-5">{step.subtitle}</p>
+          </>
+        ) : (
+          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
+        )}
+      </FadeUp>
+      <StaggerContainer className="space-y-3">
         {step.options?.map((opt, i) => (
-          <button
-            key={i}
-            onClick={() => select(i)}
-            className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
-              picked === i ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
-            }`}
-          >
-            {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
-            <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
-            {picked === i && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
-          </button>
+          <StaggerItem key={i}>
+            <button
+              onClick={() => select(i)}
+              className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
+                picked === i ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
+              }`}
+            >
+              {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
+              <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
+              {picked === i && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
+            </button>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
     </ScreenWrapper>
   );
 }
@@ -362,21 +424,22 @@ function SingleSelectDescScreen({ step, onNext, onAnswer }: Props) {
 
   return (
     <ScreenWrapper>
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
-      <div className="space-y-3">
+      <FadeUp><h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1></FadeUp>
+      <StaggerContainer className="space-y-3">
         {step.options?.map((opt, i) => (
-          <button
-            key={i}
-            onClick={() => select(i)}
-            className={`w-full p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
-              picked === i ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
-            }`}
-          >
-            <span className="text-sm font-semibold text-[#1a1f3d]">{opt.label}</span>
-            {opt.description && <p className="text-xs text-gray-400 mt-1">{opt.description}</p>}
-          </button>
+          <StaggerItem key={i}>
+            <button
+              onClick={() => select(i)}
+              className={`w-full p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
+                picked === i ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+              }`}
+            >
+              <span className="text-sm font-semibold text-[#1a1f3d]">{opt.label}</span>
+              {opt.description && <p className="text-xs text-gray-400 mt-1">{opt.description}</p>}
+            </button>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
     </ScreenWrapper>
   );
 }
@@ -389,9 +452,8 @@ function YesNoScreen({ step, onNext, onAnswer }: Props) {
   return (
     <ScrollArea className="h-full bg-white">
       <div className="flex flex-col h-full min-h-[100dvh] px-5 pt-[72px] pb-6">
-        <h1 className="text-[22px] font-bold text-[#1a1f3d] text-center mb-5 leading-tight">{step.title}</h1>
-        {/* Image card - constrained height */}
-        <div className="flex-1 min-h-0 flex items-center justify-center mb-6">
+        <FadeUp><h1 className="text-[22px] font-bold text-[#1a1f3d] text-center mb-5 leading-tight">{step.title}</h1></FadeUp>
+        <FadeUp delay={0.1} className="flex-1 min-h-0 flex items-center justify-center mb-6">
           <div className="relative rounded-2xl overflow-hidden w-full max-h-[50vh]">
             {step.image ? (
               <img src={step.image} alt="" className="w-full h-full object-contain" />
@@ -399,11 +461,11 @@ function YesNoScreen({ step, onNext, onAnswer }: Props) {
               <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-full" />
             )}
           </div>
-        </div>
-        <div className="mt-auto flex gap-3">
+        </FadeUp>
+        <FadeUp delay={0.2} className="mt-auto flex gap-3">
           <NavyButton onClick={() => handleAnswer('No')} className="flex-1">No</NavyButton>
           <NavyButton onClick={() => handleAnswer('Yes')} className="flex-1">Yes</NavyButton>
-        </div>
+        </FadeUp>
       </div>
     </ScrollArea>
   );
@@ -416,22 +478,24 @@ function DoYouWantScreen({ step, onNext, onAnswer }: Props) {
   };
   return (
     <ScreenWrapper>
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4">{step.title}</h1>
-      {step.image ? (
-        <div className="flex-1 flex items-center justify-center">
-          <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
-        </div>
-      ) : (
-        <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="flex-1" />
-      )}
-      <div className="mt-auto flex gap-3 pt-6">
+      <FadeUp><h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4">{step.title}</h1></FadeUp>
+      <FadeUp delay={0.1}>
+        {step.image ? (
+          <div className="flex-1 flex items-center justify-center">
+            <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
+          </div>
+        ) : (
+          <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="flex-1" />
+        )}
+      </FadeUp>
+      <FadeUp delay={0.2} className="mt-auto flex gap-3 pt-6">
         <button onClick={() => handleChoice('No')} className="px-8 py-3.5 rounded-full border border-gray-300 text-sm font-medium text-[#1a1f3d] active:scale-[0.98] transition-all">
           {step.secondaryButtonLabel}
         </button>
         <button onClick={() => handleChoice('Yes')} className="flex-1 py-3.5 rounded-full bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all">
           {step.buttonLabel}
         </button>
-      </div>
+      </FadeUp>
     </ScreenWrapper>
   );
 }
@@ -439,12 +503,12 @@ function DoYouWantScreen({ step, onNext, onAnswer }: Props) {
 function InfoStatScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper bg="bg-[#fdf8f4]">
-      <IllustrationPlaceholder label={step.illustrationLabel || 'Statistic'} className="h-36 mb-6" />
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-3">{step.statHighlight}</h1>
-      <p className="text-sm text-gray-500 mb-8 leading-relaxed">{step.description}</p>
-      <div className="mt-auto">
+      <FadeUp><IllustrationPlaceholder label={step.illustrationLabel || 'Statistic'} className="h-36 mb-6" /></FadeUp>
+      <FadeUp delay={0.1}><h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-3">{step.statHighlight}</h1></FadeUp>
+      <FadeUp delay={0.15}><p className="text-sm text-gray-500 mb-8 leading-relaxed">{step.description}</p></FadeUp>
+      <FadeUp delay={0.25} className="mt-auto">
         <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
-      </div>
+      </FadeUp>
     </ScreenWrapper>
   );
 }
@@ -454,60 +518,66 @@ function MotivationalScreen({ step, onNext }: Props) {
   const isFullScreenBg = step.image && !step.description;
 
   if (isFullScreenBg) {
-    // Parse title to highlight "build momentum" in yellow
     const titleParts = step.title?.split(/(build momentum)/i) || [step.title];
     return (
       <div className="flex flex-col h-full relative overflow-hidden">
         <img src={step.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="relative z-10 h-full">
-          <h1 className={`absolute left-1/2 -translate-x-1/2 w-[85%] text-[20px] font-extrabold text-white text-center leading-snug drop-shadow-lg ${
-            step.title?.includes('build momentum') || step.title?.includes('Tailored')
-              ? 'top-1/2 -translate-y-1/2'
-              : 'bottom-[160px]'
-          }`}>
-            {titleParts.map((part, i) =>
-              /build momentum/i.test(part) ? (
-                <span key={i} className="text-yellow-300 font-extrabold">{part}</span>
-              ) : (
-                <span key={i}>{part}</span>
-              )
-            )}
-          </h1>
-          <button
-            onClick={onNext}
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[85%] py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base active:scale-95 transition-transform shadow-xl"
-          >
-            {step.buttonLabel}
-          </button>
+          <FadeUp delay={0.15}>
+            <h1 className={`absolute left-1/2 -translate-x-1/2 w-[85%] text-[20px] font-extrabold text-white text-center leading-snug drop-shadow-lg ${
+              step.title?.includes('build momentum') || step.title?.includes('Tailored')
+                ? 'top-1/2 -translate-y-1/2'
+                : 'bottom-[160px]'
+            }`}>
+              {titleParts.map((part, i) =>
+                /build momentum/i.test(part) ? (
+                  <span key={i} className="text-yellow-300 font-extrabold">{part}</span>
+                ) : (
+                  <span key={i}>{part}</span>
+                )
+              )}
+            </h1>
+          </FadeUp>
+          <FadeUp delay={0.3}>
+            <button
+              onClick={onNext}
+              className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[85%] py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base active:scale-95 transition-transform shadow-xl"
+            >
+              {step.buttonLabel}
+            </button>
+          </FadeUp>
         </div>
       </div>
     );
   }
 
-  // Default motivational with stat + description
   const descMatch = step.description?.match(/^(\d+%)\s*(.*)/s);
   
   return (
     <ScreenWrapper center>
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight whitespace-pre-line">{step.title}</h1>
-      {step.image ? (
-        <div className="flex items-center justify-center mb-5">
-          <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
-        </div>
-      ) : step.illustrationLabel ? (
-        <IllustrationPlaceholder label={step.illustrationLabel} className="h-44 mb-5" />
-      ) : null}
-      {descMatch ? (
-        <p className="text-[15px] text-gray-600 leading-relaxed text-center mb-4">
-          <span className="text-[#1a1f3d] font-extrabold text-2xl">{descMatch[1]}</span>{' '}
-          {descMatch[2]}
-        </p>
-      ) : step.description ? (
-        <p className="text-sm text-gray-500 leading-relaxed mb-4">{step.description}</p>
-      ) : null}
-      <div className="mt-auto">
+      <FadeUp><h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight whitespace-pre-line">{step.title}</h1></FadeUp>
+      <FadeUp delay={0.1}>
+        {step.image ? (
+          <div className="flex items-center justify-center mb-5">
+            <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
+          </div>
+        ) : step.illustrationLabel ? (
+          <IllustrationPlaceholder label={step.illustrationLabel} className="h-44 mb-5" />
+        ) : null}
+      </FadeUp>
+      <FadeUp delay={0.15}>
+        {descMatch ? (
+          <p className="text-[15px] text-gray-600 leading-relaxed text-center mb-4">
+            <span className="text-[#1a1f3d] font-extrabold text-2xl">{descMatch[1]}</span>{' '}
+            {descMatch[2]}
+          </p>
+        ) : step.description ? (
+          <p className="text-sm text-gray-500 leading-relaxed mb-4">{step.description}</p>
+        ) : null}
+      </FadeUp>
+      <FadeUp delay={0.25} className="mt-auto">
         <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
-      </div>
+      </FadeUp>
     </ScreenWrapper>
   );
 }
