@@ -124,10 +124,10 @@ function IllustrationPlaceholder({ label, className = '' }: { label: string; cla
   );
 }
 
-function ScreenWrapper({ children, bg = 'bg-white' }: { children: React.ReactNode; bg?: string }) {
+function ScreenWrapper({ children, bg = 'bg-white', center = false }: { children: React.ReactNode; bg?: string; center?: boolean }) {
   return (
     <ScrollArea className={`h-full ${bg}`}>
-      <div className="flex flex-col h-full min-h-[100dvh] px-5 pt-[72px] pb-6">
+      <div className={`flex flex-col h-full min-h-[100dvh] px-5 pt-[72px] pb-6 ${center ? 'justify-center' : ''}`}>
         {children}
       </div>
     </ScrollArea>
