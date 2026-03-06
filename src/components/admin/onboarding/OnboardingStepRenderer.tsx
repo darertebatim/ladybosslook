@@ -89,6 +89,8 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <TaskSelectPurpleScreen step={step} onNext={onNext} />;
     case 'confetti-message':
       return <ConfettiMessageScreen step={step} onNext={onNext} />;
+    case 'personalized-plan':
+      return <PersonalizedPlanScreen step={step} onNext={onNext} answers={answers} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }
@@ -1748,5 +1750,132 @@ function ConfettiMessageScreen({ step, onNext }: Props) {
         <div className="mt-6 text-5xl animate-bounce">🎉</div>
       </div>
     </div>
+  );
+}
+
+// ─── Personalized Plan Screen ──────────────────────────────────
+
+interface PlanItem {
+  emoji: string;
+  label: string;
+  description: string;
+}
+
+function getPersonalizedPlan(answers: OnboardingAnswers = {}): PlanItem[] {
+  const items: PlanItem[] = [];
+
+  // Sleep-based recommendations (mp-5)
+  const sleep = answers['mp-5'];
+  if (sleep === 'Less than 6 hours' || sleep === 'More than 10 hours') {
+    items.push({ emoji: '😴', label: 'Sleep Optimization', description: 'Personalized sleep routines and bedtime reminders' });
+  }
+
+  // Wake-up difficulty (mp-6)
+  const wakeUp = answers['mp-6'];
+  if (wakeUp === '20-30 minutes' || wakeUp === 'More than 30 minutes') {
+    items.push({ emoji: '🌅', label: 'Morning Kickstart Routine', description: 'Gentle wake-up routines with breathing exercises' });
+  }
+
+  // Energy level (mp-7)
+  const energy = answers['mp-7'];
+  if (energy && typeof energy === 'string' && energy.includes('Low')) {
+    items.push({ emoji: '⚡', label: 'Energy Boost Program', description: 'Micro-habits and movement breaks to recharge your day' });
+  } else if (energy && typeof energy === 'string' && energy.includes('Medium')) {
+    items.push({ emoji: '🔋', label: 'Energy Maintenance', description: 'Smart scheduling to keep your energy steady' });
+  }
+
+  // Goals (mp-10)
+  const goal = answers['mp-10'];
+  if (goal === 'More productive') {
+    items.push({ emoji: '📋', label: 'Productivity Planner', description: 'Smart task scheduling and focus sessions' });
+  } else if (goal === 'More active') {
+    items.push({ emoji: '🏃', label: 'Activity Challenges', description: 'Daily movement goals and workout reminders' });
+  } else if (goal === 'More disciplined') {
+    items.push({ emoji: '🎯', label: 'Discipline Builder', description: 'Streak tracking and accountability tools' });
+  } else if (goal === 'More mindfulness') {
+    items.push({ emoji: '🧘', label: 'Mindfulness Journey', description: 'Guided meditations and breathing exercises' });
+  }
+
+  // Distraction (mp-12)
+  const distraction = answers['mp-12'];
+  if (distraction === 'Easily distracted') {
+    items.push({ emoji: '🧠', label: 'Focus Mode', description: 'Distraction-free focus sessions with gentle reminders' });
+  }
+
+  // Procrastination (mp-13)
+  const procrastination = answers['mp-13'];
+  if (procrastination && typeof procrastination === 'string' && procrastination.includes('want to change')) {
+    items.push({ emoji: '🚀', label: 'Anti-Procrastination System', description: '2-minute rule tasks and momentum builders' });
+  }
+
+  // Support system (mp-14)
+  const support = answers['mp-14'];
+  if (support && typeof support === 'string' && (support.includes('Weak') || support.includes('isolated'))) {
+    items.push({ emoji: '🤝', label: 'Community Support', description: 'Connect with like-minded people in group challenges' });
+  }
+
+  // Motivation (mp-15)
+  const motivation = answers['mp-15'];
+  if (motivation && typeof motivation === 'string' && motivation.includes('health')) {
+    items.push({ emoji: '💚', label: 'Health Dashboard', description: 'Water tracking, mood logs, and wellness insights' });
+  } else if (motivation && typeof motivation === 'string' && motivation.includes('goals')) {
+    items.push({ emoji: '🏆', label: 'Goal Tracker', description: 'Visual progress tracking with milestones and rewards' });
+  }
+
+  // ADHD flag (mp-17)
+  const adhd = answers['mp-17'];
+  if (adhd === 'Yes' || adhd === 'I suspect I might') {
+    items.push({ emoji: '🌈', label: 'ADHD-Friendly Tools', description: 'Simplified routines with visual cues and gentle nudges' });
+  }
+
+  // Always include these universal items
+  items.push({ emoji: '📊', label: 'Weekly Progress Reports', description: 'Personalized insights on your habits and growth' });
+  items.push({ emoji: '🔔', label: 'Smart Reminders', description: 'Timed to your schedule, not random notifications' });
+
+  return items;
+}
+
+function PersonalizedPlanScreen({ step, onNext, answers }: { step: OnboardingStep; onNext: () => void; answers?: OnboardingAnswers }) {
+  const [visibleCount, setVisibleCount] = useState(0);
+  const plan = getPersonalizedPlan(answers);
+
+  useEffect(() => {
+    if (visibleCount < plan.length) {
+      const timer = setTimeout(() => setVisibleCount(prev => prev + 1), 200);
+      return () => clearTimeout(timer);
+    }
+  }, [visibleCount, plan.length]);
+
+  return (
+    <ScreenWrapper>
+      <div className="pt-16 px-1">
+        <h1 className="text-[22px] font-extrabold text-[#1a1f3d] leading-snug mb-1">{step.title}</h1>
+        <p className="text-sm text-[#1a1f3d]/60 mb-5">{step.subtitle}</p>
+
+        <div className="space-y-3">
+          {plan.map((item, i) => (
+            <div
+              key={i}
+              className={`flex items-start gap-3 rounded-2xl bg-[#f4f2ff] p-3.5 transition-all duration-500 ${
+                i < visibleCount ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+              }`}
+            >
+              <div className="text-2xl shrink-0 mt-0.5">{item.emoji}</div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[15px] font-bold text-[#1a1f3d]">{item.label}</span>
+                  <span className="text-green-500 text-base">✓</span>
+                </div>
+                <p className="text-xs text-[#1a1f3d]/50 leading-snug mt-0.5">{item.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 pb-8">
+          <NavyButton onClick={onNext}>{step.buttonLabel || 'Get Started!'}</NavyButton>
+        </div>
+      </div>
+    </ScreenWrapper>
   );
 }
