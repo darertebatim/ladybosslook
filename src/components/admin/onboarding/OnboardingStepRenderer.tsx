@@ -127,7 +127,7 @@ function IllustrationPlaceholder({ label, className = '' }: { label: string; cla
 function ScreenWrapper({ children, bg = 'bg-white' }: { children: React.ReactNode; bg?: string }) {
   return (
     <ScrollArea className={`h-full ${bg}`}>
-      <div className="flex flex-col h-full min-h-[700px] px-5 pt-[72px] pb-6">
+      <div className="flex flex-col h-full min-h-[100dvh] px-5 pt-[72px] pb-6">
         {children}
       </div>
     </ScrollArea>
@@ -383,15 +383,17 @@ function YesNoScreen({ step, onNext, onAnswer }: Props) {
   };
   return (
     <ScrollArea className="h-full bg-white">
-      <div className="flex flex-col h-full min-h-[700px] px-5 pt-14 pb-6">
+      <div className="flex flex-col h-full min-h-[100dvh] px-5 pt-[72px] pb-6">
         <h1 className="text-[22px] font-bold text-[#1a1f3d] text-center mb-5 leading-tight">{step.title}</h1>
-        {/* 4:5 image card */}
-        <div className="relative rounded-2xl overflow-hidden mb-6" style={{ aspectRatio: '4/5' }}>
-          {step.image ? (
-            <img src={step.image} alt="" className="w-full h-full object-cover" />
-          ) : (
-            <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-full" />
-          )}
+        {/* Image card - constrained height */}
+        <div className="flex-1 min-h-0 flex items-center justify-center mb-6">
+          <div className="relative rounded-2xl overflow-hidden w-full max-h-[50vh]">
+            {step.image ? (
+              <img src={step.image} alt="" className="w-full h-full object-contain" />
+            ) : (
+              <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-full" />
+            )}
+          </div>
         </div>
         <div className="mt-auto flex gap-3">
           <NavyButton onClick={() => handleAnswer('No')} className="flex-1">No</NavyButton>
@@ -1095,7 +1097,8 @@ function PaywallScreen({ step, onNext }: Props) {
   };
 
   return (
-    <ScreenWrapper>
+    <ScrollArea className="h-full bg-white">
+      <div className="flex flex-col h-full min-h-[100dvh] px-5 pt-[calc(env(safe-area-inset-top,44px)+12px)] pb-6">
       <div className="flex items-center justify-between mb-3">
         <button onClick={onNext} className="text-gray-400 text-lg active:opacity-60">✕</button>
         <button
@@ -1166,7 +1169,8 @@ function PaywallScreen({ step, onNext }: Props) {
         <span className="text-[10px] text-gray-300">·</span>
         <a href="/privacy" target="_blank" className="text-[10px] text-gray-400 underline">Privacy</a>
       </div>
-    </ScreenWrapper>
+      </div>
+    </ScrollArea>
   );
 }
 
