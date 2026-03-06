@@ -139,11 +139,6 @@ function ScreenWrapper({ children, bg = 'bg-white', center = false }: { children
 function WelcomeScreen({ step, onNext }: Props) {
   return (
     <div className="h-full relative overflow-hidden bg-gradient-to-b from-purple-400 via-purple-300 to-purple-100">
-      {/* App icon top-left */}
-      <div className="absolute top-3 left-4 z-10">
-        <img src={appIcon} alt="Simora" className="w-10 h-10 rounded-xl shadow-md" />
-      </div>
-
       {/* Mascot image — top area, centered on mouth */}
       {step.image && (
         <div className="absolute inset-x-0 top-0 h-[58%]">
