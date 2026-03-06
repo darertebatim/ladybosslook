@@ -89,6 +89,8 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <TaskSelectPurpleScreen step={step} onNext={onNext} />;
     case 'confetti-message':
       return <ConfettiMessageScreen step={step} onNext={onNext} />;
+    case 'personalized-plan':
+      return <PersonalizedPlanScreen step={step} onNext={onNext} answers={answers} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }

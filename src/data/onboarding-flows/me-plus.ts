@@ -389,6 +389,15 @@ export const mePlusFlow: OnboardingFlow = {
       description: '',
     },
 
+    // ─── Your Personalized Plan ─────────────────────────────
+    {
+      id: 'mp-33',
+      type: 'personalized-plan',
+      title: 'Your Personalized Plan',
+      subtitle: 'Based on your answers, here\'s what Simora will do for you',
+      buttonLabel: 'Get Started!',
+    },
+
     // ─── PDF2 Page 15: Get Started (purple) ───────────────
     {
       id: 'mp-35',
