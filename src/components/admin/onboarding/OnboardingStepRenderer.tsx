@@ -1872,6 +1872,13 @@ function PersonalizedPlanScreen({ step, onNext, answers }: { step: OnboardingSte
               </div>
             ))}
           </div>
+
+          <div className="mt-4 flex items-start gap-2 rounded-xl bg-[#fff8e1] p-3">
+            <FluentEmoji emoji="✨" size={18} className="shrink-0 mt-0.5" />
+            <p className="text-[11px] text-[#1a1f3d]/60 leading-snug">
+              These features are coming soon — your answers help us prioritize what matters most to you.
+            </p>
+          </div>
         </div>
 
         <div className="fixed bottom-0 left-0 right-0 px-5 pb-8 pt-4 bg-gradient-to-t from-white via-white to-white/0 z-10">
