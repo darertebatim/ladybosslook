@@ -295,25 +295,26 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
 
   return (
     <ScreenWrapper>
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
-      <div className="space-y-3 mb-6">
+      <FadeUp><h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1></FadeUp>
+      <StaggerContainer className="space-y-3 mb-6">
         {step.options?.map((opt, i) => (
-          <button
-            key={i}
-            onClick={() => toggle(i)}
-            className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
-              selected.has(i) ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
-            }`}
-          >
-            {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
-            <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
-            {selected.has(i) && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
-          </button>
+          <StaggerItem key={i}>
+            <button
+              onClick={() => toggle(i)}
+              className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
+                selected.has(i) ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
+              }`}
+            >
+              {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
+              <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
+              {selected.has(i) && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
+            </button>
+          </StaggerItem>
         ))}
-      </div>
-      <div className="mt-auto">
+      </StaggerContainer>
+      <FadeUp delay={0.3} className="mt-auto">
         <NavyButton onClick={onNext} disabled={selected.size === 0}>{step.buttonLabel}</NavyButton>
-      </div>
+      </FadeUp>
     </ScreenWrapper>
   );
 }
