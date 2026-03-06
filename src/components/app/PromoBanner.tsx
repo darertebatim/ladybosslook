@@ -348,7 +348,13 @@ export function PromoBanner({
     }
   };
 
-  if (eligibleBanners.length === 0) return null;
+  const isVisible = eligibleBanners.length > 0;
+
+  useEffect(() => {
+    onVisibilityChange?.(isVisible);
+  }, [isVisible, onVisibilityChange]);
+
+  if (!isVisible) return null;
 
   // Show only the first eligible banner; once dismissed the next one appears
   const banner = eligibleBanners[0];
