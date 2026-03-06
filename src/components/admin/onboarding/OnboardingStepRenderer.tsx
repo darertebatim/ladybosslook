@@ -472,7 +472,7 @@ function MotivationalScreen({ step, onNext }: Props) {
           </h1>
           <button
             onClick={onNext}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[70%] py-4 rounded-full bg-[#1a1f3d] text-white font-bold text-base active:scale-95 transition-transform shadow-xl"
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[85%] py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base active:scale-95 transition-transform shadow-xl"
           >
             {step.buttonLabel}
           </button>
