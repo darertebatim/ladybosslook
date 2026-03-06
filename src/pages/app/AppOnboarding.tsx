@@ -85,7 +85,8 @@ export default function AppOnboarding() {
     if (!flow) return;
     const stepImages = flow.steps.map(s => s.image).filter(Boolean) as string[];
     const extraImages = [meplusMascotBg, meplusPaywall2, meplusPaywall3, meplusCommunityFooter];
-    preloadImages([...stepImages, ...extraImages]);
+    const emojiUrls = collectEmojiUrls(flow);
+    preloadImages([...stepImages, ...extraImages, ...emojiUrls]);
   }, [flow]);
 
   // Save progress
