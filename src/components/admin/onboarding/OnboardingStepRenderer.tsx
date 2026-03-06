@@ -124,10 +124,10 @@ function IllustrationPlaceholder({ label, className = '' }: { label: string; cla
   );
 }
 
-function ScreenWrapper({ children, bg = 'bg-white' }: { children: React.ReactNode; bg?: string }) {
+function ScreenWrapper({ children, bg = 'bg-white', center = false }: { children: React.ReactNode; bg?: string; center?: boolean }) {
   return (
     <ScrollArea className={`h-full ${bg}`}>
-      <div className="flex flex-col h-full min-h-[100dvh] px-5 pt-[72px] pb-6">
+      <div className={`flex flex-col h-full min-h-[100dvh] px-5 pt-[72px] pb-6 ${center ? 'justify-center' : ''}`}>
         {children}
       </div>
     </ScrollArea>
@@ -139,11 +139,6 @@ function ScreenWrapper({ children, bg = 'bg-white' }: { children: React.ReactNod
 function WelcomeScreen({ step, onNext }: Props) {
   return (
     <div className="h-full relative overflow-hidden bg-gradient-to-b from-purple-400 via-purple-300 to-purple-100">
-      {/* App icon top-left */}
-      <div className="absolute top-3 left-4 z-10">
-        <img src={appIcon} alt="Simora" className="w-10 h-10 rounded-xl shadow-md" />
-      </div>
-
       {/* Mascot image — top area, centered on mouth */}
       {step.image && (
         <div className="absolute inset-x-0 top-0 h-[58%]">
@@ -213,7 +208,7 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
     return (
       <BottomSheetWrapper bgImage={meplusMascotBg}>
         <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
-        <div className="space-y-3 mb-6">
+        <div className="mt-auto space-y-3 mb-6">
           {step.options?.map((opt, i) => (
             <button
               key={i}
@@ -298,7 +293,7 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
     return (
       <BottomSheetWrapper bgImage={meplusMascotBg}>
         <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
-        <div className="space-y-3">
+        <div className="mt-auto space-y-3">
           {step.options?.map((opt, i) => (
             <button
               key={i}
@@ -483,7 +478,7 @@ function MotivationalScreen({ step, onNext }: Props) {
   const descMatch = step.description?.match(/^(\d+%)\s*(.*)/s);
   
   return (
-    <ScreenWrapper>
+    <ScreenWrapper center>
       <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight whitespace-pre-line">{step.title}</h1>
       {step.image ? (
         <div className="flex items-center justify-center mb-5">
@@ -851,7 +846,7 @@ function PersonalSummaryScreen({ step, onNext, answers }: Props) {
   const isGood = (status: string) => status.includes('track');
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper center>
       <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-6 whitespace-pre-line">{step.title}</h1>
 
       {/* 2×2 Circle Grid */}
@@ -1216,7 +1211,7 @@ function BeforeAfterScreen({ step, onNext }: Props) {
 
 function ScienceBackedScreen({ step, onNext }: Props) {
   return (
-    <ScreenWrapper>
+    <ScreenWrapper center>
       {step.subtitle ? (
         <>
           <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight">{step.title}</h1>
