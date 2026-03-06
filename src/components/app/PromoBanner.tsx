@@ -80,7 +80,8 @@ function shouldShowBanner(banner: PromoBannerData): boolean {
 export function PromoBanner({ 
   location = 'home_top', 
   currentPlaylistId,
-  className 
+  className,
+  onVisibilityChange
 }: PromoBannerProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
