@@ -8,6 +8,7 @@ import { mePlusFlow } from '@/data/onboarding-flows/me-plus';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
+import { getFluentEmojiUrl, getFluentEmojiUrlAlt, isEmoji } from '@/lib/fluentEmoji';
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
 import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
@@ -22,6 +23,36 @@ function preloadImages(srcs: string[]) {
       img.src = src;
     }
   });
+}
+
+/**
+ * Collect all unique emoji characters used in onboarding steps
+ * and return their Fluent Emoji CDN URLs for preloading
+ */
+function collectEmojiUrls(flow: typeof mePlusFlow): string[] {
+  const emojis = new Set<string>();
+
+  for (const step of flow.steps) {
+    // Emojis from options
+    step.options?.forEach(opt => {
+      if (opt.emoji && isEmoji(opt.emoji)) emojis.add(opt.emoji);
+    });
+    // Emojis from stat badges
+    step.statBadges?.forEach(b => {
+      if (b.value && isEmoji(b.value)) emojis.add(b.value);
+    });
+  }
+
+  // Emojis used in personalized plan (all possible ones)
+  const planEmojis = ['😴', '🌅', '⚡', '🔋', '📋', '🏃', '🎯', '🧘', '🧠', '🚀', '🤝', '💚', '🏆', '🌈', '📊', '🔔', '✨'];
+  planEmojis.forEach(e => emojis.add(e));
+
+  const urls: string[] = [];
+  emojis.forEach(emoji => {
+    urls.push(getFluentEmojiUrl(emoji));
+    urls.push(getFluentEmojiUrlAlt(emoji));
+  });
+  return urls;
 }
 
 export default function AppOnboarding() {
@@ -54,7 +85,8 @@ export default function AppOnboarding() {
     if (!flow) return;
     const stepImages = flow.steps.map(s => s.image).filter(Boolean) as string[];
     const extraImages = [meplusMascotBg, meplusPaywall2, meplusPaywall3, meplusCommunityFooter];
-    preloadImages([...stepImages, ...extraImages]);
+    const emojiUrls = collectEmojiUrls(flow);
+    preloadImages([...stepImages, ...extraImages, ...emojiUrls]);
   }, [flow]);
 
   // Save progress
