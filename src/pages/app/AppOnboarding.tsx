@@ -120,22 +120,24 @@ export default function AppOnboarding() {
 
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col">
-      {/* Navigation bar */}
-      <div className="shrink-0 px-4 py-2 flex items-center absolute top-[env(safe-area-inset-top,44px)] left-0 right-0 z-20">
-        <button onClick={goBack} className="mr-2 active:opacity-60 p-1">
-          <ChevronLeft className="h-5 w-5 text-[#1a1f3d]" />
-        </button>
-        {/* Slim progress bar */}
-        <div className="flex-1 h-[3px] bg-black/10 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-[#1a1f3d] rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
+      {/* Navigation bar — hidden on paywall steps (they have their own controls) */}
+      {step.type !== 'paywall' && (
+        <div className="shrink-0 px-4 py-2 flex items-center absolute top-[env(safe-area-inset-top,44px)] left-0 right-0 z-20">
+          <button onClick={goBack} className="mr-2 active:opacity-60 p-1">
+            <ChevronLeft className="h-5 w-5 text-[#1a1f3d]" />
+          </button>
+          {/* Slim progress bar */}
+          <div className="flex-1 h-[3px] bg-black/10 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-[#1a1f3d] rounded-full transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <button onClick={handleClose} className="ml-2 active:opacity-60 p-1 text-xs text-[#1a1f3d] font-medium">
+            Skip
+          </button>
         </div>
-        <button onClick={handleClose} className="ml-2 active:opacity-60 p-1 text-xs text-muted-foreground font-medium">
-          Skip
-        </button>
-      </div>
+      )}
 
       {/* Step content - full screen */}
       <div className="flex-1 overflow-hidden">

@@ -1097,7 +1097,8 @@ function PaywallScreen({ step, onNext }: Props) {
   };
 
   return (
-    <ScreenWrapper>
+    <ScrollArea className="h-full bg-white">
+      <div className="flex flex-col h-full min-h-[100dvh] px-5 pt-[calc(env(safe-area-inset-top,44px)+12px)] pb-6">
       <div className="flex items-center justify-between mb-3">
         <button onClick={onNext} className="text-gray-400 text-lg active:opacity-60">✕</button>
         <button
