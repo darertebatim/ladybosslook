@@ -147,7 +147,7 @@ function WelcomeScreen({ step, onNext }: Props) {
       )}
 
       {/* Bottom sheet with rounded top */}
-      <div className="absolute inset-x-0 bottom-0 h-[48%] bg-white rounded-t-[28px] flex flex-col items-center justify-end px-6 pb-5 pt-7 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-hidden">
+      <div className="absolute inset-x-0 bottom-0 h-[48%] bg-white rounded-t-[28px] flex flex-col items-center px-6 pb-5 pt-7 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-hidden">
         {/* Sparkles scattered in the white space */}
         <div className="absolute top-6 left-8 text-amber-300/60 animate-pulse" style={{ animationDelay: '0s', animationDuration: '2.5s' }}>✦</div>
         <div className="absolute top-10 right-12 text-purple-300/50 animate-pulse text-xs" style={{ animationDelay: '0.8s', animationDuration: '3s' }}>✦</div>
@@ -160,16 +160,19 @@ function WelcomeScreen({ step, onNext }: Props) {
         <div className="absolute top-12 left-[20%] animate-[floatFeather2_5s_ease-in-out_infinite] text-amber-200/40 text-xs" style={{ animationDelay: '1.2s', transform: 'rotate(-15deg)' }}>🪶</div>
         <div className="absolute top-5 left-[60%] animate-[floatFeather3_4.5s_ease-in-out_infinite] text-amber-300/35 text-[10px]" style={{ animationDelay: '2.5s', transform: 'rotate(40deg)' }}>🪶</div>
 
+        <div className="flex-1" />
         <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight relative z-10">{step.title}</h1>
         <p className="text-[17px] font-semibold text-[#1a1f3d] text-center mb-4 leading-relaxed max-w-[260px] whitespace-pre-line relative z-10">{step.subtitle}</p>
         <img src={appIcon} alt="Simora" className="w-14 h-14 rounded-2xl shadow-lg mb-4 relative z-10" />
-        <button
-          onClick={onNext}
-          className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 relative z-10"
-        >
-          {step.buttonLabel}
-          <span className="text-base">→</span>
-        </button>
+        <div className="mt-auto w-full relative z-10">
+          <button
+            onClick={onNext}
+            className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          >
+            {step.buttonLabel}
+            <span className="text-base">→</span>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -469,7 +472,7 @@ function MotivationalScreen({ step, onNext }: Props) {
           </h1>
           <button
             onClick={onNext}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[70%] py-4 rounded-full bg-[#1a1f3d] text-white font-bold text-base active:scale-95 transition-transform shadow-xl"
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[85%] py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base active:scale-95 transition-transform shadow-xl"
           >
             {step.buttonLabel}
           </button>
