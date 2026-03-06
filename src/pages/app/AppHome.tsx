@@ -81,6 +81,7 @@ const AppHome = () => {
   const [showNotificationFlow, setShowNotificationFlow] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showActionLimit, setShowActionLimit] = useState(false);
+  const [hasPromoBanner, setHasPromoBanner] = useState(false);
   
   // Goal input state
   const [goalInputTask, setGoalInputTask] = useState<UserTask | null>(null);
