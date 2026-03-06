@@ -846,7 +846,7 @@ function PersonalSummaryScreen({ step, onNext, answers }: Props) {
   const isGood = (status: string) => status.includes('track');
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper center>
       <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-6 whitespace-pre-line">{step.title}</h1>
 
       {/* 2×2 Circle Grid */}
