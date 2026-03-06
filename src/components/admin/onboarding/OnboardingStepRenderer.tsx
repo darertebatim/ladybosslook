@@ -10,6 +10,7 @@ import SealCheck from '@/components/app/SealCheck';
 import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
 import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
 import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
+import meplusPlanMascot from '@/assets/onboarding/meplus-plan-mascot.png';
 
 interface Props {
   step: OnboardingStep;
