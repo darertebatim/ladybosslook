@@ -1169,7 +1169,8 @@ function PaywallScreen({ step, onNext }: Props) {
         <span className="text-[10px] text-gray-300">·</span>
         <a href="/privacy" target="_blank" className="text-[10px] text-gray-400 underline">Privacy</a>
       </div>
-    </ScreenWrapper>
+      </div>
+    </ScrollArea>
   );
 }
 
