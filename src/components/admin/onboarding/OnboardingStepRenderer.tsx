@@ -1600,7 +1600,7 @@ function ADHDInfoScreen({ step, onNext }: Props) {
         <IllustrationPlaceholder label={step.illustrationLabel || 'Brain comparison'} className="h-40 mb-4" />
       )}
       <div className="bg-gray-50 rounded-2xl p-4 mb-4">
-        <p className="text-sm font-bold text-[#1a1f3d] mb-3">Me+ can help ADHD:</p>
+        <p className="text-sm font-bold text-[#1a1f3d] mb-3"><span className="bg-[#e8e4ff] px-1.5 py-0.5 rounded font-extrabold">Simora</span> can help ADHD:</p>
         <ul className="space-y-2">
           {step.options?.map((opt, i) => (
             <li key={i} className="flex items-start gap-2 text-sm text-[#1a1f3d]">
