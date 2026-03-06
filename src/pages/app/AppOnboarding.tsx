@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { OnboardingAnswers } from '@/types/onboarding';
 import { OnboardingStepRenderer } from '@/components/admin/onboarding/OnboardingStepRenderer';
@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { getFluentEmojiUrl, getFluentEmojiUrlAlt, isEmoji } from '@/lib/fluentEmoji';
+import { AnimatePresence, motion } from 'framer-motion';
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
 import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
