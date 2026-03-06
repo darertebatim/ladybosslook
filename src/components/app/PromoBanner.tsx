@@ -348,29 +348,30 @@ export function PromoBanner({
 
   if (eligibleBanners.length === 0) return null;
 
+  // Show only the first eligible banner; once dismissed the next one appears
+  const banner = eligibleBanners[0];
+
   return (
-    <div className={`space-y-3 ${className || "px-4 py-2"}`}>
-      {eligibleBanners.map(banner => (
-        <div
-          key={banner.id}
-          className="relative w-full rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
-          onClick={() => handleTap(banner)}
-        >
-          <img
-            src={banner.cover_image_url}
-            alt="Promo"
-            className={`w-full ${getAspectRatioClass(banner.aspect_ratio)} object-cover`}
-          />
-          {banner.display_frequency !== 'forever' && (
-            <button
-              onClick={(e) => handleDismiss(e, banner)}
-              className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 flex items-center justify-center active:scale-90 transition-transform"
-            >
-              <X className="h-4 w-4 text-white" />
-            </button>
-          )}
-        </div>
-      ))}
+    <div className={className || "px-4 py-2"}>
+      <div
+        key={banner.id}
+        className="relative w-full rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
+        onClick={() => handleTap(banner)}
+      >
+        <img
+          src={banner.cover_image_url}
+          alt="Promo"
+          className={`w-full ${getAspectRatioClass(banner.aspect_ratio)} object-cover`}
+        />
+        {banner.display_frequency !== 'forever' && (
+          <button
+            onClick={(e) => handleDismiss(e, banner)}
+            className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 flex items-center justify-center active:scale-90 transition-transform"
+          >
+            <X className="h-4 w-4 text-white" />
+          </button>
+        )}
+      </div>
     </div>
   );
 }
