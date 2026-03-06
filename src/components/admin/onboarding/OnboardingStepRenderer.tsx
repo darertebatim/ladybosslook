@@ -1850,7 +1850,11 @@ function PersonalizedPlanScreen({ step, onNext, answers }: { step: OnboardingSte
   return (
     <ScreenWrapper>
       <div className="flex flex-col h-full">
-        <div className="flex-1 overflow-y-auto pt-16 px-1 pb-28">
+        <div className="flex-1 overflow-y-auto pt-14 px-1 pb-28">
+          {/* Header image */}
+          <div className="flex justify-center mb-3">
+            <img src={meplusPlanMascot} alt="Plan mascot" className="w-full max-h-[160px] object-contain rounded-2xl" />
+          </div>
           <h1 className="text-[22px] font-extrabold text-[#1a1f3d] leading-snug mb-1">{step.title}</h1>
           <p className="text-sm text-[#1a1f3d]/60 mb-5">{step.subtitle}</p>
 
