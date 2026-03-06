@@ -889,7 +889,7 @@ const AppHome = () => {
                 <div>
                   {/* Mood Check-in Banner - above actions, hidden while welcome card is active */}
                   {/* Mood Check-in Banner - hidden while welcome card is active */}
-                  {!showWelcomeCard && <MoodCheckInBanner />}
+                  {!showWelcomeCard && !hasPromoBanner && <MoodCheckInBanner />}
                   {/* My Actions header - always show */}
                   <div className="flex items-center gap-2 mb-3">
                     <h2 className="text-sm font-semibold text-foreground tracking-wide">

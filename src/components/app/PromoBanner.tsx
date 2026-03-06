@@ -30,6 +30,7 @@ interface PromoBannerProps {
   location?: DisplayLocation;
   currentPlaylistId?: string;
   className?: string;
+  onVisibilityChange?: (visible: boolean) => void;
 }
 
 const STORAGE_KEY = 'promo_banner_dismissals';
