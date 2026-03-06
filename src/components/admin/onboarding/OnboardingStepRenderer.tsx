@@ -424,21 +424,22 @@ function SingleSelectDescScreen({ step, onNext, onAnswer }: Props) {
 
   return (
     <ScreenWrapper>
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
-      <div className="space-y-3">
+      <FadeUp><h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1></FadeUp>
+      <StaggerContainer className="space-y-3">
         {step.options?.map((opt, i) => (
-          <button
-            key={i}
-            onClick={() => select(i)}
-            className={`w-full p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
-              picked === i ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
-            }`}
-          >
-            <span className="text-sm font-semibold text-[#1a1f3d]">{opt.label}</span>
-            {opt.description && <p className="text-xs text-gray-400 mt-1">{opt.description}</p>}
-          </button>
+          <StaggerItem key={i}>
+            <button
+              onClick={() => select(i)}
+              className={`w-full p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
+                picked === i ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+              }`}
+            >
+              <span className="text-sm font-semibold text-[#1a1f3d]">{opt.label}</span>
+              {opt.description && <p className="text-xs text-gray-400 mt-1">{opt.description}</p>}
+            </button>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
     </ScreenWrapper>
   );
 }
