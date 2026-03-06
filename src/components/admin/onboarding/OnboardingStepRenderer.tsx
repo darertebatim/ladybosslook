@@ -107,7 +107,7 @@ function NavyButton({ children, className = '', onClick, disabled }: { children:
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`w-full py-3.5 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all ${disabled ? 'opacity-40' : ''} ${className}`}
+      className={`w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base active:scale-[0.98] transition-all ${disabled ? 'opacity-40' : ''} ${className}`}
     >
       {children}
     </button>
