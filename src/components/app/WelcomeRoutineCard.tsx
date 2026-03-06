@@ -134,8 +134,8 @@ export function WelcomeRoutineCard({ onActionAdded, onDismiss }: WelcomeRoutineC
 
   return (
     <>
-      {/* Fullscreen overlay when flipped — covers header, FAB, nav, everything */}
-      {isFlipped && (
+      {/* Fullscreen overlay when flipped — portal to body so it escapes any stacking context */}
+      {isFlipped && createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 animate-fade-in">
           {/* Centered action picker card */}
           <div 
@@ -252,7 +252,8 @@ export function WelcomeRoutineCard({ onActionAdded, onDismiss }: WelcomeRoutineC
               </>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
       
       {/* Front card — inline in the page */}
