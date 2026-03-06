@@ -356,53 +356,59 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
   if (hasBg) {
     return (
       <BottomSheetWrapper bgImage={meplusMascotBg}>
-        <div className="min-h-[4.5em] flex items-start justify-center mb-5">
-          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center leading-snug">{step.title}</h1>
-        </div>
-        <div className="space-y-3">
+        <FadeUp>
+          <div className="min-h-[4.5em] flex items-start justify-center mb-5">
+            <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center leading-snug">{step.title}</h1>
+          </div>
+        </FadeUp>
+        <StaggerContainer className="space-y-3">
           {step.options?.map((opt, i) => (
-            <button
-              key={i}
-              onClick={() => select(i)}
-              className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
-                picked === i ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
-              }`}
-            >
-              {opt.emoji && <FluentEmoji emoji={opt.emoji} size={28} />}
-              <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
-              {picked === i && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
-            </button>
+            <StaggerItem key={i}>
+              <button
+                onClick={() => select(i)}
+                className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+                  picked === i ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
+                }`}
+              >
+                {opt.emoji && <FluentEmoji emoji={opt.emoji} size={28} />}
+                <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
+                {picked === i && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
+              </button>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </BottomSheetWrapper>
     );
   }
 
   return (
     <ScreenWrapper>
-      {step.subtitle ? (
-        <>
-          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
-          <p className="text-base text-gray-500 mb-5">{step.subtitle}</p>
-        </>
-      ) : (
-        <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
-      )}
-      <div className="space-y-3">
+      <FadeUp>
+        {step.subtitle ? (
+          <>
+            <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
+            <p className="text-base text-gray-500 mb-5">{step.subtitle}</p>
+          </>
+        ) : (
+          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
+        )}
+      </FadeUp>
+      <StaggerContainer className="space-y-3">
         {step.options?.map((opt, i) => (
-          <button
-            key={i}
-            onClick={() => select(i)}
-            className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
-              picked === i ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
-            }`}
-          >
-            {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
-            <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
-            {picked === i && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
-          </button>
+          <StaggerItem key={i}>
+            <button
+              onClick={() => select(i)}
+              className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
+                picked === i ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
+              }`}
+            >
+              {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
+              <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
+              {picked === i && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
+            </button>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
     </ScreenWrapper>
   );
 }
