@@ -383,15 +383,17 @@ function YesNoScreen({ step, onNext, onAnswer }: Props) {
   };
   return (
     <ScrollArea className="h-full bg-white">
-      <div className="flex flex-col h-full min-h-[700px] px-5 pt-14 pb-6">
+      <div className="flex flex-col h-full min-h-[100dvh] px-5 pt-[72px] pb-6">
         <h1 className="text-[22px] font-bold text-[#1a1f3d] text-center mb-5 leading-tight">{step.title}</h1>
-        {/* 4:5 image card */}
-        <div className="relative rounded-2xl overflow-hidden mb-6" style={{ aspectRatio: '4/5' }}>
-          {step.image ? (
-            <img src={step.image} alt="" className="w-full h-full object-cover" />
-          ) : (
-            <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-full" />
-          )}
+        {/* Image card - constrained height */}
+        <div className="flex-1 min-h-0 flex items-center justify-center mb-6">
+          <div className="relative rounded-2xl overflow-hidden w-full max-h-[50vh]">
+            {step.image ? (
+              <img src={step.image} alt="" className="w-full h-full object-contain" />
+            ) : (
+              <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-full" />
+            )}
+          </div>
         </div>
         <div className="mt-auto flex gap-3">
           <NavyButton onClick={() => handleAnswer('No')} className="flex-1">No</NavyButton>
