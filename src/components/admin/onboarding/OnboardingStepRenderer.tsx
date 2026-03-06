@@ -453,10 +453,10 @@ function YesNoScreen({ step, onNext, onAnswer }: Props) {
   };
   return (
     <ScrollArea className="h-full bg-white">
-      <div className="flex flex-col h-full min-h-[100dvh] px-5 pt-[72px] pb-6">
-        <FadeUp><h1 className="text-[22px] font-bold text-[#1a1f3d] text-center mb-5 mt-4 leading-tight">{step.title}</h1></FadeUp>
+      <div className="flex flex-col h-full min-h-[100dvh] pt-[72px] pb-6">
+        <FadeUp className="px-5"><h1 className="text-[22px] font-bold text-[#1a1f3d] text-center mb-5 mt-4 leading-tight">{step.title}</h1></FadeUp>
         <FadeUp delay={0.1} className="flex-1 min-h-0 flex items-center justify-center mb-6">
-          <div className="relative rounded-2xl overflow-hidden w-full max-h-[50vh] -mx-5">
+          <div className="relative overflow-hidden w-full max-h-[50vh]">
             {step.image ? (
               <img src={step.image} alt="" className="w-full h-full object-contain" />
             ) : (
@@ -464,7 +464,7 @@ function YesNoScreen({ step, onNext, onAnswer }: Props) {
             )}
           </div>
         </FadeUp>
-        <FadeUp delay={0.2} className="mt-auto flex gap-3">
+        <FadeUp delay={0.2} className="mt-auto flex gap-3 px-5">
           <NavyButton onClick={() => handleAnswer('No')} className="flex-1">No</NavyButton>
           <NavyButton onClick={() => handleAnswer('Yes')} className="flex-1">Yes</NavyButton>
         </FadeUp>
