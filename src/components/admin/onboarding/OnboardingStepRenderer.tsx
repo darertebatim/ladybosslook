@@ -1211,7 +1211,7 @@ function BeforeAfterScreen({ step, onNext }: Props) {
 
 function ScienceBackedScreen({ step, onNext }: Props) {
   return (
-    <ScreenWrapper>
+    <ScreenWrapper center>
       {step.subtitle ? (
         <>
           <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight">{step.title}</h1>
