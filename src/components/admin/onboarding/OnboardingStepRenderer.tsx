@@ -518,60 +518,66 @@ function MotivationalScreen({ step, onNext }: Props) {
   const isFullScreenBg = step.image && !step.description;
 
   if (isFullScreenBg) {
-    // Parse title to highlight "build momentum" in yellow
     const titleParts = step.title?.split(/(build momentum)/i) || [step.title];
     return (
       <div className="flex flex-col h-full relative overflow-hidden">
         <img src={step.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="relative z-10 h-full">
-          <h1 className={`absolute left-1/2 -translate-x-1/2 w-[85%] text-[20px] font-extrabold text-white text-center leading-snug drop-shadow-lg ${
-            step.title?.includes('build momentum') || step.title?.includes('Tailored')
-              ? 'top-1/2 -translate-y-1/2'
-              : 'bottom-[160px]'
-          }`}>
-            {titleParts.map((part, i) =>
-              /build momentum/i.test(part) ? (
-                <span key={i} className="text-yellow-300 font-extrabold">{part}</span>
-              ) : (
-                <span key={i}>{part}</span>
-              )
-            )}
-          </h1>
-          <button
-            onClick={onNext}
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[85%] py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base active:scale-95 transition-transform shadow-xl"
-          >
-            {step.buttonLabel}
-          </button>
+          <FadeUp delay={0.15}>
+            <h1 className={`absolute left-1/2 -translate-x-1/2 w-[85%] text-[20px] font-extrabold text-white text-center leading-snug drop-shadow-lg ${
+              step.title?.includes('build momentum') || step.title?.includes('Tailored')
+                ? 'top-1/2 -translate-y-1/2'
+                : 'bottom-[160px]'
+            }`}>
+              {titleParts.map((part, i) =>
+                /build momentum/i.test(part) ? (
+                  <span key={i} className="text-yellow-300 font-extrabold">{part}</span>
+                ) : (
+                  <span key={i}>{part}</span>
+                )
+              )}
+            </h1>
+          </FadeUp>
+          <FadeUp delay={0.3}>
+            <button
+              onClick={onNext}
+              className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[85%] py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base active:scale-95 transition-transform shadow-xl"
+            >
+              {step.buttonLabel}
+            </button>
+          </FadeUp>
         </div>
       </div>
     );
   }
 
-  // Default motivational with stat + description
   const descMatch = step.description?.match(/^(\d+%)\s*(.*)/s);
   
   return (
     <ScreenWrapper center>
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight whitespace-pre-line">{step.title}</h1>
-      {step.image ? (
-        <div className="flex items-center justify-center mb-5">
-          <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
-        </div>
-      ) : step.illustrationLabel ? (
-        <IllustrationPlaceholder label={step.illustrationLabel} className="h-44 mb-5" />
-      ) : null}
-      {descMatch ? (
-        <p className="text-[15px] text-gray-600 leading-relaxed text-center mb-4">
-          <span className="text-[#1a1f3d] font-extrabold text-2xl">{descMatch[1]}</span>{' '}
-          {descMatch[2]}
-        </p>
-      ) : step.description ? (
-        <p className="text-sm text-gray-500 leading-relaxed mb-4">{step.description}</p>
-      ) : null}
-      <div className="mt-auto">
+      <FadeUp><h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight whitespace-pre-line">{step.title}</h1></FadeUp>
+      <FadeUp delay={0.1}>
+        {step.image ? (
+          <div className="flex items-center justify-center mb-5">
+            <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
+          </div>
+        ) : step.illustrationLabel ? (
+          <IllustrationPlaceholder label={step.illustrationLabel} className="h-44 mb-5" />
+        ) : null}
+      </FadeUp>
+      <FadeUp delay={0.15}>
+        {descMatch ? (
+          <p className="text-[15px] text-gray-600 leading-relaxed text-center mb-4">
+            <span className="text-[#1a1f3d] font-extrabold text-2xl">{descMatch[1]}</span>{' '}
+            {descMatch[2]}
+          </p>
+        ) : step.description ? (
+          <p className="text-sm text-gray-500 leading-relaxed mb-4">{step.description}</p>
+        ) : null}
+      </FadeUp>
+      <FadeUp delay={0.25} className="mt-auto">
         <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
-      </div>
+      </FadeUp>
     </ScreenWrapper>
   );
 }
