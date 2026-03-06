@@ -293,7 +293,7 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
     return (
       <BottomSheetWrapper bgImage={meplusMascotBg}>
         <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
-        <div className="space-y-3">
+        <div className="mt-auto space-y-3">
           {step.options?.map((opt, i) => (
             <button
               key={i}
