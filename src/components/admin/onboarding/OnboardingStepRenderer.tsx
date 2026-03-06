@@ -160,7 +160,7 @@ function WelcomeScreen({ step, onNext }: Props) {
         <div className="absolute top-12 left-[20%] animate-[floatFeather2_5s_ease-in-out_infinite] text-amber-200/40 text-xs" style={{ animationDelay: '1.2s', transform: 'rotate(-15deg)' }}>🪶</div>
         <div className="absolute top-5 left-[60%] animate-[floatFeather3_4.5s_ease-in-out_infinite] text-amber-300/35 text-[10px]" style={{ animationDelay: '2.5s', transform: 'rotate(40deg)' }}>🪶</div>
 
-        <div className="flex-1" />
+        
         <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight relative z-10">{step.title}</h1>
         <p className="text-[17px] font-semibold text-[#1a1f3d] text-center mb-4 leading-relaxed max-w-[260px] whitespace-pre-line relative z-10">{step.subtitle}</p>
         <img src={appIcon} alt="Simora" className="w-14 h-14 rounded-2xl shadow-lg mb-4 relative z-10" />
