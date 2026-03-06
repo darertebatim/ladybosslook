@@ -503,12 +503,12 @@ function DoYouWantScreen({ step, onNext, onAnswer }: Props) {
 function InfoStatScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper bg="bg-[#fdf8f4]">
-      <IllustrationPlaceholder label={step.illustrationLabel || 'Statistic'} className="h-36 mb-6" />
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-3">{step.statHighlight}</h1>
-      <p className="text-sm text-gray-500 mb-8 leading-relaxed">{step.description}</p>
-      <div className="mt-auto">
+      <FadeUp><IllustrationPlaceholder label={step.illustrationLabel || 'Statistic'} className="h-36 mb-6" /></FadeUp>
+      <FadeUp delay={0.1}><h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-3">{step.statHighlight}</h1></FadeUp>
+      <FadeUp delay={0.15}><p className="text-sm text-gray-500 mb-8 leading-relaxed">{step.description}</p></FadeUp>
+      <FadeUp delay={0.25} className="mt-auto">
         <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
-      </div>
+      </FadeUp>
     </ScreenWrapper>
   );
 }
