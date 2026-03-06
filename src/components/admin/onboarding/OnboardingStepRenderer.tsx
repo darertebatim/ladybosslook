@@ -454,9 +454,9 @@ function YesNoScreen({ step, onNext, onAnswer }: Props) {
   return (
     <ScrollArea className="h-full bg-white">
       <div className="flex flex-col h-full min-h-[100dvh] px-5 pt-[72px] pb-6">
-        <FadeUp><h1 className="text-[22px] font-bold text-[#1a1f3d] text-center mb-5 leading-tight">{step.title}</h1></FadeUp>
+        <FadeUp><h1 className="text-[22px] font-bold text-[#1a1f3d] text-center mb-5 mt-4 leading-tight">{step.title}</h1></FadeUp>
         <FadeUp delay={0.1} className="flex-1 min-h-0 flex items-center justify-center mb-6">
-          <div className="relative rounded-2xl overflow-hidden w-full max-h-[50vh]">
+          <div className="relative rounded-2xl overflow-hidden w-full max-h-[50vh] -mx-5">
             {step.image ? (
               <img src={step.image} alt="" className="w-full h-full object-contain" />
             ) : (
@@ -1313,10 +1313,10 @@ function ScienceBackedScreen({ step, onNext }: Props) {
     <ScreenWrapper center>
       {step.subtitle ? (
         <>
-          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight">{step.title}</h1>
+          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-6 leading-tight">{step.title}</h1>
           {step.image ? (
-            <div className="flex items-center justify-center mb-5">
-              <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
+            <div className="flex items-center justify-center mb-5 -mx-5">
+              <img src={step.image} alt="" className="w-full object-contain" />
             </div>
           ) : (
             <IllustrationPlaceholder label={step.illustrationLabel || step.subtitle} className="h-36 mb-4" />
