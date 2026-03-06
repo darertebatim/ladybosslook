@@ -80,6 +80,7 @@ export default function AppOnboarding() {
     } catch { return 0; }
   });
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
+  const [direction, setDirection] = useState(1); // 1 = forward, -1 = back
 
   // Preload images on mount
   useEffect(() => {
