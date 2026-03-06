@@ -1,58 +1,36 @@
 
 
-## Calm-Style Animated Background for Watch Page
+# Onboarding iOS Bug Fixes
 
-Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
+## Issues Identified
 
-### What You'll Get
+1. **"Continue" buttons floating too high** — `ScreenWrapper` uses `min-h-[700px]` fixed height. On real iPhones (especially larger ones), the `mt-auto` pushes the button to the bottom of 700px, not the bottom of the viewport. The wrapper needs to use the actual viewport height instead.
 
-- A deep dark blue gradient background on the Watch page header area
-- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
-- Subtle lightning flashes that pulse periodically
-- All text updated to white/light colors for contrast
-- Lightweight implementation using CSS keyframes (no extra dependencies)
+2. **Yes/No screens — image overflows** — The image uses `aspect-ratio: 4/5` with no max-height constraint, so on real devices it pushes out of bounds. Need to cap the image height and let it scale within available space.
 
-### Design Details
+3. **Paywall — Close/Restore buttons behind progress bar** — The paywall renders its own close (✕) and Restore buttons inside `ScreenWrapper` at the top, but the `AppOnboarding` page already has a progress bar + back/skip in the same area. These overlap. The paywall's close/restore row needs to be repositioned below the progress bar area, or the progress bar should be hidden on paywall steps.
 
-- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
-- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
-- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
-- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
-- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
+4. **Skip button color** — Currently `text-muted-foreground`, needs to be black (`text-[#1a1f3d]`).
 
-### Technical Approach
+## Plan
 
-**Files to modify:**
+### 1. Fix ScreenWrapper height (buttons too high)
+- **File:** `OnboardingStepRenderer.tsx` — `ScreenWrapper` component (line 127-135)
+- Change `min-h-[700px]` to `min-h-[100dvh]` (or remove it entirely since the parent is `h-full`) so content fills the real viewport height and `mt-auto` pushes buttons to the actual bottom.
 
-1. **`src/pages/app/AppWatch.tsx`**
-   - Replace the header `bg-[#E8F4FE]` with the dark gradient
-   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
-   - Add a lightning flash overlay div
-   - Update all text classes to white variants (`text-white`, `text-white/60`)
-   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
-   - Extend the gradient into the page background behind the content area
+### 2. Fix Yes/No image overflow
+- **File:** `OnboardingStepRenderer.tsx` — `YesNoScreen` (line 379-402)
+- Constrain the image container: replace fixed `aspect-ratio: 4/5` with a `flex-1 overflow-hidden` approach so the image fills available space without overflowing. Add `max-h-[50vh]` to the image container.
 
-2. **`tailwind.config.ts`**
-   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
-   - Register corresponding animation utilities
+### 3. Fix paywall overlap with progress bar
+- **File:** `AppOnboarding.tsx` — Hide the top navigation bar (back + progress + skip) when the current step is a paywall type, since the paywall has its own close/restore controls.
+- **File:** `OnboardingStepRenderer.tsx` — Adjust paywall screen to add more top padding to clear the safe area since it manages its own header.
 
-### Visual Structure
+### 4. Skip button → black
+- **File:** `AppOnboarding.tsx` (line ~131) — Change skip button class from `text-muted-foreground` to `text-[#1a1f3d]`.
 
-```text
-+----------------------------------+
-|  [dark blue gradient header]     |
-|  ~~~ cloud layer 1 (slow) ~~~   |
-|  ~~~ cloud layer 2 (slower) ~~~ |
-|  * lightning flash (periodic) *  |
-|                                  |
-|  Watch          [icons]          |
-|  [categories row]                |
-|  [filters]              [lang]   |
-+----------------------------------+
-|  [normal white content area]     |
-|  [playlist cards grid]           |
-+----------------------------------+
-```
-
-The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
+### Technical Details
+- `100dvh` is the correct unit for iOS Safari/WebView as it accounts for dynamic viewport changes.
+- The `DoYouWantScreen` also uses `ScreenWrapper` so it benefits from fix #1 automatically.
+- All screens using `ScreenWrapper` with `mt-auto` buttons will be fixed by the single `min-h` change.
 
