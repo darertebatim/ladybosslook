@@ -207,8 +207,10 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
   if (hasBg) {
     return (
       <BottomSheetWrapper bgImage={meplusMascotBg}>
-        <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
-        <div className="mt-auto space-y-3 mb-6">
+        <div className="min-h-[4.5em] flex items-start justify-center mb-5">
+          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center leading-snug">{step.title}</h1>
+        </div>
+        <div className="space-y-3 mb-6">
           {step.options?.map((opt, i) => (
             <button
               key={i}
@@ -292,8 +294,10 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
   if (hasBg) {
     return (
       <BottomSheetWrapper bgImage={meplusMascotBg}>
-        <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1>
-        <div className="mt-auto space-y-3">
+        <div className="min-h-[4.5em] flex items-start justify-center mb-5">
+          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center leading-snug">{step.title}</h1>
+        </div>
+        <div className="space-y-3">
           {step.options?.map((opt, i) => (
             <button
               key={i}
