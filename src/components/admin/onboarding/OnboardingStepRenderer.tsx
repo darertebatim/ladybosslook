@@ -454,7 +454,7 @@ function YesNoScreen({ step, onNext, onAnswer }: Props) {
   return (
     <ScrollArea className="h-full bg-white">
       <div className="flex flex-col h-full min-h-[100dvh] pt-[72px] pb-6">
-        <FadeUp className="px-5"><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 mt-2 leading-tight">{step.title}</h1></FadeUp>
+        <FadeUp className="px-5"><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-1 mt-2 leading-tight">{step.title}</h1></FadeUp>
         <FadeUp delay={0.1} className="flex-1 min-h-0 flex items-center justify-center px-4">
           <div className="relative overflow-hidden w-full rounded-2xl">
             {step.image ? (
