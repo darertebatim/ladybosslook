@@ -1313,9 +1313,9 @@ function ScienceBackedScreen({ step, onNext }: Props) {
     <ScreenWrapper center>
       {step.subtitle ? (
         <>
-          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-6 leading-tight">{step.title}</h1>
+          <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight">{step.title}</h1>
           {step.image ? (
-            <div className="flex items-center justify-center mb-5 -mx-5">
+            <div className="flex items-center justify-center mb-3">
               <img src={step.image} alt="" className="w-full object-contain" />
             </div>
           ) : (
