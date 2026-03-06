@@ -394,7 +394,7 @@ export const mePlusFlow: OnboardingFlow = {
       id: 'mp-33',
       type: 'personalized-plan',
       title: 'Your Personalized Plan',
-      subtitle: 'Based on your answers, here\'s what Simora will do for you',
+      subtitle: 'Based on your answers, we\'re building these features just for you — rolling out soon!',
       buttonLabel: 'Get Started!',
     },
 
