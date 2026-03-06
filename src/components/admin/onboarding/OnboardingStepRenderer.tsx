@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
+import { supabase } from '@/integrations/supabase/client';
 import confetti from 'canvas-confetti';
 import { motion } from 'framer-motion';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
@@ -1162,12 +1164,29 @@ function PaywallScreen({ step, onNext }: Props) {
   );
   const { handlePurchase, handleRestore, isPurchasing, isRestoring } = useRevenueCat();
 
+  // Fetch real product IDs from program_catalog
+  const { data: productIds } = useQuery({
+    queryKey: ['paywall-product-ids'],
+    queryFn: async () => {
+      const { data } = await (supabase
+        .from('program_catalog')
+        .select('ios_product_id, annual_ios_product_id')
+        .eq('slug', 'simora-plus')
+        .maybeSingle() as any);
+      return {
+        monthly: data?.ios_product_id || '',
+        annual: data?.annual_ios_product_id || '',
+      };
+    },
+    staleTime: 1000 * 60 * 10,
+  });
+
   const onSubscribe = async () => {
     const tier = step.pricingTiers?.[selectedTier];
-    if (!tier) return;
-    // Map tier index to product IDs — annual is index 1
+    if (!tier || !productIds) return;
     const plan = selectedTier === 1 ? 'annual' : 'monthly';
-    const productId = plan === 'annual' ? 'simora_plus_annual' : 'simora_plus_monthly';
+    const productId = plan === 'annual' ? productIds.annual : productIds.monthly;
+    if (!productId) { console.error('[Paywall] No product ID for plan:', plan); return; }
     await handlePurchase(productId, plan);
   };
 
