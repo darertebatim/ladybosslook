@@ -1847,7 +1847,7 @@ function PersonalizedPlanScreen({ step, onNext, answers }: { step: OnboardingSte
   }, [visibleCount, plan.length]);
 
   return (
-    <ScreenWrapper onNext={onNext} buttonLabel={step.buttonLabel || 'Get Started!'}>
+    <ScreenWrapper>
       <div className="pt-16 px-1">
         <h1 className="text-[22px] font-extrabold text-[#1a1f3d] leading-snug mb-1">{step.title}</h1>
         <p className="text-sm text-[#1a1f3d]/60 mb-5">{step.subtitle}</p>
@@ -1870,6 +1870,10 @@ function PersonalizedPlanScreen({ step, onNext, answers }: { step: OnboardingSte
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="mt-8 pb-8">
+          <NavyButton onClick={onNext}>{step.buttonLabel || 'Get Started!'}</NavyButton>
         </div>
       </div>
     </ScreenWrapper>
