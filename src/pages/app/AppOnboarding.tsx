@@ -174,16 +174,27 @@ export default function AppOnboarding() {
         </div>
       )}
 
-      {/* Step content - full screen */}
+      {/* Step content - full screen with slide transition */}
       <div className="flex-1 overflow-hidden">
-        <OnboardingStepRenderer
-          key={step.id}
-          step={step}
-          onNext={goNext}
-          onMilestone={handleMilestone}
-          onAnswer={handleAnswer}
-          answers={answers}
-        />
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div
+            key={step.id}
+            custom={direction}
+            initial={{ opacity: 0, x: direction * 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: direction * -40 }}
+            transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+            className="h-full"
+          >
+            <OnboardingStepRenderer
+              step={step}
+              onNext={goNext}
+              onMilestone={handleMilestone}
+              onAnswer={handleAnswer}
+              answers={answers}
+            />
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
