@@ -478,7 +478,7 @@ function MotivationalScreen({ step, onNext }: Props) {
   const descMatch = step.description?.match(/^(\d+%)\s*(.*)/s);
   
   return (
-    <ScreenWrapper>
+    <ScreenWrapper center>
       <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight whitespace-pre-line">{step.title}</h1>
       {step.image ? (
         <div className="flex items-center justify-center mb-5">
