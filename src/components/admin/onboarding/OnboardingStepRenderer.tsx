@@ -107,7 +107,7 @@ function NavyButton({ children, className = '', onClick, disabled }: { children:
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`w-full py-3.5 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all ${disabled ? 'opacity-40' : ''} ${className}`}
+      className={`w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base active:scale-[0.98] transition-all ${disabled ? 'opacity-40' : ''} ${className}`}
     >
       {children}
     </button>
@@ -480,21 +480,21 @@ function DoYouWantScreen({ step, onNext, onAnswer }: Props) {
   };
   return (
     <ScreenWrapper>
-      <FadeUp><h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4">{step.title}</h1></FadeUp>
+      <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1></FadeUp>
       <FadeUp delay={0.1}>
         {step.image ? (
           <div className="flex-1 flex items-center justify-center">
-            <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
+            <img src={step.image} alt="" className="w-full object-contain" />
           </div>
         ) : (
           <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="flex-1" />
         )}
       </FadeUp>
-      <FadeUp delay={0.2} className="mt-auto flex gap-3 pt-6">
-        <button onClick={() => handleChoice('No')} className="px-8 py-3.5 rounded-full border border-gray-300 text-sm font-medium text-[#1a1f3d] active:scale-[0.98] transition-all">
+      <FadeUp delay={0.2} className="mt-auto flex gap-3 pt-4">
+        <button onClick={() => handleChoice('No')} className="px-8 py-4 rounded-full border border-gray-300 text-base font-medium text-[#1a1f3d] active:scale-[0.98] transition-all">
           {step.secondaryButtonLabel}
         </button>
-        <button onClick={() => handleChoice('Yes')} className="flex-1 py-3.5 rounded-full bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all">
+        <button onClick={() => handleChoice('Yes')} className="flex-1 py-4 rounded-full bg-[#1a1f3d] text-white font-bold text-base active:scale-[0.98] transition-all">
           {step.buttonLabel}
         </button>
       </FadeUp>
@@ -557,14 +557,14 @@ function MotivationalScreen({ step, onNext }: Props) {
   
   return (
     <ScreenWrapper center>
-      <FadeUp><h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight whitespace-pre-line">{step.title}</h1></FadeUp>
+      <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight whitespace-pre-line">{step.title}</h1></FadeUp>
       <FadeUp delay={0.1}>
         {step.image ? (
-          <div className="flex items-center justify-center mb-5">
-            <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
+          <div className="flex items-center justify-center mb-3">
+            <img src={step.image} alt="" className="w-full object-contain" />
           </div>
         ) : step.illustrationLabel ? (
-          <IllustrationPlaceholder label={step.illustrationLabel} className="h-44 mb-5" />
+          <IllustrationPlaceholder label={step.illustrationLabel} className="h-44 mb-3" />
         ) : null}
       </FadeUp>
       <FadeUp delay={0.15}>
@@ -1271,14 +1271,14 @@ function PaywallScreen({ step, onNext }: Props) {
 function BeforeAfterScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
-      <p className="text-lg font-semibold text-[#1a1f3d] text-center mb-5">{step.subtitle}</p>
+      <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
+      <p className="text-lg font-semibold text-[#1a1f3d] text-center mb-3">{step.subtitle}</p>
       {step.image ? (
-        <div className="flex-1 flex items-center justify-center mb-6">
-          <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
+        <div className="flex-1 flex items-center justify-center mb-4">
+          <img src={step.image} alt="" className="w-full object-contain" />
         </div>
       ) : (
-        <div className="flex gap-3 mb-6">
+        <div className="flex gap-3 mb-4">
           <div className="flex-1 bg-red-50 rounded-2xl p-4">
             <p className="text-xs font-bold text-red-400 uppercase mb-3">Before</p>
             <ul className="space-y-2">
@@ -1313,9 +1313,9 @@ function ScienceBackedScreen({ step, onNext }: Props) {
     <ScreenWrapper center>
       {step.subtitle ? (
         <>
-          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-6 leading-tight">{step.title}</h1>
+          <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight">{step.title}</h1>
           {step.image ? (
-            <div className="flex items-center justify-center mb-5 -mx-5">
+            <div className="flex items-center justify-center mb-3">
               <img src={step.image} alt="" className="w-full object-contain" />
             </div>
           ) : (
@@ -1586,13 +1586,13 @@ function ContractScreen({ step, onNext }: Props) {
 function DistressGridScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5 whitespace-pre-line">{step.title}</h1>
+      <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 whitespace-pre-line">{step.title}</h1>
       {step.image ? (
-        <div className="flex-1 flex items-center justify-center mb-6">
-          <img src={step.image} alt="" className="w-full max-w-[300px] object-contain" />
+        <div className="flex-1 flex items-center justify-center mb-4">
+          <img src={step.image} alt="" className="w-full object-contain" />
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-4">
           {step.options?.map((opt, i) => (
             <div key={i} className="rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 aspect-square flex items-center justify-center p-3">
               <IllustrationPlaceholder label={opt.label} className="w-full h-full" />
@@ -1610,13 +1610,13 @@ function DistressGridScreen({ step, onNext }: Props) {
 function ADHDInfoScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
-      <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-4">{step.title}</h1>
+      <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
       {step.image ? (
-        <div className="flex items-center justify-center mb-4">
-          <img src={step.image} alt="" className="w-full max-w-[280px] object-contain rounded-2xl" />
+        <div className="flex items-center justify-center mb-3">
+          <img src={step.image} alt="" className="w-full object-contain rounded-2xl" />
         </div>
       ) : (
-        <IllustrationPlaceholder label={step.illustrationLabel || 'Brain comparison'} className="h-40 mb-4" />
+        <IllustrationPlaceholder label={step.illustrationLabel || 'Brain comparison'} className="h-40 mb-3" />
       )}
       <div className="bg-gray-50 rounded-2xl p-4 mb-4">
         <p className="text-sm font-bold text-[#1a1f3d] mb-3"><span className="bg-[#e8e4ff] px-1.5 py-0.5 rounded font-extrabold">Simora</span> can help ADHD:</p>
