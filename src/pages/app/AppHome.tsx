@@ -847,7 +847,7 @@ const AppHome = () => {
                 </div>}
 
               {/* Period Status Card - shows cycle info when onboarding is complete */}
-              {selectedTag === null && homeData?.periodSettings?.onboarding_done && homeData?.periodSettings?.show_on_home && (
+              {homeData?.periodSettings?.onboarding_done && homeData?.periodSettings?.show_on_home && (
                 <div className="mb-4">
                   <PeriodStatusCard />
                 </div>
