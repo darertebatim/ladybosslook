@@ -2145,8 +2145,8 @@ const AppTaskCreate = ({
           <Button
             onClick={handleSubmit}
             disabled={!title.trim() || createTask.isPending || updateTask.isPending}
-            variant="ghost"
-            className="text-primary font-semibold"
+            size="sm"
+            className="bg-primary text-primary-foreground font-semibold rounded-full px-5 active:scale-95"
           >
             {taskId ? 'Save' : 'Create'}
           </Button>
