@@ -133,6 +133,11 @@ export default function RoutinesBank() {
   const [createActionSheetOpen, setCreateActionSheetOpen] = useState(false);
   const [createActionSectionId, setCreateActionSectionId] = useState<string | null>(null);
 
+  // Edit action sheet state
+  const [editActionSheetOpen, setEditActionSheetOpen] = useState(false);
+  const [editActionTaskBankId, setEditActionTaskBankId] = useState<string | null>(null);
+  const [editActionInitialData, setEditActionInitialData] = useState<Partial<TaskFormData> | undefined>(undefined);
+
   // Section editor state
   const [sectionDialogOpen, setSectionDialogOpen] = useState(false);
   const [editingSection, setEditingSection] = useState<LocalSection | null>(null);
@@ -717,6 +722,120 @@ export default function RoutinesBank() {
 
   const handleCreateActionSave = (formData: TaskFormData) => {
     createActionMutation.mutate({ formData, sectionId: createActionSectionId });
+  };
+
+  // Edit existing action in task bank
+  const fetchSubtasks = async (taskId: string): Promise<string[]> => {
+    const { data } = await supabase
+      .from('admin_task_bank_subtasks')
+      .select('title')
+      .eq('task_id', taskId)
+      .order('order_index', { ascending: true });
+    return (data || []).map(s => s.title);
+  };
+
+  const openEditActionSheet = async (taskBankId: string) => {
+    const { data: task } = await supabase
+      .from('admin_task_bank')
+      .select('*')
+      .eq('id', taskBankId)
+      .single();
+    if (!task) return;
+
+    const subtasks = await fetchSubtasks(taskBankId);
+    setEditActionTaskBankId(taskBankId);
+    setEditActionInitialData({
+      title: task.title,
+      description: task.description || null,
+      icon: task.emoji,
+      color: task.color as any,
+      scheduledDate: new Date(),
+      scheduledTime: null,
+      timePeriod: task.time_period as any || null,
+      repeatEnabled: task.repeat_pattern !== 'none',
+      repeatPattern: ['daily', 'weekly', 'monthly'].includes(task.repeat_pattern)
+        ? task.repeat_pattern as 'daily' | 'weekly' | 'monthly'
+        : 'daily',
+      repeatInterval: task.repeat_interval || 1,
+      repeatDays: task.repeat_days || [],
+      reminderEnabled: task.reminder_enabled,
+      reminderTime: '09:00',
+      tag: task.category,
+      subtasks,
+      linkedPlaylistId: task.linked_playlist_id,
+      proLinkType: task.pro_link_type as any,
+      proLinkValue: task.pro_link_value,
+      goalEnabled: task.goal_enabled,
+      goalType: (task.goal_type as 'timer' | 'count') || 'count',
+      goalTarget: task.goal_target || 2,
+      goalUnit: task.goal_unit || 'times',
+    });
+    setEditActionSheetOpen(true);
+  };
+
+  const editActionMutation = useMutation({
+    mutationFn: async (data: { id: string; formData: TaskFormData }) => {
+      const taskData = {
+        title: data.formData.title,
+        emoji: data.formData.icon,
+        color: data.formData.color,
+        category: data.formData.tag || 'general',
+        repeat_pattern: data.formData.repeatEnabled ? data.formData.repeatPattern : 'none',
+        repeat_interval: data.formData.repeatInterval,
+        repeat_days: data.formData.repeatDays,
+        reminder_enabled: data.formData.reminderEnabled,
+        goal_enabled: data.formData.goalEnabled,
+        goal_type: data.formData.goalEnabled ? data.formData.goalType : null,
+        goal_target: data.formData.goalEnabled ? data.formData.goalTarget : null,
+        goal_unit: data.formData.goalEnabled ? data.formData.goalUnit : null,
+        pro_link_type: data.formData.proLinkType,
+        pro_link_value: data.formData.proLinkValue,
+        linked_playlist_id: data.formData.proLinkType === 'playlist' ? data.formData.proLinkValue : data.formData.linkedPlaylistId,
+        tag: data.formData.tag,
+        description: data.formData.description || null,
+        time_period: data.formData.timePeriod || null,
+      };
+
+      const { error } = await supabase.from('admin_task_bank').update(taskData).eq('id', data.id);
+      if (error) throw error;
+
+      // Replace subtasks
+      await supabase.from('admin_task_bank_subtasks').delete().eq('task_id', data.id);
+      if (data.formData.subtasks && data.formData.subtasks.length > 0) {
+        const subtaskRecords = data.formData.subtasks.map((title, index) => ({
+          task_id: data.id,
+          title,
+          order_index: index,
+        }));
+        await supabase.from('admin_task_bank_subtasks').insert(subtaskRecords);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-task-bank-for-picker'] });
+      // Update local task list with new data
+      if (editActionTaskBankId) {
+        supabase.from('admin_task_bank').select('*').eq('id', editActionTaskBankId).single().then(({ data: updated }) => {
+          if (updated) {
+            setLocalTasks(prev => prev.map(t => t.task_id === editActionTaskBankId
+              ? { ...t, title: updated.title, emoji: updated.emoji, color: updated.color }
+              : t
+            ));
+          }
+        });
+      }
+      toast.success('Action updated');
+      setEditActionSheetOpen(false);
+      setEditActionTaskBankId(null);
+    },
+    onError: (error) => {
+      toast.error('Failed to update: ' + error.message);
+    },
+  });
+
+  const handleEditActionSave = (formData: TaskFormData) => {
+    if (!editActionTaskBankId) return;
+    editActionMutation.mutate({ id: editActionTaskBankId, formData });
   };
 
   const removeTask = (taskId: string) => {
@@ -1632,14 +1751,14 @@ export default function RoutinesBank() {
                             </Select>
                           )}
                           {task.task_id && (
-                            <a
-                              href={`/admin/tasks-bank?edit=${task.task_id}`}
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); openEditActionSheet(task.task_id!); }}
                               className="p-1 text-muted-foreground hover:text-foreground rounded hover:bg-accent"
-                              title="Edit action in task bank"
-                              onClick={(e) => e.stopPropagation()}
+                              title="Edit action"
                             >
                               <Pencil className="h-3 w-3" />
-                            </a>
+                            </button>
                           )}
                           <button type="button" onClick={() => removeTask(task.id)} className="p-1 text-destructive hover:bg-destructive/10 rounded">
                             <X className="h-3 w-3" />
@@ -1898,6 +2017,17 @@ export default function RoutinesBank() {
         }}
         onSaveSheet={handleCreateActionSave}
       />
+
+      {/* Edit Action Sheet */}
+      {editActionInitialData && (
+        <AppTaskCreate
+          isSheet={true}
+          sheetOpen={editActionSheetOpen}
+          onSheetOpenChange={setEditActionSheetOpen}
+          initialData={editActionInitialData}
+          onSaveSheet={handleEditActionSave}
+        />
+      )}
     </Card>
   );
 }
