@@ -144,7 +144,7 @@ export default function AppInspire() {
           )}
 
           {/* Promo Banner - Under Categories */}
-          <PromoBanner location="routines_after_categories" className="px-4 pb-2" />
+          <PromoBanner location="routines_after_categories" className="px-4 pb-2" carousel />
 
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
