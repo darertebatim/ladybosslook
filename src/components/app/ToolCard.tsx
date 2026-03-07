@@ -151,15 +151,15 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
             </span>
           )}
         </div>
+        {isPremiumTool && (
+          <div className="absolute -top-2 -left-1 z-10 inline-flex items-center gap-0.5 text-[8px] font-bold text-amber-700 bg-amber-200 px-1.5 py-0.5 rounded-full shadow-sm">
+            <Crown className="h-2.5 w-2.5" /> PLUS
+          </div>
+        )}
         {isLocked && (
-          <>
-            <div className="absolute -top-2 -left-1 z-10 inline-flex items-center gap-0.5 text-[8px] font-bold text-amber-700 bg-amber-200 px-1.5 py-0.5 rounded-full shadow-sm">
-              <Crown className="h-2.5 w-2.5" /> PLUS
-            </div>
-            <div className="ml-auto flex-shrink-0 p-1.5 rounded-full bg-amber-100">
-              <FluentEmoji emoji="🔒" size={18} />
-            </div>
-          </>
+          <div className="ml-auto flex-shrink-0 p-1.5 rounded-full bg-amber-100">
+            <FluentEmoji emoji="🔒" size={18} />
+          </div>
         )}
       </button>
       <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
