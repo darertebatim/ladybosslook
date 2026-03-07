@@ -5,6 +5,8 @@ import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { useBilingualText } from '@/components/ui/BilingualText';
+import { cn } from '@/lib/utils';
 
 export default function AppReflectionFlow() {
   const { reflectionId } = useParams<{ reflectionId: string }>();
