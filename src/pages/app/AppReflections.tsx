@@ -33,7 +33,7 @@ export default function AppReflections() {
   const { isSubscribed } = useSubscription();
 
   // Add to routines state (page-level)
-  const { data: existingPageTask } = useExistingProTask('reflection');
+  const { data: existingPageTask } = useExistingProTask('reflection', null, true);
   const addRoutinePlan = useAddRoutinePlan();
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
