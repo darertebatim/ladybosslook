@@ -85,7 +85,8 @@ export function PromoBanner({
   location = 'home_top', 
   currentPlaylistId,
   className,
-  onVisibilityChange
+  onVisibilityChange,
+  carousel = false,
 }: PromoBannerProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
