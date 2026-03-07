@@ -1751,14 +1751,14 @@ export default function RoutinesBank() {
                             </Select>
                           )}
                           {task.task_id && (
-                            <a
-                              href={`/admin/tasks-bank?edit=${task.task_id}`}
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); openEditActionSheet(task.task_id!); }}
                               className="p-1 text-muted-foreground hover:text-foreground rounded hover:bg-accent"
-                              title="Edit action in task bank"
-                              onClick={(e) => e.stopPropagation()}
+                              title="Edit action"
                             >
                               <Pencil className="h-3 w-3" />
-                            </a>
+                            </button>
                           )}
                           <button type="button" onClick={() => removeTask(task.id)} className="p-1 text-destructive hover:bg-destructive/10 rounded">
                             <X className="h-3 w-3" />
