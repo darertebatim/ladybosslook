@@ -453,11 +453,11 @@ function YesNoScreen({ step, onNext, onAnswer }: Props) {
   };
   return (
     <div className="h-full flex flex-col bg-white">
-      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 px-5 pt-4">
-        <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-1 mt-2 leading-tight">{step.title}</h1></FadeUp>
-        <FadeUp delay={0.1} className="flex items-center justify-center">
+      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 px-5 pt-4 flex flex-col justify-center items-center">
+        <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight">{step.title}</h1></FadeUp>
+        <FadeUp delay={0.1} className="w-full flex items-center justify-center">
           {step.image ? (
-            <img src={step.image} alt="" className="w-full max-h-[40vh] object-contain rounded-2xl" />
+            <img src={step.image} alt="" className="w-full max-h-[45vh] object-contain rounded-2xl" />
           ) : (
             <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-48" />
           )}
@@ -478,11 +478,11 @@ function DoYouWantScreen({ step, onNext, onAnswer }: Props) {
   };
   return (
     <div className="h-full flex flex-col bg-white">
-      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 px-5 pt-4">
-        <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1></FadeUp>
-        <FadeUp delay={0.1} className="flex items-center justify-center">
+      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 px-5 pt-4 flex flex-col justify-center items-center">
+        <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-4">{step.title}</h1></FadeUp>
+        <FadeUp delay={0.1} className="w-full flex items-center justify-center">
           {step.image ? (
-            <img src={step.image} alt="" className="w-full max-h-[40vh] object-contain rounded-2xl" />
+            <img src={step.image} alt="" className="w-full max-h-[45vh] object-contain rounded-2xl" />
           ) : (
             <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-48" />
           )}
