@@ -124,7 +124,7 @@ export function RoutineBankCard({
         )}
 
         {/* Square Image Container */}
-        <div className="relative aspect-square w-full overflow-hidden rounded-b-2xl">
+        <div className={cn("relative aspect-square w-full overflow-hidden", coverOnly ? "rounded-2xl" : "rounded-b-2xl")}>
           {routine.cover_image_url ? (
             <CachedImage
               src={routine.cover_image_url}
