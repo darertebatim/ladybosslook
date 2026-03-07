@@ -987,7 +987,7 @@ const AppHome = () => {
               {selectedTag === null && !showWelcomeCard && <div className="tour-suggested-routine mt-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 text-violet-500" />
+                      <CalendarPlus className="h-4 w-4 text-violet-500" />
                       <h2 className="text-sm font-semibold text-foreground/70 tracking-wide">
                         Try a routine
                       </h2>
