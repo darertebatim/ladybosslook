@@ -156,9 +156,9 @@ export default function AppReflectionNotes() {
                     </div>
                   </div>
                   {item.first_question && (
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {item.first_question}  {item.first_answer || ''}
-                    </p>
+                    <BilingualText as="p" className="text-sm text-muted-foreground line-clamp-2">
+                      {`${item.first_question}  ${item.first_answer || ''}`}
+                    </BilingualText>
                   )}
                 </button>
               ))}
