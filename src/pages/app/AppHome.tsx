@@ -950,7 +950,7 @@ const AppHome = () => {
                             <SortableTaskList tasks={[filteredTasks[0]]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                             {/* Pointing finger centered on the card */}
                             <div className="flex justify-center -mt-12 animate-bounce">
-                              <span className="text-8xl" style={{ transform: 'rotate(-45deg)', display: 'inline-block' }}>☝️</span>
+                              <span className="text-8xl" style={{ transform: 'rotate(135deg)', display: 'inline-block' }}>☝️</span>
                             </div>
                             <p className="text-center text-sm text-white/90 mt-1 mb-2 animate-fade-in font-medium">
                               Tap on an action to edit, skip, or delete it
