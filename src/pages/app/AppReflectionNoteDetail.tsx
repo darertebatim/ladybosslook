@@ -110,6 +110,9 @@ export default function AppReflectionNoteDetail() {
     deleteMutation.mutate();
   };
 
+  // Bilingual detection for edit textarea
+  const { className: editBiClassName, direction: editDir } = useBilingualText(editText);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
