@@ -11,6 +11,7 @@ import {
   usePopularRoutinesBank,
 } from '@/hooks/useRoutinesBank';
 import { RoutinesTour, TourHelpButton } from '@/components/app/tour';
+import { PromoBanner } from '@/components/app/PromoBanner';
 
 export default function AppInspire() {
   const navigate = useNavigate();
