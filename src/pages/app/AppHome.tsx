@@ -1011,7 +1011,7 @@ const AppHome = () => {
                         <RoutineBankCard
                           routine={routine}
                           onClick={() => navigate(`/app/routines/${routine.id}`)}
-                          compact
+                          coverOnly
                         />
                       </div>
                     ))}
