@@ -638,6 +638,7 @@ export default function RoutinesBank() {
       task_id: task.id,
       title: task.title,
       emoji: task.emoji,
+      color: task.color || 'sky',
       section_id: sectionId,
       task_order: localTasks.filter(t => t.section_id === sectionId).length,
       schedule_days: [],
