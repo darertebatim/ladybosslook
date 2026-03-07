@@ -93,8 +93,8 @@ export default function AppReflections() {
               >
                 <div className="flex items-center">
                   <div className="flex-1 p-4">
-                    <p className="font-bold text-base leading-tight text-foreground">{r.title}</p>
-                    {r.subtitle && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{r.subtitle}</p>}
+                    <BilingualText as="p" className="font-bold text-base leading-tight text-foreground">{r.title}</BilingualText>
+                    {r.subtitle && <BilingualText as="p" className="text-sm text-muted-foreground mt-1 line-clamp-2">{r.subtitle}</BilingualText>}
                   </div>
                   {r.cover_image_url && (
                     <div className="w-28 h-28 shrink-0">
