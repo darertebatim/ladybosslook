@@ -33,6 +33,8 @@ interface PromoBannerProps {
   currentPlaylistId?: string;
   className?: string;
   onVisibilityChange?: (visible: boolean) => void;
+  /** Show all eligible banners in a carousel instead of one at a time */
+  carousel?: boolean;
 }
 
 const STORAGE_KEY = 'promo_banner_dismissals';
