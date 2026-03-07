@@ -5,6 +5,7 @@ import './index.css'
 import { Capacitor } from '@capacitor/core';
 import { initializePushNotificationHandlers, clearBadge } from './lib/pushNotifications';
 import { logBuildInfo } from './lib/buildInfo';
+import { initAppsFlyer } from './lib/appsflyer';
 
 // Global error handler to catch any uncaught errors
 window.onerror = (message, source, lineno, colno, error) => {
@@ -58,6 +59,13 @@ async function initializeNative() {
     console.log('[Main] ✓ Push handlers initialized');
   } catch (e) {
     console.warn('[Main] Push init failed:', e);
+  }
+  
+  // AppsFlyer SDK
+  try {
+    await initAppsFlyer();
+  } catch (e) {
+    console.warn('[Main] AppsFlyer init failed:', e);
   }
 }
 
