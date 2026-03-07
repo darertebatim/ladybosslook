@@ -325,7 +325,6 @@ export function PromoBanner({
       case 'period': navigate('/app/period'); break;
       case 'chat': navigate('/app/chat'); break;
       case 'profile': navigate('/app/profile'); break;
-      case 'planner': navigate('/app/home'); break;
       case 'custom_url':
         if (banner.custom_url) {
           banner.custom_url.startsWith('http') ? window.open(banner.custom_url, '_blank') : navigate(banner.custom_url);
