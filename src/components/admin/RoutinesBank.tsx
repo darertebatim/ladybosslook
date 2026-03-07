@@ -1634,13 +1634,11 @@ export default function RoutinesBank() {
                           {task.task_id && (
                             <a
                               href={`/admin/tasks-bank?edit=${task.task_id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
                               className="p-1 text-muted-foreground hover:text-foreground rounded hover:bg-accent"
                               title="Edit action in task bank"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              <ExternalLink className="h-3 w-3" />
+                              <Pencil className="h-3 w-3" />
                             </a>
                           )}
                           <button type="button" onClick={() => removeTask(task.id)} className="p-1 text-destructive hover:bg-destructive/10 rounded">
