@@ -13,6 +13,8 @@ interface RoutineBankCardProps {
   onClick?: () => void;
   onDismiss?: () => void;
   variant?: 'default' | 'compact';
+  /** Show only square cover image with badge, no title header */
+  coverOnly?: boolean;
   className?: string;
 }
 
