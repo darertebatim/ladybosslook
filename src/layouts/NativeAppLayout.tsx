@@ -52,29 +52,12 @@ const NativeAppLayout = () => {
   // Comprehensive cleanup of stale/legacy local notifications (runs first, before schedulers)
   useNotificationCleanup();
 
-  // Defer non-critical hooks to free main thread during initial render
+  // Defer non-critical hooks — mount DeferredLayoutHooks after 5s delay
   const [deferredReady, setDeferredReady] = useState(false);
   useEffect(() => {
     const timer = setTimeout(() => setDeferredReady(true), 5000);
     return () => clearTimeout(timer);
   }, []);
-
-  // These hooks only run after 5s delay
-  useEffect(() => {
-    if (!deferredReady || !user?.id) return;
-    // Dynamic imports to avoid loading these modules on initial render
-    Promise.all([
-      import('@/hooks/useAppInstallTracking'),
-      import('@/hooks/useAppsFlyerTracking'),
-      import('@/hooks/useLocalNotificationScheduler'),
-      import('@/hooks/useHybridNotificationScheduler'),
-      import('@/hooks/useProgramEventNotificationScheduler'),
-      import('@/hooks/useSmartActionNudges'),
-      import('@/hooks/usePeriodNotifications'),
-    ]).then(() => {
-      console.log('[Layout] Deferred hooks modules loaded');
-    });
-  }, [deferredReady, user?.id]);
   
   // Custom hooks after useState declarations
   const { unreadCount } = useUnreadChat();
