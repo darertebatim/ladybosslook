@@ -212,7 +212,7 @@ export default function RoutinesBank() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('admin_task_bank')
-        .select('id, title, emoji, category, is_active, repeat_pattern')
+        .select('id, title, emoji, category, color, is_active, repeat_pattern')
         .eq('is_active', true)
         .order('title', { ascending: true });
       if (error) throw error;
