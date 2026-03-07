@@ -111,15 +111,17 @@ export function RoutineBankCard({
         )}
         onClick={handleClick}
       >
-        {/* Title Header Section */}
-        <div className={cn(
-          'px-3 py-3 rounded-t-2xl h-[3.75rem] flex items-start',
-          bgColor
-        )}>
-          <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
-            {routine.title}
-          </h3>
-        </div>
+        {/* Title Header Section - hidden in coverOnly mode */}
+        {!coverOnly && (
+          <div className={cn(
+            'px-3 py-3 rounded-t-2xl h-[3.75rem] flex items-start',
+            bgColor
+          )}>
+            <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
+              {routine.title}
+            </h3>
+          </div>
+        )}
 
         {/* Square Image Container */}
         <div className="relative aspect-square w-full overflow-hidden rounded-b-2xl">
