@@ -120,9 +120,9 @@ export default function AppReflectionFlow() {
 
       {/* Content */}
       <div className="flex-1 flex flex-col px-6 py-6 overflow-y-auto overscroll-contain">
-        <p className="text-xl font-bold leading-snug text-justify">{page?.content}</p>
+        <p className={cn("text-xl font-bold leading-snug text-justify", contentBilingualClassName)} dir={contentDirection}>{page?.content}</p>
         {page?.description && (
-          <p className="mt-4 text-sm text-foreground leading-relaxed whitespace-pre-line text-justify">{page.description}</p>
+          <p className={cn("mt-4 text-sm text-foreground leading-relaxed whitespace-pre-line text-justify", descBilingualClassName)} dir={descDirection}>{page.description}</p>
         )}
 
         {page?.type === 'question' && (
@@ -131,7 +131,11 @@ export default function AppReflectionFlow() {
             value={answers[page.id] || ''}
             onChange={(e) => setAnswers((prev) => ({ ...prev, [page.id]: e.target.value }))}
             placeholder="Type your answer…"
-            className="mt-6 w-full bg-transparent border-0 border-b-2 border-muted-foreground/20 focus:border-primary outline-none resize-none text-base min-h-[120px] placeholder:text-muted-foreground/50 transition-colors"
+            className={cn(
+              "mt-6 w-full bg-transparent border-0 border-b-2 border-muted-foreground/20 focus:border-primary outline-none resize-none text-base min-h-[120px] placeholder:text-muted-foreground/50 transition-colors",
+              answerBilingualClassName
+            )}
+            dir={answerDirection}
           />
         )}
       </div>
