@@ -107,7 +107,7 @@ export const AddedToRoutineButton = ({
 
   if (isAdded) {
     return (
-      <div className={cn("flex items-center gap-2", className)}>
+      <div className="flex items-center gap-2">
         {/* Main "Added — Go to Planner" button */}
         <Button
           variant={variant === 'outline' ? 'outline' : 'ghost'}
