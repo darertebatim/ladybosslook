@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -68,6 +69,7 @@ interface AdminSettings {
 
 export default function TasksBank() {
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<TaskBankItem | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -137,7 +139,20 @@ export default function TasksBank() {
     },
   });
 
-  // Quick toggle for is_popular
+  // Auto-open edit sheet from ?edit=taskId query param
+  useEffect(() => {
+    const editId = searchParams.get('edit');
+    if (editId && tasks.length > 0 && !sheetOpen) {
+      const task = tasks.find(t => t.id === editId);
+      if (task) {
+        openEditSheet(task);
+        // Clear the query param
+        setSearchParams({}, { replace: true });
+      }
+    }
+  }, [searchParams, tasks]);
+
+
   const togglePopular = useMutation({
     mutationFn: async ({ id, is_popular }: { id: string; is_popular: boolean }) => {
       const { error } = await supabase
