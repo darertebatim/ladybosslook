@@ -5,6 +5,8 @@ import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { useBilingualText } from '@/components/ui/BilingualText';
+import { cn } from '@/lib/utils';
 
 export default function AppReflectionFlow() {
   const { reflectionId } = useParams<{ reflectionId: string }>();
@@ -21,6 +23,11 @@ export default function AppReflectionFlow() {
   const page = pages?.[currentIndex];
   const isLast = currentIndex === totalPages - 1;
   const progress = totalPages > 0 ? ((currentIndex + 1) / totalPages) * 100 : 0;
+
+  const currentAnswer = answers[page?.id || ''] || '';
+  const { className: contentBilingualClassName, direction: contentDirection } = useBilingualText(page?.content || '');
+  const { className: descBilingualClassName, direction: descDirection } = useBilingualText(page?.description || '');
+  const { className: answerBilingualClassName, direction: answerDirection } = useBilingualText(currentAnswer);
 
   // Auto-focus textarea on question pages
   useEffect(() => {
@@ -113,9 +120,9 @@ export default function AppReflectionFlow() {
 
       {/* Content */}
       <div className="flex-1 flex flex-col px-6 py-6 overflow-y-auto overscroll-contain">
-        <p className="text-xl font-bold leading-snug text-justify">{page?.content}</p>
+        <p className={cn("text-xl font-bold leading-snug text-justify", contentBilingualClassName)} dir={contentDirection}>{page?.content}</p>
         {page?.description && (
-          <p className="mt-4 text-sm text-foreground leading-relaxed whitespace-pre-line text-justify">{page.description}</p>
+          <p className={cn("mt-4 text-sm text-foreground leading-relaxed whitespace-pre-line text-justify", descBilingualClassName)} dir={descDirection}>{page.description}</p>
         )}
 
         {page?.type === 'question' && (
@@ -124,7 +131,11 @@ export default function AppReflectionFlow() {
             value={answers[page.id] || ''}
             onChange={(e) => setAnswers((prev) => ({ ...prev, [page.id]: e.target.value }))}
             placeholder="Type your answer…"
-            className="mt-6 w-full bg-transparent border-0 border-b-2 border-muted-foreground/20 focus:border-primary outline-none resize-none text-base min-h-[120px] placeholder:text-muted-foreground/50 transition-colors"
+            className={cn(
+              "mt-6 w-full bg-transparent border-0 border-b-2 border-muted-foreground/20 focus:border-primary outline-none resize-none text-base min-h-[120px] placeholder:text-muted-foreground/50 transition-colors",
+              answerBilingualClassName
+            )}
+            dir={answerDirection}
           />
         )}
       </div>
