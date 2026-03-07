@@ -149,7 +149,7 @@ export default function AppReflectionNotes() {
                       <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center text-lg">📝</div>
                     )}
                     <div>
-                      <p className="font-semibold text-sm">{item.reflection_title}</p>
+                      <BilingualText as="p" className="font-semibold text-sm">{item.reflection_title}</BilingualText>
                       <p className="text-xs text-muted-foreground">
                         {format(new Date(item.completed_at), 'MMM d, yyyy • hh:mm a')}
                       </p>
