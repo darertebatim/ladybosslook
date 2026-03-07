@@ -442,22 +442,28 @@ export function PromoBannerManager() {
   const getDestinationLabel = (banner: PromoBanner) => {
     switch (banner.destination_type) {
       case 'routine':
+      case 'routines_hub': {
+        const routineBank = routinesBank?.find(r => r.id === banner.destination_id);
+        if (routineBank) return `${routineBank.emoji || '📋'} ${routineBank.title}`;
         const routine = routines?.find(r => r.id === banner.destination_id);
         return routine?.title || 'Unknown Routine';
-      case 'playlist':
+      }
+      case 'playlist': {
         const playlist = playlists?.find(p => p.id === banner.destination_id);
         return playlist?.name || 'Unknown Playlist';
-      case 'tasks':
+      }
+      case 'tasks': {
         const task = taskTemplates?.find(t => t.id === banner.destination_id);
         return task ? `${task.emoji} ${task.title}` : 'Unknown Action';
-      case 'routines_hub':
-        const routineBank = routinesBank?.find(r => r.id === banner.destination_id);
-        return routineBank ? `${routineBank.emoji || '📋'} ${routineBank.title}` : 'Unknown Routine';
-      case 'breathe_exercise':
+      }
+      case 'breathe_exercise': {
         const exercise = breathingExercises?.find(e => e.id === banner.destination_id);
         return exercise ? `${exercise.emoji || '🫁'} ${exercise.name}` : 'Unknown Exercise';
+      }
       case 'tasks_bank':
-        return 'Actions Bank Page';
+      case 'planner':
+      case 'home':
+        return 'Home / Action Planner';
       case 'journal':
         return 'Journal';
       case 'programs':
@@ -468,10 +474,8 @@ export function PromoBannerManager() {
         return 'Water Tracking';
       case 'channels':
         return 'Feed / Channels';
-      case 'home':
-        return 'Home Page';
       case 'inspire':
-        return 'Explore / Routines';
+        return 'Routines Hub';
       case 'emotion':
         return 'Emotion Tracker';
       case 'period':
@@ -480,8 +484,6 @@ export function PromoBannerManager() {
         return 'Chat / Support';
       case 'profile':
         return 'Profile / Settings';
-      case 'planner':
-        return 'Action Planner';
       case 'custom_url':
         return banner.custom_url || 'Custom URL';
       case 'external_url':
