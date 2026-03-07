@@ -730,7 +730,7 @@ export function PromoBannerManager() {
               {['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType) && (
                 <div className="space-y-2">
                   <Label>
-                    {destinationType === 'routine' && 'Select Routine Plan'}
+                    {destinationType === 'routines_hub' && 'Select Routine'}
                     {destinationType === 'playlist' && 'Select Playlist'}
                     {destinationType === 'tasks' && 'Select Action Template'}
                     {destinationType === 'routines_hub' && 'Select Routine from Bank'}
