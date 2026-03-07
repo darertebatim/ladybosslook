@@ -817,8 +817,19 @@ export default function RoutinesBank() {
       if (editActionTaskBankId) {
         supabase.from('admin_task_bank').select('*').eq('id', editActionTaskBankId).single().then(({ data: updated }) => {
           if (updated) {
+            const rp = updated.repeat_pattern;
+            const isOnce = rp === 'none';
+            const isWeekly = rp === 'weekly';
             setLocalTasks(prev => prev.map(t => t.task_id === editActionTaskBankId
-              ? { ...t, title: updated.title, emoji: updated.emoji, color: updated.color }
+              ? {
+                  ...t,
+                  title: updated.title,
+                  emoji: updated.emoji,
+                  color: updated.color,
+                  is_once: isOnce,
+                  schedule_days: isWeekly ? (updated.repeat_days || []) : [],
+                  monthly_day: rp === 'monthly' ? 1 : null,
+                }
               : t
             ));
           }
