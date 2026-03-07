@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import useEmblaCarousel from 'embla-carousel-react';
+import { cn } from '@/lib/utils';
 
 type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch' | 'routines_top' | 'routines_after_categories';
 
@@ -31,6 +33,8 @@ interface PromoBannerProps {
   currentPlaylistId?: string;
   className?: string;
   onVisibilityChange?: (visible: boolean) => void;
+  /** Show all eligible banners in a carousel instead of one at a time */
+  carousel?: boolean;
 }
 
 const STORAGE_KEY = 'promo_banner_dismissals';
@@ -81,7 +85,8 @@ export function PromoBanner({
   location = 'home_top', 
   currentPlaylistId,
   className,
-  onVisibilityChange
+  onVisibilityChange,
+  carousel = false,
 }: PromoBannerProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -354,9 +359,20 @@ export function PromoBanner({
     onVisibilityChange?.(isVisible);
   }, [isVisible, onVisibilityChange]);
 
-  if (!isVisible) return null;
+  // Carousel mode: show all eligible banners with swipe & dots
+  if (carousel && eligibleBanners.length > 1) {
+    return (
+      <PromoBannerCarousel
+        banners={eligibleBanners}
+        className={className}
+        getAspectRatioClass={getAspectRatioClass}
+        onTap={handleTap}
+        onDismiss={handleDismiss}
+      />
+    );
+  }
 
-  // Show only the first eligible banner; once dismissed the next one appears
+  // Single banner mode (default): show first eligible, next appears on dismiss
   const banner = eligibleBanners[0];
 
   return (
@@ -379,6 +395,79 @@ export function PromoBanner({
             <X className="h-4 w-4 text-white" />
           </button>
         )}
+      </div>
+    </div>
+  );
+}
+
+// --- Carousel sub-component ---
+
+function PromoBannerCarousel({
+  banners,
+  className,
+  getAspectRatioClass,
+  onTap,
+  onDismiss,
+}: {
+  banners: PromoBannerData[];
+  className?: string;
+  getAspectRatioClass: (ratio?: string) => string;
+  onTap: (banner: PromoBannerData) => void;
+  onDismiss: (e: React.MouseEvent, banner: PromoBannerData) => void;
+}) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'center' });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
+    emblaApi.on('select', onSelect);
+    onSelect();
+    return () => { emblaApi.off('select', onSelect); };
+  }, [emblaApi]);
+
+  return (
+    <div className={className || "px-4 py-2"}>
+      <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
+        <div className="flex">
+          {banners.map((banner) => (
+            <div
+              key={banner.id}
+              className="relative min-w-0 flex-[0_0_100%] cursor-pointer active:scale-[0.98] transition-transform"
+              onClick={() => onTap(banner)}
+            >
+              <img
+                src={banner.cover_image_url}
+                alt="Promo"
+                className={`w-full ${getAspectRatioClass(banner.aspect_ratio)} object-cover`}
+              />
+              {banner.display_frequency !== 'forever' && (
+                <button
+                  onClick={(e) => onDismiss(e, banner)}
+                  className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 flex items-center justify-center active:scale-90 transition-transform"
+                >
+                  <X className="h-4 w-4 text-white" />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Dots */}
+      <div className="flex justify-center gap-1.5 mt-2">
+        {banners.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => emblaApi?.scrollTo(index)}
+            className={cn(
+              "h-1.5 rounded-full transition-all",
+              index === selectedIndex
+                ? "w-4 bg-foreground/70"
+                : "w-1.5 bg-foreground/20"
+            )}
+          />
+        ))}
       </div>
     </div>
   );
