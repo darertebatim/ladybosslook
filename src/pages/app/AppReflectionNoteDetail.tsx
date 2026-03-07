@@ -171,9 +171,9 @@ export default function AppReflectionNoteDetail() {
                 className="py-5 first:pt-0 w-full text-left active:bg-muted/50 transition-colors rounded-lg"
                 onClick={() => handleEdit(idx)}
               >
-                <p className="text-base text-muted-foreground leading-relaxed">{qa.question}</p>
+                <BilingualText as="p" className="text-base text-muted-foreground leading-relaxed">{qa.question}</BilingualText>
                 {qa.answer && (
-                  <p className="mt-2 text-base font-medium">{qa.answer}</p>
+                  <BilingualText as="p" className="mt-2 text-base font-medium">{qa.answer}</BilingualText>
                 )}
               </button>
             ))}
