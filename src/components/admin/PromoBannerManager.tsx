@@ -277,7 +277,7 @@ export function PromoBannerManager() {
   // Create banner mutation
   const createMutation = useMutation({
     mutationFn: async () => {
-      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType);
+      const needsDestinationId = ['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType);
       const needsCustomUrl = ['custom_url', 'external_url'].includes(destinationType);
       if (needsDestinationId && !destinationId) {
         throw new Error(`Please select a ${destinationType.replace('_', ' ')} before saving`);
@@ -319,7 +319,7 @@ export function PromoBannerManager() {
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!editingBanner) return;
-      const needsDestinationId = ['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType);
+      const needsDestinationId = ['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType);
       const needsCustomUrl = ['custom_url', 'external_url'].includes(destinationType);
       if (needsDestinationId && !destinationId) {
         throw new Error(`Please select a ${destinationType.replace('_', ' ')} before saving`);
@@ -442,22 +442,28 @@ export function PromoBannerManager() {
   const getDestinationLabel = (banner: PromoBanner) => {
     switch (banner.destination_type) {
       case 'routine':
+      case 'routines_hub': {
+        const routineBank = routinesBank?.find(r => r.id === banner.destination_id);
+        if (routineBank) return `${routineBank.emoji || '📋'} ${routineBank.title}`;
         const routine = routines?.find(r => r.id === banner.destination_id);
         return routine?.title || 'Unknown Routine';
-      case 'playlist':
+      }
+      case 'playlist': {
         const playlist = playlists?.find(p => p.id === banner.destination_id);
         return playlist?.name || 'Unknown Playlist';
-      case 'tasks':
+      }
+      case 'tasks': {
         const task = taskTemplates?.find(t => t.id === banner.destination_id);
         return task ? `${task.emoji} ${task.title}` : 'Unknown Action';
-      case 'routines_hub':
-        const routineBank = routinesBank?.find(r => r.id === banner.destination_id);
-        return routineBank ? `${routineBank.emoji || '📋'} ${routineBank.title}` : 'Unknown Routine';
-      case 'breathe_exercise':
+      }
+      case 'breathe_exercise': {
         const exercise = breathingExercises?.find(e => e.id === banner.destination_id);
         return exercise ? `${exercise.emoji || '🫁'} ${exercise.name}` : 'Unknown Exercise';
+      }
       case 'tasks_bank':
-        return 'Actions Bank Page';
+      case 'planner':
+      case 'home':
+        return 'Home / Action Planner';
       case 'journal':
         return 'Journal';
       case 'programs':
@@ -468,10 +474,8 @@ export function PromoBannerManager() {
         return 'Water Tracking';
       case 'channels':
         return 'Feed / Channels';
-      case 'home':
-        return 'Home Page';
       case 'inspire':
-        return 'Explore / Routines';
+        return 'Routines Hub';
       case 'emotion':
         return 'Emotion Tracker';
       case 'period':
@@ -480,8 +484,6 @@ export function PromoBannerManager() {
         return 'Chat / Support';
       case 'profile':
         return 'Profile / Settings';
-      case 'planner':
-        return 'Action Planner';
       case 'custom_url':
         return banner.custom_url || 'Custom URL';
       case 'external_url':
@@ -700,13 +702,10 @@ export function PromoBannerManager() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="home">🏠 Home</SelectItem>
-                    <SelectItem value="inspire">✨ Explore / Routines Hub</SelectItem>
-                    <SelectItem value="routine">📋 Routine Plan (specific)</SelectItem>
-                    <SelectItem value="routines_hub">📚 Routine Bank (specific)</SelectItem>
-                    <SelectItem value="tasks_bank">📝 Actions Bank Page</SelectItem>
+                    <SelectItem value="home">🏠 Home / Action Planner</SelectItem>
+                    <SelectItem value="inspire">✨ Routines Hub</SelectItem>
+                    <SelectItem value="routines_hub">📋 Routine (specific)</SelectItem>
                     <SelectItem value="tasks">☑️ Action Template (specific)</SelectItem>
-                    <SelectItem value="planner">📅 Action Planner</SelectItem>
                     <SelectItem value="playlist">🎧 Playlist (specific)</SelectItem>
                     <SelectItem value="programs">🎓 Programs / Store</SelectItem>
                     <SelectItem value="journal">📔 Journal</SelectItem>
@@ -730,10 +729,10 @@ export function PromoBannerManager() {
               </div>
 
               {/* Destination ID - for types that need specific selection */}
-              {['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType) && (
+              {['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType) && (
                 <div className="space-y-2">
                   <Label>
-                    {destinationType === 'routine' && 'Select Routine Plan'}
+                    {destinationType === 'routines_hub' && 'Select Routine'}
                     {destinationType === 'playlist' && 'Select Playlist'}
                     {destinationType === 'tasks' && 'Select Action Template'}
                     {destinationType === 'routines_hub' && 'Select Routine from Bank'}

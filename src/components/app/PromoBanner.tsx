@@ -299,9 +299,10 @@ export function PromoBanner({
 
     switch (banner.destination_type) {
       case 'routine':
+      case 'routines_hub':
         if (banner.destination_id) navigate(`/app/routines/${banner.destination_id}`);
+        else navigate('/app/routines');
         break;
-      case 'playlist':
         if (banner.destination_id) navigate(`/app/player/playlist/${banner.destination_id}`);
         break;
       case 'journal': navigate('/app/journal'); break;
@@ -314,17 +315,16 @@ export function PromoBanner({
       case 'tasks':
         navigate(banner.destination_id ? `/app/home/new?template=${banner.destination_id}` : '/app/home');
         break;
-      case 'routines_hub':
-        navigate(banner.destination_id ? `/app/routines/${banner.destination_id}` : '/app/routines');
+      case 'tasks_bank':
+      case 'planner':
+        navigate('/app/home');
         break;
-      case 'tasks_bank': navigate('/app/home'); break;
       case 'breathe_exercise': navigate('/app/breathe'); break;
       case 'emotion': navigate('/app/emotion'); break;
       case 'mood': navigate('/app/mood'); break;
       case 'period': navigate('/app/period'); break;
       case 'chat': navigate('/app/chat'); break;
       case 'profile': navigate('/app/profile'); break;
-      case 'planner': navigate('/app/home'); break;
       case 'custom_url':
         if (banner.custom_url) {
           banner.custom_url.startsWith('http') ? window.open(banner.custom_url, '_blank') : navigate(banner.custom_url);
