@@ -53,6 +53,7 @@ export function RoutineBankCard({
   onClick, 
   onDismiss,
   variant = 'default',
+  coverOnly = false,
   className,
 }: RoutineBankCardProps) {
   const color = routine.color || 'purple';
