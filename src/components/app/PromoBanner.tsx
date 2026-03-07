@@ -375,6 +375,8 @@ export function PromoBanner({
   // Single banner mode (default): show first eligible, next appears on dismiss
   const banner = eligibleBanners[0];
 
+  if (!banner) return null;
+
   return (
     <div className={className || "px-4 py-2"}>
       <div
