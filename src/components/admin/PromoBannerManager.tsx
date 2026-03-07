@@ -700,13 +700,10 @@ export function PromoBannerManager() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="home">🏠 Home</SelectItem>
-                    <SelectItem value="inspire">✨ Explore / Routines Hub</SelectItem>
-                    <SelectItem value="routine">📋 Routine Plan (specific)</SelectItem>
-                    <SelectItem value="routines_hub">📚 Routine Bank (specific)</SelectItem>
-                    <SelectItem value="tasks_bank">📝 Actions Bank Page</SelectItem>
+                    <SelectItem value="home">🏠 Home / Action Planner</SelectItem>
+                    <SelectItem value="inspire">✨ Routines Hub</SelectItem>
+                    <SelectItem value="routines_hub">📋 Routine (specific)</SelectItem>
                     <SelectItem value="tasks">☑️ Action Template (specific)</SelectItem>
-                    <SelectItem value="planner">📅 Action Planner</SelectItem>
                     <SelectItem value="playlist">🎧 Playlist (specific)</SelectItem>
                     <SelectItem value="programs">🎓 Programs / Store</SelectItem>
                     <SelectItem value="journal">📔 Journal</SelectItem>
