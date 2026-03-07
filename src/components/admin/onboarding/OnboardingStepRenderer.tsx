@@ -479,24 +479,26 @@ function DoYouWantScreen({ step, onNext, onAnswer }: Props) {
     onNext();
   };
   return (
-    <ScreenWrapper>
-      <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1></FadeUp>
-      <FadeUp delay={0.1} className="flex-1 flex items-center justify-center min-h-0">
-        {step.image ? (
-          <img src={step.image} alt="" className="w-full max-h-[50vh] object-contain rounded-2xl" />
-        ) : (
-          <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-48" />
-        )}
-      </FadeUp>
-      <FadeUp delay={0.2} className="mt-auto flex gap-3 pt-4">
-        <button onClick={() => handleChoice('No')} className="px-8 py-4 rounded-full border border-gray-300 text-base font-medium text-[#1a1f3d] active:scale-[0.98] transition-all">
+    <div className="h-full flex flex-col bg-white">
+      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 px-5 pt-4">
+        <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1></FadeUp>
+        <FadeUp delay={0.1} className="flex items-center justify-center">
+          {step.image ? (
+            <img src={step.image} alt="" className="w-full max-h-[45vh] object-contain rounded-2xl" />
+          ) : (
+            <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-48" />
+          )}
+        </FadeUp>
+      </div>
+      <FadeUp delay={0.2} className="shrink-0 flex gap-3 px-5 py-4">
+        <button onClick={() => handleChoice('No')} className="flex-1 py-4 rounded-full border border-gray-300 text-base font-medium text-[#1a1f3d] active:scale-[0.98] transition-all">
           {step.secondaryButtonLabel}
         </button>
         <button onClick={() => handleChoice('Yes')} className="flex-1 py-4 rounded-full bg-[#1a1f3d] text-white font-bold text-base active:scale-[0.98] transition-all">
           {step.buttonLabel}
         </button>
       </FadeUp>
-    </ScreenWrapper>
+    </div>
   );
 }
 
