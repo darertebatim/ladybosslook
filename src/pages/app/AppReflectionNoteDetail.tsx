@@ -192,8 +192,9 @@ export default function AppReflectionNoteDetail() {
           <Textarea
             value={editText}
             onChange={(e) => setEditText(e.target.value)}
-            className="min-h-[120px]"
-            placeholder="Type your answer…"
+            className="min-h-[120px] text-right font-farsi"
+            dir="rtl"
+            placeholder="پاسخ خود را بنویسید…"
           />
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditingIdx(null)}>Cancel</Button>
