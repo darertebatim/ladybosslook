@@ -19,6 +19,11 @@ export default function AppReflectionFlow() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const currentAnswer = answers[page?.id || ''] || '';
+  const { className: contentBilingualClassName, direction: contentDirection } = useBilingualText(page?.content || '');
+  const { className: descBilingualClassName, direction: descDirection } = useBilingualText(page?.description || '');
+  const { className: answerBilingualClassName, direction: answerDirection } = useBilingualText(currentAnswer);
+
   const totalPages = pages?.length || 0;
   const page = pages?.[currentIndex];
   const isLast = currentIndex === totalPages - 1;
