@@ -139,7 +139,20 @@ export default function TasksBank() {
     },
   });
 
-  // Quick toggle for is_popular
+  // Auto-open edit sheet from ?edit=taskId query param
+  useEffect(() => {
+    const editId = searchParams.get('edit');
+    if (editId && tasks.length > 0 && !sheetOpen) {
+      const task = tasks.find(t => t.id === editId);
+      if (task) {
+        openEditSheet(task);
+        // Clear the query param
+        setSearchParams({}, { replace: true });
+      }
+    }
+  }, [searchParams, tasks]);
+
+
   const togglePopular = useMutation({
     mutationFn: async ({ id, is_popular }: { id: string; is_popular: boolean }) => {
       const { error } = await supabase
