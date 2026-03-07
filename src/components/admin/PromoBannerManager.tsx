@@ -727,7 +727,7 @@ export function PromoBannerManager() {
               </div>
 
               {/* Destination ID - for types that need specific selection */}
-              {['routine', 'playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType) && (
+              {['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType) && (
                 <div className="space-y-2">
                   <Label>
                     {destinationType === 'routines_hub' && 'Select Routine'}
