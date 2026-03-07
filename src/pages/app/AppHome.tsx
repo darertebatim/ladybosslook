@@ -1005,12 +1005,13 @@ const AppHome = () => {
                       All <ChevronRight className="h-3.5 w-3.5" />
                     </button>
                   </div>
-                  <div className="flex gap-3 overflow-x-auto pt-3 pb-2 scrollbar-hide">
+                  <div className="flex gap-3 overflow-x-auto pt-3 pb-2 pl-1 scrollbar-hide">
                     {suggestedRoutines.map((routine) => (
-                      <div key={routine.id} className="shrink-0 w-40">
+                      <div key={routine.id} className="shrink-0 w-36">
                         <RoutineBankCard
                           routine={routine}
                           onClick={() => navigate(`/app/routines/${routine.id}`)}
+                          coverOnly
                         />
                       </div>
                     ))}
