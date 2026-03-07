@@ -947,12 +947,14 @@ const AppHome = () => {
                         {/* Only spotlight the FIRST action */}
                         {filteredTasks.length > 0 && (
                           <div className="relative z-[101]">
-                            <SortableTaskList tasks={[filteredTasks[0]]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
-                            {/* Pointing finger centered on the card */}
-                            <div className="flex justify-center animate-bounce" style={{ marginTop: '-7.5rem', marginBottom: '0.5rem' }}>
-                              <span className="text-8xl" style={{ transform: 'rotate(135deg)', display: 'inline-block' }}>☝️</span>
+                            <div className="relative">
+                              <SortableTaskList tasks={[filteredTasks[0]]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                              {/* Pointing finger absolutely positioned over the card */}
+                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none animate-bounce">
+                                <span className="text-8xl" style={{ transform: 'rotate(135deg)', display: 'inline-block' }}>☝️</span>
+                              </div>
                             </div>
-                            <p className="text-center text-sm text-white/90 mt-1 mb-2 animate-fade-in font-medium">
+                            <p className="text-center text-sm text-white/90 mt-3 mb-2 animate-fade-in font-medium">
                               Tap on an action to edit, skip, or delete it
                             </p>
                           </div>
