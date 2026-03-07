@@ -2017,6 +2017,17 @@ export default function RoutinesBank() {
         }}
         onSaveSheet={handleCreateActionSave}
       />
+
+      {/* Edit Action Sheet */}
+      {editActionInitialData && (
+        <AppTaskCreate
+          isSheet={true}
+          sheetOpen={editActionSheetOpen}
+          onSheetOpenChange={setEditActionSheetOpen}
+          initialData={editActionInitialData}
+          onSaveSheet={handleEditActionSave}
+        />
+      )}
     </Card>
   );
 }
