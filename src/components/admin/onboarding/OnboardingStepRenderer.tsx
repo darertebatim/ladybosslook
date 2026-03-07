@@ -133,7 +133,7 @@ function IllustrationPlaceholder({ label, className = '' }: { label: string; cla
 function ScreenWrapper({ children, bg = 'bg-white', center = false }: { children: React.ReactNode; bg?: string; center?: boolean }) {
   return (
     <div className={`h-full ${bg} overflow-y-auto overscroll-contain`}>
-      <div className={`flex flex-col min-h-full px-5 pt-4 pb-6 ${center ? 'justify-center' : ''}`} style={{ minHeight: '-webkit-fill-available' }}>
+      <div className={`flex flex-col h-full px-5 pt-4 pb-6 ${center ? 'justify-center' : ''}`}>
         {children}
       </div>
     </div>
@@ -453,11 +453,11 @@ function YesNoScreen({ step, onNext, onAnswer }: Props) {
   };
   return (
     <div className="h-full flex flex-col bg-white">
-      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 px-5 pt-4 flex flex-col justify-center items-center">
+      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 px-5 pt-4 flex flex-col items-center">
         <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-4 leading-tight">{step.title}</h1></FadeUp>
-        <FadeUp delay={0.1} className="w-full flex items-center justify-center">
+        <FadeUp delay={0.1} className="flex-1 min-h-0 w-full flex items-center justify-center">
           {step.image ? (
-            <img src={step.image} alt="" className="w-full max-h-[45vh] object-contain rounded-2xl" />
+            <img src={step.image} alt="" className="w-full max-h-full object-contain rounded-2xl" />
           ) : (
             <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-48" />
           )}
@@ -478,11 +478,11 @@ function DoYouWantScreen({ step, onNext, onAnswer }: Props) {
   };
   return (
     <div className="h-full flex flex-col bg-white">
-      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 px-5 pt-4 flex flex-col justify-center items-center">
+      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 px-5 pt-4 flex flex-col items-center">
         <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-4">{step.title}</h1></FadeUp>
-        <FadeUp delay={0.1} className="w-full flex items-center justify-center">
+        <FadeUp delay={0.1} className="flex-1 min-h-0 w-full flex items-center justify-center">
           {step.image ? (
-            <img src={step.image} alt="" className="w-full max-h-[45vh] object-contain rounded-2xl" />
+            <img src={step.image} alt="" className="w-full max-h-full object-contain rounded-2xl" />
           ) : (
             <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-48" />
           )}
@@ -1190,7 +1190,7 @@ function PaywallScreen({ step, onNext }: Props) {
 
   return (
     <ScrollArea className="h-full bg-white">
-      <div className="flex flex-col h-full min-h-[100dvh] px-5 pt-[calc(env(safe-area-inset-top,44px)+12px)] pb-6">
+      <div className="flex flex-col h-full px-5 pt-[calc(env(safe-area-inset-top,44px)+12px)] pb-6">
       <div className="flex items-center justify-between mb-3">
         <button onClick={onNext} className="text-gray-400 text-lg active:opacity-60">✕</button>
         <button
@@ -1586,8 +1586,8 @@ function DistressGridScreen({ step, onNext }: Props) {
     <ScreenWrapper>
       <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 whitespace-pre-line">{step.title}</h1>
       {step.image ? (
-        <div className="flex-1 flex items-center justify-center mb-4">
-          <img src={step.image} alt="" className="w-full object-contain" />
+        <div className="flex-1 min-h-0 flex items-center justify-center mb-4">
+          <img src={step.image} alt="" className="w-full max-h-full object-contain" />
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 mb-4">
@@ -1814,7 +1814,7 @@ function ConfettiMessageScreen({ step, onNext }: Props) {
   }, []);
 
   return (
-    <div className="h-full flex flex-col items-center justify-center bg-[#f8f5ff] relative overflow-hidden min-h-[100dvh]">
+    <div className="h-full flex flex-col items-center justify-center bg-[#f8f5ff] relative overflow-hidden">
       {/* Floating emoji particles */}
       {['🎉', '🥳', '✨', '🌟', '💫', '🎊', '⭐', '💜'].map((emoji, i) => (
         <span
