@@ -5,8 +5,6 @@ import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { useBilingualText } from '@/components/ui/BilingualText';
-import { cn } from '@/lib/utils';
 
 export default function AppReflectionFlow() {
   const { reflectionId } = useParams<{ reflectionId: string }>();
@@ -93,11 +91,6 @@ export default function AppReflectionFlow() {
     );
   }
 
-  // Bilingual detection for content text
-  const { className: contentBiClassName, direction: contentDir } = useBilingualText(page?.content || '');
-  const { className: descBiClassName, direction: descDir } = useBilingualText(page?.description || '');
-  const { className: answerBiClassName, direction: answerDir } = useBilingualText(answers[page?.id || ''] || '');
-
   return (
     <div
       className="h-[100dvh] bg-background flex flex-col overflow-hidden"
@@ -120,9 +113,9 @@ export default function AppReflectionFlow() {
 
       {/* Content */}
       <div className="flex-1 flex flex-col px-6 py-6 overflow-y-auto overscroll-contain">
-        <p className={cn("text-xl font-bold leading-snug", contentBiClassName)} dir={contentDir}>{page?.content}</p>
+        <p className="text-xl font-bold leading-snug text-justify">{page?.content}</p>
         {page?.description && (
-          <p className={cn("mt-4 text-sm text-foreground leading-relaxed whitespace-pre-line", descBiClassName)} dir={descDir}>{page.description}</p>
+          <p className="mt-4 text-sm text-foreground leading-relaxed whitespace-pre-line text-justify">{page.description}</p>
         )}
 
         {page?.type === 'question' && (
@@ -130,9 +123,8 @@ export default function AppReflectionFlow() {
             ref={textareaRef}
             value={answers[page.id] || ''}
             onChange={(e) => setAnswers((prev) => ({ ...prev, [page.id]: e.target.value }))}
-            placeholder="پاسخ خود را بنویسید…"
-            className={cn("mt-6 w-full bg-transparent border-0 border-b-2 border-muted-foreground/20 focus:border-primary outline-none resize-none text-base min-h-[120px] placeholder:text-muted-foreground/50 transition-colors", answerBiClassName)}
-            dir={answerDir}
+            placeholder="Type your answer…"
+            className="mt-6 w-full bg-transparent border-0 border-b-2 border-muted-foreground/20 focus:border-primary outline-none resize-none text-base min-h-[120px] placeholder:text-muted-foreground/50 transition-colors"
           />
         )}
       </div>

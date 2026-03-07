@@ -5,7 +5,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
-import { BilingualText } from '@/components/ui/BilingualText';
 
 interface CompletedReflection {
   reflection_id: string;
@@ -149,16 +148,16 @@ export default function AppReflectionNotes() {
                       <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center text-lg">📝</div>
                     )}
                     <div>
-                      <BilingualText as="p" className="font-semibold text-sm">{item.reflection_title}</BilingualText>
+                      <p className="font-semibold text-sm">{item.reflection_title}</p>
                       <p className="text-xs text-muted-foreground">
                         {format(new Date(item.completed_at), 'MMM d, yyyy • hh:mm a')}
                       </p>
                     </div>
                   </div>
                   {item.first_question && (
-                    <BilingualText as="p" className="text-sm text-muted-foreground line-clamp-2">
-                      {`${item.first_question}  ${item.first_answer || ''}`}
-                    </BilingualText>
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {item.first_question}  {item.first_answer || ''}
+                    </p>
                   )}
                 </button>
               ))}

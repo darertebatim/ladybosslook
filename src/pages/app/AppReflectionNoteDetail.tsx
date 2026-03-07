@@ -11,8 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { BilingualText, useBilingualText } from '@/components/ui/BilingualText';
-import { cn } from '@/lib/utils';
 
 export default function AppReflectionNoteDetail() {
   const { reflectionId } = useParams<{ reflectionId: string }>();
@@ -110,9 +108,6 @@ export default function AppReflectionNoteDetail() {
     deleteMutation.mutate();
   };
 
-  // Bilingual detection for edit textarea
-  const { className: editBiClassName, direction: editDir } = useBilingualText(editText);
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -174,9 +169,9 @@ export default function AppReflectionNoteDetail() {
                 className="py-5 first:pt-0 w-full text-left active:bg-muted/50 transition-colors rounded-lg"
                 onClick={() => handleEdit(idx)}
               >
-                <BilingualText as="p" className="text-base text-muted-foreground leading-relaxed">{qa.question}</BilingualText>
+                <p className="text-base text-muted-foreground leading-relaxed">{qa.question}</p>
                 {qa.answer && (
-                  <BilingualText as="p" className="mt-2 text-base font-medium">{qa.answer}</BilingualText>
+                  <p className="mt-2 text-base font-medium">{qa.answer}</p>
                 )}
               </button>
             ))}
@@ -197,9 +192,8 @@ export default function AppReflectionNoteDetail() {
           <Textarea
             value={editText}
             onChange={(e) => setEditText(e.target.value)}
-            className={cn("min-h-[120px]", editBiClassName)}
-            dir={editDir}
-            placeholder="پاسخ خود را بنویسید…"
+            className="min-h-[120px]"
+            placeholder="Type your answer…"
           />
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditingIdx(null)}>Cancel</Button>

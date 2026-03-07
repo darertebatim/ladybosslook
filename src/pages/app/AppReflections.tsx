@@ -11,7 +11,6 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
-import { BilingualText } from '@/components/ui/BilingualText';
 
 const SYNTHETIC_REFLECTION_TASK: RoutinePlanTask = {
   id: 'synthetic-reflection-task',
@@ -93,8 +92,8 @@ export default function AppReflections() {
               >
                 <div className="flex items-center">
                   <div className="flex-1 p-4">
-                    <BilingualText as="p" className="font-bold text-base leading-tight text-foreground">{r.title}</BilingualText>
-                    {r.subtitle && <BilingualText as="p" className="text-sm text-muted-foreground mt-1 line-clamp-2">{r.subtitle}</BilingualText>}
+                    <p className="font-bold text-base leading-tight text-foreground">{r.title}</p>
+                    {r.subtitle && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{r.subtitle}</p>}
                   </div>
                   {r.cover_image_url && (
                     <div className="w-28 h-28 shrink-0">
@@ -241,9 +240,9 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <BilingualText as="p" className="font-semibold text-base leading-tight">{reflection.title}</BilingualText>
+            <p className="font-semibold text-base leading-tight">{reflection.title}</p>
             {reflection.subtitle && (
-              <BilingualText as="p" className="text-sm text-muted-foreground mt-1 line-clamp-2">{reflection.subtitle}</BilingualText>
+              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{reflection.subtitle}</p>
             )}
           </div>
         </button>
