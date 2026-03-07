@@ -481,13 +481,11 @@ function DoYouWantScreen({ step, onNext, onAnswer }: Props) {
   return (
     <ScreenWrapper>
       <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1></FadeUp>
-      <FadeUp delay={0.1}>
+      <FadeUp delay={0.1} className="flex-1 flex items-center justify-center min-h-0">
         {step.image ? (
-          <div className="flex-1 flex items-center justify-center">
-            <img src={step.image} alt="" className="w-full object-contain" />
-          </div>
+          <img src={step.image} alt="" className="w-full max-h-[50vh] object-contain rounded-2xl" />
         ) : (
-          <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="flex-1" />
+          <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-48" />
         )}
       </FadeUp>
       <FadeUp delay={0.2} className="mt-auto flex gap-3 pt-4">
