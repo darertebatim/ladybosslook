@@ -455,9 +455,10 @@ export default function RoutinesBank() {
       id: t.id,
       task_id: t.task_id,
       title: t.title,
-      emoji: t.emoji,
+      emoji: t.emoji || '📝',
+      color: '', // will be resolved from taskBank at render time
       section_id: t.section_id,
-      task_order: t.task_order,
+      task_order: t.task_order ?? 0,
       schedule_days: (t as any).schedule_days || [],
       drip_day: (t as any).drip_day ?? null,
       monthly_day: (t as any).monthly_day ?? null,
