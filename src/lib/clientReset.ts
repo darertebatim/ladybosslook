@@ -73,27 +73,41 @@ export function resetTour(feature: typeof TOUR_FEATURES[number]): void {
 }
 
 /**
- * Full client-side reset - clears ALL onboarding and tour flags
- * Call this after admin data reset to ensure complete "Day 1" experience
+ * Full client-side reset - clears ALL onboarding, tour, and app state flags.
+ * Sweeps all simora_* keys plus known app keys so nothing is missed.
  */
 export function fullClientReset(): void {
+  // 1. Remove all explicitly listed keys
   CLIENT_RESET_KEYS.forEach(key => {
     localStorage.removeItem(key);
   });
-  
-  // Clear tour prompt flags so banner re-appears
-  localStorage.removeItem('simora_tour_prompt_shown');
-  localStorage.removeItem('simora_tour_prompt_dismissed_at');
-  
-  // Clear badge celebration keys for today
-  const today = getLocalDateStr();
-  localStorage.removeItem(`simora_celebrated_${today}`);
-  
-  // Set flags to force tour banner/popup to show immediately
+
+  // 2. Sweep ALL localStorage keys matching app prefixes or dynamic patterns
+  //    This catches celebration keys, gold streak, streak goal, etc.
+  const keysToRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key) continue;
+    if (
+      key.startsWith('simora_') ||
+      key.startsWith('mood-banner') ||
+      key.startsWith('routine_') ||
+      key.startsWith('appTour') ||
+      key === 'autoSyncCalendar'
+    ) {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach(key => localStorage.removeItem(key));
+
+  // 3. Clear React Query persisted cache
+  localStorage.removeItem('lb-query-cache-v4');
+
+  // 4. Set flags to force tour banner/popup and new-user experience
   localStorage.setItem('simora_tours_just_reset', 'true');
   localStorage.setItem('simora_force_new_user', 'true');
-  
-  console.log('[clientReset] Full client reset complete');
+
+  console.log(`[clientReset] Full client reset complete — cleared ${keysToRemove.length + CLIENT_RESET_KEYS.length} keys`);
 }
 
 /**
