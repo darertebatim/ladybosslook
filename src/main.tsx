@@ -5,6 +5,7 @@ import './index.css'
 import { Capacitor } from '@capacitor/core';
 import { initializePushNotificationHandlers, clearBadge } from './lib/pushNotifications';
 import { logBuildInfo } from './lib/buildInfo';
+import { initAppsFlyer } from './lib/appsflyer';
 
 // Global error handler to catch any uncaught errors
 window.onerror = (message, source, lineno, colno, error) => {
