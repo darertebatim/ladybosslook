@@ -11,6 +11,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
+import { BilingualText } from '@/components/ui/BilingualText';
 
 const SYNTHETIC_REFLECTION_TASK: RoutinePlanTask = {
   id: 'synthetic-reflection-task',
