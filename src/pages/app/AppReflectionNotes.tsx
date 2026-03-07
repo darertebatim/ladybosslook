@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
+import { BilingualText } from '@/components/ui/BilingualText';
 
 interface CompletedReflection {
   reflection_id: string;
