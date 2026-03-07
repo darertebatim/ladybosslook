@@ -43,7 +43,7 @@ export default function AppReflections() {
   const all = reflections || [];
 
   return (
-    <div className="min-h-screen bg-background pb-24 font-farsi" dir="rtl">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <header
         className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
