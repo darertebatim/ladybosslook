@@ -75,11 +75,12 @@ export function useExistingPlaylistTask(playlistId: string | undefined) {
 }
 
 // Check if user already has a task with a specific pro_link_type (and optionally pro_link_value)
-export function useExistingProTask(linkType: string | undefined, linkValue?: string | null) {
+// When exactMatch is true and linkValue is not provided, only matches tasks where pro_link_value IS NULL
+export function useExistingProTask(linkType: string | undefined, linkValue?: string | null, exactMatch = false) {
   const { user } = useAuth();
   
   return useQuery({
-    queryKey: ['pro-task-exists', linkType, linkValue, user?.id],
+    queryKey: ['pro-task-exists', linkType, linkValue, exactMatch, user?.id],
     queryFn: async () => {
       if (!linkType || !user) return false;
 
@@ -90,9 +91,12 @@ export function useExistingProTask(linkType: string | undefined, linkValue?: str
         .eq('pro_link_type', linkType)
         .eq('is_active', true);
 
-      // If linkValue is provided, also filter by it
+      // If linkValue is provided, filter by it
       if (linkValue) {
         query = query.eq('pro_link_value', linkValue);
+      } else if (exactMatch) {
+        // Only match tasks where pro_link_value is null (page-level generic tasks)
+        query = query.is('pro_link_value', null);
       }
 
       const { data, error } = await query.limit(1);
