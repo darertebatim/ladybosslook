@@ -1,17 +1,13 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, ExternalLink } from 'lucide-react';
 import { dearMeFlow } from '@/data/onboarding-flows/dear-me';
 import { mePlusFlow } from '@/data/onboarding-flows/me-plus';
 import { OnboardingFlowCard } from '@/components/admin/onboarding/OnboardingFlowCard';
-import { OnboardingPreview } from '@/components/admin/onboarding/OnboardingPreview';
 import { useDefaultOnboarding, useSetDefaultOnboarding } from '@/hooks/useDefaultOnboarding';
 import { toast } from 'sonner';
 
 export default function Onboarding() {
-  const [previewFlowId, setPreviewFlowId] = useState<string | null>(null);
   const flows = [dearMeFlow, mePlusFlow];
-  const previewFlow = flows.find(f => f.id === previewFlowId);
   const { flowId: defaultFlowId } = useDefaultOnboarding();
   const setDefaultMutation = useSetDefaultOnboarding();
 
@@ -20,6 +16,10 @@ export default function Onboarding() {
       onSuccess: () => toast.success('Default onboarding flow updated'),
       onError: () => toast.error('Failed to update default flow'),
     });
+  };
+
+  const handlePreview = (flowId: string) => {
+    window.open(`/app/onboarding/${flowId}`, '_blank');
   };
 
   return (
@@ -40,19 +40,12 @@ export default function Onboarding() {
           <OnboardingFlowCard
             key={flow.id}
             flow={flow}
-            onPreview={() => setPreviewFlowId(flow.id)}
+            onPreview={() => handlePreview(flow.id)}
             isDefault={defaultFlowId === flow.id}
             onSetDefault={() => handleSetDefault(flow.id)}
           />
         ))}
       </div>
-
-      {previewFlow && (
-        <OnboardingPreview
-          flow={previewFlow}
-          onClose={() => setPreviewFlowId(null)}
-        />
-      )}
     </div>
   );
 }
