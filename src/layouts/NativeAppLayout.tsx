@@ -161,6 +161,9 @@ const NativeAppLayout = () => {
         <Outlet />
       </main>
 
+      {/* Deferred background hooks — mount after 5s to free initial render */}
+      {deferredReady && <DeferredLayoutHooks userId={user?.id} />}
+
       {/* Mini Player - show when audio is playing and not on player page or chat page */}
       {!isOnPlayerPage && !isOnChatPage && <MiniPlayer />}
 
