@@ -218,7 +218,7 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
       <div className="w-full flex items-center gap-4 py-4">
         <button
           onClick={handleReflectionClick}
-          className="flex-1 flex items-center gap-4 text-right transition-transform active:scale-[0.98] min-w-0"
+          className="flex-1 flex items-center gap-4 text-left transition-transform active:scale-[0.98] min-w-0"
         >
           {/* Cover with PLUS badge */}
           <div className="relative shrink-0">

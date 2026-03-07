@@ -139,7 +139,7 @@ export default function AppReflectionFlow() {
 
       {/* FAB */}
       <div
-        className="p-6 flex justify-start shrink-0"
+        className="p-6 flex justify-end shrink-0"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}
       >
         <button
@@ -147,7 +147,7 @@ export default function AppReflectionFlow() {
           disabled={saveResponse.isPending}
           className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg active:scale-95 transition-transform disabled:opacity-50"
         >
-          {isLast ? <Check className="h-6 w-6" /> : <ArrowRight className="h-6 w-6 rotate-180" />}
+          {isLast ? <Check className="h-6 w-6" /> : <ArrowRight className="h-6 w-6" />}
         </button>
       </div>
     </div>
