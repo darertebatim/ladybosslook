@@ -241,9 +241,9 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-base leading-tight">{reflection.title}</p>
+            <BilingualText as="p" className="font-semibold text-base leading-tight">{reflection.title}</BilingualText>
             {reflection.subtitle && (
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{reflection.subtitle}</p>
+              <BilingualText as="p" className="text-sm text-muted-foreground mt-1 line-clamp-2">{reflection.subtitle}</BilingualText>
             )}
           </div>
         </button>
