@@ -6,7 +6,7 @@ import { Capacitor } from '@capacitor/core';
  */
 
 const APPSFLYER_DEV_KEY = 'HmUqSP98nbh7uNctZxS48M';
-const APPLE_APP_ID = ''; // TODO: Set your Apple App Store ID once published (e.g. "123456789")
+const APPLE_APP_ID = '6755076134';
 
 let isInitialized = false;
 
