@@ -37,7 +37,7 @@ export function RichTextEditor({ value, onChange, placeholder, className, imageB
       // Show loading placeholder
       const range = quill.getSelection(true);
       quill.insertText(range.index, 'Uploading image...', { italic: true, color: '#999' });
-      quill.setSelection(range.index + 'Uploading image...'.length);
+      quill.setSelection(range.index + 'Uploading image...'.length, 0);
 
       try {
         const ext = file.name.split('.').pop() || 'jpg';
