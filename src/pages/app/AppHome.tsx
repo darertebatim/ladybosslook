@@ -984,8 +984,8 @@ const AppHome = () => {
               )}
 
               {/* Popular Routine Suggestions - only show routines user hasn't added */}
-              {selectedTag === null && !showWelcomeCard && <div className="tour-suggested-routine mt-6">
-                  <div className="flex items-center justify-between">
+              {suggestedRoutines.length > 0 && selectedTag === null && !showWelcomeCard && <div className="tour-suggested-routine mt-6">
+                  <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <CalendarPlus className="h-4 w-4 text-violet-500" />
                       <h2 className="text-sm font-semibold text-foreground/70 tracking-wide">
@@ -998,6 +998,16 @@ const AppHome = () => {
                     >
                       All <ChevronRight className="h-3.5 w-3.5" />
                     </button>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                    {suggestedRoutines.map((routine) => (
+                      <div key={routine.id} className="shrink-0 w-40">
+                        <RoutineBankCard
+                          routine={routine}
+                          onClick={() => navigate(`/app/routines/${routine.id}`)}
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>}
 
