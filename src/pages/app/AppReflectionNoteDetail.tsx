@@ -109,7 +109,7 @@ export default function AppReflectionNoteDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background font-farsi" dir="rtl">
       {/* Header */}
       <div
         className="px-4 pb-3 flex items-center justify-between border-b"
@@ -166,7 +166,7 @@ export default function AppReflectionNoteDetail() {
             {data.qaPairs.map((qa, idx) => (
               <button
                 key={idx}
-                className="py-5 first:pt-0 w-full text-left active:bg-muted/50 transition-colors rounded-lg"
+                className="py-5 first:pt-0 w-full text-right active:bg-muted/50 transition-colors rounded-lg"
                 onClick={() => handleEdit(idx)}
               >
                 <p className="text-base text-muted-foreground leading-relaxed">{qa.question}</p>
@@ -192,8 +192,9 @@ export default function AppReflectionNoteDetail() {
           <Textarea
             value={editText}
             onChange={(e) => setEditText(e.target.value)}
-            className="min-h-[120px]"
-            placeholder="Type your answer…"
+            className="min-h-[120px] text-right font-farsi"
+            dir="rtl"
+            placeholder="پاسخ خود را بنویسید…"
           />
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditingIdx(null)}>Cancel</Button>

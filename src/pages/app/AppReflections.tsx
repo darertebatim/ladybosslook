@@ -43,7 +43,7 @@ export default function AppReflections() {
   const all = reflections || [];
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-24 font-farsi" dir="rtl">
       {/* Header */}
       <header
         className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
@@ -87,7 +87,7 @@ export default function AppReflections() {
               <button
                 key={r.id}
                 onClick={() => navigate(`/app/reflections/${r.id}`)}
-                className="w-full rounded-2xl overflow-hidden text-left transition-transform active:scale-[0.97] relative"
+                className="w-full rounded-2xl overflow-hidden text-right transition-transform active:scale-[0.97] relative"
                 style={{ backgroundColor: r.cover_color || '#ffffff' }}
               >
                 <div className="flex items-center">
@@ -218,7 +218,7 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
       <div className="w-full flex items-center gap-4 py-4">
         <button
           onClick={handleReflectionClick}
-          className="flex-1 flex items-center gap-4 text-left transition-transform active:scale-[0.98] min-w-0"
+          className="flex-1 flex items-center gap-4 text-right transition-transform active:scale-[0.98] min-w-0"
         >
           {/* Cover with PLUS badge */}
           <div className="relative shrink-0">
