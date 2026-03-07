@@ -452,24 +452,22 @@ function YesNoScreen({ step, onNext, onAnswer }: Props) {
     onNext();
   };
   return (
-    <ScrollArea className="h-full bg-white">
-      <div className="flex flex-col h-full min-h-[100dvh] pt-[72px] pb-6">
-        <FadeUp className="px-5"><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-1 mt-2 leading-tight">{step.title}</h1></FadeUp>
-        <FadeUp delay={0.1} className="flex-1 min-h-0 flex items-center justify-center px-4">
-          <div className="relative overflow-hidden w-full rounded-2xl">
-            {step.image ? (
-              <img src={step.image} alt="" className="w-full object-contain" />
-            ) : (
-              <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-full" />
-            )}
-          </div>
-        </FadeUp>
-        <FadeUp delay={0.2} className="mt-auto flex gap-3 px-5 pt-4">
-          <NavyButton onClick={() => handleAnswer('No')} className="flex-1 !py-4 !text-base">No</NavyButton>
-          <NavyButton onClick={() => handleAnswer('Yes')} className="flex-1 !py-4 !text-base">Yes</NavyButton>
+    <div className="h-full flex flex-col bg-white">
+      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 px-5 pt-4">
+        <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-1 mt-2 leading-tight">{step.title}</h1></FadeUp>
+        <FadeUp delay={0.1} className="flex items-center justify-center">
+          {step.image ? (
+            <img src={step.image} alt="" className="w-full max-h-[40vh] object-contain rounded-2xl" />
+          ) : (
+            <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-48" />
+          )}
         </FadeUp>
       </div>
-    </ScrollArea>
+      <FadeUp delay={0.2} className="shrink-0 flex gap-3 px-5 py-4">
+        <NavyButton onClick={() => handleAnswer('No')} className="flex-1 !py-4 !text-base">No</NavyButton>
+        <NavyButton onClick={() => handleAnswer('Yes')} className="flex-1 !py-4 !text-base">Yes</NavyButton>
+      </FadeUp>
+    </div>
   );
 }
 
@@ -484,7 +482,7 @@ function DoYouWantScreen({ step, onNext, onAnswer }: Props) {
         <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1></FadeUp>
         <FadeUp delay={0.1} className="flex items-center justify-center">
           {step.image ? (
-            <img src={step.image} alt="" className="w-full max-h-[45vh] object-contain rounded-2xl" />
+            <img src={step.image} alt="" className="w-full max-h-[40vh] object-contain rounded-2xl" />
           ) : (
             <IllustrationPlaceholder label={step.illustrationLabel || 'Illustration'} className="w-full h-48" />
           )}
