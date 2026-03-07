@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home, MessageCircle, Compass, Music, Users, Headset, CalendarPlus } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { AudioPlayerProvider, useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { useTrackAppReturn } from '@/hooks/useUserPresence';
@@ -16,14 +16,7 @@ import { cn } from '@/lib/utils';
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
 import { usePushNotificationFlow } from '@/hooks/usePushNotificationFlow';
 import { useTimezoneSync } from '@/hooks/useTimezoneSync';
-import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
-import { useLocalNotificationScheduler } from '@/hooks/useLocalNotificationScheduler';
-import { useHybridNotificationScheduler } from '@/hooks/useHybridNotificationScheduler';
-import { useProgramEventNotificationScheduler } from '@/hooks/useProgramEventNotificationScheduler';
-import { useSmartActionNudges } from '@/hooks/useSmartActionNudges';
-import { usePeriodNotifications } from '@/hooks/usePeriodNotifications';
 import { useNotificationCleanup } from '@/hooks/useNotificationCleanup';
-import { useAppsFlyerTracking } from '@/hooks/useAppsFlyerTracking';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
