@@ -1012,6 +1012,12 @@ const AppHome = () => {
                           routine={routine}
                           onClick={() => navigate(`/app/routines/${routine.id}`)}
                           coverOnly
+                          onDismiss={() => {
+                            const updated = new Set(dismissedRoutineIds);
+                            updated.add(routine.id);
+                            setDismissedRoutineIds(updated);
+                            localStorage.setItem('simora_dismissed_routine_ids', JSON.stringify([...updated]));
+                          }}
                         />
                       </div>
                     ))}
