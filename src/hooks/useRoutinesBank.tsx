@@ -555,8 +555,8 @@ export function useAddRoutineFromBank() {
             repeat_days: repeatDays,
             scheduled_date: scheduledDate,
             scheduled_time: edited?.scheduledTime || null,
-            // Use category from admin_task_bank (the source of truth), fallback to routine.category
-            tag: edited?.tag ?? bankTask?.category ?? routine.category,
+            // Group all routine tasks under the routine's category (not individual task categories)
+            tag: edited?.tag ?? routine.category,
             // Copy time_period from admin_task_bank
             time_period: bankTask?.time_period ?? null,
             linked_playlist_id: proLinkType === 'playlist' ? proLinkValue : null,
