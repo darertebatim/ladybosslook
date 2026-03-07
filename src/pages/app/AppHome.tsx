@@ -890,12 +890,41 @@ const AppHome = () => {
                   {/* Mood Check-in Banner - above actions, hidden while welcome card is active */}
                   {/* Mood Check-in Banner - hidden while welcome card is active */}
                   {!showWelcomeCard && !hasPromoBanner && <MoodCheckInBanner />}
-                  {/* My Actions header - always show */}
+                   {/* My Actions header with category pills */}
                   <div className="flex items-center gap-2 mb-3">
-                    <h2 className="text-sm font-semibold text-foreground tracking-wide">
+                    <h2 className="text-sm font-semibold text-foreground tracking-wide shrink-0">
                       My actions
                     </h2>
-                    <span className="text-xs text-foreground/40 ml-auto">Hold to reorder</span>
+                    {taskTags.length > 0 && (
+                      <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
+                        <button
+                          onClick={() => setSelectedTag(null)}
+                          className={cn(
+                            'px-2.5 py-0.5 rounded-full text-[11px] whitespace-nowrap transition-all font-medium',
+                            selectedTag === null
+                              ? 'bg-primary/15 text-primary'
+                              : 'bg-muted text-muted-foreground'
+                          )}
+                        >
+                          All
+                        </button>
+                        {taskTags.map(tag => (
+                          <button
+                            key={tag}
+                            onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
+                            className={cn(
+                              'px-2.5 py-0.5 rounded-full text-[11px] whitespace-nowrap transition-all capitalize font-medium',
+                              selectedTag === tag
+                                ? 'bg-primary/15 text-primary'
+                                : 'bg-muted text-muted-foreground'
+                            )}
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <span className="text-xs text-foreground/40 ml-auto shrink-0">Hold to reorder</span>
                   </div>
                   
                   {/* Coach mark spotlight for first-ever action */}
