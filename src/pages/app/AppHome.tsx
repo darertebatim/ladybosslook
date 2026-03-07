@@ -854,7 +854,7 @@ const AppHome = () => {
               )}
 
               {/* Fasting Status Card */}
-              {selectedTag === null && (
+              {(
                 <div className="mb-4">
                   <FastingStatusCard />
                 </div>
