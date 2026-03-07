@@ -46,32 +46,35 @@ const NativeAppLayout = () => {
   // Auto-detect and sync user's timezone on app open
   useTimezoneSync(user?.id);
   
-  // Track app version on every app open
-  useAppInstallTracking(user?.id);
-  
-  // AppsFlyer user tracking
-  useAppsFlyerTracking(user?.id);
-
   // Track app returns (every open/resume increments return count)
   useTrackAppReturn(user?.id);
   
   // Comprehensive cleanup of stale/legacy local notifications (runs first, before schedulers)
   useNotificationCleanup();
-  
-  // Legacy cleanup of old daily local notifications
-  useLocalNotificationScheduler(user?.id);
-  
-  // Smart Action Nudges - random reminders from user's planner data
-  useSmartActionNudges(user?.id);
-  
-  // Period tracker notifications
-  usePeriodNotifications(user?.id);
-  
-  // Hybrid notification scheduler - syncs server config to local notifications
-  useHybridNotificationScheduler(user?.id);
-  
-  // Program event notifications - sessions and drip content (local-first)
-  useProgramEventNotificationScheduler();
+
+  // Defer non-critical hooks to free main thread during initial render
+  const [deferredReady, setDeferredReady] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setDeferredReady(true), 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // These hooks only run after 5s delay
+  useEffect(() => {
+    if (!deferredReady || !user?.id) return;
+    // Dynamic imports to avoid loading these modules on initial render
+    Promise.all([
+      import('@/hooks/useAppInstallTracking'),
+      import('@/hooks/useAppsFlyerTracking'),
+      import('@/hooks/useLocalNotificationScheduler'),
+      import('@/hooks/useHybridNotificationScheduler'),
+      import('@/hooks/useProgramEventNotificationScheduler'),
+      import('@/hooks/useSmartActionNudges'),
+      import('@/hooks/usePeriodNotifications'),
+    ]).then(() => {
+      console.log('[Layout] Deferred hooks modules loaded');
+    });
+  }, [deferredReady, user?.id]);
   
   // Custom hooks after useState declarations
   const { unreadCount } = useUnreadChat();
