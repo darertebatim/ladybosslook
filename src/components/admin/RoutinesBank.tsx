@@ -109,6 +109,7 @@ interface LocalTask {
   task_id: string | null;
   title: string;
   emoji: string;
+  color: string;
   section_id: string | null;
   task_order: number;
   schedule_days: number[];
