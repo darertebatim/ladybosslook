@@ -93,7 +93,8 @@ export default function AppReflectionFlow() {
 
   return (
     <div
-      className="h-[100dvh] bg-background flex flex-col overflow-hidden"
+      className="h-[100dvh] bg-background flex flex-col overflow-hidden font-farsi"
+      dir="rtl"
     >
       {/* Top bar: back + progress */}
       <div
@@ -101,9 +102,9 @@ export default function AppReflectionFlow() {
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
       >
         <button onClick={handleBack} className="shrink-0 active:scale-95 transition-transform p-1">
-          <ArrowLeft className="h-6 w-6" />
+          <ArrowLeft className="h-6 w-6 rotate-180" />
         </button>
-        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden" dir="ltr">
           <div
             className="h-full bg-foreground rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
@@ -113,9 +114,9 @@ export default function AppReflectionFlow() {
 
       {/* Content */}
       <div className="flex-1 flex flex-col px-6 py-6 overflow-y-auto overscroll-contain">
-        <p className="text-xl font-bold leading-snug text-justify">{page?.content}</p>
+        <p className="text-xl font-bold leading-snug text-right">{page?.content}</p>
         {page?.description && (
-          <p className="mt-4 text-sm text-foreground leading-relaxed whitespace-pre-line text-justify">{page.description}</p>
+          <p className="mt-4 text-sm text-foreground leading-relaxed whitespace-pre-line text-right">{page.description}</p>
         )}
 
         {page?.type === 'question' && (
@@ -123,8 +124,9 @@ export default function AppReflectionFlow() {
             ref={textareaRef}
             value={answers[page.id] || ''}
             onChange={(e) => setAnswers((prev) => ({ ...prev, [page.id]: e.target.value }))}
-            placeholder="Type your answer…"
-            className="mt-6 w-full bg-transparent border-0 border-b-2 border-muted-foreground/20 focus:border-primary outline-none resize-none text-base min-h-[120px] placeholder:text-muted-foreground/50 transition-colors"
+            placeholder="پاسخ خود را بنویسید…"
+            className="mt-6 w-full bg-transparent border-0 border-b-2 border-muted-foreground/20 focus:border-primary outline-none resize-none text-base min-h-[120px] placeholder:text-muted-foreground/50 transition-colors text-right font-farsi"
+            dir="rtl"
           />
         )}
       </div>
