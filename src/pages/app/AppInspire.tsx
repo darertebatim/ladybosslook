@@ -11,6 +11,7 @@ import {
   usePopularRoutinesBank,
 } from '@/hooks/useRoutinesBank';
 import { RoutinesTour, TourHelpButton } from '@/components/app/tour';
+import { PromoBanner } from '@/components/app/PromoBanner';
 
 export default function AppInspire() {
   const navigate = useNavigate();
@@ -98,6 +99,9 @@ export default function AppInspire() {
 
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full">
         <div className="pb-safe w-full max-w-full">
+          {/* Promo Banner - Top */}
+          <PromoBanner location="routines_top" className="px-4 pt-3" />
+
           {/* Categories - quick nav */}
           {categories && categories.length > 0 && (
             <div className="mt-4">
@@ -138,6 +142,9 @@ export default function AppInspire() {
               </ScrollArea>
             </div>
           )}
+
+          {/* Promo Banner - Under Categories */}
+          <PromoBanner location="routines_after_categories" className="px-4 pb-2" />
 
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
