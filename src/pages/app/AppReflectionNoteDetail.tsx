@@ -197,8 +197,8 @@ export default function AppReflectionNoteDetail() {
           <Textarea
             value={editText}
             onChange={(e) => setEditText(e.target.value)}
-            className="min-h-[120px] text-right font-farsi"
-            dir="rtl"
+            className={cn("min-h-[120px]", editBiClassName)}
+            dir={editDir}
             placeholder="پاسخ خود را بنویسید…"
           />
           <DialogFooter>
