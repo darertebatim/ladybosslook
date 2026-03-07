@@ -133,6 +133,11 @@ export default function RoutinesBank() {
   const [createActionSheetOpen, setCreateActionSheetOpen] = useState(false);
   const [createActionSectionId, setCreateActionSectionId] = useState<string | null>(null);
 
+  // Edit action sheet state
+  const [editActionSheetOpen, setEditActionSheetOpen] = useState(false);
+  const [editActionTaskBankId, setEditActionTaskBankId] = useState<string | null>(null);
+  const [editActionInitialData, setEditActionInitialData] = useState<Partial<TaskFormData> | undefined>(undefined);
+
   // Section editor state
   const [sectionDialogOpen, setSectionDialogOpen] = useState(false);
   const [editingSection, setEditingSection] = useState<LocalSection | null>(null);
