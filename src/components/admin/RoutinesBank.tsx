@@ -838,6 +838,7 @@ export default function RoutinesBank() {
     editActionMutation.mutate({ id: editActionTaskBankId, formData });
   };
 
+  const removeTask = (taskId: string) => {
     setLocalTasks(localTasks.filter(t => t.id !== taskId));
   };
 
