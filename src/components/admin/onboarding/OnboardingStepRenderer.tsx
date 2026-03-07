@@ -132,11 +132,11 @@ function IllustrationPlaceholder({ label, className = '' }: { label: string; cla
 
 function ScreenWrapper({ children, bg = 'bg-white', center = false }: { children: React.ReactNode; bg?: string; center?: boolean }) {
   return (
-    <ScrollArea className={`h-full ${bg}`}>
+    <div className={`h-full overflow-y-auto overscroll-contain ${bg}`}>
       <div className={`flex flex-col min-h-full px-5 pt-4 pb-6 ${center ? 'justify-center' : ''}`}>
         {children}
       </div>
-    </ScrollArea>
+    </div>
   );
 }
 
