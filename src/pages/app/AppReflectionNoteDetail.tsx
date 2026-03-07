@@ -166,7 +166,7 @@ export default function AppReflectionNoteDetail() {
             {data.qaPairs.map((qa, idx) => (
               <button
                 key={idx}
-                className="py-5 first:pt-0 w-full text-left active:bg-muted/50 transition-colors rounded-lg"
+                className="py-5 first:pt-0 w-full text-right active:bg-muted/50 transition-colors rounded-lg"
                 onClick={() => handleEdit(idx)}
               >
                 <p className="text-base text-muted-foreground leading-relaxed">{qa.question}</p>
