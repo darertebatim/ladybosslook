@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home, MessageCircle, Compass, Music, Users, Headset, CalendarPlus } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { AudioPlayerProvider, useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { useTrackAppReturn } from '@/hooks/useUserPresence';
@@ -16,14 +16,8 @@ import { cn } from '@/lib/utils';
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
 import { usePushNotificationFlow } from '@/hooks/usePushNotificationFlow';
 import { useTimezoneSync } from '@/hooks/useTimezoneSync';
-import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
-import { useLocalNotificationScheduler } from '@/hooks/useLocalNotificationScheduler';
-import { useHybridNotificationScheduler } from '@/hooks/useHybridNotificationScheduler';
-import { useProgramEventNotificationScheduler } from '@/hooks/useProgramEventNotificationScheduler';
-import { useSmartActionNudges } from '@/hooks/useSmartActionNudges';
-import { usePeriodNotifications } from '@/hooks/usePeriodNotifications';
 import { useNotificationCleanup } from '@/hooks/useNotificationCleanup';
-import { useAppsFlyerTracking } from '@/hooks/useAppsFlyerTracking';
+import { DeferredLayoutHooks } from '@/components/app/DeferredLayoutHooks';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
@@ -53,32 +47,18 @@ const NativeAppLayout = () => {
   // Auto-detect and sync user's timezone on app open
   useTimezoneSync(user?.id);
   
-  // Track app version on every app open
-  useAppInstallTracking(user?.id);
-  
-  // AppsFlyer user tracking
-  useAppsFlyerTracking(user?.id);
-
   // Track app returns (every open/resume increments return count)
   useTrackAppReturn(user?.id);
   
   // Comprehensive cleanup of stale/legacy local notifications (runs first, before schedulers)
   useNotificationCleanup();
-  
-  // Legacy cleanup of old daily local notifications
-  useLocalNotificationScheduler(user?.id);
-  
-  // Smart Action Nudges - random reminders from user's planner data
-  useSmartActionNudges(user?.id);
-  
-  // Period tracker notifications
-  usePeriodNotifications(user?.id);
-  
-  // Hybrid notification scheduler - syncs server config to local notifications
-  useHybridNotificationScheduler(user?.id);
-  
-  // Program event notifications - sessions and drip content (local-first)
-  useProgramEventNotificationScheduler();
+
+  // Defer non-critical hooks — mount DeferredLayoutHooks after 5s delay
+  const [deferredReady, setDeferredReady] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setDeferredReady(true), 5000);
+    return () => clearTimeout(timer);
+  }, []);
   
   // Custom hooks after useState declarations
   const { unreadCount } = useUnreadChat();
@@ -180,6 +160,9 @@ const NativeAppLayout = () => {
       >
         <Outlet />
       </main>
+
+      {/* Deferred background hooks — mount after 5s to free initial render */}
+      {deferredReady && <DeferredLayoutHooks userId={user?.id} />}
 
       {/* Mini Player - show when audio is playing and not on player page or chat page */}
       {!isOnPlayerPage && !isOnChatPage && <MiniPlayer />}
