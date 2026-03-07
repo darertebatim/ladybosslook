@@ -88,6 +88,7 @@ interface TaskBankItem {
   title: string;
   emoji: string;
   category: string;
+  color: string;
   is_active: boolean;
   repeat_pattern: string;
 }
