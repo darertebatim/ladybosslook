@@ -1586,8 +1586,8 @@ function DistressGridScreen({ step, onNext }: Props) {
     <ScreenWrapper>
       <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 whitespace-pre-line">{step.title}</h1>
       {step.image ? (
-        <div className="flex-1 flex items-center justify-center mb-4">
-          <img src={step.image} alt="" className="w-full object-contain" />
+        <div className="flex-1 min-h-0 flex items-center justify-center mb-4">
+          <img src={step.image} alt="" className="w-full max-h-full object-contain" />
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 mb-4">
