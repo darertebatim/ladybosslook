@@ -3,7 +3,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay, subDays } from 'date-fns';
-import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Heart } from 'lucide-react';
+import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Heart, Zap } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { HomeMenu } from '@/components/app/HomeMenu';
 import { cn } from '@/lib/utils';
@@ -892,8 +892,9 @@ const AppHome = () => {
                   {!showWelcomeCard && !hasPromoBanner && <MoodCheckInBanner />}
                    {/* My Actions header with category pills */}
                   <div className="flex items-center gap-2 mb-3">
+                    <Zap className="h-4 w-4 text-amber-500 shrink-0" />
                     <h2 className="text-sm font-semibold text-foreground tracking-wide shrink-0">
-                      My actions
+                      My Actions
                     </h2>
                     {taskTags.length > 0 && (
                       <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
@@ -902,26 +903,37 @@ const AppHome = () => {
                           className={cn(
                             'px-2.5 py-0.5 rounded-full text-[11px] whitespace-nowrap transition-all font-medium',
                             selectedTag === null
-                              ? 'bg-primary/15 text-primary'
+                              ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
                               : 'bg-muted text-muted-foreground'
                           )}
                         >
                           All
                         </button>
-                        {taskTags.map(tag => (
-                          <button
-                            key={tag}
-                            onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
-                            className={cn(
-                              'px-2.5 py-0.5 rounded-full text-[11px] whitespace-nowrap transition-all capitalize font-medium',
-                              selectedTag === tag
-                                ? 'bg-primary/15 text-primary'
-                                : 'bg-muted text-muted-foreground'
-                            )}
-                          >
-                            {tag}
-                          </button>
-                        ))}
+                        {taskTags.map((tag, i) => {
+                          const pillColors = [
+                            'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+                            'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
+                            'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
+                            'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400',
+                            'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+                            'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
+                          ];
+                          const activeColor = pillColors[i % pillColors.length];
+                          return (
+                            <button
+                              key={tag}
+                              onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
+                              className={cn(
+                                'px-2.5 py-0.5 rounded-full text-[11px] whitespace-nowrap transition-all capitalize font-medium',
+                                selectedTag === tag
+                                  ? activeColor
+                                  : 'bg-muted text-muted-foreground'
+                              )}
+                            >
+                              {tag}
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                     <span className="text-xs text-foreground/40 ml-auto shrink-0">Hold to reorder</span>
