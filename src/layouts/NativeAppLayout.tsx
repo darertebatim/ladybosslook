@@ -56,6 +56,9 @@ const NativeAppLayout = () => {
   // Track app version on every app open
   useAppInstallTracking(user?.id);
   
+  // AppsFlyer user tracking
+  useAppsFlyerTracking(user?.id);
+
   // Track app returns (every open/resume increments return count)
   useTrackAppReturn(user?.id);
   
