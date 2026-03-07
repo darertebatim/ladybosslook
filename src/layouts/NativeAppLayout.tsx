@@ -23,6 +23,7 @@ import { useProgramEventNotificationScheduler } from '@/hooks/useProgramEventNot
 import { useSmartActionNudges } from '@/hooks/useSmartActionNudges';
 import { usePeriodNotifications } from '@/hooks/usePeriodNotifications';
 import { useNotificationCleanup } from '@/hooks/useNotificationCleanup';
+import { useAppsFlyerTracking } from '@/hooks/useAppsFlyerTracking';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
