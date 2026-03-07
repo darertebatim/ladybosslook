@@ -12,7 +12,6 @@ import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlanne
 import { useNewHomeData } from '@/hooks/useNewHomeData';
 import { SortableTaskList } from '@/components/app/SortableTaskList';
 import { MonthCalendar } from '@/components/app/MonthCalendar';
-import { MonthCalendar } from '@/components/app/MonthCalendar';
 import { ProgramEventCard } from '@/components/app/ProgramEventCard';
 import { PromoBanner } from '@/components/app/PromoBanner';
 import { HomeBanner } from '@/components/app/HomeBanner';
