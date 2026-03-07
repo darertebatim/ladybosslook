@@ -19,7 +19,7 @@ export function QuickActionsGrid() {
     },
     {
       icon: Users,
-      label: 'Channels',
+      label: 'Chats',
       to: '/app/channels',
       bgColor: 'bg-[#E6D9FC]', // lavender
       iconColor: 'text-violet-600',
