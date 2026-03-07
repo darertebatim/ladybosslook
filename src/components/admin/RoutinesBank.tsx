@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
-import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles, Gift, Calendar, Flame, CalendarIcon } from 'lucide-react';
+import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles, Gift, Calendar, Flame, CalendarIcon, ExternalLink } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
@@ -88,6 +88,7 @@ interface TaskBankItem {
   title: string;
   emoji: string;
   category: string;
+  color: string;
   is_active: boolean;
   repeat_pattern: string;
 }
@@ -108,6 +109,7 @@ interface LocalTask {
   task_id: string | null;
   title: string;
   emoji: string;
+  color: string;
   section_id: string | null;
   task_order: number;
   schedule_days: number[];
@@ -210,7 +212,7 @@ export default function RoutinesBank() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('admin_task_bank')
-        .select('id, title, emoji, category, is_active, repeat_pattern')
+        .select('id, title, emoji, category, color, is_active, repeat_pattern')
         .eq('is_active', true)
         .order('title', { ascending: true });
       if (error) throw error;
@@ -453,9 +455,10 @@ export default function RoutinesBank() {
       id: t.id,
       task_id: t.task_id,
       title: t.title,
-      emoji: t.emoji,
+      emoji: t.emoji || '📝',
+      color: '', // will be resolved from taskBank at render time
       section_id: t.section_id,
-      task_order: t.task_order,
+      task_order: t.task_order ?? 0,
       schedule_days: (t as any).schedule_days || [],
       drip_day: (t as any).drip_day ?? null,
       monthly_day: (t as any).monthly_day ?? null,
@@ -635,6 +638,7 @@ export default function RoutinesBank() {
       task_id: task.id,
       title: task.title,
       emoji: task.emoji,
+      color: task.color || 'sky',
       section_id: sectionId,
       task_order: localTasks.filter(t => t.section_id === sectionId).length,
       schedule_days: [],
@@ -1584,8 +1588,26 @@ export default function RoutinesBank() {
 
                     if (!showGroups && uncategorizedTasks.length === 0 && localSections.length > 0) return null;
 
-                    const renderTaskRow = (task: LocalTask, tIdx: number, listLength: number, sectionId: string | null) => (
-                      <div key={task.id} className="rounded bg-background border">
+                    const getTaskColor = (task: LocalTask): string => {
+                      if (task.color) return task.color;
+                      if (task.task_id) {
+                        const bankItem = taskBank.find(b => b.id === task.task_id);
+                        if (bankItem?.color) return bankItem.color;
+                      }
+                      return 'sky';
+                    };
+
+                    const colorHexMap: Record<string, string> = {
+                      pink: '#FFD6E8', peach: '#FFE4C4', yellow: '#FFF59D', lime: '#E8F5A3',
+                      sky: '#C5E8FA', mint: '#B8F5E4', lavender: '#E8D4F8', purple: '#E8D4F8',
+                      blue: '#C5E8FA', red: '#FFD6E8', orange: '#FFE4C4', green: '#E8F5A3',
+                    };
+
+                    const renderTaskRow = (task: LocalTask, tIdx: number, listLength: number, sectionId: string | null) => {
+                      const taskColor = getTaskColor(task);
+                      const colorHex = colorHexMap[taskColor] || '#C5E8FA';
+                      return (
+                      <div key={task.id} className="rounded border overflow-hidden" style={{ backgroundColor: `${colorHex}30` }}>
                         <div className="flex items-center gap-2 p-2">
                           <div className="flex flex-col">
                             <button type="button" onClick={() => moveTaskUp(task.id, sectionId)} disabled={tIdx === 0} className="text-muted-foreground hover:text-foreground disabled:opacity-30">
@@ -1595,6 +1617,7 @@ export default function RoutinesBank() {
                               <ChevronDown className="h-3 w-3" />
                             </button>
                           </div>
+                          <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: colorHex }} />
                           <TaskIcon iconName={task.emoji} size={16} />
                           <span className="flex-1 text-sm truncate">{task.title}</span>
                           {renderTaskScheduleConfig(task)}
@@ -1608,12 +1631,24 @@ export default function RoutinesBank() {
                               </SelectContent>
                             </Select>
                           )}
+                          {task.task_id && (
+                            <a
+                              href={`/admin/tasks-bank?edit=${task.task_id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1 text-muted-foreground hover:text-foreground rounded hover:bg-accent"
+                              title="Edit action in task bank"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          )}
                           <button type="button" onClick={() => removeTask(task.id)} className="p-1 text-destructive hover:bg-destructive/10 rounded">
                             <X className="h-3 w-3" />
                           </button>
                         </div>
                       </div>
-                    );
+                    );};
 
                     // For challenge mode, show flat list as before
                     if (formData.schedule_type === 'challenge') {
