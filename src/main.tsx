@@ -60,6 +60,13 @@ async function initializeNative() {
   } catch (e) {
     console.warn('[Main] Push init failed:', e);
   }
+  
+  // AppsFlyer SDK
+  try {
+    await initAppsFlyer();
+  } catch (e) {
+    console.warn('[Main] AppsFlyer init failed:', e);
+  }
 }
 
 // Initialize native features (non-blocking)
