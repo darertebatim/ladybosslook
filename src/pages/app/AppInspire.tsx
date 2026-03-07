@@ -100,7 +100,7 @@ export default function AppInspire() {
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full">
         <div className="pb-safe w-full max-w-full">
           {/* Promo Banner - Top */}
-          <PromoBanner location="routines_top" className="px-4 pt-3" />
+          <PromoBanner location="routines_top" className="px-4 pt-3" carousel />
 
           {/* Categories - quick nav */}
           {categories && categories.length > 0 && (
