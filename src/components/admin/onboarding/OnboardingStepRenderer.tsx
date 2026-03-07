@@ -1814,7 +1814,7 @@ function ConfettiMessageScreen({ step, onNext }: Props) {
   }, []);
 
   return (
-    <div className="h-full flex flex-col items-center justify-center bg-[#f8f5ff] relative overflow-hidden min-h-[100dvh]">
+    <div className="h-full flex flex-col items-center justify-center bg-[#f8f5ff] relative overflow-hidden">
       {/* Floating emoji particles */}
       {['🎉', '🥳', '✨', '🌟', '💫', '🎊', '⭐', '💜'].map((emoji, i) => (
         <span
