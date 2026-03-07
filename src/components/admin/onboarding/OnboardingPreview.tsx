@@ -110,7 +110,7 @@ export function OnboardingPreview({ flow, onClose }: Props) {
           <div className="w-[375px] h-[812px] bg-black rounded-[3rem] p-3 shadow-2xl">
             <div className="w-full h-full rounded-[2.4rem] overflow-hidden bg-white flex flex-col relative">
               {/* iOS Status Bar */}
-              <div className="shrink-0 px-6 pt-3 pb-1 flex items-center justify-between z-20 absolute top-0 left-0 right-0" style={{ background: 'transparent' }}>
+              <div className="shrink-0 px-6 pt-3 pb-1 flex items-center justify-between z-20">
                 <span className="text-xs font-semibold text-black">9:41</span>
                 <div className="absolute left-1/2 -translate-x-1/2 top-3 w-28 h-5 bg-black rounded-full" />
                 <div className="flex items-center gap-1">
@@ -120,21 +120,22 @@ export function OnboardingPreview({ flow, onClose }: Props) {
                 </div>
               </div>
 
-              {/* Navigation bar - overlaid on content */}
-              <div className="shrink-0 px-4 py-2 flex items-center absolute top-9 left-0 right-0 z-20">
-                {currentStep > 0 && (
-                  <button onClick={goBack} className="mr-2 active:opacity-60">
-                    <ChevronLeft className="h-5 w-5 text-[#1a1f3d]" />
-                  </button>
-                )}
-                {/* Slim progress bar with transparent background */}
-                <div className="flex-1 h-[3px] bg-white/30 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-[#1a1f3d] rounded-full transition-all duration-300"
-                    style={{ width: `${progress}%` }}
-                  />
+              {/* Navigation bar - in normal flow like the real app */}
+              {step.type !== 'paywall' && (
+                <div className="shrink-0 px-4 py-2 flex items-center z-20 bg-white">
+                  {currentStep > 0 && (
+                    <button onClick={goBack} className="mr-2 active:opacity-60">
+                      <ChevronLeft className="h-5 w-5 text-[#1a1f3d]" />
+                    </button>
+                  )}
+                  <div className="flex-1 h-[3px] bg-black/10 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#1a1f3d] rounded-full transition-all duration-300"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Step content */}
               <div className="flex-1 overflow-hidden">
