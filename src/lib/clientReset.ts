@@ -36,6 +36,10 @@ const CLIENT_RESET_KEYS = [
   
   // Coach marks
   'simora_tap_coach_shown',
+  
+  // Dismissed routine suggestions
+  'simora_dismissed_routine_ids',
+  'simora_dismissed_ritual_ids',
 ] as const;
 
 /**
