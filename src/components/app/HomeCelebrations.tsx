@@ -74,7 +74,7 @@ interface HomeCelebrationsProps {
   showGoldStreakCelebration: boolean;
   setShowGoldStreakCelebration: (v: boolean) => void;
   goldStreakData: any;
-  goldDatesThisWeek: string[];
+  goldDatesThisWeek: Date[];
   updateGoldStreak: any;
 
   // Streak goal completion
