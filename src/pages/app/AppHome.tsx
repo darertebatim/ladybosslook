@@ -1084,185 +1084,74 @@ const AppHome = () => {
           <Plus className="h-6 w-6" />
         </button>
 
-        {/* Paywall for action limit */}
-        <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
-        <ActionLimitSheet
-          open={showActionLimit}
-          onOpenChange={setShowActionLimit}
-          onTakeChallenge={() => setShowPaywall(true)}
-        />
-
-        {/* Quick Start Sheet */}
-        <TaskQuickStartSheet open={showQuickStart} onOpenChange={setShowQuickStart} onContinue={handleQuickStartContinue} />
-
-        {/* Task Detail Modal */}
-        <TaskDetailModal 
-          task={selectedTask} 
-          open={!!selectedTask} 
-          onClose={() => setSelectedTask(null)} 
-          date={selectedDate} 
-          isCompleted={selectedTask ? completedTaskIds.has(selectedTask.id) : false}
+        {/* All celebrations, modals, and sheets */}
+        <HomeCelebrations
+          showPaywall={showPaywall}
+          setShowPaywall={setShowPaywall}
+          showActionLimit={showActionLimit}
+          setShowActionLimit={setShowActionLimit}
+          showQuickStart={showQuickStart}
+          setShowQuickStart={setShowQuickStart}
+          onQuickStartContinue={handleQuickStartContinue}
+          selectedTask={selectedTask}
+          setSelectedTask={setSelectedTask}
+          selectedDate={selectedDate}
+          completedTaskIds={completedTaskIds}
           completedSubtaskIds={completedSubtaskIds}
-          goalProgress={selectedTask ? (goalProgressMap.get(selectedTask.id) || 0) : 0}
-          onEdit={handleEditTask}
-          onDelete={handleDeleteTask}
-          onStreakIncrease={() => setShowStreakModal(true)}
+          goalProgressMap={goalProgressMap}
+          onEditTask={handleEditTask}
+          onDeleteTask={handleDeleteTask}
+          onSkipTask={handleSkipTask}
           onOpenGoalInput={handleOpenGoalInput}
           onOpenTimer={handleOpenTimer}
-          
-          onSkip={handleSkipTask}
-        />
-
-        {/* Streak celebration modal (also handles first action celebration) */}
-        <StreakCelebration 
-          open={showStreakModal} 
-          onClose={() => {
-            setShowStreakModal(false);
-            // After first-action celebration closes, show "tap to manage" coach mark
-            if (isFirstActionCelebration && localStorage.getItem('simora_tap_coach_shown') !== 'true') {
-              setTimeout(() => setShowTapCoachMark(true), 600);
-              localStorage.setItem('simora_tap_coach_shown', 'true');
-            }
-            setIsFirstActionCelebration(false);
-          }}
-          isFirstAction={isFirstActionCelebration}
+          showStreakModal={showStreakModal}
+          setShowStreakModal={setShowStreakModal}
+          isFirstActionCelebration={isFirstActionCelebration}
+          setIsFirstActionCelebration={setIsFirstActionCelebration}
+          setShowTapCoachMark={setShowTapCoachMark}
+          streak={streak}
           shouldShowGoalSelection={
-            // Show goal selection if: first streak day (current_streak === 1) and no goal set
-            !!streak && 
-            streak.current_streak === 1 && 
+            !!streak &&
+            streak.current_streak === 1 &&
             !streak.streak_goal &&
             streak.last_completion_date === format(new Date(), 'yyyy-MM-dd')
           }
-          onShowGoalSelection={() => {
-            setIsStreakUpgrade(false);
-            setShowGoalSelection(true);
-          }}
-        />
-
-        {/* Streak Goal Selection - Full screen modal */}
-        <StreakGoalSelection
-          open={showGoalSelection}
-          onClose={() => setShowGoalSelection(false)}
-          onSelectGoal={(goal) => {
-            setStreakGoal.mutate(goal, {
-              onSuccess: () => {
-                setShowGoalSelection(false);
-                setIsStreakUpgrade(false);
-                setConfirmedGoal(goal);
-                setShowGoalConfirmation(true);
-              },
-            });
-          }}
-          isLoading={setStreakGoal.isPending}
-          minGoal={isStreakUpgrade ? (streak?.streak_goal || 0) : 0}
-          isUpgrade={isStreakUpgrade}
-        />
-
-        <StreakGoalConfirmation
-          open={showGoalConfirmation}
-          goal={confirmedGoal}
-          onClose={() => setShowGoalConfirmation(false)}
-        />
-
-        {/* Badge celebration (silver/almost-there toasts + gold modal) */}
-        <BadgeCelebration
-          type={badgeCelebrationType}
-          onClose={() => {
-            const wassilver = badgeCelebrationType === 'silver';
-            closeBadgeCelebration();
-            if (wassilver) {
-              maybeRequestReview();
-            }
-          }}
-          onCollectGold={closeBadgeCelebration}
-          onGoldCollected={() => {
-            // Check if already shown today to prevent re-showing on navigation
-            if (localStorage.getItem(goldCelebrationShownKey) === 'true') {
-              return;
-            }
-            // Mark as shown for today
-            localStorage.setItem(goldCelebrationShownKey, 'true');
-            // Update gold streak and show celebration
-            updateGoldStreak.mutate(undefined, {
-              onSuccess: () => {
-                setShowGoldStreakCelebration(true);
-              },
-            });
-          }}
-          completedCount={badgeCompletedCount}
-          totalCount={badgeTotalCount}
-        />
-
-        {/* Gold Streak Celebration - shows after gold badge collected */}
-        <GoldStreakCelebration
-          open={showGoldStreakCelebration}
-          onClose={() => setShowGoldStreakCelebration(false)}
-          currentGoldStreak={goldStreakData?.currentGoldStreak || 1}
+          showGoalSelection={showGoalSelection}
+          setShowGoalSelection={setShowGoalSelection}
+          isStreakUpgrade={isStreakUpgrade}
+          setIsStreakUpgrade={setIsStreakUpgrade}
+          showGoalConfirmation={showGoalConfirmation}
+          setShowGoalConfirmation={setShowGoalConfirmation}
+          confirmedGoal={confirmedGoal}
+          setConfirmedGoal={setConfirmedGoal}
+          setStreakGoal={setStreakGoal}
+          badgeCelebrationType={badgeCelebrationType}
+          closeBadgeCelebration={closeBadgeCelebration}
+          badgeCompletedCount={badgeCompletedCount}
+          badgeTotalCount={badgeTotalCount}
+          maybeRequestReview={maybeRequestReview}
+          showGoldStreakCelebration={showGoldStreakCelebration}
+          setShowGoldStreakCelebration={setShowGoldStreakCelebration}
+          goldStreakData={goldStreakData}
           goldDatesThisWeek={goldDatesThisWeek}
-        />
-
-        {/* Task Skip Sheet */}
-        <TaskSkipSheet
-          task={skipTask}
-          open={!!skipTask}
-          onClose={() => setSkipTask(null)}
-          date={selectedDate}
-        />
-
-        {/* Goal Input Sheet */}
-        <GoalInputSheet
-          open={!!goalInputTask}
-          onOpenChange={(open) => !open && setGoalInputTask(null)}
-          unit={goalInputTask?.goal_unit || 'times'}
-          onConfirm={handleGoalInputConfirm}
-        />
-
-        {/* Timer Screen - Full screen overlay */}
-        {timerTask && (
-          <TaskTimerScreen
-            task={timerTask}
-            currentProgress={goalProgressMap.get(timerTask.id) || 0}
-            onSaveProgress={handleTimerSaveProgress}
-            onMarkComplete={handleTimerMarkComplete}
-            onClose={() => setTimerTask(null)}
-          />
-        )}
-
-        {/* Streak Goal Completion Celebration */}
-        <StreakGoalCompletionCelebration
-          open={showStreakGoalCompletion}
-          streakGoal={streak?.streak_goal || 7}
-          currentStreak={streak?.current_streak || 0}
-          onClose={() => setShowStreakGoalCompletion(false)}
-          onLevelUp={() => {
-            setShowStreakGoalCompletion(false);
-            setIsStreakUpgrade(true);
-            setShowGoalSelection(true);
-          }}
-        />
-
-
-
-        {user && showNotificationFlow && (
-          <PushNotificationOnboarding 
-            userId={user.id} 
-            onComplete={() => setShowNotificationFlow(false)} 
-            onSkip={() => setShowNotificationFlow(false)} 
-          />
-        )}
-
-        {/* Streak Recovery Prompt */}
-        <StreakRecoveryPrompt
-          open={showRecoveryPrompt}
-          previousStreak={streak?.longest_streak || 0}
-          onRecover={() => {
-            const prev = streak?.longest_streak || 0;
-            recoverStreak.mutate(prev, {
-              onSuccess: () => setShowRecoveryPrompt(false),
-            });
-          }}
-          onDismiss={() => setShowRecoveryPrompt(false)}
-          isLoading={recoverStreak.isPending}
+          updateGoldStreak={updateGoldStreak}
+          showStreakGoalCompletion={showStreakGoalCompletion}
+          setShowStreakGoalCompletion={setShowStreakGoalCompletion}
+          skipTask={skipTask}
+          setSkipTask={setSkipTask}
+          goalInputTask={goalInputTask}
+          setGoalInputTask={setGoalInputTask}
+          onGoalInputConfirm={handleGoalInputConfirm}
+          timerTask={timerTask}
+          setTimerTask={setTimerTask}
+          onTimerSaveProgress={handleTimerSaveProgress}
+          onTimerMarkComplete={handleTimerMarkComplete}
+          showRecoveryPrompt={showRecoveryPrompt}
+          setShowRecoveryPrompt={setShowRecoveryPrompt}
+          recoverStreak={recoverStreak}
+          userId={user?.id}
+          showNotificationFlow={showNotificationFlow}
+          setShowNotificationFlow={setShowNotificationFlow}
         />
 
         {/* New Interactive Home Tour */}
