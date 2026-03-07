@@ -59,7 +59,7 @@ export async function logAppsFlyerEvent(
     const { AppsFlyer } = await import('appsflyer-capacitor-plugin');
     await AppsFlyer.logEvent({
       eventName,
-      eventValues,
+      eventValue: eventValues,
     });
     console.log('[AppsFlyer] Event logged:', eventName);
   } catch (error) {
