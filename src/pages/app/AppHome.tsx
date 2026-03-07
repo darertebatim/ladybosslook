@@ -927,7 +927,7 @@ const AppHome = () => {
                                 'px-2.5 py-0.5 rounded-full text-[11px] whitespace-nowrap transition-all capitalize font-medium',
                                 selectedTag === tag
                                   ? activeColor
-                                  : 'bg-muted text-muted-foreground'
+                                  : 'bg-white text-muted-foreground dark:bg-white/10'
                               )}
                             >
                               {tag}
