@@ -57,7 +57,7 @@ export function RichTextEditor({ value, onChange, placeholder, className, imageB
         // Remove placeholder and insert image
         quill.deleteText(range.index, 'Uploading image...'.length);
         quill.insertEmbed(range.index, 'image', urlData.publicUrl);
-        quill.setSelection(range.index + 1);
+        quill.setSelection(range.index + 1, 0);
         
         toast.success('Image added');
       } catch (err: any) {
