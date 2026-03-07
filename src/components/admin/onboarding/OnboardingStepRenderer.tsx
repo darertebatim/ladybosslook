@@ -132,8 +132,8 @@ function IllustrationPlaceholder({ label, className = '' }: { label: string; cla
 
 function ScreenWrapper({ children, bg = 'bg-white', center = false }: { children: React.ReactNode; bg?: string; center?: boolean }) {
   return (
-    <div className={`h-full flex flex-col ${bg}`}>
-      <div className={`flex-1 flex flex-col overflow-y-auto overscroll-contain px-5 pt-4 pb-6 ${center ? 'justify-center' : ''}`}>
+    <div className={`h-full ${bg} overflow-y-auto overscroll-contain`}>
+      <div className={`flex flex-col min-h-full px-5 pt-4 pb-6 ${center ? 'justify-center' : ''}`} style={{ minHeight: '-webkit-fill-available' }}>
         {children}
       </div>
     </div>
