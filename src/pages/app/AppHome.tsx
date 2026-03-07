@@ -33,15 +33,12 @@ import { FastingStatusCard } from '@/components/app/FastingStatusCard';
 import { WelcomeRoutineCard } from '@/components/app/WelcomeRoutineCard';
 import { toast } from 'sonner';
 import { useWeeklyTaskCompletion, useDateRangeTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
-import { BadgeCelebration } from '@/components/app/BadgeCelebration';
-import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { useBadgeCelebration } from '@/hooks/useBadgeCelebration';
 import { useGoldStreak, useGoldDatesThisWeek, useUpdateGoldStreak } from '@/hooks/useGoldStreak';
 import { useTodayMood } from '@/hooks/useMoodLogs';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useAppReview } from '@/hooks/useAppReview';
-import { PaywallSheet } from '@/components/app/PaywallSheet';
-import { ActionLimitSheet, hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
+import { hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 import { MoodCheckInBanner } from '@/components/mood/MoodCheckInBanner';
 import { OnboardingBanner } from '@/components/app/OnboardingBanner';
 
