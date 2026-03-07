@@ -904,7 +904,7 @@ const AppHome = () => {
                             'px-2.5 py-0.5 rounded-full text-[11px] whitespace-nowrap transition-all font-medium',
                             selectedTag === null
                               ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                              : 'bg-muted text-muted-foreground'
+                              : 'bg-white text-muted-foreground dark:bg-white/10'
                           )}
                         >
                           All
