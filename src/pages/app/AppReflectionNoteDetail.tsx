@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { useBilingualText } from '@/components/ui/BilingualText';
+import { BilingualText, useBilingualText } from '@/components/ui/BilingualText';
 import { cn } from '@/lib/utils';
 
 export default function AppReflectionNoteDetail() {
