@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { BilingualText, useBilingualText } from '@/components/ui/BilingualText';
+import { cn } from '@/lib/utils';
 
 export default function AppReflectionNoteDetail() {
   const { reflectionId } = useParams<{ reflectionId: string }>();
@@ -108,8 +110,11 @@ export default function AppReflectionNoteDetail() {
     deleteMutation.mutate();
   };
 
+  // Bilingual detection for edit textarea
+  const { className: editBiClassName, direction: editDir } = useBilingualText(editText);
+
   return (
-    <div className="min-h-screen bg-background font-farsi" dir="rtl">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <div
         className="px-4 pb-3 flex items-center justify-between border-b"
@@ -166,12 +171,12 @@ export default function AppReflectionNoteDetail() {
             {data.qaPairs.map((qa, idx) => (
               <button
                 key={idx}
-                className="py-5 first:pt-0 w-full text-right active:bg-muted/50 transition-colors rounded-lg"
+                className="py-5 first:pt-0 w-full text-left active:bg-muted/50 transition-colors rounded-lg"
                 onClick={() => handleEdit(idx)}
               >
-                <p className="text-base text-muted-foreground leading-relaxed">{qa.question}</p>
+                <BilingualText as="p" className="text-base text-muted-foreground leading-relaxed">{qa.question}</BilingualText>
                 {qa.answer && (
-                  <p className="mt-2 text-base font-medium">{qa.answer}</p>
+                  <BilingualText as="p" className="mt-2 text-base font-medium">{qa.answer}</BilingualText>
                 )}
               </button>
             ))}
@@ -192,8 +197,8 @@ export default function AppReflectionNoteDetail() {
           <Textarea
             value={editText}
             onChange={(e) => setEditText(e.target.value)}
-            className="min-h-[120px] text-right font-farsi"
-            dir="rtl"
+            className={cn("min-h-[120px]", editBiClassName)}
+            dir={editDir}
             placeholder="پاسخ خود را بنویسید…"
           />
           <DialogFooter>

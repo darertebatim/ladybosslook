@@ -11,6 +11,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
+import { BilingualText } from '@/components/ui/BilingualText';
 
 const SYNTHETIC_REFLECTION_TASK: RoutinePlanTask = {
   id: 'synthetic-reflection-task',
@@ -43,7 +44,7 @@ export default function AppReflections() {
   const all = reflections || [];
 
   return (
-    <div className="min-h-screen bg-background pb-24 font-farsi" dir="rtl">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <header
         className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
@@ -87,13 +88,13 @@ export default function AppReflections() {
               <button
                 key={r.id}
                 onClick={() => navigate(`/app/reflections/${r.id}`)}
-                className="w-full rounded-2xl overflow-hidden text-right transition-transform active:scale-[0.97] relative"
+                className="w-full rounded-2xl overflow-hidden text-left transition-transform active:scale-[0.97] relative"
                 style={{ backgroundColor: r.cover_color || '#ffffff' }}
               >
                 <div className="flex items-center">
                   <div className="flex-1 p-4">
-                    <p className="font-bold text-base leading-tight text-foreground">{r.title}</p>
-                    {r.subtitle && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{r.subtitle}</p>}
+                    <BilingualText as="p" className="font-bold text-base leading-tight text-foreground">{r.title}</BilingualText>
+                    {r.subtitle && <BilingualText as="p" className="text-sm text-muted-foreground mt-1 line-clamp-2">{r.subtitle}</BilingualText>}
                   </div>
                   {r.cover_image_url && (
                     <div className="w-28 h-28 shrink-0">
@@ -218,7 +219,7 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
       <div className="w-full flex items-center gap-4 py-4">
         <button
           onClick={handleReflectionClick}
-          className="flex-1 flex items-center gap-4 text-right transition-transform active:scale-[0.98] min-w-0"
+          className="flex-1 flex items-center gap-4 text-left transition-transform active:scale-[0.98] min-w-0"
         >
           {/* Cover with PLUS badge */}
           <div className="relative shrink-0">
@@ -240,9 +241,9 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-base leading-tight">{reflection.title}</p>
+            <BilingualText as="p" className="font-semibold text-base leading-tight">{reflection.title}</BilingualText>
             {reflection.subtitle && (
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{reflection.subtitle}</p>
+              <BilingualText as="p" className="text-sm text-muted-foreground mt-1 line-clamp-2">{reflection.subtitle}</BilingualText>
             )}
           </div>
         </button>

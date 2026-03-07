@@ -5,6 +5,8 @@ import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { useBilingualText } from '@/components/ui/BilingualText';
+import { cn } from '@/lib/utils';
 
 export default function AppReflectionFlow() {
   const { reflectionId } = useParams<{ reflectionId: string }>();
@@ -91,10 +93,14 @@ export default function AppReflectionFlow() {
     );
   }
 
+  // Bilingual detection for content text
+  const { className: contentBiClassName, direction: contentDir } = useBilingualText(page?.content || '');
+  const { className: descBiClassName, direction: descDir } = useBilingualText(page?.description || '');
+  const { className: answerBiClassName, direction: answerDir } = useBilingualText(answers[page?.id || ''] || '');
+
   return (
     <div
-      className="h-[100dvh] bg-background flex flex-col overflow-hidden font-farsi"
-      dir="rtl"
+      className="h-[100dvh] bg-background flex flex-col overflow-hidden"
     >
       {/* Top bar: back + progress */}
       <div
@@ -102,9 +108,9 @@ export default function AppReflectionFlow() {
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
       >
         <button onClick={handleBack} className="shrink-0 active:scale-95 transition-transform p-1">
-          <ArrowLeft className="h-6 w-6 rotate-180" />
+          <ArrowLeft className="h-6 w-6" />
         </button>
-        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden" dir="ltr">
+        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
           <div
             className="h-full bg-foreground rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
@@ -114,9 +120,9 @@ export default function AppReflectionFlow() {
 
       {/* Content */}
       <div className="flex-1 flex flex-col px-6 py-6 overflow-y-auto overscroll-contain">
-        <p className="text-xl font-bold leading-snug text-right">{page?.content}</p>
+        <p className={cn("text-xl font-bold leading-snug", contentBiClassName)} dir={contentDir}>{page?.content}</p>
         {page?.description && (
-          <p className="mt-4 text-sm text-foreground leading-relaxed whitespace-pre-line text-right">{page.description}</p>
+          <p className={cn("mt-4 text-sm text-foreground leading-relaxed whitespace-pre-line", descBiClassName)} dir={descDir}>{page.description}</p>
         )}
 
         {page?.type === 'question' && (
@@ -125,15 +131,15 @@ export default function AppReflectionFlow() {
             value={answers[page.id] || ''}
             onChange={(e) => setAnswers((prev) => ({ ...prev, [page.id]: e.target.value }))}
             placeholder="پاسخ خود را بنویسید…"
-            className="mt-6 w-full bg-transparent border-0 border-b-2 border-muted-foreground/20 focus:border-primary outline-none resize-none text-base min-h-[120px] placeholder:text-muted-foreground/50 transition-colors text-right font-farsi"
-            dir="rtl"
+            className={cn("mt-6 w-full bg-transparent border-0 border-b-2 border-muted-foreground/20 focus:border-primary outline-none resize-none text-base min-h-[120px] placeholder:text-muted-foreground/50 transition-colors", answerBiClassName)}
+            dir={answerDir}
           />
         )}
       </div>
 
       {/* FAB */}
       <div
-        className="p-6 flex justify-start shrink-0"
+        className="p-6 flex justify-end shrink-0"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}
       >
         <button
@@ -141,7 +147,7 @@ export default function AppReflectionFlow() {
           disabled={saveResponse.isPending}
           className="h-14 w-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg active:scale-95 transition-transform disabled:opacity-50"
         >
-          {isLast ? <Check className="h-6 w-6" /> : <ArrowRight className="h-6 w-6 rotate-180" />}
+          {isLast ? <Check className="h-6 w-6" /> : <ArrowRight className="h-6 w-6" />}
         </button>
       </div>
     </div>
