@@ -69,6 +69,7 @@ interface AdminSettings {
 
 export default function TasksBank() {
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<TaskBankItem | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
