@@ -1,58 +1,74 @@
 
 
-## Calm-Style Animated Background for Watch Page
+# Performance Optimization Plan for v1.2.02
 
-Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
+## Current State
 
-### What You'll Get
+AppHome.tsx is **1,294 lines** with 25+ `useState` hooks, 50+ imports, and multiple heavy sub-components. The home page fires 4-5 parallel Supabase queries on top of the consolidated RPC. NativeAppLayout runs 10+ hooks on every mount (notification schedulers, trackers, etc.). The app already has good foundations (lazy loading, RPC consolidation, query caching), but there are clear wins remaining.
 
-- A deep dark blue gradient background on the Watch page header area
-- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
-- Subtle lightning flashes that pulse periodically
-- All text updated to white/light colors for contrast
-- Lightweight implementation using CSS keyframes (no extra dependencies)
+## Proposed Optimizations
 
-### Design Details
+### 1. Split AppHome into smaller components
+The 1,294-line monolith causes large re-renders on any state change. Extract into:
+- `HomeHeader` — calendar strip, month selector, streak badge
+- `HomeTaskList` — task filtering, sortable list, coach marks
+- `HomeCelebrations` — all celebration/modal state (streak, badge, gold, goal)
+- `HomeBottomDashboard` — FAB, active rounds carousel
 
-- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
-- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
-- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
-- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
-- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
+This isolates re-renders. When a celebration modal opens, only `HomeCelebrations` re-renders — not the entire task list.
 
-### Technical Approach
+### 2. Reduce unnecessary re-renders with memo boundaries
+- Wrap `TaskCard`, `ProgramEventCard`, `RoutineBankCard` renders in `React.memo` (if not already)
+- Memoize the week strip day buttons (currently re-created on every render — 21 buttons)
+- Move `weekDays` computation out of component or use `useMemo` with stable deps (already done, but the inline `.map()` in JSX re-creates elements)
 
-**Files to modify:**
+### 3. Defer non-critical layout hooks in NativeAppLayout
+Currently all 10+ hooks run immediately on mount. Defer non-essential ones:
+- `useSmartActionNudges` — delay 10s
+- `usePeriodNotifications` — delay 8s
+- `useAppInstallTracking` — delay 5s
+- `useAppsFlyerTracking` — delay 5s
 
-1. **`src/pages/app/AppWatch.tsx`**
-   - Replace the header `bg-[#E8F4FE]` with the dark gradient
-   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
-   - Add a lightning flash overlay div
-   - Update all text classes to white variants (`text-white`, `text-white/60`)
-   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
-   - Extend the gradient into the page background behind the content area
+This frees the main thread during initial render for smoother perceived load.
 
-2. **`tailwind.config.ts`**
-   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
-   - Register corresponding animation utilities
+### 4. Reduce home page query waterfall
+`useNewHomeData` makes the RPC call, then fires 3 more parallel queries, then conditionally fires a `program_sessions` query. The sessions query can be folded into the RPC function to eliminate this waterfall step.
 
-### Visual Structure
-
-```text
-+----------------------------------+
-|  [dark blue gradient header]     |
-|  ~~~ cloud layer 1 (slow) ~~~   |
-|  ~~~ cloud layer 2 (slower) ~~~ |
-|  * lightning flash (periodic) *  |
-|                                  |
-|  Watch          [icons]          |
-|  [categories row]                |
-|  [filters]              [lang]   |
-+----------------------------------+
-|  [normal white content area]     |
-|  [playlist cards grid]           |
-+----------------------------------+
+### 5. Preload critical route chunks
+AppHome is lazy-loaded. For the native app, preload it immediately since it's always the first screen:
+```ts
+// In main.tsx or App.tsx for native
+if (isNativeApp()) {
+  import('@/pages/app/AppHome');
+}
 ```
 
-The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
+### 6. Optimize the week strip scroll handler
+The scroll handler uses a 100ms debounce but recalculates on every scroll event. Add `passive: true` to the scroll listener and use `requestAnimationFrame` for the debounced handler.
+
+### 7. Reduce localStorage reads on every render
+Multiple `useState` initializers read `localStorage` synchronously (welcome card, dismissed routines, celebration flags). Consolidate into a single read on mount.
+
+### 8. Version bump
+Update `__APP_VERSION__` in `vite.config.ts` from `1.1.04` to `1.2.02`.
+
+## Impact Summary
+
+| Optimization | Impact | Effort |
+|---|---|---|
+| Split AppHome | High — fewer re-renders | Medium |
+| Defer layout hooks | High — faster initial paint | Low |
+| Preload home chunk | Medium — eliminates lazy load delay | Low |
+| Fold sessions into RPC | Medium — removes waterfall | Low |
+| Memo boundaries | Medium — smoother interactions | Low |
+| Consolidate localStorage | Low — cleaner code | Low |
+| Version bump | Required | Trivial |
+
+## Files to Modify
+- `src/pages/app/AppHome.tsx` — split into sub-components
+- `src/layouts/NativeAppLayout.tsx` — defer hooks
+- `src/App.tsx` or `src/main.tsx` — preload home chunk
+- `supabase/functions/` or RPC — fold sessions query
+- `vite.config.ts` — version bump
+- New files: `src/components/app/HomeHeader.tsx`, `HomeCelebrations.tsx`, `HomeTaskList.tsx`
 
