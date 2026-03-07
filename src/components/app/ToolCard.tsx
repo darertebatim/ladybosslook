@@ -33,7 +33,8 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
   const { isSubscribed } = useSubscription();
   const [showPaywall, setShowPaywall] = useState(false);
   const IconComponent = iconMap[tool.icon] || Circle;
-  const isLocked = LOCKED_TOOLS.includes(tool.id) && !isSubscribed;
+  const isPremiumTool = LOCKED_TOOLS.includes(tool.id);
+  const isLocked = isPremiumTool && !isSubscribed;
 
   const handleClick = () => {
     if (tool.comingSoon) {
