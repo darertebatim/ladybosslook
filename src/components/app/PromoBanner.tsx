@@ -315,10 +315,10 @@ export function PromoBanner({
       case 'tasks':
         navigate(banner.destination_id ? `/app/home/new?template=${banner.destination_id}` : '/app/home');
         break;
-      case 'routines_hub':
-        navigate(banner.destination_id ? `/app/routines/${banner.destination_id}` : '/app/routines');
+      case 'tasks_bank':
+      case 'planner':
+        navigate('/app/home');
         break;
-      case 'tasks_bank': navigate('/app/home'); break;
       case 'breathe_exercise': navigate('/app/breathe'); break;
       case 'emotion': navigate('/app/emotion'); break;
       case 'mood': navigate('/app/mood'); break;
