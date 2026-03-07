@@ -950,7 +950,7 @@ const AppHome = () => {
                             <div className="relative">
                               <SortableTaskList tasks={[filteredTasks[0]]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                               {/* Pointing finger absolutely positioned over the card */}
-                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none animate-bounce">
+                              <div className="absolute inset-0 flex items-start justify-center pointer-events-none animate-bounce" style={{ top: '-2rem' }}>
                                 <span className="text-8xl" style={{ transform: 'rotate(135deg)', display: 'inline-block' }}>☝️</span>
                               </div>
                             </div>
