@@ -109,7 +109,7 @@ export default function AppReflectionNoteDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background font-farsi" dir="rtl">
       {/* Header */}
       <div
         className="px-4 pb-3 flex items-center justify-between border-b"
