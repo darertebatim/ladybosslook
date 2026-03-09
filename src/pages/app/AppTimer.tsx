@@ -754,22 +754,9 @@ export default function AppTimer() {
     );
   }
 
-  // ─── STATS SCREEN (placeholder) ───
+  // ─── STATS SCREEN ───
   if (screen === 'stats') {
-    return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <div className="flex items-center px-4 pt-4 pb-2">
-          <button onClick={() => { setScreen('setup'); haptic.light(); }} className="p-2 -ml-2">
-            <ArrowLeft className="h-5 w-5 text-foreground" />
-          </button>
-        </div>
-        <div className="flex-1 flex flex-col items-center justify-center px-6">
-          <BarChart2 className="h-12 w-12 text-muted-foreground/30 mb-4" />
-          <h2 className="text-xl font-semibold text-foreground mb-2">Stats</h2>
-          <p className="text-sm text-muted-foreground text-center">Coming soon</p>
-        </div>
-      </div>
-    );
+    return <FocusStatsScreen onBack={() => { setScreen('setup'); haptic.light(); }} />;
   }
 
   if (screen === 'adjustTime') {
