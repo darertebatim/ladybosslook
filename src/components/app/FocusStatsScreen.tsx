@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { format, addDays, subDays, startOfWeek, endOfWeek, addWeeks, subWeeks, addMonths, subMonths, addYears, subYears, parseISO, differenceInCalendarDays } from 'date-fns';
 import { useFocusStats, FocusSession } from '@/hooks/useFocusSessions';
+import tomato3d from '@/assets/tomato-3d.png';
 
 type Period = 'day' | 'week' | 'month' | 'year';
 
