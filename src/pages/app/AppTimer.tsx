@@ -302,6 +302,15 @@ export default function AppTimer() {
 
         {/* Timer Display */}
         <div className="flex-1 flex flex-col items-center justify-center px-6 -mt-8">
+          {/* Pomodoro tomatoes */}
+          {activeTab === 'pomodoro' && (
+            <div className="flex gap-2 mb-4">
+              {Array.from({ length: POMODORO_ROUNDS }, (_, i) => (
+                <span key={i} className="text-2xl">🍅</span>
+              ))}
+            </div>
+          )}
+
           {/* Hand-drawn ellipse */}
           <div className="relative">
             {/* SVG Ellipse */}
@@ -360,7 +369,7 @@ export default function AppTimer() {
             onClick={startTimer}
             className="flex-1 h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
           >
-            Start Timer
+            {activeTab === 'pomodoro' ? 'Start Focus' : 'Start Timer'}
           </button>
           <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center shrink-0">
             <CalendarDays className="h-5 w-5 text-muted-foreground" />
