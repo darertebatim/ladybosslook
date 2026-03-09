@@ -426,8 +426,8 @@ const AppProfile = () => {
               </Button>
             </>
           )}
-          <Button variant="outline" className="rounded-2xl h-12 px-4" onClick={() => navigate('/app/settings')}>
-            <Settings className="h-4 w-4" />
+          <Button variant="outline" className="flex-1 rounded-2xl h-12" onClick={() => navigate('/app/settings')}>
+            <Settings className="mr-2 h-4 w-4" />Settings
           </Button>
         </div>
 
