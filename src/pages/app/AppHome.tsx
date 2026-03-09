@@ -758,7 +758,7 @@ const AppHome = () => {
                         <div className={cn(
                           'w-11 h-11 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all relative',
                           isSelected 
-                            ? 'bg-chip-lavender text-foreground scale-105 shadow-sm' 
+                            ? 'bg-chip-lavender text-foreground scale-105' 
                             : isTodayDate 
                               ? 'border border-background text-muted-foreground' 
                               : 'text-muted-foreground/60',
