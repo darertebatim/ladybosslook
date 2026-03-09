@@ -410,29 +410,6 @@ const AppPresence = () => {
   );
 };
 
-// Small stat card for the top row
-interface StatCardProps {
-  icon: typeof Flame;
-  label: string;
-  value: number;
-  iconColor: string;
-  isLoading?: boolean;
-}
-
-function StatCard({ icon: Icon, label, value, iconColor, isLoading }: StatCardProps) {
-  return (
-    <div className="bg-white rounded-2xl p-4 shadow-sm text-center">
-      <Icon className={cn('h-5 w-5 mx-auto mb-2', iconColor)} />
-      {isLoading ? (
-        <Skeleton className="h-7 w-10 mx-auto mb-1" />
-      ) : (
-        <div className="text-2xl font-bold text-orange-900">{value}</div>
-      )}
-      <div className="text-xs text-orange-700/60 font-medium">{label}</div>
-    </div>
-  );
-}
-
 // Activity stat card
 interface ActivityStatCardProps {
   icon: typeof Headphones;
