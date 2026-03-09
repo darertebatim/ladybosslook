@@ -391,7 +391,7 @@ export default function AppTimer() {
 
         {/* Done button with lavender gradient */}
         <div className="px-6 pb-8 pt-4 relative">
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-purple-100/50 to-transparent pointer-events-none dark:from-purple-950/20" />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-muted/50 to-transparent pointer-events-none" />
           <button
             onClick={() => { setScreen('setup'); haptic.medium(); }}
             className="relative w-full h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
