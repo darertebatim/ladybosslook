@@ -228,7 +228,7 @@ const AppActionStats = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-border/50 pb-3">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">🏅</span>
+                  <img src={coinGold} alt="Gold" className="w-8 h-8 object-contain" />
                   <span className="text-base font-semibold text-foreground">Gold Badge</span>
                 </div>
                 <div className="flex items-baseline gap-1">
