@@ -466,7 +466,7 @@ export default function AppTimer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="px-6 pb-8 pt-4 flex items-center gap-3">
+        <div className="px-6 pt-4 flex items-center gap-3" style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}>
           <button
             onClick={() => { setScreen('settings'); setSettingsTab(activeTab); haptic.light(); }}
             className="w-12 h-12 rounded-full bg-muted flex items-center justify-center shrink-0"
