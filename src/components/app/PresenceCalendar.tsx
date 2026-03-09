@@ -15,7 +15,7 @@ import {
   isAfter,
 } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { useStreakCalendar, useMoodCalendar, useActionCalendar } from '@/hooks/usePresenceCalendars';
+import { useStreakCalendar, useActionCalendar } from '@/hooks/usePresenceCalendars';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -86,75 +86,6 @@ export function StreakCalendar() {
                 isToday && !isActive && 'text-orange-500 font-bold',
               )}
             >
-              {format(day, 'd')}
-            </span>
-          </div>
-        );
-      })}
-    </CalendarShell>
-  );
-}
-
-// ─── MOOD CALENDAR ───
-
-const VALENCE_EMOJI_MAP: Record<string, string> = {
-  positive: '😊',
-  negative: '😔',
-  neutral: '😐',
-};
-
-const VALENCE_BG: Record<string, string> = {
-  positive: 'bg-yellow-300',
-  negative: 'bg-yellow-200',
-  neutral: 'bg-green-200',
-};
-
-export function MoodCalendar() {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const { data: moodByDate = {} } = useMoodCalendar(currentMonth);
-  const days = useCalendarDays(currentMonth);
-  const today = new Date();
-
-  return (
-    <CalendarShell
-      currentMonth={currentMonth}
-      onPrev={() => setCurrentMonth(m => subMonths(m, 1))}
-      onNext={() => setCurrentMonth(m => addMonths(m, 1))}
-    >
-      {days.map((day, idx) => {
-        const dateStr = format(day, 'yyyy-MM-dd');
-        const inMonth = isSameMonth(day, currentMonth);
-        const mood = moodByDate[dateStr];
-        const isToday = isSameDay(day, today);
-
-        if (!inMonth) {
-          return (
-            <div key={idx} className="flex items-center justify-center h-10">
-              <span className="text-sm text-muted-foreground/30">{format(day, 'd')}</span>
-            </div>
-          );
-        }
-
-        if (mood) {
-          const valence = mood.valence || 'neutral';
-          const bg = VALENCE_BG[valence] || VALENCE_BG.neutral;
-          const emoji = VALENCE_EMOJI_MAP[valence] || '😊';
-
-          return (
-            <div key={idx} className="flex items-center justify-center h-10">
-              <div className={cn('w-9 h-9 rounded-full flex items-center justify-center', bg)}>
-                <FluentEmoji emoji={emoji} size={22} />
-              </div>
-            </div>
-          );
-        }
-
-        return (
-          <div key={idx} className="flex items-center justify-center h-10">
-            <span className={cn(
-              'text-sm font-medium',
-              isToday ? 'text-orange-500 font-bold' : 'text-foreground',
-            )}>
               {format(day, 'd')}
             </span>
           </div>
