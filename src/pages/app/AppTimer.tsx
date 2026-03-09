@@ -29,6 +29,9 @@ export default function AppTimer() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const holdTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const holdStartRef = useRef<number>(0);
+  const rulerRef = useRef<HTMLDivElement>(null);
+  const lastHapticVal = useRef(25);
+  const rulerInitialized = useRef(false);
 
   // Fetch individual audio tracks from soundscape playlists
   const { data: soundscapeTracks = [] } = useQuery({
