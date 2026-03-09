@@ -733,7 +733,36 @@ export default function AppTimer() {
     );
   }
 
-  // ─── POMODORO BREAK SCREEN ───
+  // ─── POMODORO: ROUND DONE → "Time for a short break" ───
+  if (screen === 'pomodoroRoundDone') {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="min-h-screen bg-black flex flex-col items-center justify-center px-8 relative select-none"
+      >
+        <span className="text-5xl mb-8">🍅</span>
+        <h1 className="text-3xl font-extrabold text-white text-center leading-tight mb-2">
+          You've been focusing for{' '}
+          <span className="text-[hsl(var(--primary))]">{minutes} min</span>.
+        </h1>
+        <h1 className="text-3xl font-extrabold text-white text-center leading-tight">
+          Time for a short break.
+        </h1>
+
+        <div className="absolute bottom-12 left-0 right-0 px-8">
+          <button
+            onClick={() => { haptic.medium(); startPomodoroBreak(); }}
+            className="w-full h-14 rounded-full bg-white text-black font-semibold text-base transition-transform active:scale-[0.97]"
+          >
+            Take a break
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // ─── POMODORO: BREAK COUNTDOWN ───
   if (screen === 'pomodoroBreak') {
     const breakTimeStr = formatTime(secondsLeft);
 
@@ -741,23 +770,23 @@ export default function AppTimer() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="min-h-screen bg-background flex flex-col items-center justify-center relative select-none"
+        className="min-h-screen bg-black flex flex-col items-center justify-center relative select-none"
       >
         {/* Tomato progress */}
         <div className="flex gap-2 mb-6">
           {Array.from({ length: POMODORO_ROUNDS }, (_, i) => (
-            <span key={i} className={cn("text-2xl transition-opacity", i < pomodoroRound ? "opacity-100" : "opacity-30")}>
+            <span key={i} className={cn("text-2xl transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
               🍅
             </span>
           ))}
         </div>
 
-        <p className="text-muted-foreground text-sm mb-2">Break time</p>
-        <span className="text-6xl font-bold text-foreground mb-4" style={{ fontVariantNumeric: 'tabular-nums' }}>
+        <p className="text-white/50 text-sm mb-2">Break time</p>
+        <span className="text-6xl font-bold text-white mb-4" style={{ fontVariantNumeric: 'tabular-nums' }}>
           {breakTimeStr}
         </span>
-        <p className="text-muted-foreground text-sm">
-          Round {pomodoroRound + 1} starts soon
+        <p className="text-white/40 text-sm">
+          Round {nextRoundRef.current + 1} starts soon
         </p>
 
         {/* Skip break */}
@@ -766,9 +795,9 @@ export default function AppTimer() {
             if (intervalRef.current) clearInterval(intervalRef.current);
             intervalRef.current = null;
             haptic.medium();
-            startPomodoroRound(pomodoroRound);
+            startPomodoroRound(nextRoundRef.current);
           }}
-          className="mt-10 px-6 py-3 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
+          className="mt-10 px-6 py-3 rounded-full bg-white/10 text-white font-semibold text-sm transition-transform active:scale-[0.97]"
         >
           Skip break
         </button>
@@ -776,8 +805,38 @@ export default function AppTimer() {
     );
   }
 
+  // ─── POMODORO: BREAK DONE → "Break's over!" ───
+  if (screen === 'pomodoroBreakDone') {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="min-h-screen bg-black flex flex-col items-center justify-center px-8 relative select-none"
+      >
+        <span className="text-5xl mb-8">🍅</span>
+        <h1 className="text-3xl font-extrabold text-center leading-tight mb-1">
+          <span className="text-[hsl(var(--primary))]">Break's over!</span>
+        </h1>
+        <h1 className="text-3xl font-extrabold text-white text-center leading-tight">
+          Time to dive into your next Pomodoro session!
+        </h1>
+
+        <div className="absolute bottom-12 left-0 right-0 px-8">
+          <button
+            onClick={() => { haptic.medium(); startPomodoroRound(nextRoundRef.current); }}
+            className="w-full h-14 rounded-full bg-white text-black font-semibold text-base transition-transform active:scale-[0.97]"
+          >
+            Start focus
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
+
   // ─── COMPLETED SCREEN ───
   if (screen === 'completed') {
+    const totalFocusMin = activeTab === 'pomodoro' ? minutes * POMODORO_ROUNDS : minutes;
+
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -788,7 +847,11 @@ export default function AppTimer() {
           <Check className="h-8 w-8 text-background" />
         </div>
         <h1 className="text-3xl font-bold text-foreground mb-2 text-center">Wow! You did it!</h1>
-        <p className="text-muted-foreground text-center mb-10">Celebrate your progress!</p>
+        <p className="text-muted-foreground text-center mb-10">
+          {activeTab === 'pomodoro'
+            ? `Celebrate your progress—${totalFocusMin} minutes of focus completed`
+            : 'Celebrate your progress!'}
+        </p>
         <button
           onClick={() => { haptic.success(); setScreen('setup'); }}
           className="w-full max-w-xs h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
