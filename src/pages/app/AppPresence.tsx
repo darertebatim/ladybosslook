@@ -172,6 +172,9 @@ const AppPresence = () => {
           {/* Content */}
           <div className="px-4 py-6 space-y-6">
             
+            {/* Subscription Card */}
+            <SubscriptionCard />
+            
             {/* Profile Card */}
             <PresenceProfileCard />
             
