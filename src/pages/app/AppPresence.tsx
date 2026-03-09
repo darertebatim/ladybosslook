@@ -115,7 +115,7 @@ const AppPresence = () => {
             <div className="absolute top-32 right-8 w-1.5 h-1.5 rounded-full bg-white/60" />
             
             {/* Hero Content */}
-            <div className="relative z-10 px-6 pb-16 pt-4">
+            <div className="relative z-10 px-6 pb-4 pt-4">
               {/* Top row: 2 stat cards on left, big number on right */}
               <div className="flex items-center gap-3 mb-6">
                 {/* Left: stacked stat cards */}
