@@ -328,6 +328,8 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return '/app/fasting?weight=1';
     case 'reflection':
       return linkValue ? `/app/reflections/${linkValue}` : '/app/reflections';
+    case 'focus_timer':
+      return '/app/timer';
     default:
       return '/app/home';
   }
