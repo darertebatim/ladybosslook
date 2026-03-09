@@ -76,7 +76,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'water',
-    name: 'Water Tracker',
+    name: 'Water',
     icon: 'Droplets',
     bgColor: 'bg-[#D6E6FC]',
     iconColor: 'text-blue-600',
