@@ -809,7 +809,7 @@ export default function AppTimer() {
   }
 
   if (screen === 'adjustTime') {
-
+    const isPomodoro = activeTab === 'pomodoro';
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <div className="flex items-center px-4 pb-2" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}>
