@@ -127,59 +127,81 @@ const AppPresence = () => {
             <div className="absolute top-32 right-8 w-1.5 h-1.5 rounded-full bg-white/60" />
             
             {/* Hero Content */}
-            <div className="relative z-10 px-6 pb-16 pt-4">
-              {/* Top row: 2 stat cards on left, big number on right */}
-              <div className="flex items-center gap-3 mb-6">
-                {/* Left: stacked stat cards */}
-                <div className="flex flex-col gap-2 w-1/3 shrink-0">
-                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-sm text-center">
-                    <Flame className="h-5 w-5 mx-auto mb-1 text-orange-500" />
-                    {isLoading ? (
-                      <Skeleton className="h-7 w-10 mx-auto mb-1 bg-white/30" />
-                    ) : (
-                      <div className="text-2xl font-bold text-orange-900">{stats?.currentStreak || 0}</div>
-                    )}
-                    <div className="text-xs text-orange-700/60 font-medium">Days Streak</div>
-                  </div>
-                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-sm text-center">
-                    <CheckCircle2 className="h-5 w-5 mx-auto mb-1 text-amber-600" />
-                    {isLoading ? (
-                      <Skeleton className="h-7 w-10 mx-auto mb-1 bg-white/30" />
-                    ) : (
-                      <div className="text-2xl font-bold text-orange-900">{stats?.totalTaskCompletions || 0}</div>
-                    )}
-                    <div className="text-xs text-orange-700/60 font-medium">Actions Done</div>
-                  </div>
+            <div className="relative z-10 px-6 pb-16 pt-4 text-center">
+              {/* Big returns number */}
+              <div className="relative inline-flex items-center justify-center mb-3">
+                <div className="absolute w-20 h-20 rounded-full bg-orange-300/40 blur-xl" />
+                <Flame 
+                  className="relative w-16 h-16 text-orange-600 drop-shadow-lg animate-pulse" 
+                  strokeWidth={1.5}
+                  fill="rgba(251, 146, 60, 0.3)"
+                />
+              </div>
+              {isLoading ? (
+                <Skeleton className="h-20 w-28 mx-auto bg-white/30 rounded-xl mb-1" />
+              ) : (
+                <div className="mb-1">
+                  <span 
+                    className="text-7xl font-bold text-orange-700"
+                    style={{ textShadow: '0 2px 10px rgba(234, 88, 12, 0.2)' }}
+                  >
+                    {stats?.weeklyReturns || 0}
+                  </span>
                 </div>
-                
-                {/* Right: big returns number */}
-                <div className="flex-1 text-center">
-                  <div className="relative inline-flex items-center justify-center mb-3">
-                    <div className="absolute w-20 h-20 rounded-full bg-orange-300/40 blur-xl" />
-                    <Flame 
-                      className="relative w-16 h-16 text-orange-600 drop-shadow-lg animate-pulse" 
-                      strokeWidth={1.5}
-                      fill="rgba(251, 146, 60, 0.3)"
-                    />
-                  </div>
-                  {isLoading ? (
-                    <Skeleton className="h-20 w-28 mx-auto bg-white/30 rounded-xl mb-1" />
-                  ) : (
-                    <div className="mb-1">
-                      <span 
-                        className="text-7xl font-bold text-orange-700"
-                        style={{ textShadow: '0 2px 10px rgba(234, 88, 12, 0.2)' }}
-                      >
-                        {stats?.weeklyReturns || 0}
+              )}
+              <p className="text-orange-600/80 text-base font-medium mb-6">returns this week</p>
+              
+              {/* Compact Profile Card */}
+              <div 
+                className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-sm mx-2 cursor-pointer active:scale-[0.98] transition-transform"
+                onClick={() => navigate('/app/profile')}
+              >
+                <div className="flex items-center gap-3">
+                  {/* Avatar */}
+                  <Avatar className="h-14 w-14 border-2 border-orange-200 shrink-0">
+                    <AvatarImage src={profile?.avatar_url || ''} alt={profile?.full_name || 'User'} />
+                    <AvatarFallback className="bg-orange-100 text-orange-700 font-semibold text-lg">
+                      {(profile?.full_name || user?.email || '?').charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  {/* Info */}
+                  <div className="flex-1 min-w-0 text-left">
+                    <h3 className="text-base font-bold text-orange-900 truncate">
+                      {profile?.full_name || 'Set your name'}
+                    </h3>
+                    <div className="flex items-center gap-3 mt-1 text-xs text-orange-700/60 font-medium">
+                      {profile?.city && (
+                        <span className="flex items-center gap-0.5 truncate">
+                          <MapPin className="h-3 w-3 shrink-0" />
+                          {profile.city}{profile.country ? `, ${profile.country}` : ''}
+                        </span>
+                      )}
+                      {profile?.occupation && (
+                        <span className="flex items-center gap-0.5 truncate">
+                          <Briefcase className="h-3 w-3 shrink-0" />
+                          {profile.occupation}
+                        </span>
+                      )}
+                    </div>
+                    {/* Stats row */}
+                    <div className="flex items-center gap-3 mt-1.5">
+                      <span className="text-xs font-semibold text-orange-700">
+                        🔥 {stats?.currentStreak || 0} <span className="font-normal text-orange-700/60">streak</span>
+                      </span>
+                      <span className="text-xs font-semibold text-orange-700">
+                        ✅ {stats?.totalTaskCompletions || 0} <span className="font-normal text-orange-700/60">actions</span>
                       </span>
                     </div>
-                  )}
-                  <p className="text-orange-600/80 text-base font-medium">returns this week</p>
+                  </div>
+                  
+                  {/* Edit hint */}
+                  <Pencil className="h-4 w-4 text-orange-400 shrink-0" />
                 </div>
               </div>
               
-              {/* Week presence grid in a clean white card */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-sm mx-2">
+              {/* Week presence grid */}
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-sm mx-2 mt-3">
                 <WeeklyPresenceGrid 
                   lastActiveDate={lastActiveDate} 
                   showedUpToday={showedUpToday}
