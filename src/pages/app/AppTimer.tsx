@@ -1,11 +1,21 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, ArrowLeft, ChevronRight, Settings, CalendarDays, Check, AlertCircle } from 'lucide-react';
+import { X, ArrowLeft, ChevronRight, Settings, CalendarDays, Check, AlertCircle, VolumeX, Volume2, Maximize } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { timerThemes } from '@/lib/timerThemes';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const soundscapes = [
+  { id: 'none', label: 'No Sound', emoji: '🔇' },
+  { id: 'rain', label: 'Rain', emoji: '🌧️', url: 'https://cdn.freesound.org/previews/531/531947_6386839-lq.mp3' },
+  { id: 'ocean', label: 'Ocean', emoji: '🌊', url: 'https://cdn.freesound.org/previews/467/467330_5765286-lq.mp3' },
+  { id: 'forest', label: 'Forest', emoji: '🌲', url: 'https://cdn.freesound.org/previews/365/365492_4284968-lq.mp3' },
+  { id: 'fire', label: 'Fireplace', emoji: '🔥', url: 'https://cdn.freesound.org/previews/499/499023_9497060-lq.mp3' },
+  { id: 'birds', label: 'Birds', emoji: '🐦', url: 'https://cdn.freesound.org/previews/368/368004_4284968-lq.mp3' },
+  { id: 'wind', label: 'Wind', emoji: '💨', url: 'https://cdn.freesound.org/previews/377/377837_3905081-lq.mp3' },
+];
 
 type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped';
 
@@ -19,6 +29,10 @@ export default function AppTimer() {
   const [totalSeconds, setTotalSeconds] = useState(0);
   const [holdProgress, setHoldProgress] = useState(0);
   const [activeTab, setActiveTab] = useState<'timer' | 'pomodoro'>('timer');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [selectedSound, setSelectedSound] = useState('none');
+  const [showSoundPicker, setShowSoundPicker] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const holdTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const holdStartRef = useRef<number>(0);
