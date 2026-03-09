@@ -12,6 +12,7 @@ import { WeeklyPresenceGrid } from '@/components/app/WeeklyPresenceGrid';
 import { StreakChallengeCard } from '@/components/app/StreakChallengeCard';
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
 import { PresenceProfileCard } from '@/components/app/PresenceProfileCard';
+import { SubscriptionCard } from '@/components/app/SubscriptionManagement';
 import { StreakGoalSelection, StreakGoalValue } from '@/components/app/StreakGoalSelection';
 import { BackButton } from '@/components/app/BackButton';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -170,6 +171,9 @@ const AppPresence = () => {
           
           {/* Content */}
           <div className="px-4 py-6 space-y-6">
+            
+            {/* Subscription Card */}
+            <SubscriptionCard />
             
             {/* Profile Card */}
             <PresenceProfileCard />
