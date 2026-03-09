@@ -308,7 +308,12 @@ export const TaskCard = memo(function TaskCard({
               <div className="flex items-center gap-2">
                 <span className="text-[13px] text-black/80">{formatTime(task)}</span>
                 {hasGoal && (
-                  <span className="text-[13px] text-black/80 font-medium">• {formatProGoalLabel()}</span>
+                  <span className="text-[13px] text-black/80 font-medium">• {(() => {
+                    const label = formatProGoalLabel();
+                    if (typeof label === 'string') return label;
+                    if (label) return <>{label.prefix}<AnimatedProgress value={label.progress} />{label.suffix}</>;
+                    return null;
+                  })()}</span>
                 )}
               </div>
               
