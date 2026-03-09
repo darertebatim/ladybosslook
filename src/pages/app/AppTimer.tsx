@@ -645,7 +645,7 @@ export default function AppTimer() {
           <p className="text-white/40 text-sm">Hold to stop timer</p>
           <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-purple-400 to-pink-400"
+              className="h-full rounded-full bg-white/60"
               style={{ width: `${holdProgress * 100}%` }}
               transition={{ duration: 0 }}
             />
