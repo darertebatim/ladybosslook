@@ -11,6 +11,7 @@ import { AchievementCard } from '@/components/app/AchievementCard';
 import { WeeklyPresenceGrid } from '@/components/app/WeeklyPresenceGrid';
 import { StreakChallengeCard } from '@/components/app/StreakChallengeCard';
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
+import { PresenceProfileCard } from '@/components/app/PresenceProfileCard';
 import { StreakGoalSelection, StreakGoalValue } from '@/components/app/StreakGoalSelection';
 import { BackButton } from '@/components/app/BackButton';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -170,7 +171,8 @@ const AppPresence = () => {
           {/* Content */}
           <div className="px-4 py-6 space-y-6">
             
-            
+            {/* Profile Card */}
+            <PresenceProfileCard />
             
             {/* Streak Challenge Card - show if user has a goal set OR if streak was broken (recovery available) */}
             {(hasStreakChallenge || streakRecoveryAvailable) && streak && (
