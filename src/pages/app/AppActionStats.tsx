@@ -248,7 +248,7 @@ const AppActionStats = () => {
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">🥉</span>
+                  <img src={coinBronze} alt="Bronze" className="w-8 h-8 object-contain" />
                   <span className="text-base font-semibold text-foreground">Bronze Badge</span>
                 </div>
                 <div className="flex items-baseline gap-1">
