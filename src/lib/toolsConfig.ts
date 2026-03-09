@@ -94,7 +94,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'period',
-    name: 'Period Tracker',
+    name: 'Period',
     icon: 'Heart',
     bgColor: 'bg-[#FCE4EC]',
     iconColor: 'text-pink-600',
