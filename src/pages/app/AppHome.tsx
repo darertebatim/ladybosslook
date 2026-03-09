@@ -949,7 +949,7 @@ const AppHome = () => {
                         })}
                       </div>
                     )}
-                    <span className="text-xs text-foreground/40 ml-auto shrink-0">Hold to reorder</span>
+                    
                   </div>
                   
                   {/* Coach mark spotlight for first-ever action */}
