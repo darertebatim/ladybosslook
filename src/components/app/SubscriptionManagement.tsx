@@ -59,7 +59,7 @@ export function SubscriptionCard() {
           onClick={() => setShowPaywall(true)}
           className="w-full rounded-2xl p-4 text-left transition-transform active:scale-[0.98]"
           style={{
-            background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)',
+            background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(0 0% 15%) 100%)',
           }}
         >
           <div className="flex items-center justify-between">
