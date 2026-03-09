@@ -117,7 +117,7 @@ const AppPresence = () => {
               {/* Top row: 2 stat cards on left, big number on right */}
               <div className="flex items-center gap-3 mb-6">
                 {/* Left: stacked stat cards */}
-                <div className="flex flex-col gap-2 flex-1">
+                <div className="flex flex-col gap-2 w-1/3 shrink-0">
                   <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-sm text-center">
                     <Flame className="h-5 w-5 mx-auto mb-1 text-orange-500" />
                     {isLoading ? (
