@@ -182,6 +182,7 @@ export default function AppTimer() {
 
   const startTimer = () => {
     haptic.medium();
+    sessionStartRef.current = new Date();
     if (activeTab === 'pomodoro') {
       setPomodoroRound(0);
       setIsBreak(false);
@@ -193,6 +194,13 @@ export default function AppTimer() {
       setScreen('running');
       runCountdown(total, () => {
         haptic.success();
+        saveFocusSession.mutate({
+          durationSeconds: total,
+          sessionType: 'timer',
+          theme: customTheme || selectedTheme,
+          completed: true,
+          startedAt: sessionStartRef.current,
+        });
         setScreen('completed');
         fireConfetti();
       });
