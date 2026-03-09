@@ -478,20 +478,36 @@ export const TaskCard = memo(function TaskCard({
             )}
           </button>
         ) : isCountGoal ? (
-          <button
-            onClick={handleOpenGoalInput}
-            className="w-9 h-9 flex items-center justify-center shrink-0"
-          >
-            {goalReached ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : isWater ? (
-              <span className="w-9 h-9 rounded-full border-2 border-sky-400 bg-sky-100 flex items-center justify-center">
-                <Droplets className="h-5 w-5 text-sky-500" />
-              </span>
-            ) : (
-              <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center">
-                <Plus className="h-5 w-5 text-foreground/70" strokeWidth={2} />
-              </span>
-            )}
-          </button>
+          <div className="relative">
+            <AnimatePresence>
+              {showFloatingPlus && isSmallCountGoal && (
+                <motion.span
+                  key={floatingPlusKey}
+                  initial={{ opacity: 1, y: 0, scale: 0.8 }}
+                  animate={{ opacity: 0, y: -32, scale: 1.2 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.55, ease: 'easeOut' }}
+                  className="absolute -top-2 left-1/2 -translate-x-1/2 text-sm font-bold text-teal-500 pointer-events-none z-10"
+                >
+                  +1
+                </motion.span>
+              )}
+            </AnimatePresence>
+            <button
+              onClick={handleOpenGoalInput}
+              className="w-9 h-9 flex items-center justify-center shrink-0"
+            >
+              {goalReached ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : isWater ? (
+                <span className="w-9 h-9 rounded-full border-2 border-sky-400 bg-sky-100 flex items-center justify-center">
+                  <Droplets className="h-5 w-5 text-sky-500" />
+                </span>
+              ) : (
+                <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center">
+                  <Plus className="h-5 w-5 text-foreground/70" strokeWidth={2} />
+                </span>
+              )}
+            </button>
+          </div>
         ) : (
           <button
             onClick={handleToggleComplete}
