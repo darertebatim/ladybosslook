@@ -373,8 +373,9 @@ const AppProfile = () => {
         className="shrink-0 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="pt-3 pb-1 px-4 text-center">
-          <h1 className="font-semibold text-lg">Profile</h1>
+        <div className="pt-3 pb-1 px-4 flex items-center">
+          <BackButton to="/app" className="text-foreground" />
+          <h1 className="font-semibold text-lg flex-1 text-center mr-8">Profile</h1>
         </div>
 
         {/* Avatar + Name + Bio */}
