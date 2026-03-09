@@ -327,6 +327,9 @@ export default function AppTimer() {
   // Ruler scroll helpers
   const TICK_WIDTH = 16;
   const MAX_MIN = 90;
+  const POMODORO_STEP = 5;
+  const POMODORO_MIN = 5;
+  const POMODORO_MAX = 60;
 
   const scrollToMinute = useCallback((min: number, smooth = true) => {
     if (!rulerRef.current) return;
@@ -341,8 +344,17 @@ export default function AppTimer() {
     const containerW = rulerRef.current.clientWidth;
     const paddingLeft = containerW / 2;
     const scrollLeft = rulerRef.current.scrollLeft;
-    const val = Math.round((scrollLeft - paddingLeft + containerW / 2) / TICK_WIDTH);
-    const clamped = Math.max(1, Math.min(MAX_MIN, val));
+    const rawVal = (scrollLeft - paddingLeft + containerW / 2) / TICK_WIDTH;
+
+    let clamped: number;
+    if (activeTab === 'pomodoro') {
+      // Snap to nearest 5-min increment
+      clamped = Math.round(rawVal / POMODORO_STEP) * POMODORO_STEP;
+      clamped = Math.max(POMODORO_MIN, Math.min(POMODORO_MAX, clamped));
+    } else {
+      clamped = Math.max(1, Math.min(MAX_MIN, Math.round(rawVal)));
+    }
+
     if (clamped !== lastHapticVal.current) {
       if (clamped % 5 === 0) {
         haptic.medium();
@@ -352,7 +364,7 @@ export default function AppTimer() {
       lastHapticVal.current = clamped;
     }
     setMinutes(clamped);
-  }, []);
+  }, [activeTab]);
 
   // Scroll ruler to current minute when entering adjustTime
   useEffect(() => {
