@@ -1233,7 +1233,7 @@ export default function AppTimer() {
           Time to dive into your next Pomodoro session!
         </h1>
 
-        <div className="absolute bottom-12 left-0 right-0 px-8">
+        <div className="absolute left-0 right-0 px-8" style={{ bottom: 'max(48px, calc(env(safe-area-inset-bottom) + 24px))' }}>
           <button
             onClick={() => { haptic.medium(); startPomodoroRound(nextRoundRef.current); }}
             className="w-full h-14 rounded-full bg-white text-black font-semibold text-base transition-transform active:scale-[0.97]"
