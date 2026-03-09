@@ -15,27 +15,28 @@ import {
   isAfter,
 } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useStreakCalendar, useMoodCalendar, useActionCalendar } from '@/hooks/usePresenceCalendars';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-// ─── STREAK CALENDAR ───
-
-interface StreakCalendarProps {
-  activeDates: string[]; // 'yyyy-MM-dd'
-}
-
-export function StreakCalendar({ activeDates }: StreakCalendarProps) {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const activeSet = useMemo(() => new Set(activeDates), [activeDates]);
-
-  const days = useMemo(() => {
+function useCalendarDays(currentMonth: Date) {
+  return useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
     const calStart = startOfWeek(monthStart, { weekStartsOn: 0 });
     const calEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
     return eachDayOfInterval({ start: calStart, end: calEnd });
   }, [currentMonth]);
+}
 
+// ─── STREAK CALENDAR (self-contained with data fetching) ───
+
+export function StreakCalendar() {
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const { data: activeDates = [] } = useStreakCalendar(currentMonth);
+  const activeSet = useMemo(() => new Set(activeDates), [activeDates]);
+  const days = useCalendarDays(currentMonth);
   const today = new Date();
 
   return (
@@ -49,11 +50,6 @@ export function StreakCalendar({ activeDates }: StreakCalendarProps) {
         const inMonth = isSameMonth(day, currentMonth);
         const isActive = activeSet.has(dateStr);
         const isToday = isSameDay(day, today);
-        const isFuture = isAfter(day, today);
-
-        // Check consecutive for pill effect
-        const prevActive = activeSet.has(format(addDays(day, -1), 'yyyy-MM-dd'));
-        const nextActive = activeSet.has(format(addDays(day, 1), 'yyyy-MM-dd'));
 
         if (!inMonth) {
           return (
@@ -63,17 +59,22 @@ export function StreakCalendar({ activeDates }: StreakCalendarProps) {
           );
         }
 
+        // Check consecutive for pill effect
+        const prevDay = addDays(day, -1);
+        const nextDay = addDays(day, 1);
+        const prevActive = isSameMonth(prevDay, currentMonth) && activeSet.has(format(prevDay, 'yyyy-MM-dd'));
+        const nextActive = isSameMonth(nextDay, currentMonth) && activeSet.has(format(nextDay, 'yyyy-MM-dd'));
+
         return (
           <div key={idx} className="flex items-center justify-center h-10 relative">
             {isActive && (
               <div
                 className={cn(
-                  'absolute inset-y-1 bg-orange-400',
-                  // Pill shape for consecutive days
-                  prevActive && nextActive && 'inset-x-0 rounded-none',
-                  prevActive && !nextActive && 'left-0 right-1 rounded-r-full',
-                  !prevActive && nextActive && 'left-1 right-0 rounded-l-full',
-                  !prevActive && !nextActive && 'inset-x-1 rounded-full',
+                  'absolute inset-y-1',
+                  prevActive && nextActive && 'inset-x-0 rounded-none bg-orange-400',
+                  prevActive && !nextActive && 'left-0 right-1 rounded-r-full bg-orange-400',
+                  !prevActive && nextActive && 'left-1 right-0 rounded-l-full bg-orange-400',
+                  !prevActive && !nextActive && 'inset-x-1 rounded-full bg-orange-400',
                 )}
               />
             )}
@@ -81,8 +82,7 @@ export function StreakCalendar({ activeDates }: StreakCalendarProps) {
               className={cn(
                 'relative z-10 text-sm font-medium',
                 isActive && 'text-white',
-                !isActive && !isFuture && 'text-foreground',
-                isFuture && !isActive && 'text-foreground',
+                !isActive && 'text-foreground',
                 isToday && !isActive && 'text-orange-500 font-bold',
               )}
             >
@@ -97,27 +97,22 @@ export function StreakCalendar({ activeDates }: StreakCalendarProps) {
 
 // ─── MOOD CALENDAR ───
 
-interface MoodCalendarProps {
-  moodByDate: Record<string, { emotion: string; valence: string }>;
-}
-
-const VALENCE_EMOJI: Record<string, string> = {
+const VALENCE_EMOJI_MAP: Record<string, string> = {
   positive: '😊',
   negative: '😔',
   neutral: '😐',
 };
 
-export function MoodCalendar({ moodByDate }: MoodCalendarProps) {
+const VALENCE_BG: Record<string, string> = {
+  positive: 'bg-yellow-300',
+  negative: 'bg-yellow-200',
+  neutral: 'bg-green-200',
+};
+
+export function MoodCalendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-
-  const days = useMemo(() => {
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(currentMonth);
-    const calStart = startOfWeek(monthStart, { weekStartsOn: 0 });
-    const calEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
-    return eachDayOfInterval({ start: calStart, end: calEnd });
-  }, [currentMonth]);
-
+  const { data: moodByDate = {} } = useMoodCalendar(currentMonth);
+  const days = useCalendarDays(currentMonth);
   const today = new Date();
 
   return (
@@ -141,18 +136,14 @@ export function MoodCalendar({ moodByDate }: MoodCalendarProps) {
         }
 
         if (mood) {
-          // Show a yellow circle with smiley face
           const valence = mood.valence || 'neutral';
-          const bgColor = valence === 'positive' ? 'bg-yellow-300' 
-            : valence === 'negative' ? 'bg-yellow-200' 
-            : 'bg-green-200';
-          
+          const bg = VALENCE_BG[valence] || VALENCE_BG.neutral;
+          const emoji = VALENCE_EMOJI_MAP[valence] || '😊';
+
           return (
             <div key={idx} className="flex items-center justify-center h-10">
-              <div className={cn('w-9 h-9 rounded-full flex items-center justify-center', bgColor)}>
-                <span className="text-base leading-none">
-                  {VALENCE_EMOJI[valence] || '😊'}
-                </span>
+              <div className={cn('w-9 h-9 rounded-full flex items-center justify-center', bg)}>
+                <FluentEmoji emoji={emoji} size={22} />
               </div>
             </div>
           );
@@ -175,21 +166,10 @@ export function MoodCalendar({ moodByDate }: MoodCalendarProps) {
 
 // ─── ACTION CALENDAR ───
 
-interface ActionCalendarProps {
-  countsByDate: Record<string, number>;
-}
-
-export function ActionCalendar({ countsByDate }: ActionCalendarProps) {
+export function ActionCalendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-
-  const days = useMemo(() => {
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(currentMonth);
-    const calStart = startOfWeek(monthStart, { weekStartsOn: 0 });
-    const calEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
-    return eachDayOfInterval({ start: calStart, end: calEnd });
-  }, [currentMonth]);
-
+  const { data: countsByDate = {} } = useActionCalendar(currentMonth);
+  const days = useCalendarDays(currentMonth);
   const today = new Date();
 
   return (
@@ -213,17 +193,17 @@ export function ActionCalendar({ countsByDate }: ActionCalendarProps) {
         }
 
         if (count > 0) {
-          // Gold coin style – brighter for more completions
+          // Gold coin – brighter for more completions
           const intensity = Math.min(count, 5);
-          const bgColor = intensity >= 3 ? 'bg-amber-400' : intensity >= 2 ? 'bg-amber-300' : 'bg-amber-200';
-          
+          const bg = intensity >= 3 ? 'bg-amber-400' : intensity >= 2 ? 'bg-amber-300' : 'bg-amber-200';
+
           return (
             <div key={idx} className="flex items-center justify-center h-10">
               <div className={cn(
                 'w-9 h-9 rounded-full flex items-center justify-center shadow-sm',
-                bgColor,
+                bg,
               )}>
-                <span className="text-base">💎</span>
+                <FluentEmoji emoji={intensity >= 3 ? '🏆' : '💎'} size={20} />
               </div>
             </div>
           );
