@@ -424,7 +424,7 @@ export default function AppTimer() {
         {/* Bottom bar */}
         <div className="px-6 pb-8 pt-4 flex items-center gap-3">
           <button
-            onClick={() => { setScreen('adjustTime'); haptic.light(); }}
+            onClick={() => { setScreen('settings'); setSettingsTab(activeTab); haptic.light(); }}
             className="w-12 h-12 rounded-full bg-muted flex items-center justify-center shrink-0"
           >
             <Settings className="h-5 w-5 text-muted-foreground" />
