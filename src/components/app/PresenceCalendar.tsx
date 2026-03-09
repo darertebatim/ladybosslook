@@ -15,7 +15,7 @@ import {
   isAfter,
 } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { useStreakCalendar, useMoodCalendar, useActionCalendar } from '@/hooks/usePresenceCalendars';
+import { useStreakCalendar, useActionCalendar } from '@/hooks/usePresenceCalendars';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
