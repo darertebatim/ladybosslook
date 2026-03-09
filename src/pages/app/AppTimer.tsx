@@ -1226,7 +1226,7 @@ export default function AppTimer() {
         animate={{ opacity: 1 }}
         className="min-h-screen bg-black flex flex-col items-center justify-center px-8 relative select-none"
       >
-        <span className="text-5xl mb-8">🍅</span>
+        <img src={tomato3d} alt="🍅" className="w-14 h-14 mb-8" />
         <h1 className="text-3xl font-extrabold text-center leading-tight mb-1">
           <span className="text-[hsl(var(--primary))]">Break's over!</span>
         </h1>
