@@ -85,7 +85,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'emotions',
-    name: 'Emotion Check',
+    name: 'Emotions',
     icon: 'HeartHandshake',
     bgColor: 'bg-[#EDE9FE]',
     iconColor: 'text-violet-600',
