@@ -140,27 +140,27 @@ const AppPresence = () => {
                 
                 {/* Right: big returns number */}
                 <div className="flex-1 text-center">
-                  <div className="relative inline-flex items-center justify-center mb-2">
-                    <div className="absolute w-16 h-16 rounded-full bg-orange-300/40 blur-xl" />
+                  <div className="relative inline-flex items-center justify-center mb-3">
+                    <div className="absolute w-20 h-20 rounded-full bg-orange-300/40 blur-xl" />
                     <Flame 
-                      className="relative w-12 h-12 text-orange-600 drop-shadow-lg animate-pulse" 
+                      className="relative w-16 h-16 text-orange-600 drop-shadow-lg animate-pulse" 
                       strokeWidth={1.5}
                       fill="rgba(251, 146, 60, 0.3)"
                     />
                   </div>
                   {isLoading ? (
-                    <Skeleton className="h-16 w-24 mx-auto bg-white/30 rounded-xl mb-1" />
+                    <Skeleton className="h-20 w-28 mx-auto bg-white/30 rounded-xl mb-1" />
                   ) : (
                     <div className="mb-1">
                       <span 
-                        className="text-6xl font-bold text-orange-700"
+                        className="text-7xl font-bold text-orange-700"
                         style={{ textShadow: '0 2px 10px rgba(234, 88, 12, 0.2)' }}
                       >
                         {stats?.weeklyReturns || 0}
                       </span>
                     </div>
                   )}
-                  <p className="text-orange-600/80 text-sm font-medium">returns this week</p>
+                  <p className="text-orange-600/80 text-base font-medium">returns this week</p>
                 </div>
               </div>
               
