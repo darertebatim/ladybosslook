@@ -180,15 +180,17 @@ export default function AppTimer() {
   const scrollToMinute = useCallback((min: number, smooth = true) => {
     if (!rulerRef.current) return;
     const containerW = rulerRef.current.clientWidth;
-    const scrollPos = min * TICK_WIDTH - containerW / 2;
+    const paddingLeft = containerW / 2; // paddingLeft is '50%' of container
+    const scrollPos = paddingLeft + min * TICK_WIDTH - containerW / 2;
     rulerRef.current.scrollTo({ left: scrollPos, behavior: smooth ? 'smooth' : 'auto' });
   }, []);
 
   const handleRulerScroll = useCallback(() => {
     if (!rulerRef.current) return;
     const containerW = rulerRef.current.clientWidth;
+    const paddingLeft = containerW / 2;
     const scrollLeft = rulerRef.current.scrollLeft;
-    const val = Math.round((scrollLeft + containerW / 2) / TICK_WIDTH);
+    const val = Math.round((scrollLeft - paddingLeft + containerW / 2) / TICK_WIDTH);
     const clamped = Math.max(1, Math.min(MAX_MIN, val));
     if (clamped !== lastHapticVal.current) {
       if (clamped % 5 === 0) {
