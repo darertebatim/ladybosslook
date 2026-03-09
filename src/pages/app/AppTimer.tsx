@@ -16,8 +16,7 @@ import { toast } from 'sonner';
 
 type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped' | 'pomodoroRoundDone' | 'pomodoroBreak' | 'pomodoroBreakDone' | 'settings' | 'stats';
 
-const POMODORO_ROUNDS = 4;
-const BREAK_SECONDS = 5 * 60; // 5 minutes
+// Defaults moved to state: pomodoroCycles, breakMinutes
 
 const SYNTHETIC_TIMER_TASK: RoutinePlanTask = {
   id: 'synthetic-focus-timer',
