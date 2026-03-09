@@ -340,10 +340,10 @@ export default function AppTimer() {
 
           {/* Large minute display */}
           <div className="flex items-baseline gap-1 mb-8">
-            <span className="text-7xl font-bold text-purple-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+            <span className="text-7xl font-bold text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
               {minutes}
             </span>
-            <span className="text-2xl font-semibold text-purple-400">min</span>
+            <span className="text-2xl font-semibold text-muted-foreground">min</span>
           </div>
 
           {/* Scrollable ruler */}
