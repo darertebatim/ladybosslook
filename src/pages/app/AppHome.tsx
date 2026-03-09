@@ -933,7 +933,7 @@ const AppHome = () => {
                   
                   {/* Coach mark spotlight for first-ever action */}
                   {(() => {
-                    const isFirstActionPending = localStorage.getItem('simora_first_action_celebrated') !== 'true' && completedTaskIds.size === 0;
+                    const isFirstActionPending = localStorage.getItem('simora_first_action_celebrated') !== 'true' && completedTaskIds.size === 0 && totalCompletions === 0;
                     return isFirstActionPending ? (
                       <>
                         {/* Dark overlay behind everything */}
