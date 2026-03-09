@@ -426,61 +426,95 @@ export default function AppTimer() {
           </button>
         </div>
 
-        {/* Soundscape picker dropdown */}
+        {/* Soundscape bottom sheet */}
         <AnimatePresence>
           {showSoundPicker && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="absolute top-28 right-4 z-30 bg-white/10 backdrop-blur-xl rounded-2xl p-2 min-w-[180px] max-h-[60vh] overflow-y-auto"
-              onTouchStart={(e) => e.stopPropagation()}
-              onMouseDown={(e) => e.stopPropagation()}
-            >
-              {/* No sound option */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  haptic.light();
-                  setSelectedSoundId(null);
-                  setSelectedSoundUrl(null);
-                  setShowSoundPicker(false);
-                }}
-                className={cn(
-                  'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-colors',
-                  !selectedSoundId ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/5'
-                )}
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/40 z-30"
+                onClick={(e) => { e.stopPropagation(); setShowSoundPicker(false); }}
+                onTouchStart={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+              />
+              {/* Sheet */}
+              <motion.div
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                className="fixed bottom-0 left-0 right-0 z-40 bg-background rounded-t-3xl max-h-[70vh] flex flex-col"
+                onTouchStart={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
               >
-                <span className="text-base">🔇</span>
-                <span className="text-sm font-medium">No Sound</span>
-                {!selectedSoundId && <Check className="h-3.5 w-3.5 ml-auto text-purple-400" />}
-              </button>
-              {/* Soundscape playlists */}
-              {soundscapeTracks.map(track => (
-                <button
-                  key={track.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    haptic.light();
-                    setSelectedSoundId(track.id);
-                    setSelectedSoundUrl(track.url);
-                    setShowSoundPicker(false);
-                  }}
-                  className={cn(
-                    'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-colors',
-                    selectedSoundId === track.id ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/5'
-                  )}
-                >
-                  {track.cover ? (
-                    <img src={track.cover} alt="" className="w-7 h-7 rounded-lg object-cover" />
-                  ) : (
-                    <span className="text-base">🎵</span>
-                  )}
-                  <span className="text-sm font-medium truncate">{track.name}</span>
-                  {selectedSoundId === track.id && <Check className="h-3.5 w-3.5 ml-auto shrink-0 text-purple-400" />}
-                </button>
-              ))}
-            </motion.div>
+                {/* Header */}
+                <div className="flex items-center justify-between px-5 pt-5 pb-3">
+                  <button onClick={(e) => { e.stopPropagation(); setShowSoundPicker(false); }}>
+                    <X className="h-5 w-5 text-foreground" />
+                  </button>
+                  <span className="text-base font-semibold text-foreground">White Noise</span>
+                  <div className="w-5" />
+                </div>
+
+                {/* List */}
+                <div className="flex-1 overflow-y-auto px-5 pb-8">
+                  {/* Music off */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      haptic.light();
+                      setSelectedSoundId(null);
+                      setSelectedSoundUrl(null);
+                      setShowSoundPicker(false);
+                    }}
+                    className="w-full flex items-center gap-4 py-4 border-b border-border"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                      <div className="relative">
+                        <Music className="h-5 w-5 text-purple-600" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-[1.5px] h-7 bg-purple-600 rotate-45 rounded-full" />
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-base font-medium text-foreground flex-1 text-left">Music off</span>
+                    {!selectedSoundId && (
+                      <div className="w-6 h-6 rounded-full border-[5px] border-foreground" />
+                    )}
+                  </button>
+
+                  {/* Tracks */}
+                  {soundscapeTracks.map(track => (
+                    <button
+                      key={track.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        haptic.light();
+                        setSelectedSoundId(track.id);
+                        setSelectedSoundUrl(track.url);
+                        setShowSoundPicker(false);
+                      }}
+                      className="w-full flex items-center gap-4 py-4 border-b border-border"
+                    >
+                      {track.cover ? (
+                        <img src={track.cover} alt="" className="w-12 h-12 rounded-full object-cover shrink-0" />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center shrink-0">
+                          <Music className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                      )}
+                      <span className="text-base font-medium text-foreground flex-1 text-left truncate">{track.name}</span>
+                      {selectedSoundId === track.id && (
+                        <div className="w-6 h-6 rounded-full border-[5px] border-foreground" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
 
