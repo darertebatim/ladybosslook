@@ -113,32 +113,56 @@ const AppPresence = () => {
             <div className="absolute top-32 right-8 w-1.5 h-1.5 rounded-full bg-white/60" />
             
             {/* Hero Content */}
-            <div className="relative z-10 px-6 pb-16 pt-4 text-center">
-              {/* Large Flame Icon with glow */}
-              <div className="relative inline-flex items-center justify-center mb-4">
-                {/* Glow effect */}
-                <div className="absolute w-24 h-24 rounded-full bg-orange-300/40 blur-xl" />
-                <Flame 
-                  className="relative w-20 h-20 text-orange-600 drop-shadow-lg animate-pulse" 
-                  strokeWidth={1.5}
-                  fill="rgba(251, 146, 60, 0.3)"
-                />
-              </div>
-              
-              {/* Main stat: Days This Month */}
-              {isLoading ? (
-                <Skeleton className="h-20 w-32 mx-auto bg-white/30 rounded-xl mb-2" />
-              ) : (
-                <div className="mb-2">
-                  <span 
-                    className="text-7xl font-bold text-orange-700"
-                    style={{ textShadow: '0 2px 10px rgba(234, 88, 12, 0.2)' }}
-                  >
-                    {stats?.weeklyReturns || 0}
-                  </span>
+            <div className="relative z-10 px-6 pb-16 pt-4">
+              {/* Top row: 2 stat cards on left, big number on right */}
+              <div className="flex items-center gap-3 mb-6">
+                {/* Left: stacked stat cards */}
+                <div className="flex flex-col gap-2 flex-1">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-sm text-center">
+                    <Flame className="h-5 w-5 mx-auto mb-1 text-orange-500" />
+                    {isLoading ? (
+                      <Skeleton className="h-7 w-10 mx-auto mb-1 bg-white/30" />
+                    ) : (
+                      <div className="text-2xl font-bold text-orange-900">{stats?.currentStreak || 0}</div>
+                    )}
+                    <div className="text-xs text-orange-700/60 font-medium">Days Streak</div>
+                  </div>
+                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-sm text-center">
+                    <CheckCircle2 className="h-5 w-5 mx-auto mb-1 text-amber-600" />
+                    {isLoading ? (
+                      <Skeleton className="h-7 w-10 mx-auto mb-1 bg-white/30" />
+                    ) : (
+                      <div className="text-2xl font-bold text-orange-900">{stats?.totalTaskCompletions || 0}</div>
+                    )}
+                    <div className="text-xs text-orange-700/60 font-medium">Actions Done</div>
+                  </div>
                 </div>
-              )}
-              <p className="text-orange-600/80 text-lg font-medium mb-8">returns this week</p>
+                
+                {/* Right: big returns number */}
+                <div className="flex-1 text-center">
+                  <div className="relative inline-flex items-center justify-center mb-2">
+                    <div className="absolute w-16 h-16 rounded-full bg-orange-300/40 blur-xl" />
+                    <Flame 
+                      className="relative w-12 h-12 text-orange-600 drop-shadow-lg animate-pulse" 
+                      strokeWidth={1.5}
+                      fill="rgba(251, 146, 60, 0.3)"
+                    />
+                  </div>
+                  {isLoading ? (
+                    <Skeleton className="h-16 w-24 mx-auto bg-white/30 rounded-xl mb-1" />
+                  ) : (
+                    <div className="mb-1">
+                      <span 
+                        className="text-6xl font-bold text-orange-700"
+                        style={{ textShadow: '0 2px 10px rgba(234, 88, 12, 0.2)' }}
+                      >
+                        {stats?.weeklyReturns || 0}
+                      </span>
+                    </div>
+                  )}
+                  <p className="text-orange-600/80 text-sm font-medium">returns this week</p>
+                </div>
+              </div>
               
               {/* Week presence grid in a clean white card */}
               <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-sm mx-2">
@@ -169,23 +193,7 @@ const AppPresence = () => {
           {/* Content */}
           <div className="px-4 py-6 space-y-6">
             
-            {/* Quick Stats Row - above challenges */}
-            <div className="grid grid-cols-2 gap-3">
-              <StatCard 
-                icon={Flame}
-                label="Days Streak"
-                value={stats?.currentStreak || 0}
-                iconColor="text-orange-500"
-                isLoading={isLoading}
-              />
-              <StatCard 
-                icon={CheckCircle2}
-                label="Actions Done"
-                value={stats?.totalTaskCompletions || 0}
-                iconColor="text-amber-600"
-                isLoading={isLoading}
-              />
-            </div>
+            
             
             {/* Streak Challenge Card - show if user has a goal set OR if streak was broken (recovery available) */}
             {(hasStreakChallenge || streakRecoveryAvailable) && streak && (
