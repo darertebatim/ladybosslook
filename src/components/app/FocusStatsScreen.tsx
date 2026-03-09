@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { format, addDays, subDays, startOfWeek, endOfWeek, addWeeks, subWeeks, addMonths, subMonths, addYears, subYears, parseISO, differenceInCalendarDays } from 'date-fns';
 import { useFocusStats, FocusSession } from '@/hooks/useFocusSessions';
-import tomato3d from '@/assets/tomato-3d.png';
 
 type Period = 'day' | 'week' | 'month' | 'year';
 
@@ -144,7 +143,7 @@ export const FocusStatsScreen = ({ onBack }: FocusStatsScreenProps) => {
             <div className="flex-1 border-r border-border/50 pr-4">
               <p className="text-sm font-medium text-muted-foreground mb-2">Pomodoro Counts</p>
               <div className="flex items-center gap-2">
-                <img src={tomato3d} alt="🍅" className="w-7 h-7" />
+                <span className="text-2xl">🍅</span>
                 <span className="text-3xl font-bold text-foreground">{stats.pomodoroCount}</span>
               </div>
             </div>
