@@ -367,7 +367,7 @@ export default function AppTimer() {
           {/* Pomodoro tomatoes */}
           {activeTab === 'pomodoro' && (
             <div className="flex gap-2 mb-4">
-              {Array.from({ length: POMODORO_ROUNDS }, (_, i) => (
+              {Array.from({ length: pomodoroCycles }, (_, i) => (
                 <span key={i} className="text-2xl">🍅</span>
               ))}
             </div>
