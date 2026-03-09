@@ -149,9 +149,9 @@ const AppActionStats = () => {
           {/* Progress Badge Info */}
           <div className="bg-white rounded-2xl p-5 shadow-sm mb-6 mt-2 text-center">
             <div className="flex items-center justify-center gap-2 mb-3">
-              <span className="text-3xl">🏅</span>
-              <span className="text-3xl">💎</span>
-              <span className="text-3xl">🥉</span>
+              <img src={coinGold} alt="Gold" className="w-10 h-10 object-contain" />
+              <img src={coinSilver} alt="Silver" className="w-10 h-10 object-contain" />
+              <img src={coinBronze} alt="Bronze" className="w-10 h-10 object-contain" />
             </div>
             <h3 className="text-lg font-bold text-foreground mb-2">Progress Badge</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
