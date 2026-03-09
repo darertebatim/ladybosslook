@@ -1,11 +1,21 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, ArrowLeft, ChevronRight, Settings, CalendarDays, Check, AlertCircle } from 'lucide-react';
+import { X, ArrowLeft, ChevronRight, Settings, CalendarDays, Check, AlertCircle, VolumeX, Volume2, Maximize } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { timerThemes } from '@/lib/timerThemes';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const soundscapes = [
+  { id: 'none', label: 'No Sound', emoji: '🔇' },
+  { id: 'rain', label: 'Rain', emoji: '🌧️', url: 'https://cdn.freesound.org/previews/531/531947_6386839-lq.mp3' },
+  { id: 'ocean', label: 'Ocean', emoji: '🌊', url: 'https://cdn.freesound.org/previews/467/467330_5765286-lq.mp3' },
+  { id: 'forest', label: 'Forest', emoji: '🌲', url: 'https://cdn.freesound.org/previews/365/365492_4284968-lq.mp3' },
+  { id: 'fire', label: 'Fireplace', emoji: '🔥', url: 'https://cdn.freesound.org/previews/499/499023_9497060-lq.mp3' },
+  { id: 'birds', label: 'Birds', emoji: '🐦', url: 'https://cdn.freesound.org/previews/368/368004_4284968-lq.mp3' },
+  { id: 'wind', label: 'Wind', emoji: '💨', url: 'https://cdn.freesound.org/previews/377/377837_3905081-lq.mp3' },
+];
 
 type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped';
 
@@ -19,6 +29,10 @@ export default function AppTimer() {
   const [totalSeconds, setTotalSeconds] = useState(0);
   const [holdProgress, setHoldProgress] = useState(0);
   const [activeTab, setActiveTab] = useState<'timer' | 'pomodoro'>('timer');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [selectedSound, setSelectedSound] = useState('none');
+  const [showSoundPicker, setShowSoundPicker] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const holdTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const holdStartRef = useRef<number>(0);
@@ -28,8 +42,37 @@ export default function AppTimer() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (holdTimerRef.current) clearInterval(holdTimerRef.current);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
     };
   }, []);
+
+  // Soundscape audio management
+  useEffect(() => {
+    if (screen === 'running' && selectedSound !== 'none') {
+      const sound = soundscapes.find(s => s.id === selectedSound);
+      if (sound?.url) {
+        const audio = new Audio(sound.url);
+        audio.loop = true;
+        audio.volume = 0.5;
+        audio.play().catch(() => {});
+        audioRef.current = audio;
+      }
+    } else {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    }
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, [screen, selectedSound]);
 
   const formatTime = (secs: number) => {
     const m = Math.floor(secs / 60);
@@ -315,11 +358,15 @@ export default function AppTimer() {
 
   // ─── RUNNING SCREEN ───
   if (screen === 'running') {
+    const timeStr = formatTime(secondsLeft);
+    const [mm, ss] = timeStr.split(':');
+    const digitColors = ['text-purple-400', 'text-pink-400', 'text-violet-500', 'text-fuchsia-400'];
+
     return (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="min-h-screen bg-black flex flex-col items-center justify-center relative select-none"
+        className="min-h-screen bg-black flex flex-col items-center justify-center relative select-none overflow-hidden"
         onTouchStart={onHoldStart}
         onTouchEnd={onHoldEnd}
         onTouchCancel={onHoldEnd}
@@ -327,23 +374,118 @@ export default function AppTimer() {
         onMouseUp={onHoldEnd}
         onMouseLeave={onHoldEnd}
       >
+        {/* Top-right controls */}
+        <div className="absolute top-12 right-4 flex flex-col gap-3 z-20">
+          <button
+            onClick={(e) => { e.stopPropagation(); haptic.light(); setShowSoundPicker(!showSoundPicker); }}
+            onTouchStart={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm"
+          >
+            {selectedSound === 'none' ? (
+              <VolumeX className="h-5 w-5 text-white/60" />
+            ) : (
+              <Volume2 className="h-5 w-5 text-white/60" />
+            )}
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); haptic.light(); setIsFullscreen(!isFullscreen); }}
+            onTouchStart={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm"
+          >
+            <Maximize className="h-5 w-5 text-white/60" />
+          </button>
+        </div>
+
+        {/* Soundscape picker dropdown */}
+        <AnimatePresence>
+          {showSoundPicker && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute top-28 right-4 z-30 bg-white/10 backdrop-blur-xl rounded-2xl p-2 min-w-[160px]"
+              onTouchStart={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              {soundscapes.map(s => (
+                <button
+                  key={s.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    haptic.light();
+                    setSelectedSound(s.id);
+                    setShowSoundPicker(false);
+                  }}
+                  className={cn(
+                    'w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-colors',
+                    selectedSound === s.id ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/5'
+                  )}
+                >
+                  <span className="text-base">{s.emoji}</span>
+                  <span className="text-sm font-medium">{s.label}</span>
+                  {selectedSound === s.id && <Check className="h-3.5 w-3.5 ml-auto text-purple-400" />}
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Hearts decoration */}
-        <div className="absolute top-20 right-10 text-pink-400/40 text-2xl select-none">💜</div>
-        <div className="absolute top-28 right-6 text-pink-300/30 text-sm select-none">💕</div>
-        <div className="absolute top-24 left-10 text-purple-400/30 text-lg select-none">✨</div>
+        {!isFullscreen && (
+          <>
+            <div className="absolute top-20 right-16 text-pink-400/40 text-2xl select-none">💜</div>
+            <div className="absolute top-28 right-20 text-pink-300/30 text-sm select-none">💕</div>
+            <div className="absolute top-24 left-10 text-purple-400/30 text-lg select-none">✨</div>
+          </>
+        )}
 
         {/* Countdown */}
-        <div className="flex flex-col items-center">
-          <span className="text-8xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-violet-400 bg-clip-text text-transparent tracking-tight">
-            {formatTime(secondsLeft)}
-          </span>
-          {/* Decorative lines */}
-          <div className="flex gap-1 mt-4">
-            <div className="w-8 h-0.5 rounded-full bg-purple-500/40" />
-            <div className="w-12 h-0.5 rounded-full bg-pink-500/30" />
-            <div className="w-6 h-0.5 rounded-full bg-violet-500/40" />
-          </div>
-          <p className="text-white/30 text-sm mt-3">{customTheme || selectedTheme}</p>
+        <div className={cn(
+          "flex items-center justify-center",
+          isFullscreen ? "flex-col" : "flex-col"
+        )}>
+          {isFullscreen ? (
+            // Fullscreen: huge vertical digits filling the screen
+            <div className="flex flex-col items-center gap-0 leading-none">
+              {[mm[0], mm[1]].map((d, i) => (
+                <span key={`m${i}`} className={cn("font-black", digitColors[i])}
+                  style={{ fontSize: 'min(45vw, 220px)', lineHeight: 0.85 }}>{d}</span>
+              ))}
+              <div className="flex gap-3 my-1">
+                <div className="w-5 h-5 rounded-full bg-white/30" />
+                <div className="w-5 h-5 rounded-full bg-white/30" />
+              </div>
+              {[ss[0], ss[1]].map((d, i) => (
+                <span key={`s${i}`} className={cn("font-black", digitColors[i + 2])}
+                  style={{ fontSize: 'min(45vw, 220px)', lineHeight: 0.85 }}>{d}</span>
+              ))}
+            </div>
+          ) : (
+            // Normal: horizontal time display
+            <>
+              <div className="flex items-center">
+                {[mm[0], mm[1]].map((d, i) => (
+                  <span key={`m${i}`} className={cn("text-8xl font-black", digitColors[i])}>{d}</span>
+                ))}
+                <div className="flex flex-col gap-2 mx-1">
+                  <div className="w-3 h-3 rounded-full bg-white/30" />
+                  <div className="w-3 h-3 rounded-full bg-white/30" />
+                </div>
+                {[ss[0], ss[1]].map((d, i) => (
+                  <span key={`s${i}`} className={cn("text-8xl font-black", digitColors[i + 2])}>{d}</span>
+                ))}
+              </div>
+              {/* Decorative lines */}
+              <div className="flex gap-1 mt-4">
+                <div className="w-8 h-0.5 rounded-full bg-purple-500/40" />
+                <div className="w-12 h-0.5 rounded-full bg-pink-500/30" />
+                <div className="w-6 h-0.5 rounded-full bg-violet-500/40" />
+              </div>
+              <p className="text-white/30 text-sm mt-3">{customTheme || selectedTheme}</p>
+            </>
+          )}
         </div>
 
         {/* Hold to stop */}
