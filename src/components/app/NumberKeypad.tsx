@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { X, Check, Delete } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
@@ -25,14 +26,29 @@ export const NumberKeypad = ({
   maxLength = 4,
   validationHint,
 }: NumberKeypadProps) => {
+  // Track if user has started typing — first digit press replaces existing value
+  const [hasStartedTyping, setHasStartedTyping] = useState(false);
+
+  // Reset typing state when keypad opens
+  useEffect(() => {
+    if (open) {
+      setHasStartedTyping(false);
+    }
+  }, [open]);
+
   const handleKeyPress = (key: string) => {
     haptic.light();
     
     if (key === 'backspace') {
       onChange(value.slice(0, -1));
+      setHasStartedTyping(true);
     } else if (key === 'confirm') {
       onConfirm();
       onOpenChange(false);
+    } else if (!hasStartedTyping) {
+      // First digit press: replace existing value entirely
+      onChange(key);
+      setHasStartedTyping(true);
     } else if (value.length < maxLength) {
       onChange(value + key);
     }
