@@ -409,10 +409,10 @@ export default function AppTimer() {
         </div>
 
         {/* Timer Display */}
-        <div className="flex-1 flex flex-col items-center justify-center px-6">
-          {/* Pomodoro tomatoes */}
+        <div className="flex-1 flex flex-col items-center justify-center px-6 relative">
+          {/* Pomodoro tomatoes — absolutely positioned so they don't shift the circle */}
           {activeTab === 'pomodoro' && (
-            <div className="flex gap-2 mb-4">
+            <div className="absolute top-[calc(50%-180px)] flex gap-2">
               {Array.from({ length: pomodoroCycles }, (_, i) => (
                 <span key={i} className="text-2xl">🍅</span>
               ))}
