@@ -663,7 +663,6 @@ export default function AppTimer() {
         animate={{ opacity: 1, scale: 1 }}
         className="min-h-screen flex flex-col items-center justify-center px-6 bg-background"
       >
-      >
         <div className="w-16 h-16 rounded-full bg-foreground flex items-center justify-center mb-6">
           <Check className="h-8 w-8 text-background" />
         </div>
