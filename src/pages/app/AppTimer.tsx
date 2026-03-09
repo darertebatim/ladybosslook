@@ -274,6 +274,44 @@ export default function AppTimer() {
 
   // ─── ADJUST TIME SCREEN ───
   if (screen === 'adjustTime') {
+    const TICK_WIDTH = 16; // px per minute tick
+    const MAX_MIN = 90;
+    const rulerRef = useRef<HTMLDivElement>(null);
+    const isDragging = useRef(false);
+    const lastHapticVal = useRef(minutes);
+
+    const scrollToMinute = (min: number, smooth = true) => {
+      if (!rulerRef.current) return;
+      const containerW = rulerRef.current.clientWidth;
+      const scrollPos = (min) * TICK_WIDTH - containerW / 2;
+      rulerRef.current.scrollTo({ left: scrollPos, behavior: smooth ? 'smooth' : 'auto' });
+    };
+
+    const handleRulerScroll = () => {
+      if (!rulerRef.current) return;
+      const containerW = rulerRef.current.clientWidth;
+      const scrollLeft = rulerRef.current.scrollLeft;
+      const val = Math.round((scrollLeft + containerW / 2) / TICK_WIDTH);
+      const clamped = Math.max(1, Math.min(MAX_MIN, val));
+      if (clamped !== minutes) {
+        setMinutes(clamped);
+        if (clamped !== lastHapticVal.current) {
+          // Haptic on every 5th value, or selection on each
+          if (clamped % 5 === 0) {
+            haptic.medium();
+          } else {
+            haptic.selection();
+          }
+          lastHapticVal.current = clamped;
+        }
+      }
+    };
+
+    // Scroll to initial value on mount
+    useEffect(() => {
+      setTimeout(() => scrollToMinute(minutes, false), 50);
+    }, []);
+
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <div className="flex items-center px-4 pt-4 pb-2">
@@ -283,39 +321,62 @@ export default function AppTimer() {
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center px-6">
-          <h2 className="text-xl font-semibold text-foreground mb-10">Adjust the time</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-16">Adjust the time</h2>
 
-          {/* Large minute display */}
-          <div className="flex items-baseline gap-2 mb-12">
-            <span className="text-7xl font-bold bg-gradient-to-r from-purple-500 to-violet-500 bg-clip-text text-transparent">
-              {minutes}
-            </span>
-            <span className="text-2xl font-medium text-muted-foreground">min</span>
+          {/* Triangle pointer */}
+          <div className="mb-2">
+            <svg width="20" height="12" viewBox="0 0 20 12">
+              <polygon points="10,0 20,12 0,12" fill="hsl(265, 80%, 60%)" />
+            </svg>
           </div>
 
-          {/* Slider */}
-          <div className="w-full max-w-xs">
-            <input
-              type="range"
-              min={1}
-              max={90}
-              value={minutes}
-              onChange={(e) => {
-                const v = Number(e.target.value);
-                if (v !== minutes) haptic.selection();
-                setMinutes(v);
-              }}
-              className="w-full h-2 bg-muted rounded-full appearance-none cursor-pointer
-                [&::-webkit-slider-thumb]:appearance-none
-                [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6
-                [&::-webkit-slider-thumb]:rounded-full
-                [&::-webkit-slider-thumb]:bg-purple-500
-                [&::-webkit-slider-thumb]:shadow-lg
-                [&::-webkit-slider-thumb]:cursor-pointer"
-            />
-            <div className="flex justify-between text-xs text-muted-foreground mt-2">
-              <span>1 min</span>
-              <span>90 min</span>
+          {/* Large minute display */}
+          <div className="flex items-baseline gap-1 mb-8">
+            <span className="text-7xl font-bold text-purple-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+              {minutes}
+            </span>
+            <span className="text-2xl font-semibold text-purple-400">min</span>
+          </div>
+
+          {/* Scrollable ruler */}
+          <div className="w-full max-w-sm relative">
+            {/* Fade edges */}
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+            
+            {/* Center line indicator */}
+            <div className="absolute left-1/2 -translate-x-[1.5px] top-0 w-[3px] h-16 bg-purple-500 rounded-full z-10 pointer-events-none" />
+
+            <div
+              ref={rulerRef}
+              className="overflow-x-auto scrollbar-hide"
+              onScroll={handleRulerScroll}
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
+            >
+              <div className="flex items-end" style={{ width: `${(MAX_MIN + 1) * TICK_WIDTH + 400}px`, paddingLeft: '50%', paddingRight: '50%' }}>
+                {Array.from({ length: MAX_MIN + 1 }, (_, i) => {
+                  const isMajor = i % 5 === 0;
+                  return (
+                    <div key={i} className="flex flex-col items-center" style={{ width: `${TICK_WIDTH}px`, flexShrink: 0 }}>
+                      <div
+                        className={cn(
+                          "rounded-full transition-colors",
+                          isMajor ? "w-[3px] h-10" : "w-[2px] h-6",
+                          i === minutes ? "bg-purple-500" : "bg-muted-foreground/25"
+                        )}
+                      />
+                      {isMajor && (
+                        <span className={cn(
+                          "text-xs mt-2 font-medium transition-colors",
+                          i === minutes ? "text-purple-500" : "text-muted-foreground/40"
+                        )}>
+                          {i}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
