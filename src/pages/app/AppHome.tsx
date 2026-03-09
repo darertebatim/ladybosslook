@@ -269,6 +269,12 @@ const AppHome = () => {
       initialLoadDone.current = true;
       prevTotalCompletions.current = totalCompletions;
       prevHasCompletionToday.current = hasAnyCompletionToday;
+      
+      // Auto-set flag for existing users who already have completions
+      // (prevents the first-action spotlight from showing every day for legacy users)
+      if (totalCompletions > 0 && localStorage.getItem('simora_first_action_celebrated') !== 'true') {
+        localStorage.setItem('simora_first_action_celebrated', 'true');
+      }
       return;
     }
 
