@@ -466,7 +466,304 @@ export default function AppTimer() {
   }
 
 
-  // ─── ADJUST TIME SCREEN ───
+  // ─── SETTINGS SCREEN ───
+  if (screen === 'settings') {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 pt-4 pb-2">
+          <button onClick={() => { setScreen('setup'); haptic.light(); }} className="p-2 -ml-2">
+            <ArrowLeft className="h-5 w-5 text-foreground" />
+          </button>
+          <button
+            onClick={() => { setScreen('setup'); haptic.light(); }}
+            className="text-base font-semibold text-foreground pr-2"
+          >
+            Save
+          </button>
+        </div>
+
+        <div className="px-5 pt-2 pb-4">
+          <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+        </div>
+
+        {/* Timer / Pomodoro tabs */}
+        <div className="px-5 mb-4">
+          <div className="flex bg-muted rounded-full p-1">
+            <button
+              onClick={() => { setSettingsTab('timer'); haptic.light(); }}
+              className={cn(
+                'flex-1 py-2.5 rounded-full text-sm font-medium transition-colors',
+                settingsTab === 'timer' ? 'bg-foreground text-background' : 'text-muted-foreground'
+              )}
+            >
+              Timer
+            </button>
+            <button
+              onClick={() => { setSettingsTab('pomodoro'); haptic.light(); }}
+              className={cn(
+                'flex-1 py-2.5 rounded-full text-sm font-medium transition-colors',
+                settingsTab === 'pomodoro' ? 'bg-foreground text-background' : 'text-muted-foreground'
+              )}
+            >
+              Pomodoro
+            </button>
+          </div>
+        </div>
+
+        {/* Reminders card */}
+        <div className="px-5 mb-6">
+          <div className="bg-muted/50 rounded-2xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Bell className="h-5 w-5 text-foreground" />
+              <span className="text-base font-medium text-foreground">Reminders</span>
+            </div>
+            <Switch
+              checked={remindersEnabled}
+              onCheckedChange={(checked) => { setRemindersEnabled(checked); haptic.light(); }}
+            />
+          </div>
+        </div>
+
+        {/* Pomodoro-specific settings */}
+        {settingsTab === 'pomodoro' && (
+          <>
+            <div className="px-5 mb-3">
+              <h2 className="text-lg font-bold text-foreground">Pomodoro Technique</h2>
+            </div>
+
+            <div className="px-5 mb-6">
+              <div className="bg-muted/50 rounded-2xl divide-y divide-border/50">
+                {/* Pomodoro Cycle */}
+                <button
+                  onClick={() => { setShowCyclePicker(true); haptic.light(); }}
+                  className="w-full flex items-center justify-between p-4"
+                >
+                  <div className="flex items-center gap-3">
+                    <TimerIcon className="h-5 w-5 text-foreground" />
+                    <span className="text-base font-medium text-foreground">Pomodoro Cycle</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm text-muted-foreground">{pomodoroCycles} sessions</span>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                </button>
+
+                {/* Short Break */}
+                <button
+                  onClick={() => { setShowBreakPicker(true); haptic.light(); }}
+                  className="w-full flex items-center justify-between p-4"
+                >
+                  <div className="flex items-center gap-3">
+                    <Coffee className="h-5 w-5 text-foreground" />
+                    <span className="text-base font-medium text-foreground">Short Break</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm text-muted-foreground">{breakMinutes} mins</span>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* How it works link */}
+            <div className="flex-1" />
+            <div className="px-5 pb-8">
+              <button
+                onClick={() => { setShowHowItWorks(true); haptic.light(); }}
+                className="w-full text-center text-sm font-medium text-foreground underline underline-offset-2"
+              >
+                How Pomodoro Technique Works?
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* Pomodoro Cycle Picker Sheet */}
+        <AnimatePresence>
+          {showCyclePicker && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/40 z-30"
+                onClick={() => setShowCyclePicker(false)}
+              />
+              <motion.div
+                initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                className="fixed bottom-0 left-0 right-0 z-40 bg-background rounded-t-3xl"
+              >
+                <div className="flex items-center justify-between px-5 pt-5 pb-3">
+                  <button onClick={() => setShowCyclePicker(false)}>
+                    <X className="h-5 w-5 text-foreground" />
+                  </button>
+                  <span className="text-base font-semibold text-foreground">Pomodoro Cycle</span>
+                  <div className="w-5" />
+                </div>
+
+                <div className="px-5 py-6 flex flex-col items-center gap-2">
+                  {[2, 3, 4, 5, 6].map(n => (
+                    <button
+                      key={n}
+                      onClick={() => { setPomodoroCycles(n); haptic.selection(); }}
+                      className={cn(
+                        "w-full py-3.5 rounded-xl text-center transition-colors flex items-center justify-between px-6",
+                        n === pomodoroCycles ? "bg-muted" : ""
+                      )}
+                    >
+                      <span className={cn(
+                        "text-2xl font-bold",
+                        n === pomodoroCycles ? "text-foreground" : "text-muted-foreground/50"
+                      )}>{n}</span>
+                      {n === pomodoroCycles && (
+                        <span className="text-base text-muted-foreground">session</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                <p className="text-center text-sm text-muted-foreground px-8 pb-4">
+                  Typically, every 4 pomodoros establish a deep focus rhythm.
+                </p>
+
+                <div className="px-5 pb-8">
+                  <button
+                    onClick={() => { setShowCyclePicker(false); haptic.medium(); }}
+                    className="w-full h-12 rounded-full bg-foreground text-background font-semibold text-base"
+                  >
+                    OK
+                  </button>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Short Break Picker Sheet */}
+        <AnimatePresence>
+          {showBreakPicker && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/40 z-30"
+                onClick={() => setShowBreakPicker(false)}
+              />
+              <motion.div
+                initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                className="fixed bottom-0 left-0 right-0 z-40 bg-background rounded-t-3xl"
+              >
+                <div className="flex items-center justify-between px-5 pt-5 pb-3">
+                  <button onClick={() => setShowBreakPicker(false)}>
+                    <X className="h-5 w-5 text-foreground" />
+                  </button>
+                  <span className="text-base font-semibold text-foreground">Short Break</span>
+                  <div className="w-5" />
+                </div>
+
+                <div className="px-5 py-6 flex flex-col items-center gap-2">
+                  {[3, 4, 5, 6, 7, 10].map(n => (
+                    <button
+                      key={n}
+                      onClick={() => { setBreakMinutes(n); haptic.selection(); }}
+                      className={cn(
+                        "w-full py-3.5 rounded-xl text-center transition-colors flex items-center justify-between px-6",
+                        n === breakMinutes ? "bg-muted" : ""
+                      )}
+                    >
+                      <span className={cn(
+                        "text-2xl font-bold",
+                        n === breakMinutes ? "text-foreground" : "text-muted-foreground/50"
+                      )}>{n}</span>
+                      {n === breakMinutes && (
+                        <span className="text-base text-muted-foreground">min</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                <p className="text-center text-sm text-muted-foreground px-8 pb-4">
+                  A short break after each Pomodoro helps refresh your mind and boost creativity.
+                </p>
+
+                <div className="px-5 pb-8">
+                  <button
+                    onClick={() => { setShowBreakPicker(false); haptic.medium(); }}
+                    className="w-full h-12 rounded-full bg-foreground text-background font-semibold text-base"
+                  >
+                    OK
+                  </button>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* How Pomodoro Works Sheet */}
+        <AnimatePresence>
+          {showHowItWorks && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/40 z-30"
+                onClick={() => setShowHowItWorks(false)}
+              />
+              <motion.div
+                initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                className="fixed bottom-0 left-0 right-0 z-40 bg-background rounded-t-3xl px-6 pt-8 pb-8"
+              >
+                <h2 className="text-2xl font-bold text-foreground text-center mb-6">
+                  How Pomodoro Technique Works?
+                </h2>
+
+                <div className="space-y-5 mb-8">
+                  <p className="text-base text-foreground">
+                    🍅 Pomodoro Technique is a simple tool to boost focus and productivity.
+                  </p>
+                  <p className="text-base text-foreground">
+                    🍅 Work for 25 minutes, take a 5-minute break, and repeat.
+                  </p>
+                  <p className="text-base text-foreground">
+                    🍅 It's perfect for staying on track and avoiding burnout.
+                  </p>
+                  <p className="text-base text-foreground">
+                    🍅 Balancing work and rest is essential for long-term productivity.
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => { setShowHowItWorks(false); haptic.light(); }}
+                  className="w-full h-12 rounded-full bg-foreground text-background font-semibold text-base"
+                >
+                  Got it
+                </button>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  }
+
+  // ─── STATS SCREEN (placeholder) ───
+  if (screen === 'stats') {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <div className="flex items-center px-4 pt-4 pb-2">
+          <button onClick={() => { setScreen('setup'); haptic.light(); }} className="p-2 -ml-2">
+            <ArrowLeft className="h-5 w-5 text-foreground" />
+          </button>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center px-6">
+          <BarChart2 className="h-12 w-12 text-muted-foreground/30 mb-4" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">Stats</h2>
+          <p className="text-sm text-muted-foreground text-center">Coming soon</p>
+        </div>
+      </div>
+    );
+  }
+
   if (screen === 'adjustTime') {
 
     return (
