@@ -454,7 +454,7 @@ export default function AppTimer() {
   if (screen === 'running') {
     const timeStr = formatTime(secondsLeft);
     const [mm, ss] = timeStr.split(':');
-    const digitColors = ['text-purple-400', 'text-pink-400', 'text-violet-500', 'text-fuchsia-400'];
+    const digitColors = ['text-white', 'text-white/80', 'text-white/90', 'text-white/70'];
 
     return (
       <motion.div
