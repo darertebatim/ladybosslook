@@ -13,6 +13,7 @@ import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { toast } from 'sonner';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { FocusStatsScreen } from '@/components/app/FocusStatsScreen';
 import { useSaveFocusSession } from '@/hooks/useFocusSessions';
 
@@ -414,7 +415,7 @@ export default function AppTimer() {
           {activeTab === 'pomodoro' && (
             <div className="absolute top-[calc(50%-180px)] flex gap-2">
               {Array.from({ length: pomodoroCycles }, (_, i) => (
-                <span key={i} className="text-2xl">🍅</span>
+                <FluentEmoji key={i} emoji="🍅" size={28} />
               ))}
             </div>
           )}
@@ -762,17 +763,17 @@ export default function AppTimer() {
                 </h2>
 
                 <div className="space-y-5 mb-8">
-                  <p className="text-base text-foreground">
-                    🍅 Pomodoro Technique is a simple tool to boost focus and productivity.
+                  <p className="text-base text-foreground flex items-start gap-2">
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> Pomodoro Technique is a simple tool to boost focus and productivity.
                   </p>
-                  <p className="text-base text-foreground">
-                    🍅 Work for 25 minutes, take a 5-minute break, and repeat.
+                  <p className="text-base text-foreground flex items-start gap-2">
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> Work for 25 minutes, take a 5-minute break, and repeat.
                   </p>
-                  <p className="text-base text-foreground">
-                    🍅 It's perfect for staying on track and avoiding burnout.
+                  <p className="text-base text-foreground flex items-start gap-2">
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> It's perfect for staying on track and avoiding burnout.
                   </p>
-                  <p className="text-base text-foreground">
-                    🍅 Balancing work and rest is essential for long-term productivity.
+                  <p className="text-base text-foreground flex items-start gap-2">
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> Balancing work and rest is essential for long-term productivity.
                   </p>
                 </div>
 
@@ -1077,8 +1078,8 @@ export default function AppTimer() {
         {activeTab === 'pomodoro' && !isFullscreen && (
           <div className="absolute left-0 right-0 flex justify-center gap-2" style={{ top: 'calc(env(safe-area-inset-top) + 24px)' }}>
             {Array.from({ length: pomodoroCycles }, (_, i) => (
-              <span key={i} className={cn("text-xl transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
-                🍅
+              <span key={i} className={cn("transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
+                <FluentEmoji emoji="🍅" size={24} />
               </span>
             ))}
           </div>
@@ -1153,7 +1154,7 @@ export default function AppTimer() {
         animate={{ opacity: 1 }}
         className="min-h-screen bg-black flex flex-col items-center justify-center px-8 relative select-none"
       >
-        <span className="text-5xl mb-8">🍅</span>
+        <FluentEmoji emoji="🍅" size={56} className="mb-8" />
         <h1 className="text-3xl font-extrabold text-white text-center leading-tight mb-2">
           You've been focusing for{' '}
           <span className="text-[hsl(var(--primary))]">{minutes} min</span>.
@@ -1187,8 +1188,8 @@ export default function AppTimer() {
         {/* Tomato progress */}
         <div className="flex gap-2 mb-6">
           {Array.from({ length: pomodoroCycles }, (_, i) => (
-            <span key={i} className={cn("text-2xl transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
-              🍅
+            <span key={i} className={cn("transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
+              <FluentEmoji emoji="🍅" size={28} />
             </span>
           ))}
         </div>
@@ -1225,7 +1226,7 @@ export default function AppTimer() {
         animate={{ opacity: 1 }}
         className="min-h-screen bg-black flex flex-col items-center justify-center px-8 relative select-none"
       >
-        <span className="text-5xl mb-8">🍅</span>
+        <FluentEmoji emoji="🍅" size={56} className="mb-8" />
         <h1 className="text-3xl font-extrabold text-center leading-tight mb-1">
           <span className="text-[hsl(var(--primary))]">Break's over!</span>
         </h1>
