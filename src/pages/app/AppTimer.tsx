@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, ArrowLeft, ChevronRight, Settings, CalendarDays, Check, AlertCircle, Music, Maximize } from 'lucide-react';
+import { X, ArrowLeft, ChevronRight, Settings, CalendarPlus, Check, AlertCircle, Music, Maximize } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { timerThemes } from '@/lib/timerThemes';
@@ -8,6 +8,10 @@ import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
+import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
+import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
+import { toast } from 'sonner';
 
 type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped' | 'pomodoroRoundDone' | 'pomodoroBreak' | 'pomodoroBreakDone';
 
