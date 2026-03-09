@@ -22,7 +22,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'focus-timer',
-    name: 'Focus Timer',
+    name: 'Timer',
     icon: 'Clock',
     bgColor: 'bg-[#E8E4F8]',
     iconColor: 'text-purple-600',
