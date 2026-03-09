@@ -64,6 +64,7 @@ const AppMood = lazy(() => import("@/pages/app/AppMood"));
 const AppMoodHistory = lazy(() => import("@/pages/app/AppMoodHistory"));
 const AppPresence = lazy(() => import("@/pages/app/AppPresence"));
 const AppFasting = lazy(() => import("@/pages/app/AppFasting"));
+const AppTimer = lazy(() => import("@/pages/app/AppTimer"));
 const AppAdminSupport = lazy(() => import("@/pages/app/AppAdminSupport"));
 const AppChannelPost = lazy(() => import("@/pages/app/AppChannelPost"));
 const AppRate = lazy(() => import("@/pages/app/AppRate"));
