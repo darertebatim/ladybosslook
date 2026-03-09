@@ -659,6 +659,17 @@ export default function AppTimer() {
           </>
         )}
 
+        {/* Pomodoro tomato indicators */}
+        {activeTab === 'pomodoro' && !isFullscreen && (
+          <div className="absolute top-24 left-0 right-0 flex justify-center gap-2">
+            {Array.from({ length: POMODORO_ROUNDS }, (_, i) => (
+              <span key={i} className={cn("text-xl transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
+                🍅
+              </span>
+            ))}
+          </div>
+        )}
+
         {/* Countdown */}
         <div className="flex items-center justify-center flex-col">
           {isFullscreen ? (
@@ -698,7 +709,9 @@ export default function AppTimer() {
                 <div className="w-12 h-0.5 rounded-full bg-white/15" />
                 <div className="w-6 h-0.5 rounded-full bg-white/20" />
               </div>
-              <p className="text-white/30 text-sm mt-3">{customTheme || selectedTheme}</p>
+              <p className="text-white/30 text-sm mt-3">
+                {activeTab === 'pomodoro' ? `Round ${pomodoroRound + 1} of ${POMODORO_ROUNDS}` : (customTheme || selectedTheme)}
+              </p>
             </>
           )}
         </div>
