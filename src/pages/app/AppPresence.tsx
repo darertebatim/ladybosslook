@@ -41,6 +41,7 @@ const AppPresence = () => {
     },
     enabled: !!user?.id,
   });
+  const { data: challenges } = useUserChallenges();
   const setStreakGoal = useSetStreakGoal();
   const recoverStreak = useRecoverStreak();
   const [showGoalSelection, setShowGoalSelection] = useState(false);
