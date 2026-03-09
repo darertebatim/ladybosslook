@@ -265,9 +265,17 @@ const AppPresence = () => {
             
             {/* Mood Insights */}
             <section>
-              <h3 className="text-sm font-semibold text-orange-900/60 mb-3">
-                Mood Insights
-              </h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-orange-900/60">
+                  Mood Insights
+                </h3>
+                <button
+                  onClick={() => navigate('/app/mood/history')}
+                  className="flex items-center gap-0.5 text-sm font-medium text-muted-foreground active:scale-95 transition-transform"
+                >
+                  View All <ChevronRightIcon className="h-4 w-4" />
+                </button>
+              </div>
               <MoodCalendar />
             </section>
             
