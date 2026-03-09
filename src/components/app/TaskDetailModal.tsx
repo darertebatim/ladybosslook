@@ -281,7 +281,7 @@ export const TaskDetailModal = ({
               <Button
                 onClick={() => {
                   onClose();
-                  navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: 'planner' } });
+                  navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: '/app/home' } });
                 }}
                 className={cn('w-full gap-2 h-10 rounded-xl text-sm', proConfig.buttonClass)}
               >

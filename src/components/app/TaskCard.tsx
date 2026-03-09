@@ -336,7 +336,7 @@ export const TaskCard = memo(function TaskCard({
                 if (proLinkType === 'weight') {
                   setWeightOpen(true);
                 } else {
-                  navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: 'planner' } });
+                  navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: '/app/home' } });
                 }
               }}
               className={cn(
