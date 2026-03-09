@@ -63,6 +63,7 @@ const AppEmotionHistory = lazy(() => import("@/pages/app/AppEmotionHistory"));
 const AppMood = lazy(() => import("@/pages/app/AppMood"));
 const AppMoodHistory = lazy(() => import("@/pages/app/AppMoodHistory"));
 const AppPresence = lazy(() => import("@/pages/app/AppPresence"));
+const AppActionStats = lazy(() => import("@/pages/app/AppActionStats"));
 const AppFasting = lazy(() => import("@/pages/app/AppFasting"));
 const AppTimer = lazy(() => import("@/pages/app/AppTimer"));
 const AppAdminSupport = lazy(() => import("@/pages/app/AppAdminSupport"));
@@ -436,6 +437,7 @@ const App = () => (
                   <Route path="/app/mood" element={<ProtectedRoute><AppMood /></ProtectedRoute>} />
                   <Route path="/app/mood/history" element={<ProtectedRoute><AppMoodHistory /></ProtectedRoute>} />
                   <Route path="/app/presence" element={<ProtectedRoute><AppPresence /></ProtectedRoute>} />
+                  <Route path="/app/action-stats" element={<ProtectedRoute><AppActionStats /></ProtectedRoute>} />
                   <Route path="/app/fasting" element={<ProtectedRoute><AppFasting /></ProtectedRoute>} />
                   <Route path="/app/timer" element={<ProtectedRoute><AppTimer /></ProtectedRoute>} />
                   <Route path="/app/support" element={<ProtectedRoute><AppAdminSupport /></ProtectedRoute>} />
