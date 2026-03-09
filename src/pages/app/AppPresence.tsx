@@ -77,7 +77,7 @@ const AppPresence = () => {
                 <User className="w-4.5 h-4.5 text-orange-700" />
               </button>
               <button
-                onClick={() => navigate('/app/settings')}
+                onClick={() => navigate('/app/settings', { state: { from: '/app/presence' } })}
                 className="w-9 h-9 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
               >
                 <Settings className="w-4.5 h-4.5 text-orange-700" />
