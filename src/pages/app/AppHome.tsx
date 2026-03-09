@@ -729,7 +729,7 @@ const AppHome = () => {
                 <div 
                   ref={weekStripRef}
                   onScroll={handleWeekStripScroll}
-                  className={cn("flex mt-0 overflow-x-auto overflow-y-hidden transition-opacity duration-200 snap-x snap-mandatory", showCalendar ? "opacity-0" : "opacity-100")}
+                  className={cn("flex mt-0 py-1 overflow-x-auto overflow-y-visible transition-opacity duration-200 snap-x snap-mandatory", showCalendar ? "opacity-0" : "opacity-100")}
                   style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch', touchAction: 'pan-x' }}
                 >
                   {weekDays.map((day, idx) => {
@@ -756,7 +756,7 @@ const AppHome = () => {
                     style={{ minWidth: 'calc(100% / 7)' }}
                   >
                         <div className={cn(
-                          'w-11 h-11 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all relative overflow-hidden',
+                          'w-11 h-11 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all relative',
                           isSelected 
                             ? 'bg-chip-lavender text-foreground scale-105 shadow-sm' 
                             : isTodayDate 
