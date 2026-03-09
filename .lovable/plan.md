@@ -1,58 +1,32 @@
 
 
-## Calm-Style Animated Background for Watch Page
+## Redesign: Week Strip Day Items as Rounded Squares
 
-Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
+### Current State
+Each day in the week strip is a vertical column with the day name above and a circle below. Coins replace the circle content. The selected day gets a pill-shaped lavender background.
 
-### What You'll Get
+### New Design
+Each day becomes a **rounded square card** containing both the day name and number stacked inside. Key changes:
 
-- A deep dark blue gradient background on the Watch page header area
-- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
-- Subtle lightning flashes that pulse periodically
-- All text updated to white/light colors for contrast
-- Lightweight implementation using CSS keyframes (no extra dependencies)
+1. **Square shape**: Replace the circle+label layout with a single `w-11 h-14 rounded-xl` container per day
+2. **Layout inside square**: Day name (e.g., "Tue") on top, date number (e.g., "10") below, both centered vertically
+3. **Selected state**: Lavender background (`bg-chip-lavender`) with dark text, slightly scaled up
+4. **Today (unselected)**: Subtle violet border or lighter violet background
+5. **Default**: Light gray text on transparent background
+6. **Coins/badges**: When a day has a badge, the coin image fills the lower portion of the square (replacing the number), day name stays visible on top
+7. **Program event stars**: Positioned at top-right corner of the square
 
-### Design Details
+### File Changes
+- **`src/pages/app/AppHome.tsx`** (lines ~749-789): Restructure the day button markup from circle+label to a single rounded square card with both elements inside. Remove the separate day name span and circle div, replace with one unified container.
 
-- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
-- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
-- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
-- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
-- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
-
-### Technical Approach
-
-**Files to modify:**
-
-1. **`src/pages/app/AppWatch.tsx`**
-   - Replace the header `bg-[#E8F4FE]` with the dark gradient
-   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
-   - Add a lightning flash overlay div
-   - Update all text classes to white variants (`text-white`, `text-white/60`)
-   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
-   - Extend the gradient into the page background behind the content area
-
-2. **`tailwind.config.ts`**
-   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
-   - Register corresponding animation utilities
-
-### Visual Structure
-
+### Visual Spec
 ```text
-+----------------------------------+
-|  [dark blue gradient header]     |
-|  ~~~ cloud layer 1 (slow) ~~~   |
-|  ~~~ cloud layer 2 (slower) ~~~ |
-|  * lightning flash (periodic) *  |
-|                                  |
-|  Watch          [icons]          |
-|  [categories row]                |
-|  [filters]              [lang]   |
-+----------------------------------+
-|  [normal white content area]     |
-|  [playlist cards grid]           |
-+----------------------------------+
+┌─────┐  ┌─────┐  ┌█████┐  ┌─────┐
+│ Sun │  │ Mon │  │ Tue │  │ Wed │
+│  8  │  │ 🥇  │  │ 10  │  │ 11  │
+└─────┘  └─────┘  └█████┘  └─────┘
+ gray    coin+gray  selected   gray
 ```
 
-The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
+Selected = lavender bg, bold text. Coins overlay the number area. The gap between items stays at roughly the same `calc(100%/7)` width distribution.
 
