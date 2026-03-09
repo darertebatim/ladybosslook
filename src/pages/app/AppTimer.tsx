@@ -228,7 +228,7 @@ export default function AppTimer() {
               onClick={() => { setActiveTab('timer'); haptic.light(); }}
               className={cn(
                 'px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
-                activeTab === 'timer' ? 'bg-purple-200 text-purple-800' : 'text-muted-foreground'
+                activeTab === 'timer' ? 'bg-foreground text-background' : 'text-muted-foreground'
               )}
             >
               Timer
@@ -237,7 +237,7 @@ export default function AppTimer() {
               onClick={() => { setActiveTab('pomodoro'); haptic.light(); }}
               className={cn(
                 'px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
-                activeTab === 'pomodoro' ? 'bg-purple-200 text-purple-800' : 'text-muted-foreground'
+                activeTab === 'pomodoro' ? 'bg-foreground text-background' : 'text-muted-foreground'
               )}
             >
               Pomodoro
@@ -255,22 +255,22 @@ export default function AppTimer() {
               <ellipse
                 cx="140" cy="140" rx="125" ry="125"
                 fill="none"
-                stroke="hsl(var(--primary) / 0.15)"
+                stroke="hsl(var(--foreground) / 0.1)"
                 strokeWidth="3"
                 strokeDasharray="8 6"
                 className="opacity-80"
               />
               <ellipse
                 cx="140" cy="140" rx="115" ry="115"
-                fill="hsl(var(--primary) / 0.06)"
-                stroke="hsl(var(--primary) / 0.25)"
+                fill="hsl(var(--foreground) / 0.04)"
+                stroke="hsl(var(--foreground) / 0.12)"
                 strokeWidth="2"
               />
             </svg>
 
-            {/* Hearts decoration */}
-            <div className="absolute top-4 right-6 text-pink-300 text-lg select-none">💜</div>
-            <div className="absolute top-10 right-2 text-pink-200 text-xs select-none">💕</div>
+            {/* Decorative dots */}
+            <div className="absolute top-4 right-6 text-muted-foreground/40 text-lg select-none">●</div>
+            <div className="absolute top-10 right-2 text-muted-foreground/20 text-xs select-none">●</div>
 
             {/* Time display */}
             <button
@@ -334,16 +334,16 @@ export default function AppTimer() {
           {/* Triangle pointer */}
           <div className="mb-2">
             <svg width="20" height="12" viewBox="0 0 20 12">
-              <polygon points="10,0 20,12 0,12" fill="hsl(265, 80%, 60%)" />
+              <polygon points="10,0 20,12 0,12" fill="hsl(var(--foreground))" />
             </svg>
           </div>
 
           {/* Large minute display */}
           <div className="flex items-baseline gap-1 mb-8">
-            <span className="text-7xl font-bold text-purple-500" style={{ fontVariantNumeric: 'tabular-nums' }}>
+            <span className="text-7xl font-bold text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
               {minutes}
             </span>
-            <span className="text-2xl font-semibold text-purple-400">min</span>
+            <span className="text-2xl font-semibold text-muted-foreground">min</span>
           </div>
 
           {/* Scrollable ruler */}
@@ -353,7 +353,7 @@ export default function AppTimer() {
             <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
             
             {/* Center line indicator */}
-            <div className="absolute left-1/2 -translate-x-[1.5px] top-0 w-[3px] h-16 bg-purple-500 rounded-full z-10 pointer-events-none" />
+            <div className="absolute left-1/2 -translate-x-[1.5px] top-0 w-[3px] h-16 bg-foreground rounded-full z-10 pointer-events-none" />
 
             <div
               ref={rulerRef}
@@ -370,13 +370,13 @@ export default function AppTimer() {
                         className={cn(
                           "rounded-full transition-colors",
                           isMajor ? "w-[3px] h-10" : "w-[2px] h-6",
-                          i === minutes ? "bg-purple-500" : "bg-muted-foreground/25"
+                          i === minutes ? "bg-foreground" : "bg-muted-foreground/25"
                         )}
                       />
                       {isMajor && (
                         <span className={cn(
                           "text-xs mt-2 font-medium transition-colors",
-                          i === minutes ? "text-purple-500" : "text-muted-foreground/40"
+                          i === minutes ? "text-foreground" : "text-muted-foreground/40"
                         )}>
                           {i}
                         </span>
@@ -391,7 +391,7 @@ export default function AppTimer() {
 
         {/* Done button with lavender gradient */}
         <div className="px-6 pb-8 pt-4 relative">
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-purple-100/50 to-transparent pointer-events-none dark:from-purple-950/20" />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-muted/50 to-transparent pointer-events-none" />
           <button
             onClick={() => { setScreen('setup'); haptic.medium(); }}
             className="relative w-full h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
@@ -438,7 +438,7 @@ export default function AppTimer() {
                 className={cn(
                   'px-4 py-2 rounded-full text-sm font-medium transition-transform active:scale-95',
                   theme.color,
-                  selectedTheme === theme.label && !customTheme && 'ring-2 ring-purple-400 ring-offset-2'
+                  selectedTheme === theme.label && !customTheme && 'ring-2 ring-foreground ring-offset-2'
                 )}
               >
                 {theme.label}
@@ -454,7 +454,7 @@ export default function AppTimer() {
   if (screen === 'running') {
     const timeStr = formatTime(secondsLeft);
     const [mm, ss] = timeStr.split(':');
-    const digitColors = ['text-purple-400', 'text-pink-400', 'text-violet-500', 'text-fuchsia-400'];
+    const digitColors = ['text-white', 'text-white/80', 'text-white/90', 'text-white/70'];
 
     return (
       <motion.div
@@ -541,11 +541,11 @@ export default function AppTimer() {
                     }}
                     className="w-full flex items-center gap-4 py-4 border-b border-border"
                   >
-                    <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center shrink-0">
                       <div className="relative">
-                        <Music className="h-5 w-5 text-purple-600" />
+                        <Music className="h-5 w-5 text-foreground" />
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-[1.5px] h-7 bg-purple-600 rotate-45 rounded-full" />
+                          <div className="w-[1.5px] h-7 bg-foreground rotate-45 rounded-full" />
                         </div>
                       </div>
                     </div>
@@ -587,12 +587,12 @@ export default function AppTimer() {
           )}
         </AnimatePresence>
 
-        {/* Hearts decoration */}
+        {/* Decorative elements */}
         {!isFullscreen && (
           <>
-            <div className="absolute top-20 right-16 text-pink-400/40 text-2xl select-none">💜</div>
-            <div className="absolute top-28 right-20 text-pink-300/30 text-sm select-none">💕</div>
-            <div className="absolute top-24 left-10 text-purple-400/30 text-lg select-none">✨</div>
+            <div className="absolute top-20 right-16 text-white/10 text-2xl select-none">●</div>
+            <div className="absolute top-28 right-20 text-white/5 text-sm select-none">●</div>
+            <div className="absolute top-24 left-10 text-white/8 text-lg select-none">✦</div>
           </>
         )}
 
@@ -631,9 +631,9 @@ export default function AppTimer() {
               </div>
               {/* Decorative lines */}
               <div className="flex gap-1 mt-4">
-                <div className="w-8 h-0.5 rounded-full bg-purple-500/40" />
-                <div className="w-12 h-0.5 rounded-full bg-pink-500/30" />
-                <div className="w-6 h-0.5 rounded-full bg-violet-500/40" />
+                <div className="w-8 h-0.5 rounded-full bg-white/20" />
+                <div className="w-12 h-0.5 rounded-full bg-white/15" />
+                <div className="w-6 h-0.5 rounded-full bg-white/20" />
               </div>
               <p className="text-white/30 text-sm mt-3">{customTheme || selectedTheme}</p>
             </>
@@ -645,7 +645,7 @@ export default function AppTimer() {
           <p className="text-white/40 text-sm">Hold to stop timer</p>
           <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-purple-400 to-pink-400"
+              className="h-full rounded-full bg-white/60"
               style={{ width: `${holdProgress * 100}%` }}
               transition={{ duration: 0 }}
             />
@@ -661,8 +661,7 @@ export default function AppTimer() {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="min-h-screen flex flex-col items-center justify-center px-6"
-        style={{ background: 'linear-gradient(180deg, hsl(270 80% 96%) 0%, hsl(280 60% 94%) 100%)' }}
+        className="min-h-screen flex flex-col items-center justify-center px-6 bg-background"
       >
         <div className="w-16 h-16 rounded-full bg-foreground flex items-center justify-center mb-6">
           <Check className="h-8 w-8 text-background" />
@@ -685,8 +684,7 @@ export default function AppTimer() {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="min-h-screen flex flex-col items-center justify-center px-6"
-        style={{ background: 'linear-gradient(180deg, hsl(270 80% 96%) 0%, hsl(280 60% 94%) 100%)' }}
+        className="min-h-screen flex flex-col items-center justify-center px-6 bg-background"
       >
         <div className="w-16 h-16 rounded-full bg-foreground flex items-center justify-center mb-6">
           <AlertCircle className="h-8 w-8 text-background" />
