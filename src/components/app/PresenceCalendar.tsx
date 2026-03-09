@@ -12,11 +12,10 @@ import {
   isSameMonth,
   isSameDay,
   addDays,
-  isAfter,
 } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { useStreakCalendar, useActionCalendar } from '@/hooks/usePresenceCalendars';
-import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { useStreakCalendar } from '@/hooks/usePresenceCalendars';
+import { useDateRangeTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 
 const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
@@ -30,7 +29,33 @@ function useCalendarDays(currentMonth: Date) {
   }, [currentMonth]);
 }
 
-// ─── STREAK CALENDAR (self-contained with data fetching) ───
+// ─── Badge emoji for each level ───
+function BadgeIcon({ level, size = 28 }: { level: BadgeLevel; size?: number }) {
+  if (level === 'gold') {
+    return (
+      <div className="w-9 h-9 rounded-full bg-amber-400 flex items-center justify-center shadow-sm">
+        <span style={{ fontSize: size * 0.7 }}>🏅</span>
+      </div>
+    );
+  }
+  if (level === 'silver') {
+    return (
+      <div className="w-9 h-9 rounded-full bg-sky-200 flex items-center justify-center shadow-sm">
+        <span style={{ fontSize: size * 0.7 }}>💎</span>
+      </div>
+    );
+  }
+  if (level === 'bronze') {
+    return (
+      <div className="w-9 h-9 rounded-full bg-orange-200 flex items-center justify-center shadow-sm">
+        <span style={{ fontSize: size * 0.7 }}>🥉</span>
+      </div>
+    );
+  }
+  return null;
+}
+
+// ─── STREAK CALENDAR ───
 
 export function StreakCalendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -59,7 +84,6 @@ export function StreakCalendar() {
           );
         }
 
-        // Check consecutive for pill effect
         const prevDay = addDays(day, -1);
         const nextDay = addDays(day, 1);
         const prevActive = isSameMonth(prevDay, currentMonth) && activeSet.has(format(prevDay, 'yyyy-MM-dd'));
@@ -95,11 +119,13 @@ export function StreakCalendar() {
   );
 }
 
-// ─── ACTION CALENDAR ───
+// ─── ACTION CALENDAR (badge-based like me+) ───
 
 export function ActionCalendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const { data: countsByDate = {} } = useActionCalendar(currentMonth);
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(currentMonth);
+  const { data: badgeData = {} } = useDateRangeTaskCompletion(monthStart, monthEnd);
   const days = useCalendarDays(currentMonth);
   const today = new Date();
 
@@ -112,8 +138,9 @@ export function ActionCalendar() {
       {days.map((day, idx) => {
         const dateStr = format(day, 'yyyy-MM-dd');
         const inMonth = isSameMonth(day, currentMonth);
-        const count = countsByDate[dateStr] || 0;
         const isToday = isSameDay(day, today);
+        const dayData = badgeData[dateStr];
+        const badge = dayData?.badgeLevel || 'none';
 
         if (!inMonth) {
           return (
@@ -123,19 +150,10 @@ export function ActionCalendar() {
           );
         }
 
-        if (count > 0) {
-          // Gold coin – brighter for more completions
-          const intensity = Math.min(count, 5);
-          const bg = intensity >= 3 ? 'bg-amber-400' : intensity >= 2 ? 'bg-amber-300' : 'bg-amber-200';
-
+        if (badge !== 'none') {
           return (
             <div key={idx} className="flex items-center justify-center h-10">
-              <div className={cn(
-                'w-9 h-9 rounded-full flex items-center justify-center shadow-sm',
-                bg,
-              )}>
-                <FluentEmoji emoji={intensity >= 3 ? '🏆' : '💎'} size={20} />
-              </div>
+              <BadgeIcon level={badge} />
             </div>
           );
         }
@@ -164,10 +182,9 @@ interface CalendarShellProps {
   children: React.ReactNode;
 }
 
-function CalendarShell({ currentMonth, onPrev, onNext, children }: CalendarShellProps) {
+export function CalendarShell({ currentMonth, onPrev, onNext, children }: CalendarShellProps) {
   return (
     <div className="bg-white rounded-2xl p-4 shadow-sm">
-      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <button onClick={onPrev} className="p-1 active:scale-90 transition-transform">
           <ChevronLeft className="h-5 w-5 text-muted-foreground" />
@@ -179,8 +196,6 @@ function CalendarShell({ currentMonth, onPrev, onNext, children }: CalendarShell
           <ChevronRight className="h-5 w-5 text-muted-foreground" />
         </button>
       </div>
-
-      {/* Weekday headers */}
       <div className="grid grid-cols-7 mb-1">
         {WEEKDAY_LABELS.map((label, i) => (
           <div key={i} className="text-center text-xs font-semibold text-muted-foreground py-1">
@@ -188,8 +203,6 @@ function CalendarShell({ currentMonth, onPrev, onNext, children }: CalendarShell
           </div>
         ))}
       </div>
-
-      {/* Day grid */}
       <div className="grid grid-cols-7">
         {children}
       </div>

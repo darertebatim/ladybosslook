@@ -1,0 +1,344 @@
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  startOfYear,
+  endOfYear,
+  addMonths,
+  subMonths,
+  addYears,
+  subYears,
+  eachDayOfInterval,
+  startOfWeek,
+  endOfWeek,
+  isSameMonth,
+  isSameDay,
+  getDay,
+  getWeek,
+} from 'date-fns';
+import { cn } from '@/lib/utils';
+import { useDateRangeTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
+import { BackButton } from '@/components/app/BackButton';
+import { SEOHead } from '@/components/SEOHead';
+
+const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+function BadgeIcon({ level }: { level: BadgeLevel }) {
+  if (level === 'gold') {
+    return (
+      <div className="w-9 h-9 rounded-full bg-amber-400 flex items-center justify-center shadow-sm">
+        <span className="text-base">🏅</span>
+      </div>
+    );
+  }
+  if (level === 'silver') {
+    return (
+      <div className="w-9 h-9 rounded-full bg-sky-200 flex items-center justify-center shadow-sm">
+        <span className="text-base">💎</span>
+      </div>
+    );
+  }
+  if (level === 'bronze') {
+    return (
+      <div className="w-9 h-9 rounded-full bg-orange-200 flex items-center justify-center shadow-sm">
+        <span className="text-base">🥉</span>
+      </div>
+    );
+  }
+  return null;
+}
+
+const AppActionStats = () => {
+  const navigate = useNavigate();
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentYear, setCurrentYear] = useState(new Date());
+
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(currentMonth);
+  const { data: badgeData = {} } = useDateRangeTaskCompletion(monthStart, monthEnd);
+
+  // Year range for heatmap
+  const yearStart = startOfYear(currentYear);
+  const yearEnd = endOfYear(currentYear);
+  const { data: yearBadgeData = {} } = useDateRangeTaskCompletion(yearStart, yearEnd);
+
+  // Calendar days
+  const days = useMemo(() => {
+    const calStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+    const calEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+    return eachDayOfInterval({ start: calStart, end: calEnd });
+  }, [currentMonth]);
+
+  const today = new Date();
+
+  // Badge summary counts for the month
+  const badgeSummary = useMemo(() => {
+    let gold = 0, silver = 0, bronze = 0;
+    Object.values(badgeData).forEach(d => {
+      if (d.badgeLevel === 'gold') gold++;
+      else if (d.badgeLevel === 'silver') silver++;
+      else if (d.badgeLevel === 'bronze') bronze++;
+    });
+    return { gold, silver, bronze };
+  }, [badgeData]);
+
+  // Year records
+  const yearRecords = useMemo(() => {
+    let perfectDays = 0;
+    let totalCompleted = 0;
+    let totalTasks = 0;
+    let currentStreak = 0;
+    let bestStreak = 0;
+    let monthCompleted = 0;
+    let monthTotal = 0;
+
+    const sortedDates = Object.keys(yearBadgeData).sort();
+    
+    sortedDates.forEach(dateStr => {
+      const d = yearBadgeData[dateStr];
+      if (d.badgeLevel === 'gold') perfectDays++;
+      totalCompleted += d.completedTasks;
+      totalTasks += d.totalTasks;
+
+      // Check if in current month
+      if (dateStr >= format(monthStart, 'yyyy-MM-dd') && dateStr <= format(monthEnd, 'yyyy-MM-dd')) {
+        monthCompleted += d.completedTasks;
+        monthTotal += d.totalTasks;
+      }
+
+      // Streak calculation
+      if (d.completedTasks > 0) {
+        currentStreak++;
+        bestStreak = Math.max(bestStreak, currentStreak);
+      } else if (d.totalTasks > 0) {
+        currentStreak = 0;
+      }
+    });
+
+    const overallRate = totalTasks > 0 ? Math.round((totalCompleted / totalTasks) * 100) : 0;
+    const monthlyRate = monthTotal > 0 ? Math.round((monthCompleted / monthTotal) * 100) : 0;
+
+    return { perfectDays, bestStreak, totalCompleted, monthCompleted, overallRate, monthlyRate };
+  }, [yearBadgeData, currentMonth]);
+
+  // Year heatmap data
+  const yearDays = useMemo(() => {
+    return eachDayOfInterval({ start: yearStart, end: yearEnd });
+  }, [currentYear]);
+
+  return (
+    <>
+      <SEOHead title="Action Stats - LadyBoss" description="Your action completion statistics" />
+      
+      <div className="flex flex-col h-dvh overflow-hidden bg-amber-50">
+        {/* Header */}
+        <header 
+          className="shrink-0 relative z-10"
+          style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
+        >
+          <div className="px-4 py-2 flex items-center">
+            <BackButton to="/app/presence" className="text-orange-700" />
+            <h1 className="flex-1 text-center text-lg font-semibold text-foreground">
+              Action Stats
+            </h1>
+            <div className="w-9" /> {/* Spacer */}
+          </div>
+        </header>
+
+        {/* Scrollable Content */}
+        <div 
+          className="flex-1 overflow-y-auto overscroll-contain px-4 pb-8"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
+          {/* Progress Badge Info */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm mb-6 mt-2 text-center">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <span className="text-3xl">🏅</span>
+              <span className="text-3xl">💎</span>
+              <span className="text-3xl">🥉</span>
+            </div>
+            <h3 className="text-lg font-bold text-foreground mb-2">Progress Badge</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Complete at least one action to earn the Bronze Badge. Reach 50% completion for the Silver Badge. Finish all actions to claim the Gold Badge.
+            </p>
+          </div>
+
+          {/* Task Stats Calendar */}
+          <h3 className="text-base font-bold text-foreground mb-3">Action Stats</h3>
+          <div className="bg-white rounded-2xl p-4 shadow-sm mb-6">
+            {/* Month navigation */}
+            <div className="flex items-center justify-between mb-4">
+              <button onClick={() => setCurrentMonth(m => subMonths(m, 1))} className="p-1 active:scale-90 transition-transform">
+                <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+              </button>
+              <h4 className="text-base font-semibold text-foreground">
+                {format(currentMonth, 'MMM yyyy')}
+              </h4>
+              <button onClick={() => setCurrentMonth(m => addMonths(m, 1))} className="p-1 active:scale-90 transition-transform">
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              </button>
+            </div>
+
+            {/* Weekday headers */}
+            <div className="grid grid-cols-7 mb-1">
+              {WEEKDAY_LABELS.map((label, i) => (
+                <div key={i} className="text-center text-xs font-semibold text-muted-foreground py-1">
+                  {label}
+                </div>
+              ))}
+            </div>
+
+            {/* Day grid */}
+            <div className="grid grid-cols-7">
+              {days.map((day, idx) => {
+                const dateStr = format(day, 'yyyy-MM-dd');
+                const inMonth = isSameMonth(day, currentMonth);
+                const isToday = isSameDay(day, today);
+                const dayData = badgeData[dateStr];
+                const badge = dayData?.badgeLevel || 'none';
+
+                if (!inMonth) {
+                  return (
+                    <div key={idx} className="flex items-center justify-center h-10">
+                      <span className="text-sm text-muted-foreground/30">{format(day, 'd')}</span>
+                    </div>
+                  );
+                }
+
+                if (badge !== 'none') {
+                  return (
+                    <div key={idx} className="flex items-center justify-center h-10">
+                      <BadgeIcon level={badge} />
+                    </div>
+                  );
+                }
+
+                return (
+                  <div key={idx} className="flex items-center justify-center h-10">
+                    <span className={cn(
+                      'text-sm font-medium',
+                      isToday ? 'text-orange-500 font-bold' : 'text-foreground',
+                    )}>
+                      {format(day, 'd')}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Badge Summary */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm mb-6">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-border/50 pb-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🏅</span>
+                  <span className="text-base font-semibold text-foreground">Gold Badge</span>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl font-bold text-foreground">{badgeSummary.gold}</span>
+                  <span className="text-sm text-muted-foreground">days</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between border-b border-border/50 pb-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">💎</span>
+                  <span className="text-base font-semibold text-foreground">Silver Badge</span>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl font-bold text-foreground">{badgeSummary.silver}</span>
+                  <span className="text-sm text-muted-foreground">{badgeSummary.silver === 1 ? 'day' : 'days'}</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🥉</span>
+                  <span className="text-base font-semibold text-foreground">Bronze Badge</span>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl font-bold text-foreground">{badgeSummary.bronze}</span>
+                  <span className="text-sm text-muted-foreground">{badgeSummary.bronze === 1 ? 'day' : 'days'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Data this year - Heatmap */}
+          <h3 className="text-base font-bold text-foreground mb-3">Data this year</h3>
+          <div className="bg-white rounded-2xl p-4 shadow-sm mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <button onClick={() => setCurrentYear(y => subYears(y, 1))} className="p-1 active:scale-90 transition-transform">
+                <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+              </button>
+              <h4 className="text-base font-semibold text-foreground">
+                {format(currentYear, 'yyyy')}
+              </h4>
+              <button onClick={() => setCurrentYear(y => addYears(y, 1))} className="p-1 active:scale-90 transition-transform">
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              </button>
+            </div>
+            
+            {/* Simple heatmap grid */}
+            <div className="flex flex-wrap gap-[2px]">
+              {yearDays.map((day, idx) => {
+                const dateStr = format(day, 'yyyy-MM-dd');
+                const dayData = yearBadgeData[dateStr];
+                const badge = dayData?.badgeLevel || 'none';
+                
+                return (
+                  <div
+                    key={idx}
+                    className={cn(
+                      'w-[7px] h-[7px] rounded-[1px]',
+                      badge === 'gold' && 'bg-amber-400',
+                      badge === 'silver' && 'bg-sky-300',
+                      badge === 'bronze' && 'bg-orange-300',
+                      badge === 'none' && 'bg-muted/40',
+                    )}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Record */}
+          <h3 className="text-base font-bold text-foreground mb-3">Record</h3>
+          <div className="bg-white rounded-2xl p-5 shadow-sm mb-6">
+            <div className="space-y-4">
+              <RecordRow label="Perfect Days" value={yearRecords.perfectDays} unit="days" />
+              <RecordRow label="Best Streaks" value={yearRecords.bestStreak} unit="days" />
+              <RecordRow label="Actions Done Total" value={yearRecords.totalCompleted} />
+              <RecordRow label="Actions Done This Month" value={yearRecords.monthCompleted} />
+              <RecordRow label="Overall Rate" value={yearRecords.overallRate} unit="%" />
+              <RecordRow label="Monthly Rate" value={yearRecords.monthlyRate} unit="%" />
+            </div>
+          </div>
+
+          <div className="h-8 pb-safe" />
+        </div>
+      </div>
+    </>
+  );
+};
+
+function RecordRow({ label, value, unit }: { label: string; value: number; unit?: string }) {
+  const isLast = !unit || unit === '%';
+  return (
+    <div className={cn(
+      'flex items-center justify-between',
+      !isLast && 'border-b border-border/50 pb-3',
+      unit === '%' && 'border-b border-border/50 pb-3',
+    )}>
+      <span className="text-base text-foreground">{label}</span>
+      <div className="flex items-baseline gap-1">
+        <span className="text-2xl font-bold text-foreground">{value}</span>
+        {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
+      </div>
+    </div>
+  );
+}
+
+export default AppActionStats;
