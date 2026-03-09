@@ -587,12 +587,12 @@ export default function AppTimer() {
           )}
         </AnimatePresence>
 
-        {/* Hearts decoration */}
+        {/* Decorative elements */}
         {!isFullscreen && (
           <>
-            <div className="absolute top-20 right-16 text-pink-400/40 text-2xl select-none">💜</div>
-            <div className="absolute top-28 right-20 text-pink-300/30 text-sm select-none">💕</div>
-            <div className="absolute top-24 left-10 text-purple-400/30 text-lg select-none">✨</div>
+            <div className="absolute top-20 right-16 text-white/10 text-2xl select-none">●</div>
+            <div className="absolute top-28 right-20 text-white/5 text-sm select-none">●</div>
+            <div className="absolute top-24 left-10 text-white/8 text-lg select-none">✦</div>
           </>
         )}
 
