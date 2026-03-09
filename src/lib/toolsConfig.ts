@@ -103,7 +103,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'fasting',
-    name: 'Fasting Timer',
+    name: 'Fasting',
     icon: 'Timer',
     bgColor: 'bg-[#FFE4C4]',
     iconColor: 'text-amber-600',
