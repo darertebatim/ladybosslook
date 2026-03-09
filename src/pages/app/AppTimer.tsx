@@ -365,7 +365,7 @@ export default function AppTimer() {
         </div>
 
         {/* Timer Display */}
-        <div className="flex-1 flex flex-col items-center justify-center px-6 -mt-8">
+        <div className="flex-1 flex flex-col items-center justify-center px-6">
           {/* Pomodoro tomatoes */}
           {activeTab === 'pomodoro' && (
             <div className="flex gap-2 mb-4">
