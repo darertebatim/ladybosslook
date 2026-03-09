@@ -13,7 +13,7 @@ function useProfileData() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('full_name, email, avatar_url, city, country, timezone')
+        .select('full_name, email, avatar_url, city, country, timezone, date_of_birth, relationship_status, occupation, gender')
         .eq('id', user!.id)
         .single();
       if (error) throw error;
