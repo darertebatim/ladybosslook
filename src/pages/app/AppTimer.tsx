@@ -116,28 +116,76 @@ export default function AppTimer() {
 
   const startTimer = () => {
     haptic.medium();
+    if (activeTab === 'pomodoro') {
+      setPomodoroRound(0);
+      setIsBreak(false);
+      startPomodoroRound(0);
+    } else {
+      const total = minutes * 60;
+      setSecondsLeft(total);
+      setTotalSeconds(total);
+      setScreen('running');
+      runCountdown(total, () => {
+        haptic.success();
+        setScreen('completed');
+        fireConfetti();
+      });
+    }
+  };
+
+  const fireConfetti = () => {
+    setTimeout(() => {
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#a78bfa', '#c084fc', '#e879f9', '#f0abfc', '#fcd34d'] });
+    }, 200);
+    confetti({ particleCount: 50, angle: 60, spread: 55, origin: { x: 0, y: 0.7 }, colors: ['#a78bfa', '#c084fc', '#e879f9'] });
+    confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1, y: 0.7 }, colors: ['#a78bfa', '#c084fc', '#e879f9'] });
+  };
+
+  const startPomodoroRound = (round: number) => {
     const total = minutes * 60;
+    setPomodoroRound(round);
+    setIsBreak(false);
     setSecondsLeft(total);
     setTotalSeconds(total);
     setScreen('running');
+    runCountdown(total, () => {
+      haptic.success();
+      // Round complete
+      const nextRound = round + 1;
+      if (nextRound >= POMODORO_ROUNDS) {
+        // All rounds done
+        setScreen('completed');
+        fireConfetti();
+      } else {
+        // Start break
+        startPomodoroBreak(nextRound);
+      }
+    });
+  };
 
+  const startPomodoroBreak = (nextRound: number) => {
+    setIsBreak(true);
+    setSecondsLeft(BREAK_SECONDS);
+    setTotalSeconds(BREAK_SECONDS);
+    setScreen('pomodoroBreak');
+    runCountdown(BREAK_SECONDS, () => {
+      haptic.medium();
+      startPomodoroRound(nextRound);
+    });
+  };
+
+  const runCountdown = (total: number, onComplete: () => void) => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    let remaining = total;
+    setSecondsLeft(remaining);
     intervalRef.current = setInterval(() => {
-      setSecondsLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(intervalRef.current!);
-          intervalRef.current = null;
-          haptic.success();
-          setScreen('completed');
-          // Fire confetti
-          setTimeout(() => {
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#a78bfa', '#c084fc', '#e879f9', '#f0abfc', '#fcd34d'] });
-          }, 200);
-          confetti({ particleCount: 50, angle: 60, spread: 55, origin: { x: 0, y: 0.7 }, colors: ['#a78bfa', '#c084fc', '#e879f9'] });
-          confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1, y: 0.7 }, colors: ['#a78bfa', '#c084fc', '#e879f9'] });
-          return 0;
-        }
-        return prev - 1;
-      });
+      remaining -= 1;
+      setSecondsLeft(remaining);
+      if (remaining <= 0) {
+        clearInterval(intervalRef.current!);
+        intervalRef.current = null;
+        onComplete();
+      }
     }, 1000);
   };
 
