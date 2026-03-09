@@ -353,7 +353,7 @@ export default function AppTimer() {
             <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
             
             {/* Center line indicator */}
-            <div className="absolute left-1/2 -translate-x-[1.5px] top-0 w-[3px] h-16 bg-purple-500 rounded-full z-10 pointer-events-none" />
+            <div className="absolute left-1/2 -translate-x-[1.5px] top-0 w-[3px] h-16 bg-foreground rounded-full z-10 pointer-events-none" />
 
             <div
               ref={rulerRef}
