@@ -802,9 +802,9 @@ const AppHome = () => {
               setSelectedDate(new Date());
               setCurrentMonth(startOfMonth(new Date()));
               haptic.light();
-            }} className="absolute right-2 flex items-center gap-0.5 px-3 py-0.5 text-sm font-semibold text-violet-700 bg-violet-200 dark:bg-violet-700 dark:text-violet-100 rounded-full shadow-sm active:scale-95 transition-transform">
-                  <ChevronLeft className="h-3.5 w-3.5" />
+            }} className="absolute left-2 flex items-center gap-0.5 px-3 py-0.5 text-sm font-semibold text-violet-700 bg-violet-200 dark:bg-violet-700 dark:text-violet-100 rounded-full shadow-sm active:scale-95 transition-transform">
                   Today
+                  <ChevronRight className="h-3.5 w-3.5" />
                 </button>}
             </div>
           </div>
