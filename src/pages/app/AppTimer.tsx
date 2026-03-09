@@ -30,34 +30,38 @@ export default function AppTimer() {
   const holdTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const holdStartRef = useRef<number>(0);
 
-  // Fetch soundscape playlists with their first audio track
+  // Fetch individual audio tracks from soundscape playlists
   const { data: soundscapeTracks = [] } = useQuery({
-    queryKey: ['timer-soundscapes'],
+    queryKey: ['timer-soundscape-tracks'],
     queryFn: async () => {
+      // Get soundscape playlists
       const { data: playlists, error } = await supabase
         .from('audio_playlists')
-        .select('id, name, cover_image_url')
+        .select('id, name')
         .eq('category', 'soundscape')
         .eq('is_hidden', false)
         .order('sort_order', { ascending: true });
-      if (error || !playlists) return [];
+      if (error || !playlists?.length) return [];
 
-      const tracks = await Promise.all(playlists.map(async (pl) => {
-        const { data: items } = await supabase
-          .from('audio_playlist_items')
-          .select('audio_id, audio_content:audio_id(file_url, title)')
-          .eq('playlist_id', pl.id)
-          .order('sort_order', { ascending: true })
-          .limit(1);
-        const firstItem = items?.[0] as any;
-        return {
-          id: pl.id,
-          name: pl.name,
-          cover: pl.cover_image_url,
-          url: firstItem?.audio_content?.file_url || null,
-        };
-      }));
-      return tracks.filter(t => t.url);
+      const playlistIds = playlists.map(p => p.id);
+
+      // Get all tracks from these playlists
+      const { data: items } = await supabase
+        .from('audio_playlist_items')
+        .select('audio_id, playlist_id, sort_order, audio_content:audio_id(id, title, file_url, cover_image_url)')
+        .in('playlist_id', playlistIds)
+        .order('sort_order', { ascending: true });
+
+      if (!items) return [];
+
+      return (items as any[])
+        .filter(item => item.audio_content?.file_url)
+        .map(item => ({
+          id: item.audio_content.id,
+          name: item.audio_content.title,
+          cover: item.audio_content.cover_image_url,
+          url: item.audio_content.file_url,
+        }));
     },
   });
 
@@ -489,19 +493,19 @@ export default function AppTimer() {
         {/* Countdown */}
         <div className="flex items-center justify-center flex-col">
           {isFullscreen ? (
-            // Fullscreen: massive overlapping digits filling entire screen height
-            <div className="flex flex-col items-center leading-none" style={{ gap: '-2vw' }}>
+            // Fullscreen: digits rotated 90° so phone is held landscape-style
+            <div className="rotate-90 flex items-center" style={{ transformOrigin: 'center center' }}>
               {[mm[0], mm[1]].map((d, i) => (
                 <span key={`m${i}`} className={cn("font-black", digitColors[i])}
-                  style={{ fontSize: 'min(55vw, 280px)', lineHeight: 0.78, marginTop: i > 0 ? '-3vw' : 0 }}>{d}</span>
+                  style={{ fontSize: 'min(40vh, 300px)', lineHeight: 0.85 }}>{d}</span>
               ))}
-              <div className="flex gap-4 my-0">
-                <div className="w-6 h-6 rounded-full bg-white/30" />
-                <div className="w-6 h-6 rounded-full bg-white/30" />
+              <div className="flex flex-col gap-3 mx-2">
+                <div className="w-5 h-5 rounded-full bg-white/30" />
+                <div className="w-5 h-5 rounded-full bg-white/30" />
               </div>
               {[ss[0], ss[1]].map((d, i) => (
                 <span key={`s${i}`} className={cn("font-black", digitColors[i + 2])}
-                  style={{ fontSize: 'min(55vw, 280px)', lineHeight: 0.78, marginTop: i > 0 ? '-3vw' : 0 }}>{d}</span>
+                  style={{ fontSize: 'min(40vh, 300px)', lineHeight: 0.85 }}>{d}</span>
               ))}
             </div>
           ) : (
@@ -560,7 +564,7 @@ export default function AppTimer() {
         <h1 className="text-3xl font-bold text-foreground mb-2 text-center">Wow! You did it!</h1>
         <p className="text-muted-foreground text-center mb-10">Celebrate your progress!</p>
         <button
-          onClick={() => { haptic.success(); navigate(-1); }}
+          onClick={() => { haptic.success(); setScreen('setup'); }}
           className="w-full max-w-xs h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
         >
           I'm doing great!
@@ -584,7 +588,7 @@ export default function AppTimer() {
         <h1 className="text-3xl font-bold text-foreground mb-2 text-center">Relax! Every effort counts!</h1>
         <p className="text-muted-foreground text-center mb-10">Let's continue when you're ready.</p>
         <button
-          onClick={() => { haptic.light(); navigate(-1); }}
+          onClick={() => { haptic.light(); setScreen('setup'); }}
           className="w-full max-w-xs h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
         >
           Got it!
