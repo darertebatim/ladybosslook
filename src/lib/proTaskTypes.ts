@@ -272,6 +272,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Link to a video playlist',
     requiresValue: true,
   },
+  focus_timer: {
+    value: 'focus_timer',
+    label: 'Focus Timer',
+    icon: Clock,
+    badgeText: 'Focus',
+    color: 'slate',
+    gradientClass: 'bg-gradient-to-br from-slate-100 to-gray-100 dark:from-slate-900/40 dark:to-gray-900/40',
+    iconColorClass: 'text-slate-600 dark:text-slate-400',
+    badgeColorClass: 'bg-slate-500/20 text-slate-700 dark:text-slate-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open the focus timer',
+    requiresValue: false,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
