@@ -275,45 +275,47 @@ export default function AppTimer() {
     );
   }
 
+  // Ruler scroll helpers
+  const TICK_WIDTH = 16;
+  const MAX_MIN = 90;
+
+  const scrollToMinute = useCallback((min: number, smooth = true) => {
+    if (!rulerRef.current) return;
+    const containerW = rulerRef.current.clientWidth;
+    const scrollPos = min * TICK_WIDTH - containerW / 2;
+    rulerRef.current.scrollTo({ left: scrollPos, behavior: smooth ? 'smooth' : 'auto' });
+  }, []);
+
+  const handleRulerScroll = useCallback(() => {
+    if (!rulerRef.current) return;
+    const containerW = rulerRef.current.clientWidth;
+    const scrollLeft = rulerRef.current.scrollLeft;
+    const val = Math.round((scrollLeft + containerW / 2) / TICK_WIDTH);
+    const clamped = Math.max(1, Math.min(MAX_MIN, val));
+    if (clamped !== lastHapticVal.current) {
+      if (clamped % 5 === 0) {
+        haptic.medium();
+      } else {
+        haptic.selection();
+      }
+      lastHapticVal.current = clamped;
+    }
+    setMinutes(clamped);
+  }, []);
+
+  // Scroll ruler to current minute when entering adjustTime
+  useEffect(() => {
+    if (screen === 'adjustTime') {
+      rulerInitialized.current = false;
+      setTimeout(() => {
+        scrollToMinute(minutes, false);
+        rulerInitialized.current = true;
+      }, 50);
+    }
+  }, [screen, scrollToMinute]);
+
   // ─── ADJUST TIME SCREEN ───
   if (screen === 'adjustTime') {
-    const TICK_WIDTH = 16; // px per minute tick
-    const MAX_MIN = 90;
-    const rulerRef = useRef<HTMLDivElement>(null);
-    const isDragging = useRef(false);
-    const lastHapticVal = useRef(minutes);
-
-    const scrollToMinute = (min: number, smooth = true) => {
-      if (!rulerRef.current) return;
-      const containerW = rulerRef.current.clientWidth;
-      const scrollPos = (min) * TICK_WIDTH - containerW / 2;
-      rulerRef.current.scrollTo({ left: scrollPos, behavior: smooth ? 'smooth' : 'auto' });
-    };
-
-    const handleRulerScroll = () => {
-      if (!rulerRef.current) return;
-      const containerW = rulerRef.current.clientWidth;
-      const scrollLeft = rulerRef.current.scrollLeft;
-      const val = Math.round((scrollLeft + containerW / 2) / TICK_WIDTH);
-      const clamped = Math.max(1, Math.min(MAX_MIN, val));
-      if (clamped !== minutes) {
-        setMinutes(clamped);
-        if (clamped !== lastHapticVal.current) {
-          // Haptic on every 5th value, or selection on each
-          if (clamped % 5 === 0) {
-            haptic.medium();
-          } else {
-            haptic.selection();
-          }
-          lastHapticVal.current = clamped;
-        }
-      }
-    };
-
-    // Scroll to initial value on mount
-    useEffect(() => {
-      setTimeout(() => scrollToMinute(minutes, false), 50);
-    }, []);
 
     return (
       <div className="min-h-screen bg-background flex flex-col">
