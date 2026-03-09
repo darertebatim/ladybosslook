@@ -16,39 +16,32 @@ import {
   endOfWeek,
   isSameMonth,
   isSameDay,
-  getDay,
-  getWeek,
 } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useDateRangeTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
 
+import coinBronze from '@/assets/coin-bronze.png';
+import coinSilver from '@/assets/coin-silver.png';
+import coinGold from '@/assets/coin-gold.png';
+
 const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-function BadgeIcon({ level }: { level: BadgeLevel }) {
-  if (level === 'gold') {
-    return (
-      <div className="w-9 h-9 rounded-full bg-amber-400 flex items-center justify-center shadow-sm">
-        <span className="text-base">🏅</span>
-      </div>
-    );
-  }
-  if (level === 'silver') {
-    return (
-      <div className="w-9 h-9 rounded-full bg-sky-200 flex items-center justify-center shadow-sm">
-        <span className="text-base">💎</span>
-      </div>
-    );
-  }
-  if (level === 'bronze') {
-    return (
-      <div className="w-9 h-9 rounded-full bg-orange-200 flex items-center justify-center shadow-sm">
-        <span className="text-base">🥉</span>
-      </div>
-    );
-  }
-  return null;
+const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
+  bronze: coinBronze,
+  silver: coinSilver,
+  gold: coinGold,
+};
+
+function BadgeIcon({ level }: { level: Exclude<BadgeLevel, 'none'> }) {
+  return (
+    <img
+      src={BADGE_IMAGES[level]}
+      alt={`${level} badge`}
+      className="w-8 h-8 object-contain"
+    />
+  );
 }
 
 const AppActionStats = () => {
