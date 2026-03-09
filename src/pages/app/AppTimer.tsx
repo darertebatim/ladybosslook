@@ -173,6 +173,45 @@ export default function AppTimer() {
     navigate(-1);
   };
 
+  // Ruler scroll helpers
+  const TICK_WIDTH = 16;
+  const MAX_MIN = 90;
+
+  const scrollToMinute = useCallback((min: number, smooth = true) => {
+    if (!rulerRef.current) return;
+    const containerW = rulerRef.current.clientWidth;
+    const scrollPos = min * TICK_WIDTH - containerW / 2;
+    rulerRef.current.scrollTo({ left: scrollPos, behavior: smooth ? 'smooth' : 'auto' });
+  }, []);
+
+  const handleRulerScroll = useCallback(() => {
+    if (!rulerRef.current) return;
+    const containerW = rulerRef.current.clientWidth;
+    const scrollLeft = rulerRef.current.scrollLeft;
+    const val = Math.round((scrollLeft + containerW / 2) / TICK_WIDTH);
+    const clamped = Math.max(1, Math.min(MAX_MIN, val));
+    if (clamped !== lastHapticVal.current) {
+      if (clamped % 5 === 0) {
+        haptic.medium();
+      } else {
+        haptic.selection();
+      }
+      lastHapticVal.current = clamped;
+    }
+    setMinutes(clamped);
+  }, []);
+
+  // Scroll ruler to current minute when entering adjustTime
+  useEffect(() => {
+    if (screen === 'adjustTime') {
+      rulerInitialized.current = false;
+      setTimeout(() => {
+        scrollToMinute(minutes, false);
+        rulerInitialized.current = true;
+      }, 50);
+    }
+  }, [screen, scrollToMinute]);
+
   // ─── SETUP SCREEN ───
   if (screen === 'setup') {
     return (
