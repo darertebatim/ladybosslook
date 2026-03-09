@@ -31,7 +31,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'reflections',
-    name: 'Guided Reflections',
+    name: 'Reflections',
     icon: 'Brain',
     bgColor: 'bg-[#CCFBF1]',
     iconColor: 'text-teal-600',
