@@ -370,13 +370,13 @@ export default function AppTimer() {
                         className={cn(
                           "rounded-full transition-colors",
                           isMajor ? "w-[3px] h-10" : "w-[2px] h-6",
-                          i === minutes ? "bg-purple-500" : "bg-muted-foreground/25"
+                          i === minutes ? "bg-foreground" : "bg-muted-foreground/25"
                         )}
                       />
                       {isMajor && (
                         <span className={cn(
                           "text-xs mt-2 font-medium transition-colors",
-                          i === minutes ? "text-purple-500" : "text-muted-foreground/40"
+                          i === minutes ? "text-foreground" : "text-muted-foreground/40"
                         )}>
                           {i}
                         </span>
