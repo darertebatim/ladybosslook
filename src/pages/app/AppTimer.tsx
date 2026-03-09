@@ -564,7 +564,7 @@ export default function AppTimer() {
         <h1 className="text-3xl font-bold text-foreground mb-2 text-center">Wow! You did it!</h1>
         <p className="text-muted-foreground text-center mb-10">Celebrate your progress!</p>
         <button
-          onClick={() => { haptic.success(); navigate(-1); }}
+          onClick={() => { haptic.success(); setScreen('setup'); }}
           className="w-full max-w-xs h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
         >
           I'm doing great!
