@@ -237,7 +237,7 @@ export default function AppTimer() {
               onClick={() => { setActiveTab('pomodoro'); haptic.light(); }}
               className={cn(
                 'px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
-                activeTab === 'pomodoro' ? 'bg-purple-200 text-purple-800' : 'text-muted-foreground'
+                activeTab === 'pomodoro' ? 'bg-foreground text-background' : 'text-muted-foreground'
               )}
             >
               Pomodoro
