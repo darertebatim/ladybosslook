@@ -756,7 +756,7 @@ const AppHome = () => {
                     style={{ minWidth: 'calc(100% / 7)' }}
                   >
                         <div className={cn(
-                          'w-11 h-14 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all relative',
+                          'w-11 h-11 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all relative overflow-hidden',
                           isSelected 
                             ? 'bg-chip-lavender text-foreground scale-105 shadow-sm' 
                             : isTodayDate 
@@ -765,21 +765,23 @@ const AppHome = () => {
                           hasBadge && isSelected && 'ring-2 ring-primary/30 ring-offset-1'
                         )}>
                           {hasProgramEvents && (
-                            <Star className={cn("absolute -top-1 -right-1 h-2.5 w-2.5 z-20", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />
+                            <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5 z-20", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />
                           )}
-                          <span className={cn('text-[10px] font-medium leading-none', isSelected && 'text-foreground')}>
-                            {format(day, 'EEE')}
-                          </span>
                           {hasBadge ? (
                             <img 
                               src={BADGE_IMAGES[badgeLevel]} 
                               alt={`${badgeLevel} badge`}
-                              className="w-7 h-7 object-cover rounded-full"
+                              className="absolute inset-0 w-full h-full object-cover"
                             />
                           ) : (
-                            <span className={cn('text-sm font-bold leading-none', isSelected && 'text-foreground')}>
-                              {format(day, 'd')}
-                            </span>
+                            <>
+                              <span className={cn('text-[10px] font-medium leading-none', isSelected && 'text-foreground')}>
+                                {format(day, 'EEE')}
+                              </span>
+                              <span className={cn('text-sm font-bold leading-none', isSelected && 'text-foreground')}>
+                                {format(day, 'd')}
+                              </span>
+                            </>
                           )}
                         </div>
                       </button>;
