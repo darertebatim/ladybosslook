@@ -763,17 +763,17 @@ export default function AppTimer() {
                 </h2>
 
                 <div className="space-y-5 mb-8">
-                  <p className="text-base text-foreground">
-                    🍅 Pomodoro Technique is a simple tool to boost focus and productivity.
+                  <p className="text-base text-foreground flex items-start gap-2">
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> Pomodoro Technique is a simple tool to boost focus and productivity.
                   </p>
-                  <p className="text-base text-foreground">
-                    🍅 Work for 25 minutes, take a 5-minute break, and repeat.
+                  <p className="text-base text-foreground flex items-start gap-2">
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> Work for 25 minutes, take a 5-minute break, and repeat.
                   </p>
-                  <p className="text-base text-foreground">
-                    🍅 It's perfect for staying on track and avoiding burnout.
+                  <p className="text-base text-foreground flex items-start gap-2">
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> It's perfect for staying on track and avoiding burnout.
                   </p>
-                  <p className="text-base text-foreground">
-                    🍅 Balancing work and rest is essential for long-term productivity.
+                  <p className="text-base text-foreground flex items-start gap-2">
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> Balancing work and rest is essential for long-term productivity.
                   </p>
                 </div>
 
