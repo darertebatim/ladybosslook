@@ -120,6 +120,9 @@ export const TaskCard = memo(function TaskCard({
     }
   };
 
+  // Check if this is a small count goal that should use tap-to-increment
+  const isSmallCountGoal = isCountGoal && !isWater && (task.goal_target || 0) < 10;
+
   const handleOpenGoalInput = (e: React.MouseEvent) => {
     e.stopPropagation();
     
@@ -137,6 +140,19 @@ export const TaskCard = memo(function TaskCard({
     // Water tasks: navigate to the dedicated water tracking page
     if (isWater) {
       navigate('/app/water', { state: { from: 'planner' } });
+      return;
+    }
+    
+    // Small count goals: directly increment by 1 with animation
+    if (isSmallCountGoal && onOpenGoalInput) {
+      // Trigger floating +1 animation
+      setShowFloatingPlus(true);
+      setFloatingPlusKey(prev => prev + 1);
+      setTimeout(() => setShowFloatingPlus(false), 600);
+      
+      // Directly confirm with amount = 1
+      // We pass the task to onOpenGoalInput which will be handled differently for small goals
+      onOpenGoalInput(task);
       return;
     }
     
