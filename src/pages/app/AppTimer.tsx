@@ -42,8 +42,37 @@ export default function AppTimer() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (holdTimerRef.current) clearInterval(holdTimerRef.current);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
     };
   }, []);
+
+  // Soundscape audio management
+  useEffect(() => {
+    if (screen === 'running' && selectedSound !== 'none') {
+      const sound = soundscapes.find(s => s.id === selectedSound);
+      if (sound?.url) {
+        const audio = new Audio(sound.url);
+        audio.loop = true;
+        audio.volume = 0.5;
+        audio.play().catch(() => {});
+        audioRef.current = audio;
+      }
+    } else {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    }
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, [screen, selectedSound]);
 
   const formatTime = (secs: number) => {
     const m = Math.floor(secs / 60);
