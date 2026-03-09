@@ -278,9 +278,21 @@ export default function AppTimer() {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+    // Save partial session
+    const elapsed = totalSeconds - secondsLeft;
+    if (elapsed > 0) {
+      saveFocusSession.mutate({
+        durationSeconds: elapsed,
+        sessionType: activeTab === 'pomodoro' ? 'pomodoro' : 'timer',
+        theme: customTheme || selectedTheme,
+        pomodoroRounds: activeTab === 'pomodoro' ? pomodoroRound + 1 : undefined,
+        completed: false,
+        startedAt: sessionStartRef.current,
+      });
+    }
     haptic.warning();
     setScreen('stopped');
-  }, []);
+  }, [totalSeconds, secondsLeft, activeTab, customTheme, selectedTheme, pomodoroRound, saveFocusSession]);
 
   // Hold-to-stop handlers
   const onHoldStart = () => {
