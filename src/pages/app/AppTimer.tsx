@@ -334,7 +334,7 @@ export default function AppTimer() {
           {/* Triangle pointer */}
           <div className="mb-2">
             <svg width="20" height="12" viewBox="0 0 20 12">
-              <polygon points="10,0 20,12 0,12" fill="hsl(265, 80%, 60%)" />
+              <polygon points="10,0 20,12 0,12" fill="hsl(var(--foreground))" />
             </svg>
           </div>
 
