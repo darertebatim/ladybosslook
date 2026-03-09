@@ -226,10 +226,10 @@ export default function AppTimer() {
 
   const startPomodoroBreak = () => {
     setIsBreak(true);
-    setSecondsLeft(BREAK_SECONDS);
-    setTotalSeconds(BREAK_SECONDS);
+    setSecondsLeft(breakMinutes * 60);
+    setTotalSeconds(breakMinutes * 60);
     setScreen('pomodoroBreak');
-    runCountdown(BREAK_SECONDS, () => {
+    runCountdown(breakMinutes * 60, () => {
       haptic.medium();
       // Show "Break's over" screen
       setScreen('pomodoroBreakDone');
