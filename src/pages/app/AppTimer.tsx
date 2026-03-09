@@ -51,9 +51,16 @@ export default function AppTimer() {
   const [showSoundPicker, setShowSoundPicker] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
-  // Pomodoro state
+  // Pomodoro settings
   const [pomodoroRound, setPomodoroRound] = useState(0);
   const [isBreak, setIsBreak] = useState(false);
+  const [pomodoroCycles, setPomodoroCycles] = useState(4);
+  const [breakMinutes, setBreakMinutes] = useState(5);
+  const [remindersEnabled, setRemindersEnabled] = useState(true);
+  const [settingsTab, setSettingsTab] = useState<'timer' | 'pomodoro'>('timer');
+  const [showCyclePicker, setShowCyclePicker] = useState(false);
+  const [showBreakPicker, setShowBreakPicker] = useState(false);
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const holdTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
