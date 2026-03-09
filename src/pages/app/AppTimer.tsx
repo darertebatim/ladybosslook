@@ -1,8 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, ArrowLeft, ChevronRight, Settings, CalendarPlus, Check, AlertCircle, Music, Maximize } from 'lucide-react';
+import { X, ArrowLeft, ChevronRight, Settings, CalendarPlus, Check, AlertCircle, Music, Maximize, BarChart2, Bell, Coffee, Timer as TimerIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
+import { Switch } from '@/components/ui/switch';
 import { timerThemes } from '@/lib/timerThemes';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
