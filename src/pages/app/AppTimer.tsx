@@ -917,7 +917,7 @@ export default function AppTimer() {
 
   // ─── COMPLETED SCREEN ───
   if (screen === 'completed') {
-    const totalFocusMin = activeTab === 'pomodoro' ? minutes * POMODORO_ROUNDS : minutes;
+    const totalFocusMin = activeTab === 'pomodoro' ? minutes * pomodoroCycles : minutes;
 
     return (
       <motion.div
