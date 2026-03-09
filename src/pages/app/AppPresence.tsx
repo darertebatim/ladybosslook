@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { SEOHead } from '@/components/SEOHead';
 import { toast } from 'sonner';
 import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation';
+import { StreakCalendar, MoodCalendar, ActionCalendar } from '@/components/app/PresenceCalendar';
 
 const AppPresence = () => {
   const navigate = useNavigate();
@@ -250,6 +251,30 @@ const AppPresence = () => {
                   isLoading={isLoading}
                 />
               </div>
+            </section>
+            
+            {/* Streak Calendar */}
+            <section>
+              <h3 className="text-sm font-semibold text-orange-900/60 mb-3">
+                Streak Calendar
+              </h3>
+              <StreakCalendar />
+            </section>
+            
+            {/* Mood Insights */}
+            <section>
+              <h3 className="text-sm font-semibold text-orange-900/60 mb-3">
+                Mood Insights
+              </h3>
+              <MoodCalendar />
+            </section>
+            
+            {/* Action Stats */}
+            <section>
+              <h3 className="text-sm font-semibold text-orange-900/60 mb-3">
+                Action Stats
+              </h3>
+              <ActionCalendar />
             </section>
             
             {/* Achievements */}
