@@ -758,13 +758,13 @@ const AppHome = () => {
                         {/* Pill wraps around both day name and number for selected */}
                         <div className={cn('flex flex-col items-center px-1 py-0 rounded-full transition-all', isSelected && 'bg-chip-lavender')}>
                           {/* Day name - selected is black, others are grey */}
-                          <span className={cn('text-[11px] font-medium leading-tight', isSelected ? 'text-foreground' : 'text-[#C6C1CF]')}>
+                          <span className={cn('text-[11px] font-medium leading-none', isSelected ? 'text-foreground' : 'text-[#C6C1CF]')}>
                             {format(day, 'EEE')}
                           </span>
                           
                           {/* Badge or Number */}
                           <div className={cn(
-                            'w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative mt-0.5',
+                            'w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative -mt-0.5',
                             !hasBadge && (isSelected 
                               ? 'bg-white text-foreground dark:bg-white dark:text-foreground'
                               : isTodayDate 
