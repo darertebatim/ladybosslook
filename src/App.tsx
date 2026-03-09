@@ -437,6 +437,7 @@ const App = () => (
                   <Route path="/app/mood/history" element={<ProtectedRoute><AppMoodHistory /></ProtectedRoute>} />
                   <Route path="/app/presence" element={<ProtectedRoute><AppPresence /></ProtectedRoute>} />
                   <Route path="/app/fasting" element={<ProtectedRoute><AppFasting /></ProtectedRoute>} />
+                  <Route path="/app/timer" element={<ProtectedRoute><AppTimer /></ProtectedRoute>} />
                   <Route path="/app/support" element={<ProtectedRoute><AppAdminSupport /></ProtectedRoute>} />
                   <Route path="/app/channels/new" element={<ProtectedRoute><AppChannelPost /></ProtectedRoute>} />
                   <Route path="/app/rate" element={<ProtectedRoute><AppRate /></ProtectedRoute>} />

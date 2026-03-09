@@ -93,6 +93,15 @@ export const wellnessTools: ToolConfig[] = [
     description: 'Cycle tracking',
   },
   {
+    id: 'focus-timer',
+    name: 'Focus Timer',
+    icon: 'Clock',
+    bgColor: 'bg-[#E8E4F8]',
+    iconColor: 'text-purple-600',
+    route: '/app/timer',
+    description: 'Stay focused',
+  },
+  {
     id: 'fasting',
     name: 'Fasting Timer',
     icon: 'Timer',
