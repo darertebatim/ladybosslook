@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, ArrowLeft, ChevronRight, ChevronLeft, Settings, CalendarPlus, Check, AlertCircle, Music, Maximize, Bell, Coffee, Timer as TimerIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import tomato3d from '@/assets/tomato-3d.png';
 import { haptic } from '@/lib/haptics';
 import { Switch } from '@/components/ui/switch';
 import { timerThemes } from '@/lib/timerThemes';
@@ -414,7 +415,7 @@ export default function AppTimer() {
           {activeTab === 'pomodoro' && (
             <div className="absolute top-[calc(50%-180px)] flex gap-2">
               {Array.from({ length: pomodoroCycles }, (_, i) => (
-                <span key={i} className="text-2xl">🍅</span>
+                <img src={tomato3d} alt="🍅" className="w-7 h-7" />
               ))}
             </div>
           )}
@@ -763,16 +764,16 @@ export default function AppTimer() {
 
                 <div className="space-y-5 mb-8">
                   <p className="text-base text-foreground">
-                    🍅 Pomodoro Technique is a simple tool to boost focus and productivity.
+                    <img src={tomato3d} alt="" className="w-5 h-5 inline mr-1" /> Pomodoro Technique is a simple tool to boost focus and productivity.
                   </p>
                   <p className="text-base text-foreground">
-                    🍅 Work for 25 minutes, take a 5-minute break, and repeat.
+                    <img src={tomato3d} alt="" className="w-5 h-5 inline mr-1" /> Work for 25 minutes, take a 5-minute break, and repeat.
                   </p>
                   <p className="text-base text-foreground">
-                    🍅 It's perfect for staying on track and avoiding burnout.
+                    <img src={tomato3d} alt="" className="w-5 h-5 inline mr-1" /> It's perfect for staying on track and avoiding burnout.
                   </p>
                   <p className="text-base text-foreground">
-                    🍅 Balancing work and rest is essential for long-term productivity.
+                    <img src={tomato3d} alt="" className="w-5 h-5 inline mr-1" /> Balancing work and rest is essential for long-term productivity.
                   </p>
                 </div>
 
@@ -1077,8 +1078,8 @@ export default function AppTimer() {
         {activeTab === 'pomodoro' && !isFullscreen && (
           <div className="absolute left-0 right-0 flex justify-center gap-2" style={{ top: 'calc(env(safe-area-inset-top) + 24px)' }}>
             {Array.from({ length: pomodoroCycles }, (_, i) => (
-              <span key={i} className={cn("text-xl transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
-                🍅
+              <span key={i} className={cn("transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
+                <img src={tomato3d} alt="🍅" className="w-6 h-6" />
               </span>
             ))}
           </div>
@@ -1153,7 +1154,7 @@ export default function AppTimer() {
         animate={{ opacity: 1 }}
         className="min-h-screen bg-black flex flex-col items-center justify-center px-8 relative select-none"
       >
-        <span className="text-5xl mb-8">🍅</span>
+        <img src={tomato3d} alt="🍅" className="w-14 h-14 mb-8" />
         <h1 className="text-3xl font-extrabold text-white text-center leading-tight mb-2">
           You've been focusing for{' '}
           <span className="text-[hsl(var(--primary))]">{minutes} min</span>.
@@ -1187,8 +1188,8 @@ export default function AppTimer() {
         {/* Tomato progress */}
         <div className="flex gap-2 mb-6">
           {Array.from({ length: pomodoroCycles }, (_, i) => (
-            <span key={i} className={cn("text-2xl transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
-              🍅
+            <span key={i} className={cn("transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
+              <img src={tomato3d} alt="🍅" className="w-7 h-7" />
             </span>
           ))}
         </div>
@@ -1225,7 +1226,7 @@ export default function AppTimer() {
         animate={{ opacity: 1 }}
         className="min-h-screen bg-black flex flex-col items-center justify-center px-8 relative select-none"
       >
-        <span className="text-5xl mb-8">🍅</span>
+        <img src={tomato3d} alt="🍅" className="w-14 h-14 mb-8" />
         <h1 className="text-3xl font-extrabold text-center leading-tight mb-1">
           <span className="text-[hsl(var(--primary))]">Break's over!</span>
         </h1>
