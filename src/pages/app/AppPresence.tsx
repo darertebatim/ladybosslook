@@ -170,24 +170,17 @@ const AppPresence = () => {
           <div className="px-4 py-6 space-y-6">
             
             {/* Quick Stats Row - above challenges */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <StatCard 
                 icon={Flame}
-                label="Streak"
+                label="Days Streak"
                 value={stats?.currentStreak || 0}
                 iconColor="text-orange-500"
                 isLoading={isLoading}
               />
               <StatCard 
-                icon={RotateCcw}
-                label="Returns"
-                value={stats?.returnCount || 0}
-                iconColor="text-orange-600"
-                isLoading={isLoading}
-              />
-              <StatCard 
                 icon={CheckCircle2}
-                label="Actions"
+                label="Actions Done"
                 value={stats?.totalTaskCompletions || 0}
                 iconColor="text-amber-600"
                 isLoading={isLoading}
