@@ -39,6 +39,14 @@ export function PresenceProfileCard() {
     return tz.replace(/_/g, ' ').replace('America/', '').replace('Europe/', '').replace('Asia/', '');
   };
 
+  const formatBirthday = (dob?: string | null) => {
+    if (!dob) return null;
+    try {
+      const date = new Date(dob + 'T00:00:00');
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch { return null; }
+  };
+
   return (
     <button
       onClick={() => navigate('/app/profile')}
