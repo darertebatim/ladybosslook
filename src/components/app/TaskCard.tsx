@@ -527,13 +527,13 @@ export const TaskCard = memo(function TaskCard({
               className="w-9 h-9 flex items-center justify-center shrink-0"
             >
               {goalReached ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : isWater ? (
-                <span className="w-9 h-9 rounded-full border-2 border-sky-400 bg-sky-100 flex items-center justify-center">
+                <CircleProgressButton progress={goalProgress} target={task.goal_target || 1}>
                   <Droplets className="h-5 w-5 text-sky-500" />
-                </span>
+                </CircleProgressButton>
               ) : (
-                <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center">
+                <CircleProgressButton progress={goalProgress} target={task.goal_target || 1}>
                   <Plus className="h-5 w-5 text-foreground/70" strokeWidth={2} />
-                </span>
+                </CircleProgressButton>
               )}
             </button>
           </div>
