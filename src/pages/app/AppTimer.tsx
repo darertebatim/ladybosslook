@@ -1078,8 +1078,8 @@ export default function AppTimer() {
         {activeTab === 'pomodoro' && !isFullscreen && (
           <div className="absolute left-0 right-0 flex justify-center gap-2" style={{ top: 'calc(env(safe-area-inset-top) + 24px)' }}>
             {Array.from({ length: pomodoroCycles }, (_, i) => (
-              <span key={i} className={cn("text-xl transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
-                🍅
+              <span key={i} className={cn("transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
+                <img src={tomato3d} alt="🍅" className="w-6 h-6" />
               </span>
             ))}
           </div>
