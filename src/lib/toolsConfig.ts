@@ -121,7 +121,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'profile',
-    name: 'My Profile',
+    name: 'Profile',
     icon: 'User',
     bgColor: 'bg-[#F1F5F9]',
     iconColor: 'text-slate-600',
