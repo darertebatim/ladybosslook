@@ -15,7 +15,8 @@ import {
   ChevronDown, Settings, Camera, Globe, Heart, Briefcase, Instagram, Send, MessageSquare
 } from 'lucide-react';
 import { JournalStats } from '@/components/app/JournalStats';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { BackButton } from '@/components/app/BackButton';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -372,8 +373,9 @@ const AppProfile = () => {
         className="shrink-0 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="pt-3 pb-1 px-4 text-center">
-          <h1 className="font-semibold text-lg">Profile</h1>
+        <div className="pt-3 pb-1 px-4 flex items-center">
+          <BackButton to="/app" className="text-foreground" />
+          <h1 className="font-semibold text-lg flex-1 text-center mr-8">Profile</h1>
         </div>
 
         {/* Avatar + Name + Bio */}
