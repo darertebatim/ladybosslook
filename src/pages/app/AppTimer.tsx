@@ -746,7 +746,7 @@ export default function AppTimer() {
         {/* Pomodoro tomato indicators */}
         {activeTab === 'pomodoro' && !isFullscreen && (
           <div className="absolute top-24 left-0 right-0 flex justify-center gap-2">
-            {Array.from({ length: POMODORO_ROUNDS }, (_, i) => (
+            {Array.from({ length: pomodoroCycles }, (_, i) => (
               <span key={i} className={cn("text-xl transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
                 🍅
               </span>
