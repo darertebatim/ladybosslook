@@ -253,6 +253,30 @@ const AppPresence = () => {
               </div>
             </section>
             
+            {/* Streak Calendar */}
+            <section>
+              <h3 className="text-sm font-semibold text-orange-900/60 mb-3">
+                Streak Calendar
+              </h3>
+              <StreakCalendar />
+            </section>
+            
+            {/* Mood Insights */}
+            <section>
+              <h3 className="text-sm font-semibold text-orange-900/60 mb-3">
+                Mood Insights
+              </h3>
+              <MoodCalendar />
+            </section>
+            
+            {/* Action Stats */}
+            <section>
+              <h3 className="text-sm font-semibold text-orange-900/60 mb-3">
+                Action Stats
+              </h3>
+              <ActionCalendar />
+            </section>
+            
             {/* Achievements */}
             <section className="bg-white rounded-2xl p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
