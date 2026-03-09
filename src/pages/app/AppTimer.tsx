@@ -408,9 +408,9 @@ export default function AppTimer() {
             className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm"
           >
             {!selectedSoundId ? (
-              <VolumeX className="h-5 w-5 text-white/60" />
+              <Music className="h-5 w-5 text-white/60" />
             ) : (
-              <Volume2 className="h-5 w-5 text-white/60" />
+              <Music2 className="h-5 w-5 text-white/60" />
             )}
           </button>
           <button
