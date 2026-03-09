@@ -403,7 +403,7 @@ export default function AppTimer() {
             onMouseDown={(e) => e.stopPropagation()}
             className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm"
           >
-            {selectedSound === 'none' ? (
+            {!selectedSoundId ? (
               <VolumeX className="h-5 w-5 text-white/60" />
             ) : (
               <Volume2 className="h-5 w-5 text-white/60" />
@@ -426,27 +426,51 @@ export default function AppTimer() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute top-28 right-4 z-30 bg-white/10 backdrop-blur-xl rounded-2xl p-2 min-w-[160px]"
+              className="absolute top-28 right-4 z-30 bg-white/10 backdrop-blur-xl rounded-2xl p-2 min-w-[180px] max-h-[60vh] overflow-y-auto"
               onTouchStart={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
             >
-              {soundscapes.map(s => (
+              {/* No sound option */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  haptic.light();
+                  setSelectedSoundId(null);
+                  setSelectedSoundUrl(null);
+                  setShowSoundPicker(false);
+                }}
+                className={cn(
+                  'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-colors',
+                  !selectedSoundId ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/5'
+                )}
+              >
+                <span className="text-base">🔇</span>
+                <span className="text-sm font-medium">No Sound</span>
+                {!selectedSoundId && <Check className="h-3.5 w-3.5 ml-auto text-purple-400" />}
+              </button>
+              {/* Soundscape playlists */}
+              {soundscapeTracks.map(track => (
                 <button
-                  key={s.id}
+                  key={track.id}
                   onClick={(e) => {
                     e.stopPropagation();
                     haptic.light();
-                    setSelectedSound(s.id);
+                    setSelectedSoundId(track.id);
+                    setSelectedSoundUrl(track.url);
                     setShowSoundPicker(false);
                   }}
                   className={cn(
-                    'w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-colors',
-                    selectedSound === s.id ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/5'
+                    'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-colors',
+                    selectedSoundId === track.id ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/5'
                   )}
                 >
-                  <span className="text-base">{s.emoji}</span>
-                  <span className="text-sm font-medium">{s.label}</span>
-                  {selectedSound === s.id && <Check className="h-3.5 w-3.5 ml-auto text-purple-400" />}
+                  {track.cover ? (
+                    <img src={track.cover} alt="" className="w-7 h-7 rounded-lg object-cover" />
+                  ) : (
+                    <span className="text-base">🎵</span>
+                  )}
+                  <span className="text-sm font-medium truncate">{track.name}</span>
+                  {selectedSoundId === track.id && <Check className="h-3.5 w-3.5 ml-auto shrink-0 text-purple-400" />}
                 </button>
               ))}
             </motion.div>
@@ -463,24 +487,21 @@ export default function AppTimer() {
         )}
 
         {/* Countdown */}
-        <div className={cn(
-          "flex items-center justify-center",
-          isFullscreen ? "flex-col" : "flex-col"
-        )}>
+        <div className="flex items-center justify-center flex-col">
           {isFullscreen ? (
-            // Fullscreen: huge vertical digits filling the screen
-            <div className="flex flex-col items-center gap-0 leading-none">
+            // Fullscreen: massive overlapping digits filling entire screen height
+            <div className="flex flex-col items-center leading-none" style={{ gap: '-2vw' }}>
               {[mm[0], mm[1]].map((d, i) => (
                 <span key={`m${i}`} className={cn("font-black", digitColors[i])}
-                  style={{ fontSize: 'min(45vw, 220px)', lineHeight: 0.85 }}>{d}</span>
+                  style={{ fontSize: 'min(55vw, 280px)', lineHeight: 0.78, marginTop: i > 0 ? '-3vw' : 0 }}>{d}</span>
               ))}
-              <div className="flex gap-3 my-1">
-                <div className="w-5 h-5 rounded-full bg-white/30" />
-                <div className="w-5 h-5 rounded-full bg-white/30" />
+              <div className="flex gap-4 my-0">
+                <div className="w-6 h-6 rounded-full bg-white/30" />
+                <div className="w-6 h-6 rounded-full bg-white/30" />
               </div>
               {[ss[0], ss[1]].map((d, i) => (
                 <span key={`s${i}`} className={cn("font-black", digitColors[i + 2])}
-                  style={{ fontSize: 'min(45vw, 220px)', lineHeight: 0.85 }}>{d}</span>
+                  style={{ fontSize: 'min(55vw, 280px)', lineHeight: 0.78, marginTop: i > 0 ? '-3vw' : 0 }}>{d}</span>
               ))}
             </div>
           ) : (
