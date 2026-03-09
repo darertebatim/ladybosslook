@@ -426,10 +426,32 @@ export default function AppTimer() {
           >
             {activeTab === 'pomodoro' ? 'Start Focus' : 'Start Timer'}
           </button>
-          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center shrink-0">
-            <CalendarDays className="h-5 w-5 text-muted-foreground" />
-          </div>
+          <button
+            onClick={handleRoutineClick}
+            className={cn(
+              "w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors",
+              isAdded
+                ? "bg-success/20"
+                : "bg-urgency"
+            )}
+          >
+            {isAdded ? (
+              <Check className="h-5 w-5 text-success" />
+            ) : (
+              <CalendarPlus className="h-5 w-5 text-urgency-foreground" />
+            )}
+          </button>
         </div>
+
+        {/* Routine Preview Sheet */}
+        <RoutinePreviewSheet
+          open={showRoutineSheet}
+          onOpenChange={setShowRoutineSheet}
+          tasks={[SYNTHETIC_TIMER_TASK]}
+          routineTitle="Focus Timer"
+          onSave={handleSaveRoutine}
+          isSaving={addRoutinePlan.isPending}
+        />
       </div>
     );
   }
