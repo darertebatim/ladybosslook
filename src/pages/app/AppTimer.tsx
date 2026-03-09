@@ -268,9 +268,9 @@ export default function AppTimer() {
               />
             </svg>
 
-            {/* Hearts decoration */}
-            <div className="absolute top-4 right-6 text-pink-300 text-lg select-none">💜</div>
-            <div className="absolute top-10 right-2 text-pink-200 text-xs select-none">💕</div>
+            {/* Decorative dots */}
+            <div className="absolute top-4 right-6 text-muted-foreground/40 text-lg select-none">●</div>
+            <div className="absolute top-10 right-2 text-muted-foreground/20 text-xs select-none">●</div>
 
             {/* Time display */}
             <button
