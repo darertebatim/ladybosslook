@@ -760,7 +760,7 @@ const AppHome = () => {
                           isSelected 
                             ? 'bg-chip-lavender text-foreground scale-105 shadow-sm' 
                             : isTodayDate 
-                              ? 'border border-primary/30 text-muted-foreground' 
+                              ? 'border border-background text-muted-foreground' 
                               : 'text-muted-foreground/60',
                           hasBadge && isSelected && 'ring-2 ring-primary/30 ring-offset-1'
                         )}>
