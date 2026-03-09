@@ -9,7 +9,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped';
+type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped' | 'pomodoroBreak';
+
+const POMODORO_ROUNDS = 4;
+const BREAK_SECONDS = 5 * 60; // 5 minutes
 
 export default function AppTimer() {
   const navigate = useNavigate();
@@ -25,6 +28,9 @@ export default function AppTimer() {
   const [selectedSoundUrl, setSelectedSoundUrl] = useState<string | null>(null);
   const [selectedSoundId, setSelectedSoundId] = useState<string | null>(null);
   const [showSoundPicker, setShowSoundPicker] = useState(false);
+  // Pomodoro state
+  const [pomodoroRound, setPomodoroRound] = useState(0); // 0-based, current round
+  const [isBreak, setIsBreak] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const holdTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -110,28 +116,76 @@ export default function AppTimer() {
 
   const startTimer = () => {
     haptic.medium();
+    if (activeTab === 'pomodoro') {
+      setPomodoroRound(0);
+      setIsBreak(false);
+      startPomodoroRound(0);
+    } else {
+      const total = minutes * 60;
+      setSecondsLeft(total);
+      setTotalSeconds(total);
+      setScreen('running');
+      runCountdown(total, () => {
+        haptic.success();
+        setScreen('completed');
+        fireConfetti();
+      });
+    }
+  };
+
+  const fireConfetti = () => {
+    setTimeout(() => {
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#a78bfa', '#c084fc', '#e879f9', '#f0abfc', '#fcd34d'] });
+    }, 200);
+    confetti({ particleCount: 50, angle: 60, spread: 55, origin: { x: 0, y: 0.7 }, colors: ['#a78bfa', '#c084fc', '#e879f9'] });
+    confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1, y: 0.7 }, colors: ['#a78bfa', '#c084fc', '#e879f9'] });
+  };
+
+  const startPomodoroRound = (round: number) => {
     const total = minutes * 60;
+    setPomodoroRound(round);
+    setIsBreak(false);
     setSecondsLeft(total);
     setTotalSeconds(total);
     setScreen('running');
+    runCountdown(total, () => {
+      haptic.success();
+      // Round complete
+      const nextRound = round + 1;
+      if (nextRound >= POMODORO_ROUNDS) {
+        // All rounds done
+        setScreen('completed');
+        fireConfetti();
+      } else {
+        // Start break
+        startPomodoroBreak(nextRound);
+      }
+    });
+  };
 
+  const startPomodoroBreak = (nextRound: number) => {
+    setIsBreak(true);
+    setSecondsLeft(BREAK_SECONDS);
+    setTotalSeconds(BREAK_SECONDS);
+    setScreen('pomodoroBreak');
+    runCountdown(BREAK_SECONDS, () => {
+      haptic.medium();
+      startPomodoroRound(nextRound);
+    });
+  };
+
+  const runCountdown = (total: number, onComplete: () => void) => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    let remaining = total;
+    setSecondsLeft(remaining);
     intervalRef.current = setInterval(() => {
-      setSecondsLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(intervalRef.current!);
-          intervalRef.current = null;
-          haptic.success();
-          setScreen('completed');
-          // Fire confetti
-          setTimeout(() => {
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#a78bfa', '#c084fc', '#e879f9', '#f0abfc', '#fcd34d'] });
-          }, 200);
-          confetti({ particleCount: 50, angle: 60, spread: 55, origin: { x: 0, y: 0.7 }, colors: ['#a78bfa', '#c084fc', '#e879f9'] });
-          confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1, y: 0.7 }, colors: ['#a78bfa', '#c084fc', '#e879f9'] });
-          return 0;
-        }
-        return prev - 1;
-      });
+      remaining -= 1;
+      setSecondsLeft(remaining);
+      if (remaining <= 0) {
+        clearInterval(intervalRef.current!);
+        intervalRef.current = null;
+        onComplete();
+      }
     }, 1000);
   };
 
@@ -248,6 +302,15 @@ export default function AppTimer() {
 
         {/* Timer Display */}
         <div className="flex-1 flex flex-col items-center justify-center px-6 -mt-8">
+          {/* Pomodoro tomatoes */}
+          {activeTab === 'pomodoro' && (
+            <div className="flex gap-2 mb-4">
+              {Array.from({ length: POMODORO_ROUNDS }, (_, i) => (
+                <span key={i} className="text-2xl">🍅</span>
+              ))}
+            </div>
+          )}
+
           {/* Hand-drawn ellipse */}
           <div className="relative">
             {/* SVG Ellipse */}
@@ -306,7 +369,7 @@ export default function AppTimer() {
             onClick={startTimer}
             className="flex-1 h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
           >
-            Start Timer
+            {activeTab === 'pomodoro' ? 'Start Focus' : 'Start Timer'}
           </button>
           <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center shrink-0">
             <CalendarDays className="h-5 w-5 text-muted-foreground" />
@@ -596,6 +659,17 @@ export default function AppTimer() {
           </>
         )}
 
+        {/* Pomodoro tomato indicators */}
+        {activeTab === 'pomodoro' && !isFullscreen && (
+          <div className="absolute top-24 left-0 right-0 flex justify-center gap-2">
+            {Array.from({ length: POMODORO_ROUNDS }, (_, i) => (
+              <span key={i} className={cn("text-xl transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
+                🍅
+              </span>
+            ))}
+          </div>
+        )}
+
         {/* Countdown */}
         <div className="flex items-center justify-center flex-col">
           {isFullscreen ? (
@@ -635,7 +709,9 @@ export default function AppTimer() {
                 <div className="w-12 h-0.5 rounded-full bg-white/15" />
                 <div className="w-6 h-0.5 rounded-full bg-white/20" />
               </div>
-              <p className="text-white/30 text-sm mt-3">{customTheme || selectedTheme}</p>
+              <p className="text-white/30 text-sm mt-3">
+                {activeTab === 'pomodoro' ? `Round ${pomodoroRound + 1} of ${POMODORO_ROUNDS}` : (customTheme || selectedTheme)}
+              </p>
             </>
           )}
         </div>
@@ -651,6 +727,49 @@ export default function AppTimer() {
             />
           </div>
         </div>
+      </motion.div>
+    );
+  }
+
+  // ─── POMODORO BREAK SCREEN ───
+  if (screen === 'pomodoroBreak') {
+    const breakTimeStr = formatTime(secondsLeft);
+
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="min-h-screen bg-background flex flex-col items-center justify-center relative select-none"
+      >
+        {/* Tomato progress */}
+        <div className="flex gap-2 mb-6">
+          {Array.from({ length: POMODORO_ROUNDS }, (_, i) => (
+            <span key={i} className={cn("text-2xl transition-opacity", i < pomodoroRound ? "opacity-100" : "opacity-30")}>
+              🍅
+            </span>
+          ))}
+        </div>
+
+        <p className="text-muted-foreground text-sm mb-2">Break time</p>
+        <span className="text-6xl font-bold text-foreground mb-4" style={{ fontVariantNumeric: 'tabular-nums' }}>
+          {breakTimeStr}
+        </span>
+        <p className="text-muted-foreground text-sm">
+          Round {pomodoroRound + 1} starts soon
+        </p>
+
+        {/* Skip break */}
+        <button
+          onClick={() => {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+            intervalRef.current = null;
+            haptic.medium();
+            startPomodoroRound(pomodoroRound);
+          }}
+          className="mt-10 px-6 py-3 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
+        >
+          Skip break
+        </button>
       </motion.div>
     );
   }
