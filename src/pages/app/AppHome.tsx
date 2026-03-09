@@ -762,7 +762,7 @@ const AppHome = () => {
                             : isTodayDate 
                               ? 'border border-background text-muted-foreground' 
                               : 'text-muted-foreground/60',
-                          hasBadge && isSelected && 'ring-2 ring-primary/30 ring-offset-1'
+                          hasBadge && isSelected && 'ring-2 ring-chip-lavender ring-offset-0'
                         )}>
                           {hasProgramEvents && (
                             <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5 z-20", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />
