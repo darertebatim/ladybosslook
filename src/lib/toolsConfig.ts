@@ -40,7 +40,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'journal',
-    name: 'Journal Writing',
+    name: 'Journal',
     icon: 'BookOpen',
     bgColor: 'bg-[#FAE5C5]',
     iconColor: 'text-orange-600',
