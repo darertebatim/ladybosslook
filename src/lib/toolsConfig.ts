@@ -13,7 +13,7 @@ export interface ToolConfig {
 export const wellnessTools: ToolConfig[] = [
   {
     id: 'routines',
-    name: 'Routine Bank',
+    name: 'Routines',
     icon: 'CalendarPlus',
     bgColor: 'bg-[#D1FAE5]',
     iconColor: 'text-emerald-600',
@@ -22,7 +22,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'focus-timer',
-    name: 'Focus Timer',
+    name: 'Timer',
     icon: 'Clock',
     bgColor: 'bg-[#E8E4F8]',
     iconColor: 'text-purple-600',
@@ -31,7 +31,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'reflections',
-    name: 'Guided Reflections',
+    name: 'Reflections',
     icon: 'Brain',
     bgColor: 'bg-[#CCFBF1]',
     iconColor: 'text-teal-600',
@@ -40,7 +40,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'journal',
-    name: 'Journal Writing',
+    name: 'Journal',
     icon: 'BookOpen',
     bgColor: 'bg-[#FAE5C5]',
     iconColor: 'text-orange-600',
@@ -49,7 +49,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'breathe',
-    name: 'Breathe Practice',
+    name: 'Breathe',
     icon: 'Wind',
     bgColor: 'bg-[#D3F2EA]',
     iconColor: 'text-teal-600',
@@ -58,7 +58,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'mood',
-    name: 'Mood Check',
+    name: 'Mood',
     icon: 'Smile',
     bgColor: 'bg-[#FEF9C3]',
     iconColor: 'text-yellow-600',
@@ -67,7 +67,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'videos',
-    name: 'Video Player',
+    name: 'Videos',
     icon: 'Dumbbell',
     bgColor: 'bg-[#FCE4EC]',
     iconColor: 'text-rose-600',
@@ -76,7 +76,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'water',
-    name: 'Water Tracker',
+    name: 'Water',
     icon: 'Droplets',
     bgColor: 'bg-[#D6E6FC]',
     iconColor: 'text-blue-600',
@@ -85,7 +85,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'emotions',
-    name: 'Emotion Check',
+    name: 'Emotions',
     icon: 'HeartHandshake',
     bgColor: 'bg-[#EDE9FE]',
     iconColor: 'text-violet-600',
@@ -94,7 +94,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'period',
-    name: 'Period Tracker',
+    name: 'Period',
     icon: 'Heart',
     bgColor: 'bg-[#FCE4EC]',
     iconColor: 'text-pink-600',
@@ -103,7 +103,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'fasting',
-    name: 'Fasting Timer',
+    name: 'Fasting',
     icon: 'Timer',
     bgColor: 'bg-[#FFE4C4]',
     iconColor: 'text-amber-600',
