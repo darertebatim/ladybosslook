@@ -135,27 +135,32 @@ export const TaskCard = memo(function TaskCard({
       return;
     }
     
-    haptic.light();
-    
     // Water tasks: navigate to the dedicated water tracking page
     if (isWater) {
+      haptic.light();
       navigate('/app/water', { state: { from: 'planner' } });
       return;
     }
     
     // Small count goals: directly increment by 1 with animation
     if (isSmallCountGoal && onOpenGoalInput) {
+      // Medium haptic for satisfying feedback
+      haptic.medium();
+      
       // Trigger floating +1 animation
       setShowFloatingPlus(true);
       setFloatingPlusKey(prev => prev + 1);
       setTimeout(() => setShowFloatingPlus(false), 600);
       
-      // Directly confirm with amount = 1
-      // We pass the task to onOpenGoalInput which will be handled differently for small goals
+      // Trigger full card animations (emoji bounce + ripple wave)
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 1000);
+      
       onOpenGoalInput(task);
       return;
     }
     
+    haptic.light();
     if (onOpenGoalInput) {
       onOpenGoalInput(task);
     }
@@ -189,19 +194,31 @@ export const TaskCard = memo(function TaskCard({
 
   const colorClass = TASK_COLOR_CLASSES[task.color] || TASK_COLOR_CLASSES.yellow;
   
+  // Animated goal progress number component
+  const AnimatedProgress = ({ value }: { value: number }) => (
+    <motion.span
+      key={value}
+      initial={{ scale: 1.5, color: '#14b8a6' }}
+      animate={{ scale: 1, color: 'inherit' }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+      className="inline-block"
+    >
+      {value}
+    </motion.span>
+  );
+
   // Format goal display
   const formatGoalLabel = () => {
     if (!hasGoal) return null;
     
     if (isTimerGoal) {
-      // Timer goals: show in minutes
       const progressMins = Math.floor(goalProgress / 60);
       const goalMins = Math.floor((task.goal_target || 0) / 60);
       return `Goal: ${progressMins}/${goalMins} min`;
     }
     
     const unit = task.goal_unit || 'times';
-    return `Goal: ${goalProgress}/${task.goal_target} ${unit}`;
+    return { prefix: 'Goal: ', progress: goalProgress, suffix: `/${task.goal_target} ${unit}` };
   };
 
   // Format goal display for Pro Tasks too
@@ -215,7 +232,7 @@ export const TaskCard = memo(function TaskCard({
     }
     
     const unit = task.goal_unit || 'times';
-    return `${goalProgress}/${task.goal_target} ${unit}`;
+    return { prefix: '', progress: goalProgress, suffix: `/${task.goal_target} ${unit}` };
   };
 
   // Pro Task - uses user's chosen color but shows Pro icon and badge
@@ -291,7 +308,12 @@ export const TaskCard = memo(function TaskCard({
               <div className="flex items-center gap-2">
                 <span className="text-[13px] text-black/80">{formatTime(task)}</span>
                 {hasGoal && (
-                  <span className="text-[13px] text-black/80 font-medium">• {formatProGoalLabel()}</span>
+                  <span className="text-[13px] text-black/80 font-medium">• {(() => {
+                    const label = formatProGoalLabel();
+                    if (typeof label === 'string') return label;
+                    if (label) return <>{label.prefix}<AnimatedProgress value={label.progress} />{label.suffix}</>;
+                    return null;
+                  })()}</span>
                 )}
               </div>
               
@@ -450,7 +472,12 @@ export const TaskCard = memo(function TaskCard({
               </span>
             )}
             {hasGoal ? (
-              <span className="text-[13px] text-black/80 font-medium">{formatGoalLabel()}</span>
+              <span className="text-[13px] text-black/80 font-medium">{(() => {
+                const label = formatGoalLabel();
+                if (typeof label === 'string') return label;
+                if (label) return <>{label.prefix}<AnimatedProgress value={label.progress} />{label.suffix}</>;
+                return null;
+              })()}</span>
             ) : (
               <span className="text-[13px] text-black/80">{formatTime(task)}</span>
             )}
