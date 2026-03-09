@@ -1301,6 +1301,42 @@ export type Database = {
           },
         ]
       }
+      focus_sessions: {
+        Row: {
+          completed: boolean
+          created_at: string
+          duration_seconds: number
+          id: string
+          pomodoro_rounds: number | null
+          session_type: string
+          started_at: string
+          theme: string | null
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          duration_seconds: number
+          id?: string
+          pomodoro_rounds?: number | null
+          session_type?: string
+          started_at?: string
+          theme?: string | null
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          duration_seconds?: number
+          id?: string
+          pomodoro_rounds?: number | null
+          session_type?: string
+          started_at?: string
+          theme?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       form_submissions: {
         Row: {
           city: string

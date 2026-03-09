@@ -14,6 +14,7 @@ import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { toast } from 'sonner';
 import { FocusStatsScreen } from '@/components/app/FocusStatsScreen';
+import { useSaveFocusSession } from '@/hooks/useFocusSessions';
 
 type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped' | 'pomodoroRoundDone' | 'pomodoroBreak' | 'pomodoroBreakDone' | 'settings' | 'stats';
 
@@ -68,6 +69,10 @@ export default function AppTimer() {
   const rulerRef = useRef<HTMLDivElement>(null);
   const lastHapticVal = useRef(25);
   const rulerInitialized = useRef(false);
+  const sessionStartRef = useRef<Date>(new Date());
+
+  // Session saving
+  const saveFocusSession = useSaveFocusSession();
 
   // Routine integration
   const { data: existingTask } = useExistingProTask('focus_timer');
@@ -177,6 +182,7 @@ export default function AppTimer() {
 
   const startTimer = () => {
     haptic.medium();
+    sessionStartRef.current = new Date();
     if (activeTab === 'pomodoro') {
       setPomodoroRound(0);
       setIsBreak(false);
@@ -188,6 +194,13 @@ export default function AppTimer() {
       setScreen('running');
       runCountdown(total, () => {
         haptic.success();
+        saveFocusSession.mutate({
+          durationSeconds: total,
+          sessionType: 'timer',
+          theme: customTheme || selectedTheme,
+          completed: true,
+          startedAt: sessionStartRef.current,
+        });
         setScreen('completed');
         fireConfetti();
       });
@@ -216,10 +229,18 @@ export default function AppTimer() {
       const nextRound = round + 1;
       nextRoundRef.current = nextRound;
       if (nextRound >= pomodoroCycles) {
+        // Save complete pomodoro session
+        saveFocusSession.mutate({
+          durationSeconds: minutes * 60 * pomodoroCycles,
+          sessionType: 'pomodoro',
+          theme: customTheme || selectedTheme,
+          pomodoroRounds: pomodoroCycles,
+          completed: true,
+          startedAt: sessionStartRef.current,
+        });
         setScreen('completed');
         fireConfetti();
       } else {
-        // Show "You've been focusing" screen
         setScreen('pomodoroRoundDone');
       }
     });
@@ -257,9 +278,21 @@ export default function AppTimer() {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+    // Save partial session
+    const elapsed = totalSeconds - secondsLeft;
+    if (elapsed > 0) {
+      saveFocusSession.mutate({
+        durationSeconds: elapsed,
+        sessionType: activeTab === 'pomodoro' ? 'pomodoro' : 'timer',
+        theme: customTheme || selectedTheme,
+        pomodoroRounds: activeTab === 'pomodoro' ? pomodoroRound + 1 : undefined,
+        completed: false,
+        startedAt: sessionStartRef.current,
+      });
+    }
     haptic.warning();
     setScreen('stopped');
-  }, []);
+  }, [totalSeconds, secondsLeft, activeTab, customTheme, selectedTheme, pomodoroRound, saveFocusSession]);
 
   // Hold-to-stop handlers
   const onHoldStart = () => {
@@ -335,8 +368,10 @@ export default function AppTimer() {
   if (screen === 'setup') {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 pt-4 pb-2">
+        <div
+          className="flex items-center justify-between px-4 pb-2"
+          style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}
+        >
           <button onClick={goBack} className="p-2 -ml-2">
             <X className="h-5 w-5 text-foreground" />
           </button>
@@ -431,7 +466,7 @@ export default function AppTimer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="px-6 pb-8 pt-4 flex items-center gap-3">
+        <div className="px-6 pt-4 flex items-center gap-3" style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}>
           <button
             onClick={() => { setScreen('settings'); setSettingsTab(activeTab); haptic.light(); }}
             className="w-12 h-12 rounded-full bg-muted flex items-center justify-center shrink-0"
@@ -480,7 +515,7 @@ export default function AppTimer() {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 pt-4 pb-2">
+        <div className="flex items-center justify-between px-4 pb-2" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}>
           <button onClick={() => { setScreen('setup'); haptic.light(); }} className="p-2 -ml-2">
             <ArrowLeft className="h-5 w-5 text-foreground" />
           </button>
@@ -764,7 +799,7 @@ export default function AppTimer() {
 
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <div className="flex items-center px-4 pt-4 pb-2">
+        <div className="flex items-center px-4 pb-2" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}>
           <button onClick={() => { setScreen('setup'); haptic.light(); }} className="p-2 -ml-2">
             <ArrowLeft className="h-5 w-5 text-foreground" />
           </button>
@@ -832,7 +867,7 @@ export default function AppTimer() {
         </div>
 
         {/* Done button with lavender gradient */}
-        <div className="px-6 pb-8 pt-4 relative">
+        <div className="px-6 pt-4 relative" style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}>
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-muted/50 to-transparent pointer-events-none" />
           <button
             onClick={() => { setScreen('setup'); haptic.medium(); }}
@@ -849,7 +884,7 @@ export default function AppTimer() {
   if (screen === 'pickTheme') {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <div className="flex items-center px-4 pt-4 pb-2">
+        <div className="flex items-center px-4 pb-2" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}>
           <button onClick={() => { setScreen('setup'); haptic.light(); }} className="p-2 -ml-2">
             <ArrowLeft className="h-5 w-5 text-foreground" />
           </button>
@@ -911,7 +946,7 @@ export default function AppTimer() {
         onMouseLeave={onHoldEnd}
       >
         {/* Top-right controls */}
-        <div className="absolute top-12 right-4 flex flex-col gap-3 z-20">
+        <div className="absolute right-4 flex flex-col gap-3 z-20" style={{ top: 'calc(env(safe-area-inset-top) + 12px)' }}>
           <button
             onClick={(e) => { e.stopPropagation(); haptic.light(); setShowSoundPicker(!showSoundPicker); }}
             onTouchStart={(e) => e.stopPropagation()}
@@ -1040,7 +1075,7 @@ export default function AppTimer() {
 
         {/* Pomodoro tomato indicators */}
         {activeTab === 'pomodoro' && !isFullscreen && (
-          <div className="absolute top-24 left-0 right-0 flex justify-center gap-2">
+          <div className="absolute left-0 right-0 flex justify-center gap-2" style={{ top: 'calc(env(safe-area-inset-top) + 24px)' }}>
             {Array.from({ length: pomodoroCycles }, (_, i) => (
               <span key={i} className={cn("text-xl transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
                 🍅
@@ -1096,7 +1131,7 @@ export default function AppTimer() {
         </div>
 
         {/* Hold to stop */}
-        <div className="absolute bottom-16 left-0 right-0 px-10 flex flex-col items-center gap-3">
+        <div className="absolute left-0 right-0 px-10 flex flex-col items-center gap-3" style={{ bottom: 'max(64px, calc(env(safe-area-inset-bottom) + 32px))' }}>
           <p className="text-white/40 text-sm">Hold to stop timer</p>
           <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
             <motion.div
@@ -1127,7 +1162,7 @@ export default function AppTimer() {
           Time for a short break.
         </h1>
 
-        <div className="absolute bottom-12 left-0 right-0 px-8">
+        <div className="absolute left-0 right-0 px-8" style={{ bottom: 'max(48px, calc(env(safe-area-inset-bottom) + 24px))' }}>
           <button
             onClick={() => { haptic.medium(); startPomodoroBreak(); }}
             className="w-full h-14 rounded-full bg-white text-black font-semibold text-base transition-transform active:scale-[0.97]"
@@ -1198,7 +1233,7 @@ export default function AppTimer() {
           Time to dive into your next Pomodoro session!
         </h1>
 
-        <div className="absolute bottom-12 left-0 right-0 px-8">
+        <div className="absolute left-0 right-0 px-8" style={{ bottom: 'max(48px, calc(env(safe-area-inset-bottom) + 24px))' }}>
           <button
             onClick={() => { haptic.medium(); startPomodoroRound(nextRoundRef.current); }}
             className="w-full h-14 rounded-full bg-white text-black font-semibold text-base transition-transform active:scale-[0.97]"
