@@ -214,7 +214,7 @@ export default function AppTimer() {
       haptic.success();
       const nextRound = round + 1;
       nextRoundRef.current = nextRound;
-      if (nextRound >= POMODORO_ROUNDS) {
+      if (nextRound >= pomodoroCycles) {
         setScreen('completed');
         fireConfetti();
       } else {
