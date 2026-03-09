@@ -9,7 +9,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped';
+type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped' | 'pomodoroBreak';
+
+const POMODORO_ROUNDS = 4;
+const BREAK_SECONDS = 5 * 60; // 5 minutes
 
 export default function AppTimer() {
   const navigate = useNavigate();
@@ -25,6 +28,9 @@ export default function AppTimer() {
   const [selectedSoundUrl, setSelectedSoundUrl] = useState<string | null>(null);
   const [selectedSoundId, setSelectedSoundId] = useState<string | null>(null);
   const [showSoundPicker, setShowSoundPicker] = useState(false);
+  // Pomodoro state
+  const [pomodoroRound, setPomodoroRound] = useState(0); // 0-based, current round
+  const [isBreak, setIsBreak] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const holdTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
