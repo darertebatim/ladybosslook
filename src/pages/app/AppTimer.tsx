@@ -18,6 +18,22 @@ type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | '
 const POMODORO_ROUNDS = 4;
 const BREAK_SECONDS = 5 * 60; // 5 minutes
 
+const SYNTHETIC_TIMER_TASK: RoutinePlanTask = {
+  id: 'synthetic-focus-timer',
+  plan_id: 'synthetic-focus-timer',
+  title: 'Focus Timer',
+  icon: '⏱️',
+  color: 'stone',
+  task_order: 0,
+  is_active: true,
+  created_at: new Date().toISOString(),
+  linked_playlist_id: null,
+  pro_link_type: 'focus_timer',
+  pro_link_value: null,
+  linked_playlist: null,
+  tag: 'pro',
+};
+
 export default function AppTimer() {
   const navigate = useNavigate();
   const [screen, setScreen] = useState<Screen>('setup');
@@ -32,8 +48,10 @@ export default function AppTimer() {
   const [selectedSoundUrl, setSelectedSoundUrl] = useState<string | null>(null);
   const [selectedSoundId, setSelectedSoundId] = useState<string | null>(null);
   const [showSoundPicker, setShowSoundPicker] = useState(false);
+  const [showRoutineSheet, setShowRoutineSheet] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
   // Pomodoro state
-  const [pomodoroRound, setPomodoroRound] = useState(0); // 0-based, current round
+  const [pomodoroRound, setPomodoroRound] = useState(0);
   const [isBreak, setIsBreak] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -42,6 +60,37 @@ export default function AppTimer() {
   const rulerRef = useRef<HTMLDivElement>(null);
   const lastHapticVal = useRef(25);
   const rulerInitialized = useRef(false);
+
+  // Routine integration
+  const { data: existingTask } = useExistingProTask('focus_timer');
+  const addRoutinePlan = useAddRoutinePlan();
+  const isAdded = !!existingTask || justAdded;
+
+  const handleRoutineClick = () => {
+    haptic.light();
+    if (isAdded) {
+      navigate('/app/home');
+    } else {
+      setShowRoutineSheet(true);
+    }
+  };
+
+  const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
+    try {
+      await addRoutinePlan.mutateAsync({
+        planId: 'synthetic-focus-timer',
+        selectedTaskIds,
+        editedTasks,
+        syntheticTasks: [SYNTHETIC_TIMER_TASK],
+      });
+      toast.success('Focus Timer added to your routine!');
+      setShowRoutineSheet(false);
+      setJustAdded(true);
+    } catch (error) {
+      console.error('Failed to add routine:', error);
+      toast.error('Failed to add routine');
+    }
+  };
 
   // Fetch individual audio tracks from soundscape playlists
   const { data: soundscapeTracks = [] } = useQuery({
