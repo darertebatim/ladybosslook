@@ -14,7 +14,7 @@ import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { toast } from 'sonner';
 
-type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped' | 'pomodoroRoundDone' | 'pomodoroBreak' | 'pomodoroBreakDone';
+type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped' | 'pomodoroRoundDone' | 'pomodoroBreak' | 'pomodoroBreakDone' | 'settings' | 'stats';
 
 const POMODORO_ROUNDS = 4;
 const BREAK_SECONDS = 5 * 60; // 5 minutes
