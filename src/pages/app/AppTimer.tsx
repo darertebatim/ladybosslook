@@ -946,7 +946,7 @@ export default function AppTimer() {
         onMouseLeave={onHoldEnd}
       >
         {/* Top-right controls */}
-        <div className="absolute top-12 right-4 flex flex-col gap-3 z-20">
+        <div className="absolute right-4 flex flex-col gap-3 z-20" style={{ top: 'calc(env(safe-area-inset-top) + 12px)' }}>
           <button
             onClick={(e) => { e.stopPropagation(); haptic.light(); setShowSoundPicker(!showSoundPicker); }}
             onTouchStart={(e) => e.stopPropagation()}
