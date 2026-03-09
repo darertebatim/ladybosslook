@@ -167,7 +167,7 @@ const AppPresence = () => {
               </div>
               
               {/* Subscription & Profile cards pulled into hero area */}
-              <div className="px-4 space-y-3 -mb-10">
+              <div className="-mx-2 space-y-3 -mb-10">
                 <SubscriptionCard />
                 <PresenceProfileCard />
               </div>
