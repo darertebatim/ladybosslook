@@ -17,7 +17,17 @@ import { cn } from '@/lib/utils';
 import { useStreakCalendar } from '@/hooks/usePresenceCalendars';
 import { useDateRangeTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 
+import coinBronze from '@/assets/coin-bronze.png';
+import coinSilver from '@/assets/coin-silver.png';
+import coinGold from '@/assets/coin-gold.png';
+
 const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
+  bronze: coinBronze,
+  silver: coinSilver,
+  gold: coinGold,
+};
 
 function useCalendarDays(currentMonth: Date) {
   return useMemo(() => {
@@ -29,30 +39,14 @@ function useCalendarDays(currentMonth: Date) {
   }, [currentMonth]);
 }
 
-// ─── Badge emoji for each level ───
-function BadgeIcon({ level, size = 28 }: { level: BadgeLevel; size?: number }) {
-  if (level === 'gold') {
-    return (
-      <div className="w-9 h-9 rounded-full bg-amber-400 flex items-center justify-center shadow-sm">
-        <span style={{ fontSize: size * 0.7 }}>🏅</span>
-      </div>
-    );
-  }
-  if (level === 'silver') {
-    return (
-      <div className="w-9 h-9 rounded-full bg-sky-200 flex items-center justify-center shadow-sm">
-        <span style={{ fontSize: size * 0.7 }}>💎</span>
-      </div>
-    );
-  }
-  if (level === 'bronze') {
-    return (
-      <div className="w-9 h-9 rounded-full bg-orange-200 flex items-center justify-center shadow-sm">
-        <span style={{ fontSize: size * 0.7 }}>🥉</span>
-      </div>
-    );
-  }
-  return null;
+function BadgeIcon({ level }: { level: Exclude<BadgeLevel, 'none'> }) {
+  return (
+    <img
+      src={BADGE_IMAGES[level]}
+      alt={`${level} badge`}
+      className="w-8 h-8 object-contain"
+    />
+  );
 }
 
 // ─── STREAK CALENDAR ───

@@ -16,39 +16,32 @@ import {
   endOfWeek,
   isSameMonth,
   isSameDay,
-  getDay,
-  getWeek,
 } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useDateRangeTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
 
+import coinBronze from '@/assets/coin-bronze.png';
+import coinSilver from '@/assets/coin-silver.png';
+import coinGold from '@/assets/coin-gold.png';
+
 const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-function BadgeIcon({ level }: { level: BadgeLevel }) {
-  if (level === 'gold') {
-    return (
-      <div className="w-9 h-9 rounded-full bg-amber-400 flex items-center justify-center shadow-sm">
-        <span className="text-base">🏅</span>
-      </div>
-    );
-  }
-  if (level === 'silver') {
-    return (
-      <div className="w-9 h-9 rounded-full bg-sky-200 flex items-center justify-center shadow-sm">
-        <span className="text-base">💎</span>
-      </div>
-    );
-  }
-  if (level === 'bronze') {
-    return (
-      <div className="w-9 h-9 rounded-full bg-orange-200 flex items-center justify-center shadow-sm">
-        <span className="text-base">🥉</span>
-      </div>
-    );
-  }
-  return null;
+const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
+  bronze: coinBronze,
+  silver: coinSilver,
+  gold: coinGold,
+};
+
+function BadgeIcon({ level }: { level: Exclude<BadgeLevel, 'none'> }) {
+  return (
+    <img
+      src={BADGE_IMAGES[level]}
+      alt={`${level} badge`}
+      className="w-8 h-8 object-contain"
+    />
+  );
 }
 
 const AppActionStats = () => {
@@ -156,9 +149,9 @@ const AppActionStats = () => {
           {/* Progress Badge Info */}
           <div className="bg-white rounded-2xl p-5 shadow-sm mb-6 mt-2 text-center">
             <div className="flex items-center justify-center gap-2 mb-3">
-              <span className="text-3xl">🏅</span>
-              <span className="text-3xl">💎</span>
-              <span className="text-3xl">🥉</span>
+              <img src={coinGold} alt="Gold" className="w-10 h-10 object-contain" />
+              <img src={coinSilver} alt="Silver" className="w-10 h-10 object-contain" />
+              <img src={coinBronze} alt="Bronze" className="w-10 h-10 object-contain" />
             </div>
             <h3 className="text-lg font-bold text-foreground mb-2">Progress Badge</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -235,7 +228,7 @@ const AppActionStats = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-border/50 pb-3">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">🏅</span>
+                  <img src={coinGold} alt="Gold" className="w-8 h-8 object-contain" />
                   <span className="text-base font-semibold text-foreground">Gold Badge</span>
                 </div>
                 <div className="flex items-baseline gap-1">
@@ -245,7 +238,7 @@ const AppActionStats = () => {
               </div>
               <div className="flex items-center justify-between border-b border-border/50 pb-3">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">💎</span>
+                  <img src={coinSilver} alt="Silver" className="w-8 h-8 object-contain" />
                   <span className="text-base font-semibold text-foreground">Silver Badge</span>
                 </div>
                 <div className="flex items-baseline gap-1">
@@ -255,7 +248,7 @@ const AppActionStats = () => {
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">🥉</span>
+                  <img src={coinBronze} alt="Bronze" className="w-8 h-8 object-contain" />
                   <span className="text-base font-semibold text-foreground">Bronze Badge</span>
                 </div>
                 <div className="flex items-baseline gap-1">
