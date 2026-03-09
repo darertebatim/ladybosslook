@@ -18,7 +18,9 @@ import { cn } from '@/lib/utils';
 import { SEOHead } from '@/components/SEOHead';
 import { toast } from 'sonner';
 import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation';
-import { StreakCalendar, MoodCalendar, ActionCalendar } from '@/components/app/PresenceCalendar';
+import { StreakCalendar, ActionCalendar } from '@/components/app/PresenceCalendar';
+import { MoodCalendar } from '@/components/mood/MoodCalendar';
+import { ChevronRight as ChevronRightIcon } from 'lucide-react';
 
 const AppPresence = () => {
   const navigate = useNavigate();
