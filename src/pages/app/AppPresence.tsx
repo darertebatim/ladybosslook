@@ -127,57 +127,54 @@ const AppPresence = () => {
             <div className="absolute top-12 right-24 w-2 h-2 rounded-full bg-white/50" />
             <div className="absolute top-32 right-8 w-1.5 h-1.5 rounded-full bg-white/60" />
             
-            {/* Hero Content */}
-            <div className="relative z-10 px-6 pb-16 pt-4 text-center">
-              {/* Large Flame Icon with glow */}
-              <div className="relative inline-flex items-center justify-center mb-4">
-                {/* Glow effect */}
-                <div className="absolute w-24 h-24 rounded-full bg-orange-300/40 blur-xl" />
-                <Flame 
-                  className="relative w-20 h-20 text-orange-600 drop-shadow-lg animate-pulse" 
-                  strokeWidth={1.5}
-                  fill="rgba(251, 146, 60, 0.3)"
-                />
-              </div>
-              
-              {/* Main stat: Days This Month */}
-              {isLoading ? (
-                <Skeleton className="h-20 w-32 mx-auto bg-white/30 rounded-xl mb-2" />
-              ) : (
-                <div className="mb-2">
-                  <span 
-                    className="text-7xl font-bold text-orange-700"
-                    style={{ textShadow: '0 2px 10px rgba(234, 88, 12, 0.2)' }}
-                  >
-                    {stats?.weeklyReturns || 0}
-                  </span>
-                </div>
+            {/* Hero Content - Profile Card */}
+            <div className="relative z-10 px-6 pb-10 pt-4 text-center">
+              {/* Avatar with glow */}
+              <button
+                onClick={() => navigate('/app/profile')}
+                className="relative inline-block mb-4 active:scale-95 transition-transform"
+              >
+                <div className="absolute inset-0 w-24 h-24 mx-auto rounded-full bg-orange-300/50 blur-xl" />
+                <Avatar className="h-24 w-24 mx-auto ring-4 ring-white/40 shadow-xl relative">
+                  {profile?.avatar_url && <AvatarImage src={profile.avatar_url} alt="Profile" />}
+                  <AvatarFallback className="text-2xl font-bold bg-white/30 text-orange-800">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+
+              {/* Name */}
+              <h2 
+                className="text-2xl font-bold text-orange-800 mb-1"
+                style={{ textShadow: '0 1px 8px rgba(234, 88, 12, 0.15)' }}
+              >
+                {profile?.full_name || 'Your Name'}
+              </h2>
+              {profile?.bio && (
+                <p className="text-orange-600/70 text-sm mb-5 max-w-[240px] mx-auto line-clamp-2">
+                  {profile.bio}
+                </p>
               )}
-              <p className="text-orange-600/80 text-lg font-medium mb-8">returns this week</p>
+              {!profile?.bio && <div className="mb-5" />}
               
-              {/* Week presence grid in a clean white card */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-sm mx-2">
-                <WeeklyPresenceGrid 
-                  lastActiveDate={lastActiveDate} 
-                  showedUpToday={showedUpToday}
-                  variant="light" 
-                />
+              {/* Stats row */}
+              <div className="flex items-center justify-center gap-4">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-5 py-3 shadow-sm text-center min-w-[90px]">
+                  <Flame className="h-4 w-4 mx-auto mb-1 text-orange-500" />
+                  <div className="text-xl font-bold text-orange-900">{stats?.currentStreak || 0}</div>
+                  <div className="text-[10px] text-orange-700/60 font-medium">Day Streak</div>
+                </div>
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-5 py-3 shadow-sm text-center min-w-[90px]">
+                  <RotateCcw className="h-4 w-4 mx-auto mb-1 text-orange-600" />
+                  <div className="text-xl font-bold text-orange-900">{stats?.returnCount || 0}</div>
+                  <div className="text-[10px] text-orange-700/60 font-medium">Returns</div>
+                </div>
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-5 py-3 shadow-sm text-center min-w-[90px]">
+                  <CheckCircle2 className="h-4 w-4 mx-auto mb-1 text-amber-600" />
+                  <div className="text-xl font-bold text-orange-900">{stats?.totalTaskCompletions || 0}</div>
+                  <div className="text-[10px] text-orange-700/60 font-medium">Actions</div>
+                </div>
               </div>
-            </div>
-          </div>
-          
-          {/* Encouragement Card - overlapping hero */}
-          <div className="px-4 -mt-4 relative z-20">
-            <div className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl p-4 shadow-lg flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                <Heart className="w-5 h-5 text-white" fill="rgba(255,255,255,0.8)" />
-              </div>
-              <p className="text-white font-medium text-sm">
-                {stats?.returnCount && stats.returnCount > 0 
-                  ? "You came back, and that takes real strength! 💪"
-                  : "You showed up, and that's what matters most! ✨"
-                }
-              </p>
             </div>
           </div>
           
