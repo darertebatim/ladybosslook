@@ -13,6 +13,7 @@ import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { toast } from 'sonner';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { FocusStatsScreen } from '@/components/app/FocusStatsScreen';
 import { useSaveFocusSession } from '@/hooks/useFocusSessions';
 
