@@ -359,7 +359,9 @@ export default function AppTimer() {
               Pomodoro
             </button>
           </div>
-          <div className="w-9" />
+          <button onClick={() => { setScreen('stats'); haptic.light(); }} className="p-2 -mr-2">
+            <BarChart2 className="h-5 w-5 text-foreground" />
+          </button>
         </div>
 
         {/* Timer Display */}
