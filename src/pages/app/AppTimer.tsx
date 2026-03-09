@@ -631,9 +631,9 @@ export default function AppTimer() {
               </div>
               {/* Decorative lines */}
               <div className="flex gap-1 mt-4">
-                <div className="w-8 h-0.5 rounded-full bg-purple-500/40" />
-                <div className="w-12 h-0.5 rounded-full bg-pink-500/30" />
-                <div className="w-6 h-0.5 rounded-full bg-violet-500/40" />
+                <div className="w-8 h-0.5 rounded-full bg-white/20" />
+                <div className="w-12 h-0.5 rounded-full bg-white/15" />
+                <div className="w-6 h-0.5 rounded-full bg-white/20" />
               </div>
               <p className="text-white/30 text-sm mt-3">{customTheme || selectedTheme}</p>
             </>
