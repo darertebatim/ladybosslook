@@ -541,11 +541,11 @@ export default function AppTimer() {
                     }}
                     className="w-full flex items-center gap-4 py-4 border-b border-border"
                   >
-                    <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center shrink-0">
                       <div className="relative">
-                        <Music className="h-5 w-5 text-purple-600" />
+                        <Music className="h-5 w-5 text-foreground" />
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-[1.5px] h-7 bg-purple-600 rotate-45 rounded-full" />
+                          <div className="w-[1.5px] h-7 bg-foreground rotate-45 rounded-full" />
                         </div>
                       </div>
                     </div>
