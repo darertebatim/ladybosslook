@@ -49,7 +49,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'breathe',
-    name: 'Breathe Practice',
+    name: 'Breathe',
     icon: 'Wind',
     bgColor: 'bg-[#D3F2EA]',
     iconColor: 'text-teal-600',
