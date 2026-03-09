@@ -164,29 +164,6 @@ const AppPresence = () => {
                 </div>
               </div>
               
-              {/* Week presence grid in a clean white card */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-sm mx-2">
-                <WeeklyPresenceGrid 
-                  lastActiveDate={lastActiveDate} 
-                  showedUpToday={showedUpToday}
-                  variant="light" 
-                />
-              </div>
-            </div>
-          </div>
-          
-          {/* Encouragement Card - overlapping hero */}
-          <div className="px-4 -mt-4 relative z-20">
-            <div className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl p-4 shadow-lg flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                <Heart className="w-5 h-5 text-white" fill="rgba(255,255,255,0.8)" />
-              </div>
-              <p className="text-white font-medium text-sm">
-                {stats?.returnCount && stats.returnCount > 0 
-                  ? "You came back, and that takes real strength! 💪"
-                  : "You showed up, and that's what matters most! ✨"
-                }
-              </p>
             </div>
           </div>
           
