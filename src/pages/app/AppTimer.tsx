@@ -794,7 +794,7 @@ export default function AppTimer() {
                 <div className="w-6 h-0.5 rounded-full bg-white/20" />
               </div>
               <p className="text-white/30 text-sm mt-3">
-                {activeTab === 'pomodoro' ? `Round ${pomodoroRound + 1} of ${POMODORO_ROUNDS}` : (customTheme || selectedTheme)}
+                {activeTab === 'pomodoro' ? `Round ${pomodoroRound + 1} of ${pomodoroCycles}` : (customTheme || selectedTheme)}
               </p>
             </>
           )}
