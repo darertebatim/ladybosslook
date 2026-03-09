@@ -31,7 +31,16 @@ const AppPresence = () => {
   const { data: stats, isLoading } = usePresenceStats();
   const { data: presence } = useUserPresence();
   const { data: streak } = useUserStreak();
-  const { data: challenges } = useUserChallenges();
+  const { user } = useAuth();
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('profiles').select('*').eq('id', user?.id).single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
   const setStreakGoal = useSetStreakGoal();
   const recoverStreak = useRecoverStreak();
   const [showGoalSelection, setShowGoalSelection] = useState(false);
