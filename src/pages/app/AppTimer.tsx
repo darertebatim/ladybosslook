@@ -764,16 +764,16 @@ export default function AppTimer() {
 
                 <div className="space-y-5 mb-8">
                   <p className="text-base text-foreground">
-                    🍅 Pomodoro Technique is a simple tool to boost focus and productivity.
+                    <img src={tomato3d} alt="" className="w-5 h-5 inline mr-1" /> Pomodoro Technique is a simple tool to boost focus and productivity.
                   </p>
                   <p className="text-base text-foreground">
-                    🍅 Work for 25 minutes, take a 5-minute break, and repeat.
+                    <img src={tomato3d} alt="" className="w-5 h-5 inline mr-1" /> Work for 25 minutes, take a 5-minute break, and repeat.
                   </p>
                   <p className="text-base text-foreground">
-                    🍅 It's perfect for staying on track and avoiding burnout.
+                    <img src={tomato3d} alt="" className="w-5 h-5 inline mr-1" /> It's perfect for staying on track and avoiding burnout.
                   </p>
                   <p className="text-base text-foreground">
-                    🍅 Balancing work and rest is essential for long-term productivity.
+                    <img src={tomato3d} alt="" className="w-5 h-5 inline mr-1" /> Balancing work and rest is essential for long-term productivity.
                   </p>
                 </div>
 
