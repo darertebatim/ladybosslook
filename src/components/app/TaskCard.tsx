@@ -216,7 +216,7 @@ export const TaskCard = memo(function TaskCard({
     if (isTimerGoal) {
       const progressMins = Math.floor(goalProgress / 60);
       const goalMins = Math.floor((task.goal_target || 0) / 60);
-      return `Goal: ${progressMins}/${goalMins} min`;
+      return `${progressMins}/${goalMins} min`;
     }
     
     const unit = task.goal_unit || 'times';
