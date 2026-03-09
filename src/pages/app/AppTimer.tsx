@@ -600,18 +600,18 @@ export default function AppTimer() {
         <div className="flex items-center justify-center flex-col">
           {isFullscreen ? (
             // Fullscreen: digits rotated 90° so phone is held landscape-style
-            <div className="rotate-90 flex items-center" style={{ transformOrigin: 'center center' }}>
+            <div className="rotate-90 flex items-center" style={{ transformOrigin: 'center center', fontVariantNumeric: 'tabular-nums' }}>
               {[mm[0], mm[1]].map((d, i) => (
-                <span key={`m${i}`} className={cn("font-black", digitColors[i])}
-                  style={{ fontSize: 'min(40vh, 300px)', lineHeight: 0.85 }}>{d}</span>
+                <span key={`m${i}`} className={cn("font-black inline-block text-center", digitColors[i])}
+                  style={{ fontSize: 'min(40vh, 300px)', lineHeight: 0.85, width: '0.65em' }}>{d}</span>
               ))}
               <div className="flex flex-col gap-3 mx-2">
                 <div className="w-5 h-5 rounded-full bg-white/30" />
                 <div className="w-5 h-5 rounded-full bg-white/30" />
               </div>
               {[ss[0], ss[1]].map((d, i) => (
-                <span key={`s${i}`} className={cn("font-black", digitColors[i + 2])}
-                  style={{ fontSize: 'min(40vh, 300px)', lineHeight: 0.85 }}>{d}</span>
+                <span key={`s${i}`} className={cn("font-black inline-block text-center", digitColors[i + 2])}
+                  style={{ fontSize: 'min(40vh, 300px)', lineHeight: 0.85, width: '0.65em' }}>{d}</span>
               ))}
             </div>
           ) : (
