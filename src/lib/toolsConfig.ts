@@ -13,7 +13,7 @@ export interface ToolConfig {
 export const wellnessTools: ToolConfig[] = [
   {
     id: 'routines',
-    name: 'Routine Bank',
+    name: 'Routines',
     icon: 'CalendarPlus',
     bgColor: 'bg-[#D1FAE5]',
     iconColor: 'text-emerald-600',
