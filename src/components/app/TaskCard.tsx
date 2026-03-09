@@ -135,27 +135,32 @@ export const TaskCard = memo(function TaskCard({
       return;
     }
     
-    haptic.light();
-    
     // Water tasks: navigate to the dedicated water tracking page
     if (isWater) {
+      haptic.light();
       navigate('/app/water', { state: { from: 'planner' } });
       return;
     }
     
     // Small count goals: directly increment by 1 with animation
     if (isSmallCountGoal && onOpenGoalInput) {
+      // Medium haptic for satisfying feedback
+      haptic.medium();
+      
       // Trigger floating +1 animation
       setShowFloatingPlus(true);
       setFloatingPlusKey(prev => prev + 1);
       setTimeout(() => setShowFloatingPlus(false), 600);
       
-      // Directly confirm with amount = 1
-      // We pass the task to onOpenGoalInput which will be handled differently for small goals
+      // Trigger full card animations (emoji bounce + ripple wave)
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 1000);
+      
       onOpenGoalInput(task);
       return;
     }
     
+    haptic.light();
     if (onOpenGoalInput) {
       onOpenGoalInput(task);
     }
