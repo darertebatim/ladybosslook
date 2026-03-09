@@ -415,7 +415,7 @@ export default function AppTimer() {
           {activeTab === 'pomodoro' && (
             <div className="absolute top-[calc(50%-180px)] flex gap-2">
               {Array.from({ length: pomodoroCycles }, (_, i) => (
-                <span key={i} className="text-2xl">🍅</span>
+                <img src={tomato3d} alt="🍅" className="w-7 h-7" />
               ))}
             </div>
           )}
