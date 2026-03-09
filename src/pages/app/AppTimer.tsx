@@ -517,11 +517,6 @@ export default function AppTimer() {
             </>
           )}
         </AnimatePresence>
-                </button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* Hearts decoration */}
         {!isFullscreen && (
