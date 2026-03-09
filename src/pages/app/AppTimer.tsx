@@ -438,7 +438,7 @@ export default function AppTimer() {
                 className={cn(
                   'px-4 py-2 rounded-full text-sm font-medium transition-transform active:scale-95',
                   theme.color,
-                  selectedTheme === theme.label && !customTheme && 'ring-2 ring-purple-400 ring-offset-2'
+                  selectedTheme === theme.label && !customTheme && 'ring-2 ring-foreground ring-offset-2'
                 )}
               >
                 {theme.label}
