@@ -216,11 +216,11 @@ export const TaskCard = memo(function TaskCard({
     if (isTimerGoal) {
       const progressMins = Math.floor(goalProgress / 60);
       const goalMins = Math.floor((task.goal_target || 0) / 60);
-      return `Goal: ${progressMins}/${goalMins} min`;
+      return `${progressMins}/${goalMins} min`;
     }
     
     const unit = task.goal_unit || 'times';
-    return { prefix: 'Goal: ', progress: goalProgress, suffix: `/${task.goal_target} ${unit}` };
+    return { prefix: '', progress: goalProgress, suffix: `/${task.goal_target} ${unit}` };
   };
 
   // Format goal display for Pro Tasks too
@@ -473,15 +473,14 @@ export const TaskCard = memo(function TaskCard({
                 {completedCount}/{totalSubtasks}
               </span>
             )}
-            {hasGoal ? (
-              <span className="text-[13px] text-black/80 font-medium">{(() => {
+            <span className="text-[13px] text-black/80">{formatTime(task)}</span>
+            {hasGoal && (
+              <span className="text-[13px] text-black/80 font-medium">• {(() => {
                 const label = formatGoalLabel();
                 if (typeof label === 'string') return label;
                 if (label) return <>{label.prefix}<AnimatedProgress value={label.progress} />{label.suffix}</>;
                 return null;
               })()}</span>
-            ) : (
-              <span className="text-[13px] text-black/80">{formatTime(task)}</span>
             )}
           </div>
           
