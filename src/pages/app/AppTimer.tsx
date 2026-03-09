@@ -255,15 +255,15 @@ export default function AppTimer() {
               <ellipse
                 cx="140" cy="140" rx="125" ry="125"
                 fill="none"
-                stroke="hsl(var(--primary) / 0.15)"
+                stroke="hsl(var(--foreground) / 0.1)"
                 strokeWidth="3"
                 strokeDasharray="8 6"
                 className="opacity-80"
               />
               <ellipse
                 cx="140" cy="140" rx="115" ry="115"
-                fill="hsl(var(--primary) / 0.06)"
-                stroke="hsl(var(--primary) / 0.25)"
+                fill="hsl(var(--foreground) / 0.04)"
+                stroke="hsl(var(--foreground) / 0.12)"
                 strokeWidth="2"
               />
             </svg>
