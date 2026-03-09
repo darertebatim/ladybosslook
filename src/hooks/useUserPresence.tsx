@@ -162,9 +162,13 @@ export async function updatePresence(userId: string, completedDateStr: string): 
 }
 
 /**
- * Track app returns - increments return_count every time the app opens or resumes.
- * Encourages healthy habit of coming back to Simora instead of scrolling social media.
+ * Track app returns - increments return_count when user opens/resumes the app.
+ * Debounced: only counts once per 5-minute window to avoid inflated counts
+ * from page reloads, HMR, or rapid background/foreground switches.
  */
+const RETURN_DEBOUNCE_MS = 5 * 60 * 1000; // 5 minutes
+const LAST_RETURN_KEY = 'lb_last_return_ts';
+
 export const useTrackAppReturn = (userId: string | undefined) => {
   const queryClient = useQueryClient();
   const hasTrackedMount = useRef(false);
@@ -172,7 +176,18 @@ export const useTrackAppReturn = (userId: string | undefined) => {
   useEffect(() => {
     if (!userId) return;
 
+    const shouldTrack = () => {
+      const lastReturn = localStorage.getItem(LAST_RETURN_KEY);
+      if (!lastReturn) return true;
+      const elapsed = Date.now() - parseInt(lastReturn, 10);
+      return elapsed >= RETURN_DEBOUNCE_MS;
+    };
+
     const incrementReturn = async () => {
+      if (!shouldTrack()) return;
+      
+      localStorage.setItem(LAST_RETURN_KEY, Date.now().toString());
+
       try {
         // Log individual return event for weekly tracking
         await supabase
