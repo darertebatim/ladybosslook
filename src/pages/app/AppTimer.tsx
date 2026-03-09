@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, ArrowLeft, ChevronRight, ChevronLeft, Settings, CalendarPlus, Check, AlertCircle, Music, Maximize, Bell, Coffee, Timer as TimerIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import tomato3d from '@/assets/tomato-3d.png';
 import { haptic } from '@/lib/haptics';
 import { Switch } from '@/components/ui/switch';
 import { timerThemes } from '@/lib/timerThemes';
