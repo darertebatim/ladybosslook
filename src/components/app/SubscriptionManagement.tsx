@@ -99,24 +99,24 @@ export function SubscriptionCard() {
       >
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <p className="font-bold text-white text-base drop-shadow-sm">{planLabel}</p>
-            <p className="text-white/80 text-xs mt-0.5">Enjoy all premium features & contents</p>
+            <p className="font-bold text-foreground text-base">{planLabel}</p>
+            <p className="text-foreground/70 text-xs mt-0.5">Enjoy all premium features & contents</p>
           </div>
           <div className="h-14 w-14 rounded-full bg-yellow-300/40 flex items-center justify-center">
-            <Crown className="h-7 w-7 text-white drop-shadow" />
+            <Crown className="h-7 w-7 text-foreground" />
           </div>
         </div>
         {/* Progress bar decoration */}
-        <div className="mt-3 h-1.5 bg-white/30 rounded-full overflow-hidden">
-          <div className="h-full bg-white/70 rounded-full" style={{ width: '15%' }} />
+        <div className="mt-3 h-1.5 bg-foreground/20 rounded-full overflow-hidden">
+          <div className="h-full bg-foreground/50 rounded-full" style={{ width: '15%' }} />
         </div>
         <div className="flex items-center justify-between mt-2">
-          <p className="text-white/90 text-xs">
+          <p className="text-foreground/70 text-xs">
             {expiresAt ? `Expiration: ${format(new Date(expiresAt), 'yyyy-MM-dd')}` : 'Active Subscription'}
           </p>
           <div className="flex items-center gap-1">
-            <span className="text-white text-xs font-semibold">Manage</span>
-            <ChevronRight className="h-3.5 w-3.5 text-white" />
+            <span className="text-foreground text-xs font-semibold">Manage</span>
+            <ChevronRight className="h-3.5 w-3.5 text-foreground" />
           </div>
         </div>
       </button>
