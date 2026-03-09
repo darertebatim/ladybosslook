@@ -220,7 +220,7 @@ export const TaskCard = memo(function TaskCard({
     }
     
     const unit = task.goal_unit || 'times';
-    return { prefix: 'Goal: ', progress: goalProgress, suffix: `/${task.goal_target} ${unit}` };
+    return { prefix: '', progress: goalProgress, suffix: `/${task.goal_target} ${unit}` };
   };
 
   // Format goal display for Pro Tasks too
