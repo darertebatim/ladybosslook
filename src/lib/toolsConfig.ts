@@ -112,7 +112,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'programs',
-    name: 'My Programs',
+    name: 'Programs',
     icon: 'GraduationCap',
     bgColor: 'bg-[#FEF3C7]',
     iconColor: 'text-amber-600',
@@ -121,7 +121,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'profile',
-    name: 'My Profile',
+    name: 'Profile',
     icon: 'User',
     bgColor: 'bg-[#F1F5F9]',
     iconColor: 'text-slate-600',
@@ -133,7 +133,7 @@ export const wellnessTools: ToolConfig[] = [
 export const audioTools: ToolConfig[] = [
   {
     id: 'meditate',
-    name: 'Guided Meditation',
+    name: 'Meditate',
     icon: 'Brain',
     bgColor: 'bg-[#E8E4F8]',
     iconColor: 'text-indigo-600',
@@ -151,7 +151,7 @@ export const audioTools: ToolConfig[] = [
   },
   {
     id: 'soundscape',
-    name: 'Sound Scapes',
+    name: 'Soundscape',
     icon: 'Waves',
     bgColor: 'bg-[#D4F1F4]',
     iconColor: 'text-cyan-600',
