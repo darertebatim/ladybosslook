@@ -360,7 +360,15 @@ export default function AppTimer() {
             </button>
           </div>
           <button onClick={() => { setScreen('stats'); haptic.light(); }} className="p-2 -mr-2">
-            <BarChart2 className="h-5 w-5 text-foreground" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="M3 7h18" />
+              <path d="M8 3v4" />
+              <path d="M16 3v4" />
+              <rect x="7" y="11" width="3" height="8" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="11.5" y="13" width="3" height="6" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="16" y="15" width="3" height="4" rx="0.5" fill="currentColor" stroke="none" />
+            </svg>
           </button>
         </div>
 
