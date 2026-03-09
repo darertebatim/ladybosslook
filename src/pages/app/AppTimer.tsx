@@ -141,6 +141,8 @@ export default function AppTimer() {
     confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1, y: 0.7 }, colors: ['#a78bfa', '#c084fc', '#e879f9'] });
   };
 
+  const nextRoundRef = useRef(0);
+
   const startPomodoroRound = (round: number) => {
     const total = minutes * 60;
     setPomodoroRound(round);
@@ -150,27 +152,27 @@ export default function AppTimer() {
     setScreen('running');
     runCountdown(total, () => {
       haptic.success();
-      // Round complete
       const nextRound = round + 1;
+      nextRoundRef.current = nextRound;
       if (nextRound >= POMODORO_ROUNDS) {
-        // All rounds done
         setScreen('completed');
         fireConfetti();
       } else {
-        // Start break
-        startPomodoroBreak(nextRound);
+        // Show "You've been focusing" screen
+        setScreen('pomodoroRoundDone');
       }
     });
   };
 
-  const startPomodoroBreak = (nextRound: number) => {
+  const startPomodoroBreak = () => {
     setIsBreak(true);
     setSecondsLeft(BREAK_SECONDS);
     setTotalSeconds(BREAK_SECONDS);
     setScreen('pomodoroBreak');
     runCountdown(BREAK_SECONDS, () => {
       haptic.medium();
-      startPomodoroRound(nextRound);
+      // Show "Break's over" screen
+      setScreen('pomodoroBreakDone');
     });
   };
 
