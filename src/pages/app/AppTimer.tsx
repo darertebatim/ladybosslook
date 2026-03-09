@@ -661,8 +661,8 @@ export default function AppTimer() {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="min-h-screen flex flex-col items-center justify-center px-6"
-        style={{ background: 'linear-gradient(180deg, hsl(270 80% 96%) 0%, hsl(280 60% 94%) 100%)' }}
+        className="min-h-screen flex flex-col items-center justify-center px-6 bg-background"
+      >
       >
         <div className="w-16 h-16 rounded-full bg-foreground flex items-center justify-center mb-6">
           <Check className="h-8 w-8 text-background" />
