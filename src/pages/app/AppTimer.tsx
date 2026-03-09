@@ -1131,7 +1131,7 @@ export default function AppTimer() {
         </div>
 
         {/* Hold to stop */}
-        <div className="absolute bottom-16 left-0 right-0 px-10 flex flex-col items-center gap-3">
+        <div className="absolute left-0 right-0 px-10 flex flex-col items-center gap-3" style={{ bottom: 'max(64px, calc(env(safe-area-inset-bottom) + 32px))' }}>
           <p className="text-white/40 text-sm">Hold to stop timer</p>
           <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
             <motion.div
