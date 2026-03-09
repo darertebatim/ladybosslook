@@ -144,7 +144,7 @@ export const FocusStatsScreen = ({ onBack }: FocusStatsScreenProps) => {
             <div className="flex-1 border-r border-border/50 pr-4">
               <p className="text-sm font-medium text-muted-foreground mb-2">Pomodoro Counts</p>
               <div className="flex items-center gap-2">
-                <span className="text-2xl">🍅</span>
+                <img src={tomato3d} alt="🍅" className="w-7 h-7" />
                 <span className="text-3xl font-bold text-foreground">{stats.pomodoroCount}</span>
               </div>
             </div>
