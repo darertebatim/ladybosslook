@@ -548,16 +548,16 @@ export default function AppTimer() {
           ) : (
             // Normal: horizontal time display
             <>
-              <div className="flex items-center">
+              <div className="flex items-center" style={{ fontVariantNumeric: 'tabular-nums' }}>
                 {[mm[0], mm[1]].map((d, i) => (
-                  <span key={`m${i}`} className={cn("text-8xl font-black", digitColors[i])}>{d}</span>
+                  <span key={`m${i}`} className={cn("text-8xl font-black inline-block w-[1.15ch] text-center", digitColors[i])}>{d}</span>
                 ))}
                 <div className="flex flex-col gap-2 mx-1">
                   <div className="w-3 h-3 rounded-full bg-white/30" />
                   <div className="w-3 h-3 rounded-full bg-white/30" />
                 </div>
                 {[ss[0], ss[1]].map((d, i) => (
-                  <span key={`s${i}`} className={cn("text-8xl font-black", digitColors[i + 2])}>{d}</span>
+                  <span key={`s${i}`} className={cn("text-8xl font-black inline-block w-[1.15ch] text-center", digitColors[i + 2])}>{d}</span>
                 ))}
               </div>
               {/* Decorative lines */}
