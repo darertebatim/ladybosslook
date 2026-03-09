@@ -21,6 +21,15 @@ export const wellnessTools: ToolConfig[] = [
     description: 'Daily routines',
   },
   {
+    id: 'focus-timer',
+    name: 'Focus Timer',
+    icon: 'Clock',
+    bgColor: 'bg-[#E8E4F8]',
+    iconColor: 'text-purple-600',
+    route: '/app/timer',
+    description: 'Stay focused',
+  },
+  {
     id: 'reflections',
     name: 'Guided Reflections',
     icon: 'Brain',
@@ -91,15 +100,6 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-pink-600',
     route: '/app/period',
     description: 'Cycle tracking',
-  },
-  {
-    id: 'focus-timer',
-    name: 'Focus Timer',
-    icon: 'Clock',
-    bgColor: 'bg-[#E8E4F8]',
-    iconColor: 'text-purple-600',
-    route: '/app/timer',
-    description: 'Stay focused',
   },
   {
     id: 'fasting',
