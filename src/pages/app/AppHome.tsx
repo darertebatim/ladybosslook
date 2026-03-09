@@ -490,8 +490,29 @@ const AppHome = () => {
   }, []);
 
   const handleOpenGoalInput = useCallback((task: UserTask) => {
+    // Small count goals (< 10): directly increment by 1 without opening keyboard
+    const isSmallCountGoal = task.goal_enabled && task.goal_type === 'count' && (task.goal_target || 0) < 10 && !isWaterTask(task);
+    if (isSmallCountGoal) {
+      addGoalProgress.mutate(
+        { taskId: task.id, date: selectedDate, amount: 1 },
+        {
+          onSuccess: (result) => {
+            haptic.success();
+            const unit = task.goal_unit || 'times';
+            toast(`+1 ${unit}`, {
+              description: `Progress: ${result.newProgress}/${task.goal_target}`,
+              duration: 2000,
+            });
+            if (result.streakIncreased) {
+              setShowStreakModal(true);
+            }
+          },
+        }
+      );
+      return;
+    }
     setGoalInputTask(task);
-  }, []);
+  }, [selectedDate, addGoalProgress]);
 
   const handleOpenTimer = useCallback((task: UserTask) => {
     setTimerTask(task);
