@@ -482,7 +482,6 @@ export const TaskCard = memo(function TaskCard({
                 return null;
               })()}</span>
             )}
-            )}
           </div>
           
           {/* Title - for goal tasks, only strike when goal reached; for regular tasks, when completed */}
