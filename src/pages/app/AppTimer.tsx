@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, ArrowLeft, ChevronRight, Settings, CalendarPlus, Check, AlertCircle, Music, Maximize, BarChart2, Bell, Coffee, Timer as TimerIcon } from 'lucide-react';
+import { X, ArrowLeft, ChevronRight, ChevronLeft, Settings, CalendarPlus, Check, AlertCircle, Music, Maximize, Bell, Coffee, Timer as TimerIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { Switch } from '@/components/ui/switch';
@@ -13,6 +13,7 @@ import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { toast } from 'sonner';
+import { FocusStatsScreen } from '@/components/app/FocusStatsScreen';
 
 type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped' | 'pomodoroRoundDone' | 'pomodoroBreak' | 'pomodoroBreakDone' | 'settings' | 'stats';
 
@@ -360,7 +361,15 @@ export default function AppTimer() {
             </button>
           </div>
           <button onClick={() => { setScreen('stats'); haptic.light(); }} className="p-2 -mr-2">
-            <BarChart2 className="h-5 w-5 text-foreground" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="M3 7h18" />
+              <path d="M8 3v4" />
+              <path d="M16 3v4" />
+              <rect x="7" y="11" width="3" height="8" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="11.5" y="13" width="3" height="6" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="16" y="15" width="3" height="4" rx="0.5" fill="currentColor" stroke="none" />
+            </svg>
           </button>
         </div>
 
@@ -746,22 +755,9 @@ export default function AppTimer() {
     );
   }
 
-  // ─── STATS SCREEN (placeholder) ───
+  // ─── STATS SCREEN ───
   if (screen === 'stats') {
-    return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <div className="flex items-center px-4 pt-4 pb-2">
-          <button onClick={() => { setScreen('setup'); haptic.light(); }} className="p-2 -ml-2">
-            <ArrowLeft className="h-5 w-5 text-foreground" />
-          </button>
-        </div>
-        <div className="flex-1 flex flex-col items-center justify-center px-6">
-          <BarChart2 className="h-12 w-12 text-muted-foreground/30 mb-4" />
-          <h2 className="text-xl font-semibold text-foreground mb-2">Stats</h2>
-          <p className="text-sm text-muted-foreground text-center">Coming soon</p>
-        </div>
-      </div>
-    );
+    return <FocusStatsScreen onBack={() => { setScreen('setup'); haptic.light(); }} />;
   }
 
   if (screen === 'adjustTime') {
