@@ -110,3 +110,12 @@ export function PresenceProfileCard() {
     </button>
   );
 }
+
+function InfoPill({ icon: Icon, text }: { icon: typeof MapPin; text: string }) {
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-50 text-[11px] text-orange-700/60 font-medium">
+      <Icon className="w-3 h-3 shrink-0" />
+      {text}
+    </span>
+  );
+}
