@@ -867,7 +867,7 @@ export default function AppTimer() {
         </div>
 
         {/* Done button with lavender gradient */}
-        <div className="px-6 pb-8 pt-4 relative">
+        <div className="px-6 pt-4 relative" style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}>
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-muted/50 to-transparent pointer-events-none" />
           <button
             onClick={() => { setScreen('setup'); haptic.medium(); }}
