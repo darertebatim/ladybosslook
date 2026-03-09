@@ -229,10 +229,18 @@ export default function AppTimer() {
       const nextRound = round + 1;
       nextRoundRef.current = nextRound;
       if (nextRound >= pomodoroCycles) {
+        // Save complete pomodoro session
+        saveFocusSession.mutate({
+          durationSeconds: minutes * 60 * pomodoroCycles,
+          sessionType: 'pomodoro',
+          theme: customTheme || selectedTheme,
+          pomodoroRounds: pomodoroCycles,
+          completed: true,
+          startedAt: sessionStartRef.current,
+        });
         setScreen('completed');
         fireConfetti();
       } else {
-        // Show "You've been focusing" screen
         setScreen('pomodoroRoundDone');
       }
     });
