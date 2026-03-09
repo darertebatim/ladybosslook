@@ -493,19 +493,19 @@ export default function AppTimer() {
         {/* Countdown */}
         <div className="flex items-center justify-center flex-col">
           {isFullscreen ? (
-            // Fullscreen: massive overlapping digits filling entire screen height
-            <div className="flex flex-col items-center leading-none" style={{ gap: '-2vw' }}>
+            // Fullscreen: digits rotated 90° so phone is held landscape-style
+            <div className="rotate-90 flex items-center" style={{ transformOrigin: 'center center' }}>
               {[mm[0], mm[1]].map((d, i) => (
                 <span key={`m${i}`} className={cn("font-black", digitColors[i])}
-                  style={{ fontSize: 'min(55vw, 280px)', lineHeight: 0.78, marginTop: i > 0 ? '-3vw' : 0 }}>{d}</span>
+                  style={{ fontSize: 'min(40vh, 300px)', lineHeight: 0.85 }}>{d}</span>
               ))}
-              <div className="flex gap-4 my-0">
-                <div className="w-6 h-6 rounded-full bg-white/30" />
-                <div className="w-6 h-6 rounded-full bg-white/30" />
+              <div className="flex flex-col gap-3 mx-2">
+                <div className="w-5 h-5 rounded-full bg-white/30" />
+                <div className="w-5 h-5 rounded-full bg-white/30" />
               </div>
               {[ss[0], ss[1]].map((d, i) => (
                 <span key={`s${i}`} className={cn("font-black", digitColors[i + 2])}
-                  style={{ fontSize: 'min(55vw, 280px)', lineHeight: 0.78, marginTop: i > 0 ? '-3vw' : 0 }}>{d}</span>
+                  style={{ fontSize: 'min(40vh, 300px)', lineHeight: 0.85 }}>{d}</span>
               ))}
             </div>
           ) : (
