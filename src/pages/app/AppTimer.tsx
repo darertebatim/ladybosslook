@@ -30,34 +30,38 @@ export default function AppTimer() {
   const holdTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const holdStartRef = useRef<number>(0);
 
-  // Fetch soundscape playlists with their first audio track
+  // Fetch individual audio tracks from soundscape playlists
   const { data: soundscapeTracks = [] } = useQuery({
-    queryKey: ['timer-soundscapes'],
+    queryKey: ['timer-soundscape-tracks'],
     queryFn: async () => {
+      // Get soundscape playlists
       const { data: playlists, error } = await supabase
         .from('audio_playlists')
-        .select('id, name, cover_image_url')
+        .select('id, name')
         .eq('category', 'soundscape')
         .eq('is_hidden', false)
         .order('sort_order', { ascending: true });
-      if (error || !playlists) return [];
+      if (error || !playlists?.length) return [];
 
-      const tracks = await Promise.all(playlists.map(async (pl) => {
-        const { data: items } = await supabase
-          .from('audio_playlist_items')
-          .select('audio_id, audio_content:audio_id(file_url, title)')
-          .eq('playlist_id', pl.id)
-          .order('sort_order', { ascending: true })
-          .limit(1);
-        const firstItem = items?.[0] as any;
-        return {
-          id: pl.id,
-          name: pl.name,
-          cover: pl.cover_image_url,
-          url: firstItem?.audio_content?.file_url || null,
-        };
-      }));
-      return tracks.filter(t => t.url);
+      const playlistIds = playlists.map(p => p.id);
+
+      // Get all tracks from these playlists
+      const { data: items } = await supabase
+        .from('audio_playlist_items')
+        .select('audio_id, playlist_id, sort_order, audio_content:audio_id(id, title, file_url, cover_image_url)')
+        .in('playlist_id', playlistIds)
+        .order('sort_order', { ascending: true });
+
+      if (!items) return [];
+
+      return (items as any[])
+        .filter(item => item.audio_content?.file_url)
+        .map(item => ({
+          id: item.audio_content.id,
+          name: item.audio_content.title,
+          cover: item.audio_content.cover_image_url,
+          url: item.audio_content.file_url,
+        }));
     },
   });
 
