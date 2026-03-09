@@ -166,17 +166,16 @@ const AppPresence = () => {
                 </div>
               </div>
               
+              {/* Subscription & Profile cards pulled into hero area */}
+              <div className="px-4 space-y-3 -mb-10">
+                <SubscriptionCard />
+                <PresenceProfileCard />
+              </div>
             </div>
           </div>
           
           {/* Content */}
-          <div className="px-4 py-6 space-y-6">
-            
-            {/* Subscription Card */}
-            <SubscriptionCard />
-            
-            {/* Profile Card */}
-            <PresenceProfileCard />
+          <div className="px-4 py-6 space-y-6 mt-6">
             
             {/* Streak Challenge Card - show if user has a goal set OR if streak was broken (recovery available) */}
             {(hasStreakChallenge || streakRecoveryAvailable) && streak && (
