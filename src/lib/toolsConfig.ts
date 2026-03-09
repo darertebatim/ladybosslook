@@ -67,7 +67,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'videos',
-    name: 'Video Player',
+    name: 'Videos',
     icon: 'Dumbbell',
     bgColor: 'bg-[#FCE4EC]',
     iconColor: 'text-rose-600',
