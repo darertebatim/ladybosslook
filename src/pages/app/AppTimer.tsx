@@ -407,11 +407,14 @@ export default function AppTimer() {
             onMouseDown={(e) => e.stopPropagation()}
             className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm"
           >
-            {!selectedSoundId ? (
+            <div className="relative">
               <Music className="h-5 w-5 text-white/60" />
-            ) : (
-              <Music2 className="h-5 w-5 text-white/60" />
-            )}
+              {!selectedSoundId && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-[1.5px] h-7 bg-white/60 rotate-45 rounded-full" />
+                </div>
+              )}
+            </div>
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); haptic.light(); setIsFullscreen(!isFullscreen); }}
