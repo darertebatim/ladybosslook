@@ -755,36 +755,32 @@ const AppHome = () => {
                     className={cn("flex justify-center", isWeekStart && "snap-start")}
                     style={{ minWidth: 'calc(100% / 7)' }}
                   >
-                        {/* Pill wraps around both day name and number for selected */}
-                        <div className={cn('flex flex-col items-center px-1 py-0 rounded-full transition-all', isSelected && 'bg-chip-lavender')}>
-                          {/* Day name - selected is black, others are grey */}
-                          <span className={cn('text-[11px] font-medium leading-none', isSelected ? 'text-foreground' : 'text-[#C6C1CF]')}>
+                        <div className={cn(
+                          'w-11 h-14 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all relative',
+                          isSelected 
+                            ? 'bg-chip-lavender text-foreground scale-105 shadow-sm' 
+                            : isTodayDate 
+                              ? 'border border-primary/30 text-muted-foreground' 
+                              : 'text-muted-foreground/60',
+                          hasBadge && isSelected && 'ring-2 ring-primary/30 ring-offset-1'
+                        )}>
+                          {hasProgramEvents && (
+                            <Star className={cn("absolute -top-1 -right-1 h-2.5 w-2.5 z-20", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />
+                          )}
+                          <span className={cn('text-[10px] font-medium leading-none', isSelected && 'text-foreground')}>
                             {format(day, 'EEE')}
                           </span>
-                          
-                          {/* Badge or Number */}
-                          <div className={cn(
-                            'w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all relative -mt-1',
-                            !hasBadge && (isSelected 
-                              ? 'bg-white text-foreground dark:bg-white dark:text-foreground'
-                              : isTodayDate 
-                                ? 'bg-violet-200/70 text-[#C6C1CF] dark:bg-violet-800/50 dark:text-violet-300' 
-                                : 'text-[#C6C1CF]'),
-                            hasBadge && isSelected && "ring-2 ring-white ring-offset-1 ring-offset-chip-lavender"
-                          )}>
-                            {hasProgramEvents && (
-                              <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5 z-20", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />
-                            )}
-                            {hasBadge ? (
-                              <img 
-                                src={BADGE_IMAGES[badgeLevel]} 
-                                alt={`${badgeLevel} badge`}
-                                className="w-[140%] h-[140%] object-cover overflow-hidden rounded-full"
-                              />
-                            ) : (
-                              <span className="relative z-10">{format(day, 'd')}</span>
-                            )}
-                          </div>
+                          {hasBadge ? (
+                            <img 
+                              src={BADGE_IMAGES[badgeLevel]} 
+                              alt={`${badgeLevel} badge`}
+                              className="w-7 h-7 object-cover rounded-full"
+                            />
+                          ) : (
+                            <span className={cn('text-sm font-bold leading-none', isSelected && 'text-foreground')}>
+                              {format(day, 'd')}
+                            </span>
+                          )}
                         </div>
                       </button>;
                 })}
