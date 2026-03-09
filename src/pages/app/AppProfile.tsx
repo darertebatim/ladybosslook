@@ -15,7 +15,8 @@ import {
   ChevronDown, Settings, Camera, Globe, Heart, Briefcase, Instagram, Send, MessageSquare
 } from 'lucide-react';
 import { JournalStats } from '@/components/app/JournalStats';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { BackButton } from '@/components/app/BackButton';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
