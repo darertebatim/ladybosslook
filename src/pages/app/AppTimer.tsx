@@ -14,6 +14,7 @@ import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { toast } from 'sonner';
 import { FocusStatsScreen } from '@/components/app/FocusStatsScreen';
+import { useSaveFocusSession } from '@/hooks/useFocusSessions';
 
 type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped' | 'pomodoroRoundDone' | 'pomodoroBreak' | 'pomodoroBreakDone' | 'settings' | 'stats';
 
