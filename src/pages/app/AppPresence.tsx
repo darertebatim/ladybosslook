@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { SEOHead } from '@/components/SEOHead';
 import { toast } from 'sonner';
 import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation';
+import { StreakCalendar, MoodCalendar, ActionCalendar } from '@/components/app/PresenceCalendar';
 
 const AppPresence = () => {
   const navigate = useNavigate();
