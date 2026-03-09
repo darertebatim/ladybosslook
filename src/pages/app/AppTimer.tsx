@@ -819,21 +819,31 @@ export default function AppTimer() {
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center px-6">
-          <h2 className="text-xl font-semibold text-foreground mb-16">Adjust the time</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-16">
+            {isPomodoro ? 'Adjust the Pomodoro time' : 'Adjust the time'}
+          </h2>
 
           {/* Triangle pointer */}
           <div className="mb-2">
             <svg width="20" height="12" viewBox="0 0 20 12">
-              <polygon points="10,0 20,12 0,12" fill="hsl(var(--foreground))" />
+              <polygon points="10,0 20,12 0,12" fill={isPomodoro ? 'hsl(0, 70%, 68%)' : 'hsl(var(--foreground))'} />
             </svg>
           </div>
 
           {/* Large minute display */}
           <div className="flex items-baseline gap-1 mb-8">
-            <span className="text-7xl font-bold text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
+            <span
+              className="text-7xl font-bold"
+              style={{ fontVariantNumeric: 'tabular-nums', color: isPomodoro ? 'hsl(0, 70%, 68%)' : 'hsl(var(--foreground))' }}
+            >
               {minutes}
             </span>
-            <span className="text-2xl font-semibold text-muted-foreground">min</span>
+            <span
+              className="text-2xl font-semibold"
+              style={{ color: isPomodoro ? 'hsl(0, 70%, 68%)' : 'hsl(var(--muted-foreground))' }}
+            >
+              min
+            </span>
           </div>
 
           {/* Scrollable ruler */}
@@ -843,7 +853,10 @@ export default function AppTimer() {
             <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
             
             {/* Center line indicator */}
-            <div className="absolute left-1/2 -translate-x-[1.5px] top-0 w-[3px] h-16 bg-foreground rounded-full z-10 pointer-events-none" />
+            <div
+              className="absolute left-1/2 -translate-x-[1.5px] top-0 w-[3px] h-16 rounded-full z-10 pointer-events-none"
+              style={{ backgroundColor: isPomodoro ? 'hsl(0, 70%, 68%)' : 'hsl(var(--foreground))' }}
+            />
 
             <div
               ref={rulerRef}
@@ -851,30 +864,62 @@ export default function AppTimer() {
               onScroll={handleRulerScroll}
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
             >
-              <div className="flex items-end" style={{ width: `${(MAX_MIN + 1) * TICK_WIDTH + 400}px`, paddingLeft: '50%', paddingRight: '50%' }}>
-                {Array.from({ length: MAX_MIN + 1 }, (_, i) => {
-                  const isMajor = i % 5 === 0;
-                  return (
-                    <div key={i} className="flex flex-col items-center" style={{ width: `${TICK_WIDTH}px`, flexShrink: 0 }}>
-                      <div
-                        className={cn(
-                          "rounded-full transition-colors",
-                          isMajor ? "w-[3px] h-10" : "w-[2px] h-6",
-                          i === minutes ? "bg-foreground" : "bg-muted-foreground/25"
-                        )}
-                      />
-                      {isMajor && (
-                        <span className={cn(
-                          "text-xs mt-2 font-medium transition-colors",
-                          i === minutes ? "text-foreground" : "text-muted-foreground/40"
-                        )}>
+              {isPomodoro ? (
+                /* Pomodoro: 5-min steps only */
+                <div className="flex items-end" style={{ width: `${(POMODORO_MAX + 1) * TICK_WIDTH + 400}px`, paddingLeft: '50%', paddingRight: '50%' }}>
+                  {Array.from({ length: POMODORO_MAX + 1 }, (_, i) => {
+                    const isMajor = i % 5 === 0;
+                    if (!isMajor && i % 1 === 0) {
+                      // Show minor ticks between 5-min marks
+                      return (
+                        <div key={i} className="flex flex-col items-center" style={{ width: `${TICK_WIDTH}px`, flexShrink: 0 }}>
+                          <div className="w-[2px] h-6 rounded-full bg-muted-foreground/25" />
+                        </div>
+                      );
+                    }
+                    return (
+                      <div key={i} className="flex flex-col items-center" style={{ width: `${TICK_WIDTH}px`, flexShrink: 0 }}>
+                        <div
+                          className="rounded-full transition-colors w-[3px] h-10"
+                          style={{ backgroundColor: i === minutes ? 'hsl(0, 70%, 68%)' : 'hsl(var(--muted-foreground) / 0.25)' }}
+                        />
+                        <span
+                          className="text-xs mt-2 font-medium transition-colors"
+                          style={{ color: i === minutes ? 'hsl(0, 70%, 68%)' : 'hsl(var(--muted-foreground) / 0.4)' }}
+                        >
                           {i}
                         </span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* Timer: 1-min steps */
+                <div className="flex items-end" style={{ width: `${(MAX_MIN + 1) * TICK_WIDTH + 400}px`, paddingLeft: '50%', paddingRight: '50%' }}>
+                  {Array.from({ length: MAX_MIN + 1 }, (_, i) => {
+                    const isMajor = i % 5 === 0;
+                    return (
+                      <div key={i} className="flex flex-col items-center" style={{ width: `${TICK_WIDTH}px`, flexShrink: 0 }}>
+                        <div
+                          className={cn(
+                            "rounded-full transition-colors",
+                            isMajor ? "w-[3px] h-10" : "w-[2px] h-6",
+                            i === minutes ? "bg-foreground" : "bg-muted-foreground/25"
+                          )}
+                        />
+                        {isMajor && (
+                          <span className={cn(
+                            "text-xs mt-2 font-medium transition-colors",
+                            i === minutes ? "text-foreground" : "text-muted-foreground/40"
+                          )}>
+                            {i}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>
