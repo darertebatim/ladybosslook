@@ -4,6 +4,7 @@ import { Check, Plus, Play, Droplets, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import SealCheck from './SealCheck';
+import { CircleProgressButton } from './CircleProgressButton';
 import { 
   UserTask, 
   TASK_COLOR_CLASSES,
