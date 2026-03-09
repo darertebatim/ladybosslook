@@ -515,7 +515,7 @@ export default function AppTimer() {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 pt-4 pb-2">
+        <div className="flex items-center justify-between px-4 pb-2" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}>
           <button onClick={() => { setScreen('setup'); haptic.light(); }} className="p-2 -ml-2">
             <ArrowLeft className="h-5 w-5 text-foreground" />
           </button>
