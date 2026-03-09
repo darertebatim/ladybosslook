@@ -194,17 +194,19 @@ export const TaskCard = memo(function TaskCard({
 
   const colorClass = TASK_COLOR_CLASSES[task.color] || TASK_COLOR_CLASSES.yellow;
   
-  // Animated goal progress number component
+  // Animated goal progress number component - only animates when this card is actively animating
   const AnimatedProgress = ({ value }: { value: number }) => (
-    <motion.span
-      key={value}
-      initial={{ scale: 1.5, color: '#14b8a6' }}
-      animate={{ scale: 1, color: 'inherit' }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="inline-block"
-    >
-      {value}
-    </motion.span>
+    isAnimating ? (
+      <motion.span
+        key={value}
+        initial={{ scale: 1.5, color: '#14b8a6' }}
+        animate={{ scale: 1, color: 'inherit' }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+        className="inline-block"
+      >
+        {value}
+      </motion.span>
+    ) : <span>{value}</span>
   );
 
   // Format goal display
