@@ -856,7 +856,7 @@ export default function AppTimer() {
       >
         {/* Tomato progress */}
         <div className="flex gap-2 mb-6">
-          {Array.from({ length: POMODORO_ROUNDS }, (_, i) => (
+          {Array.from({ length: pomodoroCycles }, (_, i) => (
             <span key={i} className={cn("text-2xl transition-opacity", i <= pomodoroRound ? "opacity-100" : "opacity-30")}>
               🍅
             </span>
