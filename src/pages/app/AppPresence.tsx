@@ -248,6 +248,22 @@ const AppPresence = () => {
               </div>
             </section>
             
+            {/* Action Stats */}
+            <section>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-orange-900/60">
+                  Action Stats
+                </h3>
+                <button
+                  onClick={() => navigate('/app/action-stats')}
+                  className="flex items-center gap-0.5 text-sm font-medium text-muted-foreground active:scale-95 transition-transform"
+                >
+                  View All <ChevronRightIcon className="h-4 w-4" />
+                </button>
+              </div>
+              <ActionCalendar />
+            </section>
+            
             {/* Streak Calendar */}
             <section>
               <h3 className="text-sm font-semibold text-orange-900/60 mb-3">
@@ -270,22 +286,6 @@ const AppPresence = () => {
                 </button>
               </div>
               <MoodCalendar />
-            </section>
-            
-            {/* Action Stats */}
-            <section>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-orange-900/60">
-                  Action Stats
-                </h3>
-                <button
-                  onClick={() => navigate('/app/action-stats')}
-                  className="flex items-center gap-0.5 text-sm font-medium text-muted-foreground active:scale-95 transition-transform"
-                >
-                  View All <ChevronRightIcon className="h-4 w-4" />
-                </button>
-              </div>
-              <ActionCalendar />
             </section>
             
             {/* Achievements */}
