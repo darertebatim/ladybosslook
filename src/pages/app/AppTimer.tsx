@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, ArrowLeft, ChevronRight, Settings, CalendarDays, Check, AlertCircle, VolumeX, Volume2, Maximize } from 'lucide-react';
+import { X, ArrowLeft, ChevronRight, Settings, CalendarDays, Check, AlertCircle, Music, Music2, Maximize } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { timerThemes } from '@/lib/timerThemes';
