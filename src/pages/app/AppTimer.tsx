@@ -731,6 +731,49 @@ export default function AppTimer() {
     );
   }
 
+  // ─── POMODORO BREAK SCREEN ───
+  if (screen === 'pomodoroBreak') {
+    const breakTimeStr = formatTime(secondsLeft);
+
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="min-h-screen bg-background flex flex-col items-center justify-center relative select-none"
+      >
+        {/* Tomato progress */}
+        <div className="flex gap-2 mb-6">
+          {Array.from({ length: POMODORO_ROUNDS }, (_, i) => (
+            <span key={i} className={cn("text-2xl transition-opacity", i < pomodoroRound ? "opacity-100" : "opacity-30")}>
+              🍅
+            </span>
+          ))}
+        </div>
+
+        <p className="text-muted-foreground text-sm mb-2">Break time</p>
+        <span className="text-6xl font-bold text-foreground mb-4" style={{ fontVariantNumeric: 'tabular-nums' }}>
+          {breakTimeStr}
+        </span>
+        <p className="text-muted-foreground text-sm">
+          Round {pomodoroRound + 1} starts soon
+        </p>
+
+        {/* Skip break */}
+        <button
+          onClick={() => {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+            intervalRef.current = null;
+            haptic.medium();
+            startPomodoroRound(pomodoroRound);
+          }}
+          className="mt-10 px-6 py-3 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
+        >
+          Skip break
+        </button>
+      </motion.div>
+    );
+  }
+
   // ─── COMPLETED SCREEN ───
   if (screen === 'completed') {
     return (
