@@ -27,6 +27,7 @@ import { ChevronRight as ChevronRightIcon } from 'lucide-react';
 
 const AppPresence = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { data: stats, isLoading } = usePresenceStats();
   const { data: presence } = useUserPresence();
   const { data: streak } = useUserStreak();
@@ -37,9 +38,20 @@ const AppPresence = () => {
   const [showGoalConfirmation, setShowGoalConfirmation] = useState(false);
   const [confirmedGoal, setConfirmedGoal] = useState(7);
   const [showRecoveryPrompt, setShowRecoveryPrompt] = useState(false);
-  
-  const lastActiveDate = presence?.lastActiveDate ? new Date(presence.lastActiveDate) : null;
-  const showedUpToday = presence?.showedUpToday || false;
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('profiles').select('full_name, avatar_url, bio').eq('id', user!.id).single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  const initials = profile?.full_name
+    ? profile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+    : '?';
   
   // Get achievement status
   const { unlocked, locked } = stats 
