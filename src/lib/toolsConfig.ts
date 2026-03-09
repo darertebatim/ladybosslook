@@ -112,7 +112,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'programs',
-    name: 'My Programs',
+    name: 'Programs',
     icon: 'GraduationCap',
     bgColor: 'bg-[#FEF3C7]',
     iconColor: 'text-amber-600',
