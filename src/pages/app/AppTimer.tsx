@@ -228,7 +228,7 @@ export default function AppTimer() {
               onClick={() => { setActiveTab('timer'); haptic.light(); }}
               className={cn(
                 'px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
-                activeTab === 'timer' ? 'bg-purple-200 text-purple-800' : 'text-muted-foreground'
+                activeTab === 'timer' ? 'bg-foreground text-background' : 'text-muted-foreground'
               )}
             >
               Timer
