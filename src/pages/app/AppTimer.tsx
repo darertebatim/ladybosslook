@@ -69,6 +69,10 @@ export default function AppTimer() {
   const rulerRef = useRef<HTMLDivElement>(null);
   const lastHapticVal = useRef(25);
   const rulerInitialized = useRef(false);
+  const sessionStartRef = useRef<Date>(new Date());
+
+  // Session saving
+  const saveFocusSession = useSaveFocusSession();
 
   // Routine integration
   const { data: existingTask } = useExistingProTask('focus_timer');
