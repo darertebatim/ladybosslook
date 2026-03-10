@@ -908,6 +908,10 @@ export default function RoutinesBank() {
 
   const filteredRoutines = selectedCategory === 'all' 
     ? routines 
+    : selectedCategory === 'popular'
+    ? routines.filter(r => r.is_popular)
+    : selectedCategory === 'featured'
+    ? routines.filter(r => r.is_featured)
     : routines.filter(r => r.category === selectedCategory);
 
   const filteredTaskBank = taskBank.filter(t => 
