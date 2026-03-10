@@ -224,17 +224,6 @@ export function RoutinePreviewSheet({
   };
 
   const handleSave = () => {
-    const wouldExceedLimit = !isSubscribed && (allExistingTasks.length + selectedTaskIds.size) > MAX_FREE_ACTIONS;
-    if (!isFree && !isSubscribed && (tasks.length > 1 || wouldExceedLimit)) {
-      // First time hitting the limit → show soft "Keep it simple" gate
-      if (!hasSeenActionLimitSoft()) {
-        markActionLimitSoftSeen();
-        setShowActionLimit(true);
-      } else {
-        setShowPaywall(true);
-      }
-      return;
-    }
     const editedTasksList = Object.values(editedTasks);
     onSave(Array.from(selectedTaskIds), editedTasksList);
   };
