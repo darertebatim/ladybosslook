@@ -404,7 +404,7 @@ export default function RoutinesBank() {
 
   const toggleFeatured = useMutation({
     mutationFn: async ({ id, is_featured }: { id: string; is_featured: boolean }) => {
-      const { error } = await supabase.from('routines_bank').update({ is_featured }).eq('id', id);
+      const { error } = await (supabase.from('routines_bank').update({ is_featured } as any).eq('id', id) as any);
       if (error) throw error;
     },
     onSuccess: () => {

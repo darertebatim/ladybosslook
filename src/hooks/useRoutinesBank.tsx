@@ -192,13 +192,13 @@ export function useFeaturedRoutinesBank() {
   return useQuery({
     queryKey: ['routines-bank-featured'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase
         .from('routines_bank')
         .select('*')
         .eq('is_active', true)
-        .eq('is_featured', true)
+        .eq('is_featured', true as any)
         .order('sort_order', { ascending: true })
-        .limit(6);
+        .limit(6) as any);
 
       if (error) throw error;
       return data as RoutineBankItem[];
