@@ -104,7 +104,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
         <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
           {/* Category */}
           {routine.subtitle && (
-            <p className="text-[11px] text-muted-foreground truncate">{routine.subtitle}</p>
+            <p className="text-[11px] text-foreground/80 truncate">{routine.subtitle}</p>
           )}
 
           {/* Title */}
