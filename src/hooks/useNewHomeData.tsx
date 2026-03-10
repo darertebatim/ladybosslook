@@ -47,12 +47,12 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
       .select('id, repeat_pattern, scheduled_date, repeat_days')
       .eq('user_id', userId)
       .eq('is_active', true),
-    // Random routine suggestion
+    // Random routine suggestion (from featured)
     supabase
       .from('routines_bank')
       .select('*')
       .eq('is_active', true)
-      .eq('is_popular', true)
+      .eq('is_featured' as any, true)
       .limit(10),
     // User's added bank routines
     supabase
