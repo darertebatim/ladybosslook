@@ -111,6 +111,26 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
           </div>
         </div>
 
+        {/* Square thumbnail */}
+        <div className="relative h-20 w-20 flex-shrink-0 rounded-xl overflow-hidden">
+          {routine.cover_image_url ? (
+            <CachedImage
+              src={routine.cover_image_url}
+              alt={routine.title}
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className={cn(
+              'w-full h-full bg-gradient-to-br flex items-center justify-center',
+              gradient
+            )}>
+              <FluentEmoji emoji={routineEmoji} size={36} className="opacity-60" />
+            </div>
+          )}
+        </div>
+
         {/* Dismiss button */}
         {onDismiss && (
           <button
