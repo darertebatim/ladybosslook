@@ -139,10 +139,10 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
               haptic.light();
               onDismiss();
             }}
-            className="absolute top-2 right-2 p-1 rounded-full bg-foreground/10 active:scale-95 transition-transform"
+            className="absolute top-2 right-2 p-1 rounded-full bg-black/30 active:scale-95 transition-transform"
             aria-label="Dismiss suggestion"
           >
-            <X className="h-3.5 w-3.5 text-muted-foreground" />
+            <X className="h-3.5 w-3.5 text-white" />
           </button>
         )}
       </div>
