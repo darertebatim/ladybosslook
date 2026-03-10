@@ -23,7 +23,7 @@ import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarouse
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
 import { useFeaturedRoutinesBank } from '@/hooks/useRoutinesBank';
-import { RoutineBankCard } from '@/components/app/RoutineBankCard';
+import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 import { haptic } from '@/lib/haptics';
 import { isWaterTask } from '@/lib/waterTracking';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
@@ -1044,21 +1044,18 @@ const AppHome = () => {
                       All <ChevronRight className="h-3.5 w-3.5" />
                     </button>
                   </div>
-                  <div className="flex gap-3 overflow-x-auto pt-3 pb-2 pl-3 scrollbar-hide">
+                  <div className="space-y-2 px-1">
                     {suggestedRoutines.map((routine) => (
-                      <div key={routine.id} className="shrink-0 w-36">
-                        <RoutineBankCard
-                          routine={routine}
-                          onClick={() => navigate(`/app/routines/${routine.id}`)}
-                          coverOnly
-                          onDismiss={() => {
-                            const updated = new Set(dismissedRoutineIds);
-                            updated.add(routine.id);
-                            setDismissedRoutineIds(updated);
-                            localStorage.setItem('simora_dismissed_routine_ids', JSON.stringify([...updated]));
-                          }}
-                        />
-                      </div>
+                      <FeaturedRoutineCard
+                        key={routine.id}
+                        routine={routine}
+                        onDismiss={() => {
+                          const updated = new Set(dismissedRoutineIds);
+                          updated.add(routine.id);
+                          setDismissedRoutineIds(updated);
+                          localStorage.setItem('simora_dismissed_routine_ids', JSON.stringify([...updated]));
+                        }}
+                      />
                     ))}
                   </div>
                 </div>}
