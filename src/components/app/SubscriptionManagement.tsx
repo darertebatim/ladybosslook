@@ -57,23 +57,20 @@ export function SubscriptionCard() {
       <>
         <button
           onClick={() => setShowPaywall(true)}
-          className="w-full rounded-2xl p-4 text-left transition-transform active:scale-[0.98] border border-border"
+          className="w-full rounded-2xl p-5 text-left transition-transform active:scale-[0.98] border-2 border-amber-400/80"
           style={{
-            background: 'linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--background)) 100%)',
+            background: 'linear-gradient(135deg, hsl(30, 60%, 96%) 0%, hsl(20, 50%, 94%) 100%)',
           }}
         >
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Sparkles className="h-6 w-6 text-orange-500 flex-shrink-0" />
             <div className="flex-1">
-              <p className="font-bold text-foreground text-base">Upgrade to SimoraPlus</p>
-              <p className="text-muted-foreground text-xs mt-0.5">Unlock all premium features & content</p>
+              <p className="font-bold text-red-500 text-base">Start Your 7-Day Free Trial</p>
+              <div className="flex items-center gap-1 mt-1">
+                <span className="text-foreground/70 text-sm">Get Premium</span>
+                <ChevronRight className="h-4 w-4 text-foreground/70" />
+              </div>
             </div>
-            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
-              <Sparkles className="h-6 w-6 text-foreground" />
-            </div>
-          </div>
-          <div className="flex items-center gap-1 mt-3">
-            <span className="text-foreground text-xs font-medium">View Plans</span>
-            <ChevronRight className="h-3.5 w-3.5 text-foreground" />
           </div>
         </button>
         <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
