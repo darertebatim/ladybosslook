@@ -1,85 +1,58 @@
 
 
-# Expand & Adjust "Build a New Life" Actions
+## Calm-Style Animated Background for Watch Page
 
-## Current State
-25 actions exist across 5 routines. Several need frequency adjustments, and colors are inconsistent (some got changed from the original migration).
+Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
 
-## Adjustments to Existing Actions
+### What You'll Get
 
-| Action | Current | Change To | Reason |
-|--------|---------|-----------|--------|
-| Write 3 goals for this year | daily | none (one-time) | You set yearly goals once, not daily |
-| Research 1 career path today | daily | weekly | Research is a weekly deep-dive activity |
-| Learn 1 thing about the local tax system | none | weekly | Should be recurring weekly learning |
-| Explore 1 local business regulation | none | weekly | Same — recurring weekly |
-| Set up or update a professional profile | none | none | Correct as one-time |
-| Do 1 thing outside your comfort zone | daily | weekly | Daily is too intense for comfort zone pushes |
-| Apply to 1 opportunity | daily | weekly | Realistic pace for job/opportunity applications |
-| Message 1 new connection | daily | weekly | Daily messaging is too aggressive |
-| Help someone or ask for help today | daily | weekly | More sustainable as weekly |
+- A deep dark blue gradient background on the Watch page header area
+- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
+- Subtle lightning flashes that pulse periodically
+- All text updated to white/light colors for contrast
+- Lightweight implementation using CSS keyframes (no extra dependencies)
 
-Also fix colors to match routine pillar colors consistently (emerald, sky, pink, yellow, lavender).
+### Design Details
 
-## New Actions to Add (35 total)
+- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
+- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
+- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
+- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
+- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
 
-### Find Your Direction (+7)
-| Title | Freq | Why |
-|-------|------|-----|
-| Write a personal vision statement | none | One-time foundational exercise |
-| Set 3 milestones for the next 90 days | none | Quarterly planning |
-| List 5 transferable skills from your past career | none | Self-discovery |
-| Map your ideal daily schedule | none | Life design |
-| Read 1 article about your industry locally | weekly | Market awareness |
-| Write down 3 things you're grateful for today | daily | Daily gratitude |
-| Reflect: What did I learn this week? | weekly | Weekly reflection |
+### Technical Approach
 
-### Learn the System (+7)
-| Title | Freq | Why |
-|-------|------|-----|
-| Research banking options and open an account | none | One-time setup |
-| Learn about your visa or residency rights | none | Critical one-time |
-| Understand how the local job market works | none | Research task |
-| Research local education or certification options | weekly | Ongoing exploration |
-| Learn 1 new local law or regulation | weekly | System literacy |
-| Set up utilities or essential services | none | Practical one-time |
-| Research public transport or commute options | none | Settlement task |
+**Files to modify:**
 
-### Rebuild Confidence (+7)
-| Title | Freq | Why |
-|-------|------|-----|
-| Learn 5 new words in the local language | daily | Language building |
-| Write a list of your achievements so far | none | Confidence anchor |
-| Share your story with someone today | weekly | Identity practice |
-| Watch 1 video in the local language | daily | Immersion |
-| Celebrate 1 cultural tradition from home | weekly | Identity preservation |
-| Write a letter to your future self | none | Motivational |
-| Say no to 1 thing that drains your energy | weekly | Boundary setting |
+1. **`src/pages/app/AppWatch.tsx`**
+   - Replace the header `bg-[#E8F4FE]` with the dark gradient
+   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
+   - Add a lightning flash overlay div
+   - Update all text classes to white variants (`text-white`, `text-white/60`)
+   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
+   - Extend the gradient into the page background behind the content area
 
-### Grow Your Income (+7)
-| Title | Freq | Why |
-|-------|------|-----|
-| Update your CV for the local market | none | One-time |
-| Research average salaries in your field | none | Market research |
-| Spend 20 min learning a digital skill | daily | Skill building |
-| Set a monthly budget and review it | weekly | Financial health |
-| Explore 1 local networking or business event | weekly | Opportunity finding |
-| Save or invest a small amount today | daily | Financial habit |
-| Brainstorm 3 business or side hustle ideas | none | Ideation |
+2. **`tailwind.config.ts`**
+   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
+   - Register corresponding animation utilities
 
-### Build Your Network (+7)
-| Title | Freq | Why |
-|-------|------|-----|
-| Introduce yourself to a neighbor or colleague | weekly | Real-world connections |
-| Join 1 online community related to your field | none | Digital networking |
-| Volunteer for 1 hour in your community | weekly | Social capital |
-| Follow up with someone you met recently | weekly | Relationship maintenance |
-| Attend a language exchange or cultural meetup | weekly | Dual-purpose networking |
-| Write a thank you note to someone who helped you | weekly | Gratitude networking |
-| Share a useful resource with your network | weekly | Value-first networking |
+### Visual Structure
 
-## Implementation
-1. **UPDATE** 9 existing actions (repeat_pattern + color fixes) via the insert tool
-2. **INSERT** 35 new actions into `admin_task_bank` with correct categories, colors, frequencies
-3. Actions go into the bank only (not linked to specific routines) — users pick them when building custom routines
+```text
++----------------------------------+
+|  [dark blue gradient header]     |
+|  ~~~ cloud layer 1 (slow) ~~~   |
+|  ~~~ cloud layer 2 (slower) ~~~ |
+|  * lightning flash (periodic) *  |
+|                                  |
+|  Watch          [icons]          |
+|  [categories row]                |
+|  [filters]              [lang]   |
++----------------------------------+
+|  [normal white content area]     |
+|  [playlist cards grid]           |
++----------------------------------+
+```
+
+The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
 
