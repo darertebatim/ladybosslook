@@ -124,7 +124,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
                 PLUS
               </Badge>
             )}
-            <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground font-medium">
+            <span className="flex items-center gap-0.5 text-[10px] text-foreground/70 font-medium">
               Tap to explore
               <ChevronRight className="h-3 w-3" />
             </span>
