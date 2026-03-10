@@ -104,7 +104,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
         <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
           {/* Category */}
           {routine.subtitle && (
-            <p className="text-[11px] text-muted-foreground truncate">{routine.subtitle}</p>
+            <p className="text-[11px] text-foreground/80 truncate">{routine.subtitle}</p>
           )}
 
           {/* Title */}
@@ -124,7 +124,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
                 PLUS
               </Badge>
             )}
-            <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground font-medium">
+            <span className="flex items-center gap-0.5 text-[10px] text-foreground/70 font-medium">
               Tap to explore
               <ChevronRight className="h-3 w-3" />
             </span>
