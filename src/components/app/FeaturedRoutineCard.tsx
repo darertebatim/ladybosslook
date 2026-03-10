@@ -58,7 +58,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
       )}
       onClick={handleClick}
     >
-      <div className="flex gap-3 p-3">
+      <div className="flex gap-3 p-2">
         {/* Square thumbnail */}
         <div className="relative h-20 w-20 flex-shrink-0 rounded-xl overflow-hidden">
           {routine.cover_image_url ? (
