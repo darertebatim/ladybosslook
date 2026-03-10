@@ -23,7 +23,7 @@ import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarouse
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
 import { useFeaturedRoutinesBank } from '@/hooks/useRoutinesBank';
-import { RoutineBankCard } from '@/components/app/RoutineBankCard';
+import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 import { haptic } from '@/lib/haptics';
 import { isWaterTask } from '@/lib/waterTracking';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
