@@ -187,19 +187,18 @@ export function usePopularRoutinesBank() {
   });
 }
 
-// Fetch featured routines (for banner)
+// Fetch featured routines (for home promo banners)
 export function useFeaturedRoutinesBank() {
   return useQuery({
     queryKey: ['routines-bank-featured'],
     queryFn: async () => {
-      // For now, use popular routines as featured
       const { data, error } = await supabase
         .from('routines_bank')
         .select('*')
         .eq('is_active', true)
-        .eq('is_popular', true)
+        .eq('is_featured', true)
         .order('sort_order', { ascending: true })
-        .limit(3);
+        .limit(6);
 
       if (error) throw error;
       return data as RoutineBankItem[];

@@ -1151,6 +1151,19 @@ export default function RoutinesBank() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      toggleFeatured.mutate({ id: routine.id, is_featured: !routine.is_featured });
+                    }}
+                    className={cn(
+                      "p-2 transition-all",
+                      routine.is_featured ? "text-emerald-500" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                    )}
+                    title={routine.is_featured ? "Remove from featured (home)" : "Feature on home"}
+                  >
+                    <Flame className={cn("h-4 w-4", routine.is_featured && "fill-emerald-500")} />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
                       toggleActive.mutate({ id: routine.id, is_active: !routine.is_active });
                     }}
                     className={cn(
