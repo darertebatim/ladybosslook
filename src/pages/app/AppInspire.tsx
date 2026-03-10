@@ -146,6 +146,25 @@ export default function AppInspire() {
             </div>
           )}
 
+          {/* Featured Routines Carousel */}
+          {featuredRoutines.length > 0 && (
+            <div className="mt-4 px-4">
+              <div className="flex items-center gap-2 mb-3">
+                <CalendarPlus className="h-4 w-4 text-violet-500" />
+                <h2 className="text-sm font-semibold text-foreground/70 tracking-wide">
+                  Featured
+                </h2>
+              </div>
+              <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory">
+                {featuredRoutines.map((routine) => (
+                  <div key={routine.id} className="shrink-0 w-[85%] snap-start">
+                    <FeaturedRoutineCard routine={routine} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Promo Banner - Under Categories */}
           <PromoBanner location="routines_after_categories" className="px-4 pb-2" carousel />
 
