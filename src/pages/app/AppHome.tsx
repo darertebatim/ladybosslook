@@ -179,18 +179,8 @@ const AppHome = () => {
   } = useSkipsForDate(selectedDate);
 
   const handleFabClick = useCallback(() => {
-    if (tasks.length >= MAX_FREE_ACTIONS_PER_DAY && !hasAccessToProgram('simora-plus')) {
-      haptic.light();
-      if (!hasSeenActionLimitSoft()) {
-        markActionLimitSoftSeen();
-        setShowActionLimit(true);
-      } else {
-        setShowPaywall(true);
-      }
-      return;
-    }
     setShowQuickStart(true);
-  }, [tasks.length, hasAccessToProgram]);
+  }, []);
 
   // Streak data now comes from useNewHomeData (consolidated RPC)
   const {
