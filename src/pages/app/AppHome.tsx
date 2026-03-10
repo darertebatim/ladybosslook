@@ -1044,18 +1044,19 @@ const AppHome = () => {
                       All <ChevronRight className="h-3.5 w-3.5" />
                     </button>
                   </div>
-                  <div className="space-y-2 px-1">
+                  <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide snap-x snap-mandatory">
                     {suggestedRoutines.map((routine) => (
-                      <FeaturedRoutineCard
-                        key={routine.id}
-                        routine={routine}
-                        onDismiss={() => {
-                          const updated = new Set(dismissedRoutineIds);
-                          updated.add(routine.id);
-                          setDismissedRoutineIds(updated);
-                          localStorage.setItem('simora_dismissed_routine_ids', JSON.stringify([...updated]));
-                        }}
-                      />
+                      <div key={routine.id} className="shrink-0 w-[85%] snap-start">
+                        <FeaturedRoutineCard
+                          routine={routine}
+                          onDismiss={() => {
+                            const updated = new Set(dismissedRoutineIds);
+                            updated.add(routine.id);
+                            setDismissedRoutineIds(updated);
+                            localStorage.setItem('simora_dismissed_routine_ids', JSON.stringify([...updated]));
+                          }}
+                        />
+                      </div>
                     ))}
                   </div>
                 </div>}
