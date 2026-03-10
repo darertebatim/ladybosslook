@@ -188,7 +188,7 @@ export default function RoutinesBank() {
         .select('*')
         .order('sort_order', { ascending: true });
       if (error) throw error;
-      return data as RoutineBankItem[];
+      return data as unknown as RoutineBankItem[];
     },
   });
 
