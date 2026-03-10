@@ -28,6 +28,25 @@ const colorGradients: Record<string, string> = {
   peach: 'from-orange-300/80 to-orange-500/90',
 };
 
+const colorBackgrounds: Record<string, string> = {
+  yellow: 'bg-amber-50 border-amber-200/60',
+  pink: 'bg-pink-50 border-pink-200/60',
+  purple: 'bg-purple-50 border-purple-200/60',
+  blue: 'bg-blue-50 border-blue-200/60',
+  green: 'bg-emerald-50 border-emerald-200/60',
+  orange: 'bg-orange-50 border-orange-200/60',
+  red: 'bg-red-50 border-red-200/60',
+  teal: 'bg-teal-50 border-teal-200/60',
+  indigo: 'bg-indigo-50 border-indigo-200/60',
+  rose: 'bg-rose-50 border-rose-200/60',
+  amber: 'bg-amber-50 border-amber-200/60',
+  mint: 'bg-teal-50 border-teal-200/60',
+  lavender: 'bg-purple-50 border-purple-200/60',
+  sky: 'bg-sky-50 border-sky-200/60',
+  lime: 'bg-lime-50 border-lime-200/60',
+  peach: 'bg-orange-50 border-orange-200/60',
+};
+
 interface FeaturedRoutineCardProps {
   routine: RoutineBankItem;
   onDismiss?: () => void;
