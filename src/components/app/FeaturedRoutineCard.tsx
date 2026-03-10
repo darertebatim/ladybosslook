@@ -62,6 +62,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
   const color = routine.color || 'purple';
   const gradient = colorGradients[color] || colorGradients.purple;
   const routineEmoji = routine.emoji && isEmoji(routine.emoji) ? routine.emoji : '✨';
+  const bgColor = colorBackgrounds[color] || colorBackgrounds.purple;
 
   const handleClick = () => {
     haptic.light();
@@ -72,7 +73,8 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
     <button
       className={cn(
         "relative w-full text-left rounded-2xl overflow-hidden cursor-pointer transition-all active:scale-[0.98]",
-        "bg-muted/60 border border-border/50 shadow-sm",
+        "border shadow-sm",
+        bgColor,
         className
       )}
       onClick={handleClick}
