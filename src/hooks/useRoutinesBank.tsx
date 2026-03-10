@@ -191,17 +191,19 @@ export function usePopularRoutinesBank() {
 export function useFeaturedRoutinesBank() {
   return useQuery({
     queryKey: ['routines-bank-featured'],
-    queryFn: async () => {
-      const { data, error } = await (supabase
+    queryFn: async (): Promise<RoutineBankItem[]> => {
+      const query = supabase
         .from('routines_bank')
         .select('*')
-        .eq('is_active', true)
-        .eq('is_featured', true as any)
+        .eq('is_active', true);
+      
+      const { data, error } = await (query as any)
+        .eq('is_featured', true)
         .order('sort_order', { ascending: true })
-        .limit(6) as any);
+        .limit(6);
 
       if (error) throw error;
-      return data as RoutineBankItem[];
+      return (data || []) as RoutineBankItem[];
     },
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
