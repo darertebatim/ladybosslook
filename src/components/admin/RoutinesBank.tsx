@@ -53,6 +53,7 @@ interface RoutineBankItem {
   emoji: string;
   is_active: boolean;
   is_popular: boolean;
+  is_featured: boolean;
   is_free: boolean;
   is_welcome_popup: boolean;
   sort_order: number;
