@@ -908,6 +908,10 @@ export default function RoutinesBank() {
 
   const filteredRoutines = selectedCategory === 'all' 
     ? routines 
+    : selectedCategory === 'popular'
+    ? routines.filter(r => r.is_popular)
+    : selectedCategory === 'featured'
+    ? routines.filter(r => r.is_featured)
     : routines.filter(r => r.category === selectedCategory);
 
   const filteredTaskBank = taskBank.filter(t => 
@@ -1052,6 +1056,14 @@ export default function RoutinesBank() {
             <TabsTrigger value="all" className="flex items-center gap-1">
               <Layers className="h-3 w-3" />
               All
+            </TabsTrigger>
+            <TabsTrigger value="popular" className="flex items-center gap-1">
+              <Star className="h-3 w-3" />
+              Popular
+            </TabsTrigger>
+            <TabsTrigger value="featured" className="flex items-center gap-1">
+              <Flame className="h-3 w-3" />
+              Featured
             </TabsTrigger>
             {routineCategories.map((cat) => (
               <TabsTrigger 
