@@ -53,6 +53,7 @@ interface RoutineBankItem {
   emoji: string;
   is_active: boolean;
   is_popular: boolean;
+  is_featured: boolean;
   is_free: boolean;
   is_welcome_popup: boolean;
   sort_order: number;
@@ -187,7 +188,7 @@ export default function RoutinesBank() {
         .select('*')
         .order('sort_order', { ascending: true });
       if (error) throw error;
-      return data as RoutineBankItem[];
+      return data as unknown as RoutineBankItem[];
     },
   });
 
@@ -392,13 +393,24 @@ export default function RoutinesBank() {
     },
   });
 
-  // Toggle popular/active
+  // Toggle popular/active/featured
   const togglePopular = useMutation({
     mutationFn: async ({ id, is_popular }: { id: string; is_popular: boolean }) => {
       const { error } = await supabase.from('routines_bank').update({ is_popular }).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['routines-bank'] }),
+  });
+
+  const toggleFeatured = useMutation({
+    mutationFn: async ({ id, is_featured }: { id: string; is_featured: boolean }) => {
+      const { error } = await (supabase.from('routines_bank').update({ is_featured } as any).eq('id', id) as any);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
+      queryClient.invalidateQueries({ queryKey: ['routines-bank-featured'] });
+    },
   });
 
   const toggleActive = useMutation({
@@ -1135,6 +1147,19 @@ export default function RoutinesBank() {
                     title={routine.is_popular ? "Remove from popular" : "Mark as popular"}
                   >
                     <Star className={cn("h-4 w-4", routine.is_popular && "fill-amber-500")} />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFeatured.mutate({ id: routine.id, is_featured: !routine.is_featured });
+                    }}
+                    className={cn(
+                      "p-2 transition-all",
+                      routine.is_featured ? "text-emerald-500" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                    )}
+                    title={routine.is_featured ? "Remove from featured (home)" : "Feature on home"}
+                  >
+                    <Flame className={cn("h-4 w-4", routine.is_featured && "fill-emerald-500")} />
                   </button>
                   <button
                     onClick={(e) => {

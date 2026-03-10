@@ -22,7 +22,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
-import { usePopularRoutinesBank, useUserAddedBankRoutines } from '@/hooks/useRoutinesBank';
+import { useFeaturedRoutinesBank } from '@/hooks/useRoutinesBank';
 import { RoutineBankCard } from '@/components/app/RoutineBankCard';
 import { haptic } from '@/lib/haptics';
 import { isWaterTask } from '@/lib/waterTracking';
@@ -316,17 +316,13 @@ const AppHome = () => {
     setTimeout(() => setShowRecoveryPrompt(true), 1200);
   }, [streak]);
 
-  // Popular routines for suggestions (filter out already-added ones)
+  // Featured routines for promo banners (only dismiss on tap/close, not on adoption)
   const {
-    data: popularRoutines = []
-  } = usePopularRoutinesBank();
-  const {
-    data: addedRoutineIds = []
-  } = useUserAddedBankRoutines();
-  const addedRoutineIdsSet = useMemo(() => new Set(addedRoutineIds), [addedRoutineIds]);
+    data: featuredRoutines = []
+  } = useFeaturedRoutinesBank();
   const suggestedRoutines = useMemo(() => 
-    popularRoutines.filter(r => !addedRoutineIdsSet.has(r.id) && !dismissedRoutineIds.has(r.id)).slice(0, 4), 
-    [popularRoutines, addedRoutineIdsSet, dismissedRoutineIds]
+    featuredRoutines.filter(r => !dismissedRoutineIds.has(r.id)), 
+    [featuredRoutines, dismissedRoutineIds]
   );
 
   // Generate 3 weeks of days (prev, current, next) for scrollable strip
