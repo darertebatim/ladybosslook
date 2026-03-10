@@ -1057,6 +1057,14 @@ export default function RoutinesBank() {
               <Layers className="h-3 w-3" />
               All
             </TabsTrigger>
+            <TabsTrigger value="popular" className="flex items-center gap-1">
+              <Star className="h-3 w-3" />
+              Popular
+            </TabsTrigger>
+            <TabsTrigger value="featured" className="flex items-center gap-1">
+              <Flame className="h-3 w-3" />
+              Featured
+            </TabsTrigger>
             {routineCategories.map((cat) => (
               <TabsTrigger 
                 key={cat.slug} 
