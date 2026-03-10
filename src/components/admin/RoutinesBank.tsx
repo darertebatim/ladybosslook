@@ -393,13 +393,24 @@ export default function RoutinesBank() {
     },
   });
 
-  // Toggle popular/active
+  // Toggle popular/active/featured
   const togglePopular = useMutation({
     mutationFn: async ({ id, is_popular }: { id: string; is_popular: boolean }) => {
       const { error } = await supabase.from('routines_bank').update({ is_popular }).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['routines-bank'] }),
+  });
+
+  const toggleFeatured = useMutation({
+    mutationFn: async ({ id, is_featured }: { id: string; is_featured: boolean }) => {
+      const { error } = await supabase.from('routines_bank').update({ is_featured }).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
+      queryClient.invalidateQueries({ queryKey: ['routines-bank-featured'] });
+    },
   });
 
   const toggleActive = useMutation({
