@@ -9,9 +9,11 @@ import {
   useRoutineBankCategories,
   useRoutinesBank,
   usePopularRoutinesBank,
+  useFeaturedRoutinesBank,
 } from '@/hooks/useRoutinesBank';
 import { RoutinesTour, TourHelpButton } from '@/components/app/tour';
 import { PromoBanner } from '@/components/app/PromoBanner';
+import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 
 export default function AppInspire() {
   const navigate = useNavigate();
