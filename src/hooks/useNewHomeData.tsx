@@ -40,26 +40,29 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
   const d = rpcData as any;
 
   // 2. Remaining queries that need joins/complex logic (run in parallel)
+  const tasksQuery = supabase
+    .from('user_tasks')
+    .select('id, repeat_pattern, scheduled_date, repeat_days')
+    .eq('user_id', userId)
+    .eq('is_active', true);
+
+  const routineQuery = (supabase
+    .from('routines_bank')
+    .select('*')
+    .eq('is_active', true) as any)
+    .eq('is_featured', true)
+    .limit(10);
+
+  const addedBankQuery = supabase
+    .from('user_routines_bank')
+    .select('routine_id')
+    .eq('user_id', userId)
+    .eq('is_active', true);
+
   const [tasksRes, routineRes, addedBankRoutinesRes] = await Promise.all([
-    // All active tasks (for today count + isNewUser detection)
-    supabase
-      .from('user_tasks')
-      .select('id, repeat_pattern, scheduled_date, repeat_days')
-      .eq('user_id', userId)
-      .eq('is_active', true),
-    // Random routine suggestion (from featured)
-    supabase
-      .from('routines_bank')
-      .select('*')
-      .eq('is_active', true)
-      .eq('is_featured' as any, true)
-      .limit(10),
-    // User's added bank routines
-    supabase
-      .from('user_routines_bank')
-      .select('routine_id')
-      .eq('user_id', userId)
-      .eq('is_active', true),
+    tasksQuery,
+    routineQuery,
+    addedBankQuery,
   ]);
 
   // Filter tasks for today
