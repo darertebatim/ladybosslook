@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { Flame, Shield, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
+import { cn } from '@/lib/utils';
 
 interface StreakLostBannerProps {
   open: boolean;
@@ -13,8 +14,8 @@ interface StreakLostBannerProps {
 }
 
 /**
- * Banner shown when user lost their regular streak and returns to the app.
- * Offers recovery if shields are available.
+ * Full-screen modal shown when user lost their regular streak.
+ * Offers recovery shield if available.
  */
 export const StreakLostBanner = ({
   open,
@@ -24,45 +25,87 @@ export const StreakLostBanner = ({
   onDismiss,
   isLoading,
 }: StreakLostBannerProps) => {
+  const [isAnimating] = useState(true);
+
   if (!open) return null;
 
   return (
-    <div className="mx-4 rounded-2xl bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 p-4 relative overflow-hidden">
-      <button
-        onClick={() => { haptic.light(); onDismiss(); }}
-        className="absolute top-3 right-3 p-1 rounded-full text-muted-foreground hover:text-foreground transition-colors"
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      onClick={() => { haptic.light(); onDismiss(); }}
+    >
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+
+      <div
+        className={cn(
+          'relative bg-gradient-to-b from-red-400 to-red-500 rounded-3xl p-8 w-full max-w-[300px] text-center transition-all duration-500',
+          isAnimating ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
+        )}
+        onClick={(e) => e.stopPropagation()}
       >
-        <X className="h-4 w-4" />
-      </button>
-
-      <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
-          <Flame className="h-5 w-5 text-orange-500" />
-        </div>
-        <div className="flex-1 min-w-0 pr-4">
-          <h3 className="font-semibold text-foreground text-sm">
-            Your {previousStreak}-day streak was lost
-          </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {hasShieldsRemaining
-              ? "But you can still recover it with a shield!"
-              : "Start fresh — every journey begins with day one."
-            }
-          </p>
-        </div>
-      </div>
-
-      {hasShieldsRemaining && (
-        <Button
-          onClick={() => { haptic.success(); onRecover(); }}
-          disabled={isLoading}
-          size="sm"
-          className="mt-3 w-full bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-semibold gap-1.5"
+        <button
+          onClick={() => { haptic.light(); onDismiss(); }}
+          className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
         >
-          <Shield className="w-3.5 h-3.5" />
-          Use Recovery Shield
-        </Button>
-      )}
+          <X className="h-5 w-5" />
+        </button>
+
+        {/* Icon */}
+        <div className="mb-4 flex justify-center">
+          <div className="grid place-items-center size-20 rounded-2xl bg-red-300/40 text-white shadow-inner">
+            <span className="text-4xl">💔</span>
+          </div>
+        </div>
+
+        {/* Title */}
+        <div className="text-3xl font-bold text-white mb-1">
+          Day {previousStreak}
+        </div>
+        <p className="text-white/70 text-sm mb-4">streak was lost</p>
+
+        {/* Message */}
+        <p className="text-white/90 text-sm mb-6 leading-relaxed">
+          {hasShieldsRemaining
+            ? <>You missed a day. Use a <span className="font-semibold text-white">Recovery Shield</span> to restore your {previousStreak}-day streak.</>
+            : "Your streak has reset. But showing up today starts a new one."
+          }
+        </p>
+
+        {/* Flame dots */}
+        <div className="flex justify-center gap-1 mb-6">
+          {Array.from({ length: Math.min(previousStreak, 7) }).map((_, i) => (
+            <Flame
+              key={i}
+              className="h-4 w-4 text-white/40 fill-white/20"
+            />
+          ))}
+        </div>
+
+        {hasShieldsRemaining ? (
+          <>
+            <Button
+              onClick={() => { haptic.success(); onRecover(); }}
+              disabled={isLoading}
+              className="w-full bg-white hover:bg-white/90 text-red-600 font-semibold py-3 rounded-xl mb-3"
+            >
+              🛡️ Use Recovery Shield
+            </Button>
+            <button
+              onClick={() => { haptic.light(); onDismiss(); }}
+              className="text-white/60 text-xs hover:text-white/80 transition-colors"
+            >
+              Let the streak reset
+            </button>
+          </>
+        ) : (
+          <Button
+            onClick={() => { haptic.light(); onDismiss(); }}
+            className="w-full bg-white hover:bg-white/90 text-red-600 font-semibold py-3 rounded-xl"
+          >
+            Start Fresh
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

@@ -22,6 +22,7 @@ import {
   Users,
   Headset,
   Crown,
+  Shield,
   RefreshCw,
 } from 'lucide-react';
 
@@ -40,6 +41,7 @@ import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation'
 import { ActionLimitSheet, resetActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 import { StreakLostBanner } from '@/components/app/StreakLostBanner';
 import { GoldStreakLostBanner } from '@/components/app/GoldStreakLostBanner';
+import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
@@ -72,6 +74,7 @@ export default function AppTest() {
   const [confirmedGoal, setConfirmedGoal] = useState<7 | 14 | 30 | 50>(7);
   const [showStreakLostBanner, setShowStreakLostBanner] = useState(false);
   const [showGoldStreakLostBanner, setShowGoldStreakLostBanner] = useState(false);
+  const [showRecoverySuccess, setShowRecoverySuccess] = useState<'streak' | 'gold' | null>(null);
 
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
@@ -509,25 +512,35 @@ export default function AppTest() {
               <Crown className="h-4 w-4 mr-2" />
               Gold Streak Lost Banner
             </Button>
+            <Button onClick={() => setShowRecoverySuccess('streak')} variant="outline">
+              <Shield className="h-4 w-4 mr-2" />
+              Recovery Success (Streak)
+            </Button>
+            <Button onClick={() => setShowRecoverySuccess('gold')} variant="outline">
+              <Shield className="h-4 w-4 mr-2" />
+              Recovery Success (Gold)
+            </Button>
           </div>
-          {showStreakLostBanner && (
-            <StreakLostBanner
-              open={true}
-              previousStreak={12}
-              hasShieldsRemaining={true}
-              onRecover={() => { toast.success('Streak recovered!'); setShowStreakLostBanner(false); }}
-              onDismiss={() => setShowStreakLostBanner(false)}
-            />
-          )}
-          {showGoldStreakLostBanner && (
-            <GoldStreakLostBanner
-              open={true}
-              previousGoldStreak={5}
-              hasShieldsRemaining={true}
-              onRecover={() => { toast.success('Gold streak recovered!'); setShowGoldStreakLostBanner(false); }}
-              onDismiss={() => setShowGoldStreakLostBanner(false)}
-            />
-          )}
+          <StreakLostBanner
+            open={showStreakLostBanner}
+            previousStreak={12}
+            hasShieldsRemaining={true}
+            onRecover={() => { setShowStreakLostBanner(false); setShowRecoverySuccess('streak'); }}
+            onDismiss={() => setShowStreakLostBanner(false)}
+          />
+          <GoldStreakLostBanner
+            open={showGoldStreakLostBanner}
+            previousGoldStreak={5}
+            hasShieldsRemaining={true}
+            onRecover={() => { setShowGoldStreakLostBanner(false); setShowRecoverySuccess('gold'); }}
+            onDismiss={() => setShowGoldStreakLostBanner(false)}
+          />
+          <RecoverySuccessBanner
+            open={showRecoverySuccess !== null}
+            restoredStreak={showRecoverySuccess === 'gold' ? 5 : 12}
+            type={showRecoverySuccess || 'streak'}
+            onClose={() => setShowRecoverySuccess(null)}
+          />
         </CardContent>
       </Card>
 
