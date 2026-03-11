@@ -409,14 +409,22 @@ export default function AppTest() {
             Celebrations
           </CardTitle>
           <CardDescription>
-            Test presence, course, and track completion celebrations
+            Test streak, course, and track completion celebrations
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap gap-2">
-            <Button onClick={() => setShowStreakCelebration(true)} variant="outline">
-              <Sparkles className="h-4 w-4 mr-2" />
-              Presence Celebration
+            <Button onClick={() => { setStreakTestCount(1); setShowStreakCelebration(true); }} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              Streak (1 day)
+            </Button>
+            <Button onClick={() => { setStreakTestCount(7); setShowStreakCelebration(true); }} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              Streak (7 days)
+            </Button>
+            <Button onClick={() => { setStreakTestCount(30); setShowStreakCelebration(true); }} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              Streak (30 days)
             </Button>
             <Button onClick={() => setShowCompletionCelebration(true)} variant="outline">
               <Trophy className="h-4 w-4 mr-2" />
