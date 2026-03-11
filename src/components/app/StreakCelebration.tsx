@@ -109,32 +109,34 @@ export const StreakCelebration = ({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex flex-col justify-end"
+      className="fixed inset-0 z-[100] flex flex-col justify-end pb-[env(safe-area-inset-bottom)]"
       onClick={handleClose}
     >
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
 
-      {/* Flame icon floating above the card */}
-      <div className="relative z-10 flex flex-col items-center mb-[-40px]">
-        <img
-          src={streakFlameImg}
-          alt="Streak flame"
-          className={cn(
-            'w-24 h-24 object-contain drop-shadow-2xl transition-all duration-700',
-            isAnimating ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
-          )}
-        />
-      </div>
+      {/* Content wrapper to keep flame above card */}
+      <div className="relative z-10 flex flex-col items-center">
+        {/* Flame icon floating above the card */}
+        <div className="mb-[-40px] z-20">
+          <img
+            src={streakFlameImg}
+            alt="Streak flame"
+            className={cn(
+              'w-24 h-24 object-contain drop-shadow-2xl transition-all duration-700',
+              isAnimating ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+            )}
+          />
+        </div>
 
-      {/* Card */}
-      <div
-        className={cn(
-          'relative z-10 bg-gray-800/95 rounded-t-3xl px-6 pt-14 pb-8 transition-all duration-500',
-          isAnimating ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
-        )}
-        onClick={(e) => e.stopPropagation()}
-      >
+        {/* Card */}
+        <div
+          className={cn(
+            'relative z-10 w-full bg-gray-800/95 rounded-t-3xl px-6 pt-14 pb-8 transition-all duration-500',
+            isAnimating ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
+          )}
+          onClick={(e) => e.stopPropagation()}
+        >
         {/* Streak count */}
         <div className={cn(
           'text-center mb-1 transition-all duration-500 delay-150',
