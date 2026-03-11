@@ -190,7 +190,7 @@ export const GoldStreakCelebration = ({
         </h1>
         <h2 className="text-3xl font-bold text-center mb-8">
           <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">
-            {nextGoal} day streak?
+            {nextGoal} day Gold streak?
           </span>
         </h2>
 
