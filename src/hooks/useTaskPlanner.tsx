@@ -1048,7 +1048,7 @@ export const useAddGoalProgress = () => {
         // Update presence metrics
         await updatePresence(user.id, dateStr);
         
-        return { completion: data, newProgress: amount, addedAmount: amount, streakIncreased: streakResult.increased };
+        return { completion: data, newProgress: amount, addedAmount: amount, streakIncreased: streakResult.increased, newStreak: streakResult.newStreak };
       }
     },
     onSuccess: (_, variables) => {
