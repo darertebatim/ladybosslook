@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { StreakMilestoneCelebration } from '@/components/app/StreakMilestoneCelebration';
+import { StreakMilestoneCelebration, isStreakMilestone, getStreakMilestoneKey } from '@/components/app/StreakMilestoneCelebration';
 import { format } from 'date-fns';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { StreakGoalSelection } from '@/components/app/StreakGoalSelection';
