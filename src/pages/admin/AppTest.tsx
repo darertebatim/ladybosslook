@@ -535,6 +535,7 @@ export default function AppTest() {
             previousGoldStreak={5}
             hasShieldsRemaining={true}
             shieldsLeft={2}
+            isSubscribed={false}
             onRecover={() => { setShowGoldStreakLostBanner(false); setShowRecoverySuccess('gold'); }}
             onDismiss={() => setShowGoldStreakLostBanner(false)}
           />
