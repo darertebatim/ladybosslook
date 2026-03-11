@@ -61,6 +61,7 @@ export default function AppTest() {
   
   // Component visibility states
   const [showStreakCelebration, setShowStreakCelebration] = useState(false);
+  const [testStreakDay, setTestStreakDay] = useState(1);
   const [showCompletionCelebration, setShowCompletionCelebration] = useState(false);
   const [showTrackCelebration, setShowTrackCelebration] = useState(false);
   const [showTrackCelebrationPlaylistComplete, setShowTrackCelebrationPlaylistComplete] = useState(false);
