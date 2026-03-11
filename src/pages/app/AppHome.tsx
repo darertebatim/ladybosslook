@@ -1073,6 +1073,7 @@ const AppHome = () => {
                       <div key={routine.id} className="shrink-0 w-[85%] snap-start">
                         <FeaturedRoutineCard
                           routine={routine}
+                          categoryName={categoryNameMap.get(routine.category)}
                           onDismiss={() => {
                             const updated = new Set(dismissedRoutineIds);
                             updated.add(routine.id);
