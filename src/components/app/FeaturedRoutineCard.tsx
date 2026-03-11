@@ -128,7 +128,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
             )}
             {routine.category && (
               <span className="text-[10px] text-foreground/70 font-medium truncate capitalize">
-                {routine.category}
+                {categoryName || routine.category}
               </span>
             )}
           </div>
