@@ -132,6 +132,16 @@ export function MoodDashboard() {
     navigate('/app/home');
   }, [navigate]);
 
+  const handleRitualPromptAdd = useCallback(() => {
+    setShowRitualPrompt(false);
+    setShowRoutineSheet(true);
+  }, []);
+
+  const handleRitualPromptSkip = useCallback(() => {
+    setShowRitualPrompt(false);
+    setShowCelebration(true);
+  }, []);
+
   const handleRoutineClick = () => {
     haptic.light();
     if (isAdded) {
