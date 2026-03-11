@@ -1016,9 +1016,22 @@ const AppHome = () => {
                         )}
                       </>
                     ) : (
-                      <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                      <SortableTaskList tasks={repeatingTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                     );
                   })()}
+
+                  {/* One-time Actions Section */}
+                  {oneTimeTasks.length > 0 && (
+                    <div className="mt-5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <CalendarCheck className="h-4 w-4 text-blue-500 shrink-0" />
+                        <h2 className="text-sm font-semibold text-foreground tracking-wide">
+                          One-time Actions
+                        </h2>
+                      </div>
+                      <SortableTaskList tasks={oneTimeTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                    </div>
+                  )}
                   {/* Onboarding Banner - below actions, hidden while welcome card is active */}
                   {!showWelcomeCard && <OnboardingBanner />}
                 </div>
