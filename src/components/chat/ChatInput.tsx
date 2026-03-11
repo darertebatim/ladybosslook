@@ -663,7 +663,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
         <Button
           variant="ghost"
           size="icon"
-          className="shrink-0 h-12 w-12 rounded-full text-foreground bg-[#F4ECFE] dark:bg-violet-950/50 active:bg-[#E8DCFA] dark:active:bg-violet-900/50"
+          className="shrink-0 h-12 w-12 rounded-full text-foreground bg-orange-100 dark:bg-orange-950/50 active:bg-orange-200 dark:active:bg-orange-900/50"
           onClick={handleNativeAttachment}
           disabled={disabled || uploading || isRecording || !!attachment}
         >
