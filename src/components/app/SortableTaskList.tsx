@@ -193,6 +193,28 @@ export const SortableTaskList = ({
 
   const activeTask = activeId ? localTasks.find(t => t.id === activeId) : null;
 
+  // Split tasks: repeating vs one-time
+  const repeatingTasks = localTasks.filter(t => t.repeat_pattern && t.repeat_pattern !== 'none');
+  const oneTimeTasks = localTasks.filter(t => !t.repeat_pattern || t.repeat_pattern === 'none');
+  const allOrderedIds = [...repeatingTasks, ...oneTimeTasks].map(t => t.id);
+
+  const renderTask = (task: UserTask) => (
+    <SortableTaskItem
+      key={task.id}
+      task={task}
+      date={date}
+      isCompleted={completedTaskIds.has(task.id)}
+      completedSubtaskIds={completedSubtaskIds}
+      goalProgress={goalProgressMap.get(task.id) || 0}
+      onTap={onTaskTap}
+      onStreakIncrease={onStreakIncrease}
+      onOpenGoalInput={onOpenGoalInput}
+      onOpenTimer={onOpenTimer}
+      onOpenWaterTracking={onOpenWaterTracking}
+      isDragging={activeId === task.id}
+    />
+  );
+
   return (
     <>
     <DndContext
@@ -201,28 +223,24 @@ export const SortableTaskList = ({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <SortableContext items={localTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext items={allOrderedIds} strategy={verticalListSortingStrategy}>
         <div className="space-y-3">
-          {localTasks.map((task) => (
-            <SortableTaskItem
-              key={task.id}
-              task={task}
-              date={date}
-              isCompleted={completedTaskIds.has(task.id)}
-              completedSubtaskIds={completedSubtaskIds}
-              goalProgress={goalProgressMap.get(task.id) || 0}
-              onTap={onTaskTap}
-              onStreakIncrease={onStreakIncrease}
-              onOpenGoalInput={onOpenGoalInput}
-              onOpenTimer={onOpenTimer}
-              onOpenWaterTracking={onOpenWaterTracking}
-              isDragging={activeId === task.id}
-            />
-          ))}
+          {/* Repeating tasks */}
+          {repeatingTasks.map(renderTask)}
         </div>
+
+        {/* Quick Add Card */}
+        <QuickAddCard date={date} taskCount={localTasks.length} />
+
+        {/* One-time tasks */}
+        {oneTimeTasks.length > 0 && (
+          <div className="space-y-3 mt-3">
+            {oneTimeTasks.map(renderTask)}
+          </div>
+        )}
       </SortableContext>
 
-      {/* Drag overlay - the visual element that follows the cursor */}
+      {/* Drag overlay */}
       <DragOverlay>
         {activeTask ? (
           <div className="opacity-90 scale-105 shadow-2xl rounded-2xl">
@@ -236,9 +254,6 @@ export const SortableTaskList = ({
         ) : null}
       </DragOverlay>
     </DndContext>
-
-    {/* Quick Add Card */}
-    <QuickAddCard date={date} />
   </>
   );
 };
