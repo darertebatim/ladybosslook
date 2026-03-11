@@ -1,10 +1,13 @@
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, ExternalLink } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Plus } from 'lucide-react';
 import { dearMeFlow } from '@/data/onboarding-flows/dear-me';
 import { mePlusFlow } from '@/data/onboarding-flows/me-plus';
 import { OnboardingFlowCard } from '@/components/admin/onboarding/OnboardingFlowCard';
 import { useDefaultOnboarding, useSetDefaultOnboarding } from '@/hooks/useDefaultOnboarding';
 import { toast } from 'sonner';
+import OnboardingAnswers from './OnboardingAnswers';
 
 export default function Onboarding() {
   const flows = [dearMeFlow, mePlusFlow];
@@ -35,17 +38,30 @@ export default function Onboarding() {
         </Button>
       </div>
 
-      <div className="space-y-3">
-        {flows.map(flow => (
-          <OnboardingFlowCard
-            key={flow.id}
-            flow={flow}
-            onPreview={() => handlePreview(flow.id)}
-            isDefault={defaultFlowId === flow.id}
-            onSetDefault={() => handleSetDefault(flow.id)}
-          />
-        ))}
-      </div>
+      <Tabs defaultValue="flows">
+        <TabsList>
+          <TabsTrigger value="flows">Flows</TabsTrigger>
+          <TabsTrigger value="answers">Answers</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="flows" className="mt-4">
+          <div className="space-y-3">
+            {flows.map(flow => (
+              <OnboardingFlowCard
+                key={flow.id}
+                flow={flow}
+                onPreview={() => handlePreview(flow.id)}
+                isDefault={defaultFlowId === flow.id}
+                onSetDefault={() => handleSetDefault(flow.id)}
+              />
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="answers" className="mt-4">
+          <OnboardingAnswers />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
