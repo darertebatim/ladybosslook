@@ -10,6 +10,7 @@ interface StreakGoalCompletionCelebrationProps {
   currentStreak: number;
   onClose: () => void;
   onLevelUp: () => void;
+  onWrapUp?: () => void;
 }
 
 /**
