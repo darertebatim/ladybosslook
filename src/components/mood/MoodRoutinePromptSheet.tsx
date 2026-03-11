@@ -81,25 +81,30 @@ export function MoodRoutinePromptSheet({
           "rounded-t-3xl border-0 px-5 pt-8 pb-6",
           moodData.bgColor
         )}
-        style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}
+        style={{ 
+          paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
+          minHeight: '480px',
+        }}
       >
-        {/* Header: Emoji + Feeling text */}
-        <div className="flex flex-col items-center text-center mb-6">
-          <div className={cn(
-            "w-16 h-16 rounded-full flex items-center justify-center mb-3",
-            moodData.bgColor.replace('100', '200')
-          )}>
-            <FluentEmoji emoji={moodData.emoji} size={40} />
+        {/* Vertically centered content */}
+        <div className="flex flex-col items-center justify-center flex-1" style={{ minHeight: '340px' }}>
+          <div className="flex flex-col items-center text-center">
+            <div className={cn(
+              "w-16 h-16 rounded-full flex items-center justify-center mb-3",
+              moodData.bgColor.replace('100', '200')
+            )}>
+              <FluentEmoji emoji={moodData.emoji} size={40} />
+            </div>
+            <p className="text-sm font-medium text-foreground/50 mb-1">
+              {moodData.celebrationText}
+            </p>
+            <h2 className="text-xl font-bold text-foreground leading-snug mb-2">
+              Make it a Daily Habit
+            </h2>
+            <p className="text-sm text-foreground/50 leading-relaxed max-w-[280px]">
+              Checking in with your mood daily helps you spot patterns, understand triggers, and build emotional awareness over time.
+            </p>
           </div>
-          <p className="text-sm font-medium text-foreground/50 mb-1">
-            {moodData.celebrationText}
-          </p>
-          <h2 className="text-xl font-bold text-foreground leading-snug mb-2">
-            Make it a Daily Habit
-          </h2>
-          <p className="text-sm text-foreground/50 leading-relaxed max-w-[280px]">
-            Checking in with your mood daily helps you spot patterns, understand triggers, and build emotional awareness over time.
-          </p>
         </div>
 
         {/* Add Button */}
