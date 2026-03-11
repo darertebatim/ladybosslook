@@ -564,6 +564,7 @@ export default function AppTest() {
             isSubscribed={false}
             onRecover={() => {}}
             onDismiss={() => setShowStreakLostNoShields(false)}
+            onSubscribe={() => { setShowStreakLostNoShields(false); setShowPaywall(true); }}
           />
           <GoldStreakLostBanner
             open={showGoldLostNoShields}
