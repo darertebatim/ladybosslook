@@ -636,8 +636,8 @@ const AppHome = () => {
             <div className="justify-self-start flex items-center gap-1 tour-menu-button">
               <HomeMenu onStartTour={startHomeTour || undefined} />
               <button
-                onClick={() => navigate('/app/chat')}
-                className="p-2 text-foreground hover:text-foreground transition-colors"
+                onClick={() => { haptic.light(); navigate('/app/chat'); }}
+                className="p-2 -mr-2 text-foreground hover:text-foreground transition-colors"
               >
                 <MessageCircle className="h-5 w-5" />
               </button>
