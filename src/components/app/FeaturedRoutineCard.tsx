@@ -125,8 +125,8 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
               </Badge>
             )}
             {routine.category && (
-              <span className="text-[10px] text-foreground/70 font-medium truncate">
-                {routine.category}
+              <span className="text-[10px] text-foreground/70 font-medium truncate capitalize">
+                {routine.category.replace(/[-_]/g, ' ')}
               </span>
             )}
           </div>
