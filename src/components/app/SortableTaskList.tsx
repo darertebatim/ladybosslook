@@ -278,4 +278,3 @@ function QuickAddCard({ onOpen }: { onOpen?: () => void }) {
     </button>
   );
 }
-}
