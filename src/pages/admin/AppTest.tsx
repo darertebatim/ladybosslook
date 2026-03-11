@@ -81,6 +81,7 @@ export default function AppTest() {
   const [showGoldLostNoShields, setShowGoldLostNoShields] = useState(false);
   const [showRecoverySuccess, setShowRecoverySuccess] = useState<'streak' | 'gold' | null>(null);
   const [showStreakGoalCompletion, setShowStreakGoalCompletion] = useState(false);
+  const [showChallengeSummary, setShowChallengeSummary] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
