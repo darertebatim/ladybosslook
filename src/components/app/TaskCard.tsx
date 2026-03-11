@@ -89,6 +89,25 @@ export const TaskCard = memo(function TaskCard({
     return formatTimeLabelWithEmoji(task);
   };
 
+  // Format repeat pattern label
+  const getRepeatLabel = (task: UserTask): string | null => {
+    const p = task.repeat_pattern;
+    if (!p || p === 'none') return null;
+    if (p === 'daily') return 'Daily';
+    if (p === 'weekly') return 'Weekly';
+    if (p === 'monthly') return 'Monthly';
+    if (p === 'weekend') return 'Weekends';
+    if (p === 'custom' && task.repeat_days?.length === 5) return 'Weekdays';
+    if (p === 'custom' && task.repeat_days?.length) {
+      const days = task.repeat_days.length;
+      if (days === 7) return 'Daily';
+      if (days === 5) return 'Weekdays';
+      return `${days}x/week`;
+    }
+    return null;
+  };
+  const repeatLabel = getRepeatLabel(task);
+
   const handleToggleComplete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
@@ -310,6 +329,9 @@ export const TaskCard = memo(function TaskCard({
               {/* Top line: Time + Goal (if applicable) */}
               <div className="flex items-center gap-2">
                 <span className="text-[13px] text-black/80">{formatTime(task)}</span>
+                {repeatLabel && (
+                  <span className="text-[13px] text-black/50">• {repeatLabel}</span>
+                )}
                 {hasGoal && (
                   <span className="text-[13px] text-black/80 font-medium">• {(() => {
                     const label = formatProGoalLabel();
@@ -475,6 +497,9 @@ export const TaskCard = memo(function TaskCard({
               </span>
             )}
             <span className="text-[13px] text-black/80">{formatTime(task)}</span>
+            {repeatLabel && (
+              <span className="text-[13px] text-black/50">• {repeatLabel}</span>
+            )}
             {hasGoal && (
               <span className="text-[13px] text-black/80 font-medium">• {(() => {
                 const label = formatGoalLabel();
