@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Crown, Shield, X } from 'lucide-react';
+import { Crown, Shield, X, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
@@ -9,6 +10,7 @@ interface GoldStreakLostBannerProps {
   previousGoldStreak: number;
   hasShieldsRemaining: boolean;
   shieldsLeft: number;
+  isSubscribed: boolean;
   onRecover: () => void;
   onDismiss: () => void;
   isLoading?: boolean;
@@ -23,10 +25,12 @@ export const GoldStreakLostBanner = ({
   previousGoldStreak,
   hasShieldsRemaining,
   shieldsLeft,
+  isSubscribed,
   onRecover,
   onDismiss,
   isLoading,
 }: GoldStreakLostBannerProps) => {
+  const navigate = useNavigate();
   const [isAnimating] = useState(true);
 
   if (!open) return null;
@@ -102,13 +106,38 @@ export const GoldStreakLostBanner = ({
               Let the gold streak reset
             </Button>
           </>
+        ) : !isSubscribed ? (
+          <>
+            <p className="text-white/80 text-xs mb-3">
+              No shields left. Unlock more with <span className="font-semibold text-white">Simora Plus</span>.
+            </p>
+            <Button
+              onClick={() => { haptic.light(); onDismiss(); navigate('/app/subscribe'); }}
+              className="w-full bg-white hover:bg-white/90 text-amber-600 font-semibold py-3 rounded-xl mb-2"
+            >
+              <Sparkles className="h-4 w-4 mr-1" />
+              Get Simora Plus
+            </Button>
+            <Button
+              onClick={() => { haptic.light(); onDismiss(); }}
+              variant="ghost"
+              className="w-full text-white/70 hover:text-white hover:bg-white/10 text-xs font-medium rounded-xl"
+            >
+              Start Fresh
+            </Button>
+          </>
         ) : (
-          <Button
-            onClick={() => { haptic.light(); onDismiss(); }}
-            className="w-full bg-white hover:bg-white/90 text-amber-600 font-semibold py-3 rounded-xl"
-          >
-            Start Fresh
-          </Button>
+          <>
+            <p className="text-white/80 text-xs mb-3">
+              All recovery shields have been used. Time for a fresh start.
+            </p>
+            <Button
+              onClick={() => { haptic.light(); onDismiss(); }}
+              className="w-full bg-white hover:bg-white/90 text-amber-600 font-semibold py-3 rounded-xl"
+            >
+              Start Fresh
+            </Button>
+          </>
         )}
       </div>
     </div>
