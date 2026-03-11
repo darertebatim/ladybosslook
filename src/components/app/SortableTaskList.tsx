@@ -1,5 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
-import type { TaskColor } from '@/hooks/useTaskPlanner';
+import { useState, useCallback } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -20,11 +19,10 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
-import { UserTask, useReorderTasks, useCreateTask } from '@/hooks/useTaskPlanner';
+import { UserTask, useReorderTasks } from '@/hooks/useTaskPlanner';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
 import { Plus } from 'lucide-react';
-import { format } from 'date-fns';
 
 interface SortableTaskItemProps {
   task: UserTask;
@@ -105,6 +103,7 @@ interface SortableTaskListProps {
   onOpenGoalInput: (task: UserTask) => void;
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
+  onOpenQuickStart?: () => void;
 }
 
 export const SortableTaskList = ({
@@ -118,6 +117,7 @@ export const SortableTaskList = ({
   onOpenGoalInput,
   onOpenTimer,
   onOpenWaterTracking,
+  onOpenQuickStart,
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
@@ -231,7 +231,7 @@ export const SortableTaskList = ({
         </div>
 
         {/* Quick Add Card */}
-        <QuickAddCard date={date} taskCount={localTasks.length} />
+        <QuickAddCard onOpen={onOpenQuickStart} />
 
         {/* One-time tasks */}
         {oneTimeTasks.length > 0 && (
@@ -259,96 +259,20 @@ export const SortableTaskList = ({
   );
 };
 
-const QUICK_ADD_VARIANTS: { emoji: string; color: TaskColor }[] = [
-  { emoji: '☀️', color: 'yellow' },
-  { emoji: '🌿', color: 'green' },
-  { emoji: '💜', color: 'purple' },
-  { emoji: '🔥', color: 'red' },
-  { emoji: '💧', color: 'blue' },
-  { emoji: '🧡', color: 'orange' },
-  { emoji: '⭐', color: 'yellow' },
-  { emoji: '🎯', color: 'red' },
-  { emoji: '🌸', color: 'pink' },
-  { emoji: '🍀', color: 'green' },
-  { emoji: '✨', color: 'lavender' },
-  { emoji: '🌊', color: 'sky' },
-];
-
-function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [title, setTitle] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
-  const createTask = useCreateTask();
-
-  const handleSubmit = () => {
-    const trimmed = title.trim();
-    if (!trimmed) return;
-
-    const variant = QUICK_ADD_VARIANTS[taskCount % QUICK_ADD_VARIANTS.length];
-
-    haptic.medium();
-    createTask.mutate({
-      title: trimmed,
-      scheduled_date: format(date, 'yyyy-MM-dd'),
-      emoji: variant.emoji,
-      color: variant.color,
-      order_index: taskCount,
-    });
-    setTitle('');
-    inputRef.current?.focus();
-  };
-
-  if (!isOpen) {
-    return (
-      <button
-        onClick={() => {
-          setIsOpen(true);
-          haptic.light();
-          setTimeout(() => inputRef.current?.focus(), 100);
-        }}
-        className="mt-3 w-full rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2 active:scale-[0.98] transition-all"
-      >
-        <div className="w-10 h-10 flex items-center justify-center shrink-0" />
-        <span className="flex-1 text-left text-[15px] font-semibold text-muted-foreground">Quick add action...</span>
-        <div className="w-9 h-9 rounded-full bg-urgency flex items-center justify-center shrink-0">
-          <Plus className="h-5 w-5 text-urgency-foreground" strokeWidth={2.5} />
-        </div>
-      </button>
-    );
-  }
-
+function QuickAddCard({ onOpen }: { onOpen?: () => void }) {
   return (
-    <div className="mt-3 rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2">
+    <button
+      onClick={() => {
+        haptic.light();
+        onOpen?.();
+      }}
+      className="mt-3 w-full rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2 active:scale-[0.98] transition-all"
+    >
       <div className="w-10 h-10 flex items-center justify-center shrink-0" />
-      <input
-        ref={inputRef}
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') handleSubmit();
-          if (e.key === 'Escape') { setIsOpen(false); setTitle(''); }
-        }}
-        onBlur={() => {
-          if (!title.trim()) {
-            setIsOpen(false);
-          }
-        }}
-        placeholder="Type action name..."
-        className="flex-1 bg-transparent text-[15px] font-semibold text-foreground placeholder:text-muted-foreground outline-none"
-        autoFocus
-      />
-      {title.trim() ? (
-        <button
-          onClick={handleSubmit}
-          className="px-3 py-1.5 rounded-2xl bg-urgency text-urgency-foreground text-xs font-semibold active:scale-95 transition-transform"
-        >
-          Add
-        </button>
-      ) : (
-        <div className="w-9 h-9 rounded-full bg-urgency flex items-center justify-center shrink-0">
-          <Plus className="h-5 w-5 text-urgency-foreground" strokeWidth={2.5} />
-        </div>
-      )}
-    </div>
+      <span className="flex-1 text-left text-[15px] font-semibold text-muted-foreground">Quick add action...</span>
+      <div className="w-9 h-9 rounded-full bg-urgency flex items-center justify-center shrink-0">
+        <Plus className="h-5 w-5 text-urgency-foreground" strokeWidth={2.5} />
+      </div>
+    </button>
   );
 }
