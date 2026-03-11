@@ -913,6 +913,12 @@ export default function AppTest() {
           toast.info('Challenge accepted → paywall would open here');
         }}
       />
+
+      <StreakMilestoneCelebration
+        open={showStreakMilestone}
+        streak={streakMilestoneValue}
+        onClose={() => setShowStreakMilestone(false)}
+      />
     </div>
   );
 }
