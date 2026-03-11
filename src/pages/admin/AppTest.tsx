@@ -40,6 +40,7 @@ import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation'
 import { ActionLimitSheet, resetActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 import { StreakLostBanner } from '@/components/app/StreakLostBanner';
 import { GoldStreakLostBanner } from '@/components/app/GoldStreakLostBanner';
+import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
