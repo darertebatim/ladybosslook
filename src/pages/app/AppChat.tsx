@@ -520,8 +520,8 @@ export default function AppChat() {
             </Button>
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="h-11 w-11 rounded-full bg-muted border border-border flex items-center justify-center">
-                  <MessageCircle className="h-5 w-5 text-foreground" />
+                <div className="h-11 w-11 rounded-full bg-orange-500 flex items-center justify-center">
+                  <Headset className="h-5 w-5 text-white" />
                 </div>
                 {/* Online indicator */}
                 <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-background" />
