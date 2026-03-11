@@ -22,6 +22,7 @@ export const StreakLostBanner = ({
   open,
   previousStreak,
   hasShieldsRemaining,
+  shieldsLeft,
   onRecover,
   onDismiss,
   isLoading,
