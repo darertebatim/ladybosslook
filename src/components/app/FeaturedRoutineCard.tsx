@@ -69,7 +69,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
   const handleClick = () => {
     haptic.light();
     onDismiss?.();
-    navigate(`/app/routines/${routine.id}`);
+    navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } });
   };
 
   return (
