@@ -4264,6 +4264,10 @@ export type Database = {
         Args: { p_date_str: string; p_user_id: string }
         Returns: Json
       }
+      get_program_events_for_date: {
+        Args: { p_date_str: string; p_user_id: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
