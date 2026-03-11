@@ -86,6 +86,7 @@ export function MoodDashboard() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [showRitualPrompt, setShowRitualPrompt] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
+  const [neverPrompt] = useState(() => localStorage.getItem('mood_routine_never') === 'true');
 
   const isAdded = existingTask || justAdded;
 
@@ -115,7 +116,7 @@ export function MoodDashboard() {
       haptic.success();
       
       // If not in routine, show ritual prompt first; otherwise celebration
-      if (!isAdded) {
+      if (!isAdded && !neverPrompt) {
         setShowRitualPrompt(true);
       } else {
         setShowCelebration(true);
@@ -138,6 +139,12 @@ export function MoodDashboard() {
   }, []);
 
   const handleRoutinePromptSkip = useCallback(() => {
+    setShowRitualPrompt(false);
+    setShowCelebration(true);
+  }, []);
+
+  const handleRoutinePromptNever = useCallback(() => {
+    localStorage.setItem('mood_routine_never', 'true');
     setShowRitualPrompt(false);
     setShowCelebration(true);
   }, []);
@@ -308,6 +315,7 @@ export function MoodDashboard() {
         mood={selectedMood}
         onAddToRoutine={handleRoutinePromptAdd}
         onSkip={handleRoutinePromptSkip}
+        onNever={handleRoutinePromptNever}
       />
 
       {/* Mood Celebration Sheet */}
