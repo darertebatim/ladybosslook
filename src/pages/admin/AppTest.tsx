@@ -410,10 +410,12 @@ export default function AppTest() {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap gap-2">
-            <Button onClick={() => setShowStreakCelebration(true)} variant="outline">
-              <Sparkles className="h-4 w-4 mr-2" />
-              Presence Celebration
-            </Button>
+            {[1, 3, 7, 14, 30].map(day => (
+              <Button key={day} onClick={() => { setTestStreakDay(day); setShowStreakCelebration(true); }} variant="outline" size="sm">
+                <Flame className="h-3 w-3 mr-1" />
+                Streak Day {day}
+              </Button>
+            ))}
             <Button onClick={() => setShowCompletionCelebration(true)} variant="outline">
               <Trophy className="h-4 w-4 mr-2" />
               Course Completion
