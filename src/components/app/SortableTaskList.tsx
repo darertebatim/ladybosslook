@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import type { TaskColor } from '@/hooks/useTaskPlanner';
 import {
   DndContext,
   closestCenter,
@@ -258,6 +259,21 @@ export const SortableTaskList = ({
   );
 };
 
+const QUICK_ADD_VARIANTS: { emoji: string; color: TaskColor }[] = [
+  { emoji: '☀️', color: 'yellow' },
+  { emoji: '🌿', color: 'green' },
+  { emoji: '💜', color: 'purple' },
+  { emoji: '🔥', color: 'red' },
+  { emoji: '💧', color: 'blue' },
+  { emoji: '🧡', color: 'orange' },
+  { emoji: '⭐', color: 'yellow' },
+  { emoji: '🎯', color: 'red' },
+  { emoji: '🌸', color: 'pink' },
+  { emoji: '🍀', color: 'green' },
+  { emoji: '✨', color: 'lavender' },
+  { emoji: '🌊', color: 'sky' },
+];
+
 function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
@@ -268,12 +284,14 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
     const trimmed = title.trim();
     if (!trimmed) return;
 
+    const variant = QUICK_ADD_VARIANTS[taskCount % QUICK_ADD_VARIANTS.length];
+
     haptic.medium();
     createTask.mutate({
       title: trimmed,
       scheduled_date: format(date, 'yyyy-MM-dd'),
-      emoji: '☀️',
-      color: 'yellow',
+      emoji: variant.emoji,
+      color: variant.color,
       order_index: taskCount,
     });
     setTitle('');
@@ -288,10 +306,10 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
           haptic.light();
           setTimeout(() => inputRef.current?.focus(), 100);
         }}
-        className="mt-3 w-full rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-orange-300 flex items-center gap-2 active:scale-[0.98] transition-all"
+        className="mt-3 w-full rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2 active:scale-[0.98] transition-all"
       >
         <div className="w-10 h-10 flex items-center justify-center shrink-0">
-          <Plus className="h-5 w-5 text-orange-400" />
+          <Plus className="h-5 w-5 text-urgency" />
         </div>
         <span className="text-[15px] font-semibold text-muted-foreground">Quick add action...</span>
       </button>
@@ -299,9 +317,9 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   }
 
   return (
-    <div className="mt-3 rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-orange-300 flex items-center gap-2">
+    <div className="mt-3 rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2">
       <div className="w-10 h-10 flex items-center justify-center shrink-0">
-        <Plus className="h-5 w-5 text-orange-400" />
+        <Plus className="h-5 w-5 text-urgency" />
       </div>
       <input
         ref={inputRef}
@@ -323,7 +341,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
       {title.trim() && (
         <button
           onClick={handleSubmit}
-          className="px-3 py-1.5 rounded-2xl bg-primary text-primary-foreground text-xs font-semibold active:scale-95 transition-transform"
+          className="px-3 py-1.5 rounded-2xl bg-urgency text-urgency-foreground text-xs font-semibold active:scale-95 transition-transform"
         >
           Add
         </button>
