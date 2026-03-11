@@ -119,10 +119,14 @@ export default function AppTest() {
                 <CardTitle className="text-lg">🎉 Celebrations</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button onClick={() => setShowStreakCelebration(true)} className="w-full justify-start" variant="outline">
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Presence Celebration
-                </Button>
+                <div className="flex gap-1">
+                  {[1, 3, 7, 14, 30].map(day => (
+                    <Button key={day} onClick={() => { setTestStreakDay(day); setShowStreakCelebration(true); }} className="flex-1" variant="outline" size="sm">
+                      <Flame className="h-3 w-3 mr-1" />
+                      Day {day}
+                    </Button>
+                  ))}
+                </div>
                 <Button onClick={() => setShowCompletionCelebration(true)} className="w-full justify-start" variant="outline">
                   <Trophy className="h-4 w-4 mr-2" />
                   Course Completion
