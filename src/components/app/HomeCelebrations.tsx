@@ -167,6 +167,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
           setIsFirstActionCelebration(false);
         }}
         isFirstAction={isFirstActionCelebration}
+        currentStreak={streak?.current_streak || 1}
         shouldShowGoalSelection={shouldShowGoalSelection}
         onShowGoalSelection={() => {
           setIsStreakUpgrade(false);
