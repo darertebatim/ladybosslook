@@ -96,30 +96,34 @@ export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, previ
   if (page === 1) return (
     <div ref={containerRef} style={{ position: 'relative', minHeight: '100%', background: '#fff', fontFamily: SF }}>
 
-      {/* Fixed hero background + mascot */}
+      {/* Fixed hero background + full-width mascot */}
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1,
         height: 420,
-        background: `
-          radial-gradient(ellipse 80% 60% at 50% 100%, #f59e0b22 0%, transparent 60%),
-          radial-gradient(ellipse 60% 50% at 85% 60%, #a855f7 0%, transparent 50%),
-          radial-gradient(ellipse 60% 50% at 15% 60%, #7e22ce 0%, transparent 50%),
-          radial-gradient(ellipse 100% 80% at 50% 20%, #4c1d95 0%, #1e0851 100%)
-        `,
+        overflow: 'hidden',
       }}>
-        <Header dark />
+        {/* Mascot image as full background */}
+        <img src={mascotHero} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
 
-        <div style={{ paddingLeft: 20, paddingRight: 20, textAlign: 'center' }}>
-          <p style={{ color: '#fff', fontSize: 22, fontWeight: 800, lineHeight: 1.28, margin: 0, letterSpacing: -0.3 }}>
-            Plus users are{' '}
-            <span style={{ color: '#f59e0b', fontSize: 28, fontWeight: 900 }}>4.2x</span>
-            {' '}more likely to stay consistent and see real change!
-          </p>
-        </div>
+        {/* Overlay gradient for text readability */}
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+          background: `
+            linear-gradient(to bottom, rgba(30,8,81,0.7) 0%, rgba(30,8,81,0.3) 40%, transparent 70%),
+            linear-gradient(to top, rgba(30,8,81,0.5) 0%, transparent 40%)
+          `,
+        }} />
 
-        {/* Centered mascot */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
-          <img src={mascotHero} alt="" style={{ width: 200, height: 200, objectFit: 'contain' }} />
+        {/* Content on top */}
+        <div style={{ position: 'relative', zIndex: 2 }}>
+          <Header dark />
+          <div style={{ paddingLeft: 20, paddingRight: 20, textAlign: 'center' }}>
+            <p style={{ color: '#fff', fontSize: 22, fontWeight: 800, lineHeight: 1.28, margin: 0, letterSpacing: -0.3, textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>
+              Plus users are{' '}
+              <span style={{ color: '#f59e0b', fontSize: 28, fontWeight: 900 }}>4.2x</span>
+              {' '}more likely to stay consistent and see real change!
+            </p>
+          </div>
         </div>
       </div>
 
