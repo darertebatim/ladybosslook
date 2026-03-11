@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, X, Check } from 'lucide-react';
 import type { PaywallProgramData } from './PaywallClassic';
