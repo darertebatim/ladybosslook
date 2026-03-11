@@ -44,6 +44,7 @@ import { GoldStreakLostBanner } from '@/components/app/GoldStreakLostBanner';
 import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
 import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
+import { ChallengeCompleteSummary } from '@/components/app/ChallengeCompleteSummary';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
