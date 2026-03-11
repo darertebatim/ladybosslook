@@ -113,7 +113,7 @@ export const StreakLostBanner = ({
               No shields left. Unlock more with <span className="font-semibold text-white">Simora Plus</span>.
             </p>
             <Button
-              onClick={() => { haptic.light(); onDismiss(); navigate('/app/subscribe'); }}
+              onClick={() => { haptic.light(); onDismiss(); onSubscribe?.(); }}
               className="w-full bg-white hover:bg-white/90 text-red-600 font-semibold py-3 rounded-xl mb-2"
             >
               <Sparkles className="h-4 w-4 mr-1" />
