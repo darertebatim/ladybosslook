@@ -137,77 +137,81 @@ export const StreakCelebration = ({
           )}
           onClick={(e) => e.stopPropagation()}
         >
-        {/* Streak count */}
-        <div className={cn(
-          'text-center mb-1 transition-all duration-500 delay-150',
-          isAnimating ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
-        )}>
-          <span className="text-6xl font-bold text-orange-400">
-            {currentStreak}
-          </span>
-        </div>
-        <p className="text-center text-white/50 text-sm mb-4">
-          {currentStreak === 1 ? 'day streak' : 'days streak'}
-        </p>
+          {/* Streak count */}
+          <div className={cn(
+            'text-center mb-1 transition-all duration-500 delay-150',
+            isAnimating ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+          )}>
+            <span className="text-6xl font-bold text-orange-400">
+              {currentStreak}
+            </span>
+          </div>
+          <p className="text-center text-white/50 text-sm mb-4">
+            {currentStreak === 1 ? 'day streak' : 'days streak'}
+          </p>
 
-        {/* Message */}
-        <p className="text-center text-white/80 text-sm leading-relaxed whitespace-pre-line mb-6">
-          {getMessage()}
-        </p>
+          {/* Message */}
+          <p className="text-center text-white/80 text-sm leading-relaxed whitespace-pre-line mb-6">
+            {getMessage()}
+          </p>
 
-        {/* Week progress bar */}
-        <div className="mb-2">
-          <div className="relative h-3 bg-white/10 rounded-full overflow-hidden">
-            <div
-              className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
-              style={{
-                width: `${progressPercent}%`,
-                background: 'repeating-linear-gradient(45deg, #fb923c, #fb923c 6px, #fdba74 6px, #fdba74 12px)',
-              }}
-            />
-            {progressPercent > 0 && (
+          {/* Week progress bar */}
+          <div className="mb-2">
+            <div className="relative h-3 bg-white/10 rounded-full overflow-hidden">
               <div
-                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-all duration-700"
-                style={{ left: `${progressPercent}%` }}
-              >
-                <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center shadow-lg">
-                  <Flame className="w-3 h-3 text-white" fill="currentColor" />
+                className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
+                style={{
+                  width: `${progressPercent}%`,
+                  background: 'repeating-linear-gradient(45deg, #fb923c, #fb923c 6px, #fdba74 6px, #fdba74 12px)',
+                }}
+              />
+            </div>
+            {/* Small flame indicator below the bar */}
+            {progressPercent > 0 && (
+              <div className="relative h-0">
+                <div
+                  className="absolute -top-[22px] -translate-x-1/2 transition-all duration-700"
+                  style={{ left: `${progressPercent}%` }}
+                >
+                  <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center shadow-lg">
+                    <Flame className="w-3 h-3 text-white" fill="currentColor" />
+                  </div>
                 </div>
               </div>
             )}
           </div>
-        </div>
 
-        {/* Weekday labels */}
-        <div className="flex justify-between px-1 mb-8">
-          {WEEKDAY_LABELS.map((label, i) => {
-            const isActive = i < streakDaysThisWeek;
-            const isToday = i === todayIndex;
-            return (
-              <span
-                key={i}
-                className={cn(
-                  'text-xs font-medium w-6 text-center transition-colors',
-                  isToday
-                    ? 'text-orange-400 font-bold'
-                    : isActive
-                    ? 'text-orange-400/60'
-                    : 'text-white/30'
-                )}
-              >
-                {label}
-              </span>
-            );
-          })}
-        </div>
+          {/* Weekday labels */}
+          <div className="flex justify-between px-1 mb-8">
+            {WEEKDAY_LABELS.map((label, i) => {
+              const isActive = i < streakDaysThisWeek;
+              const isToday = i === todayIndex;
+              return (
+                <span
+                  key={i}
+                  className={cn(
+                    'text-xs font-medium w-6 text-center transition-colors',
+                    isToday
+                      ? 'text-orange-400 font-bold'
+                      : isActive
+                      ? 'text-orange-400/60'
+                      : 'text-white/30'
+                  )}
+                >
+                  {label}
+                </span>
+              );
+            })}
+          </div>
 
-        {/* CTA */}
-        <Button
-          onClick={handleClose}
-          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl text-base"
-        >
-          I'm committed
-        </Button>
+          {/* CTA */}
+          <Button
+            onClick={handleClose}
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl text-base"
+          >
+            I'm committed
+          </Button>
+        </div>
       </div>
 
       <SoftReviewPrompt
