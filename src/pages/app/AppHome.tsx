@@ -101,8 +101,7 @@ const AppHome = () => {
   const setStreakGoal = useSetStreakGoal();
   const recoverStreak = useRecoverStreak();
   const [showRecoveryPrompt, setShowRecoveryPrompt] = useState(false);
-  const [showStreakMilestone, setShowStreakMilestone] = useState(false);
-  const [streakMilestoneValue, setStreakMilestoneValue] = useState(0);
+  const [celebrationStreakCount, setCelebrationStreakCount] = useState(1);
 
   // Gold streak celebration state - use localStorage to prevent re-showing on navigation
   const todayStr = format(new Date(), 'yyyy-MM-dd');
