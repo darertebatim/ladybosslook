@@ -414,14 +414,22 @@ const AppHome = () => {
   // Fetch badge data for expanded month calendar
   const { data: monthBadgeData } = useDateRangeTaskCompletion(dateRange.start, dateRange.end);
 
-  // Filter tasks by tag and exclude skipped tasks
+  // Filter tasks by tag and exclude skipped tasks, merge carry-forward tasks for today
   const filteredTasks = useMemo(() => {
     let result = tasks.filter(task => !skippedTaskIds.has(task.id));
+    
+    // Merge carry-forward (uncompleted past one-time) tasks when viewing today
+    if (isToday(selectedDate) && carryForwardTasks.length > 0) {
+      const existingIds = new Set(result.map(t => t.id));
+      const newCarryForward = carryForwardTasks.filter(t => !existingIds.has(t.id) && !skippedTaskIds.has(t.id));
+      result = [...result, ...newCarryForward];
+    }
+    
     if (selectedTag) {
       result = result.filter(task => task.tag === selectedTag);
     }
     return result;
-  }, [tasks, selectedTag, skippedTaskIds]);
+  }, [tasks, selectedTag, skippedTaskIds, selectedDate, carryForwardTasks]);
 
   // Get unique tags from tasks
   const taskTags = useMemo(() => {
