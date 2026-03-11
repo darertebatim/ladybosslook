@@ -88,10 +88,9 @@ export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
 
   return (
     <>
-      <Dialog open={open && !showCelebration} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-[400px] h-[85vh] p-0 rounded-2xl overflow-hidden border-0 [&>button]:hidden">
-          <VisuallyHidden><DialogTitle>Upgrade to simora+</DialogTitle></VisuallyHidden>
-          <div className="h-full overflow-y-auto">
+      {open && !showCelebration && (
+        <div className="fixed inset-0 z-50 bg-white">
+          <div className="h-full overflow-y-auto" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
             <Component
               program={programData}
               onPurchase={onPurchaseComplete}
@@ -99,8 +98,8 @@ export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
               onClose={() => onOpenChange(false)}
             />
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )
 
       <PurchaseCelebration
         open={showCelebration}
