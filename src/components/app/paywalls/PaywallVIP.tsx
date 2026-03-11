@@ -48,7 +48,15 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
 
   const trialDays = program.trial_days || 7;
 
-  const handlePurchase = async () => {
+  // Preload images for later pages to prevent lag
+  useEffect(() => {
+    [comparisonTable, beforeAfter].forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
+
     if (preview) return;
     setIsPurchasing(true);
     try {
