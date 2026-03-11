@@ -1186,6 +1186,9 @@ const AppHome = () => {
           userId={user?.id}
           showNotificationFlow={showNotificationFlow}
           setShowNotificationFlow={setShowNotificationFlow}
+          showStreakMilestone={showStreakMilestone}
+          setShowStreakMilestone={setShowStreakMilestone}
+          streakMilestoneValue={streakMilestoneValue}
         />
 
         {/* New Interactive Home Tour */}
