@@ -120,9 +120,17 @@ export default function AppTest() {
                 <CardTitle className="text-lg">🎉 Celebrations</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button onClick={() => setShowStreakCelebration(true)} className="w-full justify-start" variant="outline">
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Presence Celebration
+                <Button onClick={() => { setStreakTestCount(1); setShowStreakCelebration(true); }} className="w-full justify-start" variant="outline">
+                  <Flame className="h-4 w-4 mr-2" />
+                  Streak Celebration (1 day)
+                </Button>
+                <Button onClick={() => { setStreakTestCount(7); setShowStreakCelebration(true); }} className="w-full justify-start" variant="outline">
+                  <Flame className="h-4 w-4 mr-2" />
+                  Streak Celebration (7 days)
+                </Button>
+                <Button onClick={() => { setStreakTestCount(30); setShowStreakCelebration(true); }} className="w-full justify-start" variant="outline">
+                  <Flame className="h-4 w-4 mr-2" />
+                  Streak Celebration (30 days)
                 </Button>
                 <Button onClick={() => setShowCompletionCelebration(true)} className="w-full justify-start" variant="outline">
                   <Trophy className="h-4 w-4 mr-2" />
