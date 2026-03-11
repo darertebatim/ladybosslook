@@ -25,10 +25,12 @@ export const GoldStreakLostBanner = ({
   previousGoldStreak,
   hasShieldsRemaining,
   shieldsLeft,
+  isSubscribed,
   onRecover,
   onDismiss,
   isLoading,
 }: GoldStreakLostBannerProps) => {
+  const navigate = useNavigate();
   const [isAnimating] = useState(true);
 
   if (!open) return null;
