@@ -128,17 +128,17 @@ export function MoodRoutinePromptSheet({
         <div className="flex gap-2">
           <Button
             variant="ghost"
-            onClick={handleSkip}
-            className="flex-1 h-10 rounded-full text-foreground/40 hover:text-foreground/60 hover:bg-foreground/5 text-sm"
+            onClick={handleNever}
+            className="flex-1 h-10 rounded-full text-foreground/40 hover:text-foreground/60 hover:bg-foreground/10 active:scale-95 transition-all text-sm"
           >
-            Not now
+            Never
           </Button>
           <Button
             variant="ghost"
-            onClick={handleNever}
-            className="flex-1 h-10 rounded-full text-foreground/40 hover:text-foreground/60 hover:bg-foreground/5 text-sm"
+            onClick={handleSkip}
+            className="flex-1 h-10 rounded-full text-foreground/40 hover:text-foreground/60 hover:bg-foreground/10 active:scale-95 transition-all text-sm"
           >
-            Never
+            Not now
           </Button>
         </div>
       </SheetContent>
