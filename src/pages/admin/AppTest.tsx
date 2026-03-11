@@ -533,6 +533,7 @@ export default function AppTest() {
             open={showGoldStreakLostBanner}
             previousGoldStreak={5}
             hasShieldsRemaining={true}
+            shieldsLeft={2}
             onRecover={() => { setShowGoldStreakLostBanner(false); setShowRecoverySuccess('gold'); }}
             onDismiss={() => setShowGoldStreakLostBanner(false)}
           />
