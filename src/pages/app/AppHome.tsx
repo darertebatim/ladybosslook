@@ -957,7 +957,7 @@ const AppHome = () => {
                         
                         {/* Spotlighted task card + hint — disable body tap so only checkbox works */}
                         <div className="relative z-[101]">
-                          <SortableTaskList tasks={repeatingTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                          <SortableTaskList tasks={repeatingTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                           
                           {/* Bouncing hand hint pointing at the checkbox */}
                           <div
@@ -997,7 +997,7 @@ const AppHome = () => {
                         {filteredTasks.length > 0 && (
                           <div className="relative z-[101]">
                             <div className="relative">
-                              <SortableTaskList tasks={[repeatingTasks[0]]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                              <SortableTaskList tasks={[repeatingTasks[0]]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                               {/* Pointing finger absolutely positioned over the card */}
                               <div className="absolute inset-0 flex items-start justify-center pointer-events-none animate-bounce" style={{ top: '-5rem' }}>
                                 <span className="text-8xl" style={{ transform: 'rotate(135deg)', display: 'inline-block' }}>☝️</span>
@@ -1011,12 +1011,12 @@ const AppHome = () => {
                         {/* Remaining tasks behind the overlay */}
                         {filteredTasks.length > 1 && (
                           <div className="relative z-[1]">
-                            <SortableTaskList tasks={repeatingTasks.slice(1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                            <SortableTaskList tasks={repeatingTasks.slice(1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                           </div>
                         )}
                       </>
                     ) : (
-                      <SortableTaskList tasks={repeatingTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                      <SortableTaskList tasks={repeatingTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                     );
                   })()}
 
