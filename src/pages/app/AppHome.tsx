@@ -482,14 +482,7 @@ const AppHome = () => {
     const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated') === 'true';
     if (!alreadyCelebrated) return;
     
-    // Check if this is a milestone streak
-    if (isStreakMilestone(newStreak) && localStorage.getItem(getStreakMilestoneKey(newStreak)) !== 'true') {
-      localStorage.setItem(getStreakMilestoneKey(newStreak), 'true');
-      setStreakMilestoneValue(newStreak);
-      setShowStreakMilestone(true);
-      return;
-    }
-    
+    setCelebrationStreakCount(newStreak);
     setShowStreakModal(true);
   }, []);
 
