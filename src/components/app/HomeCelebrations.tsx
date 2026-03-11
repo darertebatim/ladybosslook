@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { StreakMilestoneCelebration, isStreakMilestone, getStreakMilestoneKey } from '@/components/app/StreakMilestoneCelebration';
 import { format } from 'date-fns';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { StreakGoalSelection } from '@/components/app/StreakGoalSelection';
@@ -52,6 +51,7 @@ interface HomeCelebrationsProps {
   setShowTapCoachMark: (v: boolean) => void;
   streak: any;
   shouldShowGoalSelection: boolean;
+  celebrationStreakCount: number;
 
   // Streak goal
   showGoalSelection: boolean;
@@ -106,12 +106,6 @@ interface HomeCelebrationsProps {
   userId?: string;
   showNotificationFlow: boolean;
   setShowNotificationFlow: (v: boolean) => void;
-
-  // Streak milestone
-  showStreakMilestone: boolean;
-  setShowStreakMilestone: (v: boolean) => void;
-  streakMilestoneValue: number;
-  setStreakMilestoneValue: (v: number) => void;
 }
 
 export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebrationsProps) {
@@ -121,7 +115,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     selectedTask, setSelectedTask, selectedDate, completedTaskIds, completedSubtaskIds,
     goalProgressMap, onEditTask, onDeleteTask, onSkipTask, onOpenGoalInput, onOpenTimer,
     showStreakModal, setShowStreakModal, isFirstActionCelebration, setIsFirstActionCelebration,
-    setShowTapCoachMark, streak, shouldShowGoalSelection,
+    setShowTapCoachMark, streak, shouldShowGoalSelection, celebrationStreakCount,
     showGoalSelection, setShowGoalSelection, isStreakUpgrade, setIsStreakUpgrade,
     showGoalConfirmation, setShowGoalConfirmation, confirmedGoal, setConfirmedGoal, setStreakGoal,
     badgeCelebrationType, closeBadgeCelebration, badgeCompletedCount, badgeTotalCount, maybeRequestReview,
@@ -131,7 +125,6 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     timerTask, setTimerTask, onTimerSaveProgress, onTimerMarkComplete,
     showRecoveryPrompt, setShowRecoveryPrompt, recoverStreak,
     userId, showNotificationFlow, setShowNotificationFlow,
-    showStreakMilestone, setShowStreakMilestone, streakMilestoneValue, setStreakMilestoneValue,
   } = props;
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -159,13 +152,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         onEdit={onEditTask}
         onDelete={onDeleteTask}
         onStreakIncrease={(newStreak: number) => {
-          if (isStreakMilestone(newStreak) && localStorage.getItem(getStreakMilestoneKey(newStreak)) !== 'true') {
-            localStorage.setItem(getStreakMilestoneKey(newStreak), 'true');
-            setStreakMilestoneValue(newStreak);
-            setShowStreakMilestone(true);
-          } else {
-            setShowStreakModal(true);
-          }
+          setShowStreakModal(true);
         }}
         onOpenGoalInput={onOpenGoalInput}
         onOpenTimer={onOpenTimer}
@@ -174,6 +161,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
 
       <StreakCelebration
         open={showStreakModal}
+        streakCount={celebrationStreakCount}
         onClose={() => {
           setShowStreakModal(false);
           if (isFirstActionCelebration && localStorage.getItem('simora_tap_coach_shown') !== 'true') {
@@ -295,12 +283,6 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         }}
         onDismiss={() => setShowRecoveryPrompt(false)}
         isLoading={recoverStreak.isPending}
-      />
-
-      <StreakMilestoneCelebration
-        open={showStreakMilestone}
-        streak={streakMilestoneValue}
-        onClose={() => setShowStreakMilestone(false)}
       />
     </>
   );

@@ -1,5 +1,4 @@
 // AppHome - Main home page component
-import { isStreakMilestone, getStreakMilestoneKey } from '@/components/app/StreakMilestoneCelebration';
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -102,8 +101,7 @@ const AppHome = () => {
   const setStreakGoal = useSetStreakGoal();
   const recoverStreak = useRecoverStreak();
   const [showRecoveryPrompt, setShowRecoveryPrompt] = useState(false);
-  const [showStreakMilestone, setShowStreakMilestone] = useState(false);
-  const [streakMilestoneValue, setStreakMilestoneValue] = useState(0);
+  const [celebrationStreakCount, setCelebrationStreakCount] = useState(1);
 
   // Gold streak celebration state - use localStorage to prevent re-showing on navigation
   const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -484,14 +482,7 @@ const AppHome = () => {
     const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated') === 'true';
     if (!alreadyCelebrated) return;
     
-    // Check if this is a milestone streak
-    if (isStreakMilestone(newStreak) && localStorage.getItem(getStreakMilestoneKey(newStreak)) !== 'true') {
-      localStorage.setItem(getStreakMilestoneKey(newStreak), 'true');
-      setStreakMilestoneValue(newStreak);
-      setShowStreakMilestone(true);
-      return;
-    }
-    
+    setCelebrationStreakCount(newStreak);
     setShowStreakModal(true);
   }, []);
 
@@ -1186,10 +1177,7 @@ const AppHome = () => {
           userId={user?.id}
           showNotificationFlow={showNotificationFlow}
           setShowNotificationFlow={setShowNotificationFlow}
-          showStreakMilestone={showStreakMilestone}
-          setShowStreakMilestone={setShowStreakMilestone}
-          streakMilestoneValue={streakMilestoneValue}
-          setStreakMilestoneValue={setStreakMilestoneValue}
+          celebrationStreakCount={celebrationStreakCount}
         />
 
         {/* New Interactive Home Tour */}

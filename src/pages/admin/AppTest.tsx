@@ -45,7 +45,7 @@ import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
 import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { ChallengeCompleteSummary } from '@/components/app/ChallengeCompleteSummary';
-import { StreakMilestoneCelebration, STREAK_MILESTONES } from '@/components/app/StreakMilestoneCelebration';
+
 
 // Mock bottom nav items for testing
 const mockNavItems = [
@@ -84,8 +84,7 @@ export default function AppTest() {
   const [showStreakGoalCompletion, setShowStreakGoalCompletion] = useState(false);
   const [showChallengeSummary, setShowChallengeSummary] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
-  const [streakMilestoneValue, setStreakMilestoneValue] = useState(0);
-  const [showStreakMilestone, setShowStreakMilestone] = useState(false);
+  const [streakTestCount, setStreakTestCount] = useState(1);
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
     return (
@@ -121,9 +120,17 @@ export default function AppTest() {
                 <CardTitle className="text-lg">🎉 Celebrations</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button onClick={() => setShowStreakCelebration(true)} className="w-full justify-start" variant="outline">
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Presence Celebration
+                <Button onClick={() => { setStreakTestCount(1); setShowStreakCelebration(true); }} className="w-full justify-start" variant="outline">
+                  <Flame className="h-4 w-4 mr-2" />
+                  Streak Celebration (1 day)
+                </Button>
+                <Button onClick={() => { setStreakTestCount(7); setShowStreakCelebration(true); }} className="w-full justify-start" variant="outline">
+                  <Flame className="h-4 w-4 mr-2" />
+                  Streak Celebration (7 days)
+                </Button>
+                <Button onClick={() => { setStreakTestCount(30); setShowStreakCelebration(true); }} className="w-full justify-start" variant="outline">
+                  <Flame className="h-4 w-4 mr-2" />
+                  Streak Celebration (30 days)
                 </Button>
                 <Button onClick={() => setShowCompletionCelebration(true)} className="w-full justify-start" variant="outline">
                   <Trophy className="h-4 w-4 mr-2" />
@@ -299,6 +306,7 @@ export default function AppTest() {
         {/* Render all modals/dialogs */}
         <StreakCelebration
           open={showStreakCelebration}
+          streakCount={streakTestCount}
           onClose={() => setShowStreakCelebration(false)}
         />
         <CompletionCelebration
@@ -401,14 +409,22 @@ export default function AppTest() {
             Celebrations
           </CardTitle>
           <CardDescription>
-            Test presence, course, and track completion celebrations
+            Test streak, course, and track completion celebrations
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap gap-2">
-            <Button onClick={() => setShowStreakCelebration(true)} variant="outline">
-              <Sparkles className="h-4 w-4 mr-2" />
-              Presence Celebration
+            <Button onClick={() => { setStreakTestCount(1); setShowStreakCelebration(true); }} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              Streak (1 day)
+            </Button>
+            <Button onClick={() => { setStreakTestCount(7); setShowStreakCelebration(true); }} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              Streak (7 days)
+            </Button>
+            <Button onClick={() => { setStreakTestCount(30); setShowStreakCelebration(true); }} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              Streak (30 days)
             </Button>
             <Button onClick={() => setShowCompletionCelebration(true)} variant="outline">
               <Trophy className="h-4 w-4 mr-2" />
@@ -430,20 +446,6 @@ export default function AppTest() {
               <Star className="h-4 w-4 mr-2" />
               Challenge Wrap-Up Summary
             </Button>
-          </div>
-          <Separator className="my-2" />
-          <p className="text-sm text-muted-foreground font-medium">Streak Milestones</p>
-          <div className="flex flex-wrap gap-2">
-            {STREAK_MILESTONES.map((m) => (
-              <Button
-                key={m}
-                variant="outline"
-                onClick={() => { setStreakMilestoneValue(m); setShowStreakMilestone(true); }}
-              >
-                <Flame className="h-4 w-4 mr-2" />
-                {m}-Day Streak
-              </Button>
-            ))}
           </div>
         </CardContent>
       </Card>
@@ -821,6 +823,7 @@ export default function AppTest() {
       {/* Render all modals/dialogs */}
       <StreakCelebration
         open={showStreakCelebration}
+        streakCount={streakTestCount}
         onClose={() => setShowStreakCelebration(false)}
       />
 
@@ -914,11 +917,6 @@ export default function AppTest() {
         }}
       />
 
-      <StreakMilestoneCelebration
-        open={showStreakMilestone}
-        streak={streakMilestoneValue}
-        onClose={() => setShowStreakMilestone(false)}
-      />
     </div>
   );
 }
