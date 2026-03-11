@@ -445,6 +445,14 @@ export default function RoutinesBank() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['routines-bank'] }),
   });
 
+  const updateSortOrder = useMutation({
+    mutationFn: async ({ id, sort_order }: { id: string; sort_order: number }) => {
+      const { error } = await supabase.from('routines_bank').update({ sort_order }).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['routines-bank'] }),
+  });
+
   // Fetch sections and tasks for a routine when editing
   const fetchRoutineData = async (routineId: string) => {
     const [sectionsRes, tasksRes] = await Promise.all([
@@ -1121,6 +1129,19 @@ export default function RoutinesBank() {
                       )}
                     </div>
                   </div>
+                  {selectedCategory === 'featured' && (
+                    <input
+                      type="number"
+                      value={routine.sort_order}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value) || 0;
+                        updateSortOrder.mutate({ id: routine.id, sort_order: val });
+                      }}
+                      className="w-14 h-8 text-center text-xs border rounded bg-background"
+                      title="Sort order (lower = first)"
+                    />
+                  )}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
