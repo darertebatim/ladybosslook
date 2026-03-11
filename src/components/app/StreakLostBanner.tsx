@@ -32,7 +32,6 @@ export const StreakLostBanner = ({
   isLoading,
 }: StreakLostBannerProps) => {
   const [isAnimating] = useState(true);
-  const [isAnimating] = useState(true);
 
   if (!open) return null;
 
