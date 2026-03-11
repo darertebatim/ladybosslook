@@ -256,7 +256,7 @@ const NativeAppLayout = () => {
             to="/app/presence"
             className="flex items-center justify-center min-h-[44px] tour-nav-presence"
           >
-            <div className="flex items-center justify-center gap-0.5 w-11 h-11 rounded-xl bg-gradient-to-br from-orange-400 to-orange-500 text-white shadow-sm active:scale-95 transition-transform">
+            <div className="flex items-center justify-center gap-0.5 w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-orange-500 text-white shadow-sm active:scale-95 transition-transform">
               <Flame className="h-5 w-5 fill-current shrink-0" />
               <span className="text-sm font-bold leading-none">{streakCount}</span>
             </div>
