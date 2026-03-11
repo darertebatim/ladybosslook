@@ -58,6 +58,7 @@ export function MoodRoutinePromptSheet({
   mood,
   onAddToRoutine,
   onSkip,
+  onNever,
   isLoading,
 }: MoodRoutinePromptSheetProps) {
   const moodData = mood ? MOOD_CONFIG[mood] : null;
