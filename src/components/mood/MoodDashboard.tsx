@@ -315,6 +315,7 @@ export function MoodDashboard() {
         mood={selectedMood}
         onAddToRoutine={handleRoutinePromptAdd}
         onSkip={handleRoutinePromptSkip}
+        onNever={handleRoutinePromptNever}
       />
 
       {/* Mood Celebration Sheet */}
