@@ -111,6 +111,7 @@ interface HomeCelebrationsProps {
   showStreakMilestone: boolean;
   setShowStreakMilestone: (v: boolean) => void;
   streakMilestoneValue: number;
+  setStreakMilestoneValue: (v: number) => void;
 }
 
 export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebrationsProps) {
