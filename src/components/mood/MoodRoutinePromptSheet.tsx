@@ -124,14 +124,23 @@ export function MoodRoutinePromptSheet({
           Add to My Routines
         </Button>
 
-        {/* Skip */}
-        <Button
-          variant="ghost"
-          onClick={handleSkip}
-          className="w-full h-10 rounded-full text-foreground/40 hover:bg-foreground/5 text-sm"
-        >
-          Not now
-        </Button>
+        {/* Skip buttons */}
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            onClick={handleSkip}
+            className="flex-1 h-10 rounded-full text-foreground/40 hover:text-foreground/60 hover:bg-foreground/5 text-sm"
+          >
+            Not now
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={handleNever}
+            className="flex-1 h-10 rounded-full text-foreground/40 hover:text-foreground/60 hover:bg-foreground/5 text-sm"
+          >
+            Never
+          </Button>
+        </div>
       </SheetContent>
     </Sheet>
   );
