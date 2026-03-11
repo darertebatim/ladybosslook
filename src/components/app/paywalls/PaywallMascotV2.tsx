@@ -107,11 +107,8 @@ export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, previ
 
         {/* Overlay gradient for text readability */}
         <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-          background: `
-            linear-gradient(to bottom, rgba(30,8,81,0.7) 0%, rgba(30,8,81,0.3) 40%, transparent 70%),
-            linear-gradient(to top, rgba(30,8,81,0.5) 0%, transparent 40%)
-          `,
+          position: 'absolute', top: 0, left: 0, right: 0, height: 120,
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 100%)',
         }} />
 
         {/* Content on top */}
