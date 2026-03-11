@@ -62,177 +62,95 @@ function getUnlockDateTime(
 
 /**
  * Hook to fetch program events (sessions + content unlocks) for a specific date
+ * Uses a single RPC call instead of multiple sequential queries
  */
 export function useProgramEventsForDate(date: Date) {
   const { user } = useAuth();
   const dateStr = format(date, 'yyyy-MM-dd');
-  
-  // Compute local day boundaries in ISO format for timezone-safe session queries
-  // This ensures a session stored as "2026-01-22 01:30:00+00" (UTC) appears on Jan 21 (local)
-  const startOfDayLocal = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
-  const endOfDayLocal = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0, 0, 0, 0);
-  const startIso = startOfDayLocal.toISOString();
-  const endIso = endOfDayLocal.toISOString();
+
   return useQuery({
     queryKey: ['planner-program-events', dateStr, user?.id],
     queryFn: async (): Promise<ProgramEvent[]> => {
       if (!user) return [];
 
-      const events: ProgramEvent[] = [];
+      const { data, error } = await supabase.rpc('get_program_events_for_date', {
+        p_user_id: user.id,
+        p_date_str: dateStr,
+      }) as { data: any; error: any };
 
-      // 1. Get user's active enrollments with round data
-      const { data: enrollments, error: enrollError } = await supabase
-        .from('course_enrollments')
-        .select(`
-          id,
-          program_slug,
-          course_name,
-          round_id,
-          enrolled_at,
-          program_rounds (
-            id,
-            program_slug,
-            round_name,
-            first_session_date,
-            drip_offset_days,
-            audio_playlist_id,
-            google_meet_link,
-            is_self_paced
-          )
-        `)
-        .eq('user_id', user.id)
-        .eq('status', 'active');
-
-      if (enrollError || !enrollments) {
-        console.error('Error fetching enrollments:', enrollError);
+      if (error) {
+        console.error('Error fetching program events:', error);
         return [];
       }
 
-      // Get completions for this date
-      const { data: completions } = await supabase
-        .from('planner_program_completions')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('completed_date', dateStr);
+      if (!data) return [];
 
-      const completionSet = new Set(
-        (completions || []).map((c) => `${c.event_type}:${c.event_id}`)
-      );
+      const events: ProgramEvent[] = [];
 
-      // Get program catalog for titles
-      const { data: programs } = await supabase
-        .from('program_catalog')
-        .select('slug, title');
-      
-      const programTitleMap = new Map(
-        (programs || []).map(p => [p.slug, p.title])
-      );
+      // Process sessions (already filtered by date in RPC)
+      for (const s of (data.sessions || [])) {
+        const sessionDate = new Date(s.sessionDate);
+        events.push({
+          id: s.id,
+          type: 'session',
+          title: s.title,
+          programSlug: s.programSlug,
+          programTitle: s.programTitle,
+          roundId: s.roundId,
+          time: format(sessionDate, 'h:mm a'),
+          isCompleted: s.isCompleted,
+          meetingLink: s.meetingLink,
+          sessionNumber: s.sessionNumber,
+        });
+      }
 
-      // Process each enrollment
-      for (const enrollment of enrollments) {
-        const round = enrollment.program_rounds as any;
-        if (!round) continue;
-
-        const programTitle = programTitleMap.get(enrollment.program_slug || '') || enrollment.course_name;
-        const programSlug = enrollment.program_slug || '';
-
-        // 2. Get live sessions for this round on the selected date (timezone-safe)
-        const { data: sessions } = await supabase
-          .from('program_sessions')
-          .select('*')
-          .eq('round_id', round.id)
-          .gte('session_date', startIso)
-          .lt('session_date', endIso);
-
-        for (const session of sessions || []) {
-          const sessionDate = new Date(session.session_date);
+      // Process modules — client-side drip date filtering
+      for (const m of (data.modules || [])) {
+        const { unlockDate, unlockTime } = getUnlockDateTime(
+          m.dripDelayDays,
+          m.dripAnchorDate,
+          m.dripOffsetDays || 0
+        );
+        if (unlockDate && isSameDay(unlockDate, date)) {
           events.push({
-            id: session.id,
-            type: 'session',
-            title: session.title,
-            programSlug,
-            programTitle,
-            roundId: round.id,
-            time: format(sessionDate, 'h:mm a'),
-            isCompleted: completionSet.has(`session:${session.id}`),
-            meetingLink: session.meeting_link || round.google_meet_link,
-            sessionNumber: session.session_number,
+            id: m.id,
+            type: 'module',
+            title: m.title,
+            programSlug: m.programSlug,
+            programTitle: m.programTitle,
+            roundId: m.roundId,
+            time: unlockTime || undefined,
+            isCompleted: m.isCompleted,
+            moduleId: m.moduleId,
+            playlistId: m.playlistId,
           });
-        }
-
-        // 3. Get content unlocks for this date (modules/supplements)
-        // For self-paced rounds, use enrolled_at as the drip anchor
-        const dripAnchorDate = round.is_self_paced ? enrollment.enrolled_at : round.first_session_date;
-        if (round.audio_playlist_id && dripAnchorDate) {
-          // Get modules (supplements)
-          const { data: modules } = await supabase
-            .from('playlist_supplements')
-            .select('*')
-            .eq('playlist_id', round.audio_playlist_id);
-
-          for (const module of modules || []) {
-            const { unlockDate, unlockTime } = getUnlockDateTime(
-              module.drip_delay_days,
-              dripAnchorDate,
-              round.drip_offset_days || 0
-            );
-            
-            if (unlockDate && isSameDay(unlockDate, date)) {
-              events.push({
-                id: module.id,
-                type: 'module',
-                title: module.title,
-                programSlug,
-                programTitle,
-                roundId: round.id,
-                time: unlockTime || undefined,
-                isCompleted: completionSet.has(`module:${module.id}`),
-                moduleId: module.id,
-                playlistId: round.audio_playlist_id,
-              });
-            }
-          }
-
-          // Get audio tracks
-          const { data: playlistItems } = await supabase
-            .from('audio_playlist_items')
-            .select(`
-              id,
-              drip_delay_days,
-              audio_content (
-                id,
-                title
-              )
-            `)
-            .eq('playlist_id', round.audio_playlist_id);
-
-          for (const item of playlistItems || []) {
-            const { unlockDate, unlockTime } = getUnlockDateTime(
-              item.drip_delay_days,
-              dripAnchorDate,
-              round.drip_offset_days || 0
-            );
-            
-            const audio = item.audio_content as any;
-            if (unlockDate && isSameDay(unlockDate, date) && audio) {
-              events.push({
-                id: audio.id,
-                type: 'track',
-                title: audio.title,
-                programSlug,
-                programTitle,
-                roundId: round.id,
-                time: unlockTime || undefined,
-                isCompleted: completionSet.has(`track:${audio.id}`),
-                trackId: audio.id,
-                playlistId: round.audio_playlist_id,
-              });
-            }
-          }
         }
       }
 
-      // Sort: sessions with time first, then by time, then modules/tracks
+      // Process tracks — client-side drip date filtering
+      for (const t of (data.tracks || [])) {
+        const { unlockDate, unlockTime } = getUnlockDateTime(
+          t.dripDelayDays,
+          t.dripAnchorDate,
+          t.dripOffsetDays || 0
+        );
+        if (unlockDate && isSameDay(unlockDate, date)) {
+          events.push({
+            id: t.id,
+            type: 'track',
+            title: t.title,
+            programSlug: t.programSlug,
+            programTitle: t.programTitle,
+            roundId: t.roundId,
+            time: unlockTime || undefined,
+            isCompleted: t.isCompleted,
+            trackId: t.trackId,
+            playlistId: t.playlistId,
+          });
+        }
+      }
+
+      // Sort: sessions first, then by time
       events.sort((a, b) => {
         if (a.type === 'session' && b.type !== 'session') return -1;
         if (a.type !== 'session' && b.type === 'session') return 1;
@@ -243,7 +161,7 @@ export function useProgramEventsForDate(date: Date) {
       return events;
     },
     enabled: !!user,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
 }
 
