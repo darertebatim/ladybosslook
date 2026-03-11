@@ -79,6 +79,7 @@ function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask & { sc
 export default function AppInspireDetail() {
   const { planId } = useParams<{ planId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPreviewSheet, setShowPreviewSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const { showHint, dismissHint } = useAddToRoutineHint();
