@@ -42,6 +42,8 @@ import { ActionLimitSheet, resetActionLimitSoftSeen } from '@/components/app/Act
 import { StreakLostBanner } from '@/components/app/StreakLostBanner';
 import { GoldStreakLostBanner } from '@/components/app/GoldStreakLostBanner';
 import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
+import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
+import { PaywallSheet } from '@/components/app/PaywallSheet';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
@@ -77,7 +79,8 @@ export default function AppTest() {
   const [showStreakLostNoShields, setShowStreakLostNoShields] = useState(false);
   const [showGoldLostNoShields, setShowGoldLostNoShields] = useState(false);
   const [showRecoverySuccess, setShowRecoverySuccess] = useState<'streak' | 'gold' | null>(null);
-
+  const [showStreakGoalCompletion, setShowStreakGoalCompletion] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
     return (
@@ -414,6 +417,10 @@ export default function AppTest() {
               <Sparkles className="h-4 w-4 mr-2" />
               Playlist Complete
             </Button>
+            <Button onClick={() => setShowStreakGoalCompletion(true)} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              Streak Goal Completed (7 days)
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -557,6 +564,7 @@ export default function AppTest() {
             isSubscribed={false}
             onRecover={() => {}}
             onDismiss={() => setShowStreakLostNoShields(false)}
+            onSubscribe={() => { setShowStreakLostNoShields(false); setShowPaywall(true); }}
           />
           <GoldStreakLostBanner
             open={showGoldLostNoShields}
@@ -573,6 +581,17 @@ export default function AppTest() {
             type={showRecoverySuccess || 'streak'}
             onClose={() => setShowRecoverySuccess(null)}
           />
+          <StreakGoalCompletionCelebration
+            open={showStreakGoalCompletion}
+            streakGoal={7}
+            currentStreak={7}
+            onClose={() => setShowStreakGoalCompletion(false)}
+            onLevelUp={() => {
+              setShowStreakGoalCompletion(false);
+              toast.info('Level up → goal selection would open');
+            }}
+          />
+          <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
         </CardContent>
       </Card>
 

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Crown, Shield, X, Sparkles } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
@@ -13,6 +12,7 @@ interface GoldStreakLostBannerProps {
   isSubscribed: boolean;
   onRecover: () => void;
   onDismiss: () => void;
+  onSubscribe?: () => void;
   isLoading?: boolean;
 }
 
@@ -28,9 +28,9 @@ export const GoldStreakLostBanner = ({
   isSubscribed,
   onRecover,
   onDismiss,
+  onSubscribe,
   isLoading,
 }: GoldStreakLostBannerProps) => {
-  const navigate = useNavigate();
   const [isAnimating] = useState(true);
 
   if (!open) return null;
@@ -112,7 +112,7 @@ export const GoldStreakLostBanner = ({
               No shields left. Unlock more with <span className="font-semibold text-white">Simora Plus</span>.
             </p>
             <Button
-              onClick={() => { haptic.light(); onDismiss(); navigate('/app/subscribe'); }}
+              onClick={() => { haptic.light(); onDismiss(); onSubscribe?.(); }}
               className="w-full bg-white hover:bg-white/90 text-amber-600 font-semibold py-3 rounded-xl mb-2"
             >
               <Sparkles className="h-4 w-4 mr-1" />
