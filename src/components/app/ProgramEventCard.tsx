@@ -68,9 +68,11 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
   const isSession = event.type === 'session';
   const currentSettings = isSession ? sessionSettings : contentSettings;
   const saveSettings = isSession ? setSessionSettings : setContentSettings;
+  const isFutureDate = isFuture(startOfDay(date));
 
   const handleToggleComplete = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isFutureDate) return;
     
     haptic.light();
 
