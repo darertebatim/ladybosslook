@@ -22,7 +22,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
-import { useFeaturedRoutinesBank } from '@/hooks/useRoutinesBank';
+import { useFeaturedRoutinesBank, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 import { haptic } from '@/lib/haptics';
 import { isWaterTask } from '@/lib/waterTracking';
