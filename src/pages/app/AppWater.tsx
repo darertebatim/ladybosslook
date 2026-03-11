@@ -463,6 +463,12 @@ const AppWater = () => {
         open={showStreakModal}
         onClose={() => setShowStreakModal(false)}
       />
+
+      <StreakMilestoneCelebration
+        open={showStreakMilestone}
+        streak={streakMilestoneValue}
+        onClose={() => setShowStreakMilestone(false)}
+      />
     </>
   );
 };
