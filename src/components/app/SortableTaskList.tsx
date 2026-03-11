@@ -259,7 +259,7 @@ export const SortableTaskList = ({
   );
 };
 
-const QUICK_ADD_VARIANTS: { emoji: string; color: string }[] = [
+const QUICK_ADD_VARIANTS: { emoji: string; color: TaskColor }[] = [
   { emoji: '☀️', color: 'yellow' },
   { emoji: '🌿', color: 'green' },
   { emoji: '💜', color: 'purple' },
@@ -270,8 +270,8 @@ const QUICK_ADD_VARIANTS: { emoji: string; color: string }[] = [
   { emoji: '🎯', color: 'red' },
   { emoji: '🌸', color: 'pink' },
   { emoji: '🍀', color: 'green' },
-  { emoji: '✨', color: 'purple' },
-  { emoji: '🌊', color: 'blue' },
+  { emoji: '✨', color: 'lavender' },
+  { emoji: '🌊', color: 'sky' },
 ];
 
 function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
