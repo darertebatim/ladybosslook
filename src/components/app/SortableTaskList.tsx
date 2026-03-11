@@ -105,7 +105,6 @@ interface SortableTaskListProps {
   onOpenGoalInput: (task: UserTask) => void;
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
-  onOpenNewActionSheet?: () => void;
 }
 
 export const SortableTaskList = ({
@@ -119,7 +118,6 @@ export const SortableTaskList = ({
   onOpenGoalInput,
   onOpenTimer,
   onOpenWaterTracking,
-  onOpenNewActionSheet,
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
@@ -233,7 +231,7 @@ export const SortableTaskList = ({
         </div>
 
         {/* Quick Add Card */}
-        <QuickAddCard date={date} taskCount={localTasks.length} onOpenFullSheet={onOpenNewActionSheet} />
+        <QuickAddCard date={date} taskCount={localTasks.length} />
 
         {/* One-time tasks */}
         {oneTimeTasks.length > 0 && (
@@ -276,7 +274,7 @@ const QUICK_ADD_VARIANTS: { emoji: string; color: TaskColor }[] = [
   { emoji: '🌊', color: 'sky' },
 ];
 
-function QuickAddCard({ date, taskCount, onOpenFullSheet }: { date: Date; taskCount: number; onOpenFullSheet?: () => void }) {
+function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -308,29 +306,18 @@ function QuickAddCard({ date, taskCount, onOpenFullSheet }: { date: Date; taskCo
           haptic.light();
           setTimeout(() => inputRef.current?.focus(), 100);
         }}
-        className="mt-3 w-full rounded-3xl pl-3 pr-3 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2 active:scale-[0.98] transition-all"
+        className="mt-3 w-full rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2 active:scale-[0.98] transition-all"
       >
         <div className="w-10 h-10 flex items-center justify-center shrink-0">
           <Plus className="h-5 w-5 text-urgency" />
         </div>
-        <span className="flex-1 text-left text-[15px] font-semibold text-muted-foreground">Quick add action...</span>
-        {/* FAB-style circle on the right */}
-        <div
-          className="w-10 h-10 rounded-full bg-urgency flex items-center justify-center shrink-0 shadow-urgency"
-          onClick={(e) => {
-            e.stopPropagation();
-            haptic.medium();
-            onOpenFullSheet?.();
-          }}
-        >
-          <Plus className="h-5 w-5 text-urgency-foreground" />
-        </div>
+        <span className="text-[15px] font-semibold text-muted-foreground">Quick add action...</span>
       </button>
     );
   }
 
   return (
-    <div className="mt-3 rounded-3xl pl-3 pr-3 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2">
+    <div className="mt-3 rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2">
       <div className="w-10 h-10 flex items-center justify-center shrink-0">
         <Plus className="h-5 w-5 text-urgency" />
       </div>
@@ -354,25 +341,11 @@ function QuickAddCard({ date, taskCount, onOpenFullSheet }: { date: Date; taskCo
       {title.trim() && (
         <button
           onClick={handleSubmit}
-          className="px-3 py-1.5 rounded-2xl bg-muted text-foreground text-xs font-semibold active:scale-95 transition-transform whitespace-nowrap"
+          className="px-3 py-1.5 rounded-2xl bg-urgency text-urgency-foreground text-xs font-semibold active:scale-95 transition-transform"
         >
-          Quick add
+          Add
         </button>
       )}
-      <div
-        className="w-10 h-10 rounded-full bg-urgency flex items-center justify-center shrink-0 shadow-urgency active:scale-95 transition-transform cursor-pointer"
-        onClick={() => {
-          haptic.medium();
-          if (title.trim()) {
-            // Has text → open full sheet with pre-filled title
-            onOpenFullSheet?.();
-          } else {
-            onOpenFullSheet?.();
-          }
-        }}
-      >
-        <Plus className="h-5 w-5 text-urgency-foreground" />
-      </div>
     </div>
   );
 }
