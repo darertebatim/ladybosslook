@@ -341,13 +341,19 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
           if (e.key === 'Escape') { setIsOpen(false); setTitle(''); }
         }}
         onBlur={() => {
-          if (!title.trim()) {
-            setIsOpen(false);
-          }
+          // Delay blur to allow button taps to register first (critical for iOS)
+          setTimeout(() => {
+            if (!title.trim() && document.activeElement !== inputRef.current) {
+              setIsOpen(false);
+            }
+          }, 200);
         }}
         placeholder="Type action name..."
         className="flex-1 bg-transparent text-[15px] font-semibold text-foreground placeholder:text-muted-foreground outline-none"
-        autoFocus
+        enterKeyHint="done"
+        autoComplete="off"
+        autoCorrect="on"
+        spellCheck={false}
       />
       {title.trim() && (
         <div className="flex items-center gap-1.5">
