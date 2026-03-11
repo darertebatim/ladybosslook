@@ -189,10 +189,7 @@ const AppPresence = () => {
                   previousStreak={previousStreakForRecovery}
                   onRecover={() => setShowRecoveryPrompt(true)}
                 />
-                <div>
-                  <p className="text-xs text-muted-foreground mb-2">Recovery Shields</p>
-                  <RecoveryShields recoveryUsed={!!(streak as any).streak_recovery_used} />
-                </div>
+                <RecoveryShields recoveryUsed={!!(streak as any).streak_recovery_used} />
               </div>
             )}
             
