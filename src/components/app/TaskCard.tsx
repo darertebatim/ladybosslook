@@ -15,7 +15,7 @@ import {
 import { haptic } from '@/lib/haptics';
 import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
-import { isToday, isBefore, startOfDay } from 'date-fns';
+import { isToday, isBefore, startOfDay, parseISO, format as fnsFormat } from 'date-fns';
 import { toast } from 'sonner';
 import { isWaterTask } from '@/lib/waterTracking';
 import { formatTimeLabelWithEmoji } from '@/lib/taskScheduling';
@@ -92,7 +92,17 @@ export const TaskCard = memo(function TaskCard({
   // Format repeat pattern label
   const getRepeatLabel = (task: UserTask): string => {
     const p = task.repeat_pattern;
-    if (!p || p === 'none') return 'Today';
+    if (!p || p === 'none') {
+      // Carry-forward: show original date if scheduled_date is before the viewing date
+      if (task.scheduled_date) {
+        const scheduledDate = parseISO(task.scheduled_date);
+        const viewingDate = startOfDay(date);
+        if (isBefore(scheduledDate, viewingDate)) {
+          return fnsFormat(scheduledDate, 'MMM d');
+        }
+      }
+      return 'Today';
+    }
     if (p === 'daily') return 'Daily';
     if (p === 'weekly') return 'Weekly';
     if (p === 'monthly') return 'Monthly';

@@ -1,4 +1,5 @@
 import { Check, Plus, Play, Droplets, FastForward, Pencil, Trash2 } from 'lucide-react';
+import { parseISO, isBefore, startOfDay, format as fnsFormat } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
@@ -72,14 +73,24 @@ export const TaskDetailModal = ({
   const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
 
   const getRepeatText = () => {
+    const p = task.repeat_pattern;
+    if (!p || p === 'none') {
+      // Carry-forward: show original date
+      if (task.scheduled_date) {
+        const scheduledDate = parseISO(task.scheduled_date);
+        if (isBefore(scheduledDate, startOfDay(date))) {
+          return `From ${fnsFormat(scheduledDate, 'MMM d')}`;
+        }
+      }
+      return '';
+    }
     const patterns: Record<string, string> = {
-      none: '',
       daily: 'Repeats every day',
       weekly: 'Repeats every week',
       monthly: 'Repeats every month',
       weekend: 'Repeats on weekends',
     };
-    return patterns[task.repeat_pattern] || '';
+    return patterns[p] || '';
   };
 
   const getReminderText = () => {
