@@ -1,20 +1,22 @@
 import { useEffect, useState } from 'react';
 import { format, addDays, startOfWeek, isSameDay } from 'date-fns';
-import { useUserPresence } from '@/hooks/useUserPresence';
 import { useAppReview } from '@/hooks/useAppReview';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
-import { Check, Sparkles, Heart } from 'lucide-react';
+import { Check, Sparkles, Heart, Flame } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { SoftReviewPrompt } from './SoftReviewPrompt';
+import { WeeklyPresenceGrid } from './WeeklyPresenceGrid';
 
 interface StreakCelebrationProps {
   open: boolean;
   onClose: () => void;
-  isFirstAction?: boolean; // When true, shows special first-action celebration
-  onShowGoalSelection?: () => void; // Callback to show goal selection after first streak day
-  shouldShowGoalSelection?: boolean; // Whether to trigger goal selection on close
+  isFirstAction?: boolean;
+  onShowGoalSelection?: () => void;
+  shouldShowGoalSelection?: boolean;
+  /** Current consecutive day streak count */
+  streakCount?: number;
 }
 
 const CONFETTI_COLORS = [
@@ -26,13 +28,8 @@ const CONFETTI_COLORS = [
 ];
 
 /**
- * Unified Celebration Component - Strength-first approach
- * 
- * Philosophy: "Simora measures depth of return, not length of absence."
- * - Celebrates showing up, not consecutive days
- * - Welcomes users back after gaps without shame
- * - Reinforces identity: "Your strength is still here"
- * - Special celebration for first action ever
+ * Daily Streak Celebration - shows current consecutive day streak.
+ * Triggered every time user completes their first action of the day.
  */
 export const StreakCelebration = ({ 
   open, 
@@ -40,44 +37,35 @@ export const StreakCelebration = ({
   isFirstAction = false,
   onShowGoalSelection,
   shouldShowGoalSelection = false,
+  streakCount = 1,
 }: StreakCelebrationProps) => {
-  const { data: presence } = useUserPresence();
   const { maybeRequestReview, shouldShowForStreak } = useAppReview();
   const [isAnimating, setIsAnimating] = useState(false);
   const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false);
   const [showReviewPrompt, setShowReviewPrompt] = useState(false);
 
-  const thisMonthDays = presence?.thisMonthActiveDays || 1;
-  const isReturning = presence?.isReturning || false;
-
-  // Handle close with potential review prompt or goal selection
   const handleClose = async () => {
     onClose();
     
-    // Check if we should show goal selection (first streak day, no goal set)
     if (shouldShowGoalSelection && onShowGoalSelection) {
-      // Small delay to let this modal close smoothly first
       setTimeout(() => {
         onShowGoalSelection();
       }, 300);
       return;
     }
     
-    // Check if we should show review after closing - show soft prompt first
-    if (shouldShowForStreak(thisMonthDays)) {
+    if (shouldShowForStreak(streakCount)) {
       setTimeout(() => {
         setShowReviewPrompt(true);
       }, 300);
     }
   };
 
-  // Handle accepting the soft review prompt
   const handleAcceptReview = async () => {
     setShowReviewPrompt(false);
     await maybeRequestReview();
   };
 
-  // Handle declining the soft review prompt
   const handleDeclineReview = () => {
     setShowReviewPrompt(false);
   };
@@ -87,7 +75,6 @@ export const StreakCelebration = ({
       setIsAnimating(true);
       haptic.success();
 
-      // Trigger confetti for first action celebration
       if (isFirstAction && !hasTriggeredConfetti) {
         setHasTriggeredConfetti(true);
         
@@ -122,67 +109,47 @@ export const StreakCelebration = ({
 
   if (!open) return null;
 
-  const lastActiveDate = presence?.lastActiveDate 
-    ? new Date(presence.lastActiveDate)
-    : new Date();
-
-  // Generate week days for presence indicator (checkmarks, not streak)
-  const weekStart = startOfWeek(new Date(), { weekStartsOn: 0 });
-  const weekDays = Array.from({ length: 7 }, (_, i) => {
-    const day = addDays(weekStart, i);
-    return {
-      date: day,
-      label: format(day, 'EEEEE'),
-      isActive: day <= lastActiveDate && presence?.showedUpToday,
-      isToday: isSameDay(day, new Date()),
-    };
-  });
-
-  // Messages based on context
   const getMessage = () => {
     if (isFirstAction) {
       return "Your first action is in.\nKeep it small. Keep it kind.";
     }
-    if (isReturning) {
-      return "Your strength is still here. Welcome back.";
+    if (streakCount >= 100) {
+      return "Triple digits. You're a legend. 💎";
     }
-    if (thisMonthDays === 1) {
-      return "You showed up. That's strength.";
+    if (streakCount >= 50) {
+      return "50+ days of consistency.\nThat's extraordinary. 🏆";
     }
-    if (thisMonthDays <= 3) {
-      return "You're here again. ✨";
+    if (streakCount >= 30) {
+      return "A full month. This is who you are now. 👑";
     }
-    if (thisMonthDays === 7) {
-      return "7 days this month. You keep showing up.";
+    if (streakCount >= 21) {
+      return "They say 21 days builds a habit.\nYou just did it. 🌟";
     }
-    if (thisMonthDays >= 14) {
-      return "You've shown up so many times. That's real strength.";
+    if (streakCount >= 14) {
+      return "Two weeks strong. You're unstoppable. 💪";
     }
-    return `${thisMonthDays} days this month. You're building something.`;
+    if (streakCount >= 7) {
+      return "A full week of showing up. That takes real commitment. ⚡";
+    }
+    if (streakCount >= 3) {
+      return "You're building momentum. Keep it going! 🔥";
+    }
+    if (streakCount === 2) {
+      return "Day 2. You came back. That's everything.";
+    }
+    return "You showed up. That's strength.";
   };
 
   const getTitle = () => {
     if (isFirstAction) {
       return "You showed up for yourself";
     }
-    return `${thisMonthDays} ${thisMonthDays === 1 ? 'day' : 'days'}`;
+    return `${streakCount} ${streakCount === 1 ? 'day' : 'days'}`;
   };
 
   const getSubtitle = () => {
-    if (isFirstAction) {
-      return null;
-    }
-    return "this month";
-  };
-
-  const getIcon = () => {
-    if (isFirstAction) {
-      return <Heart className="h-9 w-9 fill-current" />;
-    }
-    if (isReturning) {
-      return '💜';
-    }
-    return '✨';
+    if (isFirstAction) return null;
+    return "streak";
   };
 
   return (
@@ -208,25 +175,32 @@ export const StreakCelebration = ({
         )}>
           {isFirstAction ? (
             <div className="grid place-items-center size-20 rounded-2xl bg-orange-400 text-white shadow-lg">
-              {getIcon()}
+              <Heart className="h-9 w-9 fill-current" />
             </div>
           ) : (
-            <span className="text-5xl">{getIcon()}</span>
+            <div className="grid place-items-center size-20 rounded-full"
+              style={{
+                background: 'linear-gradient(180deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                boxShadow: '0 8px 32px rgba(251, 191, 36, 0.5)',
+              }}
+            >
+              <Flame className="h-10 w-10 text-white" strokeWidth={1.5} fill="rgba(255,255,255,0.3)" />
+            </div>
           )}
         </div>
 
         {/* Title */}
         <div className={cn(
-          'text-2xl font-semibold text-white mb-2 transition-all duration-500 delay-200',
+          'text-2xl font-semibold text-white mb-1 transition-all duration-500 delay-200',
           isAnimating ? 'scale-100 opacity-100' : 'scale-50 opacity-0',
-          !isFirstAction && 'text-4xl'
+          !isFirstAction && 'text-4xl font-bold'
         )}>
           {getTitle()}
         </div>
         
         {/* Subtitle */}
         {getSubtitle() && (
-          <p className="text-white/60 text-sm mb-4">{getSubtitle()}</p>
+          <p className="text-white/70 text-lg font-medium mb-3">{getSubtitle()}</p>
         )}
 
         {/* Message */}
@@ -234,29 +208,10 @@ export const StreakCelebration = ({
           {getMessage()}
         </p>
 
-        {/* Week presence indicator - only show for non-first-action */}
+        {/* Weekly presence grid - only show for non-first-action */}
         {!isFirstAction && (
-          <div className="flex justify-center gap-2 mb-6">
-            {weekDays.map((day, i) => (
-              <div key={i} className="flex flex-col items-center gap-1">
-                <div 
-                  className={cn(
-                    'w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all',
-                    day.isToday
-                      ? 'bg-orange-400 text-white ring-2 ring-orange-300'
-                      : day.isActive
-                      ? 'bg-orange-400/50 text-white'
-                      : 'bg-white/10 text-white/40'
-                  )}
-                >
-                  {day.isActive || day.isToday ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    day.label
-                  )}
-                </div>
-              </div>
-            ))}
+          <div className="mb-6">
+            <WeeklyPresenceGrid variant="dark" />
           </div>
         )}
 
@@ -269,14 +224,14 @@ export const StreakCelebration = ({
             'Continue'
           ) : (
             <>
-              <Sparkles className="h-4 w-4 mr-2" />
-              I'm here
+              <Flame className="h-4 w-4 mr-2" />
+              Keep Going
             </>
           )}
         </Button>
       </div>
 
-      {/* Soft Review Prompt - shown after streak celebration closes */}
+      {/* Soft Review Prompt */}
       <SoftReviewPrompt
         isOpen={showReviewPrompt}
         onClose={handleDeclineReview}
