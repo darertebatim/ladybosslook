@@ -104,7 +104,6 @@ interface SortableTaskListProps {
   onOpenGoalInput: (task: UserTask) => void;
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
-  hideQuickAdd?: boolean;
 }
 
 export const SortableTaskList = ({
@@ -118,7 +117,6 @@ export const SortableTaskList = ({
   onOpenGoalInput,
   onOpenTimer,
   onOpenWaterTracking,
-  hideQuickAdd,
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
@@ -240,7 +238,7 @@ export const SortableTaskList = ({
     </DndContext>
 
     {/* Quick Add Card */}
-    {!hideQuickAdd && <QuickAddCard date={date} />}
+    <QuickAddCard date={date} />
   </>
   );
 };
@@ -275,20 +273,20 @@ function QuickAddCard({ date }: { date: Date }) {
           haptic.light();
           setTimeout(() => inputRef.current?.focus(), 100);
         }}
-        className="mt-3 w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 active:scale-[0.98] transition-all"
+        className="mt-3 w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-dashed border-muted-foreground/20 bg-muted/30 active:scale-[0.98] transition-all"
       >
-        <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center">
-          <Plus className="h-4.5 w-4.5 text-primary" />
+        <div className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center">
+          <Plus className="h-4 w-4 text-muted-foreground" />
         </div>
-        <span className="text-sm font-medium text-foreground/70">Add a one-time action...</span>
+        <span className="text-sm text-muted-foreground">Quick add action...</span>
       </button>
     );
   }
 
   return (
-    <div className="mt-3 flex items-center gap-2 px-3 py-3 rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10 shadow-sm">
-      <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
-        <Plus className="h-4.5 w-4.5 text-primary" />
+    <div className="mt-3 flex items-center gap-2 px-3 py-2.5 rounded-2xl border border-primary/30 bg-card shadow-sm">
+      <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+        <Plus className="h-4 w-4 text-primary" />
       </div>
       <input
         ref={inputRef}
@@ -304,13 +302,13 @@ function QuickAddCard({ date }: { date: Date }) {
           }
         }}
         placeholder="Type action name..."
-        className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60 outline-none"
+        className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
         autoFocus
       />
       {title.trim() && (
         <button
           onClick={handleSubmit}
-          className="px-3.5 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold active:scale-95 transition-transform shadow-sm"
+          className="px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold active:scale-95 transition-transform"
         >
           Add
         </button>

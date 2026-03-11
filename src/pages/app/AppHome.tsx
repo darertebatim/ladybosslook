@@ -3,7 +3,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay, subDays } from 'date-fns';
-import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, Headset, ArrowLeft, Heart, Zap, CalendarCheck } from 'lucide-react';
+import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, Headset, ArrowLeft, Heart, Zap } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { HomeMenu } from '@/components/app/HomeMenu';
 import { cn } from '@/lib/utils';
@@ -421,10 +421,6 @@ const AppHome = () => {
     }
     return result;
   }, [tasks, selectedTag, skippedTaskIds]);
-
-  // Split into repeating and one-time tasks
-  const repeatingTasks = useMemo(() => filteredTasks.filter(t => t.repeat_pattern !== 'none'), [filteredTasks]);
-  const oneTimeTasks = useMemo(() => filteredTasks.filter(t => t.repeat_pattern === 'none'), [filteredTasks]);
 
   // Get unique tags from tasks
   const taskTags = useMemo(() => {
@@ -957,7 +953,7 @@ const AppHome = () => {
                         
                         {/* Spotlighted task card + hint — disable body tap so only checkbox works */}
                         <div className="relative z-[101]">
-                          <SortableTaskList tasks={repeatingTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                          <SortableTaskList tasks={filteredTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                           
                           {/* Bouncing hand hint pointing at the checkbox */}
                           <div
@@ -997,7 +993,7 @@ const AppHome = () => {
                         {filteredTasks.length > 0 && (
                           <div className="relative z-[101]">
                             <div className="relative">
-                              <SortableTaskList tasks={[repeatingTasks[0]]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                              <SortableTaskList tasks={[filteredTasks[0]]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                               {/* Pointing finger absolutely positioned over the card */}
                               <div className="absolute inset-0 flex items-start justify-center pointer-events-none animate-bounce" style={{ top: '-5rem' }}>
                                 <span className="text-8xl" style={{ transform: 'rotate(135deg)', display: 'inline-block' }}>☝️</span>
@@ -1011,27 +1007,14 @@ const AppHome = () => {
                         {/* Remaining tasks behind the overlay */}
                         {filteredTasks.length > 1 && (
                           <div className="relative z-[1]">
-                            <SortableTaskList tasks={repeatingTasks.slice(1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                            <SortableTaskList tasks={filteredTasks.slice(1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                           </div>
                         )}
                       </>
                     ) : (
-                      <SortableTaskList tasks={repeatingTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                      <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                     );
                   })()}
-
-                  {/* One-time Actions Section */}
-                  {oneTimeTasks.length > 0 && (
-                    <div className="mt-5">
-                      <div className="flex items-center gap-2 mb-3">
-                        <CalendarCheck className="h-4 w-4 text-blue-500 shrink-0" />
-                        <h2 className="text-sm font-semibold text-foreground tracking-wide">
-                          One-time Actions
-                        </h2>
-                      </div>
-                      <SortableTaskList tasks={oneTimeTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
-                    </div>
-                  )}
                   {/* Onboarding Banner - below actions, hidden while welcome card is active */}
                   {!showWelcomeCard && <OnboardingBanner />}
                 </div>
