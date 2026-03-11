@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils';
 import { UserTask, useReorderTasks, useCreateTask } from '@/hooks/useTaskPlanner';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
-import { Plus } from 'lucide-react';
+import { Plus, LayoutGrid } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface SortableTaskItemProps {
