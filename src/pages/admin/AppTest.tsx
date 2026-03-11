@@ -511,6 +511,14 @@ export default function AppTest() {
               <Crown className="h-4 w-4 mr-2" />
               Gold Streak Lost Banner
             </Button>
+            <Button onClick={() => setShowRecoverySuccess('streak')} variant="outline">
+              <Shield className="h-4 w-4 mr-2" />
+              Recovery Success (Streak)
+            </Button>
+            <Button onClick={() => setShowRecoverySuccess('gold')} variant="outline">
+              <Shield className="h-4 w-4 mr-2" />
+              Recovery Success (Gold)
+            </Button>
           </div>
           <StreakLostBanner
             open={showStreakLostBanner}
