@@ -22,6 +22,7 @@ import {
   Users,
   Headset,
   Crown,
+  Shield,
   RefreshCw,
 } from 'lucide-react';
 
