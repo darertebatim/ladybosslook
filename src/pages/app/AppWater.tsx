@@ -106,13 +106,8 @@ const AppWater = () => {
             duration: 2000,
           });
           if (result.streakIncreased) {
-            if (isStreakMilestone(result.newStreak) && localStorage.getItem(getStreakMilestoneKey(result.newStreak)) !== 'true') {
-              localStorage.setItem(getStreakMilestoneKey(result.newStreak), 'true');
-              setStreakMilestoneValue(result.newStreak);
-              setShowStreakMilestone(true);
-            } else {
-              setShowStreakModal(true);
-            }
+            setCelebrationStreakCount(result.newStreak);
+            setShowStreakModal(true);
           }
         },
       }
