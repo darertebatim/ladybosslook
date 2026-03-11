@@ -132,12 +132,12 @@ export function MoodDashboard() {
     navigate('/app/home');
   }, [navigate]);
 
-  const handleRitualPromptAdd = useCallback(() => {
+  const handleRoutinePromptAdd = useCallback(() => {
     setShowRitualPrompt(false);
     setShowRoutineSheet(true);
   }, []);
 
-  const handleRitualPromptSkip = useCallback(() => {
+  const handleRoutinePromptSkip = useCallback(() => {
     setShowRitualPrompt(false);
     setShowCelebration(true);
   }, []);
