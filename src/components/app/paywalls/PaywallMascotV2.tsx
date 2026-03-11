@@ -103,7 +103,7 @@ export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, previ
         overflow: 'hidden',
       }}>
         {/* Mascot image as full background */}
-        <img src={mascotHero} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 40%' }} />
+        <img src={mascotHero} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 55%' }} />
 
         {/* Overlay gradient for text readability */}
         <div style={{
@@ -128,7 +128,7 @@ export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, previ
       </div>
 
       {/* Spacer to push scrollable content below the fixed hero */}
-      <div style={{ height: 380 }} />
+      <div style={{ height: 340 }} />
 
       {/* Scrollable sheet that overlaps the hero */}
       <div style={{
