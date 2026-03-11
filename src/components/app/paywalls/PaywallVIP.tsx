@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, X, Check } from 'lucide-react';
 import type { PaywallProgramData } from './PaywallClassic';
@@ -45,16 +45,22 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
   const [page, setPage] = useState<1 | 2 | 3>(1);
   const [selectedPlan, setSelectedPlan] = useState<'annual' | 'monthly'>('annual');
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const trialDays = program.trial_days || 7;
 
-  // Preload images for later pages to prevent lag
+  // Preload images for later pages
   useEffect(() => {
     [comparisonTable, beforeAfter].forEach(src => {
       const img = new Image();
       img.src = src;
     });
   }, []);
+
+  // Scroll to top on page change
+  useEffect(() => {
+    containerRef.current?.closest('[class*="overflow-y-auto"]')?.scrollTo(0, 0);
+  }, [page]);
 
   const handlePurchase = async () => {
     if (preview) return;
@@ -87,7 +93,7 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
 
   /* ═══════════════════ PAGE 1 ═══════════════════ */
   if (page === 1) return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', background: '#fff', fontFamily: SF }}>
+    <div ref={containerRef} style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', background: '#fff', fontFamily: SF }}>
       <div style={{ flex: 1 }}>
 
         {/* Purple hero */}
@@ -172,7 +178,7 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
 
   /* ═══════════════════ PAGE 2 ═══════════════════ */
   if (page === 2) return (
-    <div style={{
+    <div ref={containerRef} style={{
       display: 'flex', flexDirection: 'column', minHeight: '100%', fontFamily: SF,
       background: `
         radial-gradient(ellipse 70% 40% at 10% 60%, #fde68a55 0%, transparent 60%),
@@ -222,7 +228,7 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
 
   /* ═══════════════════ PAGE 3 ═══════════════════ */
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', background: '#fff', fontFamily: SF }}>
+    <div ref={containerRef} style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', background: '#fff', fontFamily: SF }}>
       <div style={{ flex: 1 }}>
         <Header />
 
