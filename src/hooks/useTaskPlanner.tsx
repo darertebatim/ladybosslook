@@ -147,6 +147,7 @@ export interface CreateTaskInput {
   goal_type?: 'timer' | 'count' | null;
   goal_target?: number | null;
   goal_unit?: string | null;
+  order_index?: number;
 }
 
 export interface UpdateTaskInput extends Partial<CreateTaskInput> {
@@ -506,6 +507,7 @@ export const useCreateTask = () => {
           goal_type: taskData.goal_type || null,
           goal_target: taskData.goal_target || null,
           goal_unit: taskData.goal_unit || null,
+          ...(taskData.order_index !== undefined ? { order_index: taskData.order_index } : {}),
         })
         .select()
         .single();

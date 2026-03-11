@@ -193,6 +193,28 @@ export const SortableTaskList = ({
 
   const activeTask = activeId ? localTasks.find(t => t.id === activeId) : null;
 
+  // Split tasks: repeating vs one-time
+  const repeatingTasks = localTasks.filter(t => t.repeat_pattern && t.repeat_pattern !== 'none');
+  const oneTimeTasks = localTasks.filter(t => !t.repeat_pattern || t.repeat_pattern === 'none');
+  const allOrderedIds = [...repeatingTasks, ...oneTimeTasks].map(t => t.id);
+
+  const renderTask = (task: UserTask) => (
+    <SortableTaskItem
+      key={task.id}
+      task={task}
+      date={date}
+      isCompleted={completedTaskIds.has(task.id)}
+      completedSubtaskIds={completedSubtaskIds}
+      goalProgress={goalProgressMap.get(task.id) || 0}
+      onTap={onTaskTap}
+      onStreakIncrease={onStreakIncrease}
+      onOpenGoalInput={onOpenGoalInput}
+      onOpenTimer={onOpenTimer}
+      onOpenWaterTracking={onOpenWaterTracking}
+      isDragging={activeId === task.id}
+    />
+  );
+
   return (
     <>
     <DndContext
@@ -201,28 +223,24 @@ export const SortableTaskList = ({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <SortableContext items={localTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext items={allOrderedIds} strategy={verticalListSortingStrategy}>
         <div className="space-y-3">
-          {localTasks.map((task) => (
-            <SortableTaskItem
-              key={task.id}
-              task={task}
-              date={date}
-              isCompleted={completedTaskIds.has(task.id)}
-              completedSubtaskIds={completedSubtaskIds}
-              goalProgress={goalProgressMap.get(task.id) || 0}
-              onTap={onTaskTap}
-              onStreakIncrease={onStreakIncrease}
-              onOpenGoalInput={onOpenGoalInput}
-              onOpenTimer={onOpenTimer}
-              onOpenWaterTracking={onOpenWaterTracking}
-              isDragging={activeId === task.id}
-            />
-          ))}
+          {/* Repeating tasks */}
+          {repeatingTasks.map(renderTask)}
         </div>
+
+        {/* Quick Add Card */}
+        <QuickAddCard date={date} taskCount={localTasks.length} />
+
+        {/* One-time tasks */}
+        {oneTimeTasks.length > 0 && (
+          <div className="space-y-3 mt-3">
+            {oneTimeTasks.map(renderTask)}
+          </div>
+        )}
       </SortableContext>
 
-      {/* Drag overlay - the visual element that follows the cursor */}
+      {/* Drag overlay */}
       <DragOverlay>
         {activeTask ? (
           <div className="opacity-90 scale-105 shadow-2xl rounded-2xl">
@@ -236,14 +254,11 @@ export const SortableTaskList = ({
         ) : null}
       </DragOverlay>
     </DndContext>
-
-    {/* Quick Add Card */}
-    <QuickAddCard date={date} />
   </>
   );
 };
 
-function QuickAddCard({ date }: { date: Date }) {
+function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -259,9 +274,9 @@ function QuickAddCard({ date }: { date: Date }) {
       scheduled_date: format(date, 'yyyy-MM-dd'),
       emoji: '☀️',
       color: 'yellow',
+      order_index: taskCount,
     });
     setTitle('');
-    // Keep open for rapid entry
     inputRef.current?.focus();
   };
 
@@ -273,20 +288,20 @@ function QuickAddCard({ date }: { date: Date }) {
           haptic.light();
           setTimeout(() => inputRef.current?.focus(), 100);
         }}
-        className="mt-3 w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-dashed border-muted-foreground/20 bg-muted/30 active:scale-[0.98] transition-all"
+        className="mt-3 w-full rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-orange-300 flex items-center gap-2 active:scale-[0.98] transition-all"
       >
-        <div className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center">
-          <Plus className="h-4 w-4 text-muted-foreground" />
+        <div className="w-10 h-10 flex items-center justify-center shrink-0">
+          <Plus className="h-5 w-5 text-orange-400" />
         </div>
-        <span className="text-sm text-muted-foreground">Quick add action...</span>
+        <span className="text-[15px] font-semibold text-muted-foreground">Quick add action...</span>
       </button>
     );
   }
 
   return (
-    <div className="mt-3 flex items-center gap-2 px-3 py-2.5 rounded-2xl border border-primary/30 bg-card shadow-sm">
-      <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-        <Plus className="h-4 w-4 text-primary" />
+    <div className="mt-3 rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-orange-300 flex items-center gap-2">
+      <div className="w-10 h-10 flex items-center justify-center shrink-0">
+        <Plus className="h-5 w-5 text-orange-400" />
       </div>
       <input
         ref={inputRef}
@@ -302,13 +317,13 @@ function QuickAddCard({ date }: { date: Date }) {
           }
         }}
         placeholder="Type action name..."
-        className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+        className="flex-1 bg-transparent text-[15px] font-semibold text-foreground placeholder:text-muted-foreground outline-none"
         autoFocus
       />
       {title.trim() && (
         <button
           onClick={handleSubmit}
-          className="px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold active:scale-95 transition-transform"
+          className="px-3 py-1.5 rounded-2xl bg-primary text-primary-foreground text-xs font-semibold active:scale-95 transition-transform"
         >
           Add
         </button>
