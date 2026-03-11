@@ -44,6 +44,7 @@ import { GoldStreakLostBanner } from '@/components/app/GoldStreakLostBanner';
 import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
 import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
+import { ChallengeCompleteSummary } from '@/components/app/ChallengeCompleteSummary';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
@@ -80,6 +81,7 @@ export default function AppTest() {
   const [showGoldLostNoShields, setShowGoldLostNoShields] = useState(false);
   const [showRecoverySuccess, setShowRecoverySuccess] = useState<'streak' | 'gold' | null>(null);
   const [showStreakGoalCompletion, setShowStreakGoalCompletion] = useState(false);
+  const [showChallengeSummary, setShowChallengeSummary] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
@@ -421,6 +423,10 @@ export default function AppTest() {
               <Flame className="h-4 w-4 mr-2" />
               Streak Goal Completed (7 days)
             </Button>
+            <Button onClick={() => setShowChallengeSummary(true)} variant="outline">
+              <Star className="h-4 w-4 mr-2" />
+              Challenge Wrap-Up Summary
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -588,8 +594,20 @@ export default function AppTest() {
             onClose={() => setShowStreakGoalCompletion(false)}
             onLevelUp={() => {
               setShowStreakGoalCompletion(false);
-              toast.info('Level up → goal selection would open');
+              setConfirmedGoal(14);
+              setShowGoalConfirmation(true);
             }}
+            onWrapUp={() => {
+              setShowStreakGoalCompletion(false);
+              setShowChallengeSummary(true);
+            }}
+          />
+          <ChallengeCompleteSummary
+            open={showChallengeSummary}
+            streakGoal={7}
+            totalActions={42}
+            perfectDays={5}
+            onClose={() => setShowChallengeSummary(false)}
           />
           <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
         </CardContent>

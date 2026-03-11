@@ -10,6 +10,7 @@ interface StreakGoalCompletionCelebrationProps {
   currentStreak: number;
   onClose: () => void;
   onLevelUp: () => void;
+  onWrapUp?: () => void;
 }
 
 /**
@@ -22,6 +23,7 @@ export const StreakGoalCompletionCelebration = ({
   currentStreak,
   onClose,
   onLevelUp,
+  onWrapUp,
 }: StreakGoalCompletionCelebrationProps) => {
   useEffect(() => {
     if (!open) return;
@@ -99,11 +101,16 @@ export const StreakGoalCompletionCelebration = ({
             variant="ghost"
             onClick={(e) => {
               e.stopPropagation();
-              onClose();
+              haptic.light();
+              if (onWrapUp) {
+                onWrapUp();
+              } else {
+                onClose();
+              }
             }}
-            className="w-full h-12 text-white/80 hover:text-white hover:bg-white/10 font-medium text-sm rounded-2xl"
+            className="w-full h-12 text-white/80 hover:text-white bg-white/10 hover:bg-white/15 font-medium text-sm rounded-2xl"
           >
-            {hasHigherGoals ? 'Not Now' : 'Done'}
+            {hasHigherGoals ? 'Wrap Up Challenge 🎖️' : 'Done'}
           </Button>
         </div>
       </div>
