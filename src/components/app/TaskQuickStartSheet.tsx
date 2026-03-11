@@ -281,21 +281,6 @@ export const TaskQuickStartSheet = ({
                 {/* Random & Browse All - above suggestions */}
                 <div className="tour-action-buttons space-y-2 mb-3">
                   <button
-                    onClick={handleRandomAction}
-                    disabled={isRolling}
-                    className={cn(
-                      "w-full flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-muted active:bg-muted/70 transition-all active:scale-[0.98]",
-                      isRolling && "opacity-70"
-                    )}
-                  >
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-                      <Dices className={cn("w-4 h-4 text-muted-foreground", isRolling && "animate-spin")} />
-                    </div>
-                    <span className="text-sm font-medium text-foreground">
-                      {isRolling ? 'Rolling...' : 'Random Action'}
-                    </span>
-                  </button>
-                  <button
                     onClick={handleBrowseAll}
                     className="w-full flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-muted active:bg-muted/70 transition-all active:scale-[0.98]"
                   >
