@@ -46,7 +46,7 @@ export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, previ
   const [page, setPage] = useState<1 | 2 | 3>(1);
   const [selectedPlan, setSelectedPlan] = useState<'annual' | 'monthly'>('annual');
   const [isPurchasing, setIsPurchasing] = useState(false);
-  const containerRef = React.useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const trialDays = program.trial_days || 7;
 
