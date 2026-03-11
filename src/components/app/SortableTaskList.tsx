@@ -240,7 +240,7 @@ export const SortableTaskList = ({
     </DndContext>
 
     {/* Quick Add Card */}
-    <QuickAddCard date={date} />
+    {!hideQuickAdd && <QuickAddCard date={date} />}
   </>
   );
 };
