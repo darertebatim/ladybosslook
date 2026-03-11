@@ -422,6 +422,10 @@ const AppHome = () => {
     return result;
   }, [tasks, selectedTag, skippedTaskIds]);
 
+  // Split into repeating and one-time tasks
+  const repeatingTasks = useMemo(() => filteredTasks.filter(t => t.repeat_pattern !== 'none'), [filteredTasks]);
+  const oneTimeTasks = useMemo(() => filteredTasks.filter(t => t.repeat_pattern === 'none'), [filteredTasks]);
+
   // Get unique tags from tasks
   const taskTags = useMemo(() => {
     const tags = new Set<string>();
