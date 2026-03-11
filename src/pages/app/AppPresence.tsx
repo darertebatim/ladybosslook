@@ -10,6 +10,7 @@ import { ACHIEVEMENTS, getAchievementStatus } from '@/lib/achievements';
 import { AchievementCard } from '@/components/app/AchievementCard';
 import { WeeklyPresenceGrid } from '@/components/app/WeeklyPresenceGrid';
 import { StreakChallengeCard } from '@/components/app/StreakChallengeCard';
+import { RecoveryShields } from '@/components/app/RecoveryShields';
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
 import { PresenceProfileCard } from '@/components/app/PresenceProfileCard';
 import { SubscriptionCard } from '@/components/app/SubscriptionManagement';

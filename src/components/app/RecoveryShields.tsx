@@ -17,8 +17,8 @@ export const RecoveryShields = ({ recoveryUsed, className }: RecoveryShieldsProp
 
   const shields = [
     { id: 1, locked: false, used: recoveryUsed },
-    { id: 2, locked: !hasAccess, used: false },
-    { id: 3, locked: !hasAccess, used: false },
+    { id: 2, locked: !isSubscribed, used: false },
+    { id: 3, locked: !isSubscribed, used: false },
   ];
 
   return (
