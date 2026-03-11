@@ -235,7 +235,7 @@ export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, previ
 
   /* ═══════════════════ PAGE 3 ═══════════════════ */
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', background: '#fff', fontFamily: SF }}>
+    <div ref={containerRef} style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', background: '#fff', fontFamily: SF }}>
       <div style={{ flex: 1 }}>
         <Header />
 
