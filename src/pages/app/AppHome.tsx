@@ -1189,6 +1189,7 @@ const AppHome = () => {
           showStreakMilestone={showStreakMilestone}
           setShowStreakMilestone={setShowStreakMilestone}
           streakMilestoneValue={streakMilestoneValue}
+          setStreakMilestoneValue={setStreakMilestoneValue}
         />
 
         {/* New Interactive Home Tour */}
