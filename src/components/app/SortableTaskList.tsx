@@ -348,6 +348,15 @@ function QuickAddCard({ date, taskCount, onOpenFullSheet }: { date: Date; taskCo
           Add
         </button>
       )}
+      <button
+        onClick={() => {
+          haptic.light();
+          onOpenFullSheet?.();
+        }}
+        className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center shrink-0 active:scale-95 transition-transform"
+      >
+        <LayoutGrid className="h-4 w-4 text-muted-foreground" />
+      </button>
     </div>
   );
 }
