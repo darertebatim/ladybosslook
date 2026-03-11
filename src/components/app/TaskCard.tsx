@@ -362,7 +362,7 @@ export const TaskCard = memo(function TaskCard({
                 }
               }}
               className={cn(
-                'flex items-center justify-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all shadow-sm active:scale-95',
+                'flex flex-col items-center justify-center gap-0.5 px-2.5 py-1.5 rounded-xl text-[10px] font-bold shrink-0 transition-all shadow-sm active:scale-95',
                 proConfig.buttonClass
               )}
             >
