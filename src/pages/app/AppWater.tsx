@@ -9,7 +9,7 @@ import { isWaterTask, createWaterRoutineTask } from '@/lib/waterTracking';
 import { WaterInputSheet } from '@/components/app/WaterInputSheet';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
-import { StreakMilestoneCelebration, isStreakMilestone, getStreakMilestoneKey } from '@/components/app/StreakMilestoneCelebration';
+
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
