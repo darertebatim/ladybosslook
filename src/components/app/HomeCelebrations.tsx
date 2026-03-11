@@ -161,9 +161,8 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         onStreakIncrease={(newStreak: number) => {
           if (isStreakMilestone(newStreak) && localStorage.getItem(getStreakMilestoneKey(newStreak)) !== 'true') {
             localStorage.setItem(getStreakMilestoneKey(newStreak), 'true');
+            setStreakMilestoneValue(newStreak);
             setShowStreakMilestone(true);
-            // We need to pass the value somehow - but HomeCelebrations doesn't own the state directly
-            // The parent already sets streakMilestoneValue, so let's just use setShowStreakModal for non-milestones
           } else {
             setShowStreakModal(true);
           }
