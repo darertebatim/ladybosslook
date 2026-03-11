@@ -95,12 +95,13 @@ export const StreakLostBanner = ({
             <p className="text-white/50 text-[10px] mb-2">
               {shieldsLeft} shield{shieldsLeft !== 1 ? 's' : ''} remaining
             </p>
-            <button
+            <Button
               onClick={() => { haptic.light(); onDismiss(); }}
-              className="text-white/60 text-xs hover:text-white/80 transition-colors"
+              variant="ghost"
+              className="w-full text-white/70 hover:text-white hover:bg-white/10 text-xs font-medium rounded-xl"
             >
               Let the streak reset
-            </button>
+            </Button>
           </>
         ) : (
           <Button
