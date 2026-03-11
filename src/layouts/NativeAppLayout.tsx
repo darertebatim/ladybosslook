@@ -1,5 +1,6 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home, MessageCircle, Compass, Music, Users, Flame, CalendarPlus } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef, useState } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
