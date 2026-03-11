@@ -84,7 +84,6 @@ export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, previ
       </button>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ color: dark ? '#fff' : '#0a0a0a', fontSize: 17, fontWeight: 600, letterSpacing: -0.3, fontFamily: SF }}>simora+</span>
-        <span style={{ background: '#f59e0b', color: '#1a1a1a', fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 6, letterSpacing: 0.5, textTransform: 'uppercase' as const, fontFamily: SF }}>Plus</span>
       </div>
       <button onClick={onRestore} style={{ position: 'absolute', right: 14, background: 'none', border: 'none', cursor: 'pointer', color: dark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.4)', fontSize: 13, fontFamily: SF }}>
         Restore
