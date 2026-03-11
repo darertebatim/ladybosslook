@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Trophy, Flame, Star, Share2, X } from 'lucide-react';
+import { Share2, X } from 'lucide-react';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
 import { Share } from '@capacitor/share';
@@ -135,7 +136,7 @@ export const ChallengeCompleteSummary = ({
               boxShadow: '0 0 40px rgba(251, 191, 36, 0.4), 0 8px 24px rgba(0,0,0,0.3)',
             }}
           >
-            <span className="text-3xl">{badgeEmoji}</span>
+            <FluentEmoji emoji={badgeEmoji} size={40} />
           </div>
           <p className="mt-2 text-amber-400 text-xs font-semibold tracking-widest uppercase">
             {badgeLabel}
@@ -160,7 +161,7 @@ export const ChallengeCompleteSummary = ({
               className="rounded-2xl p-3 text-center"
               style={{ background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(8px)' }}
             >
-              <span className="text-lg mb-1 block">{stat.icon}</span>
+              <div className="mb-1 flex justify-center"><FluentEmoji emoji={stat.icon} size={28} /></div>
               <p className="text-xl font-bold text-white">{stat.value}</p>
               <p className="text-white/50 text-[10px] leading-tight mt-0.5">{stat.label}</p>
             </div>
