@@ -45,16 +45,22 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
   const [page, setPage] = useState<1 | 2 | 3>(1);
   const [selectedPlan, setSelectedPlan] = useState<'annual' | 'monthly'>('annual');
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const trialDays = program.trial_days || 7;
 
-  // Preload images for later pages to prevent lag
+  // Preload images for later pages
   useEffect(() => {
     [comparisonTable, beforeAfter].forEach(src => {
       const img = new Image();
       img.src = src;
     });
   }, []);
+
+  // Scroll to top on page change
+  useEffect(() => {
+    containerRef.current?.closest('[class*="overflow-y-auto"]')?.scrollTo(0, 0);
+  }, [page]);
 
   const handlePurchase = async () => {
     if (preview) return;
