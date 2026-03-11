@@ -13,7 +13,7 @@ interface RecoveryShieldsProps {
  * Shield 2-3: Locked for non-subscribers
  */
 export const RecoveryShields = ({ recoveryUsed, className }: RecoveryShieldsProps) => {
-  const { hasAccess } = useSubscription();
+  const { isSubscribed } = useSubscription();
 
   const shields = [
     { id: 1, locked: false, used: recoveryUsed },
