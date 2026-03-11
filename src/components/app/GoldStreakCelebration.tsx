@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
 
-import badgeGold from '@/assets/badge-gold.png';
+import coinGold from '@/assets/coin-gold.png';
 
 interface GoldStreakCelebrationProps {
   open: boolean;
@@ -175,7 +175,7 @@ export const GoldStreakCelebration = ({
             }}
           />
           <img 
-            src={badgeGold}
+            src={coinGold}
             alt="Gold badge"
             className="w-32 h-32 object-contain relative z-10"
             style={{ 
@@ -190,7 +190,7 @@ export const GoldStreakCelebration = ({
         </h1>
         <h2 className="text-3xl font-bold text-center mb-8">
           <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 bg-clip-text text-transparent">
-            {nextGoal} day streak?
+            {nextGoal} day Gold streak?
           </span>
         </h2>
 
@@ -212,7 +212,7 @@ export const GoldStreakCelebration = ({
                 >
                   {day.isGold ? (
                     <img 
-                      src={badgeGold}
+                      src={coinGold}
                       alt="Gold"
                       className="w-10 h-10 object-contain"
                       style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}
