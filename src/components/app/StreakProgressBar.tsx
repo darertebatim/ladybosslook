@@ -16,23 +16,21 @@ export const StreakProgressBar = ({ current, goal, className }: StreakProgressBa
   
   return (
     <div className={cn('relative flex items-center gap-2', className)}>
-      {/* Progress track */}
-      <div className="relative flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
-        {/* Striped fill */}
-        <div 
-          className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
-          style={{ 
-            width: `${progress}%`,
-            background: 'repeating-linear-gradient(45deg, #fb923c, #fb923c 6px, #fdba74 6px, #fdba74 12px)',
-          }}
-        />
-      </div>
-      {/* Flame indicator - positioned outside overflow-hidden */}
-      {progress > 0 && (
-        <div 
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 transition-all duration-500"
-          style={{ left: `calc(${progress}% * (1 - 36px / 100%))` }}
-        >
+      {/* Track wrapper - relative for flame positioning */}
+      <div className="relative flex-1">
+        {/* Progress track */}
+        <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+          <div 
+            className="h-full rounded-full transition-all duration-500"
+            style={{ 
+              width: `${progress}%`,
+              background: 'repeating-linear-gradient(45deg, #fb923c, #fb923c 6px, #fdba74 6px, #fdba74 12px)',
+            }}
+          />
+        </div>
+        
+        {/* Flame indicator - outside overflow-hidden */}
+        {progress > 0 && (
           <div 
             className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 transition-all duration-500"
             style={{ left: `${progress}%` }}
@@ -41,8 +39,8 @@ export const StreakProgressBar = ({ current, goal, className }: StreakProgressBa
               <Flame className="w-3 h-3 text-white" fill="currentColor" />
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
       
       {/* Goal badge */}
       <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
