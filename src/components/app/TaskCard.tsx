@@ -32,7 +32,7 @@ interface TaskCardProps {
   completedSubtaskIds: string[];
   goalProgress?: number;
   onTap?: (task: UserTask) => void;
-  onStreakIncrease?: (newStreak: number) => void;
+  onStreakIncrease?: () => void;
   onOpenGoalInput?: (task: UserTask) => void;
   onOpenTimer?: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
@@ -143,8 +143,9 @@ export const TaskCard = memo(function TaskCard({
     } else {
       const result = await completeTask.mutateAsync({ taskId: task.id, date });
       if (result.streakIncreased && onStreakIncrease) {
+        // Stronger haptic for streak
         haptic.medium();
-        onStreakIncrease(result.newStreak);
+        onStreakIncrease();
       }
     }
   };

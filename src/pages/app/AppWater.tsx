@@ -9,7 +9,6 @@ import { isWaterTask, createWaterRoutineTask } from '@/lib/waterTracking';
 import { WaterInputSheet } from '@/components/app/WaterInputSheet';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
-
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
@@ -28,7 +27,6 @@ const AppWater = () => {
   const [showInputSheet, setShowInputSheet] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState(false);
-  const [celebrationStreakCount, setCelebrationStreakCount] = useState(1);
   const [localProgress, setLocalProgress] = useState(0);
   
   const prevProgressRef = useRef(0);
@@ -106,7 +104,6 @@ const AppWater = () => {
             duration: 2000,
           });
           if (result.streakIncreased) {
-            setCelebrationStreakCount(result.newStreak);
             setShowStreakModal(true);
           }
         },
@@ -455,7 +452,6 @@ const AppWater = () => {
       {/* Streak celebration */}
       <StreakCelebration
         open={showStreakModal}
-        streakCount={celebrationStreakCount}
         onClose={() => setShowStreakModal(false)}
       />
     </>

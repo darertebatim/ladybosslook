@@ -867,7 +867,7 @@ export const useCompleteTask = () => {
       // Update presence metrics
       await updatePresence(user.id, dateStr);
 
-      return { completion: data, streakIncreased: streakResult.increased, newStreak: streakResult.newStreak };
+      return { completion: data, streakIncreased: streakResult.increased };
     },
     onSuccess: (_, variables) => {
       const dateStr = format(variables.date, 'yyyy-MM-dd');
@@ -1048,7 +1048,7 @@ export const useAddGoalProgress = () => {
         // Update presence metrics
         await updatePresence(user.id, dateStr);
         
-        return { completion: data, newProgress: amount, addedAmount: amount, streakIncreased: streakResult.increased, newStreak: streakResult.newStreak };
+        return { completion: data, newProgress: amount, addedAmount: amount, streakIncreased: streakResult.increased };
       }
     },
     onSuccess: (_, variables) => {
@@ -1154,7 +1154,7 @@ export const useCreateTaskFromTemplate = () => {
 /**
  * Update user streak on task completion
  */
-async function updateStreak(userId: string, completedDateStr: string): Promise<{ increased: boolean; newStreak: number }> {
+async function updateStreak(userId: string, completedDateStr: string): Promise<{ increased: boolean }> {
   // Get current streak
   const { data: streak } = await supabase
     .from('user_streaks')
@@ -1173,12 +1173,12 @@ async function updateStreak(userId: string, completedDateStr: string): Promise<{
       longest_streak: 1,
       last_completion_date: today,
     });
-    return { increased: true, newStreak: 1 };
+    return { increased: true };
   }
 
   // If already completed today, no change
   if (streak.last_completion_date === today) {
-    return { increased: false, newStreak: streak.current_streak };
+    return { increased: false };
   }
 
   // If completed yesterday, increment streak
@@ -1195,7 +1195,7 @@ async function updateStreak(userId: string, completedDateStr: string): Promise<{
       })
       .eq('user_id', userId);
 
-    return { increased: true, newStreak };
+    return { increased: true };
   }
 
   // Otherwise, reset streak to 1
@@ -1207,7 +1207,7 @@ async function updateStreak(userId: string, completedDateStr: string): Promise<{
     })
     .eq('user_id', userId);
 
-  return { increased: true, newStreak: 1 };
+  return { increased: true };
 }
 
 /**

@@ -51,7 +51,6 @@ interface HomeCelebrationsProps {
   setShowTapCoachMark: (v: boolean) => void;
   streak: any;
   shouldShowGoalSelection: boolean;
-  celebrationStreakCount: number;
 
   // Streak goal
   showGoalSelection: boolean;
@@ -115,7 +114,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     selectedTask, setSelectedTask, selectedDate, completedTaskIds, completedSubtaskIds,
     goalProgressMap, onEditTask, onDeleteTask, onSkipTask, onOpenGoalInput, onOpenTimer,
     showStreakModal, setShowStreakModal, isFirstActionCelebration, setIsFirstActionCelebration,
-    setShowTapCoachMark, streak, shouldShowGoalSelection, celebrationStreakCount,
+    setShowTapCoachMark, streak, shouldShowGoalSelection,
     showGoalSelection, setShowGoalSelection, isStreakUpgrade, setIsStreakUpgrade,
     showGoalConfirmation, setShowGoalConfirmation, confirmedGoal, setConfirmedGoal, setStreakGoal,
     badgeCelebrationType, closeBadgeCelebration, badgeCompletedCount, badgeTotalCount, maybeRequestReview,
@@ -151,9 +150,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         goalProgress={selectedTask ? (goalProgressMap.get(selectedTask.id) || 0) : 0}
         onEdit={onEditTask}
         onDelete={onDeleteTask}
-        onStreakIncrease={(newStreak: number) => {
-          setShowStreakModal(true);
-        }}
+        onStreakIncrease={() => setShowStreakModal(true)}
         onOpenGoalInput={onOpenGoalInput}
         onOpenTimer={onOpenTimer}
         onSkip={onSkipTask}
@@ -161,7 +158,6 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
 
       <StreakCelebration
         open={showStreakModal}
-        streakCount={celebrationStreakCount}
         onClose={() => {
           setShowStreakModal(false);
           if (isFirstActionCelebration && localStorage.getItem('simora_tap_coach_shown') !== 'true') {

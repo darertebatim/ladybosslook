@@ -101,7 +101,7 @@ const AppHome = () => {
   const setStreakGoal = useSetStreakGoal();
   const recoverStreak = useRecoverStreak();
   const [showRecoveryPrompt, setShowRecoveryPrompt] = useState(false);
-  const [celebrationStreakCount, setCelebrationStreakCount] = useState(1);
+
 
   // Gold streak celebration state - use localStorage to prevent re-showing on navigation
   const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -476,13 +476,11 @@ const AppHome = () => {
     dateKey: todayDateStr,
   });
 
-  const handleStreakIncrease = useCallback((newStreak: number) => {
+  const handleStreakIncrease = useCallback(() => {
     // If user has never celebrated first action, don't open streak modal immediately —
     // let triggerFirstCelebration handle it with proper delay after seal animation
     const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated') === 'true';
     if (!alreadyCelebrated) return;
-    
-    setCelebrationStreakCount(newStreak);
     setShowStreakModal(true);
   }, []);
 
@@ -501,7 +499,7 @@ const AppHome = () => {
               duration: 2000,
             });
             if (result.streakIncreased) {
-              handleStreakIncrease(result.newStreak);
+              setShowStreakModal(true);
             }
           },
         }
@@ -533,7 +531,7 @@ const AppHome = () => {
             duration: 2000,
           });
           if (result.streakIncreased) {
-            handleStreakIncrease(result.newStreak);
+            setShowStreakModal(true);
           }
         },
       }
@@ -555,7 +553,7 @@ const AppHome = () => {
             duration: 2000,
           });
           if (result.streakIncreased) {
-            handleStreakIncrease(result.newStreak);
+            setShowStreakModal(true);
           }
         },
       }
@@ -1177,7 +1175,6 @@ const AppHome = () => {
           userId={user?.id}
           showNotificationFlow={showNotificationFlow}
           setShowNotificationFlow={setShowNotificationFlow}
-          celebrationStreakCount={celebrationStreakCount}
         />
 
         {/* New Interactive Home Tour */}
