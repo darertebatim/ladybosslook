@@ -329,6 +329,9 @@ export const TaskCard = memo(function TaskCard({
               {/* Top line: Time + Goal (if applicable) */}
               <div className="flex items-center gap-2">
                 <span className="text-[13px] text-black/80">{formatTime(task)}</span>
+                {repeatLabel && (
+                  <span className="text-[13px] text-black/50">• {repeatLabel}</span>
+                )}
                 {hasGoal && (
                   <span className="text-[13px] text-black/80 font-medium">• {(() => {
                     const label = formatProGoalLabel();
