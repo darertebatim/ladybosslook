@@ -4,6 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbars globally — native iOS feel */
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}
+
 /* Prevent iOS Safari auto-zoom on input focus */
 @supports (-webkit-touch-callout: none) {
   input,
