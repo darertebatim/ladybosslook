@@ -1,4 +1,5 @@
 // AppHome - Main home page component
+import { isStreakMilestone, getStreakMilestoneKey } from '@/components/app/StreakMilestoneCelebration';
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -101,7 +102,8 @@ const AppHome = () => {
   const setStreakGoal = useSetStreakGoal();
   const recoverStreak = useRecoverStreak();
   const [showRecoveryPrompt, setShowRecoveryPrompt] = useState(false);
-
+  const [showStreakMilestone, setShowStreakMilestone] = useState(false);
+  const [streakMilestoneValue, setStreakMilestoneValue] = useState(0);
 
   // Gold streak celebration state - use localStorage to prevent re-showing on navigation
   const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -476,11 +478,20 @@ const AppHome = () => {
     dateKey: todayDateStr,
   });
 
-  const handleStreakIncrease = useCallback(() => {
+  const handleStreakIncrease = useCallback((newStreak: number) => {
     // If user has never celebrated first action, don't open streak modal immediately —
     // let triggerFirstCelebration handle it with proper delay after seal animation
     const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated') === 'true';
     if (!alreadyCelebrated) return;
+    
+    // Check if this is a milestone streak
+    if (isStreakMilestone(newStreak) && localStorage.getItem(getStreakMilestoneKey(newStreak)) !== 'true') {
+      localStorage.setItem(getStreakMilestoneKey(newStreak), 'true');
+      setStreakMilestoneValue(newStreak);
+      setShowStreakMilestone(true);
+      return;
+    }
+    
     setShowStreakModal(true);
   }, []);
 
@@ -499,7 +510,7 @@ const AppHome = () => {
               duration: 2000,
             });
             if (result.streakIncreased) {
-              setShowStreakModal(true);
+              handleStreakIncrease(result.newStreak);
             }
           },
         }
@@ -531,7 +542,7 @@ const AppHome = () => {
             duration: 2000,
           });
           if (result.streakIncreased) {
-            setShowStreakModal(true);
+            handleStreakIncrease(result.newStreak);
           }
         },
       }
@@ -553,7 +564,7 @@ const AppHome = () => {
             duration: 2000,
           });
           if (result.streakIncreased) {
-            setShowStreakModal(true);
+            handleStreakIncrease(result.newStreak);
           }
         },
       }
@@ -1175,6 +1186,10 @@ const AppHome = () => {
           userId={user?.id}
           showNotificationFlow={showNotificationFlow}
           setShowNotificationFlow={setShowNotificationFlow}
+          showStreakMilestone={showStreakMilestone}
+          setShowStreakMilestone={setShowStreakMilestone}
+          streakMilestoneValue={streakMilestoneValue}
+          setStreakMilestoneValue={setStreakMilestoneValue}
         />
 
         {/* New Interactive Home Tour */}

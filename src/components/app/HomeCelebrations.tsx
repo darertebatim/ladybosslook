@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { StreakMilestoneCelebration, isStreakMilestone, getStreakMilestoneKey } from '@/components/app/StreakMilestoneCelebration';
 import { format } from 'date-fns';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { StreakGoalSelection } from '@/components/app/StreakGoalSelection';
@@ -105,6 +106,12 @@ interface HomeCelebrationsProps {
   userId?: string;
   showNotificationFlow: boolean;
   setShowNotificationFlow: (v: boolean) => void;
+
+  // Streak milestone
+  showStreakMilestone: boolean;
+  setShowStreakMilestone: (v: boolean) => void;
+  streakMilestoneValue: number;
+  setStreakMilestoneValue: (v: number) => void;
 }
 
 export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebrationsProps) {
@@ -124,6 +131,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     timerTask, setTimerTask, onTimerSaveProgress, onTimerMarkComplete,
     showRecoveryPrompt, setShowRecoveryPrompt, recoverStreak,
     userId, showNotificationFlow, setShowNotificationFlow,
+    showStreakMilestone, setShowStreakMilestone, streakMilestoneValue, setStreakMilestoneValue,
   } = props;
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -150,7 +158,15 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         goalProgress={selectedTask ? (goalProgressMap.get(selectedTask.id) || 0) : 0}
         onEdit={onEditTask}
         onDelete={onDeleteTask}
-        onStreakIncrease={() => setShowStreakModal(true)}
+        onStreakIncrease={(newStreak: number) => {
+          if (isStreakMilestone(newStreak) && localStorage.getItem(getStreakMilestoneKey(newStreak)) !== 'true') {
+            localStorage.setItem(getStreakMilestoneKey(newStreak), 'true');
+            setStreakMilestoneValue(newStreak);
+            setShowStreakMilestone(true);
+          } else {
+            setShowStreakModal(true);
+          }
+        }}
         onOpenGoalInput={onOpenGoalInput}
         onOpenTimer={onOpenTimer}
         onSkip={onSkipTask}
@@ -279,6 +295,12 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         }}
         onDismiss={() => setShowRecoveryPrompt(false)}
         isLoading={recoverStreak.isPending}
+      />
+
+      <StreakMilestoneCelebration
+        open={showStreakMilestone}
+        streak={streakMilestoneValue}
+        onClose={() => setShowStreakMilestone(false)}
       />
     </>
   );

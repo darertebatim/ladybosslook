@@ -9,6 +9,7 @@ import { isWaterTask, createWaterRoutineTask } from '@/lib/waterTracking';
 import { WaterInputSheet } from '@/components/app/WaterInputSheet';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
+import { StreakMilestoneCelebration, isStreakMilestone, getStreakMilestoneKey } from '@/components/app/StreakMilestoneCelebration';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
@@ -27,6 +28,8 @@ const AppWater = () => {
   const [showInputSheet, setShowInputSheet] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState(false);
+  const [showStreakMilestone, setShowStreakMilestone] = useState(false);
+  const [streakMilestoneValue, setStreakMilestoneValue] = useState(0);
   const [localProgress, setLocalProgress] = useState(0);
   
   const prevProgressRef = useRef(0);
@@ -104,7 +107,13 @@ const AppWater = () => {
             duration: 2000,
           });
           if (result.streakIncreased) {
-            setShowStreakModal(true);
+            if (isStreakMilestone(result.newStreak) && localStorage.getItem(getStreakMilestoneKey(result.newStreak)) !== 'true') {
+              localStorage.setItem(getStreakMilestoneKey(result.newStreak), 'true');
+              setStreakMilestoneValue(result.newStreak);
+              setShowStreakMilestone(true);
+            } else {
+              setShowStreakModal(true);
+            }
           }
         },
       }
@@ -453,6 +462,12 @@ const AppWater = () => {
       <StreakCelebration
         open={showStreakModal}
         onClose={() => setShowStreakModal(false)}
+      />
+
+      <StreakMilestoneCelebration
+        open={showStreakMilestone}
+        streak={streakMilestoneValue}
+        onClose={() => setShowStreakMilestone(false)}
       />
     </>
   );
