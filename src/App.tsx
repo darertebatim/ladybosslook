@@ -96,7 +96,7 @@ const Subscriptions = lazy(() => import("@/pages/admin/Subscriptions"));
 const BrandDesign = lazy(() => import("@/pages/admin/BrandDesign"));
 const Onboarding = lazy(() => import("@/pages/admin/Onboarding"));
 const Banners = lazy(() => import("@/pages/admin/Banners"));
-const OnboardingAnswers = lazy(() => import("@/pages/admin/OnboardingAnswers"));
+
 
 // Lazy load marketing/landing pages
 const Programs = lazy(() => import("@/pages/Programs"));
