@@ -445,6 +445,14 @@ export default function RoutinesBank() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['routines-bank'] }),
   });
 
+  const updateSortOrder = useMutation({
+    mutationFn: async ({ id, sort_order }: { id: string; sort_order: number }) => {
+      const { error } = await supabase.from('routines_bank').update({ sort_order }).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['routines-bank'] }),
+  });
+
   // Fetch sections and tasks for a routine when editing
   const fetchRoutineData = async (routineId: string) => {
     const [sectionsRes, tasksRes] = await Promise.all([
