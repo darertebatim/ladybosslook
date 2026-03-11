@@ -96,9 +96,9 @@ export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, previ
   if (page === 1) return (
     <div ref={containerRef} style={{ position: 'relative', minHeight: '100%', background: '#fff', fontFamily: SF }}>
 
-      {/* Fixed hero background + full-width mascot */}
+      {/* Hero background + full-width mascot */}
       <div style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1,
+        position: preview ? 'absolute' : 'fixed', top: 0, left: 0, right: 0, zIndex: 1,
         height: 420,
         overflow: 'hidden',
       }}>
