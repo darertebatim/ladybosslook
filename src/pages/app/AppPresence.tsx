@@ -10,6 +10,7 @@ import { ACHIEVEMENTS, getAchievementStatus } from '@/lib/achievements';
 import { AchievementCard } from '@/components/app/AchievementCard';
 import { WeeklyPresenceGrid } from '@/components/app/WeeklyPresenceGrid';
 import { StreakChallengeCard } from '@/components/app/StreakChallengeCard';
+import { RecoveryShields } from '@/components/app/RecoveryShields';
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
 import { PresenceProfileCard } from '@/components/app/PresenceProfileCard';
 import { SubscriptionCard } from '@/components/app/SubscriptionManagement';
@@ -179,14 +180,20 @@ const AppPresence = () => {
             
             {/* Streak Challenge Card - show if user has a goal set OR if streak was broken (recovery available) */}
             {(hasStreakChallenge || streakRecoveryAvailable) && streak && (
-              <StreakChallengeCard
-                currentStreak={streak.current_streak}
-                streakGoal={streak.streak_goal || previousStreakForRecovery}
-                onLevelUp={() => setShowGoalSelection(true)}
-                canRecover={streakRecoveryAvailable}
-                previousStreak={previousStreakForRecovery}
-                onRecover={() => setShowRecoveryPrompt(true)}
-              />
+              <div className="space-y-3">
+                <StreakChallengeCard
+                  currentStreak={streak.current_streak}
+                  streakGoal={streak.streak_goal || previousStreakForRecovery}
+                  onLevelUp={() => setShowGoalSelection(true)}
+                  canRecover={streakRecoveryAvailable}
+                  previousStreak={previousStreakForRecovery}
+                  onRecover={() => setShowRecoveryPrompt(true)}
+                />
+                <div>
+                  <p className="text-xs text-muted-foreground mb-2">Recovery Shields</p>
+                  <RecoveryShields recoveryUsed={!!(streak as any).streak_recovery_used} />
+                </div>
+              </div>
             )}
             
             {/* Challenge Routine Cards */}
