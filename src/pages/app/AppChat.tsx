@@ -520,8 +520,8 @@ export default function AppChat() {
             </Button>
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="h-11 w-11 rounded-full bg-muted border border-border flex items-center justify-center">
-                  <MessageCircle className="h-5 w-5 text-foreground" />
+                <div className="h-11 w-11 rounded-full bg-orange-500 flex items-center justify-center">
+                  <Headset className="h-5 w-5 text-white" />
                 </div>
                 {/* Online indicator */}
                 <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-background" />
@@ -571,7 +571,7 @@ export default function AppChat() {
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 animate-fade-in">
                 <div className="w-full max-w-sm p-6 mb-6">
-                  {/* Avatar - clean */}
+                  {/* Avatar */}
                   <div className="relative mx-auto mb-5">
                     <div className="h-20 w-20 mx-auto rounded-full bg-orange-500 flex items-center justify-center">
                       <Headset className="h-9 w-9 text-white" />
@@ -579,17 +579,6 @@ export default function AppChat() {
                     {/* Online indicator */}
                     <div className="absolute bottom-1 right-1/2 translate-x-8 h-4 w-4 rounded-full bg-emerald-500 border-2 border-background" />
                   </div>
-                  
-                  {/* Time-based greeting */}
-                  <p className="text-muted-foreground text-[15px] mb-1">
-                    {getGreeting().text} {getGreeting().emoji}
-                  </p>
-                  <h2 className="font-semibold text-xl mb-3">I'm Mary, and I'm here for you</h2>
-                  
-                  {/* Core message */}
-                  <p className="text-[15px] text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
-                    No rush. No judgment. Just a real person who cares.
-                  </p>
                 </div>
                 
                 {/* Conversation starters */}
