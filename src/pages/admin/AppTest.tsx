@@ -593,6 +593,17 @@ export default function AppTest() {
               setConfirmedGoal(14);
               setShowGoalConfirmation(true);
             }}
+            onWrapUp={() => {
+              setShowStreakGoalCompletion(false);
+              setShowChallengeSummary(true);
+            }}
+          />
+          <ChallengeCompleteSummary
+            open={showChallengeSummary}
+            streakGoal={7}
+            totalActions={42}
+            perfectDays={5}
+            onClose={() => setShowChallengeSummary(false)}
           />
           <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
         </CardContent>
