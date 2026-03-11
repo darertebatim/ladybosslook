@@ -28,9 +28,10 @@ export const StreakLostBanner = ({
   isSubscribed,
   onRecover,
   onDismiss,
+  onSubscribe,
   isLoading,
 }: StreakLostBannerProps) => {
-  const navigate = useNavigate();
+  const [isAnimating] = useState(true);
   const [isAnimating] = useState(true);
 
   if (!open) return null;
