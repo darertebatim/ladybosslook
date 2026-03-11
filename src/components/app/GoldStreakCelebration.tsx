@@ -212,7 +212,7 @@ export const GoldStreakCelebration = ({
                 >
                   {day.isGold ? (
                     <img 
-                      src={badgeGold}
+                      src={coinGold}
                       alt="Gold"
                       className="w-10 h-10 object-contain"
                       style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}
