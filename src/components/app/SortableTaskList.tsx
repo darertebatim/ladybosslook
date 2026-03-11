@@ -233,7 +233,7 @@ export const SortableTaskList = ({
         </div>
 
         {/* Quick Add Card */}
-        <QuickAddCard date={date} taskCount={localTasks.length} />
+        <QuickAddCard onOpen={onOpenQuickStart} />
 
         {/* One-time tasks */}
         {oneTimeTasks.length > 0 && (
