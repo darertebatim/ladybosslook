@@ -32,7 +32,6 @@ export const GoldStreakLostBanner = ({
   isLoading,
 }: GoldStreakLostBannerProps) => {
   const [isAnimating] = useState(true);
-  const [isAnimating] = useState(true);
 
   if (!open) return null;
 
