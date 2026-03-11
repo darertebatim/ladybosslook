@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Crown, Shield, X } from 'lucide-react';
+import { Crown, Shield, X, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
