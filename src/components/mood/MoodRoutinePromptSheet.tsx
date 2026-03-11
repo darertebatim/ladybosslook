@@ -73,6 +73,11 @@ export function MoodRoutinePromptSheet({
     onSkip();
   };
 
+  const handleNever = () => {
+    haptic.light();
+    onNever();
+  };
+
   if (!moodData) return null;
 
   return (
