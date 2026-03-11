@@ -632,9 +632,15 @@ const AppHome = () => {
       }}>
           {/* Title bar - three column layout for balanced centering */}
           <div className="grid grid-cols-[auto_1fr_auto] items-center px-4 h-10">
-            {/* Left: Menu button */}
-            <div className="justify-self-start tour-menu-button">
+            {/* Left: Menu + Support */}
+            <div className="justify-self-start flex items-center gap-1 tour-menu-button">
               <HomeMenu onStartTour={startHomeTour || undefined} />
+              <button
+                onClick={() => navigate('/app/support')}
+                className="p-2 -ml-1 text-foreground hover:text-foreground transition-colors"
+              >
+                <MessageCircle className="h-5 w-5" />
+              </button>
             </div>
 
             {/* Center: Title - changes to month/year when expanded */}
