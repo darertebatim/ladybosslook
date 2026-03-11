@@ -38,6 +38,8 @@ import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { StreakGoalSelection, StreakGoalValue } from '@/components/app/StreakGoalSelection';
 import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation';
 import { ActionLimitSheet, resetActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
+import { StreakLostBanner } from '@/components/app/StreakLostBanner';
+import { GoldStreakLostBanner } from '@/components/app/GoldStreakLostBanner';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
@@ -68,6 +70,8 @@ export default function AppTest() {
   const [showStreakGoalSelection, setShowStreakGoalSelection] = useState(false);
   const [showGoalConfirmation, setShowGoalConfirmation] = useState(false);
   const [confirmedGoal, setConfirmedGoal] = useState<7 | 14 | 30 | 50>(7);
+  const [showStreakLostBanner, setShowStreakLostBanner] = useState(false);
+  const [showGoldStreakLostBanner, setShowGoldStreakLostBanner] = useState(false);
 
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
@@ -484,6 +488,48 @@ export default function AppTest() {
         </CardContent>
       </Card>
 
+      {/* Streak Lost Banners */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Flame className="h-5 w-5 text-orange-500" />
+            Streak Lost Banners
+          </CardTitle>
+          <CardDescription>
+            Banners shown when user returns after losing a streak
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setShowStreakLostBanner(!showStreakLostBanner)} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              Streak Lost Banner
+            </Button>
+            <Button onClick={() => setShowGoldStreakLostBanner(!showGoldStreakLostBanner)} variant="outline">
+              <Crown className="h-4 w-4 mr-2" />
+              Gold Streak Lost Banner
+            </Button>
+          </div>
+          {showStreakLostBanner && (
+            <StreakLostBanner
+              open={true}
+              previousStreak={12}
+              hasShieldsRemaining={true}
+              onRecover={() => { toast.success('Streak recovered!'); setShowStreakLostBanner(false); }}
+              onDismiss={() => setShowStreakLostBanner(false)}
+            />
+          )}
+          {showGoldStreakLostBanner && (
+            <GoldStreakLostBanner
+              open={true}
+              previousGoldStreak={5}
+              hasShieldsRemaining={true}
+              onRecover={() => { toast.success('Gold streak recovered!'); setShowGoldStreakLostBanner(false); }}
+              onDismiss={() => setShowGoldStreakLostBanner(false)}
+            />
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
