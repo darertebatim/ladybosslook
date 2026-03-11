@@ -372,6 +372,3 @@ function QuickAddCard({ date, taskCount, onOpenFullSheet }: { date: Date; taskCo
     </div>
   );
 }
-    </div>
-  );
-}
