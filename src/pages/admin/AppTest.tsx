@@ -522,6 +522,14 @@ export default function AppTest() {
               <Shield className="h-4 w-4 mr-2" />
               Recovery Success (Gold)
             </Button>
+            <Button onClick={() => setShowStreakLostNoShields(true)} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              No Shields (Free User)
+            </Button>
+            <Button onClick={() => setShowGoldLostNoShields(true)} variant="outline">
+              <Crown className="h-4 w-4 mr-2" />
+              No Shields (Plus User)
+            </Button>
           </div>
           <StreakLostBanner
             open={showStreakLostBanner}
