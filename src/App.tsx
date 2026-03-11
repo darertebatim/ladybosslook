@@ -96,7 +96,7 @@ const Subscriptions = lazy(() => import("@/pages/admin/Subscriptions"));
 const BrandDesign = lazy(() => import("@/pages/admin/BrandDesign"));
 const Onboarding = lazy(() => import("@/pages/admin/Onboarding"));
 const Banners = lazy(() => import("@/pages/admin/Banners"));
-const OnboardingAnswers = lazy(() => import("@/pages/admin/OnboardingAnswers"));
+
 
 // Lazy load marketing/landing pages
 const Programs = lazy(() => import("@/pages/Programs"));
@@ -386,7 +386,7 @@ const App = () => (
                       <Route path="tools/tasks" element={<ProtectedRoute requiredPage="tools"><TasksBank /></ProtectedRoute>} />
                       <Route path="tools/notifications" element={<ProtectedRoute requiredPage="tools"><NotificationAnalytics /></ProtectedRoute>} />
                       <Route path="onboarding" element={<ProtectedRoute requiredPage="tools"><Onboarding /></ProtectedRoute>} />
-                      <Route path="onboarding-answers" element={<ProtectedRoute requiredPage="tools"><OnboardingAnswers /></ProtectedRoute>} />
+                      
                       <Route path="banners" element={<ProtectedRoute requiredPage="communications"><Banners /></ProtectedRoute>} />
                       <Route path="app" element={<ProtectedRoute requiredPage="system"><AppTest /></ProtectedRoute>} />
                     </Route>
