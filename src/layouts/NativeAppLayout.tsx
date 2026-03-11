@@ -139,7 +139,7 @@ const NativeAppLayout = () => {
     { path: '/app/routines', icon: CalendarPlus, label: 'Routines', tourClass: 'tour-nav-routines' },
     { path: '/app/player', icon: Music, label: 'Listen', tourClass: 'tour-nav-listen' },
     { path: '/app/channels', icon: Users, label: 'Chats', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
-    { path: '/app/chat', icon: Headset, label: 'Support', tourClass: 'tour-nav-support' },
+    { path: '/app/presence', icon: Flame, label: 'Presence', tourClass: 'tour-nav-presence' },
   ];
 
   // Tab bar actual height: grid content (~48px for compact) + safe area inset
