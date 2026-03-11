@@ -15,7 +15,7 @@ import {
 import { haptic } from '@/lib/haptics';
 import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
-import { isToday, isBefore, startOfDay } from 'date-fns';
+import { isToday, isBefore, startOfDay, parseISO, format as fnsFormat } from 'date-fns';
 import { toast } from 'sonner';
 import { isWaterTask } from '@/lib/waterTracking';
 import { formatTimeLabelWithEmoji } from '@/lib/taskScheduling';
