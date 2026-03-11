@@ -45,6 +45,7 @@ import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
 import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { ChallengeCompleteSummary } from '@/components/app/ChallengeCompleteSummary';
+import { StreakMilestoneCelebration, STREAK_MILESTONES } from '@/components/app/StreakMilestoneCelebration';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
@@ -83,6 +84,8 @@ export default function AppTest() {
   const [showStreakGoalCompletion, setShowStreakGoalCompletion] = useState(false);
   const [showChallengeSummary, setShowChallengeSummary] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [streakMilestoneValue, setStreakMilestoneValue] = useState(0);
+  const [showStreakMilestone, setShowStreakMilestone] = useState(false);
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
     return (
@@ -427,6 +430,20 @@ export default function AppTest() {
               <Star className="h-4 w-4 mr-2" />
               Challenge Wrap-Up Summary
             </Button>
+          </div>
+          <Separator className="my-2" />
+          <p className="text-sm text-muted-foreground font-medium">Streak Milestones</p>
+          <div className="flex flex-wrap gap-2">
+            {STREAK_MILESTONES.map((m) => (
+              <Button
+                key={m}
+                variant="outline"
+                onClick={() => { setStreakMilestoneValue(m); setShowStreakMilestone(true); }}
+              >
+                <Flame className="h-4 w-4 mr-2" />
+                {m}-Day Streak
+              </Button>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -895,6 +912,12 @@ export default function AppTest() {
           setShowActionLimit(false);
           toast.info('Challenge accepted → paywall would open here');
         }}
+      />
+
+      <StreakMilestoneCelebration
+        open={showStreakMilestone}
+        streak={streakMilestoneValue}
+        onClose={() => setShowStreakMilestone(false)}
       />
     </div>
   );
