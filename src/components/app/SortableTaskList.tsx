@@ -351,24 +351,28 @@ function QuickAddCard({ date, taskCount, onOpenFullSheet }: { date: Date; taskCo
         className="flex-1 bg-transparent text-[15px] font-semibold text-foreground placeholder:text-muted-foreground outline-none"
         autoFocus
       />
-      {title.trim() ? (
+      {title.trim() && (
         <button
           onClick={handleSubmit}
-          className="w-10 h-10 rounded-full bg-urgency flex items-center justify-center shrink-0 shadow-urgency active:scale-95 transition-transform"
+          className="px-3 py-1.5 rounded-2xl bg-muted text-foreground text-xs font-semibold active:scale-95 transition-transform whitespace-nowrap"
         >
-          <Plus className="h-5 w-5 text-urgency-foreground rotate-0" />
+          Quick add
         </button>
-      ) : (
-        <div
-          className="w-10 h-10 rounded-full bg-urgency flex items-center justify-center shrink-0 shadow-urgency active:scale-95 transition-transform cursor-pointer"
-          onClick={() => {
-            haptic.medium();
-            onOpenFullSheet?.();
-          }}
-        >
-          <Plus className="h-5 w-5 text-urgency-foreground" />
-        </div>
       )}
+      <div
+        className="w-10 h-10 rounded-full bg-urgency flex items-center justify-center shrink-0 shadow-urgency active:scale-95 transition-transform cursor-pointer"
+        onClick={() => {
+          haptic.medium();
+          if (title.trim()) {
+            // Has text → open full sheet with pre-filled title
+            onOpenFullSheet?.();
+          } else {
+            onOpenFullSheet?.();
+          }
+        }}
+      >
+        <Plus className="h-5 w-5 text-urgency-foreground" />
+      </div>
     </div>
   );
 }
