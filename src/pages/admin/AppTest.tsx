@@ -417,6 +417,10 @@ export default function AppTest() {
               <Sparkles className="h-4 w-4 mr-2" />
               Playlist Complete
             </Button>
+            <Button onClick={() => setShowStreakGoalCompletion(true)} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              Streak Goal Completed (7 days)
+            </Button>
           </div>
         </CardContent>
       </Card>
