@@ -175,7 +175,7 @@ export const GoldStreakCelebration = ({
             }}
           />
           <img 
-            src={badgeGold}
+            src={coinGold}
             alt="Gold badge"
             className="w-32 h-32 object-contain relative z-10"
             style={{ 
