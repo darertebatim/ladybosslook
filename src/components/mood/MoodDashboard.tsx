@@ -301,6 +301,14 @@ export function MoodDashboard() {
         isSaving={addRoutinePlan.isPending}
       />
 
+      {/* Ritual Prompt Sheet - shown before celebration if not in routine */}
+      <MoodRitualPromptSheet
+        open={showRitualPrompt}
+        onOpenChange={setShowRitualPrompt}
+        onAddToRitual={handleRitualPromptAdd}
+        onSkip={handleRitualPromptSkip}
+      />
+
       {/* Mood Celebration Sheet */}
       <MoodCelebrationSheet
         open={showCelebration}
