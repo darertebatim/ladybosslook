@@ -294,7 +294,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
       scheduled_date: format(date, 'yyyy-MM-dd'),
       emoji: variant.emoji,
       color: variant.color,
-      order_index: taskCount,
+      order_index: 0,
     });
     setTitle('');
     inputRef.current?.focus();
