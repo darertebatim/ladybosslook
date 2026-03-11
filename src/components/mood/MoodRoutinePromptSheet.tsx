@@ -48,6 +48,7 @@ interface MoodRoutinePromptSheetProps {
   mood: string | null;
   onAddToRoutine: () => void;
   onSkip: () => void;
+  onNever: () => void;
   isLoading?: boolean;
 }
 
