@@ -143,6 +143,12 @@ export function MoodDashboard() {
     setShowCelebration(true);
   }, []);
 
+  const handleRoutinePromptNever = useCallback(() => {
+    localStorage.setItem('mood_routine_never', 'true');
+    setShowRitualPrompt(false);
+    setShowCelebration(true);
+  }, []);
+
   const handleRoutineClick = () => {
     haptic.light();
     if (isAdded) {
