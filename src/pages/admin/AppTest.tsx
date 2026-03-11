@@ -74,6 +74,8 @@ export default function AppTest() {
   const [confirmedGoal, setConfirmedGoal] = useState<7 | 14 | 30 | 50>(7);
   const [showStreakLostBanner, setShowStreakLostBanner] = useState(false);
   const [showGoldStreakLostBanner, setShowGoldStreakLostBanner] = useState(false);
+  const [showStreakLostNoShields, setShowStreakLostNoShields] = useState(false);
+  const [showGoldLostNoShields, setShowGoldLostNoShields] = useState(false);
   const [showRecoverySuccess, setShowRecoverySuccess] = useState<'streak' | 'gold' | null>(null);
 
   // iOS Preview Mode renders the test content in a simulated iOS environment
