@@ -28,8 +28,7 @@ const AppWater = () => {
   const [showInputSheet, setShowInputSheet] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState(false);
-  const [showStreakMilestone, setShowStreakMilestone] = useState(false);
-  const [streakMilestoneValue, setStreakMilestoneValue] = useState(0);
+  const [celebrationStreakCount, setCelebrationStreakCount] = useState(1);
   const [localProgress, setLocalProgress] = useState(0);
   
   const prevProgressRef = useRef(0);
