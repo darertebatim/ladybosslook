@@ -84,6 +84,7 @@ export function MoodDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showRitualPrompt, setShowRitualPrompt] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
 
   const isAdded = existingTask || justAdded;
