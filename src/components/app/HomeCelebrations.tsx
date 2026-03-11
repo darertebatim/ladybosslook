@@ -273,7 +273,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         previousStreak={streak?.longest_streak || 0}
         onRecover={() => {
           const prev = streak?.longest_streak || 0;
-          recoverStreak.mutate(prev, {
+          recoverStreak.mutate({ previousStreak: prev, type: 'streak' }, {
             onSuccess: () => setShowRecoveryPrompt(false),
           });
         }}

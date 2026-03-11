@@ -3,17 +3,24 @@ import { cn } from '@/lib/utils';
 import { useSubscription } from '@/hooks/useSubscription';
 
 interface RecoveryShieldsProps {
-  recoveryUsed: boolean;
+  /** Number of shields already used (0-3) */
+  recoveryCount: number;
   className?: string;
 }
 
-export const RecoveryShields = ({ recoveryUsed, className }: RecoveryShieldsProps) => {
+/**
+ * 3 small square recovery shield cards.
+ * Shield 1: Free for all users
+ * Shield 2-3: Unlocked for subscribers only
+ * Shows used/available/locked state based on recoveryCount
+ */
+export const RecoveryShields = ({ recoveryCount, className }: RecoveryShieldsProps) => {
   const { isSubscribed } = useSubscription();
 
   const shields = [
-    { id: 1, locked: false, used: recoveryUsed },
-    { id: 2, locked: !isSubscribed, used: false },
-    { id: 3, locked: !isSubscribed, used: false },
+    { id: 1, locked: false, used: recoveryCount >= 1 },
+    { id: 2, locked: !isSubscribed, used: recoveryCount >= 2 },
+    { id: 3, locked: !isSubscribed, used: recoveryCount >= 3 },
   ];
 
   return (

@@ -1406,24 +1406,44 @@ export const useUndoSkip = () => {
 };
 
 /**
- * Recover a broken streak (one-time per streak run)
+ * Recover a broken streak (regular or gold) using a recovery shield.
+ * Users have a pool of 3 shields (1 free + 2 for subscribers). Never resets.
  */
 export const useRecoverStreak = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (previousStreak: number) => {
+    mutationFn: async ({ previousStreak, type = 'streak' }: { previousStreak: number; type?: 'streak' | 'gold' }) => {
       if (!user?.id) throw new Error('Not authenticated');
+
+      // Get current recovery count
+      const { data: current } = await supabase
+        .from('user_streaks')
+        .select('streak_recovery_count')
+        .eq('user_id', user.id)
+        .single();
+
+      const count = (current as any)?.streak_recovery_count || 0;
+      if (count >= 3) throw new Error('No recovery shields remaining');
+
+      const updates: any = {
+        streak_recovery_count: count + 1,
+        streak_recovery_used: true,
+        streak_recovery_used_at: new Date().toISOString(),
+      };
+
+      if (type === 'streak') {
+        updates.current_streak = previousStreak;
+        updates.last_completion_date = format(new Date(), 'yyyy-MM-dd');
+      } else {
+        updates.current_gold_streak = previousStreak;
+        updates.last_gold_date = format(new Date(), 'yyyy-MM-dd');
+      }
 
       const { error } = await supabase
         .from('user_streaks')
-        .update({
-          current_streak: previousStreak,
-          streak_recovery_used: true,
-          streak_recovery_used_at: new Date().toISOString(),
-          last_completion_date: format(new Date(), 'yyyy-MM-dd'),
-        } as any)
+        .update(updates)
         .eq('user_id', user.id);
 
       if (error) throw error;
@@ -1431,6 +1451,7 @@ export const useRecoverStreak = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
       queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
+      queryClient.invalidateQueries({ queryKey: ['gold-streak'] });
     },
     onError: (error) => {
       console.error('Recover streak error:', error);

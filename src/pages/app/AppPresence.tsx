@@ -49,9 +49,11 @@ const AppPresence = () => {
   // Check if user has a streak goal challenge active
   const hasStreakChallenge = streak?.streak_goal && streak.streak_goal > 0;
 
-  // Recovery: streak is broken if current_streak reset to 0 but longest_streak > 0
+  // Recovery: check shield availability by count (max 3)
+  const recoveryCount = (streak as any)?.streak_recovery_count || 0;
+  const hasShieldsRemaining = recoveryCount < 3;
   const streakRecoveryAvailable = streak && 
-    !!(streak as any).streak_recovery_used === false &&
+    hasShieldsRemaining &&
     streak.current_streak === 0 &&
     streak.longest_streak > 0;
   const previousStreakForRecovery = streak?.longest_streak || 0;
@@ -189,7 +191,7 @@ const AppPresence = () => {
                   previousStreak={previousStreakForRecovery}
                   onRecover={() => setShowRecoveryPrompt(true)}
                 />
-                <RecoveryShields recoveryUsed={!!(streak as any).streak_recovery_used} />
+                <RecoveryShields recoveryCount={recoveryCount} />
               </div>
             )}
             
@@ -349,7 +351,7 @@ const AppPresence = () => {
         open={showRecoveryPrompt}
         previousStreak={previousStreakForRecovery}
         onRecover={() => {
-          recoverStreak.mutate(previousStreakForRecovery, {
+          recoverStreak.mutate({ previousStreak: previousStreakForRecovery, type: 'streak' }, {
             onSuccess: () => setShowRecoveryPrompt(false),
           });
         }}
