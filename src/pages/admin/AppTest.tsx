@@ -38,6 +38,8 @@ import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { StreakGoalSelection, StreakGoalValue } from '@/components/app/StreakGoalSelection';
 import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation';
 import { ActionLimitSheet, resetActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
+import { StreakLostBanner } from '@/components/app/StreakLostBanner';
+import { GoldStreakLostBanner } from '@/components/app/GoldStreakLostBanner';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
