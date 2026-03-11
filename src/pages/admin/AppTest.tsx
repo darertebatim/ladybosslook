@@ -814,6 +814,8 @@ export default function AppTest() {
       <StreakCelebration
         open={showStreakCelebration}
         onClose={() => setShowStreakCelebration(false)}
+        currentStreak={testStreakDay}
+        isFirstAction={testStreakDay === 1}
       />
 
       <CompletionCelebration
