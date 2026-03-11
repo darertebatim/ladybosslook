@@ -19,9 +19,11 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
-import { UserTask, useReorderTasks } from '@/hooks/useTaskPlanner';
+import { UserTask, useReorderTasks, useCreateTask } from '@/hooks/useTaskPlanner';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
+import { Plus } from 'lucide-react';
+import { format } from 'date-fns';
 
 interface SortableTaskItemProps {
   task: UserTask;
@@ -192,6 +194,7 @@ export const SortableTaskList = ({
   const activeTask = activeId ? localTasks.find(t => t.id === activeId) : null;
 
   return (
+    <>
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
@@ -233,5 +236,83 @@ export const SortableTaskList = ({
         ) : null}
       </DragOverlay>
     </DndContext>
+
+    {/* Quick Add Card */}
+    <QuickAddCard date={date} />
+  </>
   );
 };
+
+function QuickAddCard({ date }: { date: Date }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [title, setTitle] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const createTask = useCreateTask();
+
+  const handleSubmit = () => {
+    const trimmed = title.trim();
+    if (!trimmed) return;
+
+    haptic.medium();
+    createTask.mutate({
+      title: trimmed,
+      scheduled_date: format(date, 'yyyy-MM-dd'),
+      emoji: '☀️',
+      color: 'yellow',
+    });
+    setTitle('');
+    // Keep open for rapid entry
+    inputRef.current?.focus();
+  };
+
+  if (!isOpen) {
+    return (
+      <button
+        onClick={() => {
+          setIsOpen(true);
+          haptic.light();
+          setTimeout(() => inputRef.current?.focus(), 100);
+        }}
+        className="mt-3 w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-dashed border-muted-foreground/20 bg-muted/30 active:scale-[0.98] transition-all"
+      >
+        <div className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center">
+          <Plus className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <span className="text-sm text-muted-foreground">Quick add action...</span>
+      </button>
+    );
+  }
+
+  return (
+    <div className="mt-3 flex items-center gap-2 px-3 py-2.5 rounded-2xl border border-primary/30 bg-card shadow-sm">
+      <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+        <Plus className="h-4 w-4 text-primary" />
+      </div>
+      <input
+        ref={inputRef}
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') handleSubmit();
+          if (e.key === 'Escape') { setIsOpen(false); setTitle(''); }
+        }}
+        onBlur={() => {
+          if (!title.trim()) {
+            setIsOpen(false);
+          }
+        }}
+        placeholder="Type action name..."
+        className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+        autoFocus
+      />
+      {title.trim() && (
+        <button
+          onClick={handleSubmit}
+          className="px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold active:scale-95 transition-transform"
+        >
+          Add
+        </button>
+      )}
+    </div>
+  );
+}
