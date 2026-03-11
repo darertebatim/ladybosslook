@@ -56,7 +56,7 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
     });
   }, []);
 
-
+  const handlePurchase = async () => {
     if (preview) return;
     setIsPurchasing(true);
     try {
