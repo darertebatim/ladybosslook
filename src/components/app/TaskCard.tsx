@@ -497,6 +497,9 @@ export const TaskCard = memo(function TaskCard({
               </span>
             )}
             <span className="text-[13px] text-black/80">{formatTime(task)}</span>
+            {repeatLabel && (
+              <span className="text-[13px] text-black/50">• {repeatLabel}</span>
+            )}
             {hasGoal && (
               <span className="text-[13px] text-black/80 font-medium">• {(() => {
                 const label = formatGoalLabel();
