@@ -10,9 +10,11 @@ import {
 import { haptic } from '@/lib/haptics';
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
-import { isToday } from 'date-fns';
+import { isToday, isBefore, startOfDay } from 'date-fns';
 import { SessionReminderSheet } from '@/components/app/SessionReminderSheet';
 import { useSessionReminderSettings } from '@/hooks/useSessionReminderSettings';
+import SealCheck from '@/components/app/SealCheck';
+import { toast } from 'sonner';
 
 interface ProgramEventCardProps {
   event: ProgramEvent;
