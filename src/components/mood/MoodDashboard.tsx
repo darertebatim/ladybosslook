@@ -116,7 +116,7 @@ export function MoodDashboard() {
       haptic.success();
       
       // If not in routine, show ritual prompt first; otherwise celebration
-      if (!isAdded) {
+      if (!isAdded && !neverPrompt) {
         setShowRitualPrompt(true);
       } else {
         setShowCelebration(true);
