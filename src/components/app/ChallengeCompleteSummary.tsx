@@ -136,7 +136,7 @@ export const ChallengeCompleteSummary = ({
               boxShadow: '0 0 40px rgba(251, 191, 36, 0.4), 0 8px 24px rgba(0,0,0,0.3)',
             }}
           >
-            <span className="text-3xl">{badgeEmoji}</span>
+            <FluentEmoji emoji={badgeEmoji} size={40} />
           </div>
           <p className="mt-2 text-amber-400 text-xs font-semibold tracking-widest uppercase">
             {badgeLabel}
