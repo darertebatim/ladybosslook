@@ -147,6 +147,7 @@ export interface CreateTaskInput {
   goal_type?: 'timer' | 'count' | null;
   goal_target?: number | null;
   goal_unit?: string | null;
+  order_index?: number;
 }
 
 export interface UpdateTaskInput extends Partial<CreateTaskInput> {
