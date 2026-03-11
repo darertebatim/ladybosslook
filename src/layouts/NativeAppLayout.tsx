@@ -1,5 +1,6 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home, MessageCircle, Compass, Music, Users, Flame, CalendarPlus } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef, useState } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
@@ -128,6 +129,22 @@ const NativeAppLayout = () => {
   // Get unread feed count for Channels badge
   const { data: unreadFeedCount = 0 } = useUnreadFeedCount();
 
+  // Get streak count for Presence nav badge
+  const { data: streakCount = 0 } = useQuery({
+    queryKey: ['nav-streak', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      const { data } = await supabase
+        .from('user_streaks')
+        .select('current_streak')
+        .eq('user_id', user.id)
+        .single();
+      return data?.current_streak || 0;
+    },
+    enabled: !!user?.id,
+    staleTime: 60_000,
+  });
+
   // Check if we're on the audio player page - don't show mini player there
   const isOnPlayerPage = location.pathname.match(/^\/app\/player\/[^/]+$/);
   // Check if we're on chat page - hide tab bar for full-screen experience
@@ -139,7 +156,6 @@ const NativeAppLayout = () => {
     { path: '/app/routines', icon: CalendarPlus, label: 'Routines', tourClass: 'tour-nav-routines' },
     { path: '/app/player', icon: Music, label: 'Listen', tourClass: 'tour-nav-listen' },
     { path: '/app/channels', icon: Users, label: 'Chats', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
-    { path: '/app/presence', icon: Flame, label: 'Presence', tourClass: 'tour-nav-presence' },
   ];
 
   // Tab bar actual height: grid content (~48px for compact) + safe area inset
@@ -234,6 +250,17 @@ const NativeAppLayout = () => {
               </Link>
             );
           })}
+
+          {/* Presence - orange streak pill */}
+          <Link
+            to="/app/presence"
+            className="flex items-center justify-center min-h-[44px] tour-nav-presence"
+          >
+            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-sm active:scale-95 transition-transform">
+              <Flame className="h-4 w-4 fill-current" />
+              <span className="text-sm font-semibold">{streakCount}</span>
+            </div>
+          </Link>
         </div>
       </nav>
       )}
