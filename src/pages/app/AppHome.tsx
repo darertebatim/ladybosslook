@@ -476,11 +476,21 @@ const AppHome = () => {
     dateKey: todayDateStr,
   });
 
-  const handleStreakIncrease = useCallback(() => {
+  const handleStreakIncrease = useCallback((newStreak: number) => {
     // If user has never celebrated first action, don't open streak modal immediately —
     // let triggerFirstCelebration handle it with proper delay after seal animation
     const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated') === 'true';
     if (!alreadyCelebrated) return;
+    
+    // Check if this is a milestone streak
+    const { isStreakMilestone, getStreakMilestoneKey } = require('@/components/app/StreakMilestoneCelebration');
+    if (isStreakMilestone(newStreak) && localStorage.getItem(getStreakMilestoneKey(newStreak)) !== 'true') {
+      localStorage.setItem(getStreakMilestoneKey(newStreak), 'true');
+      setStreakMilestoneValue(newStreak);
+      setShowStreakMilestone(true);
+      return;
+    }
+    
     setShowStreakModal(true);
   }, []);
 
