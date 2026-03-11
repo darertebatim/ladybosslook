@@ -131,7 +131,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     timerTask, setTimerTask, onTimerSaveProgress, onTimerMarkComplete,
     showRecoveryPrompt, setShowRecoveryPrompt, recoverStreak,
     userId, showNotificationFlow, setShowNotificationFlow,
-    showStreakMilestone, setShowStreakMilestone, streakMilestoneValue,
+    showStreakMilestone, setShowStreakMilestone, streakMilestoneValue, setStreakMilestoneValue,
   } = props;
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
