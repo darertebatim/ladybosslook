@@ -1012,7 +1012,7 @@ const AppHome = () => {
                         )}
                       </>
                     ) : (
-                      <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                      <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenQuickStart={() => setShowQuickStart(true)} />
                     );
                   })()}
                   {/* Onboarding Banner - below actions, hidden while welcome card is active */}
