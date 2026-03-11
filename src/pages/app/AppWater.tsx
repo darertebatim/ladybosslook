@@ -455,13 +455,8 @@ const AppWater = () => {
       {/* Streak celebration */}
       <StreakCelebration
         open={showStreakModal}
+        streakCount={celebrationStreakCount}
         onClose={() => setShowStreakModal(false)}
-      />
-
-      <StreakMilestoneCelebration
-        open={showStreakMilestone}
-        streak={streakMilestoneValue}
-        onClose={() => setShowStreakMilestone(false)}
       />
     </>
   );

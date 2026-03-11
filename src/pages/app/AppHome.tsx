@@ -1177,10 +1177,7 @@ const AppHome = () => {
           userId={user?.id}
           showNotificationFlow={showNotificationFlow}
           setShowNotificationFlow={setShowNotificationFlow}
-          showStreakMilestone={showStreakMilestone}
-          setShowStreakMilestone={setShowStreakMilestone}
-          streakMilestoneValue={streakMilestoneValue}
-          setStreakMilestoneValue={setStreakMilestoneValue}
+          celebrationStreakCount={celebrationStreakCount}
         />
 
         {/* New Interactive Home Tour */}
