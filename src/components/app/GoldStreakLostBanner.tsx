@@ -22,6 +22,7 @@ export const GoldStreakLostBanner = ({
   open,
   previousGoldStreak,
   hasShieldsRemaining,
+  shieldsLeft,
   onRecover,
   onDismiss,
   isLoading,
