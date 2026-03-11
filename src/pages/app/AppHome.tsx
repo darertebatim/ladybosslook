@@ -321,8 +321,17 @@ const AppHome = () => {
   const {
     data: featuredRoutines = []
   } = useFeaturedRoutinesBank();
+  const { data: routineCategories = [] } = useRoutineBankCategories();
+  
+  // Map slug → category name for display
+  const categoryNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    routineCategories.forEach(cat => map.set(cat.slug, cat.name));
+    return map;
+  }, [routineCategories]);
+  
   const suggestedRoutines = useMemo(() => 
-    featuredRoutines.filter(r => !dismissedRoutineIds.has(r.id)), 
+    featuredRoutines.filter(r => !dismissedRoutineIds.has(r.id)),
     [featuredRoutines, dismissedRoutineIds]
   );
 
