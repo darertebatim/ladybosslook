@@ -70,6 +70,8 @@ export default function AppTest() {
   const [showStreakGoalSelection, setShowStreakGoalSelection] = useState(false);
   const [showGoalConfirmation, setShowGoalConfirmation] = useState(false);
   const [confirmedGoal, setConfirmedGoal] = useState<7 | 14 | 30 | 50>(7);
+  const [showStreakLostBanner, setShowStreakLostBanner] = useState(false);
+  const [showGoldStreakLostBanner, setShowGoldStreakLostBanner] = useState(false);
 
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
