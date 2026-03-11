@@ -1,83 +1,62 @@
 import { useEffect, useState } from 'react';
-import { format, addDays, startOfWeek, isSameDay } from 'date-fns';
-import { useUserPresence } from '@/hooks/useUserPresence';
+import { getDay } from 'date-fns';
 import { useAppReview } from '@/hooks/useAppReview';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
-import { Check, Sparkles, Heart } from 'lucide-react';
+import { Flame } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { SoftReviewPrompt } from './SoftReviewPrompt';
+import streakFlameImg from '@/assets/streak-flame-3d.png';
 
 interface StreakCelebrationProps {
   open: boolean;
   onClose: () => void;
-  isFirstAction?: boolean; // When true, shows special first-action celebration
-  onShowGoalSelection?: () => void; // Callback to show goal selection after first streak day
-  shouldShowGoalSelection?: boolean; // Whether to trigger goal selection on close
+  isFirstAction?: boolean;
+  onShowGoalSelection?: () => void;
+  shouldShowGoalSelection?: boolean;
+  currentStreak?: number;
 }
 
 const CONFETTI_COLORS = [
-  '#fb923c', // orange-400
-  '#f97316', // orange-500
-  '#ea580c', // orange-600
-  '#fbbf24', // amber-400
-  '#fcd34d', // amber-300
+  '#fb923c', '#f97316', '#ea580c', '#fbbf24', '#fcd34d',
 ];
 
+const WEEKDAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
 /**
- * Unified Celebration Component - Strength-first approach
- * 
- * Philosophy: "Simora measures depth of return, not length of absence."
- * - Celebrates showing up, not consecutive days
- * - Welcomes users back after gaps without shame
- * - Reinforces identity: "Your strength is still here"
- * - Special celebration for first action ever
+ * Me+-inspired Streak Day Celebration
+ * Shows daily streak count with flame icon, week progress bar, and motivational message.
  */
-export const StreakCelebration = ({ 
-  open, 
-  onClose, 
+export const StreakCelebration = ({
+  open,
+  onClose,
   isFirstAction = false,
   onShowGoalSelection,
   shouldShowGoalSelection = false,
+  currentStreak = 1,
 }: StreakCelebrationProps) => {
-  const { data: presence } = useUserPresence();
   const { maybeRequestReview, shouldShowForStreak } = useAppReview();
   const [isAnimating, setIsAnimating] = useState(false);
   const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false);
   const [showReviewPrompt, setShowReviewPrompt] = useState(false);
 
-  const thisMonthDays = presence?.thisMonthActiveDays || 1;
-  const isReturning = presence?.isReturning || false;
-
-  // Handle close with potential review prompt or goal selection
   const handleClose = async () => {
     onClose();
-    
-    // Check if we should show goal selection (first streak day, no goal set)
     if (shouldShowGoalSelection && onShowGoalSelection) {
-      // Small delay to let this modal close smoothly first
-      setTimeout(() => {
-        onShowGoalSelection();
-      }, 300);
+      setTimeout(() => onShowGoalSelection(), 300);
       return;
     }
-    
-    // Check if we should show review after closing - show soft prompt first
-    if (shouldShowForStreak(thisMonthDays)) {
-      setTimeout(() => {
-        setShowReviewPrompt(true);
-      }, 300);
+    if (shouldShowForStreak(currentStreak)) {
+      setTimeout(() => setShowReviewPrompt(true), 300);
     }
   };
 
-  // Handle accepting the soft review prompt
   const handleAcceptReview = async () => {
     setShowReviewPrompt(false);
     await maybeRequestReview();
   };
 
-  // Handle declining the soft review prompt
   const handleDeclineReview = () => {
     setShowReviewPrompt(false);
   };
@@ -86,197 +65,149 @@ export const StreakCelebration = ({
     if (open) {
       setIsAnimating(true);
       haptic.success();
-
-      // Trigger confetti for first action celebration
-      if (isFirstAction && !hasTriggeredConfetti) {
+      if (!hasTriggeredConfetti) {
         setHasTriggeredConfetti(true);
-        
         confetti({
-          particleCount: 70,
-          spread: 65,
-          origin: { y: 0.5 },
-          colors: CONFETTI_COLORS,
-          scalar: 0.9,
-          ticks: 220,
+          particleCount: 60, spread: 55, origin: { y: 0.4 },
+          colors: CONFETTI_COLORS, scalar: 0.9, ticks: 200,
         });
-
-        setTimeout(() => {
-          confetti({
-            particleCount: 35,
-            spread: 48,
-            origin: { y: 0.45 },
-            colors: CONFETTI_COLORS,
-            scalar: 0.95,
-            ticks: 200,
-          });
-        }, 350);
+        if (currentStreak >= 7) {
+          setTimeout(() => {
+            confetti({
+              particleCount: 40, spread: 45, origin: { y: 0.35 },
+              colors: CONFETTI_COLORS, scalar: 0.95, ticks: 180,
+            });
+          }, 350);
+        }
       }
     }
-  }, [open, isFirstAction, hasTriggeredConfetti]);
+  }, [open, hasTriggeredConfetti, currentStreak]);
 
   useEffect(() => {
-    if (!open) {
-      setHasTriggeredConfetti(false);
-    }
+    if (!open) setHasTriggeredConfetti(false);
   }, [open]);
 
   if (!open) return null;
 
-  const lastActiveDate = presence?.lastActiveDate 
-    ? new Date(presence.lastActiveDate)
-    : new Date();
+  // Current day of week (0=Sun), convert to Mon-start index (0=Mon)
+  const jsDay = getDay(new Date()); // 0=Sun
+  const todayIndex = jsDay === 0 ? 6 : jsDay - 1; // 0=Mon, 6=Sun
 
-  // Generate week days for presence indicator (checkmarks, not streak)
-  const weekStart = startOfWeek(new Date(), { weekStartsOn: 0 });
-  const weekDays = Array.from({ length: 7 }, (_, i) => {
-    const day = addDays(weekStart, i);
-    return {
-      date: day,
-      label: format(day, 'EEEEE'),
-      isActive: day <= lastActiveDate && presence?.showedUpToday,
-      isToday: isSameDay(day, new Date()),
-    };
-  });
+  // How many days this week the user has been active (streak capped to week position)
+  const streakDaysThisWeek = Math.min(currentStreak, todayIndex + 1);
 
-  // Messages based on context
   const getMessage = () => {
-    if (isFirstAction) {
-      return "Your first action is in.\nKeep it small. Keep it kind.";
-    }
-    if (isReturning) {
-      return "Your strength is still here. Welcome back.";
-    }
-    if (thisMonthDays === 1) {
-      return "You showed up. That's strength.";
-    }
-    if (thisMonthDays <= 3) {
-      return "You're here again. ✨";
-    }
-    if (thisMonthDays === 7) {
-      return "7 days this month. You keep showing up.";
-    }
-    if (thisMonthDays >= 14) {
-      return "You've shown up so many times. That's real strength.";
-    }
-    return `${thisMonthDays} days this month. You're building something.`;
+    if (currentStreak === 1) return "A streak is born! Keep it up\nevery day to help it grow.";
+    if (currentStreak === 2) return "Two in a row! You're\nbuilding momentum.";
+    if (currentStreak === 3) return "Your habit is getting stronger—\nlet's keep it going!";
+    if (currentStreak <= 6) return "You're on fire! Keep showing up.";
+    return `${currentStreak} days strong! Nothing can stop you.`;
   };
 
-  const getTitle = () => {
-    if (isFirstAction) {
-      return "You showed up for yourself";
-    }
-    return `${thisMonthDays} ${thisMonthDays === 1 ? 'day' : 'days'}`;
-  };
-
-  const getSubtitle = () => {
-    if (isFirstAction) {
-      return null;
-    }
-    return "this month";
-  };
-
-  const getIcon = () => {
-    if (isFirstAction) {
-      return <Heart className="h-9 w-9 fill-current" />;
-    }
-    if (isReturning) {
-      return '💜';
-    }
-    return '✨';
-  };
+  // Week progress percentage (out of 7 days)
+  const progressPercent = Math.min((streakDaysThisWeek / 7) * 100, 100);
 
   return (
-    <div 
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    <div
+      className="fixed inset-0 z-[100] flex flex-col justify-end"
       onClick={handleClose}
     >
-      {/* Gentle overlay */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
 
-      {/* Modal content */}
-      <div 
+      {/* Flame icon floating above the card */}
+      <div className="relative z-10 flex flex-col items-center mb-[-40px]">
+        <img
+          src={streakFlameImg}
+          alt="Streak flame"
+          className={cn(
+            'w-24 h-24 object-contain drop-shadow-2xl transition-all duration-700',
+            isAnimating ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+          )}
+        />
+      </div>
+
+      {/* Card */}
+      <div
         className={cn(
-          'relative bg-gradient-to-b from-orange-400 to-orange-500 rounded-3xl p-8 w-full max-w-[300px] text-center transition-all duration-500',
-          isAnimating ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
+          'relative z-10 bg-gray-800/95 rounded-t-3xl px-6 pt-14 pb-8 transition-all duration-500',
+          isAnimating ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Icon */}
+        {/* Streak count */}
         <div className={cn(
-          'mb-4 transition-transform duration-700 flex justify-center',
-          isAnimating && 'animate-pulse'
+          'text-center mb-1 transition-all duration-500 delay-150',
+          isAnimating ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
         )}>
-          {isFirstAction ? (
-            <div className="grid place-items-center size-20 rounded-2xl bg-orange-400 text-white shadow-lg">
-              {getIcon()}
-            </div>
-          ) : (
-            <span className="text-5xl">{getIcon()}</span>
-          )}
+          <span className="text-6xl font-bold text-orange-400">
+            {currentStreak}
+          </span>
         </div>
-
-        {/* Title */}
-        <div className={cn(
-          'text-2xl font-semibold text-white mb-2 transition-all duration-500 delay-200',
-          isAnimating ? 'scale-100 opacity-100' : 'scale-50 opacity-0',
-          !isFirstAction && 'text-4xl'
-        )}>
-          {getTitle()}
-        </div>
-        
-        {/* Subtitle */}
-        {getSubtitle() && (
-          <p className="text-white/60 text-sm mb-4">{getSubtitle()}</p>
-        )}
+        <p className="text-center text-white/50 text-sm mb-4">
+          {currentStreak === 1 ? 'day streak' : 'days streak'}
+        </p>
 
         {/* Message */}
-        <p className="text-white/80 text-sm mb-6 leading-relaxed whitespace-pre-line">
+        <p className="text-center text-white/80 text-sm leading-relaxed whitespace-pre-line mb-6">
           {getMessage()}
         </p>
 
-        {/* Week presence indicator - only show for non-first-action */}
-        {!isFirstAction && (
-          <div className="flex justify-center gap-2 mb-6">
-            {weekDays.map((day, i) => (
-              <div key={i} className="flex flex-col items-center gap-1">
-                <div 
-                  className={cn(
-                    'w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all',
-                    day.isToday
-                      ? 'bg-orange-400 text-white ring-2 ring-orange-300'
-                      : day.isActive
-                      ? 'bg-orange-400/50 text-white'
-                      : 'bg-white/10 text-white/40'
-                  )}
-                >
-                  {day.isActive || day.isToday ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    day.label
-                  )}
+        {/* Week progress bar */}
+        <div className="mb-2">
+          <div className="relative h-3 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
+              style={{
+                width: `${progressPercent}%`,
+                background: 'repeating-linear-gradient(45deg, #fb923c, #fb923c 6px, #fdba74 6px, #fdba74 12px)',
+              }}
+            />
+            {progressPercent > 0 && (
+              <div
+                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-all duration-700"
+                style={{ left: `${progressPercent}%` }}
+              >
+                <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center shadow-lg">
+                  <Flame className="w-3 h-3 text-white" fill="currentColor" />
                 </div>
               </div>
-            ))}
+            )}
           </div>
-        )}
+        </div>
 
-        {/* Button */}
+        {/* Weekday labels */}
+        <div className="flex justify-between px-1 mb-8">
+          {WEEKDAY_LABELS.map((label, i) => {
+            const isActive = i < streakDaysThisWeek;
+            const isToday = i === todayIndex;
+            return (
+              <span
+                key={i}
+                className={cn(
+                  'text-xs font-medium w-6 text-center transition-colors',
+                  isToday
+                    ? 'text-orange-400 font-bold'
+                    : isActive
+                    ? 'text-orange-400/60'
+                    : 'text-white/30'
+                )}
+              >
+                {label}
+              </span>
+            );
+          })}
+        </div>
+
+        {/* CTA */}
         <Button
           onClick={handleClose}
-          className="w-full bg-white hover:bg-white/90 text-orange-600 font-medium py-3 rounded-xl"
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl text-base"
         >
-          {isFirstAction ? (
-            'Continue'
-          ) : (
-            <>
-              <Sparkles className="h-4 w-4 mr-2" />
-              I'm here
-            </>
-          )}
+          I'm committed
         </Button>
       </div>
 
-      {/* Soft Review Prompt - shown after streak celebration closes */}
       <SoftReviewPrompt
         isOpen={showReviewPrompt}
         onClose={handleDeclineReview}
