@@ -588,7 +588,8 @@ export default function AppTest() {
             onClose={() => setShowStreakGoalCompletion(false)}
             onLevelUp={() => {
               setShowStreakGoalCompletion(false);
-              toast.info('Level up → goal selection would open');
+              setConfirmedGoal(14);
+              setShowGoalConfirmation(true);
             }}
           />
           <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
