@@ -166,18 +166,18 @@ export const TaskQuickStartSheet = ({
                 onClick={handleClose}
                 className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
               >
-                <X className="w-4 h-4 text-muted-foreground" />
+                <X className="w-4 h-4 text-foreground" />
               </button>
             </div>
 
             {/* Title input */}
             <div className="px-4 pb-3">
-              <div className="bg-muted/50 rounded-xl p-3">
+              <div className="rounded-xl p-3">
                 <Input
                   value={taskName}
                   onChange={(e) => setTaskName(e.target.value.slice(0, 50))}
                   placeholder="Type a new action..."
-                  className="text-base font-medium text-center border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1"
+                  className="text-xl font-semibold text-center border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/40 h-auto py-2"
                   maxLength={50}
                   autoFocus
                   onKeyDown={(e) => {
