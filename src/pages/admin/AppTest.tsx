@@ -439,20 +439,6 @@ export default function AppTest() {
               Challenge Wrap-Up Summary
             </Button>
           </div>
-          <Separator className="my-2" />
-          <p className="text-sm text-muted-foreground font-medium">Streak Milestones</p>
-          <div className="flex flex-wrap gap-2">
-            {STREAK_MILESTONES.map((m) => (
-              <Button
-                key={m}
-                variant="outline"
-                onClick={() => { setStreakMilestoneValue(m); setShowStreakMilestone(true); }}
-              >
-                <Flame className="h-4 w-4 mr-2" />
-                {m}-Day Streak
-              </Button>
-            ))}
-          </div>
         </CardContent>
       </Card>
 
