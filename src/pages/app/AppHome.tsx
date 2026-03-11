@@ -636,7 +636,7 @@ const AppHome = () => {
             <div className="justify-self-start flex items-center gap-1 tour-menu-button">
               <HomeMenu onStartTour={startHomeTour || undefined} />
               <button
-                onClick={() => navigate('/app/support')}
+                onClick={() => navigate('/app/chat')}
                 className="p-2 -ml-1 text-foreground hover:text-foreground transition-colors"
               >
                 <Headset className="h-5 w-5" />
