@@ -43,9 +43,19 @@ function getUnlockDateTime(
   if (dripDelayDays === 0) return { unlockDate: null, unlockTime: null };
   if (!firstSessionDate) return { unlockDate: null, unlockTime: null };
   
-  const firstSession = firstSessionDate.includes('T')
-    ? new Date(firstSessionDate)
-    : new Date(firstSessionDate + 'T00:00:00');
+  // Handle both ISO format (contains T) and PostgreSQL format (space-separated)
+  // e.g. "2026-01-11T16:00:00+00:00" or "2026-01-11 16:00:00+00"
+  let firstSession: Date;
+  if (firstSessionDate.includes('T') || firstSessionDate.includes('+') || firstSessionDate.includes('Z')) {
+    // Already has timezone or ISO marker — parse directly
+    firstSession = new Date(firstSessionDate);
+  } else {
+    // Date-only string like "2026-01-11" — add time component
+    firstSession = new Date(firstSessionDate + 'T00:00:00');
+  }
+
+  // Guard against invalid dates
+  if (isNaN(firstSession.getTime())) return { unlockDate: null, unlockTime: null };
   
   const unlockDate = new Date(firstSession);
   unlockDate.setDate(unlockDate.getDate() + (dripDelayDays - 1) + dripOffsetDays);
