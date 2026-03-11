@@ -70,9 +70,22 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
   const currentSettings = isSession ? sessionSettings : contentSettings;
   const saveSettings = isSession ? setSessionSettings : setContentSettings;
 
+  // Check if this is a future date (after today)
+  const isFutureDate = !isToday(date) && !isBefore(startOfDay(date), startOfDay(new Date()));
+
   const handleToggleComplete = (e: React.MouseEvent) => {
     e.stopPropagation();
     
+    // Prevent completing tasks for future dates
+    if (isFutureDate) {
+      haptic.light();
+      toast("Let's focus on today's rituals.", {
+        icon: '☝️',
+        duration: 2000,
+      });
+      return;
+    }
+
     haptic.light();
 
     setIsAnimating(true);
