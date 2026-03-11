@@ -164,7 +164,7 @@ export default function AppInspire() {
               <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory">
                 {featuredRoutines.map((routine) => (
                   <div key={routine.id} className="shrink-0 w-[85%] snap-start">
-                    <FeaturedRoutineCard routine={routine} />
+                    <FeaturedRoutineCard routine={routine} categoryName={categoryNameMap.get(routine.category)} />
                   </div>
                 ))}
               </div>
