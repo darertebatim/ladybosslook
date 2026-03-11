@@ -23,6 +23,7 @@ export const StreakGoalCompletionCelebration = ({
   currentStreak,
   onClose,
   onLevelUp,
+  onWrapUp,
 }: StreakGoalCompletionCelebrationProps) => {
   useEffect(() => {
     if (!open) return;
