@@ -206,7 +206,7 @@ export default function AppInspireDetail() {
         className="fixed top-0 left-0 right-0 z-50 flex items-center px-4"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
       >
-        <BackButtonCircle to="/app/routines" />
+        <BackButtonCircle to={(location.state as any)?.from || '/app/routines'} />
       </header>
 
       {/* Scroll Container */}
