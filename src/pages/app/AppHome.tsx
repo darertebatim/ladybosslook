@@ -177,6 +177,7 @@ const AppHome = () => {
   const {
     data: skippedTaskIds = new Set<string>()
   } = useSkipsForDate(selectedDate);
+  const { data: carryForwardTasks = [] } = useCarryForwardTasks();
 
   const handleFabClick = useCallback(() => {
     setShowQuickStart(true);
