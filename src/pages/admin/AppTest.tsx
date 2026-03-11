@@ -581,6 +581,17 @@ export default function AppTest() {
             type={showRecoverySuccess || 'streak'}
             onClose={() => setShowRecoverySuccess(null)}
           />
+          <StreakGoalCompletionCelebration
+            open={showStreakGoalCompletion}
+            streakGoal={7}
+            currentStreak={7}
+            onClose={() => setShowStreakGoalCompletion(false)}
+            onLevelUp={() => {
+              setShowStreakGoalCompletion(false);
+              toast.info('Level up → goal selection would open');
+            }}
+          />
+          <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
         </CardContent>
       </Card>
 
