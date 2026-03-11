@@ -2,30 +2,68 @@ import { Button } from '@/components/ui/button';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { CalendarPlus } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
+import { cn } from '@/lib/utils';
 import {
   Sheet,
   SheetContent,
 } from '@/components/ui/sheet';
 
-interface MoodRitualPromptSheetProps {
+interface MoodData {
+  emoji: string;
+  bgColor: string;
+  celebrationText: string;
+}
+
+const MOOD_CONFIG: Record<string, MoodData> = {
+  great: {
+    emoji: '😄',
+    bgColor: 'bg-yellow-100',
+    celebrationText: 'Amazing! You feel great!',
+  },
+  good: {
+    emoji: '🙂',
+    bgColor: 'bg-green-100',
+    celebrationText: "Nice! You're feeling good!",
+  },
+  okay: {
+    emoji: '😐',
+    bgColor: 'bg-blue-100',
+    celebrationText: "You're feeling okay.",
+  },
+  not_great: {
+    emoji: '😔',
+    bgColor: 'bg-purple-100',
+    celebrationText: "It's okay to feel not great.",
+  },
+  bad: {
+    emoji: '😢',
+    bgColor: 'bg-red-100',
+    celebrationText: "It's okay to have tough days.",
+  },
+};
+
+interface MoodRoutinePromptSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAddToRitual: () => void;
+  mood: string | null;
+  onAddToRoutine: () => void;
   onSkip: () => void;
   isLoading?: boolean;
 }
 
-export function MoodRitualPromptSheet({
+export function MoodRoutinePromptSheet({
   open,
   onOpenChange,
-  onAddToRitual,
+  mood,
+  onAddToRoutine,
   onSkip,
   isLoading,
-}: MoodRitualPromptSheetProps) {
+}: MoodRoutinePromptSheetProps) {
+  const moodData = mood ? MOOD_CONFIG[mood] : null;
 
   const handleAdd = () => {
     haptic.medium();
-    onAddToRitual();
+    onAddToRoutine();
   };
 
   const handleSkip = () => {
@@ -33,24 +71,33 @@ export function MoodRitualPromptSheet({
     onSkip();
   };
 
+  if (!moodData) return null;
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="rounded-t-3xl border-0 px-5 pt-8 pb-6 bg-amber-50 dark:bg-amber-950/40"
+        className={cn(
+          "rounded-t-3xl border-0 px-5 pt-8 pb-6",
+          moodData.bgColor
+        )}
         style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}
-        hideCloseButton
       >
-        {/* Illustration */}
+        {/* Header: Emoji + Feeling text */}
         <div className="flex flex-col items-center text-center mb-6">
-          <div className="w-20 h-20 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center mb-4">
-            <FluentEmoji emoji="🌟" size={48} />
+          <div className={cn(
+            "w-16 h-16 rounded-full flex items-center justify-center mb-3",
+            moodData.bgColor.replace('100', '200')
+          )}>
+            <FluentEmoji emoji={moodData.emoji} size={40} />
           </div>
-
+          <p className="text-sm font-medium text-foreground/50 mb-1">
+            {moodData.celebrationText}
+          </p>
           <h2 className="text-xl font-bold text-foreground leading-snug mb-2">
             Make it a Daily Habit
           </h2>
-          <p className="text-sm text-foreground/60 leading-relaxed max-w-[280px]">
+          <p className="text-sm text-foreground/50 leading-relaxed max-w-[280px]">
             Checking in with your mood daily helps you spot patterns, understand triggers, and build emotional awareness over time.
           </p>
         </div>
@@ -62,7 +109,7 @@ export function MoodRitualPromptSheet({
           className="w-full h-12 rounded-full bg-foreground text-background hover:bg-foreground/90 font-semibold text-base gap-2 mb-3"
         >
           <CalendarPlus className="h-5 w-5" />
-          Add to My Rituals
+          Add to My Routines
         </Button>
 
         {/* Skip */}

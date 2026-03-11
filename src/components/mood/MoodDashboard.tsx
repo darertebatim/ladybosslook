@@ -11,7 +11,7 @@ import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { MoodCelebrationSheet } from './MoodCelebrationSheet';
-import { MoodRitualPromptSheet } from './MoodRitualPromptSheet';
+import { MoodRoutinePromptSheet } from './MoodRoutinePromptSheet';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -132,12 +132,12 @@ export function MoodDashboard() {
     navigate('/app/home');
   }, [navigate]);
 
-  const handleRitualPromptAdd = useCallback(() => {
+  const handleRoutinePromptAdd = useCallback(() => {
     setShowRitualPrompt(false);
     setShowRoutineSheet(true);
   }, []);
 
-  const handleRitualPromptSkip = useCallback(() => {
+  const handleRoutinePromptSkip = useCallback(() => {
     setShowRitualPrompt(false);
     setShowCelebration(true);
   }, []);
@@ -301,12 +301,13 @@ export function MoodDashboard() {
         isSaving={addRoutinePlan.isPending}
       />
 
-      {/* Ritual Prompt Sheet - shown before celebration if not in routine */}
-      <MoodRitualPromptSheet
+      {/* Routine Prompt Sheet - shown before celebration if not in routine */}
+      <MoodRoutinePromptSheet
         open={showRitualPrompt}
         onOpenChange={setShowRitualPrompt}
-        onAddToRitual={handleRitualPromptAdd}
-        onSkip={handleRitualPromptSkip}
+        mood={selectedMood}
+        onAddToRoutine={handleRoutinePromptAdd}
+        onSkip={handleRoutinePromptSkip}
       />
 
       {/* Mood Celebration Sheet */}
