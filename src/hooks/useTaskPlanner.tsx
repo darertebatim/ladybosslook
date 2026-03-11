@@ -280,6 +280,59 @@ export const useTasksForDate = (date: Date) => {
 };
 
 /**
+ * Get uncompleted one-time tasks from past dates that should carry forward to today.
+ * These are tasks with repeat_pattern='none' and scheduled_date < today that have no completion.
+ */
+export const useCarryForwardTasks = () => {
+  const { user } = useAuth();
+  const { data: allTasks = [], isLoading: tasksLoading } = useAllActiveTasks();
+  const todayStr = getLocalDateStr();
+
+  // Get all past one-time task IDs to check completions
+  const pastOneTimeTasks = allTasks.filter(
+    t => t.repeat_pattern === 'none' && t.scheduled_date && t.scheduled_date < todayStr
+  );
+
+  const pastTaskIds = pastOneTimeTasks.map(t => t.id);
+
+  // Query completions for these past tasks on their original dates
+  const { data: pastCompletions = [], isLoading: completionsLoading } = useQuery({
+    queryKey: ['carry-forward-completions', user?.id, pastTaskIds.join(',')],
+    queryFn: async () => {
+      if (!user?.id || pastTaskIds.length === 0) return [];
+
+      const { data, error } = await supabase
+        .from('task_completions')
+        .select('task_id, completed_date')
+        .eq('user_id', user.id)
+        .in('task_id', pastTaskIds);
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user?.id && pastTaskIds.length > 0,
+    staleTime: 1000 * 60 * 2,
+  });
+
+  // Filter: only tasks that were NOT completed on their scheduled_date
+  const completedTaskIds = new Set(
+    pastCompletions
+      .filter(c => {
+        const task = pastOneTimeTasks.find(t => t.id === c.task_id);
+        return task && c.completed_date === task.scheduled_date;
+      })
+      .map(c => c.task_id)
+  );
+
+  const carryForwardTasks = pastOneTimeTasks.filter(t => !completedTaskIds.has(t.id));
+
+  return {
+    data: carryForwardTasks,
+    isLoading: tasksLoading || completionsLoading,
+  };
+};
+
+/**
  * Get subtasks for a task
  */
 export const useSubtasks = (taskId: string | undefined) => {
