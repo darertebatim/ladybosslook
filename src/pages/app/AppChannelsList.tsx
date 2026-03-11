@@ -297,12 +297,13 @@ export default function AppChannelsList() {
               onClick={handleSupportClick}
               className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors text-left bg-primary/[0.03] border-b-2 border-primary/10"
             >
-              <div className="h-12 w-12 rounded-full flex items-center justify-center shrink-0 bg-primary/10 text-primary">
+              <div className="h-12 w-12 rounded-full flex items-center justify-center shrink-0 bg-orange-500 text-white">
                 <Headset className="h-5 w-5" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-foreground truncate">Support</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wide bg-orange-500 text-white px-1.5 py-0.5 rounded">Private</span>
                 </div>
                 {supportSummary?.lastMessage ? (
                   <p className="text-sm text-muted-foreground truncate mt-0.5">
@@ -310,7 +311,7 @@ export default function AppChannelsList() {
                   </p>
                 ) : (
                   <p className="text-sm text-muted-foreground/60 mt-0.5">
-                    Chat with our team
+                    Chat with our team (Private)
                   </p>
                 )}
               </div>
