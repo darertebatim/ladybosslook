@@ -157,7 +157,14 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         goalProgress={selectedTask ? (goalProgressMap.get(selectedTask.id) || 0) : 0}
         onEdit={onEditTask}
         onDelete={onDeleteTask}
-        onStreakIncrease={() => setShowStreakModal(true)}
+        onStreakIncrease={(newStreak: number) => {
+          if (isStreakMilestone(newStreak) && localStorage.getItem(getStreakMilestoneKey(newStreak)) !== 'true') {
+            localStorage.setItem(getStreakMilestoneKey(newStreak), 'true');
+            setShowStreakMilestone(newStreak);
+          } else {
+            setShowStreakModal(true);
+          }
+        }}
         onOpenGoalInput={onOpenGoalInput}
         onOpenTimer={onOpenTimer}
         onSkip={onSkipTask}
