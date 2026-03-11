@@ -600,8 +600,8 @@ export default function AppChat() {
                 </div>
                 
                 {/* Warm footer */}
-                <p className="text-[13px] text-muted-foreground/60 max-w-[260px] leading-relaxed">
-                  Type, or tap the mic if that feels easier — we're listening. We check in throughout the day. 💜
+                <p className="text-[13px] text-foreground max-w-[260px] leading-relaxed">
+                  Type, or tap the mic if that feels easier — we're listening. We check in throughout the day. 🧡
                 </p>
               </div>
             ) : (
