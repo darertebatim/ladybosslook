@@ -908,11 +908,6 @@ export default function AppTest() {
         }}
       />
 
-      <StreakMilestoneCelebration
-        open={showStreakMilestone}
-        streak={streakMilestoneValue}
-        onClose={() => setShowStreakMilestone(false)}
-      />
     </div>
   );
 }
