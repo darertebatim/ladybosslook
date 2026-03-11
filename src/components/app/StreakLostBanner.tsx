@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Flame, Shield, X, Sparkles } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
@@ -13,6 +12,7 @@ interface StreakLostBannerProps {
   isSubscribed: boolean;
   onRecover: () => void;
   onDismiss: () => void;
+  onSubscribe?: () => void;
   isLoading?: boolean;
 }
 
