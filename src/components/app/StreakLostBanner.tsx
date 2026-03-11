@@ -122,7 +122,7 @@ export const StreakLostBanner = ({
             <Button
               onClick={() => { haptic.light(); onDismiss(); }}
               variant="ghost"
-              className="w-full text-white/70 hover:text-white hover:bg-white/10 text-xs font-medium rounded-xl"
+              className="w-full text-white bg-white/15 hover:bg-white/25 text-xs font-medium rounded-xl"
             >
               Start Fresh
             </Button>
