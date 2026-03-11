@@ -168,51 +168,6 @@ export default function AppChannelsList() {
           </div>
         ) : channels && channels.length > 0 ? (
           <div className="divide-y divide-border/50">
-            {/* Support Chat - Always at top */}
-            <button
-              onClick={handleSupportClick}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors text-left bg-primary/[0.03] border-b-2 border-primary/10"
-            >
-              {/* Support icon */}
-              <div className="h-12 w-12 rounded-full flex items-center justify-center shrink-0 bg-primary/10 text-primary">
-                <Headset className="h-5 w-5" />
-              </div>
-
-              {/* Support info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-foreground truncate">
-                    Support
-                  </span>
-                </div>
-                {supportSummary?.lastMessage ? (
-                  <p className="text-sm text-muted-foreground truncate mt-0.5">
-                    {supportSummary.lastMessage.sender_type === 'user' ? 'You' : 'Support'}: {supportSummary.lastMessage.content}
-                  </p>
-                ) : (
-                  <p className="text-sm text-muted-foreground/60 mt-0.5">
-                    Chat with our team
-                  </p>
-                )}
-              </div>
-
-              {/* Right side: time + unread badge */}
-              <div className="flex flex-col items-end gap-1 shrink-0">
-                {supportSummary?.lastMessage?.created_at && (
-                  <span className="text-xs text-muted-foreground">
-                    {formatLastMessageTime(new Date(supportSummary.lastMessage.created_at))}
-                  </span>
-                )}
-                {supportUnreadCount > 0 && (
-                  <Badge className="h-5 min-w-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs font-semibold">
-                    {supportUnreadCount > 99 ? '99+' : supportUnreadCount}
-                  </Badge>
-                )}
-              </div>
-
-              <ChevronRight className="h-4 w-4 text-muted-foreground/50 shrink-0" />
-            </button>
-
             {/* Coach Chat - only shown when user has access */}
             {hasCoachAccess && (
             <button
@@ -257,7 +212,6 @@ export default function AppChannelsList() {
               .sort((a, b) => {
                 const aLastMsg = summaries?.[a.id]?.lastMessage?.created_at;
                 const bLastMsg = summaries?.[b.id]?.lastMessage?.created_at;
-                // Channels with messages come first, sorted by most recent
                 if (!aLastMsg && !bLastMsg) return 0;
                 if (!aLastMsg) return 1;
                 if (!bLastMsg) return -1;
@@ -278,7 +232,6 @@ export default function AppChannelsList() {
                   onClick={() => handleChannelClick(channel.slug)}
                   className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors text-left"
                 >
-                  {/* Channel icon */}
                   <div className={cn(
                     "h-12 w-12 rounded-full flex items-center justify-center shrink-0 overflow-hidden",
                     channel.type === 'general' && "bg-primary/10 text-primary",
@@ -300,7 +253,6 @@ export default function AppChannelsList() {
                     )}
                   </div>
 
-                  {/* Channel info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-foreground truncate">
@@ -322,7 +274,6 @@ export default function AppChannelsList() {
                     )}
                   </div>
 
-                  {/* Right side: time + unread badge */}
                   <div className="flex flex-col items-end gap-1 shrink-0">
                     {lastMessageTime && (
                       <span className="text-xs text-muted-foreground">
@@ -340,6 +291,43 @@ export default function AppChannelsList() {
                 </button>
               );
             })}
+
+            {/* Support Chat - Last in the list */}
+            <button
+              onClick={handleSupportClick}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors text-left"
+            >
+              <div className="h-12 w-12 rounded-full flex items-center justify-center shrink-0 bg-primary/10 text-primary">
+                <Headset className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-foreground truncate">Support</span>
+                </div>
+                {supportSummary?.lastMessage ? (
+                  <p className="text-sm text-muted-foreground truncate mt-0.5">
+                    {supportSummary.lastMessage.sender_type === 'user' ? 'You' : 'Support'}: {supportSummary.lastMessage.content}
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground/60 mt-0.5">
+                    Chat with our team
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col items-end gap-1 shrink-0">
+                {supportSummary?.lastMessage?.created_at && (
+                  <span className="text-xs text-muted-foreground">
+                    {formatLastMessageTime(new Date(supportSummary.lastMessage.created_at))}
+                  </span>
+                )}
+                {supportUnreadCount > 0 && (
+                  <Badge className="h-5 min-w-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs font-semibold">
+                    {supportUnreadCount > 99 ? '99+' : supportUnreadCount}
+                  </Badge>
+                )}
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground/50 shrink-0" />
+            </button>
           </div>
         ) : (
           <div className="text-center py-12 px-4">
