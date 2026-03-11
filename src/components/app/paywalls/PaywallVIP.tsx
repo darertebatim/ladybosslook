@@ -178,7 +178,7 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
 
   /* ═══════════════════ PAGE 2 ═══════════════════ */
   if (page === 2) return (
-    <div style={{
+    <div ref={containerRef} style={{
       display: 'flex', flexDirection: 'column', minHeight: '100%', fontFamily: SF,
       background: `
         radial-gradient(ellipse 70% 40% at 10% 60%, #fde68a55 0%, transparent 60%),
