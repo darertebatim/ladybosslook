@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Trophy, Flame, Star, Share2, X } from 'lucide-react';
+import { Share2, X } from 'lucide-react';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
 import { Share } from '@capacitor/share';
