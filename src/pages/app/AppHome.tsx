@@ -3,7 +3,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay, subDays } from 'date-fns';
-import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, MessageCircle, ArrowLeft, Heart, Zap } from 'lucide-react';
+import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, Headset, ArrowLeft, Heart, Zap } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { HomeMenu } from '@/components/app/HomeMenu';
 import { cn } from '@/lib/utils';
@@ -639,7 +639,7 @@ const AppHome = () => {
                 onClick={() => navigate('/app/support')}
                 className="p-2 -ml-1 text-foreground hover:text-foreground transition-colors"
               >
-                <MessageCircle className="h-5 w-5" />
+                <Headset className="h-5 w-5" />
               </button>
             </div>
 
