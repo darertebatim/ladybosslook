@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useKeyboard } from "@/hooks/useKeyboard";
@@ -93,6 +93,7 @@ const conversationStarters = [
  */
 export default function AppChat() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const draftMessage = searchParams.get('draft') || '';
   const { user } = useAuth();
@@ -429,10 +430,10 @@ export default function AppChat() {
     isPulling.current = false;
   };
 
-  // Navigate back to app home
   const handleBack = () => {
     haptic.light();
-    navigate('/app/home');
+    const from = (location as any).state?.from;
+    navigate(from || '/app/home');
   };
 
   // Track scroll position to show/hide scroll-to-bottom button
