@@ -324,9 +324,10 @@ export default function AppInspireDetail() {
           {routine.description && (
             <div
               className="mt-5 text-foreground leading-relaxed prose prose-sm max-w-none
-                prose-headings:text-foreground prose-headings:font-semibold
+                prose-headings:text-foreground prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2
                 prose-strong:text-foreground prose-a:text-primary
-                prose-ul:pl-5 prose-ol:pl-5"
+                prose-ul:pl-5 prose-ul:list-disc prose-ol:pl-5 prose-ol:list-decimal
+                prose-li:my-1 prose-p:my-2"
               dangerouslySetInnerHTML={{ __html: routine.description }}
             />
           )}
