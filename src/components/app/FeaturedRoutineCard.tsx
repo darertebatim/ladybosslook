@@ -51,12 +51,14 @@ interface FeaturedRoutineCardProps {
   routine: RoutineBankItem;
   onDismiss?: () => void;
   className?: string;
+  categoryName?: string;
 }
 
 export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
   routine,
   onDismiss,
   className,
+  categoryName,
 }: FeaturedRoutineCardProps) {
   const navigate = useNavigate();
   const color = routine.color || 'purple';
@@ -126,7 +128,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
             )}
             {routine.category && (
               <span className="text-[10px] text-foreground/70 font-medium truncate capitalize">
-                {routine.category.replace(/[-_]/g, ' ')}
+                {categoryName || routine.category}
               </span>
             )}
           </div>
