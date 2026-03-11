@@ -74,6 +74,8 @@ export default function AppTest() {
   const [confirmedGoal, setConfirmedGoal] = useState<7 | 14 | 30 | 50>(7);
   const [showStreakLostBanner, setShowStreakLostBanner] = useState(false);
   const [showGoldStreakLostBanner, setShowGoldStreakLostBanner] = useState(false);
+  const [showStreakLostNoShields, setShowStreakLostNoShields] = useState(false);
+  const [showGoldLostNoShields, setShowGoldLostNoShields] = useState(false);
   const [showRecoverySuccess, setShowRecoverySuccess] = useState<'streak' | 'gold' | null>(null);
 
   // iOS Preview Mode renders the test content in a simulated iOS environment
@@ -520,6 +522,14 @@ export default function AppTest() {
               <Shield className="h-4 w-4 mr-2" />
               Recovery Success (Gold)
             </Button>
+            <Button onClick={() => setShowStreakLostNoShields(true)} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              No Shields (Free User)
+            </Button>
+            <Button onClick={() => setShowGoldLostNoShields(true)} variant="outline">
+              <Crown className="h-4 w-4 mr-2" />
+              No Shields (Plus User)
+            </Button>
           </div>
           <StreakLostBanner
             open={showStreakLostBanner}
@@ -538,6 +548,24 @@ export default function AppTest() {
             isSubscribed={false}
             onRecover={() => { setShowGoldStreakLostBanner(false); setShowRecoverySuccess('gold'); }}
             onDismiss={() => setShowGoldStreakLostBanner(false)}
+          />
+          <StreakLostBanner
+            open={showStreakLostNoShields}
+            previousStreak={12}
+            hasShieldsRemaining={false}
+            shieldsLeft={0}
+            isSubscribed={false}
+            onRecover={() => {}}
+            onDismiss={() => setShowStreakLostNoShields(false)}
+          />
+          <GoldStreakLostBanner
+            open={showGoldLostNoShields}
+            previousGoldStreak={5}
+            hasShieldsRemaining={false}
+            shieldsLeft={0}
+            isSubscribed={true}
+            onRecover={() => {}}
+            onDismiss={() => setShowGoldLostNoShields(false)}
           />
           <RecoverySuccessBanner
             open={showRecoverySuccess !== null}
