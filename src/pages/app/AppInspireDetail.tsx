@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { AddToRoutineHandHint, useAddToRoutineHint } from '@/components/app/AddToRoutineHandHint';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -79,6 +79,7 @@ function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask & { sc
 export default function AppInspireDetail() {
   const { planId } = useParams<{ planId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPreviewSheet, setShowPreviewSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const { showHint, dismissHint } = useAddToRoutineHint();
@@ -205,7 +206,7 @@ export default function AppInspireDetail() {
         className="fixed top-0 left-0 right-0 z-50 flex items-center px-4"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
       >
-        <BackButtonCircle to="/app/routines" />
+        <BackButtonCircle to={(location.state as any)?.from || '/app/routines'} />
       </header>
 
       {/* Scroll Container */}
