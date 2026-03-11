@@ -90,9 +90,9 @@ export const TaskCard = memo(function TaskCard({
   };
 
   // Format repeat pattern label
-  const getRepeatLabel = (task: UserTask): string | null => {
+  const getRepeatLabel = (task: UserTask): string => {
     const p = task.repeat_pattern;
-    if (!p || p === 'none') return null;
+    if (!p || p === 'none') return 'Today';
     if (p === 'daily') return 'Daily';
     if (p === 'weekly') return 'Weekly';
     if (p === 'monthly') return 'Monthly';
@@ -104,7 +104,7 @@ export const TaskCard = memo(function TaskCard({
       if (days === 5) return 'Weekdays';
       return `${days}x/week`;
     }
-    return null;
+    return 'Today';
   };
   const repeatLabel = getRepeatLabel(task);
 
