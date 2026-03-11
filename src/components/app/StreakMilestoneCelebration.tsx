@@ -14,7 +14,7 @@ interface StreakMilestoneCelebrationProps {
 const MILESTONE_CONFIG: Record<number, { emoji: string; title: string; message: string }> = {
   3: { emoji: '🔥', title: '3-Day Streak!', message: "You're building momentum. Keep it going!" },
   7: { emoji: '⚡', title: '7-Day Streak!', message: 'A full week of showing up. That takes real commitment.' },
-  14: { emoji: '💪', title: '14-Day Streak!', message: 'Two weeks strong. You're unstoppable.' },
+  14: { emoji: '💪', title: '14-Day Streak!', message: "Two weeks strong. You're unstoppable." },
   21: { emoji: '🌟', title: '21-Day Streak!', message: "They say 21 days builds a habit.\nYou just did it." },
   30: { emoji: '👑', title: '30-Day Streak!', message: 'A full month. This is who you are now.' },
   50: { emoji: '🏆', title: '50-Day Streak!', message: "50 days of consistency.\nThat's extraordinary." },
