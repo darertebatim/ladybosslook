@@ -10,6 +10,7 @@ interface GoldStreakLostBannerProps {
   previousGoldStreak: number;
   hasShieldsRemaining: boolean;
   shieldsLeft: number;
+  isSubscribed: boolean;
   onRecover: () => void;
   onDismiss: () => void;
   isLoading?: boolean;
