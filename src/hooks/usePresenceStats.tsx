@@ -46,7 +46,8 @@ export function usePresenceStats() {
         supabase
           .from('journal_entries')
           .select('id', { count: 'exact', head: true })
-          .eq('user_id', user.id),
+          .eq('user_id', user.id)
+          .neq('title', '__mood_checkin__'),
         supabase
           .from('breathing_sessions')
           .select('id', { count: 'exact', head: true })

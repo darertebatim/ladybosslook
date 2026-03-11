@@ -42,6 +42,7 @@ export const useJournalEntries = (searchQuery?: string) => {
         .from('journal_entries')
         .select('*')
         .eq('user_id', user.id)
+        .neq('title', '__mood_checkin__')
         .order('created_at', { ascending: false });
 
       if (searchQuery && searchQuery.trim()) {
