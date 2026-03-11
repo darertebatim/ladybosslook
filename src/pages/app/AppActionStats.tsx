@@ -154,8 +154,8 @@ const AppActionStats = () => {
               <img src={coinBronze} alt="Bronze" className="w-10 h-10 object-contain" />
             </div>
             <h3 className="text-lg font-bold text-foreground mb-2">Progress Badge</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Complete at least one action to earn the Bronze Badge. Reach 50% completion for the Silver Badge. Finish all actions to claim the Gold Badge.
+            <p className="text-sm text-foreground leading-snug">
+              Complete at least one action for Bronze. Reach 50% for Silver. Finish all actions to claim Gold.
             </p>
           </div>
 
