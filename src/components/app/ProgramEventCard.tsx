@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Video, BookOpen, Music, ExternalLink, Settings2 } from 'lucide-react';
-import SealCheck from './SealCheck';
+import { Check, Video, BookOpen, Music, ExternalLink, Settings2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   ProgramEvent, 
@@ -11,8 +10,7 @@ import {
 import { haptic } from '@/lib/haptics';
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
-import { isToday, isBefore, startOfDay } from 'date-fns';
-import { toast } from 'sonner';
+import { isToday } from 'date-fns';
 import { SessionReminderSheet } from '@/components/app/SessionReminderSheet';
 import { useSessionReminderSettings } from '@/hooks/useSessionReminderSettings';
 
@@ -69,20 +67,9 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
   const isSession = event.type === 'session';
   const currentSettings = isSession ? sessionSettings : contentSettings;
   const saveSettings = isSession ? setSessionSettings : setContentSettings;
-  // Check if this is a future date (after today) - same logic as TaskCard
-  const isFutureDate = !isToday(date) && !isBefore(startOfDay(date), startOfDay(new Date()));
 
   const handleToggleComplete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
-    if (isFutureDate) {
-      haptic.light();
-      toast("Let's focus on today's rituals.", {
-        description: "You can honor this action when the day comes.",
-        duration: 3000,
-      });
-      return;
-    }
     
     haptic.light();
 
@@ -209,15 +196,14 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
           <button
             onClick={handleToggleComplete}
             className={cn(
-              'w-9 h-9 flex items-center justify-center shrink-0 transition-all duration-200',
-              isFutureDate && 'opacity-30 pointer-events-none'
+              'w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
+              event.isCompleted
+                ? 'bg-emerald-500 text-white shadow-md'
+                : 'border-2 border-foreground/25 hover:border-foreground/40 bg-white/50',
+              isAnimating && 'scale-110'
             )}
           >
-            {event.isCompleted ? (
-              <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} />
-            ) : (
-              <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
-            )}
+            {event.isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
           </button>
         </div>
       </div>
