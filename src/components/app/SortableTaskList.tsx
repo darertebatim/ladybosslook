@@ -19,9 +19,11 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
-import { UserTask, useReorderTasks } from '@/hooks/useTaskPlanner';
+import { UserTask, useReorderTasks, useCreateTask } from '@/hooks/useTaskPlanner';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
+import { Plus } from 'lucide-react';
+import { format } from 'date-fns';
 
 interface SortableTaskItemProps {
   task: UserTask;
