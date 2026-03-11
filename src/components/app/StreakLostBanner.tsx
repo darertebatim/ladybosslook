@@ -8,6 +8,7 @@ interface StreakLostBannerProps {
   open: boolean;
   previousStreak: number;
   hasShieldsRemaining: boolean;
+  shieldsLeft: number;
   onRecover: () => void;
   onDismiss: () => void;
   isLoading?: boolean;
