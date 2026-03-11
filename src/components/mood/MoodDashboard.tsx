@@ -11,6 +11,7 @@ import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { MoodCelebrationSheet } from './MoodCelebrationSheet';
+import { MoodRitualPromptSheet } from './MoodRitualPromptSheet';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
