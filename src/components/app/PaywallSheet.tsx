@@ -1,9 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useDefaultPaywall, PaywallVariantId } from '@/hooks/useDefaultPaywall';
 import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallMascot, PaywallComparison, PaywallLimitedOffer, PaywallVIP, PaywallOnboarding, PaywallMascotV2, type PaywallProgramData } from '@/components/app/paywalls';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
 import { PurchaseCelebration } from '@/components/app/PurchaseCelebration';
 
@@ -19,7 +17,6 @@ const VARIANT_MAP: Record<PaywallVariantId, React.ComponentType<any>> = {
   onboarding: PaywallOnboarding,
   'mascot-v2': PaywallMascotV2,
 };
-
 
 const SIMORA_PLUS_SLUG = 'simora-plus';
 
@@ -69,7 +66,6 @@ export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
 
   const onPurchaseComplete = async (productId: string, plan: 'monthly' | 'annual') => {
     await handlePurchase(productId, plan);
-    // Don't close dialog immediately - celebration will show
   };
 
   const onRestoreComplete = async () => {
@@ -89,8 +85,8 @@ export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
   return (
     <>
       {open && !showCelebration && (
-        <div className="fixed inset-0 z-50 bg-white">
-          <div className="h-full overflow-y-auto" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <div className="fixed inset-0 z-50 bg-white" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+          <div className="h-full overflow-y-auto">
             <Component
               program={programData}
               onPurchase={onPurchaseComplete}
@@ -99,7 +95,7 @@ export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
             />
           </div>
         </div>
-      )
+      )}
 
       <PurchaseCelebration
         open={showCelebration}
