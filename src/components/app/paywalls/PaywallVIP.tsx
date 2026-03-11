@@ -228,7 +228,7 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
 
   /* ═══════════════════ PAGE 3 ═══════════════════ */
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', background: '#fff', fontFamily: SF }}>
+    <div ref={containerRef} style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', background: '#fff', fontFamily: SF }}>
       <div style={{ flex: 1 }}>
         <Header />
 
