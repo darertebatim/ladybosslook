@@ -308,19 +308,18 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
         }}
         className="mt-3 w-full rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2 active:scale-[0.98] transition-all"
       >
-        <div className="w-10 h-10 flex items-center justify-center shrink-0">
-          <Plus className="h-5 w-5 text-urgency" />
+        <div className="w-10 h-10 flex items-center justify-center shrink-0" />
+        <span className="flex-1 text-left text-[15px] font-semibold text-muted-foreground">Quick add action...</span>
+        <div className="w-9 h-9 rounded-full bg-urgency flex items-center justify-center shrink-0">
+          <Plus className="h-5 w-5 text-urgency-foreground" strokeWidth={2.5} />
         </div>
-        <span className="text-[15px] font-semibold text-muted-foreground">Quick add action...</span>
       </button>
     );
   }
 
   return (
     <div className="mt-3 rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2">
-      <div className="w-10 h-10 flex items-center justify-center shrink-0">
-        <Plus className="h-5 w-5 text-urgency" />
-      </div>
+      <div className="w-10 h-10 flex items-center justify-center shrink-0" />
       <input
         ref={inputRef}
         value={title}
@@ -338,13 +337,17 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
         className="flex-1 bg-transparent text-[15px] font-semibold text-foreground placeholder:text-muted-foreground outline-none"
         autoFocus
       />
-      {title.trim() && (
+      {title.trim() ? (
         <button
           onClick={handleSubmit}
           className="px-3 py-1.5 rounded-2xl bg-urgency text-urgency-foreground text-xs font-semibold active:scale-95 transition-transform"
         >
           Add
         </button>
+      ) : (
+        <div className="w-9 h-9 rounded-full bg-urgency flex items-center justify-center shrink-0">
+          <Plus className="h-5 w-5 text-urgency-foreground" strokeWidth={2.5} />
+        </div>
       )}
     </div>
   );
