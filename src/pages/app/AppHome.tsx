@@ -847,7 +847,7 @@ const AppHome = () => {
                     All
                   </button>
                   {taskTags.map(tag => <button key={tag} onClick={() => setSelectedTag(tag === selectedTag ? null : tag)} className={cn('px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-all capitalize font-medium', selectedTag === tag ? 'bg-chip-lavender text-foreground' : 'bg-transparent border border-foreground/20 text-foreground/60')}>
-                      {tag}
+                      {categoryNameMap.get(tag) || tag}
                     </button>)}
                 </div>
               </div>} */}
