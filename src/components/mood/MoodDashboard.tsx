@@ -114,8 +114,12 @@ export function MoodDashboard() {
       
       haptic.success();
       
-      // Show celebration sheet
-      setShowCelebration(true);
+      // If not in routine, show ritual prompt first; otherwise celebration
+      if (!isAdded) {
+        setShowRitualPrompt(true);
+      } else {
+        setShowCelebration(true);
+      }
       setIsSubmitting(false);
     } catch (error) {
       console.error('Failed to log mood:', error);
