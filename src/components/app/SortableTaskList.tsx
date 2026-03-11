@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import type { TaskColor } from '@/hooks/useTaskPlanner';
 import {
   DndContext,
   closestCenter,
