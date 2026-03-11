@@ -23,8 +23,9 @@ import { cn } from '@/lib/utils';
 import { UserTask, useReorderTasks, useCreateTask } from '@/hooks/useTaskPlanner';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
-import { Plus } from 'lucide-react';
+import { Plus, MoreHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 interface SortableTaskItemProps {
   task: UserTask;
