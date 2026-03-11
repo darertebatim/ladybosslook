@@ -564,7 +564,7 @@ const AppHome = () => {
             duration: 2000,
           });
           if (result.streakIncreased) {
-            setShowStreakModal(true);
+            handleStreakIncrease(result.newStreak);
           }
         },
       }
