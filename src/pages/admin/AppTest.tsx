@@ -423,6 +423,10 @@ export default function AppTest() {
               <Flame className="h-4 w-4 mr-2" />
               Streak Goal Completed (7 days)
             </Button>
+            <Button onClick={() => setShowChallengeSummary(true)} variant="outline">
+              <Star className="h-4 w-4 mr-2" />
+              Challenge Wrap-Up Summary
+            </Button>
           </div>
         </CardContent>
       </Card>
