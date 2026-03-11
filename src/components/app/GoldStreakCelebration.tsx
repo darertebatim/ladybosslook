@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
 
-import badgeGold from '@/assets/badge-gold.png';
+import coinGold from '@/assets/coin-gold.png';
 
 interface GoldStreakCelebrationProps {
   open: boolean;
