@@ -33,6 +33,12 @@ export default function AppInspire() {
 
   const isLoading = categoriesLoading || routinesLoading || popularLoading;
 
+  const categoryNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    categories?.forEach(cat => map.set(cat.slug, cat.name));
+    return map;
+  }, [categories]);
+
   // Group routines by category
   const routinesByCategory = useMemo(() => {
     if (!allRoutines || !categories) return {};
