@@ -526,6 +526,7 @@ export default function AppTest() {
             previousStreak={12}
             hasShieldsRemaining={true}
             shieldsLeft={2}
+            isSubscribed={false}
             onRecover={() => { setShowStreakLostBanner(false); setShowRecoverySuccess('streak'); }}
             onDismiss={() => setShowStreakLostBanner(false)}
           />
