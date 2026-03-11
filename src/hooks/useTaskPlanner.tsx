@@ -867,7 +867,7 @@ export const useCompleteTask = () => {
       // Update presence metrics
       await updatePresence(user.id, dateStr);
 
-      return { completion: data, streakIncreased: streakResult.increased };
+      return { completion: data, streakIncreased: streakResult.increased, newStreak: streakResult.newStreak };
     },
     onSuccess: (_, variables) => {
       const dateStr = format(variables.date, 'yyyy-MM-dd');
