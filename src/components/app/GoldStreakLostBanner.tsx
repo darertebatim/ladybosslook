@@ -106,13 +106,38 @@ export const GoldStreakLostBanner = ({
               Let the gold streak reset
             </Button>
           </>
+        ) : !isSubscribed ? (
+          <>
+            <p className="text-white/80 text-xs mb-3">
+              No shields left. Unlock more with <span className="font-semibold text-white">Simora Plus</span>.
+            </p>
+            <Button
+              onClick={() => { haptic.light(); onDismiss(); navigate('/app/subscribe'); }}
+              className="w-full bg-white hover:bg-white/90 text-amber-600 font-semibold py-3 rounded-xl mb-2"
+            >
+              <Sparkles className="h-4 w-4 mr-1" />
+              Get Simora Plus
+            </Button>
+            <Button
+              onClick={() => { haptic.light(); onDismiss(); }}
+              variant="ghost"
+              className="w-full text-white/70 hover:text-white hover:bg-white/10 text-xs font-medium rounded-xl"
+            >
+              Start Fresh
+            </Button>
+          </>
         ) : (
-          <Button
-            onClick={() => { haptic.light(); onDismiss(); }}
-            className="w-full bg-white hover:bg-white/90 text-amber-600 font-semibold py-3 rounded-xl"
-          >
-            Start Fresh
-          </Button>
+          <>
+            <p className="text-white/80 text-xs mb-3">
+              All recovery shields have been used. Time for a fresh start.
+            </p>
+            <Button
+              onClick={() => { haptic.light(); onDismiss(); }}
+              className="w-full bg-white hover:bg-white/90 text-amber-600 font-semibold py-3 rounded-xl"
+            >
+              Start Fresh
+            </Button>
+          </>
         )}
       </div>
     </div>
