@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, X, Check } from 'lucide-react';
 import type { PaywallProgramData } from './PaywallClassic';
@@ -47,6 +47,14 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
   const [isPurchasing, setIsPurchasing] = useState(false);
 
   const trialDays = program.trial_days || 7;
+
+  // Preload images for later pages to prevent lag
+  useEffect(() => {
+    [comparisonTable, beforeAfter].forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
 
   const handlePurchase = async () => {
     if (preview) return;
