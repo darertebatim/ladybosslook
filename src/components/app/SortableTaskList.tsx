@@ -302,19 +302,30 @@ function QuickAddCard({ date, taskCount, onOpenFullSheet }: { date: Date; taskCo
 
   if (!isOpen) {
     return (
-      <button
-        onClick={() => {
-          setIsOpen(true);
-          haptic.light();
-          setTimeout(() => inputRef.current?.focus(), 100);
-        }}
-        className="mt-3 w-full rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2 active:scale-[0.98] transition-all"
-      >
-        <div className="w-10 h-10 flex items-center justify-center shrink-0">
-          <Plus className="h-5 w-5 text-urgency" />
-        </div>
-        <span className="text-[15px] font-semibold text-muted-foreground">Quick add action...</span>
-      </button>
+      <div className="mt-3 flex items-center gap-2">
+        <button
+          onClick={() => {
+            setIsOpen(true);
+            haptic.light();
+            setTimeout(() => inputRef.current?.focus(), 100);
+          }}
+          className="flex-1 rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2 active:scale-[0.98] transition-all"
+        >
+          <div className="w-10 h-10 flex items-center justify-center shrink-0">
+            <Plus className="h-5 w-5 text-urgency" />
+          </div>
+          <span className="text-[15px] font-semibold text-muted-foreground">Quick add action...</span>
+        </button>
+        <button
+          onClick={() => {
+            haptic.light();
+            onOpenFullSheet?.();
+          }}
+          className="w-12 h-12 rounded-2xl bg-card border-2 border-urgency/30 flex items-center justify-center shrink-0 active:scale-95 transition-transform"
+        >
+          <LayoutGrid className="h-5 w-5 text-urgency" />
+        </button>
+      </div>
     );
   }
 
