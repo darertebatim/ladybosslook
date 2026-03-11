@@ -99,9 +99,10 @@ export function MoodDashboard() {
     haptic.medium();
     
     try {
-      // Save mood as a journal entry
+      // Save mood as a journal entry (marked so it's hidden from journal list)
       const moodLabel = MOODS.find(m => m.value === selectedMood)?.label || selectedMood;
       await createJournalEntry.mutateAsync({
+        title: '__mood_checkin__',
         content: `Feeling ${moodLabel.toLowerCase()} today.`,
         mood: selectedMood,
       });
