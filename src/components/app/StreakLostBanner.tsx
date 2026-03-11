@@ -88,10 +88,13 @@ export const StreakLostBanner = ({
             <Button
               onClick={() => { haptic.success(); onRecover(); }}
               disabled={isLoading}
-              className="w-full bg-white hover:bg-white/90 text-red-600 font-semibold py-3 rounded-xl mb-3"
+              className="w-full bg-white hover:bg-white/90 text-red-600 font-semibold py-3 rounded-xl mb-2"
             >
               🛡️ Use Recovery Shield
             </Button>
+            <p className="text-white/50 text-[10px] mb-2">
+              {shieldsLeft} shield{shieldsLeft !== 1 ? 's' : ''} remaining
+            </p>
             <button
               onClick={() => { haptic.light(); onDismiss(); }}
               className="text-white/60 text-xs hover:text-white/80 transition-colors"
