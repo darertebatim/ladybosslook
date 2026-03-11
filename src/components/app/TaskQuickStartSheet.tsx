@@ -166,7 +166,7 @@ export const TaskQuickStartSheet = ({
                 onClick={handleClose}
                 className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
               >
-                <X className="w-4 h-4 text-muted-foreground" />
+                <X className="w-4 h-4 text-foreground" />
               </button>
             </div>
 
