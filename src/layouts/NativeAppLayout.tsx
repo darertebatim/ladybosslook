@@ -129,6 +129,22 @@ const NativeAppLayout = () => {
   // Get unread feed count for Channels badge
   const { data: unreadFeedCount = 0 } = useUnreadFeedCount();
 
+  // Get streak count for Presence nav badge
+  const { data: streakCount = 0 } = useQuery({
+    queryKey: ['nav-streak', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      const { data } = await supabase
+        .from('user_streaks')
+        .select('current_streak')
+        .eq('user_id', user.id)
+        .single();
+      return data?.current_streak || 0;
+    },
+    enabled: !!user?.id,
+    staleTime: 60_000,
+  });
+
   // Check if we're on the audio player page - don't show mini player there
   const isOnPlayerPage = location.pathname.match(/^\/app\/player\/[^/]+$/);
   // Check if we're on chat page - hide tab bar for full-screen experience
@@ -140,7 +156,6 @@ const NativeAppLayout = () => {
     { path: '/app/routines', icon: CalendarPlus, label: 'Routines', tourClass: 'tour-nav-routines' },
     { path: '/app/player', icon: Music, label: 'Listen', tourClass: 'tour-nav-listen' },
     { path: '/app/channels', icon: Users, label: 'Chats', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
-    { path: '/app/presence', icon: Flame, label: 'Presence', tourClass: 'tour-nav-presence' },
   ];
 
   // Tab bar actual height: grid content (~48px for compact) + safe area inset
