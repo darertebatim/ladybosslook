@@ -1129,6 +1129,19 @@ export default function RoutinesBank() {
                       )}
                     </div>
                   </div>
+                  {selectedCategory === 'featured' && (
+                    <input
+                      type="number"
+                      value={routine.sort_order}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value) || 0;
+                        updateSortOrder.mutate({ id: routine.id, sort_order: val });
+                      }}
+                      className="w-14 h-8 text-center text-xs border rounded bg-background"
+                      title="Sort order (lower = first)"
+                    />
+                  )}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
