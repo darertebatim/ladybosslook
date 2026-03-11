@@ -943,7 +943,7 @@ const AppHome = () => {
                                   : 'bg-white text-muted-foreground dark:bg-white/10'
                               )}
                             >
-                              {tag}
+                              {tag.replace(/[-_]/g, ' ')}
                             </button>
                           );
                         })}
