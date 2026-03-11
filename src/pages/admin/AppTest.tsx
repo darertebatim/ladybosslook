@@ -306,6 +306,7 @@ export default function AppTest() {
         {/* Render all modals/dialogs */}
         <StreakCelebration
           open={showStreakCelebration}
+          streakCount={streakTestCount}
           onClose={() => setShowStreakCelebration(false)}
         />
         <CompletionCelebration
