@@ -94,76 +94,87 @@ export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, previ
 
   /* ═══════════════════ PAGE 1 ═══════════════════ */
   if (page === 1) return (
-    <div ref={containerRef} style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', background: '#fff', fontFamily: SF }}>
-      <div style={{ flex: 1 }}>
+    <div ref={containerRef} style={{ position: 'relative', minHeight: '100%', background: '#fff', fontFamily: SF }}>
 
-        {/* Purple hero */}
-        <div style={{
-          position: 'relative', paddingTop: 0,
-          background: `
-            radial-gradient(ellipse 80% 60% at 50% 100%, #f59e0b22 0%, transparent 60%),
-            radial-gradient(ellipse 60% 50% at 85% 60%, #a855f7 0%, transparent 50%),
-            radial-gradient(ellipse 60% 50% at 15% 60%, #7e22ce 0%, transparent 50%),
-            radial-gradient(ellipse 100% 80% at 50% 20%, #4c1d95 0%, #1e0851 100%)
-          `,
-        }}>
-          <Header dark />
+      {/* Fixed hero background + mascot */}
+      <div style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1,
+        height: 420,
+        background: `
+          radial-gradient(ellipse 80% 60% at 50% 100%, #f59e0b22 0%, transparent 60%),
+          radial-gradient(ellipse 60% 50% at 85% 60%, #a855f7 0%, transparent 50%),
+          radial-gradient(ellipse 60% 50% at 15% 60%, #7e22ce 0%, transparent 50%),
+          radial-gradient(ellipse 100% 80% at 50% 20%, #4c1d95 0%, #1e0851 100%)
+        `,
+      }}>
+        <Header dark />
 
-          <div style={{ paddingLeft: 20, paddingRight: 20, textAlign: 'center' }}>
-            <p style={{ color: '#fff', fontSize: 22, fontWeight: 800, lineHeight: 1.28, margin: 0, letterSpacing: -0.3 }}>
-              Plus users are{' '}
-              <span style={{ color: '#f59e0b', fontSize: 28, fontWeight: 900 }}>4.2x</span>
-              {' '}more likely to stay consistent and see real change!
-            </p>
-          </div>
-
-          {/* Mascot hero */}
-          <div style={{ position: 'relative', marginTop: 20 }}>
-            <div style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '150%', height: 80, background: '#fff', borderRadius: '50% 50% 0 0' }} />
-            <img src={mascotHero} alt="" style={{ display: 'block', width: '100%', height: 200, objectFit: 'cover', objectPosition: 'center bottom', position: 'relative', zIndex: 2 }} />
-          </div>
-        </div>
-
-        {/* Features */}
-        <div style={{ background: '#fff', paddingTop: 24, paddingBottom: 16 }}>
-          <p style={{ textAlign: 'center', fontSize: 22, fontWeight: 800, color: '#0a0a0a', margin: '0 0 20px', letterSpacing: -0.3 }}>What you get</p>
-          <div style={{ paddingLeft: 20, paddingRight: 20 }}>
-            {FEATURES.map((feature, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -24 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.15 + i * 0.1, duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
-                style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 22 }}
-              >
-                <div style={{ width: 58, height: 58, borderRadius: '50%', background: '#f3f3f5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {feature.img === null ? (
-                    <div style={{ position: 'relative', width: 34, height: 34 }}>
-                      <div style={{ width: 34, height: 34, borderRadius: '50%', border: '3px solid #ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-                        <span style={{ fontSize: 8, fontWeight: 900, color: '#ef4444', letterSpacing: 0.5 }}>ADS</span>
-                        <div style={{ position: 'absolute', top: '50%', left: -2, right: -2, height: 3, background: '#ef4444', transform: 'rotate(-45deg)', transformOrigin: 'center' }} />
-                      </div>
-                    </div>
-                  ) : (
-                    <img src={feature.img} alt={feature.title} style={{ width: 36, height: 36, objectFit: 'contain' }} />
-                  )}
-                </div>
-                <div style={{ flex: 1, paddingTop: 8 }}>
-                  <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: '#0f0f0f', lineHeight: 1.2, letterSpacing: -0.2 }}>{feature.title}</p>
-                  {feature.desc && <p style={{ margin: '3px 0 0', fontSize: 14, fontWeight: 400, color: '#8e8e93', lineHeight: 1.4 }}>{feature.desc}</p>}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Bottom mascot */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24, marginBottom: 8 }}>
-            <img src={mascotBottom} alt="" style={{ width: '72%', maxWidth: 290, height: 'auto', objectFit: 'contain' }} />
-          </div>
-          <p style={{ textAlign: 'center', fontSize: 20, fontWeight: 800, color: '#0a0a0a', lineHeight: 1.3, margin: '8px 24px 32px', letterSpacing: -0.3 }}>
-            Cancel anytime, no<br />penalties or fees
+        <div style={{ paddingLeft: 20, paddingRight: 20, textAlign: 'center' }}>
+          <p style={{ color: '#fff', fontSize: 22, fontWeight: 800, lineHeight: 1.28, margin: 0, letterSpacing: -0.3 }}>
+            Plus users are{' '}
+            <span style={{ color: '#f59e0b', fontSize: 28, fontWeight: 900 }}>4.2x</span>
+            {' '}more likely to stay consistent and see real change!
           </p>
         </div>
+
+        {/* Centered mascot */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+          <img src={mascotHero} alt="" style={{ width: 200, height: 200, objectFit: 'contain' }} />
+        </div>
+      </div>
+
+      {/* Spacer to push scrollable content below the fixed hero */}
+      <div style={{ height: 380 }} />
+
+      {/* Scrollable sheet that overlaps the hero */}
+      <div style={{
+        position: 'relative', zIndex: 2,
+        background: '#fff',
+        borderRadius: '28px 28px 0 0',
+        paddingTop: 28, paddingBottom: 16,
+        boxShadow: '0 -4px 20px rgba(0,0,0,0.08)',
+        minHeight: 'calc(100vh - 380px)',
+      }}>
+        {/* Drag indicator */}
+        <div style={{ width: 40, height: 4, borderRadius: 2, background: '#ddd', margin: '0 auto 20px' }} />
+
+        <p style={{ textAlign: 'center', fontSize: 22, fontWeight: 800, color: '#0a0a0a', margin: '0 0 20px', letterSpacing: -0.3 }}>What you get</p>
+        <div style={{ paddingLeft: 20, paddingRight: 20 }}>
+          {FEATURES.map((feature, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -24 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.15 + i * 0.1, duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
+              style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 22 }}
+            >
+              <div style={{ width: 58, height: 58, borderRadius: '50%', background: '#f3f3f5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                {feature.img === null ? (
+                  <div style={{ position: 'relative', width: 34, height: 34 }}>
+                    <div style={{ width: 34, height: 34, borderRadius: '50%', border: '3px solid #ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+                      <span style={{ fontSize: 8, fontWeight: 900, color: '#ef4444', letterSpacing: 0.5 }}>ADS</span>
+                      <div style={{ position: 'absolute', top: '50%', left: -2, right: -2, height: 3, background: '#ef4444', transform: 'rotate(-45deg)', transformOrigin: 'center' }} />
+                    </div>
+                  </div>
+                ) : (
+                  <img src={feature.img} alt={feature.title} style={{ width: 36, height: 36, objectFit: 'contain' }} />
+                )}
+              </div>
+              <div style={{ flex: 1, paddingTop: 8 }}>
+                <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: '#0f0f0f', lineHeight: 1.2, letterSpacing: -0.2 }}>{feature.title}</p>
+                {feature.desc && <p style={{ margin: '3px 0 0', fontSize: 14, fontWeight: 400, color: '#8e8e93', lineHeight: 1.4 }}>{feature.desc}</p>}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Bottom mascot */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24, marginBottom: 8 }}>
+          <img src={mascotBottom} alt="" style={{ width: '72%', maxWidth: 290, height: 'auto', objectFit: 'contain' }} />
+        </div>
+        <p style={{ textAlign: 'center', fontSize: 20, fontWeight: 800, color: '#0a0a0a', lineHeight: 1.3, margin: '8px 24px 32px', letterSpacing: -0.3 }}>
+          Cancel anytime, no<br />penalties or fees
+        </p>
       </div>
 
       {/* Sticky CTA → goes to page 2 */}
