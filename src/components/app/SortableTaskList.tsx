@@ -280,6 +280,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   const [title, setTitle] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const createTask = useCreateTask();
+  const navigate = useNavigate();
 
   const handleSubmit = () => {
     const trimmed = title.trim();
@@ -297,6 +298,15 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
     });
     setTitle('');
     inputRef.current?.focus();
+  };
+
+  const handleOpenDetails = () => {
+    const trimmed = title.trim();
+    if (!trimmed) return;
+    haptic.light();
+    setIsOpen(false);
+    setTitle('');
+    navigate(`/app/home/new?name=${encodeURIComponent(trimmed)}`);
   };
 
   if (!isOpen) {
