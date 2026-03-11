@@ -147,11 +147,7 @@ export default function OnboardingAnswers() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Onboarding Answers</h1>
-        <p className="text-sm text-muted-foreground mt-1">View user responses from onboarding flows</p>
-      </div>
+    <div className="space-y-4">
 
       {/* Filters */}
       <div className="flex gap-3 flex-wrap">
