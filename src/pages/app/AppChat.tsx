@@ -93,6 +93,7 @@ const conversationStarters = [
  */
 export default function AppChat() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const draftMessage = searchParams.get('draft') || '';
   const { user } = useAuth();
