@@ -639,7 +639,7 @@ const AppHome = () => {
                 onClick={() => navigate('/app/support')}
                 className="p-2 -ml-1 text-foreground hover:text-foreground transition-colors"
               >
-                <MessageCircle className="h-5 w-5" />
+                <Headset className="h-5 w-5" />
               </button>
             </div>
 
