@@ -306,8 +306,8 @@ const AppHome = () => {
   // Auto-show recovery prompt when streak is broken and recovery hasn't been used
   useEffect(() => {
     if (!streak) return;
-    const recoveryUsed = !!(streak as any).streak_recovery_used;
-    if (recoveryUsed) return;
+    const recoveryCount = (streak as any).streak_recovery_count || 0;
+    if (recoveryCount >= 3) return;
     if (streak.current_streak !== 0) return;
     if (streak.longest_streak <= 0) return;
     const shownKey = 'simora_recovery_prompt_shown';

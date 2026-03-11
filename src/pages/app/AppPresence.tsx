@@ -351,7 +351,7 @@ const AppPresence = () => {
         open={showRecoveryPrompt}
         previousStreak={previousStreakForRecovery}
         onRecover={() => {
-          recoverStreak.mutate(previousStreakForRecovery, {
+          recoverStreak.mutate({ previousStreak: previousStreakForRecovery, type: 'streak' }, {
             onSuccess: () => setShowRecoveryPrompt(false),
           });
         }}
