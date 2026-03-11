@@ -128,7 +128,7 @@ export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, previ
       </div>
 
       {/* Spacer to push scrollable content below the fixed hero */}
-      <div style={{ height: 380 }} />
+      <div style={{ height: 340 }} />
 
       {/* Scrollable sheet that overlaps the hero */}
       <div style={{
