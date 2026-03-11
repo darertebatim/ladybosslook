@@ -194,6 +194,7 @@ export const SortableTaskList = ({
   const activeTask = activeId ? localTasks.find(t => t.id === activeId) : null;
 
   return (
+    <>
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
