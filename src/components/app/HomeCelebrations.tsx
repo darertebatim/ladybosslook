@@ -287,6 +287,12 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         onDismiss={() => setShowRecoveryPrompt(false)}
         isLoading={recoverStreak.isPending}
       />
+
+      <StreakMilestoneCelebration
+        open={showStreakMilestone}
+        streak={streakMilestoneValue}
+        onClose={() => setShowStreakMilestone(false)}
+      />
     </>
   );
 });
