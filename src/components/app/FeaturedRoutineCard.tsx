@@ -61,6 +61,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
   categoryName,
 }: FeaturedRoutineCardProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const color = routine.color || 'purple';
   const gradient = colorGradients[color] || colorGradients.purple;
   const routineEmoji = routine.emoji && isEmoji(routine.emoji) ? routine.emoji : '✨';
