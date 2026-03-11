@@ -191,7 +191,7 @@ const AppPresence = () => {
                   previousStreak={previousStreakForRecovery}
                   onRecover={() => setShowRecoveryPrompt(true)}
                 />
-                <RecoveryShields recoveryUsed={!!(streak as any).streak_recovery_used} />
+                <RecoveryShields recoveryCount={recoveryCount} />
               </div>
             )}
             
