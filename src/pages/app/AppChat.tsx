@@ -528,7 +528,7 @@ export default function AppChat() {
               </div>
               <div>
                 <h1 className="font-semibold text-[17px]">Support</h1>
-                <p className="text-[13px] text-muted-foreground">
+                <p className="text-[13px] text-orange-500">
                   {conversation?.status === 'resolved' ? 'Resolved' : 'This conversation is private'}
                 </p>
               </div>
@@ -600,8 +600,8 @@ export default function AppChat() {
                 </div>
                 
                 {/* Warm footer */}
-                <p className="text-[13px] text-muted-foreground/60 max-w-[260px] leading-relaxed">
-                  Type, or tap the mic if that feels easier — we're listening. We check in throughout the day. 💜
+                <p className="text-[13px] text-foreground max-w-[260px] leading-relaxed">
+                  Type, or tap the mic if that feels easier — we're listening. We check in throughout the day. 🧡
                 </p>
               </div>
             ) : (
