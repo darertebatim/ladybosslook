@@ -98,7 +98,7 @@ export default function AppChannelsList() {
   };
 
   const handleSupportClick = () => {
-    navigate('/app/chat');
+    navigate('/app/chat', { state: { from: '/app/channels' } });
   };
 
   const handleCoachClick = () => {

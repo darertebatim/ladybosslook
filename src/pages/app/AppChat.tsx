@@ -429,10 +429,10 @@ export default function AppChat() {
     isPulling.current = false;
   };
 
-  // Navigate back to app home
   const handleBack = () => {
     haptic.light();
-    navigate('/app/home');
+    const from = (location as any).state?.from;
+    navigate(from || '/app/home');
   };
 
   // Track scroll position to show/hide scroll-to-bottom button
