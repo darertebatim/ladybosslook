@@ -34,7 +34,7 @@ interface SortableTaskItemProps {
   completedSubtaskIds: string[];
   goalProgress: number;
   onTap: (task: UserTask) => void;
-  onStreakIncrease: () => void;
+  onStreakIncrease: (newStreak: number) => void;
   onOpenGoalInput: (task: UserTask) => void;
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
