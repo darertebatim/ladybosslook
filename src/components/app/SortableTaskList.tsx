@@ -276,7 +276,7 @@ const QUICK_ADD_VARIANTS: { emoji: string; color: TaskColor }[] = [
   { emoji: '🌊', color: 'sky' },
 ];
 
-function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
+function QuickAddCard({ date, taskCount, onOpenFullSheet }: { date: Date; taskCount: number; onOpenFullSheet?: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
