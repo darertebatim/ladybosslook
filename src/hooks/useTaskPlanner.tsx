@@ -1154,7 +1154,7 @@ export const useCreateTaskFromTemplate = () => {
 /**
  * Update user streak on task completion
  */
-async function updateStreak(userId: string, completedDateStr: string): Promise<{ increased: boolean }> {
+async function updateStreak(userId: string, completedDateStr: string): Promise<{ increased: boolean; newStreak: number }> {
   // Get current streak
   const { data: streak } = await supabase
     .from('user_streaks')
@@ -1173,12 +1173,12 @@ async function updateStreak(userId: string, completedDateStr: string): Promise<{
       longest_streak: 1,
       last_completion_date: today,
     });
-    return { increased: true };
+    return { increased: true, newStreak: 1 };
   }
 
   // If already completed today, no change
   if (streak.last_completion_date === today) {
-    return { increased: false };
+    return { increased: false, newStreak: streak.current_streak };
   }
 
   // If completed yesterday, increment streak
@@ -1195,7 +1195,7 @@ async function updateStreak(userId: string, completedDateStr: string): Promise<{
       })
       .eq('user_id', userId);
 
-    return { increased: true };
+    return { increased: true, newStreak };
   }
 
   // Otherwise, reset streak to 1
@@ -1207,7 +1207,7 @@ async function updateStreak(userId: string, completedDateStr: string): Promise<{
     })
     .eq('user_id', userId);
 
-  return { increased: true };
+  return { increased: true, newStreak: 1 };
 }
 
 /**
