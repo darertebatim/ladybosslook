@@ -143,9 +143,8 @@ export const TaskCard = memo(function TaskCard({
     } else {
       const result = await completeTask.mutateAsync({ taskId: task.id, date });
       if (result.streakIncreased && onStreakIncrease) {
-        // Stronger haptic for streak
         haptic.medium();
-        onStreakIncrease();
+        onStreakIncrease(result.newStreak);
       }
     }
   };

@@ -122,7 +122,7 @@ export const TaskDetailModal = ({
       const result = await completeTask.mutateAsync({ taskId: task.id, date });
       if (result.streakIncreased && onStreakIncrease) {
         haptic.medium();
-        onStreakIncrease();
+        onStreakIncrease(result.newStreak);
       }
     }
   };
