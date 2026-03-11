@@ -51,12 +51,14 @@ interface FeaturedRoutineCardProps {
   routine: RoutineBankItem;
   onDismiss?: () => void;
   className?: string;
+  categoryName?: string;
 }
 
 export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
   routine,
   onDismiss,
   className,
+  categoryName,
 }: FeaturedRoutineCardProps) {
   const navigate = useNavigate();
   const color = routine.color || 'purple';
