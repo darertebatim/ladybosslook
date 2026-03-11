@@ -952,7 +952,7 @@ const AppHome = () => {
                                   : 'bg-white text-muted-foreground dark:bg-white/10'
                               )}
                             >
-                              {tag.replace(/[-_]/g, ' ')}
+                              {categoryNameMap.get(tag) || tag}
                             </button>
                           );
                         })}
