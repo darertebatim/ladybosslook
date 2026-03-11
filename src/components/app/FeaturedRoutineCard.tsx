@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { Badge } from "@/components/ui/badge";
 import { X, Crown, ChevronRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { haptic } from '@/lib/haptics';
 import { CachedImage } from '@/components/ui/CachedImage';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
