@@ -11,7 +11,7 @@ import {
 import { haptic } from '@/lib/haptics';
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
-import { isToday } from 'date-fns';
+import { isToday, isFuture, startOfDay } from 'date-fns';
 import { SessionReminderSheet } from '@/components/app/SessionReminderSheet';
 import { useSessionReminderSettings } from '@/hooks/useSessionReminderSettings';
 
