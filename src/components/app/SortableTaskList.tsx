@@ -353,15 +353,16 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
         <div className="flex items-center gap-1.5">
           <button
             onClick={handleSubmit}
-            className="px-3 py-1.5 rounded-2xl bg-urgency text-urgency-foreground text-xs font-semibold active:scale-95 transition-transform"
+            className="flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl text-[10px] font-bold shrink-0 transition-all shadow-sm active:scale-95 bg-white hover:bg-white/90 text-foreground border border-border/50"
           >
+            <Plus className="h-3.5 w-3.5" />
             Add
           </button>
           <button
             onClick={handleOpenDetails}
-            className="w-9 h-9 rounded-2xl border-2 border-urgency/30 flex items-center justify-center active:scale-95 transition-transform"
+            className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center shrink-0 active:scale-95 transition-transform"
           >
-            <MoreHorizontal className="h-4 w-4 text-urgency" />
+            <MoreHorizontal className="h-4 w-4" />
           </button>
         </div>
       )}
