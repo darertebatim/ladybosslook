@@ -113,10 +113,10 @@ export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, previ
         {/* Content on top */}
         <div style={{ position: 'relative', zIndex: 2 }}>
           <Header dark />
-          <div style={{ paddingLeft: 20, paddingRight: 20, textAlign: 'center' }}>
-            <p style={{ color: '#fff', fontSize: 22, fontWeight: 800, lineHeight: 1.28, margin: 0, letterSpacing: -0.3, textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>
+          <div style={{ paddingLeft: 16, paddingRight: 16, textAlign: 'center' }}>
+            <p style={{ color: '#fff', fontSize: 26, fontWeight: 800, lineHeight: 1.28, margin: 0, letterSpacing: -0.3, textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>
               Plus users are{' '}
-              <span style={{ color: '#f59e0b', fontSize: 28, fontWeight: 900 }}>4.2x</span>
+              <span style={{ color: '#f59e0b', fontSize: 34, fontWeight: 900 }}>4.2x</span>
               {' '}more likely to stay consistent and see real change!
             </p>
           </div>
