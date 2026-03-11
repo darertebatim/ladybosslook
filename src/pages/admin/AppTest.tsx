@@ -549,6 +549,24 @@ export default function AppTest() {
             onRecover={() => { setShowGoldStreakLostBanner(false); setShowRecoverySuccess('gold'); }}
             onDismiss={() => setShowGoldStreakLostBanner(false)}
           />
+          <StreakLostBanner
+            open={showStreakLostNoShields}
+            previousStreak={12}
+            hasShieldsRemaining={false}
+            shieldsLeft={0}
+            isSubscribed={false}
+            onRecover={() => {}}
+            onDismiss={() => setShowStreakLostNoShields(false)}
+          />
+          <GoldStreakLostBanner
+            open={showGoldLostNoShields}
+            previousGoldStreak={5}
+            hasShieldsRemaining={false}
+            shieldsLeft={0}
+            isSubscribed={true}
+            onRecover={() => {}}
+            onDismiss={() => setShowGoldLostNoShields(false)}
+          />
           <RecoverySuccessBanner
             open={showRecoverySuccess !== null}
             restoredStreak={showRecoverySuccess === 'gold' ? 5 : 12}
