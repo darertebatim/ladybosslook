@@ -11,6 +11,7 @@ import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { MoodCelebrationSheet } from './MoodCelebrationSheet';
+import { MoodRitualPromptSheet } from './MoodRitualPromptSheet';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -83,6 +84,7 @@ export function MoodDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showRitualPrompt, setShowRitualPrompt] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
 
   const isAdded = existingTask || justAdded;
@@ -112,8 +114,12 @@ export function MoodDashboard() {
       
       haptic.success();
       
-      // Show celebration sheet
-      setShowCelebration(true);
+      // If not in routine, show ritual prompt first; otherwise celebration
+      if (!isAdded) {
+        setShowRitualPrompt(true);
+      } else {
+        setShowCelebration(true);
+      }
       setIsSubmitting(false);
     } catch (error) {
       console.error('Failed to log mood:', error);
@@ -125,6 +131,16 @@ export function MoodDashboard() {
   const handleCelebrationDone = useCallback(() => {
     navigate('/app/home');
   }, [navigate]);
+
+  const handleRitualPromptAdd = useCallback(() => {
+    setShowRitualPrompt(false);
+    setShowRoutineSheet(true);
+  }, []);
+
+  const handleRitualPromptSkip = useCallback(() => {
+    setShowRitualPrompt(false);
+    setShowCelebration(true);
+  }, []);
 
   const handleRoutineClick = () => {
     haptic.light();
@@ -146,6 +162,8 @@ export function MoodDashboard() {
       toast.success('Mood check-in added to your rituals!');
       setShowRoutineSheet(false);
       setJustAdded(true);
+      // Show celebration after adding
+      setShowCelebration(true);
     } catch (error) {
       console.error('Failed to add ritual:', error);
       toast.error('Failed to add ritual');
@@ -281,6 +299,14 @@ export function MoodDashboard() {
         routineTitle="Daily Mood Check-in"
         onSave={handleSaveRoutine}
         isSaving={addRoutinePlan.isPending}
+      />
+
+      {/* Ritual Prompt Sheet - shown before celebration if not in routine */}
+      <MoodRitualPromptSheet
+        open={showRitualPrompt}
+        onOpenChange={setShowRitualPrompt}
+        onAddToRitual={handleRitualPromptAdd}
+        onSkip={handleRitualPromptSkip}
       />
 
       {/* Mood Celebration Sheet */}
