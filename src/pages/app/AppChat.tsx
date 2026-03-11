@@ -573,8 +573,8 @@ export default function AppChat() {
                 <div className="w-full max-w-sm p-6 mb-6">
                   {/* Avatar - clean */}
                   <div className="relative mx-auto mb-5">
-                    <div className="h-20 w-20 mx-auto rounded-full bg-muted border border-border flex items-center justify-center">
-                      <span className="text-4xl">💜</span>
+                    <div className="h-20 w-20 mx-auto rounded-full bg-orange-500 flex items-center justify-center">
+                      <Headset className="h-9 w-9 text-white" />
                     </div>
                     {/* Online indicator */}
                     <div className="absolute bottom-1 right-1/2 translate-x-8 h-4 w-4 rounded-full bg-emerald-500 border-2 border-background" />
