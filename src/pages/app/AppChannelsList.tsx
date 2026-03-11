@@ -310,7 +310,7 @@ export default function AppChannelsList() {
                     {supportSummary.lastMessage.sender_type === 'user' ? 'You' : 'Support'}: {supportSummary.lastMessage.content}
                   </p>
                 ) : (
-                  <p className="text-sm text-muted-foreground/60 mt-0.5">
+                  <p className="text-sm text-foreground mt-0.5">
                     Chat with our team (Private)
                   </p>
                 )}
