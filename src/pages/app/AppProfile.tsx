@@ -249,12 +249,14 @@ const AppProfile = () => {
     setIsEditing(false);
   };
 
-  const handleAvatarUpload = async (file: File) => {
+  const handleAvatarUpload = async (rawFile: File) => {
     if (!user?.id) return;
     setIsUploadingAvatar(true);
     try {
-      const ext = file.name.split('.').pop() || 'jpg';
-      const filePath = `${user.id}/avatar.${ext}`;
+      // Crop to centered square and resize to 512x512
+      const { cropImageToSquare } = await import('@/lib/cropImageToSquare');
+      const file = await cropImageToSquare(rawFile, 512);
+      const filePath = `${user.id}/avatar.jpg`;
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
