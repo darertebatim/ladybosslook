@@ -89,6 +89,24 @@ export const TaskCard = memo(function TaskCard({
     return formatTimeLabelWithEmoji(task);
   };
 
+  // Format repeat pattern label
+  const getRepeatLabel = (task: UserTask): string | null => {
+    const p = task.repeat_pattern;
+    if (!p || p === 'none') return null;
+    if (p === 'daily') return 'Daily';
+    if (p === 'weekly') return 'Weekly';
+    if (p === 'monthly') return 'Monthly';
+    if (p === 'weekdays') return 'Weekdays';
+    if (p === 'custom' && task.repeat_days?.length) {
+      const days = task.repeat_days.length;
+      if (days === 7) return 'Daily';
+      if (days === 5) return 'Weekdays';
+      return `${days}x/week`;
+    }
+    return null;
+  };
+  const repeatLabel = getRepeatLabel(task);
+
   const handleToggleComplete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
