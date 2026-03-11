@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils';
 import { UserTask, useReorderTasks, useCreateTask } from '@/hooks/useTaskPlanner';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
-import { Plus, LayoutGrid } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface SortableTaskItemProps {
@@ -302,35 +302,35 @@ function QuickAddCard({ date, taskCount, onOpenFullSheet }: { date: Date; taskCo
 
   if (!isOpen) {
     return (
-      <div className="mt-3 flex items-center gap-2">
-        <button
-          onClick={() => {
-            setIsOpen(true);
-            haptic.light();
-            setTimeout(() => inputRef.current?.focus(), 100);
-          }}
-          className="flex-1 rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2 active:scale-[0.98] transition-all"
-        >
-          <div className="w-10 h-10 flex items-center justify-center shrink-0">
-            <Plus className="h-5 w-5 text-urgency" />
-          </div>
-          <span className="text-[15px] font-semibold text-muted-foreground">Quick add action...</span>
-        </button>
-        <button
-          onClick={() => {
-            haptic.light();
+      <button
+        onClick={() => {
+          setIsOpen(true);
+          haptic.light();
+          setTimeout(() => inputRef.current?.focus(), 100);
+        }}
+        className="mt-3 w-full rounded-3xl pl-3 pr-3 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2 active:scale-[0.98] transition-all"
+      >
+        <div className="w-10 h-10 flex items-center justify-center shrink-0">
+          <Plus className="h-5 w-5 text-urgency" />
+        </div>
+        <span className="flex-1 text-left text-[15px] font-semibold text-muted-foreground">Quick add action...</span>
+        {/* FAB-style circle on the right */}
+        <div
+          className="w-10 h-10 rounded-full bg-urgency flex items-center justify-center shrink-0 shadow-urgency"
+          onClick={(e) => {
+            e.stopPropagation();
+            haptic.medium();
             onOpenFullSheet?.();
           }}
-          className="w-12 h-12 rounded-2xl bg-card border-2 border-urgency/30 flex items-center justify-center shrink-0 active:scale-95 transition-transform"
         >
-          <LayoutGrid className="h-5 w-5 text-urgency" />
-        </button>
-      </div>
+          <Plus className="h-5 w-5 text-urgency-foreground" />
+        </div>
+      </button>
     );
   }
 
   return (
-    <div className="mt-3 rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2">
+    <div className="mt-3 rounded-3xl pl-3 pr-3 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2">
       <div className="w-10 h-10 flex items-center justify-center shrink-0">
         <Plus className="h-5 w-5 text-urgency" />
       </div>
@@ -351,23 +351,24 @@ function QuickAddCard({ date, taskCount, onOpenFullSheet }: { date: Date; taskCo
         className="flex-1 bg-transparent text-[15px] font-semibold text-foreground placeholder:text-muted-foreground outline-none"
         autoFocus
       />
-      {title.trim() && (
+      {title.trim() ? (
         <button
           onClick={handleSubmit}
-          className="px-3 py-1.5 rounded-2xl bg-urgency text-urgency-foreground text-xs font-semibold active:scale-95 transition-transform"
+          className="w-10 h-10 rounded-full bg-urgency flex items-center justify-center shrink-0 shadow-urgency active:scale-95 transition-transform"
         >
-          Add
+          <Plus className="h-5 w-5 text-urgency-foreground rotate-0" />
         </button>
+      ) : (
+        <div
+          className="w-10 h-10 rounded-full bg-urgency flex items-center justify-center shrink-0 shadow-urgency active:scale-95 transition-transform cursor-pointer"
+          onClick={() => {
+            haptic.medium();
+            onOpenFullSheet?.();
+          }}
+        >
+          <Plus className="h-5 w-5 text-urgency-foreground" />
+        </div>
       )}
-      <button
-        onClick={() => {
-          haptic.light();
-          onOpenFullSheet?.();
-        }}
-        className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center shrink-0 active:scale-95 transition-transform"
-      >
-        <LayoutGrid className="h-4 w-4 text-muted-foreground" />
-      </button>
     </div>
   );
 }
