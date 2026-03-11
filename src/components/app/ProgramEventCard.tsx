@@ -11,7 +11,8 @@ import {
 import { haptic } from '@/lib/haptics';
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
-import { isToday, isFuture, startOfDay } from 'date-fns';
+import { isToday, isBefore, startOfDay } from 'date-fns';
+import { toast } from 'sonner';
 import { SessionReminderSheet } from '@/components/app/SessionReminderSheet';
 import { useSessionReminderSettings } from '@/hooks/useSessionReminderSettings';
 
@@ -68,11 +69,20 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
   const isSession = event.type === 'session';
   const currentSettings = isSession ? sessionSettings : contentSettings;
   const saveSettings = isSession ? setSessionSettings : setContentSettings;
-  const isFutureDate = isFuture(startOfDay(date));
+  // Check if this is a future date (after today) - same logic as TaskCard
+  const isFutureDate = !isToday(date) && !isBefore(startOfDay(date), startOfDay(new Date()));
 
   const handleToggleComplete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isFutureDate) return;
+    
+    if (isFutureDate) {
+      haptic.light();
+      toast("Let's focus on today's rituals.", {
+        description: "You can honor this action when the day comes.",
+        duration: 3000,
+      });
+      return;
+    }
     
     haptic.light();
 
