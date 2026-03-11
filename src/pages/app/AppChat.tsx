@@ -570,8 +570,7 @@ export default function AppChat() {
           <div className="p-4">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 animate-fade-in">
-                {/* Welcome card - clean white */}
-                <div className="w-full max-w-sm bg-card rounded-3xl p-6 mb-6 border border-border/50">
+                <div className="w-full max-w-sm p-6 mb-6">
                   {/* Avatar - clean */}
                   <div className="relative mx-auto mb-5">
                     <div className="h-20 w-20 mx-auto rounded-full bg-muted border border-border flex items-center justify-center">
