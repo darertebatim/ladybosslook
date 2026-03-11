@@ -1,5 +1,4 @@
 // AppHome - Main home page component
-import { isStreakMilestone, getStreakMilestoneKey } from '@/components/app/StreakMilestoneCelebration';
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
