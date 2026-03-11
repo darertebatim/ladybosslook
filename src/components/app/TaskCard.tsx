@@ -96,7 +96,8 @@ export const TaskCard = memo(function TaskCard({
     if (p === 'daily') return 'Daily';
     if (p === 'weekly') return 'Weekly';
     if (p === 'monthly') return 'Monthly';
-    if (p === 'weekdays' || (p === 'custom' && task.repeat_days?.length === 5)) return 'Weekdays';
+    if (p === 'weekend') return 'Weekends';
+    if (p === 'custom' && task.repeat_days?.length === 5) return 'Weekdays';
     if (p === 'custom' && task.repeat_days?.length) {
       const days = task.repeat_days.length;
       if (days === 7) return 'Daily';
