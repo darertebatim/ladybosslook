@@ -210,15 +210,13 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
           {/* Checkbox */}
           <button
             onClick={handleToggleComplete}
-            className={cn(
-              'w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-200',
-              event.isCompleted
-                ? 'bg-emerald-500 text-white shadow-md'
-                : 'border-2 border-foreground/25 hover:border-foreground/40 bg-white/50',
-              isAnimating && 'scale-110'
-            )}
+            className="w-9 h-9 flex items-center justify-center shrink-0"
           >
-            {event.isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
+            {event.isCompleted ? (
+              <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} />
+            ) : (
+              <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
+            )}
           </button>
         </div>
       </div>
