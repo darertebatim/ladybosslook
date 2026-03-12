@@ -282,6 +282,6 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         onDismiss={() => setShowRecoveryPrompt(false)}
         isLoading={recoverStreak.isPending}
       />
-    </>
+    </OverlayPortal>
   );
 });

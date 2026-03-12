@@ -85,7 +85,7 @@ export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
   return (
     <>
       {open && !showCelebration && (
-        <div className="fixed inset-0 z-[60] bg-white" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <div className="fixed inset-0 z-[200] bg-white" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
           <div className="h-full overflow-y-auto">
             <Component
               program={programData}
