@@ -1180,7 +1180,7 @@ ${context.programs?.map((p: any) => `- ${p.title} (${p.slug}) - ${p.type}`).join
 - When on the Tools page and user asks to CREATE something, ALWAYS use the direct-action create tools
 - When user asks to CHANGE, EDIT, UPDATE, MOVE, or RENAME something, ALWAYS use the UPDATE tools with the item's ID from the context. NEVER create a duplicate.
 - When user asks to DELETE or REMOVE something, use the appropriate DELETE tool with the item's ID from context.
-- The IDs listed in "Existing Actions/Rituals/Exercises" above are real database IDs — use them for updates and deletes
+- The IDs listed in "Existing Actions/Routines/Exercises" above are real database IDs — use them for updates and deletes
 - Use appropriate emojis for each item
 - Match Ladyboss brand: warm, empowering, wellness-focused
 - For bilingual: English first, then Farsi if requested
