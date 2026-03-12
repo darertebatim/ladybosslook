@@ -1240,7 +1240,7 @@ function getToolDefinitions(currentPage?: string) {
               is_popular: { type: "boolean", description: "Mark as popular" },
               sections: {
                 type: "array",
-                description: "Ritual sections (optional groupings)",
+                description: "Routine sections (optional groupings)",
                 items: {
                   type: "object",
                   properties: {
