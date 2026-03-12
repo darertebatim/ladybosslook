@@ -983,10 +983,10 @@ async function fetchContext(supabase: any, currentPage?: string) {
     const [
       { data: categories },
       { data: recentActions },
-      { data: recentRituals },
+      { data: recentRoutines },
       { data: breathingExercises },
       { data: actionSubtasks },
-      { data: ritualTasks },
+      { data: routineTasks },
     ] = await Promise.all([
       supabase.from("routine_categories").select("id, name, slug, icon").eq("is_active", true).order("display_order"),
       supabase.from("admin_task_bank").select("id, title, emoji, category, color, description, time_period").eq("is_active", true).order("sort_order").limit(20),
@@ -998,10 +998,10 @@ async function fetchContext(supabase: any, currentPage?: string) {
 
     context.categories = categories || [];
     context.existingActions = recentActions || [];
-    context.existingRituals = recentRituals || [];
+    context.existingRoutines = recentRoutines || [];
     context.breathingExercises = breathingExercises || [];
     context.actionSubtasks = actionSubtasks || [];
-    context.ritualTasks = ritualTasks || [];
+    context.routineTasks = routineTasks || [];
   }
 
   if (currentPage === "routines") {
