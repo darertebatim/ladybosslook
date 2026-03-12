@@ -9,6 +9,7 @@ import { haptic } from '@/lib/haptics';
 import { PeriodLog, SYMPTOM_OPTIONS, FLOW_OPTIONS } from '@/lib/periodTracking';
 import { Trash2 } from 'lucide-react';
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 
 interface PeriodDaySheetProps {
   open: boolean;
