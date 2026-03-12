@@ -58,6 +58,7 @@ export const StreakGoalSelection = ({
   const currentMultiplier = MULTIPLIERS[selectedGoal];
 
   return (
+    <OverlayPortal>
     <div className="fixed inset-0 z-[9999] flex flex-col">
       {/* Purple gradient background */}
       <div 
