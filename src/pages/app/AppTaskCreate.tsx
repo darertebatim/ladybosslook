@@ -1047,22 +1047,24 @@ const AppTaskCreate = ({
         </button>
       </div>
 
-      {/* Subtasks Card */}
+      {/* Subtasks Card - Sortable */}
       <div className="mx-4 mt-2 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">
-        {subtasks.map((subtask, index) => (
-          <div key={index} className="flex items-center gap-3 px-4 py-3 border-b border-muted/30">
-            <div className="w-6 h-6 rounded-full bg-muted/50 flex items-center justify-center shrink-0">
-              <div className="w-2 h-0.5 bg-muted-foreground/50 rounded-full" />
-            </div>
-            <span className="flex-1 text-foreground">{subtask}</span>
-            <button 
-              onClick={() => removeSubtask(index)} 
-              className="p-1.5 rounded-full hover:bg-muted/50"
-            >
-              <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-            </button>
-          </div>
-        ))}
+        <DndContext
+          sensors={subtaskSensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleSubtaskDragEnd}
+        >
+          <SortableContext items={subtasks.map((_, i) => `subtask-${i}`)} strategy={verticalListSortingStrategy}>
+            {subtasks.map((subtask, index) => (
+              <SortableSubtaskItem
+                key={`subtask-${index}`}
+                id={`subtask-${index}`}
+                subtask={subtask}
+                onRemove={() => removeSubtask(index)}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
 
         <div className="flex items-center gap-3 px-4 py-3">
           <Plus className="h-5 w-5 text-muted-foreground shrink-0" />
