@@ -810,32 +810,32 @@ async function deleteRoutineTask(supabase: any, args: any) {
 
 // ============= COVER GENERATION =============
 
-async function generateRitualCover(supabase: any, args: any) {
+async function generateRoutineCover(supabase: any, args: any) {
   if (!args.ritual_id) {
-    return { success: false, error: "Missing ritual_id", action: "generate_ritual_cover" };
+    return { success: false, error: "Missing ritual_id", action: "generate_routine_cover" };
   }
 
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) {
-    return { success: false, error: "LOVABLE_API_KEY not configured", action: "generate_ritual_cover" };
+    return { success: false, error: "LOVABLE_API_KEY not configured", action: "generate_routine_cover" };
   }
 
-  const resolved = await resolveRitualId(supabase, args.ritual_id);
+  const resolved = await resolveRoutineId(supabase, args.ritual_id);
   if (!resolved) {
-    return { success: false, error: `Ritual not found: "${args.ritual_id}". Use the exact UUID from context.`, action: "generate_ritual_cover" };
+    return { success: false, error: `Routine not found: "${args.ritual_id}". Use the exact UUID from context.`, action: "generate_routine_cover" };
   }
 
-  // Fetch the ritual details
-  const { data: ritual, error: fetchError } = await supabase.from("routines_bank")
+  // Fetch the routine details
+  const { data: routine, error: fetchError } = await supabase.from("routines_bank")
     .select("id, title, subtitle, description, category, emoji")
     .eq("id", resolved.id)
     .single();
 
-  if (fetchError || !ritual) {
-    return { success: false, error: "Ritual not found", action: "generate_ritual_cover" };
+  if (fetchError || !routine) {
+    return { success: false, error: "Routine not found", action: "generate_routine_cover" };
   }
 
-  // Fetch ritual tasks for icon context
+  // Fetch routine tasks for icon context
   const { data: tasks } = await supabase.from("routines_bank_tasks")
     .select("title, emoji")
     .eq("routine_id", resolved.id)
@@ -854,7 +854,7 @@ gentle feminine wellness style, friendly digital illustration,
 soft glow and sparkles, modern wellness illustration, minimal but expressive objects.
 
 Main scene:
-${customDesc || `A cover representing "${ritual.title}"${ritual.description ? ` — ${ritual.description}` : ""}`}
+${customDesc || `A cover representing "${routine.title}"${routine.description ? ` — ${routine.description}` : ""}`}
 
 Floating around:
 ${taskIcons ? `Soft illustrated icons representing: ${taskIcons}` : "Small floating hearts, stars, and gentle sparkle elements"}
@@ -870,13 +870,13 @@ gentle purple accents, soft glow lighting.
 
 Composition:
 centered hero element, balanced clean layout,
-designed as a mobile app ritual cover.
+designed as a mobile app routine cover.
 The background gradient MUST extend to all edges — NO white borders or padding.
 
 ABSOLUTELY NO text, words, letters, or typography of any kind.
 Clean cover illustration only.`;
 
-  console.log(`[generate_ritual_cover] Generating for ritual: ${ritual.title}`);
+  console.log(`[generate_routine_cover] Generating for routine: ${routine.title}`);
 
   try {
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -896,12 +896,12 @@ Clean cover illustration only.`;
       const errText = await response.text();
       console.error("AI image generation error:", response.status, errText);
       if (response.status === 429) {
-        return { success: false, error: "Rate limit exceeded. Try again in a moment.", action: "generate_ritual_cover" };
+        return { success: false, error: "Rate limit exceeded. Try again in a moment.", action: "generate_routine_cover" };
       }
       if (response.status === 402) {
-        return { success: false, error: "AI credits exhausted.", action: "generate_ritual_cover" };
+        return { success: false, error: "AI credits exhausted.", action: "generate_routine_cover" };
       }
-      return { success: false, error: `AI error: ${response.status}`, action: "generate_ritual_cover" };
+      return { success: false, error: `AI error: ${response.status}`, action: "generate_routine_cover" };
     }
 
     const data = await response.json();
@@ -909,13 +909,13 @@ Clean cover illustration only.`;
 
     if (!imageData) {
       console.error("No image in AI response");
-      return { success: false, error: "No image was generated", action: "generate_ritual_cover" };
+      return { success: false, error: "No image was generated", action: "generate_routine_cover" };
     }
 
     // Upload to storage
     const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
     const imageBuffer = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
-    const fileName = `ritual-${resolved.id}-${Date.now()}.png`;
+    const fileName = `routine-${resolved.id}-${Date.now()}.png`;
 
     const { error: uploadError } = await supabase.storage
       .from("routine-covers")
@@ -923,34 +923,34 @@ Clean cover illustration only.`;
 
     if (uploadError) {
       console.error("Upload error:", uploadError);
-      return { success: false, error: `Upload failed: ${uploadError.message}`, action: "generate_ritual_cover" };
+      return { success: false, error: `Upload failed: ${uploadError.message}`, action: "generate_routine_cover" };
     }
 
     const { data: { publicUrl } } = supabase.storage
       .from("routine-covers")
       .getPublicUrl(fileName);
 
-    // Update the ritual with the cover URL
+    // Update the routine with the cover URL
     const { error: updateError } = await supabase.from("routines_bank")
       .update({ cover_image_url: publicUrl })
       .eq("id", resolved.id);
 
     if (updateError) {
-      console.error("Update ritual cover error:", updateError);
-      return { success: false, error: `Cover uploaded but failed to update ritual: ${updateError.message}`, action: "generate_ritual_cover" };
+      console.error("Update routine cover error:", updateError);
+      return { success: false, error: `Cover uploaded but failed to update routine: ${updateError.message}`, action: "generate_routine_cover" };
     }
 
-    console.log(`[generate_ritual_cover] Cover generated and saved: ${publicUrl}`);
+    console.log(`[generate_routine_cover] Cover generated and saved: ${publicUrl}`);
 
     return {
       success: true,
-      action: "generate_ritual_cover",
-      message: `Generated and applied Simora-style cover for "${ritual.title}"`,
-      created: { title: ritual.title, emoji: ritual.emoji, coverUrl: publicUrl },
+      action: "generate_routine_cover",
+      message: `Generated and applied Simora-style cover for "${routine.title}"`,
+      created: { title: routine.title, emoji: routine.emoji, coverUrl: publicUrl },
     };
   } catch (e) {
     console.error("Cover generation error:", e);
-    return { success: false, error: e instanceof Error ? e.message : "Unknown error", action: "generate_ritual_cover" };
+    return { success: false, error: e instanceof Error ? e.message : "Unknown error", action: "generate_routine_cover" };
   }
 }
 
