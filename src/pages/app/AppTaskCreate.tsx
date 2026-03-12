@@ -1,8 +1,23 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format, addDays, nextMonday, startOfDay } from 'date-fns';
-import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag, AlarmClock, Target, Wind, Pencil, Brain } from 'lucide-react';
+import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag, AlarmClock, Target, Wind, Pencil, Brain, GripVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  DndContext,
+  closestCenter,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -22,6 +37,7 @@ import {
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 import { Capacitor } from '@capacitor/core';
+import { haptic } from '@/lib/haptics';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
@@ -293,6 +309,37 @@ const TimePickerSheet = ({
   );
 };
 
+// Sortable subtask item for drag-to-reorder
+const SortableSubtaskItem = ({ id, subtask, onRemove }: { id: string; subtask: string; onRemove: () => void }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        'flex items-center gap-2 px-4 py-3 border-b border-muted/30 bg-white dark:bg-slate-800',
+        isDragging && 'opacity-50 z-50 shadow-lg'
+      )}
+    >
+      <button {...attributes} {...listeners} className="touch-none p-1 -ml-1 text-muted-foreground/50">
+        <GripVertical className="h-4 w-4" />
+      </button>
+      <div className="w-5 h-5 rounded-full bg-muted/50 flex items-center justify-center shrink-0">
+        <div className="w-2 h-0.5 bg-muted-foreground/50 rounded-full" />
+      </div>
+      <span className="flex-1 text-foreground">{subtask}</span>
+      <button onClick={onRemove} className="p-1.5 rounded-full hover:bg-muted/50">
+        <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+      </button>
+    </div>
+  );
+};
+
 const AppTaskCreate = ({ 
   isSheet = false, 
   sheetOpen = false, 
@@ -396,7 +443,22 @@ const AppTaskCreate = ({
   const { handleFocus: handleNewSubtaskFocus } = useKeyboardScroll(newSubtaskInputRef, { block: 'center' });
   const { handleFocus: handleTitleFocus } = useKeyboardScroll(titleInputRef, { block: 'center' });
   const { handleFocus: handleDescriptionFocus } = useKeyboardScroll(descriptionRef, { block: 'center' });
-  
+
+  // Subtask drag-to-reorder
+  const subtaskSensors = useSensors(
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+  );
+
+  const handleSubtaskDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = subtasks.findIndex((_, i) => `subtask-${i}` === active.id);
+    const newIndex = subtasks.findIndex((_, i) => `subtask-${i}` === over.id);
+    if (oldIndex !== -1 && newIndex !== -1) {
+      setSubtasks(arrayMove(subtasks, oldIndex, newIndex));
+      haptic.light();
+    }
+  }, [subtasks]);
   // Determine the current pro link config
   const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
 
@@ -1047,22 +1109,24 @@ const AppTaskCreate = ({
         </button>
       </div>
 
-      {/* Subtasks Card */}
+      {/* Subtasks Card - Sortable */}
       <div className="mx-4 mt-2 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">
-        {subtasks.map((subtask, index) => (
-          <div key={index} className="flex items-center gap-3 px-4 py-3 border-b border-muted/30">
-            <div className="w-6 h-6 rounded-full bg-muted/50 flex items-center justify-center shrink-0">
-              <div className="w-2 h-0.5 bg-muted-foreground/50 rounded-full" />
-            </div>
-            <span className="flex-1 text-foreground">{subtask}</span>
-            <button 
-              onClick={() => removeSubtask(index)} 
-              className="p-1.5 rounded-full hover:bg-muted/50"
-            >
-              <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-            </button>
-          </div>
-        ))}
+        <DndContext
+          sensors={subtaskSensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleSubtaskDragEnd}
+        >
+          <SortableContext items={subtasks.map((_, i) => `subtask-${i}`)} strategy={verticalListSortingStrategy}>
+            {subtasks.map((subtask, index) => (
+              <SortableSubtaskItem
+                key={`subtask-${index}`}
+                id={`subtask-${index}`}
+                subtask={subtask}
+                onRemove={() => removeSubtask(index)}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
 
         <div className="flex items-center gap-3 px-4 py-3">
           <Plus className="h-5 w-5 text-muted-foreground shrink-0" />
