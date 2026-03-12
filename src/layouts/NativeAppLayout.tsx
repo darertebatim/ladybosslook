@@ -249,15 +249,15 @@ const NativeAppLayout = () => {
             );
           })}
 
-          {/* Presence - streak icon + count */}
+          {/* Presence - orange streak pill */}
           <Link
             to="/app/presence"
-            className="flex flex-col items-center justify-center gap-0.5 min-h-[44px] tour-nav-presence active:scale-95 transition-transform"
+            className="flex items-center justify-center min-h-[44px] tour-nav-presence"
           >
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center">
-              <Flame className="h-4 w-4 text-white fill-white shrink-0" />
+            <div className="flex items-center justify-center gap-0.5 w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-orange-500 text-white shadow-sm active:scale-95 transition-transform">
+              <Flame className="h-5 w-5 fill-current shrink-0" />
+              <span className="text-sm font-bold leading-none">{streakCount}</span>
             </div>
-            <span className="text-[10px] font-medium text-foreground leading-none">{streakCount}</span>
           </Link>
         </div>
       </nav>
