@@ -166,9 +166,10 @@ const NativeAppLayout = () => {
     <div className="flex flex-col h-[100dvh] bg-background app-theme font-farsi">
       {/* Main Content - scrollable container for iOS */}
       <main 
+        data-scroll-container="true"
         className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain"
         style={{
-          paddingBottom: isOnChatPage ? 0 : TAB_BAR_CONTENT_HEIGHT + 8,
+          paddingBottom: (isOnChatPage || isKeyboardOpen) ? 0 : TAB_BAR_CONTENT_HEIGHT + 8,
           // iOS WKWebView: make the actual scroll container momentum-scrollable and
           // explicitly allow vertical panning. This helps prevent intermittent “stuck” scroll.
           WebkitOverflowScrolling: 'touch',
@@ -182,10 +183,10 @@ const NativeAppLayout = () => {
       {deferredReady && <DeferredLayoutHooks userId={user?.id} />}
 
       {/* Mini Player - show when audio is playing and not on player page or chat page */}
-      {!isOnPlayerPage && !isOnChatPage && <MiniPlayer />}
+      {!isOnPlayerPage && !isOnChatPage && !isKeyboardOpen && <MiniPlayer />}
 
       {/* Bottom Navigation - hidden on chat page for full-screen experience */}
-      {!isOnChatPage && (
+      {!isOnChatPage && !isKeyboardOpen && (
       <nav className={cn(
         "fixed bottom-0 left-0 right-0 z-50 shadow-lg pb-safe",
         (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
