@@ -367,9 +367,9 @@ Think: Finch app + Fabulous app + Calm app — but MORE feminine, more emotional
 MAIN SCENE (CENTER HERO):
 ${heroScene}
 
-FLOATING ICONS (representing this ritual's actual actions):
+FLOATING ICONS (representing this routine's actual actions):
 ${floatingIconsSection}
-These small delicate icons float gently around the main character and SYMBOLIZE what the ritual is about.
+These small delicate icons float gently around the main character and SYMBOLIZE what the routine is about.
 
 CHARACTER DIRECTION (VERY IMPORTANT):
 - Gentle smiling woman, calm confident pose
