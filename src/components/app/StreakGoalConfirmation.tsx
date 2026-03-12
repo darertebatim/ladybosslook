@@ -24,6 +24,7 @@ export function StreakGoalConfirmation({ open, goal, onClose }: StreakGoalConfir
   };
 
   return (
+    <OverlayPortal>
     <div
       className="fixed inset-0 z-[9999] flex flex-col"
       style={{
