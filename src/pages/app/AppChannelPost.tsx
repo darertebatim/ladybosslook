@@ -41,6 +41,7 @@ export default function AppChannelPost() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { handleFocus: handleTextareaFocus } = useKeyboardScroll(textareaRef);
 
   // Form state
   const [channelId, setChannelId] = useState('');
