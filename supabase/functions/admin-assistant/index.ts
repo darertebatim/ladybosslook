@@ -1127,11 +1127,11 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 11. When user mentions "subtasks", "steps", "checklist items" for an ACTION → use add_subtasks_to_action tool. Match the action by title to find its ID.
 12. When user asks to remove/delete a subtask → use delete_subtask with the subtask's ID from context.
 13. When user says "delete", "remove" an action/ritual/exercise → use the appropriate delete tool. Always confirm what was deleted.
-14. When user asks to add tasks to an existing ritual → use add_tasks_to_ritual. Match the ritual by title to find its ID.
-15. When user asks to remove a task from a ritual → use delete_ritual_task with the task's ID from context.
-16. When user says "generate cover", "create cover image", "make a cover" for a ritual → use generate_ritual_cover.
-17. **DESCRIPTION IS RICH TEXT (BLOG POST)**: When the user provides a long description, multiple paragraphs, or detailed content for a ritual:
-    - Put ALL content into the ritual's "description" field using HTML formatting.
+14. When user asks to add tasks to an existing routine → use add_tasks_to_routine. Match the routine by title to find its ID.
+15. When user asks to remove a task from a routine → use delete_routine_task with the task's ID from context.
+16. When user says "generate cover", "create cover image", "make a cover" for a routine → use generate_routine_cover.
+17. **DESCRIPTION IS RICH TEXT (BLOG POST)**: When the user provides a long description, multiple paragraphs, or detailed content for a routine:
+    - Put ALL content into the routine's "description" field using HTML formatting.
     - Use <h2>/<h3> for section headings, <p> for paragraphs, <ul>/<ol> for lists, <strong>/<em> for emphasis.
     - NEVER truncate or summarize — include the FULL user-provided text.
     - Structure it like a blog post with clear headings and paragraphs.
