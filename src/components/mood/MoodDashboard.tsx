@@ -155,7 +155,7 @@ export function MoodDashboard() {
 
   const handleRoutinePromptNever = useCallback(() => {
     localStorage.setItem('mood_routine_never', 'true');
-    setShowRitualPrompt(false);
+    setShowRoutinePrompt(false);
     if (pendingRoute) {
       navigate(pendingRoute);
       setPendingRoute(null);
