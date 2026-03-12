@@ -130,6 +130,16 @@ export function MoodDashboard() {
     navigate('/app/home');
   }, [navigate]);
 
+  // Intercept action clicks from celebration to show routine prompt
+  const handleCelebrationAction = useCallback((route: string): boolean => {
+    if (!isAdded && !neverPrompt) {
+      setPendingRoute(route);
+      setShowRitualPrompt(true);
+      return true; // intercept
+    }
+    return false; // let celebration handle navigation
+  }, [isAdded, neverPrompt]);
+
   const handleRoutinePromptAdd = useCallback(() => {
     setShowRitualPrompt(false);
     setShowRoutineSheet(true);
@@ -137,14 +147,20 @@ export function MoodDashboard() {
 
   const handleRoutinePromptSkip = useCallback(() => {
     setShowRitualPrompt(false);
-    setShowCelebration(true);
-  }, []);
+    if (pendingRoute) {
+      navigate(pendingRoute);
+      setPendingRoute(null);
+    }
+  }, [pendingRoute, navigate]);
 
   const handleRoutinePromptNever = useCallback(() => {
     localStorage.setItem('mood_routine_never', 'true');
     setShowRitualPrompt(false);
-    setShowCelebration(true);
-  }, []);
+    if (pendingRoute) {
+      navigate(pendingRoute);
+      setPendingRoute(null);
+    }
+  }, [pendingRoute, navigate]);
 
   const handleRoutineClick = () => {
     haptic.light();
