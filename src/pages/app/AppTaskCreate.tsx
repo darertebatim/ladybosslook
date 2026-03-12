@@ -309,7 +309,38 @@ const TimePickerSheet = ({
   );
 };
 
-const AppTaskCreate = ({ 
+// Sortable subtask item for drag-to-reorder
+const SortableSubtaskItem = ({ id, subtask, onRemove }: { id: string; subtask: string; onRemove: () => void }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        'flex items-center gap-2 px-4 py-3 border-b border-muted/30 bg-white dark:bg-slate-800',
+        isDragging && 'opacity-50 z-50 shadow-lg'
+      )}
+    >
+      <button {...attributes} {...listeners} className="touch-none p-1 -ml-1 text-muted-foreground/50">
+        <GripVertical className="h-4 w-4" />
+      </button>
+      <div className="w-5 h-5 rounded-full bg-muted/50 flex items-center justify-center shrink-0">
+        <div className="w-2 h-0.5 bg-muted-foreground/50 rounded-full" />
+      </div>
+      <span className="flex-1 text-foreground">{subtask}</span>
+      <button onClick={onRemove} className="p-1.5 rounded-full hover:bg-muted/50">
+        <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+      </button>
+    </div>
+  );
+};
+
+
   isSheet = false, 
   sheetOpen = false, 
   onSheetOpenChange, 
