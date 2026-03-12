@@ -87,6 +87,7 @@ export function MoodDashboard() {
   const [showRitualPrompt, setShowRitualPrompt] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const [neverPrompt] = useState(() => localStorage.getItem('mood_routine_never') === 'true');
+  const [pendingRoute, setPendingRoute] = useState<string | null>(null);
 
   const isAdded = existingTask || justAdded;
 
