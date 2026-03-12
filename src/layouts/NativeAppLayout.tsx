@@ -235,10 +235,6 @@ const NativeAppLayout = () => {
                     <span className="absolute -top-0.5 -right-0.5 bg-primary w-2 h-2 rounded-full" />
                   )}
                   
-                  {/* Active indicator dot */}
-                  {isActive && (
-                    <span className={cn("absolute -bottom-1 w-1 h-1 rounded-full", (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player')) ? "bg-white" : "bg-foreground")} />
-                  )}
                 </div>
                 
                 <span className={cn(
