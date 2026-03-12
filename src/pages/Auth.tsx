@@ -31,15 +31,14 @@ export default function Auth() {
   const focusedInputRef = useRef<HTMLInputElement | null>(null);
   const prevKeyboardOpen = useRef(false);
   
-  // iOS keyboard scroll fix: scroll focused input into view when keyboard opens
+  // iOS keyboard scroll fix: multi-pass scroll when keyboard opens
   useEffect(() => {
     if (isKeyboardOpen && !prevKeyboardOpen.current && focusedInputRef.current) {
-      setTimeout(() => {
-        focusedInputRef.current?.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center' 
-        });
-      }, 50);
+      const el = focusedInputRef.current;
+      const scroll = () => el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(scroll, 60);
+      setTimeout(scroll, 300);
+      setTimeout(scroll, 500);
     }
     prevKeyboardOpen.current = isKeyboardOpen;
   }, [isKeyboardOpen]);
