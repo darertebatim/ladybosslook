@@ -390,23 +390,8 @@ const AppTaskCreate = ({
   const newSubtaskInputRef = useRef<HTMLInputElement>(null);
   const subtaskRefs = useRef<(HTMLInputElement | null)[]>([]);
   
-  // Ref to track the currently focused input for keyboard scroll fix
-  const focusedInputRef = useRef<HTMLInputElement | null>(null);
-  const prevKeyboardOpen = useRef(false);
-  
-  // iOS keyboard scroll fix: scroll focused input into view when keyboard opens
-  useEffect(() => {
-    if (isKeyboardOpen && !prevKeyboardOpen.current && focusedInputRef.current) {
-      // Keyboard just opened - scroll the focused input into view after viewport settles
-      setTimeout(() => {
-        focusedInputRef.current?.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center' 
-        });
-      }, 50);
-    }
-    prevKeyboardOpen.current = isKeyboardOpen;
-  }, [isKeyboardOpen]);
+  // iOS keyboard scroll fix for subtask input
+  const { handleFocus: handleNewSubtaskFocus } = useKeyboardScroll(newSubtaskInputRef, { block: 'center' });
   
   // Determine the current pro link config
   const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
