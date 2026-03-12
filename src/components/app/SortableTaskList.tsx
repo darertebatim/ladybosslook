@@ -107,6 +107,7 @@ interface SortableTaskListProps {
   onOpenGoalInput: (task: UserTask) => void;
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
+  hideQuickAdd?: boolean;
 }
 
 export const SortableTaskList = ({
@@ -120,6 +121,7 @@ export const SortableTaskList = ({
   onOpenGoalInput,
   onOpenTimer,
   onOpenWaterTracking,
+  hideQuickAdd = false,
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
@@ -247,7 +249,7 @@ export const SortableTaskList = ({
         )}
 
         {/* Quick Add Card */}
-        <QuickAddCard date={date} taskCount={localTasks.length} />
+        {!hideQuickAdd && <QuickAddCard date={date} taskCount={localTasks.length} />}
       </SortableContext>
 
       {/* Drag overlay */}

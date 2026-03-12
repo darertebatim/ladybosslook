@@ -972,7 +972,7 @@ const AppHome = () => {
                         
                         {/* Spotlighted task card + hint — disable body tap so only checkbox works */}
                         <div className="relative z-[101]">
-                          <SortableTaskList tasks={filteredTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                          <SortableTaskList tasks={filteredTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                           
                           {/* Bouncing hand hint pointing at the checkbox */}
                           <div
@@ -980,7 +980,7 @@ const AppHome = () => {
                             style={{
                               top: '50%',
                               right: '52px',
-                              marginTop: '-80px',
+                              marginTop: '-24px',
                               filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
                               animation: 'coachHandBounce 1.4s ease-in-out infinite',
                               transform: 'rotate(-45deg)',
