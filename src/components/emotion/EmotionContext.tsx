@@ -9,6 +9,7 @@ import { CONTEXT_OPTIONS, getEmotionLabel, type Valence, type ContextOption } fr
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 
 // Icon mapping
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
