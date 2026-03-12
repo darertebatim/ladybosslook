@@ -66,8 +66,8 @@ const NativeAppLayout = () => {
   const { unreadCount } = useUnreadChat();
   const { showUnreadPopup, unreadMessageCount, dismissPopup, goToChat } = useChatNotifications();
   const invalidateAllEnrollmentData = useInvalidateAllEnrollmentData();
+  const { isKeyboardOpen } = useKeyboard();
 
-  // Debounce ref to prevent double invalidation from realtime + mutation success
   const lastInvalidationTime = useRef(0);
   const INVALIDATION_DEBOUNCE_MS = 2000;
 
