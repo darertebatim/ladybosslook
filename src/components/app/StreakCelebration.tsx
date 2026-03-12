@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { Flame } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { SoftReviewPrompt } from './SoftReviewPrompt';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 import streakFlameImg from '@/assets/streak-flame-3d.png';
 
 interface StreakCelebrationProps {
