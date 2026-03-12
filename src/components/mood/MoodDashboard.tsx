@@ -141,7 +141,7 @@ export function MoodDashboard() {
   }, [isAdded, neverPrompt]);
 
   const handleRoutinePromptAdd = useCallback(() => {
-    setShowRitualPrompt(false);
+    setShowRoutinePrompt(false);
     setShowRoutineSheet(true);
   }, []);
 
