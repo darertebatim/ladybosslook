@@ -848,13 +848,10 @@ const AppTaskCreate = ({
         </button>
         <div className="relative flex-1 min-w-0">
           <Input
+            ref={titleInputRef}
             value={title}
             onChange={(e) => setTitle(e.target.value.slice(0, 50))}
-            onFocus={(e) => {
-              if (Capacitor.isNativePlatform()) {
-                focusedInputRef.current = e.target;
-              }
-            }}
+            onFocus={handleTitleFocus}
             placeholder="Action name"
             className="w-full text-lg font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0 pr-6"
             maxLength={50}
