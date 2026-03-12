@@ -109,5 +109,6 @@ export const StreakRecoveryPrompt = ({
         </button>
       </div>
     </div>
+    </OverlayPortal>
   );
 };

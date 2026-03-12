@@ -137,5 +137,6 @@ export const RecoverySuccessBanner = ({
         </Button>
       </div>
     </div>
+    </OverlayPortal>
   );
 };

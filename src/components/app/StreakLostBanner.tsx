@@ -144,5 +144,6 @@ export const StreakLostBanner = ({
         )}
       </div>
     </div>
+    </OverlayPortal>
   );
 };

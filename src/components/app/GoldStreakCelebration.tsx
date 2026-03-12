@@ -260,5 +260,6 @@ export const GoldStreakCelebration = ({
         </div>
       </div>
     </div>
+    </OverlayPortal>
   );
 };

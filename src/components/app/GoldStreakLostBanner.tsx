@@ -143,5 +143,6 @@ export const GoldStreakLostBanner = ({
         )}
       </div>
     </div>
+    </OverlayPortal>
   );
 };
