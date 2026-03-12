@@ -232,15 +232,22 @@ export const SortableTaskList = ({
           {repeatingTasks.map(renderTask)}
         </div>
 
-        {/* Quick Add Card */}
-        <QuickAddCard date={date} taskCount={localTasks.length} />
+        {/* Separator between repeating and one-time tasks */}
+        {repeatingTasks.length > 0 && oneTimeTasks.length > 0 && (
+          <div className="my-3 flex items-center gap-3 px-2">
+            <div className="flex-1 h-[1px] bg-border/60" />
+          </div>
+        )}
 
         {/* One-time tasks */}
         {oneTimeTasks.length > 0 && (
-          <div className="space-y-3 mt-3">
+          <div className="space-y-3">
             {oneTimeTasks.map(renderTask)}
           </div>
         )}
+
+        {/* Quick Add Card */}
+        <QuickAddCard date={date} taskCount={localTasks.length} />
       </SortableContext>
 
       {/* Drag overlay */}
