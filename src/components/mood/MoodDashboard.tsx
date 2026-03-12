@@ -134,7 +134,7 @@ export function MoodDashboard() {
   const handleCelebrationAction = useCallback((route: string): boolean => {
     if (!isAdded && !neverPrompt) {
       setPendingRoute(route);
-      setShowRitualPrompt(true);
+      setShowRoutinePrompt(true);
       return true; // intercept
     }
     return false; // let celebration handle navigation
