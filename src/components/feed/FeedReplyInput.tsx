@@ -17,6 +17,7 @@ interface FeedReplyInputProps {
 export function FeedReplyInput({ onSend, disabled, placeholder = "Write a reply..." }: FeedReplyInputProps) {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { handleFocus } = useKeyboardScroll(textareaRef);
 
   // Auto-resize textarea based on content
   useEffect(() => {
