@@ -783,9 +783,9 @@ async function addTasksToRoutine(supabase: any, args: any) {
   };
 }
 
-async function deleteRitualTask(supabase: any, args: any) {
+async function deleteRoutineTask(supabase: any, args: any) {
   if (!args.id) {
-    return { success: false, error: "Missing task ID", action: "delete_ritual_task" };
+    return { success: false, error: "Missing task ID", action: "delete_routine_task" };
   }
 
   const { data: task } = await supabase.from("routines_bank_tasks")
@@ -798,13 +798,13 @@ async function deleteRitualTask(supabase: any, args: any) {
     .eq("id", args.id);
 
   if (error) {
-    return { success: false, error: error.message, action: "delete_ritual_task" };
+    return { success: false, error: error.message, action: "delete_routine_task" };
   }
 
   return {
     success: true,
-    action: "delete_ritual_task",
-    message: `Deleted task "${task?.title || args.id}" from ritual`,
+    action: "delete_routine_task",
+    message: `Deleted task "${task?.title || args.id}" from routine`,
   };
 }
 
