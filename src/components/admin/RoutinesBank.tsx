@@ -1391,7 +1391,7 @@ export default function RoutinesBank() {
 
                   {/* Schedule Type */}
                   <div className="space-y-2 border-t pt-4">
-                    <Label>Ritual Type</Label>
+                    <Label>Routine Type</Label>
                     <div className="grid grid-cols-2 gap-2">
                       {[
                         { value: 'daily', label: 'Normal', desc: 'Actions with their own repeat settings', icon: '☀️' },
