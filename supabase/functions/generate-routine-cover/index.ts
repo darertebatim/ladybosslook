@@ -325,7 +325,7 @@ function buildSimoraPrompt(
       if (lower.includes('energy') || lower.includes('focus') || lower.includes('reset')) return 'glowing energy orb or lightning bolt (soft)';
       return 'soft glowing sparkle';
     });
-    floatingIconsSection = `Floating icons representing the ritual's actual actions: ${iconHints.join(', ')}`;
+    floatingIconsSection = `Floating icons representing the routine's actual actions: ${iconHints.join(', ')}`;
   } else {
     floatingIconsSection = pickRandom(dna.floatingIconSets);
   }
