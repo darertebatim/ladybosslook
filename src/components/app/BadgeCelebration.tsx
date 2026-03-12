@@ -285,6 +285,7 @@ export function BadgeCelebration({
 
   // Full-screen Gold celebration modal
   return (
+    <OverlayPortal>
     <div 
       className="fixed inset-0 z-[9999] flex items-end justify-center"
     >
