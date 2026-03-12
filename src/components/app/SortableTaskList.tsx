@@ -346,6 +346,12 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
           if (e.key === 'Enter') handleSubmit();
           if (e.key === 'Escape') { setIsOpen(false); setTitle(''); }
         }}
+        onFocus={() => {
+          // Ensure input is visible above keyboard on iOS
+          setTimeout(() => {
+            inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 350);
+        }}
         onBlur={() => {
           // Delay blur to allow button taps to register first (critical for iOS)
           setTimeout(() => {
