@@ -1327,11 +1327,11 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "update_ritual_in_bank",
-          description: "Update an EXISTING ritual in the Rituals Bank. Use this when the user wants to change, edit, move category, rename, or modify a ritual. Do NOT create a new one.",
+          description: "Update an EXISTING routine in the Routines Bank. Use this when the user wants to change, edit, move category, rename, or modify a routine. Do NOT create a new one.",
           parameters: {
             type: "object",
             properties: {
-              id: { type: "string", description: "The ID of the existing ritual to update (from context)" },
+              id: { type: "string", description: "The ID of the existing routine to update (from context)" },
               title: { type: "string", description: "New title" },
               subtitle: { type: "string" },
               description: { type: "string" },
