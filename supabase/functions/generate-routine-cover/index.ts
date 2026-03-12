@@ -301,7 +301,7 @@ function buildSimoraPrompt(
   const mood = pickRandom(dna.moods);
   const colorPalette = pickRandom(dna.colors);
 
-  // Build dynamic floating icons from real actions — use the icons that represent the actual ritual tasks
+  // Build dynamic floating icons from real actions — use the icons that represent the actual routine tasks
   let floatingIconsSection: string;
   if (actionTitles.length > 0) {
     const iconHints = actionTitles.slice(0, 5).map(a => {
