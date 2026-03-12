@@ -218,7 +218,7 @@ const categoryVisualDNA: Record<string, { heroScenes: string[]; floatingIconSets
   },
   self_care: {
     heroScenes: [
-      'woman in a relaxing self-care moment, bath or skincare ritual, soft glow surrounding her',
+      'woman in a relaxing self-care moment, bath or skincare routine, soft glow surrounding her',
       'woman applying skincare with a peaceful smile, soft glowing bathroom, luxurious self-love energy',
       'woman wrapped in a soft robe with a face mask, spa-like setting, gentle self-love atmosphere',
     ],
