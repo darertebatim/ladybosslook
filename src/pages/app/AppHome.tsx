@@ -1012,6 +1012,10 @@ const AppHome = () => {
                               70%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
                               100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
                             }
+                            @keyframes checkboxGlow {
+                              0%, 100% { box-shadow: 0 0 12px 4px rgba(255,180,50,0.5), 0 0 24px 8px rgba(255,180,50,0.25); }
+                              50%      { box-shadow: 0 0 20px 8px rgba(255,180,50,0.7), 0 0 36px 14px rgba(255,180,50,0.35); }
+                            }
                           `}</style>
                           
                           <p className="text-center text-sm text-white/90 mt-5 mb-2 animate-fade-in font-medium">
