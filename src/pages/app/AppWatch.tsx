@@ -77,7 +77,7 @@ export default function AppWatch() {
     linked_playlist: null,
   };
 
-  const handleAddWatchToRituals = useCallback(() => {
+  const handleAddWatchToRoutines = useCallback(() => {
     haptic.medium();
     setShowRoutineSheet(true);
   }, []);
