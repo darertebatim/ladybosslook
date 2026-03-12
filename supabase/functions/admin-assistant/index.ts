@@ -1226,13 +1226,13 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "create_ritual_in_bank",
-          description: "Create a complete ritual in the Rituals Bank with optional sections and tasks. This IMMEDIATELY creates it in the database.",
+          description: "Create a complete routine in the Routines Bank with optional sections and tasks. This IMMEDIATELY creates it in the database.",
           parameters: {
             type: "object",
             properties: {
-              title: { type: "string", description: "Ritual title" },
+              title: { type: "string", description: "Routine title" },
               subtitle: { type: "string", description: "Short subtitle" },
-              description: { type: "string", description: "Rich HTML description of the ritual (blog-post style). Use HTML tags: <h2>, <h3>, <p>, <ul>, <ol>, <strong>, <em>. Put ALL content here, structured with headings and paragraphs. Do NOT truncate." },
+              description: { type: "string", description: "Rich HTML description of the routine (blog-post style). Use HTML tags: <h2>, <h3>, <p>, <ul>, <ol>, <strong>, <em>. Put ALL content here, structured with headings and paragraphs. Do NOT truncate." },
               category: { type: "string", description: "Category slug" },
               emoji: { type: "string", description: "Single emoji" },
               color: { type: "string", description: "Hex color" },
