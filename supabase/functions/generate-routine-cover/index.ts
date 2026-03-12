@@ -436,7 +436,7 @@ serve(async (req) => {
     console.log(`Generating cover for: "${planTitle}" | Category: ${categoryName} | Actions: [${actionTitles.join(', ')}]`);
 
     const prompt = buildSimoraPrompt(
-      planTitle || 'Wellness Ritual',
+      planTitle || 'Wellness Routine',
       planSubtitle || '',
       planDescription || '',
       categoryName || '',
