@@ -5,6 +5,7 @@ import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 import { useEffect } from 'react';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 interface RecoverySuccessBannerProps {
   open: boolean;
