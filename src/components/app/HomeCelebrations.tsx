@@ -131,7 +131,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
   const goldCelebrationShownKey = `simora_gold_celebration_shown_${todayStr}`;
 
   return (
-    <>
+    <OverlayPortal>
       <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
       <ActionLimitSheet
         open={showActionLimit}
