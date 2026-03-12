@@ -980,12 +980,12 @@ const AppHome = () => {
                               className="absolute pointer-events-none"
                               style={{
                                 top: '50%',
-                                right: '16px',
-                                width: '44px',
-                                height: '44px',
+                                right: '10px',
+                                width: '48px',
+                                height: '48px',
                                 transform: 'translateY(-50%)',
                                 borderRadius: '50%',
-                                boxShadow: '0 0 12px 4px rgba(255,180,50,0.5), 0 0 24px 8px rgba(255,180,50,0.25)',
+                                boxShadow: '0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35)',
                                 animation: 'checkboxGlow 1.6s ease-in-out infinite',
                               }}
                             />
