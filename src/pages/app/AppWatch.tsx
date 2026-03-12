@@ -90,10 +90,10 @@ export default function AppWatch() {
         editedTasks,
       });
       setShowRoutineSheet(false);
-      toast.success('Added to your rituals! 📺');
+      toast.success('Added to your routines! 📺');
     } catch (error) {
-      console.error('Failed to add ritual:', error);
-      toast.error('Failed to add to rituals');
+      console.error('Failed to add routine:', error);
+      toast.error('Failed to add to routines');
     }
   };
 
