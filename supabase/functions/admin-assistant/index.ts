@@ -1099,19 +1099,19 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 - Each action can have multiple subtasks (e.g., "Workout" → subtasks: "20 leg rises", "10 heel touches", "1 min plank").
 - Use add_subtasks_to_action to add them, delete_subtask to remove one.
 
-### RITUAL DESCRIPTION (BLOG-STYLE RICH TEXT):
-- The ritual "description" field supports **rich HTML content** (like a blog post).
+### ROUTINE DESCRIPTION (BLOG-STYLE RICH TEXT):
+- The routine "description" field supports **rich HTML content** (like a blog post).
 - When the user provides a long description, multiple paragraphs, or detailed content → put ALL of it into the "description" field.
 - Use HTML formatting: <h2>, <h3> for headings, <p> for paragraphs, <ul>/<ol> for lists, <strong>, <em> for emphasis.
-- Structure the content like a blog article with headings and paragraphs (e.g., "Why This Ritual?", "What You'll Need", "How It Works").
+- Structure the content like a blog article with headings and paragraphs (e.g., "Why This Routine?", "What You'll Need", "How It Works").
 - Do NOT truncate or shorten the user's content. Put the FULL text into description.
 - Do NOT use sections (routines_bank_sections). All content goes in the description field.
 
-### RITUAL TASKS EXPLAINED:
-- **Ritual tasks** are the individual activities within a RITUAL (routines_bank item).
-- Each ritual can have multiple tasks grouped by sections.
-- The existing tasks for each ritual are listed above in the "Existing Rituals" section.
-- Use add_tasks_to_ritual to add new tasks, delete_ritual_task to remove one.
+### ROUTINE TASKS EXPLAINED:
+- **Routine tasks** are the individual activities within a ROUTINE (routines_bank item).
+- Each routine can have multiple tasks grouped by sections.
+- The existing tasks for each routine are listed above in the "Existing Routines" section.
+- Use add_tasks_to_routine to add new tasks, delete_routine_task to remove one.
 
 ### IMPORTANT RULES:
 1. When user says "create", "add", "make" → USE the create tool to create it directly in the database
