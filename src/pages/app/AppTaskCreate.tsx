@@ -386,12 +386,16 @@ const AppTaskCreate = ({
   const [showGoalSettings, setShowGoalSettings] = useState(false);
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
   
-  // Refs for subtask inputs to scroll into view
+  // Refs for inputs to scroll into view
   const newSubtaskInputRef = useRef<HTMLInputElement>(null);
   const subtaskRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const titleInputRef = useRef<HTMLInputElement>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
   
-  // iOS keyboard scroll fix for subtask input
+  // iOS keyboard scroll fix
   const { handleFocus: handleNewSubtaskFocus } = useKeyboardScroll(newSubtaskInputRef, { block: 'center' });
+  const { handleFocus: handleTitleFocus } = useKeyboardScroll(titleInputRef, { block: 'center' });
+  const { handleFocus: handleDescriptionFocus } = useKeyboardScroll(descriptionRef, { block: 'center' });
   
   // Determine the current pro link config
   const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
