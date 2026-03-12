@@ -54,7 +54,7 @@ const categoryVisualDNA: Record<string, { heroScenes: string[]; floatingIconSets
       'dusky lavender, rose gold, soft violet, warm cream, gentle indigo',
     ],
     moods: [
-      'winding down energy, peaceful reflection, calming night ritual',
+      'winding down energy, peaceful reflection, calming night routine',
       'gentle evening unwinding, soft tranquility, restorative calm',
       'quiet evening peace, reflective mood, gentle self-care before sleep',
     ]
