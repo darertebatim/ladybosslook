@@ -672,17 +672,17 @@ async function deleteActionFromBank(supabase: any, args: any) {
   };
 }
 
-async function deleteRitualFromBank(supabase: any, args: any) {
+async function deleteRoutineFromBank(supabase: any, args: any) {
   if (!args.id) {
-    return { success: false, error: "Missing ritual ID", action: "delete_ritual_from_bank" };
+    return { success: false, error: "Missing routine ID", action: "delete_ritual_from_bank" };
   }
 
-  const resolved = await resolveRitualId(supabase, args.id);
+  const resolved = await resolveRoutineId(supabase, args.id);
   if (!resolved) {
-    return { success: false, error: `Ritual not found: "${args.id}". Make sure to use the exact UUID from context.`, action: "delete_ritual_from_bank" };
+    return { success: false, error: `Routine not found: "${args.id}". Make sure to use the exact UUID from context.`, action: "delete_ritual_from_bank" };
   }
 
-  // Delete tasks, sections, then the ritual
+  // Delete tasks, sections, then the routine
   await supabase.from("routines_bank_tasks")
     .delete()
     .eq("routine_id", resolved.id);
@@ -696,14 +696,14 @@ async function deleteRitualFromBank(supabase: any, args: any) {
     .eq("id", resolved.id);
 
   if (error) {
-    console.error("Delete ritual error:", error);
+    console.error("Delete routine error:", error);
     return { success: false, error: error.message, action: "delete_ritual_from_bank" };
   }
 
   return {
     success: true,
     action: "delete_ritual_from_bank",
-    message: `Deleted ritual "${resolved.title}" and all its tasks/sections`,
+    message: `Deleted routine "${resolved.title}" and all its tasks/sections`,
   };
 }
 
