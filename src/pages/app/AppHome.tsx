@@ -69,8 +69,8 @@ const AppHome = () => {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showActionLimit, setShowActionLimit] = useState(false);
   const [hasPromoBanner, setHasPromoBanner] = useState(false);
+  const { isKeyboardOpen } = useKeyboard();
   
-  // Goal input state
   const [goalInputTask, setGoalInputTask] = useState<UserTask | null>(null);
   const addGoalProgress = useAddGoalProgress();
   
