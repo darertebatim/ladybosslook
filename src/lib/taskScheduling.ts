@@ -112,7 +112,7 @@ export function formatTimeLabel(task: { scheduled_time?: string | null; time_per
 export function formatTimeLabelWithEmoji(task: { scheduled_time?: string | null; time_period?: string | null }): string {
   if (task.time_period) {
     const period = TIME_PERIODS.find(p => p.id === task.time_period);
-    return period ? `${period.emoji} ${period.label}` : 'Anytime';
+    return period ? period.label : 'Anytime';
   }
   if (task.scheduled_time) {
     const [hours, minutes] = task.scheduled_time.split(':');
