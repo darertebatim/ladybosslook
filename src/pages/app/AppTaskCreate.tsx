@@ -411,7 +411,22 @@ const AppTaskCreate = ({
   const { handleFocus: handleNewSubtaskFocus } = useKeyboardScroll(newSubtaskInputRef, { block: 'center' });
   const { handleFocus: handleTitleFocus } = useKeyboardScroll(titleInputRef, { block: 'center' });
   const { handleFocus: handleDescriptionFocus } = useKeyboardScroll(descriptionRef, { block: 'center' });
-  
+
+  // Subtask drag-to-reorder
+  const subtaskSensors = useSensors(
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+  );
+
+  const handleSubtaskDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = subtasks.findIndex((_, i) => `subtask-${i}` === active.id);
+    const newIndex = subtasks.findIndex((_, i) => `subtask-${i}` === over.id);
+    if (oldIndex !== -1 && newIndex !== -1) {
+      setSubtasks(arrayMove(subtasks, oldIndex, newIndex));
+      haptic.light();
+    }
+  }, [subtasks]);
   // Determine the current pro link config
   const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
 
