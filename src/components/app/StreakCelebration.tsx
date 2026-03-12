@@ -109,6 +109,7 @@ export const StreakCelebration = ({
   const progressPercent = Math.min((streakDaysThisWeek / 7) * 100, 100);
 
   return (
+    <OverlayPortal>
     <div
       className="fixed inset-0 z-[100] flex flex-col justify-end pb-[env(safe-area-inset-bottom)]"
       onClick={handleClose}
@@ -221,5 +222,6 @@ export const StreakCelebration = ({
         onAccept={handleAcceptReview}
       />
     </div>
+    </OverlayPortal>
   );
 };
