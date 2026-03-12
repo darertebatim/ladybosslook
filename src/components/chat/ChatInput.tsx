@@ -55,6 +55,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { handleFocus: keyboardScrollFocus } = useKeyboardScroll(textareaRef);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
