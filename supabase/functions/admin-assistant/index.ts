@@ -1119,7 +1119,7 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "ð
 3. Don't just describe what you'd create â€” ACTUALLY create/update it
 4. Pick appropriate emojis, categories, and colors
 5. Use existing categories from the list above (use the slug)
-6. For rituals, include tasks with relevant emojis and durations
+6. For routines, include tasks with relevant emojis and durations
 7. After creating/updating/deleting, confirm what was done with details
 8. To find the correct item ID for updates, match by title from the existing items lists above
 9. When asked to CHANGE a COLOR: you MUST pick a DIFFERENT hex color than the current one shown in context. Do NOT re-use the same color. Choose a visually distinct new color.
