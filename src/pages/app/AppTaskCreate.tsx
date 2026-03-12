@@ -690,13 +690,6 @@ const AppTaskCreate = ({
     }
   };
 
-  // Store focused input ref for iOS keyboard scroll fix
-  const handleSubtaskInputFocus = (element: HTMLInputElement | null) => {
-    if (element && Capacitor.isNativePlatform()) {
-      focusedInputRef.current = element;
-      // The useEffect watching isKeyboardOpen will handle scrolling
-    }
-  };
 
   const removeSubtask = (index: number) => {
     setSubtasks(subtasks.filter((_, i) => i !== index));
