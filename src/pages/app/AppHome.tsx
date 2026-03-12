@@ -39,6 +39,7 @@ import { useAppReview } from '@/hooks/useAppReview';
 import { hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 import { MoodCheckInBanner } from '@/components/mood/MoodCheckInBanner';
 import { OnboardingBanner } from '@/components/app/OnboardingBanner';
+import { useKeyboard } from '@/hooks/useKeyboard';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
@@ -68,8 +69,8 @@ const AppHome = () => {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showActionLimit, setShowActionLimit] = useState(false);
   const [hasPromoBanner, setHasPromoBanner] = useState(false);
+  const { isKeyboardOpen } = useKeyboard();
   
-  // Goal input state
   const [goalInputTask, setGoalInputTask] = useState<UserTask | null>(null);
   const addGoalProgress = useAddGoalProgress();
   
@@ -827,7 +828,7 @@ const AppHome = () => {
       }} />
 
         {/* Scroll container */}
-        <div className="flex-1 overflow-y-auto overscroll-contain">
+        <div className="flex-1 overflow-y-auto overscroll-contain" data-home-scroll-container="true">
           <div className="px-4 pt-6 pb-4 pb-safe">
             {/* Notification Banner - prompts users to enable notifications */}
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
@@ -1096,11 +1097,11 @@ const AppHome = () => {
           </div>
 
           {/* Extra padding for fixed bottom dashboard */}
-          <div className="h-[200px]" />
+          <div style={{ height: isKeyboardOpen ? '24px' : '200px' }} />
         </div>
 
         {/* Fixed Bottom Dashboard - only show if user has active programs */}
-        {activeRounds.length > 0 && (
+        {activeRounds.length > 0 && !isKeyboardOpen && (
           <div className="tour-programs-carousel fixed bottom-0 left-0 right-0 z-40 rounded-t shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)] bg-primary-foreground rounded-none" style={{
             paddingBottom: 'max(64px, calc(52px + env(safe-area-inset-bottom)))'
           }}>
@@ -1111,11 +1112,13 @@ const AppHome = () => {
         )}
 
         {/* FAB - positioned above the fixed bottom dashboard */}
-        <button onClick={handleFabClick} className="tour-add-task fixed right-4 w-14 h-14 rounded-full bg-urgency text-urgency-foreground shadow-cta flex items-center justify-center hover:bg-urgency-dark active:scale-95 transition-all z-50" style={{
-        bottom: 'calc(100px + env(safe-area-inset-bottom))'
-      }}>
-          <Plus className="h-6 w-6" />
-        </button>
+        {!isKeyboardOpen && (
+          <button onClick={handleFabClick} className="tour-add-task fixed right-4 w-14 h-14 rounded-full bg-urgency text-urgency-foreground shadow-cta flex items-center justify-center hover:bg-urgency-dark active:scale-95 transition-all z-50" style={{
+          bottom: 'calc(100px + env(safe-area-inset-bottom))'
+        }}>
+            <Plus className="h-6 w-6" />
+          </button>
+        )}
 
         {/* All celebrations, modals, and sheets */}
         <HomeCelebrations

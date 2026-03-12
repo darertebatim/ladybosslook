@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type { TaskColor } from '@/hooks/useTaskPlanner';
 import {
   DndContext,
@@ -21,6 +21,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
 import { UserTask, useReorderTasks, useCreateTask } from '@/hooks/useTaskPlanner';
+import { useKeyboard } from '@/hooks/useKeyboard';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
 import { Plus, MoreHorizontal } from 'lucide-react';
@@ -281,6 +282,67 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const createTask = useCreateTask();
   const navigate = useNavigate();
+  const { isKeyboardOpen } = useKeyboard();
+
+  const findScrollableParent = (element: HTMLElement | null): HTMLElement | null => {
+    let parent = element?.parentElement ?? null;
+
+    while (parent) {
+      const computedStyle = window.getComputedStyle(parent);
+      const canScroll = /(auto|scroll)/.test(computedStyle.overflowY) && parent.scrollHeight > parent.clientHeight;
+
+      if (canScroll) return parent;
+      parent = parent.parentElement;
+    }
+
+    return null;
+  };
+
+  const scrollInputIntoView = (behavior: ScrollBehavior = 'smooth') => {
+    const inputEl = inputRef.current;
+    if (!inputEl) return;
+
+    const homeScrollContainer = document.querySelector('[data-home-scroll-container="true"]') as HTMLElement | null;
+    const scrollParent = homeScrollContainer ?? findScrollableParent(inputEl);
+
+    if (scrollParent) {
+      const inputRect = inputEl.getBoundingClientRect();
+      const parentRect = scrollParent.getBoundingClientRect();
+      const preferredOffset = Math.max(24, parentRect.height * 0.28);
+      const targetTop = scrollParent.scrollTop + (inputRect.top - parentRect.top) - preferredOffset;
+
+      scrollParent.scrollTo({
+        top: Math.max(0, targetTop),
+        behavior,
+      });
+      return;
+    }
+
+    inputEl.scrollIntoView({ behavior, block: 'center', inline: 'nearest' });
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const focusTimer = window.setTimeout(() => {
+      inputRef.current?.focus();
+      scrollInputIntoView('smooth');
+    }, 60);
+
+    const settleTimer = window.setTimeout(() => {
+      scrollInputIntoView('smooth');
+    }, isKeyboardOpen ? 240 : 320);
+
+    const finalTimer = window.setTimeout(() => {
+      scrollInputIntoView('smooth');
+    }, isKeyboardOpen ? 420 : 520);
+
+    return () => {
+      window.clearTimeout(focusTimer);
+      window.clearTimeout(settleTimer);
+      window.clearTimeout(finalTimer);
+    };
+  }, [isOpen, isKeyboardOpen]);
 
   const handleSubmit = () => {
     const trimmed = title.trim();
@@ -315,13 +377,6 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
         onClick={() => {
           setIsOpen(true);
           haptic.light();
-          setTimeout(() => {
-            inputRef.current?.focus();
-            // Scroll the input into view so it's visible above the keyboard
-            setTimeout(() => {
-              inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 300);
-          }, 100);
         }}
         className="mt-3 w-full rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2 active:scale-[0.98] transition-all"
       >
@@ -347,10 +402,9 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
           if (e.key === 'Escape') { setIsOpen(false); setTitle(''); }
         }}
         onFocus={() => {
-          // Ensure input is visible above keyboard on iOS
-          setTimeout(() => {
-            inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }, 350);
+          window.setTimeout(() => {
+            scrollInputIntoView('smooth');
+          }, 120);
         }}
         onBlur={() => {
           // Delay blur to allow button taps to register first (critical for iOS)
