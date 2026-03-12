@@ -1,5 +1,6 @@
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 interface StreakGoalConfirmationProps {
   open: boolean;
