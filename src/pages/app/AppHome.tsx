@@ -828,7 +828,7 @@ const AppHome = () => {
       }} />
 
         {/* Scroll container */}
-        <div className="flex-1 overflow-y-auto overscroll-contain">
+        <div className="flex-1 overflow-y-auto overscroll-contain" data-home-scroll-container="true">
           <div className="px-4 pt-6 pb-4 pb-safe">
             {/* Notification Banner - prompts users to enable notifications */}
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
