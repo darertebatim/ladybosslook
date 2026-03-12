@@ -286,7 +286,7 @@ function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// Build a dynamic prompt using the ritual's actual actions and visual DNA
+// Build a dynamic prompt using the routine's actual actions and visual DNA
 function buildSimoraPrompt(
   title: string,
   subtitle: string,
