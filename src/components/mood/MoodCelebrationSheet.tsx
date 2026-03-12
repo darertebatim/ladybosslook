@@ -90,6 +90,7 @@ interface MoodCelebrationSheetProps {
   onOpenChange: (open: boolean) => void;
   mood: string | null;
   onDone: () => void;
+  onActionClick?: (route: string) => boolean; // return true to intercept navigation
 }
 
 export function MoodCelebrationSheet({
