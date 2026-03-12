@@ -1047,10 +1047,10 @@ export default function RoutinesBank() {
         <div>
           <CardTitle className="flex items-center gap-2">
             <Layers className="h-5 w-5" />
-            Rituals Bank
+            Routines Bank
           </CardTitle>
           <CardDescription>
-            Create and manage ritual templates with rich sections
+            Create and manage routine templates with rich sections
           </CardDescription>
         </div>
         <Button onClick={openNewDialog} className="gap-2">
