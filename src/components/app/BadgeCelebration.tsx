@@ -356,5 +356,6 @@ export function BadgeCelebration({
         </Button>
       </div>
     </div>
+    </OverlayPortal>
   );
 }
