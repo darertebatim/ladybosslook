@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 import coinGold from '@/assets/coin-gold.png';
 
