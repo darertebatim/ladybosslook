@@ -353,8 +353,8 @@ function buildSimoraPrompt(
   return `Square mobile app cover illustration for a wellness app called Simora.
 Unique seed variation: ${Math.random().toString(36).substring(7)}
 
-RITUAL: "${title}"${subtitle ? `\nSUBTITLE: "${subtitle}"` : ''}
-RITUAL ACTIONS: ${actionTitles.length > 0 ? actionTitles.slice(0, 5).join(', ') : 'general wellness actions'}
+ROUTINE: "${title}"${subtitle ? `\nSUBTITLE: "${subtitle}"` : ''}
+ROUTINE ACTIONS: ${actionTitles.length > 0 ? actionTitles.slice(0, 5).join(', ') : 'general wellness actions'}
 
 STYLE (CRITICAL — follow exactly):
 Soft pastel digital illustration, ${styleVariation}.
