@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
 import { Sparkles, Trophy } from 'lucide-react';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 import coinGold from '@/assets/coin-gold.png';
 import coinSilver from '@/assets/coin-silver.png';
