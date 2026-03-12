@@ -975,6 +975,21 @@ const AppHome = () => {
                           <div className="relative">
                             <SortableTaskList tasks={filteredTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                           
+                            {/* Glowing ring around the checkbox */}
+                            <div
+                              className="absolute pointer-events-none"
+                              style={{
+                                top: '50%',
+                                right: '16px',
+                                width: '44px',
+                                height: '44px',
+                                transform: 'translateY(-50%)',
+                                borderRadius: '50%',
+                                boxShadow: '0 0 12px 4px rgba(255,180,50,0.5), 0 0 24px 8px rgba(255,180,50,0.25)',
+                                animation: 'checkboxGlow 1.6s ease-in-out infinite',
+                              }}
+                            />
+
                             {/* Bouncing hand hint pointing at the checkbox — positioned relative to the card */}
                             <div
                               className="absolute pointer-events-none"
@@ -996,6 +1011,10 @@ const AppHome = () => {
                               55%  { transform: translateY(-100%) rotate(-45deg) translateY(5px); }
                               70%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
                               100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
+                            }
+                            @keyframes checkboxGlow {
+                              0%, 100% { box-shadow: 0 0 12px 4px rgba(255,180,50,0.5), 0 0 24px 8px rgba(255,180,50,0.25); }
+                              50%      { box-shadow: 0 0 20px 8px rgba(255,180,50,0.7), 0 0 36px 14px rgba(255,180,50,0.35); }
                             }
                           `}</style>
                           
