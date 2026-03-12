@@ -20,6 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -385,27 +386,16 @@ const AppTaskCreate = ({
   const [showGoalSettings, setShowGoalSettings] = useState(false);
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
   
-  // Refs for subtask inputs to scroll into view
+  // Refs for inputs to scroll into view
   const newSubtaskInputRef = useRef<HTMLInputElement>(null);
   const subtaskRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const titleInputRef = useRef<HTMLInputElement>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
   
-  // Ref to track the currently focused input for keyboard scroll fix
-  const focusedInputRef = useRef<HTMLInputElement | null>(null);
-  const prevKeyboardOpen = useRef(false);
-  
-  // iOS keyboard scroll fix: scroll focused input into view when keyboard opens
-  useEffect(() => {
-    if (isKeyboardOpen && !prevKeyboardOpen.current && focusedInputRef.current) {
-      // Keyboard just opened - scroll the focused input into view after viewport settles
-      setTimeout(() => {
-        focusedInputRef.current?.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center' 
-        });
-      }, 50);
-    }
-    prevKeyboardOpen.current = isKeyboardOpen;
-  }, [isKeyboardOpen]);
+  // iOS keyboard scroll fix
+  const { handleFocus: handleNewSubtaskFocus } = useKeyboardScroll(newSubtaskInputRef, { block: 'center' });
+  const { handleFocus: handleTitleFocus } = useKeyboardScroll(titleInputRef, { block: 'center' });
+  const { handleFocus: handleDescriptionFocus } = useKeyboardScroll(descriptionRef, { block: 'center' });
   
   // Determine the current pro link config
   const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
@@ -704,13 +694,6 @@ const AppTaskCreate = ({
     }
   };
 
-  // Store focused input ref for iOS keyboard scroll fix
-  const handleSubtaskInputFocus = (element: HTMLInputElement | null) => {
-    if (element && Capacitor.isNativePlatform()) {
-      focusedInputRef.current = element;
-      // The useEffect watching isKeyboardOpen will handle scrolling
-    }
-  };
 
   const removeSubtask = (index: number) => {
     setSubtasks(subtasks.filter((_, i) => i !== index));
@@ -865,13 +848,10 @@ const AppTaskCreate = ({
         </button>
         <div className="relative flex-1 min-w-0">
           <Input
+            ref={titleInputRef}
             value={title}
             onChange={(e) => setTitle(e.target.value.slice(0, 50))}
-            onFocus={(e) => {
-              if (Capacitor.isNativePlatform()) {
-                focusedInputRef.current = e.target;
-              }
-            }}
+            onFocus={handleTitleFocus}
             placeholder="Action name"
             className="w-full text-lg font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0 pr-6"
             maxLength={50}
@@ -908,13 +888,10 @@ const AppTaskCreate = ({
       {/* Description - Simple textarea with placeholder */}
       <div className="px-4 pb-3">
         <Textarea
+          ref={descriptionRef}
           value={description || ''}
           onChange={(e) => setDescription(e.target.value || null)}
-          onFocus={(e) => {
-            if (Capacitor.isNativePlatform()) {
-              focusedInputRef.current = e.target as unknown as HTMLInputElement;
-            }
-          }}
+          onFocus={handleDescriptionFocus}
           placeholder="Add a description or notes..."
           className="w-full bg-white/60 dark:bg-slate-700/60 border-0 rounded-xl resize-none text-sm placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-foreground/20 min-h-0"
           rows={2}
@@ -1094,7 +1071,7 @@ const AppTaskCreate = ({
             value={newSubtask}
             onChange={(e) => setNewSubtask(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addSubtask()}
-            onFocus={(e) => handleSubtaskInputFocus(e.target as HTMLInputElement)}
+            onFocus={handleNewSubtaskFocus}
             placeholder="Subtasks"
             className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto text-base placeholder:text-muted-foreground/50"
           />
