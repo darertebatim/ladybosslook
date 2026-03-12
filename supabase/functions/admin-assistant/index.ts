@@ -498,14 +498,14 @@ async function updateActionInBank(supabase: any, args: any) {
   };
 }
 
-async function updateRitualInBank(supabase: any, args: any) {
+async function updateRoutineInBank(supabase: any, args: any) {
   if (!args.id) {
-    return { success: false, error: "Missing ritual ID", action: "update_ritual_in_bank" };
+    return { success: false, error: "Missing routine ID", action: "update_ritual_in_bank" };
   }
 
-  const resolved = await resolveRitualId(supabase, args.id);
+  const resolved = await resolveRoutineId(supabase, args.id);
   if (!resolved) {
-    return { success: false, error: `Ritual not found: "${args.id}". Use the exact UUID from context.`, action: "update_ritual_in_bank" };
+    return { success: false, error: `Routine not found: "${args.id}". Use the exact UUID from context.`, action: "update_ritual_in_bank" };
   }
 
   const updates: Record<string, any> = {};
@@ -526,14 +526,14 @@ async function updateRitualInBank(supabase: any, args: any) {
     .single();
 
   if (error) {
-    console.error("Update ritual error:", error);
+    console.error("Update routine error:", error);
     return { success: false, error: error.message, action: "update_ritual_in_bank" };
   }
 
   return {
     success: true,
     action: "update_ritual_in_bank",
-    message: `Updated ritual "${data.title}" — color is now ${data.color}`,
+    message: `Updated routine "${data.title}" — color is now ${data.color}`,
     created: data,
   };
 }
