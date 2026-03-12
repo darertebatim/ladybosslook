@@ -1516,12 +1516,12 @@ function getToolDefinitions(currentPage?: string) {
     tools.push({
       type: "function",
       function: {
-        name: "generate_ritual_cover",
-        description: "Generate a beautiful Simora-style pastel cover image for a ritual using AI. The image is automatically uploaded and applied to the ritual. Use when user asks to create/generate a cover for a ritual.",
+        name: "generate_routine_cover",
+        description: "Generate a beautiful Simora-style pastel cover image for a routine using AI. The image is automatically uploaded and applied to the routine. Use when user asks to create/generate a cover for a routine.",
         parameters: {
           type: "object",
           properties: {
-            ritual_id: { type: "string", description: "The ID of the ritual to generate a cover for (from context)" },
+            ritual_id: { type: "string", description: "The ID of the routine to generate a cover for (from context)" },
             description: { type: "string", description: "Optional custom description to guide the image generation (e.g., 'woman meditating at sunrise with floating hearts')" },
           },
           required: ["ritual_id"],
