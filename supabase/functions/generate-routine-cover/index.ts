@@ -31,7 +31,7 @@ const categoryVisualDNA: Record<string, { heroScenes: string[]; floatingIconSets
       'coral sunrise, soft peachy orange, warm cream, golden glow, light blush',
     ],
     moods: [
-      'calm morning energy, fresh start, uplifting daily ritual',
+      'calm morning energy, fresh start, uplifting daily routine',
       'gentle awakening, warm sunrise feeling, hopeful new day',
       'energizing soft morning, joyful beginning, peaceful intention-setting',
     ]
@@ -54,7 +54,7 @@ const categoryVisualDNA: Record<string, { heroScenes: string[]; floatingIconSets
       'dusky lavender, rose gold, soft violet, warm cream, gentle indigo',
     ],
     moods: [
-      'winding down energy, peaceful reflection, calming night ritual',
+      'winding down energy, peaceful reflection, calming night routine',
       'gentle evening unwinding, soft tranquility, restorative calm',
       'quiet evening peace, reflective mood, gentle self-care before sleep',
     ]
@@ -218,7 +218,7 @@ const categoryVisualDNA: Record<string, { heroScenes: string[]; floatingIconSets
   },
   self_care: {
     heroScenes: [
-      'woman in a relaxing self-care moment, bath or skincare ritual, soft glow surrounding her',
+      'woman in a relaxing self-care moment, bath or skincare routine, soft glow surrounding her',
       'woman applying skincare with a peaceful smile, soft glowing bathroom, luxurious self-love energy',
       'woman wrapped in a soft robe with a face mask, spa-like setting, gentle self-love atmosphere',
     ],
@@ -286,7 +286,7 @@ function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// Build a dynamic prompt using the ritual's actual actions and visual DNA
+// Build a dynamic prompt using the routine's actual actions and visual DNA
 function buildSimoraPrompt(
   title: string,
   subtitle: string,
@@ -301,7 +301,7 @@ function buildSimoraPrompt(
   const mood = pickRandom(dna.moods);
   const colorPalette = pickRandom(dna.colors);
 
-  // Build dynamic floating icons from real actions — use the icons that represent the actual ritual tasks
+  // Build dynamic floating icons from real actions — use the icons that represent the actual routine tasks
   let floatingIconsSection: string;
   if (actionTitles.length > 0) {
     const iconHints = actionTitles.slice(0, 5).map(a => {
@@ -325,7 +325,7 @@ function buildSimoraPrompt(
       if (lower.includes('energy') || lower.includes('focus') || lower.includes('reset')) return 'glowing energy orb or lightning bolt (soft)';
       return 'soft glowing sparkle';
     });
-    floatingIconsSection = `Floating icons representing the ritual's actual actions: ${iconHints.join(', ')}`;
+    floatingIconsSection = `Floating icons representing the routine's actual actions: ${iconHints.join(', ')}`;
   } else {
     floatingIconsSection = pickRandom(dna.floatingIconSets);
   }
@@ -353,8 +353,8 @@ function buildSimoraPrompt(
   return `Square mobile app cover illustration for a wellness app called Simora.
 Unique seed variation: ${Math.random().toString(36).substring(7)}
 
-RITUAL: "${title}"${subtitle ? `\nSUBTITLE: "${subtitle}"` : ''}
-RITUAL ACTIONS: ${actionTitles.length > 0 ? actionTitles.slice(0, 5).join(', ') : 'general wellness actions'}
+ROUTINE: "${title}"${subtitle ? `\nSUBTITLE: "${subtitle}"` : ''}
+ROUTINE ACTIONS: ${actionTitles.length > 0 ? actionTitles.slice(0, 5).join(', ') : 'general wellness actions'}
 
 STYLE (CRITICAL — follow exactly):
 Soft pastel digital illustration, ${styleVariation}.
@@ -367,14 +367,14 @@ Think: Finch app + Fabulous app + Calm app — but MORE feminine, more emotional
 MAIN SCENE (CENTER HERO):
 ${heroScene}
 
-FLOATING ICONS (representing this ritual's actual actions):
+FLOATING ICONS (representing this routine's actual actions):
 ${floatingIconsSection}
-These small delicate icons float gently around the main character and SYMBOLIZE what the ritual is about.
+These small delicate icons float gently around the main character and SYMBOLIZE what the routine is about.
 
 CHARACTER DIRECTION (VERY IMPORTANT):
 - Gentle smiling woman, calm confident pose
 - Wellness lifestyle illustration style
-- Soft athletic or casual cozy outfit appropriate to the ritual
+- Soft athletic or casual cozy outfit appropriate to the routine
 - Warm expression, soft body language
 - Empowering feminine energy — safe, strong, and soft
 - NOT aggressive fitness energy
@@ -436,7 +436,7 @@ serve(async (req) => {
     console.log(`Generating cover for: "${planTitle}" | Category: ${categoryName} | Actions: [${actionTitles.join(', ')}]`);
 
     const prompt = buildSimoraPrompt(
-      planTitle || 'Wellness Ritual',
+      planTitle || 'Wellness Routine',
       planSubtitle || '',
       planDescription || '',
       categoryName || '',

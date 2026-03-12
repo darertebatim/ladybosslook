@@ -1047,15 +1047,15 @@ export default function RoutinesBank() {
         <div>
           <CardTitle className="flex items-center gap-2">
             <Layers className="h-5 w-5" />
-            Rituals Bank
+            Routines Bank
           </CardTitle>
           <CardDescription>
-            Create and manage ritual templates with rich sections
+            Create and manage routine templates with rich sections
           </CardDescription>
         </div>
         <Button onClick={openNewDialog} className="gap-2">
           <Plus className="h-4 w-4" />
-          New Ritual
+          New Routine
         </Button>
       </CardHeader>
       <CardContent>
@@ -1391,7 +1391,7 @@ export default function RoutinesBank() {
 
                   {/* Schedule Type */}
                   <div className="space-y-2 border-t pt-4">
-                    <Label>Ritual Type</Label>
+                    <Label>Routine Type</Label>
                     <div className="grid grid-cols-2 gap-2">
                       {[
                         { value: 'daily', label: 'Normal', desc: 'Actions with their own repeat settings', icon: '☀️' },
@@ -1995,7 +1995,7 @@ export default function RoutinesBank() {
           <DialogHeader>
             <DialogTitle>{editingSection?.isNew ? 'New Section' : 'Edit Section'}</DialogTitle>
             <DialogDescription>
-              Add descriptive content to introduce this part of the ritual
+              Add descriptive content to introduce this part of the routine
             </DialogDescription>
           </DialogHeader>
           

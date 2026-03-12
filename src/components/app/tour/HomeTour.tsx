@@ -74,13 +74,13 @@ export function HomeTour({
 
     // Banner step removed - announcements no longer part of tour
 
-    // Conditionally add suggested rituals step
+    // Conditionally add suggested routines step
     if (hasSuggestedRoutines) {
       baseSteps.push({
         id: 'rituals',
-        title: 'Suggested Rituals',
+        title: 'Suggested Routines',
         target: '.tour-suggested-ritual',
-        description: 'Quick rituals designed for you. Tap to preview and add.',
+        description: 'Quick routines designed for you. Tap to preview and add.',
         position: 'top',
         action: 'tap',
         condition: () => !!document.querySelector('.tour-suggested-ritual'),

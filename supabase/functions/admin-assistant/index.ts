@@ -26,7 +26,7 @@ function isValidUUID(value: string): boolean {
   return UUID_REGEX.test(value);
 }
 
-async function resolveRitualId(supabase: any, idOrTitle: string): Promise<{ id: string; title: string } | null> {
+async function resolveRoutineId(supabase: any, idOrTitle: string): Promise<{ id: string; title: string } | null> {
   if (isValidUUID(idOrTitle)) {
     const { data } = await supabase.from("routines_bank").select("id, title").eq("id", idOrTitle).single();
     return data;
@@ -116,9 +116,9 @@ serve(async (req) => {
       "delete_action_from_bank",
       "delete_ritual_from_bank",
       "delete_breathing_exercise",
-      "add_tasks_to_ritual",
-      "delete_ritual_task",
-      "generate_ritual_cover",
+      "add_tasks_to_routine",
+      "delete_routine_task",
+      "generate_routine_cover",
     ];
 
     const allTools = getToolDefinitions(currentPage);
@@ -298,13 +298,13 @@ async function executeToolAction(supabase: any, fnName: string, args: any): Prom
       case "create_action_in_bank":
         return await createActionInBank(supabase, args);
       case "create_ritual_in_bank":
-        return await createRitualInBank(supabase, args);
+        return await createRoutineInBank(supabase, args);
       case "create_breathing_exercise":
         return await createBreathingExercise(supabase, args);
       case "update_action_in_bank":
         return await updateActionInBank(supabase, args);
       case "update_ritual_in_bank":
-        return await updateRitualInBank(supabase, args);
+        return await updateRoutineInBank(supabase, args);
       case "update_breathing_exercise":
         return await updateBreathingExercise(supabase, args);
       case "add_subtasks_to_action":
@@ -314,15 +314,15 @@ async function executeToolAction(supabase: any, fnName: string, args: any): Prom
       case "delete_action_from_bank":
         return await deleteActionFromBank(supabase, args);
       case "delete_ritual_from_bank":
-        return await deleteRitualFromBank(supabase, args);
+        return await deleteRoutineFromBank(supabase, args);
       case "delete_breathing_exercise":
         return await deleteBreathingExerciseAction(supabase, args);
-      case "add_tasks_to_ritual":
-        return await addTasksToRitual(supabase, args);
-      case "delete_ritual_task":
-        return await deleteRitualTask(supabase, args);
-      case "generate_ritual_cover":
-        return await generateRitualCover(supabase, args);
+      case "add_tasks_to_routine":
+        return await addTasksToRoutine(supabase, args);
+      case "delete_routine_task":
+        return await deleteRoutineTask(supabase, args);
+      case "generate_routine_cover":
+        return await generateRoutineCover(supabase, args);
       default:
         return { success: false, error: `Unknown tool: ${fnName}` };
     }
@@ -360,8 +360,8 @@ async function createActionInBank(supabase: any, args: any) {
   };
 }
 
-async function createRitualInBank(supabase: any, args: any) {
-  const { data: ritual, error: ritualError } = await supabase.from("routines_bank").insert({
+async function createRoutineInBank(supabase: any, args: any) {
+  const { data: routine, error: routineError } = await supabase.from("routines_bank").insert({
     title: args.title,
     subtitle: args.subtitle || null,
     description: args.description || null,
@@ -373,9 +373,9 @@ async function createRitualInBank(supabase: any, args: any) {
     is_popular: args.is_popular || false,
   }).select("id, title, emoji, category").single();
 
-  if (ritualError) {
-    console.error("Insert ritual error:", ritualError);
-    return { success: false, error: ritualError.message, action: "create_ritual_in_bank" };
+  if (routineError) {
+    console.error("Insert routine error:", routineError);
+    return { success: false, error: routineError.message, action: "create_ritual_in_bank" };
   }
 
   const sectionMap: Record<string, string> = {};
@@ -383,7 +383,7 @@ async function createRitualInBank(supabase: any, args: any) {
     for (let i = 0; i < args.sections.length; i++) {
       const sec = args.sections[i];
       const { data: sectionData, error: secError } = await supabase.from("routines_bank_sections").insert({
-        routine_id: ritual.id,
+        routine_id: routine.id,
         title: sec.title,
         section_order: i,
         is_active: true,
@@ -402,7 +402,7 @@ async function createRitualInBank(supabase: any, args: any) {
       const sectionId = task.section_title ? sectionMap[task.section_title] : null;
       
       const { error: taskError } = await supabase.from("routines_bank_tasks").insert({
-        routine_id: ritual.id,
+        routine_id: routine.id,
         section_id: sectionId || null,
         section_title: task.section_title || null,
         title: task.title,
@@ -420,8 +420,8 @@ async function createRitualInBank(supabase: any, args: any) {
   return {
     success: true,
     action: "create_ritual_in_bank",
-    message: `Created ritual "${ritual.title}" with ${Object.keys(sectionMap).length} sections and ${taskCount} tasks`,
-    created: { ...ritual, sectionCount: Object.keys(sectionMap).length, taskCount },
+    message: `Created routine "${routine.title}" with ${Object.keys(sectionMap).length} sections and ${taskCount} tasks`,
+    created: { ...routine, sectionCount: Object.keys(sectionMap).length, taskCount },
   };
 }
 
@@ -498,14 +498,14 @@ async function updateActionInBank(supabase: any, args: any) {
   };
 }
 
-async function updateRitualInBank(supabase: any, args: any) {
+async function updateRoutineInBank(supabase: any, args: any) {
   if (!args.id) {
-    return { success: false, error: "Missing ritual ID", action: "update_ritual_in_bank" };
+    return { success: false, error: "Missing routine ID", action: "update_ritual_in_bank" };
   }
 
-  const resolved = await resolveRitualId(supabase, args.id);
+  const resolved = await resolveRoutineId(supabase, args.id);
   if (!resolved) {
-    return { success: false, error: `Ritual not found: "${args.id}". Use the exact UUID from context.`, action: "update_ritual_in_bank" };
+    return { success: false, error: `Routine not found: "${args.id}". Use the exact UUID from context.`, action: "update_ritual_in_bank" };
   }
 
   const updates: Record<string, any> = {};
@@ -526,14 +526,14 @@ async function updateRitualInBank(supabase: any, args: any) {
     .single();
 
   if (error) {
-    console.error("Update ritual error:", error);
+    console.error("Update routine error:", error);
     return { success: false, error: error.message, action: "update_ritual_in_bank" };
   }
 
   return {
     success: true,
     action: "update_ritual_in_bank",
-    message: `Updated ritual "${data.title}" — color is now ${data.color}`,
+    message: `Updated routine "${data.title}" — color is now ${data.color}`,
     created: data,
   };
 }
@@ -672,17 +672,17 @@ async function deleteActionFromBank(supabase: any, args: any) {
   };
 }
 
-async function deleteRitualFromBank(supabase: any, args: any) {
+async function deleteRoutineFromBank(supabase: any, args: any) {
   if (!args.id) {
-    return { success: false, error: "Missing ritual ID", action: "delete_ritual_from_bank" };
+    return { success: false, error: "Missing routine ID", action: "delete_ritual_from_bank" };
   }
 
-  const resolved = await resolveRitualId(supabase, args.id);
+  const resolved = await resolveRoutineId(supabase, args.id);
   if (!resolved) {
-    return { success: false, error: `Ritual not found: "${args.id}". Make sure to use the exact UUID from context.`, action: "delete_ritual_from_bank" };
+    return { success: false, error: `Routine not found: "${args.id}". Make sure to use the exact UUID from context.`, action: "delete_ritual_from_bank" };
   }
 
-  // Delete tasks, sections, then the ritual
+  // Delete tasks, sections, then the routine
   await supabase.from("routines_bank_tasks")
     .delete()
     .eq("routine_id", resolved.id);
@@ -696,14 +696,14 @@ async function deleteRitualFromBank(supabase: any, args: any) {
     .eq("id", resolved.id);
 
   if (error) {
-    console.error("Delete ritual error:", error);
+    console.error("Delete routine error:", error);
     return { success: false, error: error.message, action: "delete_ritual_from_bank" };
   }
 
   return {
     success: true,
     action: "delete_ritual_from_bank",
-    message: `Deleted ritual "${resolved.title}" and all its tasks/sections`,
+    message: `Deleted routine "${resolved.title}" and all its tasks/sections`,
   };
 }
 
@@ -733,26 +733,26 @@ async function deleteBreathingExerciseAction(supabase: any, args: any) {
   };
 }
 
-// ============= RITUAL TASK MANAGEMENT =============
+// ============= ROUTINE TASK MANAGEMENT =============
 
-async function addTasksToRitual(supabase: any, args: any) {
+async function addTasksToRoutine(supabase: any, args: any) {
   if (!args.ritual_id) {
-    return { success: false, error: "Missing ritual_id", action: "add_tasks_to_ritual" };
+    return { success: false, error: "Missing ritual_id", action: "add_tasks_to_routine" };
   }
   if (!args.tasks?.length) {
-    return { success: false, error: "No tasks provided", action: "add_tasks_to_ritual" };
+    return { success: false, error: "No tasks provided", action: "add_tasks_to_routine" };
   }
 
-  const resolved = await resolveRitualId(supabase, args.ritual_id);
+  const resolved = await resolveRoutineId(supabase, args.ritual_id);
   if (!resolved) {
-    return { success: false, error: `Ritual not found: "${args.ritual_id}". Use the exact UUID from context.`, action: "add_tasks_to_ritual" };
+    return { success: false, error: `Routine not found: "${args.ritual_id}". Use the exact UUID from context.`, action: "add_tasks_to_routine" };
   }
-  const ritualId = resolved.id;
+  const routineId = resolved.id;
 
   // Get current max task_order
   const { data: existing } = await supabase.from("routines_bank_tasks")
     .select("task_order")
-    .eq("routine_id", ritualId)
+    .eq("routine_id", routineId)
     .order("task_order", { ascending: false })
     .limit(1);
 
@@ -761,7 +761,7 @@ async function addTasksToRitual(supabase: any, args: any) {
   const inserted = [];
   for (const task of args.tasks) {
     const { data, error } = await supabase.from("routines_bank_tasks").insert({
-      routine_id: ritualId,
+      routine_id: routineId,
       section_id: task.section_id || null,
       section_title: task.section_title || null,
       title: task.title,
@@ -777,15 +777,15 @@ async function addTasksToRitual(supabase: any, args: any) {
 
   return {
     success: true,
-    action: "add_tasks_to_ritual",
-    message: `Added ${inserted.length} task(s) to ritual`,
+    action: "add_tasks_to_routine",
+    message: `Added ${inserted.length} task(s) to routine`,
     created: inserted,
   };
 }
 
-async function deleteRitualTask(supabase: any, args: any) {
+async function deleteRoutineTask(supabase: any, args: any) {
   if (!args.id) {
-    return { success: false, error: "Missing task ID", action: "delete_ritual_task" };
+    return { success: false, error: "Missing task ID", action: "delete_routine_task" };
   }
 
   const { data: task } = await supabase.from("routines_bank_tasks")
@@ -798,44 +798,44 @@ async function deleteRitualTask(supabase: any, args: any) {
     .eq("id", args.id);
 
   if (error) {
-    return { success: false, error: error.message, action: "delete_ritual_task" };
+    return { success: false, error: error.message, action: "delete_routine_task" };
   }
 
   return {
     success: true,
-    action: "delete_ritual_task",
-    message: `Deleted task "${task?.title || args.id}" from ritual`,
+    action: "delete_routine_task",
+    message: `Deleted task "${task?.title || args.id}" from routine`,
   };
 }
 
 // ============= COVER GENERATION =============
 
-async function generateRitualCover(supabase: any, args: any) {
+async function generateRoutineCover(supabase: any, args: any) {
   if (!args.ritual_id) {
-    return { success: false, error: "Missing ritual_id", action: "generate_ritual_cover" };
+    return { success: false, error: "Missing ritual_id", action: "generate_routine_cover" };
   }
 
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) {
-    return { success: false, error: "LOVABLE_API_KEY not configured", action: "generate_ritual_cover" };
+    return { success: false, error: "LOVABLE_API_KEY not configured", action: "generate_routine_cover" };
   }
 
-  const resolved = await resolveRitualId(supabase, args.ritual_id);
+  const resolved = await resolveRoutineId(supabase, args.ritual_id);
   if (!resolved) {
-    return { success: false, error: `Ritual not found: "${args.ritual_id}". Use the exact UUID from context.`, action: "generate_ritual_cover" };
+    return { success: false, error: `Routine not found: "${args.ritual_id}". Use the exact UUID from context.`, action: "generate_routine_cover" };
   }
 
-  // Fetch the ritual details
-  const { data: ritual, error: fetchError } = await supabase.from("routines_bank")
+  // Fetch the routine details
+  const { data: routine, error: fetchError } = await supabase.from("routines_bank")
     .select("id, title, subtitle, description, category, emoji")
     .eq("id", resolved.id)
     .single();
 
-  if (fetchError || !ritual) {
-    return { success: false, error: "Ritual not found", action: "generate_ritual_cover" };
+  if (fetchError || !routine) {
+    return { success: false, error: "Routine not found", action: "generate_routine_cover" };
   }
 
-  // Fetch ritual tasks for icon context
+  // Fetch routine tasks for icon context
   const { data: tasks } = await supabase.from("routines_bank_tasks")
     .select("title, emoji")
     .eq("routine_id", resolved.id)
@@ -854,7 +854,7 @@ gentle feminine wellness style, friendly digital illustration,
 soft glow and sparkles, modern wellness illustration, minimal but expressive objects.
 
 Main scene:
-${customDesc || `A cover representing "${ritual.title}"${ritual.description ? ` — ${ritual.description}` : ""}`}
+${customDesc || `A cover representing "${routine.title}"${routine.description ? ` — ${routine.description}` : ""}`}
 
 Floating around:
 ${taskIcons ? `Soft illustrated icons representing: ${taskIcons}` : "Small floating hearts, stars, and gentle sparkle elements"}
@@ -870,13 +870,13 @@ gentle purple accents, soft glow lighting.
 
 Composition:
 centered hero element, balanced clean layout,
-designed as a mobile app ritual cover.
+designed as a mobile app routine cover.
 The background gradient MUST extend to all edges — NO white borders or padding.
 
 ABSOLUTELY NO text, words, letters, or typography of any kind.
 Clean cover illustration only.`;
 
-  console.log(`[generate_ritual_cover] Generating for ritual: ${ritual.title}`);
+  console.log(`[generate_routine_cover] Generating for routine: ${routine.title}`);
 
   try {
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -896,12 +896,12 @@ Clean cover illustration only.`;
       const errText = await response.text();
       console.error("AI image generation error:", response.status, errText);
       if (response.status === 429) {
-        return { success: false, error: "Rate limit exceeded. Try again in a moment.", action: "generate_ritual_cover" };
+        return { success: false, error: "Rate limit exceeded. Try again in a moment.", action: "generate_routine_cover" };
       }
       if (response.status === 402) {
-        return { success: false, error: "AI credits exhausted.", action: "generate_ritual_cover" };
+        return { success: false, error: "AI credits exhausted.", action: "generate_routine_cover" };
       }
-      return { success: false, error: `AI error: ${response.status}`, action: "generate_ritual_cover" };
+      return { success: false, error: `AI error: ${response.status}`, action: "generate_routine_cover" };
     }
 
     const data = await response.json();
@@ -909,13 +909,13 @@ Clean cover illustration only.`;
 
     if (!imageData) {
       console.error("No image in AI response");
-      return { success: false, error: "No image was generated", action: "generate_ritual_cover" };
+      return { success: false, error: "No image was generated", action: "generate_routine_cover" };
     }
 
     // Upload to storage
     const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
     const imageBuffer = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
-    const fileName = `ritual-${resolved.id}-${Date.now()}.png`;
+    const fileName = `routine-${resolved.id}-${Date.now()}.png`;
 
     const { error: uploadError } = await supabase.storage
       .from("routine-covers")
@@ -923,34 +923,34 @@ Clean cover illustration only.`;
 
     if (uploadError) {
       console.error("Upload error:", uploadError);
-      return { success: false, error: `Upload failed: ${uploadError.message}`, action: "generate_ritual_cover" };
+      return { success: false, error: `Upload failed: ${uploadError.message}`, action: "generate_routine_cover" };
     }
 
     const { data: { publicUrl } } = supabase.storage
       .from("routine-covers")
       .getPublicUrl(fileName);
 
-    // Update the ritual with the cover URL
+    // Update the routine with the cover URL
     const { error: updateError } = await supabase.from("routines_bank")
       .update({ cover_image_url: publicUrl })
       .eq("id", resolved.id);
 
     if (updateError) {
-      console.error("Update ritual cover error:", updateError);
-      return { success: false, error: `Cover uploaded but failed to update ritual: ${updateError.message}`, action: "generate_ritual_cover" };
+      console.error("Update routine cover error:", updateError);
+      return { success: false, error: `Cover uploaded but failed to update routine: ${updateError.message}`, action: "generate_routine_cover" };
     }
 
-    console.log(`[generate_ritual_cover] Cover generated and saved: ${publicUrl}`);
+    console.log(`[generate_routine_cover] Cover generated and saved: ${publicUrl}`);
 
     return {
       success: true,
-      action: "generate_ritual_cover",
-      message: `Generated and applied Simora-style cover for "${ritual.title}"`,
-      created: { title: ritual.title, emoji: ritual.emoji, coverUrl: publicUrl },
+      action: "generate_routine_cover",
+      message: `Generated and applied Simora-style cover for "${routine.title}"`,
+      created: { title: routine.title, emoji: routine.emoji, coverUrl: publicUrl },
     };
   } catch (e) {
     console.error("Cover generation error:", e);
-    return { success: false, error: e instanceof Error ? e.message : "Unknown error", action: "generate_ritual_cover" };
+    return { success: false, error: e instanceof Error ? e.message : "Unknown error", action: "generate_routine_cover" };
   }
 }
 
@@ -983,10 +983,10 @@ async function fetchContext(supabase: any, currentPage?: string) {
     const [
       { data: categories },
       { data: recentActions },
-      { data: recentRituals },
+      { data: recentRoutines },
       { data: breathingExercises },
       { data: actionSubtasks },
-      { data: ritualTasks },
+      { data: routineTasks },
     ] = await Promise.all([
       supabase.from("routine_categories").select("id, name, slug, icon").eq("is_active", true).order("display_order"),
       supabase.from("admin_task_bank").select("id, title, emoji, category, color, description, time_period").eq("is_active", true).order("sort_order").limit(20),
@@ -998,10 +998,10 @@ async function fetchContext(supabase: any, currentPage?: string) {
 
     context.categories = categories || [];
     context.existingActions = recentActions || [];
-    context.existingRituals = recentRituals || [];
+    context.existingRoutines = recentRoutines || [];
     context.breathingExercises = breathingExercises || [];
     context.actionSubtasks = actionSubtasks || [];
-    context.ritualTasks = ritualTasks || [];
+    context.routineTasks = routineTasks || [];
   }
 
   if (currentPage === "routines") {
@@ -1053,7 +1053,7 @@ ${context.feedChannels?.map((c: any) => `- "${c.name}" (ID: ${c.id}, slug: ${c.s
 
   if (currentPage === "tools") {
     prompt += `
-## Current Page: TOOLS (Actions Bank, Rituals Bank, Breathing Exercises)
+## Current Page: TOOLS (Actions Bank, Routines Bank, Breathing Exercises)
 
 You can DIRECTLY CREATE, UPDATE, and DELETE items in the database. When the user asks you to do something, USE THE TOOLS to do it immediately.
 
@@ -1067,9 +1067,9 @@ ${context.existingActions?.slice(0, 20).map((a: any) => {
   return `- ID: "${a.id}" | ${a.emoji} ${a.title} [${a.category}] color:${a.color || 'none'} ${a.time_period ? `time:${a.time_period}` : ''}${subText}`;
 }).join("\n") || "None"}
 
-### Existing Rituals (${context.existingRituals?.length || 0} active)
-${context.existingRituals?.map((r: any) => {
-  const tasks = (context.ritualTasks || []).filter((t: any) => t.routine_id === r.id);
+### Existing Routines (${context.existingRoutines?.length || 0} active)
+${context.existingRoutines?.map((r: any) => {
+  const tasks = (context.routineTasks || []).filter((t: any) => t.routine_id === r.id);
   const taskText = tasks.length ? `\n    Tasks: ${tasks.map((t: any) => `"${t.emoji || '✅'} ${t.title}" (ID:${t.id})`).join(', ')}` : '';
   return `- ID: "${r.id}" | ${r.emoji || "🌟"} ${r.title} [${r.category}] color:${r.color || 'none'} desc:${r.description ? `"${r.description.substring(0, 100)}..."` : 'none'}${taskText}`;
 }).join("\n") || "None"}
@@ -1080,7 +1080,7 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 ### What You Can Do (DIRECT DATABASE ACTIONS):
 - "Create a morning meditation action" → create_action_in_bank
 - "Add 5 self-care actions" → call create_action_in_bank multiple times
-- "Create a morning ritual with tasks" → create_ritual_in_bank
+- "Create a morning routine with tasks" → create_ritual_in_bank
 - "Add a 4-7-8 breathing exercise" → create_breathing_exercise
 - "Change the category of X" → update_action_in_bank / update_ritual_in_bank
 - "Rename X to Y" → use the update tool with the item's ID
@@ -1088,30 +1088,30 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 - "Add subtasks to action X" → add_subtasks_to_action
 - "Remove subtask Y" → delete_subtask
 - **"Delete action X"** → delete_action_from_bank (deletes the action and its subtasks)
-- **"Delete ritual X"** → delete_ritual_from_bank (deletes the ritual, its tasks)
+- **"Delete routine X"** → delete_ritual_from_bank (deletes the routine, its tasks)
 - **"Delete breathing exercise X"** → delete_breathing_exercise
-- **"Add tasks to ritual X"** → add_tasks_to_ritual (adds new tasks to an existing ritual)
-- **"Remove task Y from ritual"** → delete_ritual_task (removes a specific task from a ritual)
-- **"Generate a cover for ritual X"** → generate_ritual_cover (generates a Simora-style pastel cover image using AI and uploads it)
+- **"Add tasks to routine X"** → add_tasks_to_routine (adds new tasks to an existing routine)
+- **"Remove task Y from routine"** → delete_routine_task (removes a specific task from a routine)
+- **"Generate a cover for routine X"** → generate_routine_cover (generates a Simora-style pastel cover image using AI and uploads it)
 
 ### SUBTASKS EXPLAINED:
 - **Subtasks** are smaller steps/checklist items that belong to an ACTION (admin_task_bank item).
 - Each action can have multiple subtasks (e.g., "Workout" → subtasks: "20 leg rises", "10 heel touches", "1 min plank").
 - Use add_subtasks_to_action to add them, delete_subtask to remove one.
 
-### RITUAL DESCRIPTION (BLOG-STYLE RICH TEXT):
-- The ritual "description" field supports **rich HTML content** (like a blog post).
+### ROUTINE DESCRIPTION (BLOG-STYLE RICH TEXT):
+- The routine "description" field supports **rich HTML content** (like a blog post).
 - When the user provides a long description, multiple paragraphs, or detailed content → put ALL of it into the "description" field.
 - Use HTML formatting: <h2>, <h3> for headings, <p> for paragraphs, <ul>/<ol> for lists, <strong>, <em> for emphasis.
-- Structure the content like a blog article with headings and paragraphs (e.g., "Why This Ritual?", "What You'll Need", "How It Works").
+- Structure the content like a blog article with headings and paragraphs (e.g., "Why This Routine?", "What You'll Need", "How It Works").
 - Do NOT truncate or shorten the user's content. Put the FULL text into description.
 - Do NOT use sections (routines_bank_sections). All content goes in the description field.
 
-### RITUAL TASKS EXPLAINED:
-- **Ritual tasks** are the individual activities within a RITUAL (routines_bank item).
-- Each ritual can have multiple tasks grouped by sections.
-- The existing tasks for each ritual are listed above in the "Existing Rituals" section.
-- Use add_tasks_to_ritual to add new tasks, delete_ritual_task to remove one.
+### ROUTINE TASKS EXPLAINED:
+- **Routine tasks** are the individual activities within a ROUTINE (routines_bank item).
+- Each routine can have multiple tasks grouped by sections.
+- The existing tasks for each routine are listed above in the "Existing Routines" section.
+- Use add_tasks_to_routine to add new tasks, delete_routine_task to remove one.
 
 ### IMPORTANT RULES:
 1. When user says "create", "add", "make" → USE the create tool to create it directly in the database
@@ -1119,7 +1119,7 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 3. Don't just describe what you'd create — ACTUALLY create/update it
 4. Pick appropriate emojis, categories, and colors
 5. Use existing categories from the list above (use the slug)
-6. For rituals, include tasks with relevant emojis and durations
+6. For routines, include tasks with relevant emojis and durations
 7. After creating/updating/deleting, confirm what was done with details
 8. To find the correct item ID for updates, match by title from the existing items lists above
 9. When asked to CHANGE a COLOR: you MUST pick a DIFFERENT hex color than the current one shown in context. Do NOT re-use the same color. Choose a visually distinct new color.
@@ -1127,11 +1127,11 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 11. When user mentions "subtasks", "steps", "checklist items" for an ACTION → use add_subtasks_to_action tool. Match the action by title to find its ID.
 12. When user asks to remove/delete a subtask → use delete_subtask with the subtask's ID from context.
 13. When user says "delete", "remove" an action/ritual/exercise → use the appropriate delete tool. Always confirm what was deleted.
-14. When user asks to add tasks to an existing ritual → use add_tasks_to_ritual. Match the ritual by title to find its ID.
-15. When user asks to remove a task from a ritual → use delete_ritual_task with the task's ID from context.
-16. When user says "generate cover", "create cover image", "make a cover" for a ritual → use generate_ritual_cover.
-17. **DESCRIPTION IS RICH TEXT (BLOG POST)**: When the user provides a long description, multiple paragraphs, or detailed content for a ritual:
-    - Put ALL content into the ritual's "description" field using HTML formatting.
+14. When user asks to add tasks to an existing routine → use add_tasks_to_routine. Match the routine by title to find its ID.
+15. When user asks to remove a task from a routine → use delete_routine_task with the task's ID from context.
+16. When user says "generate cover", "create cover image", "make a cover" for a routine → use generate_routine_cover.
+17. **DESCRIPTION IS RICH TEXT (BLOG POST)**: When the user provides a long description, multiple paragraphs, or detailed content for a routine:
+    - Put ALL content into the routine's "description" field using HTML formatting.
     - Use <h2>/<h3> for section headings, <p> for paragraphs, <ul>/<ol> for lists, <strong>/<em> for emphasis.
     - NEVER truncate or summarize — include the FULL user-provided text.
     - Structure it like a blog post with clear headings and paragraphs.
@@ -1180,7 +1180,7 @@ ${context.programs?.map((p: any) => `- ${p.title} (${p.slug}) - ${p.type}`).join
 - When on the Tools page and user asks to CREATE something, ALWAYS use the direct-action create tools
 - When user asks to CHANGE, EDIT, UPDATE, MOVE, or RENAME something, ALWAYS use the UPDATE tools with the item's ID from the context. NEVER create a duplicate.
 - When user asks to DELETE or REMOVE something, use the appropriate DELETE tool with the item's ID from context.
-- The IDs listed in "Existing Actions/Rituals/Exercises" above are real database IDs — use them for updates and deletes
+- The IDs listed in "Existing Actions/Routines/Exercises" above are real database IDs — use them for updates and deletes
 - Use appropriate emojis for each item
 - Match Ladyboss brand: warm, empowering, wellness-focused
 - For bilingual: English first, then Farsi if requested
@@ -1226,13 +1226,13 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "create_ritual_in_bank",
-          description: "Create a complete ritual in the Rituals Bank with optional sections and tasks. This IMMEDIATELY creates it in the database.",
+          description: "Create a complete routine in the Routines Bank with optional sections and tasks. This IMMEDIATELY creates it in the database.",
           parameters: {
             type: "object",
             properties: {
-              title: { type: "string", description: "Ritual title" },
+              title: { type: "string", description: "Routine title" },
               subtitle: { type: "string", description: "Short subtitle" },
-              description: { type: "string", description: "Rich HTML description of the ritual (blog-post style). Use HTML tags: <h2>, <h3>, <p>, <ul>, <ol>, <strong>, <em>. Put ALL content here, structured with headings and paragraphs. Do NOT truncate." },
+              description: { type: "string", description: "Rich HTML description of the routine (blog-post style). Use HTML tags: <h2>, <h3>, <p>, <ul>, <ol>, <strong>, <em>. Put ALL content here, structured with headings and paragraphs. Do NOT truncate." },
               category: { type: "string", description: "Category slug" },
               emoji: { type: "string", description: "Single emoji" },
               color: { type: "string", description: "Hex color" },
@@ -1240,7 +1240,7 @@ function getToolDefinitions(currentPage?: string) {
               is_popular: { type: "boolean", description: "Mark as popular" },
               sections: {
                 type: "array",
-                description: "Ritual sections (optional groupings)",
+                description: "Routine sections (optional groupings)",
                 items: {
                   type: "object",
                   properties: {
@@ -1251,7 +1251,7 @@ function getToolDefinitions(currentPage?: string) {
               },
               tasks: {
                 type: "array",
-                description: "Tasks/actions within the ritual",
+                description: "Tasks/actions within the routine",
                 items: {
                   type: "object",
                   properties: {
@@ -1327,11 +1327,11 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "update_ritual_in_bank",
-          description: "Update an EXISTING ritual in the Rituals Bank. Use this when the user wants to change, edit, move category, rename, or modify a ritual. Do NOT create a new one.",
+          description: "Update an EXISTING routine in the Routines Bank. Use this when the user wants to change, edit, move category, rename, or modify a routine. Do NOT create a new one.",
           parameters: {
             type: "object",
             properties: {
-              id: { type: "string", description: "The ID of the existing ritual to update (from context)" },
+              id: { type: "string", description: "The ID of the existing routine to update (from context)" },
               title: { type: "string", description: "New title" },
               subtitle: { type: "string" },
               description: { type: "string" },
@@ -1437,11 +1437,11 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "delete_ritual_from_bank",
-          description: "Permanently DELETE a ritual from the Rituals Bank including all its tasks and sections. Use when user says 'delete', 'remove' a ritual.",
+          description: "Permanently DELETE a routine from the Routines Bank including all its tasks and sections. Use when user says 'delete', 'remove' a routine.",
           parameters: {
             type: "object",
             properties: {
-              id: { type: "string", description: "The ID of the ritual to delete (from context)" },
+              id: { type: "string", description: "The ID of the routine to delete (from context)" },
             },
             required: ["id"],
           },
@@ -1463,17 +1463,17 @@ function getToolDefinitions(currentPage?: string) {
       },
     );
 
-    // Ritual task management tools
+    // Routine task management tools
     tools.push(
       {
         type: "function",
         function: {
-          name: "add_tasks_to_ritual",
-          description: "Add new tasks to an EXISTING ritual in the Rituals Bank. Use when user wants to add more tasks/activities to a ritual that already exists.",
+          name: "add_tasks_to_routine",
+          description: "Add new tasks to an EXISTING routine in the Routines Bank. Use when user wants to add more tasks/activities to a routine that already exists.",
           parameters: {
             type: "object",
             properties: {
-              ritual_id: { type: "string", description: "The ID of the ritual to add tasks to (from context)" },
+              ritual_id: { type: "string", description: "The ID of the routine to add tasks to (from context)" },
               tasks: {
                 type: "array",
                 description: "Tasks to add to the ritual",
@@ -1499,8 +1499,8 @@ function getToolDefinitions(currentPage?: string) {
       {
         type: "function",
         function: {
-          name: "delete_ritual_task",
-          description: "Delete a specific task from a ritual. Use the task's ID from context.",
+          name: "delete_routine_task",
+          description: "Delete a specific task from a routine. Use the task's ID from context.",
           parameters: {
             type: "object",
             properties: {
@@ -1516,12 +1516,12 @@ function getToolDefinitions(currentPage?: string) {
     tools.push({
       type: "function",
       function: {
-        name: "generate_ritual_cover",
-        description: "Generate a beautiful Simora-style pastel cover image for a ritual using AI. The image is automatically uploaded and applied to the ritual. Use when user asks to create/generate a cover for a ritual.",
+        name: "generate_routine_cover",
+        description: "Generate a beautiful Simora-style pastel cover image for a routine using AI. The image is automatically uploaded and applied to the routine. Use when user asks to create/generate a cover for a routine.",
         parameters: {
           type: "object",
           properties: {
-            ritual_id: { type: "string", description: "The ID of the ritual to generate a cover for (from context)" },
+            ritual_id: { type: "string", description: "The ID of the routine to generate a cover for (from context)" },
             description: { type: "string", description: "Optional custom description to guide the image generation (e.g., 'woman meditating at sunrise with floating hearts')" },
           },
           required: ["ritual_id"],

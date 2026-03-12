@@ -124,7 +124,7 @@ export const TaskCard = memo(function TaskCard({
     // Prevent completing tasks for future dates - show toast message
     if (isFutureDate) {
       haptic.light();
-      toast("Let's focus on today's rituals.", {
+      toast("Let's focus on today's routines.", {
         description: "You can honor this action when the day comes.",
         duration: 3000,
       });
@@ -158,7 +158,7 @@ export const TaskCard = memo(function TaskCard({
     
     if (isFutureDate) {
       haptic.light();
-      toast("Let's focus on today's rituals.", {
+      toast("Let's focus on today's routines.", {
         description: "You can track this goal when the day comes.",
         duration: 3000,
       });
@@ -201,7 +201,7 @@ export const TaskCard = memo(function TaskCard({
     
     if (isFutureDate) {
       haptic.light();
-      toast("Let's focus on today's rituals.", {
+      toast("Let's focus on today's routines.", {
         description: "You can start this timer when the day comes.",
         duration: 3000,
       });

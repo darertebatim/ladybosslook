@@ -84,7 +84,7 @@ export function MoodDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
-  const [showRitualPrompt, setShowRitualPrompt] = useState(false);
+  const [showRoutinePrompt, setShowRoutinePrompt] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const [neverPrompt] = useState(() => localStorage.getItem('mood_routine_never') === 'true');
   const [pendingRoute, setPendingRoute] = useState<string | null>(null);
@@ -134,19 +134,19 @@ export function MoodDashboard() {
   const handleCelebrationAction = useCallback((route: string): boolean => {
     if (!isAdded && !neverPrompt) {
       setPendingRoute(route);
-      setShowRitualPrompt(true);
+      setShowRoutinePrompt(true);
       return true; // intercept
     }
     return false; // let celebration handle navigation
   }, [isAdded, neverPrompt]);
 
   const handleRoutinePromptAdd = useCallback(() => {
-    setShowRitualPrompt(false);
+    setShowRoutinePrompt(false);
     setShowRoutineSheet(true);
   }, []);
 
   const handleRoutinePromptSkip = useCallback(() => {
-    setShowRitualPrompt(false);
+    setShowRoutinePrompt(false);
     if (pendingRoute) {
       navigate(pendingRoute);
       setPendingRoute(null);
@@ -155,7 +155,7 @@ export function MoodDashboard() {
 
   const handleRoutinePromptNever = useCallback(() => {
     localStorage.setItem('mood_routine_never', 'true');
-    setShowRitualPrompt(false);
+    setShowRoutinePrompt(false);
     if (pendingRoute) {
       navigate(pendingRoute);
       setPendingRoute(null);
@@ -179,7 +179,7 @@ export function MoodDashboard() {
         editedTasks,
         syntheticTasks: [SYNTHETIC_MOOD_TASK],
       });
-      toast.success('Mood check-in added to your rituals!');
+      toast.success('Mood check-in added to your routines!');
       setShowRoutineSheet(false);
       setJustAdded(true);
       // Navigate to pending route after adding
@@ -188,8 +188,8 @@ export function MoodDashboard() {
         setPendingRoute(null);
       }
     } catch (error) {
-      console.error('Failed to add ritual:', error);
-      toast.error('Failed to add ritual');
+      console.error('Failed to add routine:', error);
+      toast.error('Failed to add routine');
     }
   };
 
@@ -301,7 +301,7 @@ export function MoodDashboard() {
               {isSubmitting ? 'Saving...' : (selectedMoodData?.buttonText || 'I feel...')}
             </Button>
 
-            {/* Add to Rituals Button - icon only */}
+            {/* Add to Routines Button - icon only */}
             <AddedToRoutineButton
               isAdded={!!isAdded}
               onAddClick={handleRoutineClick}
@@ -326,8 +326,8 @@ export function MoodDashboard() {
 
       {/* Routine Prompt Sheet - shown before celebration if not in routine */}
       <MoodRoutinePromptSheet
-        open={showRitualPrompt}
-        onOpenChange={setShowRitualPrompt}
+        open={showRoutinePrompt}
+        onOpenChange={setShowRoutinePrompt}
         mood={selectedMood}
         onAddToRoutine={handleRoutinePromptAdd}
         onSkip={handleRoutinePromptSkip}

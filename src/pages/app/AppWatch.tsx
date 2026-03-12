@@ -57,7 +57,7 @@ export default function AppWatch() {
     setScrollY(e.currentTarget.scrollTop);
   }, []);
 
-  // Add to rituals
+  // Add to routines
   const { data: isWatchAdded } = useExistingProTask('route', '/app/watch');
   const addPlanMutation = useAddRoutinePlan();
 
@@ -77,7 +77,7 @@ export default function AppWatch() {
     linked_playlist: null,
   };
 
-  const handleAddWatchToRituals = useCallback(() => {
+  const handleAddWatchToRoutines = useCallback(() => {
     haptic.medium();
     setShowRoutineSheet(true);
   }, []);
@@ -90,10 +90,10 @@ export default function AppWatch() {
         editedTasks,
       });
       setShowRoutineSheet(false);
-      toast.success('Added to your rituals! 📺');
+      toast.success('Added to your routines! 📺');
     } catch (error) {
-      console.error('Failed to add ritual:', error);
-      toast.error('Failed to add to rituals');
+      console.error('Failed to add routine:', error);
+      toast.error('Failed to add to routines');
     }
   };
 
@@ -249,7 +249,7 @@ export default function AppWatch() {
               <>
                 <h1 className="text-xl font-bold text-white tracking-tight">Watch</h1>
                 <div className="flex items-center gap-1">
-                  <AddedToRoutineButton isAdded={!!isWatchAdded} onAddClick={handleAddWatchToRituals} iconOnly />
+                  <AddedToRoutineButton isAdded={!!isWatchAdded} onAddClick={handleAddWatchToRoutines} iconOnly />
                   <button onClick={() => setShowSearch(true)} className="p-2 -mr-2">
                     <Search className="h-5 w-5 text-white/70" />
                   </button>
