@@ -541,16 +541,21 @@ export const useCreateTask = () => {
       let finalOrderIndex = taskData.order_index;
       if (finalOrderIndex === -1) {
         finalOrderIndex = 0;
-        // Increment order_index for all existing one-time tasks for this date
-        const repeatPattern = taskData.repeat_pattern || 'none';
-        if (repeatPattern === 'none' && taskData.scheduled_date) {
-          await supabase.rpc('increment_task_order_indices', {
-            p_user_id: user.id,
-            p_scheduled_date: taskData.scheduled_date,
-          }).then(() => {}).catch(() => {
-            // Non-critical: if RPC doesn't exist, tasks still get created
-            console.warn('[CreateTask] Could not shift order indices');
-          });
+        // Shift existing one-time tasks down so new task appears at top
+        if (taskData.scheduled_date) {
+          const { data: existing } = await supabase
+            .from('user_tasks')
+            .select('id, order_index')
+            .eq('user_id', user.id)
+            .eq('repeat_pattern', 'none')
+            .eq('is_active', true);
+          if (existing && existing.length > 0) {
+            await Promise.all(
+              existing.map(t =>
+                supabase.from('user_tasks').update({ order_index: (t.order_index ?? 0) + 1 }).eq('id', t.id)
+              )
+            );
+          }
         }
       }
 
