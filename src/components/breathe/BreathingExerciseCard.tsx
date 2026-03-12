@@ -64,12 +64,12 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
         editedTasks,
         syntheticTasks: [syntheticTask],
       });
-      toast.success(`${exercise.name} added to your rituals!`);
+      toast.success(`${exercise.name} added to your routines!`);
       setShowRoutineSheet(false);
       setJustAdded(true);
     } catch (error) {
-      console.error('Failed to add ritual:', error);
-      toast.error('Failed to add ritual');
+      console.error('Failed to add routine:', error);
+      toast.error('Failed to add routine');
     }
   };
 
