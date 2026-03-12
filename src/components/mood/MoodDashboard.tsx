@@ -179,7 +179,7 @@ export function MoodDashboard() {
         editedTasks,
         syntheticTasks: [SYNTHETIC_MOOD_TASK],
       });
-      toast.success('Mood check-in added to your rituals!');
+      toast.success('Mood check-in added to your routines!');
       setShowRoutineSheet(false);
       setJustAdded(true);
       // Navigate to pending route after adding
@@ -188,8 +188,8 @@ export function MoodDashboard() {
         setPendingRoute(null);
       }
     } catch (error) {
-      console.error('Failed to add ritual:', error);
-      toast.error('Failed to add ritual');
+      console.error('Failed to add routine:', error);
+      toast.error('Failed to add routine');
     }
   };
 
