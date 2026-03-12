@@ -14,6 +14,7 @@ import {
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
+import { playCompletionSound } from '@/lib/completionSound';
 import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
 import { isWaterTask } from '@/lib/waterTracking';
