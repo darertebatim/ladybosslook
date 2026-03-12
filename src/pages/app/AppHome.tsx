@@ -980,12 +980,12 @@ const AppHome = () => {
                               className="absolute pointer-events-none"
                               style={{
                                 top: '50%',
-                                right: '16px',
-                                width: '44px',
-                                height: '44px',
+                                right: '10px',
+                                width: '48px',
+                                height: '48px',
                                 transform: 'translateY(-50%)',
                                 borderRadius: '50%',
-                                boxShadow: '0 0 12px 4px rgba(255,180,50,0.5), 0 0 24px 8px rgba(255,180,50,0.25)',
+                                boxShadow: '0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35)',
                                 animation: 'checkboxGlow 1.6s ease-in-out infinite',
                               }}
                             />
@@ -1013,8 +1013,8 @@ const AppHome = () => {
                               100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
                             }
                             @keyframes checkboxGlow {
-                              0%, 100% { box-shadow: 0 0 12px 4px rgba(255,180,50,0.5), 0 0 24px 8px rgba(255,180,50,0.25); }
-                              50%      { box-shadow: 0 0 20px 8px rgba(255,180,50,0.7), 0 0 36px 14px rgba(255,180,50,0.35); }
+                              0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
+                              50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
                             }
                           `}</style>
                           
