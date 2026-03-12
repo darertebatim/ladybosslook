@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Capacitor } from '@capacitor/core';
 import { Camera as CapacitorCamera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 import { detectVideoType, getVideoPlatformLabel } from '@/lib/videoUtils';
 
 const ACTION_TYPES = [
