@@ -1032,12 +1032,46 @@ const AppHome = () => {
                         {filteredTasks.length > 0 && (
                           <div className="relative z-[101]">
                             <div className="relative">
-                              <SortableTaskList tasks={[filteredTasks[0]]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
-                              {/* Pointing finger absolutely positioned over the card */}
-                              <div className="absolute inset-0 flex items-start justify-center pointer-events-none animate-bounce" style={{ top: '-5rem' }}>
-                                <span className="text-8xl" style={{ transform: 'rotate(135deg)', display: 'inline-block' }}>☝️</span>
+                              <SortableTaskList tasks={[filteredTasks[0]]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                              
+                              {/* Glowing highlight on the card center */}
+                              <div
+                                className="absolute pointer-events-none"
+                                style={{
+                                  top: '50%',
+                                  left: '50%',
+                                  width: '80%',
+                                  height: '100%',
+                                  transform: 'translate(-50%, -50%)',
+                                  borderRadius: '24px',
+                                  boxShadow: '0 0 16px 6px rgba(255,255,255,0.5), 0 0 32px 12px rgba(255,255,255,0.25)',
+                                  animation: 'checkboxGlow 1.6s ease-in-out infinite',
+                                }}
+                              />
+
+                              {/* Bouncing hand hint — positioned relative to the card */}
+                              <div
+                                className="absolute pointer-events-none"
+                                style={{
+                                  top: '50%',
+                                  left: '50%',
+                                  transform: 'translate(-50%, -120%)',
+                                  filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
+                                  animation: 'tapCoachBounce 1.4s ease-in-out infinite',
+                                }}
+                              >
+                                <span className="text-7xl" style={{ display: 'inline-block' }}>👆</span>
                               </div>
                             </div>
+                            <style>{`
+                              @keyframes tapCoachBounce {
+                                0%   { transform: translate(-50%, -120%) translateY(0px); }
+                                40%  { transform: translate(-50%, -120%) translateY(8px); }
+                                55%  { transform: translate(-50%, -120%) translateY(4px); }
+                                70%  { transform: translate(-50%, -120%) translateY(8px); }
+                                100% { transform: translate(-50%, -120%) translateY(0px); }
+                              }
+                            `}</style>
                             <p className="text-center text-sm text-white/90 mt-3 mb-2 animate-fade-in font-medium">
                               Tap on an action to edit, skip, or delete it
                             </p>
@@ -1046,7 +1080,7 @@ const AppHome = () => {
                         {/* Remaining tasks behind the overlay */}
                         {filteredTasks.length > 1 && (
                           <div className="relative z-[1]">
-                            <SortableTaskList tasks={filteredTasks.slice(1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                            <SortableTaskList tasks={filteredTasks.slice(1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                           </div>
                         )}
                       </>
