@@ -37,6 +37,7 @@ import {
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 import { Capacitor } from '@capacitor/core';
+import { haptic } from '@/lib/haptics';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
