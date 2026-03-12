@@ -119,7 +119,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
           {/* Badge */}
           <div className="flex items-center gap-1.5 mt-0.5">
             {routine.is_free ? (
-              <Badge className="bg-green-500 hover:bg-green-500 text-white rounded-full text-[10px] px-1.5 py-0 shadow-sm h-4 font-semibold">
+              <Badge className="rounded-full text-[10px] px-1.5 py-0 shadow-sm h-4 font-semibold text-black border-0" style={{ backgroundColor: '#E8F5A3' }}>
                 FREE
               </Badge>
             ) : (
