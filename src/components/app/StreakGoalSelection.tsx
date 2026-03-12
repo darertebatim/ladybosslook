@@ -3,6 +3,7 @@ import { Flame, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 export type StreakGoalValue = 7 | 14 | 30 | 50;
 
