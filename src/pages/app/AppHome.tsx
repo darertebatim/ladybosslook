@@ -1073,6 +1073,10 @@ const AppHome = () => {
                                 70%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
                                 100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
                               }
+                              @keyframes checkboxGlow {
+                                0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
+                                50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
+                              }
                             `}</style>
                             <p className="text-center text-sm text-white/90 mt-3 mb-2 animate-fade-in font-medium">
                               Tap on an action to edit, skip, or delete it
