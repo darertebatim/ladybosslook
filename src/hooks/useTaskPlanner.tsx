@@ -271,8 +271,8 @@ export const useTasksForDate = (date: Date) => {
         return a.order_index - b.order_index;
       }
       
-      if (aHasPeriod && !bHasPeriod) return -1;
-      if (!aHasPeriod && bHasPeriod) return 1;
+      if (aHasPeriod && !bHasPeriod) return 1;
+      if (!aHasPeriod && bHasPeriod) return -1;
       
       return a.order_index - b.order_index;
     }
