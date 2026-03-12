@@ -972,29 +972,30 @@ const AppHome = () => {
                         
                         {/* Spotlighted task card + hint — disable body tap so only checkbox works */}
                         <div className="relative z-[101]">
-                          <SortableTaskList tasks={filteredTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                          <div className="relative">
+                            <SortableTaskList tasks={filteredTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                           
-                          {/* Bouncing hand hint pointing at the checkbox */}
-                          <div
-                            className="absolute pointer-events-none"
-                            style={{
-                              top: '50%',
-                              right: '52px',
-                              marginTop: '-100px',
-                              filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
-                              animation: 'coachHandBounce 1.4s ease-in-out infinite',
-                              transform: 'rotate(-45deg)',
-                            }}
-                          >
-                            <FluentEmoji emoji="👇" size={64} />
+                            {/* Bouncing hand hint pointing at the checkbox — positioned relative to the card */}
+                            <div
+                              className="absolute pointer-events-none"
+                              style={{
+                                top: '50%',
+                                right: '52px',
+                                transform: 'translateY(-100%) rotate(-45deg)',
+                                filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
+                                animation: 'coachHandBounce 1.4s ease-in-out infinite',
+                              }}
+                            >
+                              <FluentEmoji emoji="👇" size={64} />
+                            </div>
                           </div>
                           <style>{`
                             @keyframes coachHandBounce {
-                              0%   { transform: rotate(-45deg) translateY(0px); }
-                              40%  { transform: rotate(-45deg) translateY(10px); }
-                              55%  { transform: rotate(-45deg) translateY(5px); }
-                              70%  { transform: rotate(-45deg) translateY(10px); }
-                              100% { transform: rotate(-45deg) translateY(0px); }
+                              0%   { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
+                              40%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
+                              55%  { transform: translateY(-100%) rotate(-45deg) translateY(5px); }
+                              70%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
+                              100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
                             }
                           `}</style>
                           
