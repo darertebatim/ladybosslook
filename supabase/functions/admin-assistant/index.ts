@@ -1463,17 +1463,17 @@ function getToolDefinitions(currentPage?: string) {
       },
     );
 
-    // Ritual task management tools
+    // Routine task management tools
     tools.push(
       {
         type: "function",
         function: {
-          name: "add_tasks_to_ritual",
-          description: "Add new tasks to an EXISTING ritual in the Rituals Bank. Use when user wants to add more tasks/activities to a ritual that already exists.",
+          name: "add_tasks_to_routine",
+          description: "Add new tasks to an EXISTING routine in the Routines Bank. Use when user wants to add more tasks/activities to a routine that already exists.",
           parameters: {
             type: "object",
             properties: {
-              ritual_id: { type: "string", description: "The ID of the ritual to add tasks to (from context)" },
+              ritual_id: { type: "string", description: "The ID of the routine to add tasks to (from context)" },
               tasks: {
                 type: "array",
                 description: "Tasks to add to the ritual",
