@@ -116,9 +116,9 @@ serve(async (req) => {
       "delete_action_from_bank",
       "delete_ritual_from_bank",
       "delete_breathing_exercise",
-      "add_tasks_to_ritual",
-      "delete_ritual_task",
-      "generate_ritual_cover",
+      "add_tasks_to_routine",
+      "delete_routine_task",
+      "generate_routine_cover",
     ];
 
     const allTools = getToolDefinitions(currentPage);
