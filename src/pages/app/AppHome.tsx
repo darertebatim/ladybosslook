@@ -1054,7 +1054,7 @@ const AppHome = () => {
                                 className="absolute pointer-events-none"
                                 style={{
                                   top: '50%',
-                                  left: '100px',
+                                  left: '70px',
                                   transform: 'translateY(-100%) rotate(-45deg)',
                                   filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
                                   animation: 'tapCoachBounce 1.4s ease-in-out infinite',
