@@ -504,7 +504,7 @@ export const TaskCard = memo(function TaskCard({
                 {completedCount}/{totalSubtasks}
               </span>
             )}
-            <span className="text-[11px] text-black/80">{formatTime(task)}</span>
+            <span className="text-[11px] leading-normal text-black/80">{formatTime(task)}</span>
             <span className="text-[11px] text-black/80">• {repeatLabel}</span>
             {hasGoal && (
               <span className="text-[11px] text-black/80 font-medium">• {(() => {
