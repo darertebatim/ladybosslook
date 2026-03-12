@@ -57,7 +57,7 @@ export default function AppWatch() {
     setScrollY(e.currentTarget.scrollTop);
   }, []);
 
-  // Add to rituals
+  // Add to routines
   const { data: isWatchAdded } = useExistingProTask('route', '/app/watch');
   const addPlanMutation = useAddRoutinePlan();
 
