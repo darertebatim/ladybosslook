@@ -340,6 +340,7 @@ export function MoodDashboard() {
         onOpenChange={setShowCelebration}
         mood={selectedMood}
         onDone={handleCelebrationDone}
+        onActionClick={handleCelebrationAction}
       />
     </>
   );
