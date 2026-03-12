@@ -193,5 +193,6 @@ export const StreakGoalSelection = ({
         </div>
       </div>
     </div>
+    </OverlayPortal>
   );
 };

@@ -117,5 +117,6 @@ export const StreakGoalCompletionCelebration = ({
         </div>
       </div>
     </div>
+    </OverlayPortal>
   );
 };

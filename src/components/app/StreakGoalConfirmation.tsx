@@ -147,5 +147,6 @@ export function StreakGoalConfirmation({ open, goal, onClose }: StreakGoalConfir
         </button>
       </div>
     </div>
+    </OverlayPortal>
   );
 }
