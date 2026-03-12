@@ -1080,7 +1080,7 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 ### What You Can Do (DIRECT DATABASE ACTIONS):
 - "Create a morning meditation action" → create_action_in_bank
 - "Add 5 self-care actions" → call create_action_in_bank multiple times
-- "Create a morning ritual with tasks" → create_ritual_in_bank
+- "Create a morning routine with tasks" → create_ritual_in_bank
 - "Add a 4-7-8 breathing exercise" → create_breathing_exercise
 - "Change the category of X" → update_action_in_bank / update_ritual_in_bank
 - "Rename X to Y" → use the update tool with the item's ID
@@ -1088,11 +1088,11 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 - "Add subtasks to action X" → add_subtasks_to_action
 - "Remove subtask Y" → delete_subtask
 - **"Delete action X"** → delete_action_from_bank (deletes the action and its subtasks)
-- **"Delete ritual X"** → delete_ritual_from_bank (deletes the ritual, its tasks)
+- **"Delete routine X"** → delete_ritual_from_bank (deletes the routine, its tasks)
 - **"Delete breathing exercise X"** → delete_breathing_exercise
-- **"Add tasks to ritual X"** → add_tasks_to_ritual (adds new tasks to an existing ritual)
-- **"Remove task Y from ritual"** → delete_ritual_task (removes a specific task from a ritual)
-- **"Generate a cover for ritual X"** → generate_ritual_cover (generates a Simora-style pastel cover image using AI and uploads it)
+- **"Add tasks to routine X"** → add_tasks_to_routine (adds new tasks to an existing routine)
+- **"Remove task Y from routine"** → delete_routine_task (removes a specific task from a routine)
+- **"Generate a cover for routine X"** → generate_routine_cover (generates a Simora-style pastel cover image using AI and uploads it)
 
 ### SUBTASKS EXPLAINED:
 - **Subtasks** are smaller steps/checklist items that belong to an ACTION (admin_task_bank item).
