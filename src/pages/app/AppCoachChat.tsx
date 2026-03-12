@@ -220,9 +220,10 @@ export default function AppCoachChat() {
 
   useEffect(() => {
     if (isKeyboardOpen && messages.length > 0) {
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      const scroll = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(scroll, 60);
+      setTimeout(scroll, 300);
+      setTimeout(scroll, 500);
     }
   }, [isKeyboardOpen, messages.length]);
 

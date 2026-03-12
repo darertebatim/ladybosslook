@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 
 interface FeedReplyInputProps {
   onSend: (message: string) => void;
@@ -16,6 +17,7 @@ interface FeedReplyInputProps {
 export function FeedReplyInput({ onSend, disabled, placeholder = "Write a reply..." }: FeedReplyInputProps) {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { handleFocus } = useKeyboardScroll(textareaRef);
 
   // Auto-resize textarea based on content
   useEffect(() => {
@@ -69,6 +71,7 @@ export function FeedReplyInput({ onSend, disabled, placeholder = "Write a reply.
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
+          onFocus={handleFocus}
           placeholder={placeholder}
           disabled={disabled}
           className="min-h-[32px] max-h-24 resize-none text-[15px] leading-[22px] bg-transparent border-0 focus-visible:ring-0 p-0 py-1"

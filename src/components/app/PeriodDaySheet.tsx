@@ -9,6 +9,7 @@ import { haptic } from '@/lib/haptics';
 import { PeriodLog, SYMPTOM_OPTIONS, FLOW_OPTIONS } from '@/lib/periodTracking';
 import { Trash2 } from 'lucide-react';
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 
 interface PeriodDaySheetProps {
   open: boolean;
@@ -57,26 +58,8 @@ export const PeriodDaySheet = ({
     }
   }, [open, existingLog]);
 
-  // Handle keyboard for notes - multi-stage scroll for iOS
-  const handleNotesFocus = () => {
-    const scrollIntoView = () => {
-      notesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    };
-    
-    // Initial delay for keyboard to start appearing
-    setTimeout(scrollIntoView, 100);
-    // After keyboard animation
-    setTimeout(scrollIntoView, 300);
-  };
-
-  // Auto-scroll when keyboard opens while textarea is focused
-  useEffect(() => {
-    if (isKeyboardOpen && document.activeElement === notesRef.current) {
-      setTimeout(() => {
-        notesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
-    }
-  }, [isKeyboardOpen]);
+  // Multi-pass iOS keyboard scroll fix
+  const { handleFocus: handleNotesFocus } = useKeyboardScroll(notesRef);
 
   const toggleSymptom = (symptomId: string) => {
     haptic.light();

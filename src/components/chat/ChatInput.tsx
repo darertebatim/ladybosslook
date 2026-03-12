@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, X, Loader2, FileText, Image as ImageIcon, Mic, Square, Play, Pause, Trash2, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 import { 
   showAttachmentActionSheet, 
   takePhoto, 
@@ -54,6 +55,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { handleFocus: keyboardScrollFocus } = useKeyboardScroll(textareaRef);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -677,7 +679,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            onFocus={onFocus}
+            onFocus={() => { onFocus?.(); keyboardScrollFocus(); }}
             onBlur={onBlur}
             placeholder={placeholder}
             disabled={disabled || uploading || isRecording}

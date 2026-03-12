@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Capacitor } from '@capacitor/core';
 import { Camera as CapacitorCamera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 import { detectVideoType, getVideoPlatformLabel } from '@/lib/videoUtils';
 
 const ACTION_TYPES = [
@@ -40,6 +41,7 @@ export default function AppChannelPost() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { handleFocus: handleTextareaFocus } = useKeyboardScroll(textareaRef);
 
   // Form state
   const [channelId, setChannelId] = useState('');
@@ -388,18 +390,7 @@ export default function AppChannelPost() {
     target.style.height = Math.min(target.scrollHeight, 150) + 'px';
   };
 
-  // iOS keyboard scroll fix
-  useEffect(() => {
-    const handleFocus = () => {
-      setTimeout(() => {
-        textareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 300);
-    };
-
-    const textarea = textareaRef.current;
-    textarea?.addEventListener('focus', handleFocus);
-    return () => textarea?.removeEventListener('focus', handleFocus);
-  }, []);
+  // iOS keyboard scroll fix - handled by useKeyboardScroll hook
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -581,6 +572,7 @@ export default function AppChannelPost() {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               onInput={handleTextareaInput}
+              onFocus={handleTextareaFocus}
               placeholder="Type a message..."
               dir="auto"
               rows={1}

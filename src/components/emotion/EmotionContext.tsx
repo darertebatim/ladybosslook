@@ -9,6 +9,7 @@ import { CONTEXT_OPTIONS, getEmotionLabel, type Valence, type ContextOption } fr
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 
 // Icon mapping
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -58,22 +59,8 @@ export const EmotionContext = ({
   // Get valence-based colors
   const valenceColors = VALENCE_COLORS[valence];
 
-  // Handle keyboard - scroll textarea into view when focused
-  const handleNotesFocus = () => {
-    const scrollIntoView = () => {
-      notesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    };
-    setTimeout(scrollIntoView, 100);
-    setTimeout(scrollIntoView, 300);
-  };
-
-  useEffect(() => {
-    if (isKeyboardOpen && document.activeElement === notesRef.current) {
-      setTimeout(() => {
-        notesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
-    }
-  }, [isKeyboardOpen]);
+  // Multi-pass iOS keyboard scroll fix
+  const { handleFocus: handleNotesFocus } = useKeyboardScroll(notesRef);
 
   const toggleContext = (context: string) => {
     haptic.light();

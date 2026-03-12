@@ -36,16 +36,13 @@ export default function AppChannelDetail() {
   const [readPostIds, setReadPostIds] = useState<Set<string>>(new Set());
   const [initialReadPostIds, setInitialReadPostIds] = useState<Set<string> | null>(null);
 
-  // Scroll to bottom when keyboard opens (iOS)
+  // Scroll to bottom when keyboard opens (iOS) - multi-pass
   const handleKeyboardChange = useCallback((isOpen: boolean) => {
     if (isOpen) {
-      // Delay to let keyboard animation complete
-      setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-      setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 300);
+      const scroll = () => bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(scroll, 60);
+      setTimeout(scroll, 300);
+      setTimeout(scroll, 500);
     }
   }, []);
 
