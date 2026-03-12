@@ -374,7 +374,7 @@ These small delicate icons float gently around the main character and SYMBOLIZE 
 CHARACTER DIRECTION (VERY IMPORTANT):
 - Gentle smiling woman, calm confident pose
 - Wellness lifestyle illustration style
-- Soft athletic or casual cozy outfit appropriate to the ritual
+- Soft athletic or casual cozy outfit appropriate to the routine
 - Warm expression, soft body language
 - Empowering feminine energy — safe, strong, and soft
 - NOT aggressive fitness energy
