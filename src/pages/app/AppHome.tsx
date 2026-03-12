@@ -980,7 +980,7 @@ const AppHome = () => {
                             style={{
                               top: '50%',
                               right: '52px',
-                              marginTop: '-80px',
+                              marginTop: '-24px',
                               filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
                               animation: 'coachHandBounce 1.4s ease-in-out infinite',
                               transform: 'rotate(-45deg)',
