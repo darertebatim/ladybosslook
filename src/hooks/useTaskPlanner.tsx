@@ -536,27 +536,29 @@ export const useCreateTask = () => {
 
       const { subtasks, ...taskData } = input;
 
-      // If order_index is -1, it means "insert at top of one-time tasks"
-      // Shift existing one-time tasks down first, then set order_index to 0
+      // For one-time tasks, always insert at the top of the list
+      // by shifting existing one-time tasks down and using order_index 0
       let finalOrderIndex = taskData.order_index;
-      if (finalOrderIndex === -1) {
+      const effectiveRepeat = taskData.repeat_pattern || 'none';
+      
+      if (effectiveRepeat === 'none' && (finalOrderIndex === undefined || finalOrderIndex === -1)) {
         finalOrderIndex = 0;
         // Shift existing one-time tasks down so new task appears at top
-        if (taskData.scheduled_date) {
-          const { data: existing } = await supabase
-            .from('user_tasks')
-            .select('id, order_index')
-            .eq('user_id', user.id)
-            .eq('repeat_pattern', 'none')
-            .eq('is_active', true);
-          if (existing && existing.length > 0) {
-            await Promise.all(
-              existing.map(t =>
-                supabase.from('user_tasks').update({ order_index: (t.order_index ?? 0) + 1 }).eq('id', t.id)
-              )
-            );
-          }
+        const { data: existing } = await supabase
+          .from('user_tasks')
+          .select('id, order_index')
+          .eq('user_id', user.id)
+          .eq('repeat_pattern', 'none')
+          .eq('is_active', true);
+        if (existing && existing.length > 0) {
+          await Promise.all(
+            existing.map(t =>
+              supabase.from('user_tasks').update({ order_index: (t.order_index ?? 0) + 1 }).eq('id', t.id)
+            )
+          );
         }
+      } else if (finalOrderIndex === -1) {
+        finalOrderIndex = 0;
       }
 
       // Create the task
