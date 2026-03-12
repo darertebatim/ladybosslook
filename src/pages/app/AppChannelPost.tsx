@@ -390,18 +390,7 @@ export default function AppChannelPost() {
     target.style.height = Math.min(target.scrollHeight, 150) + 'px';
   };
 
-  // iOS keyboard scroll fix
-  useEffect(() => {
-    const handleFocus = () => {
-      setTimeout(() => {
-        textareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 300);
-    };
-
-    const textarea = textareaRef.current;
-    textarea?.addEventListener('focus', handleFocus);
-    return () => textarea?.removeEventListener('focus', handleFocus);
-  }, []);
+  // iOS keyboard scroll fix - handled by useKeyboardScroll hook
 
   return (
     <div className="flex flex-col h-full bg-background">
