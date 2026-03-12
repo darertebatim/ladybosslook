@@ -1078,7 +1078,8 @@ const AppHome = () => {
                               Tap on an action to edit, skip, or delete it
                             </p>
                           </div>
-                        )}
+                          );
+                        })()}
                         {/* Remaining tasks behind the overlay */}
                         {filteredTasks.length > 1 && (
                           <div className="relative z-[1]">
