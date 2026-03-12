@@ -111,7 +111,7 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
         ) : (
           <AddedToRoutineButton
             isAdded={isAdded}
-            onAddClick={handleAddToRituals}
+            onAddClick={handleAddToRoutines}
             iconOnly
           />
         )}

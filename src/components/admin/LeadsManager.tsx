@@ -959,7 +959,7 @@ export function LeadsManager() {
                               This will reset all app data for <strong>{searchResults.profile.email}</strong> including:
                               <ul className="mt-2 list-disc list-inside space-y-1 text-sm">
                                 <li>Actions, subtasks, and completions</li>
-                                <li>Streaks and ritual progress</li>
+                                <li>Streaks and routine progress</li>
                                 <li>Journal entries</li>
                                 <li>Audio progress and bookmarks</li>
                                 <li>Chat conversations</li>

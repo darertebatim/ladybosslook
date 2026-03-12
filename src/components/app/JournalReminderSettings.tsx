@@ -72,7 +72,7 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
         isAdded={isAdded}
         onAddClick={() => setShowRoutineSheet(true)}
         isLoading={isLoading || addRoutinePlan.isPending}
-        addText="Add Journaling to My Rituals"
+        addText="Add Journaling to My Routines"
         size="sm"
         variant="outline"
       />

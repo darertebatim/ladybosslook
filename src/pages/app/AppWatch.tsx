@@ -249,7 +249,7 @@ export default function AppWatch() {
               <>
                 <h1 className="text-xl font-bold text-white tracking-tight">Watch</h1>
                 <div className="flex items-center gap-1">
-                  <AddedToRoutineButton isAdded={!!isWatchAdded} onAddClick={handleAddWatchToRituals} iconOnly />
+                  <AddedToRoutineButton isAdded={!!isWatchAdded} onAddClick={handleAddWatchToRoutines} iconOnly />
                   <button onClick={() => setShowSearch(true)} className="p-2 -mr-2">
                     <Search className="h-5 w-5 text-white/70" />
                   </button>

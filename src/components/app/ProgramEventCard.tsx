@@ -79,7 +79,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
     // Prevent completing tasks for future dates
     if (isFutureDate) {
       haptic.light();
-      toast("Let's focus on today's rituals.", {
+      toast("Let's focus on today's routines.", {
         icon: '☝️',
         duration: 2000,
       });

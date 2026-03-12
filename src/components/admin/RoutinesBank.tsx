@@ -1995,7 +1995,7 @@ export default function RoutinesBank() {
           <DialogHeader>
             <DialogTitle>{editingSection?.isNew ? 'New Section' : 'Edit Section'}</DialogTitle>
             <DialogDescription>
-              Add descriptive content to introduce this part of the ritual
+              Add descriptive content to introduce this part of the routine
             </DialogDescription>
           </DialogHeader>
           

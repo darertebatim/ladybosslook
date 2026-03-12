@@ -68,7 +68,7 @@ function PlanFeaturesTab() {
         <div>
           <p className="font-semibold text-foreground">simora+ Subscription Gate</p>
           <p className="text-sm text-muted-foreground mt-1">
-            All content and tools are <strong>free</strong> to use. The paywall only triggers when users attempt to <strong>save a ritual</strong> to their planner.
+            All content and tools are <strong>free</strong> to use. The paywall only triggers when users attempt to <strong>save a routine</strong> to their planner.
           </p>
         </div>
       </div>

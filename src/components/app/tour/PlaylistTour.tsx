@@ -37,8 +37,8 @@ export function PlaylistTour({ isFirstVisit = false, onTourReady }: PlaylistTour
     {
       id: 'add-to-routine',
       target: '.tour-add-to-routine',
-      title: 'Add to Your Rituals',
-      description: 'Tap to add this playlist to your daily rituals. Get reminders to listen.',
+      title: 'Add to Your Routines',
+      description: 'Tap to add this playlist to your daily routines. Get reminders to listen.',
       position: 'top',
       action: 'tap',
       condition: () => !!document.querySelector('.tour-add-to-routine'),
