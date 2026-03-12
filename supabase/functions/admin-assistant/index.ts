@@ -1499,8 +1499,8 @@ function getToolDefinitions(currentPage?: string) {
       {
         type: "function",
         function: {
-          name: "delete_ritual_task",
-          description: "Delete a specific task from a ritual. Use the task's ID from context.",
+          name: "delete_routine_task",
+          description: "Delete a specific task from a routine. Use the task's ID from context.",
           parameters: {
             type: "object",
             properties: {
