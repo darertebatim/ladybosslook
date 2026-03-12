@@ -60,7 +60,7 @@ export function MoodRoutinePromptSheet({
         {/* Heading */}
         <div className="text-center mb-2">
           <h2 className="text-[22px] font-bold text-foreground leading-tight">
-            Make it a Daily Routine
+            Make Mood Check-in<br />a Daily Routine
           </h2>
         </div>
 
@@ -108,14 +108,14 @@ export function MoodRoutinePromptSheet({
           <Button
             variant="ghost"
             onClick={handleNever}
-            className="flex-1 h-10 rounded-full text-transparent hover:text-muted-foreground active:text-muted-foreground hover:bg-foreground/5 active:bg-foreground/5 active:scale-95 transition-all text-sm"
+            className="flex-1 h-10 rounded-full text-muted-foreground bg-foreground/5 hover:bg-foreground/10 hover:text-foreground active:scale-95 transition-all text-sm"
           >
             Never
           </Button>
           <Button
             variant="ghost"
             onClick={handleSkip}
-            className="flex-1 h-10 rounded-full text-transparent hover:text-muted-foreground active:text-muted-foreground hover:bg-foreground/5 active:bg-foreground/5 active:scale-95 transition-all text-sm"
+            className="flex-1 h-10 rounded-full text-muted-foreground bg-foreground/5 hover:bg-foreground/10 hover:text-foreground active:scale-95 transition-all text-sm"
           >
             Not now
           </Button>
