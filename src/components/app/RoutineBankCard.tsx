@@ -95,7 +95,7 @@ export function RoutineBankCard({
     <div className="relative">
       {/* Free / Plus badge - outside card overflow */}
       {routine.is_free ? (
-        <Badge className="absolute -top-2.5 -left-2 z-30 bg-green-500 hover:bg-green-500 text-white rounded-full text-xs px-2 py-0.5 shadow-sm">
+        <Badge className="absolute -top-2.5 -left-2 z-30 rounded-full text-xs px-2 py-0.5 shadow-sm text-black font-bold" style={{ backgroundColor: '#E8F5A3' }}>
           FREE
         </Badge>
       ) : (
