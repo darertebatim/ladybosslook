@@ -356,10 +356,11 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
       scheduled_date: format(date, 'yyyy-MM-dd'),
       emoji: variant.emoji,
       color: variant.color,
-      order_index: 0,
+      order_index: -1,
     });
     setTitle('');
-    inputRef.current?.focus();
+    inputRef.current?.blur();
+    setIsOpen(false);
   };
 
   const handleOpenDetails = () => {

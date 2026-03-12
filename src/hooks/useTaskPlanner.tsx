@@ -536,6 +536,24 @@ export const useCreateTask = () => {
 
       const { subtasks, ...taskData } = input;
 
+      // If order_index is -1, it means "insert at top of one-time tasks"
+      // Shift existing one-time tasks down first, then set order_index to 0
+      let finalOrderIndex = taskData.order_index;
+      if (finalOrderIndex === -1) {
+        finalOrderIndex = 0;
+        // Increment order_index for all existing one-time tasks for this date
+        const repeatPattern = taskData.repeat_pattern || 'none';
+        if (repeatPattern === 'none' && taskData.scheduled_date) {
+          await supabase.rpc('increment_task_order_indices', {
+            p_user_id: user.id,
+            p_scheduled_date: taskData.scheduled_date,
+          }).then(() => {}).catch(() => {
+            // Non-critical: if RPC doesn't exist, tasks still get created
+            console.warn('[CreateTask] Could not shift order indices');
+          });
+        }
+      }
+
       // Create the task
       const { data: task, error: taskError } = await supabase
         .from('user_tasks')
