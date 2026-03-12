@@ -146,7 +146,7 @@ export function MoodDashboard() {
   }, []);
 
   const handleRoutinePromptSkip = useCallback(() => {
-    setShowRitualPrompt(false);
+    setShowRoutinePrompt(false);
     if (pendingRoute) {
       navigate(pendingRoute);
       setPendingRoute(null);
