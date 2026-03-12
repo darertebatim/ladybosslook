@@ -1067,9 +1067,9 @@ ${context.existingActions?.slice(0, 20).map((a: any) => {
   return `- ID: "${a.id}" | ${a.emoji} ${a.title} [${a.category}] color:${a.color || 'none'} ${a.time_period ? `time:${a.time_period}` : ''}${subText}`;
 }).join("\n") || "None"}
 
-### Existing Rituals (${context.existingRituals?.length || 0} active)
-${context.existingRituals?.map((r: any) => {
-  const tasks = (context.ritualTasks || []).filter((t: any) => t.routine_id === r.id);
+### Existing Routines (${context.existingRoutines?.length || 0} active)
+${context.existingRoutines?.map((r: any) => {
+  const tasks = (context.routineTasks || []).filter((t: any) => t.routine_id === r.id);
   const taskText = tasks.length ? `\n    Tasks: ${tasks.map((t: any) => `"${t.emoji || '✅'} ${t.title}" (ID:${t.id})`).join(', ')}` : '';
   return `- ID: "${r.id}" | ${r.emoji || "🌟"} ${r.title} [${r.category}] color:${r.color || 'none'} desc:${r.description ? `"${r.description.substring(0, 100)}..."` : 'none'}${taskText}`;
 }).join("\n") || "None"}
