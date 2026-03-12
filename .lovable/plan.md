@@ -1,58 +1,56 @@
 
 
-## Calm-Style Animated Background for Watch Page
+# Terminology Cleanup: "Ritual" → "Routine" & "Task" → "Action"
 
-Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
+## Investigation Summary
 
-### What You'll Get
+Found **remaining "ritual" references in 15 files** across the app, admin panel, and edge functions. Here's every location grouped by area.
 
-- A deep dark blue gradient background on the Watch page header area
-- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
-- Subtle lightning flashes that pulse periodically
-- All text updated to white/light colors for contrast
-- Lightweight implementation using CSS keyframes (no extra dependencies)
+---
 
-### Design Details
+## App (User-Facing UI) — 10 files
 
-- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
-- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
-- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
-- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
-- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
+| File | What to change |
+|------|---------------|
+| `src/components/app/TaskTemplateCard.tsx` | aria-label: "Add to my rituals" → "Add to my routines" |
+| `src/components/app/TaskCard.tsx` | 3 toast messages: "today's rituals" → "today's routines" |
+| `src/components/app/ProgramEventCard.tsx` | Toast: "today's rituals" → "today's routines" |
+| `src/components/app/JournalReminderSettings.tsx` | Button text: "Add Journaling to My Rituals" → "...Routines"; toast: "ritual" → "routine" |
+| `src/components/mood/MoodDashboard.tsx` | Variable names (`showRitualPrompt`), toast: "added to your rituals!" → "routines!", comments |
+| `src/pages/app/AppWatch.tsx` | Comments + toasts: "rituals" → "routines" |
+| `src/components/breathe/BreathingExerciseCard.tsx` | Function name + toasts: "rituals" → "routines" |
+| `src/components/app/paywalls/PaywallMascot.tsx` | Feature text: "Unlimited rituals to your planner" → "Unlimited routines..." |
+| `src/components/app/tour/PlaylistTour.tsx` | Tour step: "Add to Your Rituals" → "...Routines" |
+| `src/components/app/tour/HomeTour.tsx` | Tour step: "Suggested Rituals" → "Suggested Routines", description text |
 
-### Technical Approach
+## Admin Panel — 2 files
 
-**Files to modify:**
+| File | What to change |
+|------|---------------|
+| `src/components/admin/RoutinesBank.tsx` | Title: "Rituals Bank" → "Routines Bank"; button: "New Ritual" → "New Routine"; label: "Ritual Type" → "Routine Type"; dialog description |
+| `src/components/admin/LeadsManager.tsx` | Text: "ritual progress" → "routine progress" |
 
-1. **`src/pages/app/AppWatch.tsx`**
-   - Replace the header `bg-[#E8F4FE]` with the dark gradient
-   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
-   - Add a lightning flash overlay div
-   - Update all text classes to white variants (`text-white`, `text-white/60`)
-   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
-   - Extend the gradient into the page background behind the content area
+## Hooks — 1 file
 
-2. **`tailwind.config.ts`**
-   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
-   - Register corresponding animation utilities
+| File | What to change |
+|------|---------------|
+| `src/hooks/useFeatureTour.tsx` | Tour feature type `'rituals'` — this is a code/localStorage key, will rename for consistency |
 
-### Visual Structure
+## Edge Functions — 2 files
 
-```text
-+----------------------------------+
-|  [dark blue gradient header]     |
-|  ~~~ cloud layer 1 (slow) ~~~   |
-|  ~~~ cloud layer 2 (slower) ~~~ |
-|  * lightning flash (periodic) *  |
-|                                  |
-|  Watch          [icons]          |
-|  [categories row]                |
-|  [filters]              [lang]   |
-+----------------------------------+
-|  [normal white content area]     |
-|  [playlist cards grid]           |
-+----------------------------------+
-```
+| File | What to change |
+|------|---------------|
+| `supabase/functions/admin-assistant/index.ts` | ~50 occurrences: function names (`resolveRitualId` → `resolveRoutineId`, `createRitualInBank` → `createRoutineInBank`, etc.), tool names in switch cases, AI prompt text, user-facing messages |
+| `supabase/functions/generate-routine-cover/index.ts` | Prompt text: "RITUAL:" → "ROUTINE:", comments, default title "Wellness Ritual" → "Wellness Routine" |
 
-The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
+## Approach
+
+- Rename all user-facing strings (toasts, labels, aria-labels, tour descriptions, paywall features)
+- Rename internal variable/function names where they say "ritual" for code consistency
+- Keep database column names and table names unchanged (no schema migration needed)
+- Keep `home_rituals` as a display location enum value (internal identifier, label already says "After Routines")
+
+## Not Changed (intentional)
+- Database table/column names — these are structural, not user-facing
+- The `PromoBanner` `DisplayLocation` type value `home_rituals` — internal enum, admin label already correct
 
