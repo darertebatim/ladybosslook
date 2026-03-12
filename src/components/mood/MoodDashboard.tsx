@@ -301,7 +301,7 @@ export function MoodDashboard() {
               {isSubmitting ? 'Saving...' : (selectedMoodData?.buttonText || 'I feel...')}
             </Button>
 
-            {/* Add to Rituals Button - icon only */}
+            {/* Add to Routines Button - icon only */}
             <AddedToRoutineButton
               isAdded={!!isAdded}
               onAddClick={handleRoutineClick}
