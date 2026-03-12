@@ -26,7 +26,7 @@ function isValidUUID(value: string): boolean {
   return UUID_REGEX.test(value);
 }
 
-async function resolveRitualId(supabase: any, idOrTitle: string): Promise<{ id: string; title: string } | null> {
+async function resolveRoutineId(supabase: any, idOrTitle: string): Promise<{ id: string; title: string } | null> {
   if (isValidUUID(idOrTitle)) {
     const { data } = await supabase.from("routines_bank").select("id, title").eq("id", idOrTitle).single();
     return data;
