@@ -1028,11 +1028,13 @@ const AppHome = () => {
                         {/* Dark overlay for "tap to manage" coach mark */}
                         <div className="fixed inset-0 bg-black/60 z-[100] animate-fade-in" onClick={() => setShowTapCoachMark(false)} />
                         
-                        {/* Only spotlight the FIRST action */}
-                        {filteredTasks.length > 0 && (
+                        {/* Spotlight the first UNCOMPLETED action, fallback to first task */}
+                        {filteredTasks.length > 0 && (() => {
+                          const spotlightTask = filteredTasks.find(t => !completedTaskIds.has(t.id)) || filteredTasks[0];
+                          return (
                           <div className="relative z-[101]">
                             <div className="relative">
-                              <SortableTaskList tasks={[filteredTasks[0]]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                              <SortableTaskList tasks={[spotlightTask]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                               
                               {/* Glowing highlight around the action name area */}
                               <div
