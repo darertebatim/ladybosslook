@@ -572,6 +572,7 @@ export default function AppChannelPost() {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               onInput={handleTextareaInput}
+              onFocus={handleTextareaFocus}
               placeholder="Type a message..."
               dir="auto"
               rows={1}
