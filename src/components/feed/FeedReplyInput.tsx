@@ -71,6 +71,7 @@ export function FeedReplyInput({ onSend, disabled, placeholder = "Write a reply.
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
+          onFocus={handleFocus}
           placeholder={placeholder}
           disabled={disabled}
           className="min-h-[32px] max-h-24 resize-none text-[15px] leading-[22px] bg-transparent border-0 focus-visible:ring-0 p-0 py-1"

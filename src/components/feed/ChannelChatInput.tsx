@@ -35,16 +35,8 @@ export function ChannelChatInput({ channelId, replyTo, onCancelReply, onKeyboard
     }
   }, [replyTo]);
 
-  // Scroll input into view when focused on iOS
-  const handleFocus = () => {
-    // Delay to let iOS keyboard animation complete
-    setTimeout(() => {
-      textareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
-    setTimeout(() => {
-      textareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 300);
-  };
+  // Multi-pass iOS keyboard scroll fix
+  const { handleFocus } = useKeyboardScroll(textareaRef);
 
   const handleSubmit = async () => {
     const trimmedContent = content.trim();

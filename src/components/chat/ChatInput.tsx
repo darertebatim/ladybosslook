@@ -679,7 +679,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            onFocus={onFocus}
+            onFocus={() => { onFocus?.(); keyboardScrollFocus(); }}
             onBlur={onBlur}
             placeholder={placeholder}
             disabled={disabled || uploading || isRecording}
