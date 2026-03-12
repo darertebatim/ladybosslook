@@ -121,6 +121,11 @@ export function MoodCelebrationSheet({
 
   const handleDone = () => {
     haptic.light();
+    const homeRoute = '/app/home';
+    if (onActionClick?.(homeRoute)) {
+      onOpenChange(false);
+      return;
+    }
     onOpenChange(false);
     onDone();
   };
