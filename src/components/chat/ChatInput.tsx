@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, X, Loader2, FileText, Image as ImageIcon, Mic, Square, Play, Pause, Trash2, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 import { 
   showAttachmentActionSheet, 
   takePhoto, 
