@@ -240,37 +240,46 @@ export const useTasksForDate = (date: Date) => {
   // Filter tasks that apply to this date - computed from cached data
   const tasksForDate = allTasks.filter(task => taskAppliesToDate(task, dateStr));
 
-  // Sort tasks: specific times first (chronologically), then time periods (by category order), then Anytime by order_index
+  // Sort tasks: repeating tasks use time-based sorting, one-time tasks sort purely by order_index
   const sortedTasks = [...tasksForDate].sort((a, b) => {
-    const aHasTime = !!a.scheduled_time;
-    const bHasTime = !!b.scheduled_time;
-    const aHasPeriod = !!a.time_period;
-    const bHasPeriod = !!b.time_period;
+    const aIsOneTime = !a.repeat_pattern || a.repeat_pattern === 'none';
+    const bIsOneTime = !b.repeat_pattern || b.repeat_pattern === 'none';
     
-    // Both have specific times - sort chronologically
-    if (aHasTime && bHasTime) {
-      return a.scheduled_time!.localeCompare(b.scheduled_time!);
-    }
+    // Repeating tasks always come before one-time tasks (handled by SortableTaskList grouping)
+    // But within each group, apply different sorting:
     
-    // Specific time comes before time_period and Anytime
-    if (aHasTime && !bHasTime) return -1;
-    if (!aHasTime && bHasTime) return 1;
-    
-    // Both have time_periods - sort by category order
-    if (aHasPeriod && bHasPeriod) {
-      const aOrder = getTimePeriodSortOrder(a.time_period);
-      const bOrder = getTimePeriodSortOrder(b.time_period);
-      if (aOrder !== bOrder) return aOrder - bOrder;
-      // Same period - sort by order_index
+    // Both are one-time: sort purely by order_index (user-controlled)
+    if (aIsOneTime && bIsOneTime) {
       return a.order_index - b.order_index;
     }
     
-    // Time period before Anytime
-    if (aHasPeriod && !bHasPeriod) return -1;
-    if (!aHasPeriod && bHasPeriod) return 1;
+    // Both are repeating: use time-based sorting
+    if (!aIsOneTime && !bIsOneTime) {
+      const aHasTime = !!a.scheduled_time;
+      const bHasTime = !!b.scheduled_time;
+      const aHasPeriod = !!a.time_period;
+      const bHasPeriod = !!b.time_period;
+      
+      if (aHasTime && bHasTime) return a.scheduled_time!.localeCompare(b.scheduled_time!);
+      if (aHasTime && !bHasTime) return -1;
+      if (!aHasTime && bHasTime) return 1;
+      
+      if (aHasPeriod && bHasPeriod) {
+        const aOrder = getTimePeriodSortOrder(a.time_period);
+        const bOrder = getTimePeriodSortOrder(b.time_period);
+        if (aOrder !== bOrder) return aOrder - bOrder;
+        return a.order_index - b.order_index;
+      }
+      
+      if (aHasPeriod && !bHasPeriod) return -1;
+      if (!aHasPeriod && bHasPeriod) return 1;
+      
+      return a.order_index - b.order_index;
+    }
     
-    // Both Anytime - sort by order_index
-    return a.order_index - b.order_index;
+    // Repeating before one-time
+    if (!aIsOneTime && bIsOneTime) return -1;
+    return 1;
   });
 
   return {
