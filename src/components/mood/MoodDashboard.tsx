@@ -87,6 +87,7 @@ export function MoodDashboard() {
   const [showRitualPrompt, setShowRitualPrompt] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const [neverPrompt] = useState(() => localStorage.getItem('mood_routine_never') === 'true');
+  const [pendingRoute, setPendingRoute] = useState<string | null>(null);
 
   const isAdded = existingTask || justAdded;
 
@@ -115,12 +116,8 @@ export function MoodDashboard() {
       
       haptic.success();
       
-      // If not in routine, show ritual prompt first; otherwise celebration
-      if (!isAdded && !neverPrompt) {
-        setShowRitualPrompt(true);
-      } else {
-        setShowCelebration(true);
-      }
+      // Always show celebration first
+      setShowCelebration(true);
       setIsSubmitting(false);
     } catch (error) {
       console.error('Failed to log mood:', error);
@@ -133,6 +130,16 @@ export function MoodDashboard() {
     navigate('/app/home');
   }, [navigate]);
 
+  // Intercept action clicks from celebration to show routine prompt
+  const handleCelebrationAction = useCallback((route: string): boolean => {
+    if (!isAdded && !neverPrompt) {
+      setPendingRoute(route);
+      setShowRitualPrompt(true);
+      return true; // intercept
+    }
+    return false; // let celebration handle navigation
+  }, [isAdded, neverPrompt]);
+
   const handleRoutinePromptAdd = useCallback(() => {
     setShowRitualPrompt(false);
     setShowRoutineSheet(true);
@@ -140,14 +147,20 @@ export function MoodDashboard() {
 
   const handleRoutinePromptSkip = useCallback(() => {
     setShowRitualPrompt(false);
-    setShowCelebration(true);
-  }, []);
+    if (pendingRoute) {
+      navigate(pendingRoute);
+      setPendingRoute(null);
+    }
+  }, [pendingRoute, navigate]);
 
   const handleRoutinePromptNever = useCallback(() => {
     localStorage.setItem('mood_routine_never', 'true');
     setShowRitualPrompt(false);
-    setShowCelebration(true);
-  }, []);
+    if (pendingRoute) {
+      navigate(pendingRoute);
+      setPendingRoute(null);
+    }
+  }, [pendingRoute, navigate]);
 
   const handleRoutineClick = () => {
     haptic.light();
@@ -169,8 +182,11 @@ export function MoodDashboard() {
       toast.success('Mood check-in added to your rituals!');
       setShowRoutineSheet(false);
       setJustAdded(true);
-      // Show celebration after adding
-      setShowCelebration(true);
+      // Navigate to pending route after adding
+      if (pendingRoute) {
+        navigate(pendingRoute);
+        setPendingRoute(null);
+      }
     } catch (error) {
       console.error('Failed to add ritual:', error);
       toast.error('Failed to add ritual');
@@ -324,6 +340,7 @@ export function MoodDashboard() {
         onOpenChange={setShowCelebration}
         mood={selectedMood}
         onDone={handleCelebrationDone}
+        onActionClick={handleCelebrationAction}
       />
     </>
   );

@@ -90,6 +90,7 @@ interface MoodCelebrationSheetProps {
   onOpenChange: (open: boolean) => void;
   mood: string | null;
   onDone: () => void;
+  onActionClick?: (route: string) => boolean; // return true to intercept navigation
 }
 
 export function MoodCelebrationSheet({
@@ -97,18 +98,25 @@ export function MoodCelebrationSheet({
   onOpenChange,
   mood,
   onDone,
+  onActionClick,
 }: MoodCelebrationSheetProps) {
   const navigate = useNavigate();
   const moodData = mood ? MOOD_CONFIG[mood] : null;
 
   const handleAction = (action: typeof ACTIONS[number]) => {
     haptic.medium();
-    onOpenChange(false);
-    if (action.routeKey === 'journal') {
-      navigate(`/app/journal/new?mood=${mood}`);
-    } else if (action.route) {
-      navigate(action.route);
+    const route = action.routeKey === 'journal' 
+      ? `/app/journal/new?mood=${mood}` 
+      : action.route || '/app/home';
+    
+    // If interceptor returns true, don't navigate yet
+    if (onActionClick?.(route)) {
+      onOpenChange(false);
+      return;
     }
+    
+    onOpenChange(false);
+    navigate(route);
   };
 
   const handleDone = () => {
