@@ -315,7 +315,13 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
         onClick={() => {
           setIsOpen(true);
           haptic.light();
-          setTimeout(() => inputRef.current?.focus(), 100);
+          setTimeout(() => {
+            inputRef.current?.focus();
+            // Scroll the input into view so it's visible above the keyboard
+            setTimeout(() => {
+              inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+          }, 100);
         }}
         className="mt-3 w-full rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2 active:scale-[0.98] transition-all"
       >
