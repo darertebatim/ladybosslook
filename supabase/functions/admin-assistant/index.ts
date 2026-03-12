@@ -360,8 +360,8 @@ async function createActionInBank(supabase: any, args: any) {
   };
 }
 
-async function createRitualInBank(supabase: any, args: any) {
-  const { data: ritual, error: ritualError } = await supabase.from("routines_bank").insert({
+async function createRoutineInBank(supabase: any, args: any) {
+  const { data: routine, error: routineError } = await supabase.from("routines_bank").insert({
     title: args.title,
     subtitle: args.subtitle || null,
     description: args.description || null,
@@ -373,9 +373,9 @@ async function createRitualInBank(supabase: any, args: any) {
     is_popular: args.is_popular || false,
   }).select("id, title, emoji, category").single();
 
-  if (ritualError) {
-    console.error("Insert ritual error:", ritualError);
-    return { success: false, error: ritualError.message, action: "create_ritual_in_bank" };
+  if (routineError) {
+    console.error("Insert routine error:", routineError);
+    return { success: false, error: routineError.message, action: "create_ritual_in_bank" };
   }
 
   const sectionMap: Record<string, string> = {};
@@ -383,7 +383,7 @@ async function createRitualInBank(supabase: any, args: any) {
     for (let i = 0; i < args.sections.length; i++) {
       const sec = args.sections[i];
       const { data: sectionData, error: secError } = await supabase.from("routines_bank_sections").insert({
-        routine_id: ritual.id,
+        routine_id: routine.id,
         title: sec.title,
         section_order: i,
         is_active: true,
@@ -402,7 +402,7 @@ async function createRitualInBank(supabase: any, args: any) {
       const sectionId = task.section_title ? sectionMap[task.section_title] : null;
       
       const { error: taskError } = await supabase.from("routines_bank_tasks").insert({
-        routine_id: ritual.id,
+        routine_id: routine.id,
         section_id: sectionId || null,
         section_title: task.section_title || null,
         title: task.title,
@@ -420,8 +420,8 @@ async function createRitualInBank(supabase: any, args: any) {
   return {
     success: true,
     action: "create_ritual_in_bank",
-    message: `Created ritual "${ritual.title}" with ${Object.keys(sectionMap).length} sections and ${taskCount} tasks`,
-    created: { ...ritual, sectionCount: Object.keys(sectionMap).length, taskCount },
+    message: `Created routine "${routine.title}" with ${Object.keys(sectionMap).length} sections and ${taskCount} tasks`,
+    created: { ...routine, sectionCount: Object.keys(sectionMap).length, taskCount },
   };
 }
 
