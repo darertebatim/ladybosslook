@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { format } from 'date-fns';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { StreakGoalSelection } from '@/components/app/StreakGoalSelection';
 import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
