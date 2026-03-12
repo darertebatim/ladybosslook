@@ -19,6 +19,7 @@ import { usePushNotificationFlow } from '@/hooks/usePushNotificationFlow';
 import { useTimezoneSync } from '@/hooks/useTimezoneSync';
 import { useNotificationCleanup } from '@/hooks/useNotificationCleanup';
 import { DeferredLayoutHooks } from '@/components/app/DeferredLayoutHooks';
+import { useKeyboard } from '@/hooks/useKeyboard';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus

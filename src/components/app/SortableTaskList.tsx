@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type { TaskColor } from '@/hooks/useTaskPlanner';
 import {
   DndContext,
@@ -21,6 +21,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
 import { UserTask, useReorderTasks, useCreateTask } from '@/hooks/useTaskPlanner';
+import { useKeyboard } from '@/hooks/useKeyboard';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
 import { Plus, MoreHorizontal } from 'lucide-react';

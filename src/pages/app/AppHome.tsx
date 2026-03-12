@@ -39,6 +39,7 @@ import { useAppReview } from '@/hooks/useAppReview';
 import { hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 import { MoodCheckInBanner } from '@/components/mood/MoodCheckInBanner';
 import { OnboardingBanner } from '@/components/app/OnboardingBanner';
+import { useKeyboard } from '@/hooks/useKeyboard';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
