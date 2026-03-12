@@ -1437,11 +1437,11 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "delete_ritual_from_bank",
-          description: "Permanently DELETE a ritual from the Rituals Bank including all its tasks and sections. Use when user says 'delete', 'remove' a ritual.",
+          description: "Permanently DELETE a routine from the Routines Bank including all its tasks and sections. Use when user says 'delete', 'remove' a routine.",
           parameters: {
             type: "object",
             properties: {
-              id: { type: "string", description: "The ID of the ritual to delete (from context)" },
+              id: { type: "string", description: "The ID of the routine to delete (from context)" },
             },
             required: ["id"],
           },
