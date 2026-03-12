@@ -101,6 +101,7 @@ export const GoldStreakCelebration = ({
     : `${currentGoldStreak} days strong! Keep your momentum going!`;
 
   return (
+    <OverlayPortal>
     <div 
       className="fixed inset-0 z-[9999] flex flex-col"
       onClick={onClose}
