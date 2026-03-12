@@ -142,6 +142,7 @@ export const TaskCard = memo(function TaskCard({
     if (isCompleted) {
       uncompleteTask.mutate({ taskId: task.id, date });
     } else {
+      playCompletionSound();
       const result = await completeTask.mutateAsync({ taskId: task.id, date });
       if (result.streakIncreased && onStreakIncrease) {
         // Stronger haptic for streak
