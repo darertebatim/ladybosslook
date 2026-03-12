@@ -733,26 +733,26 @@ async function deleteBreathingExerciseAction(supabase: any, args: any) {
   };
 }
 
-// ============= RITUAL TASK MANAGEMENT =============
+// ============= ROUTINE TASK MANAGEMENT =============
 
-async function addTasksToRitual(supabase: any, args: any) {
+async function addTasksToRoutine(supabase: any, args: any) {
   if (!args.ritual_id) {
-    return { success: false, error: "Missing ritual_id", action: "add_tasks_to_ritual" };
+    return { success: false, error: "Missing ritual_id", action: "add_tasks_to_routine" };
   }
   if (!args.tasks?.length) {
-    return { success: false, error: "No tasks provided", action: "add_tasks_to_ritual" };
+    return { success: false, error: "No tasks provided", action: "add_tasks_to_routine" };
   }
 
-  const resolved = await resolveRitualId(supabase, args.ritual_id);
+  const resolved = await resolveRoutineId(supabase, args.ritual_id);
   if (!resolved) {
-    return { success: false, error: `Ritual not found: "${args.ritual_id}". Use the exact UUID from context.`, action: "add_tasks_to_ritual" };
+    return { success: false, error: `Routine not found: "${args.ritual_id}". Use the exact UUID from context.`, action: "add_tasks_to_routine" };
   }
-  const ritualId = resolved.id;
+  const routineId = resolved.id;
 
   // Get current max task_order
   const { data: existing } = await supabase.from("routines_bank_tasks")
     .select("task_order")
-    .eq("routine_id", ritualId)
+    .eq("routine_id", routineId)
     .order("task_order", { ascending: false })
     .limit(1);
 
@@ -761,7 +761,7 @@ async function addTasksToRitual(supabase: any, args: any) {
   const inserted = [];
   for (const task of args.tasks) {
     const { data, error } = await supabase.from("routines_bank_tasks").insert({
-      routine_id: ritualId,
+      routine_id: routineId,
       section_id: task.section_id || null,
       section_title: task.section_title || null,
       title: task.title,
@@ -777,8 +777,8 @@ async function addTasksToRitual(supabase: any, args: any) {
 
   return {
     success: true,
-    action: "add_tasks_to_ritual",
-    message: `Added ${inserted.length} task(s) to ritual`,
+    action: "add_tasks_to_routine",
+    message: `Added ${inserted.length} task(s) to routine`,
     created: inserted,
   };
 }
