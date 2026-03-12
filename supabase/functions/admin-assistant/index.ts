@@ -1053,7 +1053,7 @@ ${context.feedChannels?.map((c: any) => `- "${c.name}" (ID: ${c.id}, slug: ${c.s
 
   if (currentPage === "tools") {
     prompt += `
-## Current Page: TOOLS (Actions Bank, Rituals Bank, Breathing Exercises)
+## Current Page: TOOLS (Actions Bank, Routines Bank, Breathing Exercises)
 
 You can DIRECTLY CREATE, UPDATE, and DELETE items in the database. When the user asks you to do something, USE THE TOOLS to do it immediately.
 
