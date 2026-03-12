@@ -182,8 +182,11 @@ export function MoodDashboard() {
       toast.success('Mood check-in added to your rituals!');
       setShowRoutineSheet(false);
       setJustAdded(true);
-      // Show celebration after adding
-      setShowCelebration(true);
+      // Navigate to pending route after adding
+      if (pendingRoute) {
+        navigate(pendingRoute);
+        setPendingRoute(null);
+      }
     } catch (error) {
       console.error('Failed to add ritual:', error);
       toast.error('Failed to add ritual');
