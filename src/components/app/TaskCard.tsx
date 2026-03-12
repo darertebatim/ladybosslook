@@ -338,7 +338,7 @@ export const TaskCard = memo(function TaskCard({
             <div className={cn("flex-1 min-w-0", isAnimating && "animate-ripple-wave [animation-delay:0.6s]")}>
               {/* Top line: Time + Goal (if applicable) */}
               <div className="flex items-center gap-2">
-                <span className="text-[11px] text-black/80">{formatTime(task)}</span>
+                <span className="text-[11px] leading-normal text-black/80">{formatTime(task)}</span>
                 <span className="text-[11px] text-black/80">• {repeatLabel}</span>
                 {hasGoal && (
                   <span className="text-[11px] text-black/80 font-medium">• {(() => {
