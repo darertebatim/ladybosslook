@@ -31,7 +31,7 @@ const categoryVisualDNA: Record<string, { heroScenes: string[]; floatingIconSets
       'coral sunrise, soft peachy orange, warm cream, golden glow, light blush',
     ],
     moods: [
-      'calm morning energy, fresh start, uplifting daily ritual',
+      'calm morning energy, fresh start, uplifting daily routine',
       'gentle awakening, warm sunrise feeling, hopeful new day',
       'energizing soft morning, joyful beginning, peaceful intention-setting',
     ]
