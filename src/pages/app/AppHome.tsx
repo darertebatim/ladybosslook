@@ -1034,42 +1034,42 @@ const AppHome = () => {
                             <div className="relative">
                               <SortableTaskList tasks={[filteredTasks[0]]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                               
-                              {/* Glowing highlight on the card center */}
+                              {/* Glowing highlight around the action name area */}
                               <div
                                 className="absolute pointer-events-none"
                                 style={{
                                   top: '50%',
-                                  left: '50%',
-                                  width: '80%',
-                                  height: '100%',
-                                  transform: 'translate(-50%, -50%)',
-                                  borderRadius: '24px',
-                                  boxShadow: '0 0 16px 6px rgba(255,255,255,0.5), 0 0 32px 12px rgba(255,255,255,0.25)',
+                                  left: '80px',
+                                  width: '180px',
+                                  height: '36px',
+                                  transform: 'translateY(-50%)',
+                                  borderRadius: '12px',
+                                  boxShadow: '0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35)',
                                   animation: 'checkboxGlow 1.6s ease-in-out infinite',
                                 }}
                               />
 
-                              {/* Bouncing hand hint — positioned relative to the card */}
+                              {/* Bouncing hand hint pointing at the action name — same style as first spotlight */}
                               <div
                                 className="absolute pointer-events-none"
                                 style={{
                                   top: '50%',
-                                  left: '50%',
-                                  transform: 'translate(-50%, -120%)',
+                                  left: '140px',
+                                  transform: 'translateY(-100%) rotate(-45deg)',
                                   filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
                                   animation: 'tapCoachBounce 1.4s ease-in-out infinite',
                                 }}
                               >
-                                <span className="text-7xl" style={{ display: 'inline-block' }}>👆</span>
+                                <FluentEmoji emoji="👇" size={64} />
                               </div>
                             </div>
                             <style>{`
                               @keyframes tapCoachBounce {
-                                0%   { transform: translate(-50%, -120%) translateY(0px); }
-                                40%  { transform: translate(-50%, -120%) translateY(8px); }
-                                55%  { transform: translate(-50%, -120%) translateY(4px); }
-                                70%  { transform: translate(-50%, -120%) translateY(8px); }
-                                100% { transform: translate(-50%, -120%) translateY(0px); }
+                                0%   { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
+                                40%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
+                                55%  { transform: translateY(-100%) rotate(-45deg) translateY(5px); }
+                                70%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
+                                100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
                               }
                             `}</style>
                             <p className="text-center text-sm text-white/90 mt-3 mb-2 animate-fade-in font-medium">
