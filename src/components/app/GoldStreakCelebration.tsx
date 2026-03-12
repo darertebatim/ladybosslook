@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 import coinGold from '@/assets/coin-gold.png';
 
@@ -100,6 +101,7 @@ export const GoldStreakCelebration = ({
     : `${currentGoldStreak} days strong! Keep your momentum going!`;
 
   return (
+    <OverlayPortal>
     <div 
       className="fixed inset-0 z-[9999] flex flex-col"
       onClick={onClose}
@@ -258,5 +260,6 @@ export const GoldStreakCelebration = ({
         </div>
       </div>
     </div>
+    </OverlayPortal>
   );
 };

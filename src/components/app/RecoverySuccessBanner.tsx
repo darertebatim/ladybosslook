@@ -5,6 +5,7 @@ import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 import { useEffect } from 'react';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 interface RecoverySuccessBannerProps {
   open: boolean;
@@ -46,6 +47,7 @@ export const RecoverySuccessBanner = ({
   const isGold = type === 'gold';
 
   return (
+    <OverlayPortal>
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4"
       onClick={onClose}
@@ -135,5 +137,6 @@ export const RecoverySuccessBanner = ({
         </Button>
       </div>
     </div>
+    </OverlayPortal>
   );
 };

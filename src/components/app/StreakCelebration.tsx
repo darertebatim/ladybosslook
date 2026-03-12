@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { Flame } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { SoftReviewPrompt } from './SoftReviewPrompt';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 import streakFlameImg from '@/assets/streak-flame-3d.png';
 
 interface StreakCelebrationProps {
@@ -108,6 +109,7 @@ export const StreakCelebration = ({
   const progressPercent = Math.min((streakDaysThisWeek / 7) * 100, 100);
 
   return (
+    <OverlayPortal>
     <div
       className="fixed inset-0 z-[100] flex flex-col justify-end pb-[env(safe-area-inset-bottom)]"
       onClick={handleClose}
@@ -220,5 +222,6 @@ export const StreakCelebration = ({
         onAccept={handleAcceptReview}
       />
     </div>
+    </OverlayPortal>
   );
 };

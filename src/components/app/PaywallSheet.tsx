@@ -4,6 +4,7 @@ import { useDefaultPaywall, PaywallVariantId } from '@/hooks/useDefaultPaywall';
 import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallMascot, PaywallComparison, PaywallLimitedOffer, PaywallVIP, PaywallOnboarding, PaywallMascotV2, type PaywallProgramData } from '@/components/app/paywalls';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
 import { PurchaseCelebration } from '@/components/app/PurchaseCelebration';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 const VARIANT_MAP: Record<PaywallVariantId, React.ComponentType<any>> = {
   classic: PaywallClassic,
@@ -83,9 +84,9 @@ export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
   };
 
   return (
-    <>
+    <OverlayPortal>
       {open && !showCelebration && (
-        <div className="fixed inset-0 z-[60] bg-white" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <div className="fixed inset-0 z-[200] bg-white" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
           <div className="h-full overflow-y-auto">
             <Component
               program={programData}
@@ -102,6 +103,6 @@ export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
         onClose={handleDismissCelebration}
         plan={purchasedPlan}
       />
-    </>
+    </OverlayPortal>
   );
 }

@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { format } from 'date-fns';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { StreakGoalSelection } from '@/components/app/StreakGoalSelection';
 import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
@@ -130,7 +131,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
   const goldCelebrationShownKey = `simora_gold_celebration_shown_${todayStr}`;
 
   return (
-    <>
+    <OverlayPortal>
       <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
       <ActionLimitSheet
         open={showActionLimit}
@@ -281,6 +282,6 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         onDismiss={() => setShowRecoveryPrompt(false)}
         isLoading={recoverStreak.isPending}
       />
-    </>
+    </OverlayPortal>
   );
 });

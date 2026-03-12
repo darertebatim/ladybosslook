@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Flame, Sparkles, ArrowUp } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 interface StreakGoalCompletionCelebrationProps {
   open: boolean;
@@ -43,6 +44,7 @@ export const StreakGoalCompletionCelebration = ({
   const hasHigherGoals = streakGoal < 50;
 
   return (
+    <OverlayPortal>
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
       style={{ background: 'linear-gradient(180deg, #ea580c 0%, #f97316 30%, #fb923c 60%, #fdba74 100%)' }}
     >
@@ -115,5 +117,6 @@ export const StreakGoalCompletionCelebration = ({
         </div>
       </div>
     </div>
+    </OverlayPortal>
   );
 };

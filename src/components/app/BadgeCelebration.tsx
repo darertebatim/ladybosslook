@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
 import { Sparkles, Trophy } from 'lucide-react';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 import coinGold from '@/assets/coin-gold.png';
 import coinSilver from '@/assets/coin-silver.png';
@@ -284,6 +285,7 @@ export function BadgeCelebration({
 
   // Full-screen Gold celebration modal
   return (
+    <OverlayPortal>
     <div 
       className="fixed inset-0 z-[9999] flex items-end justify-center"
     >
@@ -354,5 +356,6 @@ export function BadgeCelebration({
         </Button>
       </div>
     </div>
+    </OverlayPortal>
   );
 }

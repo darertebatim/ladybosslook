@@ -1,5 +1,6 @@
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 interface StreakGoalConfirmationProps {
   open: boolean;
@@ -23,6 +24,7 @@ export function StreakGoalConfirmation({ open, goal, onClose }: StreakGoalConfir
   };
 
   return (
+    <OverlayPortal>
     <div
       className="fixed inset-0 z-[9999] flex flex-col"
       style={{
@@ -145,5 +147,6 @@ export function StreakGoalConfirmation({ open, goal, onClose }: StreakGoalConfir
         </button>
       </div>
     </div>
+    </OverlayPortal>
   );
 }

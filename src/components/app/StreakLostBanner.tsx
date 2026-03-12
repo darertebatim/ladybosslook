@@ -3,6 +3,7 @@ import { Flame, Shield, X, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 interface StreakLostBannerProps {
   open: boolean;
@@ -36,6 +37,7 @@ export const StreakLostBanner = ({
   if (!open) return null;
 
   return (
+    <OverlayPortal>
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4"
       onClick={() => { haptic.light(); onDismiss(); }}
@@ -142,5 +144,6 @@ export const StreakLostBanner = ({
         )}
       </div>
     </div>
+    </OverlayPortal>
   );
 };
