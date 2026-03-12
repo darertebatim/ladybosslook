@@ -3,6 +3,7 @@ import { Crown, Shield, X, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 interface GoldStreakLostBannerProps {
   open: boolean;
