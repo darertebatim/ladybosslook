@@ -50,7 +50,7 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
     onClick();
   };
 
-  const handleAddToRituals = () => {
+  const handleAddToRoutines = () => {
     if (isLocked) { haptic.light(); setShowPaywall(true); return; }
     haptic.light();
     setShowRoutineSheet(true);
