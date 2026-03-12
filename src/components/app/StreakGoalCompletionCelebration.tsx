@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Flame, Sparkles, ArrowUp } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 interface StreakGoalCompletionCelebrationProps {
   open: boolean;
