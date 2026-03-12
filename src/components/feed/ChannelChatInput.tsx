@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useCreateUserPost, FeedPost } from '@/hooks/useFeed';
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
