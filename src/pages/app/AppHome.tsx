@@ -1039,8 +1039,8 @@ const AppHome = () => {
                                 className="absolute pointer-events-none"
                                 style={{
                                   top: '50%',
-                                  left: '80px',
-                                  width: '180px',
+                                  left: '50px',
+                                  width: '160px',
                                   height: '36px',
                                   transform: 'translateY(-50%)',
                                   borderRadius: '12px',
