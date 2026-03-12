@@ -84,7 +84,7 @@ export function MoodDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
-  const [showRitualPrompt, setShowRitualPrompt] = useState(false);
+  const [showRoutinePrompt, setShowRoutinePrompt] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const [neverPrompt] = useState(() => localStorage.getItem('mood_routine_never') === 'true');
   const [pendingRoute, setPendingRoute] = useState<string | null>(null);
