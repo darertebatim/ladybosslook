@@ -888,13 +888,10 @@ const AppTaskCreate = ({
       {/* Description - Simple textarea with placeholder */}
       <div className="px-4 pb-3">
         <Textarea
+          ref={descriptionRef}
           value={description || ''}
           onChange={(e) => setDescription(e.target.value || null)}
-          onFocus={(e) => {
-            if (Capacitor.isNativePlatform()) {
-              focusedInputRef.current = e.target as unknown as HTMLInputElement;
-            }
-          }}
+          onFocus={handleDescriptionFocus}
           placeholder="Add a description or notes..."
           className="w-full bg-white/60 dark:bg-slate-700/60 border-0 rounded-xl resize-none text-sm placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-foreground/20 min-h-0"
           rows={2}
