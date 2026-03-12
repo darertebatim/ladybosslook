@@ -37,6 +37,7 @@ export const StreakLostBanner = ({
   if (!open) return null;
 
   return (
+    <OverlayPortal>
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4"
       onClick={() => { haptic.light(); onDismiss(); }}
