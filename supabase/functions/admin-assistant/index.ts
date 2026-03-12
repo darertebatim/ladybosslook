@@ -298,13 +298,13 @@ async function executeToolAction(supabase: any, fnName: string, args: any): Prom
       case "create_action_in_bank":
         return await createActionInBank(supabase, args);
       case "create_ritual_in_bank":
-        return await createRitualInBank(supabase, args);
+        return await createRoutineInBank(supabase, args);
       case "create_breathing_exercise":
         return await createBreathingExercise(supabase, args);
       case "update_action_in_bank":
         return await updateActionInBank(supabase, args);
       case "update_ritual_in_bank":
-        return await updateRitualInBank(supabase, args);
+        return await updateRoutineInBank(supabase, args);
       case "update_breathing_exercise":
         return await updateBreathingExercise(supabase, args);
       case "add_subtasks_to_action":
@@ -314,15 +314,15 @@ async function executeToolAction(supabase: any, fnName: string, args: any): Prom
       case "delete_action_from_bank":
         return await deleteActionFromBank(supabase, args);
       case "delete_ritual_from_bank":
-        return await deleteRitualFromBank(supabase, args);
+        return await deleteRoutineFromBank(supabase, args);
       case "delete_breathing_exercise":
         return await deleteBreathingExerciseAction(supabase, args);
-      case "add_tasks_to_ritual":
-        return await addTasksToRitual(supabase, args);
-      case "delete_ritual_task":
-        return await deleteRitualTask(supabase, args);
-      case "generate_ritual_cover":
-        return await generateRitualCover(supabase, args);
+      case "add_tasks_to_routine":
+        return await addTasksToRoutine(supabase, args);
+      case "delete_routine_task":
+        return await deleteRoutineTask(supabase, args);
+      case "generate_routine_cover":
+        return await generateRoutineCover(supabase, args);
       default:
         return { success: false, error: `Unknown tool: ${fnName}` };
     }
