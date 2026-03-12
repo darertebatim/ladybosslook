@@ -410,15 +410,15 @@ export function RoutinePreviewSheet({
                   {/* Group tasks by repeat_pattern */}
                   {(() => {
                     const groups = [
-                      { key: 'daily', label: 'Daily tasks', filter: (t: RoutinePlanTask) => {
+                      { key: 'daily', label: 'Daily actions', filter: (t: RoutinePlanTask) => {
                         const p = editedTasks[t.id]?.repeatPattern || (t as any).repeat_pattern || 'daily';
                         return p === 'daily';
                       }},
-                      { key: 'weekly', label: 'Weekly tasks', filter: (t: RoutinePlanTask) => {
+                      { key: 'weekly', label: 'Weekly actions', filter: (t: RoutinePlanTask) => {
                         const p = editedTasks[t.id]?.repeatPattern || (t as any).repeat_pattern;
                         return p === 'weekly';
                       }},
-                      { key: 'monthly', label: 'Monthly tasks', filter: (t: RoutinePlanTask) => {
+                      { key: 'monthly', label: 'Monthly actions', filter: (t: RoutinePlanTask) => {
                         const p = editedTasks[t.id]?.repeatPattern || (t as any).repeat_pattern;
                         return p === 'monthly';
                       }},
