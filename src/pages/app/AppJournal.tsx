@@ -20,10 +20,8 @@ const JOURNAL_PROMPTS = [
   'Today I learned\u2026',
   "I'm grateful for\u2026",
   "I'm feeling\u2026",
-  'One thing I want to remember\u2026',
-  'What challenged me today\u2026',
-  'A moment that made me smile\u2026',
-  'Something I want to let go of\u2026',
+  'What challenged me\u2026',
+  'A win today\u2026',
 ];
 
 const calculateMonthlyPresence = (entries: any[]): number => {
