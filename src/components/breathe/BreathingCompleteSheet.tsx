@@ -54,7 +54,7 @@ export function BreathingCompleteSheet({
       >
         {/* Header */}
         <div className="flex flex-col items-center text-center mb-6">
-          <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
             <FluentEmoji emoji="🧘" size={44} />
           </div>
 
