@@ -19,7 +19,7 @@ const ACTIONS = [
     route: '/app/journal/new',
   },
   {
-    label: 'Reflect',
+    label: 'Self Reflection',
     image: reflectImg,
     route: '/app/reflections',
   },
