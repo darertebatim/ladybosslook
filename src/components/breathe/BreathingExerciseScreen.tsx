@@ -332,6 +332,14 @@ export function BreathingExerciseScreen({
         onOpenChange={setShowInfoSheet}
         onDismiss={handleInfoDismiss}
       />
+
+      {/* Completion Sheet */}
+      <BreathingCompleteSheet
+        open={showCompleteSheet}
+        onOpenChange={setShowCompleteSheet}
+        exerciseName={exercise.name}
+        durationSeconds={completedDuration}
+      />
     </div>
   );
 }
