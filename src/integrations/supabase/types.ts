@@ -1043,6 +1043,38 @@ export type Database = {
         }
         Relationships: []
       }
+      feed_channel_exclusions: {
+        Row: {
+          channel_id: string
+          created_at: string
+          id: string
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_channel_exclusions_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "feed_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feed_channels: {
         Row: {
           allow_comments: boolean
