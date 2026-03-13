@@ -42,6 +42,16 @@ const AppJournal = () => {
   const handleTourReady = useCallback((tourStart: () => void) => {
     setStartTour(() => tourStart);
   }, []);
+
+  const handleToggleSearch = useCallback(() => {
+    setShowSearch((prev) => {
+      const next = !prev;
+      if (!next) {
+        setSearchQuery('');
+      }
+      return next;
+    });
+  }, []);
   
   const { data: entries, isLoading } = useJournalEntries(searchQuery);
 
