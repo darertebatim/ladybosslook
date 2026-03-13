@@ -74,9 +74,9 @@ const ACTIONS = [
     route: `/app/breathe?exercise=${CALM_BREATHING_ID}`,
   },
   {
-    label: 'Start My Plan',
-    image: planImg,
-    route: '/app/home',
+    label: 'Name My Emotion',
+    image: emotionImg,
+    route: '/app/emotion?step=select',
   },
   {
     label: 'Talk it Out',
