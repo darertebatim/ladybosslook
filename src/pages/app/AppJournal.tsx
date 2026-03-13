@@ -16,6 +16,16 @@ import { JournalCalendar } from '@/components/app/JournalCalendar';
 import { haptic } from '@/lib/haptics';
 import { format, startOfDay, startOfMonth, subDays, isAfter } from 'date-fns';
 
+const JOURNAL_PROMPTS = [
+  'Today I learned\u2026',
+  "I'm grateful for\u2026",
+  "I'm feeling\u2026",
+  'One thing I want to remember\u2026',
+  'What challenged me today\u2026',
+  'A moment that made me smile\u2026',
+  'Something I want to let go of\u2026',
+];
+
 const calculateMonthlyPresence = (entries: any[]): number => {
   if (!entries || entries.length === 0) return 0;
   const monthStart = startOfMonth(new Date());
@@ -208,6 +218,21 @@ const AppJournal = () => {
       {/* Scrollable entries */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="p-4 pb-32 space-y-6">
+          {/* Prompt chips */}
+          <div className="flex gap-2 overflow-x-auto no-scrollbar">
+            {JOURNAL_PROMPTS.map((prompt) => (
+              <button
+                key={prompt}
+                onClick={() => {
+                  haptic.light();
+                  navigate('/app/journal/new', { state: { prefillTitle: prompt } });
+                }}
+                className="shrink-0 px-4 py-2 rounded-full bg-muted text-sm text-foreground whitespace-nowrap transition-colors active:bg-muted/70"
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
           {entries && entries.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Loader2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,14 +26,18 @@ import {
 
 const AppJournalEntry = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { entryId } = useParams<{ entryId: string }>();
   const isNewEntry = !entryId || entryId === 'new';
   
   // Get mood from URL params for new entries (e.g., /app/journal/new?mood=great)
   const urlParams = new URLSearchParams(window.location.search);
   const initialMood = urlParams.get('mood');
+
+  // Get prefill title from navigation state (journal prompt chips)
+  const prefillTitle = (location.state as any)?.prefillTitle || '';
   
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState(prefillTitle);
   const [content, setContent] = useState('');
   const [mood, setMood] = useState<string | null>(initialMood);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
