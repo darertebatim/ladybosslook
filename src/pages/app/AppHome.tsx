@@ -859,8 +859,8 @@ const AppHome = () => {
               {/* Program Events Section - only show when "All" tag is selected */}
               {programEvents.length > 0 && <div className="mb-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <CalendarDays className="h-4 w-4 text-indigo-500" />
-                    <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">
+                    <CalendarDays className="h-4 w-4 text-foreground" />
+                    <h2 className="text-sm font-semibold text-foreground">
                       Program Events
                     </h2>
                   </div>
