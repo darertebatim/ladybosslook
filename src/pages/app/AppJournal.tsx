@@ -249,17 +249,13 @@ const AppJournal = () => {
         style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}
       >
         <button
-          onClick={handleRoutineClick}
+          onClick={handleToggleSearch}
           className={cn(
             "w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors",
-            isAdded ? "bg-success/20" : "bg-urgency"
+            showSearch ? "bg-foreground/10" : "bg-muted"
           )}
         >
-          {isAdded ? (
-            <Check className="h-5 w-5 text-success" />
-          ) : (
-            <CalendarPlus className="h-5 w-5 text-urgency-foreground" />
-          )}
+          <Search className="h-5 w-5 text-muted-foreground" />
         </button>
 
         <button
@@ -271,13 +267,17 @@ const AppJournal = () => {
         </button>
 
         <button
-          onClick={handleToggleSearch}
+          onClick={handleRoutineClick}
           className={cn(
             "w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors",
-            showSearch ? "bg-foreground/10" : "bg-muted"
+            isAdded ? "bg-success/20" : "bg-urgency"
           )}
         >
-          <Search className="h-5 w-5 text-muted-foreground" />
+          {isAdded ? (
+            <Check className="h-5 w-5 text-success" />
+          ) : (
+            <CalendarPlus className="h-5 w-5 text-urgency-foreground" />
+          )}
         </button>
       </div>
 
