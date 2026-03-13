@@ -133,7 +133,12 @@ export function MoodCelebrationSheet({
   if (!moodData) return null;
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          handleDone();
+        }
+        onOpenChange(isOpen);
+      }}>
       <SheetContent 
         side="bottom" 
         className={cn(
