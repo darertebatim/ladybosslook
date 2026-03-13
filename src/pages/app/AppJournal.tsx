@@ -134,11 +134,13 @@ const AppJournal = () => {
           <h1 className="text-lg font-semibold text-foreground">Journal Stats</h1>
           <div className="w-9" />
         </div>
-        <div className="flex-1 px-4 py-6">
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6 pb-safe">
           <JournalHeaderStats
             totalEntries={stats.totalEntries}
             thisMonth={stats.daysThisMonth}
+            streak={stats.streak}
           />
+          <JournalCalendar journalDays={stats.journalDays} />
         </div>
       </div>
     );
