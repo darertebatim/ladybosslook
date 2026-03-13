@@ -59,6 +59,7 @@ export const useEmotionLogs = () => {
         .from('emotion_logs')
         .select('*')
         .eq('user_id', user.id)
+        .neq('category', 'mood_checkin')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
