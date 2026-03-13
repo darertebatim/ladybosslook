@@ -217,12 +217,12 @@ const AppJournal = () => {
           {/* Journaling Prompts — marquee */}
           <div className="rounded-2xl bg-muted/50 border border-border/50 py-3 space-y-2 overflow-hidden">
             <p className="text-xs font-medium text-muted-foreground px-4">Journaling prompts</p>
-            {[JOURNAL_PROMPTS_ROW1, JOURNAL_PROMPTS_ROW2].map((row, i) => (
+            {JOURNAL_PROMPT_ROWS.map((row, i) => (
               <div key={i} className="relative overflow-hidden">
                 <div
                   className={cn(
                     "flex gap-2 w-max",
-                    i === 0 ? "animate-[marquee-left_25s_linear_infinite]" : "animate-[marquee-right_28s_linear_infinite]"
+                    i % 2 === 0 ? "animate-[marquee-left_25s_linear_infinite]" : "animate-[marquee-right_28s_linear_infinite]"
                   )}
                 >
                   {[...row, ...row].map((prompt, j) => (
