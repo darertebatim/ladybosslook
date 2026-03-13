@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { useCreateJournalEntry } from '@/hooks/useJournal';
+import { useCreateMoodLog } from '@/hooks/useMoodLogs';
 import { toast } from 'sonner';
 import {
   Drawer,
@@ -53,7 +53,7 @@ interface QuickMoodCheckInProps {
 
 export function QuickMoodCheckIn({ open, onOpenChange }: QuickMoodCheckInProps) {
   const navigate = useNavigate();
-  const createJournalEntry = useCreateJournalEntry();
+  const createMoodLog = useCreateMoodLog();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleMoodSelect = async (moodValue: string) => {
@@ -61,18 +61,18 @@ export function QuickMoodCheckIn({ open, onOpenChange }: QuickMoodCheckInProps) 
     setIsSubmitting(true);
     
     try {
-      // Create a journal entry with just the mood
+      // Log mood without creating a journal entry
       const moodLabel = MOODS.find(m => m.value === moodValue)?.label || moodValue;
-      const entry = await createJournalEntry.mutateAsync({
-        content: `Feeling ${moodLabel.toLowerCase()} today.`,
+      await createMoodLog.mutateAsync({
         mood: moodValue,
+        content: `Feeling ${moodLabel.toLowerCase()} today.`,
       });
       
       haptic.success();
       toast.success('Mood logged!', {
         action: {
           label: 'Write more',
-          onClick: () => navigate(`/app/journal/${entry.id}`),
+          onClick: () => navigate(`/app/journal/new?mood=${moodValue}`),
         },
       });
       onOpenChange(false);

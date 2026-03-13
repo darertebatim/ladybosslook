@@ -30,6 +30,25 @@ export interface UpdateJournalEntry {
   shared_with_admin?: boolean;
 }
 
+const LEGACY_MOOD_CHECKIN_CONTENTS = new Set([
+  'feeling great today.',
+  'feeling good today.',
+  'feeling okay today.',
+  'feeling not great today.',
+  'feeling bad today.',
+]);
+
+const isHiddenMoodCheckin = (entry: JournalEntry): boolean => {
+  if (entry.title === '__mood_checkin__') return true;
+
+  if (!entry.title && entry.mood) {
+    const normalizedContent = entry.content.trim().replace(/\s+/g, ' ').toLowerCase();
+    return LEGACY_MOOD_CHECKIN_CONTENTS.has(normalizedContent);
+  }
+
+  return false;
+};
+
 export const useJournalEntries = (searchQuery?: string) => {
   const { user, loading } = useAuth();
 
@@ -53,7 +72,7 @@ export const useJournalEntries = (searchQuery?: string) => {
       const { data, error } = await query;
 
       if (error) throw error;
-      return (data as JournalEntry[]).filter((entry) => entry.title !== '__mood_checkin__');
+      return (data as JournalEntry[]).filter((entry) => !isHiddenMoodCheckin(entry));
     },
     enabled: !loading && !!user?.id,
   });
