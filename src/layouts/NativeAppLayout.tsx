@@ -150,6 +150,8 @@ const NativeAppLayout = () => {
   const isOnPlayerPage = location.pathname.match(/^\/app\/player\/[^/]+$/);
   // Check if we're on chat page - hide tab bar for full-screen experience
   const isOnChatPage = location.pathname === '/app/chat';
+  // Hide nav on full-screen tool pages (journal, timer, etc.)
+  const isFullScreenTool = location.pathname.startsWith('/app/journal');
 
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home', tourClass: 'tour-nav-home' },
