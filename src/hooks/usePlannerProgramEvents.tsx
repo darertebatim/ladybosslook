@@ -97,9 +97,11 @@ export function useProgramEventsForDate(date: Date) {
 
       const events: ProgramEvent[] = [];
 
-      // Process sessions (already filtered by date in RPC)
+      // Process sessions — apply client-side local date filtering
+      // The RPC filters by UTC day boundaries which can mismatch the user's local date
       for (const s of (data.sessions || [])) {
         const sessionDate = new Date(s.sessionDate);
+        if (!isSameDay(sessionDate, date)) continue;
         events.push({
           id: s.id,
           type: 'session',
