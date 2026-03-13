@@ -8,9 +8,9 @@ import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 
 import journalImg from '@/assets/mood-card-journal.png';
+import reflectImg from '@/assets/mood-card-reflect.png';
 import planImg from '@/assets/mood-card-plan.png';
 import talkImg from '@/assets/mood-card-talk.png';
-import breathingImg from '@/assets/mood-card-breathing.png';
 
 const ACTIONS = [
   {
