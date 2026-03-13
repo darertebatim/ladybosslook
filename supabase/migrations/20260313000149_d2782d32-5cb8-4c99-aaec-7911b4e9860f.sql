@@ -1,0 +1,2 @@
+INSERT INTO public.feed_channel_exclusions (channel_id, user_id, reason)
+VALUES ('40c7c499-ab87-4cc6-9d3e-85d35ed8c83b', '0e2661fa-db2b-40c1-9ba5-fb86abbec6cb', 'Reviewer account - hide channel content');

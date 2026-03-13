@@ -77,8 +77,10 @@ export const EMOJI_OPTIONS = [
 ];
 
 export function useChannels() {
+  const { user } = useAuth();
+
   return useQuery({
-    queryKey: ['feed-channels'],
+    queryKey: ['feed-channels', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('feed_channels')
@@ -86,6 +88,20 @@ export function useChannels() {
         .order('sort_order', { ascending: true });
       
       if (error) throw error;
+
+      // Filter out channels the user is excluded from
+      if (user?.id) {
+        const { data: exclusions } = await supabase
+          .from('feed_channel_exclusions')
+          .select('channel_id')
+          .eq('user_id', user.id);
+
+        if (exclusions && exclusions.length > 0) {
+          const excludedIds = new Set(exclusions.map(e => e.channel_id));
+          return (data as FeedChannel[]).filter(ch => !excludedIds.has(ch.id));
+        }
+      }
+
       return data as FeedChannel[];
     },
   });
