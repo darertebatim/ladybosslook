@@ -1,58 +1,38 @@
 
 
-## Calm-Style Animated Background for Watch Page
+# Redesign Journal Page to Match Timer Layout
 
-Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
+## Current State
+The journal page has an old design: purple header with inline stats, a card with "Write Today's Entry" and "Add to Routine" buttons in the scroll area, and search/plus icons in the header.
 
-### What You'll Get
+## Target State
+Match the timer's layout pattern:
+- **Top bar**: X/close button (left), "My Journal" title (center-ish), stats icon (right) + search icon
+- **Middle**: Scrollable entries list (no quick actions card)
+- **Bottom bar**: Add to routine button (left circle), "Write Today's Entry" (center, full-width dark button), Settings/search (right circle — we'll use search here since journal doesn't have settings)
 
-- A deep dark blue gradient background on the Watch page header area
-- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
-- Subtle lightning flashes that pulse periodically
-- All text updated to white/light colors for contrast
-- Lightweight implementation using CSS keyframes (no extra dependencies)
+## Changes
 
-### Design Details
+### `src/pages/app/AppJournal.tsx` — Full redesign
 
-- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
-- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
-- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
-- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
-- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
+1. **Remove** the purple header (`bg-[#F4ECFE]`) with rounded bottom and inline stats grid
+2. **New top bar** (plain `bg-background`, matching timer):
+   - Left: X button → navigates back to `/app/home`
+   - Center: "My Journal" title
+   - Right: Stats icon (links to profile journal stats section) + Search icon
+3. **Remove** the Quick Actions Card from the scroll area
+4. **New bottom bar** (matching timer's 3-column layout):
+   - Left: Routine button (orange `CalendarPlus` circle, or green check if already added) — uses existing `JournalReminderSettings` logic
+   - Center: "Write Today's Entry" dark rounded-full button
+   - Right: Search toggle (circle button)
+5. **Search bar**: When toggled, appears below the top bar (same as current behavior)
+6. **Loading state**: Updated to match new header style
 
-### Technical Approach
+### `src/components/app/JournalReminderSettings.tsx` — Extract logic
 
-**Files to modify:**
+Expose the routine state (isAdded, handleClick, showSheet) so the parent can render the circle button in the bottom bar instead of the inline button.
 
-1. **`src/pages/app/AppWatch.tsx`**
-   - Replace the header `bg-[#E8F4FE]` with the dark gradient
-   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
-   - Add a lightning flash overlay div
-   - Update all text classes to white variants (`text-white`, `text-white/60`)
-   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
-   - Extend the gradient into the page background behind the content area
-
-2. **`tailwind.config.ts`**
-   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
-   - Register corresponding animation utilities
-
-### Visual Structure
-
-```text
-+----------------------------------+
-|  [dark blue gradient header]     |
-|  ~~~ cloud layer 1 (slow) ~~~   |
-|  ~~~ cloud layer 2 (slower) ~~~ |
-|  * lightning flash (periodic) *  |
-|                                  |
-|  Watch          [icons]          |
-|  [categories row]                |
-|  [filters]              [lang]   |
-+----------------------------------+
-|  [normal white content area]     |
-|  [playlist cards grid]           |
-+----------------------------------+
-```
-
-The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
+### Files to modify:
+- `src/pages/app/AppJournal.tsx` — Main layout restructure
+- `src/components/app/JournalReminderSettings.tsx` — Adapt for bottom-bar usage
 
