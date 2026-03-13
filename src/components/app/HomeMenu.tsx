@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Menu, Compass, Music, Users, MessageCircle,
+  Menu, Compass, Music, Users, Headset,
   BookOpen, Wind, Droplets, HeartHandshake, Heart, CalendarPlus, GraduationCap, User, HelpCircle, LogOut, Zap, Settings
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -20,7 +20,7 @@ const navPages: NavItem[] = [
   { id: 'explore', name: 'Explore', icon: <Compass className="h-4 w-4" />, route: '/app/player', color: 'text-violet-600 bg-violet-100' },
   { id: 'listen', name: 'Listen', icon: <Music className="h-4 w-4" />, route: '/app/listen', color: 'text-rose-600 bg-rose-100' },
   { id: 'channels', name: 'Chats', icon: <Users className="h-4 w-4" />, route: '/app/feed', color: 'text-teal-600 bg-teal-100' },
-  { id: 'chat', name: 'Chat', icon: <MessageCircle className="h-4 w-4" />, route: '/app/chat', color: 'text-blue-600 bg-blue-100' },
+  { id: 'chat', name: 'Support', icon: <Headset className="h-4 w-4" />, route: '/app/chat', color: 'text-orange-600 bg-orange-100' },
 ];
 
 const toolItems: NavItem[] = [
