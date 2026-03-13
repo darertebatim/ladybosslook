@@ -150,6 +150,8 @@ const NativeAppLayout = () => {
   const isOnPlayerPage = location.pathname.match(/^\/app\/player\/[^/]+$/);
   // Check if we're on chat page - hide tab bar for full-screen experience
   const isOnChatPage = location.pathname === '/app/chat';
+  // Hide nav on full-screen tool pages (journal, timer, etc.)
+  const isFullScreenTool = location.pathname.startsWith('/app/journal');
 
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home', tourClass: 'tour-nav-home' },
@@ -169,7 +171,7 @@ const NativeAppLayout = () => {
         data-scroll-container="true"
         className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain"
         style={{
-          paddingBottom: (isOnChatPage || isKeyboardOpen) ? 0 : TAB_BAR_CONTENT_HEIGHT + 8,
+          paddingBottom: (isOnChatPage || isFullScreenTool || isKeyboardOpen) ? 0 : TAB_BAR_CONTENT_HEIGHT + 8,
           // iOS WKWebView: make the actual scroll container momentum-scrollable and
           // explicitly allow vertical panning. This helps prevent intermittent “stuck” scroll.
           WebkitOverflowScrolling: 'touch',
@@ -183,10 +185,10 @@ const NativeAppLayout = () => {
       {deferredReady && <DeferredLayoutHooks userId={user?.id} />}
 
       {/* Mini Player - show when audio is playing and not on player page or chat page */}
-      {!isOnPlayerPage && !isOnChatPage && !isKeyboardOpen && <MiniPlayer />}
+      {!isOnPlayerPage && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen && <MiniPlayer />}
 
       {/* Bottom Navigation - hidden on chat page for full-screen experience */}
-      {!isOnChatPage && !isKeyboardOpen && (
+      {!isOnChatPage && !isFullScreenTool && !isKeyboardOpen && (
       <nav className={cn(
         "fixed bottom-0 left-0 right-0 z-50 shadow-lg pb-safe",
         (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
