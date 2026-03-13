@@ -188,7 +188,7 @@ const NativeAppLayout = () => {
       {!isOnPlayerPage && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen && <MiniPlayer />}
 
       {/* Bottom Navigation - hidden on chat page for full-screen experience */}
-      {!isOnChatPage && !isKeyboardOpen && (
+      {!isOnChatPage && !isFullScreenTool && !isKeyboardOpen && (
       <nav className={cn(
         "fixed bottom-0 left-0 right-0 z-50 shadow-lg pb-safe",
         (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
