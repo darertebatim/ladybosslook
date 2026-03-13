@@ -218,20 +218,23 @@ const AppJournal = () => {
       {/* Scrollable entries */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="p-4 pb-32 space-y-6">
-          {/* Prompt chips */}
-          <div className="flex gap-2 overflow-x-auto no-scrollbar">
-            {JOURNAL_PROMPTS.map((prompt) => (
-              <button
-                key={prompt}
-                onClick={() => {
-                  haptic.light();
-                  navigate('/app/journal/new', { state: { prefillTitle: prompt } });
-                }}
-                className="shrink-0 px-4 py-2 rounded-full bg-muted text-sm text-foreground whitespace-nowrap transition-colors active:bg-muted/70"
-              >
-                {prompt}
-              </button>
-            ))}
+          {/* Journaling Prompts */}
+          <div className="rounded-2xl bg-muted/50 border border-border/50 p-3 space-y-2">
+            <p className="text-xs font-medium text-muted-foreground px-1">Journaling prompts</p>
+            <div className="flex flex-wrap gap-2">
+              {JOURNAL_PROMPTS.map((prompt) => (
+                <button
+                  key={prompt}
+                  onClick={() => {
+                    haptic.light();
+                    navigate('/app/journal/new', { state: { prefillTitle: prompt } });
+                  }}
+                  className="px-3 py-1.5 rounded-full bg-background border border-border text-xs text-foreground transition-colors active:bg-accent"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
           </div>
           {entries && entries.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
