@@ -9,7 +9,7 @@ import { BreathingExercise, useSaveBreathingSession } from '@/hooks/useBreathing
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
+import { BreathingCompleteSheet } from './BreathingCompleteSheet';
 
 interface BreathingExerciseScreenProps {
   exercise: BreathingExercise;
