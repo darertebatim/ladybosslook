@@ -16,22 +16,10 @@ import { JournalCalendar } from '@/components/app/JournalCalendar';
 import { haptic } from '@/lib/haptics';
 import { format, startOfDay, startOfMonth, subDays, isAfter } from 'date-fns';
 
-const JOURNAL_PROMPTS_ROW1 = [
-  'Today I learned\u2026',
-  "I'm grateful for\u2026",
-  "I'm feeling\u2026",
-  'A win today\u2026',
-  'What inspired me\u2026',
-  'I need to let go of\u2026',
-];
-
-const JOURNAL_PROMPTS_ROW2 = [
-  'What challenged me\u2026',
-  'A moment that made me smile\u2026',
-  'One thing I want to remember\u2026',
-  'Tomorrow I want to\u2026',
-  'Something new I tried\u2026',
-  'I forgive myself for\u2026',
+const JOURNAL_PROMPT_ROWS = [
+  ['Today I learned\u2026', "I'm grateful for\u2026", "I'm feeling\u2026", 'A win today\u2026', 'What inspired me\u2026'],
+  ['What challenged me\u2026', 'A moment that made me smile\u2026', 'Tomorrow I want to\u2026', 'Something new I tried\u2026'],
+  ['I need to let go of\u2026', 'One thing I want to remember\u2026', 'I forgive myself for\u2026', 'My energy today is\u2026'],
 ];
 
 const calculateMonthlyPresence = (entries: any[]): number => {
