@@ -20,7 +20,7 @@ const ACTIONS = [
   },
   {
     label: 'Reflect',
-    image: breathingImg,
+    image: reflectImg,
     route: '/app/reflections',
   },
   {
