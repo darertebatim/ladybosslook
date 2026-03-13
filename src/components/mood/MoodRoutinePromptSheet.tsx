@@ -48,7 +48,12 @@ export function MoodRoutinePromptSheet({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          handleSkip();
+        }
+        onOpenChange(isOpen);
+      }}>
       <SheetContent
         side="bottom"
         className="rounded-t-3xl border-0 px-5 pt-7 pb-6"
