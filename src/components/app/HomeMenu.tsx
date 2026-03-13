@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Menu, Compass, Music, Users, MessageCircle,
+  Menu, Compass, Music, Users, Headset,
   BookOpen, Wind, Droplets, HeartHandshake, Heart, CalendarPlus, GraduationCap, User, HelpCircle, LogOut, Zap, Settings
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
