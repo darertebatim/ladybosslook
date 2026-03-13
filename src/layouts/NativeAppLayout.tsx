@@ -185,7 +185,7 @@ const NativeAppLayout = () => {
       {deferredReady && <DeferredLayoutHooks userId={user?.id} />}
 
       {/* Mini Player - show when audio is playing and not on player page or chat page */}
-      {!isOnPlayerPage && !isOnChatPage && !isKeyboardOpen && <MiniPlayer />}
+      {!isOnPlayerPage && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen && <MiniPlayer />}
 
       {/* Bottom Navigation - hidden on chat page for full-screen experience */}
       {!isOnChatPage && !isKeyboardOpen && (
