@@ -6,8 +6,6 @@ import { EmotionContext } from '@/components/emotion/EmotionContext';
 import { EmotionComplete } from '@/components/emotion/EmotionComplete';
 import { useEmotionLogs } from '@/hooks/useEmotionLogs';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
-import { useSubscription } from '@/hooks/useSubscription';
-import { PaywallSheet } from '@/components/app/PaywallSheet';
 import type { Valence } from '@/lib/emotionData';
 
 type Step = 'dashboard' | 'select' | 'context' | 'complete';
@@ -15,7 +13,7 @@ type Step = 'dashboard' | 'select' | 'context' | 'complete';
 interface EmotionState {
   valence: Valence | null;
   category: string | null;
-  emotions: string[]; // Now supports multiple emotions
+  emotions: string[];
 }
 
 const AppEmotion = () => {
@@ -23,15 +21,6 @@ const AppEmotion = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { createLog } = useEmotionLogs();
   const { autoCompleteEmotion } = useAutoCompleteProTask();
-  const { isSubscribed, isLoading: subLoading } = useSubscription();
-  const [showPaywall, setShowPaywall] = useState(false);
-
-  // Show paywall for non-subscribers
-  useEffect(() => {
-    if (!subLoading && !isSubscribed) {
-      setShowPaywall(true);
-    }
-  }, [subLoading, isSubscribed]);
   
   const initialStep = searchParams.get('step') === 'select' ? 'select' : 'dashboard';
   const [step, setStep] = useState<Step>(initialStep);
@@ -48,7 +37,6 @@ const AppEmotion = () => {
     emotions: [],
   });
 
-  // Navigation handlers
   const handleStartCheckIn = useCallback(() => setStep('select'), []);
   
   const handleEmotionComplete = useCallback((valence: Valence, category: string, emotions: string[]) => {
@@ -59,7 +47,6 @@ const AppEmotion = () => {
   const handleSave = useCallback(async (contexts: string[], notes: string) => {
     if (!state.valence || !state.category || state.emotions.length === 0) return;
 
-    // Store multiple emotions as comma-separated string
     await createLog.mutateAsync({
       valence: state.valence,
       category: state.category,
@@ -68,14 +55,11 @@ const AppEmotion = () => {
       notes: notes || undefined,
     });
 
-    // Auto-complete any emotion pro tasks for today
     await autoCompleteEmotion();
-
     setStep('complete');
   }, [state, createLog, autoCompleteEmotion]);
 
   const handleDone = useCallback(() => {
-    // Navigate to planner/home after completing
     navigate('/app/home');
   }, [navigate]);
 
@@ -92,7 +76,6 @@ const AppEmotion = () => {
     }
   }, [step, navigate]);
 
-  // Render current step
   const renderStep = () => {
     switch (step) {
       case 'dashboard':
@@ -123,18 +106,7 @@ const AppEmotion = () => {
     }
   };
 
-  return (
-    <>
-      {renderStep()}
-      <PaywallSheet
-        open={showPaywall}
-        onOpenChange={(open) => {
-          setShowPaywall(open);
-          if (!open && !isSubscribed) navigate('/app/home');
-        }}
-      />
-    </>
-  );
+  return <>{renderStep()}</>;
 };
 
 export default AppEmotion;
