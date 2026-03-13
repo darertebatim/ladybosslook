@@ -1,13 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useRoutinePlan, useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
-import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { toast } from 'sonner';
-
-interface JournalReminderSettingsProps {
-  className?: string;
-}
 
 // The journal Pro Routine ID - contains the "Daily Reflection & Gratitude" pro task
 const JOURNAL_ROUTINE_ID = '51be0466-99fb-4357-b48d-b584376046c5';
@@ -26,20 +21,20 @@ const SYNTHETIC_JOURNAL_TASK: RoutinePlanTask = {
   pro_link_type: 'journal',
   pro_link_value: null,
   linked_playlist: null,
-  tag: 'pro', // Pro-linked tasks use 'pro' category
+  tag: 'pro',
 };
 
-export const JournalReminderSettings = ({ className }: JournalReminderSettingsProps) => {
+/** Hook to expose journal routine state for external rendering */
+export const useJournalRoutine = () => {
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
-  
+
   const { data: routinePlan, isLoading } = useRoutinePlan(JOURNAL_ROUTINE_ID);
   const { data: existingTask } = useExistingProTask('journal');
   const addRoutinePlan = useAddRoutinePlan();
 
-  const isAdded = existingTask || justAdded;
+  const isAdded = !!existingTask || justAdded;
 
-  // Use Pro Routine tasks if available, otherwise fall back to synthetic
   const tasksToShow = useMemo(() => {
     if (routinePlan?.tasks && routinePlan.tasks.length > 0) {
       return routinePlan.tasks;
@@ -66,26 +61,14 @@ export const JournalReminderSettings = ({ className }: JournalReminderSettingsPr
     }
   };
 
-  return (
-    <div className={`${className || ''} tour-journal-add-routine`}>
-      <AddedToRoutineButton
-        isAdded={isAdded}
-        onAddClick={() => setShowRoutineSheet(true)}
-        isLoading={isLoading || addRoutinePlan.isPending}
-        addText="Add Journaling to My Routines"
-        size="sm"
-        variant="outline"
-      />
-
-      <RoutinePreviewSheet
-        open={showRoutineSheet}
-        onOpenChange={setShowRoutineSheet}
-        tasks={tasksToShow}
-        routineTitle={routinePlan?.title || 'Journaling'}
-        defaultTag="Journal"
-        onSave={handleSaveRoutine}
-        isSaving={addRoutinePlan.isPending}
-      />
-    </div>
-  );
+  return {
+    isAdded,
+    isLoading: isLoading || addRoutinePlan.isPending,
+    showRoutineSheet,
+    setShowRoutineSheet,
+    handleSaveRoutine,
+    tasksToShow,
+    routineTitle: routinePlan?.title || 'Journaling',
+    isSaving: addRoutinePlan.isPending,
+  };
 };

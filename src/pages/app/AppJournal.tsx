@@ -1,35 +1,30 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, BookOpen, NotebookPen } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { X, Search, BookOpen, NotebookPen, CalendarPlus, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
 import { useJournalEntries } from '@/hooks/useJournal';
 import { JournalEntryCard, formatDateGroup } from '@/components/app/JournalEntryCard';
 import { JournalSkeleton } from '@/components/app/skeletons/JournalSkeleton';
-import { JournalReminderSettings } from '@/components/app/JournalReminderSettings';
-import { JournalHeaderStats } from '@/components/app/JournalHeaderStats';
+import { useJournalRoutine } from '@/components/app/JournalReminderSettings';
+import { RoutinePreviewSheet } from '@/components/app/RoutinePreviewSheet';
 import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
 import { JournalTour, TourHelpButton } from '@/components/app/tour';
+import { JournalHeaderStats } from '@/components/app/JournalHeaderStats';
+import { haptic } from '@/lib/haptics';
 import { format, startOfDay, startOfMonth, subDays, isAfter } from 'date-fns';
 
-// Calculate monthly presence - unique days with entries this month
-// Replaces streak calculation (strength-first philosophy)
 const calculateMonthlyPresence = (entries: any[]): number => {
   if (!entries || entries.length === 0) return 0;
-
   const monthStart = startOfMonth(new Date());
-  
   const uniqueDays = new Set<string>();
-  
   entries.forEach(entry => {
     const entryDate = new Date(entry.created_at);
     if (entryDate >= monthStart) {
       uniqueDays.add(format(entryDate, 'yyyy-MM-dd'));
     }
   });
-
   return uniqueDays.size;
 };
 
@@ -37,8 +32,9 @@ const AppJournal = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+  const [showStats, setShowStats] = useState(false);
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
-  
+
   const handleTourReady = useCallback((tourStart: () => void) => {
     setStartTour(() => tourStart);
   }, []);
@@ -46,26 +42,40 @@ const AppJournal = () => {
   const handleToggleSearch = useCallback(() => {
     setShowSearch((prev) => {
       const next = !prev;
-      if (!next) {
-        setSearchQuery('');
-      }
+      if (!next) setSearchQuery('');
       return next;
     });
+    haptic.light();
   }, []);
-  
+
   const { data: entries, isLoading } = useJournalEntries(searchQuery);
 
-  // Calculate stats - strength-first: monthly presence, not streak
+  // Routine integration
+  const {
+    isAdded,
+    showRoutineSheet,
+    setShowRoutineSheet,
+    handleSaveRoutine,
+    tasksToShow,
+    routineTitle,
+    isSaving,
+  } = useJournalRoutine();
+
+  const handleRoutineClick = () => {
+    haptic.light();
+    if (isAdded) {
+      navigate('/app/home');
+    } else {
+      setShowRoutineSheet(true);
+    }
+  };
+
+  // Stats
   const stats = useMemo(() => {
     if (!entries) return { totalEntries: 0, daysThisMonth: 0, thisMonth: 0 };
-
     const today = startOfDay(new Date());
     const thirtyDaysAgo = subDays(today, 30);
-    
-    const thisMonth = entries.filter(e => 
-      isAfter(new Date(e.created_at), thirtyDaysAgo)
-    ).length;
-
+    const thisMonth = entries.filter(e => isAfter(new Date(e.created_at), thirtyDaysAgo)).length;
     return {
       totalEntries: entries.length,
       daysThisMonth: calculateMonthlyPresence(entries),
@@ -76,138 +86,115 @@ const AppJournal = () => {
   // Group entries by date
   const groupedEntries = useMemo(() => {
     if (!entries) return {};
-    
     const groups: Record<string, typeof entries> = {};
     entries.forEach((entry) => {
       const dateKey = format(startOfDay(new Date(entry.created_at)), 'yyyy-MM-dd');
-      if (!groups[dateKey]) {
-        groups[dateKey] = [];
-      }
+      if (!groups[dateKey]) groups[dateKey] = [];
       groups[dateKey].push(entry);
     });
-    
     return groups;
   }, [entries]);
 
   const dateKeys = Object.keys(groupedEntries).sort((a, b) => b.localeCompare(a));
 
+  // ─── STATS SCREEN ───
+  if (showStats) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <div
+          className="flex items-center justify-between px-4 pb-2"
+          style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}
+        >
+          <button onClick={() => setShowStats(false)} className="p-2 -ml-2">
+            <X className="h-5 w-5 text-foreground" />
+          </button>
+          <h1 className="text-lg font-semibold text-foreground">Journal Stats</h1>
+          <div className="w-9" />
+        </div>
+        <div className="flex-1 px-4 py-6">
+          <JournalHeaderStats
+            totalEntries={stats.totalEntries}
+            thisMonth={stats.daysThisMonth}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // ─── LOADING ───
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <div 
-          className="fixed top-0 left-0 right-0 z-10 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
-          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      <div className="min-h-screen bg-background flex flex-col">
+        <div
+          className="flex items-center justify-between px-4 pb-2"
+          style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}
         >
-          <div className="flex items-center justify-between px-4 pt-1 pb-2">
-            <div className="flex items-center gap-1">
-              <BackButton to="/app/home" showLabel={false} />
-              <h1 className="text-xl font-semibold">My Journal</h1>
-            </div>
-          </div>
+          <button onClick={() => navigate('/app/home')} className="p-2 -ml-2">
+            <X className="h-5 w-5 text-foreground" />
+          </button>
+          <h1 className="text-lg font-semibold text-foreground">My Journal</h1>
+          <div className="w-9" />
         </div>
-        <div style={{ height: 'calc(56px + env(safe-area-inset-top, 0px))' }} />
         <JournalSkeleton />
       </div>
     );
   }
 
+  // ─── MAIN SCREEN ───
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <SEOHead title="My Journal" description="Your personal journal entries" />
-      
-      {/* Header */}
-      <div 
-        className="fixed top-0 left-0 right-0 z-10 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+
+      {/* Top bar */}
+      <div
+        className="flex items-center justify-between px-4 pb-2"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}
       >
-        <div className="flex items-center justify-between px-4 pt-1 pb-1">
-          <div className="flex items-center gap-1">
-            <BackButton to="/app/home" showLabel={false} />
-            <h1 className="text-xl font-semibold">My Journal</h1>
-          </div>
-          <div className="flex items-center gap-1">
-            {startTour && (
-              <TourHelpButton onClick={startTour} />
-            )}
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={handleToggleSearch}
-            >
-              <Search className="h-5 w-5" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="tour-new-entry"
-              onClick={() => navigate('/app/journal/new')}
-            >
-              <Plus className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-        <div className="px-4 pb-3">
-          <JournalHeaderStats 
-            totalEntries={stats.totalEntries}
-            thisMonth={stats.daysThisMonth}
-          />
-        </div>
-        
-        {/* Search bar */}
-        {showSearch && (
-          <div className="px-4 pb-4">
-            <Input
-              placeholder="Search entries..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full"
-              autoFocus
-            />
-          </div>
-        )}
+        <button onClick={() => navigate('/app/home')} className="p-2 -ml-2">
+          <X className="h-5 w-5 text-foreground" />
+        </button>
+        <h1 className="text-lg font-semibold text-foreground">My Journal</h1>
+        <button onClick={() => { setShowStats(true); haptic.light(); }} className="p-2 -mr-2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M3 7h18" />
+            <path d="M8 3v4" />
+            <path d="M16 3v4" />
+            <rect x="7" y="11" width="3" height="8" rx="0.5" fill="currentColor" stroke="none" />
+            <rect x="11.5" y="13" width="3" height="6" rx="0.5" fill="currentColor" stroke="none" />
+            <rect x="16" y="15" width="3" height="4" rx="0.5" fill="currentColor" stroke="none" />
+          </svg>
+        </button>
       </div>
 
-      {/* Spacer for fixed header */}
-      <div className="shrink-0" style={{ height: 'calc(90px + env(safe-area-inset-top, 0px))' }} />
+      {/* Search bar */}
+      {showSearch && (
+        <div className="px-4 pb-3">
+          <Input
+            placeholder="Search entries..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full"
+            autoFocus
+          />
+        </div>
+      )}
 
-      {/* Scroll container */}
+      {/* Scrollable entries */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
-        <div className="p-4 pb-safe space-y-4">
-        {/* Quick Actions Card */}
-        <Card>
-          <CardContent className="p-4 space-y-3">
-            {/* Write Today's Entry Button */}
-            <Button 
-              className="w-full bg-foreground hover:bg-foreground/90 text-background" 
-              onClick={() => navigate('/app/journal/new')}
-            >
-              <NotebookPen className="h-4 w-4 mr-2" />
-              Write Today's Entry
-            </Button>
-
-            {/* Add to Routine Button */}
-            <JournalReminderSettings />
-          </CardContent>
-        </Card>
-
-        {/* Entries List */}
-        {entries && entries.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <BookOpen className="h-8 w-8 text-primary" />
+        <div className="p-4 pb-32 space-y-6">
+          {entries && entries.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <BookOpen className="h-8 w-8 text-primary" />
+              </div>
+              <h2 className="text-lg font-medium mb-2">Start Your Journal</h2>
+              <p className="text-muted-foreground text-sm max-w-xs">
+                Capture your thoughts, reflections, and daily moments in your personal journal.
+              </p>
             </div>
-            <h2 className="text-lg font-medium mb-2">Start Your Journal</h2>
-            <p className="text-muted-foreground text-sm max-w-xs mb-6">
-              Capture your thoughts, reflections, and daily moments in your personal journal.
-            </p>
-            <Button onClick={() => navigate('/app/journal/new')}>
-              <Plus className="h-4 w-4 mr-2" />
-              Write First Entry
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {dateKeys.map((dateKey) => (
+          ) : (
+            dateKeys.map((dateKey) => (
               <div key={dateKey} className="space-y-3">
                 <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
                   {formatDateGroup(dateKey)}
@@ -226,11 +213,60 @@ const AppJournal = () => {
                   ))}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
         </div>
       </div>
+
+      {/* Bottom bar — matches timer layout */}
+      <div
+        className="px-6 pt-4 flex items-center gap-3 bg-background border-t border-border/50"
+        style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}
+      >
+        <button
+          onClick={handleRoutineClick}
+          className={cn(
+            "w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors",
+            isAdded ? "bg-success/20" : "bg-urgency"
+          )}
+        >
+          {isAdded ? (
+            <Check className="h-5 w-5 text-success" />
+          ) : (
+            <CalendarPlus className="h-5 w-5 text-urgency-foreground" />
+          )}
+        </button>
+
+        <button
+          onClick={() => navigate('/app/journal/new')}
+          className="tour-new-entry flex-1 h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97] flex items-center justify-center gap-2"
+        >
+          <NotebookPen className="h-4 w-4" />
+          Write Today's Entry
+        </button>
+
+        <button
+          onClick={handleToggleSearch}
+          className={cn(
+            "w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors",
+            showSearch ? "bg-foreground/10" : "bg-muted"
+          )}
+        >
+          <Search className="h-5 w-5 text-muted-foreground" />
+        </button>
+      </div>
+
+      {/* Routine Preview Sheet */}
+      <RoutinePreviewSheet
+        open={showRoutineSheet}
+        onOpenChange={setShowRoutineSheet}
+        tasks={tasksToShow}
+        routineTitle={routineTitle}
+        defaultTag="Journal"
+        onSave={handleSaveRoutine}
+        isSaving={isSaving}
+      />
+
       {/* Feature Tour */}
       <JournalTour isFirstVisit={true} onTourReady={handleTourReady} />
     </div>
