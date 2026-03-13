@@ -19,9 +19,9 @@ const ACTIONS = [
     route: '/app/journal/new',
   },
   {
-    label: 'Check My Mood',
+    label: 'Reflect',
     image: breathingImg,
-    route: '/app/mood',
+    route: '/app/reflections',
   },
   {
     label: 'Start My Plan',
