@@ -17,13 +17,13 @@ import { haptic } from '@/lib/haptics';
 import { format, startOfDay, startOfMonth, subDays, isAfter } from 'date-fns';
 
 const JOURNAL_PROMPTS = [
-  'Today I learned…',
-  'I'm grateful for…',
-  'I'm feeling…',
-  'One thing I want to remember…',
-  'What challenged me today…',
-  'A moment that made me smile…',
-  'Something I want to let go of…',
+  'Today I learned\u2026',
+  "I'm grateful for\u2026",
+  "I'm feeling\u2026",
+  'One thing I want to remember\u2026',
+  'What challenged me today\u2026',
+  'A moment that made me smile\u2026',
+  'Something I want to let go of\u2026',
 ];
 
 const calculateMonthlyPresence = (entries: any[]): number => {
