@@ -9,7 +9,7 @@ import { BreathingExercise, useSaveBreathingSession } from '@/hooks/useBreathing
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
+import { BreathingCompleteSheet } from './BreathingCompleteSheet';
 
 interface BreathingExerciseScreenProps {
   exercise: BreathingExercise;
@@ -39,6 +39,8 @@ export function BreathingExerciseScreen({
   // Setup state
   const [selectedDuration, setSelectedDuration] = useState(60); // 1 min default
   const [showInfoSheet, setShowInfoSheet] = useState(false);
+  const [showCompleteSheet, setShowCompleteSheet] = useState(false);
+  const [completedDuration, setCompletedDuration] = useState(0);
   
   // Active session state
   const [isActive, setIsActive] = useState(false);
@@ -160,7 +162,8 @@ export function BreathingExerciseScreen({
         onSuccess: async () => {
           // Auto-complete any breathing pro tasks linked to this exercise
           await autoCompleteBreathe(exercise.id);
-          toast.success('Breathing session complete! 🧘');
+          setCompletedDuration(elapsed);
+          setShowCompleteSheet(true);
         },
       }
     );
@@ -328,6 +331,14 @@ export function BreathingExerciseScreen({
         open={showInfoSheet}
         onOpenChange={setShowInfoSheet}
         onDismiss={handleInfoDismiss}
+      />
+
+      {/* Completion Sheet */}
+      <BreathingCompleteSheet
+        open={showCompleteSheet}
+        onOpenChange={setShowCompleteSheet}
+        exerciseName={exercise.name}
+        durationSeconds={completedDuration}
       />
     </div>
   );
