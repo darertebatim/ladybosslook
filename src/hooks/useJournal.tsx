@@ -31,17 +31,19 @@ export interface UpdateJournalEntry {
 }
 
 export const useJournalEntries = (searchQuery?: string) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   return useQuery({
     queryKey: ['journal-entries', user?.id, searchQuery],
     queryFn: async () => {
-      if (!user?.id) return [];
+      const { data: authData } = await supabase.auth.getUser();
+      const userId = authData.user?.id ?? user?.id;
+      if (!userId) return [];
 
       let query = supabase
         .from('journal_entries')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (searchQuery && searchQuery.trim()) {
@@ -53,7 +55,7 @@ export const useJournalEntries = (searchQuery?: string) => {
       if (error) throw error;
       return (data as JournalEntry[]).filter((entry) => entry.title !== '__mood_checkin__');
     },
-    enabled: !!user?.id,
+    enabled: !loading && !!user?.id,
   });
 };
 
