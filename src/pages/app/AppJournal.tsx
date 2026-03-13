@@ -16,6 +16,16 @@ import { JournalCalendar } from '@/components/app/JournalCalendar';
 import { haptic } from '@/lib/haptics';
 import { format, startOfDay, startOfMonth, subDays, isAfter } from 'date-fns';
 
+const JOURNAL_PROMPTS = [
+  'Today I learned…',
+  'I'm grateful for…',
+  'I'm feeling…',
+  'One thing I want to remember…',
+  'What challenged me today…',
+  'A moment that made me smile…',
+  'Something I want to let go of…',
+];
+
 const calculateMonthlyPresence = (entries: any[]): number => {
   if (!entries || entries.length === 0) return 0;
   const monthStart = startOfMonth(new Date());
