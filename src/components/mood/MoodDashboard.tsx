@@ -75,7 +75,7 @@ export function MoodDashboard() {
   const navigate = useNavigate();
   const { autoCompleteMood } = useAutoCompleteProTask();
   const { data: todayMood } = useTodayMood();
-  const createJournalEntry = useCreateJournalEntry();
+  const createMoodLog = useCreateMoodLog();
   const { data: existingTask } = useExistingProTask('mood');
   const addRoutinePlan = useAddRoutinePlan();
   
@@ -102,12 +102,11 @@ export function MoodDashboard() {
     haptic.medium();
     
     try {
-      // Save mood as a journal entry (marked so it's hidden from journal list)
+      // Save mood check-in in emotion logs (separate from journal entries)
       const moodLabel = MOODS.find(m => m.value === selectedMood)?.label || selectedMood;
-      await createJournalEntry.mutateAsync({
-        title: '__mood_checkin__',
-        content: `Feeling ${moodLabel.toLowerCase()} today.`,
+      await createMoodLog.mutateAsync({
         mood: selectedMood,
+        content: `Feeling ${moodLabel.toLowerCase()} today.`,
       });
 
       // Auto-complete any mood pro tasks for today
@@ -123,7 +122,7 @@ export function MoodDashboard() {
       toast.error('Failed to log mood');
       setIsSubmitting(false);
     }
-  }, [selectedMood, autoCompleteMood]);
+  }, [selectedMood, autoCompleteMood, createMoodLog]);
 
   const handleCelebrationDone = useCallback(() => {
     navigate('/app/home');
