@@ -130,8 +130,9 @@ export function BreathingCompleteSheet({
 
         {/* Back to Home */}
         <Button
+          variant="ghost"
           onClick={handleDone}
-          className="w-full h-10 rounded-full text-sm"
+          className="w-full h-10 rounded-full text-sm text-foreground/40"
         >
           Back to Home
         </Button>
