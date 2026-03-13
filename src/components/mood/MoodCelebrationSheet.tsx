@@ -10,7 +10,7 @@ import {
 
 import journalImg from '@/assets/mood-card-journal.png';
 import breathingImg from '@/assets/mood-card-breathing.png';
-import planImg from '@/assets/mood-card-plan.png';
+import emotionImg from '@/assets/mood-card-emotion.png';
 import talkImg from '@/assets/mood-card-talk.png';
 
 interface MoodData {
@@ -74,9 +74,9 @@ const ACTIONS = [
     route: `/app/breathe?exercise=${CALM_BREATHING_ID}`,
   },
   {
-    label: 'Start My Plan',
-    image: planImg,
-    route: '/app/home',
+    label: 'Name My Emotion',
+    image: emotionImg,
+    route: '/app/emotion?step=select',
   },
   {
     label: 'Talk it Out',
