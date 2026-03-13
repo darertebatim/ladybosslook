@@ -10,7 +10,7 @@ import {
 
 import journalImg from '@/assets/mood-card-journal.png';
 import breathingImg from '@/assets/mood-card-breathing.png';
-import planImg from '@/assets/mood-card-plan.png';
+import emotionImg from '@/assets/mood-card-emotion.png';
 import talkImg from '@/assets/mood-card-talk.png';
 
 interface MoodData {
