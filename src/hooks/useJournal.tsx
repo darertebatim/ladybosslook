@@ -42,7 +42,6 @@ export const useJournalEntries = (searchQuery?: string) => {
         .from('journal_entries')
         .select('*')
         .eq('user_id', user.id)
-        .neq('title', '__mood_checkin__')
         .order('created_at', { ascending: false });
 
       if (searchQuery && searchQuery.trim()) {
@@ -52,7 +51,7 @@ export const useJournalEntries = (searchQuery?: string) => {
       const { data, error } = await query;
 
       if (error) throw error;
-      return data as JournalEntry[];
+      return (data as JournalEntry[]).filter((entry) => entry.title !== '__mood_checkin__');
     },
     enabled: !!user?.id,
   });
