@@ -131,8 +131,8 @@ export function BreathingCompleteSheet({
         {/* Back to Home */}
         <Button
           onClick={handleDone}
-          className="w-full h-11 rounded-full text-sm font-medium text-white hover:opacity-90"
-          style={{ backgroundColor: 'hsl(140, 50%, 85%)' }}
+          className="w-full h-11 rounded-full text-sm font-medium text-foreground/70 hover:opacity-90"
+          style={{ backgroundColor: 'hsl(140, 40%, 80%)' }}
         >
           Back to Home
         </Button>
