@@ -128,13 +128,12 @@ export function BreathingCompleteSheet({
           ))}
         </div>
 
-        {/* Maybe later */}
+        {/* Back to Home */}
         <Button
-          variant="ghost"
           onClick={handleDone}
-          className="w-full h-10 rounded-full text-foreground/40 hover:bg-foreground/5 text-sm"
+          className="w-full h-10 rounded-full text-sm"
         >
-          Maybe later
+          Back to Home
         </Button>
       </SheetContent>
     </Sheet>
