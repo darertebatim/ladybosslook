@@ -243,17 +243,41 @@ const AppJournal = () => {
         </div>
       </div>
 
-      {/* Bottom bar */}
+      {/* Bottom bar — matches timer layout */}
       <div
-        className="px-6 pt-4 flex items-center bg-background border-t border-border/50"
+        className="px-6 pt-4 flex items-center gap-3 bg-background border-t border-border/50"
         style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}
       >
+        <button
+          onClick={handleRoutineClick}
+          className={cn(
+            "w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors",
+            isAdded ? "bg-success/20" : "bg-urgency"
+          )}
+        >
+          {isAdded ? (
+            <Check className="h-5 w-5 text-success" />
+          ) : (
+            <CalendarPlus className="h-5 w-5 text-urgency-foreground" />
+          )}
+        </button>
+
         <button
           onClick={() => navigate('/app/journal/new')}
           className="tour-new-entry flex-1 h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97] flex items-center justify-center gap-2"
         >
           <NotebookPen className="h-4 w-4" />
           Write Today's Entry
+        </button>
+
+        <button
+          onClick={handleToggleSearch}
+          className={cn(
+            "w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors",
+            showSearch ? "bg-foreground/10" : "bg-muted"
+          )}
+        >
+          <Search className="h-5 w-5 text-muted-foreground" />
         </button>
       </div>
 
