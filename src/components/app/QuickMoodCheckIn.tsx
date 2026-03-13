@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { useCreateJournalEntry } from '@/hooks/useJournal';
+import { useCreateMoodLog } from '@/hooks/useMoodLogs';
 import { toast } from 'sonner';
 import {
   Drawer,
