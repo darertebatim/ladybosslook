@@ -73,14 +73,36 @@ const AppJournal = () => {
 
   // Stats
   const stats = useMemo(() => {
-    if (!entries) return { totalEntries: 0, daysThisMonth: 0, thisMonth: 0 };
+    if (!entries) return { totalEntries: 0, daysThisMonth: 0, thisMonth: 0, streak: 0, journalDays: new Set<string>() };
     const today = startOfDay(new Date());
     const thirtyDaysAgo = subDays(today, 30);
     const thisMonth = entries.filter(e => isAfter(new Date(e.created_at), thirtyDaysAgo)).length;
+
+    // Build set of unique journal days
+    const journalDays = new Set<string>();
+    entries.forEach(entry => {
+      journalDays.add(format(startOfDay(new Date(entry.created_at)), 'yyyy-MM-dd'));
+    });
+
+    // Calculate streak (consecutive days with entries ending today or yesterday)
+    let streak = 0;
+    let checkDate = today;
+    // Allow streak to start from yesterday if no entry today
+    const todayKey = format(today, 'yyyy-MM-dd');
+    if (!journalDays.has(todayKey)) {
+      checkDate = subDays(today, 1);
+    }
+    while (journalDays.has(format(checkDate, 'yyyy-MM-dd'))) {
+      streak++;
+      checkDate = subDays(checkDate, 1);
+    }
+
     return {
       totalEntries: entries.length,
       daysThisMonth: calculateMonthlyPresence(entries),
       thisMonth,
+      streak,
+      journalDays,
     };
   }, [entries]);
 
