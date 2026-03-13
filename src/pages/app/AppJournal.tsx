@@ -12,6 +12,7 @@ import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
 import { JournalTour, TourHelpButton } from '@/components/app/tour';
 import { JournalHeaderStats } from '@/components/app/JournalHeaderStats';
+import { JournalCalendar } from '@/components/app/JournalCalendar';
 import { haptic } from '@/lib/haptics';
 import { format, startOfDay, startOfMonth, subDays, isAfter } from 'date-fns';
 
