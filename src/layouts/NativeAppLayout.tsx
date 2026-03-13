@@ -171,7 +171,7 @@ const NativeAppLayout = () => {
         data-scroll-container="true"
         className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain"
         style={{
-          paddingBottom: (isOnChatPage || isKeyboardOpen) ? 0 : TAB_BAR_CONTENT_HEIGHT + 8,
+          paddingBottom: (isOnChatPage || isFullScreenTool || isKeyboardOpen) ? 0 : TAB_BAR_CONTENT_HEIGHT + 8,
           // iOS WKWebView: make the actual scroll container momentum-scrollable and
           // explicitly allow vertical panning. This helps prevent intermittent “stuck” scroll.
           WebkitOverflowScrolling: 'touch',
