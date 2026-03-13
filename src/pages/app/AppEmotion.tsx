@@ -7,7 +7,6 @@ import { EmotionComplete } from '@/components/emotion/EmotionComplete';
 import { useEmotionLogs } from '@/hooks/useEmotionLogs';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { useSubscription } from '@/hooks/useSubscription';
-import { PaywallSheet } from '@/components/app/PaywallSheet';
 import type { Valence } from '@/lib/emotionData';
 
 type Step = 'dashboard' | 'select' | 'context' | 'complete';
