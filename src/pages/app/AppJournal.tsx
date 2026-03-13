@@ -42,6 +42,16 @@ const AppJournal = () => {
   const handleTourReady = useCallback((tourStart: () => void) => {
     setStartTour(() => tourStart);
   }, []);
+
+  const handleToggleSearch = useCallback(() => {
+    setShowSearch((prev) => {
+      const next = !prev;
+      if (!next) {
+        setSearchQuery('');
+      }
+      return next;
+    });
+  }, []);
   
   const { data: entries, isLoading } = useJournalEntries(searchQuery);
 
@@ -122,7 +132,7 @@ const AppJournal = () => {
             <Button 
               variant="ghost" 
               size="icon"
-              onClick={() => setShowSearch(!showSearch)}
+              onClick={handleToggleSearch}
             >
               <Search className="h-5 w-5" />
             </Button>
