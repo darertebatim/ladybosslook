@@ -132,7 +132,7 @@ const AppJournal = () => {
             <Button 
               variant="ghost" 
               size="icon"
-              onClick={() => setShowSearch(!showSearch)}
+              onClick={handleToggleSearch}
             >
               <Search className="h-5 w-5" />
             </Button>
