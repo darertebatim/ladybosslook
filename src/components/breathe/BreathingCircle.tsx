@@ -36,14 +36,6 @@ export function BreathingCircle({
 
   return (
     <div className="relative flex items-center justify-center w-72 h-72">
-      {/* Outer fixed ring - marks the "full inhale" boundary */}
-      <div 
-        className="absolute rounded-full border-2 border-muted-foreground/30"
-        style={{
-          width: '100%',
-          height: '100%',
-        }}
-      />
 
       {/* Inner fixed ring - marks the "full exhale" boundary */}
       <div 
