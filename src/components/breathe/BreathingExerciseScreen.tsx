@@ -162,7 +162,8 @@ export function BreathingExerciseScreen({
         onSuccess: async () => {
           // Auto-complete any breathing pro tasks linked to this exercise
           await autoCompleteBreathe(exercise.id);
-          toast.success('Breathing session complete! 🧘');
+          setCompletedDuration(elapsed);
+          setShowCompleteSheet(true);
         },
       }
     );
