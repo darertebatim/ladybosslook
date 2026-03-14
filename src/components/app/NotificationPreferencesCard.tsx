@@ -199,7 +199,7 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
                   <PreferenceItem
                     icon={<Bell className="h-4 w-4" />}
                     label="Scheduled Reminders"
-                    description="Reminders for actions with specific times"
+                    description="Reminders for tasks with specific times"
                     checked={getPreference('action_reminders')}
                     onCheckedChange={handleToggle('action_reminders')}
                     disabled={updatePreference.isPending}
