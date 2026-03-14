@@ -135,7 +135,7 @@ export const GoldStreakLostBanner = ({
             </p>
             <Button
               onClick={() => { haptic.light(); onDismiss(); }}
-              className="w-full bg-white hover:bg-white/90 text-amber-600 font-semibold py-3 rounded-xl"
+              className="w-full bg-white text-amber-600 font-semibold py-3 rounded-xl"
             >
               Start Fresh
             </Button>
