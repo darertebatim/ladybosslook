@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
 import { supabase } from '@/integrations/supabase/client';
 import confetti from 'canvas-confetti';
@@ -14,6 +15,9 @@ import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
 import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
 import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
 import meplusPlanMascot from '@/assets/onboarding/meplus-plan-mascot.png';
+import { useAuth } from '@/hooks/useAuth';
+import { useCreateTask, useCompleteTask, CreateTaskInput } from '@/hooks/useTaskPlanner';
+import { format } from 'date-fns';
 
 interface Props {
   step: OnboardingStep;
