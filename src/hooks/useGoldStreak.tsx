@@ -136,10 +136,10 @@ export const useUpdateGoldStreak = () => {
       const today = format(new Date(), 'yyyy-MM-dd');
       const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
 
-      // Get current streak data
+      // Get current streak data (include recovery info)
       const { data: current } = await supabase
         .from('user_streaks')
-        .select('current_gold_streak, longest_gold_streak, last_gold_date')
+        .select('current_gold_streak, longest_gold_streak, last_gold_date, streak_recovery_used_at')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -150,9 +150,16 @@ export const useUpdateGoldStreak = () => {
       if (current?.last_gold_date === yesterday) {
         newStreak = (current.current_gold_streak || 0) + 1;
       }
-      // If last gold was today, don't update
+      // If last gold was today, don't update (already earned today)
       else if (current?.last_gold_date === today) {
         return { currentGoldStreak: current.current_gold_streak || 0, isNewStreak: false };
+      }
+      // If recovery was used today, continue from recovered streak instead of resetting to 1
+      else if ((current as any)?.streak_recovery_used_at) {
+        const recoveryDate = format(parseISO((current as any).streak_recovery_used_at), 'yyyy-MM-dd');
+        if (recoveryDate === today) {
+          newStreak = (current?.current_gold_streak || 0) + 1;
+        }
       }
 
       // Update longest if needed
