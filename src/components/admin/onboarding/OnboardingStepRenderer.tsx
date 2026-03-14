@@ -1884,14 +1884,20 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     exercises?.find((e: any) => e.category === 'calm') ||
     exercises?.[0];
 
-  // Expected onboarding rhythm: 3s in, 1s hold, 3s out, 1s hold
+  // Onboarding must always include explicit holds (we discussed this repeatedly)
+  // Keep any configured hold from DB, but never let it be too short to perceive.
   const inhaleSeconds = Number(exercise?.inhale_seconds) || 3;
   const inhaleHoldSeconds = Number(exercise?.inhale_hold_seconds);
   const exhaleSeconds = Number(exercise?.exhale_seconds) || 3;
   const exhaleHoldSeconds = Number(exercise?.exhale_hold_seconds);
 
-  const normalizedInhaleHold = Number.isFinite(inhaleHoldSeconds) && inhaleHoldSeconds > 0 ? inhaleHoldSeconds : 1;
-  const normalizedExhaleHold = Number.isFinite(exhaleHoldSeconds) && exhaleHoldSeconds > 0 ? exhaleHoldSeconds : 1;
+  const MIN_ONBOARDING_HOLD_SECONDS = 2;
+  const normalizedInhaleHold = Number.isFinite(inhaleHoldSeconds) && inhaleHoldSeconds > 0
+    ? Math.max(MIN_ONBOARDING_HOLD_SECONDS, inhaleHoldSeconds)
+    : MIN_ONBOARDING_HOLD_SECONDS;
+  const normalizedExhaleHold = Number.isFinite(exhaleHoldSeconds) && exhaleHoldSeconds > 0
+    ? Math.max(MIN_ONBOARDING_HOLD_SECONDS, exhaleHoldSeconds)
+    : MIN_ONBOARDING_HOLD_SECONDS;
 
   const [stage, setStage] = useState<'info' | 'countdown' | 'running' | 'done'>('info');
   const [countdown, setCountdown] = useState(3);
