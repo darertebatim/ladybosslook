@@ -1330,7 +1330,7 @@ export const useReorderTasks = () => {
     },
     onError: (error) => {
       console.error('Reorder tasks error:', error);
-      toast({ title: 'Failed to reorder actions', variant: 'destructive' });
+      toast({ title: 'Failed to reorder tasks', variant: 'destructive' });
     },
   });
 };
