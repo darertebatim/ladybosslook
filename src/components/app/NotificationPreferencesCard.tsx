@@ -181,7 +181,7 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
                   <PreferenceItem
                     icon={<Clock className="h-4 w-4" />}
                     label="Morning Summary"
-                    description="Daily overview of your actions at wake time"
+                    description="Daily overview of your tasks at wake time"
                     checked={getPreference('morning_summary')}
                     onCheckedChange={handleToggle('morning_summary')}
                     disabled={updatePreference.isPending}
