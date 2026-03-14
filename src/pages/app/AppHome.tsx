@@ -920,7 +920,7 @@ const AppHome = () => {
                       My Actions
                     </h2>
                     {taskTags.length > 0 && (
-                      <div className="flex gap-1.5 overflow-x-auto scrollbar-hide py-1">
+                      <div className="flex gap-1.5 overflow-x-auto overflow-y-visible scrollbar-hide">
                         <button
                           onClick={() => setSelectedTag(null)}
                           className={cn(
