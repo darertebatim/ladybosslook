@@ -1095,8 +1095,7 @@ const AppHome = () => {
                       <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                     );
                   })()}
-                  {/* Onboarding Banner - below actions, hidden while welcome card is active */}
-                  {!showWelcomeCard && <OnboardingBanner />}
+                  {/* Onboarding banner moved below routine section */}
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 px-6 animate-fade-in">
@@ -1150,6 +1149,7 @@ const AppHome = () => {
 
               {/* Tour Banner & Promo - always visible regardless of routine cards */}
               {selectedTag === null && <>
+                {!showWelcomeCard && <OnboardingBanner />}
                 <div id="tour-banner-slot" className="mt-4" />
                 <PromoBanner location="home_rituals" className="mt-4" />
               </>}
