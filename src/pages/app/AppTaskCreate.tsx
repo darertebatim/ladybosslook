@@ -1074,9 +1074,9 @@ const AppTaskCreate = ({
             <Target className={cn("h-5 w-5", goalSettings.enabled ? "text-emerald-600" : "text-black")} />
             <span className="font-medium text-black">Goal</span>
           </div>
-          <div className="flex items-center gap-2 text-black/60">
+          <div className="flex items-center gap-2 text-black">
             <span>{goalSettings.enabled ? formatGoalTarget(goalSettings) : 'Off'}</span>
-            <ChevronRight className="h-4 w-4 text-black/40" />
+            <ChevronRight className="h-4 w-4 text-black" />
           </div>
         </button>
       </div>
