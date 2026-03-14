@@ -92,7 +92,7 @@ export function MoodRoutinePromptSheet({
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-background/70">
             <TrendingUp className="h-3.5 w-3.5 text-primary" />
             <span className="text-xs font-semibold text-primary">
-              73% feel more self-aware after 7 days
+              Most users feel more self-aware after a week
             </span>
           </div>
         </div>
