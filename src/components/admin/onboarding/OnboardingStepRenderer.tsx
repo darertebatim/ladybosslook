@@ -1864,8 +1864,8 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     },
   });
 
-  // Pick "Welcome Breathing" by name, then fall back to calm category, then first available
-  const exercise = exercises?.find((e: any) => e.name?.toLowerCase().includes('welcome')) || exercises?.find((e: any) => e.category === 'calm') || exercises?.[0];
+  // Pick "Welcome Breathing" by exact name match first
+  const exercise = exercises?.find((e: any) => e.name === 'Welcome Breathing') || exercises?.find((e: any) => e.name?.toLowerCase().includes('welcome')) || exercises?.find((e: any) => e.category === 'calm') || exercises?.[0];
 
   const [phase, setPhase] = useState<'countdown' | 'running' | 'done'>('countdown');
   const [countdown, setCountdown] = useState(3);
@@ -2122,7 +2122,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                         className="absolute top-0 right-0 w-16 h-full z-50"
                         onClick={handleCheckBed}
                       />
-                      {/* Pulsing glow ring around the completion circle */}
+                      {/* Pulsing glow ring around the completion circle (matches TourOverlay style) */}
                       <div
                         className="pointer-events-none absolute z-[55] rounded-full animate-pulse"
                         style={{
@@ -2131,21 +2131,21 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                           width: '44px',
                           height: '44px',
                           transform: 'translateY(-50%)',
-                          boxShadow: '0 0 0 4px hsl(var(--primary) / 0.4), 0 0 20px 8px hsl(var(--primary) / 0.15)',
+                          boxShadow: '0 0 0 4px hsl(var(--primary) / 0.5), 0 0 20px 8px hsl(var(--primary) / 0.2)',
                         }}
                       />
-                      {/* Bouncing hand - offset so fingertip points at circle center */}
+                      {/* Bouncing hand - positioned to the LEFT of circle so fingertip points at it */}
                       <div
                         className="pointer-events-none absolute z-[60]"
                         style={{
-                          top: '-20px',
-                          right: '-18px',
+                          top: '-28px',
+                          right: '42px',
                           filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
                           animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
-                          transform: 'rotate(-45deg)',
+                          transform: 'rotate(15deg)',
                         }}
                       >
-                        <FluentEmoji emoji="👇" size={52} />
+                        <FluentEmoji emoji="👆" size={52} />
                       </div>
                     </>
                   )}
@@ -2153,25 +2153,30 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                   {/* Hint for breathe task - point at the Breathe action button */}
                   {showBreatheHint && (
                     <>
-                      {/* Pulsing glow ring around entire card */}
+                      {/* Pulsing glow ring around the Breathe action button area */}
                       <div
-                        className="pointer-events-none absolute inset-0 rounded-3xl z-[55] animate-pulse"
+                        className="pointer-events-none absolute z-[55] rounded-xl animate-pulse"
                         style={{
-                          boxShadow: '0 0 0 3px hsl(var(--primary) / 0.4), 0 0 24px 8px hsl(var(--primary) / 0.15)',
+                          top: '50%',
+                          right: '56px',
+                          width: '60px',
+                          height: '40px',
+                          transform: 'translateY(-50%)',
+                          boxShadow: '0 0 0 3px hsl(var(--primary) / 0.5), 0 0 20px 8px hsl(var(--primary) / 0.2)',
                         }}
                       />
-                      {/* Bouncing hand pointing at the Breathe button (right side, before the circle) */}
+                      {/* Bouncing hand pointing at the Breathe button - to the LEFT of button */}
                       <div
                         className="pointer-events-none absolute z-[60]"
                         style={{
-                          top: '-20px',
-                          right: '30px',
+                          top: '-28px',
+                          right: '100px',
                           filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
                           animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
-                          transform: 'rotate(-45deg)',
+                          transform: 'rotate(15deg)',
                         }}
                       >
-                        <FluentEmoji emoji="👇" size={52} />
+                        <FluentEmoji emoji="👆" size={52} />
                       </div>
                     </>
                   )}
