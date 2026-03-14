@@ -860,7 +860,7 @@ export const useDeleteTask = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-      toast({ title: 'Action deleted' });
+      toast({ title: 'Task deleted' });
     },
     onError: (error) => {
       console.error('Delete task error:', error);
