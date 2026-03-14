@@ -309,9 +309,9 @@ export function BreathingExerciseScreen({
         </div>
 
         {/* Circle — absolutely centered, never shifts */}
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none" style={{ paddingBottom: '160px' }}>
-          <div className="flex flex-col items-center">
-            <p className="text-sm text-white/40 mb-8 font-medium tracking-widest uppercase">{exercise.name}</p>
+        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none" style={{ bottom: '200px' }}>
+          <div className="relative flex flex-col items-center">
+            <p className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap text-sm text-white/40 font-medium tracking-widest uppercase">{exercise.name}</p>
 
             <ImmersiveBreathingCircle
               phase={circleState.phase}
@@ -323,27 +323,31 @@ export function BreathingExerciseScreen({
               countdownValue={countdown}
             />
 
-            {/* Phase timer */}
-            {isActive && !isPaused && !isCountingDown && (
-              <p className="mt-8 text-sm text-white/30 font-mono tracking-wider">{phaseTimeRemaining}s</p>
-            )}
+            {/* Phase timer — always takes space to avoid layout shift */}
+            <div className="mt-8 h-5 flex items-center justify-center">
+              {isActive && !isPaused && !isCountingDown && (
+                <p className="text-sm text-white/30 font-mono tracking-wider">{phaseTimeRemaining}s</p>
+              )}
+            </div>
 
-            {/* Cycle dots */}
-            {(isActive || isCountingDown) && durationMode === 'cycles' && (
-              <div className="mt-6 flex gap-2.5 flex-wrap justify-center max-w-[260px]">
-                {Array.from({ length: selectedCycles }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="rounded-full transition-all duration-500"
-                    style={{
-                      width: 8, height: 8,
-                      background: i < cycleCount ? 'rgba(167,139,250,0.8)' : 'rgba(167,139,250,0.15)',
-                      boxShadow: i < cycleCount ? '0 0 8px rgba(167,139,250,0.4)' : 'none',
-                    }}
-                  />
-                ))}
-              </div>
-            )}
+            {/* Cycle dots — always takes space */}
+            <div className="mt-4 h-8 flex items-center justify-center">
+              {(isActive || isCountingDown) && durationMode === 'cycles' && (
+                <div className="flex gap-2.5 flex-wrap justify-center max-w-[260px]">
+                  {Array.from({ length: selectedCycles }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="rounded-full transition-all duration-500"
+                      style={{
+                        width: 8, height: 8,
+                        background: i < cycleCount ? 'rgba(167,139,250,0.8)' : 'rgba(167,139,250,0.15)',
+                        boxShadow: i < cycleCount ? '0 0 8px rgba(167,139,250,0.4)' : 'none',
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
