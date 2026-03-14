@@ -1823,7 +1823,7 @@ const AppTaskCreate = ({
                   setLinkedPlaylistId(null);
                   setShowProLinkPicker(false);
                 }}
-                className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/10 text-destructive hover:bg-destructive/20"
+                className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/10 text-destructive active:bg-destructive/20"
               >
                 <XCircle className="h-5 w-5" />
                 <span>Remove Pro Action link</span>
