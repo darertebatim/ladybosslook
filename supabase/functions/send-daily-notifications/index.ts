@@ -51,7 +51,7 @@ const NOTIFICATION_TYPES = {
   period_evening: {
     hour: 17,
     title: '🌇 Evening ritual',
-    body: 'Your evening actions await.',
+    body: 'Your evening tasks await.',
     url: '/app/home',
     prefKey: 'time_period_reminders',
   },
