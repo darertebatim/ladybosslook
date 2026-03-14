@@ -2229,7 +2229,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
         {/* Task Cards with spotlight effect */}
         <div className="space-y-3 relative">
           {/* Dark spotlight overlay */}
-          {(hintPhase === 'check-bed' || hintPhase === 'breathe' || hintPhase === 'mood') && (
+          {(hintPhase === 'check-bed' || hintPhase === 'breathe' || hintPhase === 'mood' || hintPhase === 'done') && (
             <div className="fixed inset-0 z-30 bg-black/50 pointer-events-none" style={{ animation: 'fadeIn 0.5s ease-out' }} />
           )}
 
