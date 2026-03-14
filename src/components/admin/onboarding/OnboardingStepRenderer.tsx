@@ -2705,7 +2705,7 @@ const DAILY_RESET_WHEEL = [
 
 function LoopWheel() {
   return (
-    <div className="relative w-[220px] h-[220px] mx-auto">
+    <div className="relative w-[200px] h-[200px] mx-auto">
       {/* Center icon */}
       <div className="absolute inset-0 flex items-center justify-center z-10">
         <div className="w-14 h-14 rounded-full bg-white shadow-lg flex items-center justify-center">
