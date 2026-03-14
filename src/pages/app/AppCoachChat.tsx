@@ -407,7 +407,7 @@ export default function AppCoachChat() {
             style={{ paddingTop: 'env(safe-area-inset-top)' }}
           >
             <div className="flex items-center gap-1 pt-3 pb-2 px-4">
-              <Button variant="ghost" onClick={handleBack} className="-ml-2 h-10 px-2 gap-0.5 text-foreground hover:bg-transparent active:opacity-70">
+              <Button variant="ghost" onClick={handleBack} className="-ml-2 h-10 px-2 gap-0.5 text-foreground bg-transparent active:opacity-70">
                 <ChevronLeft className="h-7 w-7" />
                 <span className="text-[17px]">Back</span>
               </Button>
@@ -439,7 +439,7 @@ export default function AppCoachChat() {
             style={{ paddingTop: 'env(safe-area-inset-top)' }}
           >
             <div className="flex items-center gap-1 pt-3 pb-2 px-4">
-              <Button variant="ghost" onClick={handleBack} className="-ml-2 h-10 px-2 gap-0.5 text-foreground hover:bg-transparent active:opacity-70">
+              <Button variant="ghost" onClick={handleBack} className="-ml-2 h-10 px-2 gap-0.5 text-foreground bg-transparent active:opacity-70">
                 <ChevronLeft className="h-7 w-7" />
                 <span className="text-[17px]">Back</span>
               </Button>
@@ -485,7 +485,7 @@ export default function AppCoachChat() {
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="flex items-center gap-1 pt-3 pb-2 px-4">
-            <Button variant="ghost" onClick={handleBack} className="-ml-2 h-10 px-2 gap-0.5 text-foreground hover:bg-transparent active:opacity-70">
+            <Button variant="ghost" onClick={handleBack} className="-ml-2 h-10 px-2 gap-0.5 text-foreground bg-transparent active:opacity-70">
               <ChevronLeft className="h-7 w-7" />
               <span className="text-[17px]">Back</span>
             </Button>
@@ -557,7 +557,7 @@ export default function AppCoachChat() {
                         key={index}
                         onClick={() => handleSendMessage(starter.text)}
                         disabled={sending}
-                        className="flex items-center gap-2.5 p-3 rounded-2xl bg-muted/50 hover:bg-muted border border-border/30 text-left transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+                        className="flex items-center gap-2.5 p-3 rounded-2xl bg-muted/50 border border-border/30 text-left transition-all duration-200 active:scale-[0.98] disabled:opacity-50"
                       >
                         <starter.icon className="h-4 w-4 text-muted-foreground shrink-0" />
                         <span className="text-[13px] font-medium text-foreground leading-tight">{starter.text}</span>
@@ -619,7 +619,7 @@ export default function AppCoachChat() {
         {showScrollButton && (
           <button
             onClick={scrollToBottomSmooth}
-            className="absolute bottom-20 right-4 h-11 w-11 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center z-20 transition-all hover:scale-105 active:scale-95 animate-in fade-in slide-in-from-bottom-2"
+            className="absolute bottom-20 right-4 h-11 w-11 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center z-20 transition-all active:scale-95 animate-in fade-in slide-in-from-bottom-2"
             style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
           >
             <ChevronDown className="h-6 w-6" />

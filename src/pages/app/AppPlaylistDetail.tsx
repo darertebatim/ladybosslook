@@ -679,7 +679,7 @@ export default function AppPlaylistDetail() {
                   {({'american':'🇺🇸','turkish':'🇹🇷','spanish':'🇪🇸','all':'🌐'} as Record<string,string>)[playlist.language]}
                 </Badge>
               )}
-              {playlist.is_free && <Badge className="bg-white/20 text-white hover:bg-white/20">FREE</Badge>}
+              {playlist.is_free && <Badge className="bg-white/20 text-white">FREE</Badge>}
               {playlist.requires_subscription && (
                 <Badge className="bg-amber-200 text-amber-700 gap-1">
                   <Crown className="h-3 w-3" />
@@ -711,7 +711,7 @@ export default function AppPlaylistDetail() {
         {/* Continue Button */}
         {hasAccess && totalItems > 0 && (
           <div className="flex items-center gap-2 w-full">
-            <Button onClick={handleContinue} size="lg" className="flex-1 tour-continue-btn bg-white text-[#132240] hover:bg-white/90 active:bg-white/80">
+            <Button onClick={handleContinue} size="lg" className="flex-1 tour-continue-btn bg-white text-[#132240] active:bg-white/80">
               <Play className="h-5 w-5 mr-1" />
               {getNextPlayableItem() ? 'Continue' : 'Play'}
             </Button>
@@ -736,7 +736,7 @@ export default function AppPlaylistDetail() {
               </p>
             </div>
             <Button 
-              className="w-full bg-white text-[#132240] hover:bg-white/90 active:bg-white/80" 
+              className="w-full bg-white text-[#132240] active:bg-white/80" 
               size="lg"
               onClick={() => activatePlaylistMutation.mutate()}
               disabled={activatePlaylistMutation.isPending}
@@ -755,7 +755,7 @@ export default function AppPlaylistDetail() {
               </p>
             </div>
             <Button 
-              className="w-full gap-2 bg-white text-[#132240] hover:bg-white/90 active:bg-white/80" 
+              className="w-full gap-2 bg-white text-[#132240] active:bg-white/80" 
               size="lg"
               onClick={() => setShowPaywall(true)}
             >
@@ -775,7 +775,7 @@ export default function AppPlaylistDetail() {
             </div>
             {playlist.program_slug && (
               <Button 
-                className="w-full bg-white text-[#132240] hover:bg-white/90 active:bg-white/80" 
+                className="w-full bg-white text-[#132240] active:bg-white/80" 
                 size="lg"
                 onClick={() => navigate(`/app/programs/${playlist.program_slug}`)}
               >
@@ -802,7 +802,7 @@ export default function AppPlaylistDetail() {
                   "flex items-center gap-3 p-3 rounded-lg border border-white/10",
                   !isAvailable 
                     ? 'opacity-60 bg-white/5 cursor-not-allowed' 
-                    : 'cursor-pointer hover:bg-white/10'
+                    : 'cursor-pointer active:bg-white/10'
                 )}
               >
                 {/* Status icon */}
@@ -846,7 +846,7 @@ export default function AppPlaylistDetail() {
                 )}
 
                 {isAvailable && (
-                  <Button variant="ghost" size="icon" className="flex-shrink-0 text-white/70 hover:bg-white/10">
+                  <Button variant="ghost" size="icon" className="flex-shrink-0 text-white/70">
                     <Play className="h-4 w-4" />
                   </Button>
                 )}
@@ -875,7 +875,7 @@ export default function AppPlaylistDetail() {
                   !isAvailable 
                     ? 'opacity-60 bg-white/5 cursor-not-allowed' 
                     : hasAccess 
-                      ? 'cursor-pointer hover:bg-white/10' 
+                      ? 'cursor-pointer active:bg-white/10' 
                       : 'opacity-60'
                 )}
               >
@@ -922,7 +922,7 @@ export default function AppPlaylistDetail() {
                 </div>
 
                 {isAvailable && hasAccess && (
-                  <Button variant="ghost" size="icon" className="flex-shrink-0 text-white/70 hover:bg-white/10">
+                  <Button variant="ghost" size="icon" className="flex-shrink-0 text-white/70">
                     <Play className="h-4 w-4" />
                   </Button>
                 )}

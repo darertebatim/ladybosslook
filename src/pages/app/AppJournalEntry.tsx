@@ -290,7 +290,7 @@ const AppJournalEntry = () => {
               <Button 
                 variant="ghost" 
                 size="sm"
-                className="text-destructive hover:text-destructive"
+                className="text-destructive"
                 onClick={() => setShowDeleteDialog(true)}
               >
                 <Trash2 className="h-4 w-4 mr-1" />
@@ -314,7 +314,7 @@ const AppJournalEntry = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground"
             >
               Delete
             </AlertDialogAction>

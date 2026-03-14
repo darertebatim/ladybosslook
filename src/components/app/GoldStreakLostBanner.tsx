@@ -53,7 +53,7 @@ export const GoldStreakLostBanner = ({
       >
         <button
           onClick={() => { haptic.light(); onDismiss(); }}
-          className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-white/60 transition-colors"
         >
           <X className="h-5 w-5" />
         </button>
@@ -93,7 +93,7 @@ export const GoldStreakLostBanner = ({
             <Button
               onClick={() => { haptic.success(); onRecover(); }}
               disabled={isLoading}
-              className="w-full bg-white hover:bg-white/90 text-amber-600 font-semibold py-3 rounded-xl mb-2"
+              className="w-full bg-white text-amber-600 font-semibold py-3 rounded-xl mb-2"
             >
               🛡️ Use Recovery Shield
             </Button>
@@ -103,7 +103,7 @@ export const GoldStreakLostBanner = ({
             <Button
               onClick={() => { haptic.light(); onDismiss(); }}
               variant="ghost"
-              className="w-full text-white bg-white/15 hover:bg-white/25 text-xs font-medium rounded-xl"
+              className="w-full text-white bg-white/15 text-xs font-medium rounded-xl"
             >
               Let the gold streak reset
             </Button>
@@ -115,7 +115,7 @@ export const GoldStreakLostBanner = ({
             </p>
             <Button
               onClick={() => { haptic.light(); onDismiss(); onSubscribe?.(); }}
-              className="w-full bg-white hover:bg-white/90 text-amber-600 font-semibold py-3 rounded-xl mb-2"
+              className="w-full bg-white text-amber-600 font-semibold py-3 rounded-xl mb-2"
             >
               <Sparkles className="h-4 w-4 mr-1" />
               Get Simora Plus
@@ -123,7 +123,7 @@ export const GoldStreakLostBanner = ({
             <Button
               onClick={() => { haptic.light(); onDismiss(); }}
               variant="ghost"
-              className="w-full text-white bg-white/15 hover:bg-white/25 text-xs font-medium rounded-xl"
+              className="w-full text-white bg-white/15 text-xs font-medium rounded-xl"
             >
               Start Fresh
             </Button>
@@ -135,7 +135,7 @@ export const GoldStreakLostBanner = ({
             </p>
             <Button
               onClick={() => { haptic.light(); onDismiss(); }}
-              className="w-full bg-white hover:bg-white/90 text-amber-600 font-semibold py-3 rounded-xl"
+              className="w-full bg-white text-amber-600 font-semibold py-3 rounded-xl"
             >
               Start Fresh
             </Button>

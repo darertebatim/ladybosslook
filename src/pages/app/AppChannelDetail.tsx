@@ -221,7 +221,7 @@ export default function AppChannelDetail() {
         <p className="text-muted-foreground">Channel not found</p>
         <button
           onClick={() => navigate('/app/channels')}
-          className="mt-4 text-primary hover:underline"
+          className="mt-4 text-primary underline"
         >
           Back to channels
         </button>
@@ -244,7 +244,7 @@ export default function AppChannelDetail() {
         <div className="flex items-center gap-2 px-2 pt-2 pb-3">
           <button
             onClick={() => navigate('/app/channels')}
-            className="p-2 -ml-1 hover:bg-black/5 rounded-full transition-colors"
+            className="p-2 -ml-1 active:bg-black/5 rounded-full transition-colors"
           >
             <ChevronLeft className="h-6 w-6" />
           </button>
@@ -353,7 +353,7 @@ export default function AppChannelDetail() {
         {showScrollButton && (
           <button
             onClick={scrollToBottomSmooth}
-            className="absolute bottom-4 right-4 h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center z-20 transition-all hover:scale-105 active:scale-95 animate-in fade-in slide-in-from-bottom-2 duration-200"
+            className="absolute bottom-4 right-4 h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center z-20 transition-all active:scale-95 animate-in fade-in slide-in-from-bottom-2 duration-200"
           >
             <ChevronDown className="h-5 w-5" />
           </button>

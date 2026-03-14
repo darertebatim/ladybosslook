@@ -195,14 +195,14 @@ export default function AppFasting() {
           <Button
             variant="outline"
             onClick={handleEndFast}
-            className="rounded-full px-8 py-3 h-auto text-base font-semibold border-2 border-red-400 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 active:scale-95"
+            className="rounded-full px-8 py-3 h-auto text-base font-semibold border-2 border-red-400 text-red-600 dark:text-red-400 active:scale-95"
           >
             End Fast
           </Button>
         ) : (
           <Button
             onClick={startFast}
-            className="rounded-full px-8 py-3 h-auto text-base font-semibold bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white active:scale-95"
+            className="rounded-full px-8 py-3 h-auto text-base font-semibold bg-emerald-500 active:bg-emerald-700 text-white active:scale-95"
           >
             {isEating ? `Start ${selectedFastingHours}h Fast` : 'Start Fast'}
           </Button>

@@ -1351,7 +1351,7 @@ const AppCourseDetail = () => {
                   <Button 
                     size="sm" 
                     variant="outline"
-                    className="shrink-0 border-amber-500 text-amber-700 hover:bg-amber-100 dark:text-amber-200 dark:hover:bg-amber-900"
+                    className="shrink-0 border-amber-500 text-amber-700 dark:text-amber-200"
                     onClick={handleSyncAllSessions}
                     disabled={isSyncingAllSessions}
                   >
@@ -1556,7 +1556,7 @@ const AppCourseDetail = () => {
                   {/* Reminder Settings Button */}
                   <Button
                     variant="outline"
-                    className="w-full mb-4 bg-[#F4ECFE] hover:bg-[#E8DEF8] border-[#F4ECFE] tour-session-reminder-btn"
+                    className="w-full mb-4 bg-[#F4ECFE] border-[#F4ECFE] tour-session-reminder-btn"
                     onClick={() => setShowSessionReminderSheet(true)}
                   >
                     <Bell className="h-4 w-4 mr-2" />
@@ -1661,7 +1661,7 @@ const AppCourseDetail = () => {
                   {/* Reminder Settings Button */}
                   <Button
                     variant="outline"
-                    className="w-full mb-4 bg-[#F4ECFE] hover:bg-[#E8DEF8] border-[#F4ECFE] tour-content-reminder-btn"
+                    className="w-full mb-4 bg-[#F4ECFE] border-[#F4ECFE] tour-content-reminder-btn"
                     onClick={() => setShowContentReminderSheet(true)}
                   >
                     <Bell className="h-4 w-4 mr-2" />

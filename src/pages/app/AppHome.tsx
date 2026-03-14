@@ -656,7 +656,7 @@ const AppHome = () => {
               <HomeMenu onStartTour={startHomeTour || undefined} />
               <button
                 onClick={() => navigate('/app/chat')}
-                className="p-2 -ml-1 text-foreground hover:text-foreground transition-colors"
+                className="p-2 -ml-1 text-foreground transition-colors"
               >
                 <Headset className="h-5 w-5" />
               </button>
@@ -666,13 +666,13 @@ const AppHome = () => {
             <div className="flex justify-center justify-self-center relative z-10">
               {showCalendar ? (
                 <div className="flex items-center gap-1">
-                  <button onClick={handlePrevMonth} className="p-2.5 -m-1 rounded-full hover:bg-white/50 active:bg-white/70 transition-colors">
+                  <button onClick={handlePrevMonth} className="p-2.5 -m-1 rounded-full active:bg-white/70 transition-colors">
                     <ChevronLeft className="h-5 w-5" />
                   </button>
                   <h1 className="text-lg font-bold text-foreground min-w-[140px] text-center">
                     {format(currentMonth, 'MMMM yyyy')}
                   </h1>
-                  <button onClick={handleNextMonth} className="p-2.5 -m-1 rounded-full hover:bg-white/50 active:bg-white/70 transition-colors">
+                  <button onClick={handleNextMonth} className="p-2.5 -m-1 rounded-full active:bg-white/70 transition-colors">
                     <ChevronRight className="h-5 w-5" />
                   </button>
                 </div>

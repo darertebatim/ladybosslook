@@ -172,7 +172,7 @@ export default function AppChannelsList() {
             {hasCoachAccess && (
             <button
               onClick={handleCoachClick}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors text-left bg-primary/[0.03] border-b-2 border-primary/10"
+              className="w-full flex items-center gap-3 px-4 py-3 active:bg-muted transition-colors text-left bg-primary/[0.03] border-b-2 border-primary/10"
             >
               <div className="h-12 w-12 rounded-full flex items-center justify-center shrink-0 bg-primary/10 text-primary">
                 <GraduationCap className="h-5 w-5" />
@@ -230,7 +230,7 @@ export default function AppChannelsList() {
                 <button
                   key={channel.id}
                   onClick={() => handleChannelClick(channel.slug)}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-4 py-3 active:bg-muted transition-colors text-left"
                 >
                   <div className={cn(
                     "h-12 w-12 rounded-full flex items-center justify-center shrink-0 overflow-hidden",
@@ -295,7 +295,7 @@ export default function AppChannelsList() {
             {/* Support Chat - Last in the list */}
             <button
               onClick={handleSupportClick}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors text-left bg-primary/[0.03] border-b-2 border-primary/10"
+              className="w-full flex items-center gap-3 px-4 py-3 active:bg-muted transition-colors text-left bg-primary/[0.03] border-b-2 border-primary/10"
             >
               <div className="h-12 w-12 rounded-full flex items-center justify-center shrink-0 bg-orange-500 text-white">
                 <Headset className="h-5 w-5" />

@@ -286,7 +286,7 @@ export default function AppWatch() {
                     'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
                     progressFilter === f
                       ? 'bg-white/20 text-white backdrop-blur-sm'
-                      : 'text-white/50 hover:text-white/70'
+                      : 'text-white/50'
                   )}
                 >
                   {f === 'all' ? 'All' : f === 'in_progress' ? 'In Progress' : 'Completed'}
@@ -306,7 +306,7 @@ export default function AppWatch() {
                     onClick={() => handleLanguageChange(l.value)}
                     className={cn(
                       'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors',
-                      preferredLanguage === l.value ? 'bg-white/15 text-white font-medium' : 'text-white/70 hover:bg-white/10'
+                      preferredLanguage === l.value ? 'bg-white/15 text-white font-medium' : 'text-white/70'
                     )}
                   >
                     {l.value === 'persian' ? <PersianFlag size={14} /> : <span>{l.flag}</span>} <span>{l.label}</span>

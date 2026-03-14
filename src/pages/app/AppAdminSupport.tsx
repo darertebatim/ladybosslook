@@ -155,7 +155,7 @@ export default function AppAdminSupport() {
         <Button 
           variant="ghost" 
           size="sm"
-          className="h-10 px-2 gap-1 text-primary hover:text-primary active:scale-95"
+          className="h-10 px-2 gap-1 text-primary active:scale-95"
           onClick={handleBack}
         >
           <ChevronLeft className="h-5 w-5" />

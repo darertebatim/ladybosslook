@@ -333,8 +333,8 @@ const SortableSubtaskItem = ({ id, subtask, onRemove }: { id: string; subtask: s
         <div className="w-2 h-0.5 bg-muted-foreground/50 rounded-full" />
       </div>
       <span className="flex-1 text-foreground">{subtask}</span>
-      <button onClick={onRemove} className="p-1.5 rounded-full hover:bg-muted/50">
-        <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+      <button onClick={onRemove} className="p-1.5 rounded-full active:bg-muted/50">
+        <Trash2 className="h-4 w-4 text-muted-foreground" />
       </button>
     </div>
   );
@@ -965,7 +965,7 @@ const AppTaskCreate = ({
         {/* Date */}
         <button
           onClick={() => setShowDatePicker(true)}
-          className="w-full flex items-center justify-between py-2 px-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
+          className="w-full flex items-center justify-between py-2 px-4 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
             <Calendar className="h-5 w-5 text-foreground/70" />
@@ -980,7 +980,7 @@ const AppTaskCreate = ({
         {/* Repeat */}
         <button
           onClick={() => setShowRepeatPicker(true)}
-          className="w-full flex items-center justify-between py-2 px-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
+          className="w-full flex items-center justify-between py-2 px-4 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
             <Repeat className="h-5 w-5 text-foreground/70" />
@@ -995,7 +995,7 @@ const AppTaskCreate = ({
         {/* Time */}
         <button
           onClick={() => setShowTimePicker(true)}
-          className="w-full flex items-center justify-between py-2 px-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
+          className="w-full flex items-center justify-between py-2 px-4 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
             <Clock className="h-5 w-5 text-foreground/70" />
@@ -1010,7 +1010,7 @@ const AppTaskCreate = ({
         {/* Reminder */}
         <button
           onClick={() => setShowReminderPicker(true)}
-          className="w-full flex items-center justify-between py-2 px-4 hover:bg-muted/30 active:bg-muted/50 border-b border-muted/30"
+          className="w-full flex items-center justify-between py-2 px-4 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
             <Bell className="h-5 w-5 text-foreground/70" />
@@ -1049,7 +1049,7 @@ const AppTaskCreate = ({
         {/* Tag */}
         <button
           onClick={() => setShowTagPicker(true)}
-          className="w-full flex items-center justify-between py-2 px-4 hover:bg-muted/30 active:bg-muted/50"
+          className="w-full flex items-center justify-between py-2 px-4 active:bg-muted/50"
         >
           <div className="flex items-center gap-3">
             <Tag className="h-5 w-5 text-foreground/70" />
@@ -1067,7 +1067,7 @@ const AppTaskCreate = ({
         <button
           onClick={() => setShowGoalSettings(true)}
           className={cn(
-            "w-full flex items-center justify-between py-2 px-4 hover:bg-muted/30 active:bg-muted/50",
+            "w-full flex items-center justify-between py-2 px-4 active:bg-muted/50",
             goalSettings.enabled && "bg-emerald-50 dark:bg-emerald-900/20"
           )}
         >
@@ -1087,7 +1087,7 @@ const AppTaskCreate = ({
         <button
           onClick={() => setShowProLinkPicker(true)}
           className={cn(
-            "w-full flex items-center justify-between py-2 px-4 hover:bg-muted/30 active:bg-muted/50",
+            "w-full flex items-center justify-between py-2 px-4 active:bg-muted/50",
             proLinkType && "bg-violet-50 dark:bg-violet-900/20"
           )}
         >
@@ -1220,7 +1220,7 @@ const AppTaskCreate = ({
                     "px-4 py-2 rounded-full text-sm font-medium transition-all",
                     format(scheduledDate, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
                       ? "bg-[#E8F4FD] text-foreground"
-                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                      : "bg-muted/50 text-muted-foreground"
                   )}
                 >
                   Today
@@ -1234,7 +1234,7 @@ const AppTaskCreate = ({
                     "px-4 py-2 rounded-full text-sm font-medium transition-all",
                     format(scheduledDate, 'yyyy-MM-dd') === format(addDays(new Date(), 1), 'yyyy-MM-dd')
                       ? "bg-[#E8F4FD] text-foreground"
-                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                      : "bg-muted/50 text-muted-foreground"
                   )}
                 >
                   Tomorrow
@@ -1248,7 +1248,7 @@ const AppTaskCreate = ({
                     "px-4 py-2 rounded-full text-sm font-medium transition-all",
                     format(scheduledDate, 'yyyy-MM-dd') === format(nextMonday(new Date()), 'yyyy-MM-dd')
                       ? "bg-[#E8F4FD] text-foreground"
-                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                      : "bg-muted/50 text-muted-foreground"
                   )}
                 >
                   Next Monday
@@ -1794,7 +1794,7 @@ const AppTaskCreate = ({
                     });
                   }
                 }}
-                className="w-full bg-foreground text-background hover:bg-foreground/90 rounded-full py-6 text-base font-medium"
+                className="w-full bg-foreground text-background rounded-full py-6 text-base font-medium"
               >
                 Add New
               </Button>
@@ -1823,7 +1823,7 @@ const AppTaskCreate = ({
                   setLinkedPlaylistId(null);
                   setShowProLinkPicker(false);
                 }}
-                className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/10 text-destructive hover:bg-destructive/20"
+                className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/10 text-destructive active:bg-destructive/20"
               >
                 <XCircle className="h-5 w-5" />
                 <span>Remove Pro Action link</span>
@@ -1860,7 +1860,7 @@ const AppTaskCreate = ({
                         }
                       }}
                       className={cn(
-                        'w-full flex items-center gap-3 p-4 rounded-xl hover:bg-muted/80 text-left',
+                        'w-full flex items-center gap-3 p-4 rounded-xl active:bg-muted/80 text-left',
                         isSelected && 'bg-violet-100 dark:bg-violet-900/30 ring-2 ring-violet-500'
                       )}
                     >
@@ -1938,7 +1938,7 @@ const AppTaskCreate = ({
                       setShowPlaylistPicker(false);
                     }}
                     className={cn(
-                      'w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/80',
+                      'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
                       proLinkValue === playlist.id && 'bg-emerald-100 dark:bg-emerald-900/30'
                     )}
                   >
@@ -1982,7 +1982,7 @@ const AppTaskCreate = ({
                 setShowBreathingPicker(false);
               }}
               className={cn(
-                'w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/80',
+                'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
                 proLinkType === 'breathe' && !proLinkValue && 'bg-indigo-100 dark:bg-indigo-900/30'
               )}
             >
@@ -2010,7 +2010,7 @@ const AppTaskCreate = ({
                       setShowBreathingPicker(false);
                     }}
                     className={cn(
-                      'w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/80',
+                      'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
                       proLinkValue === exercise.id && 'bg-indigo-100 dark:bg-indigo-900/30'
                     )}
                   >
@@ -2048,7 +2048,7 @@ const AppTaskCreate = ({
                 setShowReflectionPicker(false);
               }}
               className={cn(
-                'w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/80',
+                'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
                 proLinkType === 'reflection' && !proLinkValue && 'bg-teal-100 dark:bg-teal-900/30'
               )}
             >
@@ -2076,7 +2076,7 @@ const AppTaskCreate = ({
                       setShowReflectionPicker(false);
                     }}
                     className={cn(
-                      'w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/80',
+                      'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
                       proLinkValue === reflection.id && 'bg-teal-100 dark:bg-teal-900/30'
                     )}
                   >
@@ -2219,7 +2219,7 @@ const AppTaskCreate = ({
           <AlertDialogFooter className="flex-row gap-3">
             <AlertDialogCancel className="flex-1 mt-0">Cancel</AlertDialogCancel>
             <AlertDialogAction 
-              className="flex-1 bg-red-500 hover:bg-red-600"
+              className="flex-1 bg-red-500"
               onClick={() => {
                 setIsUrgent(true);
                 setShowUrgentConfirm(false);
