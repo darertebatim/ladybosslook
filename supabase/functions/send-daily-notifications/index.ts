@@ -44,7 +44,7 @@ const NOTIFICATION_TYPES = {
   period_afternoon: {
     hour: 12,
     title: '🌤️ Afternoon is here',
-    body: 'Time for your afternoon actions.',
+    body: 'Time for your afternoon tasks.',
     url: '/app/home',
     prefKey: 'time_period_reminders',
   },
