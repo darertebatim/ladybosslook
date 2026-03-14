@@ -2769,9 +2769,9 @@ function LoopWheel() {
         const startAngle = (i * 90 - 90 + 25) * (Math.PI / 180);
         const endAngle = (i * 90 - 90 + 65) * (Math.PI / 180);
         const midAngle = (startAngle + endAngle) / 2;
-        const r = 85;
-        const mx = 110 + r * Math.cos(midAngle);
-        const my = 110 + r * Math.sin(midAngle);
+        const r = 75;
+        const mx = 100 + r * Math.cos(midAngle);
+        const my = 100 + r * Math.sin(midAngle);
 
         return (
           <motion.div
