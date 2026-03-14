@@ -529,6 +529,7 @@ export default function RoutinesBank() {
       subtitle: routine.subtitle || '',
       description: routine.description || '',
       cover_image_url: routine.cover_image_url || '',
+      cover_aspect: (routine as any).cover_aspect || 'square',
       video_url: (routine as any).video_url || '',
       category: routine.category,
       color: routine.color,
