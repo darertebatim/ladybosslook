@@ -344,11 +344,11 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
   );
 }
 
-function BottomSheetWrapper({ children, bgImage }: { children: React.ReactNode; bgImage?: string }) {
+function BottomSheetWrapper({ children, bgImage, headerHeight = 240 }: { children: React.ReactNode; bgImage?: string; headerHeight?: number }) {
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
-      {/* Background image area - taller to show more */}
-      <div className="h-[240px] shrink-0 relative">
+      {/* Background image area */}
+      <div className="shrink-0 relative" style={{ height: headerHeight }}>
         {bgImage ? (
           <img src={bgImage} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
         ) : (
