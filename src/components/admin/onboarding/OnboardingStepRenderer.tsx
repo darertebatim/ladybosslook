@@ -447,6 +447,7 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
 
 function TextInputScreen({ step, onNext, onAnswer }: Props) {
   const [value, setValue] = useState('');
+  const hasBg = !!step.illustrationLabel;
 
   const handleSubmit = () => {
     if (!value.trim()) return;
@@ -454,11 +455,11 @@ function TextInputScreen({ step, onNext, onAnswer }: Props) {
     onNext();
   };
 
-  return (
-    <ScreenWrapper>
+  const content = (
+    <>
       <FadeUp>
         <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
-        {step.subtitle && <p className="text-base text-gray-500 mb-8">{step.subtitle}</p>}
+        {step.subtitle && <p className="text-base text-gray-500 mb-6">{step.subtitle}</p>}
       </FadeUp>
       <FadeUp delay={0.15}>
         <input
@@ -480,8 +481,14 @@ function TextInputScreen({ step, onNext, onAnswer }: Props) {
           {step.buttonLabel || 'Continue'}
         </button>
       </div>
-    </ScreenWrapper>
+    </>
   );
+
+  if (hasBg) {
+    return <BottomSheetWrapper bgImage={meplusMascotBg}>{content}</BottomSheetWrapper>;
+  }
+
+  return <ScreenWrapper>{content}</ScreenWrapper>;
 }
 
 function SingleSelectDescScreen({ step, onNext, onAnswer }: Props) {

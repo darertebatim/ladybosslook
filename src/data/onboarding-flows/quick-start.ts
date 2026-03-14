@@ -89,6 +89,7 @@ export const quickStartFlow: OnboardingFlow = {
       type: 'text-input',
       title: 'What should I call you?',
       subtitle: 'Nicknames are fine.',
+      illustrationLabel: 'Mascot greeting',
       buttonLabel: 'Continue',
     },
     // 9 — Age group
@@ -97,6 +98,7 @@ export const quickStartFlow: OnboardingFlow = {
       type: 'single-select',
       title: 'What is your age group?',
       subtitle: 'I recommend routines for your age.',
+      illustrationLabel: 'Mascot with clipboard',
       options: [
         { label: '14 years or under' },
         { label: '15 ~ 19' },
@@ -114,6 +116,7 @@ export const quickStartFlow: OnboardingFlow = {
       type: 'single-select',
       title: 'What is your gender?',
       subtitle: 'I recommend routines for your gender.',
+      illustrationLabel: 'Mascot thinking',
       options: [
         { label: 'Female' },
         { label: 'Male' },
