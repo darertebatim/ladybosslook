@@ -643,7 +643,7 @@ export default function TasksBank() {
       clearSelection();
     },
     onError: (error) => {
-      toast.error('Failed to add actions: ' + error.message);
+      toast.error('Failed to add tasks: ' + error.message);
     },
   });
 
