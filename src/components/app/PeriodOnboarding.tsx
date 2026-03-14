@@ -106,7 +106,7 @@ export const PeriodOnboarding = () => {
                 haptic.light();
                 setStep('last_period');
               }}
-              className="w-full h-14 rounded-full bg-pink-500 hover:bg-pink-600 text-white font-semibold text-lg"
+              className="w-full h-14 rounded-full bg-pink-500 text-white font-semibold text-lg"
             >
               Get Started
               <ChevronRight className="h-5 w-5 ml-2" />
