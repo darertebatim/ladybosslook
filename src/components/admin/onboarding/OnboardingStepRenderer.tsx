@@ -2136,74 +2136,18 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
 }
 
 function StarterRoutineScreen({ step, onNext }: Props) {
-  const { user } = useAuth();
-  const createTask = useCreateTask();
-  const completeTask = useCompleteTask();
-
-  const [createdTaskIds, setCreatedTaskIds] = useState<Record<number, string>>({});
   const [completedIndices, setCompletedIndices] = useState<Set<number>>(new Set());
   const [hintPhase, setHintPhase] = useState<HintPhase>('check-bed');
-  const [isCreating, setIsCreating] = useState(false);
   const [showBreathing, setShowBreathing] = useState(false);
-  const createdRef = useRef(false);
 
-  // Create real tasks in Supabase on mount
-  useEffect(() => {
-    if (!user?.id || createdRef.current) return;
-    const guard = localStorage.getItem('onboarding_starter_tasks_created');
-    if (guard) { createdRef.current = true; return; }
-    createdRef.current = true;
-    setIsCreating(true);
-
-    (async () => {
-      const ids: Record<number, string> = {};
-      for (let i = 0; i < STARTER_TASKS.length; i++) {
-        const t = STARTER_TASKS[i];
-        try {
-          const result = await createTask.mutateAsync({
-            title: t.title,
-            emoji: t.emoji,
-            color: t.taskColor as any,
-            repeat_pattern: t.repeatPattern,
-            pro_link_type: (t.proLinkType as any) || null,
-            order_index: i,
-          });
-          ids[i] = result.id;
-        } catch (e) {
-          console.warn('[Onboarding] Failed to create task:', t.title, e);
-        }
-      }
-      setCreatedTaskIds(ids);
-      localStorage.setItem('onboarding_starter_tasks_created', 'true');
-      setIsCreating(false);
-    })();
-  }, [user?.id]);
-
-  // Handle completing "Get out of bed"
-  const handleCheckBed = async () => {
-    const taskId = createdTaskIds[0];
-    if (taskId) {
-      try {
-        await completeTask.mutateAsync({ taskId, date: new Date() });
-      } catch (e) {
-        console.warn('[Onboarding] Failed to complete task:', e);
-      }
-    }
+  // Handle completing "Open the app"
+  const handleCheckApp = async () => {
     setCompletedIndices(prev => new Set(prev).add(0));
     setTimeout(() => setHintPhase('breathe'), 600);
   };
 
   // Handle breathing exercise completion
   const handleBreathingComplete = useCallback(async () => {
-    // Auto-complete the breathing task (index 2)
-    const taskId = createdTaskIds[2];
-    if (taskId) {
-      try {
-        await completeTask.mutateAsync({ taskId, date: new Date() });
-      } catch (e) {
-        console.warn('[Onboarding] Failed to complete breathing task:', e);
-      }
-    }
     setCompletedIndices(prev => {
       const next = new Set(prev);
       next.add(2);
@@ -2211,15 +2155,15 @@ function StarterRoutineScreen({ step, onNext }: Props) {
     });
     setShowBreathing(false);
     setHintPhase('done');
-  }, [createdTaskIds, completeTask]);
+  }, []);
 
   // Handle breathing card tap
   const handleBreatheTap = () => {
     setShowBreathing(true);
   };
 
-  // Build UserTask objects for TaskCard rendering
-  const userTasks = STARTER_TASKS.map((t, i) => buildUserTask(t, i, createdTaskIds[i]));
+  // Build fake UserTask objects for preview rendering (no real DB tasks)
+  const userTasks = STARTER_TASKS.map((t, i) => buildUserTask(t, i));
 
   return (
     <div className="h-full flex flex-col bg-white">
@@ -2227,25 +2171,44 @@ function StarterRoutineScreen({ step, onNext }: Props) {
         {/* Header */}
         <FadeUp>
           <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center leading-tight">
-            {step.title}
+            Here's your first routine
           </h1>
         </FadeUp>
         <FadeUp delay={0.08}>
-          <p className="text-[15px] text-gray-500 text-center mt-2 mb-8">{step.subtitle}</p>
+          <p className="text-[15px] text-gray-500 text-center mt-2">{step.subtitle}</p>
         </FadeUp>
 
-        {/* Real Task Cards */}
+        {/* Phase instruction text - ABOVE task cards */}
+        <FadeUp delay={0.12}>
+          <p className="text-center text-[13px] text-gray-400 mt-3 mb-6">
+            {hintPhase === 'check-bed' && '👆 Tap the circle to complete your first task!'}
+            {hintPhase === 'breathe' && '🫁 Now tap the Breathe button to try it!'}
+            {hintPhase === 'done' && '✨ You\'re getting the hang of it!'}
+          </p>
+        </FadeUp>
+
+        {/* Task Cards with spotlight effect */}
         <div className="space-y-3 relative">
+          {/* Dark spotlight overlay - only during check-bed phase */}
+          {hintPhase === 'check-bed' && (
+            <div className="fixed inset-0 z-30 bg-black/50 pointer-events-none" style={{ animation: 'fadeIn 0.5s ease-out' }} />
+          )}
+          {/* Dark spotlight overlay - during breathe phase */}
+          {hintPhase === 'breathe' && (
+            <div className="fixed inset-0 z-30 bg-black/50 pointer-events-none" style={{ animation: 'fadeIn 0.5s ease-out' }} />
+          )}
+
           {userTasks.map((task, i) => {
             const isCompleted = completedIndices.has(i);
-            const isBedTask = i === 0;
+            const isAppTask = i === 0;
             const isBreatheTask = i === 2;
-            const showBedHint = hintPhase === 'check-bed' && isBedTask && !isCompleted;
+            const showAppHint = hintPhase === 'check-bed' && isAppTask && !isCompleted;
             const showBreatheHint = hintPhase === 'breathe' && isBreatheTask;
+            const isSpotlighted = showAppHint || showBreatheHint;
 
             return (
               <FadeUp key={task.id} delay={0.15 + i * 0.1}>
-                <div className="relative">
+                <div className={`relative ${isSpotlighted ? 'z-40' : ''}`}>
                   {/* During breathe hint phase, overlay the card to intercept taps */}
                   {showBreatheHint && (
                     <button
@@ -2253,7 +2216,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                       onClick={handleBreatheTap}
                     />
                   )}
-                  <div>
+                  <div className={isSpotlighted ? 'relative rounded-2xl shadow-2xl' : ''}>
                     <TaskCard
                       task={task}
                       date={new Date()}
@@ -2264,15 +2227,15 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                     />
                   </div>
 
-                  {/* Finger hint for bed task - pointing at the completion circle */}
-                  {showBedHint && (
+                  {/* Finger hint for app task - pointing at the completion circle */}
+                  {showAppHint && (
                     <>
                       {/* Invisible tap target on the completion circle */}
                       <button
                         className="absolute top-0 right-0 w-16 h-full z-50"
-                        onClick={handleCheckBed}
+                        onClick={handleCheckApp}
                       />
-                      {/* Pulsing glow ring around the completion circle (matches TourOverlay style) */}
+                      {/* Pulsing glow ring around the completion circle */}
                       <div
                         className="pointer-events-none absolute z-[55] rounded-full animate-pulse"
                         style={{
@@ -2299,10 +2262,9 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                     </>
                   )}
 
-                  {/* Hint for breathe task - point at the Breathe action button */}
+                  {/* Hint for breathe task */}
                   {showBreatheHint && (
                     <>
-                      {/* Pulsing glow ring around the Breathe action button area */}
                       <div
                         className="pointer-events-none absolute z-[55] rounded-xl animate-pulse"
                         style={{
@@ -2314,7 +2276,6 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                           boxShadow: '0 0 0 3px hsl(var(--primary) / 0.5), 0 0 20px 8px hsl(var(--primary) / 0.2)',
                         }}
                       />
-                      {/* Bouncing hand pointing DOWN at the Breathe button */}
                       <div
                         className="pointer-events-none absolute z-[60]"
                         style={{
@@ -2333,15 +2294,6 @@ function StarterRoutineScreen({ step, onNext }: Props) {
             );
           })}
         </div>
-
-        {/* Phase instruction text */}
-        <FadeUp delay={0.7}>
-          <p className="text-center text-[13px] text-gray-400 mt-6">
-            {hintPhase === 'check-bed' && '👆 Tap the circle to complete your first task!'}
-            {hintPhase === 'breathe' && '🫁 Now tap the Breathe button to try it!'}
-            {hintPhase === 'done' && '✨ You\'re getting the hang of it!'}
-          </p>
-        </FadeUp>
       </div>
 
       {/* CTA - only show after hints are done */}
@@ -2363,6 +2315,10 @@ function StarterRoutineScreen({ step, onNext }: Props) {
           55%  { transform: translateY(3px); }
           70%  { transform: translateY(8px); }
           100% { transform: translateY(0px); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
       `}</style>
     </div>
