@@ -1864,8 +1864,8 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     },
   });
 
-  // Pick first calm exercise (or first available)
-  const exercise = exercises?.find((e: any) => e.category === 'calm') || exercises?.[0];
+  // Pick "Welcome Breathing" by name, then fall back to calm category, then first available
+  const exercise = exercises?.find((e: any) => e.name?.toLowerCase().includes('welcome')) || exercises?.find((e: any) => e.category === 'calm') || exercises?.[0];
 
   const [phase, setPhase] = useState<'countdown' | 'running' | 'done'>('countdown');
   const [countdown, setCountdown] = useState(3);
@@ -2096,6 +2096,13 @@ function StarterRoutineScreen({ step, onNext }: Props) {
             return (
               <FadeUp key={task.id} delay={0.15 + i * 0.1}>
                 <div className="relative">
+                  {/* During breathe hint phase, overlay the card to intercept taps */}
+                  {showBreatheHint && (
+                    <button
+                      className="absolute inset-0 z-40 rounded-3xl"
+                      onClick={handleBreatheTap}
+                    />
+                  )}
                   <div>
                     <TaskCard
                       task={task}
@@ -2103,7 +2110,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                       isCompleted={isCompleted}
                       completedSubtaskIds={[]}
                       goalProgress={0}
-                      onTap={showBreatheHint ? handleBreatheTap : undefined}
+                      onTap={undefined}
                     />
                   </div>
 
@@ -2115,24 +2122,24 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                         className="absolute top-0 right-0 w-16 h-full z-50"
                         onClick={handleCheckBed}
                       />
-                      {/* Pulsing glow ring around the circle */}
+                      {/* Pulsing glow ring around the completion circle */}
                       <div
                         className="pointer-events-none absolute z-[55] rounded-full animate-pulse"
                         style={{
                           top: '50%',
-                          right: '14px',
+                          right: '10px',
                           width: '44px',
                           height: '44px',
                           transform: 'translateY(-50%)',
                           boxShadow: '0 0 0 4px hsl(var(--primary) / 0.4), 0 0 20px 8px hsl(var(--primary) / 0.15)',
                         }}
                       />
-                      {/* Bouncing hand pointing at circle */}
+                      {/* Bouncing hand - offset so fingertip points at circle center */}
                       <div
                         className="pointer-events-none absolute z-[60]"
                         style={{
-                          top: '-8px',
-                          right: '-2px',
+                          top: '-20px',
+                          right: '-18px',
                           filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
                           animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
                           transform: 'rotate(-45deg)',
@@ -2143,21 +2150,22 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                     </>
                   )}
 
-                  {/* Finger hint for breathe task */}
+                  {/* Hint for breathe task - point at the Breathe action button */}
                   {showBreatheHint && (
                     <>
-                      {/* Pulsing glow ring around the card */}
+                      {/* Pulsing glow ring around entire card */}
                       <div
                         className="pointer-events-none absolute inset-0 rounded-3xl z-[55] animate-pulse"
                         style={{
                           boxShadow: '0 0 0 3px hsl(var(--primary) / 0.4), 0 0 24px 8px hsl(var(--primary) / 0.15)',
                         }}
                       />
+                      {/* Bouncing hand pointing at the Breathe button (right side, before the circle) */}
                       <div
                         className="pointer-events-none absolute z-[60]"
                         style={{
-                          top: '-8px',
-                          right: '-2px',
+                          top: '-20px',
+                          right: '30px',
                           filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
                           animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
                           transform: 'rotate(-45deg)',
@@ -2177,7 +2185,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
         <FadeUp delay={0.7}>
           <p className="text-center text-[13px] text-gray-400 mt-6">
             {hintPhase === 'check-bed' && '👆 Tap the circle to complete your first task!'}
-            {hintPhase === 'breathe' && '🫁 Now tap to try a quick breathing exercise'}
+            {hintPhase === 'breathe' && '🫁 Now tap the Breathe button to try it!'}
             {hintPhase === 'done' && '✨ You\'re getting the hang of it!'}
           </p>
         </FadeUp>
