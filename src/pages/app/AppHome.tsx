@@ -324,11 +324,23 @@ const AppHome = () => {
   useEffect(() => {
     if (!goldStreakData) return;
     if (!streak) return;
-    // Gold streak is currently 0 but was previously > 0
-    if (goldStreakData.currentGoldStreak !== 0) return;
-    if (goldStreakData.longestGoldStreak <= 0) return;
-    // Check if last gold date exists and is not today/yesterday (meaning streak broke)
     if (!goldStreakData.lastGoldDate) return;
+    // Gold streak must have been > 0
+    const goldStreak = goldStreakData.currentGoldStreak;
+    if (goldStreak <= 0 && goldStreakData.longestGoldStreak <= 0) return;
+    
+    // Check if last gold date is before yesterday (streak is broken)
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
+    const lastGold = goldStreakData.lastGoldDate;
+    
+    // If last gold was today or yesterday, streak is still alive
+    if (lastGold === today || lastGold === yesterday) return;
+    
+    // Streak is broken — the DB still has old current_gold_streak value
+    const previousGold = goldStreak > 0 ? goldStreak : goldStreakData.longestGoldStreak;
+    if (previousGold <= 0) return;
+    
     const recoveryCount = (streak as any).streak_recovery_count || 0;
     if (recoveryCount >= 3) return;
     const shownKey = 'simora_gold_recovery_prompt_shown';
@@ -1269,7 +1281,7 @@ const AppHome = () => {
           setShowGoldRecoveryPrompt={setShowGoldRecoveryPrompt}
           showRecoverySuccess={showRecoverySuccess}
           setShowRecoverySuccess={setShowRecoverySuccess}
-          previousGoldStreak={goldStreakData?.longestGoldStreak || 0}
+          previousGoldStreak={goldStreakData?.currentGoldStreak || goldStreakData?.longestGoldStreak || 0}
           userId={user?.id}
           showNotificationFlow={showNotificationFlow}
           setShowNotificationFlow={setShowNotificationFlow}
