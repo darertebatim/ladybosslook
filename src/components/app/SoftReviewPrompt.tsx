@@ -67,7 +67,7 @@ export function SoftReviewPrompt({ isOpen, onClose, onAccept }: SoftReviewPrompt
         {/* Close button */}
         <button
           onClick={handleNotNow}
-          className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-full active:bg-gray-100 transition-colors"
           aria-label="Close"
         >
           <X className="w-5 h-5 text-gray-400" />
