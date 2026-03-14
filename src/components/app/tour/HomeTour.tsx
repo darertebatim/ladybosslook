@@ -64,7 +64,7 @@ export function HomeTour({
       },
       {
         id: 'add-action',
-        title: 'Add Actions',
+        title: 'Add Tasks',
         target: '.tour-add-task',
         description: 'Tap + to add something small to your day.',
         position: 'left',
