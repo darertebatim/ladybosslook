@@ -2138,11 +2138,11 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                       <div
                         className="pointer-events-none absolute z-[60]"
                         style={{
-                          top: '-28px',
-                          right: '42px',
+                          top: '-8px',
+                          right: '-10px',
                           filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
                           animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
-                          transform: 'rotate(15deg)',
+                          transform: 'rotate(160deg)',
                         }}
                       >
                         <FluentEmoji emoji="👆" size={52} />
