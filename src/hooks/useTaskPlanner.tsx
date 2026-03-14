@@ -864,7 +864,7 @@ export const useDeleteTask = () => {
     },
     onError: (error) => {
       console.error('Delete task error:', error);
-      toast({ title: 'Failed to delete action', variant: 'destructive' });
+      toast({ title: 'Failed to delete task', variant: 'destructive' });
     },
   });
 };
