@@ -445,7 +445,45 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
   );
 }
 
-function SingleSelectDescScreen({ step, onNext, onAnswer }: Props) {
+function TextInputScreen({ step, onNext, onAnswer }: Props) {
+  const [value, setValue] = useState('');
+
+  const handleSubmit = () => {
+    if (!value.trim()) return;
+    onAnswer?.(step.id, value.trim());
+    onNext();
+  };
+
+  return (
+    <ScreenWrapper>
+      <FadeUp>
+        <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
+        {step.subtitle && <p className="text-base text-gray-500 mb-8">{step.subtitle}</p>}
+      </FadeUp>
+      <FadeUp delay={0.15}>
+        <input
+          type="text"
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+          placeholder="Nickname *"
+          className="w-full px-5 py-4 rounded-2xl bg-gray-100 text-[#1a1f3d] text-base placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-purple-300 transition-all"
+          autoFocus
+        />
+      </FadeUp>
+      <div className="mt-auto pt-8">
+        <button
+          onClick={handleSubmit}
+          disabled={!value.trim()}
+          className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-base transition-all disabled:opacity-40"
+        >
+          {step.buttonLabel || 'Continue'}
+        </button>
+      </div>
+    </ScreenWrapper>
+  );
+}
+
   const [picked, setPicked] = useState<number | null>(null);
 
   const select = (i: number) => {
