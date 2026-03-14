@@ -1380,11 +1380,11 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "add_subtasks_to_action",
-          description: "Add subtasks (checklist steps) to an existing action in the Actions Bank.",
+          description: "Add subtasks (checklist steps) to an existing task in the Tasks Bank.",
           parameters: {
             type: "object",
             properties: {
-              task_id: { type: "string", description: "The ID of the action to add subtasks to" },
+              task_id: { type: "string", description: "The ID of the task to add subtasks to" },
               subtasks: {
                 type: "array",
                 description: "Array of subtasks to add",
