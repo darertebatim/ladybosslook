@@ -2177,18 +2177,17 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                           boxShadow: '0 0 0 3px hsl(var(--primary) / 0.5), 0 0 20px 8px hsl(var(--primary) / 0.2)',
                         }}
                       />
-                      {/* Bouncing hand pointing at the Breathe button - to the LEFT of button */}
+                      {/* Bouncing hand pointing DOWN at the Breathe button */}
                       <div
                         className="pointer-events-none absolute z-[60]"
                         style={{
-                          top: '-8px',
-                          right: '48px',
+                          top: '-40px',
+                          right: '58px',
                           filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
                           animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
-                          transform: 'rotate(160deg)',
                         }}
                       >
-                        <FluentEmoji emoji="👆" size={52} />
+                        <FluentEmoji emoji="👇" size={48} />
                       </div>
                     </>
                   )}
