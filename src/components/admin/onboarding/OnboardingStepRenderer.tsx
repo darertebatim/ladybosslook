@@ -1996,8 +1996,10 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     if (stage === 'done') return 'radial-gradient(ellipse at 50% 40%, #1e1145 0%, #0f0a2e 50%, #080618 100%)';
     if (stage === 'countdown') return 'radial-gradient(ellipse at 50% 40%, #1a0e3e 0%, #0d0825 50%, #06050f 100%)';
     if (breathPhase === 'inhale') return 'radial-gradient(ellipse at 50% 35%, #1e1155 0%, #120a3a 40%, #080618 100%)';
+    if (breathPhase === 'inhale_hold') return 'radial-gradient(ellipse at 50% 38%, #251560 0%, #150c45 40%, #0a0720 100%)';
     if (breathPhase === 'exhale') return 'radial-gradient(ellipse at 50% 45%, #160d42 0%, #0e0830 40%, #06050f 100%)';
-    return 'radial-gradient(ellipse at 50% 40%, #1a0e3e 0%, #0d0825 50%, #06050f 100%)'; // hold
+    if (breathPhase === 'exhale_hold') return 'radial-gradient(ellipse at 50% 42%, #12103a 0%, #0b0828 40%, #050412 100%)';
+    return 'radial-gradient(ellipse at 50% 40%, #1a0e3e 0%, #0d0825 50%, #06050f 100%)';
   })();
 
   // Animated circle scale
