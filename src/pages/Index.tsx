@@ -21,7 +21,13 @@ const Index = () => {
       if (user) {
         navigate('/app/home', { replace: true });
       } else {
-        navigate('/auth', { replace: true });
+        // First-time users see onboarding; returning users go to auth
+        const hasSeenOnboarding = localStorage.getItem('simora_onboarding_completed_quick-start-v1') === 'true';
+        if (hasSeenOnboarding) {
+          navigate('/auth', { replace: true });
+        } else {
+          navigate('/app/onboarding/quick-start-v1', { replace: true });
+        }
       }
     }
   }, [user, navigate]);
