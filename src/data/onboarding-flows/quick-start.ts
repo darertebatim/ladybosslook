@@ -41,7 +41,7 @@ export const quickStartFlow: OnboardingFlow = {
       type: 'motivational',
       title: 'Your daily reset button',
       subtitle: 'Whenever your day feels scattered, stressed, or heavy — Simora gives you a small reset.\n\nA few guided actions to calm your mind, refocus, and move forward.',
-      description: '"Think of it as a little daily reset button in your pocket."',
+      description: '"It feels like having a little daily reset button in my pocket."\n— Yalda-M ⭐⭐⭐⭐⭐',
       buttonLabel: 'Continue',
     },
     // 4 — Starter routine preview with real task cards
