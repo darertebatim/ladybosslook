@@ -736,7 +736,7 @@ export default function RoutinesBank() {
       setCreateActionSheetOpen(false);
     },
     onError: (error) => {
-      toast.error('Failed to create action: ' + error.message);
+      toast.error('Failed to create task: ' + error.message);
     },
   });
 
