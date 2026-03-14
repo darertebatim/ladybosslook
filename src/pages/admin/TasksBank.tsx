@@ -20,13 +20,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 // Color options matching the app
 const COLOR_OPTIONS = [
-  { name: 'pink', hex: '#FFD6E8' },
-  { name: 'peach', hex: '#FFE4C4' },
-  { name: 'yellow', hex: '#FFF59D' },
-  { name: 'lime', hex: '#E8F5A3' },
-  { name: 'sky', hex: '#C5E8FA' },
-  { name: 'mint', hex: '#B8F5E4' },
-  { name: 'lavender', hex: '#E8D4F8' },
+  { name: 'pink', hex: '#FFE0F5' },
+  { name: 'peach', hex: '#FFE6C9' },
+  { name: 'yellow', hex: '#FFF492' },
+  { name: 'lime', hex: '#E2F9F0' },
+  { name: 'sky', hex: '#D7E9FF' },
+  { name: 'mint', hex: '#E0FBB8' },
+  { name: 'lavender', hex: '#F0E3FF' },
 ];
 
 interface RoutineCategory {

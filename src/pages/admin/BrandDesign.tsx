@@ -160,13 +160,13 @@ export default function BrandDesign() {
 
       <Section title="Planner Secondary Palette" description="Heavier/darker variants used for schedule strips and card footers in the planner">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          <ColorSwatch label="Pink Dark" cssVar="planner-pink-dark" hex="#FFB8D9" />
-          <ColorSwatch label="Peach Dark" cssVar="planner-peach-dark" hex="#FFD1A3" />
-          <ColorSwatch label="Yellow Dark" cssVar="planner-yellow-dark" hex="#FFE97D" />
-          <ColorSwatch label="Lime Dark" cssVar="planner-lime-dark" hex="#D4EB82" />
-          <ColorSwatch label="Sky Dark" cssVar="planner-sky-dark" hex="#A3D5F2" />
-          <ColorSwatch label="Mint Dark" cssVar="planner-mint-dark" hex="#8EECD0" />
-          <ColorSwatch label="Lavender Dark" cssVar="planner-lavender-dark" hex="#D4B8F0" />
+          <ColorSwatch label="Pink Dark" cssVar="planner-pink-dark" hex="#FFC2EA" />
+          <ColorSwatch label="Peach Dark" cssVar="planner-peach-dark" hex="#FFD2A1" />
+          <ColorSwatch label="Yellow Dark" cssVar="planner-yellow-dark" hex="#FFEA4E" />
+          <ColorSwatch label="Lime Dark" cssVar="planner-lime-dark" hex="#C3F1E1" />
+          <ColorSwatch label="Sky Dark" cssVar="planner-sky-dark" hex="#B9D6FF" />
+          <ColorSwatch label="Mint Dark" cssVar="planner-mint-dark" hex="#C9F588" />
+          <ColorSwatch label="Lavender Dark" cssVar="planner-lavender-dark" hex="#DEC1FF" />
         </div>
         <div className="mt-3 text-xs text-muted-foreground space-y-1">
           <p><span className="font-medium">Usage:</span> Bottom schedule strip on task cards, heavier accent areas, hover states</p>

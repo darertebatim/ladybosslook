@@ -19,18 +19,18 @@ import { formatTimeLabel } from '@/lib/taskScheduling';
 
 // Secondary (darker) palette for card footer strips
 const TASK_COLOR_DARK_CLASSES: Record<string, string> = {
-  pink: 'bg-[#FFB8D9]',
-  peach: 'bg-[#FFD1A3]',
-  yellow: 'bg-[#FFE97D]',
-  lime: 'bg-[#D4EB82]',
-  sky: 'bg-[#A3D5F2]',
-  mint: 'bg-[#8EECD0]',
-  lavender: 'bg-[#D4B8F0]',
-  purple: 'bg-[#D4B8F0]',
-  blue: 'bg-[#A3D5F2]',
-  red: 'bg-[#FFB8D9]',
-  orange: 'bg-[#FFD1A3]',
-  green: 'bg-[#D4EB82]',
+  pink: 'bg-[#FFC2EA]',
+  peach: 'bg-[#FFD2A1]',
+  yellow: 'bg-[#FFEA4E]',
+  lime: 'bg-[#C3F1E1]',
+  sky: 'bg-[#B9D6FF]',
+  mint: 'bg-[#C9F588]',
+  lavender: 'bg-[#DEC1FF]',
+  purple: 'bg-[#DEC1FF]',
+  blue: 'bg-[#B9D6FF]',
+  red: 'bg-[#FFC2EA]',
+  orange: 'bg-[#FFD2A1]',
+  green: 'bg-[#C3F1E1]',
 };
 
 // Color cycle for variety in planner (used when no specific color is set)
