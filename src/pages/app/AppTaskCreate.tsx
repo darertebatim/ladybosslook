@@ -1071,8 +1071,8 @@ const AppTaskCreate = ({
           )}
         >
           <div className="flex items-center gap-3">
-            <Target className={cn("h-5 w-5", goalSettings.enabled ? "text-emerald-600" : "text-foreground/70")} />
-            <span className="font-medium">Goal</span>
+            <Target className={cn("h-5 w-5", goalSettings.enabled ? "text-emerald-600" : "text-black")} />
+            <span className="font-medium text-black">Goal</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <span>{goalSettings.enabled ? formatGoalTarget(goalSettings) : 'Off'}</span>
