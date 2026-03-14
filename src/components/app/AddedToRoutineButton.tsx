@@ -76,7 +76,7 @@ export const AddedToRoutineButton = ({
         size="icon"
         onClick={handleGoToPlanner}
         className={cn(
-          "rounded-full bg-success/20 text-success hover:bg-success/30 shrink-0",
+          "rounded-full bg-success/20 text-success shrink-0",
           className
         )}
         title="Added — Go to Planner"
