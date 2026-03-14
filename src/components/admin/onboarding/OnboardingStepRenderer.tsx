@@ -17,6 +17,7 @@ import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.p
 import meplusPlanMascot from '@/assets/onboarding/meplus-plan-mascot.png';
 import { useAuth } from '@/hooks/useAuth';
 import { useCreateTask, useCompleteTask, CreateTaskInput } from '@/hooks/useTaskPlanner';
+import { TaskCard } from '@/components/app/TaskCard';
 import { format } from 'date-fns';
 
 interface Props {
@@ -1818,11 +1819,174 @@ const STARTER_TASKS: StarterTask[] = [
   { emoji: '✅', title: 'Complete one small task', subtitle: 'Pick something quick & easy', color: '#D1FAE5', taskColor: 'green', repeatPattern: 'none' },
 ];
 
+// Build a fake UserTask object for TaskCard rendering
+function buildUserTask(t: StarterTask, index: number, taskId?: string): import('@/hooks/useTaskPlanner').UserTask {
+  return {
+    id: taskId || `onboarding-${index}`,
+    user_id: '',
+    title: t.title,
+    description: t.subtitle,
+    emoji: t.emoji,
+    color: t.taskColor as any,
+    scheduled_date: null,
+    scheduled_time: null,
+    time_period: null,
+    repeat_pattern: t.repeatPattern,
+    repeat_days: [],
+    reminder_enabled: false,
+    reminder_offset: 15,
+    is_urgent: false,
+    tag: null,
+    order_index: index,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    linked_playlist_id: null,
+    pro_link_type: (t.proLinkType as any) || null,
+    pro_link_value: null,
+    goal_enabled: false,
+    goal_type: null,
+    goal_target: null,
+    goal_unit: null,
+  };
+}
+
 type HintPhase = 'check-bed' | 'breathe' | 'done';
+
+// Mini inline breathing overlay for onboarding
+function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) {
+  const { data: exercises } = useQuery({
+    queryKey: ['breathing-exercises'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('breathing_exercises').select('*').eq('is_active', true).order('sort_order');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Pick first calm exercise (or first available)
+  const exercise = exercises?.find((e: any) => e.category === 'calm') || exercises?.[0];
+
+  const [phase, setPhase] = useState<'countdown' | 'running' | 'done'>('countdown');
+  const [countdown, setCountdown] = useState(3);
+  const [cycleCount, setCycleCount] = useState(0);
+  const [breathPhase, setBreathPhase] = useState<'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold'>('inhale');
+  const [phaseTimeLeft, setPhaseTimeLeft] = useState(0);
+  const targetCycles = 3;
+
+  // Build phases from exercise
+  const phases = useRef<{ type: 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold'; duration: number; text: string }[]>([]);
+  const currentPhaseIdx = useRef(0);
+
+  useEffect(() => {
+    if (!exercise) return;
+    const p: typeof phases.current = [];
+    if (exercise.inhale_seconds > 0) p.push({ type: 'inhale', duration: exercise.inhale_seconds, text: 'Inhale' });
+    if (exercise.inhale_hold_seconds > 0) p.push({ type: 'inhale_hold', duration: exercise.inhale_hold_seconds, text: 'Hold' });
+    if (exercise.exhale_seconds > 0) p.push({ type: 'exhale', duration: exercise.exhale_seconds, text: 'Exhale' });
+    if (exercise.exhale_hold_seconds > 0) p.push({ type: 'exhale_hold', duration: exercise.exhale_hold_seconds, text: 'Hold' });
+    phases.current = p;
+    if (p.length > 0) {
+      setPhaseTimeLeft(p[0].duration);
+      setBreathPhase(p[0].type);
+    }
+  }, [exercise]);
+
+  // Countdown
+  useEffect(() => {
+    if (phase !== 'countdown') return;
+    const t = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) { clearInterval(t); setPhase('running'); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, [phase]);
+
+  // Breathing timer
+  useEffect(() => {
+    if (phase !== 'running' || phases.current.length === 0) return;
+    const t = setInterval(() => {
+      setPhaseTimeLeft(prev => {
+        if (prev <= 1) {
+          const nextIdx = (currentPhaseIdx.current + 1) % phases.current.length;
+          // If we wrapped around, count a cycle
+          if (nextIdx === 0) {
+            setCycleCount(c => {
+              const newC = c + 1;
+              if (newC >= targetCycles) {
+                clearInterval(t);
+                setPhase('done');
+                setTimeout(onComplete, 800);
+              }
+              return newC;
+            });
+          }
+          currentPhaseIdx.current = nextIdx;
+          const nextPhase = phases.current[nextIdx];
+          setBreathPhase(nextPhase.type);
+          return nextPhase.duration;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, [phase, onComplete]);
+
+  if (!exercise) return null;
+
+  const currentP = phases.current[currentPhaseIdx.current];
+  const phaseText = phase === 'countdown' ? countdown.toString() : phase === 'done' ? '✓' : (currentP?.text || 'Inhale');
+
+  // Calculate animated scale for the breathing circle
+  let animatedScale = 0.40;
+  if (phase === 'running' && currentP) {
+    if (currentP.type === 'inhale_hold') animatedScale = 1.0;
+    else if (currentP.type === 'inhale') animatedScale = 1.0;
+    else if (currentP.type === 'exhale') animatedScale = 0.40;
+    else animatedScale = 0.40;
+  }
+  if (phase === 'done') animatedScale = 0.70;
+
+  const isAnimatingBreath = phase === 'running' && (breathPhase === 'inhale' || breathPhase === 'exhale');
+  const phaseDuration = currentP?.duration || 4;
+
+  return (
+    <div className="fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center">
+      {/* Exercise name */}
+      <p className="text-sm text-muted-foreground mb-2 font-medium">{exercise.name}</p>
+      <p className="text-xs text-muted-foreground/60 mb-8">{cycleCount}/{targetCycles} breaths</p>
+
+      {/* Breathing circle - simplified version */}
+      <div className="relative flex items-center justify-center w-56 h-56">
+        <div className="absolute rounded-full border-2 border-muted-foreground/30" style={{ width: '40%', height: '40%' }} />
+        <div
+          className={`absolute rounded-full bg-primary/20 backdrop-blur-sm shadow-lg transition-transform ${isAnimatingBreath ? 'ease-linear' : 'ease-out'}`}
+          style={{
+            width: '100%',
+            height: '100%',
+            transform: `scale(${animatedScale})`,
+            transitionDuration: isAnimatingBreath ? `${phaseDuration}s` : '0.3s',
+          }}
+        />
+        <div className="absolute rounded-full bg-card border border-border flex flex-col items-center justify-center shadow-xl" style={{ width: '35%', height: '35%' }}>
+          <span className={`font-semibold text-foreground ${phase === 'done' ? 'text-2xl' : 'text-lg'}`}>{phaseText}</span>
+          {phase === 'running' && breathPhase.includes('hold') && (
+            <span className="text-sm text-muted-foreground">{phaseTimeLeft}</span>
+          )}
+        </div>
+      </div>
+
+      {phase === 'done' && (
+        <p className="mt-8 text-lg font-semibold text-foreground animate-fade-in">Great job! 🎉</p>
+      )}
+    </div>
+  );
+}
 
 function StarterRoutineScreen({ step, onNext }: Props) {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const createTask = useCreateTask();
   const completeTask = useCompleteTask();
 
@@ -1830,6 +1994,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const [completedIndices, setCompletedIndices] = useState<Set<number>>(new Set());
   const [hintPhase, setHintPhase] = useState<HintPhase>('check-bed');
   const [isCreating, setIsCreating] = useState(false);
+  const [showBreathing, setShowBreathing] = useState(false);
   const createdRef = useRef(false);
 
   // Create real tasks in Supabase on mount
@@ -1878,11 +2043,33 @@ function StarterRoutineScreen({ step, onNext }: Props) {
     setTimeout(() => setHintPhase('breathe'), 600);
   };
 
-  // Handle breathing exercise tap
+  // Handle breathing exercise completion
+  const handleBreathingComplete = useCallback(async () => {
+    // Auto-complete the breathing task (index 2)
+    const taskId = createdTaskIds[2];
+    if (taskId) {
+      try {
+        await completeTask.mutateAsync({ taskId, date: new Date() });
+      } catch (e) {
+        console.warn('[Onboarding] Failed to complete breathing task:', e);
+      }
+    }
+    setCompletedIndices(prev => {
+      const next = new Set(prev);
+      next.add(2);
+      return next;
+    });
+    setShowBreathing(false);
+    setHintPhase('done');
+  }, [createdTaskIds, completeTask]);
+
+  // Handle breathing card tap
   const handleBreatheTap = () => {
-    localStorage.setItem('onboarding_breathe_pending', 'true');
-    navigate('/app/breathe');
+    setShowBreathing(true);
   };
+
+  // Build UserTask objects for TaskCard rendering
+  const userTasks = STARTER_TASKS.map((t, i) => buildUserTask(t, i, createdTaskIds[i]));
 
   return (
     <div className="h-full flex flex-col bg-white">
@@ -1897,9 +2084,9 @@ function StarterRoutineScreen({ step, onNext }: Props) {
           <p className="text-[15px] text-gray-500 text-center mt-2 mb-8">{step.subtitle}</p>
         </FadeUp>
 
-        {/* Task cards */}
-        <div className="space-y-3">
-          {STARTER_TASKS.map((task, i) => {
+        {/* Real Task Cards */}
+        <div className="space-y-3 relative">
+          {userTasks.map((task, i) => {
             const isCompleted = completedIndices.has(i);
             const isBedTask = i === 0;
             const isBreatheTask = i === 2;
@@ -1907,56 +2094,40 @@ function StarterRoutineScreen({ step, onNext }: Props) {
             const showBreatheHint = hintPhase === 'breathe' && isBreatheTask;
 
             return (
-              <FadeUp key={task.title} delay={0.15 + i * 0.1}>
+              <FadeUp key={task.id} delay={0.15 + i * 0.1}>
                 <div className="relative">
-                  <div
-                    className={`flex items-center gap-4 rounded-2xl p-4 transition-all ${
-                      showBreatheHint ? 'ring-[3px] ring-blue-400/60 animate-pulse' : ''
-                    } ${isCompleted ? 'opacity-60' : ''}`}
-                    style={{ backgroundColor: task.color + '66' }}
-                    onClick={showBreatheHint ? handleBreatheTap : undefined}
-                  >
-                    {/* Emoji circle */}
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: task.color }}
-                    >
-                      <FluentEmoji emoji={task.emoji} size={28} />
-                    </div>
-                    {/* Text */}
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-[15px] font-semibold text-[#1a1f3d] leading-snug ${isCompleted ? 'line-through' : ''}`}>{task.title}</p>
-                      <p className="text-[13px] text-gray-500 mt-0.5">{task.subtitle}</p>
-                    </div>
-                    {/* Completion marker */}
-                    <button
-                      className="shrink-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (showBedHint) handleCheckBed();
-                      }}
-                    >
-                      {isCompleted ? (
-                        <SealCheck className="w-7 h-7 text-teal-400" showParticles />
-                      ) : (
-                        <div className={`w-6 h-6 rounded-full border-2 ${showBedHint ? 'border-teal-400 bg-teal-50' : 'border-gray-300'} shrink-0`} />
-                      )}
-                    </button>
+                  <div className={showBreatheHint ? 'ring-[3px] ring-primary/40 rounded-3xl animate-pulse' : ''}>
+                    <TaskCard
+                      task={task}
+                      date={new Date()}
+                      isCompleted={isCompleted}
+                      completedSubtaskIds={[]}
+                      goalProgress={0}
+                      onTap={showBreatheHint ? handleBreatheTap : undefined}
+                    />
                   </div>
 
-                  {/* Finger hint for bed task */}
+                  {/* Finger hint for bed task - same style as AddToRoutineHandHint */}
                   {showBedHint && (
-                    <div
-                      className="pointer-events-none absolute z-[60]"
-                      style={{
-                        top: '6px',
-                        right: '-8px',
-                        filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.25))',
-                        animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
-                      }}
-                    >
-                      <FluentEmoji emoji="👆" size={48} />
-                    </div>
+                    <>
+                      {/* Invisible tap target on the completion circle */}
+                      <button
+                        className="absolute top-0 right-0 w-16 h-full z-50"
+                        onClick={handleCheckBed}
+                      />
+                      <div
+                        className="pointer-events-none absolute z-[60]"
+                        style={{
+                          top: '2px',
+                          right: '-4px',
+                          filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.25))',
+                          animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
+                          transform: 'rotate(-45deg)',
+                        }}
+                      >
+                        <FluentEmoji emoji="👇" size={52} />
+                      </div>
+                    </>
                   )}
 
                   {/* Finger hint for breathe task */}
@@ -1965,13 +2136,13 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                       className="pointer-events-none absolute z-[60]"
                       style={{
                         top: '50%',
-                        right: '-16px',
-                        transform: 'translateY(-50%)',
+                        right: '-12px',
+                        transform: 'translateY(-50%) rotate(-45deg)',
                         filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.25))',
                         animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
                       }}
                     >
-                      <FluentEmoji emoji="👈" size={48} />
+                      <FluentEmoji emoji="👇" size={52} />
                     </div>
                   )}
                 </div>
@@ -1984,8 +2155,8 @@ function StarterRoutineScreen({ step, onNext }: Props) {
         <FadeUp delay={0.7}>
           <p className="text-center text-[13px] text-gray-400 mt-6">
             {hintPhase === 'check-bed' && '👆 Tap the circle to complete your first task!'}
-            {hintPhase === 'breathe' && '🫁 Now try a quick breathing exercise'}
-            {hintPhase === 'done' && ''}
+            {hintPhase === 'breathe' && '🫁 Now tap to try a quick breathing exercise'}
+            {hintPhase === 'done' && '✨ You\'re getting the hang of it!'}
           </p>
         </FadeUp>
       </div>
@@ -1997,13 +2168,18 @@ function StarterRoutineScreen({ step, onNext }: Props) {
         </FadeUp>
       )}
 
+      {/* Inline breathing overlay */}
+      {showBreathing && (
+        <OnboardingBreathingOverlay onComplete={handleBreathingComplete} />
+      )}
+
       <style>{`
         @keyframes onboardingHandBounce {
-          0%   { transform: translateY(0px); }
-          40%  { transform: translateY(-8px); }
-          55%  { transform: translateY(-3px); }
-          70%  { transform: translateY(-8px); }
-          100% { transform: translateY(0px); }
+          0%   { transform: rotate(-45deg) translateY(0px); }
+          40%  { transform: rotate(-45deg) translateY(10px); }
+          55%  { transform: rotate(-45deg) translateY(5px); }
+          70%  { transform: rotate(-45deg) translateY(10px); }
+          100% { transform: rotate(-45deg) translateY(0px); }
         }
       `}</style>
     </div>
