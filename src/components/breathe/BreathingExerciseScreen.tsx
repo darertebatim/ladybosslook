@@ -87,12 +87,8 @@ export function BreathingExerciseScreen({
   const { autoCompleteBreathe } = useAutoCompleteProTask();
   const startTimeRef = useRef<number>(0);
   
-  // Refs to avoid re-creating the interval every second
-  const currentPhaseIndexRef = useRef(currentPhaseIndex);
-  const cycleCountRef = useRef(cycleCount);
+  // Ref to avoid stale elapsed value inside interval completion checks
   const totalElapsedRef = useRef(totalElapsed);
-  currentPhaseIndexRef.current = currentPhaseIndex;
-  cycleCountRef.current = cycleCount;
   totalElapsedRef.current = totalElapsed;
 
   // Always show info sheet when exercise opens
