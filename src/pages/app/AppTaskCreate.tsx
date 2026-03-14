@@ -1054,9 +1054,9 @@ const AppTaskCreate = ({
             <Tag className="h-5 w-5 text-black" />
             <span className="font-medium text-black">Category</span>
           </div>
-          <div className="flex items-center gap-2 text-black/60">
+          <div className="flex items-center gap-2 text-black">
             <span>{tag || 'No category'}</span>
-            <ChevronRight className="h-4 w-4 text-black/40" />
+            <ChevronRight className="h-4 w-4 text-black" />
           </div>
         </button>
       </div>
