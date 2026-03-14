@@ -186,7 +186,7 @@ export const StreakGoalSelection = ({
           <Button
             onClick={handleConfirm}
             disabled={isLoading}
-            className="w-full max-w-xs h-14 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-base rounded-2xl"
+            className="w-full max-w-xs h-14 bg-gray-900 text-white font-semibold text-base rounded-2xl"
           >
             {isLoading ? 'Saving...' : 'Commit to my goal'}
           </Button>

@@ -156,7 +156,7 @@ export function IAPPlanPicker({ program }: IAPPlanPickerProps) {
         <button
           onClick={handleRestore}
           disabled={isRestoring}
-          className="text-xs text-primary hover:underline"
+          className="text-xs text-primary underline"
         >
           {isRestoring ? 'Restoring...' : 'Restore'}
         </button>

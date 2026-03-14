@@ -171,8 +171,8 @@ export function PaywallMascot({ program, onPurchase, onRestore, onClose, preview
         </p>
 
         <div className="flex items-center justify-center gap-4 mt-2 text-xs opacity-50">
-          <Link to="/sms-terms" className="hover:underline">Terms</Link>
-          <Link to="/privacy" className="hover:underline">Privacy</Link>
+          <Link to="/sms-terms" className="underline">Terms</Link>
+          <Link to="/privacy" className="underline">Privacy</Link>
         </div>
       </div>
     </div>

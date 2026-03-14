@@ -77,7 +77,7 @@ export const PeriodCalendar = ({
                   'aspect-square flex items-center justify-center text-sm font-medium rounded-full transition-all relative',
                   'active:scale-90',
                   !isCurrentMonth && 'text-pink-200 pointer-events-none',
-                  isCurrentMonth && !isLogged && !isPredicted && !isOvulation && 'hover:bg-pink-50 text-pink-700',
+                  isCurrentMonth && !isLogged && !isPredicted && !isOvulation && 'text-pink-700',
                   isTodayDate && !isLogged && 'ring-2 ring-pink-400 ring-offset-1'
                 )}
               >
