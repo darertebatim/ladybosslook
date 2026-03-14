@@ -2160,7 +2160,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const handleBreathingComplete = useCallback(() => {
     setShowBreathing(false);
     setPhase('celebrate-breathe');
-    triggerCelebration(BREATHE_IDX, 'spotlight-mood');
+    triggerCelebration(BREATHE_IDX, 'spotlight-complete');
   }, []);
 
   const handleMoodTap = () => {
@@ -2169,10 +2169,29 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   };
 
   const handleMoodSelect = (moodValue: string) => {
+    const moodLabel = MOODS.find(m => m.value === moodValue)?.label || moodValue;
+    setSelectedMoodLabel(moodLabel);
     setShowMoodPicker(false);
     setPhase('celebrate-mood');
-    triggerCelebration(MOOD_IDX, 'spotlight-complete');
+    triggerCelebration(MOOD_IDX, 'feeling-mood');
   };
+
+  const handleFeelingBreatheTap = () => {
+    setShowMoodFeeling(false);
+    setShowBreathing(true);
+  };
+
+  const handleFeelingDismiss = () => {
+    setShowMoodFeeling(false);
+    setPhase('spotlight-breathe');
+  };
+
+  // Show feeling overlay when phase reaches feeling-mood
+  useEffect(() => {
+    if (phase === 'feeling-mood') {
+      setShowMoodFeeling(true);
+    }
+  }, [phase]);
 
   const handleCheckComplete = () => {
     if (phase !== 'hint-complete' && phase !== 'spotlight-complete') return;
