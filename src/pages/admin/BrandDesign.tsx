@@ -145,13 +145,13 @@ export default function BrandDesign() {
       {/* Planner Palette */}
       <Section title="Planner Action Palette" description="7 pastel colors used across the daily planner, action builder, and routine cards">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          <ColorSwatch label="Pink" cssVar="planner-pink" hex="#FFD6E8" />
-          <ColorSwatch label="Peach" cssVar="planner-peach" hex="#FFE4C4" />
-          <ColorSwatch label="Yellow" cssVar="planner-yellow" hex="#FFF59D" />
-          <ColorSwatch label="Lime" cssVar="planner-lime" hex="#E8F5A3" />
-          <ColorSwatch label="Sky" cssVar="planner-sky" hex="#C5E8FA" />
-          <ColorSwatch label="Mint" cssVar="planner-mint" hex="#B8F5E4" />
-          <ColorSwatch label="Lavender" cssVar="planner-lavender" hex="#E8D4F8" />
+          <ColorSwatch label="Pink" cssVar="planner-pink" hex="#FFE0F5" />
+          <ColorSwatch label="Peach" cssVar="planner-peach" hex="#FFE6C9" />
+          <ColorSwatch label="Yellow" cssVar="planner-yellow" hex="#FFF492" />
+          <ColorSwatch label="Lime" cssVar="planner-lime" hex="#E2F9F0" />
+          <ColorSwatch label="Sky" cssVar="planner-sky" hex="#D7E9FF" />
+          <ColorSwatch label="Mint" cssVar="planner-mint" hex="#E0FBB8" />
+          <ColorSwatch label="Lavender" cssVar="planner-lavender" hex="#F0E3FF" />
         </div>
         <div className="mt-3 text-xs text-muted-foreground space-y-1">
           <p><span className="font-medium">Aliases:</span> red → pink · orange → peach · green → lime · blue → sky · purple → lavender</p>
