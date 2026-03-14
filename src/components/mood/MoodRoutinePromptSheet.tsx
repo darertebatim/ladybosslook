@@ -8,9 +8,9 @@ import {
 } from '@/components/ui/sheet';
 
 const BENEFITS = [
-  { emoji: '📊', text: 'Spot patterns in your emotions' },
-  { emoji: '🎯', text: 'Understand your triggers better' },
-  { emoji: '💪', text: 'Build emotional resilience' },
+  { emoji: '📊', text: 'See patterns in your emotions' },
+  { emoji: '🎯', text: 'Understand what affects your mood' },
+  { emoji: '💪', text: 'Build stronger emotional resilience' },
 ];
 
 interface MoodRoutinePromptSheetProps {
@@ -65,13 +65,13 @@ export function MoodRoutinePromptSheet({
         {/* Heading */}
         <div className="text-center mb-2">
           <h2 className="text-[22px] font-bold text-foreground leading-tight">
-            Make Mood Check-in<br />a Daily Routine
+            Check In With Your<br />Mood Daily
           </h2>
         </div>
 
         {/* Description */}
         <p className="text-[15px] font-medium text-foreground text-center leading-snug max-w-[300px] mx-auto mb-5">
-          A 10-second daily check-in that compounds into real insight about yourself.
+          A 10-second check-in that helps you understand yourself better over time.
         </p>
 
         {/* Benefits */}
@@ -92,7 +92,7 @@ export function MoodRoutinePromptSheet({
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-background/70">
             <TrendingUp className="h-3.5 w-3.5 text-primary" />
             <span className="text-xs font-semibold text-primary">
-              73% feel more self-aware after 7 days
+              Most users feel more self-aware after a week
             </span>
           </div>
         </div>
