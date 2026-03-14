@@ -365,7 +365,7 @@ export default function TasksBank() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
-      toast.success('Action updated');
+      toast.success('Task updated');
       closeSheet();
     },
     onError: (error) => {
