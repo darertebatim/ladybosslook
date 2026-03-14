@@ -1907,7 +1907,7 @@ interface StarterTask {
 const STARTER_TASKS: StarterTask[] = [
   { emoji: '📱', title: 'Open Ladyboss App', subtitle: 'You already did this one!', color: '#FFEDD5', taskColor: 'orange', repeatPattern: 'daily' },
   { emoji: '🌤️', title: 'Check in with your mood', subtitle: 'How are you feeling right now?', color: '#FEF3C7', taskColor: 'yellow', proLinkType: 'mood', repeatPattern: 'daily' },
-  { emoji: '🫁', title: 'Breathing exercise', subtitle: '2 min guided breathwork', color: '#DBEAFE', taskColor: 'blue', proLinkType: 'breathe', repeatPattern: 'daily' },
+  { emoji: '🫁', title: 'Breathing exercise', subtitle: '3 deep breaths to reset', color: '#DBEAFE', taskColor: 'blue', proLinkType: 'breathe', repeatPattern: 'daily' },
   { emoji: '📝', title: 'Write a short journaling', subtitle: 'One sentence about your day', color: '#F3E8FF', taskColor: 'purple', proLinkType: 'journal', repeatPattern: 'daily' },
   { emoji: '✅', title: 'Complete onboarding', subtitle: 'Pick something quick & easy', color: '#D1FAE5', taskColor: 'green', repeatPattern: 'none' },
 ];
@@ -2504,7 +2504,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
               <h2 className="text-xl font-bold text-[#1a1f3d] mb-1">
                 You feel {selectedMoodLabel.toLowerCase()}
               </h2>
-              <p className="text-sm text-gray-500">
+               <p className="text-sm text-[#1a1f3d]">
                 Take a moment to breathe and reset your mind.
               </p>
             </div>
@@ -2519,7 +2519,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
               </div>
               <div className="text-left flex-1">
                 <span className="text-base font-semibold text-[#1a1f3d] block">Try a Breathing Exercise</span>
-                <span className="text-xs text-gray-500">2 min guided breathwork to calm your mind</span>
+                <span className="text-xs text-[#1a1f3d]/70">3 deep breaths to calm your mind</span>
               </div>
               <span className="text-lg text-gray-400">→</span>
             </button>
