@@ -54,8 +54,8 @@ export function TodayFocusCard({
                 {todayTasksCount === 0 
                   ? "Your day is open ✨"
                   : allDone 
-                    ? "You've honored all your actions!"
-                    : `${pendingTasks} action${pendingTasks !== 1 ? 's' : ''} remaining`
+                     ? "You've honored all your tasks!"
+                     : `${pendingTasks} task${pendingTasks !== 1 ? 's' : ''} remaining`
                 }
               </p>
               {todayTasksCount === 0 ? (
