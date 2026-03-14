@@ -157,7 +157,7 @@ export const PeriodDaySheet = ({
                     'px-2.5 py-1.5 rounded-full border text-xs font-medium transition-all',
                     symptoms.includes(symptom.id)
                       ? 'border-pink-500 bg-pink-50 text-pink-700'
-                      : 'border-border bg-background hover:border-pink-200 text-muted-foreground'
+                      : 'border-border bg-background text-muted-foreground'
                   )}
                 >
                   {symptom.emoji} {symptom.label}
