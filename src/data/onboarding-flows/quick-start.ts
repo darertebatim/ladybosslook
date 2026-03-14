@@ -22,18 +22,60 @@ export const quickStartFlow: OnboardingFlow = {
       ],
       buttonLabel: 'Get Started',
     },
-    // 2 — Intent question
+    // 2 — Nickname
+    {
+      id: 'qs-nickname',
+      type: 'nickname-input',
+      title: 'What should I call you?',
+      subtitle: 'Nicknames are fine.',
+      buttonLabel: 'Continue',
+    },
+    // 3 — Age group
+    {
+      id: 'qs-age-group',
+      type: 'age-group',
+      title: 'What is your age group?',
+      subtitle: 'I recommend routines for your age.',
+      secondaryButtonLabel: 'Do not select',
+      options: [
+        { label: '14 years or under' },
+        { label: '15 ~ 19' },
+        { label: '20 ~ 24' },
+        { label: '25 ~ 29' },
+        { label: '30 ~ 34' },
+        { label: '35 ~ 39' },
+        { label: '40 ~ 44' },
+        { label: '45+' },
+      ],
+    },
+    // 4 — Gender
+    {
+      id: 'qs-gender',
+      type: 'gender-select',
+      title: 'What is your gender?',
+      subtitle: 'I recommend routines for your gender.',
+      secondaryButtonLabel: 'Do not select',
+      options: [
+        { label: 'Female' },
+        { label: 'Male' },
+        { label: 'Neither' },
+      ],
+    },
+    // 5 — Intent question
     {
       id: 'qs-intent',
-      type: 'single-select',
-      title: 'What do you want\nmost right now?',
-      subtitle: 'We\'ll personalise your first routine based on your answer.',
-      illustrationLabel: 'Mascot in cozy room',
+      type: 'ideal-life',
+      title: 'Your ideal\ndaily life?',
+      subtitle: "I'll suggest a routine just for you.",
+      secondaryButtonLabel: 'Skip',
+      buttonLabel: 'Next',
       options: [
-        { label: 'Reduce stress', emoji: '🧘' },
-        { label: 'Build discipline', emoji: '💪' },
-        { label: 'Improve focus', emoji: '🎯' },
-        { label: 'Build stronger routines', emoji: '🔄' },
+        { label: 'Stop planning, start doing', emoji: '🏃' },
+        { label: 'Stay on top of your schedule', emoji: '📋' },
+        { label: 'Master your deep focus', emoji: '🎯' },
+        { label: 'Track every task you have', emoji: '✅' },
+        { label: 'Take a moment for yourself', emoji: '☕' },
+        { label: 'Own your daily energy', emoji: '✨' },
       ],
     },
     // 3 — Daily reset concept
