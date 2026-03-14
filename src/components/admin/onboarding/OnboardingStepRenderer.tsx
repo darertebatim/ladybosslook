@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { BreathingInfoSheet } from '@/components/breathe/BreathingInfoSheet';
+import { ImmersiveBreathingCircle, ImmersiveParticles, getImmersiveBgGradient } from '@/components/breathe/ImmersiveBreathingCircle';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
