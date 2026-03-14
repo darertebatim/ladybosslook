@@ -968,7 +968,7 @@ const AppTaskCreate = ({
         >
           <div className="flex items-center gap-3">
             <Calendar className="h-5 w-5 text-black" />
-            <span className="font-medium">{repeatEnabled ? 'Starting from' : 'Date'}</span>
+            <span className="font-medium text-black">{repeatEnabled ? 'Starting from' : 'Date'}</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <span>{format(scheduledDate, 'MMM d') === format(new Date(), 'MMM d') ? 'Today' : format(scheduledDate, 'MMM d, yyyy')}</span>
