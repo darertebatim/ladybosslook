@@ -2097,13 +2097,13 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
           ) : (
             <>
               <span
-                className="text-xl font-light text-white/90 tracking-wider"
-                style={{ textShadow: '0 0 15px rgba(139,92,246,0.3)' }}
+                className={`${isHolding ? 'text-2xl' : 'text-xl'} font-light ${isHolding ? 'text-white/95' : 'text-white/90'} tracking-wider transition-all duration-300`}
+                style={{ textShadow: isHolding ? '0 0 20px rgba(168,85,247,0.5)' : '0 0 15px rgba(139,92,246,0.3)' }}
               >
                 {currentP?.text || 'Inhale'}
               </span>
-              {breathPhase.includes('hold') ? (
-                <span className="text-base text-white/50 mt-1 font-mono">{phaseTimeLeft}</span>
+              {isHolding ? (
+                <span className="text-xl text-white/70 mt-1 font-mono" style={{ textShadow: '0 0 12px rgba(139,92,246,0.4)' }}>{phaseTimeLeft}</span>
               ) : currentP?.method ? (
                 <span className="text-[10px] text-white/35 mt-1.5 px-2.5 py-0.5 rounded-full border border-white/10 tracking-wider uppercase">{currentP.method}</span>
               ) : null}
