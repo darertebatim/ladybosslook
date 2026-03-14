@@ -148,7 +148,7 @@ export function PaywallGradient({ program, onPurchase, onRestore, onClose, previ
 
         <Button
           size="lg"
-          className="w-full rounded-xl h-12 bg-primary hover:bg-primary/90"
+          className="w-full rounded-xl h-12 bg-primary"
           onClick={handlePurchase}
           disabled={isPurchasing}
         >
