@@ -2365,9 +2365,9 @@ function StarterRoutineScreen({ step, onNext }: Props) {
         </div>
       </div>
 
-      {/* CTA - only show after hints are done */}
+      {/* CTA - spotlighted after hints are done */}
       {hintPhase === 'done' && (
-        <FadeUp delay={0.2} className="px-6 pb-6 pt-2">
+        <FadeUp delay={0.2} className="px-6 pb-6 pt-2 relative z-40">
           <NavyButton onClick={onNext}>Continue</NavyButton>
         </FadeUp>
       )}
