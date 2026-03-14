@@ -175,22 +175,23 @@ export function BreathingExerciseScreen({
     const timer = setInterval(() => {
       setPhaseTimeRemaining((prev) => {
         if (prev <= 1) {
-          const nextIndex = (currentPhaseIndex + 1) % phases.length;
+          const curIdx = currentPhaseIndexRef.current;
+          const nextIndex = (curIdx + 1) % phases.length;
           const completedCycle = nextIndex === 0;
 
           if (completedCycle) {
-            setCycleCount(c => {
-              const newC = c + 1;
-              if (durationMode === 'cycles' && newC >= selectedCycles) {
-                clearInterval(timer);
-                haptic.success();
-                handleComplete(totalElapsed + 1);
-              }
-              return newC;
-            });
+            const newC = cycleCountRef.current + 1;
+            setCycleCount(newC);
+            cycleCountRef.current = newC;
+            if (durationMode === 'cycles' && newC >= selectedCycles) {
+              clearInterval(timer);
+              haptic.success();
+              handleComplete(totalElapsedRef.current + 1);
+            }
           }
 
           setCurrentPhaseIndex(nextIndex);
+          currentPhaseIndexRef.current = nextIndex;
           haptic.light();
           return phases[nextIndex].duration;
         }
@@ -199,6 +200,7 @@ export function BreathingExerciseScreen({
 
       setTotalElapsed((prev) => {
         const next = prev + 1;
+        totalElapsedRef.current = next;
         if (durationMode === 'minutes' && next >= selectedMinutes * 60) {
           clearInterval(timer);
           haptic.success();
@@ -209,7 +211,7 @@ export function BreathingExerciseScreen({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isActive, isPaused, isCountingDown, currentPhaseIndex, phases, selectedCycles, selectedMinutes, durationMode, totalElapsed]);
+  }, [isActive, isPaused, isCountingDown, phases, selectedCycles, selectedMinutes, durationMode]);
 
   const handleComplete = useCallback(async (elapsed: number) => {
     saveSession.mutate(
