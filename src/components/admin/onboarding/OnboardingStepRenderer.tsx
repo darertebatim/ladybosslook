@@ -2200,20 +2200,20 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   };
 
   // Which phases show overlay
-  const showOverlay = phase.startsWith('spotlight') || phase.startsWith('hint') || phase.startsWith('celebrate') || phase === 'done';
+  const showOverlay = phase.startsWith('spotlight') || phase.startsWith('hint') || phase.startsWith('celebrate') || phase === 'feeling-mood' || phase === 'done';
   // Which task is spotlighted
   const spotlightIdx =
     phase.includes('app') ? 0 :
-    phase.includes('breathe') ? BREATHE_IDX :
     phase.includes('mood') ? MOOD_IDX :
+    phase.includes('breathe') ? BREATHE_IDX :
     phase.includes('complete') ? COMPLETE_IDX :
     -1;
 
   // Instruction text
   const instructionText =
     (phase === 'spotlight-app' || phase === 'hint-app') ? <><FluentEmoji emoji="👆" size={20} /> Tap the circle to complete your first task!</> :
-    (phase === 'spotlight-breathe' || phase === 'hint-breathe') ? <><FluentEmoji emoji="🫁" size={20} /> Now tap the Breathe button to try it!</> :
     (phase === 'spotlight-mood' || phase === 'hint-mood') ? <><FluentEmoji emoji="🌤️" size={20} /> Now check in with your mood!</> :
+    (phase === 'spotlight-breathe' || phase === 'hint-breathe') ? <><FluentEmoji emoji="🫁" size={20} /> Now tap the Breathe button to try it!</> :
     (phase === 'spotlight-complete' || phase === 'hint-complete') ? <><FluentEmoji emoji="✅" size={20} /> Tap to complete your onboarding!</> :
     phase === 'done' ? <><FluentEmoji emoji="✨" size={20} /> Tap Continue to keep going!</> :
     null;
