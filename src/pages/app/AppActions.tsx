@@ -134,12 +134,12 @@ export default function AppActions() {
       queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
       
-      toast.success('Action added to your routines! ✨');
+      toast.success('Task added to your routines! ✨');
       setPreviewSheetOpen(false);
       setSelectedTemplate(null);
     } catch (error) {
-      console.error('Error adding action:', error);
-      toast.error('Failed to add action');
+       console.error('Error adding task:', error);
+       toast.error('Failed to add task');
     } finally {
       setIsSavingTemplate(false);
     }
@@ -148,7 +148,7 @@ export default function AppActions() {
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
       <AppHeader
-        title="Actions"
+        title="Tasks"
         showBack
         backTo="/app/routines"
         rightAction={
@@ -166,7 +166,7 @@ export default function AppActions() {
         <div className="px-4 pb-2 animate-in slide-in-from-top duration-200">
           <Input
             type="search"
-            placeholder="Search actions..."
+            placeholder="Search tasks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="bg-muted/50"
@@ -220,11 +220,11 @@ export default function AppActions() {
             <div className="flex items-center gap-2 mb-3">
               <ListTodo className="w-4 h-4 text-primary" />
               <h2 className="text-sm font-semibold text-muted-foreground">
-                {selectedCategory === 'popular'
-                  ? 'POPULAR ACTIONS'
-                  : selectedCategory === 'all'
-                  ? 'ALL ACTIONS'
-                  : `${categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'CATEGORY'} ACTIONS`
+                 {selectedCategory === 'popular'
+                   ? 'POPULAR TASKS'
+                   : selectedCategory === 'all'
+                   ? 'ALL TASKS'
+                   : `${categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'CATEGORY'} TASKS`
                 }
               </h2>
             </div>
@@ -245,7 +245,7 @@ export default function AppActions() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No actions in this category</p>
+                <p className="text-muted-foreground">No tasks in this category</p>
               </div>
             )}
           </div>

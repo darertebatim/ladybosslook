@@ -74,16 +74,16 @@ interface PNLog {
 
 const scheduledPNs: PNType[] = [
   {
-    name: 'Smart Action Nudges',
+    name: 'Smart Task Nudges',
     function: 'local-smart-nudges',
     schedule: 'On app launch (local)',
-    description: 'Random reminders from user\'s actual planner data: incomplete actions, proactions (journal, breathe, emotion), and water reminders. Scheduled between 8 AM - 8 PM.',
+    description: 'Random reminders from user\'s actual planner data: incomplete tasks, proactions (journal, breathe, emotion), and water reminders. Scheduled between 8 AM - 8 PM.',
     userPreference: 'Auto (based on active tasks)',
     icon: <Sparkles className="h-5 w-5" />,
     codeFile: 'src/hooks/useSmartActionNudges.ts',
     deliveryType: 'local',
     messages: [
-      { title: '{emoji} {taskTitle}', body: 'Time to do this! Your strength grows with each action.', condition: 'Random incomplete action' },
+      { title: '{emoji} {taskTitle}', body: 'Time to do this! Your strength grows with each task.', condition: 'Random incomplete task' },
       { title: '🫁 Time for breathing', body: 'A few deep breaths can change your whole day.', condition: 'Random proaction' },
       { title: '📝 Your journal is waiting', body: 'Take a moment to write. Even a few words matter.', condition: 'Random proaction' },
       { title: '💧 Water Reminder', body: 'Have you had water recently? 💧', condition: '3-4x daily if water tracking' },
@@ -185,8 +185,8 @@ const scheduledPNs: PNType[] = [
       { title: '💪 Keep Going!', body: 'You showed up {X} days this month. One more today?', condition: '1 day inactive' },
       { title: '✨ Your Momentum is Waiting', body: 'Your {X}-day momentum is waiting. Come back and keep it alive.', condition: '2 days inactive' },
       { title: '🌿 We Miss You', body: "You've been away for {X} days. Your strength doesn't expire.", condition: '3-4 days inactive' },
-      { title: '🌸 Your Actions Miss You', body: 'You have {coins} coins waiting. Even 1 minute counts.', condition: '5-6 days inactive' },
-      { title: '🕊️ No Pressure', body: "When you're ready, everything is still here for you.", condition: '7-14 days inactive' },
+       { title: '🌸 Your Tasks Miss You', body: 'You have {coins} coins waiting. Even 1 minute counts.', condition: '5-6 days inactive' },
+       { title: '🕊️ No Pressure', body: "When you're ready, everything is still here for you.", condition: '7-14 days inactive' },
     ],
   },
   {
@@ -199,13 +199,13 @@ const scheduledPNs: PNType[] = [
     codeFile: 'supabase/functions/send-streak-challenges/index.ts',
     deliveryType: 'server',
     messages: [
-      { title: '🌱 Your First Step', body: 'Your first action is waiting. Just one tap to start.', condition: 'First week, no completions' },
+      { title: '🌱 Your First Step', body: 'Your first task is waiting. Just one tap to start.', condition: 'First week, no completions' },
       { title: '🌱 Day 2!', body: "Day 2! You came back. That's already more than most.", condition: 'First week, came yesterday' },
       { title: '🔥 Almost There', body: '{n} of {goal} days done. Just {remaining} more to hit your target.', condition: 'Streak goal proximity' },
       { title: '🏆 Goal Reached!', body: "You did it. {goal} days. That's not luck, that's you.", condition: 'Streak goal reached' },
       { title: '🔥 2 Days!', body: '2 days in a row! Come back for day 3.', condition: '2-day streak' },
       { title: '🥇 Gold Streak', body: "Gold streak: {n} days. Don't break the chain.", condition: 'Gold streak 2+' },
-      { title: '🥇 Finish for Gold', body: "You've done {x}/{y} actions today. Finish all to earn Gold.", condition: 'Partial completions today' },
+      { title: '🥇 Finish for Gold', body: "You've done {x}/{y} tasks today. Finish all to earn Gold.", condition: 'Partial completions today' },
     ],
   },
 ];
@@ -266,10 +266,10 @@ const triggeredPNs: PNType[] = [
 
 const localPNs: PNType[] = [
   {
-    name: 'Action Reminders',
+    name: 'Task Reminders',
     function: 'local-task-reminder',
     trigger: 'Capacitor LocalNotifications',
-    description: 'Scheduled reminders for user actions with configured times. 100% local - no server involved.',
+    description: 'Scheduled reminders for user tasks with configured times. 100% local - no server involved.',
     userPreference: 'reminder_enabled per task, reminder_offset (0/10/30/60 min)',
     icon: <CheckSquare className="h-5 w-5" />,
     codeFile: 'src/hooks/useLocalNotificationScheduler.ts',

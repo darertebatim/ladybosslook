@@ -309,11 +309,11 @@ export default function TasksBank() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
-      toast.success('Action created');
+      toast.success('Task created');
       closeSheet();
     },
     onError: (error) => {
-      toast.error('Failed to create action: ' + error.message);
+      toast.error('Failed to create task: ' + error.message);
     },
   });
 
@@ -365,11 +365,11 @@ export default function TasksBank() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
-      toast.success('Action updated');
+      toast.success('Task updated');
       closeSheet();
     },
     onError: (error) => {
-      toast.error('Failed to update action: ' + error.message);
+      toast.error('Failed to update task: ' + error.message);
     },
   });
 
@@ -382,7 +382,7 @@ export default function TasksBank() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
-      toast.success('Action deleted');
+      toast.success('Task deleted');
     },
   });
 
@@ -605,7 +605,7 @@ export default function TasksBank() {
   const addToExistingRoutine = useMutation({
     mutationFn: async () => {
       if (!selectedRoutineId) throw new Error('No routine selected');
-      if (selectedTasks.length === 0) throw new Error('No actions selected');
+      if (selectedTasks.length === 0) throw new Error('No tasks selected');
 
       // Get current max order for this routine
       const { data: existingTasks } = await supabase
@@ -637,13 +637,13 @@ export default function TasksBank() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
       queryClient.invalidateQueries({ queryKey: ['routines-bank-task-counts'] });
-      toast.success(`${selectedTasks.length} action(s) added to routine!`);
+      toast.success(`${selectedTasks.length} task(s) added to routine!`);
       setAddToRoutineOpen(false);
       setSelectedRoutineId('');
       clearSelection();
     },
     onError: (error) => {
-      toast.error('Failed to add actions: ' + error.message);
+      toast.error('Failed to add tasks: ' + error.message);
     },
   });
 
@@ -653,10 +653,10 @@ export default function TasksBank() {
         <div>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5" />
-            Actions Bank
-          </CardTitle>
-          <CardDescription>
-            Reusable action templates for routine planning
+             Tasks Bank
+           </CardTitle>
+           <CardDescription>
+             Reusable task templates for routine planning
           </CardDescription>
         </div>
         <div className="flex items-center gap-2">
@@ -677,7 +677,7 @@ export default function TasksBank() {
           </Button>
           <Button onClick={openNewSheet} className="gap-2">
             <Plus className="h-4 w-4" />
-            Add Action
+             Add Task
           </Button>
         </div>
       </CardHeader>

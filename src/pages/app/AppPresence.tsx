@@ -139,7 +139,7 @@ const AppPresence = () => {
                     ) : (
                       <div className="text-2xl font-bold text-orange-900">{stats?.totalTaskCompletions || 0}</div>
                     )}
-                    <div className="text-xs text-orange-700/60 font-medium">Actions Done</div>
+                    <div className="text-xs text-orange-700/60 font-medium">Tasks Done</div>
                   </div>
                 </div>
                 
@@ -248,7 +248,7 @@ const AppPresence = () => {
             <section>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-orange-900/60">
-                  Action Stats
+                   Task Stats
                 </h3>
                 <button
                   onClick={() => navigate('/app/action-stats')}

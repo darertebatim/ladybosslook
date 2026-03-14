@@ -167,7 +167,7 @@ export async function scheduleUrgentAlarm(task: UrgentTaskAlarm): Promise<{ succ
       notifications.push({
         id: notificationId,
         title: `⚠️ ${task.emoji} ${task.title}`,
-        body: 'Urgent task reminder - Time to take action!',
+        body: 'Urgent task reminder - Time to do this task!',
         schedule: {
           at: alarmTime,
           allowWhileIdle: true, // Deliver even in Doze mode

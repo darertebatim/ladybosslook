@@ -126,7 +126,7 @@ export const TaskCard = memo(function TaskCard({
     if (isFutureDate) {
       haptic.light();
       toast("Let's focus on today's routines.", {
-        description: "You can honor this action when the day comes.",
+        description: "You can honor this task when the day comes.",
         duration: 3000,
       });
       return;

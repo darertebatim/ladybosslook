@@ -124,7 +124,7 @@ const AppActionStats = () => {
 
   return (
     <>
-      <SEOHead title="Action Stats - LadyBoss" description="Your action completion statistics" />
+      <SEOHead title="Task Stats - LadyBoss" description="Your task completion statistics" />
       
       <div className="flex flex-col h-dvh overflow-hidden bg-amber-50">
         {/* Header */}
@@ -135,7 +135,7 @@ const AppActionStats = () => {
           <div className="px-4 py-2 flex items-center">
             <BackButton to="/app/presence" className="text-orange-700" />
             <h1 className="flex-1 text-center text-lg font-semibold text-foreground">
-              Action Stats
+               Task Stats
             </h1>
             <div className="w-9" /> {/* Spacer */}
           </div>
@@ -155,12 +155,12 @@ const AppActionStats = () => {
             </div>
             <h3 className="text-lg font-bold text-foreground mb-2">Progress Badge</h3>
             <p className="text-sm text-foreground leading-snug">
-              Complete at least one action for Bronze. Reach 50% for Silver. Finish all actions to claim Gold.
+              Complete at least one task for Bronze. Reach 50% for Silver. Finish all tasks to claim Gold.
             </p>
           </div>
 
           {/* Task Stats Calendar */}
-          <h3 className="text-base font-bold text-foreground mb-3">Action Stats</h3>
+          <h3 className="text-base font-bold text-foreground mb-3">Task Stats</h3>
           <div className="bg-white rounded-2xl p-4 shadow-sm mb-6">
             {/* Month navigation */}
             <div className="flex items-center justify-between mb-4">
@@ -303,8 +303,8 @@ const AppActionStats = () => {
             <div className="space-y-4">
               <RecordRow label="Perfect Days" value={yearRecords.perfectDays} unit="days" />
               <RecordRow label="Best Streaks" value={yearRecords.bestStreak} unit="days" />
-              <RecordRow label="Actions Done Total" value={yearRecords.totalCompleted} />
-              <RecordRow label="Actions Done This Month" value={yearRecords.monthCompleted} />
+               <RecordRow label="Tasks Done Total" value={yearRecords.totalCompleted} />
+               <RecordRow label="Tasks Done This Month" value={yearRecords.monthCompleted} />
               <RecordRow label="Overall Rate" value={yearRecords.overallRate} unit="%" />
               <RecordRow label="Monthly Rate" value={yearRecords.monthlyRate} unit="%" />
             </div>

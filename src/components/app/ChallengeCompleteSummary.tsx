@@ -71,7 +71,7 @@ export const ChallengeCompleteSummary = ({
 
   const handleShare = async () => {
     haptic.light();
-    const text = `${badgeEmoji} I just completed a ${streakGoal}-day streak challenge! ${totalActions} actions done across ${perfectDays} perfect days. #SelfGrowth #Simora`;
+    const text = `${badgeEmoji} I just completed a ${streakGoal}-day streak challenge! ${totalActions} tasks done across ${perfectDays} perfect days. #SelfGrowth #Simora`;
 
     if (Capacitor.isNativePlatform()) {
       try {
@@ -95,7 +95,7 @@ export const ChallengeCompleteSummary = ({
 
   const stats = [
     { label: 'Days Completed', value: streakGoal, icon: '🔥' },
-    { label: 'Actions Done', value: totalActions, icon: '✅' },
+    { label: 'Tasks Done', value: totalActions, icon: '✅' },
     { label: 'Perfect Days', value: perfectDays, icon: '⭐' },
   ];
 

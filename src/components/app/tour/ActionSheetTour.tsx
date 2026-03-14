@@ -10,17 +10,17 @@ interface ActionSheetTourProps {
 export function ActionSheetTour({ isOpen, onTourReady }: ActionSheetTourProps) {
   const steps = useMemo((): TourStep[] => [
     {
-      id: 'suggestions',
-      title: 'Quick Actions 💡',
-      description: 'Browse pre-made actions organized by category. Tap the + to add any action to your day.',
-      target: '.tour-action-suggestions',
+       id: 'suggestions',
+       title: 'Quick Tasks 💡',
+       description: 'Browse pre-made tasks organized by category. Tap the + to add any task to your day.',
+       target: '.tour-action-suggestions',
       position: 'top',
       action: 'tap',
     },
     {
       id: 'buttons',
-      title: 'Try Something New 🎲',
-      description: 'Tap "Random" for a surprise action, or "Browse All" to see the full collection.',
+       title: 'Try Something New 🎲',
+       description: 'Tap "Random" for a surprise task, or "Browse All" to see the full collection.',
       target: '.tour-action-buttons',
       position: 'bottom',
       action: 'tap',

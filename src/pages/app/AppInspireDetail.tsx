@@ -136,7 +136,7 @@ export default function AppInspireDetail() {
 
   const handleAddClick = () => {
     if (!routine?.tasks?.length) {
-      toast.error('No actions in this routine');
+      toast.error('No tasks in this routine');
       return;
     }
     setShowPreviewSheet(true);
@@ -157,7 +157,7 @@ export default function AppInspireDetail() {
       });
       setShowPreviewSheet(false);
       setJustAdded(true);
-      toast.success(`${selectedTaskIds.length} actions added!`);
+      toast.success(`${selectedTaskIds.length} tasks added!`);
     } catch (error) {
       toast.error('Failed to add routine');
     }
@@ -289,8 +289,8 @@ export default function AppInspireDetail() {
                 </span>
               )}
               {routine.tasks && routine.tasks.length > 0 && (
-                <span className="text-sm text-foreground">
-                  {routine.tasks.length} action{routine.tasks.length !== 1 ? 's' : ''}
+               <span className="text-sm text-foreground">
+                   {routine.tasks.length} task{routine.tasks.length !== 1 ? 's' : ''}
                 </span>
               )}
             </div>
@@ -406,7 +406,7 @@ export default function AppInspireDetail() {
               {/* Unsectioned tasks */}
               {(tasksBySection['unsorted']?.length ?? 0) > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">Actions</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">Tasks</h3>
                   <div className="space-y-3">
                     {tasksBySection['unsorted'].map((task) => {
                       const bgColor = TASK_COLORS[(task.color as TaskColor) || 'mint'] || TASK_COLORS.mint;

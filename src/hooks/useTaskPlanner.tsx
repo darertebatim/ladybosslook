@@ -661,11 +661,11 @@ export const useCreateTask = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-      toast({ title: 'Action created! ✨' });
+      toast({ title: 'Task created! ✨' });
     },
     onError: (error) => {
       console.error('Create task error:', error);
-      toast({ title: 'Failed to create action', variant: 'destructive' });
+      toast({ title: 'Failed to create task', variant: 'destructive' });
     },
   });
 };
@@ -832,7 +832,7 @@ export const useUpdateTask = () => {
     },
     onError: (error) => {
       console.error('Update task error:', error);
-      toast({ title: 'Failed to update action', variant: 'destructive' });
+      toast({ title: 'Failed to update task', variant: 'destructive' });
     },
   });
 };
@@ -860,11 +860,11 @@ export const useDeleteTask = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-      toast({ title: 'Action deleted' });
+      toast({ title: 'Task deleted' });
     },
     onError: (error) => {
       console.error('Delete task error:', error);
-      toast({ title: 'Failed to delete action', variant: 'destructive' });
+      toast({ title: 'Failed to delete task', variant: 'destructive' });
     },
   });
 };
@@ -1172,11 +1172,11 @@ export const useCreateTaskFromTemplate = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-      toast({ title: 'Action added from template! ✨' });
+      toast({ title: 'Task added from template! ✨' });
     },
     onError: (error) => {
       console.error('Create from template error:', error);
-      toast({ title: 'Failed to add action', variant: 'destructive' });
+      toast({ title: 'Failed to add task', variant: 'destructive' });
     },
   });
 };
@@ -1330,7 +1330,7 @@ export const useReorderTasks = () => {
     },
     onError: (error) => {
       console.error('Reorder tasks error:', error);
-      toast({ title: 'Failed to reorder actions', variant: 'destructive' });
+      toast({ title: 'Failed to reorder tasks', variant: 'destructive' });
     },
   });
 };
@@ -1406,11 +1406,11 @@ export const useSkipTask = () => {
     onSuccess: (_, { date }) => {
       const dateStr = format(date, 'yyyy-MM-dd');
       queryClient.invalidateQueries({ queryKey: ['planner-skips', user?.id, dateStr] });
-      toast({ title: 'Action skipped for today' });
+      toast({ title: 'Task skipped for today' });
     },
     onError: (error) => {
       console.error('Skip task error:', error);
-      toast({ title: 'Failed to skip action', variant: 'destructive' });
+      toast({ title: 'Failed to skip task', variant: 'destructive' });
     },
   });
 };
@@ -1472,7 +1472,7 @@ export const useSnoozeTask = () => {
     },
     onError: (error) => {
       console.error('Snooze task error:', error);
-      toast({ title: 'Failed to reschedule action', variant: 'destructive' });
+      toast({ title: 'Failed to reschedule task', variant: 'destructive' });
     },
   });
 };

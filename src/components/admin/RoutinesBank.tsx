@@ -732,11 +732,11 @@ export default function RoutinesBank() {
       queryClient.invalidateQueries({ queryKey: ['admin-task-bank-for-picker'] });
       // Auto-add the new task to the routine
       addTaskToSection(task, sectionId);
-      toast.success('Action created and added');
+      toast.success('Task created and added');
       setCreateActionSheetOpen(false);
     },
     onError: (error) => {
-      toast.error('Failed to create action: ' + error.message);
+      toast.error('Failed to create task: ' + error.message);
     },
   });
 
@@ -860,7 +860,7 @@ export default function RoutinesBank() {
           }
         });
       }
-      toast.success('Action updated');
+      toast.success('Task updated');
       setEditActionSheetOpen(false);
       setEditActionTaskBankId(null);
     },
@@ -1122,7 +1122,7 @@ export default function RoutinesBank() {
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1"><TaskIcon iconName={catInfo.icon} size={12} /> {catInfo.label}</span>
                       <span>•</span>
-                      <span>{stats.count} action{stats.count !== 1 ? 's' : ''}</span>
+                      <span>{stats.count} task{stats.count !== 1 ? 's' : ''}</span>
                       {routine.schedule_type !== 'daily' && (
                         <>
                           <span>•</span>
@@ -1416,7 +1416,7 @@ export default function RoutinesBank() {
                     <Label>Routine Type</Label>
                     <div className="grid grid-cols-2 gap-2">
                       {[
-                        { value: 'daily', label: 'Normal', desc: 'Actions with their own repeat settings', icon: '☀️' },
+                        { value: 'daily', label: 'Normal', desc: 'Tasks with their own repeat settings', icon: '☀️' },
                         { value: 'challenge', label: 'Challenge', desc: 'Sequential drip (Day 1, 2...)', icon: '🔥' },
                       ].map(opt => (
                         <button
@@ -1592,7 +1592,7 @@ export default function RoutinesBank() {
                     </span>
                     <span className="flex items-center gap-1">
                       <Layers className="h-4 w-4" />
-                      {localTasks.length} action{localTasks.length !== 1 ? 's' : ''}
+                      {localTasks.length} task{localTasks.length !== 1 ? 's' : ''}
                     </span>
                   </div>
                 </div>
@@ -1846,7 +1846,7 @@ export default function RoutinesBank() {
                               type="button"
                               onClick={(e) => { e.stopPropagation(); openEditActionSheet(task.task_id!); }}
                               className="p-1 text-muted-foreground hover:text-foreground rounded hover:bg-accent"
-                              title="Edit action"
+                              title="Edit task"
                             >
                               <Pencil className="h-3 w-3" />
                             </button>
@@ -1891,7 +1891,7 @@ export default function RoutinesBank() {
                             ) : (
                               <div className="flex gap-1">
                                 <Button type="button" variant="ghost" size="sm" onClick={() => setAddingTaskToSection('uncategorized')} className="flex-1 h-7 text-xs gap-1">
-                                  <Plus className="h-3 w-3" /> Add Action
+                                   <Plus className="h-3 w-3" /> Add Task
                                 </Button>
                                 <Button type="button" variant="outline" size="sm" onClick={() => openCreateActionSheet(null)} className="h-7 text-xs gap-1">
                                   <Sparkles className="h-3 w-3" /> Create New
@@ -1910,12 +1910,12 @@ export default function RoutinesBank() {
                         <div className="border rounded-lg overflow-hidden">
                           <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-950/20 border-b">
                             <span className="text-sm">☀️</span>
-                            <h4 className="font-medium text-sm flex-1">Daily actions</h4>
+                            <h4 className="font-medium text-sm flex-1">Daily tasks</h4>
                             <span className="text-xs text-muted-foreground">{dailyTasks.length}</span>
                           </div>
                           <div className="p-2 space-y-1">
                             {dailyTasks.length === 0 && (
-                              <p className="text-center text-muted-foreground text-xs py-2">No daily actions</p>
+                              <p className="text-center text-muted-foreground text-xs py-2">No daily tasks</p>
                             )}
                             {dailyTasks.map((task, tIdx) => renderTaskRow(task, tIdx, dailyTasks.length, null))}
                           </div>
@@ -1988,7 +1988,7 @@ export default function RoutinesBank() {
                         ) : (
                           <div className="flex gap-1">
                             <Button type="button" variant="ghost" size="sm" onClick={() => setAddingTaskToSection('uncategorized')} className="flex-1 h-7 text-xs gap-1">
-                              <Plus className="h-3 w-3" /> Add Action
+                              <Plus className="h-3 w-3" /> Add Task
                             </Button>
                             <Button type="button" variant="outline" size="sm" onClick={() => openCreateActionSheet(null)} className="h-7 text-xs gap-1">
                               <Sparkles className="h-3 w-3" /> Create New

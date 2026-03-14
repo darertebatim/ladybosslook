@@ -64,7 +64,7 @@ export function HomeTour({
       },
       {
         id: 'add-action',
-        title: 'Add Actions',
+        title: 'Add Tasks',
         target: '.tour-add-task',
         description: 'Tap + to add something small to your day.',
         position: 'left',
@@ -141,18 +141,18 @@ export function HomeTour({
     if (hasWelcomeCard) {
       baseSteps.push({
         id: 'welcome-card',
-        title: 'Your First Action 🎯',
-        target: '.tour-welcome-card',
-        description: 'Ready? Flip the card below to pick your first action.',
-        position: 'top',
-        action: 'tap',
+         title: 'Your First Task 🎯',
+         target: '.tour-welcome-card',
+         description: 'Ready? Flip the card below to pick your first task.',
+         position: 'top',
+         action: 'tap',
         condition: () => !!document.querySelector('.tour-welcome-card'),
       });
     } else {
       baseSteps.push({
         id: 'done',
-        title: 'Ready to Start! 👋',
-        description: "Ready? Tap + to add your first action.",
+         title: 'Ready to Start! 👋',
+         description: "Ready? Tap + to add your first task.",
         position: 'center',
         action: 'look',
       });

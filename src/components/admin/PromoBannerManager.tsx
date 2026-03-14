@@ -21,7 +21,7 @@ type AspectRatio = '3:1' | '4:1' | '16:9' | '1:1';
 type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch' | 'routines_top' | 'routines_after_categories';
 
 const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
-  { value: 'home_top', label: '🏠 Home - Above Actions' },
+  { value: 'home_top', label: '🏠 Home - Above Tasks' },
   { value: 'home_rituals', label: '🏠 Home - After Routines' },
   { value: 'explore', label: '🔍 Explore - Top' },
   { value: 'explore_tools', label: '🔍 Explore - Under Tools' },
@@ -454,7 +454,7 @@ export function PromoBannerManager() {
       }
       case 'tasks': {
         const task = taskTemplates?.find(t => t.id === banner.destination_id);
-        return task ? `${task.emoji} ${task.title}` : 'Unknown Action';
+        return task ? `${task.emoji} ${task.title}` : 'Unknown Task';
       }
       case 'breathe_exercise': {
         const exercise = breathingExercises?.find(e => e.id === banner.destination_id);
@@ -463,7 +463,7 @@ export function PromoBannerManager() {
       case 'tasks_bank':
       case 'planner':
       case 'home':
-        return 'Home / Action Planner';
+        return 'Home / Task Planner';
       case 'journal':
         return 'Journal';
       case 'programs':

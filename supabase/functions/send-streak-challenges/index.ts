@@ -97,7 +97,7 @@ function getFirstWeekNotification(
   if (daysSinceSignup > 7) return null;
 
   if (daysSinceSignup <= 1 && !hasAnyCompletion) {
-    return { scenario: 'first_week_day1', priority: 1, title: '🌱 Your First Step', body: 'Your first action is waiting. Just one tap to start.' };
+    return { scenario: 'first_week_day1', priority: 1, title: '🌱 Your First Step', body: 'Your first task is waiting. Just one tap to start.' };
   }
   if (daysSinceSignup === 2 && cameYesterday) {
     return { scenario: 'first_week_day2', priority: 1, title: '🌱 Day 2!', body: "Day 2! You came back. That's already more than most." };
@@ -157,7 +157,7 @@ function getGoldNotification(
   }
   // Partial completions today
   if (todayCompleted > 0 && todayTotal > 0 && todayCompleted < todayTotal) {
-    return { scenario: 'gold_partial', priority: 5, title: '🥇 Finish for Gold', body: `You've done ${todayCompleted}/${todayTotal} actions today. Finish all to earn your Gold badge.` };
+    return { scenario: 'gold_partial', priority: 5, title: '🥇 Finish for Gold', body: `You've done ${todayCompleted}/${todayTotal} tasks today. Finish all to earn your Gold badge.` };
   }
   return null;
 }

@@ -175,13 +175,13 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
                 {/* Daily Actions Section */}
                 <div className="space-y-1">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                    Daily Actions
+                     Daily Tasks
                   </p>
                   
                   <PreferenceItem
                     icon={<Clock className="h-4 w-4" />}
                     label="Morning Summary"
-                    description="Daily overview of your actions at wake time"
+                    description="Daily overview of your tasks at wake time"
                     checked={getPreference('morning_summary')}
                     onCheckedChange={handleToggle('morning_summary')}
                     disabled={updatePreference.isPending}
@@ -190,7 +190,7 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
                   <PreferenceItem
                     icon={<Clock className="h-4 w-4" />}
                     label="Evening Check-in"
-                    description="Reminder at 6 PM if actions remain"
+                    description="Reminder at 6 PM if tasks remain"
                     checked={getPreference('evening_checkin')}
                     onCheckedChange={handleToggle('evening_checkin')}
                     disabled={updatePreference.isPending}
@@ -199,7 +199,7 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
                   <PreferenceItem
                     icon={<Bell className="h-4 w-4" />}
                     label="Scheduled Reminders"
-                    description="Reminders for actions with specific times"
+                    description="Reminders for tasks with specific times"
                     checked={getPreference('action_reminders')}
                     onCheckedChange={handleToggle('action_reminders')}
                     disabled={updatePreference.isPending}
@@ -208,7 +208,7 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
                   <PreferenceItem
                     icon={<Clock className="h-4 w-4" />}
                     label="Time Period Reminders"
-                    description="Nudges for morning/afternoon/evening actions"
+                    description="Nudges for morning/afternoon/evening tasks"
                     checked={getPreference('time_period_reminders')}
                     onCheckedChange={handleToggle('time_period_reminders')}
                     disabled={updatePreference.isPending}
@@ -258,7 +258,7 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
                   <PreferenceItem
                     icon={<Sparkles className="h-4 w-4" />}
                     label="Daily Completion"
-                    description="Celebrate when you honor 3+ actions"
+                    description="Celebrate when you honor 3+ tasks"
                     checked={getPreference('daily_completion')}
                     onCheckedChange={handleToggle('daily_completion')}
                     disabled={updatePreference.isPending}
