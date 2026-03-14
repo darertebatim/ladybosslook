@@ -65,7 +65,7 @@ export function MoodRoutinePromptSheet({
         {/* Heading */}
         <div className="text-center mb-2">
           <h2 className="text-[22px] font-bold text-foreground leading-tight">
-            Make Mood Check-in<br />a Daily Routine
+            Check In With Your<br />Mood Daily
           </h2>
         </div>
 
