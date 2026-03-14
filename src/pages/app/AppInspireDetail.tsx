@@ -327,7 +327,7 @@ export default function AppInspireDetail() {
           {/* Description — rendered as rich HTML */}
           {routine.description && (
             <div
-              className="mt-5 text-foreground leading-relaxed prose prose-sm max-w-none
+              className="mt-5 text-foreground leading-relaxed prose prose-base max-w-none
                 prose-headings:text-foreground prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2
                 prose-strong:text-foreground prose-a:text-primary
                 prose-ul:pl-5 prose-ul:list-disc prose-ol:pl-5 prose-ol:list-decimal
