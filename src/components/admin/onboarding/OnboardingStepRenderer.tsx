@@ -2168,7 +2168,13 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const handleMoodSelect = (moodValue: string) => {
     setShowMoodPicker(false);
     setPhase('celebrate-mood');
-    triggerCelebration(MOOD_IDX, 'done');
+    triggerCelebration(MOOD_IDX, 'spotlight-complete');
+  };
+
+  const handleCheckComplete = () => {
+    if (phase !== 'hint-complete' && phase !== 'spotlight-complete') return;
+    setPhase('celebrate-complete');
+    triggerCelebration(COMPLETE_IDX, 'done');
   };
 
   // Which phases show overlay
