@@ -1866,8 +1866,23 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     },
   });
 
-  // Pick "Welcome Breathing" by exact name match first
-  const exercise = exercises?.find((e: any) => e.name === 'Welcome Breathing') || exercises?.find((e: any) => e.name?.toLowerCase().includes('welcome')) || exercises?.find((e: any) => e.category === 'calm') || exercises?.[0];
+  // Force the onboarding flow to use the dedicated Welcome Breathing exercise
+  const WELCOME_BREATHING_ID = '02b049a0-b2e8-4423-a055-d6bf1617f4fe';
+  const exercise =
+    exercises?.find((e: any) => e.id === WELCOME_BREATHING_ID) ||
+    exercises?.find((e: any) => e.name?.trim().toLowerCase() === 'welcome breathing') ||
+    exercises?.find((e: any) => e.name?.toLowerCase().includes('welcome')) ||
+    exercises?.find((e: any) => e.category === 'calm') ||
+    exercises?.[0];
+
+  // Expected onboarding rhythm: 3s in, 1s hold, 3s out, 1s hold
+  const inhaleSeconds = Number(exercise?.inhale_seconds) || 3;
+  const inhaleHoldSeconds = Number(exercise?.inhale_hold_seconds);
+  const exhaleSeconds = Number(exercise?.exhale_seconds) || 3;
+  const exhaleHoldSeconds = Number(exercise?.exhale_hold_seconds);
+
+  const normalizedInhaleHold = Number.isFinite(inhaleHoldSeconds) ? inhaleHoldSeconds : 1;
+  const normalizedExhaleHold = Number.isFinite(exhaleHoldSeconds) ? exhaleHoldSeconds : 1;
 
   const [stage, setStage] = useState<'info' | 'countdown' | 'running' | 'done'>('info');
   const [countdown, setCountdown] = useState(3);
@@ -1876,19 +1891,19 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
   const [phaseTimeLeft, setPhaseTimeLeft] = useState(0);
   const targetCycles = 3;
 
-  // Build phases from exercise
+  // Build phases from the selected exercise timing
   const phasesRef = useRef<{ type: 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold'; duration: number; text: string; method?: string }[]>([]);
   const currentPhaseIdx = useRef(0);
 
   useEffect(() => {
     if (!exercise) return;
     const p: typeof phasesRef.current = [];
-    if (exercise.inhale_seconds > 0) p.push({ type: 'inhale', duration: exercise.inhale_seconds, text: 'Inhale', method: exercise.inhale_method === 'nose' ? 'Nose' : 'Mouth' });
-    if (exercise.inhale_hold_seconds > 0) p.push({ type: 'inhale_hold', duration: exercise.inhale_hold_seconds, text: 'Hold' });
-    if (exercise.exhale_seconds > 0) p.push({ type: 'exhale', duration: exercise.exhale_seconds, text: 'Exhale', method: exercise.exhale_method === 'nose' ? 'Nose' : 'Mouth' });
-    if (exercise.exhale_hold_seconds > 0) p.push({ type: 'exhale_hold', duration: exercise.exhale_hold_seconds, text: 'Hold' });
+    if (inhaleSeconds > 0) p.push({ type: 'inhale', duration: inhaleSeconds, text: 'Inhale', method: exercise.inhale_method === 'nose' ? 'Nose' : 'Mouth' });
+    if (normalizedInhaleHold > 0) p.push({ type: 'inhale_hold', duration: normalizedInhaleHold, text: 'Hold' });
+    if (exhaleSeconds > 0) p.push({ type: 'exhale', duration: exhaleSeconds, text: 'Exhale', method: exercise.exhale_method === 'nose' ? 'Nose' : 'Mouth' });
+    if (normalizedExhaleHold > 0) p.push({ type: 'exhale_hold', duration: normalizedExhaleHold, text: 'Hold' });
     phasesRef.current = p;
-  }, [exercise]);
+  }, [exercise, inhaleSeconds, normalizedInhaleHold, exhaleSeconds, normalizedExhaleHold]);
 
   // When user dismisses the info sheet, start countdown
   const handleInfoDismiss = useCallback(() => {
