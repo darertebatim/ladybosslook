@@ -59,6 +59,9 @@ const NativeAppLayout = () => {
   
   // Provision Daily Reset routine if user opted in during onboarding
   useDailyResetProvisioning(user?.id);
+  
+  // Sync onboarding answers (nickname, gender) to user profile
+  useOnboardingProfileSync(user?.id);
 
   // Defer non-critical hooks — mount DeferredLayoutHooks after 5s delay
   const [deferredReady, setDeferredReady] = useState(false);
