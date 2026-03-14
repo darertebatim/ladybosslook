@@ -485,7 +485,7 @@ export default function AppCoachChat() {
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="flex items-center gap-1 pt-3 pb-2 px-4">
-            <Button variant="ghost" onClick={handleBack} className="-ml-2 h-10 px-2 gap-0.5 text-foreground hover:bg-transparent active:opacity-70">
+            <Button variant="ghost" onClick={handleBack} className="-ml-2 h-10 px-2 gap-0.5 text-foreground bg-transparent active:opacity-70">
               <ChevronLeft className="h-7 w-7" />
               <span className="text-[17px]">Back</span>
             </Button>
