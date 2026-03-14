@@ -1846,7 +1846,7 @@ export default function RoutinesBank() {
                               type="button"
                               onClick={(e) => { e.stopPropagation(); openEditActionSheet(task.task_id!); }}
                               className="p-1 text-muted-foreground hover:text-foreground rounded hover:bg-accent"
-                              title="Edit action"
+                              title="Edit task"
                             >
                               <Pencil className="h-3 w-3" />
                             </button>
