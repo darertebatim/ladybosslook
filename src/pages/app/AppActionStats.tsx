@@ -124,7 +124,7 @@ const AppActionStats = () => {
 
   return (
     <>
-      <SEOHead title="Action Stats - LadyBoss" description="Your action completion statistics" />
+      <SEOHead title="Task Stats - LadyBoss" description="Your task completion statistics" />
       
       <div className="flex flex-col h-dvh overflow-hidden bg-amber-50">
         {/* Header */}
