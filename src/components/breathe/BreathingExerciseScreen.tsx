@@ -87,13 +87,16 @@ export function BreathingExerciseScreen({
   const { autoCompleteBreathe } = useAutoCompleteProTask();
   const startTimeRef = useRef<number>(0);
   
-  // Refs for values used inside the stable interval (not in deps)
+  // Refs for values used inside the stable interval (single timer source of truth)
   const totalElapsedRef = useRef(totalElapsed);
   totalElapsedRef.current = totalElapsed;
   const currentPhaseIndexRef = useRef(currentPhaseIndex);
   currentPhaseIndexRef.current = currentPhaseIndex;
   const cycleCountRef = useRef(cycleCount);
   cycleCountRef.current = cycleCount;
+  const phaseTimeRemainingRef = useRef(phaseTimeRemaining);
+  phaseTimeRemainingRef.current = phaseTimeRemaining;
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Always show info sheet when exercise opens
   useEffect(() => {
@@ -137,7 +140,9 @@ export function BreathingExerciseScreen({
           clearInterval(timer);
           setIsCountingDown(false);
           setIsActive(true);
-          setPhaseTimeRemaining(phases[0]?.duration || 4);
+          const initialPhaseDuration = phases[0]?.duration || 4;
+          phaseTimeRemainingRef.current = initialPhaseDuration;
+          setPhaseTimeRemaining(initialPhaseDuration);
           startTimeRef.current = Date.now();
           haptic.medium();
           return 0;
@@ -150,49 +155,64 @@ export function BreathingExerciseScreen({
     return () => clearInterval(timer);
   }, [isCountingDown, phases]);
 
-  // Main breathing timer — stable interval, uses refs to avoid restarts on phase changes
+  // Main breathing timer — single guarded interval to prevent double-ticks/skipped phases
   useEffect(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
     if (!isActive || isPaused || isCountingDown || phases.length === 0) return;
 
-    const timer = setInterval(() => {
-      setPhaseTimeRemaining((prev) => {
-        if (prev <= 1) {
-          const curIdx = currentPhaseIndexRef.current;
-          const nextIndex = (curIdx + 1) % phases.length;
-          const completedCycle = nextIndex === 0;
+    intervalRef.current = setInterval(() => {
+      const nextElapsed = totalElapsedRef.current + 1;
+      totalElapsedRef.current = nextElapsed;
+      setTotalElapsed(nextElapsed);
 
-          if (completedCycle) {
-            const newC = cycleCountRef.current + 1;
-            setCycleCount(newC);
-            cycleCountRef.current = newC;
-            if (durationMode === 'cycles' && newC >= selectedCycles) {
-              clearInterval(timer);
-              haptic.success();
-              handleComplete(totalElapsedRef.current + 1);
+      let nextRemaining = phaseTimeRemainingRef.current - 1;
+      if (nextRemaining <= 0) {
+        const nextIndex = (currentPhaseIndexRef.current + 1) % phases.length;
+        currentPhaseIndexRef.current = nextIndex;
+        setCurrentPhaseIndex(nextIndex);
+        haptic.light();
+
+        if (nextIndex === 0) {
+          const newC = cycleCountRef.current + 1;
+          cycleCountRef.current = newC;
+          setCycleCount(newC);
+          if (durationMode === 'cycles' && newC >= selectedCycles) {
+            if (intervalRef.current) {
+              clearInterval(intervalRef.current);
+              intervalRef.current = null;
             }
+            haptic.success();
+            handleComplete(nextElapsed);
+            return;
           }
-
-          setCurrentPhaseIndex(nextIndex);
-          currentPhaseIndexRef.current = nextIndex;
-          haptic.light();
-          return phases[nextIndex].duration;
         }
-        return prev - 1;
-      });
 
-      setTotalElapsed((prev) => {
-        const next = prev + 1;
-        totalElapsedRef.current = next;
-        if (durationMode === 'minutes' && next >= selectedMinutes * 60) {
-          clearInterval(timer);
-          haptic.success();
-          handleComplete(next);
+        nextRemaining = phases[nextIndex].duration;
+      }
+
+      phaseTimeRemainingRef.current = nextRemaining;
+      setPhaseTimeRemaining(nextRemaining);
+
+      if (durationMode === 'minutes' && nextElapsed >= selectedMinutes * 60) {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
         }
-        return next;
-      });
+        haptic.success();
+        handleComplete(nextElapsed);
+      }
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
   }, [isActive, isPaused, isCountingDown, phases, selectedCycles, selectedMinutes, durationMode]);
 
   const handleComplete = useCallback(async (elapsed: number) => {
@@ -206,10 +226,20 @@ export function BreathingExerciseScreen({
         },
       }
     );
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
     setIsActive(false);
     setTotalElapsed(0);
     setCycleCount(0);
     setCurrentPhaseIndex(0);
+    totalElapsedRef.current = 0;
+    cycleCountRef.current = 0;
+    currentPhaseIndexRef.current = 0;
+    phaseTimeRemainingRef.current = 0;
   }, [exercise.id, saveSession, autoCompleteBreathe]);
 
   const handleStart = useCallback(() => {
@@ -218,6 +248,12 @@ export function BreathingExerciseScreen({
     setCurrentPhaseIndex(0);
     setCountdown(3);
     setIsCountingDown(true);
+
+    totalElapsedRef.current = 0;
+    cycleCountRef.current = 0;
+    currentPhaseIndexRef.current = 0;
+    phaseTimeRemainingRef.current = 0;
+
     haptic.medium();
   }, []);
 
