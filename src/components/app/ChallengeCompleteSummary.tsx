@@ -71,7 +71,7 @@ export const ChallengeCompleteSummary = ({
 
   const handleShare = async () => {
     haptic.light();
-    const text = `${badgeEmoji} I just completed a ${streakGoal}-day streak challenge! ${totalActions} actions done across ${perfectDays} perfect days. #SelfGrowth #Simora`;
+    const text = `${badgeEmoji} I just completed a ${streakGoal}-day streak challenge! ${totalActions} tasks done across ${perfectDays} perfect days. #SelfGrowth #Simora`;
 
     if (Capacitor.isNativePlatform()) {
       try {
