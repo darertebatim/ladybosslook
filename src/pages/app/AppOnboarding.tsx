@@ -59,6 +59,7 @@ function collectEmojiUrls(flow: typeof mePlusFlow): string[] {
 
 export default function AppOnboarding() {
   const { flowId } = useParams<{ flowId: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isSubscribed } = useSubscription();
