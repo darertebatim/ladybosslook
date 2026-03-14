@@ -220,11 +220,11 @@ export default function AppActions() {
             <div className="flex items-center gap-2 mb-3">
               <ListTodo className="w-4 h-4 text-primary" />
               <h2 className="text-sm font-semibold text-muted-foreground">
-                {selectedCategory === 'popular'
-                  ? 'POPULAR ACTIONS'
-                  : selectedCategory === 'all'
-                  ? 'ALL ACTIONS'
-                  : `${categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'CATEGORY'} ACTIONS`
+                 {selectedCategory === 'popular'
+                   ? 'POPULAR TASKS'
+                   : selectedCategory === 'all'
+                   ? 'ALL TASKS'
+                   : `${categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'CATEGORY'} TASKS`
                 }
               </h2>
             </div>
