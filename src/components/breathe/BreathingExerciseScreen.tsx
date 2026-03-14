@@ -160,7 +160,7 @@ export function BreathingExerciseScreen({
     return () => clearInterval(timer);
   }, [isCountingDown, phases]);
 
-  // Main breathing timer — cycle-based completion
+  // Main breathing timer — supports both cycle-based and minute-based completion
   useEffect(() => {
     if (!isActive || isPaused || isCountingDown) return;
 
@@ -173,7 +173,7 @@ export function BreathingExerciseScreen({
           if (completedCycle) {
             setCycleCount(c => {
               const newC = c + 1;
-              if (newC >= selectedCycles) {
+              if (durationMode === 'cycles' && newC >= selectedCycles) {
                 clearInterval(timer);
                 haptic.success();
                 handleComplete(totalElapsed + 1);
@@ -189,11 +189,19 @@ export function BreathingExerciseScreen({
         return prev - 1;
       });
 
-      setTotalElapsed((prev) => prev + 1);
+      setTotalElapsed((prev) => {
+        const next = prev + 1;
+        if (durationMode === 'minutes' && next >= selectedMinutes * 60) {
+          clearInterval(timer);
+          haptic.success();
+          handleComplete(next);
+        }
+        return next;
+      });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isActive, isPaused, isCountingDown, currentPhaseIndex, phases, selectedCycles, totalElapsed]);
+  }, [isActive, isPaused, isCountingDown, currentPhaseIndex, phases, selectedCycles, selectedMinutes, durationMode, totalElapsed]);
 
   const handleComplete = useCallback(async (elapsed: number) => {
     saveSession.mutate(
