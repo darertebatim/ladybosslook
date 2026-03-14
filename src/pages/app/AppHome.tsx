@@ -927,7 +927,7 @@ const AppHome = () => {
                             'px-2.5 py-0.5 rounded-full text-[11px] whitespace-nowrap transition-all font-medium',
                             selectedTag === null
                               ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                              : 'bg-white text-muted-foreground dark:bg-white/10 border border-white'
+                              : 'bg-white text-muted-foreground dark:bg-white/10 border border-border'
                           )}
                         >
                           All
@@ -950,7 +950,7 @@ const AppHome = () => {
                                 'px-2.5 py-0.5 rounded-full text-[11px] whitespace-nowrap transition-all capitalize font-medium',
                                 selectedTag === tag
                                   ? activeColor
-                                  : 'bg-white text-muted-foreground dark:bg-white/10 border border-white'
+                                  : 'bg-white text-muted-foreground dark:bg-white/10 border border-border'
                               )}
                             >
                               {categoryNameMap.get(tag) || tag}
