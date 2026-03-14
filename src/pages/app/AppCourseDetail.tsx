@@ -1351,7 +1351,7 @@ const AppCourseDetail = () => {
                   <Button 
                     size="sm" 
                     variant="outline"
-                    className="shrink-0 border-amber-500 text-amber-700 hover:bg-amber-100 dark:text-amber-200 dark:hover:bg-amber-900"
+                    className="shrink-0 border-amber-500 text-amber-700 dark:text-amber-200"
                     onClick={handleSyncAllSessions}
                     disabled={isSyncingAllSessions}
                   >
