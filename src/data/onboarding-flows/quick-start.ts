@@ -32,7 +32,16 @@ export const quickStartFlow: OnboardingFlow = {
         { label: 'Build stronger routines', emoji: '🔄' },
       ],
     },
-    // 3 — Starter routine preview
+    // 3 — Daily reset concept
+    {
+      id: 'qs-reset-concept',
+      type: 'motivational',
+      title: 'Your daily reset button',
+      subtitle: 'Whenever your day feels scattered, stressed, or heavy — Simora gives you a small reset.\n\nA few guided actions to calm your mind, refocus, and move forward.',
+      description: '"Think of it as a little daily reset button in your pocket."',
+      buttonLabel: 'Continue',
+    },
+    // 4 — Starter routine preview
     {
       id: 'qs-starter-routine',
       type: 'confetti-message',
