@@ -86,6 +86,14 @@ export function BreathingExerciseScreen({
   const saveSession = useSaveBreathingSession();
   const { autoCompleteBreathe } = useAutoCompleteProTask();
   const startTimeRef = useRef<number>(0);
+  
+  // Refs to avoid re-creating the interval every second
+  const currentPhaseIndexRef = useRef(currentPhaseIndex);
+  const cycleCountRef = useRef(cycleCount);
+  const totalElapsedRef = useRef(totalElapsed);
+  currentPhaseIndexRef.current = currentPhaseIndex;
+  cycleCountRef.current = cycleCount;
+  totalElapsedRef.current = totalElapsed;
 
   // Always show info sheet when exercise opens
   useEffect(() => {
