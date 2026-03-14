@@ -112,6 +112,13 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <PersonalizedPlanScreen step={step} onNext={onNext} answers={answers} />;
     case 'before-after-visual':
       return <BeforeAfterVisualScreen step={step} onNext={onNext} />;
+    case 'nickname-input':
+      return <NicknameInputScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'age-group':
+    case 'gender-select':
+      return <QuestionnaireSelectScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'ideal-life':
+      return <IdealLifeScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }
