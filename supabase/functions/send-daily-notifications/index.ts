@@ -23,7 +23,7 @@ const NOTIFICATION_TYPES = {
   morning_summary: {
     hour: 7,
     title: '☀️ Good morning!',
-    body: "Your actions for today are ready. Let's make it count.",
+    body: "Your tasks for today are ready. Let's make it count.",
     url: '/app/home',
     prefKey: 'morning_summary',
   },
