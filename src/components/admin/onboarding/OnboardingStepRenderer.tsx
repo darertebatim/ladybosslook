@@ -589,11 +589,11 @@ function MotivationalScreen({ step, onNext }: Props) {
         <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 overflow-hidden">
           <div className="px-5 pt-5 pb-5 flex flex-col h-full">
             <FadeUp>
-              <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight">{step.title}</h1>
+              <h1 className="text-[24px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight">{step.title}</h1>
             </FadeUp>
             {step.subtitle && (
               <FadeUp delay={0.08}>
-                <p className="text-[13px] text-gray-500 leading-relaxed text-center mb-3 whitespace-pre-line">
+                <p className="text-[15px] text-gray-500 leading-relaxed text-center mb-3 whitespace-pre-line">
                   <span className="font-bold text-[#1a1f3d]">{step.subtitle.split('\n')[0]}</span>
                   {step.subtitle.split('\n').length > 1 && '\n' + step.subtitle.split('\n').slice(1).join('\n')}
                 </p>
