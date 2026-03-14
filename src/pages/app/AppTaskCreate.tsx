@@ -1094,7 +1094,7 @@ const AppTaskCreate = ({
             <Sparkles className={cn("h-5 w-5", proLinkType ? "text-violet-600" : "text-black")} />
             <span className="font-medium text-black">Pro Action Link</span>
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="flex items-center gap-2 text-black/60">
             {proConfig ? (
               <span className="flex items-center gap-1.5">
                 <proConfig.icon className="h-4 w-4" />
