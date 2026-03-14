@@ -104,7 +104,7 @@ export function SoftReviewPrompt({ isOpen, onClose, onAccept }: SoftReviewPrompt
             
             <button
               onClick={handleNotNow}
-              className="w-full text-gray-400 text-sm font-medium py-2 hover:text-gray-600 transition-colors"
+              className="w-full text-gray-400 text-sm font-medium py-2 transition-colors"
             >
               Not Now
             </button>

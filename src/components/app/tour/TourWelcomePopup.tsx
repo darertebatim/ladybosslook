@@ -155,7 +155,7 @@ export function TourWelcomePopup({
           <Button 
             variant="ghost" 
             onClick={handleLater}
-            className="w-full h-11 rounded-2xl bg-accent/20 text-foreground/80 hover:text-foreground hover:bg-accent/30 font-medium"
+            className="w-full h-11 rounded-2xl bg-accent/20 text-foreground/80 font-medium"
           >
             Maybe Later
           </Button>

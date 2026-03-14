@@ -228,7 +228,7 @@ export const PeriodOnboarding = () => {
                   handleComplete();
                 }}
                 disabled={upsertSettings.isPending}
-                className="flex-1 h-12 rounded-full bg-pink-500 hover:bg-pink-600 text-white"
+                className="flex-1 h-12 rounded-full bg-pink-500 text-white"
               >
                 {upsertSettings.isPending ? 'Saving...' : 'Finish'}
               </Button>

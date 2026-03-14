@@ -174,7 +174,7 @@ export function HomeBanner() {
               {banner.button_text && banner.button_url && (
                 <Button
                   size="sm"
-                  className="mt-3 w-full bg-violet-600 hover:bg-violet-700"
+                  className="mt-3 w-full bg-violet-600"
                   onClick={() => handleButtonClick(banner.button_url!)}
                 >
                   {banner.button_text}

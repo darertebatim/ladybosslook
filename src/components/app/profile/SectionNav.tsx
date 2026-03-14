@@ -27,7 +27,7 @@ export function SectionNav({ items, onNavigate, className }: SectionNavProps) {
           key={item.id}
           variant="outline"
           size="sm"
-          className="h-9 px-3 rounded-xl bg-muted/50 border-0 hover:bg-muted"
+          className="h-9 px-3 rounded-xl bg-muted/50 border-0 active:bg-muted"
           onClick={() => handleClick(item.id)}
         >
           {item.icon}
