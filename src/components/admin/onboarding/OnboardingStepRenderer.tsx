@@ -1864,8 +1864,8 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     },
   });
 
-  // Pick first calm exercise (or first available)
-  const exercise = exercises?.find((e: any) => e.category === 'calm') || exercises?.[0];
+  // Pick "Welcome Breathing" by name, then fall back to calm category, then first available
+  const exercise = exercises?.find((e: any) => e.name?.toLowerCase().includes('welcome')) || exercises?.find((e: any) => e.category === 'calm') || exercises?.[0];
 
   const [phase, setPhase] = useState<'countdown' | 'running' | 'done'>('countdown');
   const [countdown, setCountdown] = useState(3);
