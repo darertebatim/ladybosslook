@@ -112,6 +112,13 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <PersonalizedPlanScreen step={step} onNext={onNext} answers={answers} />;
     case 'before-after-visual':
       return <BeforeAfterVisualScreen step={step} onNext={onNext} />;
+    case 'nickname-input':
+      return <NicknameInputScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'age-group':
+    case 'gender-select':
+      return <QuestionnaireSelectScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'ideal-life':
+      return <IdealLifeScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }
@@ -1423,6 +1430,134 @@ function BeforeAfterVisualScreen({ step, onNext }: Props) {
         </div>
       </div>
     </div>
+  );
+}
+
+// ─── Questionnaire-style screens (Routinery-inspired) ─────────
+
+function NicknameInputScreen({ step, onNext, onAnswer }: Props) {
+  const [name, setName] = useState('');
+
+  const handleSubmit = () => {
+    if (name.trim()) {
+      onAnswer?.(step.id, name.trim());
+      onNext();
+    }
+  };
+
+  return (
+    <ScreenWrapper>
+      <FadeUp>
+        <h1 className="text-[26px] font-extrabold text-[#1a1f3d] leading-tight mb-2">{step.title}</h1>
+      </FadeUp>
+      <FadeUp delay={0.08}>
+        <p className="text-[15px] text-[#1a1f3d]/50 mb-6">{step.subtitle}</p>
+      </FadeUp>
+      <FadeUp delay={0.15}>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+          placeholder="Nickname *"
+          autoFocus
+          className="w-full px-5 py-4 rounded-2xl bg-gray-100 text-[#1a1f3d] text-base placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-[#1a1f3d]/20 transition-all"
+        />
+      </FadeUp>
+      <FadeUp delay={0.2} className="mt-auto">
+        <NavyButton onClick={handleSubmit} disabled={!name.trim()}>{step.buttonLabel || 'Continue'}</NavyButton>
+      </FadeUp>
+    </ScreenWrapper>
+  );
+}
+
+function QuestionnaireSelectScreen({ step, onNext, onAnswer }: Props) {
+  const [picked, setPicked] = useState<number | null>(null);
+
+  const select = (i: number) => {
+    setPicked(i);
+    onAnswer?.(step.id, step.options?.[i]?.label || '');
+    setTimeout(onNext, 400);
+  };
+
+  return (
+    <ScreenWrapper>
+      <FadeUp>
+        <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center leading-tight mb-2 whitespace-pre-line">{step.title}</h1>
+      </FadeUp>
+      <FadeUp delay={0.08}>
+        <p className="text-[15px] text-[#1a1f3d]/50 text-center mb-6">{step.subtitle}</p>
+      </FadeUp>
+      <StaggerContainer className="space-y-3 flex-1 overflow-y-auto">
+        {step.options?.map((opt, i) => (
+          <StaggerItem key={i}>
+            <button
+              onClick={() => select(i)}
+              className={`w-full py-4 px-5 rounded-2xl text-center text-[15px] font-medium transition-all active:scale-[0.98] ${
+                picked === i ? 'bg-[#1a1f3d] text-white' : 'bg-gray-100 text-[#1a1f3d]'
+              }`}
+            >
+              {opt.label}
+            </button>
+          </StaggerItem>
+        ))}
+      </StaggerContainer>
+      {step.secondaryButtonLabel && (
+        <FadeUp delay={0.3}>
+          <button onClick={onNext} className="w-full py-3 text-sm text-[#1a1f3d]/50 font-medium underline underline-offset-2 mt-3 active:opacity-60">
+            {step.secondaryButtonLabel}
+          </button>
+        </FadeUp>
+      )}
+    </ScreenWrapper>
+  );
+}
+
+function IdealLifeScreen({ step, onNext, onAnswer }: Props) {
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+
+  const toggle = (i: number) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      next.has(i) ? next.delete(i) : next.add(i);
+      const labels = Array.from(next).map(idx => step.options?.[idx]?.label || '');
+      onAnswer?.(step.id, labels);
+      return next;
+    });
+  };
+
+  return (
+    <ScreenWrapper>
+      <FadeUp>
+        <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center leading-tight mb-2 whitespace-pre-line">{step.title}</h1>
+      </FadeUp>
+      <FadeUp delay={0.08}>
+        <p className="text-[15px] text-[#1a1f3d]/50 text-center mb-5">{step.subtitle}</p>
+      </FadeUp>
+      <StaggerContainer className="space-y-3 flex-1 overflow-y-auto">
+        {step.options?.map((opt, i) => (
+          <StaggerItem key={i}>
+            <button
+              onClick={() => toggle(i)}
+              className={`w-full py-4 px-5 rounded-2xl text-left text-[15px] font-medium transition-all active:scale-[0.98] flex items-center gap-2 ${
+                selected.has(i) ? 'bg-[#1a1f3d] text-white' : 'bg-gray-100 text-[#1a1f3d]'
+              }`}
+            >
+              <span className="flex-1">{opt.label}</span>
+              {opt.emoji && <FluentEmoji emoji={opt.emoji} size={22} />}
+            </button>
+          </StaggerItem>
+        ))}
+      </StaggerContainer>
+      <FadeUp delay={0.3} className="mt-3">
+        {step.secondaryButtonLabel && (
+          <button onClick={onNext} className="w-full py-2 text-sm text-[#1a1f3d]/50 font-medium underline underline-offset-2 mb-2 active:opacity-60">
+            {step.secondaryButtonLabel}
+          </button>
+        )}
+        <NavyButton onClick={onNext} disabled={selected.size === 0}>{step.buttonLabel || 'Next'}</NavyButton>
+      </FadeUp>
+    </ScreenWrapper>
   );
 }
 
