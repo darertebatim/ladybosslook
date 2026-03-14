@@ -87,13 +87,16 @@ export function BreathingExerciseScreen({
   const { autoCompleteBreathe } = useAutoCompleteProTask();
   const startTimeRef = useRef<number>(0);
   
-  // Refs for values used inside the stable interval (not in deps)
+  // Refs for values used inside the stable interval (single timer source of truth)
   const totalElapsedRef = useRef(totalElapsed);
   totalElapsedRef.current = totalElapsed;
   const currentPhaseIndexRef = useRef(currentPhaseIndex);
   currentPhaseIndexRef.current = currentPhaseIndex;
   const cycleCountRef = useRef(cycleCount);
   cycleCountRef.current = cycleCount;
+  const phaseTimeRemainingRef = useRef(phaseTimeRemaining);
+  phaseTimeRemainingRef.current = phaseTimeRemaining;
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Always show info sheet when exercise opens
   useEffect(() => {
