@@ -2107,7 +2107,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                     />
                   </div>
 
-                  {/* Finger hint for bed task - same style as AddToRoutineHandHint */}
+                  {/* Finger hint for bed task - pointing at the completion circle */}
                   {showBedHint && (
                     <>
                       {/* Invisible tap target on the completion circle */}
@@ -2115,12 +2115,25 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                         className="absolute top-0 right-0 w-16 h-full z-50"
                         onClick={handleCheckBed}
                       />
+                      {/* Pulsing glow ring around the circle */}
+                      <div
+                        className="pointer-events-none absolute z-[55] rounded-full animate-pulse"
+                        style={{
+                          top: '50%',
+                          right: '14px',
+                          width: '44px',
+                          height: '44px',
+                          transform: 'translateY(-50%)',
+                          boxShadow: '0 0 0 4px hsl(var(--primary) / 0.4), 0 0 20px 8px hsl(var(--primary) / 0.15)',
+                        }}
+                      />
+                      {/* Bouncing hand pointing at circle */}
                       <div
                         className="pointer-events-none absolute z-[60]"
                         style={{
-                          top: '2px',
-                          right: '-4px',
-                          filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.25))',
+                          top: '-8px',
+                          right: '-2px',
+                          filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
                           animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
                           transform: 'rotate(-45deg)',
                         }}
@@ -2132,12 +2145,28 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
                   {/* Finger hint for breathe task */}
                   {showBreatheHint && (
-                    <div
-                      className="pointer-events-none absolute z-[60]"
-                      style={{
-                        top: '50%',
-                        right: '-12px',
-                        transform: 'translateY(-50%) rotate(-45deg)',
+                    <>
+                      {/* Pulsing glow ring around the card */}
+                      <div
+                        className="pointer-events-none absolute inset-0 rounded-3xl z-[55] animate-pulse"
+                        style={{
+                          boxShadow: '0 0 0 3px hsl(var(--primary) / 0.4), 0 0 24px 8px hsl(var(--primary) / 0.15)',
+                        }}
+                      />
+                      <div
+                        className="pointer-events-none absolute z-[60]"
+                        style={{
+                          top: '-8px',
+                          right: '-2px',
+                          filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
+                          animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
+                          transform: 'rotate(-45deg)',
+                        }}
+                      >
+                        <FluentEmoji emoji="👇" size={52} />
+                      </div>
+                    </>
+                  )}
                         filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.25))',
                         animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
                       }}
