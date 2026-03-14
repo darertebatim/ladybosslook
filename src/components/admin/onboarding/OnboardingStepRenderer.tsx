@@ -1545,19 +1545,64 @@ function DiscountOfferScreen({ step, onNext }: Props) {
 }
 
 function WelcomeAboardScreen({ step, onNext }: Props) {
+  useEffect(() => {
+    haptic.success();
+    playCompletionSound();
+    confetti({
+      particleCount: 80,
+      spread: 90,
+      origin: { y: 0.3 },
+      colors: ['#2dd4bf', '#34d399', '#a78bfa', '#fbbf24', '#ec4899'],
+    });
+    const t1 = setTimeout(() => {
+      confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0, y: 0.5 }, colors: ['#FFD700', '#FFA500', '#9370DB'] });
+      confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1, y: 0.5 }, colors: ['#FFD700', '#FFA500', '#9370DB'] });
+    }, 500);
+    return () => clearTimeout(t1);
+  }, []);
+
   return (
-    <ScreenWrapper bg="bg-gradient-to-b from-indigo-50 to-white">
-      <div className="flex-1 flex flex-col items-center justify-center">
-        <div className="text-6xl mb-4">🎉</div>
-        <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
-        <p className="text-lg font-semibold text-indigo-500 text-center mb-2">{step.subtitle}</p>
-        <p className="text-sm text-gray-500 text-center mb-6">{step.description}</p>
-        <IllustrationPlaceholder label={step.illustrationLabel || 'Celebration'} className="w-40 h-40" />
+    <BottomSheetWrapper bgImage={meplusMascotBg} headerHeight={200}>
+      <div className="flex-1 flex flex-col items-center justify-center px-4">
+        {/* Celebration icon */}
+        <FadeUp>
+          <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
+            <FluentEmoji emoji="🎉" size={36} />
+          </div>
+        </FadeUp>
+
+        {/* Title */}
+        <FadeUp delay={0.1}>
+          <h1 className="text-[24px] font-extrabold text-[#1a1f3d] text-center mb-3">
+            {step.title || "You're all set! 🎉"}
+          </h1>
+        </FadeUp>
+
+        {/* Subtitle */}
+        <FadeUp delay={0.15}>
+          <p className="text-[16px] font-semibold text-indigo-500 text-center mb-5 leading-relaxed whitespace-pre-line">
+            {step.subtitle || "Your Simora journey starts now.\nLet's make today count."}
+          </p>
+        </FadeUp>
+
+        {/* Daily Reset confirmation badge */}
+        <FadeUp delay={0.25}>
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-4 flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
+              <SealCheck className="w-6 h-6 text-teal-500" showParticles />
+            </div>
+            <div>
+              <p className="text-[13px] font-bold text-[#1a1f3d]">Daily Reset added</p>
+              <p className="text-[11px] text-[#1a1f3d]/50">Your routine resets every morning</p>
+            </div>
+          </div>
+        </FadeUp>
       </div>
-      <div className="mt-auto">
-        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
-      </div>
-    </ScreenWrapper>
+
+      <FadeUp delay={0.4} className="mt-auto">
+        <NavyButton onClick={onNext}>{step.buttonLabel || "Let's go!"}</NavyButton>
+      </FadeUp>
+    </BottomSheetWrapper>
   );
 }
 
