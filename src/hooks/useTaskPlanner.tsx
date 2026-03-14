@@ -1176,7 +1176,7 @@ export const useCreateTaskFromTemplate = () => {
     },
     onError: (error) => {
       console.error('Create from template error:', error);
-      toast({ title: 'Failed to add action', variant: 'destructive' });
+      toast({ title: 'Failed to add task', variant: 'destructive' });
     },
   });
 };
