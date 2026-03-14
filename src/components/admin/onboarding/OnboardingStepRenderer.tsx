@@ -593,6 +593,20 @@ function MotivationalScreen({ step, onNext }: Props) {
             <span className="text-[#1a1f3d] font-extrabold text-2xl">{descMatch[1]}</span>{' '}
             {descMatch[2]}
           </p>
+        ) : step.description?.includes('—') ? (
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-amber-200/60 px-5 py-4 mb-4 shadow-sm">
+            {(() => {
+              const parts = step.description.split('\n');
+              const quote = parts[0];
+              const author = parts.slice(1).join('\n');
+              return (
+                <>
+                  <p className="text-[15px] text-[#1a1f3d] font-medium italic leading-relaxed text-center">{quote}</p>
+                  {author && <p className="text-[13px] text-amber-700/70 font-semibold text-center mt-2">{author}</p>}
+                </>
+              );
+            })()}
+          </div>
         ) : step.description ? (
           <p className="text-sm text-gray-500 italic leading-relaxed text-center mb-4 whitespace-pre-line">{step.description}</p>
         ) : null}

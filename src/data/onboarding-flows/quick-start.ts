@@ -1,5 +1,6 @@
 import { OnboardingFlow } from '@/types/onboarding';
 import meplusWelcomeMascot from '@/assets/onboarding/meplus-welcome-mascot.png';
+import resetBeforeAfter from '@/assets/onboarding/reset-before-after.png';
 
 export const quickStartFlow: OnboardingFlow = {
   id: 'quick-start-v1',
@@ -41,6 +42,7 @@ export const quickStartFlow: OnboardingFlow = {
       type: 'motivational',
       title: 'Your daily reset button',
       subtitle: 'Whenever your day feels scattered, stressed, or heavy — Simora gives you a small reset.\n\nA few guided actions to calm your mind, refocus, and move forward.',
+      image: resetBeforeAfter,
       description: '"It feels like having a little daily reset button in my pocket."\n— Yalda-M ⭐⭐⭐⭐⭐',
       buttonLabel: 'Continue',
     },
