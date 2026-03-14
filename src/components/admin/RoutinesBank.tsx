@@ -1416,7 +1416,7 @@ export default function RoutinesBank() {
                     <Label>Routine Type</Label>
                     <div className="grid grid-cols-2 gap-2">
                       {[
-                        { value: 'daily', label: 'Normal', desc: 'Actions with their own repeat settings', icon: '☀️' },
+                        { value: 'daily', label: 'Normal', desc: 'Tasks with their own repeat settings', icon: '☀️' },
                         { value: 'challenge', label: 'Challenge', desc: 'Sequential drip (Day 1, 2...)', icon: '🔥' },
                       ].map(opt => (
                         <button
