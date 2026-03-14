@@ -83,5 +83,42 @@ export const quickStartFlow: OnboardingFlow = {
       buttonLabel: 'Turn on notifications',
       secondaryButtonLabel: 'Maybe later',
     },
+    // 8 — Nickname
+    {
+      id: 'qs-nickname',
+      type: 'text-input',
+      title: 'What should I call you?',
+      subtitle: 'Nicknames are fine.',
+      buttonLabel: 'Continue',
+    },
+    // 9 — Age group
+    {
+      id: 'qs-age-group',
+      type: 'single-select',
+      title: 'What is your age group?',
+      subtitle: 'I recommend routines for your age.',
+      options: [
+        { label: '14 years or under' },
+        { label: '15 ~ 19' },
+        { label: '20 ~ 24' },
+        { label: '25 ~ 29' },
+        { label: '30 ~ 34' },
+        { label: '35 ~ 39' },
+        { label: '40 ~ 44' },
+        { label: '45+' },
+      ],
+    },
+    // 10 — Gender
+    {
+      id: 'qs-gender',
+      type: 'single-select',
+      title: 'What is your gender?',
+      subtitle: 'I recommend routines for your gender.',
+      options: [
+        { label: 'Female' },
+        { label: 'Male' },
+        { label: 'Neither' },
+      ],
+    },
   ],
 };
