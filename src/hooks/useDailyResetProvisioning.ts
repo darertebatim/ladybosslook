@@ -4,18 +4,11 @@ import { useQueryClient } from '@tanstack/react-query';
 
 const DAILY_RESET_FLAG = 'simora_daily_reset_enabled';
 const DAILY_RESET_PROVISIONED = 'simora_daily_reset_provisioned';
-
-const DAILY_RESET_TASKS = [
-  { emoji: '📱', title: 'Open Ladyboss App', color: 'peach', tag: 'Daily Reset', pro_link_type: 'route' as const, pro_link_value: '/app' },
-  { emoji: '🫁', title: 'Breathing exercise', color: 'sky', tag: 'Daily Reset', pro_link_type: 'breathe' as const, pro_link_value: null },
-  { emoji: '🌤️', title: 'Check in with your mood', color: 'yellow', tag: 'Daily Reset', pro_link_type: 'mood' as const, pro_link_value: null },
-  { emoji: '📝', title: 'Write a short journaling', color: 'lavender', tag: 'Daily Reset', pro_link_type: 'journal' as const, pro_link_value: null },
-  { emoji: '✅', title: 'Complete onboarding', color: 'mint', tag: 'Daily Reset', pro_link_type: null, pro_link_value: null },
-];
+const DAILY_RESET_ROUTINE_TITLE = 'Daily Reset';
 
 /**
  * After authentication, checks if the user opted into the "Daily Reset" routine
- * during onboarding and provisions the tasks into their planner.
+ * during onboarding and dynamically provisions tasks from the admin routines bank.
  */
 export function useDailyResetProvisioning(userId: string | undefined) {
   const queryClient = useQueryClient();
@@ -39,7 +32,7 @@ export function useDailyResetProvisioning(userId: string | undefined) {
           .from('user_tasks')
           .select('id')
           .eq('user_id', userId)
-          .eq('tag', 'Daily Reset')
+          .eq('tag', DAILY_RESET_ROUTINE_TITLE)
           .limit(1);
 
         if (existing && existing.length > 0) {
@@ -47,7 +40,47 @@ export function useDailyResetProvisioning(userId: string | undefined) {
           return;
         }
 
-        // Get max order_index
+        // 1. Find the Daily Reset routine in routines_bank
+        const { data: routine } = await supabase
+          .from('routines_bank')
+          .select('id')
+          .eq('title', DAILY_RESET_ROUTINE_TITLE)
+          .limit(1)
+          .single();
+
+        if (!routine) {
+          console.warn('[DailyReset] No routine found with title:', DAILY_RESET_ROUTINE_TITLE);
+          hasRun.current = false;
+          return;
+        }
+
+        // 2. Fetch tasks from routines_bank_tasks
+        const { data: routineTasks } = await supabase
+          .from('routines_bank_tasks')
+          .select('title, emoji, task_id, task_order, schedule_days')
+          .eq('routine_id', routine.id)
+          .order('task_order', { ascending: true });
+
+        if (!routineTasks || routineTasks.length === 0) {
+          console.warn('[DailyReset] No tasks found for routine:', routine.id);
+          hasRun.current = false;
+          return;
+        }
+
+        // 3. Fetch metadata from task bank for linked tasks (color, pro_link)
+        const linkedIds = routineTasks.filter(t => t.task_id).map(t => t.task_id!);
+        let bankMap: Record<string, { color: string; pro_link_type: string | null; pro_link_value: string | null }> = {};
+        if (linkedIds.length > 0) {
+          const { data: bankTasks } = await supabase
+            .from('admin_task_bank')
+            .select('id, color, pro_link_type, pro_link_value')
+            .in('id', linkedIds);
+          if (bankTasks) {
+            bankMap = Object.fromEntries(bankTasks.map(b => [b.id, { color: b.color, pro_link_type: b.pro_link_type, pro_link_value: b.pro_link_value }]));
+          }
+        }
+
+        // 4. Get max order_index
         const { data: lastTask } = await supabase
           .from('user_tasks')
           .select('order_index')
@@ -57,28 +90,36 @@ export function useDailyResetProvisioning(userId: string | undefined) {
 
         const startOrder = (lastTask?.[0]?.order_index ?? -1) + 1;
 
-        const rows = DAILY_RESET_TASKS.map((task, i) => ({
-          user_id: userId,
-          title: task.title,
-          emoji: task.emoji,
-          color: task.color,
-          tag: task.tag,
-          repeat_pattern: 'daily',
-          is_active: true,
-          order_index: startOrder + i,
-          pro_link_type: task.pro_link_type,
-          pro_link_value: task.pro_link_value,
-        }));
+        // 5. Build rows
+        const rows = routineTasks.map((task, i) => {
+          const bank = task.task_id ? bankMap[task.task_id] : null;
+          const scheduleDays = task.schedule_days || [];
+          const repeatPattern = scheduleDays.length === 7 || scheduleDays.length === 0 ? 'daily' : 'weekly';
+
+          return {
+            user_id: userId,
+            title: task.title,
+            emoji: task.emoji || '📝',
+            color: bank?.color || 'sky',
+            tag: DAILY_RESET_ROUTINE_TITLE,
+            repeat_pattern: repeatPattern,
+            repeat_days: scheduleDays.length > 0 && scheduleDays.length < 7 ? scheduleDays : null,
+            is_active: true,
+            order_index: startOrder + i,
+            pro_link_type: bank?.pro_link_type || null,
+            pro_link_value: bank?.pro_link_value || null,
+          };
+        });
 
         const { error } = await supabase.from('user_tasks').insert(rows);
 
         if (!error) {
           localStorage.setItem(DAILY_RESET_PROVISIONED, 'true');
           queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-          console.log('[DailyReset] Provisioned 5 tasks for new user');
+          console.log(`[DailyReset] Provisioned ${rows.length} tasks from admin routine`);
         } else {
           console.error('[DailyReset] Insert error:', error);
-          hasRun.current = false; // allow retry
+          hasRun.current = false;
         }
       } catch (err) {
         console.error('[DailyReset] Provisioning failed:', err);
