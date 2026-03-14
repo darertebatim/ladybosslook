@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { BreathingCircle } from '@/components/breathe/BreathingCircle';
+
 import { BreathingInfoSheet } from '@/components/breathe/BreathingInfoSheet';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
