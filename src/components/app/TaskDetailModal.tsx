@@ -159,7 +159,7 @@ export const TaskDetailModal = ({
         {/* Task card */}
         <div className={cn('rounded-3xl overflow-hidden', colorClass)}>
 
-          {/* Task header */}
+          {/* Task header - primary color */}
           <div className="px-4 pt-4 pb-3">
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 flex items-center justify-center shrink-0">
@@ -260,16 +260,7 @@ export const TaskDetailModal = ({
             </div>
           </div>
 
-          {/* Repeat/Reminder info */}
-          {combinedText && (
-            <div className="px-4 pb-3">
-              <p className="text-[13px] text-black/70 text-center">
-                {combinedText}.
-              </p>
-            </div>
-          )}
-
-          {/* Subtasks section */}
+          {/* Subtasks section - still in primary color */}
           {subtasks.length > 0 && (
             <div className="px-4 pb-3">
               <div className="bg-white/80 rounded-2xl p-3 space-y-0 divide-y divide-black/10">
@@ -320,6 +311,15 @@ export const TaskDetailModal = ({
                 })()}
                 {proConfig.badgeText}
               </Button>
+            </div>
+          )}
+
+          {/* Footer strip - secondary (darker) color */}
+          {combinedText && (
+            <div className={cn('px-4 py-3.5', darkColorClass)}>
+              <p className="text-[13px] font-medium text-black text-center">
+                {combinedText}.
+              </p>
             </div>
           )}
         </div>
