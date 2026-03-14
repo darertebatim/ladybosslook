@@ -1389,56 +1389,10 @@ function BeforeAfterVisualScreen({ step, onNext }: Props) {
         <p className="text-[15px] text-gray-400 text-center mb-5 whitespace-pre-line leading-relaxed">{step.subtitle}</p>
       </FadeUp>
 
-      {/* Before / After labels */}
+      {/* Before/After comparison image */}
       <FadeUp delay={0.15}>
-        <div className="flex gap-3 mb-2 px-1">
-          <span className="flex-1 text-center text-sm font-bold text-gray-400">Before</span>
-          <span className="flex-1 text-center text-sm font-bold text-amber-500">After</span>
-        </div>
-      </FadeUp>
-
-      {/* Before / After cards */}
-      <FadeUp delay={0.2}>
-        <div className="flex gap-3 mb-5 relative">
-          {/* Before card */}
-          <div className="flex-1 bg-gray-100 rounded-2xl p-4 pt-10 relative overflow-hidden">
-            {/* Head silhouette area */}
-            <div className="flex items-center justify-center mb-4">
-              <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
-                <span className="text-2xl text-gray-400">😵‍💫</span>
-              </div>
-            </div>
-            <ul className="space-y-2.5">
-              {step.beforeItems?.map((item, i) => (
-                <li key={i} className="text-[13px] font-semibold text-[#1a1f3d] leading-tight">{item}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Center reset icon */}
-          <div className="absolute left-1/2 top-[85px] -translate-x-1/2 z-10">
-            <div className="w-12 h-12 rounded-full bg-amber-400 shadow-lg flex items-center justify-center border-[3px] border-amber-300">
-              <span className="text-white text-xl font-bold">🔄</span>
-            </div>
-          </div>
-
-          {/* After card */}
-          <div className="flex-1 bg-amber-50 rounded-2xl p-4 pt-10 relative overflow-hidden border border-amber-200/40">
-            {/* Head silhouette area */}
-            <div className="flex items-center justify-center mb-4">
-              <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center">
-                <span className="text-2xl">😌</span>
-              </div>
-            </div>
-            <ul className="space-y-2.5">
-              {step.afterItems?.map((item, i) => (
-                <li key={i} className="text-[13px] font-semibold text-[#1a1f3d] leading-tight flex items-center gap-1.5">
-                  <span className="text-green-500 text-xs">✓</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="-mx-5 mb-5">
+          <img src={beforeAfterComparison} alt="Before and After comparison" className="w-full object-contain" />
         </div>
       </FadeUp>
 
