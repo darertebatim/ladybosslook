@@ -1,0 +1,3 @@
+-- Swap task_order for breathing and mood in Daily Reset routine
+UPDATE routines_bank_tasks SET task_order = 1 WHERE title = 'Breathing exercise' AND routine_id = (SELECT id FROM routines_bank WHERE title = 'Daily Reset' ORDER BY created_at DESC LIMIT 1);
+UPDATE routines_bank_tasks SET task_order = 2 WHERE title = 'Check in with your mood' AND routine_id = (SELECT id FROM routines_bank WHERE title = 'Daily Reset' ORDER BY created_at DESC LIMIT 1);
