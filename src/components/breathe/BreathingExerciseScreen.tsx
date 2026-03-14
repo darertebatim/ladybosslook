@@ -130,7 +130,12 @@ export function BreathingExerciseScreen({
   }
 
   const currentPhase = phases[currentPhaseIndex];
-  const progressPercent = isActive ? (cycleCount / selectedCycles) * 100 : 0;
+  const totalTargetSeconds = durationMode === 'minutes' ? selectedMinutes * 60 : 0;
+  const progressPercent = isActive
+    ? durationMode === 'cycles'
+      ? (cycleCount / selectedCycles) * 100
+      : Math.min((totalElapsed / totalTargetSeconds) * 100, 100)
+    : 0;
 
   // Initial countdown before starting
   useEffect(() => {
