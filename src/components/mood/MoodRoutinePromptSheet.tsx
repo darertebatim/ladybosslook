@@ -71,7 +71,7 @@ export function MoodRoutinePromptSheet({
 
         {/* Description */}
         <p className="text-[15px] font-medium text-foreground text-center leading-snug max-w-[300px] mx-auto mb-5">
-          A 10-second daily check-in that compounds into real insight about yourself.
+          A 10-second check-in that helps you understand yourself better over time.
         </p>
 
         {/* Benefits */}
