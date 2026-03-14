@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { playCompletionSound } from '@/lib/completionSound';
+import { haptic } from '@/lib/haptics';
 
 import { BreathingInfoSheet } from '@/components/breathe/BreathingInfoSheet';
 import { ImmersiveBreathingCircle, ImmersiveParticles, getImmersiveBgGradient } from '@/components/breathe/ImmersiveBreathingCircle';
@@ -1941,279 +1943,244 @@ function buildUserTask(t: StarterTask, index: number, taskId?: string): import('
   };
 }
 
-type HintPhase = 'check-bed' | 'breathe' | 'mood' | 'done';
+type DemoPhase =
+  | 'intro'
+  | 'revealing'
+  | 'viewing'
+  | 'spotlight-app'
+  | 'hint-app'
+  | 'celebrate-app'
+  | 'spotlight-breathe'
+  | 'hint-breathe'
+  | 'celebrate-breathe'
+  | 'spotlight-mood'
+  | 'hint-mood'
+  | 'celebrate-mood'
+  | 'done';
 
-// Mini inline breathing overlay for onboarding — uses ImmersiveBreathingCircle from breathe tool
+// ─── Mini inline breathing overlay for onboarding ──────────────
+
+type BreathPhaseLocal = 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold' | 'ready';
+
 function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) {
-  const { data: exercises } = useQuery({
-    queryKey: ['breathing-exercises'],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('breathing_exercises').select('*').eq('is_active', true).order('sort_order');
-      if (error) throw error;
-      return data;
-    },
-    refetchOnMount: 'always',
-    staleTime: 0,
-  });
-
-  const WELCOME_BREATHING_ID = '02b049a0-b2e8-4423-a055-d6bf1617f4fe';
-  const exercise =
-    exercises?.find((e: any) => e.id === WELCOME_BREATHING_ID) ||
-    exercises?.find((e: any) => e.name?.trim().toLowerCase() === 'welcome breathing') ||
-    exercises?.find((e: any) => e.name?.toLowerCase().includes('welcome')) ||
-    exercises?.find((e: any) => e.category === 'calm') ||
-    exercises?.[0];
-
-  const onboardingRhythm = { inhale: 3, inhaleHold: 2, exhale: 3, exhaleHold: 2 } as const;
-
-  const fallbackExercise = {
-    id: 'onboarding-welcome-breathing',
-    name: 'Welcome Breathing',
-    description: null,
-    category: 'calm',
-    emoji: '🫁',
-    inhale_seconds: onboardingRhythm.inhale,
-    inhale_hold_seconds: onboardingRhythm.inhaleHold,
-    exhale_seconds: onboardingRhythm.exhale,
-    exhale_hold_seconds: onboardingRhythm.exhaleHold,
-    inhale_method: 'nose',
-    exhale_method: 'mouth',
-    sort_order: 0,
-    is_active: true,
-    is_premium: false,
-    created_at: '',
-    updated_at: '',
-  };
-
-  const baseExercise = exercise ?? fallbackExercise;
-  const inhaleMethod = baseExercise.inhale_method === 'mouth' ? 'Mouth' : 'Nose';
-  const exhaleMethod = baseExercise.exhale_method === 'nose' ? 'Nose' : 'Mouth';
-
-  const phases = useMemo<Array<{ type: 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold'; duration: number; text: string; method?: string }>>(
-    () => [
-      { type: 'inhale', duration: onboardingRhythm.inhale, text: 'Inhale', method: inhaleMethod },
-      { type: 'inhale_hold', duration: onboardingRhythm.inhaleHold, text: 'Hold' },
-      { type: 'exhale', duration: onboardingRhythm.exhale, text: 'Exhale', method: exhaleMethod },
-      { type: 'exhale_hold', duration: onboardingRhythm.exhaleHold, text: 'Hold' },
-    ],
-    [inhaleMethod, exhaleMethod],
-  );
-
-  const [stage, setStage] = useState<'info' | 'countdown' | 'running' | 'done'>('info');
+  const [breathPhase, setBreathPhase] = useState<BreathPhaseLocal>('ready');
   const [countdown, setCountdown] = useState(3);
   const [cycleCount, setCycleCount] = useState(0);
-  const [currentPhaseIdx, setCurrentPhaseIdx] = useState(0);
-  const [phaseTimeLeft, setPhaseTimeLeft] = useState(phases[0].duration);
-  const targetCycles = 3;
+  const [isCountingDown, setIsCountingDown] = useState(true);
+  const totalCycles = 3;
 
-  // Refs for stable interval
-  const currentPhaseIdxRef = useRef(currentPhaseIdx);
-  currentPhaseIdxRef.current = currentPhaseIdx;
-  const cycleCountRef = useRef(cycleCount);
-  cycleCountRef.current = cycleCount;
-  const phaseTimeLeftRef = useRef(phaseTimeLeft);
-  phaseTimeLeftRef.current = phaseTimeLeft;
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Pattern: 3-2-3-2
+  const pattern = { inhale: 3, inhaleHold: 2, exhale: 3, exhaleHold: 2 };
 
-  const handleInfoDismiss = useCallback(() => {
-    setCountdown(3);
-    setCycleCount(0);
-    setCurrentPhaseIdx(0);
-    setPhaseTimeLeft(phases[0].duration);
-    phaseTimeLeftRef.current = phases[0].duration;
-    currentPhaseIdxRef.current = 0;
-    cycleCountRef.current = 0;
-    setStage('countdown');
-  }, [phases]);
-
-  // Countdown 3..2..1
+  // Countdown before starting
   useEffect(() => {
-    if (stage !== 'countdown') return;
-    const timer = window.setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          window.clearInterval(timer);
-          setCurrentPhaseIdx(0);
-          currentPhaseIdxRef.current = 0;
-          const d = phases[0].duration;
-          setPhaseTimeLeft(d);
-          phaseTimeLeftRef.current = d;
-          setStage('running');
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => window.clearInterval(timer);
-  }, [stage, phases]);
+    if (!isCountingDown) return;
+    if (countdown <= 0) {
+      setIsCountingDown(false);
+      setBreathPhase('inhale');
+      return;
+    }
+    const t = setTimeout(() => setCountdown(c => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [countdown, isCountingDown]);
 
-  // Breathing timer — single stable interval with refs
+  // Breathing cycle state machine
   useEffect(() => {
-    if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
-    if (stage !== 'running') return;
+    if (isCountingDown || breathPhase === 'ready') return;
 
-    intervalRef.current = setInterval(() => {
-      let next = phaseTimeLeftRef.current - 1;
-      if (next <= 0) {
-        const nextIdx = (currentPhaseIdxRef.current + 1) % phases.length;
-        currentPhaseIdxRef.current = nextIdx;
-        setCurrentPhaseIdx(nextIdx);
+    const durations: Record<BreathPhaseLocal, number> = {
+      inhale: pattern.inhale,
+      inhale_hold: pattern.inhaleHold,
+      exhale: pattern.exhale,
+      exhale_hold: pattern.exhaleHold,
+      ready: 0,
+    };
 
-        if (nextIdx === 0) {
-          const newC = cycleCountRef.current + 1;
-          cycleCountRef.current = newC;
-          setCycleCount(newC);
-          if (newC >= targetCycles) {
-            if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
-            setStage('done');
-            setTimeout(onComplete, 800);
-            return;
-          }
+    const nextPhase: Record<BreathPhaseLocal, BreathPhaseLocal> = {
+      inhale: 'inhale_hold',
+      inhale_hold: 'exhale',
+      exhale: 'exhale_hold',
+      exhale_hold: 'inhale',
+      ready: 'inhale',
+    };
+
+    const dur = durations[breathPhase] * 1000;
+    const t = setTimeout(() => {
+      if (breathPhase === 'exhale_hold') {
+        const next = cycleCount + 1;
+        setCycleCount(next);
+        if (next >= totalCycles) {
+          onComplete();
+          return;
         }
-        next = phases[nextIdx].duration;
       }
-      phaseTimeLeftRef.current = next;
-      setPhaseTimeLeft(next);
-    }, 1000);
+      setBreathPhase(nextPhase[breathPhase]);
+    }, dur);
 
-    return () => { if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; } };
-  }, [stage, phases, targetCycles, onComplete]);
+    return () => clearTimeout(t);
+  }, [breathPhase, isCountingDown, cycleCount]);
 
-  const currentP = phases[currentPhaseIdx];
-  const breathPhase: 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold' | 'ready' =
-    stage === 'running' ? (currentP?.type ?? 'ready') : 'ready';
+  const phaseText = isCountingDown
+    ? 'Get ready...'
+    : breathPhase === 'inhale' ? 'Breathe in'
+    : breathPhase === 'inhale_hold' ? 'Hold'
+    : breathPhase === 'exhale' ? 'Breathe out'
+    : breathPhase === 'exhale_hold' ? 'Hold'
+    : 'Ready';
 
-  const exerciseTyped = {
-    ...baseExercise,
-    name: 'Welcome Breathing',
-    inhale_seconds: onboardingRhythm.inhale,
-    inhale_hold_seconds: onboardingRhythm.inhaleHold,
-    exhale_seconds: onboardingRhythm.exhale,
-    exhale_hold_seconds: onboardingRhythm.exhaleHold,
-  } as import('@/hooks/useBreathingExercises').BreathingExercise;
-
-  // Stage: info sheet
-  if (stage === 'info') {
-    return (
-      <div className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-sm flex items-end justify-center">
-        <BreathingInfoSheet
-          exercise={exerciseTyped}
-          open={true}
-          onOpenChange={() => {}}
-          onDismiss={handleInfoDismiss}
-        />
-      </div>
-    );
-  }
-
-  const phaseDuration = currentP?.duration || 3;
-  const bgGradient = getImmersiveBgGradient(breathPhase, stage === 'countdown');
+  const phaseDuration = isCountingDown ? 1
+    : breathPhase === 'inhale' ? pattern.inhale
+    : breathPhase === 'inhale_hold' ? pattern.inhaleHold
+    : breathPhase === 'exhale' ? pattern.exhale
+    : breathPhase === 'exhale_hold' ? pattern.exhaleHold
+    : 1;
 
   return (
-    <div
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden transition-all duration-[2000ms]"
-      style={{ background: bgGradient }}
-    >
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center" style={{ background: getImmersiveBgGradient(isCountingDown ? 'ready' : breathPhase, isCountingDown) }}>
       <ImmersiveParticles />
-
-      {/* Exercise name */}
-      <p className="text-sm text-white/40 mb-8 font-medium tracking-widest uppercase">{baseExercise.name}</p>
-
-      {/* Reuse the real ImmersiveBreathingCircle */}
+      <p className="text-white/60 text-sm font-medium mb-8">
+        {cycleCount + 1} / {totalCycles} cycles
+      </p>
       <ImmersiveBreathingCircle
-        phase={breathPhase}
-        phaseDuration={stage === 'running' ? phaseDuration : 0}
-        phaseText={
-          stage === 'done' ? '✓'
-          : stage === 'countdown' ? countdown.toString()
-          : (currentP?.text || 'Inhale')
-        }
-        methodText={stage === 'running' && !breathPhase.includes('hold') ? currentP?.method : undefined}
-        isCountingDown={stage === 'countdown'}
-        countdownValue={countdown}
+        phase={isCountingDown ? 'ready' : breathPhase}
+        phaseDuration={phaseDuration}
+        phaseText={phaseText}
+        countdown={isCountingDown ? countdown : undefined}
+        isCountingDown={isCountingDown}
+        countdownValue={isCountingDown ? countdown : undefined}
       />
-
-      {/* Phase timer (below circle) */}
-      {stage === 'running' && (
-        <p className="mt-8 text-sm text-white/30 font-mono tracking-wider">{phaseTimeLeft}s</p>
-      )}
-
-      {/* Cycle progress dots */}
-      <div className="mt-6 flex gap-2.5">
-        {Array.from({ length: targetCycles }).map((_, i) => (
-          <div
-            key={i}
-            className="rounded-full transition-all duration-500"
-            style={{
-              width: 8, height: 8,
-              background: i < cycleCount ? 'rgba(167,139,250,0.8)' : 'rgba(167,139,250,0.15)',
-              boxShadow: i < cycleCount ? '0 0 8px rgba(167,139,250,0.4)' : 'none',
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Done message */}
-      {stage === 'done' && (
-        <p className="mt-8 text-lg font-light text-white/80 animate-fade-in tracking-wide">Beautiful ✨</p>
-      )}
+      <p className="text-white/40 text-xs mt-8">3-2-3-2 pattern</p>
     </div>
   );
 }
 
+// ─── StarterRoutineScreen (Step-by-step reveal + celebrations) ──
+
 function StarterRoutineScreen({ step, onNext }: Props) {
+  const [phase, setPhase] = useState<DemoPhase>('intro');
+  const [revealedCount, setRevealedCount] = useState(0);
   const [completedIndices, setCompletedIndices] = useState<Set<number>>(new Set());
-  const [hintPhase, setHintPhase] = useState<HintPhase>('check-bed');
   const [showBreathing, setShowBreathing] = useState(false);
   const [showMoodPicker, setShowMoodPicker] = useState(false);
+  const [celebratingIdx, setCelebratingIdx] = useState<number | null>(null);
+  const timersRef = useRef<NodeJS.Timeout[]>([]);
 
-  // Task indices: 0=Open app, 1=Breathing, 2=Mood, 3=Journal, 4=Small task
   const BREATHE_IDX = 1;
   const MOOD_IDX = 2;
 
-  // Handle completing "Open the app"
-  const handleCheckApp = async () => {
-    setCompletedIndices(prev => new Set(prev).add(0));
-    setTimeout(() => setHintPhase('breathe'), 600);
-  };
+  const userTasks = STARTER_TASKS.map((t, i) => buildUserTask(t, i));
 
-  // Handle breathing exercise completion
-  const handleBreathingComplete = useCallback(async () => {
-    setCompletedIndices(prev => {
-      const next = new Set(prev);
-      next.add(BREATHE_IDX);
-      return next;
-    });
-    setShowBreathing(false);
-    // After breathing, move to mood phase
-    setTimeout(() => setHintPhase('mood'), 600);
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => timersRef.current.forEach(clearTimeout);
   }, []);
 
-  // Handle breathing card tap
+  const addTimer = (fn: () => void, ms: number) => {
+    const t = setTimeout(fn, ms);
+    timersRef.current.push(t);
+    return t;
+  };
+
+  // Phase 1: Intro → Revealing → Viewing → Spotlight
+  useEffect(() => {
+    if (phase === 'intro') {
+      addTimer(() => setPhase('revealing'), 400);
+    }
+  }, [phase]);
+
+  // Staggered reveal
+  useEffect(() => {
+    if (phase !== 'revealing') return;
+    if (revealedCount >= STARTER_TASKS.length) {
+      addTimer(() => setPhase('viewing'), 300);
+      return;
+    }
+    const t = addTimer(() => setRevealedCount(prev => prev + 1), 300);
+    return () => clearTimeout(t);
+  }, [phase, revealedCount]);
+
+  // Viewing pause → first spotlight
+  useEffect(() => {
+    if (phase === 'viewing') {
+      addTimer(() => setPhase('spotlight-app'), 3000);
+    }
+  }, [phase]);
+
+  // Spotlight → Hint delays
+  useEffect(() => {
+    if (phase === 'spotlight-app') {
+      addTimer(() => setPhase('hint-app'), 500);
+    } else if (phase === 'spotlight-breathe') {
+      addTimer(() => setPhase('hint-breathe'), 500);
+    } else if (phase === 'spotlight-mood') {
+      addTimer(() => setPhase('hint-mood'), 500);
+    }
+  }, [phase]);
+
+  // Celebration trigger helper
+  const triggerCelebration = (taskIdx: number, nextPhase: DemoPhase) => {
+    setCompletedIndices(prev => new Set(prev).add(taskIdx));
+    setCelebratingIdx(taskIdx);
+    playCompletionSound();
+    haptic.success();
+    confetti({
+      particleCount: 60,
+      spread: 55,
+      origin: { y: 0.5 },
+      colors: ['#2dd4bf', '#34d399', '#a78bfa', '#fbbf24'],
+    });
+    addTimer(() => {
+      setCelebratingIdx(null);
+      setPhase(nextPhase);
+    }, 1500);
+  };
+
+  // Handlers
+  const handleCheckApp = () => {
+    if (phase !== 'hint-app' && phase !== 'spotlight-app') return;
+    setPhase('celebrate-app');
+    triggerCelebration(0, 'spotlight-breathe');
+  };
+
   const handleBreatheTap = () => {
+    if (phase !== 'hint-breathe' && phase !== 'spotlight-breathe') return;
     setShowBreathing(true);
   };
 
-  // Handle mood card tap
+  const handleBreathingComplete = useCallback(() => {
+    setShowBreathing(false);
+    setPhase('celebrate-breathe');
+    triggerCelebration(BREATHE_IDX, 'spotlight-mood');
+  }, []);
+
   const handleMoodTap = () => {
+    if (phase !== 'hint-mood' && phase !== 'spotlight-mood') return;
     setShowMoodPicker(true);
   };
 
-  // Handle mood selection
   const handleMoodSelect = (moodValue: string) => {
-    setCompletedIndices(prev => {
-      const next = new Set(prev);
-      next.add(MOOD_IDX);
-      return next;
-    });
     setShowMoodPicker(false);
-    setTimeout(() => setHintPhase('done'), 500);
+    setPhase('celebrate-mood');
+    triggerCelebration(MOOD_IDX, 'done');
   };
 
-  // Build fake UserTask objects for preview rendering (no real DB tasks)
-  const userTasks = STARTER_TASKS.map((t, i) => buildUserTask(t, i));
+  // Which phases show overlay
+  const showOverlay = phase.startsWith('spotlight') || phase.startsWith('hint') || phase.startsWith('celebrate') || phase === 'done';
+  // Which task is spotlighted
+  const spotlightIdx =
+    phase.includes('app') ? 0 :
+    phase.includes('breathe') ? BREATHE_IDX :
+    phase.includes('mood') ? MOOD_IDX :
+    -1;
 
-  // Mood picker inline overlay
+  // Instruction text
+  const instructionText =
+    (phase === 'spotlight-app' || phase === 'hint-app') ? <><FluentEmoji emoji="👆" size={20} /> Tap the circle to complete your first task!</> :
+    (phase === 'spotlight-breathe' || phase === 'hint-breathe') ? <><FluentEmoji emoji="🫁" size={20} /> Now tap the Breathe button to try it!</> :
+    (phase === 'spotlight-mood' || phase === 'hint-mood') ? <><FluentEmoji emoji="🌤️" size={20} /> Now check in with your mood!</> :
+    phase === 'done' ? <><FluentEmoji emoji="✨" size={20} /> Tap Continue to keep going!</> :
+    null;
+
   const MOODS = [
     { value: 'great', emoji: '😄', label: 'Great', bg: '#FEF08A' },
     { value: 'good', emoji: '🙂', label: 'Good', bg: '#BBF7D0' },
@@ -2225,61 +2192,79 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   return (
     <div className="h-full flex flex-col bg-white">
       <div className="flex-1 flex flex-col px-6 pt-8 pb-4 overflow-y-auto">
-        {/* Header - above spotlight overlay */}
-        <FadeUp>
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0 }}
+        >
           <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center leading-tight relative z-40">
             Here's your first routine
           </h1>
-        </FadeUp>
-        <FadeUp delay={0.08}>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+        >
           <p className="text-[15px] text-gray-500 text-center mt-2 relative z-40">{step.subtitle}</p>
-        </FadeUp>
+        </motion.div>
 
-        {/* Phase instruction text - ABOVE task cards and spotlight */}
-        <FadeUp delay={0.12}>
-          <p className="text-center text-[15px] text-white font-semibold mt-3 mb-6 relative z-40 flex items-center justify-center gap-1.5">
-            {hintPhase === 'check-bed' && <><FluentEmoji emoji="👆" size={20} /> Tap the circle to complete your first task!</>}
-            {hintPhase === 'breathe' && <><FluentEmoji emoji="🫁" size={20} /> Now tap the Breathe button to try it!</>}
-            {hintPhase === 'mood' && <><FluentEmoji emoji="🌤️" size={20} /> Now check in with your mood!</>}
-            {hintPhase === 'done' && <><FluentEmoji emoji="✨" size={20} /> Tap Continue to keep going!</>}
-          </p>
-        </FadeUp>
+        {/* Instruction text — only shows during spotlight/hint/done phases */}
+        {instructionText && (
+          <motion.p
+            key={phase}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="text-center text-[15px] text-white font-semibold mt-3 mb-6 relative z-40 flex items-center justify-center gap-1.5"
+          >
+            {instructionText}
+          </motion.p>
+        )}
+        {!instructionText && <div className="mt-3 mb-6" />}
 
-        {/* Task Cards with spotlight effect */}
+        {/* Task Cards */}
         <div className="space-y-3 relative">
           {/* Dark spotlight overlay */}
-          {(hintPhase === 'check-bed' || hintPhase === 'breathe' || hintPhase === 'mood' || hintPhase === 'done') && (
-            <div className="fixed inset-0 z-30 bg-black/50 pointer-events-none" style={{ animation: 'fadeIn 0.5s ease-out' }} />
+          {showOverlay && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="fixed inset-0 z-30 bg-black/50 pointer-events-none"
+            />
           )}
 
           {userTasks.map((task, i) => {
             const isCompleted = completedIndices.has(i);
-            const isAppTask = i === 0;
-            const isBreatheTask = i === BREATHE_IDX;
-            const isMoodTask = i === MOOD_IDX;
-            const showAppHint = hintPhase === 'check-bed' && isAppTask && !isCompleted;
-            const showBreatheHint = hintPhase === 'breathe' && isBreatheTask;
-            const showMoodHint = hintPhase === 'mood' && isMoodTask;
-            const isSpotlighted = showAppHint || showBreatheHint || showMoodHint;
+            const isVisible = phase === 'intro' ? false : phase === 'revealing' ? i < revealedCount : true;
+            const isSpotlighted = spotlightIdx === i && !phase.startsWith('celebrate');
+            const isCelebrating = celebratingIdx === i;
+            const showHintOnCircle = phase === 'hint-app' && i === 0;
+            const showHintOnCard = (phase === 'hint-breathe' && i === BREATHE_IDX) || (phase === 'hint-mood' && i === MOOD_IDX);
 
             return (
-              <FadeUp key={task.id} delay={0.15 + i * 0.1}>
-                <div className={`relative ${isSpotlighted ? 'z-40' : ''}`}>
-                  {/* During breathe hint phase, overlay the card to intercept taps */}
-                  {showBreatheHint && (
-                    <button
-                      className="absolute inset-0 z-40 rounded-3xl"
-                      onClick={handleBreatheTap}
-                    />
+              <motion.div
+                key={task.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{
+                  opacity: isVisible ? 1 : 0,
+                  y: isVisible ? 0 : 20,
+                }}
+                transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+                className="relative"
+              >
+                <div className={`relative ${isSpotlighted || isCelebrating ? 'z-40' : ''}`}>
+                  {/* Intercept taps for breathe/mood */}
+                  {(phase === 'hint-breathe' || phase === 'spotlight-breathe') && i === BREATHE_IDX && (
+                    <button className="absolute inset-0 z-40 rounded-3xl" onClick={handleBreatheTap} />
                   )}
-                  {/* During mood hint phase, overlay the card to intercept taps */}
-                  {showMoodHint && (
-                    <button
-                      className="absolute inset-0 z-40 rounded-3xl"
-                      onClick={handleMoodTap}
-                    />
+                  {(phase === 'hint-mood' || phase === 'spotlight-mood') && i === MOOD_IDX && (
+                    <button className="absolute inset-0 z-40 rounded-3xl" onClick={handleMoodTap} />
                   )}
-                  <div className={isSpotlighted ? 'relative rounded-2xl shadow-2xl' : ''}>
+
+                  <div className={isSpotlighted || isCelebrating ? 'relative rounded-2xl shadow-2xl' : ''}>
                     <TaskCard
                       task={task}
                       date={new Date()}
@@ -2290,8 +2275,15 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                     />
                   </div>
 
-                  {/* Finger hint for app task - pointing at the completion circle */}
-                  {showAppHint && (
+                  {/* Celebration SealCheck overlay */}
+                  {isCelebrating && (
+                    <div className="absolute top-1/2 right-4 -translate-y-1/2 z-50">
+                      <SealCheck className="w-10 h-10 text-teal-400 animate-seal-pop" showParticles />
+                    </div>
+                  )}
+
+                  {/* Finger hint on completion circle (app task) */}
+                  {showHintOnCircle && (
                     <>
                       <button
                         className="absolute top-0 right-0 w-16 h-full z-50"
@@ -2322,36 +2314,8 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                     </>
                   )}
 
-                  {/* Hint for breathe task */}
-                  {showBreatheHint && (
-                    <>
-                      <div
-                        className="pointer-events-none absolute z-[55] rounded-xl animate-pulse"
-                        style={{
-                          top: '50%',
-                          right: '56px',
-                          width: '60px',
-                          height: '40px',
-                          transform: 'translateY(-50%)',
-                          boxShadow: '0 0 0 3px hsl(var(--primary) / 0.5), 0 0 20px 8px hsl(var(--primary) / 0.2)',
-                        }}
-                      />
-                      <div
-                        className="pointer-events-none absolute z-[60]"
-                        style={{
-                          top: '-40px',
-                          right: '58px',
-                          filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
-                          animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
-                        }}
-                      >
-                        <FluentEmoji emoji="👇" size={48} />
-                      </div>
-                    </>
-                  )}
-
-                  {/* Hint for mood task - point at the Check button */}
-                  {showMoodHint && (
+                  {/* Finger hint on breathe/mood card */}
+                  {showHintOnCard && (
                     <>
                       <div
                         className="pointer-events-none absolute z-[55] rounded-xl animate-pulse"
@@ -2378,15 +2342,20 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                     </>
                   )}
                 </div>
-              </FadeUp>
+              </motion.div>
             );
           })}
         </div>
       </div>
 
-      {/* CTA - spotlighted after hints are done */}
-      {hintPhase === 'done' && (
-        <FadeUp delay={0.2} className="px-6 pb-6 pt-2 relative z-40">
+      {/* CTA — only in done phase */}
+      {phase === 'done' && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="px-6 pb-6 pt-2 relative z-40"
+        >
           <div className="relative">
             <NavyButton onClick={onNext}>Continue</NavyButton>
             <div
@@ -2402,22 +2371,21 @@ function StarterRoutineScreen({ step, onNext }: Props) {
               <FluentEmoji emoji="👇" size={48} />
             </div>
           </div>
-        </FadeUp>
+        </motion.div>
       )}
 
-      {/* Inline breathing overlay */}
+      {/* Breathing overlay */}
       {showBreathing && (
         <OnboardingBreathingOverlay onComplete={handleBreathingComplete} />
       )}
 
-      {/* Inline mood picker overlay */}
+      {/* Mood picker overlay */}
       {showMoodPicker && (
         <div className="fixed inset-0 z-[100] flex items-end justify-center" style={{ animation: 'fadeIn 0.3s ease-out' }}>
-          <div className="absolute inset-0 bg-black/60" onClick={() => {}} />
+          <div className="absolute inset-0 bg-black/60" />
           <div className="relative z-10 w-full bg-white rounded-t-3xl px-6 pt-6 pb-10 animate-slide-up">
             <h2 className="text-xl font-bold text-center text-[#1a1f3d] mb-2">How are you feeling?</h2>
             <p className="text-sm text-gray-400 text-center mb-6">Tap the one that fits best</p>
-            {/* Top row - 3 moods */}
             <div className="flex justify-center gap-4 mb-5">
               {MOODS.slice(0, 3).map((mood) => (
                 <button
@@ -2432,7 +2400,6 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                 </button>
               ))}
             </div>
-            {/* Bottom row - 2 moods */}
             <div className="flex justify-center gap-4">
               {MOODS.slice(3).map((mood) => (
                 <button
