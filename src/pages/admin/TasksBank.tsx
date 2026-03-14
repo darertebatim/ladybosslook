@@ -653,10 +653,10 @@ export default function TasksBank() {
         <div>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5" />
-            Actions Bank
-          </CardTitle>
-          <CardDescription>
-            Reusable action templates for routine planning
+             Tasks Bank
+           </CardTitle>
+           <CardDescription>
+             Reusable task templates for routine planning
           </CardDescription>
         </div>
         <div className="flex items-center gap-2">
