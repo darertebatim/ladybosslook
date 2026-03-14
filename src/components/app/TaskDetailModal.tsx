@@ -210,17 +210,14 @@ export const TaskDetailModal = ({
                     onOpenTimer?.(task);
                     onClose();
                   }}
-                  className={cn(
-                    'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all',
-                    goalReached
-                      ? 'bg-emerald-500 text-white shadow-md'
-                      : 'border-2 border-foreground/30 bg-white/60'
-                  )}
+                  className="w-9 h-9 flex items-center justify-center shrink-0"
                 >
                   {goalReached ? (
-                    <Check className="h-4 w-4" strokeWidth={3} />
+                    <SealCheck className="w-9 h-9 text-teal-400" />
                   ) : (
-                    <Play className="h-5 w-5 text-foreground/70 ml-0.5" fill="currentColor" />
+                    <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center">
+                      <Play className="h-4 w-4 ml-0.5" />
+                    </span>
                   )}
                 </button>
               ) : isCountGoal ? (
@@ -234,34 +231,26 @@ export const TaskDetailModal = ({
                     }
                     onClose();
                   }}
-                  className={cn(
-                    'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all',
-                    goalReached
-                      ? 'bg-emerald-500 text-white shadow-md'
-                      : isWater
-                        ? 'border-2 border-sky-400 bg-sky-100'
-                        : 'border-2 border-foreground/30 bg-white/60'
-                  )}
+                  className="w-9 h-9 flex items-center justify-center shrink-0"
                 >
                   {goalReached ? (
-                    <Check className="h-4 w-4" strokeWidth={3} />
-                  ) : isWater ? (
-                    <Droplets className="h-5 w-5 text-sky-500" />
+                    <SealCheck className="w-9 h-9 text-teal-400" />
                   ) : (
-                    <Plus className="h-5 w-5 text-foreground/70" strokeWidth={2} />
+                    <CircleProgressButton progress={goalProgress} target={task.goal_target || 1}>
+                      {isWater ? <Droplets className="h-4 w-4 text-sky-500" /> : <Plus className="h-4 w-4" />}
+                    </CircleProgressButton>
                   )}
                 </button>
               ) : (
                 <button
                   onClick={handleToggleComplete}
-                  className={cn(
-                    'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all',
-                    isCompleted
-                      ? 'bg-emerald-500 text-white shadow-md'
-                      : 'border-2 border-foreground/30 bg-white/60'
-                  )}
+                  className="w-9 h-9 flex items-center justify-center shrink-0"
                 >
-                  {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
+                  {isCompleted ? (
+                    <SealCheck className="w-9 h-9 text-teal-400" />
+                  ) : (
+                    <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
+                  )}
                 </button>
               )}
             </div>
