@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus } from 'lucide-react';
 import { dearMeFlow } from '@/data/onboarding-flows/dear-me';
 import { mePlusFlow } from '@/data/onboarding-flows/me-plus';
+import { quickStartFlow } from '@/data/onboarding-flows/quick-start';
 import { OnboardingFlowCard } from '@/components/admin/onboarding/OnboardingFlowCard';
 import { useDefaultOnboarding, useSetDefaultOnboarding } from '@/hooks/useDefaultOnboarding';
 import { toast } from 'sonner';
