@@ -19,7 +19,7 @@ export const ChallengeRoutineCard = ({
   const isCompleted = challenge.completedDays >= challenge.totalDays;
   
   return (
-    <div className={cn('bg-white rounded-2xl p-4 shadow-lg', className)}>
+    <div className={cn('bg-white rounded-2xl p-4 shadow-sm', className)}>
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
         <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">

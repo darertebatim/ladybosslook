@@ -147,7 +147,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
       <div
         onClick={handleCardClick}
         className={cn(
-          'rounded-2xl p-4 transition-all duration-200 cursor-pointer active:scale-[0.98] shadow-lg',
+          'rounded-2xl p-4 transition-all duration-200 cursor-pointer active:scale-[0.98]',
           style.gradient,
           event.isCompleted && 'opacity-60'
         )}

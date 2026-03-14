@@ -108,7 +108,7 @@ export const PeriodStatusCard = ({ className }: PeriodStatusCardProps) => {
       <div
         onClick={handleCardClick}
         className={cn(
-          'rounded-2xl p-4 transition-all duration-200 cursor-pointer active:scale-[0.98] shadow-lg',
+          'rounded-2xl p-4 transition-all duration-200 cursor-pointer active:scale-[0.98]',
           'bg-gradient-to-br from-pink-100 to-rose-100 dark:from-pink-900/30 dark:to-rose-900/30',
           className
         )}

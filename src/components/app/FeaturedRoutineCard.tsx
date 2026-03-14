@@ -77,7 +77,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
     <button
       className={cn(
         "relative w-full text-left rounded-2xl overflow-hidden cursor-pointer transition-all active:scale-[0.98]",
-        "border shadow-lg",
+        "border shadow-sm",
         bgColor,
         className
       )}
