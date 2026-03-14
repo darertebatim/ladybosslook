@@ -74,13 +74,14 @@ export const quickStartFlow: OnboardingFlow = {
       buttonLabel: 'Yes, enable it',
       secondaryButtonLabel: 'Maybe later',
     },
-    // 6 — Welcome aboard
+    // 6 — Push notification permission
     {
-      id: 'qs-welcome-aboard',
+      id: 'qs-push-permission',
       type: 'welcome-aboard',
-      title: 'You\'re all set! 🎉',
-      subtitle: 'Your Simora journey starts now.\nLet\'s make today count.',
-      buttonLabel: 'Let\'s go!',
+      title: 'With reminders, routines feel 80% easier.',
+      subtitle: 'Get gentle nudges to keep your daily reset on track.',
+      buttonLabel: 'Turn on notifications',
+      secondaryButtonLabel: 'Maybe later',
     },
   ],
 };
