@@ -1642,11 +1642,11 @@ export default function RoutinesBank() {
                           }
                         }
                         queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
-                        toast.success(`Synced ${synced} task${synced !== 1 ? 's' : ''} to Action Bank`);
+                        toast.success(`Synced ${synced} task${synced !== 1 ? 's' : ''} to Task Bank`);
                       }}
                     >
                       <Upload className="h-3.5 w-3.5" />
-                      Sync {unlinked.length} unlinked task{unlinked.length !== 1 ? 's' : ''} to Action Bank
+                      Sync {unlinked.length} unlinked task{unlinked.length !== 1 ? 's' : ''} to Task Bank
                     </Button>
                   );
                 })()}
