@@ -469,7 +469,8 @@ function TextInputScreen({ step, onNext, onAnswer }: Props) {
           onChange={e => setValue(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSubmit()}
           placeholder="Nickname *"
-          className="w-full px-5 py-4 rounded-2xl bg-gray-100 text-[#1a1f3d] text-base placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-purple-300 transition-all"
+          enterKeyHint="done"
+          className="w-full px-5 py-4 rounded-2xl bg-[#f5f5f5] text-[#1a1f3d] text-base placeholder:text-gray-400 outline-none border border-transparent focus:border-gray-300 transition-all"
           autoFocus
         />
       </FadeUp>

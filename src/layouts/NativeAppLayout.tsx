@@ -21,6 +21,7 @@ import { useNotificationCleanup } from '@/hooks/useNotificationCleanup';
 import { DeferredLayoutHooks } from '@/components/app/DeferredLayoutHooks';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { useDailyResetProvisioning } from '@/hooks/useDailyResetProvisioning';
+import { useOnboardingProfileSync } from '@/hooks/useOnboardingProfileSync';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
@@ -58,6 +59,9 @@ const NativeAppLayout = () => {
   
   // Provision Daily Reset routine if user opted in during onboarding
   useDailyResetProvisioning(user?.id);
+  
+  // Sync onboarding answers (nickname, gender) to user profile
+  useOnboardingProfileSync(user?.id);
 
   // Defer non-critical hooks — mount DeferredLayoutHooks after 5s delay
   const [deferredReady, setDeferredReady] = useState(false);
