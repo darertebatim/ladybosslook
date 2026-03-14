@@ -138,8 +138,8 @@ export default function AppActions() {
       setPreviewSheetOpen(false);
       setSelectedTemplate(null);
     } catch (error) {
-      console.error('Error adding action:', error);
-      toast.error('Failed to add action');
+       console.error('Error adding task:', error);
+       toast.error('Failed to add task');
     } finally {
       setIsSavingTemplate(false);
     }
