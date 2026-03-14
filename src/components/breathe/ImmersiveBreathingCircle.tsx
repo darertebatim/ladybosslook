@@ -72,25 +72,31 @@ export function ImmersiveBreathingCircle({
           style={{ width: '40%', height: '40%', border: '1.5px solid rgba(167,139,250,0.2)' }}
         />
 
-        {/* Hold direction ring — scales to match breathing circle */}
+        {/* Hold direction ring — wrapper scales, inner ring rotates */}
         {isHolding && (
           <div
-            className="absolute rounded-full pointer-events-none"
+            className="absolute pointer-events-none"
             style={{
               width: '100%', height: '100%',
               transform: `scale(${phase === 'inhale_hold' ? 1.04 : 0.44})`,
               transition: 'transform 0.5s ease-out',
-              border: '2px solid rgba(167,139,250,0.18)',
-              borderTopColor: 'rgba(196,181,253,0.85)',
-              borderRightColor: 'rgba(196,181,253,0.1)',
-              borderBottomColor: 'rgba(167,139,250,0.45)',
-              borderLeftColor: 'rgba(196,181,253,0.08)',
-              boxShadow: '0 0 24px rgba(139,92,246,0.35)',
-              animation: phase === 'inhale_hold'
-                ? 'imm-spin-cw 6s linear infinite'
-                : 'imm-spin-ccw 6s linear infinite',
             }}
-          />
+          >
+            <div
+              className="w-full h-full rounded-full"
+              style={{
+                border: '2px solid rgba(167,139,250,0.18)',
+                borderTopColor: 'rgba(196,181,253,0.85)',
+                borderRightColor: 'rgba(196,181,253,0.1)',
+                borderBottomColor: 'rgba(167,139,250,0.45)',
+                borderLeftColor: 'rgba(196,181,253,0.08)',
+                boxShadow: '0 0 24px rgba(139,92,246,0.35)',
+                animation: phase === 'inhale_hold'
+                  ? 'imm-spin-cw 6s linear infinite'
+                  : 'imm-spin-ccw 6s linear infinite',
+              }}
+            />
+          </div>
         )}
 
         {/* Animated breathing circle — uses CSS transition like classic */}
