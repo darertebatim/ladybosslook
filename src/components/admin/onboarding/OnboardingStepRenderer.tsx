@@ -1862,7 +1862,7 @@ function buildUserTask(t: StarterTask, index: number, taskId?: string): import('
 
 type HintPhase = 'check-bed' | 'breathe' | 'mood' | 'done';
 
-// Mini inline breathing overlay for onboarding — uses real BreathingInfoSheet + BreathingCircle
+// Mini inline breathing overlay for onboarding — uses ImmersiveBreathingCircle from breathe tool
 function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) {
   const { data: exercises } = useQuery({
     queryKey: ['breathing-exercises'],
@@ -1875,7 +1875,6 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     staleTime: 0,
   });
 
-  // Force the onboarding flow to use the dedicated Welcome Breathing exercise
   const WELCOME_BREATHING_ID = '02b049a0-b2e8-4423-a055-d6bf1617f4fe';
   const exercise =
     exercises?.find((e: any) => e.id === WELCOME_BREATHING_ID) ||
@@ -1884,12 +1883,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     exercises?.find((e: any) => e.category === 'calm') ||
     exercises?.[0];
 
-  const onboardingRhythm = {
-    inhale: 3,
-    inhaleHold: 2,
-    exhale: 3,
-    exhaleHold: 2,
-  } as const;
+  const onboardingRhythm = { inhale: 3, inhaleHold: 2, exhale: 3, exhaleHold: 2 } as const;
 
   const fallbackExercise = {
     id: 'onboarding-welcome-breathing',
@@ -1931,70 +1925,83 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
   const [phaseTimeLeft, setPhaseTimeLeft] = useState(phases[0].duration);
   const targetCycles = 3;
 
-  // When user dismisses the info sheet, start countdown
+  // Refs for stable interval
+  const currentPhaseIdxRef = useRef(currentPhaseIdx);
+  currentPhaseIdxRef.current = currentPhaseIdx;
+  const cycleCountRef = useRef(cycleCount);
+  cycleCountRef.current = cycleCount;
+  const phaseTimeLeftRef = useRef(phaseTimeLeft);
+  phaseTimeLeftRef.current = phaseTimeLeft;
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const handleInfoDismiss = useCallback(() => {
     setCountdown(3);
     setCycleCount(0);
     setCurrentPhaseIdx(0);
     setPhaseTimeLeft(phases[0].duration);
+    phaseTimeLeftRef.current = phases[0].duration;
+    currentPhaseIdxRef.current = 0;
+    cycleCountRef.current = 0;
     setStage('countdown');
   }, [phases]);
 
   // Countdown 3..2..1
   useEffect(() => {
     if (stage !== 'countdown') return;
-
     const timer = window.setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
           window.clearInterval(timer);
           setCurrentPhaseIdx(0);
-          setPhaseTimeLeft(phases[0].duration);
+          currentPhaseIdxRef.current = 0;
+          const d = phases[0].duration;
+          setPhaseTimeLeft(d);
+          phaseTimeLeftRef.current = d;
           setStage('running');
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
-
     return () => window.clearInterval(timer);
   }, [stage, phases]);
 
-  // Breathing timer (fixed onboarding rhythm: 3-2-3-2)
+  // Breathing timer — single stable interval with refs
   useEffect(() => {
+    if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
     if (stage !== 'running') return;
 
-    const timer = window.setInterval(() => {
-      setPhaseTimeLeft(prev => {
-        if (prev <= 1) {
-          const nextIdx = (currentPhaseIdx + 1) % phases.length;
-          const completedCycle = nextIdx === 0;
+    intervalRef.current = setInterval(() => {
+      let next = phaseTimeLeftRef.current - 1;
+      if (next <= 0) {
+        const nextIdx = (currentPhaseIdxRef.current + 1) % phases.length;
+        currentPhaseIdxRef.current = nextIdx;
+        setCurrentPhaseIdx(nextIdx);
 
-          if (completedCycle) {
-            const nextCycle = cycleCount + 1;
-            setCycleCount(nextCycle);
-            if (nextCycle >= targetCycles) {
-              setStage('done');
-              window.setTimeout(onComplete, 800);
-              return 0;
-            }
+        if (nextIdx === 0) {
+          const newC = cycleCountRef.current + 1;
+          cycleCountRef.current = newC;
+          setCycleCount(newC);
+          if (newC >= targetCycles) {
+            if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+            setStage('done');
+            setTimeout(onComplete, 800);
+            return;
           }
-
-          setCurrentPhaseIdx(nextIdx);
-          return phases[nextIdx].duration;
         }
-
-        return prev - 1;
-      });
+        next = phases[nextIdx].duration;
+      }
+      phaseTimeLeftRef.current = next;
+      setPhaseTimeLeft(next);
     }, 1000);
 
-    return () => window.clearInterval(timer);
-  }, [stage, currentPhaseIdx, cycleCount, targetCycles, onComplete, phases]);
+    return () => { if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; } };
+  }, [stage, phases, targetCycles, onComplete]);
 
   const currentP = phases[currentPhaseIdx];
-  const breathPhase = stage === 'running' ? (currentP?.type ?? 'ready') : 'ready';
+  const breathPhase: 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold' | 'ready' =
+    stage === 'running' ? (currentP?.type ?? 'ready') : 'ready';
 
-  // Force guide sheet + overlay to exact onboarding rhythm
   const exerciseTyped = {
     ...baseExercise,
     name: 'Welcome Breathing',
@@ -2017,158 +2024,33 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
       </div>
     );
   }
+
   const phaseDuration = currentP?.duration || 3;
-
-  // Determine background gradient based on phase
-  const bgGradient = (() => {
-    if (stage === 'done') return 'radial-gradient(ellipse at 50% 40%, #1e1145 0%, #0f0a2e 50%, #080618 100%)';
-    if (stage === 'countdown') return 'radial-gradient(ellipse at 50% 40%, #1a0e3e 0%, #0d0825 50%, #06050f 100%)';
-    if (breathPhase === 'inhale') return 'radial-gradient(ellipse at 50% 35%, #1e1155 0%, #120a3a 40%, #080618 100%)';
-    if (breathPhase === 'inhale_hold') return 'radial-gradient(ellipse at 50% 38%, #251560 0%, #150c45 40%, #0a0720 100%)';
-    if (breathPhase === 'exhale') return 'radial-gradient(ellipse at 50% 45%, #160d42 0%, #0e0830 40%, #06050f 100%)';
-    if (breathPhase === 'exhale_hold') return 'radial-gradient(ellipse at 50% 42%, #12103a 0%, #0b0828 40%, #050412 100%)';
-    return 'radial-gradient(ellipse at 50% 40%, #1a0e3e 0%, #0d0825 50%, #06050f 100%)';
-  })();
-
-  // Animated circle scale
-  const isExpanded = breathPhase === 'inhale_hold';
-  const isInhaling = breathPhase === 'inhale';
-  const isExhaling = breathPhase === 'exhale';
-  const isHolding = breathPhase === 'inhale_hold' || breathPhase === 'exhale_hold';
-  const animatedScale = stage !== 'running'
-    ? 0.45
-    : isExpanded || isInhaling ? 1.0 : 0.45;
-  const animDuration = (isInhaling || isExhaling) ? `${phaseDuration}s` : '0.3s';
-
-  // Glow intensity based on phase
-  const glowOpacity = isExpanded || isInhaling ? 0.5 : isHolding ? 0.4 : 0.2;
+  const bgGradient = getImmersiveBgGradient(breathPhase, stage === 'countdown');
 
   return (
     <div
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden transition-all duration-[2000ms]"
       style={{ background: bgGradient }}
     >
-      {/* Ambient CSS particles */}
-      <style>{`
-        @keyframes ob-float-1 { 0%,100% { transform: translate(0,0) scale(1); opacity:0.3; } 25% { transform: translate(30px,-40px) scale(1.2); opacity:0.5; } 50% { transform: translate(-20px,-80px) scale(0.8); opacity:0.2; } 75% { transform: translate(40px,-30px) scale(1.1); opacity:0.4; } }
-        @keyframes ob-float-2 { 0%,100% { transform: translate(0,0) scale(1); opacity:0.2; } 33% { transform: translate(-40px,30px) scale(1.3); opacity:0.4; } 66% { transform: translate(50px,-20px) scale(0.9); opacity:0.15; } }
-        @keyframes ob-float-3 { 0%,100% { transform: translate(0,0); opacity:0.25; } 50% { transform: translate(-30px,-50px); opacity:0.45; } }
-        @keyframes ob-pulse-ring { 0%,100% { opacity:0.15; transform:scale(1); } 50% { opacity:0.3; transform:scale(1.05); } }
-        @keyframes ob-hold-pulse { 0%,100% { transform:scale(1); filter:brightness(1); } 50% { transform:scale(1.03); filter:brightness(1.25); } }
-        @keyframes ob-count-pop { 0% { transform:scale(0.5); opacity:0; } 40% { transform:scale(1.15); opacity:1; } 100% { transform:scale(1); opacity:1; } }
-        @keyframes ob-spin-cw { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes ob-spin-ccw { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
-      `}</style>
-
-      {/* Floating bokeh particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute rounded-full" style={{ width: 6, height: 6, background: 'rgba(167,139,250,0.4)', top: '15%', left: '20%', animation: 'ob-float-1 12s ease-in-out infinite' }} />
-        <div className="absolute rounded-full" style={{ width: 4, height: 4, background: 'rgba(129,140,248,0.3)', top: '25%', right: '15%', animation: 'ob-float-2 15s ease-in-out infinite 2s' }} />
-        <div className="absolute rounded-full" style={{ width: 8, height: 8, background: 'rgba(192,132,252,0.25)', bottom: '30%', left: '12%', animation: 'ob-float-3 18s ease-in-out infinite 1s' }} />
-        <div className="absolute rounded-full" style={{ width: 3, height: 3, background: 'rgba(196,181,253,0.35)', top: '60%', right: '25%', animation: 'ob-float-1 14s ease-in-out infinite 4s' }} />
-        <div className="absolute rounded-full" style={{ width: 5, height: 5, background: 'rgba(165,180,252,0.2)', bottom: '20%', right: '35%', animation: 'ob-float-2 16s ease-in-out infinite 3s' }} />
-      </div>
+      <ImmersiveParticles />
 
       {/* Exercise name */}
-      <p className="text-sm text-white/40 mb-8 font-medium tracking-widest uppercase">{exercise.name}</p>
+      <p className="text-sm text-white/40 mb-8 font-medium tracking-widest uppercase">{baseExercise.name}</p>
 
-      {/* Custom breathing circle */}
-      <div className="relative flex items-center justify-center" style={{ width: 280, height: 280 }}>
-        {/* Outer ambient glow ring */}
-        <div
-          className="absolute rounded-full transition-opacity duration-[2000ms]"
-          style={{
-            width: '105%', height: '105%',
-            background: 'conic-gradient(from 0deg, rgba(139,92,246,0.15), rgba(99,102,241,0.1), rgba(168,85,247,0.15), rgba(139,92,246,0.15))',
-            animation: 'ob-pulse-ring 4s ease-in-out infinite',
-            filter: 'blur(8px)',
-            opacity: glowOpacity,
-          }}
-        />
-
-        {/* Inner fixed ring — exhale boundary */}
-        <div
-          className="absolute rounded-full"
-          style={{ width: '40%', height: '40%', border: '1.5px solid rgba(167,139,250,0.2)' }}
-        />
-
-        {/* Hold direction ring — scales to match the breathing circle */}
-        {isHolding && (
-          <div
-            className="absolute rounded-full pointer-events-none"
-            style={{
-              width: '100%',
-              height: '100%',
-              transform: `scale(${breathPhase === 'inhale_hold' ? 1.04 : 0.47})`,
-              transition: 'transform 0.5s ease-out',
-              border: '2px solid rgba(167,139,250,0.18)',
-              borderTopColor: 'rgba(196,181,253,0.85)',
-              borderRightColor: 'rgba(196,181,253,0.1)',
-              borderBottomColor: 'rgba(167,139,250,0.45)',
-              borderLeftColor: 'rgba(196,181,253,0.08)',
-              boxShadow: '0 0 24px rgba(139,92,246,0.35)',
-              animation: breathPhase === 'inhale_hold'
-                ? 'ob-spin-cw 6s linear infinite'
-                : 'ob-spin-ccw 6s linear infinite',
-            }}
-          />
-        )}
-
-
-        {/* Animated breathing circle */}
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: '100%', height: '100%',
-            transform: `scale(${animatedScale})`,
-            transitionProperty: 'transform',
-            transitionTimingFunction: (isInhaling || isExhaling) ? 'linear' : 'ease-out',
-            transitionDuration: animDuration,
-            background: isHolding
-              ? (breathPhase === 'inhale_hold'
-                ? 'radial-gradient(circle at 40% 35%, rgba(168,85,247,0.3) 0%, rgba(139,92,246,0.2) 50%, rgba(99,102,241,0.1) 100%)'
-                : 'radial-gradient(circle at 40% 35%, rgba(99,102,241,0.25) 0%, rgba(79,70,229,0.15) 50%, rgba(67,56,202,0.08) 100%)')
-              : 'radial-gradient(circle at 40% 35%, rgba(139,92,246,0.25) 0%, rgba(99,102,241,0.15) 50%, rgba(79,70,229,0.08) 100%)',
-            boxShadow: `0 0 40px 10px rgba(139,92,246,${glowOpacity * 0.4}), 0 0 80px 30px rgba(99,102,241,${glowOpacity * 0.2}), inset 0 0 30px rgba(167,139,250,0.1)`,
-            backdropFilter: 'blur(4px)',
-            animation: isHolding ? `ob-hold-pulse ${phaseDuration}s ease-in-out infinite` : 'none',
-          }}
-        />
-
-        {/* Center content */}
-        <div className="absolute flex flex-col items-center justify-center z-10" style={{ width: '35%', height: '35%' }}>
-          {stage === 'countdown' ? (
-            <span
-              key={countdown}
-              className="text-4xl font-light text-white/90"
-              style={{ animation: 'ob-count-pop 0.5s ease-out', textShadow: '0 0 20px rgba(139,92,246,0.5)' }}
-            >
-              {countdown}
-            </span>
-          ) : stage === 'done' ? (
-            <span className="text-3xl animate-fade-in" style={{ textShadow: '0 0 20px rgba(139,92,246,0.5)' }}>✓</span>
-          ) : (
-            <>
-              <span
-                className={`${isHolding ? 'text-2xl' : 'text-xl'} font-light ${isHolding ? 'text-white/95' : 'text-white/90'} tracking-wider transition-all duration-300`}
-                style={{ textShadow: isHolding ? '0 0 20px rgba(168,85,247,0.5)' : '0 0 15px rgba(139,92,246,0.3)' }}
-              >
-                {currentP?.text || 'Inhale'}
-              </span>
-              {isHolding ? (
-                <>
-                  <span className="text-[10px] text-white/55 mt-1 tracking-widest uppercase">
-                    {breathPhase === 'inhale_hold' ? 'Rotate Right ↻' : 'Rotate Left ↺'}
-                  </span>
-                  <span className="text-xl text-white/70 mt-1 font-mono" style={{ textShadow: '0 0 12px rgba(139,92,246,0.4)' }}>{phaseTimeLeft}</span>
-                </>
-              ) : currentP?.method ? (
-                <span className="text-[10px] text-white/35 mt-1.5 px-2.5 py-0.5 rounded-full border border-white/10 tracking-wider uppercase">{currentP.method}</span>
-              ) : null}
-            </>
-          )}
-        </div>
-      </div>
+      {/* Reuse the real ImmersiveBreathingCircle */}
+      <ImmersiveBreathingCircle
+        phase={breathPhase}
+        phaseDuration={stage === 'running' ? phaseDuration : 0}
+        phaseText={
+          stage === 'done' ? '✓'
+          : stage === 'countdown' ? countdown.toString()
+          : (currentP?.text || 'Inhale')
+        }
+        methodText={stage === 'running' && !breathPhase.includes('hold') ? currentP?.method : undefined}
+        isCountingDown={stage === 'countdown'}
+        countdownValue={countdown}
+      />
 
       {/* Phase timer (below circle) */}
       {stage === 'running' && (
@@ -2183,9 +2065,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
             className="rounded-full transition-all duration-500"
             style={{
               width: 8, height: 8,
-              background: i < cycleCount
-                ? 'rgba(167,139,250,0.8)'
-                : 'rgba(167,139,250,0.15)',
+              background: i < cycleCount ? 'rgba(167,139,250,0.8)' : 'rgba(167,139,250,0.15)',
               boxShadow: i < cycleCount ? '0 0 8px rgba(167,139,250,0.4)' : 'none',
             }}
           />
