@@ -590,16 +590,11 @@ function MotivationalScreen({ step, onNext }: Props) {
             <FadeUp>
               <h1 className="text-[24px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight">{step.title}</h1>
             </FadeUp>
-            {step.subtitle && (
-              <FadeUp delay={0.08}>
-                <p className="text-[14px] text-gray-500 leading-relaxed text-center mb-4 whitespace-pre-line">{step.subtitle}</p>
-              </FadeUp>
-            )}
             {/* Before/After image inside the sheet */}
             {step.image && (
-              <FadeUp delay={0.12}>
+              <FadeUp delay={0.1}>
                 <div className="flex items-center justify-center mb-4">
-                  <img src={step.image} alt="" className="w-full object-contain rounded-2xl" style={{ maxHeight: 180 }} />
+                  <img src={step.image} alt="" className="w-full object-contain rounded-2xl" style={{ maxHeight: 280 }} />
                 </div>
               </FadeUp>
             )}
