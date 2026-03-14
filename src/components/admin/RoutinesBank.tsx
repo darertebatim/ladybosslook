@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
-import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles, Gift, Calendar, Flame, CalendarIcon } from 'lucide-react';
+import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles, Gift, Calendar, Flame, CalendarIcon, Upload } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
@@ -1600,6 +1600,56 @@ export default function RoutinesBank() {
 
             <TabsContent value="sections" className="flex-1 min-h-0 overflow-auto mt-0" style={{ maxHeight: 'calc(85vh - 240px)' }}>
               <div className="space-y-4 py-2 pr-4">
+                {/* Bulk sync unlinked tasks to task bank */}
+                {(() => {
+                  const unlinked = localTasks.filter(t => !t.task_id);
+                  if (unlinked.length === 0) return null;
+                  return (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full gap-2 text-orange-600 border-orange-200 hover:bg-orange-50"
+                      onClick={async () => {
+                        let synced = 0;
+                        for (const task of unlinked) {
+                          const scheduleDays = task.schedule_days || [];
+                          const repeatPattern = task.is_once ? 'none' : scheduleDays.length === 7 ? 'daily' : scheduleDays.length > 0 ? 'weekly' : 'daily';
+                          const { data: inserted, error } = await supabase
+                            .from('admin_task_bank')
+                            .insert({
+                              title: task.title,
+                              emoji: task.emoji || '📝',
+                              category: formData.category || 'general',
+                              color: task.color || formData.color || 'sky',
+                              repeat_pattern: repeatPattern,
+                              repeat_days: scheduleDays.length > 0 && scheduleDays.length < 7 ? scheduleDays : null,
+                              is_active: true,
+                              is_popular: false,
+                              sort_order: 0,
+                            })
+                            .select('id')
+                            .single();
+                          if (!error && inserted) {
+                            // Link the routine task to the new bank entry
+                            if (editingRoutine) {
+                              await supabase
+                                .from('routines_bank_tasks')
+                                .update({ task_id: inserted.id })
+                                .eq('id', task.id);
+                            }
+                            setLocalTasks(prev => prev.map(t => t.id === task.id ? { ...t, task_id: inserted.id } : t));
+                            synced++;
+                          }
+                        }
+                        queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
+                        toast.success(`Synced ${synced} task${synced !== 1 ? 's' : ''} to Action Bank`);
+                      }}
+                    >
+                      <Upload className="h-3.5 w-3.5" />
+                      Sync {unlinked.length} unlinked task{unlinked.length !== 1 ? 's' : ''} to Action Bank
+                    </Button>
+                  );
+                })()}
                 {/* Sections */}
                 {localSections.map((section, sIdx) => {
                     const sectionTasks = getTasksForSection(section.id);
