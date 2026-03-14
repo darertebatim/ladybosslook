@@ -74,7 +74,7 @@ interface PNLog {
 
 const scheduledPNs: PNType[] = [
   {
-    name: 'Smart Action Nudges',
+    name: 'Smart Task Nudges',
     function: 'local-smart-nudges',
     schedule: 'On app launch (local)',
     description: 'Random reminders from user\'s actual planner data: incomplete actions, proactions (journal, breathe, emotion), and water reminders. Scheduled between 8 AM - 8 PM.',
