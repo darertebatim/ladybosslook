@@ -302,7 +302,7 @@ export default function System() {
                 Complete Reset (Admin Testing)
               </CardTitle>
               <CardDescription>
-                Reset all user data to simulate a fresh "day one" experience. This clears actions, journal entries, chat history, wallet credits, and all other user-associated data.
+                Reset all user data to simulate a fresh "day one" experience. This clears tasks, journal entries, chat history, wallet credits, and all other user-associated data.
               </CardDescription>
             </CardHeader>
             <CardContent>
