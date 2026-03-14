@@ -190,7 +190,7 @@ export function BreathingExerciseScreen({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isActive, isPaused, isCountingDown, currentPhaseIndex, phases, selectedCycles, selectedMinutes, durationMode, handleComplete]);
+  }, [isActive, isPaused, isCountingDown, currentPhaseIndex, phases, selectedCycles, selectedMinutes, durationMode]);
 
   const handleComplete = useCallback(async (elapsed: number) => {
     saveSession.mutate(
