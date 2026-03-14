@@ -157,7 +157,7 @@ export default function AppInspireDetail() {
       });
       setShowPreviewSheet(false);
       setJustAdded(true);
-      toast.success(`${selectedTaskIds.length} actions added!`);
+      toast.success(`${selectedTaskIds.length} tasks added!`);
     } catch (error) {
       toast.error('Failed to add routine');
     }
