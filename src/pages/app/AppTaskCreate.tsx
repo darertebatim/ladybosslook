@@ -2076,7 +2076,7 @@ const AppTaskCreate = ({
                       setShowReflectionPicker(false);
                     }}
                     className={cn(
-                      'w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/80',
+                      'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
                       proLinkValue === reflection.id && 'bg-teal-100 dark:bg-teal-900/30'
                     )}
                   >
