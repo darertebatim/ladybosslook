@@ -16,6 +16,9 @@ import { ActionLimitSheet } from '@/components/app/ActionLimitSheet';
 import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { TaskDetailModal } from '@/components/app/TaskDetailModal';
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
+import { GoldStreakLostBanner } from '@/components/app/GoldStreakLostBanner';
+import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
+import { useSubscription } from '@/hooks/useSubscription';
 import type { UserTask, TaskTemplate } from '@/hooks/useTaskPlanner';
 import type { BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 
