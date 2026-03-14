@@ -91,25 +91,28 @@ export const TaskDetailModal = ({
   const isWater = isWaterTask(task);
   const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
 
-  const getRepeatText = () => {
+  const getRepeatLabel = (): string => {
     const p = task.repeat_pattern;
     if (!p || p === 'none') {
-      // Carry-forward: show original date
       if (task.scheduled_date) {
         const scheduledDate = parseISO(task.scheduled_date);
         if (isBefore(scheduledDate, startOfDay(date))) {
-          return `From ${fnsFormat(scheduledDate, 'MMM d')}`;
+          return fnsFormat(scheduledDate, 'MMM d');
         }
       }
-      return '';
+      return 'Today';
     }
-    const patterns: Record<string, string> = {
-      daily: 'Repeats every day',
-      weekly: 'Repeats every week',
-      monthly: 'Repeats every month',
-      weekend: 'Repeats on weekends',
-    };
-    return patterns[p] || '';
+    if (p === 'daily') return 'Daily';
+    if (p === 'weekly') return 'Weekly';
+    if (p === 'monthly') return 'Monthly';
+    if (p === 'weekend') return 'Weekends';
+    if (p === 'custom' && task.repeat_days?.length) {
+      const days = task.repeat_days.length;
+      if (days === 7) return 'Daily';
+      if (days === 5) return 'Weekdays';
+      return `${days}x/week`;
+    }
+    return 'Today';
   };
 
   const getReminderText = () => {
