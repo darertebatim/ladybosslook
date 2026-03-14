@@ -16,7 +16,7 @@ interface SuggestedRoutineCardProps {
 
 export function SuggestedRoutineCard({ routine }: SuggestedRoutineCardProps) {
   return (
-    <Card className="p-4 border-dashed border-2 border-violet-200 dark:border-violet-800 bg-violet-50/50 dark:bg-violet-950/20">
+    <Card className="p-4 border-dashed border-2 border-violet-200 dark:border-violet-800 bg-violet-50/50 dark:bg-violet-950/20 shadow-lg">
       <div className="flex items-center gap-3">
         <div className="h-12 w-12 rounded-xl bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center">
           {routine.emoji ? (
