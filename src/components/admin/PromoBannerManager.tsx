@@ -454,7 +454,7 @@ export function PromoBannerManager() {
       }
       case 'tasks': {
         const task = taskTemplates?.find(t => t.id === banner.destination_id);
-        return task ? `${task.emoji} ${task.title}` : 'Unknown Action';
+        return task ? `${task.emoji} ${task.title}` : 'Unknown Task';
       }
       case 'breathe_exercise': {
         const exercise = breathingExercises?.find(e => e.id === banner.destination_id);
