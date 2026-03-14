@@ -1991,7 +1991,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
       </div>
     );
   }
-
+  const phaseDuration = currentP?.duration || 3;
 
   // Determine background gradient based on phase
   const bgGradient = (() => {
