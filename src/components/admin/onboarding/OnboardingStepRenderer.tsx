@@ -2167,13 +2167,6 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                       </div>
                     </>
                   )}
-                        filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.25))',
-                        animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
-                      }}
-                    >
-                      <FluentEmoji emoji="👇" size={52} />
-                    </div>
-                  )}
                 </div>
               </FadeUp>
             );
