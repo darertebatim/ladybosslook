@@ -2222,14 +2222,14 @@ function StarterRoutineScreen({ step, onNext }: Props) {
             {hintPhase === 'check-bed' && <><FluentEmoji emoji="👆" size={20} /> Tap the circle to complete your first task!</>}
             {hintPhase === 'breathe' && <><FluentEmoji emoji="🫁" size={20} /> Now tap the Breathe button to try it!</>}
             {hintPhase === 'mood' && <><FluentEmoji emoji="🌤️" size={20} /> Now check in with your mood!</>}
-            {hintPhase === 'done' && <><FluentEmoji emoji="✨" size={20} /> You're getting the hang of it!</>}
+            {hintPhase === 'done' && <><FluentEmoji emoji="✨" size={20} /> Tap Continue to keep going!</>}
           </p>
         </FadeUp>
 
         {/* Task Cards with spotlight effect */}
         <div className="space-y-3 relative">
           {/* Dark spotlight overlay */}
-          {(hintPhase === 'check-bed' || hintPhase === 'breathe' || hintPhase === 'mood') && (
+          {(hintPhase === 'check-bed' || hintPhase === 'breathe' || hintPhase === 'mood' || hintPhase === 'done') && (
             <div className="fixed inset-0 z-30 bg-black/50 pointer-events-none" style={{ animation: 'fadeIn 0.5s ease-out' }} />
           )}
 
@@ -2365,9 +2365,9 @@ function StarterRoutineScreen({ step, onNext }: Props) {
         </div>
       </div>
 
-      {/* CTA - only show after hints are done */}
+      {/* CTA - spotlighted after hints are done */}
       {hintPhase === 'done' && (
-        <FadeUp delay={0.2} className="px-6 pb-6 pt-2">
+        <FadeUp delay={0.2} className="px-6 pb-6 pt-2 relative z-40">
           <NavyButton onClick={onNext}>Continue</NavyButton>
         </FadeUp>
       )}
