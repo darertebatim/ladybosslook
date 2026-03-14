@@ -349,22 +349,54 @@ export function BreathingExerciseScreen({
         <div className="relative z-20 px-6 pb-safe mb-8">
           {!isActive && !isCountingDown && (
             <div className="mb-4 animate-fade-in">
-              <h4 className="text-sm font-medium text-white/40 mb-3 text-center tracking-widest uppercase">Cycles</h4>
-              <div className="grid grid-cols-4 gap-2">
-                {CYCLE_OPTIONS.map((option) => (
+              {/* Tab switcher */}
+              <div className="flex justify-center gap-1 mb-3">
+                {(['minutes', 'cycles'] as DurationMode[]).map((mode) => (
                   <button
-                    key={option.value}
-                    onClick={() => { setSelectedCycles(option.value); haptic.light(); }}
+                    key={mode}
+                    onClick={() => { setDurationMode(mode); haptic.light(); }}
                     className={cn(
-                      'py-3 px-2 rounded-xl text-sm font-medium transition-all',
-                      selectedCycles === option.value
-                        ? 'bg-purple-500/80 text-white'
-                        : 'bg-white/10 text-white/60'
+                      'px-4 py-1.5 rounded-full text-xs font-medium transition-all uppercase tracking-wider',
+                      durationMode === mode
+                        ? 'bg-white/20 text-white'
+                        : 'text-white/40'
                     )}
                   >
-                    {option.label}
+                    {mode === 'minutes' ? 'Minutes' : 'Cycles'}
                   </button>
                 ))}
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                {durationMode === 'cycles'
+                  ? CYCLE_OPTIONS.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => { setSelectedCycles(option.value); haptic.light(); }}
+                        className={cn(
+                          'py-3 px-2 rounded-xl text-sm font-medium transition-all',
+                          selectedCycles === option.value
+                            ? 'bg-purple-500/80 text-white'
+                            : 'bg-white/10 text-white/60'
+                        )}
+                      >
+                        {option.label}
+                      </button>
+                    ))
+                  : MINUTE_OPTIONS.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => { setSelectedMinutes(option.value); haptic.light(); }}
+                        className={cn(
+                          'py-3 px-2 rounded-xl text-sm font-medium transition-all',
+                          selectedMinutes === option.value
+                            ? 'bg-purple-500/80 text-white'
+                            : 'bg-white/10 text-white/60'
+                        )}
+                      >
+                        {option.label}
+                      </button>
+                    ))
+                }
               </div>
             </div>
           )}
@@ -376,8 +408,17 @@ export function BreathingExerciseScreen({
                 className="h-2 bg-white/10 [&>div]:bg-purple-400"
               />
               <div className="flex justify-between mt-2 text-sm text-white/40">
-                <span>{cycleCount} done</span>
-                <span>{selectedCycles} total</span>
+                {durationMode === 'cycles' ? (
+                  <>
+                    <span>{cycleCount} done</span>
+                    <span>{selectedCycles} total</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{Math.floor(totalElapsed / 60)}:{String(totalElapsed % 60).padStart(2, '0')}</span>
+                    <span>{selectedMinutes}:00</span>
+                  </>
+                )}
               </div>
             </div>
           )}
