@@ -2749,15 +2749,15 @@ function LoopWheel() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 + i * 0.15, type: 'spring', stiffness: 200, damping: 15 }}
             className="absolute flex flex-col items-center"
-            style={{ left: x, top: y, width: 56 }}
+            style={{ left: x, top: y, width: 50 }}
           >
             <div
-              className="w-[52px] h-[52px] rounded-2xl flex items-center justify-center shadow-md"
+              className="w-[46px] h-[46px] rounded-2xl flex items-center justify-center shadow-md"
               style={{ backgroundColor: task.color }}
             >
-              <FluentEmoji emoji={task.emoji} size={28} />
+              <FluentEmoji emoji={task.emoji} size={24} />
             </div>
-            <span className="text-[10px] font-semibold text-[#1a1f3d]/70 mt-1 text-center leading-tight">
+            <span className="text-[9px] font-semibold text-[#1a1f3d]/70 mt-0.5 text-center leading-tight">
               {task.title}
             </span>
           </motion.div>
