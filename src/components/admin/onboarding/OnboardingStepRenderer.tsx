@@ -236,7 +236,12 @@ function WelcomeScreen({ step, onNext }: Props) {
           <p className="text-[17px] font-semibold text-[#1a1f3d] text-center mb-4 leading-relaxed max-w-[260px] whitespace-pre-line">{step.subtitle}</p>
         </FadeUp>
         <FadeUp delay={0.3} className="relative z-10">
-          <img src={appIcon} alt="Simora" className="w-14 h-14 rounded-2xl shadow-lg mb-4 mx-auto" />
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <img src={appIcon} alt="Simora" className="w-14 h-14 rounded-2xl shadow-lg" />
+            <p className="text-[15px] text-[#1a1f3d] font-medium leading-snug">
+              Your <span className="font-extrabold text-orange-500">FREE</span><br />Routine Planner
+            </p>
+          </div>
         </FadeUp>
         <FadeUp delay={0.4} className="mt-auto w-full relative z-10">
           <button
