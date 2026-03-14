@@ -111,8 +111,8 @@ export function RoutineBankCard({
         )}
         onClick={handleClick}
       >
-        {/* Title Header Section - hidden in coverOnly mode */}
-        {!coverOnly && (
+        {/* Title Header Section - hidden in coverOnly mode or when cover is 6x4 */}
+        {!coverOnly && routine.cover_aspect !== '6x4' && (
           <div className={cn(
             'px-3 py-3 rounded-t-2xl h-[5rem] flex items-start',
             bgColor
