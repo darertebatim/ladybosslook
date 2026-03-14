@@ -1992,13 +1992,6 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     );
   }
 
-  // Stages: countdown, running, done — show BreathingCircle
-  const circlePhase: 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold' | 'ready' =
-    stage === 'countdown' ? 'ready' : stage === 'done' ? 'ready' : breathPhase;
-  const phaseDuration = currentP?.duration || 3;
-  const phaseText = stage === 'countdown' ? countdown.toString() : stage === 'done' ? '✓' : (currentP?.text || 'Inhale');
-  const methodText = stage === 'running' ? currentP?.method : undefined;
-  const holdCountdown = stage === 'running' && breathPhase.includes('hold') ? phaseTimeLeft : undefined;
 
   // Determine background gradient based on phase
   const bgGradient = (() => {
