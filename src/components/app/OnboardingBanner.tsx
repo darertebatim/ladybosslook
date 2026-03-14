@@ -21,7 +21,7 @@ export function OnboardingBanner() {
   const handleTap = () => {
     haptic.medium();
     localStorage.removeItem(ONBOARDING_PROGRESS_KEY);
-    navigate('/app/onboarding/me-plus-v1');
+    navigate('/app/onboarding/quick-start-v1');
   };
 
   const handleDismiss = (e: React.MouseEvent) => {
