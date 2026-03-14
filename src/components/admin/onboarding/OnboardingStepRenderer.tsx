@@ -2937,7 +2937,7 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
 
       {/* Description */}
       <FadeUp delay={0.1}>
-        <p className="text-[15px] text-[#1a1f3d]/55 leading-relaxed text-center mb-3">
+        <p className="text-[16px] text-[#1a1f3d] leading-relaxed text-center mb-3">
           A simple daily routine to help you reset, refocus,<br />and start each day with intention.
         </p>
       </FadeUp>
