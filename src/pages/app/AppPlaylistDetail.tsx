@@ -775,7 +775,7 @@ export default function AppPlaylistDetail() {
             </div>
             {playlist.program_slug && (
               <Button 
-                className="w-full bg-white text-[#132240] hover:bg-white/90 active:bg-white/80" 
+                className="w-full bg-white text-[#132240] active:bg-white/80" 
                 size="lg"
                 onClick={() => navigate(`/app/programs/${playlist.program_slug}`)}
               >
