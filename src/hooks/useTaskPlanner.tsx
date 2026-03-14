@@ -665,7 +665,7 @@ export const useCreateTask = () => {
     },
     onError: (error) => {
       console.error('Create task error:', error);
-      toast({ title: 'Failed to create action', variant: 'destructive' });
+      toast({ title: 'Failed to create task', variant: 'destructive' });
     },
   });
 };
