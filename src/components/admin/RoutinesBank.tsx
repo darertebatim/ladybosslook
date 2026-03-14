@@ -1915,7 +1915,7 @@ export default function RoutinesBank() {
                           </div>
                           <div className="p-2 space-y-1">
                             {dailyTasks.length === 0 && (
-                              <p className="text-center text-muted-foreground text-xs py-2">No daily actions</p>
+                              <p className="text-center text-muted-foreground text-xs py-2">No daily tasks</p>
                             )}
                             {dailyTasks.map((task, tIdx) => renderTaskRow(task, tIdx, dailyTasks.length, null))}
                           </div>
