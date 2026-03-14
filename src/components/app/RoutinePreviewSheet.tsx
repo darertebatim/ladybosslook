@@ -15,6 +15,23 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { ActionLimitSheet, hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
+import { formatTimeLabel } from '@/lib/taskScheduling';
+
+// Secondary (darker) palette for card footer strips
+const TASK_COLOR_DARK_CLASSES: Record<string, string> = {
+  pink: 'bg-[#FFB8D9]',
+  peach: 'bg-[#FFD1A3]',
+  yellow: 'bg-[#FFE97D]',
+  lime: 'bg-[#D4EB82]',
+  sky: 'bg-[#A3D5F2]',
+  mint: 'bg-[#8EECD0]',
+  lavender: 'bg-[#D4B8F0]',
+  purple: 'bg-[#D4B8F0]',
+  blue: 'bg-[#A3D5F2]',
+  red: 'bg-[#FFB8D9]',
+  orange: 'bg-[#FFD1A3]',
+  green: 'bg-[#D4EB82]',
+};
 
 // Color cycle for variety in planner (used when no specific color is set)
 export const ROUTINE_COLOR_CYCLE: TaskColor[] = [
@@ -231,21 +248,35 @@ export function RoutinePreviewSheet({
   const WEEKDAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const getRepeatLabel = (task: RoutinePlanTask, pattern: string) => {
+    // Build base repeat text
+    let repeatText = '';
     switch (pattern) {
-      case 'daily': return 'Repeats every day';
+      case 'daily': repeatText = 'Repeats every day'; break;
       case 'weekly': {
         const days = (task as any).repeat_days as number[] | null;
         if (days && days.length > 0) {
           const dayNames = days.map(d => WEEKDAY_NAMES[d] || `Day ${d}`).join(', ');
-          return `Repeats every week on ${dayNames}`;
+          repeatText = `Repeats every week on ${dayNames}`;
+        } else {
+          repeatText = 'Repeats every week';
         }
-        return 'Repeats every week';
+        break;
       }
-      case 'monthly': return 'Repeats every month';
+      case 'monthly': repeatText = 'Repeats every month'; break;
       case 'none':
-      case 'once': return 'Repeat is off';
-      default: return 'Repeats every day';
+      case 'once': repeatText = 'One-time action'; break;
+      default: repeatText = 'Repeats every day';
     }
+    
+    // Append end date if available
+    if (endMode === 'date' && endDate) {
+      const d = new Date(endDate + 'T00:00:00');
+      repeatText += ` until ${format(d, 'MMM dd, yyyy')}`;
+    } else if (endMode === 'after_days' && endAfterDays) {
+      repeatText += ` for ${endAfterDays} day${endAfterDays !== 1 ? 's' : ''}`;
+    }
+    
+    return repeatText;
   };
 
   // Find the task being edited
@@ -255,13 +286,21 @@ export function RoutinePreviewSheet({
     const isSelected = selectedTaskIds.has(task.id);
     const display = getTaskDisplay(task, index);
     const colorClass = TASK_COLOR_CLASSES[display.color];
+    const darkColorClass = TASK_COLOR_DARK_CLASSES[display.color] || 'bg-black/10';
+    const edited = editedTasks[task.id];
+    
+    // Time label
+    const timeLabel = formatTimeLabel({
+      scheduled_time: edited?.scheduledTime ?? (task as any).scheduled_time ?? null,
+      time_period: (task as any).time_period ?? null,
+    });
     
     return (
       <div key={task.id} className="flex items-start gap-3">
         <button
           onClick={() => toggleTask(task.id)}
           className={cn(
-            'w-6 h-6 mt-3 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors',
+            'w-7 h-7 mt-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors',
             isSelected 
               ? 'bg-emerald-500 border-emerald-500' 
               : 'border-muted-foreground/40 bg-transparent'
@@ -270,31 +309,29 @@ export function RoutinePreviewSheet({
           {isSelected && <Check className="w-4 h-4 text-white" />}
         </button>
         <div className={cn(
-          'flex-1 rounded-xl border border-border/50 overflow-hidden',
+          'flex-1 rounded-2xl overflow-hidden',
           colorClass
         )}>
-          <div className="flex items-center gap-3 p-3">
-            <FluentEmoji emoji={display.icon || '📝'} size={28} className="shrink-0" />
+          {/* Main content area */}
+          <div className="flex items-center gap-3 px-3 pt-3 pb-2.5">
+            <FluentEmoji emoji={display.icon || '📝'} size={40} className="shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-black truncate">{display.title}</p>
-              <p className="text-xs text-black/70 truncate">
-                {getRepeatLabel(task, display.repeatPattern)}
-              </p>
+              <p className="text-xs font-medium text-black/60 mb-0.5">{timeLabel}</p>
+              <p className="font-semibold text-[15px] text-black leading-snug line-clamp-2">{display.title}</p>
             </div>
             <button 
-              className="shrink-0 p-2 text-black/60 hover:text-black"
+              className="shrink-0 w-8 h-8 rounded-full bg-white/50 flex items-center justify-center text-black/50 hover:text-black hover:bg-white/70 transition-colors"
               onClick={() => openTaskEditor(task, index)}
             >
-              <Pencil className="w-4 h-4" />
+              <Pencil className="w-3.5 h-3.5" />
             </button>
           </div>
-          {task.description && (
-            <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
-              <p className="text-xs text-black/80 leading-relaxed">
-                {task.description}
-              </p>
-            </div>
-          )}
+          {/* Footer strip with repeat info */}
+          <div className={cn('px-4 py-2', darkColorClass)}>
+            <p className="text-xs font-medium text-black/70">
+              {getRepeatLabel(task, display.repeatPattern)}
+            </p>
+          </div>
         </div>
       </div>
     );
