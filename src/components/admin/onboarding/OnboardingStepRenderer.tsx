@@ -2663,80 +2663,88 @@ function PersonalizedPlanScreen({ step, onNext, answers }: { step: OnboardingSte
 
 // ─── Daily Reset Prompt ────────────────────────────────────────
 
+const DAILY_RESET_TASKS = [
+  { emoji: '📱', title: 'Open Ladyboss App', color: '#FFEDD5' },
+  { emoji: '🫁', title: 'Breathing exercise', color: '#DBEAFE' },
+  { emoji: '🌤️', title: 'Check in with your mood', color: '#FEF3C7' },
+  { emoji: '📝', title: 'Write a short journaling', color: '#F3E8FF' },
+  { emoji: '✅', title: 'Complete onboarding', color: '#D1FAE5' },
+];
+
 function DailyResetPromptScreen({ step, onNext }: Props) {
-  const [enabled, setEnabled] = useState(false);
+  const [added, setAdded] = useState(false);
 
-  const handleEnable = () => {
-    setEnabled(true);
-    // Store preference
+  const handleAdd = () => {
+    setAdded(true);
     try { localStorage.setItem('simora_daily_reset_enabled', 'true'); } catch {}
-    setTimeout(onNext, 400);
-  };
-
-  const handleSkip = () => {
-    try { localStorage.setItem('simora_daily_reset_enabled', 'false'); } catch {}
-    onNext();
+    setTimeout(onNext, 800);
   };
 
   return (
-    <ScreenWrapper center>
-      <div className="flex flex-col items-center text-center flex-1 justify-center gap-6">
-        {/* Icon */}
+    <div className="h-full flex flex-col bg-white">
+      <div className="flex-1 flex flex-col px-6 pt-8 pb-4 overflow-y-auto">
+        {/* Header */}
         <FadeUp>
-          <div className="w-20 h-20 rounded-[22px] bg-[#f0f4e8] flex items-center justify-center">
-            <FluentEmoji emoji="🔄" size={44} />
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-14 h-14 rounded-2xl bg-[#e8efd8] flex items-center justify-center shrink-0">
+              <FluentEmoji emoji="🔄" size={32} />
+            </div>
+            <div>
+              <h1 className="text-[22px] font-extrabold text-[#1a1f3d] leading-tight">Daily Reset</h1>
+              <p className="text-[13px] text-[#1a1f3d]/50 mt-0.5">5 daily actions · resets every morning</p>
+            </div>
           </div>
         </FadeUp>
 
-        {/* Title */}
+        {/* Description */}
         <FadeUp delay={0.1}>
-          <h1 className="text-[26px] font-bold text-[#1a1f3d] leading-tight">
-            {step.title || 'Enable Daily Reset?'}
-          </h1>
+          <p className="text-[15px] text-[#1a1f3d]/60 leading-relaxed mt-4 mb-6">
+            A simple daily routine to help you reset, refocus, and start each day with intention.
+          </p>
         </FadeUp>
 
-        {/* Subtitle */}
+        {/* Task list */}
         <FadeUp delay={0.2}>
-          <p className="text-[15px] text-[#1a1f3d]/60 leading-relaxed px-4 max-w-[320px]">
-            {step.subtitle || 'Your routine resets every morning so you can start each day fresh.'}
-          </p>
-        </FadeUp>
-
-        {/* Routine card preview */}
-        <FadeUp delay={0.3}>
-          <div className="bg-[#fafaf5] rounded-2xl p-4 flex items-center gap-3 w-full max-w-[300px] shadow-sm border border-black/5">
-            <div className="w-12 h-12 rounded-xl bg-[#e8efd8] flex items-center justify-center shrink-0">
-              <FluentEmoji emoji="🔄" size={28} />
-            </div>
-            <div className="text-left">
-              <p className="font-semibold text-[15px] text-[#1a1f3d]">Daily Reset</p>
-              <p className="text-[12px] text-[#1a1f3d]/50">🗒️ wellness • 5 tasks</p>
-            </div>
-            {enabled && (
+          <div className="space-y-2">
+            {DAILY_RESET_TASKS.map((task, i) => (
               <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="ml-auto"
+                key={task.title}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.25 + i * 0.08, duration: 0.3 }}
+                className="flex items-center gap-3 rounded-2xl p-3"
+                style={{ backgroundColor: task.color + '60' }}
               >
-                <SealCheck className="w-7 h-7" />
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: task.color }}
+                >
+                  <FluentEmoji emoji={task.emoji} size={22} />
+                </div>
+                <p className="font-semibold text-[14px] text-[#1a1f3d]">{task.title}</p>
               </motion.div>
-            )}
+            ))}
           </div>
-        </FadeUp>
-
-        {/* Info text */}
-        <FadeUp delay={0.4}>
-          <p className="text-[13px] text-[#1a1f3d]/40 px-6 max-w-[300px]">
-            All tasks will uncheck automatically each morning, ready for a new day.
-          </p>
         </FadeUp>
       </div>
 
-      {/* Buttons */}
-      <FadeUp delay={0.5} className="px-1 pb-2 pt-4">
-        <NavyButton onClick={handleEnable}>{step.buttonLabel || 'Yes, enable it'}</NavyButton>
-        <SecondaryButton onClick={handleSkip}>{step.secondaryButtonLabel || 'Maybe later'}</SecondaryButton>
+      {/* Bottom button */}
+      <FadeUp delay={0.6} className="px-6 pb-6 pt-3">
+        {!added ? (
+          <NavyButton onClick={handleAdd}>
+            Add to my routine
+          </NavyButton>
+        ) : (
+          <motion.div
+            initial={{ scale: 0.95 }}
+            animate={{ scale: 1 }}
+            className="w-full py-4 rounded-2xl bg-emerald-500 text-white font-bold text-base flex items-center justify-center gap-2"
+          >
+            <SealCheck className="w-5 h-5" />
+            Added!
+          </motion.div>
+        )}
       </FadeUp>
-    </ScreenWrapper>
+    </div>
   );
 }
