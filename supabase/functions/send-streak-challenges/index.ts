@@ -97,7 +97,7 @@ function getFirstWeekNotification(
   if (daysSinceSignup > 7) return null;
 
   if (daysSinceSignup <= 1 && !hasAnyCompletion) {
-    return { scenario: 'first_week_day1', priority: 1, title: '🌱 Your First Step', body: 'Your first action is waiting. Just one tap to start.' };
+    return { scenario: 'first_week_day1', priority: 1, title: '🌱 Your First Step', body: 'Your first task is waiting. Just one tap to start.' };
   }
   if (daysSinceSignup === 2 && cameYesterday) {
     return { scenario: 'first_week_day2', priority: 1, title: '🌱 Day 2!', body: "Day 2! You came back. That's already more than most." };
