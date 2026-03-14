@@ -2149,7 +2149,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const handleCheckApp = () => {
     if (phase !== 'hint-app' && phase !== 'spotlight-app') return;
     setPhase('celebrate-app');
-    triggerCelebration(0, 'spotlight-breathe');
+    triggerCelebration(0, 'spotlight-mood');
   };
 
   const handleBreatheTap = () => {
