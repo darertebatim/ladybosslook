@@ -3078,6 +3078,7 @@ export type Database = {
           category: string
           challenge_start_date: string | null
           color: string | null
+          cover_aspect: string
           cover_image_url: string | null
           created_at: string | null
           description: string | null
@@ -3104,6 +3105,7 @@ export type Database = {
           category?: string
           challenge_start_date?: string | null
           color?: string | null
+          cover_aspect?: string
           cover_image_url?: string | null
           created_at?: string | null
           description?: string | null
@@ -3130,6 +3132,7 @@ export type Database = {
           category?: string
           challenge_start_date?: string | null
           color?: string | null
+          cover_aspect?: string
           cover_image_url?: string | null
           created_at?: string | null
           description?: string | null

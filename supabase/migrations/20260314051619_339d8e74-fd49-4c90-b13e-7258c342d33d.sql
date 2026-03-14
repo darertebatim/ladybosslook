@@ -1,0 +1,1 @@
+ALTER TABLE public.routines_bank ADD COLUMN cover_aspect text NOT NULL DEFAULT 'square';
