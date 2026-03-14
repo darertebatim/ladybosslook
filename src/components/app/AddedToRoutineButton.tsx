@@ -64,7 +64,7 @@ export const AddedToRoutineButton = ({
       case 'outline':
         return "bg-urgency text-urgency-foreground border-0";
       default:
-        return "bg-urgency hover:bg-urgency/90 text-urgency-foreground";
+        return "bg-urgency text-urgency-foreground";
     }
   };
 
