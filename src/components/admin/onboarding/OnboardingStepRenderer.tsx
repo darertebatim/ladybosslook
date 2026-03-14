@@ -2106,14 +2106,14 @@ function StarterRoutineScreen({ step, onNext }: Props) {
     }
   }, [phase]);
 
-  // Spotlight → Hint delays
+  // Spotlight → Hint delays (not rushed)
   useEffect(() => {
     if (phase === 'spotlight-app') {
-      addTimer(() => setPhase('hint-app'), 500);
+      addTimer(() => setPhase('hint-app'), 800);
     } else if (phase === 'spotlight-breathe') {
-      addTimer(() => setPhase('hint-breathe'), 500);
+      addTimer(() => setPhase('hint-breathe'), 800);
     } else if (phase === 'spotlight-mood') {
-      addTimer(() => setPhase('hint-mood'), 500);
+      addTimer(() => setPhase('hint-mood'), 800);
     }
   }, [phase]);
 
