@@ -1968,8 +1968,15 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
 
   const currentP = phasesRef.current[currentPhaseIdx.current];
 
-  // Cast exercise to BreathingExercise type for the info sheet
-  const exerciseTyped = exercise as import('@/hooks/useBreathingExercises').BreathingExercise;
+  // Use normalized Welcome Breathing values in the guide sheet
+  const exerciseTyped = {
+    ...exercise,
+    name: 'Welcome Breathing',
+    inhale_seconds: inhaleSeconds,
+    inhale_hold_seconds: normalizedInhaleHold,
+    exhale_seconds: exhaleSeconds,
+    exhale_hold_seconds: normalizedExhaleHold,
+  } as import('@/hooks/useBreathingExercises').BreathingExercise;
 
   // Stage: info sheet
   if (stage === 'info') {
