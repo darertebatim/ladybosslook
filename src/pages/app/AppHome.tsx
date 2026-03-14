@@ -102,6 +102,8 @@ const AppHome = () => {
   const setStreakGoal = useSetStreakGoal();
   const recoverStreak = useRecoverStreak();
   const [showRecoveryPrompt, setShowRecoveryPrompt] = useState(false);
+  const [showGoldRecoveryPrompt, setShowGoldRecoveryPrompt] = useState(false);
+  const [showRecoverySuccess, setShowRecoverySuccess] = useState<'streak' | 'gold' | null>(null);
 
 
   // Gold streak celebration state - use localStorage to prevent re-showing on navigation
@@ -317,6 +319,23 @@ const AppHome = () => {
     sessionStorage.setItem(shownKey, 'true');
     setTimeout(() => setShowRecoveryPrompt(true), 1200);
   }, [streak]);
+
+  // Auto-show gold streak recovery prompt when gold streak is broken
+  useEffect(() => {
+    if (!goldStreakData) return;
+    if (!streak) return;
+    // Gold streak is currently 0 but was previously > 0
+    if (goldStreakData.currentGoldStreak !== 0) return;
+    if (goldStreakData.longestGoldStreak <= 0) return;
+    // Check if last gold date exists and is not today/yesterday (meaning streak broke)
+    if (!goldStreakData.lastGoldDate) return;
+    const recoveryCount = (streak as any).streak_recovery_count || 0;
+    if (recoveryCount >= 3) return;
+    const shownKey = 'simora_gold_recovery_prompt_shown';
+    if (sessionStorage.getItem(shownKey) === 'true') return;
+    sessionStorage.setItem(shownKey, 'true');
+    setTimeout(() => setShowGoldRecoveryPrompt(true), 1500);
+  }, [goldStreakData, streak]);
 
   // Featured routines for promo banners (only dismiss on tap/close, not on adoption)
   const {
@@ -1246,6 +1265,11 @@ const AppHome = () => {
           showRecoveryPrompt={showRecoveryPrompt}
           setShowRecoveryPrompt={setShowRecoveryPrompt}
           recoverStreak={recoverStreak}
+          showGoldRecoveryPrompt={showGoldRecoveryPrompt}
+          setShowGoldRecoveryPrompt={setShowGoldRecoveryPrompt}
+          showRecoverySuccess={showRecoverySuccess}
+          setShowRecoverySuccess={setShowRecoverySuccess}
+          previousGoldStreak={goldStreakData?.longestGoldStreak || 0}
           userId={user?.id}
           showNotificationFlow={showNotificationFlow}
           setShowNotificationFlow={setShowNotificationFlow}
