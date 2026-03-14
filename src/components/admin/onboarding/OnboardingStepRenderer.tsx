@@ -19,6 +19,7 @@ import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
 import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
 import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
 import meplusPlanMascot from '@/assets/onboarding/meplus-plan-mascot.png';
+import beforeAfterComparison from '@/assets/onboarding/before-after-comparison.png';
 import { TaskCard } from '@/components/app/TaskCard';
 import { format } from 'date-fns';
 
