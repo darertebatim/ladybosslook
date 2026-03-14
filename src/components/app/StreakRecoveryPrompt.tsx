@@ -95,7 +95,7 @@ export const StreakRecoveryPrompt = ({
         <Button
           onClick={handleRecover}
           disabled={isLoading}
-          className="w-full bg-white hover:bg-white/90 text-orange-600 font-semibold py-3 rounded-xl mb-3"
+          className="w-full bg-white text-orange-600 font-semibold py-3 rounded-xl mb-3"
         >
           🛡️ Recover My Streak
         </Button>
