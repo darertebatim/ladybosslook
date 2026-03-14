@@ -140,7 +140,9 @@ export function BreathingExerciseScreen({
           clearInterval(timer);
           setIsCountingDown(false);
           setIsActive(true);
-          setPhaseTimeRemaining(phases[0]?.duration || 4);
+          const initialPhaseDuration = phases[0]?.duration || 4;
+          phaseTimeRemainingRef.current = initialPhaseDuration;
+          setPhaseTimeRemaining(initialPhaseDuration);
           startTimeRef.current = Date.now();
           haptic.medium();
           return 0;
