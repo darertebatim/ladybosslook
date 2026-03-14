@@ -26,7 +26,7 @@ const specialBanners: SpecialBanner[] = [
   {
     name: 'Simora Onboarding',
     component: 'OnboardingBanner',
-    location: 'Home (above My Actions)',
+    location: 'Home (above My Tasks)',
     description: 'Guides new users through the onboarding flow. Features the Simora mascot with a notepad illustration.',
     conditions: [
       'Shown only to users who haven\'t completed onboarding',
