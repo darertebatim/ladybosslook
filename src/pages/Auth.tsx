@@ -13,6 +13,7 @@ import { ArrowLeft, Mail } from 'lucide-react';
 import appIcon from '@/assets/app-icon.png';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { Capacitor } from '@capacitor/core';
+import { isNativeApp } from '@/lib/platform';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -47,12 +48,18 @@ export default function Auth() {
   const searchParams = new URLSearchParams(window.location.search);
   const redirectPath = searchParams.get('redirect') || '/app/home';
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated, or to onboarding if not seen yet
   useEffect(() => {
     if (user) {
       navigate(redirectPath);
+    } else if (!authLoading) {
+      // First-time native users should see onboarding before auth
+      const hasSeenOnboarding = localStorage.getItem('simora_onboarding_completed_quick-start-v1') === 'true';
+      if (isNativeApp() && !hasSeenOnboarding) {
+        navigate('/app/onboarding/quick-start-v1', { replace: true });
+      }
     }
-  }, [user, navigate, redirectPath]);
+  }, [user, authLoading, navigate, redirectPath]);
 
   // Show branded splash while checking auth state (prevents flash of login form)
   if (authLoading) {
