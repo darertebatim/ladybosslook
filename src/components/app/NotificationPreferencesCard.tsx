@@ -175,7 +175,7 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
                 {/* Daily Actions Section */}
                 <div className="space-y-1">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                    Daily Actions
+                     Daily Tasks
                   </p>
                   
                   <PreferenceItem
