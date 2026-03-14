@@ -53,7 +53,7 @@ export const GoldStreakLostBanner = ({
       >
         <button
           onClick={() => { haptic.light(); onDismiss(); }}
-          className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-white/60 transition-colors"
         >
           <X className="h-5 w-5" />
         </button>
