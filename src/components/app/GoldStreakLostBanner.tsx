@@ -103,7 +103,7 @@ export const GoldStreakLostBanner = ({
             <Button
               onClick={() => { haptic.light(); onDismiss(); }}
               variant="ghost"
-              className="w-full text-white bg-white/15 hover:bg-white/25 text-xs font-medium rounded-xl"
+              className="w-full text-white bg-white/15 text-xs font-medium rounded-xl"
             >
               Let the gold streak reset
             </Button>
