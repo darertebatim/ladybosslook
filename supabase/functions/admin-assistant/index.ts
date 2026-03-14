@@ -348,14 +348,14 @@ async function createActionInBank(supabase: any, args: any) {
   }).select("id, title, emoji, category").single();
 
   if (error) {
-    console.error("Insert action error:", error);
+    console.error("Insert task error:", error);
     return { success: false, error: error.message, action: "create_action_in_bank" };
   }
 
   return {
     success: true,
     action: "create_action_in_bank",
-    message: `Created action "${data.title}" in ${data.category} category`,
+    message: `Created task "${data.title}" in ${data.category} category`,
     created: data,
   };
 }
