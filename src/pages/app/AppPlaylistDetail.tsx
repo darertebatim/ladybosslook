@@ -736,7 +736,7 @@ export default function AppPlaylistDetail() {
               </p>
             </div>
             <Button 
-              className="w-full bg-white text-[#132240] hover:bg-white/90 active:bg-white/80" 
+              className="w-full bg-white text-[#132240] active:bg-white/80" 
               size="lg"
               onClick={() => activatePlaylistMutation.mutate()}
               disabled={activatePlaylistMutation.isPending}
