@@ -309,7 +309,7 @@ export default function TasksBank() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
-      toast.success('Action created');
+      toast.success('Task created');
       closeSheet();
     },
     onError: (error) => {
