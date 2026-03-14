@@ -131,7 +131,7 @@ function SurveyStep({
                 'w-full flex items-center gap-3 p-4 rounded-2xl bg-card text-left transition-all',
                 selectedReason === i
                   ? 'ring-2 ring-primary bg-primary/5'
-                  : 'hover:bg-muted/50'
+                  : ''
               )}
             >
               <FluentEmoji emoji={reason.emoji} size={28} />
