@@ -99,7 +99,7 @@ export function ImmersiveBreathingCircle({
           </div>
         )}
 
-        {/* Animated breathing circle — solid radial gradient */}
+        {/* Animated breathing circle — uses CSS transition like classic */}
         <div
           className="absolute rounded-full"
           style={{

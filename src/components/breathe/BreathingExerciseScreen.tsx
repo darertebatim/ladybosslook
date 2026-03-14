@@ -160,14 +160,6 @@ export function BreathingExerciseScreen({
     return () => clearInterval(timer);
   }, [isCountingDown, phases]);
 
-  // Use refs for values that change every tick to avoid recreating the interval
-  const currentPhaseIndexRef = useRef(currentPhaseIndex);
-  currentPhaseIndexRef.current = currentPhaseIndex;
-  const totalElapsedRef = useRef(totalElapsed);
-  totalElapsedRef.current = totalElapsed;
-  const cycleCountRef = useRef(cycleCount);
-  cycleCountRef.current = cycleCount;
-
   // Main breathing timer — supports both cycle-based and minute-based completion
   useEffect(() => {
     if (!isActive || isPaused || isCountingDown) return;
@@ -175,17 +167,19 @@ export function BreathingExerciseScreen({
     const timer = setInterval(() => {
       setPhaseTimeRemaining((prev) => {
         if (prev <= 1) {
-          const nextIndex = (currentPhaseIndexRef.current + 1) % phases.length;
+          const nextIndex = (currentPhaseIndex + 1) % phases.length;
           const completedCycle = nextIndex === 0;
 
           if (completedCycle) {
-            const newC = cycleCountRef.current + 1;
-            setCycleCount(newC);
-            if (durationMode === 'cycles' && newC >= selectedCycles) {
-              clearInterval(timer);
-              haptic.success();
-              handleComplete(totalElapsedRef.current + 1);
-            }
+            setCycleCount(c => {
+              const newC = c + 1;
+              if (durationMode === 'cycles' && newC >= selectedCycles) {
+                clearInterval(timer);
+                haptic.success();
+                handleComplete(totalElapsed + 1);
+              }
+              return newC;
+            });
           }
 
           setCurrentPhaseIndex(nextIndex);
@@ -207,7 +201,7 @@ export function BreathingExerciseScreen({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isActive, isPaused, isCountingDown, phases.length, selectedCycles, selectedMinutes, durationMode]);
+  }, [isActive, isPaused, isCountingDown, currentPhaseIndex, phases, selectedCycles, selectedMinutes, durationMode, totalElapsed]);
 
   const handleComplete = useCallback(async (elapsed: number) => {
     saveSession.mutate(
