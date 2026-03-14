@@ -49,7 +49,16 @@ export const quickStartFlow: OnboardingFlow = {
       subtitle: 'A simple daily reset to start your journey',
       buttonLabel: 'Start your first reset',
     },
-    // 5 — Welcome aboard
+    // 5 — Daily reset prompt
+    {
+      id: 'qs-daily-reset-prompt',
+      type: 'daily-reset-prompt',
+      title: 'Enable Daily Reset?',
+      subtitle: 'Your routine resets every morning so you can start each day fresh.',
+      buttonLabel: 'Yes, enable it',
+      secondaryButtonLabel: 'Maybe later',
+    },
+    // 6 — Welcome aboard
     {
       id: 'qs-welcome-aboard',
       type: 'welcome-aboard',
