@@ -357,7 +357,7 @@ const AppBrowsePrograms = () => {
                       key={lang.value}
                       onClick={() => handleLanguageChange(lang.value)}
                       className={cn(
-                        "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/80 hover:bg-white/10 transition-colors",
+                        "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/80 active:bg-white/10 transition-colors",
                         preferredLanguage === lang.value && "bg-white/10 text-white font-medium"
                       )}
                     >

@@ -471,7 +471,7 @@ export default function AppTimer() {
           {/* Theme selector */}
           <button
             onClick={() => { setScreen('pickTheme'); haptic.light(); }}
-            className="flex items-center gap-1.5 mt-6 px-4 py-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+            className="flex items-center gap-1.5 mt-6 px-4 py-2 rounded-full bg-muted active:bg-muted/80 transition-colors"
           >
             <span className="text-sm font-medium text-foreground">{customTheme || selectedTheme}</span>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />

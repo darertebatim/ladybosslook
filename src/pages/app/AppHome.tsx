@@ -672,7 +672,7 @@ const AppHome = () => {
                   <h1 className="text-lg font-bold text-foreground min-w-[140px] text-center">
                     {format(currentMonth, 'MMMM yyyy')}
                   </h1>
-                  <button onClick={handleNextMonth} className="p-2.5 -m-1 rounded-full hover:bg-white/50 active:bg-white/70 transition-colors">
+                  <button onClick={handleNextMonth} className="p-2.5 -m-1 rounded-full active:bg-white/70 transition-colors">
                     <ChevronRight className="h-5 w-5" />
                   </button>
                 </div>
