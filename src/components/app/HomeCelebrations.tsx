@@ -104,6 +104,13 @@ interface HomeCelebrationsProps {
   showRecoveryPrompt: boolean;
   setShowRecoveryPrompt: (v: boolean) => void;
   recoverStreak: any;
+  
+  // Gold recovery
+  showGoldRecoveryPrompt: boolean;
+  setShowGoldRecoveryPrompt: (v: boolean) => void;
+  showRecoverySuccess: 'streak' | 'gold' | null;
+  setShowRecoverySuccess: (v: 'streak' | 'gold' | null) => void;
+  previousGoldStreak: number;
 
   // Notification
   userId?: string;
