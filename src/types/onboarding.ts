@@ -33,7 +33,8 @@ export type OnboardingStepType =
   | 'dark-paywall'
   | 'task-select-purple'
   | 'confetti-message'
-  | 'personalized-plan';
+  | 'personalized-plan'
+  | 'starter-routine';
 export interface OnboardingOption {
   label: string;
   emoji?: string;

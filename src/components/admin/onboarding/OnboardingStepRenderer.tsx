@@ -93,6 +93,8 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <TaskSelectPurpleScreen step={step} onNext={onNext} />;
     case 'confetti-message':
       return <ConfettiMessageScreen step={step} onNext={onNext} />;
+    case 'starter-routine':
+      return <StarterRoutineScreen step={step} onNext={onNext} />;
     case 'personalized-plan':
       return <PersonalizedPlanScreen step={step} onNext={onNext} answers={answers} />;
     default:
