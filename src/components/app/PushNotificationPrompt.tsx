@@ -106,7 +106,7 @@ export function PushNotificationPrompt({ userId, open, onClose }: PushNotificati
           <Button 
             onClick={handleEnable}
             disabled={isEnabling}
-            className="w-full h-12 rounded-none border-0 bg-transparent text-primary hover:bg-primary/5 text-[17px] font-semibold transition-colors"
+            className="w-full h-12 rounded-none border-0 bg-transparent text-primary text-[17px] font-semibold transition-colors"
           >
             {isEnabling ? (
               <span className="flex items-center gap-2">
