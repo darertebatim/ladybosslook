@@ -89,7 +89,7 @@ export const StreakChallengeCard = ({
           }}
           variant="outline"
           size="sm"
-          className="mt-4 w-full border-orange-200 text-orange-600 hover:bg-orange-50 rounded-xl text-xs font-semibold gap-1.5"
+          className="mt-4 w-full border-orange-200 text-orange-600 active:bg-orange-50 rounded-xl text-xs font-semibold gap-1.5"
         >
           <Shield className="w-3.5 h-3.5" />
           Use Recovery Shield

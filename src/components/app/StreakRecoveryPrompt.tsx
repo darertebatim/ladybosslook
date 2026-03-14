@@ -103,7 +103,7 @@ export const StreakRecoveryPrompt = ({
         {/* Skip */}
         <button
           onClick={handleDismiss}
-          className="text-white/60 text-xs hover:text-white/80 transition-colors"
+          className="text-white/80 text-xs transition-colors"
         >
           Let the streak reset
         </button>
