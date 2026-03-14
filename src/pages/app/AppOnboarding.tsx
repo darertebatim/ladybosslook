@@ -108,6 +108,16 @@ export default function AppOnboarding() {
 
   const handleAnswer = useCallback((stepId: string, answer: string | string[]) => {
     setAnswers(prev => ({ ...prev, [stepId]: answer }));
+
+    // Save profile-relevant answers to localStorage for post-signup sync
+    if (stepId === 'qs-nickname') {
+      localStorage.setItem('simora_onboarding_nickname', typeof answer === 'string' ? answer : answer[0] || '');
+    } else if (stepId === 'qs-gender') {
+      localStorage.setItem('simora_onboarding_gender', typeof answer === 'string' ? answer : answer[0] || '');
+    } else if (stepId === 'qs-age-group') {
+      localStorage.setItem('simora_onboarding_age_group', typeof answer === 'string' ? answer : answer[0] || '');
+    }
+
     // Persist answer to Supabase
     if (user && flowId) {
       supabase.from('onboarding_answers').insert({
