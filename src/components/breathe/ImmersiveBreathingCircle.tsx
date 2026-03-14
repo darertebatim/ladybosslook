@@ -133,18 +133,7 @@ export function ImmersiveBreathingCircle({
               >
                 {phaseText}
               </span>
-              {isHolding ? (
-                <>
-                  <span className="text-[10px] text-white/55 mt-1 tracking-widest uppercase">
-                    {phase === 'inhale_hold' ? 'Rotate Right ↻' : 'Rotate Left ↺'}
-                  </span>
-                  {countdown !== undefined && (
-                    <span className="text-xl text-white/70 mt-1 font-mono" style={{ textShadow: '0 0 12px rgba(139,92,246,0.4)' }}>
-                      {countdown}
-                    </span>
-                  )}
-                </>
-              ) : methodText ? (
+              {!isHolding && methodText ? (
                 <span className="text-[10px] text-white/35 mt-1.5 px-2.5 py-0.5 rounded-full border border-white/10 tracking-wider uppercase">
                   {methodText}
                 </span>
