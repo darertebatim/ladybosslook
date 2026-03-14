@@ -556,6 +556,11 @@ function MotivationalScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper center>
       <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight whitespace-pre-line">{step.title}</h1></FadeUp>
+      {step.subtitle && (
+        <FadeUp delay={0.08}>
+          <p className="text-[15px] text-gray-600 leading-relaxed text-center mb-4 whitespace-pre-line">{step.subtitle}</p>
+        </FadeUp>
+      )}
       <FadeUp delay={0.1}>
         {step.image ? (
           <div className="flex items-center justify-center mb-3">
@@ -572,7 +577,7 @@ function MotivationalScreen({ step, onNext }: Props) {
             {descMatch[2]}
           </p>
         ) : step.description ? (
-          <p className="text-sm text-gray-500 leading-relaxed mb-4">{step.description}</p>
+          <p className="text-sm text-gray-500 italic leading-relaxed text-center mb-4 whitespace-pre-line">{step.description}</p>
         ) : null}
       </FadeUp>
       <FadeUp delay={0.25} className="mt-auto">
