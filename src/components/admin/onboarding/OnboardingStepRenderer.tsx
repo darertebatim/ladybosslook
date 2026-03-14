@@ -2197,19 +2197,19 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   return (
     <div className="h-full flex flex-col bg-white">
       <div className="flex-1 flex flex-col px-6 pt-8 pb-4 overflow-y-auto">
-        {/* Header */}
+        {/* Header - above spotlight overlay */}
         <FadeUp>
-          <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center leading-tight">
+          <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center leading-tight relative z-40">
             Here's your first routine
           </h1>
         </FadeUp>
         <FadeUp delay={0.08}>
-          <p className="text-[15px] text-gray-500 text-center mt-2">{step.subtitle}</p>
+          <p className="text-[15px] text-gray-500 text-center mt-2 relative z-40">{step.subtitle}</p>
         </FadeUp>
 
-        {/* Phase instruction text - ABOVE task cards */}
+        {/* Phase instruction text - ABOVE task cards and spotlight */}
         <FadeUp delay={0.12}>
-          <p className="text-center text-[13px] text-gray-400 mt-3 mb-6">
+          <p className="text-center text-[13px] text-gray-400 mt-3 mb-6 relative z-40">
             {hintPhase === 'check-bed' && '👆 Tap the circle to complete your first task!'}
             {hintPhase === 'breathe' && '🫁 Now tap the Breathe button to try it!'}
             {hintPhase === 'mood' && '🌤️ Now check in with your mood!'}
