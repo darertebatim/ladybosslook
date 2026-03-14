@@ -13,7 +13,19 @@
   display: none;
 }
 
-/* Prevent iOS Safari auto-zoom on input focus */
+/* Mobile app — disable all hover effects globally */
+@media (hover: hover) {
+  * {
+    --tw-hover-override: true;
+  }
+}
+/* Force-disable hover pseudo-class for mobile-first app */
+@layer utilities {
+  *:hover {
+    --hover-disabled: true;
+  }
+}
+
 @supports (-webkit-touch-callout: none) {
   input,
   textarea,
