@@ -2367,7 +2367,18 @@ function StarterRoutineScreen({ step, onNext }: Props) {
           className="px-6 pb-6 pt-2 relative z-40"
         >
           <div className="relative">
-            <NavyButton onClick={onNext}>Continue</NavyButton>
+            {/* Sparking glow rings */}
+            <div className="absolute -inset-2 rounded-3xl animate-pulse" style={{
+              background: 'linear-gradient(135deg, rgba(168,85,247,0.3), rgba(59,130,246,0.2), rgba(52,211,153,0.3))',
+              filter: 'blur(12px)',
+            }} />
+            <div className="absolute -inset-1 rounded-2xl" style={{
+              background: 'linear-gradient(135deg, rgba(168,85,247,0.15), rgba(59,130,246,0.1), rgba(52,211,153,0.15))',
+              animation: 'sparkGlow 2s ease-in-out infinite alternate',
+            }} />
+            <div className="relative">
+              <NavyButton onClick={onNext}>Continue</NavyButton>
+            </div>
             <div
               className="pointer-events-none absolute z-[60]"
               style={{
@@ -2380,6 +2391,22 @@ function StarterRoutineScreen({ step, onNext }: Props) {
             >
               <FluentEmoji emoji="👇" size={48} />
             </div>
+            {/* Floating sparkle particles */}
+            {['✦', '✧', '✦', '✧'].map((s, idx) => (
+              <span
+                key={idx}
+                className="absolute text-white/60 animate-pulse pointer-events-none"
+                style={{
+                  fontSize: '10px',
+                  top: `${-8 + (idx % 2) * 60}px`,
+                  left: `${15 + idx * 25}%`,
+                  animationDelay: `${idx * 0.4}s`,
+                  animationDuration: `${1.5 + idx * 0.3}s`,
+                }}
+              >
+                {s}
+              </span>
+            ))}
           </div>
         </motion.div>
       )}
