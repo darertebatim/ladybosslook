@@ -106,6 +106,8 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <DailyResetPromptScreen step={step} onNext={onNext} />;
     case 'personalized-plan':
       return <PersonalizedPlanScreen step={step} onNext={onNext} answers={answers} />;
+    case 'before-after-visual':
+      return <BeforeAfterVisualScreen step={step} onNext={onNext} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }
