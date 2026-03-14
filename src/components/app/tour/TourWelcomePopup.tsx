@@ -146,7 +146,7 @@ export function TourWelcomePopup({
         <div className="px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4 flex flex-col gap-3">
           <Button 
             onClick={handleStartTour}
-            className="w-full h-12 rounded-2xl bg-foreground hover:bg-foreground/90 text-background font-semibold text-base gap-2"
+            className="w-full h-12 rounded-2xl bg-foreground text-background font-semibold text-base gap-2"
           >
             <Sparkles className="h-5 w-5" />
             Let's Go
