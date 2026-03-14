@@ -1884,111 +1884,124 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     exercises?.find((e: any) => e.category === 'calm') ||
     exercises?.[0];
 
-  // Onboarding must always include explicit holds (we discussed this repeatedly)
-  // Keep any configured hold from DB, but never let it be too short to perceive.
-  const inhaleSeconds = Number(exercise?.inhale_seconds) || 3;
-  const inhaleHoldSeconds = Number(exercise?.inhale_hold_seconds);
-  const exhaleSeconds = Number(exercise?.exhale_seconds) || 3;
-  const exhaleHoldSeconds = Number(exercise?.exhale_hold_seconds);
+  const onboardingRhythm = {
+    inhale: 3,
+    inhaleHold: 2,
+    exhale: 3,
+    exhaleHold: 2,
+  } as const;
 
-  const MIN_ONBOARDING_HOLD_SECONDS = 2;
-  const normalizedInhaleHold = Number.isFinite(inhaleHoldSeconds) && inhaleHoldSeconds > 0
-    ? Math.max(MIN_ONBOARDING_HOLD_SECONDS, inhaleHoldSeconds)
-    : MIN_ONBOARDING_HOLD_SECONDS;
-  const normalizedExhaleHold = Number.isFinite(exhaleHoldSeconds) && exhaleHoldSeconds > 0
-    ? Math.max(MIN_ONBOARDING_HOLD_SECONDS, exhaleHoldSeconds)
-    : MIN_ONBOARDING_HOLD_SECONDS;
+  const fallbackExercise = useMemo(() => ({
+    id: 'onboarding-welcome-breathing',
+    name: 'Welcome Breathing',
+    description: null,
+    category: 'calm',
+    emoji: '🫁',
+    inhale_seconds: onboardingRhythm.inhale,
+    inhale_hold_seconds: onboardingRhythm.inhaleHold,
+    exhale_seconds: onboardingRhythm.exhale,
+    exhale_hold_seconds: onboardingRhythm.exhaleHold,
+    inhale_method: 'nose',
+    exhale_method: 'mouth',
+    sort_order: 0,
+    is_active: true,
+    is_premium: false,
+    created_at: '',
+    updated_at: '',
+  }), []);
+
+  const baseExercise = exercise ?? fallbackExercise;
+  const inhaleMethod = baseExercise.inhale_method === 'mouth' ? 'Mouth' : 'Nose';
+  const exhaleMethod = baseExercise.exhale_method === 'nose' ? 'Nose' : 'Mouth';
+
+  const phases = useMemo<Array<{ type: 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold'; duration: number; text: string; method?: string }>>(
+    () => [
+      { type: 'inhale', duration: onboardingRhythm.inhale, text: 'Inhale', method: inhaleMethod },
+      { type: 'inhale_hold', duration: onboardingRhythm.inhaleHold, text: 'Hold' },
+      { type: 'exhale', duration: onboardingRhythm.exhale, text: 'Exhale', method: exhaleMethod },
+      { type: 'exhale_hold', duration: onboardingRhythm.exhaleHold, text: 'Hold' },
+    ],
+    [inhaleMethod, exhaleMethod],
+  );
 
   const [stage, setStage] = useState<'info' | 'countdown' | 'running' | 'done'>('info');
   const [countdown, setCountdown] = useState(3);
   const [cycleCount, setCycleCount] = useState(0);
-  const [breathPhase, setBreathPhase] = useState<'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold' | 'ready'>('ready');
-  const [phaseTimeLeft, setPhaseTimeLeft] = useState(0);
+  const [currentPhaseIdx, setCurrentPhaseIdx] = useState(0);
+  const [phaseTimeLeft, setPhaseTimeLeft] = useState(phases[0].duration);
   const targetCycles = 3;
-
-  // Build phases from the selected exercise timing
-  const phasesRef = useRef<{ type: 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold'; duration: number; text: string; method?: string }[]>([]);
-  const currentPhaseIdx = useRef(0);
-
-  useEffect(() => {
-    if (!exercise) return;
-    const p: typeof phasesRef.current = [];
-    if (inhaleSeconds > 0) p.push({ type: 'inhale', duration: inhaleSeconds, text: 'Inhale', method: exercise.inhale_method === 'nose' ? 'Nose' : 'Mouth' });
-    if (normalizedInhaleHold > 0) p.push({ type: 'inhale_hold', duration: normalizedInhaleHold, text: 'Hold' });
-    if (exhaleSeconds > 0) p.push({ type: 'exhale', duration: exhaleSeconds, text: 'Exhale', method: exercise.exhale_method === 'nose' ? 'Nose' : 'Mouth' });
-    if (normalizedExhaleHold > 0) p.push({ type: 'exhale_hold', duration: normalizedExhaleHold, text: 'Hold' });
-    phasesRef.current = p;
-  }, [exercise, inhaleSeconds, normalizedInhaleHold, exhaleSeconds, normalizedExhaleHold]);
 
   // When user dismisses the info sheet, start countdown
   const handleInfoDismiss = useCallback(() => {
+    setCountdown(3);
+    setCycleCount(0);
+    setCurrentPhaseIdx(0);
+    setPhaseTimeLeft(phases[0].duration);
     setStage('countdown');
-  }, []);
+  }, [phases]);
 
   // Countdown 3..2..1
   useEffect(() => {
     if (stage !== 'countdown') return;
-    const t = setInterval(() => {
+
+    const timer = window.setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
-          clearInterval(t);
-          // Start first phase
-          if (phasesRef.current.length > 0) {
-            currentPhaseIdx.current = 0;
-            const first = phasesRef.current[0];
-            setBreathPhase(first.type);
-            setPhaseTimeLeft(first.duration);
-          }
+          window.clearInterval(timer);
+          setCurrentPhaseIdx(0);
+          setPhaseTimeLeft(phases[0].duration);
           setStage('running');
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
-    return () => clearInterval(t);
-  }, [stage]);
 
-  // Breathing timer
+    return () => window.clearInterval(timer);
+  }, [stage, phases]);
+
+  // Breathing timer (fixed onboarding rhythm: 3-2-3-2)
   useEffect(() => {
-    if (stage !== 'running' || phasesRef.current.length === 0) return;
-    const t = setInterval(() => {
+    if (stage !== 'running') return;
+
+    const timer = window.setInterval(() => {
       setPhaseTimeLeft(prev => {
         if (prev <= 1) {
-          const nextIdx = (currentPhaseIdx.current + 1) % phasesRef.current.length;
-          if (nextIdx === 0) {
-            setCycleCount(c => {
-              const newC = c + 1;
-              if (newC >= targetCycles) {
-                clearInterval(t);
-                setStage('done');
-                setTimeout(onComplete, 800);
-              }
-              return newC;
-            });
+          const nextIdx = (currentPhaseIdx + 1) % phases.length;
+          const completedCycle = nextIdx === 0;
+
+          if (completedCycle) {
+            const nextCycle = cycleCount + 1;
+            setCycleCount(nextCycle);
+            if (nextCycle >= targetCycles) {
+              setStage('done');
+              window.setTimeout(onComplete, 800);
+              return 0;
+            }
           }
-          currentPhaseIdx.current = nextIdx;
-          const nextPhase = phasesRef.current[nextIdx];
-          setBreathPhase(nextPhase.type);
-          return nextPhase.duration;
+
+          setCurrentPhaseIdx(nextIdx);
+          return phases[nextIdx].duration;
         }
+
         return prev - 1;
       });
     }, 1000);
-    return () => clearInterval(t);
-  }, [stage, onComplete]);
 
-  if (!exercise) return null;
+    return () => window.clearInterval(timer);
+  }, [stage, currentPhaseIdx, cycleCount, targetCycles, onComplete, phases]);
 
-  const currentP = phasesRef.current[currentPhaseIdx.current];
+  const currentP = phases[currentPhaseIdx];
+  const breathPhase = stage === 'running' ? (currentP?.type ?? 'ready') : 'ready';
 
-  // Use normalized Welcome Breathing values in the guide sheet
+  // Force guide sheet + overlay to exact onboarding rhythm
   const exerciseTyped = {
-    ...exercise,
+    ...baseExercise,
     name: 'Welcome Breathing',
-    inhale_seconds: inhaleSeconds,
-    inhale_hold_seconds: normalizedInhaleHold,
-    exhale_seconds: exhaleSeconds,
-    exhale_hold_seconds: normalizedExhaleHold,
+    inhale_seconds: onboardingRhythm.inhale,
+    inhale_hold_seconds: onboardingRhythm.inhaleHold,
+    exhale_seconds: onboardingRhythm.exhale,
+    exhale_hold_seconds: onboardingRhythm.exhaleHold,
   } as import('@/hooks/useBreathingExercises').BreathingExercise;
 
   // Stage: info sheet
