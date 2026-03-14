@@ -190,7 +190,7 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
                   <PreferenceItem
                     icon={<Clock className="h-4 w-4" />}
                     label="Evening Check-in"
-                    description="Reminder at 6 PM if actions remain"
+                    description="Reminder at 6 PM if tasks remain"
                     checked={getPreference('evening_checkin')}
                     onCheckedChange={handleToggle('evening_checkin')}
                     disabled={updatePreference.isPending}
