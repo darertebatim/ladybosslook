@@ -102,6 +102,8 @@ const AppHome = () => {
   const setStreakGoal = useSetStreakGoal();
   const recoverStreak = useRecoverStreak();
   const [showRecoveryPrompt, setShowRecoveryPrompt] = useState(false);
+  const [showGoldRecoveryPrompt, setShowGoldRecoveryPrompt] = useState(false);
+  const [showRecoverySuccess, setShowRecoverySuccess] = useState<'streak' | 'gold' | null>(null);
 
 
   // Gold streak celebration state - use localStorage to prevent re-showing on navigation
