@@ -1423,11 +1423,11 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "delete_action_from_bank",
-          description: "Permanently DELETE an action from the Actions Bank and all its subtasks. Use when user says 'delete', 'remove' an action.",
+          description: "Permanently DELETE a task from the Tasks Bank and all its subtasks. Use when user says 'delete', 'remove' a task.",
           parameters: {
             type: "object",
             properties: {
-              id: { type: "string", description: "The ID of the action to delete (from context)" },
+              id: { type: "string", description: "The ID of the task to delete (from context)" },
             },
             required: ["id"],
           },
