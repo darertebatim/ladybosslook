@@ -1302,11 +1302,11 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "update_action_in_bank",
-          description: "Update an EXISTING action in the Actions Bank. Use this when the user wants to change, edit, move category, rename, or modify an action. Do NOT create a new one.",
+          description: "Update an EXISTING task in the Tasks Bank. Use this when the user wants to change, edit, move category, rename, or modify a task. Do NOT create a new one.",
           parameters: {
             type: "object",
             properties: {
-              id: { type: "string", description: "The ID of the existing action to update (from context)" },
+              id: { type: "string", description: "The ID of the existing task to update (from context)" },
               title: { type: "string", description: "New title" },
               emoji: { type: "string", description: "New emoji" },
               category: { type: "string", description: "New category slug" },
