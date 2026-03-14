@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Pause, Play, HelpCircle, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -100,42 +100,26 @@ export function BreathingExerciseScreen({
     setShowInfoSheet(true);
   }, [exercise.id]);
 
-  // Build phases array from exercise config
-  const phases: PhaseConfig[] = [];
-  
-  if (exercise.inhale_seconds > 0) {
-    phases.push({
-      type: 'inhale',
-      duration: exercise.inhale_seconds,
-      text: 'Inhale',
-      method: exercise.inhale_method === 'nose' ? 'Nose' : 'Mouth',
-    });
-  }
-  
-  if (exercise.inhale_hold_seconds > 0) {
-    phases.push({
-      type: 'inhale_hold',
-      duration: exercise.inhale_hold_seconds,
-      text: 'Hold',
-    });
-  }
-  
-  if (exercise.exhale_seconds > 0) {
-    phases.push({
-      type: 'exhale',
-      duration: exercise.exhale_seconds,
-      text: 'Exhale',
-      method: exercise.exhale_method === 'nose' ? 'Nose' : 'Mouth',
-    });
-  }
-  
-  if (exercise.exhale_hold_seconds > 0) {
-    phases.push({
-      type: 'exhale_hold',
-      duration: exercise.exhale_hold_seconds,
-      text: 'Hold',
-    });
-  }
+  // Build phases array from exercise config (memoized to stabilize effect deps)
+  const phases = useMemo(() => {
+    const p: PhaseConfig[] = [];
+    if (exercise.inhale_seconds > 0) {
+      p.push({ type: 'inhale', duration: exercise.inhale_seconds, text: 'Inhale', method: exercise.inhale_method === 'nose' ? 'Nose' : 'Mouth' });
+    }
+    if (exercise.inhale_hold_seconds > 0) {
+      p.push({ type: 'inhale_hold', duration: exercise.inhale_hold_seconds, text: 'Hold' });
+    }
+    if (exercise.exhale_seconds > 0) {
+      p.push({ type: 'exhale', duration: exercise.exhale_seconds, text: 'Exhale', method: exercise.exhale_method === 'nose' ? 'Nose' : 'Mouth' });
+    }
+    if (exercise.exhale_hold_seconds > 0) {
+      p.push({ type: 'exhale_hold', duration: exercise.exhale_hold_seconds, text: 'Hold' });
+    }
+    return p;
+  }, [exercise]);
+
+  const phasesRef = useRef(phases);
+  phasesRef.current = phases;
 
   const currentPhase = phases[currentPhaseIndex];
   const totalTargetSeconds = durationMode === 'minutes' ? selectedMinutes * 60 : 0;
@@ -155,7 +139,7 @@ export function BreathingExerciseScreen({
           clearInterval(timer);
           setIsCountingDown(false);
           setIsActive(true);
-          setPhaseTimeRemaining(phases[0]?.duration || 4);
+          setPhaseTimeRemaining(phasesRef.current[0]?.duration || 4);
           startTimeRef.current = Date.now();
           haptic.medium();
           return 0;
@@ -166,7 +150,7 @@ export function BreathingExerciseScreen({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isCountingDown, phases]);
+  }, [isCountingDown]);
 
   // Main breathing timer — supports both cycle-based and minute-based completion
   useEffect(() => {
@@ -175,8 +159,9 @@ export function BreathingExerciseScreen({
     const timer = setInterval(() => {
       setPhaseTimeRemaining((prev) => {
         if (prev <= 1) {
+          const p = phasesRef.current;
           const curIdx = currentPhaseIndexRef.current;
-          const nextIndex = (curIdx + 1) % phases.length;
+          const nextIndex = (curIdx + 1) % p.length;
           const completedCycle = nextIndex === 0;
 
           if (completedCycle) {
@@ -193,7 +178,7 @@ export function BreathingExerciseScreen({
           setCurrentPhaseIndex(nextIndex);
           currentPhaseIndexRef.current = nextIndex;
           haptic.light();
-          return phases[nextIndex].duration;
+          return p[nextIndex].duration;
         }
         return prev - 1;
       });
@@ -211,7 +196,7 @@ export function BreathingExerciseScreen({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isActive, isPaused, isCountingDown, phases, selectedCycles, selectedMinutes, durationMode]);
+  }, [isActive, isPaused, isCountingDown, selectedCycles, selectedMinutes, durationMode]);
 
   const handleComplete = useCallback(async (elapsed: number) => {
     saveSession.mutate(
