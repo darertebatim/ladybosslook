@@ -2118,6 +2118,8 @@ function StarterRoutineScreen({ step, onNext }: Props) {
       addTimer(() => setPhase('hint-breathe'), 800);
     } else if (phase === 'spotlight-mood') {
       addTimer(() => setPhase('hint-mood'), 800);
+    } else if (phase === 'spotlight-complete') {
+      addTimer(() => setPhase('hint-complete'), 800);
     }
   }, [phase]);
 
