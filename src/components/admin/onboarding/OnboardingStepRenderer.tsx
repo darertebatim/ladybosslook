@@ -1944,22 +1944,503 @@ function buildUserTask(t: StarterTask, index: number, taskId?: string): import('
 }
 
 type DemoPhase =
-  | 'intro'           // nothing visible yet
-  | 'revealing'       // tasks appearing one-by-one
-  | 'viewing'         // all tasks visible, no overlay (pause)
-  | 'spotlight-app'   // spotlight on task 0, no hint
-  | 'hint-app'        // finger hint on task 0
-  | 'celebrate-app'   // celebration after completing task 0
+  | 'intro'
+  | 'revealing'
+  | 'viewing'
+  | 'spotlight-app'
+  | 'hint-app'
+  | 'celebrate-app'
   | 'spotlight-breathe'
   | 'hint-breathe'
   | 'celebrate-breathe'
   | 'spotlight-mood'
   | 'hint-mood'
   | 'celebrate-mood'
-  | 'done';           // spotlight on Continue button
+  | 'done';
 
-// Mini inline breathing overlay for onboarding — uses ImmersiveBreathingCircle from breathe tool
+// ─── Mini inline breathing overlay for onboarding ──────────────
 
+type BreathPhaseLocal = 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold' | 'ready';
+
+function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) {
+  const [breathPhase, setBreathPhase] = useState<BreathPhaseLocal>('ready');
+  const [countdown, setCountdown] = useState(3);
+  const [cycleCount, setCycleCount] = useState(0);
+  const [isCountingDown, setIsCountingDown] = useState(true);
+  const totalCycles = 3;
+
+  // Pattern: 3-2-3-2
+  const pattern = { inhale: 3, inhaleHold: 2, exhale: 3, exhaleHold: 2 };
+
+  // Countdown before starting
+  useEffect(() => {
+    if (!isCountingDown) return;
+    if (countdown <= 0) {
+      setIsCountingDown(false);
+      setBreathPhase('inhale');
+      return;
+    }
+    const t = setTimeout(() => setCountdown(c => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [countdown, isCountingDown]);
+
+  // Breathing cycle state machine
+  useEffect(() => {
+    if (isCountingDown || breathPhase === 'ready') return;
+
+    const durations: Record<BreathPhaseLocal, number> = {
+      inhale: pattern.inhale,
+      inhale_hold: pattern.inhaleHold,
+      exhale: pattern.exhale,
+      exhale_hold: pattern.exhaleHold,
+      ready: 0,
+    };
+
+    const nextPhase: Record<BreathPhaseLocal, BreathPhaseLocal> = {
+      inhale: 'inhale_hold',
+      inhale_hold: 'exhale',
+      exhale: 'exhale_hold',
+      exhale_hold: 'inhale',
+      ready: 'inhale',
+    };
+
+    const dur = durations[breathPhase] * 1000;
+    const t = setTimeout(() => {
+      if (breathPhase === 'exhale_hold') {
+        const next = cycleCount + 1;
+        setCycleCount(next);
+        if (next >= totalCycles) {
+          onComplete();
+          return;
+        }
+      }
+      setBreathPhase(nextPhase[breathPhase]);
+    }, dur);
+
+    return () => clearTimeout(t);
+  }, [breathPhase, isCountingDown, cycleCount]);
+
+  const phaseText = isCountingDown
+    ? 'Get ready...'
+    : breathPhase === 'inhale' ? 'Breathe in'
+    : breathPhase === 'inhale_hold' ? 'Hold'
+    : breathPhase === 'exhale' ? 'Breathe out'
+    : breathPhase === 'exhale_hold' ? 'Hold'
+    : 'Ready';
+
+  const phaseDuration = isCountingDown ? 1
+    : breathPhase === 'inhale' ? pattern.inhale
+    : breathPhase === 'inhale_hold' ? pattern.inhaleHold
+    : breathPhase === 'exhale' ? pattern.exhale
+    : breathPhase === 'exhale_hold' ? pattern.exhaleHold
+    : 1;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center" style={{ background: getImmersiveBgGradient() }}>
+      <ImmersiveParticles />
+      <p className="text-white/60 text-sm font-medium mb-8">
+        {cycleCount + 1} / {totalCycles} cycles
+      </p>
+      <ImmersiveBreathingCircle
+        phase={isCountingDown ? 'ready' : breathPhase}
+        phaseDuration={phaseDuration}
+        phaseText={phaseText}
+        countdown={isCountingDown ? countdown : undefined}
+        isCountingDown={isCountingDown}
+        countdownValue={isCountingDown ? countdown : undefined}
+      />
+      <p className="text-white/40 text-xs mt-8">3-2-3-2 pattern</p>
+    </div>
+  );
+}
+
+// ─── StarterRoutineScreen (Step-by-step reveal + celebrations) ──
+
+function StarterRoutineScreen({ step, onNext }: Props) {
+  const [phase, setPhase] = useState<DemoPhase>('intro');
+  const [revealedCount, setRevealedCount] = useState(0);
+  const [completedIndices, setCompletedIndices] = useState<Set<number>>(new Set());
+  const [showBreathing, setShowBreathing] = useState(false);
+  const [showMoodPicker, setShowMoodPicker] = useState(false);
+  const [celebratingIdx, setCelebratingIdx] = useState<number | null>(null);
+  const timersRef = useRef<NodeJS.Timeout[]>([]);
+
+  const BREATHE_IDX = 1;
+  const MOOD_IDX = 2;
+
+  const userTasks = STARTER_TASKS.map((t, i) => buildUserTask(t, i));
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => timersRef.current.forEach(clearTimeout);
+  }, []);
+
+  const addTimer = (fn: () => void, ms: number) => {
+    const t = setTimeout(fn, ms);
+    timersRef.current.push(t);
+    return t;
+  };
+
+  // Phase 1: Intro → Revealing → Viewing → Spotlight
+  useEffect(() => {
+    if (phase === 'intro') {
+      addTimer(() => setPhase('revealing'), 400);
+    }
+  }, [phase]);
+
+  // Staggered reveal
+  useEffect(() => {
+    if (phase !== 'revealing') return;
+    if (revealedCount >= STARTER_TASKS.length) {
+      addTimer(() => setPhase('viewing'), 300);
+      return;
+    }
+    const t = addTimer(() => setRevealedCount(prev => prev + 1), 300);
+    return () => clearTimeout(t);
+  }, [phase, revealedCount]);
+
+  // Viewing pause → first spotlight
+  useEffect(() => {
+    if (phase === 'viewing') {
+      addTimer(() => setPhase('spotlight-app'), 3000);
+    }
+  }, [phase]);
+
+  // Spotlight → Hint delays
+  useEffect(() => {
+    if (phase === 'spotlight-app') {
+      addTimer(() => setPhase('hint-app'), 500);
+    } else if (phase === 'spotlight-breathe') {
+      addTimer(() => setPhase('hint-breathe'), 500);
+    } else if (phase === 'spotlight-mood') {
+      addTimer(() => setPhase('hint-mood'), 500);
+    }
+  }, [phase]);
+
+  // Celebration trigger helper
+  const triggerCelebration = (taskIdx: number, nextPhase: DemoPhase) => {
+    setCompletedIndices(prev => new Set(prev).add(taskIdx));
+    setCelebratingIdx(taskIdx);
+    playCompletionSound();
+    haptic.success();
+    confetti({
+      particleCount: 60,
+      spread: 55,
+      origin: { y: 0.5 },
+      colors: ['#2dd4bf', '#34d399', '#a78bfa', '#fbbf24'],
+    });
+    addTimer(() => {
+      setCelebratingIdx(null);
+      setPhase(nextPhase);
+    }, 1500);
+  };
+
+  // Handlers
+  const handleCheckApp = () => {
+    if (phase !== 'hint-app' && phase !== 'spotlight-app') return;
+    setPhase('celebrate-app');
+    triggerCelebration(0, 'spotlight-breathe');
+  };
+
+  const handleBreatheTap = () => {
+    if (phase !== 'hint-breathe' && phase !== 'spotlight-breathe') return;
+    setShowBreathing(true);
+  };
+
+  const handleBreathingComplete = useCallback(() => {
+    setShowBreathing(false);
+    setPhase('celebrate-breathe');
+    triggerCelebration(BREATHE_IDX, 'spotlight-mood');
+  }, []);
+
+  const handleMoodTap = () => {
+    if (phase !== 'hint-mood' && phase !== 'spotlight-mood') return;
+    setShowMoodPicker(true);
+  };
+
+  const handleMoodSelect = (moodValue: string) => {
+    setShowMoodPicker(false);
+    setPhase('celebrate-mood');
+    triggerCelebration(MOOD_IDX, 'done');
+  };
+
+  // Which phases show overlay
+  const showOverlay = phase.startsWith('spotlight') || phase.startsWith('hint') || phase.startsWith('celebrate') || phase === 'done';
+  // Which task is spotlighted
+  const spotlightIdx =
+    phase.includes('app') ? 0 :
+    phase.includes('breathe') ? BREATHE_IDX :
+    phase.includes('mood') ? MOOD_IDX :
+    -1;
+
+  // Instruction text
+  const instructionText =
+    (phase === 'spotlight-app' || phase === 'hint-app') ? <><FluentEmoji emoji="👆" size={20} /> Tap the circle to complete your first task!</> :
+    (phase === 'spotlight-breathe' || phase === 'hint-breathe') ? <><FluentEmoji emoji="🫁" size={20} /> Now tap the Breathe button to try it!</> :
+    (phase === 'spotlight-mood' || phase === 'hint-mood') ? <><FluentEmoji emoji="🌤️" size={20} /> Now check in with your mood!</> :
+    phase === 'done' ? <><FluentEmoji emoji="✨" size={20} /> Tap Continue to keep going!</> :
+    null;
+
+  const MOODS = [
+    { value: 'great', emoji: '😄', label: 'Great', bg: '#FEF08A' },
+    { value: 'good', emoji: '🙂', label: 'Good', bg: '#BBF7D0' },
+    { value: 'okay', emoji: '😐', label: 'Okay', bg: '#BFDBFE' },
+    { value: 'not_great', emoji: '😔', label: 'Not Great', bg: '#E9D5FF' },
+    { value: 'bad', emoji: '😢', label: 'Bad', bg: '#FECACA' },
+  ];
+
+  return (
+    <div className="h-full flex flex-col bg-white">
+      <div className="flex-1 flex flex-col px-6 pt-8 pb-4 overflow-y-auto">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0 }}
+        >
+          <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center leading-tight relative z-40">
+            Here's your first routine
+          </h1>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+        >
+          <p className="text-[15px] text-gray-500 text-center mt-2 relative z-40">{step.subtitle}</p>
+        </motion.div>
+
+        {/* Instruction text — only shows during spotlight/hint/done phases */}
+        {instructionText && (
+          <motion.p
+            key={phase}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="text-center text-[15px] text-white font-semibold mt-3 mb-6 relative z-40 flex items-center justify-center gap-1.5"
+          >
+            {instructionText}
+          </motion.p>
+        )}
+        {!instructionText && <div className="mt-3 mb-6" />}
+
+        {/* Task Cards */}
+        <div className="space-y-3 relative">
+          {/* Dark spotlight overlay */}
+          {showOverlay && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="fixed inset-0 z-30 bg-black/50 pointer-events-none"
+            />
+          )}
+
+          {userTasks.map((task, i) => {
+            const isCompleted = completedIndices.has(i);
+            const isVisible = phase === 'intro' ? false : phase === 'revealing' ? i < revealedCount : true;
+            const isSpotlighted = spotlightIdx === i && !phase.startsWith('celebrate');
+            const isCelebrating = celebratingIdx === i;
+            const showHintOnCircle = phase === 'hint-app' && i === 0;
+            const showHintOnCard = (phase === 'hint-breathe' && i === BREATHE_IDX) || (phase === 'hint-mood' && i === MOOD_IDX);
+
+            return (
+              <motion.div
+                key={task.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{
+                  opacity: isVisible ? 1 : 0,
+                  y: isVisible ? 0 : 20,
+                }}
+                transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+                className="relative"
+              >
+                <div className={`relative ${isSpotlighted || isCelebrating ? 'z-40' : ''}`}>
+                  {/* Intercept taps for breathe/mood */}
+                  {(phase === 'hint-breathe' || phase === 'spotlight-breathe') && i === BREATHE_IDX && (
+                    <button className="absolute inset-0 z-40 rounded-3xl" onClick={handleBreatheTap} />
+                  )}
+                  {(phase === 'hint-mood' || phase === 'spotlight-mood') && i === MOOD_IDX && (
+                    <button className="absolute inset-0 z-40 rounded-3xl" onClick={handleMoodTap} />
+                  )}
+
+                  <div className={isSpotlighted || isCelebrating ? 'relative rounded-2xl shadow-2xl' : ''}>
+                    <TaskCard
+                      task={task}
+                      date={new Date()}
+                      isCompleted={isCompleted}
+                      completedSubtaskIds={[]}
+                      goalProgress={0}
+                      onTap={undefined}
+                    />
+                  </div>
+
+                  {/* Celebration SealCheck overlay */}
+                  {isCelebrating && (
+                    <div className="absolute top-1/2 right-4 -translate-y-1/2 z-50">
+                      <SealCheck className="w-10 h-10 text-teal-400 animate-seal-pop" showParticles />
+                    </div>
+                  )}
+
+                  {/* Finger hint on completion circle (app task) */}
+                  {showHintOnCircle && (
+                    <>
+                      <button
+                        className="absolute top-0 right-0 w-16 h-full z-50"
+                        onClick={handleCheckApp}
+                      />
+                      <div
+                        className="pointer-events-none absolute z-[55] rounded-full animate-pulse"
+                        style={{
+                          top: '50%',
+                          right: '10px',
+                          width: '44px',
+                          height: '44px',
+                          transform: 'translateY(-50%)',
+                          boxShadow: '0 0 0 4px hsl(var(--primary) / 0.5), 0 0 20px 8px hsl(var(--primary) / 0.2)',
+                        }}
+                      />
+                      <div
+                        className="pointer-events-none absolute z-[60]"
+                        style={{
+                          top: '-40px',
+                          right: '6px',
+                          filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
+                          animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
+                        }}
+                      >
+                        <FluentEmoji emoji="👇" size={48} />
+                      </div>
+                    </>
+                  )}
+
+                  {/* Finger hint on breathe/mood card */}
+                  {showHintOnCard && (
+                    <>
+                      <div
+                        className="pointer-events-none absolute z-[55] rounded-xl animate-pulse"
+                        style={{
+                          top: '50%',
+                          right: '56px',
+                          width: '60px',
+                          height: '40px',
+                          transform: 'translateY(-50%)',
+                          boxShadow: '0 0 0 3px hsl(var(--primary) / 0.5), 0 0 20px 8px hsl(var(--primary) / 0.2)',
+                        }}
+                      />
+                      <div
+                        className="pointer-events-none absolute z-[60]"
+                        style={{
+                          top: '-40px',
+                          right: '58px',
+                          filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
+                          animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
+                        }}
+                      >
+                        <FluentEmoji emoji="👇" size={48} />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* CTA — only in done phase */}
+      {phase === 'done' && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="px-6 pb-6 pt-2 relative z-40"
+        >
+          <div className="relative">
+            <NavyButton onClick={onNext}>Continue</NavyButton>
+            <div
+              className="pointer-events-none absolute z-[60]"
+              style={{
+                top: '-52px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
+                animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
+              }}
+            >
+              <FluentEmoji emoji="👇" size={48} />
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Breathing overlay */}
+      {showBreathing && (
+        <OnboardingBreathingOverlay onComplete={handleBreathingComplete} />
+      )}
+
+      {/* Mood picker overlay */}
+      {showMoodPicker && (
+        <div className="fixed inset-0 z-[100] flex items-end justify-center" style={{ animation: 'fadeIn 0.3s ease-out' }}>
+          <div className="absolute inset-0 bg-black/60" />
+          <div className="relative z-10 w-full bg-white rounded-t-3xl px-6 pt-6 pb-10 animate-slide-up">
+            <h2 className="text-xl font-bold text-center text-[#1a1f3d] mb-2">How are you feeling?</h2>
+            <p className="text-sm text-gray-400 text-center mb-6">Tap the one that fits best</p>
+            <div className="flex justify-center gap-4 mb-5">
+              {MOODS.slice(0, 3).map((mood) => (
+                <button
+                  key={mood.value}
+                  onClick={() => handleMoodSelect(mood.value)}
+                  className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
+                >
+                  <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center" style={{ background: mood.bg }}>
+                    <FluentEmoji emoji={mood.emoji} size={42} />
+                  </div>
+                  <span className="text-xs font-medium text-gray-700">{mood.label}</span>
+                </button>
+              ))}
+            </div>
+            <div className="flex justify-center gap-4">
+              {MOODS.slice(3).map((mood) => (
+                <button
+                  key={mood.value}
+                  onClick={() => handleMoodSelect(mood.value)}
+                  className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
+                >
+                  <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center" style={{ background: mood.bg }}>
+                    <FluentEmoji emoji={mood.emoji} size={42} />
+                  </div>
+                  <span className="text-xs font-medium text-gray-700">{mood.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes onboardingHandBounce {
+          0%   { transform: translateY(0px); }
+          40%  { transform: translateY(8px); }
+          55%  { transform: translateY(3px); }
+          70%  { transform: translateY(8px); }
+          100% { transform: translateY(0px); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slide-up {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+        .animate-slide-up {
+          animation: slide-up 0.35s ease-out;
+        }
+      `}</style>
+    </div>
+  );
+}
 
 function ConfettiMessageScreen({ step, onNext }: Props) {
   useEffect(() => {
