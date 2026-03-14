@@ -1,38 +1,58 @@
 
 
-# Quick Onboarding Flow
+## Calm-Style Animated Background for Watch Page
 
-## Overview
-Create a new 4-screen "quick onboarding" flow that gets users into the app fast. This reuses the existing onboarding infrastructure (`OnboardingStepRenderer`, `AppOnboarding`, flow data pattern) so no new plumbing is needed.
+Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
 
-## Flow: `quick-start-v1` — 4 Screens
+### What You'll Get
 
-| # | Type | Content |
-|---|------|---------|
-| 1 | `welcome` | "Simora helps you reset your day and build small routines that make you stronger." — single CTA: "Get Started" |
-| 2 | `single-select` | "What do you want most right now?" — 4 options: Reduce stress, Build discipline, Improve focus, Build stronger routines |
-| 3 | `confetti-message` | "Here's your first routine" — show 3-4 starter tasks (mood check, breathe, one reflection, one small task). CTA: "Start your first reset" |
-| 4 | `welcome-aboard` | Quick welcome with confetti, then auto-navigate to `/app/home` |
+- A deep dark blue gradient background on the Watch page header area
+- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
+- Subtle lightning flashes that pulse periodically
+- All text updated to white/light colors for contrast
+- Lightweight implementation using CSS keyframes (no extra dependencies)
 
-## Files to Create / Edit
+### Design Details
 
-### 1. New file: `src/data/onboarding-flows/quick-start.ts`
-Define the `quickStartFlow` with id `quick-start-v1`, 4 steps using existing step types.
+- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
+- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
+- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
+- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
+- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
 
-### 2. Edit: `src/pages/app/AppOnboarding.tsx`
-Add `quickStartFlow` to the `allFlows` array so it can be rendered at `/app/onboarding/quick-start-v1`.
+### Technical Approach
 
-### 3. Edit: `src/pages/admin/Onboarding.tsx`
-Add `quickStartFlow` to the flows list so it appears in the admin Onboarding Lab.
+**Files to modify:**
 
-### 4. Edit: `src/components/app/OnboardingBanner.tsx`
-Update the banner to point to `quick-start-v1` instead of `me-plus-v1` (since this is now the default entry point for new users).
+1. **`src/pages/app/AppWatch.tsx`**
+   - Replace the header `bg-[#E8F4FE]` with the dark gradient
+   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
+   - Add a lightning flash overlay div
+   - Update all text classes to white variants (`text-white`, `text-white/60`)
+   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
+   - Extend the gradient into the page background behind the content area
 
-### 5. Edit: `src/hooks/useDefaultOnboarding.ts` (no change needed — admin can set default via UI)
+2. **`tailwind.config.ts`**
+   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
+   - Register corresponding animation utilities
 
-## Design Decisions
-- Reuses all existing step type renderers — no new components needed.
-- The intent question (screen 2) answer is saved to Supabase via existing `onboarding_answers` logic, which can be used later for personalization.
-- The "starter routine" screen (screen 3) uses `confetti-message` type to show a celebratory moment with the starter tasks listed.
-- The old 38-screen flow remains available in admin for future use (subscription-focused onboarding).
+### Visual Structure
+
+```text
++----------------------------------+
+|  [dark blue gradient header]     |
+|  ~~~ cloud layer 1 (slow) ~~~   |
+|  ~~~ cloud layer 2 (slower) ~~~ |
+|  * lightning flash (periodic) *  |
+|                                  |
+|  Watch          [icons]          |
+|  [categories row]                |
+|  [filters]              [lang]   |
++----------------------------------+
+|  [normal white content area]     |
+|  [playlist cards grid]           |
++----------------------------------+
+```
+
+The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
 
