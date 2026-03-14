@@ -114,8 +114,6 @@ export function BreathingExerciseScreen({
     return p;
   }, [exercise]);
 
-  const phasesRef = useRef(phases);
-  phasesRef.current = phases;
 
   const currentPhase = phases[currentPhaseIndex];
   const totalTargetSeconds = durationMode === 'minutes' ? selectedMinutes * 60 : 0;
