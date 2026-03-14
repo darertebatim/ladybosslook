@@ -875,7 +875,7 @@ export default function AppPlaylistDetail() {
                   !isAvailable 
                     ? 'opacity-60 bg-white/5 cursor-not-allowed' 
                     : hasAccess 
-                      ? 'cursor-pointer hover:bg-white/10' 
+                      ? 'cursor-pointer active:bg-white/10' 
                       : 'opacity-60'
                 )}
               >
