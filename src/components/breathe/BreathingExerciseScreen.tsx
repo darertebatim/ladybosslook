@@ -33,6 +33,15 @@ const CYCLE_OPTIONS = [
   { value: 30, label: '30×' },
 ];
 
+const MINUTE_OPTIONS = [
+  { value: 1, label: '1 min' },
+  { value: 3, label: '3 min' },
+  { value: 5, label: '5 min' },
+  { value: 10, label: '10 min' },
+];
+
+type DurationMode = 'cycles' | 'minutes';
+
 type LayoutMode = 'classic' | 'immersive';
 
 export function BreathingExerciseScreen({
@@ -55,6 +64,9 @@ export function BreathingExerciseScreen({
     });
   }, []);
 
+  // Duration mode
+  const [durationMode, setDurationMode] = useState<DurationMode>('cycles');
+  const [selectedMinutes, setSelectedMinutes] = useState(3);
   // Cycle-based length
   const [selectedCycles, setSelectedCycles] = useState(3);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
@@ -118,7 +130,12 @@ export function BreathingExerciseScreen({
   }
 
   const currentPhase = phases[currentPhaseIndex];
-  const progressPercent = isActive ? (cycleCount / selectedCycles) * 100 : 0;
+  const totalTargetSeconds = durationMode === 'minutes' ? selectedMinutes * 60 : 0;
+  const progressPercent = isActive
+    ? durationMode === 'cycles'
+      ? (cycleCount / selectedCycles) * 100
+      : Math.min((totalElapsed / totalTargetSeconds) * 100, 100)
+    : 0;
 
   // Initial countdown before starting
   useEffect(() => {
@@ -143,7 +160,7 @@ export function BreathingExerciseScreen({
     return () => clearInterval(timer);
   }, [isCountingDown, phases]);
 
-  // Main breathing timer — cycle-based completion
+  // Main breathing timer — supports both cycle-based and minute-based completion
   useEffect(() => {
     if (!isActive || isPaused || isCountingDown) return;
 
@@ -156,7 +173,7 @@ export function BreathingExerciseScreen({
           if (completedCycle) {
             setCycleCount(c => {
               const newC = c + 1;
-              if (newC >= selectedCycles) {
+              if (durationMode === 'cycles' && newC >= selectedCycles) {
                 clearInterval(timer);
                 haptic.success();
                 handleComplete(totalElapsed + 1);
@@ -172,11 +189,19 @@ export function BreathingExerciseScreen({
         return prev - 1;
       });
 
-      setTotalElapsed((prev) => prev + 1);
+      setTotalElapsed((prev) => {
+        const next = prev + 1;
+        if (durationMode === 'minutes' && next >= selectedMinutes * 60) {
+          clearInterval(timer);
+          haptic.success();
+          handleComplete(next);
+        }
+        return next;
+      });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isActive, isPaused, isCountingDown, currentPhaseIndex, phases, selectedCycles, totalElapsed]);
+  }, [isActive, isPaused, isCountingDown, currentPhaseIndex, phases, selectedCycles, selectedMinutes, durationMode, totalElapsed]);
 
   const handleComplete = useCallback(async (elapsed: number) => {
     saveSession.mutate(
@@ -324,22 +349,54 @@ export function BreathingExerciseScreen({
         <div className="relative z-20 px-6 pb-safe mb-8">
           {!isActive && !isCountingDown && (
             <div className="mb-4 animate-fade-in">
-              <h4 className="text-sm font-medium text-white/40 mb-3 text-center tracking-widest uppercase">Cycles</h4>
-              <div className="grid grid-cols-4 gap-2">
-                {CYCLE_OPTIONS.map((option) => (
+              {/* Tab switcher */}
+              <div className="flex justify-center gap-1 mb-3">
+                {(['minutes', 'cycles'] as DurationMode[]).map((mode) => (
                   <button
-                    key={option.value}
-                    onClick={() => { setSelectedCycles(option.value); haptic.light(); }}
+                    key={mode}
+                    onClick={() => { setDurationMode(mode); haptic.light(); }}
                     className={cn(
-                      'py-3 px-2 rounded-xl text-sm font-medium transition-all',
-                      selectedCycles === option.value
-                        ? 'bg-purple-500/80 text-white'
-                        : 'bg-white/10 text-white/60'
+                      'px-4 py-1.5 rounded-full text-xs font-medium transition-all uppercase tracking-wider',
+                      durationMode === mode
+                        ? 'bg-white/20 text-white'
+                        : 'text-white/40'
                     )}
                   >
-                    {option.label}
+                    {mode === 'minutes' ? 'Minutes' : 'Cycles'}
                   </button>
                 ))}
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                {durationMode === 'cycles'
+                  ? CYCLE_OPTIONS.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => { setSelectedCycles(option.value); haptic.light(); }}
+                        className={cn(
+                          'py-3 px-2 rounded-xl text-sm font-medium transition-all',
+                          selectedCycles === option.value
+                            ? 'bg-purple-500/80 text-white'
+                            : 'bg-white/10 text-white/60'
+                        )}
+                      >
+                        {option.label}
+                      </button>
+                    ))
+                  : MINUTE_OPTIONS.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => { setSelectedMinutes(option.value); haptic.light(); }}
+                        className={cn(
+                          'py-3 px-2 rounded-xl text-sm font-medium transition-all',
+                          selectedMinutes === option.value
+                            ? 'bg-purple-500/80 text-white'
+                            : 'bg-white/10 text-white/60'
+                        )}
+                      >
+                        {option.label}
+                      </button>
+                    ))
+                }
               </div>
             </div>
           )}
@@ -351,8 +408,17 @@ export function BreathingExerciseScreen({
                 className="h-2 bg-white/10 [&>div]:bg-purple-400"
               />
               <div className="flex justify-between mt-2 text-sm text-white/40">
-                <span>{cycleCount} done</span>
-                <span>{selectedCycles} total</span>
+                {durationMode === 'cycles' ? (
+                  <>
+                    <span>{cycleCount} done</span>
+                    <span>{selectedCycles} total</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{Math.floor(totalElapsed / 60)}:{String(totalElapsed % 60).padStart(2, '0')}</span>
+                    <span>{selectedMinutes}:00</span>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -439,25 +505,54 @@ export function BreathingExerciseScreen({
         {/* Cycle selector (only shown when not active) */}
         {!isActive && !isCountingDown && (
           <div className="mb-4 animate-fade-in">
-            <h4 className="text-sm font-medium text-muted-foreground mb-3 text-center">CYCLES</h4>
-            <div className="grid grid-cols-4 gap-2">
-              {CYCLE_OPTIONS.map((option) => (
+            {/* Tab switcher */}
+            <div className="flex justify-center gap-1 mb-3">
+              {(['minutes', 'cycles'] as DurationMode[]).map((mode) => (
                 <button
-                  key={option.value}
-                  onClick={() => {
-                    setSelectedCycles(option.value);
-                    haptic.light();
-                  }}
+                  key={mode}
+                  onClick={() => { setDurationMode(mode); haptic.light(); }}
                   className={cn(
-                    'py-3 px-2 rounded-xl text-sm font-medium transition-all',
-                    selectedCycles === option.value
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    'px-4 py-1.5 rounded-full text-xs font-medium transition-all uppercase tracking-wider',
+                    durationMode === mode
+                      ? 'bg-muted text-foreground'
+                      : 'text-muted-foreground'
                   )}
                 >
-                  {option.label}
+                  {mode === 'minutes' ? 'Minutes' : 'Cycles'}
                 </button>
               ))}
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              {durationMode === 'cycles'
+                ? CYCLE_OPTIONS.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => { setSelectedCycles(option.value); haptic.light(); }}
+                      className={cn(
+                        'py-3 px-2 rounded-xl text-sm font-medium transition-all',
+                        selectedCycles === option.value
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                      )}
+                    >
+                      {option.label}
+                    </button>
+                  ))
+                : MINUTE_OPTIONS.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => { setSelectedMinutes(option.value); haptic.light(); }}
+                      className={cn(
+                        'py-3 px-2 rounded-xl text-sm font-medium transition-all',
+                        selectedMinutes === option.value
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                      )}
+                    >
+                      {option.label}
+                    </button>
+                  ))
+              }
             </div>
           </div>
         )}
@@ -470,8 +565,17 @@ export function BreathingExerciseScreen({
               className="h-2 bg-muted [&>div]:bg-primary"
             />
             <div className="flex justify-between mt-2 text-sm text-muted-foreground">
-              <span>{cycleCount} done</span>
-              <span>{selectedCycles} total</span>
+              {durationMode === 'cycles' ? (
+                <>
+                  <span>{cycleCount} done</span>
+                  <span>{selectedCycles} total</span>
+                </>
+              ) : (
+                <>
+                  <span>{Math.floor(totalElapsed / 60)}:{String(totalElapsed % 60).padStart(2, '0')}</span>
+                  <span>{selectedMinutes}:00</span>
+                </>
+              )}
             </div>
           </div>
         )}
