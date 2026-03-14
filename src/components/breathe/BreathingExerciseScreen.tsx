@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Pause, Play, HelpCircle } from 'lucide-react';
+import { Pause, Play, HelpCircle, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { BreathingCircle } from './BreathingCircle';
+import { ImmersiveBreathingCircle, ImmersiveParticles, getImmersiveBgGradient } from './ImmersiveBreathingCircle';
 import { BreathingInfoSheet } from './BreathingInfoSheet';
 import { CloseButton } from '@/components/app/CloseButton';
 import { BreathingExercise, useSaveBreathingSession } from '@/hooks/useBreathingExercises';
@@ -25,19 +26,37 @@ interface PhaseConfig {
   method?: string;
 }
 
-const DURATION_OPTIONS = [
-  { value: 60, label: '1 min' },
-  { value: 180, label: '3 min' },
-  { value: 300, label: '5 min' },
-  { value: 600, label: '10 min' },
+const CYCLE_OPTIONS = [
+  { value: 3, label: '3×' },
+  { value: 5, label: '5×' },
+  { value: 10, label: '10×' },
+  { value: 30, label: '30×' },
 ];
+
+type LayoutMode = 'classic' | 'immersive';
 
 export function BreathingExerciseScreen({
   exercise,
   onClose,
 }: BreathingExerciseScreenProps) {
-  // Setup state
-  const [selectedDuration, setSelectedDuration] = useState(60); // 1 min default
+  // Layout toggle
+  const [layout, setLayout] = useState<LayoutMode>(() => {
+    try {
+      return (localStorage.getItem('simora_breathe_layout') as LayoutMode) || 'classic';
+    } catch { return 'classic'; }
+  });
+
+  const toggleLayout = useCallback(() => {
+    setLayout(prev => {
+      const next = prev === 'classic' ? 'immersive' : 'classic';
+      try { localStorage.setItem('simora_breathe_layout', next); } catch {}
+      haptic.light();
+      return next;
+    });
+  }, []);
+
+  // Cycle-based length
+  const [selectedCycles, setSelectedCycles] = useState(3);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
   const [showCompleteSheet, setShowCompleteSheet] = useState(false);
   const [completedDuration, setCompletedDuration] = useState(0);
@@ -47,6 +66,7 @@ export function BreathingExerciseScreen({
   const [isPaused, setIsPaused] = useState(false);
   const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
   const [phaseTimeRemaining, setPhaseTimeRemaining] = useState(0);
+  const [cycleCount, setCycleCount] = useState(0);
   const [totalElapsed, setTotalElapsed] = useState(0);
   const [isCountingDown, setIsCountingDown] = useState(false);
   const [countdown, setCountdown] = useState(3);
@@ -98,7 +118,7 @@ export function BreathingExerciseScreen({
   }
 
   const currentPhase = phases[currentPhaseIndex];
-  const progressPercent = isActive ? (totalElapsed / selectedDuration) * 100 : 0;
+  const progressPercent = isActive ? (cycleCount / selectedCycles) * 100 : 0;
 
   // Initial countdown before starting
   useEffect(() => {
@@ -123,15 +143,28 @@ export function BreathingExerciseScreen({
     return () => clearInterval(timer);
   }, [isCountingDown, phases]);
 
-  // Main breathing timer
+  // Main breathing timer — cycle-based completion
   useEffect(() => {
     if (!isActive || isPaused || isCountingDown) return;
 
     const timer = setInterval(() => {
       setPhaseTimeRemaining((prev) => {
         if (prev <= 1) {
-          // Move to next phase
           const nextIndex = (currentPhaseIndex + 1) % phases.length;
+          const completedCycle = nextIndex === 0;
+
+          if (completedCycle) {
+            setCycleCount(c => {
+              const newC = c + 1;
+              if (newC >= selectedCycles) {
+                clearInterval(timer);
+                haptic.success();
+                handleComplete(totalElapsed + 1);
+              }
+              return newC;
+            });
+          }
+
           setCurrentPhaseIndex(nextIndex);
           haptic.light();
           return phases[nextIndex].duration;
@@ -139,28 +172,17 @@ export function BreathingExerciseScreen({
         return prev - 1;
       });
 
-      setTotalElapsed((prev) => {
-        const newElapsed = prev + 1;
-        if (newElapsed >= selectedDuration) {
-          // Session complete
-          clearInterval(timer);
-          haptic.success();
-          handleComplete(newElapsed);
-        }
-        return newElapsed;
-      });
+      setTotalElapsed((prev) => prev + 1);
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isActive, isPaused, isCountingDown, currentPhaseIndex, phases, selectedDuration]);
+  }, [isActive, isPaused, isCountingDown, currentPhaseIndex, phases, selectedCycles, totalElapsed]);
 
   const handleComplete = useCallback(async (elapsed: number) => {
-    // Save session to database
     saveSession.mutate(
       { exerciseId: exercise.id, durationSeconds: elapsed },
       {
         onSuccess: async () => {
-          // Auto-complete any breathing pro tasks linked to this exercise
           await autoCompleteBreathe(exercise.id);
           setCompletedDuration(elapsed);
           setShowCompleteSheet(true);
@@ -169,10 +191,14 @@ export function BreathingExerciseScreen({
     );
     setIsActive(false);
     setTotalElapsed(0);
+    setCycleCount(0);
     setCurrentPhaseIndex(0);
   }, [exercise.id, saveSession, autoCompleteBreathe]);
 
   const handleStart = useCallback(() => {
+    setCycleCount(0);
+    setTotalElapsed(0);
+    setCurrentPhaseIndex(0);
     setCountdown(3);
     setIsCountingDown(true);
     haptic.medium();
@@ -185,7 +211,6 @@ export function BreathingExerciseScreen({
 
   const handleClose = useCallback(() => {
     if (isActive && totalElapsed > 10) {
-      // Save partial session if they did at least 10 seconds
       saveSession.mutate({ exerciseId: exercise.id, durationSeconds: totalElapsed });
     }
     onClose();
@@ -194,12 +219,6 @@ export function BreathingExerciseScreen({
   const handleInfoDismiss = useCallback(() => {
     setShowInfoSheet(false);
   }, []);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
 
   // Determine what to show in the breathing circle
   const getCircleState = () => {
@@ -221,6 +240,157 @@ export function BreathingExerciseScreen({
 
   const circleState = getCircleState();
 
+  // ─── Immersive layout ──────────────────────────────────────
+  if (layout === 'immersive') {
+    const immBgGradient = getImmersiveBgGradient(circleState.phase, isCountingDown);
+    const isDone = cycleCount >= selectedCycles && !isActive;
+
+    return (
+      <div
+        className="fixed inset-0 z-50 flex flex-col overflow-hidden transition-all duration-[2000ms]"
+        style={{ background: immBgGradient }}
+      >
+        <ImmersiveParticles />
+
+        {/* Header */}
+        <div className="relative z-20" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+          <div className="flex items-center justify-between px-4 py-3">
+            <button onClick={handleClose} className="p-2 rounded-full bg-white/10 text-white/70 active:bg-white/20">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+
+            {isActive && (
+              <span className="text-white/50 font-medium text-sm">
+                {cycleCount} / {selectedCycles}
+              </span>
+            )}
+
+            <div className="flex gap-2">
+              <button
+                onClick={toggleLayout}
+                className="p-2 rounded-full bg-white/10 text-white/70 active:bg-white/20"
+                title="Switch layout"
+              >
+                <Layers className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => setShowInfoSheet(true)}
+                className="p-2 rounded-full bg-white/10 text-white/70 active:bg-white/20"
+              >
+                <HelpCircle className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Exercise name */}
+        <div className="flex-1 flex flex-col items-center justify-center relative z-10">
+          <p className="text-sm text-white/40 mb-8 font-medium tracking-widest uppercase">{exercise.name}</p>
+
+          <ImmersiveBreathingCircle
+            phase={circleState.phase}
+            phaseDuration={isActive && !isPaused ? currentPhase?.duration || 4 : 0}
+            phaseText={circleState.text}
+            methodText={circleState.method}
+            countdown={currentPhase?.type.includes('hold') && isActive && !isPaused ? phaseTimeRemaining : undefined}
+            isCountingDown={isCountingDown}
+            countdownValue={countdown}
+          />
+
+          {/* Phase timer */}
+          {isActive && !isPaused && !isCountingDown && (
+            <p className="mt-8 text-sm text-white/30 font-mono tracking-wider">{phaseTimeRemaining}s</p>
+          )}
+
+          {/* Cycle dots */}
+          {(isActive || isCountingDown) && (
+            <div className="mt-6 flex gap-2.5 flex-wrap justify-center max-w-[260px]">
+              {Array.from({ length: selectedCycles }).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-full transition-all duration-500"
+                  style={{
+                    width: 8, height: 8,
+                    background: i < cycleCount ? 'rgba(167,139,250,0.8)' : 'rgba(167,139,250,0.15)',
+                    boxShadow: i < cycleCount ? '0 0 8px rgba(167,139,250,0.4)' : 'none',
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom controls */}
+        <div className="relative z-20 px-6 pb-safe mb-8">
+          {!isActive && !isCountingDown && (
+            <div className="mb-4 animate-fade-in">
+              <h4 className="text-sm font-medium text-white/40 mb-3 text-center tracking-widest uppercase">Cycles</h4>
+              <div className="grid grid-cols-4 gap-2">
+                {CYCLE_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => { setSelectedCycles(option.value); haptic.light(); }}
+                    className={cn(
+                      'py-3 px-2 rounded-xl text-sm font-medium transition-all',
+                      selectedCycles === option.value
+                        ? 'bg-purple-500/80 text-white'
+                        : 'bg-white/10 text-white/60'
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {(isActive || isCountingDown) && (
+            <div className="mb-4">
+              <Progress
+                value={progressPercent}
+                className="h-2 bg-white/10 [&>div]:bg-purple-400"
+              />
+              <div className="flex justify-between mt-2 text-sm text-white/40">
+                <span>{cycleCount} done</span>
+                <span>{selectedCycles} total</span>
+              </div>
+            </div>
+          )}
+
+          {!isCountingDown && (
+            <button
+              onClick={isActive ? handlePauseToggle : handleStart}
+              className="w-full h-14 text-lg font-semibold rounded-2xl bg-purple-500/80 text-white active:bg-purple-600/80 transition-all flex items-center justify-center gap-2"
+            >
+              {isActive ? (
+                isPaused ? (<><Play className="h-5 w-5" /> Resume</>) : (<><Pause className="h-5 w-5" /> Pause</>)
+              ) : (
+                <><Play className="h-5 w-5" /> Start</>
+              )}
+            </button>
+          )}
+        </div>
+
+        {/* Info Sheet */}
+        <BreathingInfoSheet
+          exercise={exercise}
+          open={showInfoSheet}
+          onOpenChange={setShowInfoSheet}
+          onDismiss={handleInfoDismiss}
+        />
+
+        {/* Completion Sheet */}
+        <BreathingCompleteSheet
+          open={showCompleteSheet}
+          onOpenChange={setShowCompleteSheet}
+          exerciseName={exercise.name}
+          durationSeconds={completedDuration}
+        />
+      </div>
+    );
+  }
+
+  // ─── Classic layout ──────────────────────────────────────────
   return (
     <div className="fixed inset-0 z-50 bg-background">
       {/* Safe area top padding */}
@@ -231,16 +401,25 @@ export function BreathingExerciseScreen({
           
           {isActive && (
             <span className="text-muted-foreground font-medium">
-              {formatTime(selectedDuration - totalElapsed)}
+              {cycleCount} / {selectedCycles}
             </span>
           )}
           
-          <button
-            onClick={() => setShowInfoSheet(true)}
-            className="p-2 rounded-full bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
-          >
-            <HelpCircle className="h-5 w-5" />
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={toggleLayout}
+              className="p-2 rounded-full bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
+              title="Switch layout"
+            >
+              <Layers className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => setShowInfoSheet(true)}
+              className="p-2 rounded-full bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
+            >
+              <HelpCircle className="h-5 w-5" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -257,21 +436,21 @@ export function BreathingExerciseScreen({
 
       {/* Controls section - fixed to bottom */}
       <div className="absolute bottom-0 left-0 right-0 px-6 pb-safe mb-8">
-        {/* Duration selector (only shown when not active) */}
+        {/* Cycle selector (only shown when not active) */}
         {!isActive && !isCountingDown && (
           <div className="mb-4 animate-fade-in">
-            <h4 className="text-sm font-medium text-muted-foreground mb-3 text-center">LENGTH</h4>
+            <h4 className="text-sm font-medium text-muted-foreground mb-3 text-center">CYCLES</h4>
             <div className="grid grid-cols-4 gap-2">
-              {DURATION_OPTIONS.map((option) => (
+              {CYCLE_OPTIONS.map((option) => (
                 <button
                   key={option.value}
                   onClick={() => {
-                    setSelectedDuration(option.value);
+                    setSelectedCycles(option.value);
                     haptic.light();
                   }}
                   className={cn(
                     'py-3 px-2 rounded-xl text-sm font-medium transition-all',
-                    selectedDuration === option.value
+                    selectedCycles === option.value
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted text-muted-foreground hover:bg-muted/80'
                   )}
@@ -291,8 +470,8 @@ export function BreathingExerciseScreen({
               className="h-2 bg-muted [&>div]:bg-primary"
             />
             <div className="flex justify-between mt-2 text-sm text-muted-foreground">
-              <span>{formatTime(totalElapsed)}</span>
-              <span>{formatTime(selectedDuration)}</span>
+              <span>{cycleCount} done</span>
+              <span>{selectedCycles} total</span>
             </div>
           </div>
         )}
