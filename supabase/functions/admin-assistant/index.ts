@@ -613,7 +613,7 @@ async function addSubtasksToAction(supabase: any, args: any) {
   return {
     success: true,
     action: "add_subtasks_to_action",
-    message: `Added ${inserted.length} subtask(s) to action`,
+    message: `Added ${inserted.length} subtask(s) to task`,
     created: inserted,
   };
 }
