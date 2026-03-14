@@ -1,58 +1,60 @@
 
 
-## Calm-Style Animated Background for Watch Page
+# Interactive Starter Routine with Guided Finger Hints
 
-Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
+## What We're Building
+Transform the starter-routine onboarding screen into a real interactive experience:
+1. Add "Get out of bed" as the first task
+2. Create real tasks in Supabase when the user reaches this screen
+3. Guide the user step-by-step with finger hints (like `AddToRoutineHandHint`):
+   - **Step 1**: Finger hint pointing at "Get out of bed" checkmark → user taps to complete it
+   - **Step 2**: Spotlight the "Breathing exercise" pro-link action button → user taps, navigates to `/app/breathe`
+   - **Step 3**: When user returns from breathing, continue onboarding to the final welcome-aboard screen
 
-### What You'll Get
+## Tasks (5 total)
 
-- A deep dark blue gradient background on the Watch page header area
-- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
-- Subtle lightning flashes that pulse periodically
-- All text updated to white/light colors for contrast
-- Lightweight implementation using CSS keyframes (no extra dependencies)
+### 1. Update `STARTER_TASKS` array
+Add "Get out of bed" (emoji: 🛏️, color: peach/orange) as the first item. The 5 tasks become:
+- 🛏️ Get out of bed — "Start your day with one small win"
+- 🌤️ Check in with your mood — pro_link: `mood`
+- 🫁 Breathing exercise — pro_link: `breathe`
+- 📝 Write a short reflection — pro_link: `journal`
+- ✅ Complete one small task — regular task
 
-### Design Details
+### 2. Create real tasks on mount
+When `StarterRoutineScreen` mounts (and user is authenticated), use `useCreateTask` to insert the 5 tasks into `user_tasks`. Store created task IDs in local state. Tasks are created with `repeat_pattern: 'daily'` (except "Complete one small task" which is `none`). Pro tasks get their `pro_link_type` set.
 
-- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
-- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
-- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
-- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
-- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
+### 3. Build interactive card list with completion state
+Instead of static cards, render cards that respond to taps:
+- Each card has a completion circle (like `TaskCard`)
+- Tapping the circle marks it complete (calls `useCompleteTask`)
+- Completed cards show `SealCheck` in teal
 
-### Technical Approach
+### 4. Implement guided hint system (3 phases)
+Use a local state machine (`hintPhase: 'check-bed' | 'breathe' | 'done'`):
 
-**Files to modify:**
+**Phase 1 — `check-bed`**: Show a bouncing 👇 finger hint (reuse `AddToRoutineHandHint` pattern) pointing at the "Get out of bed" checkmark circle. When user taps it → mark complete, advance to phase 2.
 
-1. **`src/pages/app/AppWatch.tsx`**
-   - Replace the header `bg-[#E8F4FE]` with the dark gradient
-   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
-   - Add a lightning flash overlay div
-   - Update all text classes to white variants (`text-white`, `text-white/60`)
-   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
-   - Extend the gradient into the page background behind the content area
+**Phase 2 — `breathe`**: Spotlight/highlight the breathing exercise card's pro-link action button with a pulsing ring + finger hint. When user taps → navigate to `/app/breathe`. Store `onboarding_breathe_pending` in localStorage.
 
-2. **`tailwind.config.ts`**
-   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
-   - Register corresponding animation utilities
+**Phase 3 — return**: In `AppOnboarding`, check `onboarding_breathe_pending` on mount. If set, clear it and auto-advance to the welcome-aboard step. This handles the "come back from breathing" flow.
 
-### Visual Structure
+### 5. Wire into `AppOnboarding.tsx`
+- Pass `user` and `navigate` to `StarterRoutineScreen` (extend Props or use hooks inside)
+- On the starter-routine screen, the "Start your first reset" button changes to "Continue" after the breathing exercise is done, or the button is hidden during guided phases (hints guide the user instead)
 
-```text
-+----------------------------------+
-|  [dark blue gradient header]     |
-|  ~~~ cloud layer 1 (slow) ~~~   |
-|  ~~~ cloud layer 2 (slower) ~~~ |
-|  * lightning flash (periodic) *  |
-|                                  |
-|  Watch          [icons]          |
-|  [categories row]                |
-|  [filters]              [lang]   |
-+----------------------------------+
-|  [normal white content area]     |
-|  [playlist cards grid]           |
-+----------------------------------+
-```
+## Files to Change
 
-The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
+| File | Change |
+|------|--------|
+| `src/components/admin/onboarding/OnboardingStepRenderer.tsx` | Rewrite `StarterRoutineScreen` with real task creation, interactive completion, and hint system |
+| `src/data/onboarding-flows/quick-start.ts` | Update starter-routine step config (add "Get out of bed") |
+| `src/pages/app/AppOnboarding.tsx` | Add breathe-return detection logic on mount |
+
+## Technical Details
+
+- Hint component: Self-contained inside `StarterRoutineScreen`, using the same CSS keyframe animation pattern from `AddToRoutineHandHint` (bouncing 👇 emoji)
+- Spotlight: A pulsing ring (`ring-4 ring-primary/50 animate-pulse`) around the breathing card, similar to `TourOverlay`'s spotlight ring
+- Task creation is fire-and-forget with a guard (`localStorage` flag `onboarding_tasks_created`) to avoid duplicates on re-render
+- The breathing card's pro-link button gets a CSS class (`tour-onboarding-breathe`) for targeting by the hint
 
