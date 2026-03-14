@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
 import { supabase } from '@/integrations/supabase/client';
 import confetti from 'canvas-confetti';
@@ -14,6 +15,9 @@ import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
 import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
 import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
 import meplusPlanMascot from '@/assets/onboarding/meplus-plan-mascot.png';
+import { useAuth } from '@/hooks/useAuth';
+import { useCreateTask, useCompleteTask, CreateTaskInput } from '@/hooks/useTaskPlanner';
+import { format } from 'date-fns';
 
 interface Props {
   step: OnboardingStep;
@@ -1796,17 +1800,93 @@ function TaskSelectPurpleScreen({ step, onNext }: Props) {
 
 // ─── Starter Routine Screen ──────────────────────────────────
 
-const STARTER_TASKS = [
-  { emoji: '🌤️', title: 'Check in with your mood', subtitle: 'How are you feeling right now?', color: '#FEF3C7' },
-  { emoji: '🫁', title: 'Breathing exercise', subtitle: '2 min guided breathwork', color: '#DBEAFE' },
-  { emoji: '📝', title: 'Write a short reflection', subtitle: 'One sentence about your day', color: '#F3E8FF' },
-  { emoji: '✅', title: 'Complete one small task', subtitle: 'Pick something quick & easy', color: '#D1FAE5' },
+interface StarterTask {
+  emoji: string;
+  title: string;
+  subtitle: string;
+  color: string;
+  taskColor: string;
+  proLinkType?: string;
+  repeatPattern: 'daily' | 'none';
+}
+
+const STARTER_TASKS: StarterTask[] = [
+  { emoji: '🛏️', title: 'Get out of bed', subtitle: 'Start your day with one small win', color: '#FFEDD5', taskColor: 'orange', repeatPattern: 'daily' },
+  { emoji: '🌤️', title: 'Check in with your mood', subtitle: 'How are you feeling right now?', color: '#FEF3C7', taskColor: 'yellow', proLinkType: 'mood', repeatPattern: 'daily' },
+  { emoji: '🫁', title: 'Breathing exercise', subtitle: '2 min guided breathwork', color: '#DBEAFE', taskColor: 'blue', proLinkType: 'breathe', repeatPattern: 'daily' },
+  { emoji: '📝', title: 'Write a short reflection', subtitle: 'One sentence about your day', color: '#F3E8FF', taskColor: 'purple', proLinkType: 'journal', repeatPattern: 'daily' },
+  { emoji: '✅', title: 'Complete one small task', subtitle: 'Pick something quick & easy', color: '#D1FAE5', taskColor: 'green', repeatPattern: 'none' },
 ];
 
+type HintPhase = 'check-bed' | 'breathe' | 'done';
+
 function StarterRoutineScreen({ step, onNext }: Props) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const createTask = useCreateTask();
+  const completeTask = useCompleteTask();
+
+  const [createdTaskIds, setCreatedTaskIds] = useState<Record<number, string>>({});
+  const [completedIndices, setCompletedIndices] = useState<Set<number>>(new Set());
+  const [hintPhase, setHintPhase] = useState<HintPhase>('check-bed');
+  const [isCreating, setIsCreating] = useState(false);
+  const createdRef = useRef(false);
+
+  // Create real tasks in Supabase on mount
+  useEffect(() => {
+    if (!user?.id || createdRef.current) return;
+    const guard = localStorage.getItem('onboarding_starter_tasks_created');
+    if (guard) { createdRef.current = true; return; }
+    createdRef.current = true;
+    setIsCreating(true);
+
+    (async () => {
+      const ids: Record<number, string> = {};
+      for (let i = 0; i < STARTER_TASKS.length; i++) {
+        const t = STARTER_TASKS[i];
+        try {
+          const result = await createTask.mutateAsync({
+            title: t.title,
+            emoji: t.emoji,
+            color: t.taskColor as any,
+            repeat_pattern: t.repeatPattern,
+            pro_link_type: (t.proLinkType as any) || null,
+            order_index: i,
+          });
+          ids[i] = result.id;
+        } catch (e) {
+          console.warn('[Onboarding] Failed to create task:', t.title, e);
+        }
+      }
+      setCreatedTaskIds(ids);
+      localStorage.setItem('onboarding_starter_tasks_created', 'true');
+      setIsCreating(false);
+    })();
+  }, [user?.id]);
+
+  // Handle completing "Get out of bed"
+  const handleCheckBed = async () => {
+    const taskId = createdTaskIds[0];
+    if (taskId) {
+      try {
+        await completeTask.mutateAsync({ taskId, date: new Date() });
+      } catch (e) {
+        console.warn('[Onboarding] Failed to complete task:', e);
+      }
+    }
+    setCompletedIndices(prev => new Set(prev).add(0));
+    setTimeout(() => setHintPhase('breathe'), 600);
+  };
+
+  // Handle breathing exercise tap
+  const handleBreatheTap = () => {
+    localStorage.setItem('onboarding_breathe_pending', 'true');
+    navigate('/app/breathe');
+  };
+
   return (
     <div className="h-full flex flex-col bg-white">
-      <div className="flex-1 flex flex-col px-6 pt-8 pb-4">
+      <div className="flex-1 flex flex-col px-6 pt-8 pb-4 overflow-y-auto">
         {/* Header */}
         <FadeUp>
           <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center leading-tight">
@@ -1819,36 +1899,113 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
         {/* Task cards */}
         <div className="space-y-3">
-          {STARTER_TASKS.map((task, i) => (
-            <FadeUp key={task.title} delay={0.15 + i * 0.1}>
-              <div
-                className="flex items-center gap-4 rounded-2xl p-4 active:scale-[0.98] transition-transform"
-                style={{ backgroundColor: task.color + '66' }}
-              >
-                {/* Emoji circle */}
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: task.color }}
-                >
-                  <FluentEmoji emoji={task.emoji} size={28} />
+          {STARTER_TASKS.map((task, i) => {
+            const isCompleted = completedIndices.has(i);
+            const isBedTask = i === 0;
+            const isBreatheTask = i === 2;
+            const showBedHint = hintPhase === 'check-bed' && isBedTask && !isCompleted;
+            const showBreatheHint = hintPhase === 'breathe' && isBreatheTask;
+
+            return (
+              <FadeUp key={task.title} delay={0.15 + i * 0.1}>
+                <div className="relative">
+                  <div
+                    className={`flex items-center gap-4 rounded-2xl p-4 transition-all ${
+                      showBreatheHint ? 'ring-[3px] ring-blue-400/60 animate-pulse' : ''
+                    } ${isCompleted ? 'opacity-60' : ''}`}
+                    style={{ backgroundColor: task.color + '66' }}
+                    onClick={showBreatheHint ? handleBreatheTap : undefined}
+                  >
+                    {/* Emoji circle */}
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: task.color }}
+                    >
+                      <FluentEmoji emoji={task.emoji} size={28} />
+                    </div>
+                    {/* Text */}
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-[15px] font-semibold text-[#1a1f3d] leading-snug ${isCompleted ? 'line-through' : ''}`}>{task.title}</p>
+                      <p className="text-[13px] text-gray-500 mt-0.5">{task.subtitle}</p>
+                    </div>
+                    {/* Completion marker */}
+                    <button
+                      className="shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (showBedHint) handleCheckBed();
+                      }}
+                    >
+                      {isCompleted ? (
+                        <SealCheck className="w-7 h-7 text-teal-400" showParticles />
+                      ) : (
+                        <div className={`w-6 h-6 rounded-full border-2 ${showBedHint ? 'border-teal-400 bg-teal-50' : 'border-gray-300'} shrink-0`} />
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Finger hint for bed task */}
+                  {showBedHint && (
+                    <div
+                      className="pointer-events-none absolute z-[60]"
+                      style={{
+                        top: '6px',
+                        right: '-8px',
+                        filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.25))',
+                        animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
+                      }}
+                    >
+                      <FluentEmoji emoji="👆" size={48} />
+                    </div>
+                  )}
+
+                  {/* Finger hint for breathe task */}
+                  {showBreatheHint && (
+                    <div
+                      className="pointer-events-none absolute z-[60]"
+                      style={{
+                        top: '50%',
+                        right: '-16px',
+                        transform: 'translateY(-50%)',
+                        filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.25))',
+                        animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
+                      }}
+                    >
+                      <FluentEmoji emoji="👈" size={48} />
+                    </div>
+                  )}
                 </div>
-                {/* Text */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-semibold text-[#1a1f3d] leading-snug">{task.title}</p>
-                  <p className="text-[13px] text-gray-500 mt-0.5">{task.subtitle}</p>
-                </div>
-                {/* Empty circle (like uncompleted task marker) */}
-                <div className="w-6 h-6 rounded-full border-2 border-gray-300 shrink-0" />
-              </div>
-            </FadeUp>
-          ))}
+              </FadeUp>
+            );
+          })}
         </div>
+
+        {/* Phase instruction text */}
+        <FadeUp delay={0.7}>
+          <p className="text-center text-[13px] text-gray-400 mt-6">
+            {hintPhase === 'check-bed' && '👆 Tap the circle to complete your first task!'}
+            {hintPhase === 'breathe' && '🫁 Now try a quick breathing exercise'}
+            {hintPhase === 'done' && ''}
+          </p>
+        </FadeUp>
       </div>
 
-      {/* CTA */}
-      <FadeUp delay={0.6} className="px-6 pb-6 pt-2">
-        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
-      </FadeUp>
+      {/* CTA - only show after hints are done */}
+      {hintPhase === 'done' && (
+        <FadeUp delay={0.2} className="px-6 pb-6 pt-2">
+          <NavyButton onClick={onNext}>Continue</NavyButton>
+        </FadeUp>
+      )}
+
+      <style>{`
+        @keyframes onboardingHandBounce {
+          0%   { transform: translateY(0px); }
+          40%  { transform: translateY(-8px); }
+          55%  { transform: translateY(-3px); }
+          70%  { transform: translateY(-8px); }
+          100% { transform: translateY(0px); }
+        }
+      `}</style>
     </div>
   );
 }
