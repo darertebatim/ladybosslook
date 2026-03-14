@@ -920,14 +920,14 @@ const AppHome = () => {
                       My Actions
                     </h2>
                     {taskTags.length > 0 && (
-                      <div className="flex gap-1.5 overflow-x-auto overflow-y-visible scrollbar-hide">
+                      <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
                         <button
                           onClick={() => setSelectedTag(null)}
                           className={cn(
                             'px-2.5 py-0.5 rounded-full text-[11px] whitespace-nowrap transition-all font-medium',
                             selectedTag === null
                               ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                              : 'bg-white text-muted-foreground dark:bg-white/10 border border-white shadow-[0_2px_10px_rgba(0,0,0,0.08)]'
+                              : 'bg-white text-muted-foreground dark:bg-white/10 border border-white shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(0,0,0,0.03),0_0_0_1px_rgba(0,0,0,0.02)]'
                           )}
                         >
                           All
@@ -950,7 +950,7 @@ const AppHome = () => {
                                 'px-2.5 py-0.5 rounded-full text-[11px] whitespace-nowrap transition-all capitalize font-medium',
                                 selectedTag === tag
                                   ? activeColor
-                                  : 'bg-white text-muted-foreground dark:bg-white/10 border border-white shadow-[0_2px_10px_rgba(0,0,0,0.08)]'
+                                  : 'bg-white text-muted-foreground dark:bg-white/10 border border-white shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(0,0,0,0.03),0_0_0_1px_rgba(0,0,0,0.02)]'
                               )}
                             >
                               {categoryNameMap.get(tag) || tag}
