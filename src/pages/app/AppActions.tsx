@@ -166,7 +166,7 @@ export default function AppActions() {
         <div className="px-4 pb-2 animate-in slide-in-from-top duration-200">
           <Input
             type="search"
-            placeholder="Search actions..."
+            placeholder="Search tasks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="bg-muted/50"
