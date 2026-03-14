@@ -110,7 +110,7 @@ export const StreakGoalCompletionCelebration = ({
                 onClose();
               }
             }}
-            className="w-full h-12 text-white/80 hover:text-white bg-white/10 hover:bg-white/15 font-medium text-sm rounded-2xl"
+            className="w-full h-12 text-white bg-white/10 font-medium text-sm rounded-2xl"
           >
             {hasHigherGoals ? 'Wrap Up Challenge 🎖️' : 'Done'}
           </Button>

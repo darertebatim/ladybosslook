@@ -52,7 +52,7 @@ export function BackButton({
       onClick={handleClick}
       className={cn(
         'flex items-center gap-0.5 min-h-[44px] min-w-[44px] px-1 -ml-1',
-        'text-primary hover:bg-transparent active:opacity-70',
+        'text-primary active:opacity-70',
         'transition-opacity',
         className
       )}

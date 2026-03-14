@@ -288,7 +288,7 @@ export function SupplementViewer({ isOpen, onClose, supplement, moduleContext }:
                   className={cn(
                     "flex-1 rounded-full gap-2",
                     isLastModule 
-                      ? "bg-green-600 hover:bg-green-700" 
+                      ? "bg-green-600" 
                       : ""
                   )}
                 >

@@ -259,7 +259,7 @@ export const TaskQuickStartSheet = ({
                           "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border",
                           selectedCategory === cat.slug
                             ? "bg-primary/15 text-primary border-primary/30"
-                            : "bg-muted text-foreground hover:bg-muted/80 border-transparent"
+                            : "bg-muted text-foreground border-transparent"
                         )}
                       >
                         {cat.emoji && <span className="mr-0.5">{cat.emoji}</span>}
