@@ -2222,7 +2222,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
             {hintPhase === 'check-bed' && <><FluentEmoji emoji="👆" size={20} /> Tap the circle to complete your first task!</>}
             {hintPhase === 'breathe' && <><FluentEmoji emoji="🫁" size={20} /> Now tap the Breathe button to try it!</>}
             {hintPhase === 'mood' && <><FluentEmoji emoji="🌤️" size={20} /> Now check in with your mood!</>}
-            {hintPhase === 'done' && <><FluentEmoji emoji="✨" size={20} /> You're getting the hang of it!</>}
+            {hintPhase === 'done' && <><FluentEmoji emoji="✨" size={20} /> Tap Continue to keep going!</>}
           </p>
         </FadeUp>
 
