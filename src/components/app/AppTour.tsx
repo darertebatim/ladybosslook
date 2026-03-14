@@ -5,7 +5,7 @@ import { useAppTour } from '@/hooks/useAppTour';
 export const tourSteps: Step[] = [
   {
     target: '.tour-header',
-    content: 'Welcome! 👋 This is your personal dashboard. Track your daily actions and see your progress at a glance.',
+    content: 'Welcome! 👋 This is your personal dashboard. Track your daily tasks and see your progress at a glance.',
     disableBeacon: true,
     placement: 'bottom',
   },
