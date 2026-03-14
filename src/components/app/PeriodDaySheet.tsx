@@ -132,7 +132,7 @@ export const PeriodDaySheet = ({
                       'flex-1 py-2 px-3 rounded-xl border-2 transition-all text-center',
                       flowIntensity === option.id
                         ? 'border-pink-500 bg-pink-50 text-pink-700'
-                        : 'border-border bg-background hover:border-pink-200'
+                        : 'border-border bg-background'
                     )}
                   >
                     <span className="text-base block">{option.emoji}</span>
