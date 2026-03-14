@@ -982,8 +982,8 @@ const AppTaskCreate = ({
           className="w-full flex items-center justify-between py-2 px-4 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
-            <Repeat className="h-5 w-5 text-foreground/70" />
-            <span className="font-medium">Repeat</span>
+            <Repeat className="h-5 w-5 text-black" />
+            <span className="font-medium text-black">Repeat</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <span>{getRepeatSummary()}</span>
