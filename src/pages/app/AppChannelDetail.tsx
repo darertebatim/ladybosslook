@@ -244,7 +244,7 @@ export default function AppChannelDetail() {
         <div className="flex items-center gap-2 px-2 pt-2 pb-3">
           <button
             onClick={() => navigate('/app/channels')}
-            className="p-2 -ml-1 hover:bg-black/5 rounded-full transition-colors"
+            className="p-2 -ml-1 active:bg-black/5 rounded-full transition-colors"
           >
             <ChevronLeft className="h-6 w-6" />
           </button>
