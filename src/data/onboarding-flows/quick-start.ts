@@ -43,7 +43,7 @@ export const quickStartFlow: OnboardingFlow = {
       title: 'Your daily reset button',
       subtitle: 'Whenever your day feels scattered, stressed, or heavy — Simora gives you a small reset.',
       image: resetBeforeAfter,
-      description: '"It feels like having a little daily reset button in my pocket."\n— Yalda-M ⭐⭐⭐⭐⭐',
+      description: '"It feels like having a little daily reset button in my pocket." — Yalda-M ⭐⭐⭐⭐⭐',
       buttonLabel: 'Continue',
     },
     // 3b — Before/After visual comparison
