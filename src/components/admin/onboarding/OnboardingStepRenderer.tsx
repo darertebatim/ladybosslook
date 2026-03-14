@@ -2174,8 +2174,11 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
   const handleBreathingComplete = useCallback(() => {
     setShowBreathing(false);
-    setPhase('celebrate-breathe');
-    triggerCelebration(BREATHE_IDX, 'spotlight-complete');
+    // Pause after breathing before celebration — let it breathe
+    addTimer(() => {
+      setPhase('celebrate-breathe');
+      triggerCelebration(BREATHE_IDX, 'spotlight-complete');
+    }, 1200);
   }, []);
 
   const handleMoodTap = () => {
@@ -2193,12 +2196,13 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
   const handleFeelingBreatheTap = () => {
     setShowMoodFeeling(false);
-    setPhase('spotlight-breathe');
+    // Pause before spotlighting breathe — don't rush
+    addTimer(() => setPhase('spotlight-breathe'), 1200);
   };
 
   const handleFeelingDismiss = () => {
     setShowMoodFeeling(false);
-    setPhase('spotlight-breathe');
+    addTimer(() => setPhase('spotlight-breathe'), 1200);
   };
 
   // Show feeling overlay when phase reaches feeling-mood
