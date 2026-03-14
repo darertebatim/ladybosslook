@@ -1410,7 +1410,7 @@ export const useSkipTask = () => {
     },
     onError: (error) => {
       console.error('Skip task error:', error);
-      toast({ title: 'Failed to skip action', variant: 'destructive' });
+      toast({ title: 'Failed to skip task', variant: 'destructive' });
     },
   });
 };
