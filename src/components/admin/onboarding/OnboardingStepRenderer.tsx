@@ -2071,9 +2071,14 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
             transitionProperty: 'transform',
             transitionTimingFunction: (isInhaling || isExhaling) ? 'linear' : 'ease-out',
             transitionDuration: animDuration,
-            background: 'radial-gradient(circle at 40% 35%, rgba(139,92,246,0.25) 0%, rgba(99,102,241,0.15) 50%, rgba(79,70,229,0.08) 100%)',
+            background: isHolding
+              ? (breathPhase === 'inhale_hold'
+                ? 'radial-gradient(circle at 40% 35%, rgba(168,85,247,0.3) 0%, rgba(139,92,246,0.2) 50%, rgba(99,102,241,0.1) 100%)'
+                : 'radial-gradient(circle at 40% 35%, rgba(99,102,241,0.25) 0%, rgba(79,70,229,0.15) 50%, rgba(67,56,202,0.08) 100%)')
+              : 'radial-gradient(circle at 40% 35%, rgba(139,92,246,0.25) 0%, rgba(99,102,241,0.15) 50%, rgba(79,70,229,0.08) 100%)',
             boxShadow: `0 0 40px 10px rgba(139,92,246,${glowOpacity * 0.4}), 0 0 80px 30px rgba(99,102,241,${glowOpacity * 0.2}), inset 0 0 30px rgba(167,139,250,0.1)`,
             backdropFilter: 'blur(4px)',
+            animation: isHolding ? `ob-hold-pulse ${phaseDuration}s ease-in-out infinite` : 'none',
           }}
         />
 
