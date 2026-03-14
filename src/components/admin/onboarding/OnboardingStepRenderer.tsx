@@ -18,7 +18,6 @@ import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
 import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
 import meplusPlanMascot from '@/assets/onboarding/meplus-plan-mascot.png';
 import { TaskCard } from '@/components/app/TaskCard';
-import { TaskCard } from '@/components/app/TaskCard';
 import { format } from 'date-fns';
 
 interface Props {
