@@ -256,7 +256,7 @@ export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetP
             <Button
               onClick={handleSave}
               disabled={upsertSettings.isPending}
-              className="flex-1 bg-pink-500 hover:bg-pink-600 text-white"
+              className="flex-1 bg-pink-500 text-white"
             >
               {upsertSettings.isPending ? 'Saving...' : 'Save Settings'}
             </Button>

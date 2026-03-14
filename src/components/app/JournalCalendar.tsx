@@ -34,7 +34,7 @@ export function JournalCalendar({ journalDays }: JournalCalendarProps) {
         </h3>
         <button
           onClick={() => setCurrentMonth(prev => addMonths(prev, 1))}
-          className="p-2 rounded-full hover:bg-muted active:scale-95 transition-transform"
+          className="p-2 rounded-full active:bg-muted active:scale-95 transition-transform"
         >
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </button>

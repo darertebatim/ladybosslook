@@ -45,7 +45,7 @@ export const StreakChallengeCard = ({
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-2.5 text-xs font-semibold text-violet-600 bg-violet-50 hover:bg-violet-100 rounded-full gap-1"
+            className="h-7 px-2.5 text-xs font-semibold text-violet-600 bg-violet-50 active:bg-violet-100 rounded-full gap-1"
             onClick={() => {
               haptic.light();
               onLevelUp();

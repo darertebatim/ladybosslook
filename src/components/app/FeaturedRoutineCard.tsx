@@ -123,7 +123,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
                 FREE
               </Badge>
             ) : (
-              <Badge className="bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-[10px] px-1.5 py-0 gap-0.5 shadow-sm h-4">
+              <Badge className="bg-amber-200 text-amber-700 rounded-full text-[10px] px-1.5 py-0 gap-0.5 shadow-sm h-4">
                 <Crown className="h-2.5 w-2.5" />
                 PLUS
               </Badge>
