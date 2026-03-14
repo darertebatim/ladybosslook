@@ -149,7 +149,7 @@ export function CourseNotificationPrompt({
               <Button 
                 variant="ghost" 
                 onClick={handleSkip}
-                className="w-full h-11 rounded-none border-0 border-t border-border/50 m-0 bg-transparent hover:bg-muted/30 text-[15px] font-normal text-muted-foreground"
+                className="w-full h-11 rounded-none border-0 border-t border-border/50 m-0 bg-transparent text-[15px] font-normal text-muted-foreground"
               >
                 Skip for Now
               </Button>
