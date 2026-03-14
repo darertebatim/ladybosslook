@@ -589,7 +589,7 @@ const AppSettings = () => {
                 </Button>
                 <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
                   <AlertDialogTrigger asChild>
-                    <Button variant="ghost" className="w-full justify-start h-12 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10">
+                    <Button variant="ghost" className="w-full justify-start h-12 rounded-xl text-destructive bg-destructive/10">
                       <Trash2 className="mr-3 h-4 w-4" />Delete Account
                     </Button>
                   </AlertDialogTrigger>

@@ -469,7 +469,7 @@ export default function AppInspireDetail() {
           isLoading={addRoutineFromBank.isPending}
           size="lg"
           addText="Add to my routines"
-          className="bg-urgency text-urgency-foreground hover:bg-urgency/90"
+          className="bg-urgency text-urgency-foreground"
         />
       </div>
 

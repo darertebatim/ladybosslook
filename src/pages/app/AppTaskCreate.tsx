@@ -2219,7 +2219,7 @@ const AppTaskCreate = ({
           <AlertDialogFooter className="flex-row gap-3">
             <AlertDialogCancel className="flex-1 mt-0">Cancel</AlertDialogCancel>
             <AlertDialogAction 
-              className="flex-1 bg-red-500 hover:bg-red-600"
+              className="flex-1 bg-red-500"
               onClick={() => {
                 setIsUrgent(true);
                 setShowUrgentConfirm(false);
