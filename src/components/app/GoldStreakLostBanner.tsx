@@ -115,7 +115,7 @@ export const GoldStreakLostBanner = ({
             </p>
             <Button
               onClick={() => { haptic.light(); onDismiss(); onSubscribe?.(); }}
-              className="w-full bg-white hover:bg-white/90 text-amber-600 font-semibold py-3 rounded-xl mb-2"
+              className="w-full bg-white text-amber-600 font-semibold py-3 rounded-xl mb-2"
             >
               <Sparkles className="h-4 w-4 mr-1" />
               Get Simora Plus
