@@ -860,7 +860,7 @@ export default function RoutinesBank() {
           }
         });
       }
-      toast.success('Action updated');
+      toast.success('Task updated');
       setEditActionSheetOpen(false);
       setEditActionTaskBankId(null);
     },
