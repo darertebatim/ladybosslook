@@ -1851,7 +1851,7 @@ function buildUserTask(t: StarterTask, index: number, taskId?: string): import('
   };
 }
 
-type HintPhase = 'check-bed' | 'breathe' | 'done';
+type HintPhase = 'check-bed' | 'breathe' | 'mood' | 'done';
 
 // Mini inline breathing overlay for onboarding — uses real BreathingInfoSheet + BreathingCircle
 function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) {
