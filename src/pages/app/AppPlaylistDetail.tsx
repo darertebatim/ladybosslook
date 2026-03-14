@@ -802,7 +802,7 @@ export default function AppPlaylistDetail() {
                   "flex items-center gap-3 p-3 rounded-lg border border-white/10",
                   !isAvailable 
                     ? 'opacity-60 bg-white/5 cursor-not-allowed' 
-                    : 'cursor-pointer hover:bg-white/10'
+                    : 'cursor-pointer active:bg-white/10'
                 )}
               >
                 {/* Status icon */}
