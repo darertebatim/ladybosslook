@@ -117,7 +117,7 @@ export function RoutineBankCard({
             'px-3 py-3 rounded-t-2xl h-[5rem] flex items-start',
             bgColor
           )}>
-            <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
+            <h3 className="font-bold text-lg text-foreground line-clamp-2 leading-snug">
               {routine.title}
             </h3>
           </div>
