@@ -2006,13 +2006,14 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
   const isExpanded = breathPhase === 'inhale_hold';
   const isInhaling = breathPhase === 'inhale';
   const isExhaling = breathPhase === 'exhale';
+  const isHolding = breathPhase === 'inhale_hold' || breathPhase === 'exhale_hold';
   const animatedScale = stage !== 'running'
     ? 0.45
     : isExpanded || isInhaling ? 1.0 : 0.45;
   const animDuration = (isInhaling || isExhaling) ? `${phaseDuration}s` : '0.3s';
 
   // Glow intensity based on phase
-  const glowOpacity = isExpanded || isInhaling ? 0.5 : 0.2;
+  const glowOpacity = isExpanded || isInhaling ? 0.5 : isHolding ? 0.4 : 0.2;
 
   return (
     <div
