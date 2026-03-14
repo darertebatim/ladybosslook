@@ -570,6 +570,44 @@ function MotivationalScreen({ step, onNext }: Props) {
 
   const descMatch = step.description?.match(/^(\d+%)\s*(.*)/s);
   
+  // Bottom-sheet layout when image + testimonial description
+  const hasTestimonial = step.image && step.description?.includes('—');
+  if (hasTestimonial) {
+    const parts = step.description!.split('\n');
+    const quote = parts[0];
+    const author = parts.slice(1).join('\n');
+    return (
+      <div className="h-full flex flex-col relative overflow-hidden bg-[#fdf8f4]">
+        {/* Image area */}
+        <div className="shrink-0 relative px-4 pt-2">
+          <img src={step.image} alt="" className="w-full object-contain rounded-2xl" style={{ maxHeight: 220 }} />
+        </div>
+        {/* White bottom sheet */}
+        <div className="flex-1 bg-white rounded-t-[28px] -mt-3 relative z-10 overflow-y-auto">
+          <div className="px-5 pt-6 pb-6 flex flex-col min-h-full">
+            <FadeUp>
+              <h1 className="text-[24px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight">{step.title}</h1>
+            </FadeUp>
+            {step.subtitle && (
+              <FadeUp delay={0.08}>
+                <p className="text-[14px] text-gray-500 leading-relaxed text-center mb-4 whitespace-pre-line">{step.subtitle}</p>
+              </FadeUp>
+            )}
+            <FadeUp delay={0.15}>
+              <div className="bg-amber-50/80 rounded-2xl border border-amber-200/50 px-5 py-4 mb-4">
+                <p className="text-[15px] text-[#1a1f3d] font-medium italic leading-relaxed text-center">{quote}</p>
+                {author && <p className="text-[13px] text-amber-600 font-semibold text-center mt-2">{author}</p>}
+              </div>
+            </FadeUp>
+            <FadeUp delay={0.25} className="mt-auto">
+              <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
+            </FadeUp>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <ScreenWrapper center>
       <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight whitespace-pre-line">{step.title}</h1></FadeUp>
@@ -593,20 +631,6 @@ function MotivationalScreen({ step, onNext }: Props) {
             <span className="text-[#1a1f3d] font-extrabold text-2xl">{descMatch[1]}</span>{' '}
             {descMatch[2]}
           </p>
-        ) : step.description?.includes('—') ? (
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-amber-200/60 px-5 py-4 mb-4 shadow-sm">
-            {(() => {
-              const parts = step.description.split('\n');
-              const quote = parts[0];
-              const author = parts.slice(1).join('\n');
-              return (
-                <>
-                  <p className="text-[15px] text-[#1a1f3d] font-medium italic leading-relaxed text-center">{quote}</p>
-                  {author && <p className="text-[13px] text-amber-700/70 font-semibold text-center mt-2">{author}</p>}
-                </>
-              );
-            })()}
-          </div>
         ) : step.description ? (
           <p className="text-sm text-gray-500 italic leading-relaxed text-center mb-4 whitespace-pre-line">{step.description}</p>
         ) : null}
