@@ -2174,8 +2174,11 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
   const handleBreathingComplete = useCallback(() => {
     setShowBreathing(false);
-    setPhase('celebrate-breathe');
-    triggerCelebration(BREATHE_IDX, 'spotlight-complete');
+    // Pause after breathing before celebration — let it breathe
+    addTimer(() => {
+      setPhase('celebrate-breathe');
+      triggerCelebration(BREATHE_IDX, 'spotlight-complete');
+    }, 1200);
   }, []);
 
   const handleMoodTap = () => {
