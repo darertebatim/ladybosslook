@@ -33,6 +33,15 @@ const CYCLE_OPTIONS = [
   { value: 30, label: '30×' },
 ];
 
+const MINUTE_OPTIONS = [
+  { value: 1, label: '1 min' },
+  { value: 3, label: '3 min' },
+  { value: 5, label: '5 min' },
+  { value: 10, label: '10 min' },
+];
+
+type DurationMode = 'cycles' | 'minutes';
+
 type LayoutMode = 'classic' | 'immersive';
 
 export function BreathingExerciseScreen({
