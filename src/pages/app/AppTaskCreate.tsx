@@ -1142,7 +1142,7 @@ const AppTaskCreate = ({
       </div>
 
       {/* Subtasks hint text */}
-      <p className="text-center text-sm text-black/50 mt-3 px-6">
+      <p className="text-center text-sm text-black mt-3 px-6">
         Subtasks can be set as your daily routine or checklist
       </p>
 
