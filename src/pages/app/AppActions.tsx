@@ -134,7 +134,7 @@ export default function AppActions() {
       queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
       
-      toast.success('Action added to your routines! ✨');
+      toast.success('Task added to your routines! ✨');
       setPreviewSheetOpen(false);
       setSelectedTemplate(null);
     } catch (error) {
