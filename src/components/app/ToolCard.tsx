@@ -101,7 +101,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
             </div>
           )}
           <div className={cn(
-            'w-14 h-14 rounded-2xl flex items-center justify-center relative shadow-lg',
+            'w-14 h-14 rounded-2xl flex items-center justify-center relative shadow-[0_2px_10px_rgba(0,0,0,0.08)]',
             tool.bgColor
           )}>
             <IconComponent className={cn('h-6 w-6', tool.iconColor)} />
