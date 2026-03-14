@@ -46,7 +46,7 @@ export function PaywallGradient({ program, onPurchase, onRestore, onClose, previ
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-3">
         <button onClick={onClose} className="text-muted-foreground"><X className="h-5 w-5" /></button>
-        <button onClick={onRestore} className="text-sm text-muted-foreground hover:underline">Restore</button>
+        <button onClick={onRestore} className="text-sm text-muted-foreground underline">Restore</button>
       </div>
       {/* Hero */}
       <div className="relative px-6 pt-4 pb-4 text-center">
