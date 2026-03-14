@@ -2096,6 +2096,13 @@ function StarterRoutineScreen({ step, onNext }: Props) {
             return (
               <FadeUp key={task.id} delay={0.15 + i * 0.1}>
                 <div className="relative">
+                  {/* During breathe hint phase, overlay the card to intercept taps */}
+                  {showBreatheHint && (
+                    <button
+                      className="absolute inset-0 z-40 rounded-3xl"
+                      onClick={handleBreatheTap}
+                    />
+                  )}
                   <div>
                     <TaskCard
                       task={task}
@@ -2103,7 +2110,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                       isCompleted={isCompleted}
                       completedSubtaskIds={[]}
                       goalProgress={0}
-                      onTap={showBreatheHint ? handleBreatheTap : undefined}
+                      onTap={undefined}
                     />
                   </div>
 
