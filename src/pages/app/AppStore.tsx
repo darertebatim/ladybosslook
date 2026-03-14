@@ -349,7 +349,7 @@ const AppStore = () => {
                           className="relative shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
                         >
                           <div className="relative h-32 w-32 overflow-visible mb-1.5">
-                            <div className="h-full w-full rounded-2xl overflow-hidden bg-muted shadow-lg">
+                            <div className="h-full w-full rounded-2xl overflow-hidden bg-muted shadow-[0_2px_10px_rgba(0,0,0,0.08)]">
                               {program.image ? (
                                 <CachedImage src={program.image} alt={program.title} className="w-full h-full object-cover" />
                               ) : (
@@ -395,7 +395,7 @@ const AppStore = () => {
                       className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
                     >
                       <div className="relative h-32 w-32 rounded-2xl overflow-visible mb-1.5">
-                        <div className="h-full w-full rounded-2xl overflow-hidden bg-muted shadow-lg">
+                        <div className="h-full w-full rounded-2xl overflow-hidden bg-muted shadow-[0_2px_10px_rgba(0,0,0,0.08)]">
                           {r.cover_image_url ? (
                             <CachedImage src={r.cover_image_url} alt={r.title} className="w-full h-full object-cover" />
                           ) : (
@@ -434,7 +434,7 @@ const AppStore = () => {
                       className="shrink-0 w-24 text-center transition-transform active:scale-[0.97]"
                     >
                       <div className="relative h-24 w-24 overflow-visible mb-1.5">
-                        <div className="h-full w-full rounded-2xl bg-muted flex items-center justify-center shadow-lg">
+                        <div className="h-full w-full rounded-2xl bg-muted flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.08)]">
                           <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} />
                         </div>
                         {exercise.is_premium && (
@@ -468,7 +468,7 @@ const AppStore = () => {
                       className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
                     >
                       <div className="relative h-32 w-32 overflow-visible mb-1.5">
-                         <div className="h-full w-full rounded-2xl overflow-hidden bg-muted shadow-lg">
+                         <div className="h-full w-full rounded-2xl overflow-hidden bg-muted shadow-[0_2px_10px_rgba(0,0,0,0.08)]">
                           {playlist.cover_image_url ? (
                             <CachedImage src={playlist.cover_image_url} alt={playlist.name} className="w-full h-full object-cover" />
                           ) : (
@@ -507,7 +507,7 @@ const AppStore = () => {
                       className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
                     >
                       <div className="relative h-32 w-32 overflow-visible mb-1.5">
-                        <div className="h-full w-full rounded-2xl overflow-hidden bg-muted shadow-lg">
+                        <div className="h-full w-full rounded-2xl overflow-hidden bg-muted shadow-[0_2px_10px_rgba(0,0,0,0.08)]">
                           {playlist.cover_image_url ? (
                             <CachedImage src={playlist.cover_image_url} alt={playlist.name} className="w-full h-full object-cover" />
                           ) : (
