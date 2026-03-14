@@ -582,12 +582,12 @@ function MotivationalScreen({ step, onNext }: Props) {
     return (
       <div className="h-full flex flex-col relative overflow-hidden">
         {/* Mascot header background */}
-        <div className="h-[220px] shrink-0 relative">
+        <div className="h-[180px] shrink-0 relative">
           <img src={meplusMascotBg} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
         </div>
         {/* White bottom sheet */}
-        <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 overflow-y-auto">
-          <div className="px-5 pt-6 pb-6 flex flex-col min-h-full">
+        <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 overflow-hidden">
+          <div className="px-5 pt-5 pb-5 flex flex-col h-full">
             <FadeUp>
               <h1 className="text-[24px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight">{step.title}</h1>
             </FadeUp>
