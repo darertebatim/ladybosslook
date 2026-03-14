@@ -37,7 +37,7 @@ const NOTIFICATION_TYPES = {
   period_morning: {
     hour: 6,
     title: '🌅 Morning time',
-    body: 'Your morning actions are waiting gently.',
+    body: 'Your morning tasks are waiting gently.',
     url: '/app/home',
     prefKey: 'time_period_reminders',
   },
