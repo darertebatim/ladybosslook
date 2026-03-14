@@ -286,7 +286,7 @@ export default function AppWatch() {
                     'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
                     progressFilter === f
                       ? 'bg-white/20 text-white backdrop-blur-sm'
-                      : 'text-white/50 hover:text-white/70'
+                      : 'text-white/50'
                   )}
                 >
                   {f === 'all' ? 'All' : f === 'in_progress' ? 'In Progress' : 'Completed'}
