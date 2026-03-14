@@ -609,8 +609,7 @@ function MotivationalScreen({ step, onNext }: Props) {
             )}
             <FadeUp delay={0.18}>
               <div className="bg-amber-50/80 rounded-2xl border border-amber-200/50 px-4 py-3 mb-3 mt-3">
-                <p className="text-[14px] text-[#1a1f3d] font-medium italic leading-relaxed text-center">{quote}</p>
-                {author && <p className="text-[12px] text-amber-600 font-semibold text-center mt-1">{author}</p>}
+                <p className="text-[14px] text-[#1a1f3d] font-medium italic leading-relaxed text-center">{step.description}</p>
               </div>
             </FadeUp>
             <FadeUp delay={0.25}>
