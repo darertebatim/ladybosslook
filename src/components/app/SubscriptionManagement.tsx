@@ -200,7 +200,7 @@ function ManageSubscriptionSheet({
             <div className="shrink-0 px-4 pb-6 pt-2">
               <Button
                 variant="default"
-                className="w-full rounded-full h-12 text-sm font-semibold bg-foreground text-background hover:bg-foreground/90"
+                className="w-full rounded-full h-12 text-sm font-semibold bg-foreground text-background"
                 onClick={() => setShowHelp(true)}
               >
                 Membership Help Center
