@@ -95,7 +95,7 @@ export const AddedToRoutineButton = ({
         onClick={onAddClick}
         disabled={isLoading}
         className={cn(
-          "rounded-xl bg-urgency text-urgency-foreground hover:bg-urgency/90 shrink-0",
+          "rounded-xl bg-urgency text-urgency-foreground shrink-0",
           className
         )}
         title="Add to My Routines"
