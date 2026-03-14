@@ -970,9 +970,9 @@ const AppTaskCreate = ({
             <Calendar className="h-5 w-5 text-black" />
             <span className="font-medium text-black">{repeatEnabled ? 'Starting from' : 'Date'}</span>
           </div>
-          <div className="flex items-center gap-2 text-black/60">
+          <div className="flex items-center gap-2 text-black">
             <span>{format(scheduledDate, 'MMM d') === format(new Date(), 'MMM d') ? 'Today' : format(scheduledDate, 'MMM d, yyyy')}</span>
-            <ChevronRight className="h-4 w-4 text-black/40" />
+            <ChevronRight className="h-4 w-4 text-black" />
           </div>
         </button>
 
@@ -985,9 +985,9 @@ const AppTaskCreate = ({
             <Repeat className="h-5 w-5 text-black" />
             <span className="font-medium text-black">Repeat</span>
           </div>
-          <div className="flex items-center gap-2 text-black/60">
+          <div className="flex items-center gap-2 text-black">
             <span>{getRepeatSummary()}</span>
-            <ChevronRight className="h-4 w-4 text-black/40" />
+            <ChevronRight className="h-4 w-4 text-black" />
           </div>
         </button>
 
@@ -1000,9 +1000,9 @@ const AppTaskCreate = ({
             <Clock className="h-5 w-5 text-black" />
             <span className="font-medium text-black">Time</span>
           </div>
-          <div className="flex items-center gap-2 text-black/60">
+          <div className="flex items-center gap-2 text-black">
             <span>{formatTimeDisplay(scheduledTime)}</span>
-            <ChevronRight className="h-4 w-4 text-black/40" />
+            <ChevronRight className="h-4 w-4 text-black" />
           </div>
         </button>
 
@@ -1015,9 +1015,9 @@ const AppTaskCreate = ({
             <Bell className="h-5 w-5 text-black" />
             <span className="font-medium text-black">Reminder</span>
           </div>
-          <div className="flex items-center gap-2 text-black/60">
+          <div className="flex items-center gap-2 text-black">
             <span>{getReminderSummary()}</span>
-            <ChevronRight className="h-4 w-4 text-black/40" />
+            <ChevronRight className="h-4 w-4 text-black" />
           </div>
         </button>
 
@@ -1025,10 +1025,10 @@ const AppTaskCreate = ({
         {reminderEnabled && scheduledTime && (
           <div className="flex items-center justify-between py-2 px-4 border-b border-muted/30">
             <div className="flex items-center gap-3">
-              <AlarmClock className={cn("h-5 w-5", isUrgent ? "text-red-500" : "text-foreground/70")} />
+              <AlarmClock className={cn("h-5 w-5", isUrgent ? "text-red-500" : "text-black")} />
               <div className="flex flex-col">
-                <span className={cn("font-medium", isUrgent && "text-red-600")}>Urgent</span>
-                <span className="text-xs text-muted-foreground">Alarm rings even on silent</span>
+                <span className={cn("font-medium text-black", isUrgent && "text-red-600")}>Urgent</span>
+                <span className="text-xs text-black/60">Alarm rings even on silent</span>
               </div>
             </div>
             <Switch 
@@ -1054,9 +1054,9 @@ const AppTaskCreate = ({
             <Tag className="h-5 w-5 text-black" />
             <span className="font-medium text-black">Category</span>
           </div>
-          <div className="flex items-center gap-2 text-black/60">
+          <div className="flex items-center gap-2 text-black">
             <span>{tag || 'No category'}</span>
-            <ChevronRight className="h-4 w-4 text-black/40" />
+            <ChevronRight className="h-4 w-4 text-black" />
           </div>
         </button>
       </div>
@@ -1074,9 +1074,9 @@ const AppTaskCreate = ({
             <Target className={cn("h-5 w-5", goalSettings.enabled ? "text-emerald-600" : "text-black")} />
             <span className="font-medium text-black">Goal</span>
           </div>
-          <div className="flex items-center gap-2 text-black/60">
+          <div className="flex items-center gap-2 text-black">
             <span>{goalSettings.enabled ? formatGoalTarget(goalSettings) : 'Off'}</span>
-            <ChevronRight className="h-4 w-4 text-black/40" />
+            <ChevronRight className="h-4 w-4 text-black" />
           </div>
         </button>
       </div>
@@ -1094,7 +1094,7 @@ const AppTaskCreate = ({
             <Sparkles className={cn("h-5 w-5", proLinkType ? "text-violet-600" : "text-black")} />
             <span className="font-medium text-black">Pro Action Link</span>
           </div>
-          <div className="flex items-center gap-2 text-black/60">
+          <div className="flex items-center gap-2 text-black">
             {proConfig ? (
               <span className="flex items-center gap-1.5">
                 <proConfig.icon className="h-4 w-4" />
@@ -1103,7 +1103,7 @@ const AppTaskCreate = ({
             ) : (
               <span>Off</span>
             )}
-            <ChevronRight className="h-4 w-4 text-black/40" />
+            <ChevronRight className="h-4 w-4 text-black" />
           </div>
         </button>
       </div>
@@ -1128,7 +1128,7 @@ const AppTaskCreate = ({
         </DndContext>
 
         <div className="flex items-center gap-3 px-4 py-3">
-          <Plus className="h-5 w-5 text-black/40 shrink-0" />
+          <Plus className="h-5 w-5 text-black shrink-0" />
           <Input
             ref={newSubtaskInputRef}
             value={newSubtask}
@@ -1136,13 +1136,13 @@ const AppTaskCreate = ({
             onKeyDown={(e) => e.key === 'Enter' && addSubtask()}
             onFocus={handleNewSubtaskFocus}
             placeholder="Subtasks"
-            className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto text-base text-black placeholder:text-black/40"
+            className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto text-base text-black placeholder:text-black/50"
           />
         </div>
       </div>
 
       {/* Subtasks hint text */}
-      <p className="text-center text-sm text-black/50 mt-3 px-6">
+      <p className="text-center text-sm text-black mt-3 px-6">
         Subtasks can be set as your daily routine or checklist
       </p>
 
