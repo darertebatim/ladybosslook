@@ -2711,7 +2711,7 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
                 animate={{ scale: 1 }}
                 className="ml-auto"
               >
-                <SealCheck size={28} />
+                <SealCheck className="w-7 h-7" />
               </motion.div>
             )}
           </div>
