@@ -659,7 +659,7 @@ export default function AppChat() {
         {showScrollButton && (
           <button
             onClick={scrollToBottomSmooth}
-            className="absolute bottom-20 right-4 h-11 w-11 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center z-20 transition-all hover:scale-105 active:scale-95 animate-in fade-in slide-in-from-bottom-2"
+            className="absolute bottom-20 right-4 h-11 w-11 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center z-20 transition-all active:scale-95 animate-in fade-in slide-in-from-bottom-2"
             style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
           >
             <ChevronDown className="h-6 w-6" />

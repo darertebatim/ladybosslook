@@ -233,7 +233,7 @@ export default function AppVideoPlaylistDetail() {
                   disabled={locked}
                   className={cn(
                     "w-full flex items-center gap-3 p-3 rounded-xl border border-white/10 transition-colors text-left",
-                    locked ? "opacity-50 cursor-not-allowed" : "hover:bg-white/10 active:scale-[0.99]",
+                    locked ? "opacity-50 cursor-not-allowed" : "active:scale-[0.99]",
                     completed && "bg-white/5 border-white/20"
                   )}
                 >
