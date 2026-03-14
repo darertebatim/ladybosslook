@@ -312,8 +312,16 @@ const AppHome = () => {
     if (!streak) return;
     const recoveryCount = (streak as any).streak_recovery_count || 0;
     if (recoveryCount >= 3) return;
-    if (streak.current_streak !== 0) return;
-    if (streak.longest_streak <= 0) return;
+    if (streak.longest_streak <= 1) return;
+    
+    // Check if streak is actually broken by comparing last_completion_date
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
+    const lastCompletion = streak.last_completion_date;
+    
+    // If last completion was today or yesterday, streak is alive
+    if (lastCompletion === today || lastCompletion === yesterday) return;
+    
     const shownKey = 'simora_recovery_prompt_shown';
     if (sessionStorage.getItem(shownKey) === 'true') return;
     sessionStorage.setItem(shownKey, 'true');
