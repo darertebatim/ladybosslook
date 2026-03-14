@@ -2036,7 +2036,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     : 1;
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center" style={{ background: getImmersiveBgGradient() }}>
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center" style={{ background: getImmersiveBgGradient(isCountingDown ? 'ready' : breathPhase, isCountingDown) }}>
       <ImmersiveParticles />
       <p className="text-white/60 text-sm font-medium mb-8">
         {cycleCount + 1} / {totalCycles} cycles
