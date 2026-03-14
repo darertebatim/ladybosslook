@@ -19,8 +19,8 @@ export function ActionSheetTour({ isOpen, onTourReady }: ActionSheetTourProps) {
     },
     {
       id: 'buttons',
-      title: 'Try Something New 🎲',
-      description: 'Tap "Random" for a surprise action, or "Browse All" to see the full collection.',
+       title: 'Try Something New 🎲',
+       description: 'Tap "Random" for a surprise task, or "Browse All" to see the full collection.',
       target: '.tour-action-buttons',
       position: 'bottom',
       action: 'tap',

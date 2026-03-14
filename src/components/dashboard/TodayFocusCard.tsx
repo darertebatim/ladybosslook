@@ -60,7 +60,7 @@ export function TodayFocusCard({
               </p>
               {todayTasksCount === 0 ? (
                 <p className="text-sm text-muted-foreground">
-                  One small action is enough
+                  One small task is enough
                 </p>
               ) : todayTasksCount > 0 && !allDone ? (
                 <p className="text-sm text-muted-foreground">

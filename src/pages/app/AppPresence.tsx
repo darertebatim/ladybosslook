@@ -248,7 +248,7 @@ const AppPresence = () => {
             <section>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-orange-900/60">
-                  Action Stats
+                   Task Stats
                 </h3>
                 <button
                   onClick={() => navigate('/app/action-stats')}

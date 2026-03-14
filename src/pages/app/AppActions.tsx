@@ -245,7 +245,7 @@ export default function AppActions() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No actions in this category</p>
+                <p className="text-muted-foreground">No tasks in this category</p>
               </div>
             )}
           </div>

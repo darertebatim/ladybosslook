@@ -269,7 +269,7 @@ const localPNs: PNType[] = [
     name: 'Task Reminders',
     function: 'local-task-reminder',
     trigger: 'Capacitor LocalNotifications',
-    description: 'Scheduled reminders for user actions with configured times. 100% local - no server involved.',
+    description: 'Scheduled reminders for user tasks with configured times. 100% local - no server involved.',
     userPreference: 'reminder_enabled per task, reminder_offset (0/10/30/60 min)',
     icon: <CheckSquare className="h-5 w-5" />,
     codeFile: 'src/hooks/useLocalNotificationScheduler.ts',

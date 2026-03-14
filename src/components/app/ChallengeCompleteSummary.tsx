@@ -95,7 +95,7 @@ export const ChallengeCompleteSummary = ({
 
   const stats = [
     { label: 'Days Completed', value: streakGoal, icon: '🔥' },
-    { label: 'Actions Done', value: totalActions, icon: '✅' },
+    { label: 'Tasks Done', value: totalActions, icon: '✅' },
     { label: 'Perfect Days', value: perfectDays, icon: '⭐' },
   ];
 

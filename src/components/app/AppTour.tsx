@@ -21,7 +21,7 @@ export const tourSteps: Step[] = [
   },
   {
     target: '.tour-add-task',
-    content: 'Tap here to add new actions or choose from popular suggestions ✨',
+    content: 'Tap here to add new tasks or choose from popular suggestions ✨',
     placement: 'left',
   },
   {

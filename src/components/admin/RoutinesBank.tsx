@@ -1988,7 +1988,7 @@ export default function RoutinesBank() {
                         ) : (
                           <div className="flex gap-1">
                             <Button type="button" variant="ghost" size="sm" onClick={() => setAddingTaskToSection('uncategorized')} className="flex-1 h-7 text-xs gap-1">
-                              <Plus className="h-3 w-3" /> Add Action
+                              <Plus className="h-3 w-3" /> Add Task
                             </Button>
                             <Button type="button" variant="outline" size="sm" onClick={() => openCreateActionSheet(null)} className="h-7 text-xs gap-1">
                               <Sparkles className="h-3 w-3" /> Create New

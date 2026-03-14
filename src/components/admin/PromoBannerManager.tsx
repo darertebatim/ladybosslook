@@ -463,7 +463,7 @@ export function PromoBannerManager() {
       case 'tasks_bank':
       case 'planner':
       case 'home':
-        return 'Home / Action Planner';
+        return 'Home / Task Planner';
       case 'journal':
         return 'Journal';
       case 'programs':

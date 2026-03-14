@@ -294,7 +294,7 @@ export const TaskQuickStartSheet = ({
                 {filteredSuggestions.length > 0 && (
                   <>
                     <p className="text-xs text-muted-foreground mb-2">
-                      {taskName.trim() ? 'Matching actions' : 'Suggestions'}
+                      {taskName.trim() ? 'Matching tasks' : 'Suggestions'}
                     </p>
                     <div className="space-y-2 tour-action-list">
                       {filteredSuggestions.map((template) => {

@@ -6,11 +6,11 @@ import { logLocalNotificationEvent } from '@/lib/localNotificationLogger';
 import { getLocalDateStr } from '@/lib/localDate';
 
 /**
- * Smart Action Nudges - Local Notification Scheduler
+ * Smart Task Nudges - Local Notification Scheduler
  * 
  * Schedules random notifications from user's actual planner data:
- * - Action Reminders: 1-3 random incomplete tasks (IDs: 200001-200010)
- * - ProAction Nudges: 1 random proaction (IDs: 200011-200020)
+ * - Task Reminders: 1-3 random incomplete tasks (IDs: 200001-200010)
+ * - ProTask Nudges: 1 random proaction (IDs: 200011-200020)
  * - Water Reminders: 3-4 random times (IDs: 200021-200030)
  * 
  * All scheduled between 8 AM and 8 PM local time.

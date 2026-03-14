@@ -303,8 +303,8 @@ const AppActionStats = () => {
             <div className="space-y-4">
               <RecordRow label="Perfect Days" value={yearRecords.perfectDays} unit="days" />
               <RecordRow label="Best Streaks" value={yearRecords.bestStreak} unit="days" />
-              <RecordRow label="Actions Done Total" value={yearRecords.totalCompleted} />
-              <RecordRow label="Actions Done This Month" value={yearRecords.monthCompleted} />
+               <RecordRow label="Tasks Done Total" value={yearRecords.totalCompleted} />
+               <RecordRow label="Tasks Done This Month" value={yearRecords.monthCompleted} />
               <RecordRow label="Overall Rate" value={yearRecords.overallRate} unit="%" />
               <RecordRow label="Monthly Rate" value={yearRecords.monthlyRate} unit="%" />
             </div>

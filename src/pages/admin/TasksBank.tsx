@@ -677,7 +677,7 @@ export default function TasksBank() {
           </Button>
           <Button onClick={openNewSheet} className="gap-2">
             <Plus className="h-4 w-4" />
-            Add Action
+             Add Task
           </Button>
         </div>
       </CardHeader>

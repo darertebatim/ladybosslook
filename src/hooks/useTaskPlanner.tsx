@@ -1472,7 +1472,7 @@ export const useSnoozeTask = () => {
     },
     onError: (error) => {
       console.error('Snooze task error:', error);
-      toast({ title: 'Failed to reschedule action', variant: 'destructive' });
+      toast({ title: 'Failed to reschedule task', variant: 'destructive' });
     },
   });
 };

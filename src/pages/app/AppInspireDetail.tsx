@@ -406,7 +406,7 @@ export default function AppInspireDetail() {
               {/* Unsectioned tasks */}
               {(tasksBySection['unsorted']?.length ?? 0) > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">Actions</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">Tasks</h3>
                   <div className="space-y-3">
                     {tasksBySection['unsorted'].map((task) => {
                       const bgColor = TASK_COLORS[(task.color as TaskColor) || 'mint'] || TASK_COLORS.mint;

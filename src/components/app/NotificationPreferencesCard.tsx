@@ -258,7 +258,7 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
                   <PreferenceItem
                     icon={<Sparkles className="h-4 w-4" />}
                     label="Daily Completion"
-                    description="Celebrate when you honor 3+ actions"
+                    description="Celebrate when you honor 3+ tasks"
                     checked={getPreference('daily_completion')}
                     onCheckedChange={handleToggle('daily_completion')}
                     disabled={updatePreference.isPending}

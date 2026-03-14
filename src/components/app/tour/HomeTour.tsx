@@ -151,8 +151,8 @@ export function HomeTour({
     } else {
       baseSteps.push({
         id: 'done',
-        title: 'Ready to Start! 👋',
-        description: "Ready? Tap + to add your first action.",
+         title: 'Ready to Start! 👋',
+         description: "Ready? Tap + to add your first task.",
         position: 'center',
         action: 'look',
       });

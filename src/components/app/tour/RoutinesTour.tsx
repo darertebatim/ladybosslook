@@ -46,8 +46,8 @@ export function RoutinesTour({ isFirstVisit = false, onTourReady }: RoutinesTour
     {
       id: 'add-action-btn',
       target: '.tour-action-add-btn',
-      title: 'Add to My Routines',
-      description: 'Tap the + button to add any action to your daily planner. Customize time, repeat, and reminders.',
+       title: 'Add to My Routines',
+       description: 'Tap the + button to add any task to your daily planner. Customize time, repeat, and reminders.',
       position: 'left',
       action: 'tap',
       condition: () => !!document.querySelector('.tour-action-add-btn'),
