@@ -100,42 +100,26 @@ export function BreathingExerciseScreen({
     setShowInfoSheet(true);
   }, [exercise.id]);
 
-  // Build phases array from exercise config
-  const phases: PhaseConfig[] = [];
-  
-  if (exercise.inhale_seconds > 0) {
-    phases.push({
-      type: 'inhale',
-      duration: exercise.inhale_seconds,
-      text: 'Inhale',
-      method: exercise.inhale_method === 'nose' ? 'Nose' : 'Mouth',
-    });
-  }
-  
-  if (exercise.inhale_hold_seconds > 0) {
-    phases.push({
-      type: 'inhale_hold',
-      duration: exercise.inhale_hold_seconds,
-      text: 'Hold',
-    });
-  }
-  
-  if (exercise.exhale_seconds > 0) {
-    phases.push({
-      type: 'exhale',
-      duration: exercise.exhale_seconds,
-      text: 'Exhale',
-      method: exercise.exhale_method === 'nose' ? 'Nose' : 'Mouth',
-    });
-  }
-  
-  if (exercise.exhale_hold_seconds > 0) {
-    phases.push({
-      type: 'exhale_hold',
-      duration: exercise.exhale_hold_seconds,
-      text: 'Hold',
-    });
-  }
+  // Build phases array from exercise config (memoized to stabilize effect deps)
+  const phases = useMemo(() => {
+    const p: PhaseConfig[] = [];
+    if (exercise.inhale_seconds > 0) {
+      p.push({ type: 'inhale', duration: exercise.inhale_seconds, text: 'Inhale', method: exercise.inhale_method === 'nose' ? 'Nose' : 'Mouth' });
+    }
+    if (exercise.inhale_hold_seconds > 0) {
+      p.push({ type: 'inhale_hold', duration: exercise.inhale_hold_seconds, text: 'Hold' });
+    }
+    if (exercise.exhale_seconds > 0) {
+      p.push({ type: 'exhale', duration: exercise.exhale_seconds, text: 'Exhale', method: exercise.exhale_method === 'nose' ? 'Nose' : 'Mouth' });
+    }
+    if (exercise.exhale_hold_seconds > 0) {
+      p.push({ type: 'exhale_hold', duration: exercise.exhale_hold_seconds, text: 'Hold' });
+    }
+    return p;
+  }, [exercise]);
+
+  const phasesRef = useRef(phases);
+  phasesRef.current = phases;
 
   const currentPhase = phases[currentPhaseIndex];
   const totalTargetSeconds = durationMode === 'minutes' ? selectedMinutes * 60 : 0;
