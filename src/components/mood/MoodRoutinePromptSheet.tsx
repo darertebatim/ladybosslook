@@ -105,7 +105,7 @@ export function MoodRoutinePromptSheet({
           style={{ boxShadow: 'var(--shadow-cta)' }}
         >
           <CalendarPlus className="h-5 w-5" />
-          Add to My Routines
+          Add Daily Mood Check-in to My Routines
         </Button>
 
         {/* Skip row — visible on hover/active */}
