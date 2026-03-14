@@ -148,7 +148,7 @@ export default function AppActions() {
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
       <AppHeader
-        title="Actions"
+        title="Tasks"
         showBack
         backTo="/app/routines"
         rightAction={
