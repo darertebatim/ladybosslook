@@ -10,6 +10,7 @@ export interface RoutineBankItem {
   subtitle: string | null;
   description: string | null;
   cover_image_url: string | null;
+  cover_aspect?: string; // 'square' | '6x4'
   category: string;
   color: string | null;
   emoji: string | null;

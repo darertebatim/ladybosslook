@@ -150,6 +150,7 @@ export default function RoutinesBank() {
     subtitle: '',
     description: '',
     cover_image_url: '',
+    cover_aspect: 'square' as string,
     video_url: '',
     category: 'general',
     color: 'yellow',
@@ -241,7 +242,8 @@ export default function RoutinesBank() {
           category: data.formData.category,
           color: data.formData.color,
           emoji: data.formData.emoji,
-          schedule_type: data.formData.schedule_type,
+           schedule_type: data.formData.schedule_type,
+           cover_aspect: data.formData.cover_aspect,
           challenge_start_date: data.formData.start_mode === 'date' && data.formData.challenge_start_date ? data.formData.challenge_start_date.toISOString().split('T')[0] : null,
           start_day_of_week: data.formData.start_mode === 'weekday' ? data.formData.start_day_of_week : null,
           end_mode: data.formData.end_mode,
@@ -317,7 +319,8 @@ export default function RoutinesBank() {
           category: data.formData.category,
           color: data.formData.color,
           emoji: data.formData.emoji,
-          schedule_type: data.formData.schedule_type,
+           schedule_type: data.formData.schedule_type,
+           cover_aspect: data.formData.cover_aspect,
           challenge_start_date: data.formData.start_mode === 'date' && data.formData.challenge_start_date ? data.formData.challenge_start_date.toISOString().split('T')[0] : null,
           start_day_of_week: data.formData.start_mode === 'weekday' ? data.formData.start_day_of_week : null,
           end_mode: data.formData.end_mode,
@@ -500,6 +503,7 @@ export default function RoutinesBank() {
       subtitle: '',
       description: '',
       cover_image_url: '',
+      cover_aspect: 'square',
       video_url: '',
       category: 'general',
       color: 'yellow',
@@ -525,6 +529,7 @@ export default function RoutinesBank() {
       subtitle: routine.subtitle || '',
       description: routine.description || '',
       cover_image_url: routine.cover_image_url || '',
+      cover_aspect: (routine as any).cover_aspect || 'square',
       video_url: (routine as any).video_url || '',
       category: routine.category,
       color: routine.color,
@@ -1336,6 +1341,23 @@ export default function RoutinesBank() {
                         Change
                       </Button>
                     </div>
+                  </div>
+
+                  {/* Cover Aspect */}
+                  <div className="space-y-2">
+                    <Label>Cover Aspect Ratio</Label>
+                    <Select
+                      value={(formData as any).cover_aspect || 'square'}
+                      onValueChange={(val) => setFormData({ ...formData, cover_aspect: val } as any)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="square">Square (1:1) — shows title header</SelectItem>
+                        <SelectItem value="6x4">Tall (6:4) — cover only, no title</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Cover Image */}

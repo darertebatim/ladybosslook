@@ -111,8 +111,8 @@ export function RoutineBankCard({
         )}
         onClick={handleClick}
       >
-        {/* Title Header Section - hidden in coverOnly mode */}
-        {!coverOnly && (
+        {/* Title Header Section - hidden in coverOnly mode or when cover is 6x4 */}
+        {!coverOnly && routine.cover_aspect !== '6x4' && (
           <div className={cn(
             'px-3 py-3 rounded-t-2xl h-[5rem] flex items-start',
             bgColor
@@ -124,7 +124,11 @@ export function RoutineBankCard({
         )}
 
         {/* Square Image Container */}
-        <div className={cn("relative aspect-square w-full overflow-hidden", coverOnly ? "rounded-2xl" : "rounded-b-2xl")}>
+        <div className={cn(
+          "relative w-full overflow-hidden",
+          routine.cover_aspect === '6x4' ? 'aspect-[4/6]' : 'aspect-square',
+          coverOnly || routine.cover_aspect === '6x4' ? "rounded-2xl" : "rounded-b-2xl"
+        )}>
           {routine.cover_image_url ? (
             <CachedImage
               src={routine.cover_image_url}
