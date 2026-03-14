@@ -382,7 +382,7 @@ export default function TasksBank() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-task-bank'] });
-      toast.success('Action deleted');
+      toast.success('Task deleted');
     },
   });
 
