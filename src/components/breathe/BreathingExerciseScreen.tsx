@@ -135,7 +135,7 @@ export function BreathingExerciseScreen({
           clearInterval(timer);
           setIsCountingDown(false);
           setIsActive(true);
-          setPhaseTimeRemaining(phasesRef.current[0]?.duration || 4);
+          setPhaseTimeRemaining(phases[0]?.duration || 4);
           startTimeRef.current = Date.now();
           haptic.medium();
           return 0;
@@ -146,35 +146,33 @@ export function BreathingExerciseScreen({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isCountingDown]);
+  }, [isCountingDown, phases]);
 
   // Main breathing timer — supports both cycle-based and minute-based completion
   useEffect(() => {
-    if (!isActive || isPaused || isCountingDown) return;
+    if (!isActive || isPaused || isCountingDown || phases.length === 0) return;
 
     const timer = setInterval(() => {
       setPhaseTimeRemaining((prev) => {
         if (prev <= 1) {
-          const p = phasesRef.current;
-          const curIdx = currentPhaseIndexRef.current;
-          const nextIndex = (curIdx + 1) % p.length;
+          const nextIndex = (currentPhaseIndex + 1) % phases.length;
           const completedCycle = nextIndex === 0;
 
           if (completedCycle) {
-            const newC = cycleCountRef.current + 1;
-            setCycleCount(newC);
-            cycleCountRef.current = newC;
-            if (durationMode === 'cycles' && newC >= selectedCycles) {
-              clearInterval(timer);
-              haptic.success();
-              handleComplete(totalElapsedRef.current + 1);
-            }
+            setCycleCount((c) => {
+              const newC = c + 1;
+              if (durationMode === 'cycles' && newC >= selectedCycles) {
+                clearInterval(timer);
+                haptic.success();
+                handleComplete(totalElapsedRef.current + 1);
+              }
+              return newC;
+            });
           }
 
           setCurrentPhaseIndex(nextIndex);
-          currentPhaseIndexRef.current = nextIndex;
           haptic.light();
-          return p[nextIndex].duration;
+          return phases[nextIndex].duration;
         }
         return prev - 1;
       });
@@ -192,7 +190,7 @@ export function BreathingExerciseScreen({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isActive, isPaused, isCountingDown, selectedCycles, selectedMinutes, durationMode]);
+  }, [isActive, isPaused, isCountingDown, currentPhaseIndex, phases, selectedCycles, selectedMinutes, durationMode, handleComplete]);
 
   const handleComplete = useCallback(async (elapsed: number) => {
     saveSession.mutate(
