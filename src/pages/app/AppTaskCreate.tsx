@@ -1938,7 +1938,7 @@ const AppTaskCreate = ({
                       setShowPlaylistPicker(false);
                     }}
                     className={cn(
-                      'w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/80',
+                      'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
                       proLinkValue === playlist.id && 'bg-emerald-100 dark:bg-emerald-900/30'
                     )}
                   >
