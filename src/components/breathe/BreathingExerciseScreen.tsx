@@ -159,8 +159,9 @@ export function BreathingExerciseScreen({
     const timer = setInterval(() => {
       setPhaseTimeRemaining((prev) => {
         if (prev <= 1) {
+          const p = phasesRef.current;
           const curIdx = currentPhaseIndexRef.current;
-          const nextIndex = (curIdx + 1) % phases.length;
+          const nextIndex = (curIdx + 1) % p.length;
           const completedCycle = nextIndex === 0;
 
           if (completedCycle) {
@@ -177,7 +178,7 @@ export function BreathingExerciseScreen({
           setCurrentPhaseIndex(nextIndex);
           currentPhaseIndexRef.current = nextIndex;
           haptic.light();
-          return phases[nextIndex].duration;
+          return p[nextIndex].duration;
         }
         return prev - 1;
       });
@@ -195,7 +196,7 @@ export function BreathingExerciseScreen({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isActive, isPaused, isCountingDown, phases, selectedCycles, selectedMinutes, durationMode]);
+  }, [isActive, isPaused, isCountingDown, selectedCycles, selectedMinutes, durationMode]);
 
   const handleComplete = useCallback(async (elapsed: number) => {
     saveSession.mutate(
