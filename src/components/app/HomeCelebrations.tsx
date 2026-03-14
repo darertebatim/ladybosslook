@@ -134,8 +134,13 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     skipTask, setSkipTask, goalInputTask, setGoalInputTask, onGoalInputConfirm,
     timerTask, setTimerTask, onTimerSaveProgress, onTimerMarkComplete,
     showRecoveryPrompt, setShowRecoveryPrompt, recoverStreak,
+    showGoldRecoveryPrompt, setShowGoldRecoveryPrompt,
+    showRecoverySuccess, setShowRecoverySuccess, previousGoldStreak,
     userId, showNotificationFlow, setShowNotificationFlow,
   } = props;
+
+  const { hasAccessToProgram } = useSubscription();
+  const isSubscribed = hasAccessToProgram('any');
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const goldCelebrationShownKey = `simora_gold_celebration_shown_${todayStr}`;
