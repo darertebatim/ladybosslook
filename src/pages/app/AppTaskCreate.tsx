@@ -62,13 +62,13 @@ import { TimePeriod, TIME_PERIODS, TimeMode, getTimeMode, formatTimeLabel, forma
 
 // Me+ style pastel color options with hex values
 const COLOR_OPTIONS: { name: TaskColor; hex: string }[] = [
-  { name: 'pink', hex: '#FFD6E8' },
-  { name: 'peach', hex: '#FFE4C4' },
-  { name: 'yellow', hex: '#FFF59D' },
-  { name: 'lime', hex: '#E8F5A3' },
-  { name: 'sky', hex: '#C5E8FA' },
-  { name: 'mint', hex: '#B8F5E4' },
-  { name: 'lavender', hex: '#E8D4F8' },
+  { name: 'pink', hex: '#FFE0F5' },
+  { name: 'peach', hex: '#FFE6C9' },
+  { name: 'yellow', hex: '#FFF492' },
+  { name: 'lime', hex: '#E2F9F0' },
+  { name: 'sky', hex: '#D7E9FF' },
+  { name: 'mint', hex: '#E0FBB8' },
+  { name: 'lavender', hex: '#F0E3FF' },
 ];
 
 // Note: Tags are now fetched from routine_categories table dynamically
@@ -927,20 +927,19 @@ const AppTaskCreate = ({
 
       {/* Color picker - Horizontal circles with checkmark */}
       <div className="px-6 pb-4">
-        <div className="flex justify-center gap-4">
+        <div className="flex justify-center gap-3">
           {COLOR_OPTIONS.map((c) => (
             <button
               key={c.name}
               onClick={() => setColor(c.name)}
               className={cn(
-                'w-12 h-12 rounded-full transition-all flex items-center justify-center',
-                'border-2 border-transparent',
-                color === c.name && 'ring-2 ring-foreground/20 ring-offset-2'
+                'w-11 h-11 rounded-full transition-all flex items-center justify-center border-[3px]',
+                color === c.name ? 'border-white ring-2 ring-black/20' : 'border-white'
               )}
               style={{ backgroundColor: c.hex }}
             >
               {color === c.name && (
-                <Check className="h-5 w-5 text-foreground/70" />
+                <Check className="h-5 w-5 text-black" strokeWidth={3} />
               )}
             </button>
           ))}
@@ -968,10 +967,10 @@ const AppTaskCreate = ({
           className="w-full flex items-center justify-between py-2 px-4 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
-            <Calendar className="h-5 w-5 text-foreground/70" />
-            <span className="font-medium">{repeatEnabled ? 'Starting from' : 'Date'}</span>
+            <Calendar className="h-5 w-5 text-black" />
+            <span className="font-medium text-black">{repeatEnabled ? 'Starting from' : 'Date'}</span>
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="flex items-center gap-2 text-black/60">
             <span>{format(scheduledDate, 'MMM d') === format(new Date(), 'MMM d') ? 'Today' : format(scheduledDate, 'MMM d, yyyy')}</span>
             <ChevronRight className="h-4 w-4" />
           </div>
@@ -983,10 +982,10 @@ const AppTaskCreate = ({
           className="w-full flex items-center justify-between py-2 px-4 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
-            <Repeat className="h-5 w-5 text-foreground/70" />
-            <span className="font-medium">Repeat</span>
+            <Repeat className="h-5 w-5 text-black" />
+            <span className="font-medium text-black">Repeat</span>
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="flex items-center gap-2 text-black/60">
             <span>{getRepeatSummary()}</span>
             <ChevronRight className="h-4 w-4" />
           </div>
@@ -998,10 +997,10 @@ const AppTaskCreate = ({
           className="w-full flex items-center justify-between py-2 px-4 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
-            <Clock className="h-5 w-5 text-foreground/70" />
-            <span className="font-medium">Time</span>
+            <Clock className="h-5 w-5 text-black" />
+            <span className="font-medium text-black">Time</span>
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="flex items-center gap-2 text-black/60">
             <span>{formatTimeDisplay(scheduledTime)}</span>
             <ChevronRight className="h-4 w-4" />
           </div>
@@ -1013,10 +1012,10 @@ const AppTaskCreate = ({
           className="w-full flex items-center justify-between py-2 px-4 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
-            <Bell className="h-5 w-5 text-foreground/70" />
-            <span className="font-medium">Reminder</span>
+            <Bell className="h-5 w-5 text-black" />
+            <span className="font-medium text-black">Reminder</span>
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="flex items-center gap-2 text-black/60">
             <span>{getReminderSummary()}</span>
             <ChevronRight className="h-4 w-4" />
           </div>
@@ -1052,10 +1051,10 @@ const AppTaskCreate = ({
           className="w-full flex items-center justify-between py-2 px-4 active:bg-muted/50"
         >
           <div className="flex items-center gap-3">
-            <Tag className="h-5 w-5 text-foreground/70" />
-            <span className="font-medium">Category</span>
+            <Tag className="h-5 w-5 text-black" />
+            <span className="font-medium text-black">Category</span>
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="flex items-center gap-2 text-black/60">
             <span>{tag || 'No category'}</span>
             <ChevronRight className="h-4 w-4" />
           </div>
@@ -1072,10 +1071,10 @@ const AppTaskCreate = ({
           )}
         >
           <div className="flex items-center gap-3">
-            <Target className={cn("h-5 w-5", goalSettings.enabled ? "text-emerald-600" : "text-foreground/70")} />
-            <span className="font-medium">Goal</span>
+            <Target className={cn("h-5 w-5", goalSettings.enabled ? "text-emerald-600" : "text-black")} />
+            <span className="font-medium text-black">Goal</span>
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="flex items-center gap-2 text-black/60">
             <span>{goalSettings.enabled ? formatGoalTarget(goalSettings) : 'Off'}</span>
             <ChevronRight className="h-4 w-4" />
           </div>
@@ -1092,10 +1091,10 @@ const AppTaskCreate = ({
           )}
         >
           <div className="flex items-center gap-3">
-            <Sparkles className={cn("h-5 w-5", proLinkType ? "text-violet-600" : "text-foreground/70")} />
-            <span className="font-medium">Pro Action Link</span>
+            <Sparkles className={cn("h-5 w-5", proLinkType ? "text-violet-600" : "text-black")} />
+            <span className="font-medium text-black">Pro Action Link</span>
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="flex items-center gap-2 text-black/60">
             {proConfig ? (
               <span className="flex items-center gap-1.5">
                 <proConfig.icon className="h-4 w-4" />
