@@ -2178,7 +2178,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
   const handleFeelingBreatheTap = () => {
     setShowMoodFeeling(false);
-    setShowBreathing(true);
+    setPhase('spotlight-breathe');
   };
 
   const handleFeelingDismiss = () => {
