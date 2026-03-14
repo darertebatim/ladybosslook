@@ -17,6 +17,7 @@ import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.p
 import meplusPlanMascot from '@/assets/onboarding/meplus-plan-mascot.png';
 import { useAuth } from '@/hooks/useAuth';
 import { useCreateTask, useCompleteTask, CreateTaskInput } from '@/hooks/useTaskPlanner';
+import { TaskCard } from '@/components/app/TaskCard';
 import { format } from 'date-fns';
 
 interface Props {
