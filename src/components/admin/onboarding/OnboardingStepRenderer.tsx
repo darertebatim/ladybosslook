@@ -2698,8 +2698,8 @@ function PersonalizedPlanScreen({ step, onNext, answers }: { step: OnboardingSte
 
 const DAILY_RESET_WHEEL = [
   { emoji: '📱', title: 'Open App', color: '#FFEDD5' },
-  { emoji: '🫁', title: 'Breathe', color: '#DBEAFE' },
   { emoji: '🌤️', title: 'Mood', color: '#FEF3C7' },
+  { emoji: '🫁', title: 'Breathe', color: '#DBEAFE' },
   { emoji: '📝', title: 'Journal', color: '#F3E8FF' },
 ];
 
