@@ -2209,11 +2209,11 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
         {/* Phase instruction text - ABOVE task cards and spotlight */}
         <FadeUp delay={0.12}>
-          <p className="text-center text-[13px] text-gray-400 mt-3 mb-6 relative z-40">
-            {hintPhase === 'check-bed' && '👆 Tap the circle to complete your first task!'}
-            {hintPhase === 'breathe' && '🫁 Now tap the Breathe button to try it!'}
-            {hintPhase === 'mood' && '🌤️ Now check in with your mood!'}
-            {hintPhase === 'done' && '✨ You\'re getting the hang of it!'}
+          <p className="text-center text-[15px] text-white font-semibold mt-3 mb-6 relative z-40 flex items-center justify-center gap-1.5">
+            {hintPhase === 'check-bed' && <><FluentEmoji emoji="👆" size={20} /> Tap the circle to complete your first task!</>}
+            {hintPhase === 'breathe' && <><FluentEmoji emoji="🫁" size={20} /> Now tap the Breathe button to try it!</>}
+            {hintPhase === 'mood' && <><FluentEmoji emoji="🌤️" size={20} /> Now check in with your mood!</>}
+            {hintPhase === 'done' && <><FluentEmoji emoji="✨" size={20} /> You're getting the hang of it!</>}
           </p>
         </FadeUp>
 
