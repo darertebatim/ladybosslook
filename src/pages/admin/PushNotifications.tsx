@@ -205,7 +205,7 @@ const scheduledPNs: PNType[] = [
       { title: '🏆 Goal Reached!', body: "You did it. {goal} days. That's not luck, that's you.", condition: 'Streak goal reached' },
       { title: '🔥 2 Days!', body: '2 days in a row! Come back for day 3.', condition: '2-day streak' },
       { title: '🥇 Gold Streak', body: "Gold streak: {n} days. Don't break the chain.", condition: 'Gold streak 2+' },
-      { title: '🥇 Finish for Gold', body: "You've done {x}/{y} actions today. Finish all to earn Gold.", condition: 'Partial completions today' },
+      { title: '🥇 Finish for Gold', body: "You've done {x}/{y} tasks today. Finish all to earn Gold.", condition: 'Partial completions today' },
     ],
   },
 ];
