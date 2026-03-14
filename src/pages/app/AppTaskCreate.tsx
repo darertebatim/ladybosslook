@@ -333,8 +333,8 @@ const SortableSubtaskItem = ({ id, subtask, onRemove }: { id: string; subtask: s
         <div className="w-2 h-0.5 bg-muted-foreground/50 rounded-full" />
       </div>
       <span className="flex-1 text-foreground">{subtask}</span>
-      <button onClick={onRemove} className="p-1.5 rounded-full hover:bg-muted/50">
-        <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+      <button onClick={onRemove} className="p-1.5 rounded-full active:bg-muted/50">
+        <Trash2 className="h-4 w-4 text-muted-foreground" />
       </button>
     </div>
   );
