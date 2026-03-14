@@ -2071,8 +2071,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
   const BREATHE_IDX = 1;
   const MOOD_IDX = 2;
-
-  const userTasks = STARTER_TASKS.map((t, i) => buildUserTask(t, i));
+  const COMPLETE_IDX = 4;
 
   // Cleanup timers on unmount
   useEffect(() => {
