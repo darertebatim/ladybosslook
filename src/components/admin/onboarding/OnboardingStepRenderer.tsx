@@ -1560,18 +1560,49 @@ function DiscountOfferScreen({ step, onNext }: Props) {
 }
 
 function WelcomeAboardScreen({ step, onNext }: Props) {
+  const handleEnable = async () => {
+    try {
+      // Try native Capacitor push notifications
+      const { PushNotifications } = await import('@capacitor/push-notifications');
+      const result = await PushNotifications.requestPermissions();
+      if (result.receive === 'granted') {
+        await PushNotifications.register();
+      }
+    } catch {
+      // Web fallback
+      try {
+        await Notification.requestPermission();
+      } catch { /* ignore */ }
+    }
+    onNext();
+  };
+
   return (
-    <ScreenWrapper bg="bg-gradient-to-b from-indigo-50 to-white">
-      <div className="flex-1 flex flex-col items-center justify-center">
-        <div className="text-6xl mb-4">🎉</div>
-        <h1 className="text-2xl font-bold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
-        <p className="text-lg font-semibold text-indigo-500 text-center mb-2">{step.subtitle}</p>
-        <p className="text-sm text-gray-500 text-center mb-6">{step.description}</p>
-        <IllustrationPlaceholder label={step.illustrationLabel || 'Celebration'} className="w-40 h-40" />
+    <ScreenWrapper>
+      <div className="flex-1 flex flex-col items-center justify-center px-2">
+        <FadeUp>
+          <FluentEmoji emoji="🔔" size={64} className="mb-6" />
+        </FadeUp>
+        <FadeUp delay={0.1}>
+          <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight">
+            With reminders,{'\n'}routines feel 80% easier.
+          </h1>
+        </FadeUp>
+        <FadeUp delay={0.2}>
+          <p className="text-[15px] text-[#1a1f3d]/70 text-center leading-relaxed max-w-[280px]">
+            Get gentle nudges to keep your daily reset on track. You can customize or turn them off anytime.
+          </p>
+        </FadeUp>
       </div>
-      <div className="mt-auto">
-        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
-      </div>
+      <FadeUp delay={0.3} className="mt-auto">
+        <NavyButton onClick={handleEnable}>Turn on notifications</NavyButton>
+        <button
+          onClick={onNext}
+          className="w-full py-3 text-sm text-[#1a1f3d]/50 font-medium active:opacity-60 mt-2"
+        >
+          Maybe later
+        </button>
+      </FadeUp>
     </ScreenWrapper>
   );
 }
