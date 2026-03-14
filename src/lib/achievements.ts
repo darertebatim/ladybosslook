@@ -63,14 +63,14 @@ export interface Achievement {
 }
 
 export const ACHIEVEMENTS: Achievement[] = [
-  // ACTIONS - 7 tiers
-  { id: 'first-step', name: 'First Step', description: 'Completed your first action', icon: Footprints, emoji: '👣', color: 'bg-emerald-500', group: 'actions', unlockCondition: (s) => s.totalTaskCompletions >= 1 },
-  { id: 'getting-started', name: 'Getting Started', description: 'Completed 10 actions', icon: Zap, emoji: '⚡', color: 'bg-yellow-500', group: 'actions', unlockCondition: (s) => s.totalTaskCompletions >= 10 },
-  { id: 'action-taker', name: 'Action Taker', description: 'Completed 25 actions', icon: Target, emoji: '🎯', color: 'bg-orange-500', group: 'actions', unlockCondition: (s) => s.totalTaskCompletions >= 25 },
-  { id: 'unstoppable', name: 'Unstoppable', description: 'Completed 50 actions', icon: Flame, emoji: '🔥', color: 'bg-red-500', group: 'actions', unlockCondition: (s) => s.totalTaskCompletions >= 50 },
-  { id: 'centurion', name: 'Centurion', description: 'Completed 100 actions', icon: Shield, emoji: '🛡️', color: 'bg-indigo-600', group: 'actions', unlockCondition: (s) => s.totalTaskCompletions >= 100 },
-  { id: 'powerhouse', name: 'Powerhouse', description: 'Completed 250 actions', icon: Crown, emoji: '👑', color: 'bg-amber-600', group: 'actions', unlockCondition: (s) => s.totalTaskCompletions >= 250 },
-  { id: 'legendary', name: 'Legendary', description: 'Completed 500 actions', icon: Gem, emoji: '💎', color: 'bg-violet-600', group: 'actions', unlockCondition: (s) => s.totalTaskCompletions >= 500 },
+  // TASKS - 7 tiers
+  { id: 'first-step', name: 'First Step', description: 'Completed your first task', icon: Footprints, emoji: '👣', color: 'bg-emerald-500', group: 'actions', unlockCondition: (s) => s.totalTaskCompletions >= 1 },
+  { id: 'getting-started', name: 'Getting Started', description: 'Completed 10 tasks', icon: Zap, emoji: '⚡', color: 'bg-yellow-500', group: 'actions', unlockCondition: (s) => s.totalTaskCompletions >= 10 },
+  { id: 'action-taker', name: 'Task Master', description: 'Completed 25 tasks', icon: Target, emoji: '🎯', color: 'bg-orange-500', group: 'actions', unlockCondition: (s) => s.totalTaskCompletions >= 25 },
+  { id: 'unstoppable', name: 'Unstoppable', description: 'Completed 50 tasks', icon: Flame, emoji: '🔥', color: 'bg-red-500', group: 'actions', unlockCondition: (s) => s.totalTaskCompletions >= 50 },
+  { id: 'centurion', name: 'Centurion', description: 'Completed 100 tasks', icon: Shield, emoji: '🛡️', color: 'bg-indigo-600', group: 'actions', unlockCondition: (s) => s.totalTaskCompletions >= 100 },
+  { id: 'powerhouse', name: 'Powerhouse', description: 'Completed 250 tasks', icon: Crown, emoji: '👑', color: 'bg-amber-600', group: 'actions', unlockCondition: (s) => s.totalTaskCompletions >= 250 },
+  { id: 'legendary', name: 'Legendary', description: 'Completed 500 tasks', icon: Gem, emoji: '💎', color: 'bg-violet-600', group: 'actions', unlockCondition: (s) => s.totalTaskCompletions >= 500 },
 
   // STREAKS - 6 tiers
   { id: 'three-day-fire', name: 'Spark', description: '3-day streak', icon: Flame, emoji: '🕯️', color: 'bg-orange-400', group: 'streaks', unlockCondition: (s) => s.longestStreak >= 3 },
