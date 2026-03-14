@@ -970,7 +970,7 @@ const AppTaskCreate = ({
             <Calendar className="h-5 w-5 text-black" />
             <span className="font-medium text-black">{repeatEnabled ? 'Starting from' : 'Date'}</span>
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="flex items-center gap-2 text-black/60">
             <span>{format(scheduledDate, 'MMM d') === format(new Date(), 'MMM d') ? 'Today' : format(scheduledDate, 'MMM d, yyyy')}</span>
             <ChevronRight className="h-4 w-4" />
           </div>
