@@ -21,6 +21,7 @@ import { useNotificationCleanup } from '@/hooks/useNotificationCleanup';
 import { DeferredLayoutHooks } from '@/components/app/DeferredLayoutHooks';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { useDailyResetProvisioning } from '@/hooks/useDailyResetProvisioning';
+import { useOnboardingProfileSync } from '@/hooks/useOnboardingProfileSync';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
