@@ -1128,7 +1128,7 @@ const AppTaskCreate = ({
         </DndContext>
 
         <div className="flex items-center gap-3 px-4 py-3">
-          <Plus className="h-5 w-5 text-black/40 shrink-0" />
+          <Plus className="h-5 w-5 text-black shrink-0" />
           <Input
             ref={newSubtaskInputRef}
             value={newSubtask}
