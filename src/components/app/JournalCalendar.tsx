@@ -25,7 +25,7 @@ export function JournalCalendar({ journalDays }: JournalCalendarProps) {
       <div className="flex items-center justify-between">
         <button
           onClick={() => setCurrentMonth(prev => subMonths(prev, 1))}
-          className="p-2 rounded-full hover:bg-muted active:scale-95 transition-transform"
+          className="p-2 rounded-full active:bg-muted active:scale-95 transition-transform"
         >
           <ChevronLeft className="h-4 w-4 text-muted-foreground" />
         </button>
