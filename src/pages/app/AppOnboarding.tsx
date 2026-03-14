@@ -76,6 +76,12 @@ export default function AppOnboarding() {
   const completedKey = `simora_onboarding_completed_${flowId}`;
 
   const [currentStep, setCurrentStep] = useState(() => {
+    // Support ?step=N query param for direct step preview
+    const stepParam = searchParams.get('step');
+    if (stepParam) {
+      const parsed = parseInt(stepParam, 10);
+      if (!isNaN(parsed) && parsed >= 0) return parsed;
+    }
     try {
       const saved = localStorage.getItem(progressKey);
       return saved ? parseInt(saved, 10) : 0;
