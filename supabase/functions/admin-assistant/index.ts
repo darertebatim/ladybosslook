@@ -642,7 +642,7 @@ async function deleteSubtask(supabase: any, args: any) {
 
 async function deleteActionFromBank(supabase: any, args: any) {
   if (!args.id) {
-    return { success: false, error: "Missing action ID", action: "delete_action_from_bank" };
+    return { success: false, error: "Missing task ID", action: "delete_action_from_bank" };
   }
 
   const resolved = await resolveActionId(supabase, args.id);
