@@ -30,7 +30,7 @@ const NOTIFICATION_TYPES = {
   evening_checkin: {
     hour: 18,
     title: '🌅 Evening check-in',
-    body: 'A few actions are still waiting for you today.',
+    body: 'A few tasks are still waiting for you today.',
     url: '/app/home',
     prefKey: 'evening_checkin',
   },
