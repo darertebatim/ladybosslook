@@ -1406,7 +1406,7 @@ export const useSkipTask = () => {
     onSuccess: (_, { date }) => {
       const dateStr = format(date, 'yyyy-MM-dd');
       queryClient.invalidateQueries({ queryKey: ['planner-skips', user?.id, dateStr] });
-      toast({ title: 'Action skipped for today' });
+      toast({ title: 'Task skipped for today' });
     },
     onError: (error) => {
       console.error('Skip task error:', error);
