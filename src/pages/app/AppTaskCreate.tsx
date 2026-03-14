@@ -1136,7 +1136,7 @@ const AppTaskCreate = ({
             onKeyDown={(e) => e.key === 'Enter' && addSubtask()}
             onFocus={handleNewSubtaskFocus}
             placeholder="Subtasks"
-            className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto text-base text-black placeholder:text-black/40"
+            className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto text-base text-black placeholder:text-black/50"
           />
         </div>
       </div>
