@@ -78,7 +78,7 @@ export function PurchaseCelebration({ open, onClose, plan }: PurchaseCelebration
       {/* Close button */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 p-2 rounded-full text-white/60 hover:text-white/90 transition-colors"
+        className="absolute top-4 right-4 p-2 rounded-full text-white/90"
         style={{ paddingTop: 'calc(0.5rem + env(safe-area-inset-top, 0px))' }}
       >
         <X className="h-6 w-6" />
