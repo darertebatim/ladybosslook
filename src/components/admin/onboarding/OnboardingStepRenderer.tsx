@@ -344,11 +344,11 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
   );
 }
 
-function BottomSheetWrapper({ children, bgImage }: { children: React.ReactNode; bgImage?: string }) {
+function BottomSheetWrapper({ children, bgImage, headerHeight = 240 }: { children: React.ReactNode; bgImage?: string; headerHeight?: number }) {
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
-      {/* Background image area - taller to show more */}
-      <div className="h-[240px] shrink-0 relative">
+      {/* Background image area */}
+      <div className="shrink-0 relative" style={{ height: headerHeight }}>
         {bgImage ? (
           <img src={bgImage} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
         ) : (
@@ -2705,11 +2705,11 @@ const DAILY_RESET_WHEEL = [
 
 function LoopWheel() {
   return (
-    <div className="relative w-[220px] h-[220px] mx-auto">
+    <div className="relative w-[200px] h-[200px] mx-auto">
       {/* Center icon */}
       <div className="absolute inset-0 flex items-center justify-center z-10">
-        <div className="w-14 h-14 rounded-full bg-white shadow-lg flex items-center justify-center">
-          <FluentEmoji emoji="🔄" size={28} />
+        <div className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center">
+          <FluentEmoji emoji="🔄" size={24} />
         </div>
       </div>
 
@@ -2738,9 +2738,9 @@ function LoopWheel() {
       {/* 4 task nodes positioned around the circle */}
       {DAILY_RESET_WHEEL.map((task, i) => {
         const angle = (i * 90 - 90) * (Math.PI / 180); // start from top
-        const radius = 85;
-        const x = 110 + radius * Math.cos(angle) - 28;
-        const y = 110 + radius * Math.sin(angle) - 28;
+        const radius = 75;
+        const x = 100 + radius * Math.cos(angle) - 25;
+        const y = 100 + radius * Math.sin(angle) - 25;
 
         return (
           <motion.div
@@ -2749,15 +2749,15 @@ function LoopWheel() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 + i * 0.15, type: 'spring', stiffness: 200, damping: 15 }}
             className="absolute flex flex-col items-center"
-            style={{ left: x, top: y, width: 56 }}
+            style={{ left: x, top: y, width: 50 }}
           >
             <div
-              className="w-[52px] h-[52px] rounded-2xl flex items-center justify-center shadow-md"
+              className="w-[46px] h-[46px] rounded-2xl flex items-center justify-center shadow-md"
               style={{ backgroundColor: task.color }}
             >
-              <FluentEmoji emoji={task.emoji} size={28} />
+              <FluentEmoji emoji={task.emoji} size={24} />
             </div>
-            <span className="text-[10px] font-semibold text-[#1a1f3d]/70 mt-1 text-center leading-tight">
+            <span className="text-[9px] font-semibold text-[#1a1f3d]/70 mt-0.5 text-center leading-tight">
               {task.title}
             </span>
           </motion.div>
@@ -2769,9 +2769,9 @@ function LoopWheel() {
         const startAngle = (i * 90 - 90 + 25) * (Math.PI / 180);
         const endAngle = (i * 90 - 90 + 65) * (Math.PI / 180);
         const midAngle = (startAngle + endAngle) / 2;
-        const r = 85;
-        const mx = 110 + r * Math.cos(midAngle);
-        const my = 110 + r * Math.sin(midAngle);
+        const r = 75;
+        const mx = 100 + r * Math.cos(midAngle);
+        const my = 100 + r * Math.sin(midAngle);
 
         return (
           <motion.div
@@ -2819,14 +2819,14 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
   };
 
   return (
-    <BottomSheetWrapper bgImage={meplusMascotBg}>
+    <BottomSheetWrapper bgImage={meplusMascotBg} headerHeight={140}>
       {/* Celebration badge */}
       <FadeUp>
-        <div className="flex flex-col items-center mb-3">
-          <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-2">
-            <FluentEmoji emoji="🎉" size={32} />
+        <div className="flex flex-col items-center mb-2">
+          <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mb-1.5">
+            <FluentEmoji emoji="🎉" size={28} />
           </div>
-          <h1 className="text-[20px] font-extrabold text-[#1a1f3d] text-center leading-tight">
+          <h1 className="text-[19px] font-extrabold text-[#1a1f3d] text-center leading-tight">
             You completed your first<br />Daily Reset!
           </h1>
         </div>
@@ -2834,7 +2834,7 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
 
       {/* Description */}
       <FadeUp delay={0.1}>
-        <p className="text-[13px] text-[#1a1f3d]/55 leading-relaxed text-center mb-4">
+        <p className="text-[12px] text-[#1a1f3d]/55 leading-relaxed text-center mb-2">
           A simple daily routine to help you reset, refocus,<br />and start each day with intention.
         </p>
       </FadeUp>
@@ -2845,7 +2845,7 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
       </FadeUp>
 
       {/* Bottom button */}
-      <FadeUp delay={0.5} className="mt-auto pt-4">
+      <FadeUp delay={0.5} className="mt-auto pt-2">
         {!added ? (
           <NavyButton onClick={handleAdd}>
             Add to my daily routine
