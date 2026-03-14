@@ -54,10 +54,10 @@ export function useDailyResetProvisioning(userId: string | undefined) {
           return;
         }
 
-        // 2. Fetch tasks from routines_bank_tasks, joined with admin_task_bank for metadata
+        // 2. Fetch tasks from routines_bank_tasks
         const { data: routineTasks } = await supabase
           .from('routines_bank_tasks')
-          .select('title, emoji, color, task_id, task_order, schedule_days')
+          .select('title, emoji, task_id, task_order, schedule_days')
           .eq('routine_id', routine.id)
           .order('task_order', { ascending: true });
 
@@ -67,16 +67,16 @@ export function useDailyResetProvisioning(userId: string | undefined) {
           return;
         }
 
-        // 3. Fetch extra metadata from task bank for linked tasks
+        // 3. Fetch metadata from task bank for linked tasks (color, pro_link)
         const linkedIds = routineTasks.filter(t => t.task_id).map(t => t.task_id!);
-        let bankMap: Record<string, { pro_link_type: string | null; pro_link_value: string | null }> = {};
+        let bankMap: Record<string, { color: string; pro_link_type: string | null; pro_link_value: string | null }> = {};
         if (linkedIds.length > 0) {
           const { data: bankTasks } = await supabase
             .from('admin_task_bank')
-            .select('id, pro_link_type, pro_link_value')
+            .select('id, color, pro_link_type, pro_link_value')
             .in('id', linkedIds);
           if (bankTasks) {
-            bankMap = Object.fromEntries(bankTasks.map(b => [b.id, { pro_link_type: b.pro_link_type, pro_link_value: b.pro_link_value }]));
+            bankMap = Object.fromEntries(bankTasks.map(b => [b.id, { color: b.color, pro_link_type: b.pro_link_type, pro_link_value: b.pro_link_value }]));
           }
         }
 
@@ -100,7 +100,7 @@ export function useDailyResetProvisioning(userId: string | undefined) {
             user_id: userId,
             title: task.title,
             emoji: task.emoji || '📝',
-            color: task.color || 'sky',
+            color: bank?.color || 'sky',
             tag: DAILY_RESET_ROUTINE_TITLE,
             repeat_pattern: repeatPattern,
             repeat_days: scheduleDays.length > 0 && scheduleDays.length < 7 ? scheduleDays : null,
