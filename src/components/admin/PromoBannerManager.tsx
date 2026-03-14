@@ -21,7 +21,7 @@ type AspectRatio = '3:1' | '4:1' | '16:9' | '1:1';
 type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch' | 'routines_top' | 'routines_after_categories';
 
 const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
-  { value: 'home_top', label: '🏠 Home - Above Actions' },
+  { value: 'home_top', label: '🏠 Home - Above Tasks' },
   { value: 'home_rituals', label: '🏠 Home - After Routines' },
   { value: 'explore', label: '🔍 Explore - Top' },
   { value: 'explore_tools', label: '🔍 Explore - Under Tools' },
