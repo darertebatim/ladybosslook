@@ -185,8 +185,8 @@ const scheduledPNs: PNType[] = [
       { title: '💪 Keep Going!', body: 'You showed up {X} days this month. One more today?', condition: '1 day inactive' },
       { title: '✨ Your Momentum is Waiting', body: 'Your {X}-day momentum is waiting. Come back and keep it alive.', condition: '2 days inactive' },
       { title: '🌿 We Miss You', body: "You've been away for {X} days. Your strength doesn't expire.", condition: '3-4 days inactive' },
-      { title: '🌸 Your Actions Miss You', body: 'You have {coins} coins waiting. Even 1 minute counts.', condition: '5-6 days inactive' },
-      { title: '🕊️ No Pressure', body: "When you're ready, everything is still here for you.", condition: '7-14 days inactive' },
+       { title: '🌸 Your Tasks Miss You', body: 'You have {coins} coins waiting. Even 1 minute counts.', condition: '5-6 days inactive' },
+       { title: '🕊️ No Pressure', body: "When you're ready, everything is still here for you.", condition: '7-14 days inactive' },
     ],
   },
   {
