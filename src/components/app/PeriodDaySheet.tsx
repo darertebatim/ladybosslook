@@ -198,7 +198,7 @@ export const PeriodDaySheet = ({
           <Button
             onClick={handleSave}
             disabled={isLoading}
-            className="flex-1 bg-pink-500 hover:bg-pink-600 text-white"
+            className="flex-1 bg-pink-500 text-white"
           >
             {isLoading ? 'Saving...' : 'Save'}
           </Button>

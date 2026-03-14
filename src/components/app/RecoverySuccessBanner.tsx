@@ -131,7 +131,7 @@ export const RecoverySuccessBanner = ({
 
         <Button
           onClick={onClose}
-          className="w-full bg-white hover:bg-white/90 text-emerald-600 font-semibold py-3 rounded-xl"
+          className="w-full bg-white text-emerald-600 font-semibold py-3 rounded-xl"
         >
           Let's Go! 🚀
         </Button>
