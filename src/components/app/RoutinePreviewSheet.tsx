@@ -320,7 +320,7 @@ export function RoutinePreviewSheet({
               <p className="font-semibold text-[15px] text-black leading-snug line-clamp-2">{display.title}</p>
             </div>
             <button 
-              className={cn("shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-black/60 hover:text-black transition-colors", darkColorClass)}
+              className={cn("shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-black/60 active:scale-95 transition-transform", darkColorClass)}
               onClick={() => openTaskEditor(task, index)}
             >
               <Pencil className="w-3.5 h-3.5" />
