@@ -1,6 +1,6 @@
 /**
  * Dark immersive breathing circle — the "zen" layout.
- * Ported from the onboarding breathing overlay design.
+ * Uses the exact same scale/transition logic as the classic BreathingCircle.
  */
 
 type BreathPhase = 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold' | 'ready';
@@ -24,24 +24,30 @@ export function ImmersiveBreathingCircle({
   isCountingDown,
   countdownValue,
 }: Props) {
-  const isExpanded = phase === 'inhale_hold';
   const isInhaling = phase === 'inhale';
   const isExhaling = phase === 'exhale';
+  const isAnimating = isInhaling || isExhaling;
   const isHolding = phase === 'inhale_hold' || phase === 'exhale_hold';
   const isReady = phase === 'ready';
 
-  const animatedScale = isReady
-    ? 0.45
-    : isExpanded || isInhaling ? 1.0 : 0.45;
+  // Exact same scale logic as classic BreathingCircle
+  let animatedScale = 0.40; // default collapsed (ready, exhale_hold)
+  if (phase === 'inhale_hold') {
+    animatedScale = 1.0;
+  } else if (isInhaling) {
+    animatedScale = 1.0; // animating TO expanded
+  } else if (isExhaling) {
+    animatedScale = 0.40; // animating TO collapsed
+  }
 
-  const animDuration = (isInhaling || isExhaling) ? `${phaseDuration}s` : '0.3s';
-  const glowOpacity = isExpanded || isInhaling ? 0.5 : isHolding ? 0.4 : 0.2;
+  const transitionDuration = isAnimating ? `${phaseDuration}s` : '0.3s';
+  const glowOpacity = animatedScale > 0.7 ? 0.5 : isHolding ? 0.4 : 0.2;
 
   return (
     <>
       <style>{`
         @keyframes imm-pulse-ring { 0%,100% { opacity:0.15; transform:scale(1); } 50% { opacity:0.3; transform:scale(1.05); } }
-        @keyframes imm-hold-pulse { 0%,100% { transform:scale(1); filter:brightness(1); } 50% { transform:scale(1.03); filter:brightness(1.25); } }
+        @keyframes imm-hold-pulse { 0%,100% { filter:brightness(1); } 50% { filter:brightness(1.15); } }
         @keyframes imm-count-pop { 0% { transform:scale(0.5); opacity:0; } 40% { transform:scale(1.15); opacity:1; } 100% { transform:scale(1); opacity:1; } }
         @keyframes imm-spin-cw { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes imm-spin-ccw { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
@@ -60,19 +66,19 @@ export function ImmersiveBreathingCircle({
           }}
         />
 
-        {/* Inner fixed ring */}
+        {/* Inner fixed ring - marks the "full exhale" boundary */}
         <div
           className="absolute rounded-full"
           style={{ width: '40%', height: '40%', border: '1.5px solid rgba(167,139,250,0.2)' }}
         />
 
-        {/* Hold direction ring — matches the breathing circle's current scale */}
+        {/* Hold direction ring — scales to match breathing circle */}
         {isHolding && (
           <div
             className="absolute rounded-full pointer-events-none"
             style={{
               width: '100%', height: '100%',
-              transform: `scale(${phase === 'inhale_hold' ? 1.04 : 0.47})`,
+              transform: `scale(${phase === 'inhale_hold' ? 1.04 : 0.44})`,
               transition: 'transform 0.5s ease-out',
               border: '2px solid rgba(167,139,250,0.18)',
               borderTopColor: 'rgba(196,181,253,0.85)',
@@ -87,23 +93,19 @@ export function ImmersiveBreathingCircle({
           />
         )}
 
-        {/* Animated breathing circle */}
+        {/* Animated breathing circle — uses CSS transition like classic */}
         <div
           className="absolute rounded-full"
           style={{
             width: '100%', height: '100%',
             transform: `scale(${animatedScale})`,
             transitionProperty: 'transform',
-            transitionTimingFunction: (isInhaling || isExhaling) ? 'linear' : 'ease-out',
-            transitionDuration: animDuration,
-            background: isHolding
-              ? (phase === 'inhale_hold'
-                ? 'radial-gradient(circle at 40% 35%, rgba(168,85,247,0.3) 0%, rgba(139,92,246,0.2) 50%, rgba(99,102,241,0.1) 100%)'
-                : 'radial-gradient(circle at 40% 35%, rgba(99,102,241,0.25) 0%, rgba(79,70,229,0.15) 50%, rgba(67,56,202,0.08) 100%)')
-              : 'radial-gradient(circle at 40% 35%, rgba(139,92,246,0.25) 0%, rgba(99,102,241,0.15) 50%, rgba(79,70,229,0.08) 100%)',
+            transitionTimingFunction: isAnimating ? 'linear' : 'ease-out',
+            transitionDuration: transitionDuration,
+            background: 'radial-gradient(circle at 40% 35%, rgba(139,92,246,0.25) 0%, rgba(99,102,241,0.15) 50%, rgba(79,70,229,0.08) 100%)',
             boxShadow: `0 0 40px 10px rgba(139,92,246,${glowOpacity * 0.4}), 0 0 80px 30px rgba(99,102,241,${glowOpacity * 0.2}), inset 0 0 30px rgba(167,139,250,0.1)`,
             backdropFilter: 'blur(4px)',
-            animation: isHolding ? `imm-hold-pulse ${phaseDuration}s ease-in-out infinite` : 'none',
+            animation: isHolding ? 'imm-hold-pulse 3s ease-in-out infinite' : 'none',
           }}
         />
 

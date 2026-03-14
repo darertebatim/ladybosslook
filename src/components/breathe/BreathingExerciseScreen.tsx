@@ -308,42 +308,47 @@ export function BreathingExerciseScreen({
           </div>
         </div>
 
-        {/* Exercise name */}
-        <div className="flex-1 flex flex-col items-center justify-center relative z-10">
-          <p className="text-sm text-white/40 mb-8 font-medium tracking-widest uppercase">{exercise.name}</p>
+        {/* Circle — absolutely centered, never shifts */}
+        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none" style={{ paddingBottom: '160px' }}>
+          <div className="flex flex-col items-center">
+            <p className="text-sm text-white/40 mb-8 font-medium tracking-widest uppercase">{exercise.name}</p>
 
-          <ImmersiveBreathingCircle
-            phase={circleState.phase}
-            phaseDuration={isActive && !isPaused ? currentPhase?.duration || 4 : 0}
-            phaseText={circleState.text}
-            methodText={circleState.method}
-            countdown={currentPhase?.type.includes('hold') && isActive && !isPaused ? phaseTimeRemaining : undefined}
-            isCountingDown={isCountingDown}
-            countdownValue={countdown}
-          />
+            <ImmersiveBreathingCircle
+              phase={circleState.phase}
+              phaseDuration={isActive && !isPaused ? currentPhase?.duration || 4 : 0}
+              phaseText={circleState.text}
+              methodText={circleState.method}
+              countdown={currentPhase?.type.includes('hold') && isActive && !isPaused ? phaseTimeRemaining : undefined}
+              isCountingDown={isCountingDown}
+              countdownValue={countdown}
+            />
 
-          {/* Phase timer */}
-          {isActive && !isPaused && !isCountingDown && (
-            <p className="mt-8 text-sm text-white/30 font-mono tracking-wider">{phaseTimeRemaining}s</p>
-          )}
+            {/* Phase timer */}
+            {isActive && !isPaused && !isCountingDown && (
+              <p className="mt-8 text-sm text-white/30 font-mono tracking-wider">{phaseTimeRemaining}s</p>
+            )}
 
-          {/* Cycle dots */}
-          {(isActive || isCountingDown) && (
-            <div className="mt-6 flex gap-2.5 flex-wrap justify-center max-w-[260px]">
-              {Array.from({ length: selectedCycles }).map((_, i) => (
-                <div
-                  key={i}
-                  className="rounded-full transition-all duration-500"
-                  style={{
-                    width: 8, height: 8,
-                    background: i < cycleCount ? 'rgba(167,139,250,0.8)' : 'rgba(167,139,250,0.15)',
-                    boxShadow: i < cycleCount ? '0 0 8px rgba(167,139,250,0.4)' : 'none',
-                  }}
-                />
-              ))}
-            </div>
-          )}
+            {/* Cycle dots */}
+            {(isActive || isCountingDown) && durationMode === 'cycles' && (
+              <div className="mt-6 flex gap-2.5 flex-wrap justify-center max-w-[260px]">
+                {Array.from({ length: selectedCycles }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-full transition-all duration-500"
+                    style={{
+                      width: 8, height: 8,
+                      background: i < cycleCount ? 'rgba(167,139,250,0.8)' : 'rgba(167,139,250,0.15)',
+                      boxShadow: i < cycleCount ? '0 0 8px rgba(167,139,250,0.4)' : 'none',
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Spacer to push controls to bottom */}
+        <div className="flex-1" />
 
         {/* Bottom controls */}
         <div className="relative z-20 px-6 pb-safe mb-8">
