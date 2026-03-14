@@ -2007,7 +2007,12 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
         countdown={holdCountdown}
       />
 
-      {stage === 'done' && (
+      {stage === 'running' && (
+        <p className="mt-4 text-sm text-muted-foreground">
+          {currentP?.text || 'Inhale'} · {phaseTimeLeft}s
+        </p>
+      )}
+
         <p className="mt-8 text-lg font-semibold text-foreground animate-fade-in">Great job! 🎉</p>
       )}
     </div>
