@@ -121,7 +121,7 @@ export const IconPicker = ({
                 'px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
                 activeCategory === cat
                   ? 'bg-violet-600 text-white'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  : 'bg-muted text-muted-foreground'
               )}
             >
               {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
