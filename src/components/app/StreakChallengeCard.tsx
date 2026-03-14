@@ -45,7 +45,7 @@ export const StreakChallengeCard = ({
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-2.5 text-xs font-semibold text-violet-600 bg-violet-50 hover:bg-violet-100 rounded-full gap-1"
+            className="h-7 px-2.5 text-xs font-semibold text-violet-600 bg-violet-50 active:bg-violet-100 rounded-full gap-1"
             onClick={() => {
               haptic.light();
               onLevelUp();
@@ -89,7 +89,7 @@ export const StreakChallengeCard = ({
           }}
           variant="outline"
           size="sm"
-          className="mt-4 w-full border-orange-200 text-orange-600 hover:bg-orange-50 rounded-xl text-xs font-semibold gap-1.5"
+          className="mt-4 w-full border-orange-200 text-orange-600 active:bg-orange-50 rounded-xl text-xs font-semibold gap-1.5"
         >
           <Shield className="w-3.5 h-3.5" />
           Use Recovery Shield

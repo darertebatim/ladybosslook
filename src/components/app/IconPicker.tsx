@@ -121,7 +121,7 @@ export const IconPicker = ({
                 'px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
                 activeCategory === cat
                   ? 'bg-violet-600 text-white'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  : 'bg-muted text-muted-foreground'
               )}
             >
               {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -142,7 +142,7 @@ export const IconPicker = ({
                   onClick={() => handleSelect(iconName)}
                   className={cn(
                     'aspect-square rounded-2xl flex items-center justify-center transition-all active:scale-95',
-                    'bg-muted/60 hover:bg-muted',
+                    'bg-muted/60',
                     selectedIcon === iconName && 'bg-violet-100 ring-2 ring-violet-500'
                   )}
                 >

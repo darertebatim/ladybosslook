@@ -66,7 +66,7 @@ export const RecoverySuccessBanner = ({
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-white/90"
         >
           <X className="h-5 w-5" />
         </button>
@@ -131,7 +131,7 @@ export const RecoverySuccessBanner = ({
 
         <Button
           onClick={onClose}
-          className="w-full bg-white hover:bg-white/90 text-emerald-600 font-semibold py-3 rounded-xl"
+          className="w-full bg-white text-emerald-600 font-semibold py-3 rounded-xl"
         >
           Let's Go! 🚀
         </Button>

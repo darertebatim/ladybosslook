@@ -67,7 +67,7 @@ export function SoftReviewPrompt({ isOpen, onClose, onAccept }: SoftReviewPrompt
         {/* Close button */}
         <button
           onClick={handleNotNow}
-          className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-full active:bg-gray-100 transition-colors"
           aria-label="Close"
         >
           <X className="w-5 h-5 text-gray-400" />
@@ -97,14 +97,14 @@ export function SoftReviewPrompt({ isOpen, onClose, onAccept }: SoftReviewPrompt
           <div className="space-y-3">
             <Button
               onClick={handleYes}
-              className="w-full bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500 text-white font-semibold py-3 rounded-xl h-auto"
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold py-3 rounded-xl h-auto"
             >
               Yes, I'll Rate It! ⭐
             </Button>
             
             <button
               onClick={handleNotNow}
-              className="w-full text-gray-400 text-sm font-medium py-2 hover:text-gray-600 transition-colors"
+              className="w-full text-gray-400 text-sm font-medium py-2 transition-colors"
             >
               Not Now
             </button>

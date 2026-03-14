@@ -106,7 +106,7 @@ export function PushNotificationPrompt({ userId, open, onClose }: PushNotificati
           <Button 
             onClick={handleEnable}
             disabled={isEnabling}
-            className="w-full h-12 rounded-none border-0 bg-transparent text-primary hover:bg-primary/5 text-[17px] font-semibold transition-colors"
+            className="w-full h-12 rounded-none border-0 bg-transparent text-primary text-[17px] font-semibold transition-colors"
           >
             {isEnabling ? (
               <span className="flex items-center gap-2">
@@ -120,7 +120,7 @@ export function PushNotificationPrompt({ userId, open, onClose }: PushNotificati
           <Button 
             variant="ghost" 
             onClick={handleMaybeLater}
-            className="w-full h-11 rounded-none border-0 border-t border-border/50 m-0 bg-transparent hover:bg-muted/30 text-[15px] font-normal text-muted-foreground"
+            className="w-full h-11 rounded-none border-0 border-t border-border/50 m-0 bg-transparent text-[15px] font-normal text-muted-foreground"
           >
             Maybe Later
           </Button>

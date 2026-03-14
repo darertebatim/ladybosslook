@@ -51,9 +51,9 @@ export const AddedToRoutineButton = ({
       case 'emotion':
         return "bg-success/30 text-white";
       case 'outline':
-        return "bg-success/10 border-success/30 text-success hover:bg-success/20";
+        return "bg-success/10 border-success/30 text-success";
       default:
-        return "bg-success/10 hover:bg-success/20 text-success";
+        return "bg-success/10 text-success";
     }
   };
 
@@ -62,9 +62,9 @@ export const AddedToRoutineButton = ({
       case 'emotion':
         return "bg-white/20 text-white";
       case 'outline':
-        return "bg-urgency hover:bg-urgency/90 text-urgency-foreground border-0";
+        return "bg-urgency text-urgency-foreground border-0";
       default:
-        return "bg-urgency hover:bg-urgency/90 text-urgency-foreground";
+        return "bg-urgency text-urgency-foreground";
     }
   };
 
@@ -76,7 +76,7 @@ export const AddedToRoutineButton = ({
         size="icon"
         onClick={handleGoToPlanner}
         className={cn(
-          "rounded-full bg-success/20 text-success hover:bg-success/30 shrink-0",
+          "rounded-full bg-success/20 text-success shrink-0",
           className
         )}
         title="Added — Go to Planner"
@@ -95,7 +95,7 @@ export const AddedToRoutineButton = ({
         onClick={onAddClick}
         disabled={isLoading}
         className={cn(
-          "rounded-xl bg-urgency text-urgency-foreground hover:bg-urgency/90 shrink-0",
+          "rounded-xl bg-urgency text-urgency-foreground shrink-0",
           className
         )}
         title="Add to My Routines"
@@ -128,7 +128,7 @@ export const AddedToRoutineButton = ({
           size="icon"
           onClick={handleAddAgain}
           disabled={isLoading}
-          className="h-10 w-10 rounded-full bg-urgency text-urgency-foreground hover:bg-urgency/90 shrink-0"
+          className="h-10 w-10 rounded-full bg-urgency text-urgency-foreground shrink-0"
           title="Add again to my routines"
         >
           <CalendarPlus className="h-4 w-4" />

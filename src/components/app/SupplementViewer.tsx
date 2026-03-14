@@ -172,7 +172,7 @@ export function SupplementViewer({ isOpen, onClose, supplement, moduleContext }:
             variant="ghost"
             size="sm"
             onClick={handleOpenExternal}
-            className="w-full text-xs text-muted-foreground hover:text-foreground gap-1"
+            className="w-full text-xs text-muted-foreground gap-1"
           >
             <ExternalLink className="h-3 w-3" />
             Having trouble? Open in new tab
@@ -288,7 +288,7 @@ export function SupplementViewer({ isOpen, onClose, supplement, moduleContext }:
                   className={cn(
                     "flex-1 rounded-full gap-2",
                     isLastModule 
-                      ? "bg-green-600 hover:bg-green-700" 
+                      ? "bg-green-600" 
                       : ""
                   )}
                 >

@@ -85,7 +85,7 @@ export function IAPPlanPicker({ program }: IAPPlanPickerProps) {
             "relative rounded-xl border-2 p-4 text-left transition-all",
             selectedPlan === 'monthly'
               ? "border-primary bg-primary/5 shadow-sm"
-              : "border-border hover:border-primary/40"
+              : "border-border"
           )}
         >
           <div className="space-y-1">
@@ -108,7 +108,7 @@ export function IAPPlanPicker({ program }: IAPPlanPickerProps) {
               "relative rounded-xl border-2 p-4 text-left transition-all",
               selectedPlan === 'annual'
                 ? "border-primary bg-primary/5 shadow-sm"
-                : "border-border hover:border-primary/40"
+                : "border-border"
             )}
           >
             {savingsPercent > 0 && (
@@ -156,7 +156,7 @@ export function IAPPlanPicker({ program }: IAPPlanPickerProps) {
         <button
           onClick={handleRestore}
           disabled={isRestoring}
-          className="text-xs text-primary hover:underline"
+          className="text-xs text-primary underline"
         >
           {isRestoring ? 'Restoring...' : 'Restore'}
         </button>

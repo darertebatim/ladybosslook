@@ -94,7 +94,7 @@ export function HomeMenu({ onStartTour }: HomeMenuProps) {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <button 
-          className="p-2 -ml-2 text-foreground hover:text-foreground transition-colors"
+          className="p-2 -ml-2 text-foreground"
           onClick={() => haptic.light()}
         >
           <Menu className="h-5 w-5" />

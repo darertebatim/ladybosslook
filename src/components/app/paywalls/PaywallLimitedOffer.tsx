@@ -80,7 +80,7 @@ export function PaywallLimitedOffer({ program, onPurchase, onRestore, onClose, p
         <button onClick={onClose} className="text-muted-foreground">
           <X className="h-5 w-5" />
         </button>
-        <button onClick={onRestore} className="text-sm text-muted-foreground hover:underline">
+        <button onClick={onRestore} className="text-sm text-muted-foreground underline">
           Restore
         </button>
       </div>
@@ -205,8 +205,8 @@ export function PaywallLimitedOffer({ program, onPurchase, onRestore, onClose, p
         Your Apple ID payment method will be automatically charged ${selectedPlan === 'monthly' ? `${monthlyPrice.toFixed(2)}/month` : `${(selectedPlan === 'annual-offer' ? offerAnnualPrice : annualPrice).toFixed(2)} for a year`}. Cancel the subscription at least 24 hours before the current subscription period.
       </p>
       <div className="flex items-center justify-center gap-4 pb-3 text-xs text-muted-foreground">
-        <Link to="/sms-terms" className="hover:underline">Terms</Link>
-        <Link to="/privacy" className="hover:underline">Privacy</Link>
+        <Link to="/sms-terms" className="underline">Terms</Link>
+        <Link to="/privacy" className="underline">Privacy</Link>
       </div>
     </div>
   );

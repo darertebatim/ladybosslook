@@ -95,7 +95,7 @@ export const MoodSelector = ({ value, onChange, className, showHeader = true }: 
                 'flex flex-col items-center gap-1 p-2 rounded-xl transition-all',
                 'border-2 min-w-[56px]',
                 isSelected ? mood.selectedColor : mood.color,
-                'hover:scale-105 active:scale-95'
+                'active:scale-95'
               )}
             >
               <FluentEmoji emoji={mood.emoji} size={28} />

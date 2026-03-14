@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { SaveRoutineHandHint, useSaveRoutineHint } from '@/components/app/AddToRoutineHandHint';
 import { Check, Pencil } from 'lucide-react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -113,6 +114,7 @@ export function RoutinePreviewSheet({
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editingTaskIndex, setEditingTaskIndex] = useState<number>(0);
   const [showEditSheet, setShowEditSheet] = useState(false);
+  const [detailTask, setDetailTask] = useState<{ task: RoutinePlanTask; index: number } | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showActionLimit, setShowActionLimit] = useState(false);
   const { isSubscribed, isLoading: subLoading } = useSubscription();
@@ -308,10 +310,13 @@ export function RoutinePreviewSheet({
         >
           {isSelected && <Check className="w-4 h-4 text-white" />}
         </button>
-        <div className={cn(
-          'flex-1 rounded-2xl overflow-hidden',
-          colorClass
-        )}>
+        <button 
+          className={cn(
+            'flex-1 rounded-2xl overflow-hidden text-left',
+            colorClass
+          )}
+          onClick={() => setDetailTask({ task, index })}
+        >
           {/* Main content area */}
           <div className="flex items-center gap-3 px-3 pt-3 pb-2.5">
             <FluentEmoji emoji={display.icon || '📝'} size={40} className="shrink-0" />
@@ -319,12 +324,13 @@ export function RoutinePreviewSheet({
               <p className="text-xs font-medium text-black mb-0.5">{timeLabel}</p>
               <p className="font-semibold text-[15px] text-black leading-snug line-clamp-2">{display.title}</p>
             </div>
-            <button 
+            <div 
               className={cn("shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-black/60 active:scale-95 transition-transform", darkColorClass)}
-              onClick={() => openTaskEditor(task, index)}
+              onClick={(e) => { e.stopPropagation(); openTaskEditor(task, index); }}
+              role="button"
             >
               <Pencil className="w-3.5 h-3.5" />
-            </button>
+            </div>
           </div>
           {/* Footer strip with repeat info */}
           <div className={cn('px-4 py-3.5', darkColorClass)}>
@@ -332,7 +338,7 @@ export function RoutinePreviewSheet({
               {getRepeatLabel(task, display.repeatPattern)}
             </p>
           </div>
-        </div>
+        </button>
       </div>
     );
   };
@@ -512,6 +518,52 @@ export function RoutinePreviewSheet({
       </Sheet>
 
       <SaveRoutineHandHint show={showSaveHint} />
+
+      {/* Task Detail Dialog */}
+      {detailTask && (() => {
+        const { task, index } = detailTask;
+        const display = getTaskDisplay(task, index);
+        const colorClass = TASK_COLOR_CLASSES[display.color];
+        const darkColorClass = TASK_COLOR_DARK_CLASSES[display.color] || 'bg-black/10';
+        const edited = editedTasks[task.id];
+        const timeLabel = formatTimeLabel({
+          scheduled_time: edited?.scheduledTime ?? (task as any).scheduled_time ?? null,
+          time_period: (task as any).time_period ?? null,
+        });
+        const repeatLabel = getRepeatLabel(task, display.repeatPattern);
+        return (
+          <Dialog open={!!detailTask} onOpenChange={(v) => !v && setDetailTask(null)}>
+            <DialogContent hideCloseButton className="sm:max-w-md p-0 gap-0 bg-transparent border-0 shadow-none flex flex-col">
+              <div className={cn('rounded-3xl overflow-hidden', colorClass)}>
+                <div className="px-4 pt-4 pb-3">
+                  <div className="flex items-center gap-3">
+                    <FluentEmoji emoji={display.icon || '📝'} size={40} className="shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-black/80">{timeLabel}</p>
+                      <p className="text-black text-[15px] font-semibold">{display.title}</p>
+                      {task.description && (
+                        <p className="text-[13px] text-black/60 mt-0.5">{task.description}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className={cn('px-4 py-3.5', darkColorClass)}>
+                  <p className="text-[13px] font-medium text-black text-center">{repeatLabel}</p>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-3">
+                <Button
+                  onClick={() => { setDetailTask(null); openTaskEditor(task, index); }}
+                  className="flex-1 gap-2 h-11 rounded-2xl border-0 bg-white text-black text-sm shadow-sm active:scale-95 transition-transform"
+                >
+                  <Pencil className="h-4 w-4" />
+                  Edit Action
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        );
+      })()}
 
       {/* Full Task Edit Sheet - uses the REAL AppTaskCreate component */}
       {editingTask && (

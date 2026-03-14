@@ -46,7 +46,7 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-3">
         <button onClick={onClose} className="text-white/60"><X className="h-5 w-5" /></button>
-        <button onClick={onRestore} className="text-sm text-white/60 hover:underline">Restore</button>
+        <button onClick={onRestore} className="text-sm text-white/60 underline">Restore</button>
       </div>
       {/* Hero */}
       {program.cover_image_url && (
@@ -158,7 +158,7 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
         {/* CTA */}
         <Button
           size="lg"
-          className="w-full mt-4 rounded-xl h-12 bg-primary text-primary-foreground hover:bg-primary/90"
+          className="w-full mt-4 rounded-xl h-12 bg-primary text-primary-foreground"
           onClick={handlePurchase}
           disabled={isPurchasing}
         >
@@ -172,8 +172,8 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
         </p>
 
         <div className="flex items-center justify-center gap-4 mt-2 text-xs opacity-50">
-          <Link to="/sms-terms" className="hover:underline">Terms</Link>
-          <Link to="/privacy" className="hover:underline">Privacy</Link>
+          <Link to="/sms-terms" className="underline">Terms</Link>
+          <Link to="/privacy" className="underline">Privacy</Link>
         </div>
       </div>
     </div>

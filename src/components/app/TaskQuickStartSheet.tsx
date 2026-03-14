@@ -153,7 +153,7 @@ export const TaskQuickStartSheet = ({
               {startTour ? (
                 <button 
                   onClick={startTour}
-                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
+                  className="w-8 h-8 flex items-center justify-center rounded-full active:bg-muted transition-colors"
                   aria-label="Start tour"
                 >
                   <HelpCircle className="w-4 h-4 text-muted-foreground" />
@@ -164,7 +164,7 @@ export const TaskQuickStartSheet = ({
               <div className="w-10 h-1 bg-muted-foreground/30 rounded-full" />
               <button 
                 onClick={handleClose}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-full active:bg-muted transition-colors"
               >
                 <X className="w-4 h-4 text-foreground" />
               </button>
@@ -205,7 +205,7 @@ export const TaskQuickStartSheet = ({
               <div className="px-4 pb-3">
                 <Button
                   onClick={handleContinue}
-                  className="w-full h-11 rounded-full bg-foreground text-background font-semibold text-sm hover:bg-foreground/90"
+                  className="w-full h-11 rounded-full bg-foreground text-background font-semibold text-sm"
                 >
                   Continue
                 </Button>
@@ -220,7 +220,7 @@ export const TaskQuickStartSheet = ({
                     haptic.light();
                     setShowIdeas(true);
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-muted/40 hover:bg-muted/60 border border-border/20 transition-all active:scale-[0.98]"
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-muted/40 border border-border/20 transition-all active:scale-[0.98]"
                 >
                   <Lightbulb className="w-4 h-4 text-amber-500" />
                   <span className="text-sm font-medium text-muted-foreground">Need inspiration?</span>
@@ -243,7 +243,7 @@ export const TaskQuickStartSheet = ({
                         "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border",
                         selectedCategory === 'popular'
                           ? "bg-primary/15 text-primary border-primary/30"
-                          : "bg-muted text-foreground hover:bg-muted/80 border-transparent"
+                          : "bg-muted text-foreground border-transparent"
                       )}
                     >
                       ⭐ Popular
@@ -259,7 +259,7 @@ export const TaskQuickStartSheet = ({
                           "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border",
                           selectedCategory === cat.slug
                             ? "bg-primary/15 text-primary border-primary/30"
-                            : "bg-muted text-foreground hover:bg-muted/80 border-transparent"
+                            : "bg-muted text-foreground border-transparent"
                         )}
                       >
                         {cat.emoji && <span className="mr-0.5">{cat.emoji}</span>}

@@ -299,7 +299,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
                     setShowRoutineSheet(true);
                   }}
                   iconOnly
-                  className="text-white hover:text-white"
+                  className="text-white"
                 />
               )}
               {hasNext && (
@@ -307,7 +307,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
                   variant="ghost"
                   size="sm"
                   onClick={playNext}
-                  className="text-white/80 hover:text-white hover:bg-white/10 gap-1"
+                  className="text-white/80 gap-1"
                 >
                   Next <SkipForward className="h-4 w-4" />
                 </Button>

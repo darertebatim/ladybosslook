@@ -78,7 +78,7 @@ export function PurchaseCelebration({ open, onClose, plan }: PurchaseCelebration
       {/* Close button */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 p-2 rounded-full text-white/60 hover:text-white/90 transition-colors"
+        className="absolute top-4 right-4 p-2 rounded-full text-white/90"
         style={{ paddingTop: 'calc(0.5rem + env(safe-area-inset-top, 0px))' }}
       >
         <X className="h-6 w-6" />
@@ -137,7 +137,7 @@ export function PurchaseCelebration({ open, onClose, plan }: PurchaseCelebration
         <Button
           size="lg"
           onClick={onClose}
-          className="w-full max-w-xs bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold shadow-lg shadow-amber-500/25"
+          className="w-full max-w-xs bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold shadow-lg shadow-amber-500/25"
         >
           Start Exploring ✨
         </Button>
