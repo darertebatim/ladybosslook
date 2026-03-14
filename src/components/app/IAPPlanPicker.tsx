@@ -85,7 +85,7 @@ export function IAPPlanPicker({ program }: IAPPlanPickerProps) {
             "relative rounded-xl border-2 p-4 text-left transition-all",
             selectedPlan === 'monthly'
               ? "border-primary bg-primary/5 shadow-sm"
-              : "border-border hover:border-primary/40"
+              : "border-border"
           )}
         >
           <div className="space-y-1">
