@@ -1,34 +1,58 @@
 
 
-# Fix Onboarding Breathing: Use Real Components + Info Guide
+## Calm-Style Animated Background for Watch Page
 
-## Problem
-1. The onboarding breathing overlay is a custom mini-implementation instead of using the real breathing components
-2. It doesn't show the info/guide sheet before starting (like the real breathe tool does — see screenshot)
-3. The exercise name lookup works, but the experience doesn't match what the user expects
+Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
 
-## Plan
+### What You'll Get
 
-### Rewrite `OnboardingBreathingOverlay` to use real components
+- A deep dark blue gradient background on the Watch page header area
+- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
+- Subtle lightning flashes that pulse periodically
+- All text updated to white/light colors for contrast
+- Lightweight implementation using CSS keyframes (no extra dependencies)
 
-Instead of the custom mini breathing circle, the overlay will:
+### Design Details
 
-1. **Phase 1 — Info Sheet**: Show `BreathingInfoSheet` with the "Welcome Breathing" exercise details (3s inhale nose, 1s hold, 3s exhale mouth, 1s hold). User taps "Okay" to proceed.
+- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
+- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
+- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
+- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
+- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
 
-2. **Phase 2 — Breathing Session**: Render the real `BreathingCircle` component (from `src/components/breathe/BreathingCircle.tsx`) with a 3-second countdown, then 3 full breath cycles using the exercise's exact timings. Show cycle count (1/3, 2/3, 3/3).
+### Technical Approach
 
-3. **Phase 3 — Complete**: After 3 cycles, auto-call `onComplete` to mark the breathing task done and return to the starter routine.
+**Files to modify:**
 
-### Key details
-- Fetch "Welcome Breathing" by exact name from `breathing_exercises` table (ID: `02b049a0-...`)
-- Use `BreathingInfoSheet` directly (it accepts a `BreathingExercise` object, `open`, `onOpenChange`, `onDismiss`)
-- Use `BreathingCircle` for the actual animation (accepts `phase`, `phaseDuration`, `phaseText`, `methodText`, `countdown`)
-- The overlay remains full-screen (`fixed inset-0 z-[100]`) with a close/X button
-- No duration picker — hardcoded to 3 cycles
-- No completion sheet — just auto-returns to onboarding
+1. **`src/pages/app/AppWatch.tsx`**
+   - Replace the header `bg-[#E8F4FE]` with the dark gradient
+   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
+   - Add a lightning flash overlay div
+   - Update all text classes to white variants (`text-white`, `text-white/60`)
+   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
+   - Extend the gradient into the page background behind the content area
 
-### Files to change
-| File | Change |
-|------|--------|
-| `src/components/admin/onboarding/OnboardingStepRenderer.tsx` | Rewrite `OnboardingBreathingOverlay` to use `BreathingInfoSheet` + `BreathingCircle`, 3-cycle limit |
+2. **`tailwind.config.ts`**
+   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
+   - Register corresponding animation utilities
+
+### Visual Structure
+
+```text
++----------------------------------+
+|  [dark blue gradient header]     |
+|  ~~~ cloud layer 1 (slow) ~~~   |
+|  ~~~ cloud layer 2 (slower) ~~~ |
+|  * lightning flash (periodic) *  |
+|                                  |
+|  Watch          [icons]          |
+|  [categories row]                |
+|  [filters]              [lang]   |
++----------------------------------+
+|  [normal white content area]     |
+|  [playlist cards grid]           |
++----------------------------------+
+```
+
+The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
 

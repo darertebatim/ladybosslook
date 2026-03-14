@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { BreathingCircle } from '@/components/breathe/BreathingCircle';
+import { BreathingInfoSheet } from '@/components/breathe/BreathingInfoSheet';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
@@ -1853,7 +1855,7 @@ function buildUserTask(t: StarterTask, index: number, taskId?: string): import('
 
 type HintPhase = 'check-bed' | 'breathe' | 'done';
 
-// Mini inline breathing overlay for onboarding
+// Mini inline breathing overlay for onboarding — uses real BreathingInfoSheet + BreathingCircle
 function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) {
   const { data: exercises } = useQuery({
     queryKey: ['breathing-exercises'],
@@ -1867,64 +1869,75 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
   // Pick "Welcome Breathing" by exact name match first
   const exercise = exercises?.find((e: any) => e.name === 'Welcome Breathing') || exercises?.find((e: any) => e.name?.toLowerCase().includes('welcome')) || exercises?.find((e: any) => e.category === 'calm') || exercises?.[0];
 
-  const [phase, setPhase] = useState<'countdown' | 'running' | 'done'>('countdown');
+  const [stage, setStage] = useState<'info' | 'countdown' | 'running' | 'done'>('info');
   const [countdown, setCountdown] = useState(3);
   const [cycleCount, setCycleCount] = useState(0);
-  const [breathPhase, setBreathPhase] = useState<'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold'>('inhale');
+  const [breathPhase, setBreathPhase] = useState<'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold' | 'ready'>('ready');
   const [phaseTimeLeft, setPhaseTimeLeft] = useState(0);
   const targetCycles = 3;
 
   // Build phases from exercise
-  const phases = useRef<{ type: 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold'; duration: number; text: string }[]>([]);
+  const phasesRef = useRef<{ type: 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold'; duration: number; text: string; method?: string }[]>([]);
   const currentPhaseIdx = useRef(0);
 
   useEffect(() => {
     if (!exercise) return;
-    const p: typeof phases.current = [];
-    if (exercise.inhale_seconds > 0) p.push({ type: 'inhale', duration: exercise.inhale_seconds, text: 'Inhale' });
+    const p: typeof phasesRef.current = [];
+    if (exercise.inhale_seconds > 0) p.push({ type: 'inhale', duration: exercise.inhale_seconds, text: 'Inhale', method: exercise.inhale_method === 'nose' ? 'Nose' : 'Mouth' });
     if (exercise.inhale_hold_seconds > 0) p.push({ type: 'inhale_hold', duration: exercise.inhale_hold_seconds, text: 'Hold' });
-    if (exercise.exhale_seconds > 0) p.push({ type: 'exhale', duration: exercise.exhale_seconds, text: 'Exhale' });
+    if (exercise.exhale_seconds > 0) p.push({ type: 'exhale', duration: exercise.exhale_seconds, text: 'Exhale', method: exercise.exhale_method === 'nose' ? 'Nose' : 'Mouth' });
     if (exercise.exhale_hold_seconds > 0) p.push({ type: 'exhale_hold', duration: exercise.exhale_hold_seconds, text: 'Hold' });
-    phases.current = p;
-    if (p.length > 0) {
-      setPhaseTimeLeft(p[0].duration);
-      setBreathPhase(p[0].type);
-    }
+    phasesRef.current = p;
   }, [exercise]);
 
-  // Countdown
+  // When user dismisses the info sheet, start countdown
+  const handleInfoDismiss = useCallback(() => {
+    setStage('countdown');
+  }, []);
+
+  // Countdown 3..2..1
   useEffect(() => {
-    if (phase !== 'countdown') return;
+    if (stage !== 'countdown') return;
     const t = setInterval(() => {
       setCountdown(prev => {
-        if (prev <= 1) { clearInterval(t); setPhase('running'); return 0; }
+        if (prev <= 1) {
+          clearInterval(t);
+          // Start first phase
+          if (phasesRef.current.length > 0) {
+            currentPhaseIdx.current = 0;
+            const first = phasesRef.current[0];
+            setBreathPhase(first.type);
+            setPhaseTimeLeft(first.duration);
+          }
+          setStage('running');
+          return 0;
+        }
         return prev - 1;
       });
     }, 1000);
     return () => clearInterval(t);
-  }, [phase]);
+  }, [stage]);
 
   // Breathing timer
   useEffect(() => {
-    if (phase !== 'running' || phases.current.length === 0) return;
+    if (stage !== 'running' || phasesRef.current.length === 0) return;
     const t = setInterval(() => {
       setPhaseTimeLeft(prev => {
         if (prev <= 1) {
-          const nextIdx = (currentPhaseIdx.current + 1) % phases.current.length;
-          // If we wrapped around, count a cycle
+          const nextIdx = (currentPhaseIdx.current + 1) % phasesRef.current.length;
           if (nextIdx === 0) {
             setCycleCount(c => {
               const newC = c + 1;
               if (newC >= targetCycles) {
                 clearInterval(t);
-                setPhase('done');
+                setStage('done');
                 setTimeout(onComplete, 800);
               }
               return newC;
             });
           }
           currentPhaseIdx.current = nextIdx;
-          const nextPhase = phases.current[nextIdx];
+          const nextPhase = phasesRef.current[nextIdx];
           setBreathPhase(nextPhase.type);
           return nextPhase.duration;
         }
@@ -1932,53 +1945,53 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
       });
     }, 1000);
     return () => clearInterval(t);
-  }, [phase, onComplete]);
+  }, [stage, onComplete]);
 
   if (!exercise) return null;
 
-  const currentP = phases.current[currentPhaseIdx.current];
-  const phaseText = phase === 'countdown' ? countdown.toString() : phase === 'done' ? '✓' : (currentP?.text || 'Inhale');
+  const currentP = phasesRef.current[currentPhaseIdx.current];
 
-  // Calculate animated scale for the breathing circle
-  let animatedScale = 0.40;
-  if (phase === 'running' && currentP) {
-    if (currentP.type === 'inhale_hold') animatedScale = 1.0;
-    else if (currentP.type === 'inhale') animatedScale = 1.0;
-    else if (currentP.type === 'exhale') animatedScale = 0.40;
-    else animatedScale = 0.40;
+  // Cast exercise to BreathingExercise type for the info sheet
+  const exerciseTyped = exercise as import('@/hooks/useBreathingExercises').BreathingExercise;
+
+  // Stage: info sheet
+  if (stage === 'info') {
+    return (
+      <div className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-sm flex items-end justify-center">
+        <BreathingInfoSheet
+          exercise={exerciseTyped}
+          open={true}
+          onOpenChange={() => {}}
+          onDismiss={handleInfoDismiss}
+        />
+      </div>
+    );
   }
-  if (phase === 'done') animatedScale = 0.70;
 
-  const isAnimatingBreath = phase === 'running' && (breathPhase === 'inhale' || breathPhase === 'exhale');
-  const phaseDuration = currentP?.duration || 4;
+  // Stages: countdown, running, done — show BreathingCircle
+  const circlePhase: 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold' | 'ready' =
+    stage === 'countdown' ? 'ready' : stage === 'done' ? 'ready' : breathPhase;
+  const phaseDuration = currentP?.duration || 3;
+  const phaseText = stage === 'countdown' ? countdown.toString() : stage === 'done' ? '✓' : (currentP?.text || 'Inhale');
+  const methodText = stage === 'running' ? currentP?.method : undefined;
+  const holdCountdown = stage === 'running' && breathPhase.includes('hold') ? phaseTimeLeft : undefined;
 
   return (
     <div className="fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center">
-      {/* Exercise name */}
-      <p className="text-sm text-muted-foreground mb-2 font-medium">{exercise.name}</p>
+      {/* Exercise name + cycle count */}
+      <p className="text-sm text-muted-foreground mb-1 font-medium">{exercise.name}</p>
       <p className="text-xs text-muted-foreground/60 mb-8">{cycleCount}/{targetCycles} breaths</p>
 
-      {/* Breathing circle - simplified version */}
-      <div className="relative flex items-center justify-center w-56 h-56">
-        <div className="absolute rounded-full border-2 border-muted-foreground/30" style={{ width: '40%', height: '40%' }} />
-        <div
-          className={`absolute rounded-full bg-primary/20 backdrop-blur-sm shadow-lg transition-transform ${isAnimatingBreath ? 'ease-linear' : 'ease-out'}`}
-          style={{
-            width: '100%',
-            height: '100%',
-            transform: `scale(${animatedScale})`,
-            transitionDuration: isAnimatingBreath ? `${phaseDuration}s` : '0.3s',
-          }}
-        />
-        <div className="absolute rounded-full bg-card border border-border flex flex-col items-center justify-center shadow-xl" style={{ width: '35%', height: '35%' }}>
-          <span className={`font-semibold text-foreground ${phase === 'done' ? 'text-2xl' : 'text-lg'}`}>{phaseText}</span>
-          {phase === 'running' && breathPhase.includes('hold') && (
-            <span className="text-sm text-muted-foreground">{phaseTimeLeft}</span>
-          )}
-        </div>
-      </div>
+      {/* Real BreathingCircle component */}
+      <BreathingCircle
+        phase={circlePhase}
+        phaseDuration={phaseDuration}
+        phaseText={phaseText}
+        methodText={methodText}
+        countdown={holdCountdown}
+      />
 
-      {phase === 'done' && (
+      {stage === 'done' && (
         <p className="mt-8 text-lg font-semibold text-foreground animate-fade-in">Great job! 🎉</p>
       )}
     </div>
