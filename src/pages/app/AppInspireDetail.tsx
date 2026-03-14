@@ -227,7 +227,10 @@ export default function AppInspireDetail() {
               <img
                 src={routine.cover_image_url}
                 alt={routine.title}
-                className="w-full h-full object-cover"
+                className={cn(
+                  "w-full h-full object-cover",
+                  routine.cover_aspect === '6x4' && "object-bottom"
+                )}
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
