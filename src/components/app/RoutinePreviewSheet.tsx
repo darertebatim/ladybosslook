@@ -316,7 +316,7 @@ export function RoutinePreviewSheet({
           <div className="flex items-center gap-3 px-3 pt-3 pb-2.5">
             <FluentEmoji emoji={display.icon || '📝'} size={40} className="shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-black/60 mb-0.5">{timeLabel}</p>
+              <p className="text-xs font-medium text-black mb-0.5">{timeLabel}</p>
               <p className="font-semibold text-[15px] text-black leading-snug line-clamp-2">{display.title}</p>
             </div>
             <button 
@@ -328,7 +328,7 @@ export function RoutinePreviewSheet({
           </div>
           {/* Footer strip with repeat info */}
           <div className={cn('px-4 py-2', darkColorClass)}>
-            <p className="text-xs font-medium text-black/70">
+            <p className="text-xs font-medium text-black">
               {getRepeatLabel(task, display.repeatPattern)}
             </p>
           </div>
