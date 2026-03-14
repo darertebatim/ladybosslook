@@ -1561,7 +1561,7 @@ function IdealLifeScreen({ step, onNext, onAnswer }: Props) {
   );
 }
 
-
+function ScienceBackedScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper center>
       {step.subtitle ? (
