@@ -162,36 +162,36 @@ export interface UpdateTaskInput extends Partial<CreateTaskInput> {
   time_period?: TimePeriod | null;
 }
 
-// Color mapping for UI - Me+ style brighter pastels
-// Palette: FFD6E8, FFE4C4, FFF59D, E8F5A3, C5E8FA, B8F5E4, E8D4F8
+// Color mapping for UI
+// Palette: FFE0F5, FFE6C9, FFF492, E2F9F0, D7E9FF, E0FBB8, F0E3FF
 export const TASK_COLORS: Record<TaskColor, string> = {
-  pink: '#FFD6E8',      // Bright pink
-  peach: '#FFE4C4',     // Warm peach
-  yellow: '#FFF59D',    // Bright sunny yellow
-  lime: '#E8F5A3',      // Fresh lime
-  sky: '#C5E8FA',       // Cyan sky blue
-  mint: '#B8F5E4',      // Vibrant mint
-  lavender: '#E8D4F8',  // Soft lavender
-  purple: '#E8D4F8',    // Same as lavender
-  blue: '#C5E8FA',      // Same as sky
-  red: '#FFD6E8',       // Use pink for red
-  orange: '#FFE4C4',    // Use peach for orange
-  green: '#E8F5A3',     // Use lime for green
+  pink: '#FFE0F5',
+  peach: '#FFE6C9',
+  yellow: '#FFF492',
+  lime: '#E2F9F0',
+  sky: '#D7E9FF',
+  mint: '#E0FBB8',
+  lavender: '#F0E3FF',
+  purple: '#F0E3FF',
+  blue: '#D7E9FF',
+  red: '#FFE0F5',
+  orange: '#FFE6C9',
+  green: '#E2F9F0',
 };
 
 export const TASK_COLOR_CLASSES: Record<TaskColor, string> = {
-  pink: 'bg-[#FFD6E8]',
-  peach: 'bg-[#FFE4C4]',
-  yellow: 'bg-[#FFF59D]',
-  lime: 'bg-[#E8F5A3]',
-  sky: 'bg-[#C5E8FA]',
-  mint: 'bg-[#B8F5E4]',
-  lavender: 'bg-[#E8D4F8]',
-  purple: 'bg-[#E8D4F8]',
-  blue: 'bg-[#C5E8FA]',
-  red: 'bg-[#FFD6E8]',
-  orange: 'bg-[#FFE4C4]',
-  green: 'bg-[#E8F5A3]',
+  pink: 'bg-[#FFE0F5]',
+  peach: 'bg-[#FFE6C9]',
+  yellow: 'bg-[#FFF492]',
+  lime: 'bg-[#E2F9F0]',
+  sky: 'bg-[#D7E9FF]',
+  mint: 'bg-[#E0FBB8]',
+  lavender: 'bg-[#F0E3FF]',
+  purple: 'bg-[#F0E3FF]',
+  blue: 'bg-[#D7E9FF]',
+  red: 'bg-[#FFE0F5]',
+  orange: 'bg-[#FFE6C9]',
+  green: 'bg-[#E2F9F0]',
 };
 
 // ============================================

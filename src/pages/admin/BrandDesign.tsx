@@ -145,13 +145,13 @@ export default function BrandDesign() {
       {/* Planner Palette */}
       <Section title="Planner Action Palette" description="7 pastel colors used across the daily planner, action builder, and routine cards">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          <ColorSwatch label="Pink" cssVar="planner-pink" hex="#FFD6E8" />
-          <ColorSwatch label="Peach" cssVar="planner-peach" hex="#FFE4C4" />
-          <ColorSwatch label="Yellow" cssVar="planner-yellow" hex="#FFF59D" />
-          <ColorSwatch label="Lime" cssVar="planner-lime" hex="#E8F5A3" />
-          <ColorSwatch label="Sky" cssVar="planner-sky" hex="#C5E8FA" />
-          <ColorSwatch label="Mint" cssVar="planner-mint" hex="#B8F5E4" />
-          <ColorSwatch label="Lavender" cssVar="planner-lavender" hex="#E8D4F8" />
+          <ColorSwatch label="Pink" cssVar="planner-pink" hex="#FFE0F5" />
+          <ColorSwatch label="Peach" cssVar="planner-peach" hex="#FFE6C9" />
+          <ColorSwatch label="Yellow" cssVar="planner-yellow" hex="#FFF492" />
+          <ColorSwatch label="Lime" cssVar="planner-lime" hex="#E2F9F0" />
+          <ColorSwatch label="Sky" cssVar="planner-sky" hex="#D7E9FF" />
+          <ColorSwatch label="Mint" cssVar="planner-mint" hex="#E0FBB8" />
+          <ColorSwatch label="Lavender" cssVar="planner-lavender" hex="#F0E3FF" />
         </div>
         <div className="mt-3 text-xs text-muted-foreground space-y-1">
           <p><span className="font-medium">Aliases:</span> red → pink · orange → peach · green → lime · blue → sky · purple → lavender</p>
@@ -160,13 +160,13 @@ export default function BrandDesign() {
 
       <Section title="Planner Secondary Palette" description="Heavier/darker variants used for schedule strips and card footers in the planner">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          <ColorSwatch label="Pink Dark" cssVar="planner-pink-dark" hex="#FFB8D9" />
-          <ColorSwatch label="Peach Dark" cssVar="planner-peach-dark" hex="#FFD1A3" />
-          <ColorSwatch label="Yellow Dark" cssVar="planner-yellow-dark" hex="#FFE97D" />
-          <ColorSwatch label="Lime Dark" cssVar="planner-lime-dark" hex="#D4EB82" />
-          <ColorSwatch label="Sky Dark" cssVar="planner-sky-dark" hex="#A3D5F2" />
-          <ColorSwatch label="Mint Dark" cssVar="planner-mint-dark" hex="#8EECD0" />
-          <ColorSwatch label="Lavender Dark" cssVar="planner-lavender-dark" hex="#D4B8F0" />
+          <ColorSwatch label="Pink Dark" cssVar="planner-pink-dark" hex="#FFC2EA" />
+          <ColorSwatch label="Peach Dark" cssVar="planner-peach-dark" hex="#FFD2A1" />
+          <ColorSwatch label="Yellow Dark" cssVar="planner-yellow-dark" hex="#FFEA4E" />
+          <ColorSwatch label="Lime Dark" cssVar="planner-lime-dark" hex="#C3F1E1" />
+          <ColorSwatch label="Sky Dark" cssVar="planner-sky-dark" hex="#B9D6FF" />
+          <ColorSwatch label="Mint Dark" cssVar="planner-mint-dark" hex="#C9F588" />
+          <ColorSwatch label="Lavender Dark" cssVar="planner-lavender-dark" hex="#DEC1FF" />
         </div>
         <div className="mt-3 text-xs text-muted-foreground space-y-1">
           <p><span className="font-medium">Usage:</span> Bottom schedule strip on task cards, heavier accent areas, hover states</p>
