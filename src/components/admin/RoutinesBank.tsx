@@ -1592,7 +1592,7 @@ export default function RoutinesBank() {
                     </span>
                     <span className="flex items-center gap-1">
                       <Layers className="h-4 w-4" />
-                      {localTasks.length} action{localTasks.length !== 1 ? 's' : ''}
+                      {localTasks.length} task{localTasks.length !== 1 ? 's' : ''}
                     </span>
                   </div>
                 </div>
