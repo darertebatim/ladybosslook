@@ -579,9 +579,6 @@ export function BreathingExerciseScreen({
             </div>
           </div>
         )}
-            </div>
-          </div>
-        )}
 
         {/* Action button */}
         {!isCountingDown && (
