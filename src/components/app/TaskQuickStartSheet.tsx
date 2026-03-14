@@ -153,7 +153,7 @@ export const TaskQuickStartSheet = ({
               {startTour ? (
                 <button 
                   onClick={startTour}
-                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
+                  className="w-8 h-8 flex items-center justify-center rounded-full active:bg-muted transition-colors"
                   aria-label="Start tour"
                 >
                   <HelpCircle className="w-4 h-4 text-muted-foreground" />
