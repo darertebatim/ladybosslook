@@ -58,7 +58,7 @@ const NOTIFICATION_TYPES = {
   period_bedtime: {
     hour: 21,
     title: '🌙 Bedtime routine',
-    body: 'Time to wind down with your bedtime actions.',
+    body: 'Time to wind down with your bedtime tasks.',
     url: '/app/home',
     prefKey: 'time_period_reminders',
   },

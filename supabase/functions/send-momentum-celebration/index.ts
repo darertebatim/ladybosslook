@@ -47,10 +47,10 @@ const INACTIVITY_MESSAGES: InactivityMessage[] = [
   },
   {
     minGap: 5, maxGap: 6,
-    title: '🌸 Your Actions Miss You',
-    body: ({ coins }) => coins > 0
-      ? `You have ${coins} coins waiting. Even 1 minute counts. Tap to return.`
-      : 'Your actions miss you. Even 1 minute counts. Tap to return.',
+     title: '🌸 Your Tasks Miss You',
+     body: ({ coins }) => coins > 0
+       ? `You have ${coins} coins waiting. Even 1 minute counts. Tap to return.`
+       : 'Your tasks miss you. Even 1 minute counts. Tap to return.',
   },
   {
     minGap: 7, maxGap: 14,

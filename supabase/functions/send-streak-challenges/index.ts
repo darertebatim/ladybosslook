@@ -157,7 +157,7 @@ function getGoldNotification(
   }
   // Partial completions today
   if (todayCompleted > 0 && todayTotal > 0 && todayCompleted < todayTotal) {
-    return { scenario: 'gold_partial', priority: 5, title: '🥇 Finish for Gold', body: `You've done ${todayCompleted}/${todayTotal} actions today. Finish all to earn your Gold badge.` };
+    return { scenario: 'gold_partial', priority: 5, title: '🥇 Finish for Gold', body: `You've done ${todayCompleted}/${todayTotal} tasks today. Finish all to earn your Gold badge.` };
   }
   return null;
 }
