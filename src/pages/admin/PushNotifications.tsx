@@ -816,7 +816,7 @@ function PNDocumentation() {
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
           <p>
-            <strong>Local-first (Smart Nudges):</strong> Action reminders, water, and period notifications are generated from on-device planner data. Non-rounded random times between 8:03 AM - 7:47 PM for natural feel.
+            <strong>Local-first (Smart Nudges):</strong> Task reminders, water, and period notifications are generated from on-device planner data. Non-rounded random times between 8:03 AM - 7:47 PM for natural feel.
           </p>
           <p>
             <strong>Server (Momentum Keeper):</strong> Detects user inactivity and sends nudges to bring them back. Includes coins context. Runs every 2h to cover all timezones.

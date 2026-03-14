@@ -316,7 +316,7 @@ export default function System() {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete all your user data including actions, journal entries, chat messages, wallet credits, and all progress.
+                      This action cannot be undone. This will permanently delete all your user data including tasks, journal entries, chat messages, wallet credits, and all progress.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>

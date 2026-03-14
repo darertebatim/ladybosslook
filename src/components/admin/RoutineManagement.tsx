@@ -370,7 +370,7 @@ function CategoriesManager() {
                 />
               </div>
               <div>
-                <Label>Action Order</Label>
+                <Label>Task Order</Label>
                 <Input
                   type="number"
                   value={formData.task_display_order}
