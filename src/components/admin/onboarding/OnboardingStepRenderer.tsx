@@ -2306,12 +2306,12 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                     </div>
                   )}
 
-                  {/* Finger hint on completion circle (app task) */}
+                  {/* Finger hint on completion circle (app task / complete task) */}
                   {showHintOnCircle && (
                     <>
                       <button
                         className="absolute top-0 right-0 w-16 h-full z-50"
-                        onClick={handleCheckApp}
+                        onClick={i === 0 ? handleCheckApp : handleCheckComplete}
                       />
                       <div
                         className="pointer-events-none absolute z-[55] rounded-full animate-pulse"
