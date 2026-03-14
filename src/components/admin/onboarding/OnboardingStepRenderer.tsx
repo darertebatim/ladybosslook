@@ -2142,7 +2142,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                           right: '42px',
                           filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
                           animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
-                          transform: 'rotate(15deg)',
+                          transform: 'rotate(5deg)',
                         }}
                       >
                         <FluentEmoji emoji="👆" size={52} />
