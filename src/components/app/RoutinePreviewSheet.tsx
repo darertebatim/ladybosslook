@@ -328,7 +328,7 @@ export function RoutinePreviewSheet({
           </div>
           {/* Footer strip with repeat info */}
           <div className={cn('px-4 py-2', darkColorClass)}>
-            <p className="text-xs font-medium text-black/70">
+            <p className="text-xs font-medium text-black">
               {getRepeatLabel(task, display.repeatPattern)}
             </p>
           </div>
