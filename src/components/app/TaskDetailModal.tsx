@@ -1,4 +1,5 @@
 import { Check, Plus, Play, Droplets, FastForward, Pencil, Trash2 } from 'lucide-react';
+import SealCheck from './SealCheck';
 import { parseISO, isBefore, startOfDay, format as fnsFormat } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -18,7 +19,8 @@ import { playCompletionSound } from '@/lib/completionSound';
 import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
 import { isWaterTask } from '@/lib/waterTracking';
-import { formatTimeLabel } from '@/lib/taskScheduling';
+import { formatTimeLabelWithEmoji } from '@/lib/taskScheduling';
+import { CircleProgressButton } from './CircleProgressButton';
 
 // Secondary (darker) palette for card footer strips
 const TASK_COLOR_DARK_CLASSES: Record<string, string> = {
@@ -89,25 +91,28 @@ export const TaskDetailModal = ({
   const isWater = isWaterTask(task);
   const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
 
-  const getRepeatText = () => {
+  const getRepeatLabel = (): string => {
     const p = task.repeat_pattern;
     if (!p || p === 'none') {
-      // Carry-forward: show original date
       if (task.scheduled_date) {
         const scheduledDate = parseISO(task.scheduled_date);
         if (isBefore(scheduledDate, startOfDay(date))) {
-          return `From ${fnsFormat(scheduledDate, 'MMM d')}`;
+          return fnsFormat(scheduledDate, 'MMM d');
         }
       }
-      return '';
+      return 'Today';
     }
-    const patterns: Record<string, string> = {
-      daily: 'Repeats every day',
-      weekly: 'Repeats every week',
-      monthly: 'Repeats every month',
-      weekend: 'Repeats on weekends',
-    };
-    return patterns[p] || '';
+    if (p === 'daily') return 'Daily';
+    if (p === 'weekly') return 'Weekly';
+    if (p === 'monthly') return 'Monthly';
+    if (p === 'weekend') return 'Weekends';
+    if (p === 'custom' && task.repeat_days?.length) {
+      const days = task.repeat_days.length;
+      if (days === 7) return 'Daily';
+      if (days === 5) return 'Weekdays';
+      return `${days}x/week`;
+    }
+    return 'Today';
   };
 
   const getReminderText = () => {
@@ -147,9 +152,12 @@ export const TaskDetailModal = ({
 
   const colorClass = TASK_COLOR_CLASSES[task.color] || TASK_COLOR_CLASSES.yellow;
   const darkColorClass = TASK_COLOR_DARK_CLASSES[task.color] || 'bg-black/10';
-  const repeatText = getRepeatText();
+  const repeatLabel = getRepeatLabel();
   const reminderText = getReminderText();
-  const combinedText = [repeatText, reminderText].filter(Boolean).join('. ');
+  const footerText = [
+    repeatLabel ? `Repeats ${repeatLabel.toLowerCase() === 'today' ? 'once' : repeatLabel.toLowerCase()}` : '',
+    reminderText
+  ].filter(Boolean).join('. ');
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -168,18 +176,16 @@ export const TaskDetailModal = ({
               </div>
               
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[13px] text-black/80">{formatTimeLabel(task)}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-black/80">{formatTimeLabelWithEmoji(task)}</span>
+                  <span className="text-[11px] text-black/80">• {repeatLabel}</span>
                   {hasGoal && (
-                    <>
-                      <span className="text-[13px] text-black/80">•</span>
-                      <span className="text-[13px] text-black/80 font-medium">
-                        {isTimerGoal
+                    <span className="text-[11px] text-black/80 font-medium">
+                      • {isTimerGoal
                           ? `${Math.floor(goalProgress / 60)}/${Math.floor((task.goal_target || 0) / 60)} min`
                           : `${goalProgress}/${task.goal_target} ${task.goal_unit || 'times'}`
                         }
-                      </span>
-                    </>
+                    </span>
                   )}
                 </div>
                 
@@ -204,17 +210,14 @@ export const TaskDetailModal = ({
                     onOpenTimer?.(task);
                     onClose();
                   }}
-                  className={cn(
-                    'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all',
-                    goalReached
-                      ? 'bg-emerald-500 text-white shadow-md'
-                      : 'border-2 border-foreground/30 bg-white/60'
-                  )}
+                  className="w-9 h-9 flex items-center justify-center shrink-0"
                 >
                   {goalReached ? (
-                    <Check className="h-4 w-4" strokeWidth={3} />
+                    <SealCheck className="w-9 h-9 text-teal-400" />
                   ) : (
-                    <Play className="h-5 w-5 text-foreground/70 ml-0.5" fill="currentColor" />
+                    <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center">
+                      <Play className="h-4 w-4 ml-0.5" />
+                    </span>
                   )}
                 </button>
               ) : isCountGoal ? (
@@ -228,34 +231,26 @@ export const TaskDetailModal = ({
                     }
                     onClose();
                   }}
-                  className={cn(
-                    'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all',
-                    goalReached
-                      ? 'bg-emerald-500 text-white shadow-md'
-                      : isWater
-                        ? 'border-2 border-sky-400 bg-sky-100'
-                        : 'border-2 border-foreground/30 bg-white/60'
-                  )}
+                  className="w-9 h-9 flex items-center justify-center shrink-0"
                 >
                   {goalReached ? (
-                    <Check className="h-4 w-4" strokeWidth={3} />
-                  ) : isWater ? (
-                    <Droplets className="h-5 w-5 text-sky-500" />
+                    <SealCheck className="w-9 h-9 text-teal-400" />
                   ) : (
-                    <Plus className="h-5 w-5 text-foreground/70" strokeWidth={2} />
+                    <CircleProgressButton progress={goalProgress} target={task.goal_target || 1}>
+                      {isWater ? <Droplets className="h-4 w-4 text-sky-500" /> : <Plus className="h-4 w-4" />}
+                    </CircleProgressButton>
                   )}
                 </button>
               ) : (
                 <button
                   onClick={handleToggleComplete}
-                  className={cn(
-                    'w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all',
-                    isCompleted
-                      ? 'bg-emerald-500 text-white shadow-md'
-                      : 'border-2 border-foreground/30 bg-white/60'
-                  )}
+                  className="w-9 h-9 flex items-center justify-center shrink-0"
                 >
-                  {isCompleted && <Check className="h-4 w-4" strokeWidth={3} />}
+                  {isCompleted ? (
+                    <SealCheck className="w-9 h-9 text-teal-400" />
+                  ) : (
+                    <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
+                  )}
                 </button>
               )}
             </div>
@@ -316,10 +311,10 @@ export const TaskDetailModal = ({
           )}
 
           {/* Footer strip - secondary (darker) color */}
-          {combinedText && (
+          {footerText && (
             <div className={cn('px-4 py-3.5', darkColorClass)}>
               <p className="text-[13px] font-medium text-black text-center">
-                {combinedText}.
+                {footerText}.
               </p>
             </div>
           )}
