@@ -230,7 +230,7 @@ export default function AppChannelsList() {
                 <button
                   key={channel.id}
                   onClick={() => handleChannelClick(channel.slug)}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-4 py-3 active:bg-muted transition-colors text-left"
                 >
                   <div className={cn(
                     "h-12 w-12 rounded-full flex items-center justify-center shrink-0 overflow-hidden",
