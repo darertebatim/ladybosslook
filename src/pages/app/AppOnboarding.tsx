@@ -129,7 +129,7 @@ export default function AppOnboarding() {
     } else {
       localStorage.setItem(completedKey, 'true');
       localStorage.removeItem(progressKey);
-      navigate('/app/home');
+      navigate('/auth');
     }
   }, [currentStep, flow, completedKey, progressKey, navigate]);
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Link } from 'react-router-dom';
 
 import { BreathingInfoSheet } from '@/components/breathe/BreathingInfoSheet';
 import { useQuery } from '@tanstack/react-query';
@@ -238,6 +239,12 @@ function WelcomeScreen({ step, onNext }: Props) {
             {step.buttonLabel}
             <span className="text-base">→</span>
           </button>
+          <p className="text-center text-sm text-[#1a1f3d]/60 mt-3">
+            Already a member?{' '}
+            <Link to="/auth" className="text-[#4CAF50] font-semibold hover:underline">
+              Sign in.
+            </Link>
+          </p>
         </FadeUp>
       </div>
     </div>
