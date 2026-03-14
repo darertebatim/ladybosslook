@@ -2264,7 +2264,10 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                     <button className="absolute inset-0 z-40 rounded-3xl" onClick={handleMoodTap} />
                   )}
 
-                  <div className={isSpotlighted || isCelebrating ? 'relative rounded-2xl shadow-2xl' : ''}>
+                  <div className={cn(
+                    isSpotlighted || isCelebrating ? 'relative rounded-2xl shadow-2xl' : '',
+                    isCelebrating && 'animate-ripple-wave'
+                  )}>
                     <TaskCard
                       task={task}
                       date={new Date()}
@@ -2273,6 +2276,12 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                       goalProgress={0}
                       onTap={undefined}
                     />
+                    {/* Celebration emoji bounce overlay */}
+                    {isCelebrating && (
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 z-50 animate-emoji-bounce">
+                        <FluentEmoji emoji={STARTER_TASKS[i].emoji} size={36} />
+                      </div>
+                    )}
                   </div>
 
                   {/* Celebration SealCheck overlay */}
