@@ -1906,8 +1906,8 @@ interface StarterTask {
 
 const STARTER_TASKS: StarterTask[] = [
   { emoji: '📱', title: 'Open Ladyboss App', subtitle: 'You already did this one!', color: '#FFEDD5', taskColor: 'orange', repeatPattern: 'daily' },
-  { emoji: '🫁', title: 'Breathing exercise', subtitle: '2 min guided breathwork', color: '#DBEAFE', taskColor: 'blue', proLinkType: 'breathe', repeatPattern: 'daily' },
   { emoji: '🌤️', title: 'Check in with your mood', subtitle: 'How are you feeling right now?', color: '#FEF3C7', taskColor: 'yellow', proLinkType: 'mood', repeatPattern: 'daily' },
+  { emoji: '🫁', title: 'Breathing exercise', subtitle: '2 min guided breathwork', color: '#DBEAFE', taskColor: 'blue', proLinkType: 'breathe', repeatPattern: 'daily' },
   { emoji: '📝', title: 'Write a short journaling', subtitle: 'One sentence about your day', color: '#F3E8FF', taskColor: 'purple', proLinkType: 'journal', repeatPattern: 'daily' },
   { emoji: '✅', title: 'Complete onboarding', subtitle: 'Pick something quick & easy', color: '#D1FAE5', taskColor: 'green', repeatPattern: 'none' },
 ];
@@ -1951,12 +1951,13 @@ type DemoPhase =
   | 'spotlight-app'
   | 'hint-app'
   | 'celebrate-app'
-  | 'spotlight-breathe'
-  | 'hint-breathe'
-  | 'celebrate-breathe'
   | 'spotlight-mood'
   | 'hint-mood'
   | 'celebrate-mood'
+  | 'feeling-mood'
+  | 'spotlight-breathe'
+  | 'hint-breathe'
+  | 'celebrate-breathe'
   | 'spotlight-complete'
   | 'hint-complete'
   | 'celebrate-complete'
@@ -2066,11 +2067,13 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const [completedIndices, setCompletedIndices] = useState<Set<number>>(new Set());
   const [showBreathing, setShowBreathing] = useState(false);
   const [showMoodPicker, setShowMoodPicker] = useState(false);
+  const [showMoodFeeling, setShowMoodFeeling] = useState(false);
+  const [selectedMoodLabel, setSelectedMoodLabel] = useState('');
   const [celebratingIdx, setCelebratingIdx] = useState<number | null>(null);
   const timersRef = useRef<NodeJS.Timeout[]>([]);
 
-  const BREATHE_IDX = 1;
-  const MOOD_IDX = 2;
+  const MOOD_IDX = 1;
+  const BREATHE_IDX = 2;
   const COMPLETE_IDX = 4;
 
   const userTasks = STARTER_TASKS.map((t, i) => buildUserTask(t, i));
@@ -2115,10 +2118,10 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   useEffect(() => {
     if (phase === 'spotlight-app') {
       addTimer(() => setPhase('hint-app'), 800);
-    } else if (phase === 'spotlight-breathe') {
-      addTimer(() => setPhase('hint-breathe'), 800);
     } else if (phase === 'spotlight-mood') {
       addTimer(() => setPhase('hint-mood'), 800);
+    } else if (phase === 'spotlight-breathe') {
+      addTimer(() => setPhase('hint-breathe'), 800);
     } else if (phase === 'spotlight-complete') {
       addTimer(() => setPhase('hint-complete'), 800);
     }
@@ -2146,7 +2149,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const handleCheckApp = () => {
     if (phase !== 'hint-app' && phase !== 'spotlight-app') return;
     setPhase('celebrate-app');
-    triggerCelebration(0, 'spotlight-breathe');
+    triggerCelebration(0, 'spotlight-mood');
   };
 
   const handleBreatheTap = () => {
@@ -2157,7 +2160,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const handleBreathingComplete = useCallback(() => {
     setShowBreathing(false);
     setPhase('celebrate-breathe');
-    triggerCelebration(BREATHE_IDX, 'spotlight-mood');
+    triggerCelebration(BREATHE_IDX, 'spotlight-complete');
   }, []);
 
   const handleMoodTap = () => {
@@ -2166,10 +2169,29 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   };
 
   const handleMoodSelect = (moodValue: string) => {
+    const moodLabel = MOODS.find(m => m.value === moodValue)?.label || moodValue;
+    setSelectedMoodLabel(moodLabel);
     setShowMoodPicker(false);
     setPhase('celebrate-mood');
-    triggerCelebration(MOOD_IDX, 'spotlight-complete');
+    triggerCelebration(MOOD_IDX, 'feeling-mood');
   };
+
+  const handleFeelingBreatheTap = () => {
+    setShowMoodFeeling(false);
+    setShowBreathing(true);
+  };
+
+  const handleFeelingDismiss = () => {
+    setShowMoodFeeling(false);
+    setPhase('spotlight-breathe');
+  };
+
+  // Show feeling overlay when phase reaches feeling-mood
+  useEffect(() => {
+    if (phase === 'feeling-mood') {
+      setShowMoodFeeling(true);
+    }
+  }, [phase]);
 
   const handleCheckComplete = () => {
     if (phase !== 'hint-complete' && phase !== 'spotlight-complete') return;
@@ -2178,20 +2200,20 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   };
 
   // Which phases show overlay
-  const showOverlay = phase.startsWith('spotlight') || phase.startsWith('hint') || phase.startsWith('celebrate') || phase === 'done';
+  const showOverlay = phase.startsWith('spotlight') || phase.startsWith('hint') || phase.startsWith('celebrate') || phase === 'feeling-mood' || phase === 'done';
   // Which task is spotlighted
   const spotlightIdx =
     phase.includes('app') ? 0 :
-    phase.includes('breathe') ? BREATHE_IDX :
     phase.includes('mood') ? MOOD_IDX :
+    phase.includes('breathe') ? BREATHE_IDX :
     phase.includes('complete') ? COMPLETE_IDX :
     -1;
 
   // Instruction text
   const instructionText =
     (phase === 'spotlight-app' || phase === 'hint-app') ? <><FluentEmoji emoji="👆" size={20} /> Tap the circle to complete your first task!</> :
-    (phase === 'spotlight-breathe' || phase === 'hint-breathe') ? <><FluentEmoji emoji="🫁" size={20} /> Now tap the Breathe button to try it!</> :
     (phase === 'spotlight-mood' || phase === 'hint-mood') ? <><FluentEmoji emoji="🌤️" size={20} /> Now check in with your mood!</> :
+    (phase === 'spotlight-breathe' || phase === 'hint-breathe') ? <><FluentEmoji emoji="🫁" size={20} /> Now tap the Breathe button to try it!</> :
     (phase === 'spotlight-complete' || phase === 'hint-complete') ? <><FluentEmoji emoji="✅" size={20} /> Tap to complete your onboarding!</> :
     phase === 'done' ? <><FluentEmoji emoji="✨" size={20} /> Tap Continue to keep going!</> :
     null;
@@ -2469,6 +2491,49 @@ function StarterRoutineScreen({ step, onNext }: Props) {
         </div>
       )}
 
+      {/* Mood feeling message overlay — shows after mood selection */}
+      {showMoodFeeling && (
+        <div className="fixed inset-0 z-[100] flex items-end justify-center" style={{ animation: 'fadeIn 0.3s ease-out' }}>
+          <div className="absolute inset-0 bg-black/60" onClick={handleFeelingDismiss} />
+          <div className="relative z-10 w-full bg-emerald-50 rounded-t-3xl px-6 pt-8 pb-10 animate-slide-up">
+            {/* Header */}
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-3">
+                <FluentEmoji emoji={MOODS.find(m => m.label === selectedMoodLabel)?.emoji || '🌤️'} size={40} />
+              </div>
+              <h2 className="text-xl font-bold text-[#1a1f3d] mb-1">
+                You feel {selectedMoodLabel.toLowerCase()}
+              </h2>
+              <p className="text-sm text-gray-500">
+                Take a moment to breathe and reset your mind.
+              </p>
+            </div>
+
+            {/* Single breathing card */}
+            <button
+              onClick={handleFeelingBreatheTap}
+              className="w-full flex items-center gap-4 rounded-2xl p-4 bg-white/90 backdrop-blur-sm active:scale-[0.97] transition-all mb-5 shadow-sm"
+            >
+              <div className="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                <FluentEmoji emoji="🫁" size={32} />
+              </div>
+              <div className="text-left flex-1">
+                <span className="text-base font-semibold text-[#1a1f3d] block">Try a Breathing Exercise</span>
+                <span className="text-xs text-gray-500">2 min guided breathwork to calm your mind</span>
+              </div>
+              <span className="text-lg text-gray-400">→</span>
+            </button>
+
+            {/* Skip */}
+            <button
+              onClick={handleFeelingDismiss}
+              className="w-full h-10 rounded-full text-sm bg-orange-200/60 text-orange-900 hover:bg-orange-200/80 transition-colors"
+            >
+              Skip for now
+            </button>
+          </div>
+        </div>
+      )}
       <style>{`
         @keyframes sparkGlow {
           0% { opacity: 0.4; transform: scale(1); }
