@@ -1883,8 +1883,8 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
   const exhaleSeconds = Number(exercise?.exhale_seconds) || 3;
   const exhaleHoldSeconds = Number(exercise?.exhale_hold_seconds);
 
-  const normalizedInhaleHold = Number.isFinite(inhaleHoldSeconds) ? inhaleHoldSeconds : 1;
-  const normalizedExhaleHold = Number.isFinite(exhaleHoldSeconds) ? exhaleHoldSeconds : 1;
+  const normalizedInhaleHold = Number.isFinite(inhaleHoldSeconds) && inhaleHoldSeconds > 0 ? inhaleHoldSeconds : 1;
+  const normalizedExhaleHold = Number.isFinite(exhaleHoldSeconds) && exhaleHoldSeconds > 0 ? exhaleHoldSeconds : 1;
 
   const [stage, setStage] = useState<'info' | 'countdown' | 'running' | 'done'>('info');
   const [countdown, setCountdown] = useState(3);
