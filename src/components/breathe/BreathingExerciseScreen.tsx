@@ -139,7 +139,7 @@ export function BreathingExerciseScreen({
           clearInterval(timer);
           setIsCountingDown(false);
           setIsActive(true);
-          setPhaseTimeRemaining(phases[0]?.duration || 4);
+          setPhaseTimeRemaining(phasesRef.current[0]?.duration || 4);
           startTimeRef.current = Date.now();
           haptic.medium();
           return 0;
@@ -150,7 +150,7 @@ export function BreathingExerciseScreen({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isCountingDown, phases]);
+  }, [isCountingDown]);
 
   // Main breathing timer — supports both cycle-based and minute-based completion
   useEffect(() => {
