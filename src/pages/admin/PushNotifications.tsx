@@ -290,7 +290,7 @@ const localPNs: PNType[] = [
     codeFile: 'src/hooks/useLocalNotificationScheduler.ts',
     deliveryType: 'local',
     messages: [
-      { title: '⏰ Urgent Reminder', body: 'Time-sensitive action required' },
+      { title: '⏰ Urgent Reminder', body: 'Time-sensitive task reminder' },
     ],
   },
 ];
