@@ -159,6 +159,22 @@ export default function BrandDesign() {
         </div>
       </Section>
 
+      <Section title="Planner Secondary Palette" description="Heavier/darker variants used for schedule strips and card footers in the planner">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <ColorSwatch label="Pink Dark" cssVar="planner-pink-dark" hsl="330, 80%, 82%" className="!bg-[#FFB8D9]" />
+          <ColorSwatch label="Peach Dark" cssVar="planner-peach-dark" hsl="30, 90%, 79%" className="!bg-[#FFD1A3]" />
+          <ColorSwatch label="Yellow Dark" cssVar="planner-yellow-dark" hsl="50, 100%, 74%" className="!bg-[#FFE97D]" />
+          <ColorSwatch label="Lime Dark" cssVar="planner-lime-dark" hsl="75, 70%, 71%" className="!bg-[#D4EB82]" />
+          <ColorSwatch label="Sky Dark" cssVar="planner-sky-dark" hsl="205, 78%, 80%" className="!bg-[#A3D5F2]" />
+          <ColorSwatch label="Mint Dark" cssVar="planner-mint-dark" hsl="160, 70%, 74%" className="!bg-[#8EECD0]" />
+          <ColorSwatch label="Lavender Dark" cssVar="planner-lavender-dark" hsl="275, 55%, 83%" className="!bg-[#D4B8F0]" />
+        </div>
+        <div className="mt-3 text-xs text-muted-foreground space-y-1">
+          <p><span className="font-medium">Hex values:</span> Pink #FFB8D9 · Peach #FFD1A3 · Yellow #FFE97D · Lime #D4EB82 · Sky #A3D5F2 · Mint #8EECD0 · Lavender #D4B8F0</p>
+          <p><span className="font-medium">Usage:</span> Bottom schedule strip on task cards, heavier accent areas, hover states</p>
+        </div>
+      </Section>
+
       {/* Gradients */}
       <Section title="Gradients">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
