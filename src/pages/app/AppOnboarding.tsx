@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { OnboardingAnswers } from '@/types/onboarding';
 import { OnboardingStepRenderer } from '@/components/admin/onboarding/OnboardingStepRenderer';
 import { ChevronLeft } from 'lucide-react';
@@ -59,6 +59,7 @@ function collectEmojiUrls(flow: typeof mePlusFlow): string[] {
 
 export default function AppOnboarding() {
   const { flowId } = useParams<{ flowId: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isSubscribed } = useSubscription();
@@ -75,6 +76,12 @@ export default function AppOnboarding() {
   const completedKey = `simora_onboarding_completed_${flowId}`;
 
   const [currentStep, setCurrentStep] = useState(() => {
+    // Support ?step=N query param for direct step preview
+    const stepParam = searchParams.get('step');
+    if (stepParam) {
+      const parsed = parseInt(stepParam, 10);
+      if (!isNaN(parsed) && parsed >= 0) return parsed;
+    }
     try {
       const saved = localStorage.getItem(progressKey);
       return saved ? parseInt(saved, 10) : 0;
