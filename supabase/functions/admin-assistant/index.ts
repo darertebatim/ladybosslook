@@ -1053,14 +1053,14 @@ ${context.feedChannels?.map((c: any) => `- "${c.name}" (ID: ${c.id}, slug: ${c.s
 
   if (currentPage === "tools") {
     prompt += `
-## Current Page: TOOLS (Actions Bank, Routines Bank, Breathing Exercises)
+## Current Page: TOOLS (Tasks Bank, Routines Bank, Breathing Exercises)
 
 You can DIRECTLY CREATE, UPDATE, and DELETE items in the database. When the user asks you to do something, USE THE TOOLS to do it immediately.
 
 ### Available Categories
 ${context.categories?.map((c: any) => `- ${c.icon || "📌"} ${c.name} (slug: "${c.slug}")`).join("\n") || "None"}
 
-### Existing Actions (${context.existingActions?.length || 0} active)
+### Existing Tasks (${context.existingActions?.length || 0} active)
 ${context.existingActions?.slice(0, 20).map((a: any) => {
   const subs = (context.actionSubtasks || []).filter((s: any) => s.task_id === a.id);
   const subText = subs.length ? ` | Subtasks: ${subs.map((s: any) => `"${s.title}" (ID:${s.id})`).join(', ')}` : '';
@@ -1078,16 +1078,16 @@ ${context.existingRoutines?.map((r: any) => {
 ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "🌬️"} ${b.name} [${b.category}]`).join("\n") || "None"}
 
 ### What You Can Do (DIRECT DATABASE ACTIONS):
-- "Create a morning meditation action" → create_action_in_bank
-- "Add 5 self-care actions" → call create_action_in_bank multiple times
+- "Create a morning meditation task" → create_action_in_bank
+- "Add 5 self-care tasks" → call create_action_in_bank multiple times
 - "Create a morning routine with tasks" → create_ritual_in_bank
 - "Add a 4-7-8 breathing exercise" → create_breathing_exercise
 - "Change the category of X" → update_action_in_bank / update_ritual_in_bank
 - "Rename X to Y" → use the update tool with the item's ID
 - "Deactivate X" → update tool with is_active: false
-- "Add subtasks to action X" → add_subtasks_to_action
+- "Add subtasks to task X" → add_subtasks_to_action
 - "Remove subtask Y" → delete_subtask
-- **"Delete action X"** → delete_action_from_bank (deletes the action and its subtasks)
+- **"Delete task X"** → delete_action_from_bank (deletes the task and its subtasks)
 - **"Delete routine X"** → delete_ritual_from_bank (deletes the routine, its tasks)
 - **"Delete breathing exercise X"** → delete_breathing_exercise
 - **"Add tasks to routine X"** → add_tasks_to_routine (adds new tasks to an existing routine)
@@ -1095,8 +1095,8 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 - **"Generate a cover for routine X"** → generate_routine_cover (generates a Simora-style pastel cover image using AI and uploads it)
 
 ### SUBTASKS EXPLAINED:
-- **Subtasks** are smaller steps/checklist items that belong to an ACTION (admin_task_bank item).
-- Each action can have multiple subtasks (e.g., "Workout" → subtasks: "20 leg rises", "10 heel touches", "1 min plank").
+- **Subtasks** are smaller steps/checklist items that belong to a TASK (admin_task_bank item).
+- Each task can have multiple subtasks (e.g., "Workout" → subtasks: "20 leg rises", "10 heel touches", "1 min plank").
 - Use add_subtasks_to_action to add them, delete_subtask to remove one.
 
 ### ROUTINE DESCRIPTION (BLOG-STYLE RICH TEXT):
@@ -1124,9 +1124,9 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 8. To find the correct item ID for updates, match by title from the existing items lists above
 9. When asked to CHANGE a COLOR: you MUST pick a DIFFERENT hex color than the current one shown in context. Do NOT re-use the same color. Choose a visually distinct new color.
 10. If the user says "change color" without specifying which color, pick a beautiful new color that fits the item's theme.
-11. When user mentions "subtasks", "steps", "checklist items" for an ACTION → use add_subtasks_to_action tool. Match the action by title to find its ID.
+11. When user mentions "subtasks", "steps", "checklist items" for a TASK → use add_subtasks_to_action tool. Match the task by title to find its ID.
 12. When user asks to remove/delete a subtask → use delete_subtask with the subtask's ID from context.
-13. When user says "delete", "remove" an action/ritual/exercise → use the appropriate delete tool. Always confirm what was deleted.
+13. When user says "delete", "remove" a task/ritual/exercise → use the appropriate delete tool. Always confirm what was deleted.
 14. When user asks to add tasks to an existing routine → use add_tasks_to_routine. Match the routine by title to find its ID.
 15. When user asks to remove a task from a routine → use delete_routine_task with the task's ID from context.
 16. When user says "generate cover", "create cover image", "make a cover" for a routine → use generate_routine_cover.
