@@ -2819,7 +2819,7 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
   };
 
   return (
-    <BottomSheetWrapper bgImage={meplusMascotBg}>
+    <BottomSheetWrapper bgImage={meplusMascotBg} headerHeight={140}>
       {/* Celebration badge */}
       <FadeUp>
         <div className="flex flex-col items-center mb-3">
