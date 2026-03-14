@@ -1,58 +1,40 @@
 
 
-## Calm-Style Animated Background for Watch Page
+# Fix Hold Phases in Welcome Breathing
 
-Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
+## Problem
+The hold phases technically exist (1 second each) but are nearly invisible — the "Hold" text flashes for just 1 second with no distinct visual effect, making it look like the exercise only does inhale/exhale.
 
-### What You'll Get
+## Changes
 
-- A deep dark blue gradient background on the Watch page header area
-- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
-- Subtle lightning flashes that pulse periodically
-- All text updated to white/light colors for contrast
-- Lightweight implementation using CSS keyframes (no extra dependencies)
+### `src/components/admin/onboarding/OnboardingStepRenderer.tsx`
 
-### Design Details
+1. **Add distinct visual effects for hold phases:**
+   - **Inhale hold**: Add a pulsing glow effect on the circle while it stays fully expanded — a gentle brightness pulse to signal "hold here"
+   - **Exhale hold**: Add a subtle shimmer/pulse at the collapsed state
+   - Add a new CSS keyframe `ob-hold-pulse` for a gentle scale+glow oscillation during holds
 
-- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
-- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
-- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
-- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
-- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
+2. **Add distinct background gradients for holds:**
+   - `inhale_hold`: Slightly brighter/warmer purple gradient than inhale
+   - `exhale_hold`: Slightly different tone than exhale to show it's a distinct phase
 
-### Technical Approach
+3. **Make "Hold" text more prominent:**
+   - Larger text size during hold phases (text-2xl vs text-xl)
+   - Brighter white opacity (text-white/95 vs text-white/90)
+   - Show countdown number larger and more visible
 
-**Files to modify:**
+4. **Circle behavior during holds:**
+   - Instead of instant `0.3s ease-out` snap, apply the `ob-hold-pulse` animation — a gentle scale oscillation (±3%) so the circle visibly "breathes" at its held position, making it clear something is happening
+   - Increase glow intensity during holds
 
-1. **`src/pages/app/AppWatch.tsx`**
-   - Replace the header `bg-[#E8F4FE]` with the dark gradient
-   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
-   - Add a lightning flash overlay div
-   - Update all text classes to white variants (`text-white`, `text-white/60`)
-   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
-   - Extend the gradient into the page background behind the content area
-
-2. **`tailwind.config.ts`**
-   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
-   - Register corresponding animation utilities
-
-### Visual Structure
+### Visual summary
 
 ```text
-+----------------------------------+
-|  [dark blue gradient header]     |
-|  ~~~ cloud layer 1 (slow) ~~~   |
-|  ~~~ cloud layer 2 (slower) ~~~ |
-|  * lightning flash (periodic) *  |
-|                                  |
-|  Watch          [icons]          |
-|  [categories row]                |
-|  [filters]              [lang]   |
-+----------------------------------+
-|  [normal white content area]     |
-|  [playlist cards grid]           |
-+----------------------------------+
+Phase         Circle              Text         Effect
+──────────────────────────────────────────────────────
+Inhale        0.45 → 1.0 (3s)    "Inhale"     Linear expand
+Inhale Hold   ~1.0 pulsing        "Hold" + n   Gentle pulse glow
+Exhale        1.0 → 0.45 (3s)    "Exhale"     Linear contract  
+Exhale Hold   ~0.45 pulsing       "Hold" + n   Gentle pulse glow
 ```
-
-The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
 
