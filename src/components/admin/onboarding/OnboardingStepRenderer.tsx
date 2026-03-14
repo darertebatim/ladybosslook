@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { BreathingCircle } from '@/components/breathe/BreathingCircle';
+
 import { BreathingInfoSheet } from '@/components/breathe/BreathingInfoSheet';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -1991,39 +1991,145 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
       </div>
     );
   }
-
-  // Stages: countdown, running, done — show BreathingCircle
-  const circlePhase: 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold' | 'ready' =
-    stage === 'countdown' ? 'ready' : stage === 'done' ? 'ready' : breathPhase;
   const phaseDuration = currentP?.duration || 3;
-  const phaseText = stage === 'countdown' ? countdown.toString() : stage === 'done' ? '✓' : (currentP?.text || 'Inhale');
-  const methodText = stage === 'running' ? currentP?.method : undefined;
-  const holdCountdown = stage === 'running' && breathPhase.includes('hold') ? phaseTimeLeft : undefined;
+
+  // Determine background gradient based on phase
+  const bgGradient = (() => {
+    if (stage === 'done') return 'radial-gradient(ellipse at 50% 40%, #1e1145 0%, #0f0a2e 50%, #080618 100%)';
+    if (stage === 'countdown') return 'radial-gradient(ellipse at 50% 40%, #1a0e3e 0%, #0d0825 50%, #06050f 100%)';
+    if (breathPhase === 'inhale') return 'radial-gradient(ellipse at 50% 35%, #1e1155 0%, #120a3a 40%, #080618 100%)';
+    if (breathPhase === 'exhale') return 'radial-gradient(ellipse at 50% 45%, #160d42 0%, #0e0830 40%, #06050f 100%)';
+    return 'radial-gradient(ellipse at 50% 40%, #1a0e3e 0%, #0d0825 50%, #06050f 100%)'; // hold
+  })();
+
+  // Animated circle scale
+  const isExpanded = breathPhase === 'inhale_hold';
+  const isInhaling = breathPhase === 'inhale';
+  const isExhaling = breathPhase === 'exhale';
+  const animatedScale = stage !== 'running'
+    ? 0.45
+    : isExpanded || isInhaling ? 1.0 : 0.45;
+  const animDuration = (isInhaling || isExhaling) ? `${phaseDuration}s` : '0.3s';
+
+  // Glow intensity based on phase
+  const glowOpacity = isExpanded || isInhaling ? 0.5 : 0.2;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center">
-      {/* Exercise name + cycle count */}
-      <p className="text-sm text-muted-foreground mb-1 font-medium">{exercise.name}</p>
-      <p className="text-xs text-muted-foreground/60">{cycleCount}/{targetCycles} breaths</p>
-      <p className="text-xs text-muted-foreground/60 mb-6">{inhaleSeconds}s in • {normalizedInhaleHold}s hold • {exhaleSeconds}s out • {normalizedExhaleHold}s hold</p>
+    <div
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden transition-all duration-[2000ms]"
+      style={{ background: bgGradient }}
+    >
+      {/* Ambient CSS particles */}
+      <style>{`
+        @keyframes ob-float-1 { 0%,100% { transform: translate(0,0) scale(1); opacity:0.3; } 25% { transform: translate(30px,-40px) scale(1.2); opacity:0.5; } 50% { transform: translate(-20px,-80px) scale(0.8); opacity:0.2; } 75% { transform: translate(40px,-30px) scale(1.1); opacity:0.4; } }
+        @keyframes ob-float-2 { 0%,100% { transform: translate(0,0) scale(1); opacity:0.2; } 33% { transform: translate(-40px,30px) scale(1.3); opacity:0.4; } 66% { transform: translate(50px,-20px) scale(0.9); opacity:0.15; } }
+        @keyframes ob-float-3 { 0%,100% { transform: translate(0,0); opacity:0.25; } 50% { transform: translate(-30px,-50px); opacity:0.45; } }
+        @keyframes ob-pulse-ring { 0%,100% { opacity:0.15; transform:scale(1); } 50% { opacity:0.3; transform:scale(1.05); } }
+        @keyframes ob-count-pop { 0% { transform:scale(0.5); opacity:0; } 40% { transform:scale(1.15); opacity:1; } 100% { transform:scale(1); opacity:1; } }
+      `}</style>
 
-      {/* Real BreathingCircle component */}
-      <BreathingCircle
-        phase={circlePhase}
-        phaseDuration={phaseDuration}
-        phaseText={phaseText}
-        methodText={methodText}
-        countdown={holdCountdown}
-      />
+      {/* Floating bokeh particles */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute rounded-full" style={{ width: 6, height: 6, background: 'rgba(167,139,250,0.4)', top: '15%', left: '20%', animation: 'ob-float-1 12s ease-in-out infinite' }} />
+        <div className="absolute rounded-full" style={{ width: 4, height: 4, background: 'rgba(129,140,248,0.3)', top: '25%', right: '15%', animation: 'ob-float-2 15s ease-in-out infinite 2s' }} />
+        <div className="absolute rounded-full" style={{ width: 8, height: 8, background: 'rgba(192,132,252,0.25)', bottom: '30%', left: '12%', animation: 'ob-float-3 18s ease-in-out infinite 1s' }} />
+        <div className="absolute rounded-full" style={{ width: 3, height: 3, background: 'rgba(196,181,253,0.35)', top: '60%', right: '25%', animation: 'ob-float-1 14s ease-in-out infinite 4s' }} />
+        <div className="absolute rounded-full" style={{ width: 5, height: 5, background: 'rgba(165,180,252,0.2)', bottom: '20%', right: '35%', animation: 'ob-float-2 16s ease-in-out infinite 3s' }} />
+      </div>
 
+      {/* Exercise name */}
+      <p className="text-sm text-white/40 mb-8 font-medium tracking-widest uppercase">{exercise.name}</p>
+
+      {/* Custom breathing circle */}
+      <div className="relative flex items-center justify-center" style={{ width: 280, height: 280 }}>
+        {/* Outer ambient glow ring */}
+        <div
+          className="absolute rounded-full transition-opacity duration-[2000ms]"
+          style={{
+            width: '105%', height: '105%',
+            background: 'conic-gradient(from 0deg, rgba(139,92,246,0.15), rgba(99,102,241,0.1), rgba(168,85,247,0.15), rgba(139,92,246,0.15))',
+            animation: 'ob-pulse-ring 4s ease-in-out infinite',
+            filter: 'blur(8px)',
+            opacity: glowOpacity,
+          }}
+        />
+
+        {/* Inner fixed ring — exhale boundary */}
+        <div
+          className="absolute rounded-full"
+          style={{ width: '40%', height: '40%', border: '1.5px solid rgba(167,139,250,0.2)' }}
+        />
+
+        {/* Animated breathing circle */}
+        <div
+          className="absolute rounded-full"
+          style={{
+            width: '100%', height: '100%',
+            transform: `scale(${animatedScale})`,
+            transitionProperty: 'transform',
+            transitionTimingFunction: (isInhaling || isExhaling) ? 'linear' : 'ease-out',
+            transitionDuration: animDuration,
+            background: 'radial-gradient(circle at 40% 35%, rgba(139,92,246,0.25) 0%, rgba(99,102,241,0.15) 50%, rgba(79,70,229,0.08) 100%)',
+            boxShadow: `0 0 40px 10px rgba(139,92,246,${glowOpacity * 0.4}), 0 0 80px 30px rgba(99,102,241,${glowOpacity * 0.2}), inset 0 0 30px rgba(167,139,250,0.1)`,
+            backdropFilter: 'blur(4px)',
+          }}
+        />
+
+        {/* Center content */}
+        <div className="absolute flex flex-col items-center justify-center z-10" style={{ width: '35%', height: '35%' }}>
+          {stage === 'countdown' ? (
+            <span
+              key={countdown}
+              className="text-4xl font-light text-white/90"
+              style={{ animation: 'ob-count-pop 0.5s ease-out', textShadow: '0 0 20px rgba(139,92,246,0.5)' }}
+            >
+              {countdown}
+            </span>
+          ) : stage === 'done' ? (
+            <span className="text-3xl animate-fade-in" style={{ textShadow: '0 0 20px rgba(139,92,246,0.5)' }}>✓</span>
+          ) : (
+            <>
+              <span
+                className="text-xl font-light text-white/90 tracking-wider"
+                style={{ textShadow: '0 0 15px rgba(139,92,246,0.3)' }}
+              >
+                {currentP?.text || 'Inhale'}
+              </span>
+              {breathPhase.includes('hold') ? (
+                <span className="text-base text-white/50 mt-1 font-mono">{phaseTimeLeft}</span>
+              ) : currentP?.method ? (
+                <span className="text-[10px] text-white/35 mt-1.5 px-2.5 py-0.5 rounded-full border border-white/10 tracking-wider uppercase">{currentP.method}</span>
+              ) : null}
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Phase timer (below circle) */}
       {stage === 'running' && (
-        <p className="mt-4 text-sm text-muted-foreground">
-          {currentP?.text || 'Inhale'} · {phaseTimeLeft}s
-        </p>
+        <p className="mt-8 text-sm text-white/30 font-mono tracking-wider">{phaseTimeLeft}s</p>
       )}
 
+      {/* Cycle progress dots */}
+      <div className="mt-6 flex gap-2.5">
+        {Array.from({ length: targetCycles }).map((_, i) => (
+          <div
+            key={i}
+            className="rounded-full transition-all duration-500"
+            style={{
+              width: 8, height: 8,
+              background: i < cycleCount
+                ? 'rgba(167,139,250,0.8)'
+                : 'rgba(167,139,250,0.15)',
+              boxShadow: i < cycleCount ? '0 0 8px rgba(167,139,250,0.4)' : 'none',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Done message */}
       {stage === 'done' && (
-        <p className="mt-8 text-lg font-semibold text-foreground animate-fade-in">Great job! 🎉</p>
+        <p className="mt-8 text-lg font-light text-white/80 animate-fade-in tracking-wide">Beautiful ✨</p>
       )}
     </div>
   );
