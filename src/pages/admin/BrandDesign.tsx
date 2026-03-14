@@ -145,16 +145,16 @@ export default function BrandDesign() {
       {/* Planner Palette */}
       <Section title="Planner Action Palette" description="7 pastel colors used across the daily planner, action builder, and routine cards">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          <ColorSwatch label="Pink" cssVar="planner-pink" hsl="302, 76%, 92%" className="!bg-[#F9DAF7]" />
-          <ColorSwatch label="Peach" cssVar="planner-peach" hsl="36, 89%, 88%" className="!bg-[#FAE5C5]" />
-          <ColorSwatch label="Yellow" cssVar="planner-yellow" hsl="54, 96%, 77%" className="!bg-[#FDF18D]" />
-          <ColorSwatch label="Lime" cssVar="planner-lime" hsl="94, 78%, 86%" className="!bg-[#E2F7BD]" />
-          <ColorSwatch label="Sky" cssVar="planner-sky" hsl="221, 93%, 92%" className="!bg-[#D7E6FD]" />
-          <ColorSwatch label="Mint" cssVar="planner-mint" hsl="157, 50%, 89%" className="!bg-[#D3F2EA]" />
-          <ColorSwatch label="Lavender" cssVar="planner-lavender" hsl="264, 82%, 92%" className="!bg-[#E5DAFC]" />
+          <ColorSwatch label="Pink" cssVar="planner-pink" hsl="330, 100%, 92%" className="!bg-[#FFD6E8]" />
+          <ColorSwatch label="Peach" cssVar="planner-peach" hsl="30, 100%, 89%" className="!bg-[#FFE4C4]" />
+          <ColorSwatch label="Yellow" cssVar="planner-yellow" hsl="55, 100%, 80%" className="!bg-[#FFF59D]" />
+          <ColorSwatch label="Lime" cssVar="planner-lime" hsl="75, 80%, 80%" className="!bg-[#E8F5A3]" />
+          <ColorSwatch label="Sky" cssVar="planner-sky" hsl="205, 85%, 88%" className="!bg-[#C5E8FA]" />
+          <ColorSwatch label="Mint" cssVar="planner-mint" hsl="160, 80%, 84%" className="!bg-[#B8F5E4]" />
+          <ColorSwatch label="Lavender" cssVar="planner-lavender" hsl="275, 65%, 90%" className="!bg-[#E8D4F8]" />
         </div>
         <div className="mt-3 text-xs text-muted-foreground space-y-1">
-          <p><span className="font-medium">Hex values:</span> Pink #F9DAF7 · Peach #FAE5C5 · Yellow #FDF18D · Lime #E2F7BD · Sky #D7E6FD · Mint #D3F2EA · Lavender #E5DAFC</p>
+          <p><span className="font-medium">Hex values:</span> Pink #FFD6E8 · Peach #FFE4C4 · Yellow #FFF59D · Lime #E8F5A3 · Sky #C5E8FA · Mint #B8F5E4 · Lavender #E8D4F8</p>
           <p><span className="font-medium">Aliases:</span> red → pink · orange → peach · green → lime · blue → sky · purple → lavender</p>
         </div>
       </Section>
