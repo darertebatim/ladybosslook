@@ -2073,6 +2073,8 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const MOOD_IDX = 2;
   const COMPLETE_IDX = 4;
 
+  const userTasks = STARTER_TASKS.map((t, i) => buildUserTask(t, i));
+
   // Cleanup timers on unmount
   useEffect(() => {
     return () => timersRef.current.forEach(clearTimeout);
