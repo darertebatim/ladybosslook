@@ -1,4 +1,5 @@
 import { OnboardingFlow } from '@/types/onboarding';
+import meplusWelcomeMascot from '@/assets/onboarding/meplus-welcome-mascot.png';
 
 export const quickStartFlow: OnboardingFlow = {
   id: 'quick-start-v1',
