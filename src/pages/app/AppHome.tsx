@@ -656,7 +656,7 @@ const AppHome = () => {
               <HomeMenu onStartTour={startHomeTour || undefined} />
               <button
                 onClick={() => navigate('/app/chat')}
-                className="p-2 -ml-1 text-foreground hover:text-foreground transition-colors"
+                className="p-2 -ml-1 text-foreground transition-colors"
               >
                 <Headset className="h-5 w-5" />
               </button>
