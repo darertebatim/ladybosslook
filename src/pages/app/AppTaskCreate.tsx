@@ -972,7 +972,7 @@ const AppTaskCreate = ({
           </div>
           <div className="flex items-center gap-2 text-black/60">
             <span>{format(scheduledDate, 'MMM d') === format(new Date(), 'MMM d') ? 'Today' : format(scheduledDate, 'MMM d, yyyy')}</span>
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-black/40" />
           </div>
         </button>
 
@@ -987,7 +987,7 @@ const AppTaskCreate = ({
           </div>
           <div className="flex items-center gap-2 text-black/60">
             <span>{getRepeatSummary()}</span>
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-black/40" />
           </div>
         </button>
 
@@ -1002,7 +1002,7 @@ const AppTaskCreate = ({
           </div>
           <div className="flex items-center gap-2 text-black/60">
             <span>{formatTimeDisplay(scheduledTime)}</span>
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-black/40" />
           </div>
         </button>
 
@@ -1017,7 +1017,7 @@ const AppTaskCreate = ({
           </div>
           <div className="flex items-center gap-2 text-black/60">
             <span>{getReminderSummary()}</span>
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-black/40" />
           </div>
         </button>
 
@@ -1056,7 +1056,7 @@ const AppTaskCreate = ({
           </div>
           <div className="flex items-center gap-2 text-black/60">
             <span>{tag || 'No category'}</span>
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-black/40" />
           </div>
         </button>
       </div>
@@ -1076,7 +1076,7 @@ const AppTaskCreate = ({
           </div>
           <div className="flex items-center gap-2 text-black/60">
             <span>{goalSettings.enabled ? formatGoalTarget(goalSettings) : 'Off'}</span>
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-black/40" />
           </div>
         </button>
       </div>
@@ -1103,7 +1103,7 @@ const AppTaskCreate = ({
             ) : (
               <span>Off</span>
             )}
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-black/40" />
           </div>
         </button>
       </div>
@@ -1128,7 +1128,7 @@ const AppTaskCreate = ({
         </DndContext>
 
         <div className="flex items-center gap-3 px-4 py-3">
-          <Plus className="h-5 w-5 text-muted-foreground shrink-0" />
+          <Plus className="h-5 w-5 text-black/40 shrink-0" />
           <Input
             ref={newSubtaskInputRef}
             value={newSubtask}
@@ -1136,13 +1136,13 @@ const AppTaskCreate = ({
             onKeyDown={(e) => e.key === 'Enter' && addSubtask()}
             onFocus={handleNewSubtaskFocus}
             placeholder="Subtasks"
-            className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto text-base placeholder:text-muted-foreground/50"
+            className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto text-base text-black placeholder:text-black/40"
           />
         </div>
       </div>
 
       {/* Subtasks hint text */}
-      <p className="text-center text-sm text-muted-foreground mt-3 px-6">
+      <p className="text-center text-sm text-black/50 mt-3 px-6">
         Subtasks can be set as your daily routine or checklist
       </p>
 
