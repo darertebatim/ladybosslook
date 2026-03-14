@@ -299,7 +299,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
                     setShowRoutineSheet(true);
                   }}
                   iconOnly
-                  className="text-white hover:text-white"
+                  className="text-white"
                 />
               )}
               {hasNext && (
