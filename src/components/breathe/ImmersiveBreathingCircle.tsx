@@ -51,6 +51,7 @@ export function ImmersiveBreathingCircle({
         @keyframes imm-count-pop { 0% { transform:scale(0.5); opacity:0; } 40% { transform:scale(1.15); opacity:1; } 100% { transform:scale(1); opacity:1; } }
         @keyframes imm-spin-cw { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes imm-spin-ccw { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+        @keyframes imm-ring-glow { 0%,100% { box-shadow: 0 0 24px rgba(139,92,246,0.35), 0 0 4px rgba(196,181,253,0.2); } 50% { box-shadow: 0 0 36px rgba(139,92,246,0.55), 0 0 8px rgba(196,181,253,0.4); } }
       `}</style>
 
       <div className="relative flex items-center justify-center" style={{ width: 280, height: 280 }}>
