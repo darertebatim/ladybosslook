@@ -1251,7 +1251,7 @@ function getToolDefinitions(currentPage?: string) {
               },
               tasks: {
                 type: "array",
-                description: "Tasks/actions within the routine",
+                description: "Tasks within the routine",
                 items: {
                   type: "object",
                   properties: {
