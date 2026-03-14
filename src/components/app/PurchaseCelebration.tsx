@@ -137,7 +137,7 @@ export function PurchaseCelebration({ open, onClose, plan }: PurchaseCelebration
         <Button
           size="lg"
           onClick={onClose}
-          className="w-full max-w-xs bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold shadow-lg shadow-amber-500/25"
+          className="w-full max-w-xs bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold shadow-lg shadow-amber-500/25"
         >
           Start Exploring ✨
         </Button>

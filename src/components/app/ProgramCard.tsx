@@ -80,7 +80,7 @@ export const ProgramCard = ({
             )
         )}
         {isEnrolled && (
-          <Badge className="bg-green-500 hover:bg-green-600 text-white text-xs rounded-full">
+          <Badge className="bg-green-500 text-white text-xs rounded-full">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Enrolled
           </Badge>

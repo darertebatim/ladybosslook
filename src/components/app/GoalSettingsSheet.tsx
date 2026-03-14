@@ -368,7 +368,7 @@ export const GoalSettingsSheet = ({
             >
               Confirm Change
             </AlertDialogAction>
-            <AlertDialogCancel className="w-full h-12 rounded-full border-0 bg-transparent text-muted-foreground hover:bg-transparent hover:text-foreground text-base">
+            <AlertDialogCancel className="w-full h-12 rounded-full border-0 bg-transparent text-muted-foreground text-base">
               Cancel
             </AlertDialogCancel>
           </AlertDialogFooter>

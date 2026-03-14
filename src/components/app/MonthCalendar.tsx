@@ -87,7 +87,7 @@ export const MonthCalendar = ({
                   className={cn(
                     'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
                     !isCurrentMonth && 'text-muted-foreground/30',
-                    isCurrentMonth && !isSelected && !isTodayDate && !hasBadge && 'hover:bg-muted/50',
+                    isCurrentMonth && !isSelected && !isTodayDate && !hasBadge && '',
                     isSelected && !hasBadge && 'bg-violet-600 text-white shadow-md',
                     !isSelected && isTodayDate && isCurrentMonth && !hasBadge && 'bg-violet-100 text-violet-700',
                     hasBadge && isSelected && 'ring-2 ring-violet-600 ring-offset-1'

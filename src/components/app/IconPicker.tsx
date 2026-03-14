@@ -142,7 +142,7 @@ export const IconPicker = ({
                   onClick={() => handleSelect(iconName)}
                   className={cn(
                     'aspect-square rounded-2xl flex items-center justify-center transition-all active:scale-95',
-                    'bg-muted/60 hover:bg-muted',
+                    'bg-muted/60',
                     selectedIcon === iconName && 'bg-violet-100 ring-2 ring-violet-500'
                   )}
                 >
