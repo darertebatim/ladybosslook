@@ -950,7 +950,7 @@ const AppHome = () => {
                                 'px-2.5 py-0.5 rounded-full text-[11px] whitespace-nowrap transition-all capitalize font-medium',
                                 selectedTag === tag
                                   ? activeColor
-                                  : 'bg-white text-muted-foreground dark:bg-white/10 border border-white'
+                                  : 'bg-white text-muted-foreground dark:bg-white/10 border border-white shadow-[0_2px_10px_rgba(0,0,0,0.08)]'
                               )}
                             >
                               {categoryNameMap.get(tag) || tag}
