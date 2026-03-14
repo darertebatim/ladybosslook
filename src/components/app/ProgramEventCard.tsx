@@ -111,17 +111,8 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
 
     switch (event.type) {
       case 'session':
-        // If today and has meeting link, open it
-        if (isToday(date) && event.meetingLink) {
-          if (Capacitor.isNativePlatform()) {
-            await Browser.open({ url: event.meetingLink });
-          } else {
-            window.open(event.meetingLink, '_blank');
-          }
-        } else {
-          // Navigate to course detail
-          navigate(`/app/course/${event.programSlug}`, { state: { from: location.pathname } });
-        }
+        // Always navigate to course detail page
+        navigate(`/app/course/${event.programSlug}`, { state: { from: location.pathname } });
         break;
       case 'module':
         // Navigate to course detail (modules section)
