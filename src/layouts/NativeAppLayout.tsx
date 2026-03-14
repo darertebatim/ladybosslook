@@ -20,6 +20,7 @@ import { useTimezoneSync } from '@/hooks/useTimezoneSync';
 import { useNotificationCleanup } from '@/hooks/useNotificationCleanup';
 import { DeferredLayoutHooks } from '@/components/app/DeferredLayoutHooks';
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { useDailyResetProvisioning } from '@/hooks/useDailyResetProvisioning';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
@@ -54,6 +55,9 @@ const NativeAppLayout = () => {
   
   // Comprehensive cleanup of stale/legacy local notifications (runs first, before schedulers)
   useNotificationCleanup();
+  
+  // Provision Daily Reset routine if user opted in during onboarding
+  useDailyResetProvisioning(user?.id);
 
   // Defer non-critical hooks — mount DeferredLayoutHooks after 5s delay
   const [deferredReady, setDeferredReady] = useState(false);
