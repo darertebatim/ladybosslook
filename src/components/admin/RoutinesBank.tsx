@@ -732,7 +732,7 @@ export default function RoutinesBank() {
       queryClient.invalidateQueries({ queryKey: ['admin-task-bank-for-picker'] });
       // Auto-add the new task to the routine
       addTaskToSection(task, sectionId);
-      toast.success('Action created and added');
+      toast.success('Task created and added');
       setCreateActionSheetOpen(false);
     },
     onError: (error) => {
