@@ -661,14 +661,14 @@ async function deleteActionFromBank(supabase: any, args: any) {
     .eq("id", resolved.id);
 
   if (error) {
-    console.error("Delete action error:", error);
+    console.error("Delete task error:", error);
     return { success: false, error: error.message, action: "delete_action_from_bank" };
   }
 
   return {
     success: true,
     action: "delete_action_from_bank",
-    message: `Deleted action "${resolved.title}"`,
+    message: `Deleted task "${resolved.title}"`,
   };
 }
 
