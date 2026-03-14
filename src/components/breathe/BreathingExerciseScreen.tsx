@@ -87,9 +87,13 @@ export function BreathingExerciseScreen({
   const { autoCompleteBreathe } = useAutoCompleteProTask();
   const startTimeRef = useRef<number>(0);
   
-  // Ref to avoid stale elapsed value inside interval completion checks
+  // Refs for values used inside the stable interval (not in deps)
   const totalElapsedRef = useRef(totalElapsed);
   totalElapsedRef.current = totalElapsed;
+  const currentPhaseIndexRef = useRef(currentPhaseIndex);
+  currentPhaseIndexRef.current = currentPhaseIndex;
+  const cycleCountRef = useRef(cycleCount);
+  cycleCountRef.current = cycleCount;
 
   // Always show info sheet when exercise opens
   useEffect(() => {
@@ -146,29 +150,30 @@ export function BreathingExerciseScreen({
     return () => clearInterval(timer);
   }, [isCountingDown, phases]);
 
-  // Main breathing timer — supports both cycle-based and minute-based completion
+  // Main breathing timer — stable interval, uses refs to avoid restarts on phase changes
   useEffect(() => {
     if (!isActive || isPaused || isCountingDown || phases.length === 0) return;
 
     const timer = setInterval(() => {
       setPhaseTimeRemaining((prev) => {
         if (prev <= 1) {
-          const nextIndex = (currentPhaseIndex + 1) % phases.length;
+          const curIdx = currentPhaseIndexRef.current;
+          const nextIndex = (curIdx + 1) % phases.length;
           const completedCycle = nextIndex === 0;
 
           if (completedCycle) {
-            setCycleCount((c) => {
-              const newC = c + 1;
-              if (durationMode === 'cycles' && newC >= selectedCycles) {
-                clearInterval(timer);
-                haptic.success();
-                handleComplete(totalElapsedRef.current + 1);
-              }
-              return newC;
-            });
+            const newC = cycleCountRef.current + 1;
+            setCycleCount(newC);
+            cycleCountRef.current = newC;
+            if (durationMode === 'cycles' && newC >= selectedCycles) {
+              clearInterval(timer);
+              haptic.success();
+              handleComplete(totalElapsedRef.current + 1);
+            }
           }
 
           setCurrentPhaseIndex(nextIndex);
+          currentPhaseIndexRef.current = nextIndex;
           haptic.light();
           return phases[nextIndex].duration;
         }
@@ -188,7 +193,7 @@ export function BreathingExerciseScreen({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isActive, isPaused, isCountingDown, currentPhaseIndex, phases, selectedCycles, selectedMinutes, durationMode]);
+  }, [isActive, isPaused, isCountingDown, phases, selectedCycles, selectedMinutes, durationMode]);
 
   const handleComplete = useCallback(async (elapsed: number) => {
     saveSession.mutate(
