@@ -184,7 +184,7 @@ export default function AppInspire() {
               {filteredPopular && filteredPopular.length > 0 && (
                 <section id="routine-category-popular">
                   <div className="flex items-center justify-between mb-2 px-4">
-                    <h2 className="text-base font-bold text-foreground">Popular</h2>
+                    <h2 className="text-xl font-bold text-foreground">Popular</h2>
                   </div>
                   <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
                     {filteredPopular.map((routine, index) => (
