@@ -1338,6 +1338,23 @@ export default function RoutinesBank() {
                     </div>
                   </div>
 
+                  {/* Cover Aspect */}
+                  <div className="space-y-2">
+                    <Label>Cover Aspect Ratio</Label>
+                    <Select
+                      value={(formData as any).cover_aspect || 'square'}
+                      onValueChange={(val) => setFormData({ ...formData, cover_aspect: val } as any)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="square">Square (1:1) — shows title header</SelectItem>
+                        <SelectItem value="6x4">Tall (6:4) — cover only, no title</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   {/* Cover Image */}
                   <ImageUploader
                     label="Cover Image"
