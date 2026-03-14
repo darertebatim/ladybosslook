@@ -1281,7 +1281,7 @@ const AppHome = () => {
           setShowGoldRecoveryPrompt={setShowGoldRecoveryPrompt}
           showRecoverySuccess={showRecoverySuccess}
           setShowRecoverySuccess={setShowRecoverySuccess}
-          previousGoldStreak={goldStreakData?.longestGoldStreak || 0}
+          previousGoldStreak={goldStreakData?.currentGoldStreak || goldStreakData?.longestGoldStreak || 0}
           userId={user?.id}
           showNotificationFlow={showNotificationFlow}
           setShowNotificationFlow={setShowNotificationFlow}
