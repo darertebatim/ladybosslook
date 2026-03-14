@@ -661,7 +661,7 @@ export const useCreateTask = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-      toast({ title: 'Action created! ✨' });
+      toast({ title: 'Task created! ✨' });
     },
     onError: (error) => {
       console.error('Create task error:', error);
