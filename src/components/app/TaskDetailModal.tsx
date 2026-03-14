@@ -20,6 +20,22 @@ import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/p
 import { isWaterTask } from '@/lib/waterTracking';
 import { formatTimeLabel } from '@/lib/taskScheduling';
 
+// Secondary (darker) palette for card footer strips
+const TASK_COLOR_DARK_CLASSES: Record<string, string> = {
+  pink: 'bg-[#FFB8D9]',
+  peach: 'bg-[#FFD1A3]',
+  yellow: 'bg-[#FFE97D]',
+  lime: 'bg-[#D4EB82]',
+  sky: 'bg-[#A3D5F2]',
+  mint: 'bg-[#8EECD0]',
+  lavender: 'bg-[#D4B8F0]',
+  purple: 'bg-[#D4B8F0]',
+  blue: 'bg-[#A3D5F2]',
+  red: 'bg-[#FFB8D9]',
+  orange: 'bg-[#FFD1A3]',
+  green: 'bg-[#D4EB82]',
+};
+
 interface TaskDetailModalProps {
   task: UserTask | null;
   open: boolean;
@@ -130,6 +146,7 @@ export const TaskDetailModal = ({
   };
 
   const colorClass = TASK_COLOR_CLASSES[task.color] || TASK_COLOR_CLASSES.yellow;
+  const darkColorClass = TASK_COLOR_DARK_CLASSES[task.color] || 'bg-black/10';
   const repeatText = getRepeatText();
   const reminderText = getReminderText();
   const combinedText = [repeatText, reminderText].filter(Boolean).join('. ');
@@ -143,7 +160,7 @@ export const TaskDetailModal = ({
         {/* Task card */}
         <div className={cn('rounded-3xl overflow-hidden', colorClass)}>
 
-          {/* Task header */}
+          {/* Task header - primary color */}
           <div className="px-4 pt-4 pb-3">
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 flex items-center justify-center shrink-0">
@@ -244,16 +261,7 @@ export const TaskDetailModal = ({
             </div>
           </div>
 
-          {/* Repeat/Reminder info */}
-          {combinedText && (
-            <div className="px-4 pb-3">
-              <p className="text-[13px] text-black/70 text-center">
-                {combinedText}.
-              </p>
-            </div>
-          )}
-
-          {/* Subtasks section */}
+          {/* Subtasks section - still in primary color */}
           {subtasks.length > 0 && (
             <div className="px-4 pb-3">
               <div className="bg-white/80 rounded-2xl p-3 space-y-0 divide-y divide-black/10">
@@ -306,6 +314,15 @@ export const TaskDetailModal = ({
               </Button>
             </div>
           )}
+
+          {/* Footer strip - secondary (darker) color */}
+          {combinedText && (
+            <div className={cn('px-4 py-3.5', darkColorClass)}>
+              <p className="text-[13px] font-medium text-black text-center">
+                {combinedText}.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Action buttons — outside the card, floating below */}
@@ -315,7 +332,7 @@ export const TaskDetailModal = ({
               onClose();
               onEdit(task);
             }}
-            className="flex-1 gap-2 h-11 rounded-2xl border-0 bg-white text-black text-sm shadow-sm hover:bg-white/90 active:scale-95 transition-transform"
+            className="flex-1 gap-2 h-11 rounded-2xl border-0 bg-white text-black text-sm shadow-sm active:scale-95 transition-transform"
           >
             <Pencil className="h-4 w-4" />
             Edit Action
@@ -327,7 +344,7 @@ export const TaskDetailModal = ({
                 onClose();
                 onSkip(task);
               }}
-              className="gap-1.5 h-11 px-5 rounded-2xl border-0 bg-white text-black text-sm shadow-sm hover:bg-white/90 active:scale-95 transition-transform"
+              className="gap-1.5 h-11 px-5 rounded-2xl border-0 bg-white text-black text-sm shadow-sm active:scale-95 transition-transform"
             >
               <FastForward className="h-4 w-4" />
               Skip
@@ -340,7 +357,7 @@ export const TaskDetailModal = ({
                 onClose();
                 onDelete(task);
               }}
-              className="gap-1.5 h-11 px-5 rounded-2xl border-0 bg-[#E07060] hover:bg-[#d06050] active:scale-95 transition-transform text-white text-sm shadow-sm"
+              className="gap-1.5 h-11 px-5 rounded-2xl border-0 bg-[#E07060] active:scale-95 transition-transform text-white text-sm shadow-sm"
             >
               <Trash2 className="h-4 w-4" strokeWidth={2} />
               Delete
