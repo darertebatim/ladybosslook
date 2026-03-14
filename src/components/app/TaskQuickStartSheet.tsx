@@ -220,7 +220,7 @@ export const TaskQuickStartSheet = ({
                     haptic.light();
                     setShowIdeas(true);
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-muted/40 hover:bg-muted/60 border border-border/20 transition-all active:scale-[0.98]"
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-muted/40 border border-border/20 transition-all active:scale-[0.98]"
                 >
                   <Lightbulb className="w-4 h-4 text-amber-500" />
                   <span className="text-sm font-medium text-muted-foreground">Need inspiration?</span>
