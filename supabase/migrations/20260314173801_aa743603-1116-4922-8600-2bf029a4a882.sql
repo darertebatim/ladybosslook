@@ -1,0 +1,1 @@
+UPDATE routines_bank_tasks SET title = 'Write a short journaling' WHERE title = 'Write a short reflection' AND routine_id = (SELECT id FROM routines_bank WHERE title = 'Daily Reset' ORDER BY created_at DESC LIMIT 1);
