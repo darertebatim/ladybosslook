@@ -1794,7 +1794,7 @@ const AppTaskCreate = ({
                     });
                   }
                 }}
-                className="w-full bg-foreground text-background hover:bg-foreground/90 rounded-full py-6 text-base font-medium"
+                className="w-full bg-foreground text-background rounded-full py-6 text-base font-medium"
               >
                 Add New
               </Button>
