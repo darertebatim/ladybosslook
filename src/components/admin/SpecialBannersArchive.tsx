@@ -14,7 +14,7 @@ const specialBanners: SpecialBanner[] = [
   {
     name: 'Mood Check-In',
     component: 'MoodCheckInBanner',
-    location: 'Home (above My Actions)',
+    location: 'Home (above My Tasks)',
     description: 'Daily prompt encouraging users to log their mood. Uses a static 3:1 image banner.',
     conditions: [
       'Hidden when Welcome card is active',
