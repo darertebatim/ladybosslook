@@ -1891,7 +1891,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     exhaleHold: 2,
   } as const;
 
-  const fallbackExercise = useMemo(() => ({
+  const fallbackExercise = {
     id: 'onboarding-welcome-breathing',
     name: 'Welcome Breathing',
     description: null,
@@ -1908,7 +1908,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     is_premium: false,
     created_at: '',
     updated_at: '',
-  }), []);
+  };
 
   const baseExercise = exercise ?? fallbackExercise;
   const inhaleMethod = baseExercise.inhale_method === 'mouth' ? 'Mouth' : 'Nose';
