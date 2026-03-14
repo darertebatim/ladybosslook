@@ -1556,7 +1556,7 @@ const AppCourseDetail = () => {
                   {/* Reminder Settings Button */}
                   <Button
                     variant="outline"
-                    className="w-full mb-4 bg-[#F4ECFE] hover:bg-[#E8DEF8] border-[#F4ECFE] tour-session-reminder-btn"
+                    className="w-full mb-4 bg-[#F4ECFE] border-[#F4ECFE] tour-session-reminder-btn"
                     onClick={() => setShowSessionReminderSheet(true)}
                   >
                     <Bell className="h-4 w-4 mr-2" />
