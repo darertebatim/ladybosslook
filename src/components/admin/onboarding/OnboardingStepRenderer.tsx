@@ -1816,7 +1816,7 @@ const STARTER_TASKS: StarterTask[] = [
   { emoji: '🫁', title: 'Breathing exercise', subtitle: '2 min guided breathwork', color: '#DBEAFE', taskColor: 'blue', proLinkType: 'breathe', repeatPattern: 'daily' },
   { emoji: '🌤️', title: 'Check in with your mood', subtitle: 'How are you feeling right now?', color: '#FEF3C7', taskColor: 'yellow', proLinkType: 'mood', repeatPattern: 'daily' },
   { emoji: '📝', title: 'Write a short journaling', subtitle: 'One sentence about your day', color: '#F3E8FF', taskColor: 'purple', proLinkType: 'journal', repeatPattern: 'daily' },
-  { emoji: '✅', title: 'Complete one small task', subtitle: 'Pick something quick & easy', color: '#D1FAE5', taskColor: 'green', repeatPattern: 'none' },
+  { emoji: '✅', title: 'Complete onboarding', subtitle: 'Pick something quick & easy', color: '#D1FAE5', taskColor: 'green', repeatPattern: 'none' },
 ];
 
 // Build a fake UserTask object for TaskCard rendering
