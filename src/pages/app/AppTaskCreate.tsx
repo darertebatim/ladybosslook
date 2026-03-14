@@ -1234,7 +1234,7 @@ const AppTaskCreate = ({
                     "px-4 py-2 rounded-full text-sm font-medium transition-all",
                     format(scheduledDate, 'yyyy-MM-dd') === format(addDays(new Date(), 1), 'yyyy-MM-dd')
                       ? "bg-[#E8F4FD] text-foreground"
-                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                      : "bg-muted/50 text-muted-foreground"
                   )}
                 >
                   Tomorrow
