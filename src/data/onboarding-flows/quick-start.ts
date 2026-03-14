@@ -1,4 +1,5 @@
 import { OnboardingFlow } from '@/types/onboarding';
+import meplusWelcomeMascot from '@/assets/onboarding/meplus-welcome-mascot.png';
 
 export const quickStartFlow: OnboardingFlow = {
   id: 'quick-start-v1',
@@ -13,6 +14,7 @@ export const quickStartFlow: OnboardingFlow = {
       type: 'welcome',
       title: 'Welcome to Simora!',
       subtitle: 'Reset your day and build\nsmall routines that make\nyou stronger.',
+      image: meplusWelcomeMascot,
       statBadges: [
         { label: 'High-Rated App', value: '4.9' },
         { label: "Users' choice", value: '31 Million' },
@@ -25,6 +27,7 @@ export const quickStartFlow: OnboardingFlow = {
       type: 'single-select',
       title: 'What do you want\nmost right now?',
       subtitle: 'We\'ll personalise your first routine based on your answer.',
+      illustrationLabel: 'Mascot in cozy room',
       options: [
         { label: 'Reduce stress', emoji: '🧘' },
         { label: 'Build discipline', emoji: '💪' },
