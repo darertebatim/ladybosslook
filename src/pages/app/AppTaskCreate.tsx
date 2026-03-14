@@ -1051,8 +1051,8 @@ const AppTaskCreate = ({
           className="w-full flex items-center justify-between py-2 px-4 active:bg-muted/50"
         >
           <div className="flex items-center gap-3">
-            <Tag className="h-5 w-5 text-foreground/70" />
-            <span className="font-medium">Category</span>
+            <Tag className="h-5 w-5 text-black" />
+            <span className="font-medium text-black">Category</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <span>{tag || 'No category'}</span>
