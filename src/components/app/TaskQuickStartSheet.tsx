@@ -205,7 +205,7 @@ export const TaskQuickStartSheet = ({
               <div className="px-4 pb-3">
                 <Button
                   onClick={handleContinue}
-                  className="w-full h-11 rounded-full bg-foreground text-background font-semibold text-sm hover:bg-foreground/90"
+                  className="w-full h-11 rounded-full bg-foreground text-background font-semibold text-sm"
                 >
                   Continue
                 </Button>
