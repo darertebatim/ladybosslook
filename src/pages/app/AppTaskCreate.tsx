@@ -967,7 +967,7 @@ const AppTaskCreate = ({
           className="w-full flex items-center justify-between py-2 px-4 active:bg-muted/50 border-b border-muted/30"
         >
           <div className="flex items-center gap-3">
-            <Calendar className="h-5 w-5 text-foreground/70" />
+            <Calendar className="h-5 w-5 text-black" />
             <span className="font-medium">{repeatEnabled ? 'Starting from' : 'Date'}</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
