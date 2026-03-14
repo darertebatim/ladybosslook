@@ -2132,7 +2132,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
     addTimer(() => {
       setCelebratingIdx(null);
       setPhase(nextPhase);
-    }, 1500);
+    }, 2500);
   };
 
   // Handlers
