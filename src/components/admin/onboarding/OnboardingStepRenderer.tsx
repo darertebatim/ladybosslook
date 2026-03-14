@@ -2118,10 +2118,10 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   useEffect(() => {
     if (phase === 'spotlight-app') {
       addTimer(() => setPhase('hint-app'), 800);
-    } else if (phase === 'spotlight-breathe') {
-      addTimer(() => setPhase('hint-breathe'), 800);
     } else if (phase === 'spotlight-mood') {
       addTimer(() => setPhase('hint-mood'), 800);
+    } else if (phase === 'spotlight-breathe') {
+      addTimer(() => setPhase('hint-breathe'), 800);
     } else if (phase === 'spotlight-complete') {
       addTimer(() => setPhase('hint-complete'), 800);
     }
