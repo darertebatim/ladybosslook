@@ -655,7 +655,7 @@ async function deleteActionFromBank(supabase: any, args: any) {
     .delete()
     .eq("task_id", resolved.id);
 
-  // Delete the action
+  // Delete the task
   const { error } = await supabase.from("admin_task_bank")
     .delete()
     .eq("id", resolved.id);
