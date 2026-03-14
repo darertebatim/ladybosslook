@@ -83,7 +83,7 @@ const scheduledPNs: PNType[] = [
     codeFile: 'src/hooks/useSmartActionNudges.ts',
     deliveryType: 'local',
     messages: [
-      { title: '{emoji} {taskTitle}', body: 'Time to do this! Your strength grows with each action.', condition: 'Random incomplete action' },
+      { title: '{emoji} {taskTitle}', body: 'Time to do this! Your strength grows with each task.', condition: 'Random incomplete task' },
       { title: '🫁 Time for breathing', body: 'A few deep breaths can change your whole day.', condition: 'Random proaction' },
       { title: '📝 Your journal is waiting', body: 'Take a moment to write. Even a few words matter.', condition: 'Random proaction' },
       { title: '💧 Water Reminder', body: 'Have you had water recently? 💧', condition: '3-4x daily if water tracking' },
