@@ -99,7 +99,7 @@ export function ImmersiveBreathingCircle({
           </div>
         )}
 
-        {/* Animated breathing circle — uses CSS transition like classic */}
+        {/* Animated breathing circle — hollow ring style */}
         <div
           className="absolute rounded-full"
           style={{
@@ -108,8 +108,9 @@ export function ImmersiveBreathingCircle({
             transitionProperty: 'transform',
             transitionTimingFunction: isAnimating ? 'linear' : 'ease-out',
             transitionDuration: transitionDuration,
-            background: 'radial-gradient(circle at 40% 35%, rgba(139,92,246,0.25) 0%, rgba(99,102,241,0.15) 50%, rgba(79,70,229,0.08) 100%)',
-            boxShadow: `0 0 40px 10px rgba(139,92,246,${glowOpacity * 0.4}), 0 0 80px 30px rgba(99,102,241,${glowOpacity * 0.2}), inset 0 0 30px rgba(167,139,250,0.1)`,
+            border: '2px solid rgba(167,139,250,0.35)',
+            background: 'radial-gradient(circle at 50% 50%, transparent 55%, rgba(139,92,246,0.08) 70%, rgba(99,102,241,0.12) 85%, rgba(139,92,246,0.06) 100%)',
+            boxShadow: `0 0 40px 10px rgba(139,92,246,${glowOpacity * 0.3}), 0 0 80px 30px rgba(99,102,241,${glowOpacity * 0.15}), inset 0 0 40px rgba(167,139,250,0.06)`,
             backdropFilter: 'blur(4px)',
             animation: isHolding ? 'imm-hold-pulse 3s ease-in-out infinite' : 'none',
           }}
