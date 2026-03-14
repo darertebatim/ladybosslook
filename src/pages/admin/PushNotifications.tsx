@@ -199,7 +199,7 @@ const scheduledPNs: PNType[] = [
     codeFile: 'supabase/functions/send-streak-challenges/index.ts',
     deliveryType: 'server',
     messages: [
-      { title: '🌱 Your First Step', body: 'Your first action is waiting. Just one tap to start.', condition: 'First week, no completions' },
+      { title: '🌱 Your First Step', body: 'Your first task is waiting. Just one tap to start.', condition: 'First week, no completions' },
       { title: '🌱 Day 2!', body: "Day 2! You came back. That's already more than most.", condition: 'First week, came yesterday' },
       { title: '🔥 Almost There', body: '{n} of {goal} days done. Just {remaining} more to hit your target.', condition: 'Streak goal proximity' },
       { title: '🏆 Goal Reached!', body: "You did it. {goal} days. That's not luck, that's you.", condition: 'Streak goal reached' },
