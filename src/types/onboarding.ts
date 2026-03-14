@@ -34,7 +34,8 @@ export type OnboardingStepType =
   | 'task-select-purple'
   | 'confetti-message'
   | 'personalized-plan'
-  | 'starter-routine';
+  | 'starter-routine'
+  | 'daily-reset-prompt';
 export interface OnboardingOption {
   label: string;
   emoji?: string;
