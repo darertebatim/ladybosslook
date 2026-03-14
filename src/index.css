@@ -13,16 +13,27 @@
   display: none;
 }
 
-/* Mobile app — disable all hover effects globally */
-@media (hover: hover) {
-  * {
-    --tw-hover-override: true;
-  }
-}
-/* Force-disable hover pseudo-class for mobile-first app */
-@layer utilities {
-  *:hover {
-    --hover-disabled: true;
+/* Mobile app — neutralize all hover effects on touch devices */
+@media (pointer: coarse) {
+  .hover\:bg-primary\/90:hover,
+  .hover\:bg-primary\/80:hover,
+  .hover\:bg-accent:hover,
+  .hover\:bg-muted:hover,
+  .hover\:bg-muted\/50:hover,
+  .hover\:bg-muted\/80:hover,
+  .hover\:text-accent-foreground:hover,
+  .hover\:text-muted-foreground:hover,
+  .hover\:bg-accent\/80:hover,
+  .hover\:bg-sidebar-accent:hover,
+  .hover\:text-sidebar-accent-foreground:hover,
+  .hover\:bg-destructive\/90:hover,
+  .hover\:bg-background:hover,
+  .hover\:bg-background\/80:hover,
+  .hover\:opacity-80:hover,
+  .hover\:scale-105:hover,
+  .hover\:border-primary\/40:hover,
+  [class*="hover\:"]:hover {
+    all: revert;
   }
 }
 
