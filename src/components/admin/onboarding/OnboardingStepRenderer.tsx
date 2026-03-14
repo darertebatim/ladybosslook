@@ -579,13 +579,13 @@ function MotivationalScreen({ step, onNext }: Props) {
     const quote = parts[0];
     const author = parts.slice(1).join('\n');
     return (
-      <div className="h-full flex flex-col relative overflow-hidden bg-[#fdf8f4]">
-        {/* Image area */}
-        <div className="shrink-0 relative px-4 pt-2">
-          <img src={step.image} alt="" className="w-full object-contain rounded-2xl" style={{ maxHeight: 220 }} />
+      <div className="h-full flex flex-col relative overflow-hidden">
+        {/* Mascot header background */}
+        <div className="h-[220px] shrink-0 relative">
+          <img src={meplusMascotBg} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
         </div>
         {/* White bottom sheet */}
-        <div className="flex-1 bg-white rounded-t-[28px] -mt-3 relative z-10 overflow-y-auto">
+        <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 overflow-y-auto">
           <div className="px-5 pt-6 pb-6 flex flex-col min-h-full">
             <FadeUp>
               <h1 className="text-[24px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight">{step.title}</h1>
@@ -595,7 +595,15 @@ function MotivationalScreen({ step, onNext }: Props) {
                 <p className="text-[14px] text-gray-500 leading-relaxed text-center mb-4 whitespace-pre-line">{step.subtitle}</p>
               </FadeUp>
             )}
-            <FadeUp delay={0.15}>
+            {/* Before/After image inside the sheet */}
+            {step.image && (
+              <FadeUp delay={0.12}>
+                <div className="flex items-center justify-center mb-4">
+                  <img src={step.image} alt="" className="w-full object-contain rounded-2xl" style={{ maxHeight: 180 }} />
+                </div>
+              </FadeUp>
+            )}
+            <FadeUp delay={0.18}>
               <div className="bg-amber-50/80 rounded-2xl border border-amber-200/50 px-5 py-4 mb-4">
                 <p className="text-[15px] text-[#1a1f3d] font-medium italic leading-relaxed text-center">{quote}</p>
                 {author && <p className="text-[13px] text-amber-600 font-semibold text-center mt-2">{author}</p>}
