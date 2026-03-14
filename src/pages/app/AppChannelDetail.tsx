@@ -221,7 +221,7 @@ export default function AppChannelDetail() {
         <p className="text-muted-foreground">Channel not found</p>
         <button
           onClick={() => navigate('/app/channels')}
-          className="mt-4 text-primary hover:underline"
+          className="mt-4 text-primary underline"
         >
           Back to channels
         </button>
