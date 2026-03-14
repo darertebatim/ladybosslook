@@ -11,7 +11,7 @@ export const tourSteps: Step[] = [
   },
   {
     target: '.tour-calendar',
-    content: 'Swipe through days to see your actions. Flame icons 🔥 show days you honored actions!',
+    content: 'Swipe through days to see your tasks. Flame icons 🔥 show days you honored tasks!',
     placement: 'bottom',
   },
   {
