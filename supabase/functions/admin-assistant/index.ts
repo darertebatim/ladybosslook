@@ -1405,7 +1405,7 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "delete_subtask",
-          description: "Delete a specific subtask from an action. Use the subtask's ID from context.",
+          description: "Delete a specific subtask from a task. Use the subtask's ID from context.",
           parameters: {
             type: "object",
             properties: {
