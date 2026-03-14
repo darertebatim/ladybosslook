@@ -2026,6 +2026,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
         @keyframes ob-float-2 { 0%,100% { transform: translate(0,0) scale(1); opacity:0.2; } 33% { transform: translate(-40px,30px) scale(1.3); opacity:0.4; } 66% { transform: translate(50px,-20px) scale(0.9); opacity:0.15; } }
         @keyframes ob-float-3 { 0%,100% { transform: translate(0,0); opacity:0.25; } 50% { transform: translate(-30px,-50px); opacity:0.45; } }
         @keyframes ob-pulse-ring { 0%,100% { opacity:0.15; transform:scale(1); } 50% { opacity:0.3; transform:scale(1.05); } }
+        @keyframes ob-hold-pulse { 0%,100% { transform:scale(1); filter:brightness(1); } 50% { transform:scale(1.03); filter:brightness(1.25); } }
         @keyframes ob-count-pop { 0% { transform:scale(0.5); opacity:0; } 40% { transform:scale(1.15); opacity:1; } 100% { transform:scale(1); opacity:1; } }
       `}</style>
 
