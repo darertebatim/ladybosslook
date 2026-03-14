@@ -1957,6 +1957,9 @@ type DemoPhase =
   | 'spotlight-mood'
   | 'hint-mood'
   | 'celebrate-mood'
+  | 'spotlight-complete'
+  | 'hint-complete'
+  | 'celebrate-complete'
   | 'done';
 
 // ─── Mini inline breathing overlay for onboarding ──────────────
