@@ -9,9 +9,9 @@ interface GlassButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
   ({ className, variant = "default", size = "md", children, ...props }, ref) => {
     const variants = {
-      default: "bg-white/10 hover:bg-white/20 border-white/20 text-foreground dark:bg-white/10 dark:hover:bg-white/20",
-      primary: "bg-primary/90 hover:bg-primary border-primary/50 text-primary-foreground",
-      ghost: "bg-transparent hover:bg-white/10 border-transparent text-foreground",
+      default: "bg-white/20 border-white/20 text-foreground dark:bg-white/20",
+      primary: "bg-primary border-primary/50 text-primary-foreground",
+      ghost: "bg-white/10 border-transparent text-foreground",
     };
 
     const sizes = {
@@ -28,7 +28,7 @@ export const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
           "inline-flex items-center justify-center rounded-full",
           "backdrop-blur-md border shadow-lg",
           "transition-all duration-200 ease-out",
-          "active:scale-95 hover:scale-105",
+          "active:scale-95",
           "disabled:opacity-50 disabled:pointer-events-none",
           variants[variant],
           sizes[size],

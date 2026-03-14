@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import plugin from "tailwindcss/plugin";
 
 export default {
 	darkMode: ["class"],
@@ -254,5 +255,12 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+	plugins: [
+		require("tailwindcss-animate"),
+		require("@tailwindcss/typography"),
+		// Mobile-first: make hover: only apply on devices with a fine pointer (no touch)
+		plugin(function ({ addVariant }) {
+			addVariant('hover', '@media (hover: hover) and (pointer: fine) { &:hover }');
+		}),
+	],
 } satisfies Config;

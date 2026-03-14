@@ -13,7 +13,7 @@
   display: none;
 }
 
-/* Prevent iOS Safari auto-zoom on input focus */
+
 @supports (-webkit-touch-callout: none) {
   input,
   textarea,
