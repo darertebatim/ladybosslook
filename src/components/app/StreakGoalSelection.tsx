@@ -153,7 +153,7 @@ export const StreakGoalSelection = ({
                 'h-14 rounded-2xl font-bold text-lg transition-all duration-200',
                 selectedGoal === goal
                   ? 'bg-orange-400 text-white ring-4 ring-white shadow-lg'
-                  : 'bg-violet-400/50 text-white/90 hover:bg-violet-400/70'
+                  : 'bg-violet-400/50 text-white/90'
               )}
             >
               {goal}
