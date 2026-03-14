@@ -32,9 +32,6 @@ const TASK_COLOR_DARK_CLASSES: Record<string, string> = {
   orange: 'bg-[#FFD1A3]',
   green: 'bg-[#D4EB82]',
 };
-import { useSubscription } from '@/hooks/useSubscription';
-import { PaywallSheet } from '@/components/app/PaywallSheet';
-import { ActionLimitSheet, hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 
 // Color cycle for variety in planner (used when no specific color is set)
 export const ROUTINE_COLOR_CYCLE: TaskColor[] = [
