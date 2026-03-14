@@ -53,7 +53,7 @@ export const AddedToRoutineButton = ({
       case 'outline':
         return "bg-success/10 border-success/30 text-success";
       default:
-        return "bg-success/10 hover:bg-success/20 text-success";
+        return "bg-success/10 text-success";
     }
   };
 
