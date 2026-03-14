@@ -434,7 +434,7 @@ const AppStore = () => {
                       className="shrink-0 w-24 text-center transition-transform active:scale-[0.97]"
                     >
                       <div className="relative h-24 w-24 overflow-visible mb-1.5">
-                        <div className="h-full w-full rounded-2xl bg-muted flex items-center justify-center">
+                        <div className="h-full w-full rounded-2xl bg-muted flex items-center justify-center shadow-lg">
                           <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} />
                         </div>
                         {exercise.is_premium && (
