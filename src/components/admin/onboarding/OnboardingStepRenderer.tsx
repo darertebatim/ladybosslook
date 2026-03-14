@@ -589,11 +589,11 @@ function MotivationalScreen({ step, onNext }: Props) {
         <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 overflow-hidden">
           <div className="px-5 pt-5 pb-5 flex flex-col h-full">
             <FadeUp>
-              <h1 className="text-[24px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight">{step.title}</h1>
+              <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight">{step.title}</h1>
             </FadeUp>
             {step.subtitle && (
               <FadeUp delay={0.08}>
-                <p className="text-[14px] text-gray-500 leading-relaxed text-center mb-4 whitespace-pre-line">
+                <p className="text-[13px] text-gray-500 leading-relaxed text-center mb-3 whitespace-pre-line">
                   <span className="font-bold text-[#1a1f3d]">{step.subtitle.split('\n')[0]}</span>
                   {step.subtitle.split('\n').length > 1 && '\n' + step.subtitle.split('\n').slice(1).join('\n')}
                 </p>
@@ -602,18 +602,18 @@ function MotivationalScreen({ step, onNext }: Props) {
             {/* Before/After image inside the sheet — full width */}
             {step.image && (
               <FadeUp delay={0.12}>
-                <div className="-mx-5 mb-4">
-                  <img src={step.image} alt="" className="w-full object-contain" />
+                <div className="-mx-5 flex-1 min-h-0 flex items-center">
+                  <img src={step.image} alt="" className="w-full object-contain max-h-full" />
                 </div>
               </FadeUp>
             )}
             <FadeUp delay={0.18}>
-              <div className="bg-amber-50/80 rounded-2xl border border-amber-200/50 px-5 py-4 mb-4">
-                <p className="text-[15px] text-[#1a1f3d] font-medium italic leading-relaxed text-center">{quote}</p>
-                {author && <p className="text-[13px] text-amber-600 font-semibold text-center mt-2">{author}</p>}
+              <div className="bg-amber-50/80 rounded-2xl border border-amber-200/50 px-4 py-3 mb-3 mt-3">
+                <p className="text-[14px] text-[#1a1f3d] font-medium italic leading-relaxed text-center">{quote}</p>
+                {author && <p className="text-[12px] text-amber-600 font-semibold text-center mt-1">{author}</p>}
               </div>
             </FadeUp>
-            <FadeUp delay={0.25} className="mt-auto">
+            <FadeUp delay={0.25}>
               <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
             </FadeUp>
           </div>
