@@ -114,6 +114,7 @@ export function RoutinePreviewSheet({
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editingTaskIndex, setEditingTaskIndex] = useState<number>(0);
   const [showEditSheet, setShowEditSheet] = useState(false);
+  const [detailTask, setDetailTask] = useState<{ task: RoutinePlanTask; index: number } | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showActionLimit, setShowActionLimit] = useState(false);
   const { isSubscribed, isLoading: subLoading } = useSubscription();
