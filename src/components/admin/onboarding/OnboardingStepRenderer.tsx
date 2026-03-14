@@ -2456,6 +2456,11 @@ function StarterRoutineScreen({ step, onNext }: Props) {
       )}
 
       <style>{`
+        @keyframes sparkGlow {
+          0% { opacity: 0.4; transform: scale(1); }
+          50% { opacity: 0.8; transform: scale(1.02); }
+          100% { opacity: 0.4; transform: scale(1); }
+        }
         @keyframes onboardingHandBounce {
           0%   { transform: translateY(0px); }
           40%  { transform: translateY(8px); }
