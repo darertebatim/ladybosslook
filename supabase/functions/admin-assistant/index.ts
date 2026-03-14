@@ -1203,15 +1203,15 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "create_action_in_bank",
-          description: "Create a new action directly in the Actions Bank database. This IMMEDIATELY creates the action.",
+          description: "Create a new task directly in the Tasks Bank database. This IMMEDIATELY creates the task.",
           parameters: {
             type: "object",
             properties: {
-              title: { type: "string", description: "Action title (e.g., '10-min meditation')" },
-              emoji: { type: "string", description: "Single emoji for the action (e.g., '🧘')" },
+              title: { type: "string", description: "Task title (e.g., '10-min meditation')" },
+              emoji: { type: "string", description: "Single emoji for the task (e.g., '🧘')" },
               category: { type: "string", description: "Category slug from available categories (e.g., 'morning', 'wellness')" },
               color: { type: "string", description: "Hex color (e.g., '#8B5CF6')" },
-              description: { type: "string", description: "Brief description of the action" },
+              description: { type: "string", description: "Brief description of the task" },
               duration_minutes: { type: "number", description: "Duration in minutes" },
               time_period: { type: "string", enum: ["morning", "afternoon", "evening", "anytime"], description: "Best time of day" },
               repeat_pattern: { type: "string", enum: ["daily", "weekly", "custom"], description: "Repeat schedule" },
