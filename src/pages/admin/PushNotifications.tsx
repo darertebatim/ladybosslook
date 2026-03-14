@@ -266,7 +266,7 @@ const triggeredPNs: PNType[] = [
 
 const localPNs: PNType[] = [
   {
-    name: 'Action Reminders',
+    name: 'Task Reminders',
     function: 'local-task-reminder',
     trigger: 'Capacitor LocalNotifications',
     description: 'Scheduled reminders for user actions with configured times. 100% local - no server involved.',
