@@ -208,7 +208,7 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
                   <PreferenceItem
                     icon={<Clock className="h-4 w-4" />}
                     label="Time Period Reminders"
-                    description="Nudges for morning/afternoon/evening actions"
+                    description="Nudges for morning/afternoon/evening tasks"
                     checked={getPreference('time_period_reminders')}
                     onCheckedChange={handleToggle('time_period_reminders')}
                     disabled={updatePreference.isPending}
