@@ -2705,7 +2705,7 @@ const DAILY_RESET_WHEEL = [
 
 function LoopWheel() {
   return (
-    <div className="relative w-[200px] h-[200px] mx-auto">
+    <div className="relative w-[220px] h-[220px] mx-auto">
       {/* Center icon */}
       <div className="absolute inset-0 flex items-center justify-center z-10">
         <div className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center">
@@ -2714,10 +2714,10 @@ function LoopWheel() {
       </div>
 
       {/* Connecting ring */}
-      <div className="absolute inset-[30px] rounded-full border-2 border-dashed border-[#1a1f3d]/10" />
+      <div className="absolute inset-[32px] rounded-full border-2 border-dashed border-[#1a1f3d]/10" />
 
       {/* Animated connecting ring glow */}
-      <svg className="absolute inset-[28px] w-[calc(100%-56px)] h-[calc(100%-56px)]" viewBox="0 0 100 100">
+      <svg className="absolute inset-[30px] w-[calc(100%-60px)] h-[calc(100%-60px)]" viewBox="0 0 100 100">
         <circle
           cx="50" cy="50" r="48"
           fill="none"
@@ -2735,12 +2735,12 @@ function LoopWheel() {
         </defs>
       </svg>
 
-      {/* 4 task nodes positioned around the circle */}
+      {/* 4 task nodes positioned around the circle (clockwise: top, right, bottom, left) */}
       {DAILY_RESET_WHEEL.map((task, i) => {
-        const angle = (i * 90 - 90) * (Math.PI / 180); // start from top
-        const radius = 75;
-        const x = 100 + radius * Math.cos(angle) - 25;
-        const y = 100 + radius * Math.sin(angle) - 25;
+        const angle = (i * 90 - 90) * (Math.PI / 180);
+        const radius = 82;
+        const x = 110 + radius * Math.cos(angle) - 27;
+        const y = 110 + radius * Math.sin(angle) - 27;
 
         return (
           <motion.div
@@ -2749,47 +2749,66 @@ function LoopWheel() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 + i * 0.15, type: 'spring', stiffness: 200, damping: 15 }}
             className="absolute flex flex-col items-center"
-            style={{ left: x, top: y, width: 50 }}
+            style={{ left: x, top: y, width: 54 }}
           >
             <div
-              className="w-[46px] h-[46px] rounded-2xl flex items-center justify-center shadow-md"
+              className="w-[50px] h-[50px] rounded-2xl flex items-center justify-center shadow-md"
               style={{ backgroundColor: task.color }}
             >
-              <FluentEmoji emoji={task.emoji} size={24} />
+              <FluentEmoji emoji={task.emoji} size={26} />
             </div>
-            <span className="text-[9px] font-semibold text-[#1a1f3d]/70 mt-0.5 text-center leading-tight">
+            <span className="text-[10px] font-semibold text-[#1a1f3d]/70 mt-1 text-center leading-tight">
               {task.title}
             </span>
           </motion.div>
         );
       })}
 
-      {/* Directional arrows between nodes */}
-      {DAILY_RESET_WHEEL.map((_, i) => {
-        const startAngle = (i * 90 - 90 + 25) * (Math.PI / 180);
-        const endAngle = (i * 90 - 90 + 65) * (Math.PI / 180);
-        const midAngle = (startAngle + endAngle) / 2;
-        const r = 75;
-        const mx = 100 + r * Math.cos(midAngle);
-        const my = 100 + r * Math.sin(midAngle);
+      {/* Directional arrow SVGs between nodes (clockwise) */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 220 220">
+        {DAILY_RESET_WHEEL.map((_, i) => {
+          const startDeg = i * 90 - 90 + 28;
+          const endDeg = i * 90 - 90 + 62;
+          const midDeg = (startDeg + endDeg) / 2;
+          const r = 82;
+          const cx = 110, cy = 110;
 
-        return (
-          <motion.div
-            key={`arrow-${i}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.35 }}
-            transition={{ delay: 0.8 + i * 0.1 }}
-            className="absolute text-[#1a1f3d] text-[10px] pointer-events-none"
-            style={{
-              left: mx - 5,
-              top: my - 5,
-              transform: `rotate(${i * 90}deg)`,
-            }}
-          >
-            ›
-          </motion.div>
-        );
-      })}
+          const toRad = (d: number) => d * (Math.PI / 180);
+          const sx = cx + r * Math.cos(toRad(startDeg));
+          const sy = cy + r * Math.sin(toRad(startDeg));
+          const ex = cx + r * Math.cos(toRad(endDeg));
+          const ey = cy + r * Math.sin(toRad(endDeg));
+
+          // Arrowhead pointing along the arc tangent
+          const arrowAngle = toRad(endDeg + 90);
+          const aLen = 5;
+          const ax1 = ex + aLen * Math.cos(arrowAngle - 2.5);
+          const ay1 = ey + aLen * Math.sin(arrowAngle - 2.5);
+          const ax2 = ex + aLen * Math.cos(arrowAngle + 2.5);
+          const ay2 = ey + aLen * Math.sin(arrowAngle + 2.5);
+
+          return (
+            <motion.g
+              key={`arrow-${i}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.3 }}
+              transition={{ delay: 0.9 + i * 0.12 }}
+            >
+              <path
+                d={`M ${sx} ${sy} A ${r} ${r} 0 0 1 ${ex} ${ey}`}
+                fill="none"
+                stroke="#1a1f3d"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+              />
+              <polygon
+                points={`${ex},${ey} ${ax1},${ay1} ${ax2},${ay2}`}
+                fill="#1a1f3d"
+              />
+            </motion.g>
+          );
+        })}
+      </svg>
 
       <style>{`
         @keyframes spinWheel {
