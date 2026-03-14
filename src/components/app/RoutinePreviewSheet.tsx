@@ -320,15 +320,15 @@ export function RoutinePreviewSheet({
               <p className="font-semibold text-[15px] text-black leading-snug line-clamp-2">{display.title}</p>
             </div>
             <button 
-              className="shrink-0 w-8 h-8 rounded-full bg-white/50 flex items-center justify-center text-black/50 hover:text-black hover:bg-white/70 transition-colors"
+              className={cn("shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-black/60 hover:text-black transition-colors", darkColorClass)}
               onClick={() => openTaskEditor(task, index)}
             >
               <Pencil className="w-3.5 h-3.5" />
             </button>
           </div>
           {/* Footer strip with repeat info */}
-          <div className={cn('px-4 py-2', darkColorClass)}>
-            <p className="text-xs font-medium text-black">
+          <div className={cn('px-4 py-3.5', darkColorClass)}>
+            <p className="text-[13px] font-medium text-black text-center">
               {getRepeatLabel(task, display.repeatPattern)}
             </p>
           </div>
