@@ -64,6 +64,9 @@ export function BreathingExerciseScreen({
     });
   }, []);
 
+  // Duration mode
+  const [durationMode, setDurationMode] = useState<DurationMode>('cycles');
+  const [selectedMinutes, setSelectedMinutes] = useState(3);
   // Cycle-based length
   const [selectedCycles, setSelectedCycles] = useState(3);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
