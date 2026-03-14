@@ -1910,7 +1910,7 @@ export default function RoutinesBank() {
                         <div className="border rounded-lg overflow-hidden">
                           <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-950/20 border-b">
                             <span className="text-sm">☀️</span>
-                            <h4 className="font-medium text-sm flex-1">Daily actions</h4>
+                            <h4 className="font-medium text-sm flex-1">Daily tasks</h4>
                             <span className="text-xs text-muted-foreground">{dailyTasks.length}</span>
                           </div>
                           <div className="p-2 space-y-1">
