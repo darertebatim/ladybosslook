@@ -486,14 +486,14 @@ async function updateActionInBank(supabase: any, args: any) {
     .single();
 
   if (error) {
-    console.error("Update action error:", error);
+    console.error("Update task error:", error);
     return { success: false, error: error.message, action: "update_action_in_bank" };
   }
 
   return {
     success: true,
     action: "update_action_in_bank",
-    message: `Updated action "${data.title}"`,
+    message: `Updated task "${data.title}"`,
     created: data,
   };
 }
