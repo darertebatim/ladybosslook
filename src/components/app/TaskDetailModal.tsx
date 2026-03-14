@@ -176,18 +176,16 @@ export const TaskDetailModal = ({
               </div>
               
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[13px] text-black/80">{formatTimeLabel(task)}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-black/80">{formatTimeLabelWithEmoji(task)}</span>
+                  <span className="text-[11px] text-black/80">• {repeatLabel}</span>
                   {hasGoal && (
-                    <>
-                      <span className="text-[13px] text-black/80">•</span>
-                      <span className="text-[13px] text-black/80 font-medium">
-                        {isTimerGoal
+                    <span className="text-[11px] text-black/80 font-medium">
+                      • {isTimerGoal
                           ? `${Math.floor(goalProgress / 60)}/${Math.floor((task.goal_target || 0) / 60)} min`
                           : `${goalProgress}/${task.goal_target} ${task.goal_unit || 'times'}`
                         }
-                      </span>
-                    </>
+                    </span>
                   )}
                 </div>
                 
