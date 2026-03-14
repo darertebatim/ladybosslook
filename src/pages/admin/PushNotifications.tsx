@@ -77,7 +77,7 @@ const scheduledPNs: PNType[] = [
     name: 'Smart Task Nudges',
     function: 'local-smart-nudges',
     schedule: 'On app launch (local)',
-    description: 'Random reminders from user\'s actual planner data: incomplete actions, proactions (journal, breathe, emotion), and water reminders. Scheduled between 8 AM - 8 PM.',
+    description: 'Random reminders from user\'s actual planner data: incomplete tasks, proactions (journal, breathe, emotion), and water reminders. Scheduled between 8 AM - 8 PM.',
     userPreference: 'Auto (based on active tasks)',
     icon: <Sparkles className="h-5 w-5" />,
     codeFile: 'src/hooks/useSmartActionNudges.ts',
