@@ -1384,30 +1384,40 @@ function BeforeAfterScreen({ step, onNext }: Props) {
 
 function BeforeAfterVisualScreen({ step, onNext }: Props) {
   return (
-    <ScreenWrapper>
-      <FadeUp>
-        <h1 className="text-[26px] font-extrabold text-black text-center mb-2 leading-tight whitespace-pre-line">{step.title}</h1>
-      </FadeUp>
-      <FadeUp delay={0.1}>
-        <p className="text-[16px] text-black text-center mb-5 whitespace-pre-line leading-relaxed">{step.subtitle}</p>
-      </FadeUp>
-
-      {/* Before/After comparison image */}
-      <FadeUp delay={0.15}>
-        <div className="-mx-5 mb-5">
-          <img src={beforeAfterComparison} alt="Before and After comparison" className="w-full object-contain" />
+    <div className="h-full flex flex-col relative overflow-hidden">
+      {/* Mascot header background — same as motivational screen */}
+      <div className="h-[180px] shrink-0 relative">
+        <img src={meplusMascotBg} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
+      </div>
+      {/* White bottom sheet */}
+      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 overflow-hidden">
+        <div className="px-5 pt-5 pb-5 flex flex-col h-full">
+          <FadeUp>
+            <h1 className="text-[24px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight whitespace-pre-line">{step.title}</h1>
+          </FadeUp>
+          {step.subtitle && (
+            <FadeUp delay={0.08}>
+              <p className="text-[15px] text-[#1a1f3d] leading-relaxed text-center mb-3 whitespace-pre-line">{step.subtitle}</p>
+            </FadeUp>
+          )}
+          {/* Before/After comparison image — full width */}
+          <FadeUp delay={0.12}>
+            <div className="-mx-5 flex-1 min-h-0 flex items-center">
+              <img src={beforeAfterComparison} alt="Before and After comparison" className="w-full object-contain max-h-full" />
+            </div>
+          </FadeUp>
+          {/* Bottom tagline */}
+          <FadeUp delay={0.18}>
+            <div className="bg-amber-50/80 rounded-2xl border border-amber-200/50 px-4 py-3 mb-3 mt-3">
+              <p className="text-[14px] text-[#1a1f3d] font-medium italic leading-relaxed text-center">{step.description}</p>
+            </div>
+          </FadeUp>
+          <FadeUp delay={0.25}>
+            <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
+          </FadeUp>
         </div>
-      </FadeUp>
-
-      {/* Bottom tagline */}
-      <FadeUp delay={0.3}>
-        <p className="text-[15px] text-black text-center mb-5 whitespace-pre-line leading-relaxed italic">{step.description}</p>
-      </FadeUp>
-
-      <FadeUp delay={0.35} className="mt-auto">
-        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
-      </FadeUp>
-    </ScreenWrapper>
+      </div>
+    </div>
   );
 }
 
