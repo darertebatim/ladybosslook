@@ -150,6 +150,7 @@ export default function RoutinesBank() {
     subtitle: '',
     description: '',
     cover_image_url: '',
+    cover_aspect: 'square' as string,
     video_url: '',
     category: 'general',
     color: 'yellow',
