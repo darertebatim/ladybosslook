@@ -1864,6 +1864,8 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
       if (error) throw error;
       return data;
     },
+    refetchOnMount: 'always',
+    staleTime: 0,
   });
 
   // Force the onboarding flow to use the dedicated Welcome Breathing exercise
