@@ -145,13 +145,13 @@ export default function BrandDesign() {
       {/* Planner Palette */}
       <Section title="Planner Action Palette" description="7 pastel colors used across the daily planner, action builder, and routine cards">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          <ColorSwatch label="Pink" cssVar="planner-pink" hsl="330, 100%, 92%" className="!bg-[#FFD6E8]" />
-          <ColorSwatch label="Peach" cssVar="planner-peach" hsl="30, 100%, 89%" className="!bg-[#FFE4C4]" />
-          <ColorSwatch label="Yellow" cssVar="planner-yellow" hsl="55, 100%, 80%" className="!bg-[#FFF59D]" />
-          <ColorSwatch label="Lime" cssVar="planner-lime" hsl="75, 80%, 80%" className="!bg-[#E8F5A3]" />
-          <ColorSwatch label="Sky" cssVar="planner-sky" hsl="205, 85%, 88%" className="!bg-[#C5E8FA]" />
-          <ColorSwatch label="Mint" cssVar="planner-mint" hsl="160, 80%, 84%" className="!bg-[#B8F5E4]" />
-          <ColorSwatch label="Lavender" cssVar="planner-lavender" hsl="275, 65%, 90%" className="!bg-[#E8D4F8]" />
+          <ColorSwatch label="Pink" cssVar="planner-pink" hsl="334, 100%, 92%" className="!bg-[#FFD6E8]" />
+          <ColorSwatch label="Peach" cssVar="planner-peach" hsl="33, 100%, 88%" className="!bg-[#FFE4C4]" />
+          <ColorSwatch label="Yellow" cssVar="planner-yellow" hsl="54, 100%, 81%" className="!bg-[#FFF59D]" />
+          <ColorSwatch label="Lime" cssVar="planner-lime" hsl="70, 82%, 80%" className="!bg-[#E8F5A3]" />
+          <ColorSwatch label="Sky" cssVar="planner-sky" hsl="200, 88%, 88%" className="!bg-[#C5E8FA]" />
+          <ColorSwatch label="Mint" cssVar="planner-mint" hsl="163, 80%, 84%" className="!bg-[#B8F5E4]" />
+          <ColorSwatch label="Lavender" cssVar="planner-lavender" hsl="273, 75%, 90%" className="!bg-[#E8D4F8]" />
         </div>
         <div className="mt-3 text-xs text-muted-foreground space-y-1">
           <p><span className="font-medium">Hex values:</span> Pink #FFD6E8 · Peach #FFE4C4 · Yellow #FFF59D · Lime #E8F5A3 · Sky #C5E8FA · Mint #B8F5E4 · Lavender #E8D4F8</p>
