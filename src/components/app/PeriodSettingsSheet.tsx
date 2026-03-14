@@ -228,7 +228,7 @@ export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetP
                 <Button
                   variant="outline"
                   size="sm"
-                  className="text-destructive border-destructive/30 hover:bg-destructive/10"
+                  className="text-destructive border-destructive/30 active:bg-destructive/10"
                 >
                   <Power className="h-4 w-4 mr-1" />
                   Deactivate
