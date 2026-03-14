@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { OnboardingAnswers } from '@/types/onboarding';
 import { OnboardingStepRenderer } from '@/components/admin/onboarding/OnboardingStepRenderer';
 import { ChevronLeft } from 'lucide-react';
