@@ -1232,13 +1232,26 @@ async function updateStreak(userId: string, completedDateStr: string): Promise<{
     return { increased: true };
   }
 
-  // Otherwise, reset streak to 1
+  // Check if recovery was used today — if so, continue from recovered streak
+  let newStreak = 1;
+  if ((streak as any)?.streak_recovery_used_at) {
+    const recoveryDate = format(parseISO((streak as any).streak_recovery_used_at), 'yyyy-MM-dd');
+    if (recoveryDate === today) {
+      newStreak = (streak.current_streak || 0) + 1;
+    }
+  }
+
+  const updates: any = {
+    current_streak: newStreak,
+    last_completion_date: today,
+  };
+  if (newStreak > streak.longest_streak) {
+    updates.longest_streak = newStreak;
+  }
+
   await supabase
     .from('user_streaks')
-    .update({
-      current_streak: 1,
-      last_completion_date: today,
-    })
+    .update(updates)
     .eq('user_id', userId);
 
   return { increased: true };
