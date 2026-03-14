@@ -12,7 +12,7 @@ export function TourHelpButton({ onClick, className }: TourHelpButtonProps) {
       onClick={onClick}
       className={cn(
         "h-9 w-9 flex items-center justify-center rounded-full",
-        "text-muted-foreground transition-colors",
+        "text-muted-foreground hover:text-foreground transition-colors",
         "active:scale-95",
         className
       )}

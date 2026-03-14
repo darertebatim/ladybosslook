@@ -350,7 +350,7 @@ export function BadgeCelebration({
         {/* Collect button */}
         <Button
           onClick={handleCollectGold}
-          className="w-full bg-slate-900 text-white font-semibold py-4 rounded-xl text-base h-auto"
+          className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-4 rounded-xl text-base h-auto"
         >
           Collect my Gold Badge
         </Button>

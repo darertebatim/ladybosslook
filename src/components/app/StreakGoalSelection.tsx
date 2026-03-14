@@ -153,7 +153,7 @@ export const StreakGoalSelection = ({
                 'h-14 rounded-2xl font-bold text-lg transition-all duration-200',
                 selectedGoal === goal
                   ? 'bg-orange-400 text-white ring-4 ring-white shadow-lg'
-                  : 'bg-violet-400/50 text-white/90'
+                  : 'bg-violet-400/50 text-white/90 hover:bg-violet-400/70'
               )}
             >
               {goal}
@@ -186,7 +186,7 @@ export const StreakGoalSelection = ({
           <Button
             onClick={handleConfirm}
             disabled={isLoading}
-            className="w-full max-w-xs h-14 bg-gray-900 text-white font-semibold text-base rounded-2xl"
+            className="w-full max-w-xs h-14 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-base rounded-2xl"
           >
             {isLoading ? 'Saving...' : 'Commit to my goal'}
           </Button>

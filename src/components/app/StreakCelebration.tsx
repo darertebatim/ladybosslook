@@ -209,7 +209,7 @@ export const StreakCelebration = ({
           {/* CTA */}
           <Button
             onClick={handleClose}
-            className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl text-base"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl text-base"
           >
             I'm committed
           </Button>

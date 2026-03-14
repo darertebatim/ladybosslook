@@ -65,7 +65,7 @@ export function AppUpdateBanner() {
           size="icon"
           variant="ghost"
           onClick={dismiss}
-          className="flex-shrink-0 h-8 w-8 text-foreground"
+          className="flex-shrink-0 h-8 w-8 text-muted-foreground hover:text-foreground"
         >
           <X className="h-4 w-4" />
         </Button>

@@ -132,7 +132,7 @@ export const PeriodDaySheet = ({
                       'flex-1 py-2 px-3 rounded-xl border-2 transition-all text-center',
                       flowIntensity === option.id
                         ? 'border-pink-500 bg-pink-50 text-pink-700'
-                        : 'border-border bg-background'
+                        : 'border-border bg-background hover:border-pink-200'
                     )}
                   >
                     <span className="text-base block">{option.emoji}</span>
@@ -157,7 +157,7 @@ export const PeriodDaySheet = ({
                     'px-2.5 py-1.5 rounded-full border text-xs font-medium transition-all',
                     symptoms.includes(symptom.id)
                       ? 'border-pink-500 bg-pink-50 text-pink-700'
-                      : 'border-border bg-background text-muted-foreground'
+                      : 'border-border bg-background hover:border-pink-200 text-muted-foreground'
                   )}
                 >
                   {symptom.emoji} {symptom.label}
@@ -190,7 +190,7 @@ export const PeriodDaySheet = ({
               variant="outline"
               onClick={handleRemove}
               disabled={isLoading}
-              className="border-red-200 text-red-600 active:bg-red-50"
+              className="border-red-200 text-red-600 hover:bg-red-50"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -198,7 +198,7 @@ export const PeriodDaySheet = ({
           <Button
             onClick={handleSave}
             disabled={isLoading}
-            className="flex-1 bg-pink-500 text-white"
+            className="flex-1 bg-pink-500 hover:bg-pink-600 text-white"
           >
             {isLoading ? 'Saving...' : 'Save'}
           </Button>

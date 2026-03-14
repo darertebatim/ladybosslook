@@ -98,7 +98,7 @@ export function SessionReminderSheet({
               {REMINDER_OPTIONS.map((option) => (
                 <div
                   key={option.value}
-                  className="flex items-center space-x-3 rounded-lg border p-3 cursor-pointer active:bg-muted/50"
+                  className="flex items-center space-x-3 rounded-lg border p-3 cursor-pointer hover:bg-muted/50"
                   onClick={() => enabled && setReminderMinutes(option.value)}
                 >
                   <RadioGroupItem value={option.value} id={`reminder-${option.value}`} />

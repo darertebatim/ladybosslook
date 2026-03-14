@@ -276,7 +276,7 @@ export function WelcomeRoutineCard({ onActionAdded, onDismiss }: WelcomeRoutineC
             
             <button
               onClick={handleDismiss}
-              className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center active:bg-black/50 transition-colors z-10"
+              className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center hover:bg-black/50 transition-colors z-10"
             >
               <X className="w-4 h-4 text-white" />
             </button>

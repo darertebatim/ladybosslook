@@ -182,7 +182,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
               {/* Settings icon - opens reminder sheet directly */}
               <button
                 onClick={handleSettingsClick}
-                className="p-1.5 rounded-full bg-foreground/5 active:bg-foreground/20 transition-colors"
+                className="p-1.5 rounded-full bg-foreground/5 hover:bg-foreground/10 active:bg-foreground/20 transition-colors"
               >
                 <Settings2 className="h-3.5 w-3.5 text-foreground/60" />
               </button>

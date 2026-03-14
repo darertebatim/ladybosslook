@@ -250,7 +250,7 @@ export const GoldStreakCelebration = ({
         >
           <Button
             onClick={onClose}
-            className="w-full max-w-[320px] h-14 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 text-stone-900 font-bold text-base rounded-2xl shadow-xl border-0"
+            className="w-full max-w-[320px] h-14 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 hover:from-amber-300 hover:via-yellow-300 hover:to-amber-300 text-stone-900 font-bold text-base rounded-2xl shadow-xl border-0"
             style={{
               boxShadow: '0 4px 20px rgba(255, 193, 7, 0.3), 0 8px 32px rgba(0, 0, 0, 0.2)',
             }}

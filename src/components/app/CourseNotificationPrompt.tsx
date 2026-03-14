@@ -133,7 +133,7 @@ export function CourseNotificationPrompt({
             <>
               <Button 
                 onClick={handleOpenSettings}
-                className="w-full h-12 rounded-none border-0 bg-transparent text-primary text-[17px] font-semibold transition-colors"
+                className="w-full h-12 rounded-none border-0 bg-transparent text-primary hover:bg-primary/5 text-[17px] font-semibold transition-colors"
               >
                 <Settings className="mr-2 h-5 w-5" />
                 Open Settings
@@ -141,7 +141,7 @@ export function CourseNotificationPrompt({
               <Button 
                 variant="ghost"
                 onClick={handleChat}
-                className="w-full h-11 rounded-none border-0 border-t border-border/50 m-0 bg-transparent text-[15px] font-normal text-muted-foreground"
+                className="w-full h-11 rounded-none border-0 border-t border-border/50 m-0 bg-transparent hover:bg-muted/30 text-[15px] font-normal text-muted-foreground"
               >
                 <MessageCircle className="mr-2 h-4 w-4" />
                 Message Us for Help
@@ -149,7 +149,7 @@ export function CourseNotificationPrompt({
               <Button 
                 variant="ghost" 
                 onClick={handleSkip}
-                className="w-full h-11 rounded-none border-0 border-t border-border/50 m-0 bg-transparent text-[15px] font-normal text-muted-foreground"
+                className="w-full h-11 rounded-none border-0 border-t border-border/50 m-0 bg-transparent hover:bg-muted/30 text-[15px] font-normal text-muted-foreground"
               >
                 Skip for Now
               </Button>
@@ -159,7 +159,7 @@ export function CourseNotificationPrompt({
               <Button 
                 onClick={handleEnable}
                 disabled={isEnabling}
-                className="w-full h-12 rounded-none border-0 bg-transparent text-primary text-[17px] font-semibold transition-colors"
+                className="w-full h-12 rounded-none border-0 bg-transparent text-primary hover:bg-primary/5 text-[17px] font-semibold transition-colors"
               >
                 {isEnabling ? (
                   <span className="flex items-center gap-2">
@@ -173,7 +173,7 @@ export function CourseNotificationPrompt({
               <Button 
                 variant="ghost" 
                 onClick={handleSkip}
-                className="w-full h-11 rounded-none border-0 border-t border-border/50 m-0 bg-transparent text-[15px] font-normal text-muted-foreground"
+                className="w-full h-11 rounded-none border-0 border-t border-border/50 m-0 bg-transparent hover:bg-muted/30 text-[15px] font-normal text-muted-foreground"
               >
                 Maybe Later
               </Button>

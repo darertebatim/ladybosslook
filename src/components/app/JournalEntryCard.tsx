@@ -59,7 +59,7 @@ export const JournalEntryCard = memo(function JournalEntryCard({
 
   return (
     <Card 
-      className="cursor-pointer active:scale-[0.98] transition-transform"
+      className="cursor-pointer hover:bg-accent/50 transition-colors active:scale-[0.98]"
       onClick={handleClick}
     >
       <CardContent className="p-4">

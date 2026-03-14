@@ -351,7 +351,7 @@ export function TourOverlay({
         {/* Skip button - larger touch target for mobile */}
         <button
           onClick={handleSkip}
-          className="absolute top-2 right-2 p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground transition-colors active:scale-95 rounded-full active:bg-muted/50"
+          className="absolute top-2 right-2 p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors active:scale-95 rounded-full hover:bg-muted/50"
           aria-label="Skip tour"
         >
           <X className="h-5 w-5" />

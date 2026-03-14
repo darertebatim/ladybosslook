@@ -93,7 +93,7 @@ export const StreakGoalCompletionCelebration = ({
                 haptic.success();
                 onLevelUp();
               }}
-              className="w-full h-14 bg-white text-orange-600 font-semibold text-base rounded-2xl shadow-lg gap-2"
+              className="w-full h-14 bg-white text-orange-600 font-semibold text-base rounded-2xl hover:bg-white/90 shadow-lg gap-2"
             >
               <ArrowUp className="w-5 h-5" />
               Level Up My Challenge
@@ -110,7 +110,7 @@ export const StreakGoalCompletionCelebration = ({
                 onClose();
               }
             }}
-            className="w-full h-12 text-white bg-white/10 font-medium text-sm rounded-2xl"
+            className="w-full h-12 text-white/80 hover:text-white bg-white/10 hover:bg-white/15 font-medium text-sm rounded-2xl"
           >
             {hasHigherGoals ? 'Wrap Up Challenge 🎖️' : 'Done'}
           </Button>

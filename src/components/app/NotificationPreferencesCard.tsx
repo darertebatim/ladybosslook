@@ -139,7 +139,7 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
     <Card className="rounded-2xl shadow-sm border-0 bg-card">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
-          <CardHeader className="pb-2 cursor-pointer active:bg-muted/30 transition-colors rounded-t-2xl">
+          <CardHeader className="pb-2 cursor-pointer hover:bg-muted/30 transition-colors rounded-t-2xl">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base flex items-center gap-2">
                 <Bell className="h-4 w-4" />

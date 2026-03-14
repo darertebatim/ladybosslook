@@ -98,7 +98,7 @@ export function NotificationBanner({ onEnableClick }: NotificationBannerProps) {
         {/* Dismiss button */}
         <button
           onClick={handleDismiss}
-          className="absolute top-2 right-2 p-1.5 rounded-full active:bg-background/50 transition-colors z-10"
+          className="absolute top-2 right-2 p-1.5 rounded-full hover:bg-background/50 transition-colors z-10"
         >
           <X className="h-4 w-4 text-muted-foreground" />
         </button>

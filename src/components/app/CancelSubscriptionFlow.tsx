@@ -131,7 +131,7 @@ function SurveyStep({
                 'w-full flex items-center gap-3 p-4 rounded-2xl bg-card text-left transition-all',
                 selectedReason === i
                   ? 'ring-2 ring-primary bg-primary/5'
-                  : ''
+                  : 'hover:bg-muted/50'
               )}
             >
               <FluentEmoji emoji={reason.emoji} size={28} />
@@ -157,7 +157,7 @@ function SurveyStep({
       <div className="shrink-0 px-4 pb-6 pt-2">
         <Button
           variant="default"
-          className="w-full rounded-full h-12 text-sm font-semibold bg-foreground text-background"
+          className="w-full rounded-full h-12 text-sm font-semibold bg-foreground text-background hover:bg-foreground/90"
           onClick={onNext}
           disabled={selectedReason === null}
         >

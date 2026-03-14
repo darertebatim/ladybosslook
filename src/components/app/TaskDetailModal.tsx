@@ -315,7 +315,7 @@ export const TaskDetailModal = ({
               onClose();
               onEdit(task);
             }}
-            className="flex-1 gap-2 h-11 rounded-2xl border-0 bg-white text-black text-sm shadow-sm active:scale-95 transition-transform"
+            className="flex-1 gap-2 h-11 rounded-2xl border-0 bg-white text-black text-sm shadow-sm hover:bg-white/90 active:scale-95 transition-transform"
           >
             <Pencil className="h-4 w-4" />
             Edit Action
@@ -327,7 +327,7 @@ export const TaskDetailModal = ({
                 onClose();
                 onSkip(task);
               }}
-              className="gap-1.5 h-11 px-5 rounded-2xl border-0 bg-white text-black text-sm shadow-sm active:scale-95 transition-transform"
+              className="gap-1.5 h-11 px-5 rounded-2xl border-0 bg-white text-black text-sm shadow-sm hover:bg-white/90 active:scale-95 transition-transform"
             >
               <FastForward className="h-4 w-4" />
               Skip
@@ -340,7 +340,7 @@ export const TaskDetailModal = ({
                 onClose();
                 onDelete(task);
               }}
-              className="gap-1.5 h-11 px-5 rounded-2xl border-0 bg-[#E07060] active:scale-95 transition-transform text-white text-sm shadow-sm"
+              className="gap-1.5 h-11 px-5 rounded-2xl border-0 bg-[#E07060] hover:bg-[#d06050] active:scale-95 transition-transform text-white text-sm shadow-sm"
             >
               <Trash2 className="h-4 w-4" strokeWidth={2} />
               Delete

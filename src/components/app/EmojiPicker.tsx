@@ -284,7 +284,7 @@ export function EmojiPicker({
                 'px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
                 activeCategory === cat
                   ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
               )}
             >
               {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -301,7 +301,7 @@ export function EmojiPicker({
                 onClick={() => handleSelect(emoji)}
                 className={cn(
                   'aspect-square rounded-2xl flex items-center justify-center transition-all active:scale-95',
-                  'bg-muted/60',
+                  'bg-muted/60 hover:bg-muted',
                   selectedEmoji === emoji && 'bg-primary/10 ring-2 ring-primary'
                 )}
               >

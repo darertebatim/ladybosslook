@@ -110,7 +110,7 @@ export const WaterInputSheet = ({
                   'flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all shrink-0 min-w-[60px]',
                   isSelected 
                     ? 'bg-sky-500 text-white shadow-md' 
-                    : 'bg-sky-100 text-sky-700'
+                    : 'bg-sky-100 text-sky-700 hover:bg-sky-200'
                 )}
               >
                 <PresetIcon className="h-5 w-5" />

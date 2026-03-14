@@ -49,7 +49,7 @@ export function PaywallMinimal({ program, onPurchase, onRestore, onClose, previe
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-3">
         <button onClick={onClose} className="text-muted-foreground"><X className="h-5 w-5" /></button>
-        <button onClick={onRestore} className="text-sm text-muted-foreground underline">Restore</button>
+        <button onClick={onRestore} className="text-sm text-muted-foreground hover:underline">Restore</button>
       </div>
       {/* Decorative top */}
       <div className="h-24 bg-gradient-to-b from-accent/40 to-transparent" />
@@ -150,8 +150,8 @@ export function PaywallMinimal({ program, onPurchase, onRestore, onClose, previe
         </Button>
 
         <div className="flex items-center justify-center gap-4 mt-3 pb-4 text-xs text-muted-foreground">
-          <Link to="/sms-terms" className="underline">Terms</Link>
-          <Link to="/privacy" className="underline">Privacy</Link>
+          <Link to="/sms-terms" className="hover:underline">Terms</Link>
+          <Link to="/privacy" className="hover:underline">Privacy</Link>
         </div>
       </div>
     </div>

@@ -228,7 +228,7 @@ export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetP
                 <Button
                   variant="outline"
                   size="sm"
-                  className="text-destructive border-destructive/30 active:bg-destructive/10"
+                  className="text-destructive border-destructive/30 hover:bg-destructive/10"
                 >
                   <Power className="h-4 w-4 mr-1" />
                   Deactivate
@@ -245,7 +245,7 @@ export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetP
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDeactivate}
-                    className="bg-destructive text-destructive-foreground"
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
                     Deactivate
                   </AlertDialogAction>
@@ -256,7 +256,7 @@ export const PeriodSettingsSheet = ({ open, onOpenChange }: PeriodSettingsSheetP
             <Button
               onClick={handleSave}
               disabled={upsertSettings.isPending}
-              className="flex-1 bg-pink-500 text-white"
+              className="flex-1 bg-pink-500 hover:bg-pink-600 text-white"
             >
               {upsertSettings.isPending ? 'Saving...' : 'Save Settings'}
             </Button>

@@ -139,7 +139,7 @@ export function TourBanner({ isFirstOpen, onStartTour, forceShow = false }: Tour
       {/* Dismiss button */}
       <button
         onClick={handleDismiss}
-        className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-black/20 active:bg-black/30 transition-colors"
+        className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-black/20 hover:bg-black/30 transition-colors"
         aria-label="Dismiss"
       >
         <X className="h-4 w-4 text-white" />

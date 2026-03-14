@@ -190,7 +190,7 @@ export const ChallengeCompleteSummary = ({
               haptic.light();
               onClose();
             }}
-            className="w-full h-11 text-white/80 font-medium text-sm rounded-2xl"
+            className="w-full h-11 text-white/50 hover:text-white/80 hover:bg-white/5 font-medium text-sm rounded-2xl"
           >
             Done
           </Button>
