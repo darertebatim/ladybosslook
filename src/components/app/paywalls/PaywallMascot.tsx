@@ -47,7 +47,7 @@ export function PaywallMascot({ program, onPurchase, onRestore, onClose, preview
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-3">
         <button onClick={onClose} className="text-white/60"><X className="h-5 w-5" /></button>
-        <button onClick={onRestore} className="text-sm text-white/60 hover:underline">Restore</button>
+        <button onClick={onRestore} className="text-sm text-white/60 underline">Restore</button>
       </div>
       {/* Mascot Hero */}
       <div className="relative h-52 overflow-hidden">
