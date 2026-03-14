@@ -1265,6 +1265,11 @@ const AppHome = () => {
           showRecoveryPrompt={showRecoveryPrompt}
           setShowRecoveryPrompt={setShowRecoveryPrompt}
           recoverStreak={recoverStreak}
+          showGoldRecoveryPrompt={showGoldRecoveryPrompt}
+          setShowGoldRecoveryPrompt={setShowGoldRecoveryPrompt}
+          showRecoverySuccess={showRecoverySuccess}
+          setShowRecoverySuccess={setShowRecoverySuccess}
+          previousGoldStreak={goldStreakData?.longestGoldStreak || 0}
           userId={user?.id}
           showNotificationFlow={showNotificationFlow}
           setShowNotificationFlow={setShowNotificationFlow}
