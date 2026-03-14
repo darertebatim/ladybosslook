@@ -1025,10 +1025,10 @@ const AppTaskCreate = ({
         {reminderEnabled && scheduledTime && (
           <div className="flex items-center justify-between py-2 px-4 border-b border-muted/30">
             <div className="flex items-center gap-3">
-              <AlarmClock className={cn("h-5 w-5", isUrgent ? "text-red-500" : "text-foreground/70")} />
+              <AlarmClock className={cn("h-5 w-5", isUrgent ? "text-red-500" : "text-black")} />
               <div className="flex flex-col">
-                <span className={cn("font-medium", isUrgent && "text-red-600")}>Urgent</span>
-                <span className="text-xs text-muted-foreground">Alarm rings even on silent</span>
+                <span className={cn("font-medium text-black", isUrgent && "text-red-600")}>Urgent</span>
+                <span className="text-xs text-black/60">Alarm rings even on silent</span>
               </div>
             </div>
             <Switch 
