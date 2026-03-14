@@ -605,7 +605,7 @@ export default function TasksBank() {
   const addToExistingRoutine = useMutation({
     mutationFn: async () => {
       if (!selectedRoutineId) throw new Error('No routine selected');
-      if (selectedTasks.length === 0) throw new Error('No actions selected');
+      if (selectedTasks.length === 0) throw new Error('No tasks selected');
 
       // Get current max order for this routine
       const { data: existingTasks } = await supabase
