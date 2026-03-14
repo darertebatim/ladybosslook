@@ -1000,7 +1000,7 @@ const AppTaskCreate = ({
             <Clock className="h-5 w-5 text-black" />
             <span className="font-medium text-black">Time</span>
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="flex items-center gap-2 text-black/60">
             <span>{formatTimeDisplay(scheduledTime)}</span>
             <ChevronRight className="h-4 w-4" />
           </div>
