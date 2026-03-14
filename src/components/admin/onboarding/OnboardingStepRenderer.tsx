@@ -2491,6 +2491,49 @@ function StarterRoutineScreen({ step, onNext }: Props) {
         </div>
       )}
 
+      {/* Mood feeling message overlay — shows after mood selection */}
+      {showMoodFeeling && (
+        <div className="fixed inset-0 z-[100] flex items-end justify-center" style={{ animation: 'fadeIn 0.3s ease-out' }}>
+          <div className="absolute inset-0 bg-black/60" onClick={handleFeelingDismiss} />
+          <div className="relative z-10 w-full bg-emerald-50 rounded-t-3xl px-6 pt-8 pb-10 animate-slide-up">
+            {/* Header */}
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-3">
+                <FluentEmoji emoji={MOODS.find(m => m.label === selectedMoodLabel)?.emoji || '🌤️'} size={40} />
+              </div>
+              <h2 className="text-xl font-bold text-[#1a1f3d] mb-1">
+                You feel {selectedMoodLabel.toLowerCase()}
+              </h2>
+              <p className="text-sm text-gray-500">
+                Take a moment to breathe and reset your mind.
+              </p>
+            </div>
+
+            {/* Single breathing card */}
+            <button
+              onClick={handleFeelingBreatheTap}
+              className="w-full flex items-center gap-4 rounded-2xl p-4 bg-white/90 backdrop-blur-sm active:scale-[0.97] transition-all mb-5 shadow-sm"
+            >
+              <div className="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                <FluentEmoji emoji="🫁" size={32} />
+              </div>
+              <div className="text-left flex-1">
+                <span className="text-base font-semibold text-[#1a1f3d] block">Try a Breathing Exercise</span>
+                <span className="text-xs text-gray-500">2 min guided breathwork to calm your mind</span>
+              </div>
+              <span className="text-lg text-gray-400">→</span>
+            </button>
+
+            {/* Skip */}
+            <button
+              onClick={handleFeelingDismiss}
+              className="w-full h-10 rounded-full text-sm bg-orange-200/60 text-orange-900 hover:bg-orange-200/80 transition-colors"
+            >
+              Skip for now
+            </button>
+          </div>
+        </div>
+      )}
       <style>{`
         @keyframes sparkGlow {
           0% { opacity: 0.4; transform: scale(1); }
