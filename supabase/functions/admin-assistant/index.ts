@@ -647,7 +647,7 @@ async function deleteActionFromBank(supabase: any, args: any) {
 
   const resolved = await resolveActionId(supabase, args.id);
   if (!resolved) {
-    return { success: false, error: `Action not found: "${args.id}". Make sure to use the exact UUID from context.`, action: "delete_action_from_bank" };
+    return { success: false, error: `Task not found: "${args.id}". Make sure to use the exact UUID from context.`, action: "delete_action_from_bank" };
   }
 
   // Delete subtasks first
