@@ -1813,8 +1813,8 @@ interface StarterTask {
 
 const STARTER_TASKS: StarterTask[] = [
   { emoji: '📱', title: 'Open the app', subtitle: 'You already did this one!', color: '#FFEDD5', taskColor: 'orange', repeatPattern: 'daily' },
-  { emoji: '🌤️', title: 'Check in with your mood', subtitle: 'How are you feeling right now?', color: '#FEF3C7', taskColor: 'yellow', proLinkType: 'mood', repeatPattern: 'daily' },
   { emoji: '🫁', title: 'Breathing exercise', subtitle: '2 min guided breathwork', color: '#DBEAFE', taskColor: 'blue', proLinkType: 'breathe', repeatPattern: 'daily' },
+  { emoji: '🌤️', title: 'Check in with your mood', subtitle: 'How are you feeling right now?', color: '#FEF3C7', taskColor: 'yellow', proLinkType: 'mood', repeatPattern: 'daily' },
   { emoji: '📝', title: 'Write a short journaling', subtitle: 'One sentence about your day', color: '#F3E8FF', taskColor: 'purple', proLinkType: 'journal', repeatPattern: 'daily' },
   { emoji: '✅', title: 'Complete one small task', subtitle: 'Pick something quick & easy', color: '#D1FAE5', taskColor: 'green', repeatPattern: 'none' },
 ];
@@ -1851,7 +1851,7 @@ function buildUserTask(t: StarterTask, index: number, taskId?: string): import('
   };
 }
 
-type HintPhase = 'check-bed' | 'breathe' | 'done';
+type HintPhase = 'check-bed' | 'breathe' | 'mood' | 'done';
 
 // Mini inline breathing overlay for onboarding — uses real BreathingInfoSheet + BreathingCircle
 function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) {
@@ -2137,6 +2137,11 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const [completedIndices, setCompletedIndices] = useState<Set<number>>(new Set());
   const [hintPhase, setHintPhase] = useState<HintPhase>('check-bed');
   const [showBreathing, setShowBreathing] = useState(false);
+  const [showMoodPicker, setShowMoodPicker] = useState(false);
+
+  // Task indices: 0=Open app, 1=Breathing, 2=Mood, 3=Journal, 4=Small task
+  const BREATHE_IDX = 1;
+  const MOOD_IDX = 2;
 
   // Handle completing "Open the app"
   const handleCheckApp = async () => {
@@ -2148,11 +2153,12 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const handleBreathingComplete = useCallback(async () => {
     setCompletedIndices(prev => {
       const next = new Set(prev);
-      next.add(2);
+      next.add(BREATHE_IDX);
       return next;
     });
     setShowBreathing(false);
-    setHintPhase('done');
+    // After breathing, move to mood phase
+    setTimeout(() => setHintPhase('mood'), 600);
   }, []);
 
   // Handle breathing card tap
@@ -2160,8 +2166,33 @@ function StarterRoutineScreen({ step, onNext }: Props) {
     setShowBreathing(true);
   };
 
+  // Handle mood card tap
+  const handleMoodTap = () => {
+    setShowMoodPicker(true);
+  };
+
+  // Handle mood selection
+  const handleMoodSelect = (moodValue: string) => {
+    setCompletedIndices(prev => {
+      const next = new Set(prev);
+      next.add(MOOD_IDX);
+      return next;
+    });
+    setShowMoodPicker(false);
+    setTimeout(() => setHintPhase('done'), 500);
+  };
+
   // Build fake UserTask objects for preview rendering (no real DB tasks)
   const userTasks = STARTER_TASKS.map((t, i) => buildUserTask(t, i));
+
+  // Mood picker inline overlay
+  const MOODS = [
+    { value: 'great', emoji: '😄', label: 'Great', bg: '#FEF08A' },
+    { value: 'good', emoji: '🙂', label: 'Good', bg: '#BBF7D0' },
+    { value: 'okay', emoji: '😐', label: 'Okay', bg: '#BFDBFE' },
+    { value: 'not_great', emoji: '😔', label: 'Not Great', bg: '#E9D5FF' },
+    { value: 'bad', emoji: '😢', label: 'Bad', bg: '#FECACA' },
+  ];
 
   return (
     <div className="h-full flex flex-col bg-white">
@@ -2181,28 +2212,27 @@ function StarterRoutineScreen({ step, onNext }: Props) {
           <p className="text-center text-[13px] text-gray-400 mt-3 mb-6">
             {hintPhase === 'check-bed' && '👆 Tap the circle to complete your first task!'}
             {hintPhase === 'breathe' && '🫁 Now tap the Breathe button to try it!'}
+            {hintPhase === 'mood' && '🌤️ Now check in with your mood!'}
             {hintPhase === 'done' && '✨ You\'re getting the hang of it!'}
           </p>
         </FadeUp>
 
         {/* Task Cards with spotlight effect */}
         <div className="space-y-3 relative">
-          {/* Dark spotlight overlay - only during check-bed phase */}
-          {hintPhase === 'check-bed' && (
-            <div className="fixed inset-0 z-30 bg-black/50 pointer-events-none" style={{ animation: 'fadeIn 0.5s ease-out' }} />
-          )}
-          {/* Dark spotlight overlay - during breathe phase */}
-          {hintPhase === 'breathe' && (
+          {/* Dark spotlight overlay */}
+          {(hintPhase === 'check-bed' || hintPhase === 'breathe' || hintPhase === 'mood') && (
             <div className="fixed inset-0 z-30 bg-black/50 pointer-events-none" style={{ animation: 'fadeIn 0.5s ease-out' }} />
           )}
 
           {userTasks.map((task, i) => {
             const isCompleted = completedIndices.has(i);
             const isAppTask = i === 0;
-            const isBreatheTask = i === 2;
+            const isBreatheTask = i === BREATHE_IDX;
+            const isMoodTask = i === MOOD_IDX;
             const showAppHint = hintPhase === 'check-bed' && isAppTask && !isCompleted;
             const showBreatheHint = hintPhase === 'breathe' && isBreatheTask;
-            const isSpotlighted = showAppHint || showBreatheHint;
+            const showMoodHint = hintPhase === 'mood' && isMoodTask;
+            const isSpotlighted = showAppHint || showBreatheHint || showMoodHint;
 
             return (
               <FadeUp key={task.id} delay={0.15 + i * 0.1}>
@@ -2212,6 +2242,13 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                     <button
                       className="absolute inset-0 z-40 rounded-3xl"
                       onClick={handleBreatheTap}
+                    />
+                  )}
+                  {/* During mood hint phase, overlay the card to intercept taps */}
+                  {showMoodHint && (
+                    <button
+                      className="absolute inset-0 z-40 rounded-3xl"
+                      onClick={handleMoodTap}
                     />
                   )}
                   <div className={isSpotlighted ? 'relative rounded-2xl shadow-2xl' : ''}>
@@ -2228,12 +2265,10 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                   {/* Finger hint for app task - pointing at the completion circle */}
                   {showAppHint && (
                     <>
-                      {/* Invisible tap target on the completion circle */}
                       <button
                         className="absolute top-0 right-0 w-16 h-full z-50"
                         onClick={handleCheckApp}
                       />
-                      {/* Pulsing glow ring around the completion circle */}
                       <div
                         className="pointer-events-none absolute z-[55] rounded-full animate-pulse"
                         style={{
@@ -2245,7 +2280,6 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                           boxShadow: '0 0 0 4px hsl(var(--primary) / 0.5), 0 0 20px 8px hsl(var(--primary) / 0.2)',
                         }}
                       />
-                      {/* Bouncing hand pointing DOWN at the circle */}
                       <div
                         className="pointer-events-none absolute z-[60]"
                         style={{
@@ -2262,6 +2296,34 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
                   {/* Hint for breathe task */}
                   {showBreatheHint && (
+                    <>
+                      <div
+                        className="pointer-events-none absolute z-[55] rounded-xl animate-pulse"
+                        style={{
+                          top: '50%',
+                          right: '56px',
+                          width: '60px',
+                          height: '40px',
+                          transform: 'translateY(-50%)',
+                          boxShadow: '0 0 0 3px hsl(var(--primary) / 0.5), 0 0 20px 8px hsl(var(--primary) / 0.2)',
+                        }}
+                      />
+                      <div
+                        className="pointer-events-none absolute z-[60]"
+                        style={{
+                          top: '-40px',
+                          right: '58px',
+                          filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
+                          animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
+                        }}
+                      >
+                        <FluentEmoji emoji="👇" size={48} />
+                      </div>
+                    </>
+                  )}
+
+                  {/* Hint for mood task - point at the Check button */}
+                  {showMoodHint && (
                     <>
                       <div
                         className="pointer-events-none absolute z-[55] rounded-xl animate-pulse"
@@ -2306,6 +2368,47 @@ function StarterRoutineScreen({ step, onNext }: Props) {
         <OnboardingBreathingOverlay onComplete={handleBreathingComplete} />
       )}
 
+      {/* Inline mood picker overlay */}
+      {showMoodPicker && (
+        <div className="fixed inset-0 z-[100] flex items-end justify-center" style={{ animation: 'fadeIn 0.3s ease-out' }}>
+          <div className="absolute inset-0 bg-black/60" onClick={() => {}} />
+          <div className="relative z-10 w-full bg-white rounded-t-3xl px-6 pt-6 pb-10 animate-slide-up">
+            <h2 className="text-xl font-bold text-center text-[#1a1f3d] mb-2">How are you feeling?</h2>
+            <p className="text-sm text-gray-400 text-center mb-6">Tap the one that fits best</p>
+            {/* Top row - 3 moods */}
+            <div className="flex justify-center gap-4 mb-5">
+              {MOODS.slice(0, 3).map((mood) => (
+                <button
+                  key={mood.value}
+                  onClick={() => handleMoodSelect(mood.value)}
+                  className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
+                >
+                  <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center" style={{ background: mood.bg }}>
+                    <FluentEmoji emoji={mood.emoji} size={42} />
+                  </div>
+                  <span className="text-xs font-medium text-gray-700">{mood.label}</span>
+                </button>
+              ))}
+            </div>
+            {/* Bottom row - 2 moods */}
+            <div className="flex justify-center gap-4">
+              {MOODS.slice(3).map((mood) => (
+                <button
+                  key={mood.value}
+                  onClick={() => handleMoodSelect(mood.value)}
+                  className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
+                >
+                  <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center" style={{ background: mood.bg }}>
+                    <FluentEmoji emoji={mood.emoji} size={42} />
+                  </div>
+                  <span className="text-xs font-medium text-gray-700">{mood.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>{`
         @keyframes onboardingHandBounce {
           0%   { transform: translateY(0px); }
@@ -2317,6 +2420,13 @@ function StarterRoutineScreen({ step, onNext }: Props) {
         @keyframes fadeIn {
           from { opacity: 0; }
           to { opacity: 1; }
+        }
+        @keyframes slide-up {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+        .animate-slide-up {
+          animation: slide-up 0.35s ease-out;
         }
       `}</style>
     </div>
