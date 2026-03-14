@@ -156,8 +156,7 @@ export default function AppInspire() {
           {featuredRoutines.length > 0 && (
             <div className="mt-4 px-4">
               <div className="flex items-center gap-2 mb-3">
-                <CalendarPlus className="h-4 w-4 text-violet-500" />
-                <h2 className="text-sm font-semibold text-foreground/70 tracking-wide">
+                <h2 className="text-xl font-bold text-foreground">
                   Featured
                 </h2>
               </div>
