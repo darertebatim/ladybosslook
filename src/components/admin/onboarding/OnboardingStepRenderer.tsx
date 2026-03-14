@@ -2822,11 +2822,11 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
     <BottomSheetWrapper bgImage={meplusMascotBg} headerHeight={140}>
       {/* Celebration badge */}
       <FadeUp>
-        <div className="flex flex-col items-center mb-3">
-          <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-2">
-            <FluentEmoji emoji="🎉" size={32} />
+        <div className="flex flex-col items-center mb-2">
+          <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mb-1.5">
+            <FluentEmoji emoji="🎉" size={28} />
           </div>
-          <h1 className="text-[20px] font-extrabold text-[#1a1f3d] text-center leading-tight">
+          <h1 className="text-[19px] font-extrabold text-[#1a1f3d] text-center leading-tight">
             You completed your first<br />Daily Reset!
           </h1>
         </div>
@@ -2834,7 +2834,7 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
 
       {/* Description */}
       <FadeUp delay={0.1}>
-        <p className="text-[13px] text-[#1a1f3d]/55 leading-relaxed text-center mb-4">
+        <p className="text-[12px] text-[#1a1f3d]/55 leading-relaxed text-center mb-2">
           A simple daily routine to help you reset, refocus,<br />and start each day with intention.
         </p>
       </FadeUp>
