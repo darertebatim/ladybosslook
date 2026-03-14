@@ -2519,7 +2519,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
               </div>
               <div className="text-left flex-1">
                 <span className="text-base font-semibold text-[#1a1f3d] block">Try a Breathing Exercise</span>
-                <span className="text-xs text-gray-500">2 min guided breathwork to calm your mind</span>
+                <span className="text-xs text-[#1a1f3d]/70">3 deep breaths to calm your mind</span>
               </div>
               <span className="text-lg text-gray-400">→</span>
             </button>
