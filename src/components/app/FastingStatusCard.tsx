@@ -242,7 +242,7 @@ export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
       <div
         onClick={handleCardClick}
         className={cn(
-          'rounded-2xl p-4 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+          'rounded-2xl p-4 transition-all duration-200 cursor-pointer active:scale-[0.98] shadow-lg',
           'bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30',
           className
         )}
