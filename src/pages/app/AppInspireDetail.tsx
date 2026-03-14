@@ -289,8 +289,8 @@ export default function AppInspireDetail() {
                 </span>
               )}
               {routine.tasks && routine.tasks.length > 0 && (
-                <span className="text-sm text-foreground">
-                  {routine.tasks.length} action{routine.tasks.length !== 1 ? 's' : ''}
+               <span className="text-sm text-foreground">
+                   {routine.tasks.length} task{routine.tasks.length !== 1 ? 's' : ''}
                 </span>
               )}
             </div>
