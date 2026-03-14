@@ -2368,7 +2368,21 @@ function StarterRoutineScreen({ step, onNext }: Props) {
       {/* CTA - spotlighted after hints are done */}
       {hintPhase === 'done' && (
         <FadeUp delay={0.2} className="px-6 pb-6 pt-2 relative z-40">
-          <NavyButton onClick={onNext}>Continue</NavyButton>
+          <div className="relative">
+            <NavyButton onClick={onNext}>Continue</NavyButton>
+            <div
+              className="pointer-events-none absolute z-[60]"
+              style={{
+                top: '-52px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
+                animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
+              }}
+            >
+              <FluentEmoji emoji="👇" size={48} />
+            </div>
+          </div>
         </FadeUp>
       )}
 
