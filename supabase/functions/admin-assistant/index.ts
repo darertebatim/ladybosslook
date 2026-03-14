@@ -585,7 +585,7 @@ async function updateBreathingExercise(supabase: any, args: any) {
 
 async function addSubtasksToAction(supabase: any, args: any) {
   if (!args.task_id) {
-    return { success: false, error: "Missing task_id (action ID)", action: "add_subtasks_to_action" };
+    return { success: false, error: "Missing task_id (task ID)", action: "add_subtasks_to_action" };
   }
   if (!args.subtasks?.length) {
     return { success: false, error: "No subtasks provided", action: "add_subtasks_to_action" };
