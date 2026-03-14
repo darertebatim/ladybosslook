@@ -174,7 +174,18 @@ export function BreathingExerciseScreen({
         const nextIndex = (currentPhaseIndexRef.current + 1) % phases.length;
         currentPhaseIndexRef.current = nextIndex;
         setCurrentPhaseIndex(nextIndex);
-        haptic.light();
+
+        // Distinct haptic per phase type
+        const nextPhaseType = phases[nextIndex].type;
+        if (nextPhaseType === 'inhale') {
+          haptic.medium();
+        } else if (nextPhaseType === 'inhale_hold') {
+          haptic.heavy();
+        } else if (nextPhaseType === 'exhale') {
+          haptic.light();
+        } else if (nextPhaseType === 'exhale_hold') {
+          haptic.selection();
+        }
 
         if (nextIndex === 0) {
           const newC = cycleCountRef.current + 1;
