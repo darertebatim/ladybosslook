@@ -19,7 +19,8 @@ import { playCompletionSound } from '@/lib/completionSound';
 import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
 import { isWaterTask } from '@/lib/waterTracking';
-import { formatTimeLabel } from '@/lib/taskScheduling';
+import { formatTimeLabelWithEmoji } from '@/lib/taskScheduling';
+import { CircleProgressButton } from './CircleProgressButton';
 
 // Secondary (darker) palette for card footer strips
 const TASK_COLOR_DARK_CLASSES: Record<string, string> = {
