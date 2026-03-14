@@ -2043,6 +2043,8 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
         @keyframes ob-pulse-ring { 0%,100% { opacity:0.15; transform:scale(1); } 50% { opacity:0.3; transform:scale(1.05); } }
         @keyframes ob-hold-pulse { 0%,100% { transform:scale(1); filter:brightness(1); } 50% { transform:scale(1.03); filter:brightness(1.25); } }
         @keyframes ob-count-pop { 0% { transform:scale(0.5); opacity:0; } 40% { transform:scale(1.15); opacity:1; } 100% { transform:scale(1); opacity:1; } }
+        @keyframes ob-spin-cw { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes ob-spin-ccw { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
       `}</style>
 
       {/* Floating bokeh particles */}
@@ -2076,6 +2078,27 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
           className="absolute rounded-full"
           style={{ width: '40%', height: '40%', border: '1.5px solid rgba(167,139,250,0.2)' }}
         />
+
+        {/* Hold direction ring: clockwise for inhale hold, counterclockwise for exhale hold */}
+        {isHolding && (
+          <div
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              width: '102%',
+              height: '102%',
+              border: '2px solid rgba(167,139,250,0.18)',
+              borderTopColor: 'rgba(196,181,253,0.85)',
+              borderRightColor: 'rgba(196,181,253,0.1)',
+              borderBottomColor: 'rgba(167,139,250,0.45)',
+              borderLeftColor: 'rgba(196,181,253,0.08)',
+              boxShadow: '0 0 24px rgba(139,92,246,0.35)',
+              animation: breathPhase === 'inhale_hold'
+                ? `ob-spin-cw ${phaseDuration}s linear infinite`
+                : `ob-spin-ccw ${phaseDuration}s linear infinite`,
+            }}
+          />
+        )}
+
 
         {/* Animated breathing circle */}
         <div
@@ -2118,7 +2141,12 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
                 {currentP?.text || 'Inhale'}
               </span>
               {isHolding ? (
-                <span className="text-xl text-white/70 mt-1 font-mono" style={{ textShadow: '0 0 12px rgba(139,92,246,0.4)' }}>{phaseTimeLeft}</span>
+                <>
+                  <span className="text-[10px] text-white/55 mt-1 tracking-widest uppercase">
+                    {breathPhase === 'inhale_hold' ? 'Rotate Right ↻' : 'Rotate Left ↺'}
+                  </span>
+                  <span className="text-xl text-white/70 mt-1 font-mono" style={{ textShadow: '0 0 12px rgba(139,92,246,0.4)' }}>{phaseTimeLeft}</span>
+                </>
               ) : currentP?.method ? (
                 <span className="text-[10px] text-white/35 mt-1.5 px-2.5 py-0.5 rounded-full border border-white/10 tracking-wider uppercase">{currentP.method}</span>
               ) : null}
