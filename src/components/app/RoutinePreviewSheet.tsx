@@ -15,6 +15,26 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { ActionLimitSheet, hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
+import { formatTimeLabel } from '@/lib/taskScheduling';
+
+// Secondary (darker) palette for card footer strips
+const TASK_COLOR_DARK_CLASSES: Record<string, string> = {
+  pink: 'bg-[#FFB8D9]',
+  peach: 'bg-[#FFD1A3]',
+  yellow: 'bg-[#FFE97D]',
+  lime: 'bg-[#D4EB82]',
+  sky: 'bg-[#A3D5F2]',
+  mint: 'bg-[#8EECD0]',
+  lavender: 'bg-[#D4B8F0]',
+  purple: 'bg-[#D4B8F0]',
+  blue: 'bg-[#A3D5F2]',
+  red: 'bg-[#FFB8D9]',
+  orange: 'bg-[#FFD1A3]',
+  green: 'bg-[#D4EB82]',
+};
+import { useSubscription } from '@/hooks/useSubscription';
+import { PaywallSheet } from '@/components/app/PaywallSheet';
+import { ActionLimitSheet, hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 
 // Color cycle for variety in planner (used when no specific color is set)
 export const ROUTINE_COLOR_CYCLE: TaskColor[] = [
