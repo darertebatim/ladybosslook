@@ -846,7 +846,7 @@ export default function AppPlaylistDetail() {
                 )}
 
                 {isAvailable && (
-                  <Button variant="ghost" size="icon" className="flex-shrink-0 text-white/70 hover:bg-white/10">
+                  <Button variant="ghost" size="icon" className="flex-shrink-0 text-white/70">
                     <Play className="h-4 w-4" />
                   </Button>
                 )}
