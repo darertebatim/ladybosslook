@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { playCompletionSound } from '@/lib/completionSound';
 import { haptic } from '@/lib/haptics';
+import { cn } from '@/lib/utils';
 
 import { BreathingInfoSheet } from '@/components/breathe/BreathingInfoSheet';
 import { ImmersiveBreathingCircle, ImmersiveParticles, getImmersiveBgGradient } from '@/components/breathe/ImmersiveBreathingCircle';
@@ -2106,14 +2107,14 @@ function StarterRoutineScreen({ step, onNext }: Props) {
     }
   }, [phase]);
 
-  // Spotlight → Hint delays
+  // Spotlight → Hint delays (not rushed)
   useEffect(() => {
     if (phase === 'spotlight-app') {
-      addTimer(() => setPhase('hint-app'), 500);
+      addTimer(() => setPhase('hint-app'), 800);
     } else if (phase === 'spotlight-breathe') {
-      addTimer(() => setPhase('hint-breathe'), 500);
+      addTimer(() => setPhase('hint-breathe'), 800);
     } else if (phase === 'spotlight-mood') {
-      addTimer(() => setPhase('hint-mood'), 500);
+      addTimer(() => setPhase('hint-mood'), 800);
     }
   }, [phase]);
 
@@ -2132,7 +2133,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
     addTimer(() => {
       setCelebratingIdx(null);
       setPhase(nextPhase);
-    }, 1500);
+    }, 2500);
   };
 
   // Handlers
@@ -2264,7 +2265,10 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                     <button className="absolute inset-0 z-40 rounded-3xl" onClick={handleMoodTap} />
                   )}
 
-                  <div className={isSpotlighted || isCelebrating ? 'relative rounded-2xl shadow-2xl' : ''}>
+                  <div className={cn(
+                    isSpotlighted || isCelebrating ? 'relative rounded-2xl shadow-2xl' : '',
+                    isCelebrating && 'animate-ripple-wave'
+                  )}>
                     <TaskCard
                       task={task}
                       date={new Date()}
@@ -2273,6 +2277,12 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                       goalProgress={0}
                       onTap={undefined}
                     />
+                    {/* Celebration emoji bounce overlay */}
+                    {isCelebrating && (
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 z-50 animate-emoji-bounce">
+                        <FluentEmoji emoji={STARTER_TASKS[i].emoji} size={36} />
+                      </div>
+                    )}
                   </div>
 
                   {/* Celebration SealCheck overlay */}
@@ -2357,7 +2367,18 @@ function StarterRoutineScreen({ step, onNext }: Props) {
           className="px-6 pb-6 pt-2 relative z-40"
         >
           <div className="relative">
-            <NavyButton onClick={onNext}>Continue</NavyButton>
+            {/* Sparking glow rings */}
+            <div className="absolute -inset-2 rounded-3xl animate-pulse" style={{
+              background: 'linear-gradient(135deg, rgba(168,85,247,0.3), rgba(59,130,246,0.2), rgba(52,211,153,0.3))',
+              filter: 'blur(12px)',
+            }} />
+            <div className="absolute -inset-1 rounded-2xl" style={{
+              background: 'linear-gradient(135deg, rgba(168,85,247,0.15), rgba(59,130,246,0.1), rgba(52,211,153,0.15))',
+              animation: 'sparkGlow 2s ease-in-out infinite alternate',
+            }} />
+            <div className="relative">
+              <NavyButton onClick={onNext}>Continue</NavyButton>
+            </div>
             <div
               className="pointer-events-none absolute z-[60]"
               style={{
@@ -2370,6 +2391,22 @@ function StarterRoutineScreen({ step, onNext }: Props) {
             >
               <FluentEmoji emoji="👇" size={48} />
             </div>
+            {/* Floating sparkle particles */}
+            {['✦', '✧', '✦', '✧'].map((s, idx) => (
+              <span
+                key={idx}
+                className="absolute text-white/60 animate-pulse pointer-events-none"
+                style={{
+                  fontSize: '10px',
+                  top: `${-8 + (idx % 2) * 60}px`,
+                  left: `${15 + idx * 25}%`,
+                  animationDelay: `${idx * 0.4}s`,
+                  animationDuration: `${1.5 + idx * 0.3}s`,
+                }}
+              >
+                {s}
+              </span>
+            ))}
           </div>
         </motion.div>
       )}
@@ -2419,6 +2456,11 @@ function StarterRoutineScreen({ step, onNext }: Props) {
       )}
 
       <style>{`
+        @keyframes sparkGlow {
+          0% { opacity: 0.4; transform: scale(1); }
+          50% { opacity: 0.8; transform: scale(1.02); }
+          100% { opacity: 0.4; transform: scale(1); }
+        }
         @keyframes onboardingHandBounce {
           0%   { transform: translateY(0px); }
           40%  { transform: translateY(8px); }
