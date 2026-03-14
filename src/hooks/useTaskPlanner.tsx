@@ -323,14 +323,9 @@ export const useCarryForwardTasks = () => {
     staleTime: 1000 * 60 * 2,
   });
 
-  // Filter: only tasks that were NOT completed on their scheduled_date
+  // Filter: one-time tasks that have ANY completion should not carry forward
   const completedTaskIds = new Set(
-    pastCompletions
-      .filter(c => {
-        const task = pastOneTimeTasks.find(t => t.id === c.task_id);
-        return task && c.completed_date === task.scheduled_date;
-      })
-      .map(c => c.task_id)
+    pastCompletions.map(c => c.task_id)
   );
 
   const carryForwardTasks = pastOneTimeTasks.filter(t => !completedTaskIds.has(t.id));
