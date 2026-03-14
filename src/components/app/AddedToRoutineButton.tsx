@@ -51,7 +51,7 @@ export const AddedToRoutineButton = ({
       case 'emotion':
         return "bg-success/30 text-white";
       case 'outline':
-        return "bg-success/10 border-success/30 text-success hover:bg-success/20";
+        return "bg-success/10 border-success/30 text-success";
       default:
         return "bg-success/10 hover:bg-success/20 text-success";
     }
