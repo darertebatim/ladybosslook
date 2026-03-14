@@ -152,9 +152,12 @@ export const TaskDetailModal = ({
 
   const colorClass = TASK_COLOR_CLASSES[task.color] || TASK_COLOR_CLASSES.yellow;
   const darkColorClass = TASK_COLOR_DARK_CLASSES[task.color] || 'bg-black/10';
-  const repeatText = getRepeatText();
+  const repeatLabel = getRepeatLabel();
   const reminderText = getReminderText();
-  const combinedText = [repeatText, reminderText].filter(Boolean).join('. ');
+  const footerText = [
+    repeatLabel ? `Repeats ${repeatLabel.toLowerCase() === 'today' ? 'once' : repeatLabel.toLowerCase()}` : '',
+    reminderText
+  ].filter(Boolean).join('. ');
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
