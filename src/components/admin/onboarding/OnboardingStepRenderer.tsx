@@ -2738,9 +2738,9 @@ function LoopWheel() {
       {/* 4 task nodes positioned around the circle */}
       {DAILY_RESET_WHEEL.map((task, i) => {
         const angle = (i * 90 - 90) * (Math.PI / 180); // start from top
-        const radius = 85;
-        const x = 110 + radius * Math.cos(angle) - 28;
-        const y = 110 + radius * Math.sin(angle) - 28;
+        const radius = 75;
+        const x = 100 + radius * Math.cos(angle) - 25;
+        const y = 100 + radius * Math.sin(angle) - 25;
 
         return (
           <motion.div
