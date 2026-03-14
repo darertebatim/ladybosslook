@@ -1996,21 +1996,24 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     if (stage === 'done') return 'radial-gradient(ellipse at 50% 40%, #1e1145 0%, #0f0a2e 50%, #080618 100%)';
     if (stage === 'countdown') return 'radial-gradient(ellipse at 50% 40%, #1a0e3e 0%, #0d0825 50%, #06050f 100%)';
     if (breathPhase === 'inhale') return 'radial-gradient(ellipse at 50% 35%, #1e1155 0%, #120a3a 40%, #080618 100%)';
+    if (breathPhase === 'inhale_hold') return 'radial-gradient(ellipse at 50% 38%, #251560 0%, #150c45 40%, #0a0720 100%)';
     if (breathPhase === 'exhale') return 'radial-gradient(ellipse at 50% 45%, #160d42 0%, #0e0830 40%, #06050f 100%)';
-    return 'radial-gradient(ellipse at 50% 40%, #1a0e3e 0%, #0d0825 50%, #06050f 100%)'; // hold
+    if (breathPhase === 'exhale_hold') return 'radial-gradient(ellipse at 50% 42%, #12103a 0%, #0b0828 40%, #050412 100%)';
+    return 'radial-gradient(ellipse at 50% 40%, #1a0e3e 0%, #0d0825 50%, #06050f 100%)';
   })();
 
   // Animated circle scale
   const isExpanded = breathPhase === 'inhale_hold';
   const isInhaling = breathPhase === 'inhale';
   const isExhaling = breathPhase === 'exhale';
+  const isHolding = breathPhase === 'inhale_hold' || breathPhase === 'exhale_hold';
   const animatedScale = stage !== 'running'
     ? 0.45
     : isExpanded || isInhaling ? 1.0 : 0.45;
   const animDuration = (isInhaling || isExhaling) ? `${phaseDuration}s` : '0.3s';
 
   // Glow intensity based on phase
-  const glowOpacity = isExpanded || isInhaling ? 0.5 : 0.2;
+  const glowOpacity = isExpanded || isInhaling ? 0.5 : isHolding ? 0.4 : 0.2;
 
   return (
     <div
@@ -2023,6 +2026,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
         @keyframes ob-float-2 { 0%,100% { transform: translate(0,0) scale(1); opacity:0.2; } 33% { transform: translate(-40px,30px) scale(1.3); opacity:0.4; } 66% { transform: translate(50px,-20px) scale(0.9); opacity:0.15; } }
         @keyframes ob-float-3 { 0%,100% { transform: translate(0,0); opacity:0.25; } 50% { transform: translate(-30px,-50px); opacity:0.45; } }
         @keyframes ob-pulse-ring { 0%,100% { opacity:0.15; transform:scale(1); } 50% { opacity:0.3; transform:scale(1.05); } }
+        @keyframes ob-hold-pulse { 0%,100% { transform:scale(1); filter:brightness(1); } 50% { transform:scale(1.03); filter:brightness(1.25); } }
         @keyframes ob-count-pop { 0% { transform:scale(0.5); opacity:0; } 40% { transform:scale(1.15); opacity:1; } 100% { transform:scale(1); opacity:1; } }
       `}</style>
 
@@ -2067,9 +2071,14 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
             transitionProperty: 'transform',
             transitionTimingFunction: (isInhaling || isExhaling) ? 'linear' : 'ease-out',
             transitionDuration: animDuration,
-            background: 'radial-gradient(circle at 40% 35%, rgba(139,92,246,0.25) 0%, rgba(99,102,241,0.15) 50%, rgba(79,70,229,0.08) 100%)',
+            background: isHolding
+              ? (breathPhase === 'inhale_hold'
+                ? 'radial-gradient(circle at 40% 35%, rgba(168,85,247,0.3) 0%, rgba(139,92,246,0.2) 50%, rgba(99,102,241,0.1) 100%)'
+                : 'radial-gradient(circle at 40% 35%, rgba(99,102,241,0.25) 0%, rgba(79,70,229,0.15) 50%, rgba(67,56,202,0.08) 100%)')
+              : 'radial-gradient(circle at 40% 35%, rgba(139,92,246,0.25) 0%, rgba(99,102,241,0.15) 50%, rgba(79,70,229,0.08) 100%)',
             boxShadow: `0 0 40px 10px rgba(139,92,246,${glowOpacity * 0.4}), 0 0 80px 30px rgba(99,102,241,${glowOpacity * 0.2}), inset 0 0 30px rgba(167,139,250,0.1)`,
             backdropFilter: 'blur(4px)',
+            animation: isHolding ? `ob-hold-pulse ${phaseDuration}s ease-in-out infinite` : 'none',
           }}
         />
 
@@ -2088,13 +2097,13 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
           ) : (
             <>
               <span
-                className="text-xl font-light text-white/90 tracking-wider"
-                style={{ textShadow: '0 0 15px rgba(139,92,246,0.3)' }}
+                className={`${isHolding ? 'text-2xl' : 'text-xl'} font-light ${isHolding ? 'text-white/95' : 'text-white/90'} tracking-wider transition-all duration-300`}
+                style={{ textShadow: isHolding ? '0 0 20px rgba(168,85,247,0.5)' : '0 0 15px rgba(139,92,246,0.3)' }}
               >
                 {currentP?.text || 'Inhale'}
               </span>
-              {breathPhase.includes('hold') ? (
-                <span className="text-base text-white/50 mt-1 font-mono">{phaseTimeLeft}</span>
+              {isHolding ? (
+                <span className="text-xl text-white/70 mt-1 font-mono" style={{ textShadow: '0 0 12px rgba(139,92,246,0.4)' }}>{phaseTimeLeft}</span>
               ) : currentP?.method ? (
                 <span className="text-[10px] text-white/35 mt-1.5 px-2.5 py-0.5 rounded-full border border-white/10 tracking-wider uppercase">{currentP.method}</span>
               ) : null}
