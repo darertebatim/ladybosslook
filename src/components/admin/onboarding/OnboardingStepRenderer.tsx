@@ -484,6 +484,7 @@ function TextInputScreen({ step, onNext, onAnswer }: Props) {
   );
 }
 
+function SingleSelectDescScreen({ step, onNext, onAnswer }: Props) {
   const [picked, setPicked] = useState<number | null>(null);
 
   const select = (i: number) => {
