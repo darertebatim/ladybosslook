@@ -158,7 +158,7 @@ export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }
         {/* CTA */}
         <Button
           size="lg"
-          className="w-full mt-4 rounded-xl h-12 bg-primary text-primary-foreground hover:bg-primary/90"
+          className="w-full mt-4 rounded-xl h-12 bg-primary text-primary-foreground"
           onClick={handlePurchase}
           disabled={isPurchasing}
         >
