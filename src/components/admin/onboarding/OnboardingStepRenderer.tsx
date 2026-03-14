@@ -2072,8 +2072,8 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const [celebratingIdx, setCelebratingIdx] = useState<number | null>(null);
   const timersRef = useRef<NodeJS.Timeout[]>([]);
 
-  const BREATHE_IDX = 1;
-  const MOOD_IDX = 2;
+  const MOOD_IDX = 1;
+  const BREATHE_IDX = 2;
   const COMPLETE_IDX = 4;
 
   const userTasks = STARTER_TASKS.map((t, i) => buildUserTask(t, i));
