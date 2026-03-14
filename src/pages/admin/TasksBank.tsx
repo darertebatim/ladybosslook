@@ -313,7 +313,7 @@ export default function TasksBank() {
       closeSheet();
     },
     onError: (error) => {
-      toast.error('Failed to create action: ' + error.message);
+      toast.error('Failed to create task: ' + error.message);
     },
   });
 
