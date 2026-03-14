@@ -2096,7 +2096,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
             return (
               <FadeUp key={task.id} delay={0.15 + i * 0.1}>
                 <div className="relative">
-                  <div className={showBreatheHint ? 'ring-[3px] ring-primary/40 rounded-3xl animate-pulse' : ''}>
+                  <div>
                     <TaskCard
                       task={task}
                       date={new Date()}
