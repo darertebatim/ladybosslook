@@ -364,7 +364,7 @@ export const GoalSettingsSheet = ({
           <AlertDialogFooter className="flex-col gap-2 sm:flex-col">
             <AlertDialogAction
               onClick={handleConfirmReset}
-              className="w-full h-14 rounded-full bg-violet-500 hover:bg-violet-600 text-white text-lg font-semibold"
+              className="w-full h-14 rounded-full bg-violet-500 text-white text-lg font-semibold active:bg-violet-600"
             >
               Confirm Change
             </AlertDialogAction>
