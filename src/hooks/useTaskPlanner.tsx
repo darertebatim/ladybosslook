@@ -832,7 +832,7 @@ export const useUpdateTask = () => {
     },
     onError: (error) => {
       console.error('Update task error:', error);
-      toast({ title: 'Failed to update action', variant: 'destructive' });
+      toast({ title: 'Failed to update task', variant: 'destructive' });
     },
   });
 };
