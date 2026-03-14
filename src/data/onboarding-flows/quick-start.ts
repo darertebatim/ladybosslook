@@ -89,6 +89,7 @@ export const quickStartFlow: OnboardingFlow = {
       type: 'text-input',
       title: 'What should I call you?',
       subtitle: 'Nicknames are fine.',
+      illustrationLabel: 'Mascot greeting',
       buttonLabel: 'Continue',
     },
     // 9 — Age group
