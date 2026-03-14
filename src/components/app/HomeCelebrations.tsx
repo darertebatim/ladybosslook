@@ -291,11 +291,43 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         onRecover={() => {
           const prev = streak?.longest_streak || 0;
           recoverStreak.mutate({ previousStreak: prev, type: 'streak' }, {
-            onSuccess: () => setShowRecoveryPrompt(false),
+            onSuccess: () => {
+              setShowRecoveryPrompt(false);
+              setShowRecoverySuccess('streak');
+            },
           });
         }}
         onDismiss={() => setShowRecoveryPrompt(false)}
         isLoading={recoverStreak.isPending}
+      />
+
+      <GoldStreakLostBanner
+        open={showGoldRecoveryPrompt}
+        previousGoldStreak={previousGoldStreak}
+        hasShieldsRemaining={((streak as any)?.streak_recovery_count || 0) < 3}
+        shieldsLeft={3 - ((streak as any)?.streak_recovery_count || 0)}
+        isSubscribed={isSubscribed}
+        onRecover={() => {
+          recoverStreak.mutate({ previousStreak: previousGoldStreak, type: 'gold' }, {
+            onSuccess: () => {
+              setShowGoldRecoveryPrompt(false);
+              setShowRecoverySuccess('gold');
+            },
+          });
+        }}
+        onDismiss={() => setShowGoldRecoveryPrompt(false)}
+        onSubscribe={() => {
+          setShowGoldRecoveryPrompt(false);
+          setShowPaywall(true);
+        }}
+        isLoading={recoverStreak.isPending}
+      />
+
+      <RecoverySuccessBanner
+        open={showRecoverySuccess !== null}
+        restoredStreak={showRecoverySuccess === 'gold' ? previousGoldStreak : (streak?.longest_streak || 0)}
+        type={showRecoverySuccess || 'streak'}
+        onClose={() => setShowRecoverySuccess(null)}
       />
     </OverlayPortal>
   );
