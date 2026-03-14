@@ -2141,7 +2141,12 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
                 {currentP?.text || 'Inhale'}
               </span>
               {isHolding ? (
-                <span className="text-xl text-white/70 mt-1 font-mono" style={{ textShadow: '0 0 12px rgba(139,92,246,0.4)' }}>{phaseTimeLeft}</span>
+                <>
+                  <span className="text-[10px] text-white/55 mt-1 tracking-widest uppercase">
+                    {breathPhase === 'inhale_hold' ? 'Rotate Right ↻' : 'Rotate Left ↺'}
+                  </span>
+                  <span className="text-xl text-white/70 mt-1 font-mono" style={{ textShadow: '0 0 12px rgba(139,92,246,0.4)' }}>{phaseTimeLeft}</span>
+                </>
               ) : currentP?.method ? (
                 <span className="text-[10px] text-white/35 mt-1.5 px-2.5 py-0.5 rounded-full border border-white/10 tracking-wider uppercase">{currentP.method}</span>
               ) : null}
