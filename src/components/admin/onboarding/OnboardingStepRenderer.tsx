@@ -2013,6 +2013,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
         </p>
       )}
 
+      {stage === 'done' && (
         <p className="mt-8 text-lg font-semibold text-foreground animate-fade-in">Great job! 🎉</p>
       )}
     </div>
