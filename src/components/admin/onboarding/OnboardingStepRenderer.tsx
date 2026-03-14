@@ -2092,13 +2092,15 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
           style={{ width: '40%', height: '40%', border: '1.5px solid rgba(167,139,250,0.2)' }}
         />
 
-        {/* Hold direction ring: clockwise for inhale hold, counterclockwise for exhale hold */}
+        {/* Hold direction ring — scales to match the breathing circle */}
         {isHolding && (
           <div
             className="absolute rounded-full pointer-events-none"
             style={{
-              width: '102%',
-              height: '102%',
+              width: '100%',
+              height: '100%',
+              transform: `scale(${breathPhase === 'inhale_hold' ? 1.04 : 0.47})`,
+              transition: 'transform 0.5s ease-out',
               border: '2px solid rgba(167,139,250,0.18)',
               borderTopColor: 'rgba(196,181,253,0.85)',
               borderRightColor: 'rgba(196,181,253,0.1)',
@@ -2106,8 +2108,8 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
               borderLeftColor: 'rgba(196,181,253,0.08)',
               boxShadow: '0 0 24px rgba(139,92,246,0.35)',
               animation: breathPhase === 'inhale_hold'
-                ? `ob-spin-cw ${phaseDuration}s linear infinite`
-                : `ob-spin-ccw ${phaseDuration}s linear infinite`,
+                ? 'ob-spin-cw 6s linear infinite'
+                : 'ob-spin-ccw 6s linear infinite',
             }}
           />
         )}
