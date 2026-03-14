@@ -141,11 +141,11 @@ export function HomeTour({
     if (hasWelcomeCard) {
       baseSteps.push({
         id: 'welcome-card',
-        title: 'Your First Action 🎯',
-        target: '.tour-welcome-card',
-        description: 'Ready? Flip the card below to pick your first action.',
-        position: 'top',
-        action: 'tap',
+         title: 'Your First Task 🎯',
+         target: '.tour-welcome-card',
+         description: 'Ready? Flip the card below to pick your first task.',
+         position: 'top',
+         action: 'tap',
         condition: () => !!document.querySelector('.tour-welcome-card'),
       });
     } else {
