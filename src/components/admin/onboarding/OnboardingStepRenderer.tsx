@@ -582,34 +582,35 @@ function MotivationalScreen({ step, onNext }: Props) {
     return (
       <div className="h-full flex flex-col relative overflow-hidden">
         {/* Mascot header background */}
-        <div className="h-[180px] shrink-0 relative">
+        <div className="h-[220px] shrink-0 relative">
           <img src={meplusMascotBg} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
         </div>
-        {/* White bottom sheet — no scroll */}
-        <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-hidden">
-          <div className="px-5 pt-5 pb-5 flex flex-col flex-1">
+        {/* White bottom sheet */}
+        <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 overflow-y-auto">
+          <div className="px-5 pt-6 pb-6 flex flex-col min-h-full">
             <FadeUp>
-              <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight">{step.title}</h1>
+              <h1 className="text-[24px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight">{step.title}</h1>
             </FadeUp>
             {step.subtitle && (
               <FadeUp delay={0.08}>
-                <p className="text-[13px] text-gray-500 leading-relaxed text-center mb-3 whitespace-pre-line">
-                  <span className="font-bold text-[#1a1f3d]">{step.subtitle}</span>
+                <p className="text-[14px] text-gray-500 leading-relaxed text-center mb-4 whitespace-pre-line">
+                  <span className="font-bold text-[#1a1f3d]">{step.subtitle.split('\n')[0]}</span>
+                  {step.subtitle.split('\n').length > 1 && '\n' + step.subtitle.split('\n').slice(1).join('\n')}
                 </p>
               </FadeUp>
             )}
             {/* Before/After image inside the sheet — full width */}
             {step.image && (
               <FadeUp delay={0.12}>
-                <div className="-mx-5 mb-3">
-                  <img src={step.image} alt="" className="w-full object-contain" style={{ maxHeight: '160px' }} />
+                <div className="-mx-5 mb-4">
+                  <img src={step.image} alt="" className="w-full object-contain" />
                 </div>
               </FadeUp>
             )}
             <FadeUp delay={0.18}>
-              <div className="bg-amber-50/80 rounded-2xl border border-amber-200/50 px-4 py-3 mb-3">
-                <p className="text-[14px] text-[#1a1f3d] font-medium italic leading-relaxed text-center">{quote}</p>
-                {author && <p className="text-[12px] text-amber-600 font-semibold text-center mt-1.5">{author}</p>}
+              <div className="bg-amber-50/80 rounded-2xl border border-amber-200/50 px-5 py-4 mb-4">
+                <p className="text-[15px] text-[#1a1f3d] font-medium italic leading-relaxed text-center">{quote}</p>
+                {author && <p className="text-[13px] text-amber-600 font-semibold text-center mt-2">{author}</p>}
               </div>
             </FadeUp>
             <FadeUp delay={0.25} className="mt-auto">
