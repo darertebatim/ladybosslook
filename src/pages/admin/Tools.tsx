@@ -27,7 +27,7 @@ export default function Tools() {
           </TabsTrigger>
           <TabsTrigger value="tasks" className="flex items-center gap-2">
             <ListTodo className="h-4 w-4" />
-            Actions Bank
+            Tasks Bank
           </TabsTrigger>
           <TabsTrigger value="breathing" className="flex items-center gap-2">
             <Wind className="h-4 w-4" />
