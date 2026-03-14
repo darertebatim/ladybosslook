@@ -93,7 +93,7 @@ export const GoldStreakLostBanner = ({
             <Button
               onClick={() => { haptic.success(); onRecover(); }}
               disabled={isLoading}
-              className="w-full bg-white hover:bg-white/90 text-amber-600 font-semibold py-3 rounded-xl mb-2"
+              className="w-full bg-white text-amber-600 font-semibold py-3 rounded-xl mb-2"
             >
               🛡️ Use Recovery Shield
             </Button>
