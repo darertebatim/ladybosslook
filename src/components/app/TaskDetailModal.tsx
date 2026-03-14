@@ -1,4 +1,5 @@
-import { Check, Plus, Play, Droplets, FastForward, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Play, Droplets, FastForward, Pencil, Trash2 } from 'lucide-react';
+import SealCheck from './SealCheck';
 import { parseISO, isBefore, startOfDay, format as fnsFormat } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
