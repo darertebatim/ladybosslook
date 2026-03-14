@@ -55,6 +55,9 @@ const NativeAppLayout = () => {
   
   // Comprehensive cleanup of stale/legacy local notifications (runs first, before schedulers)
   useNotificationCleanup();
+  
+  // Provision Daily Reset routine if user opted in during onboarding
+  useDailyResetProvisioning(user?.id);
 
   // Defer non-critical hooks — mount DeferredLayoutHooks after 5s delay
   const [deferredReady, setDeferredReady] = useState(false);
