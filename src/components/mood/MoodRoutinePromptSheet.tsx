@@ -8,9 +8,9 @@ import {
 } from '@/components/ui/sheet';
 
 const BENEFITS = [
-  { emoji: '📊', text: 'Spot patterns in your emotions' },
-  { emoji: '🎯', text: 'Understand your triggers better' },
-  { emoji: '💪', text: 'Build emotional resilience' },
+  { emoji: '📊', text: 'See patterns in your emotions' },
+  { emoji: '🎯', text: 'Understand what affects your mood' },
+  { emoji: '💪', text: 'Build stronger emotional resilience' },
 ];
 
 interface MoodRoutinePromptSheetProps {
