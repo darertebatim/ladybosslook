@@ -2256,7 +2256,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
             const isVisible = phase === 'intro' ? false : phase === 'revealing' ? i < revealedCount : true;
             const isSpotlighted = spotlightIdx === i && !phase.startsWith('celebrate');
             const isCelebrating = celebratingIdx === i;
-            const showHintOnCircle = phase === 'hint-app' && i === 0;
+            const showHintOnCircle = (phase === 'hint-app' && i === 0) || (phase === 'hint-complete' && i === COMPLETE_IDX);
             const showHintOnCard = (phase === 'hint-breathe' && i === BREATHE_IDX) || (phase === 'hint-mood' && i === MOOD_IDX);
 
             return (
