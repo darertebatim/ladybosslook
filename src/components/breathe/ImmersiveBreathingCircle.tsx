@@ -73,32 +73,30 @@ export function ImmersiveBreathingCircle({
           style={{ width: '40%', height: '40%', border: '1.5px solid rgba(167,139,250,0.2)' }}
         />
 
-        {/* Hold direction ring — wrapper scales, inner ring rotates */}
-        {isHolding && (
+        {/* Hold direction ring — always rendered, fades in/out smoothly */}
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            width: '100%', height: '100%',
+            transform: `scale(${isHolding ? (phase === 'inhale_hold' ? 1.04 : 0.44) : animatedScale > 0.7 ? 1.04 : 0.44})`,
+            opacity: isHolding ? 1 : 0,
+            transition: 'transform 0.5s ease-out, opacity 0.8s ease-in-out',
+          }}
+        >
           <div
-            className="absolute pointer-events-none"
+            className="w-full h-full rounded-full"
             style={{
-              width: '100%', height: '100%',
-              transform: `scale(${phase === 'inhale_hold' ? 1.04 : 0.44})`,
-              transition: 'transform 0.5s ease-out',
+              border: '2px solid rgba(167,139,250,0.18)',
+              borderTopColor: 'rgba(196,181,253,0.85)',
+              borderRightColor: 'rgba(196,181,253,0.1)',
+              borderBottomColor: 'rgba(167,139,250,0.45)',
+              borderLeftColor: 'rgba(196,181,253,0.08)',
+              animation: isHolding
+                ? `${phase === 'inhale_hold' ? 'imm-spin-cw' : 'imm-spin-ccw'} 6s linear infinite, imm-ring-glow 3s ease-in-out infinite`
+                : 'none',
             }}
-          >
-            <div
-              className="w-full h-full rounded-full"
-              style={{
-                border: '2px solid rgba(167,139,250,0.18)',
-                borderTopColor: 'rgba(196,181,253,0.85)',
-                borderRightColor: 'rgba(196,181,253,0.1)',
-                borderBottomColor: 'rgba(167,139,250,0.45)',
-                borderLeftColor: 'rgba(196,181,253,0.08)',
-                boxShadow: '0 0 24px rgba(139,92,246,0.35)',
-                animation: phase === 'inhale_hold'
-                  ? 'imm-spin-cw 6s linear infinite'
-                  : 'imm-spin-ccw 6s linear infinite',
-              }}
-            />
-          </div>
-        )}
+          />
+        </div>
 
         {/* Animated breathing circle — uses CSS transition like classic */}
         <div
