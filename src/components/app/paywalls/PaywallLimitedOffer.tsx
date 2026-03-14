@@ -80,7 +80,7 @@ export function PaywallLimitedOffer({ program, onPurchase, onRestore, onClose, p
         <button onClick={onClose} className="text-muted-foreground">
           <X className="h-5 w-5" />
         </button>
-        <button onClick={onRestore} className="text-sm text-muted-foreground hover:underline">
+        <button onClick={onRestore} className="text-sm text-muted-foreground underline">
           Restore
         </button>
       </div>
