@@ -310,10 +310,13 @@ export function RoutinePreviewSheet({
         >
           {isSelected && <Check className="w-4 h-4 text-white" />}
         </button>
-        <div className={cn(
-          'flex-1 rounded-2xl overflow-hidden',
-          colorClass
-        )}>
+        <button 
+          className={cn(
+            'flex-1 rounded-2xl overflow-hidden text-left',
+            colorClass
+          )}
+          onClick={() => setDetailTask({ task, index })}
+        >
           {/* Main content area */}
           <div className="flex items-center gap-3 px-3 pt-3 pb-2.5">
             <FluentEmoji emoji={display.icon || '📝'} size={40} className="shrink-0" />
@@ -321,12 +324,13 @@ export function RoutinePreviewSheet({
               <p className="text-xs font-medium text-black mb-0.5">{timeLabel}</p>
               <p className="font-semibold text-[15px] text-black leading-snug line-clamp-2">{display.title}</p>
             </div>
-            <button 
+            <div 
               className={cn("shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-black/60 active:scale-95 transition-transform", darkColorClass)}
-              onClick={() => openTaskEditor(task, index)}
+              onClick={(e) => { e.stopPropagation(); openTaskEditor(task, index); }}
+              role="button"
             >
               <Pencil className="w-3.5 h-3.5" />
-            </button>
+            </div>
           </div>
           {/* Footer strip with repeat info */}
           <div className={cn('px-4 py-3.5', darkColorClass)}>
@@ -334,7 +338,7 @@ export function RoutinePreviewSheet({
               {getRepeatLabel(task, display.repeatPattern)}
             </p>
           </div>
-        </div>
+        </button>
       </div>
     );
   };
