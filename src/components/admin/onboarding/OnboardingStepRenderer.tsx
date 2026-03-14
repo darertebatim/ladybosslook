@@ -2696,13 +2696,110 @@ function PersonalizedPlanScreen({ step, onNext, answers }: { step: OnboardingSte
 
 // ─── Daily Reset Prompt ────────────────────────────────────────
 
-const DAILY_RESET_TASKS = [
-  { emoji: '📱', title: 'Open Ladyboss App', color: '#FFEDD5' },
-  { emoji: '🫁', title: 'Breathing exercise', color: '#DBEAFE' },
-  { emoji: '🌤️', title: 'Check in with your mood', color: '#FEF3C7' },
-  { emoji: '📝', title: 'Write a short journaling', color: '#F3E8FF' },
-  { emoji: '✅', title: 'Complete onboarding', color: '#D1FAE5' },
+const DAILY_RESET_WHEEL = [
+  { emoji: '📱', title: 'Open App', color: '#FFEDD5' },
+  { emoji: '🫁', title: 'Breathe', color: '#DBEAFE' },
+  { emoji: '🌤️', title: 'Mood', color: '#FEF3C7' },
+  { emoji: '📝', title: 'Journal', color: '#F3E8FF' },
 ];
+
+function LoopWheel() {
+  return (
+    <div className="relative w-[220px] h-[220px] mx-auto">
+      {/* Center icon */}
+      <div className="absolute inset-0 flex items-center justify-center z-10">
+        <div className="w-14 h-14 rounded-full bg-white shadow-lg flex items-center justify-center">
+          <FluentEmoji emoji="🔄" size={28} />
+        </div>
+      </div>
+
+      {/* Connecting ring */}
+      <div className="absolute inset-[30px] rounded-full border-2 border-dashed border-[#1a1f3d]/10" />
+
+      {/* Animated connecting ring glow */}
+      <svg className="absolute inset-[28px] w-[calc(100%-56px)] h-[calc(100%-56px)]" viewBox="0 0 100 100">
+        <circle
+          cx="50" cy="50" r="48"
+          fill="none"
+          stroke="url(#wheelGrad)"
+          strokeWidth="1.5"
+          strokeDasharray="12 8"
+          style={{ animation: 'spinWheel 20s linear infinite' }}
+        />
+        <defs>
+          <linearGradient id="wheelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.4" />
+            <stop offset="50%" stopColor="#2dd4bf" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#fbbf24" stopOpacity="0.4" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      {/* 4 task nodes positioned around the circle */}
+      {DAILY_RESET_WHEEL.map((task, i) => {
+        const angle = (i * 90 - 90) * (Math.PI / 180); // start from top
+        const radius = 85;
+        const x = 110 + radius * Math.cos(angle) - 28;
+        const y = 110 + radius * Math.sin(angle) - 28;
+
+        return (
+          <motion.div
+            key={task.title}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 + i * 0.15, type: 'spring', stiffness: 200, damping: 15 }}
+            className="absolute flex flex-col items-center"
+            style={{ left: x, top: y, width: 56 }}
+          >
+            <div
+              className="w-[52px] h-[52px] rounded-2xl flex items-center justify-center shadow-md"
+              style={{ backgroundColor: task.color }}
+            >
+              <FluentEmoji emoji={task.emoji} size={28} />
+            </div>
+            <span className="text-[10px] font-semibold text-[#1a1f3d]/70 mt-1 text-center leading-tight">
+              {task.title}
+            </span>
+          </motion.div>
+        );
+      })}
+
+      {/* Directional arrows between nodes */}
+      {DAILY_RESET_WHEEL.map((_, i) => {
+        const startAngle = (i * 90 - 90 + 25) * (Math.PI / 180);
+        const endAngle = (i * 90 - 90 + 65) * (Math.PI / 180);
+        const midAngle = (startAngle + endAngle) / 2;
+        const r = 85;
+        const mx = 110 + r * Math.cos(midAngle);
+        const my = 110 + r * Math.sin(midAngle);
+
+        return (
+          <motion.div
+            key={`arrow-${i}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.35 }}
+            transition={{ delay: 0.8 + i * 0.1 }}
+            className="absolute text-[#1a1f3d] text-[10px] pointer-events-none"
+            style={{
+              left: mx - 5,
+              top: my - 5,
+              transform: `rotate(${i * 90}deg)`,
+            }}
+          >
+            ›
+          </motion.div>
+        );
+      })}
+
+      <style>{`
+        @keyframes spinWheel {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
+  );
+}
 
 function DailyResetPromptScreen({ step, onNext }: Props) {
   const [added, setAdded] = useState(false);
@@ -2725,11 +2822,11 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
     <BottomSheetWrapper bgImage={meplusMascotBg}>
       {/* Celebration badge */}
       <FadeUp>
-        <div className="flex flex-col items-center mb-4">
-          <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-3">
-            <FluentEmoji emoji="🎉" size={36} />
+        <div className="flex flex-col items-center mb-3">
+          <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-2">
+            <FluentEmoji emoji="🎉" size={32} />
           </div>
-          <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center leading-tight">
+          <h1 className="text-[20px] font-extrabold text-[#1a1f3d] text-center leading-tight">
             You completed your first<br />Daily Reset!
           </h1>
         </div>
@@ -2737,38 +2834,18 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
 
       {/* Description */}
       <FadeUp delay={0.1}>
-        <p className="text-[14px] text-[#1a1f3d]/55 leading-relaxed text-center mb-5">
-          A simple daily routine to help you reset, refocus, and start each day with intention.
+        <p className="text-[13px] text-[#1a1f3d]/55 leading-relaxed text-center mb-4">
+          A simple daily routine to help you reset, refocus,<br />and start each day with intention.
         </p>
       </FadeUp>
 
-      {/* Task list preview */}
+      {/* Loop Wheel */}
       <FadeUp delay={0.15}>
-        <div className="space-y-2 mb-4">
-          {DAILY_RESET_TASKS.map((task, i) => (
-            <motion.div
-              key={task.title}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 + i * 0.08, duration: 0.3 }}
-              className="flex items-center gap-3 rounded-2xl p-3"
-              style={{ backgroundColor: task.color + '40' }}
-            >
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                style={{ backgroundColor: task.color }}
-              >
-                <FluentEmoji emoji={task.emoji} size={20} />
-              </div>
-              <p className="font-semibold text-[13px] text-[#1a1f3d]">{task.title}</p>
-              <SealCheck className="w-5 h-5 text-teal-400 ml-auto" />
-            </motion.div>
-          ))}
-        </div>
+        <LoopWheel />
       </FadeUp>
 
       {/* Bottom button */}
-      <FadeUp delay={0.5} className="mt-auto">
+      <FadeUp delay={0.5} className="mt-auto pt-4">
         {!added ? (
           <NavyButton onClick={handleAdd}>
             Add to my daily routine
