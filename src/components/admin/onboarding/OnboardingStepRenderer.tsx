@@ -2504,7 +2504,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
               <h2 className="text-xl font-bold text-[#1a1f3d] mb-1">
                 You feel {selectedMoodLabel.toLowerCase()}
               </h2>
-              <p className="text-sm text-gray-500">
+               <p className="text-sm text-[#1a1f3d]">
                 Take a moment to breathe and reset your mind.
               </p>
             </div>
