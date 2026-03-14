@@ -1103,7 +1103,7 @@ const AppTaskCreate = ({
             ) : (
               <span>Off</span>
             )}
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-black/40" />
           </div>
         </button>
       </div>
