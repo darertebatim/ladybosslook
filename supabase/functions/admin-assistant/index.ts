@@ -348,14 +348,14 @@ async function createActionInBank(supabase: any, args: any) {
   }).select("id, title, emoji, category").single();
 
   if (error) {
-    console.error("Insert action error:", error);
+    console.error("Insert task error:", error);
     return { success: false, error: error.message, action: "create_action_in_bank" };
   }
 
   return {
     success: true,
     action: "create_action_in_bank",
-    message: `Created action "${data.title}" in ${data.category} category`,
+    message: `Created task "${data.title}" in ${data.category} category`,
     created: data,
   };
 }
@@ -458,12 +458,12 @@ async function createBreathingExercise(supabase: any, args: any) {
 
 async function updateActionInBank(supabase: any, args: any) {
   if (!args.id) {
-    return { success: false, error: "Missing action ID", action: "update_action_in_bank" };
+    return { success: false, error: "Missing task ID", action: "update_action_in_bank" };
   }
 
   const resolved = await resolveActionId(supabase, args.id);
   if (!resolved) {
-    return { success: false, error: `Action not found: "${args.id}". Use the exact UUID from context.`, action: "update_action_in_bank" };
+    return { success: false, error: `Task not found: "${args.id}". Use the exact UUID from context.`, action: "update_action_in_bank" };
   }
 
   const updates: Record<string, any> = {};
@@ -486,14 +486,14 @@ async function updateActionInBank(supabase: any, args: any) {
     .single();
 
   if (error) {
-    console.error("Update action error:", error);
+    console.error("Update task error:", error);
     return { success: false, error: error.message, action: "update_action_in_bank" };
   }
 
   return {
     success: true,
     action: "update_action_in_bank",
-    message: `Updated action "${data.title}"`,
+    message: `Updated task "${data.title}"`,
     created: data,
   };
 }
@@ -585,7 +585,7 @@ async function updateBreathingExercise(supabase: any, args: any) {
 
 async function addSubtasksToAction(supabase: any, args: any) {
   if (!args.task_id) {
-    return { success: false, error: "Missing task_id (action ID)", action: "add_subtasks_to_action" };
+    return { success: false, error: "Missing task_id (task ID)", action: "add_subtasks_to_action" };
   }
   if (!args.subtasks?.length) {
     return { success: false, error: "No subtasks provided", action: "add_subtasks_to_action" };
@@ -613,7 +613,7 @@ async function addSubtasksToAction(supabase: any, args: any) {
   return {
     success: true,
     action: "add_subtasks_to_action",
-    message: `Added ${inserted.length} subtask(s) to action`,
+    message: `Added ${inserted.length} subtask(s) to task`,
     created: inserted,
   };
 }
@@ -642,12 +642,12 @@ async function deleteSubtask(supabase: any, args: any) {
 
 async function deleteActionFromBank(supabase: any, args: any) {
   if (!args.id) {
-    return { success: false, error: "Missing action ID", action: "delete_action_from_bank" };
+    return { success: false, error: "Missing task ID", action: "delete_action_from_bank" };
   }
 
   const resolved = await resolveActionId(supabase, args.id);
   if (!resolved) {
-    return { success: false, error: `Action not found: "${args.id}". Make sure to use the exact UUID from context.`, action: "delete_action_from_bank" };
+    return { success: false, error: `Task not found: "${args.id}". Make sure to use the exact UUID from context.`, action: "delete_action_from_bank" };
   }
 
   // Delete subtasks first
@@ -655,20 +655,20 @@ async function deleteActionFromBank(supabase: any, args: any) {
     .delete()
     .eq("task_id", resolved.id);
 
-  // Delete the action
+  // Delete the task
   const { error } = await supabase.from("admin_task_bank")
     .delete()
     .eq("id", resolved.id);
 
   if (error) {
-    console.error("Delete action error:", error);
+    console.error("Delete task error:", error);
     return { success: false, error: error.message, action: "delete_action_from_bank" };
   }
 
   return {
     success: true,
     action: "delete_action_from_bank",
-    message: `Deleted action "${resolved.title}"`,
+    message: `Deleted task "${resolved.title}"`,
   };
 }
 
@@ -1053,14 +1053,14 @@ ${context.feedChannels?.map((c: any) => `- "${c.name}" (ID: ${c.id}, slug: ${c.s
 
   if (currentPage === "tools") {
     prompt += `
-## Current Page: TOOLS (Actions Bank, Routines Bank, Breathing Exercises)
+## Current Page: TOOLS (Tasks Bank, Routines Bank, Breathing Exercises)
 
 You can DIRECTLY CREATE, UPDATE, and DELETE items in the database. When the user asks you to do something, USE THE TOOLS to do it immediately.
 
 ### Available Categories
 ${context.categories?.map((c: any) => `- ${c.icon || "📌"} ${c.name} (slug: "${c.slug}")`).join("\n") || "None"}
 
-### Existing Actions (${context.existingActions?.length || 0} active)
+### Existing Tasks (${context.existingActions?.length || 0} active)
 ${context.existingActions?.slice(0, 20).map((a: any) => {
   const subs = (context.actionSubtasks || []).filter((s: any) => s.task_id === a.id);
   const subText = subs.length ? ` | Subtasks: ${subs.map((s: any) => `"${s.title}" (ID:${s.id})`).join(', ')}` : '';
@@ -1078,16 +1078,16 @@ ${context.existingRoutines?.map((r: any) => {
 ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "🌬️"} ${b.name} [${b.category}]`).join("\n") || "None"}
 
 ### What You Can Do (DIRECT DATABASE ACTIONS):
-- "Create a morning meditation action" → create_action_in_bank
-- "Add 5 self-care actions" → call create_action_in_bank multiple times
+- "Create a morning meditation task" → create_action_in_bank
+- "Add 5 self-care tasks" → call create_action_in_bank multiple times
 - "Create a morning routine with tasks" → create_ritual_in_bank
 - "Add a 4-7-8 breathing exercise" → create_breathing_exercise
 - "Change the category of X" → update_action_in_bank / update_ritual_in_bank
 - "Rename X to Y" → use the update tool with the item's ID
 - "Deactivate X" → update tool with is_active: false
-- "Add subtasks to action X" → add_subtasks_to_action
+- "Add subtasks to task X" → add_subtasks_to_action
 - "Remove subtask Y" → delete_subtask
-- **"Delete action X"** → delete_action_from_bank (deletes the action and its subtasks)
+- **"Delete task X"** → delete_action_from_bank (deletes the task and its subtasks)
 - **"Delete routine X"** → delete_ritual_from_bank (deletes the routine, its tasks)
 - **"Delete breathing exercise X"** → delete_breathing_exercise
 - **"Add tasks to routine X"** → add_tasks_to_routine (adds new tasks to an existing routine)
@@ -1095,8 +1095,8 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 - **"Generate a cover for routine X"** → generate_routine_cover (generates a Simora-style pastel cover image using AI and uploads it)
 
 ### SUBTASKS EXPLAINED:
-- **Subtasks** are smaller steps/checklist items that belong to an ACTION (admin_task_bank item).
-- Each action can have multiple subtasks (e.g., "Workout" → subtasks: "20 leg rises", "10 heel touches", "1 min plank").
+- **Subtasks** are smaller steps/checklist items that belong to a TASK (admin_task_bank item).
+- Each task can have multiple subtasks (e.g., "Workout" → subtasks: "20 leg rises", "10 heel touches", "1 min plank").
 - Use add_subtasks_to_action to add them, delete_subtask to remove one.
 
 ### ROUTINE DESCRIPTION (BLOG-STYLE RICH TEXT):
@@ -1124,9 +1124,9 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 8. To find the correct item ID for updates, match by title from the existing items lists above
 9. When asked to CHANGE a COLOR: you MUST pick a DIFFERENT hex color than the current one shown in context. Do NOT re-use the same color. Choose a visually distinct new color.
 10. If the user says "change color" without specifying which color, pick a beautiful new color that fits the item's theme.
-11. When user mentions "subtasks", "steps", "checklist items" for an ACTION → use add_subtasks_to_action tool. Match the action by title to find its ID.
+11. When user mentions "subtasks", "steps", "checklist items" for a TASK → use add_subtasks_to_action tool. Match the task by title to find its ID.
 12. When user asks to remove/delete a subtask → use delete_subtask with the subtask's ID from context.
-13. When user says "delete", "remove" an action/ritual/exercise → use the appropriate delete tool. Always confirm what was deleted.
+13. When user says "delete", "remove" a task/ritual/exercise → use the appropriate delete tool. Always confirm what was deleted.
 14. When user asks to add tasks to an existing routine → use add_tasks_to_routine. Match the routine by title to find its ID.
 15. When user asks to remove a task from a routine → use delete_routine_task with the task's ID from context.
 16. When user says "generate cover", "create cover image", "make a cover" for a routine → use generate_routine_cover.
@@ -1180,7 +1180,7 @@ ${context.programs?.map((p: any) => `- ${p.title} (${p.slug}) - ${p.type}`).join
 - When on the Tools page and user asks to CREATE something, ALWAYS use the direct-action create tools
 - When user asks to CHANGE, EDIT, UPDATE, MOVE, or RENAME something, ALWAYS use the UPDATE tools with the item's ID from the context. NEVER create a duplicate.
 - When user asks to DELETE or REMOVE something, use the appropriate DELETE tool with the item's ID from context.
-- The IDs listed in "Existing Actions/Routines/Exercises" above are real database IDs — use them for updates and deletes
+- The IDs listed in "Existing Tasks/Routines/Exercises" above are real database IDs — use them for updates and deletes
 - Use appropriate emojis for each item
 - Match Ladyboss brand: warm, empowering, wellness-focused
 - For bilingual: English first, then Farsi if requested
@@ -1203,15 +1203,15 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "create_action_in_bank",
-          description: "Create a new action directly in the Actions Bank database. This IMMEDIATELY creates the action.",
+          description: "Create a new task directly in the Tasks Bank database. This IMMEDIATELY creates the task.",
           parameters: {
             type: "object",
             properties: {
-              title: { type: "string", description: "Action title (e.g., '10-min meditation')" },
-              emoji: { type: "string", description: "Single emoji for the action (e.g., '🧘')" },
+              title: { type: "string", description: "Task title (e.g., '10-min meditation')" },
+              emoji: { type: "string", description: "Single emoji for the task (e.g., '🧘')" },
               category: { type: "string", description: "Category slug from available categories (e.g., 'morning', 'wellness')" },
               color: { type: "string", description: "Hex color (e.g., '#8B5CF6')" },
-              description: { type: "string", description: "Brief description of the action" },
+              description: { type: "string", description: "Brief description of the task" },
               duration_minutes: { type: "number", description: "Duration in minutes" },
               time_period: { type: "string", enum: ["morning", "afternoon", "evening", "anytime"], description: "Best time of day" },
               repeat_pattern: { type: "string", enum: ["daily", "weekly", "custom"], description: "Repeat schedule" },
@@ -1251,7 +1251,7 @@ function getToolDefinitions(currentPage?: string) {
               },
               tasks: {
                 type: "array",
-                description: "Tasks/actions within the routine",
+                description: "Tasks within the routine",
                 items: {
                   type: "object",
                   properties: {
@@ -1302,11 +1302,11 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "update_action_in_bank",
-          description: "Update an EXISTING action in the Actions Bank. Use this when the user wants to change, edit, move category, rename, or modify an action. Do NOT create a new one.",
+          description: "Update an EXISTING task in the Tasks Bank. Use this when the user wants to change, edit, move category, rename, or modify a task. Do NOT create a new one.",
           parameters: {
             type: "object",
             properties: {
-              id: { type: "string", description: "The ID of the existing action to update (from context)" },
+              id: { type: "string", description: "The ID of the existing task to update (from context)" },
               title: { type: "string", description: "New title" },
               emoji: { type: "string", description: "New emoji" },
               category: { type: "string", description: "New category slug" },
@@ -1380,11 +1380,11 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "add_subtasks_to_action",
-          description: "Add subtasks (checklist steps) to an existing action in the Actions Bank.",
+          description: "Add subtasks (checklist steps) to an existing task in the Tasks Bank.",
           parameters: {
             type: "object",
             properties: {
-              task_id: { type: "string", description: "The ID of the action to add subtasks to" },
+              task_id: { type: "string", description: "The ID of the task to add subtasks to" },
               subtasks: {
                 type: "array",
                 description: "Array of subtasks to add",
@@ -1405,7 +1405,7 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "delete_subtask",
-          description: "Delete a specific subtask from an action. Use the subtask's ID from context.",
+          description: "Delete a specific subtask from a task. Use the subtask's ID from context.",
           parameters: {
             type: "object",
             properties: {
@@ -1423,11 +1423,11 @@ function getToolDefinitions(currentPage?: string) {
         type: "function",
         function: {
           name: "delete_action_from_bank",
-          description: "Permanently DELETE an action from the Actions Bank and all its subtasks. Use when user says 'delete', 'remove' an action.",
+          description: "Permanently DELETE a task from the Tasks Bank and all its subtasks. Use when user says 'delete', 'remove' a task.",
           parameters: {
             type: "object",
             properties: {
-              id: { type: "string", description: "The ID of the action to delete (from context)" },
+              id: { type: "string", description: "The ID of the task to delete (from context)" },
             },
             required: ["id"],
           },
