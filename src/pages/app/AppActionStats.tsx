@@ -160,7 +160,7 @@ const AppActionStats = () => {
           </div>
 
           {/* Task Stats Calendar */}
-          <h3 className="text-base font-bold text-foreground mb-3">Action Stats</h3>
+          <h3 className="text-base font-bold text-foreground mb-3">Task Stats</h3>
           <div className="bg-white rounded-2xl p-4 shadow-sm mb-6">
             {/* Month navigation */}
             <div className="flex items-center justify-between mb-4">
