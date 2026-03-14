@@ -519,6 +519,52 @@ export function RoutinePreviewSheet({
 
       <SaveRoutineHandHint show={showSaveHint} />
 
+      {/* Task Detail Dialog */}
+      {detailTask && (() => {
+        const { task, index } = detailTask;
+        const display = getTaskDisplay(task, index);
+        const colorClass = TASK_COLOR_CLASSES[display.color];
+        const darkColorClass = TASK_COLOR_DARK_CLASSES[display.color] || 'bg-black/10';
+        const edited = editedTasks[task.id];
+        const timeLabel = formatTimeLabel({
+          scheduled_time: edited?.scheduledTime ?? (task as any).scheduled_time ?? null,
+          time_period: (task as any).time_period ?? null,
+        });
+        const repeatLabel = getRepeatLabel(task, display.repeatPattern);
+        return (
+          <Dialog open={!!detailTask} onOpenChange={(v) => !v && setDetailTask(null)}>
+            <DialogContent hideCloseButton className="sm:max-w-md p-0 gap-0 bg-transparent border-0 shadow-none flex flex-col">
+              <div className={cn('rounded-3xl overflow-hidden', colorClass)}>
+                <div className="px-4 pt-4 pb-3">
+                  <div className="flex items-center gap-3">
+                    <FluentEmoji emoji={display.icon || '📝'} size={40} className="shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-black/80">{timeLabel}</p>
+                      <p className="text-black text-[15px] font-semibold">{display.title}</p>
+                      {task.description && (
+                        <p className="text-[13px] text-black/60 mt-0.5">{task.description}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className={cn('px-4 py-3.5', darkColorClass)}>
+                  <p className="text-[13px] font-medium text-black text-center">{repeatLabel}</p>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-3">
+                <Button
+                  onClick={() => { setDetailTask(null); openTaskEditor(task, index); }}
+                  className="flex-1 gap-2 h-11 rounded-2xl border-0 bg-white text-black text-sm shadow-sm active:scale-95 transition-transform"
+                >
+                  <Pencil className="h-4 w-4" />
+                  Edit Action
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        );
+      })()}
+
       {/* Full Task Edit Sheet - uses the REAL AppTaskCreate component */}
       {editingTask && (
         <AppTaskCreate
