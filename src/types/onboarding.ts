@@ -36,7 +36,8 @@ export type OnboardingStepType =
   | 'personalized-plan'
   | 'starter-routine'
   | 'daily-reset-prompt'
-  | 'before-after-visual';
+  | 'before-after-visual'
+  | 'text-input';
 export interface OnboardingOption {
   label: string;
   emoji?: string;
