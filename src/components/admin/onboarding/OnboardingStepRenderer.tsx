@@ -2193,12 +2193,13 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
   const handleFeelingBreatheTap = () => {
     setShowMoodFeeling(false);
-    setPhase('spotlight-breathe');
+    // Pause before spotlighting breathe — don't rush
+    addTimer(() => setPhase('spotlight-breathe'), 1200);
   };
 
   const handleFeelingDismiss = () => {
     setShowMoodFeeling(false);
-    setPhase('spotlight-breathe');
+    addTimer(() => setPhase('spotlight-breathe'), 1200);
   };
 
   // Show feeling overlay when phase reaches feeling-mood
