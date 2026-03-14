@@ -1995,7 +1995,8 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     <div className="fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center">
       {/* Exercise name + cycle count */}
       <p className="text-sm text-muted-foreground mb-1 font-medium">{exercise.name}</p>
-      <p className="text-xs text-muted-foreground/60 mb-8">{cycleCount}/{targetCycles} breaths</p>
+      <p className="text-xs text-muted-foreground/60">{cycleCount}/{targetCycles} breaths</p>
+      <p className="text-xs text-muted-foreground/60 mb-6">{inhaleSeconds}s in • {normalizedInhaleHold}s hold • {exhaleSeconds}s out • {normalizedExhaleHold}s hold</p>
 
       {/* Real BreathingCircle component */}
       <BreathingCircle
