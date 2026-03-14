@@ -1812,7 +1812,7 @@ interface StarterTask {
 }
 
 const STARTER_TASKS: StarterTask[] = [
-  { emoji: '📱', title: 'Open the app', subtitle: 'You already did this one!', color: '#FFEDD5', taskColor: 'orange', repeatPattern: 'daily' },
+  { emoji: '📱', title: 'Open Ladyboss App', subtitle: 'You already did this one!', color: '#FFEDD5', taskColor: 'orange', repeatPattern: 'daily' },
   { emoji: '🫁', title: 'Breathing exercise', subtitle: '2 min guided breathwork', color: '#DBEAFE', taskColor: 'blue', proLinkType: 'breathe', repeatPattern: 'daily' },
   { emoji: '🌤️', title: 'Check in with your mood', subtitle: 'How are you feeling right now?', color: '#FEF3C7', taskColor: 'yellow', proLinkType: 'mood', repeatPattern: 'daily' },
   { emoji: '📝', title: 'Write a short journaling', subtitle: 'One sentence about your day', color: '#F3E8FF', taskColor: 'purple', proLinkType: 'journal', repeatPattern: 'daily' },
