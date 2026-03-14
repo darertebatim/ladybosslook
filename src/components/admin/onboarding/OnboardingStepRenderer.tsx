@@ -2837,15 +2837,34 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
     setTimeout(onNext, 1200);
   };
 
+  // Fire celebration effects on mount
+  useEffect(() => {
+    haptic.success();
+    playCompletionSound();
+    // Initial burst
+    confetti({
+      particleCount: 70,
+      spread: 80,
+      origin: { y: 0.35 },
+      colors: ['#2dd4bf', '#34d399', '#a78bfa', '#fbbf24', '#ec4899'],
+    });
+    // Delayed side bursts
+    const t = setTimeout(() => {
+      confetti({ particleCount: 30, angle: 60, spread: 50, origin: { x: 0, y: 0.5 }, colors: ['#FFD700', '#FFA500', '#9370DB'] });
+      confetti({ particleCount: 30, angle: 120, spread: 50, origin: { x: 1, y: 0.5 }, colors: ['#FFD700', '#FFA500', '#9370DB'] });
+    }, 600);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <BottomSheetWrapper bgImage={meplusMascotBg} headerHeight={140}>
       {/* Celebration badge */}
       <FadeUp>
-        <div className="flex flex-col items-center mb-2">
-          <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mb-1.5">
-            <FluentEmoji emoji="🎉" size={28} />
+        <div className="flex flex-col items-center mb-3">
+          <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-2">
+            <FluentEmoji emoji="🎉" size={32} />
           </div>
-          <h1 className="text-[19px] font-extrabold text-[#1a1f3d] text-center leading-tight">
+          <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center leading-tight">
             You completed your first<br />Daily Reset!
           </h1>
         </div>
@@ -2853,7 +2872,7 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
 
       {/* Description */}
       <FadeUp delay={0.1}>
-        <p className="text-[12px] text-[#1a1f3d]/55 leading-relaxed text-center mb-2">
+        <p className="text-[15px] text-[#1a1f3d]/55 leading-relaxed text-center mb-3">
           A simple daily routine to help you reset, refocus,<br />and start each day with intention.
         </p>
       </FadeUp>
