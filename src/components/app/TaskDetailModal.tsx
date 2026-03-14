@@ -357,7 +357,7 @@ export const TaskDetailModal = ({
                 onClose();
                 onDelete(task);
               }}
-              className="gap-1.5 h-11 px-5 rounded-2xl border-0 bg-[#E07060] hover:bg-[#d06050] active:scale-95 transition-transform text-white text-sm shadow-sm"
+              className="gap-1.5 h-11 px-5 rounded-2xl border-0 bg-[#E07060] active:scale-95 transition-transform text-white text-sm shadow-sm"
             >
               <Trash2 className="h-4 w-4" strokeWidth={2} />
               Delete
