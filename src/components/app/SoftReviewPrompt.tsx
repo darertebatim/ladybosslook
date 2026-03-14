@@ -97,7 +97,7 @@ export function SoftReviewPrompt({ isOpen, onClose, onAccept }: SoftReviewPrompt
           <div className="space-y-3">
             <Button
               onClick={handleYes}
-              className="w-full bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500 text-white font-semibold py-3 rounded-xl h-auto"
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold py-3 rounded-xl h-auto"
             >
               Yes, I'll Rate It! ⭐
             </Button>
