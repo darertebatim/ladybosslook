@@ -226,10 +226,20 @@ export function BreathingExerciseScreen({
         },
       }
     );
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
     setIsActive(false);
     setTotalElapsed(0);
     setCycleCount(0);
     setCurrentPhaseIndex(0);
+    totalElapsedRef.current = 0;
+    cycleCountRef.current = 0;
+    currentPhaseIndexRef.current = 0;
+    phaseTimeRemainingRef.current = 0;
   }, [exercise.id, saveSession, autoCompleteBreathe]);
 
   const handleStart = useCallback(() => {
@@ -238,6 +248,12 @@ export function BreathingExerciseScreen({
     setCurrentPhaseIndex(0);
     setCountdown(3);
     setIsCountingDown(true);
+
+    totalElapsedRef.current = 0;
+    cycleCountRef.current = 0;
+    currentPhaseIndexRef.current = 0;
+    phaseTimeRemainingRef.current = 0;
+
     haptic.medium();
   }, []);
 
