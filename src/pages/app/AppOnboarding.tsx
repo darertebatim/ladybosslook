@@ -76,6 +76,12 @@ export default function AppOnboarding() {
 
   const [currentStep, setCurrentStep] = useState(() => {
     try {
+      // If returning from breathing exercise, jump to the welcome-aboard step
+      if (localStorage.getItem('onboarding_breathe_pending')) {
+        localStorage.removeItem('onboarding_breathe_pending');
+        const welcomeIdx = flow?.steps.findIndex(s => s.type === 'welcome-aboard') ?? -1;
+        if (welcomeIdx >= 0) return welcomeIdx;
+      }
       const saved = localStorage.getItem(progressKey);
       return saved ? parseInt(saved, 10) : 0;
     } catch { return 0; }
