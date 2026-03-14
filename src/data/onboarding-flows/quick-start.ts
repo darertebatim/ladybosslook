@@ -46,6 +46,17 @@ export const quickStartFlow: OnboardingFlow = {
       description: '"It feels like having a little daily reset button in my pocket."\n— Yalda-M ⭐⭐⭐⭐⭐',
       buttonLabel: 'Continue',
     },
+    // 3b — Before/After visual comparison
+    {
+      id: 'qs-before-after',
+      type: 'before-after-visual',
+      title: 'Your daily reset button',
+      subtitle: 'A few minutes with Simora\ncan reset your mind and your day.',
+      description: 'Think of Simora as a little daily reset button\nin your pocket.',
+      beforeItems: ['Overwhelmed mind', 'Scattered thoughts', 'Low motivation', 'No clear next step'],
+      afterItems: ['Calm mind', 'Clear focus', 'One small step', 'Energy to continue'],
+      buttonLabel: 'Try your first reset',
+    },
     // 4 — Starter routine preview with real task cards
     {
       id: 'qs-starter-routine',

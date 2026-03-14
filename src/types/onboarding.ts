@@ -35,7 +35,8 @@ export type OnboardingStepType =
   | 'confetti-message'
   | 'personalized-plan'
   | 'starter-routine'
-  | 'daily-reset-prompt';
+  | 'daily-reset-prompt'
+  | 'before-after-visual';
 export interface OnboardingOption {
   label: string;
   emoji?: string;
