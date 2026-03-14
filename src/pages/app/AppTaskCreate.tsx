@@ -1860,7 +1860,7 @@ const AppTaskCreate = ({
                         }
                       }}
                       className={cn(
-                        'w-full flex items-center gap-3 p-4 rounded-xl hover:bg-muted/80 text-left',
+                        'w-full flex items-center gap-3 p-4 rounded-xl active:bg-muted/80 text-left',
                         isSelected && 'bg-violet-100 dark:bg-violet-900/30 ring-2 ring-violet-500'
                       )}
                     >
