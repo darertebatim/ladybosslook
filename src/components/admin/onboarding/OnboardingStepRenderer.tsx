@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { playCompletionSound } from '@/lib/completionSound';
+import { haptic } from '@/lib/haptics';
 
 import { BreathingInfoSheet } from '@/components/breathe/BreathingInfoSheet';
 import { ImmersiveBreathingCircle, ImmersiveParticles, getImmersiveBgGradient } from '@/components/breathe/ImmersiveBreathingCircle';
