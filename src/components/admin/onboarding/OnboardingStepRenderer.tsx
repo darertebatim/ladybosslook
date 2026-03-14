@@ -1957,6 +1957,9 @@ type DemoPhase =
   | 'spotlight-mood'
   | 'hint-mood'
   | 'celebrate-mood'
+  | 'spotlight-complete'
+  | 'hint-complete'
+  | 'celebrate-complete'
   | 'done';
 
 // ─── Mini inline breathing overlay for onboarding ──────────────
@@ -2068,6 +2071,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
   const BREATHE_IDX = 1;
   const MOOD_IDX = 2;
+  const COMPLETE_IDX = 4;
 
   const userTasks = STARTER_TASKS.map((t, i) => buildUserTask(t, i));
 
@@ -2115,6 +2119,8 @@ function StarterRoutineScreen({ step, onNext }: Props) {
       addTimer(() => setPhase('hint-breathe'), 800);
     } else if (phase === 'spotlight-mood') {
       addTimer(() => setPhase('hint-mood'), 800);
+    } else if (phase === 'spotlight-complete') {
+      addTimer(() => setPhase('hint-complete'), 800);
     }
   }, [phase]);
 
@@ -2162,7 +2168,13 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const handleMoodSelect = (moodValue: string) => {
     setShowMoodPicker(false);
     setPhase('celebrate-mood');
-    triggerCelebration(MOOD_IDX, 'done');
+    triggerCelebration(MOOD_IDX, 'spotlight-complete');
+  };
+
+  const handleCheckComplete = () => {
+    if (phase !== 'hint-complete' && phase !== 'spotlight-complete') return;
+    setPhase('celebrate-complete');
+    triggerCelebration(COMPLETE_IDX, 'done');
   };
 
   // Which phases show overlay
@@ -2172,6 +2184,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
     phase.includes('app') ? 0 :
     phase.includes('breathe') ? BREATHE_IDX :
     phase.includes('mood') ? MOOD_IDX :
+    phase.includes('complete') ? COMPLETE_IDX :
     -1;
 
   // Instruction text
@@ -2179,6 +2192,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
     (phase === 'spotlight-app' || phase === 'hint-app') ? <><FluentEmoji emoji="👆" size={20} /> Tap the circle to complete your first task!</> :
     (phase === 'spotlight-breathe' || phase === 'hint-breathe') ? <><FluentEmoji emoji="🫁" size={20} /> Now tap the Breathe button to try it!</> :
     (phase === 'spotlight-mood' || phase === 'hint-mood') ? <><FluentEmoji emoji="🌤️" size={20} /> Now check in with your mood!</> :
+    (phase === 'spotlight-complete' || phase === 'hint-complete') ? <><FluentEmoji emoji="✅" size={20} /> Tap to complete your onboarding!</> :
     phase === 'done' ? <><FluentEmoji emoji="✨" size={20} /> Tap Continue to keep going!</> :
     null;
 
@@ -2242,7 +2256,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
             const isVisible = phase === 'intro' ? false : phase === 'revealing' ? i < revealedCount : true;
             const isSpotlighted = spotlightIdx === i && !phase.startsWith('celebrate');
             const isCelebrating = celebratingIdx === i;
-            const showHintOnCircle = phase === 'hint-app' && i === 0;
+            const showHintOnCircle = (phase === 'hint-app' && i === 0) || (phase === 'hint-complete' && i === COMPLETE_IDX);
             const showHintOnCard = (phase === 'hint-breathe' && i === BREATHE_IDX) || (phase === 'hint-mood' && i === MOOD_IDX);
 
             return (
@@ -2292,12 +2306,12 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                     </div>
                   )}
 
-                  {/* Finger hint on completion circle (app task) */}
+                  {/* Finger hint on completion circle (app task / complete task) */}
                   {showHintOnCircle && (
                     <>
                       <button
                         className="absolute top-0 right-0 w-16 h-full z-50"
-                        onClick={handleCheckApp}
+                        onClick={i === 0 ? handleCheckApp : handleCheckComplete}
                       />
                       <div
                         className="pointer-events-none absolute z-[55] rounded-full animate-pulse"
