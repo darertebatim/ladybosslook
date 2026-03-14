@@ -16,7 +16,7 @@ export const tourSteps: Step[] = [
   },
   {
     target: '.tour-streak',
-    content: 'Your momentum! Honor actions daily to keep it growing. Can you reach 30 days?',
+    content: 'Your momentum! Honor tasks daily to keep it growing. Can you reach 30 days?',
     placement: 'bottom',
   },
   {
