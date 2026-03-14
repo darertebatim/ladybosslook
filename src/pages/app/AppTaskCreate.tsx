@@ -1067,7 +1067,7 @@ const AppTaskCreate = ({
         <button
           onClick={() => setShowGoalSettings(true)}
           className={cn(
-            "w-full flex items-center justify-between py-2 px-4 hover:bg-muted/30 active:bg-muted/50",
+            "w-full flex items-center justify-between py-2 px-4 active:bg-muted/50",
             goalSettings.enabled && "bg-emerald-50 dark:bg-emerald-900/20"
           )}
         >
