@@ -679,7 +679,7 @@ export default function AppPlaylistDetail() {
                   {({'american':'🇺🇸','turkish':'🇹🇷','spanish':'🇪🇸','all':'🌐'} as Record<string,string>)[playlist.language]}
                 </Badge>
               )}
-              {playlist.is_free && <Badge className="bg-white/20 text-white hover:bg-white/20">FREE</Badge>}
+              {playlist.is_free && <Badge className="bg-white/20 text-white">FREE</Badge>}
               {playlist.requires_subscription && (
                 <Badge className="bg-amber-200 text-amber-700 gap-1">
                   <Crown className="h-3 w-3" />
