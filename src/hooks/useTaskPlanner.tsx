@@ -1172,7 +1172,7 @@ export const useCreateTaskFromTemplate = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-      toast({ title: 'Action added from template! ✨' });
+      toast({ title: 'Task added from template! ✨' });
     },
     onError: (error) => {
       console.error('Create from template error:', error);
