@@ -458,12 +458,12 @@ async function createBreathingExercise(supabase: any, args: any) {
 
 async function updateActionInBank(supabase: any, args: any) {
   if (!args.id) {
-    return { success: false, error: "Missing action ID", action: "update_action_in_bank" };
+    return { success: false, error: "Missing task ID", action: "update_action_in_bank" };
   }
 
   const resolved = await resolveActionId(supabase, args.id);
   if (!resolved) {
-    return { success: false, error: `Action not found: "${args.id}". Use the exact UUID from context.`, action: "update_action_in_bank" };
+    return { success: false, error: `Task not found: "${args.id}". Use the exact UUID from context.`, action: "update_action_in_bank" };
   }
 
   const updates: Record<string, any> = {};
