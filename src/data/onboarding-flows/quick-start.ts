@@ -41,16 +41,15 @@ export const quickStartFlow: OnboardingFlow = {
       description: '"Think of it as a little daily reset button in your pocket."',
       buttonLabel: 'Continue',
     },
-    // 4 — Starter routine preview
+    // 4 — Starter routine preview with real task cards
     {
       id: 'qs-starter-routine',
-      type: 'confetti-message',
-      title: 'Here\'s your first routine ✨',
-      subtitle: 'A simple daily reset to start your journey:',
-      description: '🌤️ Check in with your mood\n🫁 Take a breathing exercise\n📝 Write a short reflection\n✅ Complete one small task',
+      type: 'starter-routine',
+      title: 'Here\'s your first routine',
+      subtitle: 'A simple daily reset to start your journey',
       buttonLabel: 'Start your first reset',
     },
-    // 4 — Welcome aboard
+    // 5 — Welcome aboard
     {
       id: 'qs-welcome-aboard',
       type: 'welcome-aboard',

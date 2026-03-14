@@ -93,6 +93,8 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <TaskSelectPurpleScreen step={step} onNext={onNext} />;
     case 'confetti-message':
       return <ConfettiMessageScreen step={step} onNext={onNext} />;
+    case 'starter-routine':
+      return <StarterRoutineScreen step={step} onNext={onNext} />;
     case 'personalized-plan':
       return <PersonalizedPlanScreen step={step} onNext={onNext} answers={answers} />;
     default:
@@ -1789,6 +1791,65 @@ function TaskSelectPurpleScreen({ step, onNext }: Props) {
         ))}
       </div>
     </ScreenWrapper>
+  );
+}
+
+// ─── Starter Routine Screen ──────────────────────────────────
+
+const STARTER_TASKS = [
+  { emoji: '🌤️', title: 'Check in with your mood', subtitle: 'How are you feeling right now?', color: '#FEF3C7' },
+  { emoji: '🫁', title: 'Breathing exercise', subtitle: '2 min guided breathwork', color: '#DBEAFE' },
+  { emoji: '📝', title: 'Write a short reflection', subtitle: 'One sentence about your day', color: '#F3E8FF' },
+  { emoji: '✅', title: 'Complete one small task', subtitle: 'Pick something quick & easy', color: '#D1FAE5' },
+];
+
+function StarterRoutineScreen({ step, onNext }: Props) {
+  return (
+    <div className="h-full flex flex-col bg-white">
+      <div className="flex-1 flex flex-col px-6 pt-8 pb-4">
+        {/* Header */}
+        <FadeUp>
+          <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center leading-tight">
+            {step.title}
+          </h1>
+        </FadeUp>
+        <FadeUp delay={0.08}>
+          <p className="text-[15px] text-gray-500 text-center mt-2 mb-8">{step.subtitle}</p>
+        </FadeUp>
+
+        {/* Task cards */}
+        <div className="space-y-3">
+          {STARTER_TASKS.map((task, i) => (
+            <FadeUp key={task.title} delay={0.15 + i * 0.1}>
+              <div
+                className="flex items-center gap-4 rounded-2xl p-4 active:scale-[0.98] transition-transform"
+                style={{ backgroundColor: task.color + '66' }}
+              >
+                {/* Emoji circle */}
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: task.color }}
+                >
+                  <FluentEmoji emoji={task.emoji} size={28} />
+                </div>
+                {/* Text */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-[15px] font-semibold text-[#1a1f3d] leading-snug">{task.title}</p>
+                  <p className="text-[13px] text-gray-500 mt-0.5">{task.subtitle}</p>
+                </div>
+                {/* Empty circle (like uncompleted task marker) */}
+                <div className="w-6 h-6 rounded-full border-2 border-gray-300 shrink-0" />
+              </div>
+            </FadeUp>
+          ))}
+        </div>
+      </div>
+
+      {/* CTA */}
+      <FadeUp delay={0.6} className="px-6 pb-6 pt-2">
+        <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
+      </FadeUp>
+    </div>
   );
 }
 
