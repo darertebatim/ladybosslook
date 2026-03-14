@@ -1383,10 +1383,10 @@ function BeforeAfterVisualScreen({ step, onNext }: Props) {
   return (
     <ScreenWrapper>
       <FadeUp>
-        <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight">{step.title}</h1>
+        <h1 className="text-[26px] font-extrabold text-black text-center mb-2 leading-tight whitespace-pre-line">{step.title}</h1>
       </FadeUp>
       <FadeUp delay={0.1}>
-        <p className="text-[15px] text-gray-400 text-center mb-5 whitespace-pre-line leading-relaxed">{step.subtitle}</p>
+        <p className="text-[16px] text-black text-center mb-5 whitespace-pre-line leading-relaxed">{step.subtitle}</p>
       </FadeUp>
 
       {/* Before/After comparison image */}
@@ -1398,7 +1398,7 @@ function BeforeAfterVisualScreen({ step, onNext }: Props) {
 
       {/* Bottom tagline */}
       <FadeUp delay={0.3}>
-        <p className="text-[15px] text-gray-400 text-center mb-5 whitespace-pre-line leading-relaxed italic">{step.description}</p>
+        <p className="text-[15px] text-black text-center mb-5 whitespace-pre-line leading-relaxed italic">{step.description}</p>
       </FadeUp>
 
       <FadeUp delay={0.35} className="mt-auto">
