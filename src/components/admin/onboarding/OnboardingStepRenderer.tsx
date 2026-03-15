@@ -487,7 +487,7 @@ function TextInputScreen({ step, onNext, onAnswer }: Props) {
   );
 
   if (hasBg) {
-    return <BottomSheetWrapper bgImage={meplusMascotBg}>{content}</BottomSheetWrapper>;
+    return <BottomSheetWrapper bgImage={step.image || meplusMascotBg}>{content}</BottomSheetWrapper>;
   }
 
   return <ScreenWrapper>{content}</ScreenWrapper>;
