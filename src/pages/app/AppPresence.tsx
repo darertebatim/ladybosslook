@@ -32,6 +32,7 @@ const AppPresence = () => {
   const { data: presence } = useUserPresence();
   const { data: streak } = useUserStreak();
   const { data: challenges } = useUserChallenges();
+  const { data: goldStreak } = useGoldStreak();
   const setStreakGoal = useSetStreakGoal();
   const recoverStreak = useRecoverStreak();
   const [showGoalSelection, setShowGoalSelection] = useState(false);
