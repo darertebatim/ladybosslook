@@ -87,6 +87,8 @@ export default function AppTest() {
   const [showStreakGoalCompletion, setShowStreakGoalCompletion] = useState(false);
   const [showChallengeSummary, setShowChallengeSummary] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showChallengeDayCelebration, setShowChallengeDayCelebration] = useState(false);
+  const [challengeDayTest, setChallengeDayTest] = useState(3);
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
     return (
