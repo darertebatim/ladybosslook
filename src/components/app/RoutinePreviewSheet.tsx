@@ -85,6 +85,7 @@ interface RoutinePreviewSheetProps {
   endMode?: string | null;
   endDate?: string | null;
   endAfterDays?: number | null;
+  badgeImageUrl?: string | null;
   onSave: (selectedTaskIds: string[], editedTasks: EditedTask[]) => void;
   isSaving?: boolean;
   isFree?: boolean;
