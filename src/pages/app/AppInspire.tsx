@@ -141,6 +141,17 @@ export default function AppInspire() {
                       onClick={() => navigate(`/app/routines/category/pro`, { state: { from: location.pathname } })}
                     />
                   )}
+                  {challengeRoutines.length > 0 && (
+                    <CategoryCircle
+                      name="Challenges"
+                      emoji="🔥"
+                      color="orange"
+                      onClick={() => {
+                        const el = document.getElementById('routine-category-challenges');
+                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }}
+                    />
+                  )}
                   {filteredPopular && filteredPopular.length > 0 && (
                     <CategoryCircle
                       name="Popular"
