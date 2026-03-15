@@ -12,6 +12,7 @@ import { WeeklyPresenceGrid } from '@/components/app/WeeklyPresenceGrid';
 import { StreakChallengeCard } from '@/components/app/StreakChallengeCard';
 import { RecoveryShields } from '@/components/app/RecoveryShields';
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
+import { EarnedBadgesCard } from '@/components/app/EarnedBadgesCard';
 import { PresenceProfileCard } from '@/components/app/PresenceProfileCard';
 import { SubscriptionCard } from '@/components/app/SubscriptionManagement';
 import { StreakGoalSelection, StreakGoalValue } from '@/components/app/StreakGoalSelection';
@@ -202,6 +203,9 @@ const AppPresence = () => {
                 challenge={challenge}
               />
             ))}
+
+            {/* Earned Challenge Badges */}
+            <EarnedBadgesCard />
             
             {/* All-Time Activity Stats */}
             <section className="bg-white rounded-2xl p-4 shadow-sm">

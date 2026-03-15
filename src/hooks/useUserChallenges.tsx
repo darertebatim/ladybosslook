@@ -16,6 +16,7 @@ export interface UserChallenge {
   /** Computed: the actual date the challenge begins for this user */
   computedStartDate: string | null;
   hasStarted: boolean;
+  badgeImageUrl: string | null;
 }
 
 /**
@@ -56,7 +57,7 @@ export function useUserChallenges() {
       // 2. Get only challenge-type routines with scheduling fields
       const { data: routines, error: rError } = await supabase
         .from('routines_bank')
-        .select('id, title, emoji, schedule_type, challenge_start_date, start_day_of_week, end_after_days, end_mode')
+        .select('id, title, emoji, schedule_type, challenge_start_date, start_day_of_week, end_after_days, end_mode, badge_image_url')
         .in('id', routineIds)
         .eq('schedule_type', 'challenge');
 
@@ -145,6 +146,7 @@ export function useUserChallenges() {
           addedAt,
           computedStartDate,
           hasStarted,
+          badgeImageUrl: (routine as any).badge_image_url || null,
         });
       }
 

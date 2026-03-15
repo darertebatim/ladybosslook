@@ -30,25 +30,44 @@ export const ChallengeRoutineCard = ({
         <h3 className="text-sm font-semibold text-gray-900">Challenge Routine</h3>
       </div>
       
-      {/* Challenge info */}
-      <div className="mb-4">
-        <div className="flex items-baseline gap-2">
-          <span className="text-lg">{challenge.emoji}</span>
-          <span className="text-xl font-bold text-amber-700">
-            {challenge.title}
-          </span>
-        </div>
-        <p className="text-sm text-gray-500 mt-1">
-          {!challenge.hasStarted && challenge.computedStartDate ? (
-            <span className="flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 inline" />
-              Starts {formatStartDate(challenge.computedStartDate)}
+      {/* Challenge info + badge preview */}
+      <div className="mb-4 flex items-start justify-between">
+        <div className="flex-1">
+          <div className="flex items-baseline gap-2">
+            <span className="text-lg">{challenge.emoji}</span>
+            <span className="text-xl font-bold text-amber-700">
+              {challenge.title}
             </span>
-          ) : isCompleted 
-            ? `🎉 Challenge complete! All ${challenge.totalDays} days done!`
-            : `Day ${challenge.completedDays} of ${challenge.totalDays}`
-          }
-        </p>
+          </div>
+          <p className="text-sm text-gray-500 mt-1">
+            {!challenge.hasStarted && challenge.computedStartDate ? (
+              <span className="flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5 inline" />
+                Starts {formatStartDate(challenge.computedStartDate)}
+              </span>
+            ) : isCompleted 
+              ? `🎉 Challenge complete! All ${challenge.totalDays} days done!`
+              : `Day ${challenge.completedDays} of ${challenge.totalDays}`
+            }
+          </p>
+        </div>
+
+        {/* Badge preview on right side */}
+        {challenge.badgeImageUrl && (
+          <div className="flex flex-col items-center ml-3 shrink-0">
+            <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-amber-200 bg-amber-50 shadow-sm">
+              <img 
+                src={challenge.badgeImageUrl} 
+                alt="Challenge badge" 
+                className={cn(
+                  "w-full h-full object-cover",
+                  !isCompleted && "opacity-40 grayscale"
+                )}
+              />
+            </div>
+            <span className="text-[10px] text-amber-600 font-medium mt-0.5">Badge</span>
+          </div>
+        )}
       </div>
       
       {/* Progress bar */}
