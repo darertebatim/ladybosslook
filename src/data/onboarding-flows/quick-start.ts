@@ -100,6 +100,7 @@ export const quickStartFlow: OnboardingFlow = {
       type: 'single-select',
       title: 'What is your age group?',
       subtitle: 'I recommend routines for your age.',
+      image: mascotPlanner,
       illustrationLabel: 'Mascot with clipboard',
       options: [
         { label: '14 years or under' },
