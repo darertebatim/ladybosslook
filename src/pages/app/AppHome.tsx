@@ -1305,6 +1305,9 @@ const AppHome = () => {
           userId={user?.id}
           showNotificationFlow={showNotificationFlow}
           setShowNotificationFlow={setShowNotificationFlow}
+          challengeDayCelebration={challengeDayCelebration}
+          closeChallengeDayCelebration={closeChallengeDayCelebration}
+          showChallengeDayCelebration={showChallengeDayCelebration}
         />
 
         {/* New Interactive Home Tour */}

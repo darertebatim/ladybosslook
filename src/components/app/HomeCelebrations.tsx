@@ -8,6 +8,7 @@ import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation'
 import { StreakRecoveryPrompt } from '@/components/app/StreakRecoveryPrompt';
 import { BadgeCelebration } from '@/components/app/BadgeCelebration';
 import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
+import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebration';
 import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
 import { GoalInputSheet } from '@/components/app/GoalInputSheet';
 import { TaskTimerScreen } from '@/components/app/TaskTimerScreen';
