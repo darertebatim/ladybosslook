@@ -526,6 +526,17 @@ const AppHome = () => {
     dateKey: todayDateStr,
   });
 
+  // Challenge day celebration
+  const {
+    celebrationData: challengeDayCelebration,
+    closeCelebration: closeChallengeDayCelebration,
+    showCelebration: showChallengeDayCelebration,
+  } = useChallengeDayCelebration(
+    tasks.map(t => ({ id: t.id, title: t.title })),
+    completedTaskIds,
+    todayDateStr,
+  );
+
   const handleStreakIncrease = useCallback(() => {
     // If user has never celebrated first action, don't open streak modal immediately —
     // let triggerFirstCelebration handle it with proper delay after seal animation
