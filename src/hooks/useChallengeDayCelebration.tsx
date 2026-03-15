@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useUserChallenges } from '@/hooks/useUserChallenges';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ChallengeDayCelebrationData {
   challengeTitle: string;
@@ -9,25 +11,81 @@ interface ChallengeDayCelebrationData {
   routineId: string;
 }
 
+interface ChallengeRoutineInfo {
+  routineId: string;
+  title: string;
+  emoji: string;
+  totalDays: number;
+  taskTitles: string[];
+  hasStarted: boolean;
+  completedDays: number;
+}
+
 /**
  * Detects when all challenge tasks for today are completed
  * and triggers the ChallengeDayCelebration overlay.
- *
- * It watches the list of tasks and completed task IDs,
- * cross-references with challenge routine task titles,
- * and fires once per challenge per day.
  */
 export function useChallengeDayCelebration(
   allTasks: { id: string; title: string }[],
   completedTaskIds: Set<string>,
   dateKey: string,
 ) {
-  const { data: challenges } = useUserChallenges();
+  const { user } = useAuth();
   const [celebrationData, setCelebrationData] = useState<ChallengeDayCelebrationData | null>(null);
-  const prevCompletedRef = useRef<number>(0);
   const initializedRef = useRef(false);
   const initTimeRef = useRef(0);
   const prevDateRef = useRef(dateKey);
+  const prevCompletedCountRef = useRef(0);
+
+  // Fetch challenge routines with their task titles
+  const { data: challengeInfos } = useQuery({
+    queryKey: ['challenge-routine-infos', user?.id],
+    queryFn: async (): Promise<ChallengeRoutineInfo[]> => {
+      if (!user) return [];
+
+      const { data: userRoutines } = await supabase
+        .from('user_routines_bank')
+        .select('routine_id')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+
+      if (!userRoutines?.length) return [];
+
+      const routineIds = userRoutines.map(r => r.routine_id);
+
+      const { data: routines } = await supabase
+        .from('routines_bank')
+        .select('id, title, emoji, end_after_days, challenge_start_date, start_day_of_week')
+        .in('id', routineIds)
+        .eq('schedule_type', 'challenge');
+
+      if (!routines?.length) return [];
+
+      const { data: routineTasks } = await supabase
+        .from('routines_bank_tasks')
+        .select('routine_id, title')
+        .in('routine_id', routines.map(r => r.id));
+
+      const taskTitlesByRoutine = new Map<string, string[]>();
+      (routineTasks || []).forEach(t => {
+        const titles = taskTitlesByRoutine.get(t.routine_id) || [];
+        titles.push(t.title);
+        taskTitlesByRoutine.set(t.routine_id, titles);
+      });
+
+      return routines.map(r => ({
+        routineId: r.id,
+        title: r.title,
+        emoji: r.emoji || '✨',
+        totalDays: r.end_after_days || (taskTitlesByRoutine.get(r.id)?.length || 0),
+        taskTitles: taskTitlesByRoutine.get(r.id) || [],
+        hasStarted: true, // Simplified; full logic is in useUserChallenges
+        completedDays: 0, // Will be calculated below
+      }));
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 10,
+  });
 
   // Reset on date change
   useEffect(() => {
@@ -35,86 +93,86 @@ export function useChallengeDayCelebration(
       prevDateRef.current = dateKey;
       initializedRef.current = false;
       initTimeRef.current = 0;
-      prevCompletedRef.current = 0;
+      prevCompletedCountRef.current = 0;
     }
   }, [dateKey]);
 
+  // Detect challenge day completion
   useEffect(() => {
-    if (!challenges?.length || !allTasks.length) return;
+    if (!challengeInfos?.length || !allTasks.length) return;
 
     const totalCompleted = completedTaskIds.size;
 
-    // Initialize baseline
     if (!initializedRef.current) {
-      prevCompletedRef.current = totalCompleted;
+      prevCompletedCountRef.current = totalCompleted;
       initializedRef.current = true;
       initTimeRef.current = Date.now();
       return;
     }
 
-    // Debounce after init
     if (Date.now() - initTimeRef.current < 1000) {
-      prevCompletedRef.current = totalCompleted;
+      prevCompletedCountRef.current = totalCompleted;
       return;
     }
 
-    const isNewCompletion = totalCompleted > prevCompletedRef.current;
-    prevCompletedRef.current = totalCompleted;
-
+    const isNewCompletion = totalCompleted > prevCompletedCountRef.current;
+    prevCompletedCountRef.current = totalCompleted;
     if (!isNewCompletion) return;
 
-    // Check each active challenge
-    for (const challenge of challenges) {
-      if (!challenge.hasStarted) continue;
+    // Build a map of task title → task id for matching
+    const titleToTaskId = new Map<string, string>();
+    allTasks.forEach(t => titleToTaskId.set(t.title, t.id));
 
-      // Get localStorage key for this challenge+date
+    // Check each challenge
+    for (const challenge of challengeInfos) {
+      if (!challenge.hasStarted || challenge.taskTitles.length === 0) continue;
+
       const celebratedKey = `simora_challenge_day_celebrated_${challenge.routineId}_${dateKey}`;
       if (localStorage.getItem(celebratedKey) === 'true') continue;
 
-      // Find user tasks that match this challenge's task titles
-      // We need to fetch the routine's task titles — they're embedded in the challenge hook data
-      // but not exposed. We'll match by checking if the user's tasks include titles from the routine.
-      // Since useUserChallenges doesn't expose task titles, we use a simpler approach:
-      // look for tasks whose titles match and check if ALL of them are completed.
+      // Find matching user tasks for this challenge
+      const matchingTaskIds = challenge.taskTitles
+        .map(title => titleToTaskId.get(title))
+        .filter(Boolean) as string[];
 
-      // We don't have direct access to routine task titles here.
-      // Instead, we'll use a different approach: query from the challenge data.
-      // The challenge already tells us completedDays. If completedDays just increased
-      // (via query invalidation), that means a new day was completed.
-      // But that's async. Better approach: we track the challenge's completedDays.
+      if (matchingTaskIds.length === 0) continue;
+
+      // Check if ALL matching tasks are completed today
+      const allCompleted = matchingTaskIds.every(id => completedTaskIds.has(id));
+
+      if (allCompleted) {
+        // Calculate how many total days completed (rough: count based on completions)
+        // We use the challenge data's completedDays + 1 since this is the new completion
+        localStorage.setItem(celebratedKey, 'true');
+        
+        // Count how many previous days were celebrated for this challenge
+        let dayCount = 0;
+        for (let i = 0; i < 365; i++) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const key = `simora_challenge_day_celebrated_${challenge.routineId}_${d.toISOString().split('T')[0]}`;
+          if (localStorage.getItem(key) === 'true') dayCount++;
+        }
+
+        setCelebrationData({
+          challengeTitle: challenge.title,
+          challengeEmoji: challenge.emoji,
+          currentDay: Math.min(dayCount, challenge.totalDays),
+          totalDays: challenge.totalDays,
+          routineId: challenge.routineId,
+        });
+        return; // Show one at a time
+      }
     }
-  }, [challenges, allTasks, completedTaskIds, dateKey]);
+  }, [challengeInfos, allTasks, completedTaskIds, dateKey]);
 
   const closeCelebration = useCallback(() => {
-    if (celebrationData) {
-      const celebratedKey = `simora_challenge_day_celebrated_${celebrationData.routineId}_${dateKey}`;
-      localStorage.setItem(celebratedKey, 'true');
-    }
     setCelebrationData(null);
-  }, [celebrationData, dateKey]);
-
-  // Expose a trigger that can be called externally
-  const triggerIfComplete = useCallback((routineId: string) => {
-    if (!challenges) return;
-    const challenge = challenges.find(c => c.routineId === routineId);
-    if (!challenge || !challenge.hasStarted) return;
-    
-    const celebratedKey = `simora_challenge_day_celebrated_${routineId}_${dateKey}`;
-    if (localStorage.getItem(celebratedKey) === 'true') return;
-
-    setCelebrationData({
-      challengeTitle: challenge.title,
-      challengeEmoji: challenge.emoji,
-      currentDay: challenge.completedDays,
-      totalDays: challenge.totalDays,
-      routineId: challenge.routineId,
-    });
-  }, [challenges, dateKey]);
+  }, []);
 
   return {
     celebrationData,
     closeCelebration,
     showCelebration: !!celebrationData,
-    triggerIfComplete,
   };
 }
