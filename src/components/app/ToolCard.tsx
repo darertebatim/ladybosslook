@@ -145,7 +145,11 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
         )}
       >
         <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-white/60">
-          <IconComponent className={cn('h-4.5 w-4.5', tool.iconColor)} />
+          {tool.emoji ? (
+            <span className="text-lg">{tool.emoji}</span>
+          ) : (
+            <IconComponent className={cn('h-4.5 w-4.5', tool.iconColor)} />
+          )}
         </div>
         <div className="flex flex-col items-start min-w-0">
           <h3 className="font-semibold text-foreground text-[13px] leading-tight">
