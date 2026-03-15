@@ -71,7 +71,6 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
             <IconComponent className={cn('h-5 w-5', tool.iconColor)} />
           )}
         </div>
-        </div>
         <div className="text-center">
           <span className="text-[10px] font-medium text-foreground block leading-tight">
             {tool.name}
