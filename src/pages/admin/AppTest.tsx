@@ -45,6 +45,7 @@ import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
 import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { ChallengeCompleteSummary } from '@/components/app/ChallengeCompleteSummary';
+import { PlusGateSheet } from '@/components/app/PlusGateSheet';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
@@ -69,6 +70,7 @@ export default function AppTest() {
   const [showPushPrompt, setShowPushPrompt] = useState(false);
   const [showCourseNotificationPrompt, setShowCourseNotificationPrompt] = useState(false);
   const [showActionLimit, setShowActionLimit] = useState(false);
+  const [showPlusGate, setShowPlusGate] = useState(false);
   
   // Badge celebration states
   const [badgeCelebrationType, setBadgeCelebrationType] = useState<BadgeCelebrationLevel | null>(null);
@@ -515,6 +517,25 @@ export default function AppTest() {
         </CardContent>
       </Card>
 
+      {/* Plus Gate Sheet */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Crown className="h-5 w-5 text-amber-500" />
+            Plus Tool Gate Sheet
+          </CardTitle>
+          <CardDescription>
+            Shown when a free user taps a Plus-only tool — invites them to the onboarding trial journey
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={() => setShowPlusGate(true)} variant="outline">
+            <Crown className="h-4 w-4 mr-2" />
+            Preview Gate Sheet
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Streak Lost Banners */}
       <Card>
         <CardHeader>
@@ -905,6 +926,18 @@ export default function AppTest() {
         onTakeChallenge={() => {
           setShowActionLimit(false);
           toast.info('Challenge accepted → paywall would open here');
+        }}
+      />
+
+      <PlusGateSheet
+        open={showPlusGate}
+        onOpenChange={setShowPlusGate}
+        toolName="Fasting Tracker"
+        toolEmoji="⏱️"
+        toolDescription="Track your fasting zones, log weight, and build healthy eating habits with smart reminders."
+        onStartTrial={() => {
+          setShowPlusGate(false);
+          toast.info('Would navigate to /app/onboarding/me-plus-v1');
         }}
       />
     </div>
