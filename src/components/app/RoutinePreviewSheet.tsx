@@ -353,71 +353,90 @@ export function RoutinePreviewSheet({
               <p className="text-sm text-muted-foreground">
                 Edit it to create your personalized routine.
               </p>
-              {/* Start date banner */}
-              {(() => {
-                const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                let label = 'Ready to start today!';
-                let emoji = '🚀';
-                let isFuture = false;
-                if (challengeStartDate) {
-                  const d = new Date(challengeStartDate + 'T00:00:00');
-                  const today = new Date();
-                  today.setHours(0, 0, 0, 0);
-                  if (d <= today) {
-                    label = 'Ready to start today!';
-                  } else {
-                    const diffDays = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                    label = `Starts ${format(d, 'MMM d')} · in ${diffDays} day${diffDays !== 1 ? 's' : ''}`;
-                    emoji = '📅';
-                    isFuture = true;
-                  }
-                } else if (startDayOfWeek != null) {
-                  label = `Starts next ${WEEKDAY_NAMES[startDayOfWeek]}`;
-                  emoji = '📅';
-                  isFuture = true;
-                }
-                return (
-                  <div className={`mt-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border ${
-                    isFuture 
-                      ? 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800'
-                      : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800'
-                  }`}>
-                    <span className="text-lg">{emoji}</span>
-                    <span className={`text-sm font-medium ${
-                      isFuture 
-                        ? 'text-amber-800 dark:text-amber-300'
-                        : 'text-emerald-800 dark:text-emerald-300'
-                    }`}>
-                      {label}
-                    </span>
+              {/* Start/End banners + Badge */}
+              <div className="mt-2 flex gap-2">
+                {/* Left: start & end banners */}
+                <div className={cn("flex flex-col gap-2", badgeImageUrl ? "flex-1" : "w-full")}>
+                  {/* Start date banner */}
+                  {(() => {
+                    const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                    let label = 'Starts today!';
+                    let emoji = '🚀';
+                    let isFuture = false;
+                    if (challengeStartDate) {
+                      const d = new Date(challengeStartDate + 'T00:00:00');
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      if (d <= today) {
+                        label = 'Starts today!';
+                      } else {
+                        const diffDays = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                        label = `Starts ${format(d, 'MMM d')}`;
+                        emoji = '📅';
+                        isFuture = true;
+                      }
+                    } else if (startDayOfWeek != null) {
+                      label = `Starts next ${WEEKDAY_NAMES[startDayOfWeek]}`;
+                      emoji = '📅';
+                      isFuture = true;
+                    }
+                    return (
+                      <div className={`flex items-center gap-2 rounded-xl px-3 py-2 border ${
+                        isFuture 
+                          ? 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800'
+                          : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800'
+                      }`}>
+                        <span className="text-base">{emoji}</span>
+                        <span className={`text-xs font-medium ${
+                          isFuture 
+                            ? 'text-amber-800 dark:text-amber-300'
+                            : 'text-emerald-800 dark:text-emerald-300'
+                        }`}>
+                          {label}
+                        </span>
+                      </div>
+                    );
+                  })()}
+                  {/* End date banner */}
+                  {(() => {
+                    if (endMode === 'date' && endDate) {
+                      const d = new Date(endDate + 'T00:00:00');
+                      return (
+                        <div className="flex items-center gap-2 rounded-xl px-3 py-2 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
+                          <span className="text-base">🏁</span>
+                          <span className="text-xs font-medium text-rose-800 dark:text-rose-300">
+                            Ends {format(d, 'MMM d')}
+                          </span>
+                        </div>
+                      );
+                    }
+                    if (endMode === 'after_days' && endAfterDays) {
+                      return (
+                        <div className="flex items-center gap-2 rounded-xl px-3 py-2 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
+                          <span className="text-base">🏁</span>
+                          <span className="text-xs font-medium text-rose-800 dark:text-rose-300">
+                            Ends after {endAfterDays} day{endAfterDays !== 1 ? 's' : ''}
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+                </div>
+                {/* Right: Badge preview */}
+                {badgeImageUrl && (
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-amber-300 bg-amber-50 shadow-md">
+                      <img 
+                        src={badgeImageUrl} 
+                        alt="Challenge badge" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <span className="text-[10px] text-amber-600 font-semibold mt-1">🏆 Badge</span>
                   </div>
-                );
-              })()}
-              {/* End date banner */}
-              {(() => {
-                if (endMode === 'date' && endDate) {
-                  const d = new Date(endDate + 'T00:00:00');
-                  return (
-                    <div className="mt-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
-                      <span className="text-lg">🏁</span>
-                      <span className="text-sm font-medium text-rose-800 dark:text-rose-300">
-                        Ends {format(d, 'MMM d')}
-                      </span>
-                    </div>
-                  );
-                }
-                if (endMode === 'after_days' && endAfterDays) {
-                  return (
-                    <div className="mt-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
-                      <span className="text-lg">🏁</span>
-                      <span className="text-sm font-medium text-rose-800 dark:text-rose-300">
-                        Ends after {endAfterDays} day{endAfterDays !== 1 ? 's' : ''}
-                      </span>
-                    </div>
-                  );
-                }
-                return null;
-              })()}
+                )}
+              </div>
             </SheetHeader>
 
             <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4 min-h-0">
