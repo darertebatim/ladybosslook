@@ -15,6 +15,12 @@ import { motion } from 'framer-motion';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { PersianFlag } from '@/components/ui/PersianFlag';
+
+function OptionEmoji({ emoji, size }: { emoji: string; size: number }) {
+  if (emoji === 'flag:persian') return <PersianFlag size={size} />;
+  return <FluentEmoji emoji={emoji} size={size} />;
+}
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 import appIcon from '@/assets/app-icon.png';
 import SealCheck from '@/components/app/SealCheck';
@@ -321,7 +327,7 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
                   selected.has(i) ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
                 }`}
               >
-                {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
+                {opt.emoji && <OptionEmoji emoji={opt.emoji} size={24} />}
                 <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
                 {selected.has(i) && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
               </button>
@@ -347,7 +353,7 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
                 selected.has(i) ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
               }`}
             >
-              {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
+              {opt.emoji && <OptionEmoji emoji={opt.emoji} size={24} />}
               <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
               {selected.has(i) && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
             </button>
@@ -414,7 +420,7 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
                   picked === i ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
                 }`}
               >
-                {opt.emoji && <FluentEmoji emoji={opt.emoji} size={28} />}
+                {opt.emoji && <OptionEmoji emoji={opt.emoji} size={28} />}
                 <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
                 {picked === i && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
               </button>
@@ -454,7 +460,7 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
                 picked === i ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
               }`}
             >
-              {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
+              {opt.emoji && <OptionEmoji emoji={opt.emoji} size={24} />}
               <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
               {picked === i && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
             </button>
