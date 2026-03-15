@@ -490,6 +490,7 @@ export default function AppInspireDetail() {
           endMode={(routine as any).end_mode || null}
           endDate={(routine as any).end_date || null}
           endAfterDays={(routine as any).end_after_days || null}
+          badgeImageUrl={(routine as any).badge_image_url || null}
           onSave={handleSaveRoutine}
           isSaving={addRoutineFromBank.isPending}
           isFree={(routine as any).is_free ?? false}

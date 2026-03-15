@@ -27,7 +27,7 @@ export const EarnedBadgesCard = () => {
         {badges.map((badge) => (
           <div key={badge.id} className="flex flex-col items-center gap-1">
             <div className={cn(
-              "w-14 h-14 rounded-xl overflow-hidden",
+              "w-20 h-20 rounded-xl overflow-hidden",
               "border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-yellow-50",
               "shadow-md shadow-amber-100/50",
               "ring-2 ring-amber-200/50 ring-offset-1"
@@ -38,7 +38,7 @@ export const EarnedBadgesCard = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-            <span className="text-[10px] text-gray-600 font-medium text-center leading-tight max-w-[60px] truncate">
+            <span className="text-[11px] text-gray-600 font-medium text-center leading-tight max-w-[80px] truncate">
               {badge.routineEmoji} {badge.routineTitle}
             </span>
           </div>
