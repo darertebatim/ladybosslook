@@ -112,6 +112,10 @@ export function usePresenceStats() {
         meditationMinutes: Math.floor(meditationSeconds / 60),
         maxSingleActionCompletions,
         habitsFormed,
+        focusSessions: focusResult.count || 0,
+        focusMinutes: Math.floor(((focusResult.data || []) as any[]).reduce((sum: number, s: any) => sum + (s.duration_seconds || 0), 0) / 60),
+        moodCheckins: moodCheckinResult.count || 0,
+        onlineSessions: onlineSessionResult.count || 0,
       };
 
       const { unlocked, locked } = getAchievementStatus(stats);

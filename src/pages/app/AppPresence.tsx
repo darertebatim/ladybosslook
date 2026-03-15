@@ -245,6 +245,46 @@ const AppPresence = () => {
                   iconBg="bg-amber-100"
                   isLoading={isLoading}
                 />
+                <ActivityStatCard 
+                  icon={BookOpen}
+                  label="Reflections"
+                  value={stats?.reflectionCompletions || 0}
+                  iconColor="text-purple-500"
+                  iconBg="bg-purple-100"
+                  isLoading={isLoading}
+                />
+                <ActivityStatCard 
+                  icon={Sparkles}
+                  label="Emotion Namings"
+                  value={stats?.emotionLogs || 0}
+                  iconColor="text-rose-500"
+                  iconBg="bg-rose-100"
+                  isLoading={isLoading}
+                />
+                <ActivityStatCard 
+                  icon={SmilePlus}
+                  label="Mood Check-ins"
+                  value={stats?.moodCheckins || 0}
+                  iconColor="text-blue-500"
+                  iconBg="bg-blue-100"
+                  isLoading={isLoading}
+                />
+                <ActivityStatCard 
+                  icon={Focus}
+                  label="Focus Time"
+                  value={`${stats?.focusMinutes || 0} min`}
+                  iconColor="text-indigo-500"
+                  iconBg="bg-indigo-100"
+                  isLoading={isLoading}
+                />
+                <ActivityStatCard 
+                  icon={Wifi}
+                  label="Online Sessions"
+                  value={stats?.onlineSessions || 0}
+                  iconColor="text-teal-500"
+                  iconBg="bg-teal-100"
+                  isLoading={isLoading}
+                />
               </div>
             </section>
             
