@@ -13,6 +13,7 @@ interface ChallengeDayCelebrationProps {
   challengeEmoji: string;
   currentDay: number;
   totalDays: number;
+  badgeImageUrl?: string | null;
 }
 
 const CONFETTI_COLORS = ['#f472b6', '#fb923c', '#fbbf24', '#a78bfa', '#34d399', '#60a5fa'];
