@@ -15,6 +15,12 @@ import { motion } from 'framer-motion';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { PersianFlag } from '@/components/ui/PersianFlag';
+
+function OptionEmoji({ emoji, size }: { emoji: string; size: number }) {
+  if (emoji === 'flag:persian') return <PersianFlag size={size} />;
+  return <FluentEmoji emoji={emoji} size={size} />;
+}
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 import appIcon from '@/assets/app-icon.png';
 import SealCheck from '@/components/app/SealCheck';
