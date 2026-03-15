@@ -119,6 +119,7 @@ export const quickStartFlow: OnboardingFlow = {
       type: 'single-select',
       title: 'What is your gender?',
       subtitle: 'I recommend routines for your gender.',
+      image: mascotPlanner,
       illustrationLabel: 'Mascot thinking',
       options: [
         { label: 'Female' },
