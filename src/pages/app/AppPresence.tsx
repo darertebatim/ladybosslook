@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart, User, Settings } from 'lucide-react';
+import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart, User, Settings, Sparkles, SmilePlus, Focus, Wifi, BookOpen } from 'lucide-react';
 import { usePresenceStats } from '@/hooks/usePresenceStats';
 import { useUserPresence } from '@/hooks/useUserPresence';
 import { useUserStreak, useSetStreakGoal, useRecoverStreak } from '@/hooks/useTaskPlanner';
