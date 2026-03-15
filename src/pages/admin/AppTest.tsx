@@ -45,6 +45,7 @@ import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
 import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { ChallengeCompleteSummary } from '@/components/app/ChallengeCompleteSummary';
+import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebration';
 import { PlusGateSheet } from '@/components/app/PlusGateSheet';
 
 // Mock bottom nav items for testing
