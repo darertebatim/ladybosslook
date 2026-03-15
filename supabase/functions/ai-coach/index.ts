@@ -168,8 +168,6 @@ serve(async (req) => {
         model: "google/gemini-3-flash-preview",
         messages: aiMessages,
         stream: true,
-        tools,
-        tool_choice: "auto",
       }),
     });
 
