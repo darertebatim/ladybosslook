@@ -96,7 +96,22 @@ export const quickStartFlow: OnboardingFlow = {
       illustrationLabel: 'Mascot greeting',
       buttonLabel: 'Continue',
     },
-    // 9 — Age group
+    // 9 — Preferred second language
+    {
+      id: 'qs-second-language',
+      type: 'single-select',
+      title: 'Do you speak a\nsecond language?',
+      subtitle: 'We have content in multiple languages.',
+      image: mascotPlanner,
+      illustrationLabel: 'Mascot with languages',
+      options: [
+        { label: 'English only', emoji: '🇺🇸' },
+        { label: 'Persian', emoji: '🇮🇷' },
+        { label: 'Turkish', emoji: '🇹🇷' },
+        { label: 'Spanish', emoji: '🇪🇸' },
+      ],
+    },
+    // 10 — Age group
     {
       id: 'qs-age-group',
       type: 'single-select',
