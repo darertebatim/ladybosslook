@@ -255,7 +255,7 @@ function WelcomeScreen({ step, onNext }: Props) {
           </button>
           <p className="text-center text-sm text-[#1a1f3d]/60 mt-3">
             Already a member?{' '}
-            <Link to="/auth" className="text-[#4CAF50] font-semibold hover:underline">
+            <Link to="/auth?mode=signin&skip_onboarding=true" className="text-[#4CAF50] font-semibold hover:underline">
               Sign in.
             </Link>
           </p>
