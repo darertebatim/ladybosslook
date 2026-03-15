@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { getLocalDateStr } from '@/lib/localDate';
 
 export interface UserChallenge {
   routineId: string;
@@ -9,14 +10,28 @@ export interface UserChallenge {
   totalDays: number;
   completedDays: number;
   challengeStartDate: string | null;
+  startDayOfWeek: number | null;
+  endAfterDays: number | null;
   addedAt: string;
+  /** Computed: the actual date the challenge begins for this user */
+  computedStartDate: string | null;
+  hasStarted: boolean;
+}
+
+/**
+ * Calculates the next occurrence of a given day-of-week (0=Sun, 1=Mon, ...).
+ * If today IS that day, returns today.
+ */
+function getNextDayOfWeek(dayOfWeek: number, fromDate: Date): Date {
+  const current = fromDate.getDay();
+  const daysUntil = (dayOfWeek - current + 7) % 7;
+  const result = new Date(fromDate);
+  result.setDate(result.getDate() + daysUntil);
+  return result;
 }
 
 /**
  * Fetches the user's active challenge-type routines with progress.
- * 
- * Progress is calculated by counting how many distinct dates the user
- * has completed tasks since adopting the challenge.
  */
 export function useUserChallenges() {
   const { user } = useAuth();
@@ -38,17 +53,17 @@ export function useUserChallenges() {
 
       const routineIds = userRoutines.map(r => r.routine_id);
 
-      // 2. Get only challenge-type routines
+      // 2. Get only challenge-type routines with scheduling fields
       const { data: routines, error: rError } = await supabase
         .from('routines_bank')
-        .select('id, title, emoji, schedule_type, challenge_start_date')
+        .select('id, title, emoji, schedule_type, challenge_start_date, start_day_of_week, end_after_days, end_mode')
         .in('id', routineIds)
         .eq('schedule_type', 'challenge');
 
       if (rError) throw rError;
       if (!routines?.length) return [];
 
-      // 3. Get total task count per challenge routine
+      // 3. Get task titles per routine for completion tracking
       const { data: routineTasks, error: tError } = await supabase
         .from('routines_bank_tasks')
         .select('routine_id, title')
@@ -56,56 +71,66 @@ export function useUserChallenges() {
 
       if (tError) throw tError;
 
-      // Build task count per routine
-      const taskCountMap = new Map<string, number>();
       const taskTitlesByRoutine = new Map<string, string[]>();
       (routineTasks || []).forEach(t => {
-        taskCountMap.set(t.routine_id, (taskCountMap.get(t.routine_id) || 0) + 1);
         const titles = taskTitlesByRoutine.get(t.routine_id) || [];
         titles.push(t.title);
         taskTitlesByRoutine.set(t.routine_id, titles);
       });
 
-      // 4. For each challenge, find matching user_tasks by title and count completions
       const addedAtMap = new Map(userRoutines.map(r => [r.routine_id, r.added_at]));
+      const today = new Date();
+      const todayStr = getLocalDateStr();
       const challenges: UserChallenge[] = [];
 
       for (const routine of routines) {
         const titles = taskTitlesByRoutine.get(routine.id) || [];
-        const totalDays = taskCountMap.get(routine.id) || 0;
         const addedAt = addedAtMap.get(routine.id) || '';
+        
+        // Determine totalDays from end_after_days (the 28-day challenge duration),
+        // falling back to task count only if not set
+        const totalDays = routine.end_after_days || titles.length || 0;
 
-        if (totalDays === 0) {
-          challenges.push({
-            routineId: routine.id,
-            title: routine.title,
-            emoji: routine.emoji || '✨',
-            totalDays: 0,
-            completedDays: 0,
-            challengeStartDate: routine.challenge_start_date,
-            addedAt,
-          });
-          continue;
+        // Compute the actual start date for this challenge
+        let computedStartDate: string | null = null;
+        let hasStarted = true;
+
+        if (routine.challenge_start_date) {
+          // Admin set a specific start date
+          computedStartDate = routine.challenge_start_date;
+          hasStarted = todayStr >= routine.challenge_start_date;
+        } else if (routine.start_day_of_week !== null && routine.start_day_of_week !== undefined) {
+          // "Day of week" mode - find the next occurrence from when user adopted
+          const adoptionDate = addedAt ? new Date(addedAt) : today;
+          const startDate = getNextDayOfWeek(routine.start_day_of_week, adoptionDate);
+          const y = startDate.getFullYear();
+          const m = String(startDate.getMonth() + 1).padStart(2, '0');
+          const d = String(startDate.getDate()).padStart(2, '0');
+          computedStartDate = `${y}-${m}-${d}`;
+          hasStarted = todayStr >= computedStartDate;
         }
+        // else: "Immediately" mode → hasStarted = true, computedStartDate = addedAt
 
-        // Find user_tasks matching these titles (created around adoption time)
-        const { data: matchingUserTasks } = await supabase
-          .from('user_tasks')
-          .select('id')
-          .eq('user_id', user.id)
-          .in('title', titles);
-
-        const matchingTaskIds = (matchingUserTasks || []).map(t => t.id);
+        // Count completions
         let completedDays = 0;
-
-        if (matchingTaskIds.length > 0) {
-          const { data: completions } = await supabase
-            .from('task_completions')
-            .select('task_id')
+        if (hasStarted && titles.length > 0) {
+          const { data: matchingUserTasks } = await supabase
+            .from('user_tasks')
+            .select('id')
             .eq('user_id', user.id)
-            .in('task_id', matchingTaskIds);
+            .in('title', titles);
 
-          completedDays = (completions || []).length;
+          const matchingTaskIds = (matchingUserTasks || []).map(t => t.id);
+
+          if (matchingTaskIds.length > 0) {
+            const { data: completions } = await supabase
+              .from('task_completions')
+              .select('task_id')
+              .eq('user_id', user.id)
+              .in('task_id', matchingTaskIds);
+
+            completedDays = (completions || []).length;
+          }
         }
 
         challenges.push({
@@ -115,7 +140,11 @@ export function useUserChallenges() {
           totalDays,
           completedDays: Math.min(completedDays, totalDays),
           challengeStartDate: routine.challenge_start_date,
+          startDayOfWeek: routine.start_day_of_week,
+          endAfterDays: routine.end_after_days,
           addedAt,
+          computedStartDate,
+          hasStarted,
         });
       }
 
