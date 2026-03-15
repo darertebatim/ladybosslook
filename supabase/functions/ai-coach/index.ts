@@ -181,35 +181,6 @@ serve(async (req) => {
     return new Response(combinedStream, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
-            controller.close();
-          }
-        },
-      });
-
-      return new Response(combinedStream, {
-        headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
-      });
-    }
-
-    // No tool calls — stream normally (no tools to prevent raw JSON leaking)
-    const streamResponse = await fetch(AI_GATEWAY, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: aiMessages,
-        stream: true,
-      }),
-    });
-
-    if (!streamResponse.ok) return handleAIError(streamResponse);
-
-    return new Response(streamResponse.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
-    });
   } catch (e) {
     console.error("ai-coach error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
