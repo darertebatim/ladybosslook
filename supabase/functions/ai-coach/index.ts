@@ -582,3 +582,67 @@ async function adoptRoutine(supabase: any, userId: string, args: any) {
     created: routine,
   };
 }
+
+async function suggestBreathing(supabase: any, args: any) {
+  const { data } = await supabase
+    .from("breathing_exercises")
+    .select("id, name, emoji, category, description, inhale_seconds, exhale_seconds")
+    .eq("id", args.exercise_id)
+    .single();
+
+  if (!data) {
+    return { success: false, error: "Exercise not found", action: "suggest_breathing" };
+  }
+
+  return {
+    success: true,
+    action: "suggest_breathing",
+    message: `Suggested breathing exercise: ${data.emoji} ${data.name}`,
+    created: { ...data, reason: args.reason, deepLink: `/app/breathe?exercise=${data.id}` },
+  };
+}
+
+async function getRoutineSuggestions(supabase: any, args: any) {
+  let query = supabase
+    .from("routines_bank")
+    .select("id, title, emoji, category, subtitle")
+    .eq("is_active", true)
+    .order("sort_order")
+    .limit(args.limit || 5);
+
+  if (args.category) {
+    query = query.eq("category", args.category);
+  }
+
+  const { data, error } = await query;
+  if (error) return { success: false, error: error.message, action: "get_routine_suggestions" };
+
+  return {
+    success: true,
+    action: "get_routine_suggestions",
+    message: `Found ${data?.length || 0} routines`,
+    created: { routines: data },
+  };
+}
+
+async function getTaskSuggestions(supabase: any, args: any) {
+  let query = supabase
+    .from("admin_task_bank")
+    .select("id, title, emoji, category, description, duration_minutes, time_period")
+    .eq("is_active", true)
+    .order("sort_order")
+    .limit(args.limit || 5);
+
+  if (args.category) query = query.eq("category", args.category);
+  if (args.time_period) query = query.eq("time_period", args.time_period);
+
+  const { data, error } = await query;
+  if (error) return { success: false, error: error.message, action: "get_task_suggestions" };
+
+  return {
+    success: true,
+    action: "get_task_suggestions",
+    message: `Found ${data?.length || 0} task suggestions`,
+    created: { tasks: data },
+  };
+}
