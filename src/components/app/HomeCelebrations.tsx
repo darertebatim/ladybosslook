@@ -117,6 +117,17 @@ interface HomeCelebrationsProps {
   userId?: string;
   showNotificationFlow: boolean;
   setShowNotificationFlow: (v: boolean) => void;
+
+  // Challenge day celebration
+  challengeDayCelebration: {
+    challengeTitle: string;
+    challengeEmoji: string;
+    currentDay: number;
+    totalDays: number;
+    routineId: string;
+  } | null;
+  closeChallengeDayCelebration: () => void;
+  showChallengeDayCelebration: boolean;
 }
 
 export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebrationsProps) {
