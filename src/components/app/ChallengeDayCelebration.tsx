@@ -219,7 +219,7 @@ export const ChallengeDayCelebration = ({
                   backdropFilter: 'blur(16px)',
                   boxShadow: isComplete
                     ? '0 0 50px rgba(251, 191, 36, 0.3), 0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4)'
-                    : '0 0 40px rgba(244, 114, 182, 0.2), 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)',
+                    : '0 0 40px rgba(249, 115, 22, 0.2), 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)',
                 }}
               >
                 <span className="text-5xl">{isComplete ? '🏆' : challengeEmoji}</span>
