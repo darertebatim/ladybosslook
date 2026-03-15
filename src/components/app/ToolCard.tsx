@@ -104,7 +104,11 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
             'w-14 h-14 rounded-2xl flex items-center justify-center relative shadow-lg',
             tool.bgColor
           )}>
-            <IconComponent className={cn('h-6 w-6', tool.iconColor)} />
+            {tool.emoji ? (
+              <span className="text-2xl">{tool.emoji}</span>
+            ) : (
+              <IconComponent className={cn('h-6 w-6', tool.iconColor)} />
+            )}
             {isLocked && (
               <div className="absolute -bottom-1 -right-1 p-1 rounded-full bg-amber-100">
                 <FluentEmoji emoji="🔒" size={14} />
