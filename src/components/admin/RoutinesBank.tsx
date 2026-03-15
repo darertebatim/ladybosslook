@@ -1080,6 +1080,9 @@ export default function RoutinesBank() {
               <Flame className="h-3 w-3" />
               Featured
             </TabsTrigger>
+            <TabsTrigger value="challenges" className="flex items-center gap-1">
+              🔥 Challenges
+            </TabsTrigger>
             {routineCategories.map((cat) => (
               <TabsTrigger 
                 key={cat.slug} 
