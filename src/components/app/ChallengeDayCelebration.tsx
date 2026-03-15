@@ -13,6 +13,7 @@ interface ChallengeDayCelebrationProps {
   challengeEmoji: string;
   currentDay: number;
   totalDays: number;
+  badgeImageUrl?: string | null;
 }
 
 const CONFETTI_COLORS = ['#f472b6', '#fb923c', '#fbbf24', '#a78bfa', '#34d399', '#60a5fa'];
@@ -29,6 +30,7 @@ export const ChallengeDayCelebration = ({
   challengeEmoji,
   currentDay,
   totalDays,
+  badgeImageUrl,
 }: ChallengeDayCelebrationProps) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [showContent, setShowContent] = useState(false);
@@ -184,7 +186,7 @@ export const ChallengeDayCelebration = ({
           onClick={(e) => e.stopPropagation()}
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
-          {/* Emoji badge */}
+          {/* Badge / Emoji */}
           <div className="relative mb-6">
             <div
               className="absolute inset-0 rounded-full scale-[2.5] animate-pulse"
@@ -194,20 +196,35 @@ export const ChallengeDayCelebration = ({
                   : 'radial-gradient(circle, rgba(244, 114, 182, 0.25) 0%, transparent 60%)',
               }}
             />
-            <div
-              className="relative w-28 h-28 rounded-full flex items-center justify-center"
-              style={{
-                background: isComplete
-                  ? 'linear-gradient(180deg, rgba(251, 191, 36, 0.4) 0%, rgba(217, 119, 6, 0.2) 100%)'
-                  : 'linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.3) 100%)',
-                backdropFilter: 'blur(16px)',
-                boxShadow: isComplete
-                  ? '0 0 50px rgba(251, 191, 36, 0.3), 0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4)'
-                  : '0 0 40px rgba(244, 114, 182, 0.2), 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)',
-              }}
-            >
-              <span className="text-5xl">{isComplete ? '🏆' : challengeEmoji}</span>
-            </div>
+            {isComplete && badgeImageUrl ? (
+              <div
+                className="relative w-32 h-32 rounded-2xl flex items-center justify-center overflow-hidden"
+                style={{
+                  boxShadow: '0 0 50px rgba(251, 191, 36, 0.4), 0 12px 40px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.3)',
+                }}
+              >
+                <img
+                  src={badgeImageUrl}
+                  alt="Challenge Badge"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <div
+                className="relative w-28 h-28 rounded-full flex items-center justify-center"
+                style={{
+                  background: isComplete
+                    ? 'linear-gradient(180deg, rgba(251, 191, 36, 0.4) 0%, rgba(217, 119, 6, 0.2) 100%)'
+                    : 'linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.3) 100%)',
+                  backdropFilter: 'blur(16px)',
+                  boxShadow: isComplete
+                    ? '0 0 50px rgba(251, 191, 36, 0.3), 0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4)'
+                    : '0 0 40px rgba(244, 114, 182, 0.2), 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)',
+                }}
+              >
+                <span className="text-5xl">{isComplete ? '🏆' : challengeEmoji}</span>
+              </div>
+            )}
           </div>
 
           {/* Day counter */}

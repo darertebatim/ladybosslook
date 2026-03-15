@@ -3075,6 +3075,7 @@ export type Database = {
       }
       routines_bank: {
         Row: {
+          badge_image_url: string | null
           category: string
           challenge_start_date: string | null
           color: string | null
@@ -3102,6 +3103,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          badge_image_url?: string | null
           category?: string
           challenge_start_date?: string | null
           color?: string | null
@@ -3129,6 +3131,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          badge_image_url?: string | null
           category?: string
           challenge_start_date?: string | null
           color?: string | null
@@ -3536,6 +3539,44 @@ export type Database = {
             columns: ["round_id"]
             isOneToOne: false
             referencedRelation: "program_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_challenge_badges: {
+        Row: {
+          badge_image_url: string
+          earned_at: string
+          id: string
+          routine_emoji: string
+          routine_id: string
+          routine_title: string
+          user_id: string
+        }
+        Insert: {
+          badge_image_url: string
+          earned_at?: string
+          id?: string
+          routine_emoji?: string
+          routine_id: string
+          routine_title: string
+          user_id: string
+        }
+        Update: {
+          badge_image_url?: string
+          earned_at?: string
+          id?: string
+          routine_emoji?: string
+          routine_id?: string
+          routine_title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_challenge_badges_routine_id_fkey"
+            columns: ["routine_id"]
+            isOneToOne: false
+            referencedRelation: "routines_bank"
             referencedColumns: ["id"]
           },
         ]

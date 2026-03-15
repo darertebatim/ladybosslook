@@ -162,6 +162,7 @@ export default function RoutinesBank() {
     end_mode: 'never' as 'never' | 'date' | 'after_days',
     end_date: null as Date | null,
     end_after_days: null as number | null,
+    badge_image_url: '',
   });
   const [localSections, setLocalSections] = useState<LocalSection[]>([]);
   const [localTasks, setLocalTasks] = useState<LocalTask[]>([]);
@@ -248,7 +249,8 @@ export default function RoutinesBank() {
           start_day_of_week: data.formData.start_mode === 'weekday' ? data.formData.start_day_of_week : null,
           end_mode: data.formData.end_mode,
           end_date: data.formData.end_mode === 'date' && data.formData.end_date ? data.formData.end_date.toISOString().split('T')[0] : null,
-          end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
+           end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
+           badge_image_url: data.formData.badge_image_url || null,
         })
         .select()
         .single();
@@ -325,7 +327,8 @@ export default function RoutinesBank() {
           start_day_of_week: data.formData.start_mode === 'weekday' ? data.formData.start_day_of_week : null,
           end_mode: data.formData.end_mode,
           end_date: data.formData.end_mode === 'date' && data.formData.end_date ? data.formData.end_date.toISOString().split('T')[0] : null,
-          end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
+           end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
+           badge_image_url: data.formData.badge_image_url || null,
         })
         .eq('id', data.id);
       if (error) throw error;
@@ -515,6 +518,7 @@ export default function RoutinesBank() {
       end_mode: 'never',
       end_date: null,
       end_after_days: null,
+      badge_image_url: '',
     });
     setLocalSections([]);
     setLocalTasks([]);
@@ -541,6 +545,7 @@ export default function RoutinesBank() {
       end_mode: ((routine as any).end_mode || 'never') as 'never' | 'date' | 'after_days',
       end_date: (routine as any).end_date ? new Date((routine as any).end_date) : null,
       end_after_days: (routine as any).end_after_days ?? null,
+      badge_image_url: (routine as any).badge_image_url || '',
     });
     const { sections, tasks } = await fetchRoutineData(routine.id);
     setLocalSections(sections);
@@ -1588,6 +1593,34 @@ export default function RoutinesBank() {
                       </div>
                     )}
                   </div>
+
+                  {/* Challenge Badge (only for challenge type) */}
+                  {formData.schedule_type === 'challenge' && (
+                    <div className="space-y-2 border-t pt-4">
+                      <Label className="text-xs flex items-center gap-1.5">
+                        🏆 Completion Badge
+                        <span className="text-muted-foreground font-normal">(awarded when challenge is finished)</span>
+                      </Label>
+                      <ImageUploader
+                        label="Badge Image (square)"
+                        value={formData.badge_image_url}
+                        onChange={(url) => setFormData({ ...formData, badge_image_url: url })}
+                        folder="challenge-badges"
+                      />
+                      {formData.badge_image_url && (
+                        <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                          <img
+                            src={formData.badge_image_url}
+                            alt="Badge preview"
+                            className="w-12 h-12 rounded-lg object-cover"
+                          />
+                          <div className="text-xs text-muted-foreground">
+                            Users will earn this badge when they complete all {formData.end_after_days || '?'} days
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Summary stats */}
                   <div className="flex items-center gap-4 text-sm text-muted-foreground border-t pt-4">

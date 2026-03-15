@@ -125,6 +125,7 @@ interface HomeCelebrationsProps {
     currentDay: number;
     totalDays: number;
     routineId: string;
+    badgeImageUrl: string | null;
   } | null;
   closeChallengeDayCelebration: () => void;
   showChallengeDayCelebration: boolean;
@@ -350,6 +351,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         challengeEmoji={challengeDayCelebration?.challengeEmoji || '✨'}
         currentDay={challengeDayCelebration?.currentDay || 0}
         totalDays={challengeDayCelebration?.totalDays || 0}
+        badgeImageUrl={challengeDayCelebration?.badgeImageUrl}
       />
     </OverlayPortal>
   );
