@@ -643,6 +643,52 @@ export default function AppTest() {
             onClose={() => setShowChallengeSummary(false)}
           />
           <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
+          <ChallengeDayCelebration
+            open={showChallengeDayCelebration}
+            onClose={() => setShowChallengeDayCelebration(false)}
+            challengeTitle="Razie Workout Plan"
+            challengeEmoji="💪"
+            currentDay={challengeDayTest}
+            totalDays={28}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Challenge Day Celebration */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-orange-500" />
+            Challenge Day Celebration
+          </CardTitle>
+          <CardDescription>
+            Full-page celebration when user completes all challenge tasks for the day
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => { setChallengeDayTest(1); setShowChallengeDayCelebration(true); }} variant="outline">
+              🚀 Day 1
+            </Button>
+            <Button onClick={() => { setChallengeDayTest(3); setShowChallengeDayCelebration(true); }} variant="outline">
+              🔥 Day 3
+            </Button>
+            <Button onClick={() => { setChallengeDayTest(7); setShowChallengeDayCelebration(true); }} variant="outline">
+              ⚡ Day 7
+            </Button>
+            <Button onClick={() => { setChallengeDayTest(14); setShowChallengeDayCelebration(true); }} variant="outline">
+              ⚡ Day 14 (Halfway)
+            </Button>
+            <Button onClick={() => { setChallengeDayTest(26); setShowChallengeDayCelebration(true); }} variant="outline">
+              🏁 Day 26 (Almost)
+            </Button>
+            <Button onClick={() => { setChallengeDayTest(28); setShowChallengeDayCelebration(true); }} variant="outline">
+              🎉 Day 28 (Complete)
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Shows at different milestones with unique messages: Day 1, Week 1, Halfway, Almost Done, Complete.
+          </p>
         </CardContent>
       </Card>
 
