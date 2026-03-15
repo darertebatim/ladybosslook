@@ -237,14 +237,16 @@ function WelcomeScreen({ step, onNext }: Props) {
         <FadeUp delay={0.2} className="relative z-10">
           <p className="text-[17px] font-semibold text-[#1a1f3d] text-center mb-4 leading-relaxed max-w-[260px] whitespace-pre-line">{step.subtitle}</p>
         </FadeUp>
-        <FadeUp delay={0.3} className="relative z-10">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <img src={appIcon} alt="Simora" className="w-14 h-14 rounded-2xl shadow-lg" />
-            <p className="text-[15px] text-[#1a1f3d] font-medium leading-snug">
-              Your <span className="font-extrabold text-orange-500">FREE</span><br />Routine Planner
-            </p>
-          </div>
-        </FadeUp>
+        {step.statHighlight && (
+          <FadeUp delay={0.3} className="relative z-10">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <img src={appIcon} alt="Simora" className="w-14 h-14 rounded-2xl shadow-lg" />
+              <p className="text-[15px] text-[#1a1f3d] font-medium leading-snug">
+                Your <span className="font-extrabold text-orange-500">FREE</span><br />Routine Planner
+              </p>
+            </div>
+          </FadeUp>
+        )}
         <FadeUp delay={0.4} className="mt-auto w-full relative z-10">
           <button
             onClick={onNext}
@@ -253,12 +255,14 @@ function WelcomeScreen({ step, onNext }: Props) {
             {step.buttonLabel}
             <span className="text-base">→</span>
           </button>
-          <p className="text-center text-sm text-[#1a1f3d]/60 mt-3">
-            Already a member?{' '}
-            <Link to="/auth?mode=signin&skip_onboarding=true" className="text-[#4CAF50] font-semibold hover:underline">
-              Sign in.
-            </Link>
-          </p>
+          {step.secondaryButtonLabel && (
+            <p className="text-center text-sm text-[#1a1f3d]/60 mt-3">
+              Already a member?{' '}
+              <Link to="/auth?mode=signin&skip_onboarding=true" className="text-[#4CAF50] font-semibold hover:underline">
+                Sign in.
+              </Link>
+            </p>
+          )}
         </FadeUp>
       </div>
     </div>
