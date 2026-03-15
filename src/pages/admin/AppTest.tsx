@@ -69,6 +69,7 @@ export default function AppTest() {
   const [showPushPrompt, setShowPushPrompt] = useState(false);
   const [showCourseNotificationPrompt, setShowCourseNotificationPrompt] = useState(false);
   const [showActionLimit, setShowActionLimit] = useState(false);
+  const [showPlusGate, setShowPlusGate] = useState(false);
   
   // Badge celebration states
   const [badgeCelebrationType, setBadgeCelebrationType] = useState<BadgeCelebrationLevel | null>(null);
