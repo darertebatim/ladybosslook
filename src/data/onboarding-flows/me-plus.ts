@@ -28,7 +28,7 @@ export const mePlusFlow: OnboardingFlow = {
     {
       id: 'mp-1',
       type: 'welcome',
-      title: 'Welcome to Simora!',
+      title: 'Welcome to Simora PLUS!',
       subtitle: 'Every day, a gentle step\ntowards my better self',
       image: meplusWelcomeMascot,
       statBadges: [

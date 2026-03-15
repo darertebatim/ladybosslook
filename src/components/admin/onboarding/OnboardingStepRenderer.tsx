@@ -232,7 +232,7 @@ function WelcomeScreen({ step, onNext }: Props) {
 
         
         <FadeUp delay={0.1} className="relative z-10">
-          <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight">{step.title}</h1>
+          <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight" dangerouslySetInnerHTML={{ __html: (step.title || '').replace('PLUS', '<span class="text-red-500 font-black">PLUS</span>') }} />
         </FadeUp>
         <FadeUp delay={0.2} className="relative z-10">
           <p className="text-[17px] font-semibold text-[#1a1f3d] text-center mb-4 leading-relaxed max-w-[260px] whitespace-pre-line">{step.subtitle}</p>
