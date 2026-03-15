@@ -17,6 +17,8 @@ export const quickStartFlow: OnboardingFlow = {
       title: 'Welcome to Simora!',
       subtitle: 'Reset your day and build\nsmall routines that make\nyou stronger.',
       image: meplusWelcomeMascot,
+      statHighlight: 'Your **FREE** Routine Planner',
+      secondaryButtonLabel: 'Already a member? Sign in.',
       statBadges: [
         { label: 'High-Rated App', value: '4.9' },
         { label: "Users' choice", value: '31 Million' },
