@@ -925,6 +925,8 @@ export default function RoutinesBank() {
     ? routines.filter(r => r.is_popular)
     : selectedCategory === 'featured'
     ? routines.filter(r => r.is_featured)
+    : selectedCategory === 'challenges'
+    ? routines.filter(r => r.schedule_type === 'challenge')
     : routines.filter(r => r.category === selectedCategory);
 
   const filteredTaskBank = taskBank.filter(t => 
@@ -1077,6 +1079,9 @@ export default function RoutinesBank() {
             <TabsTrigger value="featured" className="flex items-center gap-1">
               <Flame className="h-3 w-3" />
               Featured
+            </TabsTrigger>
+            <TabsTrigger value="challenges" className="flex items-center gap-1">
+              🔥 Challenges
             </TabsTrigger>
             {routineCategories.map((cat) => (
               <TabsTrigger 
