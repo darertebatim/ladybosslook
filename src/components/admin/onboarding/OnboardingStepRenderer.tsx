@@ -460,7 +460,7 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
                 picked === i ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
               }`}
             >
-              {opt.emoji && <FluentEmoji emoji={opt.emoji} size={24} />}
+              {opt.emoji && <OptionEmoji emoji={opt.emoji} size={24} />}
               <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
               {picked === i && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
             </button>
