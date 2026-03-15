@@ -106,7 +106,7 @@ export const quickStartFlow: OnboardingFlow = {
       illustrationLabel: 'Mascot with languages',
       options: [
         { label: 'English only', emoji: '🇺🇸' },
-        { label: 'Persian', emoji: '🇮🇷' },
+        { label: 'Persian', emoji: 'flag:persian' },
         { label: 'Turkish', emoji: '🇹🇷' },
         { label: 'Spanish', emoji: '🇪🇸' },
       ],
