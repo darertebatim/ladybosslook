@@ -30,6 +30,7 @@ export const mePlusFlow: OnboardingFlow = {
       type: 'welcome',
       title: 'Welcome to Simora PLUS!',
       subtitle: 'Every day, a gentle step\ntowards my better self',
+      description: 'Complete Your Questions and\nGet Your 7-Day Free Trial on Simora+',
       image: meplusWelcomeMascot,
       statBadges: [
         { label: 'High-Rated App 2024', value: '4.9' },
