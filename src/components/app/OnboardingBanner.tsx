@@ -5,8 +5,8 @@ import { haptic } from '@/lib/haptics';
 import { X } from 'lucide-react';
 import onboardingBannerImg from '@/assets/onboarding-banner.png';
 
-const ONBOARDING_COMPLETED_KEY = 'simora_onboarding_completed_quick-start-v1';
-const ONBOARDING_PROGRESS_KEY = 'simora_onboarding_progress_quick-start-v1';
+const ONBOARDING_COMPLETED_KEY = 'simora_onboarding_completed_me-plus-v1';
+const ONBOARDING_PROGRESS_KEY = 'simora_onboarding_progress_me-plus-v1';
 const ONBOARDING_DISMISSED_KEY = 'simora_onboarding_banner_dismissed';
 
 export function OnboardingBanner() {
