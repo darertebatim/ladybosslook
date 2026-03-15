@@ -248,6 +248,9 @@ function WelcomeScreen({ step, onNext }: Props) {
           </FadeUp>
         )}
         <FadeUp delay={0.4} className="mt-auto w-full relative z-10">
+          {step.description && (
+            <p className="text-center text-[13px] text-[#1a1f3d]/70 font-medium mb-3 whitespace-pre-line leading-snug">{step.description}</p>
+          )}
           <button
             onClick={onNext}
             className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
