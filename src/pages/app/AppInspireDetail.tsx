@@ -1,5 +1,7 @@
 import { useState, useMemo } from 'react';
 import { AddToRoutineHandHint, useAddToRoutineHint } from '@/components/app/AddToRoutineHandHint';
+import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
+import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
