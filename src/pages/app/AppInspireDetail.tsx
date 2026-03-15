@@ -326,10 +326,10 @@ export default function AppInspireDetail() {
                 )}
               </div>
 
-              {/* Right: Badge preview */}
+              {/* Right: Badge preview — stretches full height of start/end column */}
               {(routine as any).badge_image_url && (
-                <div className="flex flex-col items-center justify-center shrink-0">
-                  <div className="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-amber-300 bg-amber-50 shadow-md">
+                <div className="flex flex-col items-center shrink-0">
+                  <div className="flex-1 aspect-square w-auto rounded-xl overflow-hidden border-2 border-amber-300 bg-amber-50 shadow-md">
                     <img 
                       src={(routine as any).badge_image_url} 
                       alt="Challenge badge" 
