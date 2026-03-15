@@ -16,7 +16,8 @@ import { Capacitor } from '@capacitor/core';
 
 
 export default function Auth() {
-  const [isLogin, setIsLogin] = useState(true);
+  const initialSearchParams = new URLSearchParams(window.location.search);
+  const [isLogin, setIsLogin] = useState(initialSearchParams.get('mode') !== 'signup');
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [email, setEmail] = useState('');
