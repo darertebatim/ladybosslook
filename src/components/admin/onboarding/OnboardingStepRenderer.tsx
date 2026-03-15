@@ -460,7 +460,7 @@ function TextInputScreen({ step, onNext, onAnswer }: Props) {
     <>
       <FadeUp>
         <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
-        {step.subtitle && <p className="text-base text-gray-500 mb-6">{step.subtitle}</p>}
+        {step.subtitle && <p className="text-base text-[#1a1f3d] text-center mb-6">{step.subtitle}</p>}
       </FadeUp>
       <FadeUp delay={0.15}>
         <input
