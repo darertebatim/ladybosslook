@@ -1,5 +1,7 @@
 import { useState, useMemo } from 'react';
 import { AddToRoutineHandHint, useAddToRoutineHint } from '@/components/app/AddToRoutineHandHint';
+import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
+import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
@@ -87,10 +89,18 @@ export default function AppInspireDetail() {
   const { data: routine, isLoading } = useRoutineBankDetail(planId);
   const { data: addedRoutineIds = [] } = useUserAddedBankRoutines();
   const addRoutineFromBank = useAddRoutineFromBank();
+  const { data: userChallenges = [] } = useUserChallenges();
   
   // Check if routine was already added
   const isAlreadyAdded = planId ? addedRoutineIds.includes(planId) : false;
   const isAdded = isAlreadyAdded || justAdded;
+  
+  // Find this routine's challenge data if it's been added
+  const isChallenge = (routine as any)?.schedule_type === 'challenge';
+  const userChallenge = useMemo(() => {
+    if (!planId || !isChallenge) return null;
+    return userChallenges.find(c => c.routineId === planId) || null;
+  }, [planId, isChallenge, userChallenges]);
 
   // Compute effective start date label + details
   const startInfo = useMemo(() => {
@@ -276,6 +286,13 @@ export default function AppInspireDetail() {
         })()}
 
         <div className="px-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 160px)' }}>
+          {/* Challenge progress card - shown when user has added this challenge */}
+          {isAdded && userChallenge && (
+            <div className="pt-4">
+              <ChallengeRoutineCard challenge={userChallenge} />
+            </div>
+          )}
+
           {/* Subtitle & Badges */}
           <div className="pt-4">
             {routine.subtitle && (
