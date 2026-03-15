@@ -1,4 +1,4 @@
-import { Trophy } from 'lucide-react';
+import { Trophy, Calendar } from 'lucide-react';
 import { StreakProgressBar } from './StreakProgressBar';
 import { cn } from '@/lib/utils';
 import type { UserChallenge } from '@/hooks/useUserChallenges';
@@ -8,10 +8,12 @@ interface ChallengeRoutineCardProps {
   className?: string;
 }
 
-/**
- * Challenge Routine card for the Presence page.
- * Shows the user's progress on an adopted challenge-type routine.
- */
+function formatStartDate(dateStr: string): string {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const date = new Date(y, m - 1, d);
+  return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+}
+
 export const ChallengeRoutineCard = ({ 
   challenge, 
   className,
@@ -37,7 +39,12 @@ export const ChallengeRoutineCard = ({
           </span>
         </div>
         <p className="text-sm text-gray-500 mt-1">
-          {isCompleted 
+          {!challenge.hasStarted && challenge.computedStartDate ? (
+            <span className="flex items-center gap-1">
+              <Calendar className="w-3.5 h-3.5 inline" />
+              Starts {formatStartDate(challenge.computedStartDate)}
+            </span>
+          ) : isCompleted 
             ? `🎉 Challenge complete! All ${challenge.totalDays} days done!`
             : `Day ${challenge.completedDays} of ${challenge.totalDays}`
           }
@@ -46,7 +53,7 @@ export const ChallengeRoutineCard = ({
       
       {/* Progress bar */}
       <StreakProgressBar 
-        current={challenge.completedDays} 
+        current={challenge.hasStarted ? challenge.completedDays : 0} 
         goal={challenge.totalDays} 
       />
     </div>
