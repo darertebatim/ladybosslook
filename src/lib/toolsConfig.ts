@@ -2,6 +2,7 @@ export interface ToolConfig {
   id: string;
   name: string;
   icon: string;
+  emoji?: string;
   bgColor: string;
   iconColor: string;
   route: string;
