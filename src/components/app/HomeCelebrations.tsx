@@ -342,6 +342,15 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         type={showRecoverySuccess || 'streak'}
         onClose={() => setShowRecoverySuccess(null)}
       />
+
+      <ChallengeDayCelebration
+        open={showChallengeDayCelebration}
+        onClose={closeChallengeDayCelebration}
+        challengeTitle={challengeDayCelebration?.challengeTitle || ''}
+        challengeEmoji={challengeDayCelebration?.challengeEmoji || '✨'}
+        currentDay={challengeDayCelebration?.currentDay || 0}
+        totalDays={challengeDayCelebration?.totalDays || 0}
+      />
     </OverlayPortal>
   );
 });
