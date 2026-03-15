@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart, User, Settings } from 'lucide-react';
 import { usePresenceStats } from '@/hooks/usePresenceStats';
 import { useUserPresence } from '@/hooks/useUserPresence';
+import { useGoldStreak } from '@/hooks/useGoldStreak';
 import { useUserStreak, useSetStreakGoal, useRecoverStreak } from '@/hooks/useTaskPlanner';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { StreakRecoveryPrompt } from '@/components/app/StreakRecoveryPrompt';
@@ -31,6 +32,7 @@ const AppPresence = () => {
   const { data: presence } = useUserPresence();
   const { data: streak } = useUserStreak();
   const { data: challenges } = useUserChallenges();
+  const { data: goldStreak } = useGoldStreak();
   const setStreakGoal = useSetStreakGoal();
   const recoverStreak = useRecoverStreak();
   const [showGoalSelection, setShowGoalSelection] = useState(false);
@@ -119,27 +121,36 @@ const AppPresence = () => {
             
             {/* Hero Content */}
             <div className="relative z-10 px-6 pb-4 pt-4">
-              {/* Top row: 2 stat cards on left, big number on right */}
+              {/* Top row: 3 stat cards on left, big number on right */}
               <div className="flex items-center gap-3 mb-6">
                 {/* Left: stacked stat cards */}
                 <div className="flex flex-col gap-2 w-[28%] shrink-0">
-                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-sm text-center">
-                    <Flame className="h-5 w-5 mx-auto mb-1 text-orange-500" />
+                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-2.5 shadow-sm text-center">
+                    <Flame className="h-4 w-4 mx-auto mb-0.5 text-orange-500" />
                     {isLoading ? (
-                      <Skeleton className="h-7 w-10 mx-auto mb-1 bg-white/30" />
+                      <Skeleton className="h-6 w-10 mx-auto mb-0.5 bg-white/30" />
                     ) : (
-                      <div className="text-2xl font-bold text-orange-900">{stats?.currentStreak || 0}</div>
+                      <div className="text-xl font-bold text-orange-900">{stats?.currentStreak || 0}</div>
                     )}
-                    <div className="text-xs text-orange-700/60 font-medium">Days Streak</div>
+                    <div className="text-[10px] text-orange-700/60 font-medium">Days Streak</div>
                   </div>
-                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-sm text-center">
-                    <CheckCircle2 className="h-5 w-5 mx-auto mb-1 text-amber-600" />
+                  <div className="bg-gradient-to-br from-yellow-100/95 to-amber-50/95 backdrop-blur-sm rounded-2xl p-2.5 shadow-sm text-center border border-yellow-300/40">
+                    <span className="text-sm block mb-0.5">🥇</span>
                     {isLoading ? (
-                      <Skeleton className="h-7 w-10 mx-auto mb-1 bg-white/30" />
+                      <Skeleton className="h-6 w-10 mx-auto mb-0.5 bg-yellow-200/30" />
                     ) : (
-                      <div className="text-2xl font-bold text-orange-900">{stats?.totalTaskCompletions || 0}</div>
+                      <div className="text-xl font-bold text-yellow-800">{goldStreak?.currentGoldStreak || 0}</div>
                     )}
-                    <div className="text-xs text-orange-700/60 font-medium">Tasks Done</div>
+                    <div className="text-[10px] text-yellow-700/60 font-medium">Gold Streak</div>
+                  </div>
+                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-2.5 shadow-sm text-center">
+                    <CheckCircle2 className="h-4 w-4 mx-auto mb-0.5 text-amber-600" />
+                    {isLoading ? (
+                      <Skeleton className="h-6 w-10 mx-auto mb-0.5 bg-white/30" />
+                    ) : (
+                      <div className="text-xl font-bold text-orange-900">{stats?.totalTaskCompletions || 0}</div>
+                    )}
+                    <div className="text-[10px] text-orange-700/60 font-medium">Tasks Done</div>
                   </div>
                 </div>
                 
