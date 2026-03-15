@@ -909,6 +909,18 @@ export default function AppTest() {
           toast.info('Challenge accepted → paywall would open here');
         }}
       />
+
+      <PlusGateSheet
+        open={showPlusGate}
+        onOpenChange={setShowPlusGate}
+        toolName="Fasting Tracker"
+        toolEmoji="⏱️"
+        toolDescription="Track your fasting zones, log weight, and build healthy eating habits with smart reminders."
+        onStartTrial={() => {
+          setShowPlusGate(false);
+          toast.info('Would navigate to /app/onboarding/me-plus-v1');
+        }}
+      />
     </div>
   );
 }
