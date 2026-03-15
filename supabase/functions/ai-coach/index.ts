@@ -52,10 +52,15 @@ serve(async (req) => {
     const systemPrompt = buildSystemPrompt(context, mode);
     const tools = getToolDefinitions();
 
+    // ALL tools are direct-execution
     const directExecutionTools = [
       "add_task_to_planner",
       "log_mood",
       "adopt_routine",
+      "suggest_breathing",
+      "create_journal_prompt",
+      "get_routine_suggestions",
+      "get_task_suggestions",
     ];
 
     // Build AI messages
