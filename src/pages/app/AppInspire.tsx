@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, Heart, Loader2, CalendarPlus, ChevronRight } from 'lucide-react';
+import { Search, Heart, Loader2, CalendarPlus, ChevronRight, Flame } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
@@ -57,6 +57,12 @@ export default function AppInspire() {
   };
 
   const filteredPopular = popularRoutines?.filter(matchesSearch);
+
+  // Challenge routines
+  const challengeRoutines = useMemo(() => {
+    if (!allRoutines) return [];
+    return allRoutines.filter(r => r.schedule_type === 'challenge').filter(matchesSearch);
+  }, [allRoutines, searchQuery]);
 
   // Only show categories that have routines
   const nonEmptyCategories = useMemo(() => {
@@ -192,6 +198,28 @@ export default function AppInspire() {
                           routine={routine}
                           onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
                           className={index === 0 ? 'tour-routine-card' : undefined}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Challenges Section */}
+              {challengeRoutines.length > 0 && (
+                <section id="routine-category-challenges">
+                  <div className="flex items-center justify-between mb-2 px-4">
+                    <h2 className="text-xl font-bold text-foreground flex items-center gap-1.5">
+                      <Flame className="h-5 w-5 text-orange-500" />
+                      Challenges
+                    </h2>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
+                    {challengeRoutines.map((routine) => (
+                      <div key={routine.id} className="shrink-0 w-40">
+                        <RoutineBankCard
+                          routine={routine}
+                          onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
                         />
                       </div>
                     ))}
