@@ -85,28 +85,37 @@ serve(async (req) => {
       ...messages,
     ];
 
-    // First call (non-streaming) to check for tool calls
-    const firstResponse = await fetch(AI_GATEWAY, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: aiMessages,
-        tools,
-        tool_choice: "auto",
-      }),
-    });
+    // Multi-turn tool chaining loop (up to 3 rounds)
+    let currentMessages = [...aiMessages];
+    const allMutationResults: any[] = [];
+    const MAX_TOOL_ROUNDS = 3;
 
-    if (!firstResponse.ok) return handleAIError(firstResponse);
+    for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+      const callResponse = await fetch(AI_GATEWAY, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: currentMessages,
+          tools,
+          tool_choice: "auto",
+        }),
+      });
 
-    const firstResult = await firstResponse.json();
-    const choice = firstResult.choices?.[0];
+      if (!callResponse.ok) return handleAIError(callResponse);
 
-    // Handle direct-execution tool calls
-    if (choice?.finish_reason === "tool_calls" && choice?.message?.tool_calls?.length) {
+      const callResult = await callResponse.json();
+      const choice = callResult.choices?.[0];
+
+      // If no tool calls, we're done — stream the final response
+      if (choice?.finish_reason !== "tool_calls" || !choice?.message?.tool_calls?.length) {
+        break;
+      }
+
+      // Execute all tool calls in this round
       const toolCalls = choice.message.tool_calls;
       const toolResults: { tool_call_id: string; result: any }[] = [];
 
@@ -118,9 +127,13 @@ serve(async (req) => {
         toolResults.push({ tool_call_id: tc.id, result });
       }
 
-      // Follow-up with tool results
-      const followUpMessages: Message[] = [
-        ...aiMessages,
+      // Collect mutation results for action cards
+      const mutationTools = ["add_task_to_planner", "log_mood", "adopt_routine"];
+      allMutationResults.push(...toolResults.filter(tr => mutationTools.includes(tr.result.action)).map(tr => tr.result));
+
+      // Add tool call + results to conversation for next round
+      currentMessages = [
+        ...currentMessages,
         choice.message,
         ...toolResults.map((tr: any) => ({
           role: "tool" as const,
@@ -128,41 +141,46 @@ serve(async (req) => {
           tool_call_id: tr.tool_call_id,
         })),
       ];
+    }
 
-      const secondResponse = await fetch(AI_GATEWAY, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: followUpMessages,
-          stream: true,
-        }),
-      });
+    // Final streaming response (with or without prior tool context)
+    const finalResponse = await fetch(AI_GATEWAY, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: currentMessages,
+        stream: true,
+      }),
+    });
 
-      if (!secondResponse.ok) return handleAIError(secondResponse);
+    if (!finalResponse.ok) return handleAIError(finalResponse);
 
-      // Only include action_results for mutation tools (not queries)
-      const mutationTools = ["add_task_to_planner", "log_mood", "adopt_routine"];
-      const mutationResults = toolResults.filter(tr => mutationTools.includes(tr.result.action));
-      
-      const combinedStream = new ReadableStream({
-        async start(controller) {
-          if (mutationResults.length > 0) {
-            const actionData = mutationResults.map(tr => tr.result);
-            const actionEvent = `data: ${JSON.stringify({ action_results: actionData })}\n\n`;
-            controller.enqueue(new TextEncoder().encode(actionEvent));
+    const combinedStream = new ReadableStream({
+      async start(controller) {
+        if (allMutationResults.length > 0) {
+          const actionEvent = `data: ${JSON.stringify({ action_results: allMutationResults })}\n\n`;
+          controller.enqueue(new TextEncoder().encode(actionEvent));
+        }
+        const reader = finalResponse.body!.getReader();
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            controller.enqueue(value);
           }
-          const reader = secondResponse.body!.getReader();
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              controller.enqueue(value);
-            }
-          } finally {
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(combinedStream, {
+      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+    });
             controller.close();
           }
         },
