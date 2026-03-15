@@ -16,6 +16,7 @@ export interface UserChallenge {
   /** Computed: the actual date the challenge begins for this user */
   computedStartDate: string | null;
   hasStarted: boolean;
+  badgeImageUrl: string | null;
 }
 
 /**
