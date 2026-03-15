@@ -386,6 +386,7 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
   const hasBg = !!step.illustrationLabel;
 
   if (hasBg) {
+    const useGrid = (step.options?.length || 0) > 4;
     return (
       <BottomSheetWrapper bgImage={step.image || meplusMascotBg}>
         <FadeUp>
@@ -394,7 +395,7 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
             {step.subtitle && <p className="text-base text-[#1a1f3d] mt-1 text-center">{step.subtitle}</p>}
           </div>
         </FadeUp>
-        <StaggerContainer className="space-y-3">
+        <StaggerContainer className={useGrid ? "grid grid-cols-2 gap-2" : "space-y-3"}>
           {step.options?.map((opt, i) => (
             <StaggerItem key={i}>
               <button
@@ -410,6 +411,14 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
             </StaggerItem>
           ))}
         </StaggerContainer>
+        <FadeUp delay={0.3}>
+          <button
+            onClick={onNext}
+            className="w-full text-center text-sm text-gray-400 mt-4 py-2 active:opacity-60"
+          >
+            Skip this question
+          </button>
+        </FadeUp>
       </BottomSheetWrapper>
     );
   }
@@ -474,13 +483,19 @@ function TextInputScreen({ step, onNext, onAnswer }: Props) {
           autoFocus
         />
       </FadeUp>
-      <div className="mt-auto pt-8">
+      <div className="mt-auto pt-8 space-y-2">
         <button
           onClick={handleSubmit}
           disabled={!value.trim()}
           className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-base transition-all disabled:opacity-40"
         >
           {step.buttonLabel || 'Continue'}
+        </button>
+        <button
+          onClick={onNext}
+          className="w-full text-center text-sm text-gray-400 py-2 active:opacity-60"
+        >
+          Skip this question
         </button>
       </div>
     </>
