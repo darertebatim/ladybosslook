@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart, User, Settings } from 'lucide-react';
 import { usePresenceStats } from '@/hooks/usePresenceStats';
 import { useUserPresence } from '@/hooks/useUserPresence';
+import { useGoldStreak } from '@/hooks/useGoldStreak';
 import { useUserStreak, useSetStreakGoal, useRecoverStreak } from '@/hooks/useTaskPlanner';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { StreakRecoveryPrompt } from '@/components/app/StreakRecoveryPrompt';
