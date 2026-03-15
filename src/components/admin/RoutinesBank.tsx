@@ -543,6 +543,7 @@ export default function RoutinesBank() {
       end_mode: ((routine as any).end_mode || 'never') as 'never' | 'date' | 'after_days',
       end_date: (routine as any).end_date ? new Date((routine as any).end_date) : null,
       end_after_days: (routine as any).end_after_days ?? null,
+      badge_image_url: (routine as any).badge_image_url || '',
     });
     const { sections, tasks } = await fetchRoutineData(routine.id);
     setLocalSections(sections);
