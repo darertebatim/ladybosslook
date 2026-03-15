@@ -199,3 +199,6 @@ verify_jwt = false
 
 [functions.create-cart-checkout]
 verify_jwt = false
+
+[functions.ai-coach]
+verify_jwt = false

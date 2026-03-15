@@ -1,0 +1,578 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
+
+interface Message {
+  role: "user" | "assistant" | "system" | "tool";
+  content: string;
+  tool_calls?: any[];
+  tool_call_id?: string;
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: "Invalid token" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { messages, mode } = await req.json();
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    // Fetch user context
+    const context = await fetchUserContext(supabase, user.id);
+    const systemPrompt = buildSystemPrompt(context, mode);
+    const tools = getToolDefinitions();
+
+    const directExecutionTools = [
+      "add_task_to_planner",
+      "log_mood",
+      "adopt_routine",
+    ];
+
+    // Build AI messages
+    const aiMessages: Message[] = [
+      { role: "system", content: systemPrompt },
+      ...messages,
+    ];
+
+    // First call (non-streaming) to check for tool calls
+    const firstResponse = await fetch(AI_GATEWAY, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: aiMessages,
+        tools,
+        tool_choice: "auto",
+      }),
+    });
+
+    if (!firstResponse.ok) return handleAIError(firstResponse);
+
+    const firstResult = await firstResponse.json();
+    const choice = firstResult.choices?.[0];
+
+    // Handle direct-execution tool calls
+    if (choice?.finish_reason === "tool_calls" && choice?.message?.tool_calls?.length) {
+      const toolCalls = choice.message.tool_calls;
+      const hasDirectTool = toolCalls.some((tc: any) => directExecutionTools.includes(tc.function?.name));
+
+      if (hasDirectTool) {
+        const toolResults: { tool_call_id: string; result: any }[] = [];
+
+        for (const tc of toolCalls) {
+          const fnName = tc.function?.name;
+          let args: any;
+          try { args = JSON.parse(tc.function?.arguments || "{}"); } catch { args = {}; }
+
+          if (directExecutionTools.includes(fnName)) {
+            const result = await executeToolAction(supabase, user.id, fnName, args);
+            toolResults.push({ tool_call_id: tc.id, result });
+          } else {
+            toolResults.push({ tool_call_id: tc.id, result: { success: true, message: "Suggestion provided" } });
+          }
+        }
+
+        // Follow-up with tool results
+        const followUpMessages: Message[] = [
+          ...aiMessages,
+          choice.message,
+          ...toolResults.map((tr: any) => ({
+            role: "tool" as const,
+            content: JSON.stringify(tr.result),
+            tool_call_id: tr.tool_call_id,
+          })),
+        ];
+
+        const secondResponse = await fetch(AI_GATEWAY, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-3-flash-preview",
+            messages: followUpMessages,
+            stream: true,
+          }),
+        });
+
+        if (!secondResponse.ok) return handleAIError(secondResponse);
+
+        const actionData = toolResults.map(tr => tr.result);
+        const actionEvent = `data: ${JSON.stringify({ action_results: actionData })}\n\n`;
+        const actionChunk = new TextEncoder().encode(actionEvent);
+
+        const combinedStream = new ReadableStream({
+          async start(controller) {
+            controller.enqueue(actionChunk);
+            const reader = secondResponse.body!.getReader();
+            try {
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                controller.enqueue(value);
+              }
+            } finally {
+              controller.close();
+            }
+          },
+        });
+
+        return new Response(combinedStream, {
+          headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+        });
+      }
+    }
+
+    // No direct tools — stream normally
+    const streamResponse = await fetch(AI_GATEWAY, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: aiMessages,
+        stream: true,
+        tools,
+        tool_choice: "auto",
+      }),
+    });
+
+    if (!streamResponse.ok) return handleAIError(streamResponse);
+
+    return new Response(streamResponse.body, {
+      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+    });
+  } catch (e) {
+    console.error("ai-coach error:", e);
+    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});
+
+// ============= ERROR HANDLING =============
+
+function handleAIError(response: Response) {
+  if (response.status === 429) {
+    return new Response(JSON.stringify({ error: "Rate limits exceeded, please try again later." }), {
+      status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  if (response.status === 402) {
+    return new Response(JSON.stringify({ error: "AI credits exhausted." }), {
+      status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  return new Response(JSON.stringify({ error: "AI gateway error" }), {
+    status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+// ============= CONTEXT FETCHING =============
+
+async function fetchUserContext(supabase: any, userId: string) {
+  const today = new Date().toISOString().split("T")[0];
+
+  const [profileRes, tasksRes, completionsRes, emotionsRes, journalRes, streakRes, routinesRes, breathingRes, taskBankRes] = await Promise.all([
+    supabase.from("profiles").select("full_name, goals, preferred_language, gender, date_of_birth, occupation").eq("id", userId).single(),
+    supabase.from("user_tasks").select("id, title, emoji, scheduled_date, is_active, repeat_pattern, pro_link_type").eq("user_id", userId).eq("is_active", true).limit(30),
+    supabase.from("task_completions").select("task_id, completed_date").eq("user_id", userId).eq("completed_date", today),
+    supabase.from("emotion_logs").select("emotion, valence, category, created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(10),
+    supabase.from("journal_entries").select("title, mood, created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(5),
+    supabase.from("user_streaks").select("current_streak, longest_streak").eq("user_id", userId).single(),
+    supabase.from("routines_bank").select("id, title, emoji, category, subtitle").eq("is_active", true).order("sort_order").limit(50),
+    supabase.from("breathing_exercises").select("id, name, emoji, category, description").eq("is_active", true).limit(20),
+    supabase.from("admin_task_bank").select("id, title, emoji, category, description, duration_minutes, time_period").eq("is_active", true).order("sort_order").limit(50),
+  ]);
+
+  return {
+    profile: profileRes.data,
+    tasks: tasksRes.data || [],
+    todayCompletions: completionsRes.data || [],
+    recentEmotions: emotionsRes.data || [],
+    recentJournals: journalRes.data || [],
+    streak: streakRes.data,
+    availableRoutines: routinesRes.data || [],
+    availableBreathing: breathingRes.data || [],
+    availableTasks: taskBankRes.data || [],
+  };
+}
+
+// ============= SYSTEM PROMPT =============
+
+function buildSystemPrompt(context: any, mode?: string) {
+  const name = context.profile?.full_name || "there";
+  const goals = context.profile?.goals?.join(", ") || "not specified";
+  const language = context.profile?.preferred_language || "en";
+
+  const completedIds = new Set(context.todayCompletions.map((c: any) => c.task_id));
+  const todayTasks = context.tasks.filter((t: any) => {
+    const isToday = t.scheduled_date === new Date().toISOString().split("T")[0];
+    const isRepeating = t.repeat_pattern && t.repeat_pattern !== "none";
+    return isToday || isRepeating;
+  });
+  const completedCount = todayTasks.filter((t: any) => completedIds.has(t.id)).length;
+
+  const recentMoods = context.recentEmotions.slice(0, 5).map((e: any) =>
+    `${e.emotion} (${e.valence})`
+  ).join(", ");
+
+  const routinesList = context.availableRoutines.slice(0, 20).map((r: any) =>
+    `- ${r.emoji} ${r.title} (${r.category}) [id: ${r.id}]`
+  ).join("\n");
+
+  const breathingList = context.availableBreathing.slice(0, 10).map((b: any) =>
+    `- ${b.emoji} ${b.name} (${b.category}) [id: ${b.id}]`
+  ).join("\n");
+
+  const taskSuggestions = context.availableTasks.slice(0, 20).map((t: any) =>
+    `- ${t.emoji} ${t.title} (${t.category}${t.time_period ? `, ${t.time_period}` : ""}) [id: ${t.id}]`
+  ).join("\n");
+
+  return `You are Simora, a warm, supportive AI wellness coach inside the Simora app. You serve as:
+
+1. **Routine Coach** — Help users build and maintain healthy routines. Suggest routines from the available library, help with adherence, and celebrate progress.
+2. **Planning Assistant** — Help organize the day, add tasks to the planner, suggest time-blocking strategies, and review what's been accomplished.
+3. **Emotional Companion** — Provide supportive listening, mood check-ins, breathing recommendations, and journaling prompts. You are NOT a therapist — gently redirect if needed.
+
+## Your Personality
+- Warm, encouraging, and concise
+- Use emojis naturally but not excessively
+- Speak like a supportive friend, not a robot
+- Celebrate small wins enthusiastically
+- If the user seems stressed, suggest a "reset" (breathing + one small task + journaling)
+- ${language !== "en" ? `Respond in the user's preferred language: ${language}` : "Respond in English by default, but match the user's language if they write in another language."}
+
+## User Context
+- Name: ${name}
+- Goals: ${goals}
+- Today's tasks: ${todayTasks.length} total, ${completedCount} completed
+- Streak: ${context.streak?.current_streak || 0} days (longest: ${context.streak?.longest_streak || 0})
+- Recent moods: ${recentMoods || "none logged recently"}
+- Recent journals: ${context.recentJournals.length} entries in the last week
+
+## Available Routines to Suggest
+${routinesList || "No routines available"}
+
+## Available Breathing Exercises
+${breathingList || "No exercises available"}
+
+## Available Tasks to Add
+${taskSuggestions || "No tasks available"}
+
+## Tool Usage Guidelines
+- Use \`add_task_to_planner\` when users want to add a specific task to their day. Pick from the available tasks list when possible.
+- Use \`log_mood\` when users express how they're feeling and you want to log it.
+- Use \`adopt_routine\` when users want to start a routine from the library.
+- Use \`suggest_breathing\` to recommend a breathing exercise (returns as a card).
+- Use \`get_routine_suggestions\` and \`get_task_suggestions\` to show options to the user.
+- Use \`create_journal_prompt\` to suggest a journaling topic.
+
+## Important Rules
+- Keep responses concise — 2-4 sentences unless the user asks for detail
+- Don't give medical, psychiatric, or dietary advice
+- If someone is in crisis, suggest they contact a professional or crisis line
+- You can only work with features that exist in the app
+- When suggesting routines or tasks, use the IDs from the lists above`;
+}
+
+// ============= TOOL DEFINITIONS =============
+
+function getToolDefinitions() {
+  return [
+    {
+      type: "function",
+      function: {
+        name: "add_task_to_planner",
+        description: "Add a task to the user's daily planner. Use task bank IDs when available, or create a custom task.",
+        parameters: {
+          type: "object",
+          properties: {
+            task_bank_id: { type: "string", description: "ID from admin_task_bank to adopt (preferred)" },
+            title: { type: "string", description: "Custom task title if not from bank" },
+            emoji: { type: "string", description: "Emoji for custom task" },
+            scheduled_date: { type: "string", description: "Date in YYYY-MM-DD format. Defaults to today." },
+          },
+          required: ["title"],
+          additionalProperties: false,
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "log_mood",
+        description: "Log the user's current mood/emotion.",
+        parameters: {
+          type: "object",
+          properties: {
+            emotion: { type: "string", description: "The emotion name (e.g., 'happy', 'anxious', 'calm')" },
+            valence: { type: "string", enum: ["positive", "negative", "neutral"], description: "Emotional valence" },
+            category: { type: "string", description: "Category like 'joy', 'sadness', 'anger', 'fear', 'surprise'" },
+          },
+          required: ["emotion", "valence", "category"],
+          additionalProperties: false,
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "adopt_routine",
+        description: "Adopt a routine from the routines library for the user.",
+        parameters: {
+          type: "object",
+          properties: {
+            routine_id: { type: "string", description: "UUID of the routine from routines_bank" },
+          },
+          required: ["routine_id"],
+          additionalProperties: false,
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "suggest_breathing",
+        description: "Suggest a breathing exercise to the user. Returns exercise details for display.",
+        parameters: {
+          type: "object",
+          properties: {
+            exercise_id: { type: "string", description: "UUID of the breathing exercise" },
+            reason: { type: "string", description: "Brief reason for suggesting this exercise" },
+          },
+          required: ["exercise_id"],
+          additionalProperties: false,
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "create_journal_prompt",
+        description: "Create a journaling prompt for the user.",
+        parameters: {
+          type: "object",
+          properties: {
+            prompt: { type: "string", description: "The journaling prompt/question" },
+            mood: { type: "string", description: "Suggested mood tag" },
+          },
+          required: ["prompt"],
+          additionalProperties: false,
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "get_routine_suggestions",
+        description: "Get routine suggestions filtered by category. Returns routines for the user to choose from.",
+        parameters: {
+          type: "object",
+          properties: {
+            category: { type: "string", description: "Category to filter by (optional)" },
+            limit: { type: "number", description: "Max results (default 5)" },
+          },
+          additionalProperties: false,
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "get_task_suggestions",
+        description: "Get task suggestions from the task bank. Returns tasks for the user to choose from.",
+        parameters: {
+          type: "object",
+          properties: {
+            category: { type: "string", description: "Category to filter by (optional)" },
+            time_period: { type: "string", description: "Time period filter: morning, afternoon, evening (optional)" },
+            limit: { type: "number", description: "Max results (default 5)" },
+          },
+          additionalProperties: false,
+        },
+      },
+    },
+  ];
+}
+
+// ============= TOOL EXECUTION =============
+
+async function executeToolAction(supabase: any, userId: string, fnName: string, args: any) {
+  try {
+    switch (fnName) {
+      case "add_task_to_planner":
+        return await addTaskToPlanner(supabase, userId, args);
+      case "log_mood":
+        return await logMood(supabase, userId, args);
+      case "adopt_routine":
+        return await adoptRoutine(supabase, userId, args);
+      default:
+        return { success: false, error: `Unknown tool: ${fnName}` };
+    }
+  } catch (e) {
+    console.error(`Tool error (${fnName}):`, e);
+    return { success: false, error: e instanceof Error ? e.message : "Unknown error" };
+  }
+}
+
+async function addTaskToPlanner(supabase: any, userId: string, args: any) {
+  const today = new Date().toISOString().split("T")[0];
+  const scheduledDate = args.scheduled_date || today;
+
+  let taskData: any = {
+    user_id: userId,
+    title: args.title,
+    emoji: args.emoji || "✅",
+    scheduled_date: scheduledDate,
+    is_active: true,
+    repeat_pattern: "none",
+    order_index: 0,
+  };
+
+  // If task_bank_id provided, look up details from bank
+  if (args.task_bank_id) {
+    const { data: bankTask } = await supabase
+      .from("admin_task_bank")
+      .select("title, emoji, category, color, duration_minutes, time_period, repeat_pattern, description, goal_enabled, goal_type, goal_target, goal_unit")
+      .eq("id", args.task_bank_id)
+      .single();
+
+    if (bankTask) {
+      taskData = {
+        ...taskData,
+        title: bankTask.title,
+        emoji: bankTask.emoji,
+        category: bankTask.category,
+        color: bankTask.color,
+        duration_minutes: bankTask.duration_minutes,
+        time_period: bankTask.time_period,
+        repeat_pattern: bankTask.repeat_pattern || "none",
+        description: bankTask.description,
+        task_bank_id: args.task_bank_id,
+        goal_enabled: bankTask.goal_enabled,
+        goal_type: bankTask.goal_type,
+        goal_target: bankTask.goal_target,
+        goal_unit: bankTask.goal_unit,
+      };
+    }
+  }
+
+  const { data, error } = await supabase
+    .from("user_tasks")
+    .insert(taskData)
+    .select("id, title, emoji, scheduled_date")
+    .single();
+
+  if (error) {
+    return { success: false, error: error.message, action: "add_task_to_planner" };
+  }
+
+  return {
+    success: true,
+    action: "add_task_to_planner",
+    message: `Added "${data.title}" to your planner for ${data.scheduled_date}`,
+    created: data,
+  };
+}
+
+async function logMood(supabase: any, userId: string, args: any) {
+  const { data, error } = await supabase
+    .from("emotion_logs")
+    .insert({
+      user_id: userId,
+      emotion: args.emotion,
+      valence: args.valence,
+      category: args.category,
+    })
+    .select("id, emotion, valence")
+    .single();
+
+  if (error) {
+    return { success: false, error: error.message, action: "log_mood" };
+  }
+
+  return {
+    success: true,
+    action: "log_mood",
+    message: `Logged your mood: ${args.emotion}`,
+    created: data,
+  };
+}
+
+async function adoptRoutine(supabase: any, userId: string, args: any) {
+  // Check if routine exists
+  const { data: routine } = await supabase
+    .from("routines_bank")
+    .select("id, title, emoji")
+    .eq("id", args.routine_id)
+    .single();
+
+  if (!routine) {
+    return { success: false, error: "Routine not found", action: "adopt_routine" };
+  }
+
+  // Check if already adopted
+  const { data: existing } = await supabase
+    .from("user_adopted_routines")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("routine_id", args.routine_id)
+    .limit(1);
+
+  if (existing?.length) {
+    return { success: true, action: "adopt_routine", message: `You already have "${routine.title}" in your routines!`, created: routine };
+  }
+
+  const { error } = await supabase
+    .from("user_adopted_routines")
+    .insert({ user_id: userId, routine_id: args.routine_id });
+
+  if (error) {
+    return { success: false, error: error.message, action: "adopt_routine" };
+  }
+
+  return {
+    success: true,
+    action: "adopt_routine",
+    message: `Added "${routine.title}" to your routines!`,
+    created: routine,
+  };
+}
