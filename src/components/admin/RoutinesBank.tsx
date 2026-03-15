@@ -249,7 +249,8 @@ export default function RoutinesBank() {
           start_day_of_week: data.formData.start_mode === 'weekday' ? data.formData.start_day_of_week : null,
           end_mode: data.formData.end_mode,
           end_date: data.formData.end_mode === 'date' && data.formData.end_date ? data.formData.end_date.toISOString().split('T')[0] : null,
-          end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
+           end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
+           badge_image_url: data.formData.badge_image_url || null,
         })
         .select()
         .single();
