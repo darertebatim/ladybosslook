@@ -52,10 +52,15 @@ serve(async (req) => {
     const systemPrompt = buildSystemPrompt(context, mode);
     const tools = getToolDefinitions();
 
+    // ALL tools are direct-execution
     const directExecutionTools = [
       "add_task_to_planner",
       "log_mood",
       "adopt_routine",
+      "suggest_breathing",
+      "create_journal_prompt",
+      "get_routine_suggestions",
+      "get_task_suggestions",
     ];
 
     // Build AI messages
@@ -87,77 +92,72 @@ serve(async (req) => {
     // Handle direct-execution tool calls
     if (choice?.finish_reason === "tool_calls" && choice?.message?.tool_calls?.length) {
       const toolCalls = choice.message.tool_calls;
-      const hasDirectTool = toolCalls.some((tc: any) => directExecutionTools.includes(tc.function?.name));
+      const toolResults: { tool_call_id: string; result: any }[] = [];
 
-      if (hasDirectTool) {
-        const toolResults: { tool_call_id: string; result: any }[] = [];
-
-        for (const tc of toolCalls) {
-          const fnName = tc.function?.name;
-          let args: any;
-          try { args = JSON.parse(tc.function?.arguments || "{}"); } catch { args = {}; }
-
-          if (directExecutionTools.includes(fnName)) {
-            const result = await executeToolAction(supabase, user.id, fnName, args);
-            toolResults.push({ tool_call_id: tc.id, result });
-          } else {
-            toolResults.push({ tool_call_id: tc.id, result: { success: true, message: "Suggestion provided" } });
-          }
-        }
-
-        // Follow-up with tool results
-        const followUpMessages: Message[] = [
-          ...aiMessages,
-          choice.message,
-          ...toolResults.map((tr: any) => ({
-            role: "tool" as const,
-            content: JSON.stringify(tr.result),
-            tool_call_id: tr.tool_call_id,
-          })),
-        ];
-
-        const secondResponse = await fetch(AI_GATEWAY, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-3-flash-preview",
-            messages: followUpMessages,
-            stream: true,
-          }),
-        });
-
-        if (!secondResponse.ok) return handleAIError(secondResponse);
-
-        const actionData = toolResults.map(tr => tr.result);
-        const actionEvent = `data: ${JSON.stringify({ action_results: actionData })}\n\n`;
-        const actionChunk = new TextEncoder().encode(actionEvent);
-
-        const combinedStream = new ReadableStream({
-          async start(controller) {
-            controller.enqueue(actionChunk);
-            const reader = secondResponse.body!.getReader();
-            try {
-              while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                controller.enqueue(value);
-              }
-            } finally {
-              controller.close();
-            }
-          },
-        });
-
-        return new Response(combinedStream, {
-          headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
-        });
+      for (const tc of toolCalls) {
+        const fnName = tc.function?.name;
+        let args: any;
+        try { args = JSON.parse(tc.function?.arguments || "{}"); } catch { args = {}; }
+        const result = await executeToolAction(supabase, user.id, fnName, args);
+        toolResults.push({ tool_call_id: tc.id, result });
       }
+
+      // Follow-up with tool results
+      const followUpMessages: Message[] = [
+        ...aiMessages,
+        choice.message,
+        ...toolResults.map((tr: any) => ({
+          role: "tool" as const,
+          content: JSON.stringify(tr.result),
+          tool_call_id: tr.tool_call_id,
+        })),
+      ];
+
+      const secondResponse = await fetch(AI_GATEWAY, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: followUpMessages,
+          stream: true,
+        }),
+      });
+
+      if (!secondResponse.ok) return handleAIError(secondResponse);
+
+      // Only include action_results for mutation tools (not queries)
+      const mutationTools = ["add_task_to_planner", "log_mood", "adopt_routine"];
+      const mutationResults = toolResults.filter(tr => mutationTools.includes(tr.result.action));
+      
+      const combinedStream = new ReadableStream({
+        async start(controller) {
+          if (mutationResults.length > 0) {
+            const actionData = mutationResults.map(tr => tr.result);
+            const actionEvent = `data: ${JSON.stringify({ action_results: actionData })}\n\n`;
+            controller.enqueue(new TextEncoder().encode(actionEvent));
+          }
+          const reader = secondResponse.body!.getReader();
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              controller.enqueue(value);
+            }
+          } finally {
+            controller.close();
+          }
+        },
+      });
+
+      return new Response(combinedStream, {
+        headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+      });
     }
 
-    // No direct tools — stream normally
+    // No tool calls — stream normally (no tools to prevent raw JSON leaking)
     const streamResponse = await fetch(AI_GATEWAY, {
       method: "POST",
       headers: {
@@ -168,8 +168,6 @@ serve(async (req) => {
         model: "google/gemini-3-flash-preview",
         messages: aiMessages,
         stream: true,
-        tools,
-        tool_choice: "auto",
       }),
     });
 
@@ -444,6 +442,14 @@ async function executeToolAction(supabase: any, userId: string, fnName: string, 
         return await logMood(supabase, userId, args);
       case "adopt_routine":
         return await adoptRoutine(supabase, userId, args);
+      case "suggest_breathing":
+        return await suggestBreathing(supabase, args);
+      case "create_journal_prompt":
+        return { success: true, action: "create_journal_prompt", message: `Journal prompt: "${args.prompt}"`, created: { title: args.prompt, mood: args.mood } };
+      case "get_routine_suggestions":
+        return await getRoutineSuggestions(supabase, args);
+      case "get_task_suggestions":
+        return await getTaskSuggestions(supabase, args);
       default:
         return { success: false, error: `Unknown tool: ${fnName}` };
     }
@@ -574,5 +580,69 @@ async function adoptRoutine(supabase: any, userId: string, args: any) {
     action: "adopt_routine",
     message: `Added "${routine.title}" to your routines!`,
     created: routine,
+  };
+}
+
+async function suggestBreathing(supabase: any, args: any) {
+  const { data } = await supabase
+    .from("breathing_exercises")
+    .select("id, name, emoji, category, description, inhale_seconds, exhale_seconds")
+    .eq("id", args.exercise_id)
+    .single();
+
+  if (!data) {
+    return { success: false, error: "Exercise not found", action: "suggest_breathing" };
+  }
+
+  return {
+    success: true,
+    action: "suggest_breathing",
+    message: `Suggested breathing exercise: ${data.emoji} ${data.name}`,
+    created: { ...data, reason: args.reason, deepLink: `/app/breathe?exercise=${data.id}` },
+  };
+}
+
+async function getRoutineSuggestions(supabase: any, args: any) {
+  let query = supabase
+    .from("routines_bank")
+    .select("id, title, emoji, category, subtitle")
+    .eq("is_active", true)
+    .order("sort_order")
+    .limit(args.limit || 5);
+
+  if (args.category) {
+    query = query.eq("category", args.category);
+  }
+
+  const { data, error } = await query;
+  if (error) return { success: false, error: error.message, action: "get_routine_suggestions" };
+
+  return {
+    success: true,
+    action: "get_routine_suggestions",
+    message: `Found ${data?.length || 0} routines`,
+    created: { routines: data },
+  };
+}
+
+async function getTaskSuggestions(supabase: any, args: any) {
+  let query = supabase
+    .from("admin_task_bank")
+    .select("id, title, emoji, category, description, duration_minutes, time_period")
+    .eq("is_active", true)
+    .order("sort_order")
+    .limit(args.limit || 5);
+
+  if (args.category) query = query.eq("category", args.category);
+  if (args.time_period) query = query.eq("time_period", args.time_period);
+
+  const { data, error } = await query;
+  if (error) return { success: false, error: error.message, action: "get_task_suggestions" };
+
+  return {
+    success: true,
+    action: "get_task_suggestions",
+    message: `Found ${data?.length || 0} task suggestions`,
+    created: { tasks: data },
   };
 }
