@@ -46,10 +46,25 @@ export function PlusGateSheet({
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="flex items-center gap-1.5 bg-amber-100 text-amber-700 rounded-full px-3 py-1 text-xs font-bold mb-4"
+            className="flex items-center gap-1.5 bg-amber-100 text-amber-700 rounded-full px-3 py-1 text-xs font-bold mb-3"
           >
             <Crown className="h-3.5 w-3.5" />
             Simora+ Feature
+          </motion.div>
+
+          {/* Premium explainer box */}
+          <motion.div
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.22 }}
+            className="w-full rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/60 px-4 py-3.5 mb-4"
+          >
+            <p className="text-[13px] text-foreground font-semibold leading-snug">
+              ✨ Premium tools are designed for professionals who want to level up their daily life.
+            </p>
+            <p className="text-[12px] text-muted-foreground mt-1 leading-snug">
+              Are you ready to become a Simora+ member?
+            </p>
           </motion.div>
 
           {/* Title */}
