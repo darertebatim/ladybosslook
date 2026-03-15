@@ -295,33 +295,51 @@ export default function AppInspireDetail() {
               )}
             </div>
 
-            {/* Start date banner */}
-            <div className={cn(
-              'mt-4 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border',
-              startInfo.isFuture 
-                ? 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800'
-                : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800'
-            )}>
-              <span className="text-lg">{startInfo.emoji}</span>
-              <span className={cn(
-                'text-sm font-medium',
-                startInfo.isFuture 
-                  ? 'text-amber-800 dark:text-amber-300'
-                  : 'text-emerald-800 dark:text-emerald-300'
-              )}>
-                {startInfo.label}
-              </span>
-            </div>
+            {/* Start/End + Badge row */}
+            <div className={cn("mt-4 flex gap-3", (routine as any).badge_image_url ? "" : "")}>
+              {/* Left: Start & End banners */}
+              <div className={cn("flex flex-col gap-2", (routine as any).badge_image_url ? "flex-1" : "w-full")}>
+                <div className={cn(
+                  'flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border',
+                  startInfo.isFuture 
+                    ? 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800'
+                    : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800'
+                )}>
+                  <span className="text-lg">{startInfo.emoji}</span>
+                  <span className={cn(
+                    'text-sm font-medium',
+                    startInfo.isFuture 
+                      ? 'text-amber-800 dark:text-amber-300'
+                      : 'text-emerald-800 dark:text-emerald-300'
+                  )}>
+                    {startInfo.label}
+                  </span>
+                </div>
 
-            {/* End date banner */}
-            {endInfo && (
-              <div className="mt-2 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
-                <span className="text-lg">{endInfo.emoji}</span>
-                <span className="text-sm font-medium text-rose-800 dark:text-rose-300">
-                  {endInfo.label}
-                </span>
+                {endInfo && (
+                  <div className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
+                    <span className="text-lg">{endInfo.emoji}</span>
+                    <span className="text-sm font-medium text-rose-800 dark:text-rose-300">
+                      {endInfo.label}
+                    </span>
+                  </div>
+                )}
               </div>
-            )}
+
+              {/* Right: Badge preview */}
+              {(routine as any).badge_image_url && (
+                <div className="flex flex-col items-center justify-center shrink-0">
+                  <div className="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-amber-300 bg-amber-50 shadow-md">
+                    <img 
+                      src={(routine as any).badge_image_url} 
+                      alt="Challenge badge" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span className="text-[10px] text-amber-600 font-semibold mt-1">🏆 Badge</span>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Description — rendered as rich HTML */}
