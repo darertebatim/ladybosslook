@@ -308,7 +308,7 @@ export const ChallengeDayCelebration = ({
                 'flex items-center gap-1.5 backdrop-blur-sm rounded-full px-3 py-1.5 border',
                 isComplete ? 'bg-amber-800/15 border-amber-600/20' : 'bg-white/40 border-white/50'
               )}>
-                <Trophy className={cn('w-3.5 h-3.5', isComplete ? 'text-amber-600' : 'text-pink-500')} />
+                <Trophy className={cn('w-3.5 h-3.5', isComplete ? 'text-amber-600' : 'text-orange-600')} />
                 <span className={cn('text-xs font-semibold', textColor, 'opacity-90')}>
                   {isComplete ? '🏆 Challenge Champion!' :
                    isHalfway ? '⚡ Halfway Milestone' :
