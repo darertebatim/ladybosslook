@@ -391,7 +391,7 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
         <FadeUp>
           <div className="min-h-[4.5em] flex flex-col items-center justify-center mb-5">
             <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center leading-snug">{step.title}</h1>
-            {step.subtitle && <p className="text-base text-gray-500 mt-1 text-center">{step.subtitle}</p>}
+            {step.subtitle && <p className="text-base text-[#1a1f3d] mt-1 text-center">{step.subtitle}</p>}
           </div>
         </FadeUp>
         <StaggerContainer className="space-y-3">
