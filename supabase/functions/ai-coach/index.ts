@@ -43,13 +43,29 @@ serve(async (req) => {
       });
     }
 
-    const { messages, mode } = await req.json();
+    const { messages, mode, conversationSummary } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Fetch user context
+    // Fetch user context + past conversation memory
     const context = await fetchUserContext(supabase, user.id);
-    const systemPrompt = buildSystemPrompt(context, mode);
+    
+    // Load past conversation memory if not provided
+    let memory = conversationSummary || "";
+    if (!memory) {
+      const { data: convo } = await supabase
+        .from("ai_coach_conversations")
+        .select("messages")
+        .eq("user_id", user.id)
+        .single();
+      if (convo?.messages && Array.isArray(convo.messages) && convo.messages.length > 0) {
+        // Summarize last 20 messages for context
+        const recentHistory = convo.messages.slice(-20);
+        memory = recentHistory.map((m: any) => `${m.role}: ${m.content?.slice(0, 200)}`).join("\n");
+      }
+    }
+    
+    const systemPrompt = buildSystemPrompt(context, mode, memory);
     const tools = getToolDefinitions();
 
     // ALL tools are direct-execution
@@ -69,28 +85,37 @@ serve(async (req) => {
       ...messages,
     ];
 
-    // First call (non-streaming) to check for tool calls
-    const firstResponse = await fetch(AI_GATEWAY, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: aiMessages,
-        tools,
-        tool_choice: "auto",
-      }),
-    });
+    // Multi-turn tool chaining loop (up to 3 rounds)
+    let currentMessages = [...aiMessages];
+    const allMutationResults: any[] = [];
+    const MAX_TOOL_ROUNDS = 3;
 
-    if (!firstResponse.ok) return handleAIError(firstResponse);
+    for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+      const callResponse = await fetch(AI_GATEWAY, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: currentMessages,
+          tools,
+          tool_choice: "auto",
+        }),
+      });
 
-    const firstResult = await firstResponse.json();
-    const choice = firstResult.choices?.[0];
+      if (!callResponse.ok) return handleAIError(callResponse);
 
-    // Handle direct-execution tool calls
-    if (choice?.finish_reason === "tool_calls" && choice?.message?.tool_calls?.length) {
+      const callResult = await callResponse.json();
+      const choice = callResult.choices?.[0];
+
+      // If no tool calls, we're done — stream the final response
+      if (choice?.finish_reason !== "tool_calls" || !choice?.message?.tool_calls?.length) {
+        break;
+      }
+
+      // Execute all tool calls in this round
       const toolCalls = choice.message.tool_calls;
       const toolResults: { tool_call_id: string; result: any }[] = [];
 
@@ -102,9 +127,13 @@ serve(async (req) => {
         toolResults.push({ tool_call_id: tc.id, result });
       }
 
-      // Follow-up with tool results
-      const followUpMessages: Message[] = [
-        ...aiMessages,
+      // Collect mutation results for action cards
+      const mutationTools = ["add_task_to_planner", "log_mood", "adopt_routine"];
+      allMutationResults.push(...toolResults.filter(tr => mutationTools.includes(tr.result.action)).map(tr => tr.result));
+
+      // Add tool call + results to conversation for next round
+      currentMessages = [
+        ...currentMessages,
         choice.message,
         ...toolResults.map((tr: any) => ({
           role: "tool" as const,
@@ -112,53 +141,10 @@ serve(async (req) => {
           tool_call_id: tr.tool_call_id,
         })),
       ];
-
-      const secondResponse = await fetch(AI_GATEWAY, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: followUpMessages,
-          stream: true,
-        }),
-      });
-
-      if (!secondResponse.ok) return handleAIError(secondResponse);
-
-      // Only include action_results for mutation tools (not queries)
-      const mutationTools = ["add_task_to_planner", "log_mood", "adopt_routine"];
-      const mutationResults = toolResults.filter(tr => mutationTools.includes(tr.result.action));
-      
-      const combinedStream = new ReadableStream({
-        async start(controller) {
-          if (mutationResults.length > 0) {
-            const actionData = mutationResults.map(tr => tr.result);
-            const actionEvent = `data: ${JSON.stringify({ action_results: actionData })}\n\n`;
-            controller.enqueue(new TextEncoder().encode(actionEvent));
-          }
-          const reader = secondResponse.body!.getReader();
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              controller.enqueue(value);
-            }
-          } finally {
-            controller.close();
-          }
-        },
-      });
-
-      return new Response(combinedStream, {
-        headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
-      });
     }
 
-    // No tool calls — stream normally (no tools to prevent raw JSON leaking)
-    const streamResponse = await fetch(AI_GATEWAY, {
+    // Final streaming response (with or without prior tool context)
+    const finalResponse = await fetch(AI_GATEWAY, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
@@ -166,14 +152,33 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
-        messages: aiMessages,
+        messages: currentMessages,
         stream: true,
       }),
     });
 
-    if (!streamResponse.ok) return handleAIError(streamResponse);
+    if (!finalResponse.ok) return handleAIError(finalResponse);
 
-    return new Response(streamResponse.body, {
+    const combinedStream = new ReadableStream({
+      async start(controller) {
+        if (allMutationResults.length > 0) {
+          const actionEvent = `data: ${JSON.stringify({ action_results: allMutationResults })}\n\n`;
+          controller.enqueue(new TextEncoder().encode(actionEvent));
+        }
+        const reader = finalResponse.body!.getReader();
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            controller.enqueue(value);
+          }
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(combinedStream, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (e) {
@@ -235,10 +240,9 @@ async function fetchUserContext(supabase: any, userId: string) {
 
 // ============= SYSTEM PROMPT =============
 
-function buildSystemPrompt(context: any, mode?: string) {
-  const name = context.profile?.full_name || "there";
+function buildSystemPrompt(context: any, mode?: string, memory?: string) {
+  const name = context.profile?.full_name?.split(" ")[0] || "there";
   const goals = context.profile?.goals?.join(", ") || "not specified";
-  const language = context.profile?.preferred_language || "en";
 
   const completedIds = new Set(context.todayCompletions.map((c: any) => c.task_id));
   const todayTasks = context.tasks.filter((t: any) => {
@@ -264,19 +268,53 @@ function buildSystemPrompt(context: any, mode?: string) {
     `- ${t.emoji} ${t.title} (${t.category}${t.time_period ? `, ${t.time_period}` : ""}) [id: ${t.id}]`
   ).join("\n");
 
-  return `You are Simora, a warm, supportive AI wellness coach inside the Simora app. You serve as:
+  // Mode-specific persona
+  const modePersona = mode === "coach" 
+    ? `You are currently in **Routine Coach** mode. Focus on:
+- Helping build and maintain healthy routines and habits
+- Suggesting routines from the library that fit the user's goals
+- Troubleshooting adherence issues ("I keep skipping my morning routine")
+- Celebrating consistency and progress
+- Creating structured daily/weekly plans with specific tasks
+- When appropriate, use tools to add tasks or adopt routines directly`
+    : mode === "assistant"
+    ? `You are currently in **Planning Assistant** mode. Focus on:
+- Organizing the user's day with clear priorities
+- Adding tasks to the planner proactively when the user agrees
+- Reviewing what's been accomplished and what's pending
+- Suggesting time-blocking strategies
+- Breaking big goals into small actionable steps
+- Being efficient and action-oriented — propose concrete plans, not just advice`
+    : mode === "companion"
+    ? `You are currently in **Emotional Companion** mode. Focus on:
+- Supportive, empathetic listening — validate feelings first
+- Gentle mood check-ins and emotional exploration
+- Suggesting breathing exercises when the user seems stressed or anxious
+- Offering journaling prompts for self-reflection
+- Helping the user name and understand their emotions
+- You are NOT a therapist — if someone needs professional help, gently suggest it
+- Use a warmer, softer tone in this mode`
+    : `Adapt naturally between coaching, planning, and emotional support based on what the user needs. Read their tone and intent carefully.`;
 
-1. **Routine Coach** — Help users build and maintain healthy routines. Suggest routines from the available library, help with adherence, and celebrate progress.
-2. **Planning Assistant** — Help organize the day, add tasks to the planner, suggest time-blocking strategies, and review what's been accomplished.
-3. **Emotional Companion** — Provide supportive listening, mood check-ins, breathing recommendations, and journaling prompts. You are NOT a therapist — gently redirect if needed.
+  // Memory section
+  const memorySection = memory 
+    ? `\n## Previous Conversation Memory\nYou have talked with ${name} before. Here's a summary of recent conversations — reference this naturally when relevant, don't repeat it back verbatim:\n${memory}\n`
+    : "";
+
+  return `You are Simora, a warm and intelligent AI wellness coach inside the Simora app. You always respond in English.
+
+## Current Mode
+${modePersona}
 
 ## Your Personality
-- Warm, encouraging, and concise
-- Use emojis naturally but not excessively
-- Speak like a supportive friend, not a robot
+- Warm, encouraging, and concise — like a knowledgeable friend
+- Use emojis naturally but sparingly (1-2 per message max)
+- Be specific and actionable, not generic
 - Celebrate small wins enthusiastically
+- Remember what the user told you and reference it naturally
 - If the user seems stressed, suggest a "reset" (breathing + one small task + journaling)
-- ${language !== "en" ? `Respond in the user's preferred language: ${language}` : "Respond in English by default, but match the user's language if they write in another language."}
+- Ask thoughtful follow-up questions to understand the user better
+- When you take actions (add tasks, log mood), confirm what you did clearly
 
 ## User Context
 - Name: ${name}
@@ -285,7 +323,7 @@ function buildSystemPrompt(context: any, mode?: string) {
 - Streak: ${context.streak?.current_streak || 0} days (longest: ${context.streak?.longest_streak || 0})
 - Recent moods: ${recentMoods || "none logged recently"}
 - Recent journals: ${context.recentJournals.length} entries in the last week
-
+${memorySection}
 ## Available Routines to Suggest
 ${routinesList || "No routines available"}
 
@@ -296,19 +334,22 @@ ${breathingList || "No exercises available"}
 ${taskSuggestions || "No tasks available"}
 
 ## Tool Usage Guidelines
-- Use \`add_task_to_planner\` when users want to add a specific task to their day. Pick from the available tasks list when possible.
-- Use \`log_mood\` when users express how they're feeling and you want to log it.
+- **Chain multiple tools** when it makes sense. For example: if a user says "I'm stressed and need help planning," you can log their mood AND suggest breathing AND add a task — all in one response.
+- Use \`add_task_to_planner\` when users want to add a specific task. Prefer task bank items (use their IDs).
+- Use \`log_mood\` when users express feelings — do this proactively when emotions are clear from their message.
 - Use \`adopt_routine\` when users want to start a routine from the library.
-- Use \`suggest_breathing\` to recommend a breathing exercise (returns as a card).
-- Use \`get_routine_suggestions\` and \`get_task_suggestions\` to show options to the user.
-- Use \`create_journal_prompt\` to suggest a journaling topic.
+- Use \`suggest_breathing\` to recommend a breathing exercise when the user is stressed, anxious, or needs calm.
+- Use \`get_routine_suggestions\` and \`get_task_suggestions\` to fetch and present options.
+- Use \`create_journal_prompt\` to suggest journaling for self-reflection.
 
 ## Important Rules
+- Always respond in English
 - Keep responses concise — 2-4 sentences unless the user asks for detail
 - Don't give medical, psychiatric, or dietary advice
 - If someone is in crisis, suggest they contact a professional or crisis line
 - You can only work with features that exist in the app
-- When suggesting routines or tasks, use the IDs from the lists above`;
+- When suggesting routines or tasks, use the IDs from the available lists
+- Don't output raw JSON or tool call syntax — speak naturally about what you did`;
 }
 
 // ============= TOOL DEFINITIONS =============
