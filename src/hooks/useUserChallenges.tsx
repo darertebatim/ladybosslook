@@ -146,6 +146,7 @@ export function useUserChallenges() {
           addedAt,
           computedStartDate,
           hasStarted,
+          badgeImageUrl: (routine as any).badge_image_url || null,
         });
       }
 
