@@ -193,7 +193,7 @@ export const ChallengeDayCelebration = ({
               style={{
                 background: isComplete
                   ? 'radial-gradient(circle, rgba(251, 191, 36, 0.3) 0%, transparent 60%)'
-                  : 'radial-gradient(circle, rgba(244, 114, 182, 0.25) 0%, transparent 60%)',
+                  : 'radial-gradient(circle, rgba(249, 115, 22, 0.25) 0%, transparent 60%)',
               }}
             />
             {isComplete && badgeImageUrl ? (
