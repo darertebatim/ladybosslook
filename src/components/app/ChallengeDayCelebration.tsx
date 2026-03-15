@@ -110,7 +110,7 @@ export const ChallengeDayCelebration = ({
     motivationText = 'A full week in! Real discipline 💪';
   }
 
-  // Theme: bright and warm for normal, golden for complete
+  // Theme: warm orange for normal, golden for complete
   const bgStyle = isComplete
     ? {
         background:
@@ -118,7 +118,7 @@ export const ChallengeDayCelebration = ({
       }
     : {
         background:
-          'linear-gradient(160deg, #fdf2f8 0%, #fce7f3 15%, #fbcfe8 35%, #f9a8d4 55%, #f472b6 80%, #ec4899 100%)',
+          'linear-gradient(160deg, #fff7ed 0%, #fed7aa 18%, #fdba74 38%, #fb923c 58%, #f97316 78%, #ea580c 100%)',
       };
 
   const glowStyle = isComplete
@@ -128,19 +128,19 @@ export const ChallengeDayCelebration = ({
       }
     : {
         background:
-          'radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255, 255, 255, 0.5) 0%, transparent 60%)',
+          'radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255, 255, 255, 0.45) 0%, transparent 65%)',
       };
 
-  const textColor = isComplete ? 'text-amber-900' : 'text-pink-900';
-  const subTextColor = isComplete ? 'text-amber-800/70' : 'text-pink-800/70';
-  const progressBarBg = isComplete ? 'bg-amber-900/15' : 'bg-white/30';
+  const textColor = isComplete ? 'text-amber-900' : 'text-orange-900';
+  const subTextColor = isComplete ? 'text-amber-800/70' : 'text-orange-800/70';
+  const progressBarBg = isComplete ? 'bg-amber-900/15' : 'bg-white/25';
   const progressBarFill = isComplete
     ? 'linear-gradient(90deg, #d97706 0%, #fbbf24 50%, #fef08a 100%)'
-    : 'linear-gradient(90deg, #ec4899 0%, #f472b6 50%, #fce7f3 100%)';
-  const cardBg = isComplete ? 'bg-amber-800/10 border-amber-600/20' : 'bg-white/40 border-white/50';
+    : 'linear-gradient(90deg, #ea580c 0%, #f97316 40%, #fbbf24 100%)';
+  const cardBg = isComplete ? 'bg-amber-800/10 border-amber-600/20' : 'bg-white/35 border-white/40';
   const btnClass = isComplete
     ? 'bg-amber-900 hover:bg-amber-800 text-amber-50'
-    : 'bg-pink-600 hover:bg-pink-500 text-white';
+    : 'bg-white hover:bg-white/90 text-orange-700';
 
   return (
     <OverlayPortal>
