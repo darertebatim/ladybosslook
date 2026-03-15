@@ -910,6 +910,9 @@ export const useCompleteTask = () => {
       // Update presence stats
       queryClient.invalidateQueries({ queryKey: ['user-presence'] });
       queryClient.invalidateQueries({ queryKey: ['presence-stats'] });
+      // Update challenge progress
+      queryClient.invalidateQueries({ queryKey: ['user-challenges'] });
+      queryClient.invalidateQueries({ queryKey: ['challenge-routine-infos'] });
     },
     onError: (error) => {
       console.error('Complete task error:', error);

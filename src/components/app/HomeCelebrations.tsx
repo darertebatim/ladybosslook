@@ -8,6 +8,7 @@ import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation'
 import { StreakRecoveryPrompt } from '@/components/app/StreakRecoveryPrompt';
 import { BadgeCelebration } from '@/components/app/BadgeCelebration';
 import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
+import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebration';
 import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
 import { GoalInputSheet } from '@/components/app/GoalInputSheet';
 import { TaskTimerScreen } from '@/components/app/TaskTimerScreen';
@@ -116,6 +117,17 @@ interface HomeCelebrationsProps {
   userId?: string;
   showNotificationFlow: boolean;
   setShowNotificationFlow: (v: boolean) => void;
+
+  // Challenge day celebration
+  challengeDayCelebration: {
+    challengeTitle: string;
+    challengeEmoji: string;
+    currentDay: number;
+    totalDays: number;
+    routineId: string;
+  } | null;
+  closeChallengeDayCelebration: () => void;
+  showChallengeDayCelebration: boolean;
 }
 
 export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebrationsProps) {
@@ -137,6 +149,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     showGoldRecoveryPrompt, setShowGoldRecoveryPrompt,
     showRecoverySuccess, setShowRecoverySuccess, previousGoldStreak,
     userId, showNotificationFlow, setShowNotificationFlow,
+    challengeDayCelebration, closeChallengeDayCelebration, showChallengeDayCelebration,
   } = props;
 
   const { hasAccessToProgram } = useSubscription();
@@ -328,6 +341,15 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         restoredStreak={showRecoverySuccess === 'gold' ? previousGoldStreak : (streak?.longest_streak || 0)}
         type={showRecoverySuccess || 'streak'}
         onClose={() => setShowRecoverySuccess(null)}
+      />
+
+      <ChallengeDayCelebration
+        open={showChallengeDayCelebration}
+        onClose={closeChallengeDayCelebration}
+        challengeTitle={challengeDayCelebration?.challengeTitle || ''}
+        challengeEmoji={challengeDayCelebration?.challengeEmoji || '✨'}
+        currentDay={challengeDayCelebration?.currentDay || 0}
+        totalDays={challengeDayCelebration?.totalDays || 0}
       />
     </OverlayPortal>
   );

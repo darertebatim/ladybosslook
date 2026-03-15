@@ -32,6 +32,7 @@ import { WelcomeRoutineCard } from '@/components/app/WelcomeRoutineCard';
 import { toast } from 'sonner';
 import { useWeeklyTaskCompletion, useDateRangeTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 import { useBadgeCelebration } from '@/hooks/useBadgeCelebration';
+import { useChallengeDayCelebration } from '@/hooks/useChallengeDayCelebration';
 import { useGoldStreak, useGoldDatesThisWeek, useUpdateGoldStreak } from '@/hooks/useGoldStreak';
 import { useTodayMood } from '@/hooks/useMoodLogs';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -524,6 +525,17 @@ const AppHome = () => {
     totalCount: todayStats?.totalTasks || 0,
     dateKey: todayDateStr,
   });
+
+  // Challenge day celebration
+  const {
+    celebrationData: challengeDayCelebration,
+    closeCelebration: closeChallengeDayCelebration,
+    showCelebration: showChallengeDayCelebration,
+  } = useChallengeDayCelebration(
+    tasks.map(t => ({ id: t.id, title: t.title })),
+    completedTaskIds,
+    todayDateStr,
+  );
 
   const handleStreakIncrease = useCallback(() => {
     // If user has never celebrated first action, don't open streak modal immediately —
@@ -1293,6 +1305,9 @@ const AppHome = () => {
           userId={user?.id}
           showNotificationFlow={showNotificationFlow}
           setShowNotificationFlow={setShowNotificationFlow}
+          challengeDayCelebration={challengeDayCelebration}
+          closeChallengeDayCelebration={closeChallengeDayCelebration}
+          showChallengeDayCelebration={showChallengeDayCelebration}
         />
 
         {/* New Interactive Home Tour */}
