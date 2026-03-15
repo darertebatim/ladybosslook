@@ -58,6 +58,12 @@ export default function AppInspire() {
 
   const filteredPopular = popularRoutines?.filter(matchesSearch);
 
+  // Challenge routines
+  const challengeRoutines = useMemo(() => {
+    if (!allRoutines) return [];
+    return allRoutines.filter(r => r.schedule_type === 'challenge').filter(matchesSearch);
+  }, [allRoutines, searchQuery]);
+
   // Only show categories that have routines
   const nonEmptyCategories = useMemo(() => {
     if (!categories || !allRoutines) return [];
