@@ -66,7 +66,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
           tool.bgColor
         )}>
           {tool.emoji ? (
-            <span className="text-lg">{tool.emoji}</span>
+            <FluentEmoji emoji={tool.emoji} size={22} />
           ) : (
             <IconComponent className={cn('h-5 w-5', tool.iconColor)} />
           )}
