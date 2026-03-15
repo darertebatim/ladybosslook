@@ -30,6 +30,7 @@ export const ChallengeDayCelebration = ({
   challengeEmoji,
   currentDay,
   totalDays,
+  badgeImageUrl,
 }: ChallengeDayCelebrationProps) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [showContent, setShowContent] = useState(false);
