@@ -223,8 +223,8 @@ function ActionResultCard({ result }: { result: ActionResult }) {
     <Card className={cn(
       "p-2.5 text-xs",
       result.success
-        ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800"
-        : "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800"
+        ? "bg-accent/50 border-accent"
+        : "bg-destructive/10 border-destructive/30"
     )}>
       <div className="flex items-center gap-1.5">
         <span>{result.success ? '✅' : '❌'}</span>
