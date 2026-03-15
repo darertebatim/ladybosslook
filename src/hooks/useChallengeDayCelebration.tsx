@@ -3,12 +3,13 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
-interface ChallengeDayCelebrationData {
+export interface ChallengeDayCelebrationData {
   challengeTitle: string;
   challengeEmoji: string;
   currentDay: number;
   totalDays: number;
   routineId: string;
+  badgeImageUrl: string | null;
 }
 
 interface ChallengeRoutineInfo {
@@ -18,12 +19,13 @@ interface ChallengeRoutineInfo {
   totalDays: number;
   taskTitles: string[];
   hasStarted: boolean;
-  completedDays: number;
+  badgeImageUrl: string | null;
 }
 
 /**
  * Detects when all challenge tasks for today are completed
  * and triggers the ChallengeDayCelebration overlay.
+ * Awards badge when challenge is fully completed.
  */
 export function useChallengeDayCelebration(
   allTasks: { id: string; title: string }[],
@@ -55,7 +57,7 @@ export function useChallengeDayCelebration(
 
       const { data: routines } = await supabase
         .from('routines_bank')
-        .select('id, title, emoji, end_after_days, challenge_start_date, start_day_of_week')
+        .select('id, title, emoji, end_after_days, challenge_start_date, start_day_of_week, badge_image_url')
         .in('id', routineIds)
         .eq('schedule_type', 'challenge');
 
@@ -77,10 +79,10 @@ export function useChallengeDayCelebration(
         routineId: r.id,
         title: r.title,
         emoji: r.emoji || '✨',
-        totalDays: r.end_after_days || (taskTitlesByRoutine.get(r.id)?.length || 0),
+        totalDays: (r as any).end_after_days || (taskTitlesByRoutine.get(r.id)?.length || 0),
         taskTitles: taskTitlesByRoutine.get(r.id) || [],
-        hasStarted: true, // Simplified; full logic is in useUserChallenges
-        completedDays: 0, // Will be calculated below
+        hasStarted: true,
+        badgeImageUrl: (r as any).badge_image_url || null,
       }));
     },
     enabled: !!user,
@@ -119,7 +121,7 @@ export function useChallengeDayCelebration(
     prevCompletedCountRef.current = totalCompleted;
     if (!isNewCompletion) return;
 
-    // Build a map of task title → task id for matching
+    // Build a map of task title → task id
     const titleToTaskId = new Map<string, string>();
     allTasks.forEach(t => titleToTaskId.set(t.title, t.id));
 
@@ -130,22 +132,18 @@ export function useChallengeDayCelebration(
       const celebratedKey = `simora_challenge_day_celebrated_${challenge.routineId}_${dateKey}`;
       if (localStorage.getItem(celebratedKey) === 'true') continue;
 
-      // Find matching user tasks for this challenge
       const matchingTaskIds = challenge.taskTitles
         .map(title => titleToTaskId.get(title))
         .filter(Boolean) as string[];
 
       if (matchingTaskIds.length === 0) continue;
 
-      // Check if ALL matching tasks are completed today
       const allCompleted = matchingTaskIds.every(id => completedTaskIds.has(id));
 
       if (allCompleted) {
-        // Calculate how many total days completed (rough: count based on completions)
-        // We use the challenge data's completedDays + 1 since this is the new completion
         localStorage.setItem(celebratedKey, 'true');
         
-        // Count how many previous days were celebrated for this challenge
+        // Count completed challenge days from localStorage
         let dayCount = 0;
         for (let i = 0; i < 365; i++) {
           const d = new Date();
@@ -154,17 +152,26 @@ export function useChallengeDayCelebration(
           if (localStorage.getItem(key) === 'true') dayCount++;
         }
 
+        const currentDay = Math.min(dayCount, challenge.totalDays);
+        const isComplete = currentDay >= challenge.totalDays;
+
+        // Award badge if challenge is complete and has a badge
+        if (isComplete && challenge.badgeImageUrl && user) {
+          awardChallengeBadge(user.id, challenge.routineId, challenge.badgeImageUrl, challenge.title, challenge.emoji);
+        }
+
         setCelebrationData({
           challengeTitle: challenge.title,
           challengeEmoji: challenge.emoji,
-          currentDay: Math.min(dayCount, challenge.totalDays),
+          currentDay,
           totalDays: challenge.totalDays,
           routineId: challenge.routineId,
+          badgeImageUrl: challenge.badgeImageUrl,
         });
-        return; // Show one at a time
+        return;
       }
     }
-  }, [challengeInfos, allTasks, completedTaskIds, dateKey]);
+  }, [challengeInfos, allTasks, completedTaskIds, dateKey, user]);
 
   const closeCelebration = useCallback(() => {
     setCelebrationData(null);
@@ -175,4 +182,27 @@ export function useChallengeDayCelebration(
     closeCelebration,
     showCelebration: !!celebrationData,
   };
+}
+
+/** Insert badge into user_challenge_badges (ignore duplicates) */
+async function awardChallengeBadge(
+  userId: string,
+  routineId: string,
+  badgeImageUrl: string,
+  routineTitle: string,
+  routineEmoji: string,
+) {
+  try {
+    await supabase
+      .from('user_challenge_badges')
+      .insert({
+        user_id: userId,
+        routine_id: routineId,
+        badge_image_url: badgeImageUrl,
+        routine_title: routineTitle,
+        routine_emoji: routineEmoji,
+      });
+  } catch {
+    // Ignore duplicate or other errors
+  }
 }
