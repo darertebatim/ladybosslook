@@ -442,6 +442,14 @@ async function executeToolAction(supabase: any, userId: string, fnName: string, 
         return await logMood(supabase, userId, args);
       case "adopt_routine":
         return await adoptRoutine(supabase, userId, args);
+      case "suggest_breathing":
+        return await suggestBreathing(supabase, args);
+      case "create_journal_prompt":
+        return { success: true, action: "create_journal_prompt", message: `Journal prompt: "${args.prompt}"`, created: { title: args.prompt, mood: args.mood } };
+      case "get_routine_suggestions":
+        return await getRoutineSuggestions(supabase, args);
+      case "get_task_suggestions":
+        return await getTaskSuggestions(supabase, args);
       default:
         return { success: false, error: `Unknown tool: ${fnName}` };
     }
