@@ -145,7 +145,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
       >
         <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-white/60">
           {tool.emoji ? (
-            <FluentEmoji emoji={tool.emoji} size={20} />
+            <FluentEmoji emoji={tool.emoji} size={28} />
           ) : (
             <IconComponent className={cn('h-4.5 w-4.5', tool.iconColor)} />
           )}
