@@ -205,6 +205,28 @@ export default function AppInspire() {
                 </section>
               )}
 
+              {/* Challenges Section */}
+              {challengeRoutines.length > 0 && (
+                <section id="routine-category-challenges">
+                  <div className="flex items-center justify-between mb-2 px-4">
+                    <h2 className="text-xl font-bold text-foreground flex items-center gap-1.5">
+                      <Flame className="h-5 w-5 text-orange-500" />
+                      Challenges
+                    </h2>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
+                    {challengeRoutines.map((routine) => (
+                      <div key={routine.id} className="shrink-0 w-40">
+                        <RoutineBankCard
+                          routine={routine}
+                          onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
               {/* Per-category sections */}
               {nonEmptyCategories?.filter(c => c.slug !== 'pro').map((category) => {
                 const catRoutines = routinesByCategory[category.slug]?.filter(matchesSearch) || [];
