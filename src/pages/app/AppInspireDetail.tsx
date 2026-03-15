@@ -89,10 +89,18 @@ export default function AppInspireDetail() {
   const { data: routine, isLoading } = useRoutineBankDetail(planId);
   const { data: addedRoutineIds = [] } = useUserAddedBankRoutines();
   const addRoutineFromBank = useAddRoutineFromBank();
+  const { data: userChallenges = [] } = useUserChallenges();
   
   // Check if routine was already added
   const isAlreadyAdded = planId ? addedRoutineIds.includes(planId) : false;
   const isAdded = isAlreadyAdded || justAdded;
+  
+  // Find this routine's challenge data if it's been added
+  const isChallenge = (routine as any)?.schedule_type === 'challenge';
+  const userChallenge = useMemo(() => {
+    if (!planId || !isChallenge) return null;
+    return userChallenges.find(c => c.routineId === planId) || null;
+  }, [planId, isChallenge, userChallenges]);
 
   // Compute effective start date label + details
   const startInfo = useMemo(() => {
