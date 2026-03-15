@@ -13,7 +13,7 @@ import { ArrowLeft, Mail } from 'lucide-react';
 import appIcon from '@/assets/app-icon.png';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { Capacitor } from '@capacitor/core';
-import { isNativeApp } from '@/lib/platform';
+
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
