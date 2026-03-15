@@ -55,7 +55,8 @@ export default function Auth() {
     } else if (!authLoading) {
       // First-time native users should see onboarding before auth
       const hasSeenOnboarding = localStorage.getItem('simora_onboarding_completed_quick-start-v1') === 'true';
-      if (isNativeApp() && !hasSeenOnboarding) {
+      const hasCustomRedirect = searchParams.has('redirect');
+      if (!hasSeenOnboarding && !hasCustomRedirect) {
         navigate('/app/onboarding/quick-start-v1', { replace: true });
       }
     }
