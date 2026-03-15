@@ -103,6 +103,7 @@ export function RoutinePreviewSheet({
   endMode,
   endDate,
   endAfterDays,
+  badgeImageUrl,
   onSave,
   isSaving,
   isFree,
