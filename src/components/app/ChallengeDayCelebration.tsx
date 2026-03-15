@@ -16,7 +16,7 @@ interface ChallengeDayCelebrationProps {
   badgeImageUrl?: string | null;
 }
 
-const CONFETTI_COLORS = ['#f472b6', '#fb923c', '#fbbf24', '#a78bfa', '#34d399', '#60a5fa'];
+const CONFETTI_COLORS = ['#f97316', '#fb923c', '#fbbf24', '#fdba74', '#ef4444', '#34d399'];
 const COMPLETE_CONFETTI_COLORS = ['#fbbf24', '#f59e0b', '#eab308', '#fde047', '#facc15', '#fef08a'];
 
 /**
@@ -110,7 +110,7 @@ export const ChallengeDayCelebration = ({
     motivationText = 'A full week in! Real discipline 💪';
   }
 
-  // Theme: bright and warm for normal, golden for complete
+  // Theme: warm orange for normal, golden for complete
   const bgStyle = isComplete
     ? {
         background:
@@ -118,7 +118,7 @@ export const ChallengeDayCelebration = ({
       }
     : {
         background:
-          'linear-gradient(160deg, #fdf2f8 0%, #fce7f3 15%, #fbcfe8 35%, #f9a8d4 55%, #f472b6 80%, #ec4899 100%)',
+          'linear-gradient(160deg, #fff7ed 0%, #fed7aa 18%, #fdba74 38%, #fb923c 58%, #f97316 78%, #ea580c 100%)',
       };
 
   const glowStyle = isComplete
@@ -128,19 +128,19 @@ export const ChallengeDayCelebration = ({
       }
     : {
         background:
-          'radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255, 255, 255, 0.5) 0%, transparent 60%)',
+          'radial-gradient(ellipse 80% 60% at 50% 30%, rgba(255, 255, 255, 0.45) 0%, transparent 65%)',
       };
 
-  const textColor = isComplete ? 'text-amber-900' : 'text-pink-900';
-  const subTextColor = isComplete ? 'text-amber-800/70' : 'text-pink-800/70';
-  const progressBarBg = isComplete ? 'bg-amber-900/15' : 'bg-white/30';
+  const textColor = isComplete ? 'text-amber-900' : 'text-orange-900';
+  const subTextColor = isComplete ? 'text-amber-800/70' : 'text-orange-800/70';
+  const progressBarBg = isComplete ? 'bg-amber-900/15' : 'bg-white/25';
   const progressBarFill = isComplete
     ? 'linear-gradient(90deg, #d97706 0%, #fbbf24 50%, #fef08a 100%)'
-    : 'linear-gradient(90deg, #ec4899 0%, #f472b6 50%, #fce7f3 100%)';
-  const cardBg = isComplete ? 'bg-amber-800/10 border-amber-600/20' : 'bg-white/40 border-white/50';
+    : 'linear-gradient(90deg, #ea580c 0%, #f97316 40%, #fbbf24 100%)';
+  const cardBg = isComplete ? 'bg-amber-800/10 border-amber-600/20' : 'bg-white/35 border-white/40';
   const btnClass = isComplete
     ? 'bg-amber-900 hover:bg-amber-800 text-amber-50'
-    : 'bg-pink-600 hover:bg-pink-500 text-white';
+    : 'bg-white hover:bg-white/90 text-orange-700';
 
   return (
     <OverlayPortal>
@@ -193,7 +193,7 @@ export const ChallengeDayCelebration = ({
               style={{
                 background: isComplete
                   ? 'radial-gradient(circle, rgba(251, 191, 36, 0.3) 0%, transparent 60%)'
-                  : 'radial-gradient(circle, rgba(244, 114, 182, 0.25) 0%, transparent 60%)',
+                  : 'radial-gradient(circle, rgba(249, 115, 22, 0.25) 0%, transparent 60%)',
               }}
             />
             {isComplete && badgeImageUrl ? (
@@ -219,7 +219,7 @@ export const ChallengeDayCelebration = ({
                   backdropFilter: 'blur(16px)',
                   boxShadow: isComplete
                     ? '0 0 50px rgba(251, 191, 36, 0.3), 0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4)'
-                    : '0 0 40px rgba(244, 114, 182, 0.2), 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)',
+                    : '0 0 40px rgba(249, 115, 22, 0.2), 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)',
                 }}
               >
                 <span className="text-5xl">{isComplete ? '🏆' : challengeEmoji}</span>
@@ -308,7 +308,7 @@ export const ChallengeDayCelebration = ({
                 'flex items-center gap-1.5 backdrop-blur-sm rounded-full px-3 py-1.5 border',
                 isComplete ? 'bg-amber-800/15 border-amber-600/20' : 'bg-white/40 border-white/50'
               )}>
-                <Trophy className={cn('w-3.5 h-3.5', isComplete ? 'text-amber-600' : 'text-pink-500')} />
+                <Trophy className={cn('w-3.5 h-3.5', isComplete ? 'text-amber-600' : 'text-orange-600')} />
                 <span className={cn('text-xs font-semibold', textColor, 'opacity-90')}>
                   {isComplete ? '🏆 Challenge Champion!' :
                    isHalfway ? '⚡ Halfway Milestone' :
@@ -336,7 +336,7 @@ export const ChallengeDayCelebration = ({
               style={{
                 boxShadow: isComplete
                   ? '0 4px 24px rgba(217, 119, 6, 0.3), 0 8px 32px rgba(0, 0, 0, 0.1)'
-                  : '0 4px 24px rgba(236, 72, 153, 0.3), 0 8px 32px rgba(0, 0, 0, 0.08)',
+                  : '0 4px 24px rgba(255, 255, 255, 0.25), 0 8px 32px rgba(0, 0, 0, 0.08)',
               }}
             >
               {isComplete ? "I'm a Champion! 🏆" : 'Keep Going! 🔥'}
