@@ -16,7 +16,7 @@ interface ChallengeDayCelebrationProps {
   badgeImageUrl?: string | null;
 }
 
-const CONFETTI_COLORS = ['#f472b6', '#fb923c', '#fbbf24', '#a78bfa', '#34d399', '#60a5fa'];
+const CONFETTI_COLORS = ['#f97316', '#fb923c', '#fbbf24', '#fdba74', '#ef4444', '#34d399'];
 const COMPLETE_CONFETTI_COLORS = ['#fbbf24', '#f59e0b', '#eab308', '#fde047', '#facc15', '#fef08a'];
 
 /**
