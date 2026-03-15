@@ -277,7 +277,7 @@ const AppStore = () => {
                 {/* Row 1: Free tools + audio */}
                 <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pb-3 scrollbar-hide">
                   {filteredWellnessTools
-                    .filter(t => !['fasting', 'emotions', 'water', 'period'].includes(t.id))
+                    .filter(t => !['fasting', 'water', 'period'].includes(t.id))
                     .map((tool) => (
                       <ToolCard 
                         key={tool.id} 
