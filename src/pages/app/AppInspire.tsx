@@ -225,6 +225,12 @@ export default function AppInspire() {
                       <Flame className="h-5 w-5 text-orange-500" />
                       Challenges
                     </h2>
+                    <button
+                      onClick={() => navigate(`/app/routines/category/challenges`, { state: { from: location.pathname } })}
+                      className="text-sm text-primary font-medium flex items-center gap-0.5"
+                    >
+                      All <ChevronRight className="h-4 w-4" />
+                    </button>
                   </div>
                   <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
                     {challengeRoutines.map((routine) => (

@@ -2,16 +2,24 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { RoutineBankCard } from '@/components/app/RoutineBankCard';
 import { useRoutinesBank, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
+import { useMemo } from 'react';
 
 export default function AppRoutineCategory() {
   const { categorySlug } = useParams<{ categorySlug: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const { data: categories } = useRoutineBankCategories();
-  const { data: routines, isLoading } = useRoutinesBank(categorySlug);
+  const isChallenges = categorySlug === 'challenges';
+  const { data: routines, isLoading } = useRoutinesBank(isChallenges ? undefined : categorySlug);
 
   const category = categories?.find(c => c.slug === categorySlug);
-  const title = category?.name || 'Routines';
+  const title = isChallenges ? 'Challenges' : (category?.name || 'Routines');
+
+  const displayedRoutines = useMemo(() => {
+    if (!routines) return [];
+    if (isChallenges) return routines.filter(r => r.schedule_type === 'challenge');
+    return routines;
+  }, [routines, isChallenges]);
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
@@ -39,7 +47,7 @@ export default function AppRoutineCategory() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3 mt-4">
-            {routines?.map((routine) => (
+            {displayedRoutines?.map((routine) => (
               <RoutineBankCard
                 key={routine.id}
                 routine={routine}
