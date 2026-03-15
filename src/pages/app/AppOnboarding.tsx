@@ -139,7 +139,7 @@ export default function AppOnboarding() {
     } else {
       localStorage.setItem(completedKey, 'true');
       localStorage.removeItem(progressKey);
-      navigate('/auth');
+      navigate('/auth?mode=signup');
     }
   }, [currentStep, flow, completedKey, progressKey, navigate]);
 
