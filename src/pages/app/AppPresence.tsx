@@ -203,6 +203,9 @@ const AppPresence = () => {
                 challenge={challenge}
               />
             ))}
+
+            {/* Earned Challenge Badges */}
+            <EarnedBadgesCard />
             
             {/* All-Time Activity Stats */}
             <section className="bg-white rounded-2xl p-4 shadow-sm">
