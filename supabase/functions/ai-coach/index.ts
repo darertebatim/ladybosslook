@@ -43,13 +43,29 @@ serve(async (req) => {
       });
     }
 
-    const { messages, mode } = await req.json();
+    const { messages, mode, conversationSummary } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Fetch user context
+    // Fetch user context + past conversation memory
     const context = await fetchUserContext(supabase, user.id);
-    const systemPrompt = buildSystemPrompt(context, mode);
+    
+    // Load past conversation memory if not provided
+    let memory = conversationSummary || "";
+    if (!memory) {
+      const { data: convo } = await supabase
+        .from("ai_coach_conversations")
+        .select("messages")
+        .eq("user_id", user.id)
+        .single();
+      if (convo?.messages && Array.isArray(convo.messages) && convo.messages.length > 0) {
+        // Summarize last 20 messages for context
+        const recentHistory = convo.messages.slice(-20);
+        memory = recentHistory.map((m: any) => `${m.role}: ${m.content?.slice(0, 200)}`).join("\n");
+      }
+    }
+    
+    const systemPrompt = buildSystemPrompt(context, mode, memory);
     const tools = getToolDefinitions();
 
     // ALL tools are direct-execution
