@@ -517,6 +517,25 @@ export default function AppTest() {
         </CardContent>
       </Card>
 
+      {/* Plus Gate Sheet */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Crown className="h-5 w-5 text-amber-500" />
+            Plus Tool Gate Sheet
+          </CardTitle>
+          <CardDescription>
+            Shown when a free user taps a Plus-only tool — invites them to the onboarding trial journey
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={() => setShowPlusGate(true)} variant="outline">
+            <Crown className="h-4 w-4 mr-2" />
+            Preview Gate Sheet
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Streak Lost Banners */}
       <Card>
         <CardHeader>
