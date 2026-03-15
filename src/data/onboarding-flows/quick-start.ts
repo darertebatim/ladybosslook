@@ -1,6 +1,7 @@
 import { OnboardingFlow } from '@/types/onboarding';
 import meplusWelcomeMascot from '@/assets/onboarding/meplus-welcome-mascot.png';
 import resetBeforeAfter from '@/assets/onboarding/reset-before-after.png';
+import mascotPlanner from '@/assets/onboarding/mascot-planner.png';
 
 export const quickStartFlow: OnboardingFlow = {
   id: 'quick-start-v1',
@@ -89,6 +90,7 @@ export const quickStartFlow: OnboardingFlow = {
       type: 'text-input',
       title: 'What should I call you?',
       subtitle: 'Nicknames are fine.',
+      image: mascotPlanner,
       illustrationLabel: 'Mascot greeting',
       buttonLabel: 'Continue',
     },
@@ -98,6 +100,7 @@ export const quickStartFlow: OnboardingFlow = {
       type: 'single-select',
       title: 'What is your age group?',
       subtitle: 'I recommend routines for your age.',
+      image: mascotPlanner,
       illustrationLabel: 'Mascot with clipboard',
       options: [
         { label: '14 years or under' },
@@ -116,6 +119,7 @@ export const quickStartFlow: OnboardingFlow = {
       type: 'single-select',
       title: 'What is your gender?',
       subtitle: 'I recommend routines for your gender.',
+      image: mascotPlanner,
       illustrationLabel: 'Mascot thinking',
       options: [
         { label: 'Female' },

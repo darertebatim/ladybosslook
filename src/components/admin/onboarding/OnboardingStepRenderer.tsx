@@ -387,7 +387,7 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
 
   if (hasBg) {
     return (
-      <BottomSheetWrapper bgImage={meplusMascotBg}>
+      <BottomSheetWrapper bgImage={step.image || meplusMascotBg}>
         <FadeUp>
           <div className="min-h-[4.5em] flex flex-col items-center justify-center mb-5">
             <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center leading-snug">{step.title}</h1>
@@ -487,7 +487,7 @@ function TextInputScreen({ step, onNext, onAnswer }: Props) {
   );
 
   if (hasBg) {
-    return <BottomSheetWrapper bgImage={meplusMascotBg}>{content}</BottomSheetWrapper>;
+    return <BottomSheetWrapper bgImage={step.image || meplusMascotBg}>{content}</BottomSheetWrapper>;
   }
 
   return <ScreenWrapper>{content}</ScreenWrapper>;
