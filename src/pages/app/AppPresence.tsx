@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart, User, Settings } from 'lucide-react';
+import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart, User, Settings, Sparkles, SmilePlus, Focus, Wifi, BookOpen } from 'lucide-react';
 import { usePresenceStats } from '@/hooks/usePresenceStats';
 import { useUserPresence } from '@/hooks/useUserPresence';
 import { useUserStreak, useSetStreakGoal, useRecoverStreak } from '@/hooks/useTaskPlanner';
@@ -243,6 +243,46 @@ const AppPresence = () => {
                   value={stats?.breathingSessions || 0}
                   iconColor="text-amber-500"
                   iconBg="bg-amber-100"
+                  isLoading={isLoading}
+                />
+                <ActivityStatCard 
+                  icon={BookOpen}
+                  label="Reflections"
+                  value={stats?.reflectionCompletions || 0}
+                  iconColor="text-purple-500"
+                  iconBg="bg-purple-100"
+                  isLoading={isLoading}
+                />
+                <ActivityStatCard 
+                  icon={Sparkles}
+                  label="Emotion Namings"
+                  value={stats?.emotionLogs || 0}
+                  iconColor="text-rose-500"
+                  iconBg="bg-rose-100"
+                  isLoading={isLoading}
+                />
+                <ActivityStatCard 
+                  icon={SmilePlus}
+                  label="Mood Check-ins"
+                  value={stats?.moodCheckins || 0}
+                  iconColor="text-blue-500"
+                  iconBg="bg-blue-100"
+                  isLoading={isLoading}
+                />
+                <ActivityStatCard 
+                  icon={Focus}
+                  label="Focus Time"
+                  value={`${stats?.focusMinutes || 0} min`}
+                  iconColor="text-indigo-500"
+                  iconBg="bg-indigo-100"
+                  isLoading={isLoading}
+                />
+                <ActivityStatCard 
+                  icon={Wifi}
+                  label="Online Sessions"
+                  value={stats?.onlineSessions || 0}
+                  iconColor="text-teal-500"
+                  iconBg="bg-teal-100"
                   isLoading={isLoading}
                 />
               </div>

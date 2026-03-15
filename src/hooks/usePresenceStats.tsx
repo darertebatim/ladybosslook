@@ -55,13 +55,16 @@ export function usePresenceStats() {
       ]);
 
       // Fetch extended data in parallel (batch 2)
-      const [emotionResult, weeklyReturnsResult, fastingResult, reflectionResult, meditationPlaylistItems, habitStackingResult]: any[] = await (Promise.all([
+      const [emotionResult, weeklyReturnsResult, fastingResult, reflectionResult, meditationPlaylistItems, habitStackingResult, focusResult, moodCheckinResult, onlineSessionResult]: any[] = await (Promise.all([
         supabase.from('emotion_logs').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('app_return_events').select('id', { count: 'exact', head: true }).eq('user_id', user.id).gte('created_at', sevenDaysAgoStr),
         supabase.from('fasting_sessions' as any).select('id', { count: 'exact', head: true }).eq('user_id', user.id).not('ended_at', 'is', null),
         supabase.from('user_reflection_responses' as any).select('id', { count: 'exact', head: true }).eq('user_id', user.id).not('completed_at', 'is', null),
         supabase.from('audio_playlist_items' as any).select('audio_id, audio_playlists!inner(category)').eq('audio_playlists.category', 'meditate'),
         supabase.from('task_completions').select('task_id').eq('user_id', user.id),
+        supabase.from('focus_sessions').select('id, duration_seconds', { count: 'exact' }).eq('user_id', user.id).eq('completed', true),
+        supabase.from('emotion_logs').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('category', 'mood_checkin'),
+        supabase.from('app_return_events').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
       ]) as any);
 
       // Calculate listening minutes and completed tracks
@@ -109,6 +112,10 @@ export function usePresenceStats() {
         meditationMinutes: Math.floor(meditationSeconds / 60),
         maxSingleActionCompletions,
         habitsFormed,
+        focusSessions: focusResult.count || 0,
+        focusMinutes: Math.floor(((focusResult.data || []) as any[]).reduce((sum: number, s: any) => sum + (s.duration_seconds || 0), 0) / 60),
+        moodCheckins: moodCheckinResult.count || 0,
+        onlineSessions: onlineSessionResult.count || 0,
       };
 
       const { unlocked, locked } = getAchievementStatus(stats);

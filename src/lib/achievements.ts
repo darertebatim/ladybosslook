@@ -49,6 +49,10 @@ export interface PresenceStats {
   meditationMinutes: number;
   maxSingleActionCompletions: number;
   habitsFormed: number;
+  focusSessions: number;
+  focusMinutes: number;
+  moodCheckins: number;
+  onlineSessions: number;
 }
 
 export interface Achievement {
