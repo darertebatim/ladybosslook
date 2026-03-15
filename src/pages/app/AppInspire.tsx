@@ -144,6 +144,7 @@ export default function AppInspire() {
                   {challengeRoutines.length > 0 && (
                     <CategoryCircle
                       name="Challenges"
+                      icon="Flame"
                       emoji="🔥"
                       color="orange"
                       onClick={() => {
