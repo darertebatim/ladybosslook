@@ -47,7 +47,7 @@ export default function AppRoutineCategory() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3 mt-4">
-            {routines?.map((routine) => (
+            {displayedRoutines?.map((routine) => (
               <RoutineBankCard
                 key={routine.id}
                 routine={routine}
