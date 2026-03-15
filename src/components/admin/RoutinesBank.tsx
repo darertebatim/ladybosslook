@@ -516,6 +516,7 @@ export default function RoutinesBank() {
       end_mode: 'never',
       end_date: null,
       end_after_days: null,
+      badge_image_url: '',
     });
     setLocalSections([]);
     setLocalTasks([]);
