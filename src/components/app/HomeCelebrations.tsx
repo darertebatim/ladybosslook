@@ -125,6 +125,7 @@ interface HomeCelebrationsProps {
     currentDay: number;
     totalDays: number;
     routineId: string;
+    badgeImageUrl: string | null;
   } | null;
   closeChallengeDayCelebration: () => void;
   showChallengeDayCelebration: boolean;
