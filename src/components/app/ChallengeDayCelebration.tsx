@@ -336,7 +336,7 @@ export const ChallengeDayCelebration = ({
               style={{
                 boxShadow: isComplete
                   ? '0 4px 24px rgba(217, 119, 6, 0.3), 0 8px 32px rgba(0, 0, 0, 0.1)'
-                  : '0 4px 24px rgba(236, 72, 153, 0.3), 0 8px 32px rgba(0, 0, 0, 0.08)',
+                  : '0 4px 24px rgba(255, 255, 255, 0.25), 0 8px 32px rgba(0, 0, 0, 0.08)',
               }}
             >
               {isComplete ? "I'm a Champion! 🏆" : 'Keep Going! 🔥'}
