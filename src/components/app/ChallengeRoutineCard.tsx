@@ -55,7 +55,7 @@ export const ChallengeRoutineCard = ({
         {/* Badge preview on right side */}
         {challenge.badgeImageUrl && (
           <div className="flex flex-col items-center ml-3 shrink-0">
-            <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-amber-200 bg-amber-50 shadow-sm">
+            <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-amber-200 bg-amber-50 shadow-sm">
               <img 
                 src={challenge.badgeImageUrl} 
                 alt="Challenge badge" 
