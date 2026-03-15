@@ -483,13 +483,19 @@ function TextInputScreen({ step, onNext, onAnswer }: Props) {
           autoFocus
         />
       </FadeUp>
-      <div className="mt-auto pt-8">
+      <div className="mt-auto pt-8 space-y-2">
         <button
           onClick={handleSubmit}
           disabled={!value.trim()}
           className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-base transition-all disabled:opacity-40"
         >
           {step.buttonLabel || 'Continue'}
+        </button>
+        <button
+          onClick={onNext}
+          className="w-full text-center text-sm text-gray-400 py-2 active:opacity-60"
+        >
+          Skip this question
         </button>
       </div>
     </>
