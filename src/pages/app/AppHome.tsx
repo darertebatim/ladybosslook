@@ -32,6 +32,7 @@ import { WelcomeRoutineCard } from '@/components/app/WelcomeRoutineCard';
 import { toast } from 'sonner';
 import { useWeeklyTaskCompletion, useDateRangeTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 import { useBadgeCelebration } from '@/hooks/useBadgeCelebration';
+import { useChallengeDayCelebration } from '@/hooks/useChallengeDayCelebration';
 import { useGoldStreak, useGoldDatesThisWeek, useUpdateGoldStreak } from '@/hooks/useGoldStreak';
 import { useTodayMood } from '@/hooks/useMoodLogs';
 import { useSubscription } from '@/hooks/useSubscription';
