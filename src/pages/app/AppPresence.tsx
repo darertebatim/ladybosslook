@@ -125,20 +125,24 @@ const AppPresence = () => {
                 {/* Left: stacked stat cards */}
                 <div className="flex flex-col gap-2 w-[28%] shrink-0">
                   <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-sm text-center">
-                    <Flame className="h-5 w-5 mx-auto mb-1 text-orange-500" />
                     {isLoading ? (
                       <Skeleton className="h-7 w-10 mx-auto mb-1 bg-white/30" />
                     ) : (
-                      <div className="text-2xl font-bold text-orange-900">{stats?.currentStreak || 0}</div>
+                      <div className="flex items-center justify-center gap-1">
+                        <Flame className="h-5 w-5 text-orange-500" />
+                        <span className="text-2xl font-bold text-orange-900">{stats?.currentStreak || 0}</span>
+                      </div>
                     )}
                     <div className="text-xs text-orange-700/60 font-medium">Days Streak</div>
                   </div>
                   <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-sm text-center">
-                    <CheckCircle2 className="h-5 w-5 mx-auto mb-1 text-amber-600" />
                     {isLoading ? (
                       <Skeleton className="h-7 w-10 mx-auto mb-1 bg-white/30" />
                     ) : (
-                      <div className="text-2xl font-bold text-orange-900">{stats?.totalTaskCompletions || 0}</div>
+                      <div className="flex items-center justify-center gap-1">
+                        <CheckCircle2 className="h-5 w-5 text-amber-600" />
+                        <span className="text-2xl font-bold text-orange-900">{stats?.totalTaskCompletions || 0}</span>
+                      </div>
                     )}
                     <div className="text-xs text-orange-700/60 font-medium">Tasks Done</div>
                   </div>
