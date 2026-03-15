@@ -1594,6 +1594,34 @@ export default function RoutinesBank() {
                     )}
                   </div>
 
+                  {/* Challenge Badge (only for challenge type) */}
+                  {formData.schedule_type === 'challenge' && (
+                    <div className="space-y-2 border-t pt-4">
+                      <Label className="text-xs flex items-center gap-1.5">
+                        🏆 Completion Badge
+                        <span className="text-muted-foreground font-normal">(awarded when challenge is finished)</span>
+                      </Label>
+                      <ImageUploader
+                        label="Badge Image (square)"
+                        value={formData.badge_image_url}
+                        onChange={(url) => setFormData({ ...formData, badge_image_url: url })}
+                        folder="challenge-badges"
+                      />
+                      {formData.badge_image_url && (
+                        <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                          <img
+                            src={formData.badge_image_url}
+                            alt="Badge preview"
+                            className="w-12 h-12 rounded-lg object-cover"
+                          />
+                          <div className="text-xs text-muted-foreground">
+                            Users will earn this badge when they complete all {formData.end_after_days || '?'} days
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Summary stats */}
                   <div className="flex items-center gap-4 text-sm text-muted-foreground border-t pt-4">
                     <span className="flex items-center gap-1">
