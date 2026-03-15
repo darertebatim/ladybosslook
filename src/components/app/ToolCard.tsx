@@ -65,7 +65,12 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
           'w-10 h-10 rounded-xl flex items-center justify-center',
           tool.bgColor
         )}>
-          <IconComponent className={cn('h-5 w-5', tool.iconColor)} />
+          {tool.emoji ? (
+            <span className="text-lg">{tool.emoji}</span>
+          ) : (
+            <IconComponent className={cn('h-5 w-5', tool.iconColor)} />
+          )}
+        </div>
         </div>
         <div className="text-center">
           <span className="text-[10px] font-medium text-foreground block leading-tight">
