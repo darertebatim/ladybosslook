@@ -12,6 +12,7 @@ import { WeeklyPresenceGrid } from '@/components/app/WeeklyPresenceGrid';
 import { StreakChallengeCard } from '@/components/app/StreakChallengeCard';
 import { RecoveryShields } from '@/components/app/RecoveryShields';
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
+import { EarnedBadgesCard } from '@/components/app/EarnedBadgesCard';
 import { PresenceProfileCard } from '@/components/app/PresenceProfileCard';
 import { SubscriptionCard } from '@/components/app/SubscriptionManagement';
 import { StreakGoalSelection, StreakGoalValue } from '@/components/app/StreakGoalSelection';
