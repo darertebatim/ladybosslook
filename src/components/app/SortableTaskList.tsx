@@ -26,7 +26,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
-import { Plus, MoreHorizontal, CalendarPlus } from 'lucide-react';
+import { Plus, MoreHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -407,7 +407,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
       <Dialog open={isOpen} onOpenChange={(v) => !v && handleClose()}>
         <DialogContent
           hideCloseButton
-          className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none flex flex-col"
+          className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none flex flex-col !top-auto !translate-y-0 bottom-[50%]"
         >
           {/* Card — two-tone */}
           <div className="rounded-3xl overflow-hidden bg-[#FFF5E6]">
@@ -551,9 +551,6 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
                             )}
                             <span>{' • '}{timePeriodLabel}</span>
                           </p>
-                        </div>
-                        <div className="shrink-0 p-2 rounded-full bg-foreground">
-                          <CalendarPlus className="h-4 w-4 text-background" />
                         </div>
                       </div>
                     </button>
