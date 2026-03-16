@@ -421,6 +421,21 @@ function QuickAddCard({ date, taskCount, onBrowseIdeas }: { date: Date; taskCoun
               Details
             </button>
           </div>
+
+          {/* Browse ideas button — thinner, below */}
+          {onBrowseIdeas && (
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                handleClose();
+                onBrowseIdeas();
+              }}
+              className="mt-2 w-full h-9 rounded-2xl bg-white/90 text-black/60 text-[13px] font-medium flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-transform"
+            >
+              <Lightbulb className="h-3.5 w-3.5" />
+              Need some ideas?
+            </button>
+          )}
         </DialogContent>
       </Dialog>
     </>
