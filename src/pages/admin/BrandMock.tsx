@@ -102,7 +102,7 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
             <path d="M12 18.5L16 22.5L24.5 14" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         ) : (
-          <span className="w-9 h-9 rounded-full border-2 border-black bg-white" />
+          <span className="w-9 h-9 rounded-full border-2 bg-transparent" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.4)' : '#000000' }} />
         )}
       </div>
     </div>
