@@ -197,7 +197,6 @@ export default function BrandMock() {
                 background: `linear-gradient(135deg, ${O.primary} 0%, ${O.primaryL} 100%)`,
                 boxShadow: darkMode ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)' : '0 2px 10px rgba(0,0,0,0.08)',
               }}
-              }}
             >
               <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20"
                 style={{ background: 'white' }} />
