@@ -372,7 +372,7 @@ function QuickAddCard({ date, taskCount, onBrowseIdeas }: { date: Date; taskCoun
                     if (e.key === 'Enter') handleSubmit();
                     if (e.key === 'Escape') handleClose();
                   }}
-                  placeholder="Type action name..."
+                  placeholder="Type task name..."
                   className="flex-1 bg-transparent text-[15px] font-semibold text-black placeholder:text-black/40 outline-none"
                   enterKeyHint="done"
                   autoComplete="off"
