@@ -292,13 +292,12 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   const createTask = useCreateTask();
   const navigate = useNavigate();
 
-  // Auto-focus input when modal opens
+  // Auto-focus input when dialog opens
   useEffect(() => {
     if (!isOpen) return;
-    // Small delay to let the portal mount and animation start
     const t = window.setTimeout(() => {
       inputRef.current?.focus();
-    }, 50);
+    }, 100);
     return () => window.clearTimeout(t);
   }, [isOpen]);
 
@@ -322,8 +321,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
       order_index: -1,
     });
     setTitle('');
-    // Keep modal open for rapid adding — user can close with backdrop tap
-    inputRef.current?.focus();
+    handleClose();
   };
 
   const handleOpenDetails = () => {
@@ -336,7 +334,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
 
   return (
     <>
-      {/* Trigger button — always visible in task list */}
+      {/* Trigger button */}
       <button
         onClick={() => {
           setIsOpen(true);
@@ -350,49 +348,39 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
         <span className="text-[15px] font-semibold text-foreground">Quick add action...</span>
       </button>
 
-      {/* Modal overlay — renders above keyboard via portal */}
-      {isOpen && createPortal(
-        <div className="fixed inset-0 z-[100] flex flex-col justify-end">
-          {/* Backdrop */}
-          <div 
-            className="absolute inset-0 bg-black/40 animate-in fade-in duration-200"
-            onClick={handleClose}
-          />
-
-          {/* Input card — sits naturally above keyboard */}
-          <div 
-            className="relative z-10 bg-card rounded-t-3xl px-4 pt-4 animate-in slide-in-from-bottom-4 duration-200"
-            style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 12px)' }}
-          >
-            {/* Header row */}
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-2xl bg-urgency/15 flex items-center justify-center shrink-0">
-                <Plus className="h-5 w-5 text-urgency" strokeWidth={2.5} />
+      {/* Dialog — same position as TaskDetailModal */}
+      <Dialog open={isOpen} onOpenChange={(v) => !v && handleClose()}>
+        <DialogContent
+          hideCloseButton
+          className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none"
+        >
+          <div className="rounded-3xl overflow-hidden bg-card border-2 border-urgency/20">
+            {/* Input area */}
+            <div className="px-4 pt-4 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-urgency/15 flex items-center justify-center shrink-0">
+                  <Plus className="h-5 w-5 text-urgency" strokeWidth={2.5} />
+                </div>
+                <input
+                  ref={inputRef}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSubmit();
+                    if (e.key === 'Escape') handleClose();
+                  }}
+                  placeholder="Type action name..."
+                  className="flex-1 bg-transparent text-[17px] font-semibold text-foreground placeholder:text-muted-foreground outline-none"
+                  enterKeyHint="done"
+                  autoComplete="off"
+                  autoCorrect="on"
+                  spellCheck={false}
+                />
               </div>
-              <span className="text-[17px] font-bold text-foreground">Quick Add Action</span>
             </div>
 
-            {/* Input row */}
-            <div className="flex items-center gap-2 rounded-2xl border-2 border-urgency/30 bg-muted/50 px-3 py-2.5">
-              <input
-                ref={inputRef}
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSubmit();
-                  if (e.key === 'Escape') handleClose();
-                }}
-                placeholder="Type action name..."
-                className="flex-1 bg-transparent text-[16px] font-semibold text-foreground placeholder:text-muted-foreground outline-none"
-                enterKeyHint="done"
-                autoComplete="off"
-                autoCorrect="on"
-                spellCheck={false}
-              />
-            </div>
-
-            {/* Action buttons */}
-            <div className="flex items-center gap-2 mt-3">
+            {/* Action buttons strip */}
+            <div className="flex items-center gap-2 px-4 pb-4">
               <button
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={handleSubmit}
@@ -422,9 +410,8 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
               </button>
             </div>
           </div>
-        </div>,
-        document.body
-      )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
