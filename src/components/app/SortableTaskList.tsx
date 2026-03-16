@@ -404,7 +404,7 @@ function QuickAddCard({ date, taskCount, onBrowseIdeas }: { date: Date; taskCoun
               )}
             >
               <Plus className="h-4 w-4" />
-              Add Action
+              Add Task
             </button>
             <button
               onMouseDown={(e) => e.preventDefault()}

@@ -1070,7 +1070,7 @@ const AppHome = () => {
                           `}</style>
                           
                           <p className="text-center text-sm text-white/90 mt-5 mb-2 animate-fade-in font-medium">
-                            Mark off your first action to start your journey! 💪
+                            Mark off your first task to start your journey! 💪
                           </p>
                         </div>
                       </>
