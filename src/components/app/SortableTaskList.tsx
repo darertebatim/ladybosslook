@@ -500,6 +500,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
         {showIdeas && (
           <DialogPortal>
             <div
+              ref={suggestionsLayerRef}
               className="fixed left-[50%] -translate-x-1/2 z-[100] w-[calc(100%-32px)] max-w-[calc(100%-32px)] flex flex-col gap-2.5 pointer-events-auto"
               style={{ top: SUGGESTIONS_ANCHOR_TOP }}
             >
