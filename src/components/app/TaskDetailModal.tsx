@@ -330,7 +330,7 @@ export const TaskDetailModal = ({
             className="flex-1 gap-2 h-11 rounded-2xl border-0 bg-white text-black text-sm shadow-sm active:scale-95 transition-transform"
           >
             <Pencil className="h-4 w-4" />
-            Edit Action
+            Edit Task
           </Button>
           
           {!isCompleted && !goalReached && onSkip && (

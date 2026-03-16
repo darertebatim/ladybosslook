@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import type { TaskColor } from '@/hooks/useTaskPlanner';
 import {
   DndContext,
@@ -20,13 +20,18 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
-import { UserTask, useReorderTasks, useCreateTask } from '@/hooks/useTaskPlanner';
+import { UserTask, useReorderTasks, useCreateTask, useTaskTemplates, TaskTemplate, TASK_COLORS, TASK_COLOR_CLASSES } from '@/hooks/useTaskPlanner';
+import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
-import { Plus, MoreHorizontal, Lightbulb } from 'lucide-react';
+import { Plus, MoreHorizontal, CalendarPlus } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
 
 interface SortableTaskItemProps {
   task: UserTask;
@@ -108,7 +113,7 @@ interface SortableTaskListProps {
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
   hideQuickAdd?: boolean;
-  onBrowseIdeas?: () => void;
+  
 }
 
 export const SortableTaskList = ({
@@ -123,7 +128,7 @@ export const SortableTaskList = ({
   onOpenTimer,
   onOpenWaterTracking,
   hideQuickAdd = false,
-  onBrowseIdeas,
+  
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
@@ -251,7 +256,7 @@ export const SortableTaskList = ({
         )}
 
         {/* Quick Add Card */}
-        {!hideQuickAdd && <QuickAddCard date={date} taskCount={localTasks.length} onBrowseIdeas={onBrowseIdeas} />}
+        {!hideQuickAdd && <QuickAddCard date={date} taskCount={localTasks.length} />}
       </SortableContext>
 
       {/* Drag overlay */}
@@ -287,14 +292,47 @@ const QUICK_ADD_VARIANTS: { emoji: string; color: TaskColor }[] = [
   { emoji: '🌊', color: 'sky' },
 ];
 
-function QuickAddCard({ date, taskCount, onBrowseIdeas }: { date: Date; taskCount: number; onBrowseIdeas?: () => void }) {
+const TIME_PERIOD_LABELS: Record<string, string> = {
+  morning: 'Morning',
+  afternoon: 'Afternoon',
+  evening: 'Evening',
+  night: 'Bedtime',
+};
+
+function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
+  const [showIdeas, setShowIdeas] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('popular');
   const inputRef = useRef<HTMLInputElement>(null);
   const createTask = useCreateTask();
   const navigate = useNavigate();
+  const { data: templates = [] } = useTaskTemplates();
+  const { data: rawCategories = [] } = useRoutineBankCategories();
 
-  // Auto-focus input when dialog opens
+  const categories = useMemo(() => {
+    return [...rawCategories].sort((a, b) => {
+      if (a.slug === 'pro') return 1;
+      if (b.slug === 'pro') return -1;
+      const aOrder = a.task_display_order || 0;
+      const bOrder = b.task_display_order || 0;
+      if (aOrder === 0 && bOrder === 0) return 0;
+      if (aOrder === 0) return 1;
+      if (bOrder === 0) return -1;
+      return aOrder - bOrder;
+    });
+  }, [rawCategories]);
+
+  const filteredSuggestions = useMemo(() => {
+    let items = templates;
+    if (selectedCategory === 'popular') {
+      items = items.filter(t => t.is_popular);
+    } else if (selectedCategory !== 'all') {
+      items = items.filter(t => t.category === selectedCategory);
+    }
+    return items.slice(0, 5);
+  }, [templates, selectedCategory]);
+
   useEffect(() => {
     if (!isOpen) return;
     const t = window.setTimeout(() => {
@@ -306,14 +344,14 @@ function QuickAddCard({ date, taskCount, onBrowseIdeas }: { date: Date; taskCoun
   const handleClose = () => {
     setIsOpen(false);
     setTitle('');
+    setShowIdeas(false);
+    setSelectedCategory('popular');
   };
 
   const handleSubmit = () => {
     const trimmed = title.trim();
     if (!trimmed) return;
-
     const variant = QUICK_ADD_VARIANTS[taskCount % QUICK_ADD_VARIANTS.length];
-
     haptic.medium();
     createTask.mutate({
       title: trimmed,
@@ -334,6 +372,21 @@ function QuickAddCard({ date, taskCount, onBrowseIdeas }: { date: Date; taskCoun
     navigate(`/app/home/new?name=${encodeURIComponent(trimmed)}`);
   };
 
+  const handleTemplateSelect = (template: TaskTemplate) => {
+    haptic.light();
+    handleClose();
+    navigate(`/app/home/new?template=${template.id}`);
+  };
+
+  const handleShowIdeas = () => {
+    haptic.light();
+    setShowIdeas(true);
+    inputRef.current?.blur();
+    if (Capacitor.isNativePlatform()) {
+      Keyboard.hide();
+    }
+  };
+
   return (
     <>
       {/* Trigger button */}
@@ -347,18 +400,17 @@ function QuickAddCard({ date, taskCount, onBrowseIdeas }: { date: Date; taskCoun
         <div className="w-8 h-8 flex items-center justify-center shrink-0">
           <Plus className="h-5 w-5 text-urgency" strokeWidth={3} />
         </div>
-        <span className="text-[15px] font-semibold text-foreground">Quick add action...</span>
+        <span className="text-[15px] font-semibold text-foreground">Quick add task...</span>
       </button>
 
-      {/* Dialog — identical structure to TaskDetailModal */}
+      {/* Dialog */}
       <Dialog open={isOpen} onOpenChange={(v) => !v && handleClose()}>
         <DialogContent
           hideCloseButton
           className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none flex flex-col"
         >
-          {/* Card — two-tone like task detail cards */}
+          {/* Card — two-tone */}
           <div className="rounded-3xl overflow-hidden bg-[#FFF5E6]">
-            {/* Input area — primary pastel */}
             <div className="px-4 pt-4 pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 flex items-center justify-center shrink-0">
@@ -372,7 +424,7 @@ function QuickAddCard({ date, taskCount, onBrowseIdeas }: { date: Date; taskCoun
                     if (e.key === 'Enter') handleSubmit();
                     if (e.key === 'Escape') handleClose();
                   }}
-                  placeholder="Type action name..."
+                  placeholder="Type task name..."
                   className="flex-1 bg-transparent text-[15px] font-semibold text-black placeholder:text-black/40 outline-none"
                   enterKeyHint="done"
                   autoComplete="off"
@@ -381,8 +433,6 @@ function QuickAddCard({ date, taskCount, onBrowseIdeas }: { date: Date; taskCoun
                 />
               </div>
             </div>
-
-            {/* Footer strip — secondary darker shade */}
             <div className="px-4 py-3.5 bg-[#FFE6C0]">
               <p className="text-[13px] font-medium text-black text-center">
                 Press enter to add. Tap outside to cancel.
@@ -390,7 +440,7 @@ function QuickAddCard({ date, taskCount, onBrowseIdeas }: { date: Date; taskCoun
             </div>
           </div>
 
-          {/* Action buttons — outside the card, floating below (same as TaskDetailModal) */}
+          {/* Buttons outside card */}
           <div className="flex gap-2 mt-3">
             <button
               onMouseDown={(e) => e.preventDefault()}
@@ -404,7 +454,7 @@ function QuickAddCard({ date, taskCount, onBrowseIdeas }: { date: Date; taskCoun
               )}
             >
               <Plus className="h-4 w-4" />
-              Add Action
+              Add Task
             </button>
             <button
               onMouseDown={(e) => e.preventDefault()}
@@ -422,19 +472,95 @@ function QuickAddCard({ date, taskCount, onBrowseIdeas }: { date: Date; taskCoun
             </button>
           </div>
 
-          {/* Browse ideas button — thinner, below */}
-          {onBrowseIdeas && (
+          {/* "Need some ideas?" tappable text */}
+          {!showIdeas && (
             <button
               onMouseDown={(e) => e.preventDefault()}
-              onClick={() => {
-                handleClose();
-                onBrowseIdeas();
-              }}
-              className="mt-2 w-full h-9 rounded-2xl bg-white/90 text-black/60 text-[13px] font-medium flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-transform"
+              onClick={handleShowIdeas}
+              className="mt-3 text-[13px] text-white/70 font-medium text-center active:text-white/90 transition-colors"
             >
-              <Lightbulb className="h-3.5 w-3.5" />
               Need some ideas?
             </button>
+          )}
+
+          {/* Inline suggestions */}
+          {showIdeas && (
+            <div className="mt-3 flex flex-col gap-2.5 max-h-[40vh] overflow-hidden">
+              {/* Category pills */}
+              <ScrollArea className="w-full shrink-0">
+                <div className="flex gap-1.5">
+                  <button
+                    onClick={() => { haptic.light(); setSelectedCategory('popular'); }}
+                    className={cn(
+                      "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border",
+                      selectedCategory === 'popular'
+                        ? "bg-white text-black border-white/50"
+                        : "bg-white/20 text-white/80 border-transparent"
+                    )}
+                  >
+                    ⭐ Popular
+                  </button>
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.slug}
+                      onClick={() => { haptic.light(); setSelectedCategory(cat.slug); }}
+                      className={cn(
+                        "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border",
+                        selectedCategory === cat.slug
+                          ? "bg-white text-black border-white/50"
+                          : "bg-white/20 text-white/80 border-transparent"
+                      )}
+                    >
+                      {cat.emoji && <span className="mr-0.5">{cat.emoji}</span>}
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+                <ScrollBar orientation="horizontal" className="invisible" />
+              </ScrollArea>
+
+              {/* Task cards */}
+              <div className="flex-1 overflow-y-auto overscroll-contain space-y-1.5" style={{ WebkitOverflowScrolling: 'touch' }}>
+                {filteredSuggestions.map((template) => {
+                  const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
+                  const timePeriodLabel = template.time_period 
+                    ? TIME_PERIOD_LABELS[template.time_period] || template.time_period
+                    : 'Anytime';
+
+                  return (
+                    <button
+                      key={template.id}
+                      onClick={() => handleTemplateSelect(template)}
+                      className="w-full text-left rounded-2xl overflow-hidden active:scale-[0.98] transition-transform"
+                      style={{ backgroundColor: bgColor }}
+                    >
+                      <div className="flex items-center gap-2.5 px-3 py-2.5">
+                        <FluentEmoji emoji={template.emoji || '📝'} size={28} className="shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-[14px] text-black truncate">{template.title}</p>
+                          <p className="text-[11px] text-black/60 truncate">
+                            {template.category}
+                            {template.repeat_pattern && template.repeat_pattern !== 'none' && (
+                              <span>
+                                {' • '}
+                                {template.repeat_pattern === 'daily' ? 'Daily' : 
+                                 template.repeat_pattern === 'weekly' ? 'Weekly' : 
+                                 template.repeat_pattern === 'monthly' ? 'Monthly' :
+                                 template.repeat_pattern === 'weekend' ? 'Weekends' : ''}
+                              </span>
+                            )}
+                            <span>{' • '}{timePeriodLabel}</span>
+                          </p>
+                        </div>
+                        <div className="shrink-0 p-2 rounded-full bg-foreground">
+                          <CalendarPlus className="h-4 w-4 text-background" />
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>

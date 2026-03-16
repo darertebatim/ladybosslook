@@ -953,10 +953,10 @@ const AppHome = () => {
                     {selectedTag ? `No ${selectedTag} actions for this day` : 'Your day is open'}
                   </p>
                   <p className="text-xs text-muted-foreground/70 mb-4">
-                    One small action is enough
+                    One small task is enough
                   </p>
                   <button onClick={() => setShowQuickStart(true)} className="text-violet-600 font-medium">
-                    Add your first action
+                    Add your first task
                   </button>
                 </div>
               ) : filteredTasks.length > 0 ? (
@@ -1070,7 +1070,7 @@ const AppHome = () => {
                           `}</style>
                           
                           <p className="text-center text-sm text-white/90 mt-5 mb-2 animate-fade-in font-medium">
-                            Mark off your first action to start your journey! 💪
+                            Mark off your first task to start your journey! 💪
                           </p>
                         </div>
                       </>
@@ -1143,7 +1143,7 @@ const AppHome = () => {
                         )}
                       </>
                     ) : (
-                      <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onBrowseIdeas={() => setShowQuickStart(true)} />
+                      <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                     );
                   })()}
                   {/* Onboarding banner moved below routine section */}
