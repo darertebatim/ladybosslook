@@ -347,7 +347,7 @@ function QuickAddCard({ date, taskCount, onBrowseIdeas }: { date: Date; taskCoun
         <div className="w-8 h-8 flex items-center justify-center shrink-0">
           <Plus className="h-5 w-5 text-urgency" strokeWidth={3} />
         </div>
-        <span className="text-[15px] font-semibold text-foreground">Quick add action...</span>
+        <span className="text-[15px] font-semibold text-foreground">Quick add task...</span>
       </button>
 
       {/* Dialog — identical structure to TaskDetailModal */}
