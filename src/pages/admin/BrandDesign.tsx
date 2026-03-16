@@ -173,6 +173,21 @@ export default function BrandDesign() {
         </div>
       </Section>
 
+      <Section title="Planner Dark Mode Palette" description="Deep jewel-toned card backgrounds for dark mode — retains color identity without harsh contrast">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <ColorSwatch label="Peach Dark" cssVar="planner-peach-dm" hex="#3D2A1A" />
+          <ColorSwatch label="Mint Dark" cssVar="planner-mint-dm" hex="#1A2E26" />
+          <ColorSwatch label="Lavender Dark" cssVar="planner-lavender-dm" hex="#2A1F3A" />
+          <ColorSwatch label="Yellow Dark" cssVar="planner-yellow-dm" hex="#3A3010" />
+          <ColorSwatch label="Pink Dark" cssVar="planner-pink-dm" hex="#3A1A2A" />
+          <ColorSwatch label="Sky Dark" cssVar="planner-sky-dm" hex="#1A2638" />
+          <ColorSwatch label="Lime Dark" cssVar="planner-lime-dm" hex="#1E3020" />
+        </div>
+        <div className="mt-3 text-xs text-muted-foreground space-y-1">
+          <p><span className="font-medium">Usage:</span> Task card backgrounds in dark mode — subtle tinted surfaces that hint at their light-mode color</p>
+        </div>
+      </Section>
+
       {/* ==================== NEW APP ORANGE PALETTE ==================== */}
       <div className="pt-4">
         <h2 className="text-xl font-bold text-foreground flex items-center gap-2">

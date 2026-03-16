@@ -25,14 +25,20 @@ const O = {
   mint:     '#E2F9F0',
   border:   '#F5DCC8',
   success:  '#22C55E',
+  // Dark mode task card colors — deep jewel-toned variants
+  peachDark:    '#3D2A1A',
+  mintDark:     '#1A2E26',
+  lavenderDark: '#2A1F3A',
+  yellowDark:   '#3A3010',
+  pinkDark:     '#3A1A2A',
 };
 
 const TASKS = [
-  { emoji: '🧘', title: 'Morning Meditation', time: '🌅 7:00 AM', repeat: 'Daily', done: true, color: O.peach, colorDark: O.peachMid },
-  { emoji: '💧', title: 'Drink Water', time: '☀️ 8:00 AM', repeat: 'Daily', done: true, color: O.mint, colorDark: '#C3F1E1', goal: '6/8 cups' },
-  { emoji: '📖', title: 'Read 20 Pages', time: '☀️ 9:30 AM', repeat: 'Weekdays', done: false, color: O.lavender, colorDark: '#DEC1FF' },
-  { emoji: '🏃‍♀️', title: 'Evening Run', time: '🌆 6:00 PM', repeat: 'Weekly', done: false, color: O.yellow, colorDark: O.yellowMid, goal: '0/30 min' },
-  { emoji: '✍️', title: 'Journal Entry', time: '🌙 9:00 PM', repeat: 'Daily', done: false, color: O.pink, colorDark: O.pinkMid },
+  { emoji: '🧘', title: 'Morning Meditation', time: '🌅 7:00 AM', repeat: 'Daily', done: true, color: O.peach, darkColor: O.peachDark },
+  { emoji: '💧', title: 'Drink Water', time: '☀️ 8:00 AM', repeat: 'Daily', done: true, color: O.mint, darkColor: O.mintDark, goal: '6/8 cups' },
+  { emoji: '📖', title: 'Read 20 Pages', time: '☀️ 9:30 AM', repeat: 'Weekdays', done: false, color: O.lavender, darkColor: O.lavenderDark },
+  { emoji: '🏃‍♀️', title: 'Evening Run', time: '🌆 6:00 PM', repeat: 'Weekly', done: false, color: O.yellow, darkColor: O.yellowDark, goal: '0/30 min' },
+  { emoji: '✍️', title: 'Journal Entry', time: '🌙 9:00 PM', repeat: 'Daily', done: false, color: O.pink, darkColor: O.pinkDark },
 ];
 
 const QUICK_TOOLS = [
@@ -42,13 +48,13 @@ const QUICK_TOOLS = [
   { icon: Heart, label: 'Mood', bg: O.pink },
 ];
 
-const TaskCard = ({ task, index }: { task: typeof TASKS[0]; index: number }) => (
+const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: number; darkMode?: boolean }) => (
   <motion.div
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.15 + index * 0.06 }}
     className="rounded-3xl overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
-    style={{ background: task.color }}
+    style={{ background: darkMode ? task.darkColor : task.color }}
   >
     <div className="flex items-center gap-2 pl-3 pr-4 py-3">
       {/* 3D Fluent Emoji */}
@@ -60,18 +66,19 @@ const TaskCard = ({ task, index }: { task: typeof TASKS[0]; index: number }) => 
       <div className="flex-1 min-w-0">
         {/* Subtitle line */}
         <div className="flex items-center gap-1.5">
-          <span className="text-[11px] text-black/60">{task.time}</span>
-          <span className="text-[11px] text-black/60">•</span>
-          <span className="text-[11px] text-black/60">{task.repeat}</span>
+          <span className="text-[11px]" style={{ color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.6)' }}>{task.time}</span>
+          <span className="text-[11px]" style={{ color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.6)' }}>•</span>
+          <span className="text-[11px]" style={{ color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.6)' }}>{task.repeat}</span>
           {task.goal && (
             <>
-              <span className="text-[11px] text-black/60">•</span>
-              <span className="text-[11px] text-black/60 font-medium">{task.goal}</span>
+              <span className="text-[11px]" style={{ color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.6)' }}>•</span>
+              <span className="text-[11px] font-medium" style={{ color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.6)' }}>{task.goal}</span>
             </>
           )}
         </div>
         {/* Title */}
-        <p className={`text-[15px] font-semibold leading-tight text-black ${task.done ? 'line-through' : ''}`}>
+        <p className={`text-[15px] font-semibold leading-tight ${task.done ? 'line-through' : ''}`}
+          style={{ color: darkMode ? '#FAFAFA' : '#000000' }}>
           {task.title}
         </p>
       </div>
@@ -95,7 +102,7 @@ const TaskCard = ({ task, index }: { task: typeof TASKS[0]; index: number }) => 
             <path d="M12 18.5L16 22.5L24.5 14" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         ) : (
-          <span className="w-9 h-9 rounded-full border-2 border-black bg-white" />
+          <span className="w-9 h-9 rounded-full border-2 bg-transparent" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.4)' : '#000000' }} />
         )}
       </div>
     </div>
@@ -276,7 +283,7 @@ export default function BrandMock() {
             </div>
             <div className="space-y-2.5">
               {TASKS.map((task, i) => (
-                <TaskCard key={task.title} task={task} index={i} />
+                <TaskCard key={task.title} task={task} index={i} darkMode={darkMode} />
               ))}
             </div>
           </div>
