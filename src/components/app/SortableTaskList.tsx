@@ -409,7 +409,8 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
       <Dialog open={isOpen} onOpenChange={(v) => !v && handleClose()}>
         <DialogContent
           hideCloseButton
-          className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !top-[40%] !-translate-y-full"
+          className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !top-[10%] !translate-y-0"
+          style={{ top: QUICK_ADD_ANCHOR_TOP }}
         >
           {/* Card — two-tone */}
           <div className="rounded-3xl overflow-hidden bg-[#FFF5E6]">
