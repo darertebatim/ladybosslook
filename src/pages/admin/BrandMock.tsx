@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Flame, Calendar, Headphones, BookOpen, Heart, Sparkles, ChevronRight, Check, Sun, Moon, Droplets, Wind, Home, Compass, CalendarPlus, Music, Users } from 'lucide-react';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import appIcon from '@/assets/app-icon.png';
 
 // ─── Orange Palette Tokens (inline for isolated mock) ───
@@ -27,11 +28,11 @@ const O = {
 };
 
 const TASKS = [
-  { emoji: '🧘', title: 'Morning Meditation', time: '7:00 AM', done: true, color: O.peach, colorDark: O.peachMid },
-  { emoji: '💧', title: 'Drink Water', time: '8:00 AM', done: true, color: O.mint, colorDark: '#C3F1E1' },
-  { emoji: '📖', title: 'Read 20 Pages', time: '9:30 AM', done: false, color: O.lavender, colorDark: '#DEC1FF' },
-  { emoji: '🏃‍♀️', title: 'Evening Run', time: '6:00 PM', done: false, color: O.yellow, colorDark: O.yellowMid },
-  { emoji: '✍️', title: 'Journal Entry', time: '9:00 PM', done: false, color: O.pink, colorDark: O.pinkMid },
+  { emoji: '🧘', title: 'Morning Meditation', time: '🌅 7:00 AM', repeat: 'Daily', done: true, color: O.peach, colorDark: O.peachMid },
+  { emoji: '💧', title: 'Drink Water', time: '☀️ 8:00 AM', repeat: 'Daily', done: true, color: O.mint, colorDark: '#C3F1E1', goal: '6/8 cups' },
+  { emoji: '📖', title: 'Read 20 Pages', time: '☀️ 9:30 AM', repeat: 'Weekdays', done: false, color: O.lavender, colorDark: '#DEC1FF' },
+  { emoji: '🏃‍♀️', title: 'Evening Run', time: '🌆 6:00 PM', repeat: 'Weekly', done: false, color: O.yellow, colorDark: O.yellowMid, goal: '0/30 min' },
+  { emoji: '✍️', title: 'Journal Entry', time: '🌙 9:00 PM', repeat: 'Daily', done: false, color: O.pink, colorDark: O.pinkMid },
 ];
 
 const QUICK_TOOLS = [
@@ -46,27 +47,58 @@ const TaskCard = ({ task, index }: { task: typeof TASKS[0]; index: number }) => 
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.15 + index * 0.06 }}
-    className="relative overflow-hidden rounded-2xl"
-    style={{ background: O.card, border: `1px solid ${O.border}` }}
+    className="rounded-3xl overflow-hidden"
+    style={{ background: task.color }}
   >
-    <div className="flex items-center gap-3 px-4 py-3.5">
-      <span className="text-xl">{task.emoji}</span>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold truncate" style={{ color: task.done ? O.fgMuted : O.fg, textDecoration: task.done ? 'line-through' : 'none' }}>{task.title}</p>
-        <p className="text-xs" style={{ color: O.fgMuted }}>{task.time}</p>
+    <div className="flex items-center gap-2 pl-3 pr-4 py-3">
+      {/* 3D Fluent Emoji */}
+      <div className="w-10 h-10 flex items-center justify-center shrink-0">
+        <FluentEmoji emoji={task.emoji} size={32} />
       </div>
-      <div
-        className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all"
-        style={{
-          background: task.done ? O.primary : 'transparent',
-          border: task.done ? 'none' : `2px solid ${O.border}`,
-        }}
-      >
-        {task.done && <Check className="w-4 h-4 text-white" />}
+
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        {/* Subtitle line */}
+        <div className="flex items-center gap-1.5">
+          <span className="text-[11px] text-black/60">{task.time}</span>
+          <span className="text-[11px] text-black/60">•</span>
+          <span className="text-[11px] text-black/60">{task.repeat}</span>
+          {task.goal && (
+            <>
+              <span className="text-[11px] text-black/60">•</span>
+              <span className="text-[11px] text-black/60 font-medium">{task.goal}</span>
+            </>
+          )}
+        </div>
+        {/* Title */}
+        <p className={`text-[15px] font-semibold leading-tight text-black ${task.done ? 'line-through' : ''}`}>
+          {task.title}
+        </p>
+      </div>
+
+      {/* Completion button */}
+      <div className="w-9 h-9 flex items-center justify-center shrink-0">
+        {task.done ? (
+          /* SealCheck-style teal checkmark */
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <circle cx="18" cy="18" r="15" fill="#2DD4BF" />
+            {/* Seal points */}
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
+              <circle
+                key={angle}
+                cx={18 + 16 * Math.cos((angle * Math.PI) / 180)}
+                cy={18 + 16 * Math.sin((angle * Math.PI) / 180)}
+                r="3.5"
+                fill="#2DD4BF"
+              />
+            ))}
+            <path d="M12 18.5L16 22.5L24.5 14" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        ) : (
+          <span className="w-9 h-9 rounded-full border-2 border-black bg-white" />
+        )}
       </div>
     </div>
-    {/* Bottom color strip */}
-    <div className="h-1" style={{ background: `linear-gradient(90deg, ${task.color}, ${task.colorDark})` }} />
   </motion.div>
 );
 
