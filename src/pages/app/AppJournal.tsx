@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Search, BookOpen, NotebookPen, CalendarPlus, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { JournalPromptMarquee } from '@/components/app/JournalPromptMarquee';
 import { Input } from '@/components/ui/input';
 import { useJournalEntries } from '@/hooks/useJournal';
 import { JournalEntryCard, formatDateGroup } from '@/components/app/JournalEntryCard';
@@ -16,11 +17,6 @@ import { JournalCalendar } from '@/components/app/JournalCalendar';
 import { haptic } from '@/lib/haptics';
 import { format, startOfDay, startOfMonth, subDays, isAfter } from 'date-fns';
 
-const JOURNAL_PROMPT_ROWS = [
-  ['Today I learned\u2026', "I'm grateful for\u2026", "I'm feeling\u2026", 'A win today\u2026', 'What inspired me\u2026'],
-  ['What challenged me\u2026', 'A moment that made me smile\u2026', 'Tomorrow I want to\u2026', 'Something new I tried\u2026'],
-  ['I need to let go of\u2026', 'One thing I want to remember\u2026', 'I forgive myself for\u2026', 'My energy today is\u2026'],
-];
 
 const calculateMonthlyPresence = (entries: any[]): number => {
   if (!entries || entries.length === 0) return 0;
@@ -215,32 +211,10 @@ const AppJournal = () => {
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="p-4 pb-32 space-y-6">
           {/* Journaling Prompts — marquee */}
-          <div className="rounded-2xl bg-muted/50 border border-border/50 py-3 space-y-2 overflow-hidden">
-            <p className="text-xs font-medium text-muted-foreground px-4">Journaling prompts</p>
-            {JOURNAL_PROMPT_ROWS.map((row, i) => (
-              <div key={i} className="relative overflow-hidden">
-                <div
-                  className={cn(
-                    "flex gap-2 w-max",
-                    i % 2 === 0 ? "animate-[marquee-left_25s_linear_infinite]" : "animate-[marquee-right_28s_linear_infinite]"
-                  )}
-                >
-                  {[...row, ...row].map((prompt, j) => (
-                    <button
-                      key={`${prompt}-${j}`}
-                      onClick={() => {
-                        haptic.light();
-                        navigate('/app/journal/new', { state: { prefillTitle: prompt } });
-                      }}
-                      className="shrink-0 px-3 py-1.5 rounded-full bg-background border border-border text-xs text-foreground transition-colors active:bg-accent"
-                    >
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+          <JournalPromptMarquee onSelect={(prompt) => {
+              haptic.light();
+              navigate('/app/journal/new', { state: { prefillTitle: prompt } });
+            }} />
           {entries && entries.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">

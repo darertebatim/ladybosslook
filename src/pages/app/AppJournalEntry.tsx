@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useJournalEntry, useCreateJournalEntry, useUpdateJournalEntry, useDeleteJournalEntry } from '@/hooks/useJournal';
 import { MoodSelector } from '@/components/app/MoodSelector';
-import { EntryPromptChips } from '@/components/app/EntryPromptChips';
+import { JournalPromptMarquee } from '@/components/app/JournalPromptMarquee';
 
 import { JournalEntrySkeleton } from '@/components/app/skeletons/JournalSkeleton';
 import { BackButton } from '@/components/app/BackButton';
@@ -263,10 +263,9 @@ const AppJournalEntry = () => {
           </div>
 
           {/* Prompt Starters - shown for new entries with no content */}
-          {isNewEntry && !content.trim() && (
-            <EntryPromptChips onSelect={(starter) => {
-              setContent(starter);
-              textareaRef.current?.focus();
+          {isNewEntry && !title.trim() && !content.trim() && (
+            <JournalPromptMarquee onSelect={(prompt) => {
+              setTitle(prompt);
               triggerAutoSave();
             }} />
           )}
