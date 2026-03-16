@@ -348,18 +348,19 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
         <span className="text-[15px] font-semibold text-foreground">Quick add action...</span>
       </button>
 
-      {/* Dialog — same position as TaskDetailModal */}
+      {/* Dialog — identical structure to TaskDetailModal */}
       <Dialog open={isOpen} onOpenChange={(v) => !v && handleClose()}>
         <DialogContent
           hideCloseButton
-          className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none"
+          className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none flex flex-col"
         >
-          <div className="rounded-3xl overflow-hidden bg-card border-2 border-urgency/20">
-            {/* Input area */}
+          {/* Card — two-tone like task detail cards */}
+          <div className="rounded-3xl overflow-hidden bg-[#FFF5E6]">
+            {/* Input area — primary pastel */}
             <div className="px-4 pt-4 pb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-urgency/15 flex items-center justify-center shrink-0">
-                  <Plus className="h-5 w-5 text-urgency" strokeWidth={2.5} />
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 flex items-center justify-center shrink-0">
+                  <Plus className="h-6 w-6 text-urgency" strokeWidth={2.5} />
                 </div>
                 <input
                   ref={inputRef}
@@ -370,7 +371,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
                     if (e.key === 'Escape') handleClose();
                   }}
                   placeholder="Type action name..."
-                  className="flex-1 bg-transparent text-[17px] font-semibold text-foreground placeholder:text-muted-foreground outline-none"
+                  className="flex-1 bg-transparent text-[15px] font-semibold text-black placeholder:text-black/40 outline-none"
                   enterKeyHint="done"
                   autoComplete="off"
                   autoCorrect="on"
@@ -379,36 +380,44 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
               </div>
             </div>
 
-            {/* Action buttons strip */}
-            <div className="flex items-center gap-2 px-4 pb-4">
-              <button
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={handleSubmit}
-                disabled={!title.trim()}
-                className={cn(
-                  "flex-1 flex items-center justify-center gap-1.5 py-3 rounded-2xl text-[14px] font-bold transition-all active:scale-[0.97]",
-                  title.trim()
-                    ? "bg-urgency text-urgency-foreground shadow-sm"
-                    : "bg-muted text-muted-foreground"
-                )}
-              >
-                <Plus className="h-4 w-4" />
-                Add Action
-              </button>
-              <button
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={handleOpenDetails}
-                disabled={!title.trim()}
-                className={cn(
-                  "w-12 h-12 rounded-2xl border-2 flex items-center justify-center shrink-0 transition-all active:scale-95",
-                  title.trim()
-                    ? "border-foreground/20 bg-card"
-                    : "border-muted bg-muted/50"
-                )}
-              >
-                <MoreHorizontal className="h-5 w-5" />
-              </button>
+            {/* Footer strip — secondary darker shade */}
+            <div className="px-4 py-3.5 bg-[#FFE6C0]">
+              <p className="text-[13px] font-medium text-black text-center">
+                Press enter to add. Tap outside to cancel.
+              </p>
             </div>
+          </div>
+
+          {/* Action buttons — outside the card, floating below (same as TaskDetailModal) */}
+          <div className="flex gap-2 mt-3">
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={handleSubmit}
+              disabled={!title.trim()}
+              className={cn(
+                "flex-1 gap-2 h-11 rounded-2xl text-sm font-medium flex items-center justify-center shadow-sm active:scale-95 transition-transform",
+                title.trim()
+                  ? "bg-urgency text-urgency-foreground"
+                  : "bg-white text-black/40"
+              )}
+            >
+              <Plus className="h-4 w-4" />
+              Add Action
+            </button>
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={handleOpenDetails}
+              disabled={!title.trim()}
+              className={cn(
+                "gap-1.5 h-11 px-5 rounded-2xl text-sm font-medium flex items-center justify-center shadow-sm active:scale-95 transition-transform",
+                title.trim()
+                  ? "bg-white text-black"
+                  : "bg-white text-black/40"
+              )}
+            >
+              <MoreHorizontal className="h-4 w-4" />
+              Details
+            </button>
           </div>
         </DialogContent>
       </Dialog>
