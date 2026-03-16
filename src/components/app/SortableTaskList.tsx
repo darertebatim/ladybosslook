@@ -307,6 +307,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   const [showIdeas, setShowIdeas] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
   const inputRef = useRef<HTMLInputElement>(null);
+  const suggestionsLayerRef = useRef<HTMLDivElement>(null);
   const createTask = useCreateTask();
   const navigate = useNavigate();
   const { data: templates = [] } = useTaskTemplates();
@@ -411,6 +412,11 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
           hideCloseButton
           className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !translate-y-0"
           style={{ top: QUICK_ADD_ANCHOR_TOP }}
+          onInteractOutside={(event) => {
+            if (showIdeas && suggestionsLayerRef.current?.contains(event.target as Node)) {
+              event.preventDefault();
+            }
+          }}
         >
           {/* Card — two-tone */}
           <div className="rounded-3xl overflow-hidden bg-[#FFF5E6]">
@@ -494,6 +500,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
         {showIdeas && (
           <DialogPortal>
             <div
+              ref={suggestionsLayerRef}
               className="fixed left-[50%] -translate-x-1/2 z-[100] w-[calc(100%-32px)] max-w-[calc(100%-32px)] flex flex-col gap-2.5 pointer-events-auto"
               style={{ top: SUGGESTIONS_ANCHOR_TOP }}
             >
