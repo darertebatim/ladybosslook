@@ -167,7 +167,7 @@ export default function BrandMock() {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring' }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
                 style={{ background: darkMode ? '#3D2A1A' : O.peach }}
               >
                 <Flame className="w-4 h-4" style={{ color: O.primary }} />
@@ -180,7 +180,7 @@ export default function BrandMock() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="rounded-3xl p-5 relative overflow-hidden"
+              className="rounded-3xl p-5 relative overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
               style={{
                 background: `linear-gradient(135deg, ${O.primary} 0%, ${O.primaryL} 100%)`,
               }}
@@ -221,8 +221,8 @@ export default function BrandMock() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + i * 0.05 }}
-                  className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer"
-                  style={{ background: darkMode ? '#2A1A10' : tool.bg, border: `1px solid ${border}` }}
+                  className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+                  style={{ background: darkMode ? '#2A1A10' : tool.bg }}
                 >
                   <tool.icon className="w-5 h-5" style={{ color: O.primary }} />
                   <span className="text-[10px] font-medium" style={{ color: fgMuted }}>{tool.label}</span>
@@ -269,7 +269,7 @@ export default function BrandMock() {
           <div className="px-5 pb-4">
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm font-semibold" style={{ color: fg }}>Today's Actions</p>
-              <span className="text-xs font-medium px-2 py-0.5 rounded-full"
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
                 style={{ background: darkMode ? '#3D2A1A' : O.peach, color: O.primary }}>
                 2/5
               </span>
