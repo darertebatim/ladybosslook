@@ -92,8 +92,8 @@ export const MoodSelector = ({ value, onChange, className, showHeader = true }: 
               type="button"
               onClick={() => handleClick(mood.value)}
               className={cn(
-                'flex flex-col items-center gap-1 p-2 rounded-xl transition-all',
-                'border-2 min-w-[56px]',
+                'flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all',
+                'border-2 min-w-[52px]',
                 isSelected ? mood.selectedColor : mood.color,
                 'hover:scale-105 active:scale-95'
               )}

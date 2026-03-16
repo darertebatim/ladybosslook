@@ -1,9 +1,8 @@
 import { cn } from '@/lib/utils';
 
 const JOURNAL_PROMPT_ROWS = [
-  ['Today I learned…', "I'm grateful for…", "I'm feeling…", 'A win today…', 'What inspired me…'],
-  ['What challenged me…', 'A moment that made me smile…', 'Tomorrow I want to…', 'Something new I tried…'],
-  ['I need to let go of…', 'One thing I want to remember…', 'I forgive myself for…', 'My energy today is…'],
+  ['Today I learned…', "I'm grateful for…", "I'm feeling…", 'A win today…', 'What inspired me…', 'I need to let go of…'],
+  ['What challenged me…', 'A moment that made me smile…', 'Tomorrow I want to…', 'Something new I tried…', 'One thing I want to remember…', 'My energy today is…'],
 ];
 
 interface JournalPromptMarqueeProps {

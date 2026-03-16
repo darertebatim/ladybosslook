@@ -245,6 +245,11 @@ const AppJournalEntry = () => {
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="p-4 space-y-4">
+          {/* Mood Selector - Compact */}
+          <div className="py-1">
+            <MoodSelector value={mood} onChange={handleMoodChange} />
+          </div>
+
           {/* Title Input */}
           <Input
             placeholder="Title (optional)"
@@ -256,11 +261,6 @@ const AppJournalEntry = () => {
             )}
             dir={titleDirection}
           />
-
-          {/* Mood Selector - Compact */}
-          <div className="py-2">
-            <MoodSelector value={mood} onChange={handleMoodChange} />
-          </div>
 
           {/* Prompt Starters - shown for new entries with no content */}
           {isNewEntry && !title.trim() && !content.trim() && (
