@@ -261,14 +261,21 @@ const AppJournalEntry = () => {
             <MoodSelector value={mood} onChange={handleMoodChange} />
           </div>
 
+          {/* Prompt Starters - shown for new entries with no content */}
+          {isNewEntry && !content.trim() && (
+            <EntryPromptChips onSelect={(starter) => {
+              setContent(starter);
+              textareaRef.current?.focus();
+              triggerAutoSave();
+            }} />
+          )}
+
           {/* Content Textarea */}
           <Textarea
             ref={textareaRef}
             placeholder="Start writing your thoughts..."
             value={content}
             onChange={(e) => handleContentChange(e.target.value)}
-
-
             className={cn(
               "min-h-[200px] resize-none border-0 px-0 focus-visible:ring-0 text-base leading-relaxed placeholder:text-muted-foreground/50",
               contentBilingualClassName
