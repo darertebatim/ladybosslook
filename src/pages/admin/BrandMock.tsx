@@ -269,7 +269,7 @@ export default function BrandMock() {
           <div className="px-5 pb-4">
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm font-semibold" style={{ color: fg }}>Today's Actions</p>
-              <span className="text-xs font-medium px-2 py-0.5 rounded-full"
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
                 style={{ background: darkMode ? '#3D2A1A' : O.peach, color: O.primary }}>
                 2/5
               </span>
