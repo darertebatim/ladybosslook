@@ -572,7 +572,7 @@ export default function BrandMock() {
           {/* ─── Programs Section ─── */}
           <div className="px-5 pt-3 pb-1">
             <div className="flex items-center justify-between mb-2.5">
-              <p className="text-sm font-semibold" style={{ color: fg }}>Academy Programs</p>
+              <p className="text-sm font-semibold" style={{ color: fg }}>Explore Programs</p>
               <span className="text-xs font-medium" style={{ color: O.primary }}>All →</span>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
