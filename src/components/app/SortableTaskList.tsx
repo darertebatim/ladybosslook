@@ -390,7 +390,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   }
 
   return (
-    <div className="mt-3 rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2">
+    <div ref={containerRef} className="mt-3 rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2">
       <div className="w-10 h-10 flex items-center justify-center shrink-0">
         <Plus className="h-5 w-5 text-urgency" />
       </div>
@@ -400,20 +400,35 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
         onChange={(e) => setTitle(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === 'Enter') handleSubmit();
-          if (e.key === 'Escape') { setIsOpen(false); setTitle(''); }
+          if (e.key === 'Escape') {
+            isClosingRef.current = true;
+            inputRef.current?.blur();
+            setIsOpen(false);
+            setTitle('');
+          }
         }}
         onFocus={() => {
-          window.setTimeout(() => {
-            scrollInputIntoView('smooth');
-          }, 120);
+          // Don't re-scroll if we're in the process of closing
+          if (isClosingRef.current) return;
+          const t1 = window.setTimeout(() => scrollInputIntoView('smooth'), 120);
+          const t2 = window.setTimeout(() => scrollInputIntoView('smooth'), 400);
+          return () => {
+            window.clearTimeout(t1);
+            window.clearTimeout(t2);
+          };
         }}
         onBlur={() => {
-          // Delay blur to allow button taps to register first (critical for iOS)
+          // Delay to allow button taps to register (critical for iOS)
           setTimeout(() => {
-            if (!title.trim() && document.activeElement !== inputRef.current) {
+            // Only close if truly lost focus (not tapping Add/Details buttons)
+            if (document.activeElement === inputRef.current) return;
+            // Check if focus went to a button inside our container
+            if (containerRef.current?.contains(document.activeElement as Node)) return;
+            if (!title.trim()) {
+              isClosingRef.current = true;
               setIsOpen(false);
             }
-          }, 200);
+          }, 250);
         }}
         placeholder="Type action name..."
         className="flex-1 bg-transparent text-[15px] font-semibold text-foreground placeholder:text-muted-foreground outline-none"
@@ -425,6 +440,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
       {title.trim() && (
         <div className="flex items-center gap-1.5">
           <button
+            onMouseDown={(e) => e.preventDefault()}
             onClick={handleSubmit}
             className="flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl text-[10px] font-bold shrink-0 transition-all shadow-sm active:scale-95 bg-urgency text-urgency-foreground"
           >
@@ -432,6 +448,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
             Add
           </button>
           <button
+            onMouseDown={(e) => e.preventDefault()}
             onClick={handleOpenDetails}
             className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center shrink-0 active:scale-95 transition-transform"
           >
