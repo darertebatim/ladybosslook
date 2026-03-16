@@ -914,7 +914,7 @@ const AppTaskCreate = ({
             value={title}
             onChange={(e) => setTitle(e.target.value.slice(0, 50))}
             onFocus={handleTitleFocus}
-            placeholder="Action name"
+            placeholder="Task name"
             className="w-full text-lg font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0 pr-6"
             maxLength={50}
           />
