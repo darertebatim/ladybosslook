@@ -66,18 +66,19 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
       <div className="flex-1 min-w-0">
         {/* Subtitle line */}
         <div className="flex items-center gap-1.5">
-          <span className="text-[11px] text-black/60">{task.time}</span>
-          <span className="text-[11px] text-black/60">•</span>
-          <span className="text-[11px] text-black/60">{task.repeat}</span>
+          <span className="text-[11px]" style={{ color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.6)' }}>{task.time}</span>
+          <span className="text-[11px]" style={{ color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.6)' }}>•</span>
+          <span className="text-[11px]" style={{ color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.6)' }}>{task.repeat}</span>
           {task.goal && (
             <>
-              <span className="text-[11px] text-black/60">•</span>
-              <span className="text-[11px] text-black/60 font-medium">{task.goal}</span>
+              <span className="text-[11px]" style={{ color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.6)' }}>•</span>
+              <span className="text-[11px] font-medium" style={{ color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.6)' }}>{task.goal}</span>
             </>
           )}
         </div>
         {/* Title */}
-        <p className={`text-[15px] font-semibold leading-tight text-black ${task.done ? 'line-through' : ''}`}>
+        <p className={`text-[15px] font-semibold leading-tight ${task.done ? 'line-through' : ''}`}
+          style={{ color: darkMode ? '#FAFAFA' : '#000000' }}>
           {task.title}
         </p>
       </div>
