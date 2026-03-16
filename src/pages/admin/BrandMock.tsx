@@ -34,11 +34,11 @@ const O = {
 };
 
 const TASKS = [
-  { emoji: '🧘', title: 'Morning Meditation', time: '🌅 7:00 AM', repeat: 'Daily', done: true, color: O.peach, colorDark: O.peachMid },
-  { emoji: '💧', title: 'Drink Water', time: '☀️ 8:00 AM', repeat: 'Daily', done: true, color: O.mint, colorDark: '#C3F1E1', goal: '6/8 cups' },
-  { emoji: '📖', title: 'Read 20 Pages', time: '☀️ 9:30 AM', repeat: 'Weekdays', done: false, color: O.lavender, colorDark: '#DEC1FF' },
-  { emoji: '🏃‍♀️', title: 'Evening Run', time: '🌆 6:00 PM', repeat: 'Weekly', done: false, color: O.yellow, colorDark: O.yellowMid, goal: '0/30 min' },
-  { emoji: '✍️', title: 'Journal Entry', time: '🌙 9:00 PM', repeat: 'Daily', done: false, color: O.pink, colorDark: O.pinkMid },
+  { emoji: '🧘', title: 'Morning Meditation', time: '🌅 7:00 AM', repeat: 'Daily', done: true, color: O.peach, darkColor: O.peachDark },
+  { emoji: '💧', title: 'Drink Water', time: '☀️ 8:00 AM', repeat: 'Daily', done: true, color: O.mint, darkColor: O.mintDark, goal: '6/8 cups' },
+  { emoji: '📖', title: 'Read 20 Pages', time: '☀️ 9:30 AM', repeat: 'Weekdays', done: false, color: O.lavender, darkColor: O.lavenderDark },
+  { emoji: '🏃‍♀️', title: 'Evening Run', time: '🌆 6:00 PM', repeat: 'Weekly', done: false, color: O.yellow, darkColor: O.yellowDark, goal: '0/30 min' },
+  { emoji: '✍️', title: 'Journal Entry', time: '🌙 9:00 PM', repeat: 'Daily', done: false, color: O.pink, darkColor: O.pinkDark },
 ];
 
 const QUICK_TOOLS = [
