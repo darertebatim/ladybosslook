@@ -53,8 +53,13 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.15 + index * 0.06 }}
-    className="rounded-3xl overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
-    style={{ background: darkMode ? task.darkColor : task.color }}
+    className="rounded-3xl overflow-hidden"
+    style={{
+      background: darkMode ? task.darkColor : task.color,
+      boxShadow: darkMode
+        ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)'
+        : '0 2px 10px rgba(0,0,0,0.08)',
+    }}
   >
     <div className="flex items-center gap-2 pl-3 pr-4 py-3">
       {/* 3D Fluent Emoji */}
