@@ -142,6 +142,74 @@ export default function BrandDesign() {
         </div>
       </Section>
 
+      {/* ==================== ORANGE APP PALETTE (CANDIDATE) ==================== */}
+      <div className="pt-4">
+        <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+          🍊 Orange App Palette <span className="text-xs font-normal bg-muted px-2 py-0.5 rounded-full">candidate</span>
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1">Warm orange palette derived from planner colors + phoenix app icon — for potential app theme refresh</p>
+      </div>
+
+      <Section title="Orange — Primary Scale" description="Core orange ramp from the phoenix icon coral through planner peach">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <ColorSwatch label="Orange 50" cssVar="--orange-50" hex="#FFF5ED" />
+          <ColorSwatch label="Orange 100" cssVar="--orange-100" hex="#FFE6C9" />
+          <ColorSwatch label="Orange 200" cssVar="--orange-200" hex="#FFD2A1" />
+          <ColorSwatch label="Orange 300" cssVar="--orange-300" hex="#FFAE6B" />
+          <ColorSwatch label="Orange 400" cssVar="--orange-400" hex="#F5A623" />
+          <ColorSwatch label="Orange 500" cssVar="--orange-500" hex="#E6512E" />
+          <ColorSwatch label="Orange 600" cssVar="--orange-600" hex="#D94B2B" />
+          <ColorSwatch label="Orange 700" cssVar="--orange-700" hex="#A63520" />
+          <ColorSwatch label="Orange 800" cssVar="--orange-800" hex="#7C2818" />
+          <ColorSwatch label="Orange 900" cssVar="--orange-900" hex="#4A1810" />
+        </div>
+      </Section>
+
+      <Section title="Orange — Accent & Supporting" description="Warm companions from planner pastels and logo magenta/gold">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <ColorSwatch label="Peach Light" cssVar="planner-peach" hex="#FFE6C9" />
+          <ColorSwatch label="Peach Dark" cssVar="planner-peach-dark" hex="#FFD2A1" />
+          <ColorSwatch label="Golden Yellow" cssVar="logo-gold" hex="#F5A623" />
+          <ColorSwatch label="Warm Pink" cssVar="planner-pink" hex="#FFE0F5" />
+          <ColorSwatch label="Pink Dark" cssVar="planner-pink-dark" hex="#FFC2EA" />
+          <ColorSwatch label="Magenta Accent" cssVar="logo-magenta" hex="#C2255C" />
+          <ColorSwatch label="Coral CTA" cssVar="icon-coral" hex="#EB5E33" />
+          <ColorSwatch label="Deep Red" cssVar="icon-shadow" hex="#A63520" />
+        </div>
+      </Section>
+
+      <Section title="Orange — Surfaces & Neutrals" description="Warm-tinted neutrals for backgrounds, cards, and text">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <ColorSwatch label="Background" cssVar="--background" hex="#FFFCF9" />
+          <ColorSwatch label="Surface" cssVar="--surface" hex="#FFF8F2" />
+          <ColorSwatch label="Muted" cssVar="--muted" hex="#FDF0E5" />
+          <ColorSwatch label="Border" cssVar="--border" hex="#F0DBC8" />
+          <ColorSwatch label="Foreground" cssVar="--foreground" hex="#2C1810" />
+          <ColorSwatch label="Muted Foreground" cssVar="--muted-fg" hex="#8C6B54" />
+        </div>
+      </Section>
+
+      <Section title="Orange — Gradients (Preview)">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <div className="h-20 rounded-xl" style={{ background: 'linear-gradient(135deg, #F5A623, #E6512E)' }} />
+            <p className="text-xs text-muted-foreground mt-1 font-mono">Gold → Coral</p>
+          </div>
+          <div>
+            <div className="h-20 rounded-xl" style={{ background: 'linear-gradient(135deg, #FFE6C9, #FFD2A1, #FFAE6B)' }} />
+            <p className="text-xs text-muted-foreground mt-1 font-mono">Peach ramp (soft)</p>
+          </div>
+          <div>
+            <div className="h-20 rounded-xl" style={{ background: 'linear-gradient(135deg, #D94B2B, #C2255C)' }} />
+            <p className="text-xs text-muted-foreground mt-1 font-mono">Coral → Magenta</p>
+          </div>
+          <div>
+            <div className="h-20 rounded-xl" style={{ background: 'linear-gradient(135deg, #EB5E33, #F5A623, #FFE6C9)' }} />
+            <p className="text-xs text-muted-foreground mt-1 font-mono">CTA sunset ramp</p>
+          </div>
+        </div>
+      </Section>
+
       {/* Planner Palette */}
       <Section title="Planner Action Palette" description="7 pastel colors used across the daily planner, action builder, and routine cards">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
