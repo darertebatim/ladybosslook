@@ -91,7 +91,7 @@ export default function BrandDesign() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           <ColorSwatch label="Success" cssVar="--success" hex="#22C55E" />
           <ColorSwatch label="Destructive" cssVar="--destructive" hex="#EF4444" />
-          <ColorSwatch label="Chip Orange" cssVar="--chip-lavender" hex="#FFD4A3" />
+          <ColorSwatch label="Chip Lavender" cssVar="--chip-lavender" hex="#C4A1E0" />
         </div>
       </Section>
 
