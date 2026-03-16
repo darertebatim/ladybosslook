@@ -283,7 +283,7 @@ export default function BrandMock() {
             </div>
             <div className="space-y-2.5">
               {TASKS.map((task, i) => (
-                <TaskCard key={task.title} task={task} index={i} />
+                <TaskCard key={task.title} task={task} index={i} darkMode={darkMode} />
               ))}
             </div>
           </div>
