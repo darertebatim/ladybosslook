@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Search, BookOpen, NotebookPen, CalendarPlus, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { JournalPromptMarquee } from '@/components/app/JournalPromptMarquee';
 import { Input } from '@/components/ui/input';
 import { useJournalEntries } from '@/hooks/useJournal';
 import { JournalEntryCard, formatDateGroup } from '@/components/app/JournalEntryCard';
