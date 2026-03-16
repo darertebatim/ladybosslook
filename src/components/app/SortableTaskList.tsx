@@ -26,7 +26,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
-import { Plus, MoreHorizontal, CalendarPlus } from 'lucide-react';
+import { Plus, MoreHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
