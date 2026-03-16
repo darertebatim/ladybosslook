@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import type { TaskColor } from '@/hooks/useTaskPlanner';
 import {
   DndContext,
