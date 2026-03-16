@@ -143,11 +143,10 @@ export default function BrandDesign() {
       </Section>
 
       {/* Planner Palette */}
-      <Section title="Planner Action Palette" description="8 pastel colors used across the daily planner, action builder, and routine cards">
+      <Section title="Planner Action Palette" description="7 pastel colors used across the daily planner, action builder, and routine cards">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           <ColorSwatch label="Pink" cssVar="planner-pink" hex="#FFE0F5" />
           <ColorSwatch label="Peach" cssVar="planner-peach" hex="#FFE6C9" />
-          <ColorSwatch label="Orange" cssVar="planner-orange" hex="#FFDAB3" />
           <ColorSwatch label="Yellow" cssVar="planner-yellow" hex="#FFF492" />
           <ColorSwatch label="Lime" cssVar="planner-lime" hex="#E2F9F0" />
           <ColorSwatch label="Sky" cssVar="planner-sky" hex="#D7E9FF" />
@@ -163,7 +162,6 @@ export default function BrandDesign() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           <ColorSwatch label="Pink Dark" cssVar="planner-pink-dark" hex="#FFC2EA" />
           <ColorSwatch label="Peach Dark" cssVar="planner-peach-dark" hex="#FFD2A1" />
-          <ColorSwatch label="Orange Dark" cssVar="planner-orange-dark" hex="#FFC285" />
           <ColorSwatch label="Yellow Dark" cssVar="planner-yellow-dark" hex="#FFEA4E" />
           <ColorSwatch label="Lime Dark" cssVar="planner-lime-dark" hex="#C3F1E1" />
           <ColorSwatch label="Sky Dark" cssVar="planner-sky-dark" hex="#B9D6FF" />
