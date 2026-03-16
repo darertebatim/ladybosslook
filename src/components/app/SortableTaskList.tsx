@@ -289,69 +289,60 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const createTask = useCreateTask();
   const navigate = useNavigate();
-  const { isKeyboardOpen } = useKeyboard();
+  const isClosingRef = useRef(false);
 
-  const findScrollableParent = (element: HTMLElement | null): HTMLElement | null => {
-    let parent = element?.parentElement ?? null;
-
-    while (parent) {
-      const computedStyle = window.getComputedStyle(parent);
-      const canScroll = /(auto|scroll)/.test(computedStyle.overflowY) && parent.scrollHeight > parent.clientHeight;
-
-      if (canScroll) return parent;
-      parent = parent.parentElement;
-    }
-
-    return null;
-  };
-
-  const scrollInputIntoView = (behavior: ScrollBehavior = 'smooth') => {
+  const scrollInputIntoView = useCallback((behavior: ScrollBehavior = 'smooth') => {
     const inputEl = inputRef.current;
     if (!inputEl) return;
 
     const homeScrollContainer = document.querySelector('[data-home-scroll-container="true"]') as HTMLElement | null;
-    const scrollParent = homeScrollContainer ?? findScrollableParent(inputEl);
+    let scrollParent: HTMLElement | null = homeScrollContainer;
+
+    if (!scrollParent) {
+      let parent = inputEl.parentElement;
+      while (parent) {
+        const style = window.getComputedStyle(parent);
+        if (/(auto|scroll)/.test(style.overflowY) && parent.scrollHeight > parent.clientHeight) {
+          scrollParent = parent;
+          break;
+        }
+        parent = parent.parentElement;
+      }
+    }
 
     if (scrollParent) {
       const inputRect = inputEl.getBoundingClientRect();
       const parentRect = scrollParent.getBoundingClientRect();
       const preferredOffset = Math.max(24, parentRect.height * 0.28);
       const targetTop = scrollParent.scrollTop + (inputRect.top - parentRect.top) - preferredOffset;
-
-      scrollParent.scrollTo({
-        top: Math.max(0, targetTop),
-        behavior,
-      });
+      scrollParent.scrollTo({ top: Math.max(0, targetTop), behavior });
       return;
     }
 
     inputEl.scrollIntoView({ behavior, block: 'center', inline: 'nearest' });
-  };
+  }, []);
 
+  // Only run on open, NOT on isKeyboardOpen changes (prevents re-focus loop)
   useEffect(() => {
     if (!isOpen) return;
+    isClosingRef.current = false;
 
-    const focusTimer = window.setTimeout(() => {
+    const t1 = window.setTimeout(() => {
       inputRef.current?.focus();
       scrollInputIntoView('smooth');
-    }, 60);
-
-    const settleTimer = window.setTimeout(() => {
-      scrollInputIntoView('smooth');
-    }, isKeyboardOpen ? 240 : 320);
-
-    const finalTimer = window.setTimeout(() => {
-      scrollInputIntoView('smooth');
-    }, isKeyboardOpen ? 420 : 520);
+    }, 80);
+    const t2 = window.setTimeout(() => scrollInputIntoView('smooth'), 350);
+    const t3 = window.setTimeout(() => scrollInputIntoView('smooth'), 600);
 
     return () => {
-      window.clearTimeout(focusTimer);
-      window.clearTimeout(settleTimer);
-      window.clearTimeout(finalTimer);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.clearTimeout(t3);
     };
-  }, [isOpen, isKeyboardOpen]);
+  }, [isOpen, scrollInputIntoView]);
 
   const handleSubmit = () => {
     const trimmed = title.trim();
