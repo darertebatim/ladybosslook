@@ -468,37 +468,27 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
             </div>
           </div>
 
-          {/* Buttons outside card */}
-          <div className="flex gap-2 mt-3">
-            <button
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={handleSubmit}
-              disabled={!title.trim()}
-              className={cn(
-                "flex-1 gap-2 h-11 rounded-2xl text-sm font-medium flex items-center justify-center shadow-sm active:scale-95 transition-transform",
-                title.trim()
-                  ? "bg-urgency text-urgency-foreground"
-                  : "bg-white text-black/40"
-              )}
-            >
-              <Plus className="h-4 w-4" />
-              Add Task
-            </button>
-            <button
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={handleOpenDetails}
-              disabled={!title.trim()}
-              className={cn(
-                "gap-1.5 h-11 px-5 rounded-2xl text-sm font-medium flex items-center justify-center shadow-sm active:scale-95 transition-transform",
-                title.trim()
-                  ? "bg-white text-black"
-                  : "bg-white text-black/40"
-              )}
-            >
-              <MoreHorizontal className="h-4 w-4" />
-              Details
-            </button>
-          </div>
+          {/* Buttons outside card — only visible when typing */}
+          {title.trim() && (
+            <div className="flex gap-2 mt-3 animate-in fade-in slide-in-from-top-2 duration-200">
+              <button
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={handleSubmit}
+                className="flex-1 gap-2 h-11 rounded-2xl text-sm font-medium flex items-center justify-center shadow-sm active:scale-95 transition-transform bg-urgency text-urgency-foreground"
+              >
+                <Plus className="h-4 w-4" />
+                Add Task
+              </button>
+              <button
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={handleOpenDetails}
+                className="gap-1.5 h-11 px-5 rounded-2xl text-sm font-medium flex items-center justify-center shadow-sm active:scale-95 transition-transform bg-white text-black"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+                Details
+              </button>
+            </div>
+          )}
 
           {/* "Need some ideas?" tappable text */}
           <div className="mt-3 flex min-h-5 justify-center">
