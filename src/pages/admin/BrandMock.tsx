@@ -180,7 +180,7 @@ export default function BrandMock() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="rounded-3xl p-5 relative overflow-hidden"
+              className="rounded-3xl p-5 relative overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
               style={{
                 background: `linear-gradient(135deg, ${O.primary} 0%, ${O.primaryL} 100%)`,
               }}
