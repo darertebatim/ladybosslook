@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import type { TaskColor } from '@/hooks/useTaskPlanner';
 import {
   DndContext,
@@ -20,13 +20,18 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
-import { UserTask, useReorderTasks, useCreateTask } from '@/hooks/useTaskPlanner';
+import { UserTask, useReorderTasks, useCreateTask, useTaskTemplates, TaskTemplate, TASK_COLORS, TASK_COLOR_CLASSES } from '@/hooks/useTaskPlanner';
+import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
-import { Plus, MoreHorizontal, Lightbulb } from 'lucide-react';
+import { Plus, MoreHorizontal, CalendarPlus } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
 
 interface SortableTaskItemProps {
   task: UserTask;
