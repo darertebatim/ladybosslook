@@ -884,13 +884,18 @@ const AppHome = () => {
             {/* Notification Banner - prompts users to enable notifications */}
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
 
-            {/* Promo Banner */}
-            <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
+            {/* Mood Check-in Banner - priority over promo banners */}
+            {!showWelcomeCard && <MoodCheckInBanner />}
 
-            {/* Home Banners (announcements with videos/CTAs) */}
-            <div className="tour-banner">
-              <HomeBanner />
-            </div>
+            {/* Promo Banner - only show after mood check-in is done */}
+            {todayMood && <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />}
+
+            {/* Home Banners (announcements with videos/CTAs) - only show after mood check-in */}
+            {todayMood && (
+              <div className="tour-banner">
+                <HomeBanner />
+              </div>
+            )}
 
             {/* Tag filter chips - temporarily hidden */}
             {/* {taskTags.length > 0 && <div className="py-2 -mx-4 px-4 bg-background overflow-x-auto">
@@ -961,9 +966,6 @@ const AppHome = () => {
                 </div>
               ) : filteredTasks.length > 0 ? (
                 <div>
-                  {/* Mood Check-in Banner - above actions, hidden while welcome card is active */}
-                  {/* Mood Check-in Banner - hidden while welcome card is active */}
-                  {!showWelcomeCard && !hasPromoBanner && <MoodCheckInBanner />}
                    {/* My Tasks header with category pills */}
                   <div className="flex items-center gap-2 mb-3">
                     <Zap className="h-4 w-4 text-amber-500 shrink-0" />
