@@ -884,6 +884,9 @@ const AppHome = () => {
             {/* Notification Banner - prompts users to enable notifications */}
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
 
+            {/* Mood Check-in Banner - above promo banners */}
+            {!showWelcomeCard && <MoodCheckInBanner />}
+
             {/* Promo Banner */}
             <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
 
