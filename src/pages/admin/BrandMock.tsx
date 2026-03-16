@@ -319,7 +319,7 @@ export default function BrandMock() {
               <div className="grid grid-cols-6 items-center">
                 {[
                   { icon: Home, label: 'Home', active: true },
-                  { icon: Compass, label: 'Academy', active: false },
+                  { icon: Compass, label: 'Explore', active: false },
                   { icon: CalendarPlus, label: 'Routines', active: false },
                   { icon: Music, label: 'Listen', active: false },
                   { icon: Users, label: 'Chats', active: false, badge: 3 },
@@ -572,7 +572,7 @@ export default function BrandMock() {
           {/* ─── Programs Section ─── */}
           <div className="px-5 pt-3 pb-1">
             <div className="flex items-center justify-between mb-2.5">
-              <p className="text-sm font-semibold" style={{ color: fg }}>Academy Programs</p>
+              <p className="text-sm font-semibold" style={{ color: fg }}>Explore Programs</p>
               <span className="text-xs font-medium" style={{ color: O.primary }}>All →</span>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
@@ -709,7 +709,7 @@ export default function BrandMock() {
               <div className="grid grid-cols-6 items-center">
                 {[
                   { icon: Home, label: 'Home', active: false },
-                  { icon: Compass, label: 'Academy', active: true },
+                  { icon: Compass, label: 'Explore', active: true },
                   { icon: CalendarPlus, label: 'Routines', active: false },
                   { icon: Music, label: 'Listen', active: false },
                   { icon: Users, label: 'Chats', active: false },
