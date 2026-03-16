@@ -300,8 +300,8 @@ const TIME_PERIOD_LABELS: Record<string, string> = {
 };
 
 function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
-  const QUICK_ADD_ANCHOR_TOP = '10%';
-  const SUGGESTIONS_ANCHOR_TOP = 'calc(10% + 220px)';
+  const QUICK_ADD_ANCHOR_TOP = '25%';
+  const SUGGESTIONS_ANCHOR_TOP = 'calc(25% + 220px)';
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [showIdeas, setShowIdeas] = useState(false);
