@@ -42,10 +42,10 @@ const TASKS = [
 ];
 
 const QUICK_TOOLS = [
-  { icon: Headphones, label: 'Listen', bg: '#FFE6C9', darkBg: '#3D2A1A' },
-  { icon: BookOpen, label: 'Journal', bg: '#FFD2A1', darkBg: '#3A2515' },
-  { icon: Wind, label: 'Breathe', bg: '#FFF4ED', darkBg: '#2E1E14' },
-  { icon: Heart, label: 'Mood', bg: '#FFE0D0', darkBg: '#352018' },
+  { icon: Headphones, label: 'Listen' },
+  { icon: BookOpen, label: 'Journal' },
+  { icon: Wind, label: 'Breathe' },
+  { icon: Heart, label: 'Mood' },
 ];
 
 const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: number; darkMode?: boolean }) => (
@@ -53,8 +53,13 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.15 + index * 0.06 }}
-    className="rounded-3xl overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
-    style={{ background: darkMode ? task.darkColor : task.color }}
+    className="rounded-3xl overflow-hidden"
+    style={{
+      background: darkMode ? task.darkColor : task.color,
+      boxShadow: darkMode
+        ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)'
+        : '0 2px 10px rgba(0,0,0,0.08)',
+    }}
   >
     <div className="flex items-center gap-2 pl-3 pr-4 py-3">
       {/* 3D Fluent Emoji */}
@@ -174,8 +179,8 @@ export default function BrandMock() {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring' }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
-                style={{ background: darkMode ? '#3D2A1A' : O.peach }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                style={{ background: darkMode ? '#3D2A1A' : O.peach, boxShadow: darkMode ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)' : '0 2px 10px rgba(0,0,0,0.08)' }}
               >
                 <Flame className="w-4 h-4" style={{ color: O.primary }} />
                 <span className="text-sm font-bold" style={{ color: O.primary }}>12</span>
@@ -187,9 +192,10 @@ export default function BrandMock() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="rounded-3xl p-5 relative overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+              className="rounded-3xl p-5 relative overflow-hidden"
               style={{
                 background: `linear-gradient(135deg, ${O.primary} 0%, ${O.primaryL} 100%)`,
+                boxShadow: darkMode ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)' : '0 2px 10px rgba(0,0,0,0.08)',
               }}
             >
               <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20"
@@ -228,8 +234,8 @@ export default function BrandMock() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + i * 0.05 }}
-                  className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
-                  style={{ background: darkMode ? tool.darkBg : tool.bg }}
+                  className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer"
+                  style={{ background: darkMode ? '#3D2A1A' : '#FFE6C9', boxShadow: darkMode ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)' : '0 2px 10px rgba(0,0,0,0.08)' }}
                 >
                   <tool.icon className="w-5 h-5" style={{ color: O.primary }} />
                   <span className="text-[10px] font-medium" style={{ color: fgMuted }}>{tool.label}</span>
@@ -276,8 +282,8 @@ export default function BrandMock() {
           <div className="px-5 pb-4">
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm font-semibold" style={{ color: fg }}>Today's Actions</p>
-              <span className="text-xs font-medium px-2 py-0.5 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
-                style={{ background: darkMode ? '#3D2A1A' : O.peach, color: O.primary }}>
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full"
+                style={{ background: darkMode ? '#3D2A1A' : O.peach, color: O.primary, boxShadow: darkMode ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)' : '0 2px 10px rgba(0,0,0,0.08)' }}>
                 2/5
               </span>
             </div>
