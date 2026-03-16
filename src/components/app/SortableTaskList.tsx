@@ -21,7 +21,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
 import { UserTask, useReorderTasks, useCreateTask } from '@/hooks/useTaskPlanner';
-
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
 import { Plus, MoreHorizontal } from 'lucide-react';
