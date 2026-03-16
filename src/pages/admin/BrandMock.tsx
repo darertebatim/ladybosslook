@@ -101,7 +101,6 @@ const TaskCard = ({ task, index }: { task: typeof TASKS[0]; index: number }) => 
     </div>
   </motion.div>
 );
-);
 
 export default function BrandMock() {
   const [darkMode, setDarkMode] = useState(false);
