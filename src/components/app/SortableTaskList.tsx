@@ -552,9 +552,6 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
                             <span>{' • '}{timePeriodLabel}</span>
                           </p>
                         </div>
-                        <div className="shrink-0 p-2 rounded-full bg-foreground">
-                          <CalendarPlus className="h-4 w-4 text-background" />
-                        </div>
                       </div>
                     </button>
                   );
