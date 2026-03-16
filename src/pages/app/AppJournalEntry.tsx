@@ -263,10 +263,9 @@ const AppJournalEntry = () => {
           </div>
 
           {/* Prompt Starters - shown for new entries with no content */}
-          {isNewEntry && !content.trim() && (
-            <EntryPromptChips onSelect={(starter) => {
-              setContent(starter);
-              textareaRef.current?.focus();
+          {isNewEntry && !title.trim() && !content.trim() && (
+            <JournalPromptMarquee onSelect={(prompt) => {
+              setTitle(prompt);
               triggerAutoSave();
             }} />
           )}

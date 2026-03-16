@@ -211,32 +211,10 @@ const AppJournal = () => {
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="p-4 pb-32 space-y-6">
           {/* Journaling Prompts — marquee */}
-          <div className="rounded-2xl bg-muted/50 border border-border/50 py-3 space-y-2 overflow-hidden">
-            <p className="text-xs font-medium text-muted-foreground px-4">Journaling prompts</p>
-            {JOURNAL_PROMPT_ROWS.map((row, i) => (
-              <div key={i} className="relative overflow-hidden">
-                <div
-                  className={cn(
-                    "flex gap-2 w-max",
-                    i % 2 === 0 ? "animate-[marquee-left_25s_linear_infinite]" : "animate-[marquee-right_28s_linear_infinite]"
-                  )}
-                >
-                  {[...row, ...row].map((prompt, j) => (
-                    <button
-                      key={`${prompt}-${j}`}
-                      onClick={() => {
-                        haptic.light();
-                        navigate('/app/journal/new', { state: { prefillTitle: prompt } });
-                      }}
-                      className="shrink-0 px-3 py-1.5 rounded-full bg-background border border-border text-xs text-foreground transition-colors active:bg-accent"
-                    >
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+          <JournalPromptMarquee onSelect={(prompt) => {
+              haptic.light();
+              navigate('/app/journal/new', { state: { prefillTitle: prompt } });
+            }} />
           {entries && entries.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
