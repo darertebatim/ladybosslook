@@ -290,60 +290,23 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const createTask = useCreateTask();
   const navigate = useNavigate();
-  const isClosingRef = useRef(false);
 
-  const scrollInputIntoView = useCallback((behavior: ScrollBehavior = 'smooth') => {
-    const inputEl = inputRef.current;
-    if (!inputEl) return;
-
-    const homeScrollContainer = document.querySelector('[data-home-scroll-container="true"]') as HTMLElement | null;
-    let scrollParent: HTMLElement | null = homeScrollContainer;
-
-    if (!scrollParent) {
-      let parent = inputEl.parentElement;
-      while (parent) {
-        const style = window.getComputedStyle(parent);
-        if (/(auto|scroll)/.test(style.overflowY) && parent.scrollHeight > parent.clientHeight) {
-          scrollParent = parent;
-          break;
-        }
-        parent = parent.parentElement;
-      }
-    }
-
-    if (scrollParent) {
-      const inputRect = inputEl.getBoundingClientRect();
-      const parentRect = scrollParent.getBoundingClientRect();
-      const preferredOffset = Math.max(24, parentRect.height * 0.28);
-      const targetTop = scrollParent.scrollTop + (inputRect.top - parentRect.top) - preferredOffset;
-      scrollParent.scrollTo({ top: Math.max(0, targetTop), behavior });
-      return;
-    }
-
-    inputEl.scrollIntoView({ behavior, block: 'center', inline: 'nearest' });
-  }, []);
-
-  // Only run on open, NOT on isKeyboardOpen changes (prevents re-focus loop)
+  // Auto-focus input when modal opens
   useEffect(() => {
     if (!isOpen) return;
-    isClosingRef.current = false;
-
-    const t1 = window.setTimeout(() => {
+    // Small delay to let the portal mount and animation start
+    const t = window.setTimeout(() => {
       inputRef.current?.focus();
-      scrollInputIntoView('smooth');
-    }, 80);
-    const t2 = window.setTimeout(() => scrollInputIntoView('smooth'), 350);
-    const t3 = window.setTimeout(() => scrollInputIntoView('smooth'), 600);
+    }, 50);
+    return () => window.clearTimeout(t);
+  }, [isOpen]);
 
-    return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      window.clearTimeout(t3);
-    };
-  }, [isOpen, scrollInputIntoView]);
+  const handleClose = () => {
+    setIsOpen(false);
+    setTitle('');
+  };
 
   const handleSubmit = () => {
     const trimmed = title.trim();
@@ -360,21 +323,21 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
       order_index: -1,
     });
     setTitle('');
-    inputRef.current?.blur();
-    setIsOpen(false);
+    // Keep modal open for rapid adding — user can close with backdrop tap
+    inputRef.current?.focus();
   };
 
   const handleOpenDetails = () => {
     const trimmed = title.trim();
     if (!trimmed) return;
     haptic.light();
-    setIsOpen(false);
-    setTitle('');
+    handleClose();
     navigate(`/app/home/new?name=${encodeURIComponent(trimmed)}`);
   };
 
-  if (!isOpen) {
-    return (
+  return (
+    <>
+      {/* Trigger button — always visible in task list */}
       <button
         onClick={() => {
           setIsOpen(true);
@@ -387,76 +350,82 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
         </div>
         <span className="text-[15px] font-semibold text-foreground">Quick add action...</span>
       </button>
-    );
-  }
 
-  return (
-    <div ref={containerRef} className="mt-3 rounded-3xl pl-3 pr-4 py-3 bg-card border-2 border-urgency/30 flex items-center gap-2">
-      <div className="w-10 h-10 flex items-center justify-center shrink-0">
-        <Plus className="h-5 w-5 text-urgency" />
-      </div>
-      <input
-        ref={inputRef}
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') handleSubmit();
-          if (e.key === 'Escape') {
-            isClosingRef.current = true;
-            inputRef.current?.blur();
-            setIsOpen(false);
-            setTitle('');
-          }
-        }}
-        onFocus={() => {
-          // Don't re-scroll if we're in the process of closing
-          if (isClosingRef.current) return;
-          const t1 = window.setTimeout(() => scrollInputIntoView('smooth'), 120);
-          const t2 = window.setTimeout(() => scrollInputIntoView('smooth'), 400);
-          return () => {
-            window.clearTimeout(t1);
-            window.clearTimeout(t2);
-          };
-        }}
-        onBlur={() => {
-          // Delay to allow button taps to register (critical for iOS)
-          setTimeout(() => {
-            // Only close if truly lost focus (not tapping Add/Details buttons)
-            if (document.activeElement === inputRef.current) return;
-            // Check if focus went to a button inside our container
-            if (containerRef.current?.contains(document.activeElement as Node)) return;
-            if (!title.trim()) {
-              isClosingRef.current = true;
-              setIsOpen(false);
-            }
-          }, 250);
-        }}
-        placeholder="Type action name..."
-        className="flex-1 bg-transparent text-[15px] font-semibold text-foreground placeholder:text-muted-foreground outline-none"
-        enterKeyHint="done"
-        autoComplete="off"
-        autoCorrect="on"
-        spellCheck={false}
-      />
-      {title.trim() && (
-        <div className="flex items-center gap-1.5">
-          <button
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={handleSubmit}
-            className="flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl text-[10px] font-bold shrink-0 transition-all shadow-sm active:scale-95 bg-urgency text-urgency-foreground"
+      {/* Modal overlay — renders above keyboard via portal */}
+      {isOpen && createPortal(
+        <div className="fixed inset-0 z-[100] flex flex-col justify-end">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/40 animate-in fade-in duration-200"
+            onClick={handleClose}
+          />
+
+          {/* Input card — sits naturally above keyboard */}
+          <div 
+            className="relative z-10 bg-card rounded-t-3xl px-4 pt-4 animate-in slide-in-from-bottom-4 duration-200"
+            style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 12px)' }}
           >
-            <Plus className="h-3.5 w-3.5" />
-            Add
-          </button>
-          <button
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={handleOpenDetails}
-            className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center shrink-0 active:scale-95 transition-transform"
-          >
-            <MoreHorizontal className="h-4 w-4" />
-          </button>
-        </div>
+            {/* Header row */}
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-10 h-10 rounded-2xl bg-urgency/15 flex items-center justify-center shrink-0">
+                <Plus className="h-5 w-5 text-urgency" strokeWidth={2.5} />
+              </div>
+              <span className="text-[17px] font-bold text-foreground">Quick Add Action</span>
+            </div>
+
+            {/* Input row */}
+            <div className="flex items-center gap-2 rounded-2xl border-2 border-urgency/30 bg-muted/50 px-3 py-2.5">
+              <input
+                ref={inputRef}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSubmit();
+                  if (e.key === 'Escape') handleClose();
+                }}
+                placeholder="Type action name..."
+                className="flex-1 bg-transparent text-[16px] font-semibold text-foreground placeholder:text-muted-foreground outline-none"
+                enterKeyHint="done"
+                autoComplete="off"
+                autoCorrect="on"
+                spellCheck={false}
+              />
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex items-center gap-2 mt-3">
+              <button
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={handleSubmit}
+                disabled={!title.trim()}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-1.5 py-3 rounded-2xl text-[14px] font-bold transition-all active:scale-[0.97]",
+                  title.trim()
+                    ? "bg-urgency text-urgency-foreground shadow-sm"
+                    : "bg-muted text-muted-foreground"
+                )}
+              >
+                <Plus className="h-4 w-4" />
+                Add Action
+              </button>
+              <button
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={handleOpenDetails}
+                disabled={!title.trim()}
+                className={cn(
+                  "w-12 h-12 rounded-2xl border-2 flex items-center justify-center shrink-0 transition-all active:scale-95",
+                  title.trim()
+                    ? "border-foreground/20 bg-card"
+                    : "border-muted bg-muted/50"
+                )}
+              >
+                <MoreHorizontal className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
-    </div>
+    </>
   );
 }
