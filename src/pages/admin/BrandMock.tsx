@@ -235,8 +235,8 @@ export default function BrandMock() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + i * 0.05 }}
-                  className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
-                  style={{ background: darkMode ? '#3D2A1A' : '#FFE6C9' }}
+                  className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer"
+                  style={{ background: darkMode ? '#3D2A1A' : '#FFE6C9', boxShadow: darkMode ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)' : '0 2px 10px rgba(0,0,0,0.08)' }}
                 >
                   <tool.icon className="w-5 h-5" style={{ color: O.primary }} />
                   <span className="text-[10px] font-medium" style={{ color: fgMuted }}>{tool.label}</span>
