@@ -22,7 +22,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
 import { UserTask, useReorderTasks, useCreateTask, useTaskTemplates, TaskTemplate, TASK_COLORS, TASK_COLOR_CLASSES } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogPortal } from '@/components/ui/dialog';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
@@ -300,6 +300,8 @@ const TIME_PERIOD_LABELS: Record<string, string> = {
 };
 
 function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
+  const QUICK_ADD_ANCHOR_TOP = '10%';
+  const SUGGESTIONS_ANCHOR_TOP = 'calc(10% + 220px)';
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [showIdeas, setShowIdeas] = useState(false);
@@ -407,7 +409,8 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
       <Dialog open={isOpen} onOpenChange={(v) => !v && handleClose()}>
         <DialogContent
           hideCloseButton
-          className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !top-[40%] !-translate-y-full"
+          className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !top-[10%] !translate-y-0"
+          style={{ top: QUICK_ADD_ANCHOR_TOP }}
         >
           {/* Card — two-tone */}
           <div className="rounded-3xl overflow-hidden bg-[#FFF5E6]">
@@ -473,92 +476,100 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
           </div>
 
           {/* "Need some ideas?" tappable text */}
-          {!showIdeas && (
+          <div className="mt-3 flex min-h-5 justify-center">
             <button
               onMouseDown={(e) => e.preventDefault()}
               onClick={handleShowIdeas}
-              className="mt-3 text-[13px] text-white/70 font-medium text-center active:text-white/90 transition-colors"
+              className={cn(
+                "text-[13px] text-white/70 font-medium text-center active:text-white/90 transition-colors",
+                showIdeas && "opacity-0 pointer-events-none"
+              )}
             >
               Need some ideas?
             </button>
-          )}
+          </div>
         </DialogContent>
 
-        {/* Suggestions — separate fixed layer, grows downward from below the card */}
+        {/* Suggestions — separate portal layer, grows downward from below the card */}
         {showIdeas && (
-          <div className="fixed left-[50%] -translate-x-1/2 z-50 w-[calc(100%-32px)] max-w-[calc(100%-32px)] flex flex-col gap-2.5" style={{ top: '42%' }}>
-            {/* Category pills */}
-            <ScrollArea className="w-full shrink-0">
-              <div className="flex gap-1.5">
-                <button
-                  onClick={() => { haptic.light(); setSelectedCategory('popular'); }}
-                  className={cn(
-                    "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border",
-                    selectedCategory === 'popular'
-                      ? "bg-white text-black border-white/50"
-                      : "bg-white/20 text-white/80 border-transparent"
-                  )}
-                >
-                  ⭐ Popular
-                </button>
-                {categories.map((cat) => (
+          <DialogPortal>
+            <div
+              className="fixed left-[50%] -translate-x-1/2 z-[60] w-[calc(100%-32px)] max-w-[calc(100%-32px)] flex flex-col gap-2.5"
+              style={{ top: SUGGESTIONS_ANCHOR_TOP }}
+            >
+              {/* Category pills */}
+              <ScrollArea className="w-full shrink-0">
+                <div className="flex gap-1.5">
                   <button
-                    key={cat.slug}
-                    onClick={() => { haptic.light(); setSelectedCategory(cat.slug); }}
+                    onClick={() => { haptic.light(); setSelectedCategory('popular'); }}
                     className={cn(
                       "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border",
-                      selectedCategory === cat.slug
+                      selectedCategory === 'popular'
                         ? "bg-white text-black border-white/50"
                         : "bg-white/20 text-white/80 border-transparent"
                     )}
                   >
-                    {cat.emoji && <span className="mr-0.5">{cat.emoji}</span>}
-                    {cat.name}
+                    ⭐ Popular
                   </button>
-                ))}
-              </div>
-              <ScrollBar orientation="horizontal" className="invisible" />
-            </ScrollArea>
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.slug}
+                      onClick={() => { haptic.light(); setSelectedCategory(cat.slug); }}
+                      className={cn(
+                        "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border",
+                        selectedCategory === cat.slug
+                          ? "bg-white text-black border-white/50"
+                          : "bg-white/20 text-white/80 border-transparent"
+                      )}
+                    >
+                      {cat.emoji && <span className="mr-0.5">{cat.emoji}</span>}
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+                <ScrollBar orientation="horizontal" className="invisible" />
+              </ScrollArea>
 
-            {/* Task cards */}
-            <div className="overflow-y-auto overscroll-contain space-y-1.5 max-h-[40vh]" style={{ WebkitOverflowScrolling: 'touch' }}>
-              {filteredSuggestions.map((template) => {
-                const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
-                const timePeriodLabel = template.time_period 
-                  ? TIME_PERIOD_LABELS[template.time_period] || template.time_period
-                  : 'Anytime';
+              {/* Task cards */}
+              <div className="overflow-y-auto overscroll-contain space-y-1.5 max-h-[40vh]" style={{ WebkitOverflowScrolling: 'touch' }}>
+                {filteredSuggestions.map((template) => {
+                  const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
+                  const timePeriodLabel = template.time_period 
+                    ? TIME_PERIOD_LABELS[template.time_period] || template.time_period
+                    : 'Anytime';
 
-                return (
-                  <button
-                    key={template.id}
-                    onClick={() => handleTemplateSelect(template)}
-                    className="w-full text-left rounded-2xl overflow-hidden active:scale-[0.98] transition-transform"
-                    style={{ backgroundColor: bgColor }}
-                  >
-                    <div className="flex items-center gap-2.5 px-3 py-2.5">
-                      <FluentEmoji emoji={template.emoji || '📝'} size={28} className="shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-[14px] text-black truncate">{template.title}</p>
-                        <p className="text-[11px] text-black/60 truncate">
-                          {template.category}
-                          {template.repeat_pattern && template.repeat_pattern !== 'none' && (
-                            <span>
-                              {' • '}
-                              {template.repeat_pattern === 'daily' ? 'Daily' : 
-                               template.repeat_pattern === 'weekly' ? 'Weekly' : 
-                               template.repeat_pattern === 'monthly' ? 'Monthly' :
-                               template.repeat_pattern === 'weekend' ? 'Weekends' : ''}
-                            </span>
-                          )}
-                          <span>{' • '}{timePeriodLabel}</span>
-                        </p>
+                  return (
+                    <button
+                      key={template.id}
+                      onClick={() => handleTemplateSelect(template)}
+                      className="w-full text-left rounded-2xl overflow-hidden active:scale-[0.98] transition-transform"
+                      style={{ backgroundColor: bgColor }}
+                    >
+                      <div className="flex items-center gap-2.5 px-3 py-2.5">
+                        <FluentEmoji emoji={template.emoji || '📝'} size={28} className="shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-[14px] text-black truncate">{template.title}</p>
+                          <p className="text-[11px] text-black/60 truncate">
+                            {template.category}
+                            {template.repeat_pattern && template.repeat_pattern !== 'none' && (
+                              <span>
+                                {' • '}
+                                {template.repeat_pattern === 'daily' ? 'Daily' : 
+                                 template.repeat_pattern === 'weekly' ? 'Weekly' : 
+                                 template.repeat_pattern === 'monthly' ? 'Monthly' :
+                                 template.repeat_pattern === 'weekend' ? 'Weekends' : ''}
+                              </span>
+                            )}
+                            <span>{' • '}{timePeriodLabel}</span>
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                );
-              })}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          </DialogPortal>
         )}
       </Dialog>
     </>
