@@ -179,8 +179,8 @@ export default function BrandMock() {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring' }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
-                style={{ background: darkMode ? '#3D2A1A' : O.peach }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                style={{ background: darkMode ? '#3D2A1A' : O.peach, boxShadow: darkMode ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)' : '0 2px 10px rgba(0,0,0,0.08)' }}
               >
                 <Flame className="w-4 h-4" style={{ color: O.primary }} />
                 <span className="text-sm font-bold" style={{ color: O.primary }}>12</span>
