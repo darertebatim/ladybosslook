@@ -163,6 +163,7 @@ export default function BrandDesign() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           <ColorSwatch label="Pink Dark" cssVar="planner-pink-dark" hex="#FFC2EA" />
           <ColorSwatch label="Peach Dark" cssVar="planner-peach-dark" hex="#FFD2A1" />
+          <ColorSwatch label="Orange Dark" cssVar="planner-orange-dark" hex="#FFC285" />
           <ColorSwatch label="Yellow Dark" cssVar="planner-yellow-dark" hex="#FFEA4E" />
           <ColorSwatch label="Lime Dark" cssVar="planner-lime-dark" hex="#C3F1E1" />
           <ColorSwatch label="Sky Dark" cssVar="planner-sky-dark" hex="#B9D6FF" />
