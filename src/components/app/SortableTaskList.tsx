@@ -307,6 +307,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   const [showIdeas, setShowIdeas] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
   const inputRef = useRef<HTMLInputElement>(null);
+  const suggestionsLayerRef = useRef<HTMLDivElement>(null);
   const createTask = useCreateTask();
   const navigate = useNavigate();
   const { data: templates = [] } = useTaskTemplates();
