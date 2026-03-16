@@ -24,7 +24,7 @@ import { UserTask, useReorderTasks, useCreateTask } from '@/hooks/useTaskPlanner
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
-import { Plus, MoreHorizontal } from 'lucide-react';
+import { Plus, MoreHorizontal, Lightbulb } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
@@ -108,6 +108,7 @@ interface SortableTaskListProps {
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
   hideQuickAdd?: boolean;
+  onBrowseIdeas?: () => void;
 }
 
 export const SortableTaskList = ({
@@ -122,6 +123,7 @@ export const SortableTaskList = ({
   onOpenTimer,
   onOpenWaterTracking,
   hideQuickAdd = false,
+  onBrowseIdeas,
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
@@ -249,7 +251,7 @@ export const SortableTaskList = ({
         )}
 
         {/* Quick Add Card */}
-        {!hideQuickAdd && <QuickAddCard date={date} taskCount={localTasks.length} />}
+        {!hideQuickAdd && <QuickAddCard date={date} taskCount={localTasks.length} onBrowseIdeas={onBrowseIdeas} />}
       </SortableContext>
 
       {/* Drag overlay */}
@@ -285,7 +287,7 @@ const QUICK_ADD_VARIANTS: { emoji: string; color: TaskColor }[] = [
   { emoji: '🌊', color: 'sky' },
 ];
 
-function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
+function QuickAddCard({ date, taskCount, onBrowseIdeas }: { date: Date; taskCount: number; onBrowseIdeas?: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -419,6 +421,21 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
               Details
             </button>
           </div>
+
+          {/* Browse ideas button — thinner, below */}
+          {onBrowseIdeas && (
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                handleClose();
+                onBrowseIdeas();
+              }}
+              className="mt-2 w-full h-9 rounded-2xl bg-white/90 text-black/60 text-[13px] font-medium flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-transform"
+            >
+              <Lightbulb className="h-3.5 w-3.5" />
+              Need some ideas?
+            </button>
+          )}
         </DialogContent>
       </Dialog>
     </>
