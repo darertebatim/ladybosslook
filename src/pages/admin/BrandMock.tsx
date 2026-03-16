@@ -319,7 +319,7 @@ export default function BrandMock() {
               <div className="grid grid-cols-6 items-center">
                 {[
                   { icon: Home, label: 'Home', active: true },
-                  { icon: Compass, label: 'Academy', active: false },
+                  { icon: Compass, label: 'Explore', active: false },
                   { icon: CalendarPlus, label: 'Routines', active: false },
                   { icon: Music, label: 'Listen', active: false },
                   { icon: Users, label: 'Chats', active: false, badge: 3 },
