@@ -953,10 +953,10 @@ const AppHome = () => {
                     {selectedTag ? `No ${selectedTag} actions for this day` : 'Your day is open'}
                   </p>
                   <p className="text-xs text-muted-foreground/70 mb-4">
-                    One small action is enough
+                    One small task is enough
                   </p>
                   <button onClick={() => setShowQuickStart(true)} className="text-violet-600 font-medium">
-                    Add your first action
+                    Add your first task
                   </button>
                 </div>
               ) : filteredTasks.length > 0 ? (
