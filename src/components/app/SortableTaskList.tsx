@@ -256,7 +256,7 @@ export const SortableTaskList = ({
         )}
 
         {/* Quick Add Card */}
-        {!hideQuickAdd && <QuickAddCard date={date} taskCount={localTasks.length} onBrowseIdeas={onBrowseIdeas} />}
+        {!hideQuickAdd && <QuickAddCard date={date} taskCount={localTasks.length} />}
       </SortableContext>
 
       {/* Drag overlay */}
