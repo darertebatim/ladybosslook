@@ -42,10 +42,10 @@ const TASKS = [
 ];
 
 const QUICK_TOOLS = [
-  { icon: Headphones, label: 'Listen', bg: O.peach },
-  { icon: BookOpen, label: 'Journal', bg: O.lavender },
-  { icon: Wind, label: 'Breathe', bg: O.mint },
-  { icon: Heart, label: 'Mood', bg: O.pink },
+  { icon: Headphones, label: 'Listen', bg: '#FFE6C9', darkBg: '#3D2A1A' },
+  { icon: BookOpen, label: 'Journal', bg: '#FFD2A1', darkBg: '#3A2515' },
+  { icon: Wind, label: 'Breathe', bg: '#FFF4ED', darkBg: '#2E1E14' },
+  { icon: Heart, label: 'Mood', bg: '#FFE0D0', darkBg: '#352018' },
 ];
 
 const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: number; darkMode?: boolean }) => (
@@ -229,7 +229,7 @@ export default function BrandMock() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + i * 0.05 }}
                   className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
-                  style={{ background: darkMode ? '#2A1A10' : tool.bg }}
+                  style={{ background: darkMode ? tool.darkBg : tool.bg }}
                 >
                   <tool.icon className="w-5 h-5" style={{ color: O.primary }} />
                   <span className="text-[10px] font-medium" style={{ color: fgMuted }}>{tool.label}</span>
