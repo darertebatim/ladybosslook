@@ -143,7 +143,7 @@ export default function BrandDesign() {
       </Section>
 
       {/* Planner Palette */}
-      <Section title="Planner Action Palette" description="7 pastel colors used across the daily planner, action builder, and routine cards">
+      <Section title="Planner Action Palette" description="8 pastel colors used across the daily planner, action builder, and routine cards">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           <ColorSwatch label="Pink" cssVar="planner-pink" hex="#FFE0F5" />
           <ColorSwatch label="Peach" cssVar="planner-peach" hex="#FFE6C9" />
