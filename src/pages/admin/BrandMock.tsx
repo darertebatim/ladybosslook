@@ -47,7 +47,7 @@ const TaskCard = ({ task, index }: { task: typeof TASKS[0]; index: number }) => 
     initial={{ opacity: 0, y: 12 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.15 + index * 0.06 }}
-    className="rounded-3xl overflow-hidden"
+    className="rounded-3xl overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
     style={{ background: task.color }}
   >
     <div className="flex items-center gap-2 pl-3 pr-4 py-3">
