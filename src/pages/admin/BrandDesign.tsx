@@ -173,6 +173,53 @@ export default function BrandDesign() {
         </div>
       </Section>
 
+      {/* ==================== NEW APP ORANGE PALETTE ==================== */}
+      <div className="pt-4">
+        <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+          🍊 App Orange Palette <span className="text-xs font-normal bg-muted px-2 py-0.5 rounded-full">proposal</span>
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1">Warm orange system derived from the phoenix icon and planner pastels — for future app theming</p>
+      </div>
+
+      <Section title="Orange — Primary Scale" description="Core orange ramp from the phoenix coral icon colors">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <ColorSwatch label="Orange 50" cssVar="--orange-50" hex="#FFF4ED" />
+          <ColorSwatch label="Orange 100" cssVar="--orange-100" hex="#FFE6D2" />
+          <ColorSwatch label="Orange 200" cssVar="--orange-200" hex="#FFD2A1" />
+          <ColorSwatch label="Orange 300" cssVar="--orange-300" hex="#FFB870" />
+          <ColorSwatch label="Orange 400" cssVar="--orange-400" hex="#F5A623" />
+          <ColorSwatch label="Orange 500" cssVar="--orange-500" hex="#EB5E33" />
+          <ColorSwatch label="Orange 600" cssVar="--orange-600" hex="#D94B2B" />
+          <ColorSwatch label="Orange 700" cssVar="--orange-700" hex="#A63520" />
+          <ColorSwatch label="Orange 800" cssVar="--orange-800" hex="#7A2818" />
+          <ColorSwatch label="Orange 900" cssVar="--orange-900" hex="#4D1A10" />
+        </div>
+      </Section>
+
+      <Section title="Orange — Soft Tints" description="Pulled from planner peach, yellow, and pink pastels for backgrounds & cards">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <ColorSwatch label="Peach Tint" cssVar="--orange-peach" hex="#FFE6C9" />
+          <ColorSwatch label="Peach Mid" cssVar="--orange-peach-mid" hex="#FFD2A1" />
+          <ColorSwatch label="Yellow Tint" cssVar="--orange-yellow" hex="#FFF492" />
+          <ColorSwatch label="Yellow Mid" cssVar="--orange-yellow-mid" hex="#FFEA4E" />
+          <ColorSwatch label="Pink Tint" cssVar="--orange-pink" hex="#FFE0F5" />
+          <ColorSwatch label="Pink Mid" cssVar="--orange-pink-mid" hex="#FFC2EA" />
+        </div>
+      </Section>
+
+      <Section title="Orange — Semantic Tokens" description="Proposed token mapping for an orange-themed app">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <ColorSwatch label="Primary" cssVar="--primary" hex="#EB5E33" />
+          <ColorSwatch label="Primary Light" cssVar="--primary-light" hex="#F5A623" />
+          <ColorSwatch label="Primary Dark" cssVar="--primary-dark" hex="#A63520" />
+          <ColorSwatch label="Primary Foreground" cssVar="--primary-foreground" hex="#FFFFFF" />
+          <ColorSwatch label="Accent Warm" cssVar="--accent-warm" hex="#FFE6C9" />
+          <ColorSwatch label="Accent Rose" cssVar="--accent-rose" hex="#C2255C" />
+          <ColorSwatch label="Surface Warm" cssVar="--surface-warm" hex="#FFF4ED" />
+          <ColorSwatch label="Surface Peach" cssVar="--surface-peach" hex="#FFE6C9" />
+        </div>
+      </Section>
+
       {/* Gradients */}
       <Section title="Gradients">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
