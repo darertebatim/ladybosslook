@@ -63,6 +63,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   onAdjustTime,
   onResetTime,
   onMoveTaskToEnd,
+  onReorderTasks,
   onEndRoutineEarly,
   onClose,
   onCancel,
