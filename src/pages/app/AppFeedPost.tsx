@@ -145,6 +145,12 @@ export default function AppFeedPost() {
   const { direction: contentDirection, className: contentBilingualClassName } = useBilingualText(post?.content || '');
   const { direction: titleDirection, className: titleBilingualClassName } = useBilingualText(post?.title || '');
 
+  const { handleShare } = useShareContent({
+    title: post?.title || 'Post',
+    text: `💬 Check out this post on Routine Ladyboss 💫`,
+    imageUrl: post?.image_url,
+  });
+
   // Mark post as read
   useEffect(() => {
     if (post) {
