@@ -13,16 +13,6 @@ export interface ToolConfig {
 
 export const wellnessTools: ToolConfig[] = [
   {
-    id: 'my-tasks',
-    name: 'My Tasks',
-    icon: 'ListChecks',
-    emoji: '📋',
-    bgColor: 'bg-[#D7E9FF]',
-    iconColor: 'text-blue-600',
-    route: '/app/my-tasks',
-    description: 'All your tasks',
-  },
-  {
     id: 'routines',
     name: 'Routines',
     icon: 'CalendarPlus',
