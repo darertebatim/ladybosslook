@@ -285,6 +285,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Open the focus timer',
     requiresValue: false,
   },
+  focus_routine: {
+    value: 'focus_routine',
+    label: 'Focus Routine',
+    icon: Clock,
+    badgeText: 'Focus',
+    color: 'amber',
+    gradientClass: 'bg-gradient-to-br from-amber-100 to-yellow-100 dark:from-amber-900/40 dark:to-yellow-900/40',
+    iconColorClass: 'text-amber-600 dark:text-amber-400',
+    badgeColorClass: 'bg-amber-500/20 text-amber-700 dark:text-amber-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Link to a focus routine',
+    requiresValue: true,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
