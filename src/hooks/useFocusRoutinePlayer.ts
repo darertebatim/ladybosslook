@@ -338,6 +338,7 @@ export function useFocusRoutinePlayer() {
     completeTask,
     skipTask,
     moveTaskToEnd,
+    reorderTasks,
     endRoutineEarly,
     togglePause,
     adjustTime,
