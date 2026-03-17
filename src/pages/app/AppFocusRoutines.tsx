@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Play, Loader2, ChevronRight, Plus, RotatCw, ChevronLeft } from 'lucide-react';
+import { Play, Loader2, ChevronRight, Plus, RotateCw, ChevronLeft } from 'lucide-react';
 import { useRoutinesBank, useUserAddedBankRoutines } from '@/hooks/useRoutinesBank';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
