@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loader2, Pin, Megaphone, Music, Calendar, FileText, MessageSquare } from 'lucide-react';
+import { Loader2, Pin, Megaphone, Music, Calendar, FileText, MessageSquare, Share2 } from 'lucide-react';
 import { BackButton } from '@/components/app/BackButton';
 import { useFeedPost, usePostComments, useAddComment, useDeleteComment, useMarkPostRead } from '@/hooks/useFeed';
 import { useFeedRealtime, usePostCommentsRealtime } from '@/hooks/useFeedRealtime';
