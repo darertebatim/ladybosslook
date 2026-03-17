@@ -63,12 +63,6 @@ export default function AppPlaylistDetail() {
   const quickAddTask = useQuickAddPlaylistTask();
   const addRoutinePlan = useAddRoutinePlan();
 
-  const { handleShare } = useShareContent({
-    title: playlist?.name || 'Playlist',
-    text: `🎵 Check out the '${playlist?.name || 'this'}' playlist on Routine Ladyboss 💫`,
-    imageUrl: playlist?.cover_image_url,
-  });
-
   // Fetch playlist details
   const { data: playlist, isLoading: playlistLoading } = useQuery({
     queryKey: ['playlist', playlistId],
@@ -82,6 +76,12 @@ export default function AppPlaylistDetail() {
       if (error) throw error;
       return data;
     },
+  });
+
+  const { handleShare } = useShareContent({
+    title: playlist?.name || 'Playlist',
+    text: `🎵 Check out the '${playlist?.name || 'this'}' playlist on Routine Ladyboss 💫`,
+    imageUrl: playlist?.cover_image_url,
   });
 
   // Fetch tracks in playlist
