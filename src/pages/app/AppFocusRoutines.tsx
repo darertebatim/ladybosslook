@@ -202,7 +202,7 @@ export default function AppFocusRoutines() {
                             className="w-12 h-12 rounded-full bg-muted flex items-center justify-center active:scale-95 transition-transform shrink-0 ml-3"
                           >
                             {completion?.isComplete ? (
-                              <RotatCw className="w-5 h-5 text-foreground" />
+                              <RotateCw className="w-5 h-5 text-foreground" />
                             ) : (
                               <Play className="w-5 h-5 text-foreground fill-foreground ml-0.5" />
                             )}
