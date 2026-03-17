@@ -67,6 +67,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   onCancel,
 }: FocusRoutinePlayerProps) {
   const [showAdjustSheet, setShowAdjustSheet] = useState(false);
+  const [showNotifySheet, setShowNotifySheet] = useState(false);
   const [showSkipSheet, setShowSkipSheet] = useState(false);
   const [showEndDialog, setShowEndDialog] = useState(false);
   const [showCompletionFlash, setShowCompletionFlash] = useState(false);
@@ -193,14 +194,10 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
                   +{formatTime(overtimeSeconds)}
                 </p>
                 <button
-                  onClick={() => { haptic.light(); setShowAdjustSheet(true); }}
-                  className="flex items-center gap-3 mt-2 px-3 py-1 rounded-full active:bg-foreground/5"
+                  onClick={() => { haptic.light(); setShowNotifySheet(true); }}
+                  className="mt-2 px-3 py-1 rounded-full active:bg-foreground/5"
                 >
-                  <Minus className="w-3.5 h-3.5 text-foreground/40" />
-                  <span className="text-xs text-muted-foreground font-medium tabular-nums">
-                    {Math.ceil(Math.max(0, timeLeft) / 60)}m
-                  </span>
-                  <Plus className="w-3.5 h-3.5 text-foreground/40" />
+                  <span className="text-sm text-muted-foreground underline underline-offset-2">Notify again</span>
                 </button>
               </>
             ) : (
@@ -322,6 +319,54 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
               className="w-full mt-4 py-4 rounded-2xl bg-foreground/[0.04] text-red-500 font-semibold text-base active:bg-foreground/[0.08]"
             >
               Reset
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Notify Again Bottom Sheet (overtime) */}
+      {showNotifySheet && (
+        <>
+          <div
+            className="absolute inset-0 bg-black/40 z-[10] animate-in fade-in-0 duration-200"
+            onClick={() => setShowNotifySheet(false)}
+          />
+          <div className="absolute bottom-0 left-0 right-0 z-[11] bg-background rounded-t-3xl px-6 pb-8 pt-2 animate-in slide-in-from-bottom duration-300"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 32px)' }}
+          >
+            <div className="w-10 h-1 bg-foreground/10 rounded-full mx-auto mb-4" />
+            <h3 className="text-center text-lg font-bold mb-6">Notify again</h3>
+            <div className="grid grid-cols-3 gap-3">
+              {[1, 5, 10].map((mins) => {
+                const notifyTime = addSeconds(new Date(), mins * 60);
+                return (
+                  <button
+                    key={mins}
+                    onClick={() => {
+                      haptic.medium();
+                      // Set timer to exactly N minutes by computing the right delta
+                      const targetSeconds = mins * 60;
+                      const deltaMinutes = (targetSeconds - timeLeft) / 60;
+                      onAdjustTime(deltaMinutes);
+                      setShowNotifySheet(false);
+                    }}
+                    className="flex flex-col items-center gap-1 py-5 rounded-2xl bg-foreground/[0.06] active:bg-foreground/10"
+                  >
+                    <span className="text-xl font-bold text-foreground">{mins} min</span>
+                    <span className="text-xs text-muted-foreground">({format(notifyTime, 'H:mm')})</span>
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => {
+                haptic.medium();
+                setShowNotifySheet(false);
+                onCompleteTask();
+              }}
+              className="w-full mt-4 py-4 rounded-2xl bg-foreground text-background font-semibold text-base active:opacity-90"
+            >
+              Move to next task
             </button>
           </div>
         </>
