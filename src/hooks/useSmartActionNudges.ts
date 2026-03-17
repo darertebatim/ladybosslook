@@ -142,6 +142,7 @@ export function useSmartActionNudges(userId: string | undefined) {
       
       selectedTasks.forEach((task, idx) => {
         const time = randomTimeBetween(8, 20);
+        if (!time) return; // No available time slot today
         const scheduleAt = getScheduleDate(time.hour, time.minute);
         
         notifications.push({
