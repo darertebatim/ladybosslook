@@ -917,11 +917,8 @@ export const useCompleteTask = () => {
       // Update challenge progress
       queryClient.invalidateQueries({ queryKey: ['user-challenges'] });
       queryClient.invalidateQueries({ queryKey: ['challenge-routine-infos'] });
-      // If a project step was unlocked, refresh task lists
-      if (result?.unlockedStep) {
-        queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-        queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
-      }
+      // Step unlock query refresh is handled by the UI celebration callback
+      // to allow the celebration modal to show before tasks appear
     },
     onError: (error) => {
       console.error('Complete task error:', error);
