@@ -902,7 +902,7 @@ export const useCompleteTask = () => {
 
       return { completion: data, streakIncreased: streakResult.increased, unlockedStep: stepResult };
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (result, variables) => {
       const dateStr = format(variables.date, 'yyyy-MM-dd');
       queryClient.invalidateQueries({ queryKey: ['planner-completions', user?.id, dateStr] });
       queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
@@ -917,6 +917,11 @@ export const useCompleteTask = () => {
       // Update challenge progress
       queryClient.invalidateQueries({ queryKey: ['user-challenges'] });
       queryClient.invalidateQueries({ queryKey: ['challenge-routine-infos'] });
+      // If a project step was unlocked, refresh task lists
+      if (result?.unlockedStep) {
+        queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
+        queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+      }
     },
     onError: (error) => {
       console.error('Complete task error:', error);
