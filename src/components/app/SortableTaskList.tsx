@@ -226,6 +226,7 @@ export const SortableTaskList = ({
       goalProgress={goalProgressMap.get(task.id) || 0}
       onTap={onTaskTap}
       onStreakIncrease={onStreakIncrease}
+      onStepUnlocked={onStepUnlocked}
       onOpenGoalInput={onOpenGoalInput}
       onOpenTimer={onOpenTimer}
       onOpenWaterTracking={onOpenWaterTracking}
