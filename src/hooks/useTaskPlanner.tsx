@@ -44,6 +44,9 @@ export interface UserTask {
   goal_type: 'timer' | 'count' | null;
   goal_target: number | null;
   goal_unit: string | null;
+  // Routine/project fields
+  source_routine_id: string | null;
+  project_step: number | null;
   // Joined data (optional, populated by queries)
   linked_playlist?: {
     id: string;
