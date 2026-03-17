@@ -8,6 +8,7 @@ import { scheduleUrgentAlarm, cancelUrgentAlarms, isUrgentAlarmAvailable } from 
 import { scheduleTaskReminder, cancelTaskReminder, isLocalNotificationsAvailable } from '@/lib/localNotifications';
 import { getTimePeriodSortOrder, TimePeriod } from '@/lib/taskScheduling';
 import { updatePresence } from '@/hooks/useUserPresence';
+import { checkAndUnlockNextProjectStep } from '@/hooks/useProjectStepUnlock';
 import type { ProLinkType } from '@/lib/proTaskTypes';
 
 // ============================================
