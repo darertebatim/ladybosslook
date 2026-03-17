@@ -12,7 +12,7 @@ import { usePrograms } from '@/hooks/usePrograms';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { format, addDays, addMonths } from 'date-fns';
+import { format, addDays, addMonths, addYears } from 'date-fns';
 
 export const QuickEnrollUser = () => {
   const { toast } = useToast();
