@@ -10,6 +10,7 @@ import {
   useRoutinesBank,
   usePopularRoutinesBank,
   useFeaturedRoutinesBank,
+  useCompletedRoutines,
 } from '@/hooks/useRoutinesBank';
 import { RoutinesTour, TourHelpButton } from '@/components/app/tour';
 import { PromoBanner } from '@/components/app/PromoBanner';
