@@ -17,6 +17,7 @@ export interface RoutineBankItem {
   is_active: boolean | null;
   is_popular: boolean | null;
   is_free?: boolean;
+  is_focus?: boolean;
   sort_order: number | null;
   created_at: string | null;
   updated_at: string | null;
@@ -60,6 +61,8 @@ export interface RoutineBankTask {
   category?: string | null;
   repeat_pattern?: string | null;
   repeat_days?: number[] | null;
+  // Duration
+  duration_minutes?: number | null;
   // Goal fields from admin_task_bank
   goal_enabled?: boolean;
   goal_target?: number | null;

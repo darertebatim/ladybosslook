@@ -3049,6 +3049,95 @@ export type Database = {
           },
         ]
       }
+      routine_session_tasks: {
+        Row: {
+          actual_seconds: number | null
+          created_at: string
+          id: string
+          session_id: string
+          status: string
+          target_seconds: number | null
+          task_emoji: string | null
+          task_order: number | null
+          task_title: string
+        }
+        Insert: {
+          actual_seconds?: number | null
+          created_at?: string
+          id?: string
+          session_id: string
+          status?: string
+          target_seconds?: number | null
+          task_emoji?: string | null
+          task_order?: number | null
+          task_title: string
+        }
+        Update: {
+          actual_seconds?: number | null
+          created_at?: string
+          id?: string
+          session_id?: string
+          status?: string
+          target_seconds?: number | null
+          task_emoji?: string | null
+          task_order?: number | null
+          task_title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "routine_session_tasks_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "routine_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      routine_sessions: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          id: string
+          routine_emoji: string | null
+          routine_id: string
+          routine_title: string
+          started_at: string
+          tasks_completed: number | null
+          tasks_skipped: number | null
+          tasks_total: number | null
+          total_seconds: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          routine_emoji?: string | null
+          routine_id: string
+          routine_title: string
+          started_at?: string
+          tasks_completed?: number | null
+          tasks_skipped?: number | null
+          tasks_total?: number | null
+          total_seconds?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          routine_emoji?: string | null
+          routine_id?: string
+          routine_title?: string
+          started_at?: string
+          tasks_completed?: number | null
+          tasks_skipped?: number | null
+          tasks_total?: number | null
+          total_seconds?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       routine_task_templates: {
         Row: {
           category: string | null

@@ -3,7 +3,7 @@ import { AddToRoutineHandHint, useAddToRoutineHint } from '@/components/app/AddT
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Loader2, Share2, Instagram } from 'lucide-react';
+import { Loader2, Share2, Instagram, Play } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
@@ -15,6 +15,8 @@ import { toast } from 'sonner';
 import { useShareContent } from '@/hooks/useShareContent';
 import { cn } from '@/lib/utils';
 import { TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { haptic } from '@/lib/haptics';
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400 to-amber-600',
@@ -92,6 +94,7 @@ export default function AppInspireDetail() {
   const addRoutineFromBank = useAddRoutineFromBank();
   const { data: userChallenges = [] } = useUserChallenges();
   const { data: categories = [] } = useRoutineBankCategories();
+  const { startRoutine: startFocusRoutine } = useFocusPlayer();
   
   // Check if routine was already added
   const isAlreadyAdded = planId ? addedRoutineIds.includes(planId) : false;
@@ -99,6 +102,7 @@ export default function AppInspireDetail() {
   
   const isChallenge = (routine as any)?.schedule_type === 'challenge';
   const isProject = (routine as any)?.schedule_type === 'project';
+  const isFocus = (routine as any)?.is_focus === true;
   const userChallenge = useMemo(() => {
     if (!planId || !isChallenge) return null;
     return userChallenges.find(c => c.routineId === planId) || null;
@@ -324,6 +328,11 @@ export default function AppInspireDetail() {
             )}
             
             <div className="flex items-center gap-2 mt-3 flex-wrap">
+              {isFocus && (
+                <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300">
+                  🎯 Focus
+                </span>
+              )}
               {isProject && (
                 <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
                   🎯 Project
@@ -588,22 +597,48 @@ export default function AppInspireDetail() {
       {/* Animated hand hint for new users — outside footer so fixed positioning works */}
       <AddToRoutineHandHint show={showHint && !isAdded} />
 
-      {/* Sticky Add Button */}
+      {/* Sticky Footer: Play button (for focus routines already added) OR Add button */}
       <div 
         className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}
       >
-        <AddedToRoutineButton
-          isAdded={isAdded}
-          onAddClick={() => {
-            dismissHint();
-            handleAddClick();
-          }}
-          isLoading={addRoutineFromBank.isPending}
-          size="lg"
-          addText="Add to my routines"
-          className="bg-urgency text-urgency-foreground"
-        />
+        {isFocus && isAdded && routine?.tasks?.length ? (
+          <div className="flex gap-3">
+            <Button
+              onClick={() => {
+                haptic.medium();
+                startFocusRoutine({
+                  routineId: planId!,
+                  routineTitle: routine.title,
+                  routineEmoji: routine.emoji || '✨',
+                  tasks: (routine.tasks || []).map(t => ({
+                    id: t.id,
+                    title: t.title,
+                    emoji: t.emoji || '📝',
+                    targetSeconds: t.goal_target || (t.duration_minutes ? t.duration_minutes * 60 : 300),
+                    color: t.color || undefined,
+                  })),
+                });
+              }}
+              className="flex-1 h-12 rounded-xl text-base font-semibold gap-2"
+            >
+              <Play className="w-5 h-5" />
+              Start Routine
+            </Button>
+          </div>
+        ) : (
+          <AddedToRoutineButton
+            isAdded={isAdded}
+            onAddClick={() => {
+              dismissHint();
+              handleAddClick();
+            }}
+            isLoading={addRoutineFromBank.isPending}
+            size="lg"
+            addText="Add to my routines"
+            className="bg-urgency text-urgency-foreground"
+          />
+        )}
       </div>
 
       {/* Preview Sheet */}

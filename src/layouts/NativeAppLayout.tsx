@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef, useState } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { AudioPlayerProvider, useAudioPlayer } from '@/contexts/AudioPlayerContext';
+import { FocusPlayerProvider } from '@/components/app/FocusPlayerProvider';
 import { useTrackAppReturn } from '@/hooks/useUserPresence';
 import { MiniPlayer } from '@/components/audio/MiniPlayer';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -328,7 +329,9 @@ const NativeAppLayout = () => {
 const NativeAppLayoutWithProvider = () => (
   <AudioPlayerProvider>
     <UnseenContentProvider>
-      <NativeAppLayout />
+      <FocusPlayerProvider>
+        <NativeAppLayout />
+      </FocusPlayerProvider>
     </UnseenContentProvider>
   </AudioPlayerProvider>
 );
