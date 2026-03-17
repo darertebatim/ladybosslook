@@ -48,6 +48,7 @@ interface HomeCelebrationsProps {
   onSkipTask: (t: UserTask) => void;
   onOpenGoalInput: (t: UserTask) => void;
   onOpenTimer: (t: UserTask) => void;
+  onStepUnlocked: (completedStep: number, newTaskCount: number) => void;
 
   // Streak
   showStreakModal: boolean;
