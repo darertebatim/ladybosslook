@@ -87,6 +87,12 @@ export default function AppAudioPlayer() {
     enabled: !!audioId,
   });
 
+  const { handleShare } = useShareContent({
+    title: audio?.title || 'Audio',
+    text: `🎧 I'm listening to '${audio?.title || 'something great'}' on Routine Ladyboss 💫`,
+    imageUrl: audio?.cover_image_url,
+  });
+
   // Fetch playlist info for current audio
   const { data: playlistInfo } = useQuery({
     queryKey: ['audio-playlist-info', audioId],
