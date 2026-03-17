@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
-import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask, useUserAddedBankRoutines } from '@/hooks/useRoutinesBank';
+import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask, useUserAddedBankRoutines, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
 import { useShareContent } from '@/hooks/useShareContent';
