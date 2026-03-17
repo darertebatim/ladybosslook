@@ -14,6 +14,7 @@ import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreview
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { toast } from 'sonner';
+import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 
 interface FastingSession {
   id: string;
