@@ -10,6 +10,7 @@ import { BadgeCelebration } from '@/components/app/BadgeCelebration';
 import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebration';
 import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
+import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebration';
 import { GoalInputSheet } from '@/components/app/GoalInputSheet';
 import { TaskTimerScreen } from '@/components/app/TaskTimerScreen';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
@@ -47,6 +48,7 @@ interface HomeCelebrationsProps {
   onSkipTask: (t: UserTask) => void;
   onOpenGoalInput: (t: UserTask) => void;
   onOpenTimer: (t: UserTask) => void;
+  onStepUnlocked: (completedStep: number, newTaskCount: number) => void;
 
   // Streak
   showStreakModal: boolean;
@@ -129,6 +131,10 @@ interface HomeCelebrationsProps {
   } | null;
   closeChallengeDayCelebration: () => void;
   showChallengeDayCelebration: boolean;
+
+  // Step completion
+  stepCelebration: { completedStep: number; newTaskCount: number } | null;
+  onCloseStepCelebration: () => void;
 }
 
 export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebrationsProps) {
@@ -136,7 +142,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     showPaywall, setShowPaywall, showActionLimit, setShowActionLimit,
     showQuickStart, setShowQuickStart, onQuickStartContinue,
     selectedTask, setSelectedTask, selectedDate, completedTaskIds, completedSubtaskIds,
-    goalProgressMap, onEditTask, onDeleteTask, onSkipTask, onOpenGoalInput, onOpenTimer,
+    goalProgressMap, onEditTask, onDeleteTask, onSkipTask, onOpenGoalInput, onOpenTimer, onStepUnlocked,
     showStreakModal, setShowStreakModal, isFirstActionCelebration, setIsFirstActionCelebration,
     setShowTapCoachMark, streak, shouldShowGoalSelection,
     showGoalSelection, setShowGoalSelection, isStreakUpgrade, setIsStreakUpgrade,
@@ -151,6 +157,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     showRecoverySuccess, setShowRecoverySuccess, previousGoldStreak,
     userId, showNotificationFlow, setShowNotificationFlow,
     challengeDayCelebration, closeChallengeDayCelebration, showChallengeDayCelebration,
+    stepCelebration, onCloseStepCelebration,
   } = props;
 
   const { hasAccessToProgram } = useSubscription();
@@ -184,6 +191,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         onOpenGoalInput={onOpenGoalInput}
         onOpenTimer={onOpenTimer}
         onSkip={onSkipTask}
+        onStepUnlocked={onStepUnlocked}
       />
 
       <StreakCelebration
@@ -352,6 +360,13 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         currentDay={challengeDayCelebration?.currentDay || 0}
         totalDays={challengeDayCelebration?.totalDays || 0}
         badgeImageUrl={challengeDayCelebration?.badgeImageUrl}
+      />
+
+      <StepCompletionCelebration
+        open={!!stepCelebration}
+        onClose={onCloseStepCelebration}
+        completedStep={stepCelebration?.completedStep || 1}
+        newTaskCount={stepCelebration?.newTaskCount || 0}
       />
     </OverlayPortal>
   );

@@ -41,6 +41,7 @@ interface SortableTaskItemProps {
   goalProgress: number;
   onTap: (task: UserTask) => void;
   onStreakIncrease: () => void;
+  onStepUnlocked?: (completedStep: number, newTaskCount: number) => void;
   onOpenGoalInput: (task: UserTask) => void;
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
@@ -55,6 +56,7 @@ const SortableTaskItem = ({
   goalProgress,
   onTap,
   onStreakIncrease,
+  onStepUnlocked,
   onOpenGoalInput,
   onOpenTimer,
   onOpenWaterTracking,
@@ -93,6 +95,7 @@ const SortableTaskItem = ({
         goalProgress={goalProgress}
         onTap={onTap}
         onStreakIncrease={onStreakIncrease}
+        onStepUnlocked={onStepUnlocked}
         onOpenGoalInput={onOpenGoalInput}
         onOpenTimer={onOpenTimer}
         onOpenWaterTracking={onOpenWaterTracking}
@@ -109,6 +112,7 @@ interface SortableTaskListProps {
   goalProgressMap: Map<string, number>;
   onTaskTap: (task: UserTask) => void;
   onStreakIncrease: () => void;
+  onStepUnlocked?: (completedStep: number, newTaskCount: number) => void;
   onOpenGoalInput: (task: UserTask) => void;
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
@@ -124,6 +128,7 @@ export const SortableTaskList = ({
   goalProgressMap,
   onTaskTap,
   onStreakIncrease,
+  onStepUnlocked,
   onOpenGoalInput,
   onOpenTimer,
   onOpenWaterTracking,
@@ -220,6 +225,7 @@ export const SortableTaskList = ({
       goalProgress={goalProgressMap.get(task.id) || 0}
       onTap={onTaskTap}
       onStreakIncrease={onStreakIncrease}
+      onStepUnlocked={onStepUnlocked}
       onOpenGoalInput={onOpenGoalInput}
       onOpenTimer={onOpenTimer}
       onOpenWaterTracking={onOpenWaterTracking}

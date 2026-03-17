@@ -1,5 +1,6 @@
 // AppHome - Main home page component
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay, subDays } from 'date-fns';
@@ -56,12 +57,14 @@ const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
 
 const AppHome = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const {
     user
   } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [showStreakModal, setShowStreakModal] = useState(false);
+  const [stepCelebration, setStepCelebration] = useState<{ completedStep: number; newTaskCount: number } | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
   const [showQuickStart, setShowQuickStart] = useState(false);
@@ -576,6 +579,16 @@ const AppHome = () => {
 
   const { maybeRequestReview } = useAppReview();
 
+  const handleStepUnlocked = useCallback((completedStep: number, newTaskCount: number) => {
+    setStepCelebration({ completedStep, newTaskCount });
+  }, []);
+
+  const handleCloseStepCelebration = useCallback(() => {
+    setStepCelebration(null);
+    // Now refresh task lists so new step tasks appear
+    queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
+    queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+  }, [queryClient]);
 
 
   const handleGoalInputConfirm = useCallback((amount: number) => {
@@ -1026,7 +1039,7 @@ const AppHome = () => {
                         {/* Spotlighted task card + hint — disable body tap so only checkbox works */}
                         <div className="relative z-[101]">
                           <div className="relative">
-                            <SortableTaskList tasks={filteredTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                            <SortableTaskList tasks={filteredTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                           
                             {/* Glowing ring around the checkbox */}
                             <div
@@ -1087,7 +1100,7 @@ const AppHome = () => {
                           return (
                           <div className="relative z-[101]">
                             <div className="relative">
-                              <SortableTaskList tasks={[spotlightTask]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                              <SortableTaskList tasks={[spotlightTask]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                               
                               {/* Glowing highlight around the action name area */}
                               <div
@@ -1140,12 +1153,12 @@ const AppHome = () => {
                         {/* Remaining tasks behind the overlay */}
                         {filteredTasks.length > 1 && (
                           <div className="relative z-[1]">
-                            <SortableTaskList tasks={filteredTasks.slice(1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                            <SortableTaskList tasks={filteredTasks.slice(1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                           </div>
                         )}
                       </>
                     ) : (
-                      <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                      <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                     );
                   })()}
                   {/* Onboarding banner moved below routine section */}
@@ -1254,6 +1267,7 @@ const AppHome = () => {
           onSkipTask={handleSkipTask}
           onOpenGoalInput={handleOpenGoalInput}
           onOpenTimer={handleOpenTimer}
+          onStepUnlocked={handleStepUnlocked}
           showStreakModal={showStreakModal}
           setShowStreakModal={setShowStreakModal}
           isFirstActionCelebration={isFirstActionCelebration}
@@ -1310,6 +1324,8 @@ const AppHome = () => {
           challengeDayCelebration={challengeDayCelebration}
           closeChallengeDayCelebration={closeChallengeDayCelebration}
           showChallengeDayCelebration={showChallengeDayCelebration}
+          stepCelebration={stepCelebration}
+          onCloseStepCelebration={handleCloseStepCelebration}
         />
 
         {/* New Interactive Home Tour */}
