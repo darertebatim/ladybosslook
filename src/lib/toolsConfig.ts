@@ -33,6 +33,16 @@ export const wellnessTools: ToolConfig[] = [
     description: 'Stay focused',
   },
   {
+    id: 'focus-routine',
+    name: 'Focus',
+    icon: 'Play',
+    emoji: '🎯',
+    bgColor: 'bg-[#DBEAFE]',
+    iconColor: 'text-blue-600',
+    route: '/app/routines',
+    description: 'Routine player',
+  },
+  {
     id: 'reflections',
     name: 'Reflections',
     icon: 'Brain',
