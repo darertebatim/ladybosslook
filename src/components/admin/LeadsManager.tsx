@@ -371,6 +371,7 @@ export function LeadsManager() {
       setIsEnrollDialogOpen(false);
       setSelectedCourse('');
       setSelectedEnrollRound('');
+      setEnrollExpiresAt(undefined);
       
       // Refresh search results to show new enrollment
       handleSearch();
