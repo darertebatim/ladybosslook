@@ -236,6 +236,12 @@ export const useAutoCompleteProTask = () => {
       }
 
       if (tasksCompleted > 0) {
+        // Store recently completed task IDs so TaskCard can animate on return
+        const recentKey = 'pro_tasks_just_completed';
+        const existing = JSON.parse(sessionStorage.getItem(recentKey) || '[]') as string[];
+        const newIds = applicableTasks.map(t => t.id);
+        sessionStorage.setItem(recentKey, JSON.stringify([...new Set([...existing, ...newIds])]));
+
         // Invalidate queries to update UI
         queryClient.invalidateQueries({ queryKey: ['planner-completions', user.id, today] });
         queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });

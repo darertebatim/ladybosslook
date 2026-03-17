@@ -1,4 +1,4 @@
-import { useState, memo, useCallback } from 'react';
+import { useState, useEffect, memo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Plus, Play, Droplets, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
