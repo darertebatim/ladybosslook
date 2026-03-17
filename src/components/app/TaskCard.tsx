@@ -171,9 +171,12 @@ export const TaskCard = memo(function TaskCard({
       playCompletionSound();
       const result = await completeTask.mutateAsync({ taskId: task.id, date });
       if (result.streakIncreased && onStreakIncrease) {
-        // Stronger haptic for streak
         haptic.medium();
         onStreakIncrease();
+      }
+      if (result.unlockedStep) {
+        haptic.medium();
+        toast.success(`🎉 Step ${result.unlockedStep.unlockedStep - 1} complete! ${result.unlockedStep.taskCount} new tasks unlocked.`, { duration: 4000 });
       }
     }
   };

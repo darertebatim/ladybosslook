@@ -175,7 +175,11 @@ export default function AppInspireDetail() {
       });
       setShowPreviewSheet(false);
       setJustAdded(true);
-      toast.success(`${selectedTaskIds.length} tasks added!`);
+      if (isProject) {
+        toast.success(`Step 1 tasks added! Complete them to unlock the next step.`, { duration: 5000 });
+      } else {
+        toast.success(`${selectedTaskIds.length} tasks added!`);
+      }
     } catch (error) {
       toast.error('Failed to add routine');
     }
