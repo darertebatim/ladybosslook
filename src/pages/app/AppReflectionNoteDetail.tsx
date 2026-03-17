@@ -124,6 +124,14 @@ export default function AppReflectionNoteDetail() {
         <button onClick={() => navigate(-1)} className="active:scale-95 transition-transform p-1">
           <ArrowLeft className="h-5 w-5" />
         </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={handleShare}
+            className="active:scale-95 transition-transform p-1"
+            aria-label="Share"
+          >
+            <Share2 className="h-5 w-5 text-muted-foreground" />
+          </button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="active:scale-95 transition-transform p-1">

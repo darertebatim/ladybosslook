@@ -537,6 +537,18 @@ export default function AppAudioPlayer() {
             )}
           </div>
 
+          {/* Share Button */}
+          {audio && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 text-white hover:bg-white/10"
+              onClick={handleShare}
+              aria-label="Share"
+            >
+              <Share2 className="h-5 w-5" />
+            </Button>
+          )}
 
           {/* Add to Routine Button */}
           {audio && (

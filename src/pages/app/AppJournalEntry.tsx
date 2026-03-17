@@ -232,11 +232,18 @@ const AppJournalEntry = () => {
             </h1>
           </div>
           
-          {/* Done button + save status */}
+          {/* Done button + share + save status */}
           <div className="flex items-center gap-2">
             {saveStatus === 'saving' && (
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             )}
+            <button
+              onClick={handleShare}
+              className="h-9 w-9 flex items-center justify-center rounded-full active:scale-95 transition-transform"
+              aria-label="Share"
+            >
+              <Share2 className="h-4 w-4 text-muted-foreground" />
+            </button>
             <Button 
               size="sm"
               onClick={handleDone}
