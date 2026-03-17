@@ -316,6 +316,33 @@ export const TaskCard = memo(function TaskCard({
       ['.', '0', 'confirm'],
     ];
 
+    const handleProCircleClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      
+      if (isFutureDate) {
+        haptic.light();
+        toast("Let's focus on today's routines.", {
+          description: "You can do this when the day comes.",
+          duration: 3000,
+        });
+        return;
+      }
+      
+      // If already completed / goal reached, do nothing
+      if (hasGoal ? goalReached : isCompleted) return;
+      
+      haptic.light();
+      
+      // Weight is special — opens inline sheet
+      if (proLinkType === 'weight') {
+        setWeightOpen(true);
+        return;
+      }
+      
+      // Navigate to the tool
+      navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: '/app/home' } });
+    };
+
     return (
       <>
         <div
@@ -361,26 +388,7 @@ export const TaskCard = memo(function TaskCard({
               </p>
             </div>
 
-            {/* Quick navigation button - prominent action button */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                if (proLinkType === 'weight') {
-                  setWeightOpen(true);
-                } else {
-                  navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: '/app/home' } });
-                }
-              }}
-              className={cn(
-                'flex flex-col items-center justify-center gap-0.5 px-2.5 py-1.5 rounded-xl text-[10px] font-bold shrink-0 transition-all shadow-sm active:scale-95',
-                proConfig.buttonClass
-              )}
-            >
-              <ProIcon className="h-3.5 w-3.5" />
-              {proConfig.badgeText}
-            </button>
-
-            {/* Timer goal: Play button, Count goal: + button, Regular: Checkbox */}
+            {/* Circle with tool icon inside — navigates to the tool */}
             {isTimerGoal ? (
               <button
                 onClick={handleOpenTimer}
@@ -421,11 +429,13 @@ export const TaskCard = memo(function TaskCard({
               </div>
             ) : (
               <button
-                onClick={handleToggleComplete}
+                onClick={handleProCircleClick}
                 className="w-9 h-9 flex items-center justify-center shrink-0"
               >
                 {isCompleted ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
-                  <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
+                  <span className={cn("w-9 h-9 rounded-full border-2 border-dashed bg-white flex items-center justify-center", proConfig.iconColorClass.replace('text-', 'border-'))}>
+                    <ProIcon className={cn("h-4 w-4", proConfig.iconColorClass)} />
+                  </span>
                 )}
               </button>
             )}
