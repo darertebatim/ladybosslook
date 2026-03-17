@@ -144,6 +144,41 @@ export default function AppInspireDetail() {
     return null;
   }, [routine]);
 
+  const handleShare = useCallback(async () => {
+    const title = routine?.title || 'Routine';
+    const shareText = `Hey! Join me in the '${title}' routine on Routine Ladyboss 💫\nDownload the app: https://apps.apple.com/app/id6755076134`;
+    const shareUrl = 'https://apps.apple.com/app/id6755076134';
+
+    try {
+      // Try sharing with cover image
+      if (routine?.cover_image_url && navigator.canShare) {
+        const response = await fetch(routine.cover_image_url);
+        const blob = await response.blob();
+        const file = new File([blob], 'routine.jpg', { type: blob.type || 'image/jpeg' });
+        
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title, text: shareText });
+          return;
+        }
+      }
+
+      // Fallback: text + url only
+      if (navigator.share) {
+        await navigator.share({ title, text: shareText, url: shareUrl });
+        return;
+      }
+
+      // Final fallback: copy to clipboard
+      await navigator.clipboard.writeText(`${shareText}`);
+      toast.success('Link copied to clipboard!');
+    } catch (err: any) {
+      // User cancelled share — ignore AbortError
+      if (err?.name !== 'AbortError') {
+        console.error('Share failed:', err);
+      }
+    }
+  }, [routine?.title, routine?.cover_image_url]);
+
   const handleAddClick = () => {
     if (!routine?.tasks?.length) {
       toast.error('No tasks in this routine');
