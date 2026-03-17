@@ -514,9 +514,11 @@ export function useAddRoutineFromBank() {
               repeatPattern = 'none';
             }
           } else if (scheduleType === 'project') {
-            // Project: all tasks are one-time, ordered sequentially, no scheduled date drip
+            // Project: all tasks are one-time, ordered sequentially
             repeatPattern = 'none';
             scheduledDate = getLocalDateStr(new Date());
+            // step number from drip_day, fallback to index+1
+            projectStep = (task as any).drip_day ?? (index + 1);
           } else {
             // Normal routines: use per-task repeat from bank, allow user edits to override
             const monthlyDay = (task as any).monthly_day as number | null;
