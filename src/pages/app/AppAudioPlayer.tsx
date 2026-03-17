@@ -69,26 +69,6 @@ export default function AppAudioPlayer() {
   const { data: existingTask, isLoading: isCheckingTask } = useExistingAudioTask(audioId);
   const addRoutinePlan = useAddRoutinePlan();
 
-  // Fetch audio content early so we can use it in the share hook
-  const { data: audio, isLoading } = useQuery({
-    queryKey: ['audio-content', audioId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('audio_content')
-        .select('*')
-        .eq('id', audioId)
-        .single();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!audioId,
-  });
-
-  const { handleShare } = useShareContent({
-    title: audio?.title || 'Audio',
-    text: `🎧 I'm listening to '${audio?.title || 'something great'}' on Routine Ladyboss 💫`,
-    imageUrl: audio?.cover_image_url,
-  });
 
 
   // Fetch audio content
