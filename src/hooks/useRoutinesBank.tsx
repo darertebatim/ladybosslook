@@ -336,7 +336,7 @@ export function useUserAddedBankRoutines() {
 
       const { data, error } = await supabase
         .from('user_routines_bank')
-        .select('routine_id')
+        .select('routine_id, completed_at')
         .eq('user_id', user.id)
         .eq('is_active', true);
 
