@@ -94,7 +94,15 @@ export default function AppFocusRoutines() {
     return { pct, isComplete: pct === 100 };
   };
 
+  // Pre-start state
+  const [preStartRoutine, setPreStartRoutine] = useState<(typeof allRoutines extends (infer T)[] | undefined ? T : never) | null>(null);
+  const [preStartTasks, setPreStartTasks] = useState<{ id: string; title: string; emoji: string; targetSeconds: number; color?: string }[]>([]);
+  const [loadingRoutineId, setLoadingRoutineId] = useState<string | null>(null);
+
+  const totalPreStartSeconds = preStartTasks.reduce((s, t) => s + t.targetSeconds, 0);
+
   const handlePlay = async (routine: typeof allRoutines extends (infer T)[] | undefined ? T : never) => {
+    setLoadingRoutineId(routine.id);
     const { data } = await supabase
       .from('routines_bank_tasks')
       .select(`
@@ -104,25 +112,37 @@ export default function AppFocusRoutines() {
       .eq('routine_id', routine.id)
       .order('task_order', { ascending: true });
 
+    setLoadingRoutineId(null);
+
     if (!data || data.length === 0) {
       const { toast } = await import('sonner');
       toast.error('No tasks found in this routine');
       return;
     }
 
+    haptic.light();
+    const tasks = data.map(t => ({
+      id: t.id,
+      title: t.title,
+      emoji: t.emoji || '📝',
+      targetSeconds: (t.task as any)?.goal_target || (t.duration_minutes ? t.duration_minutes * 60 : 300),
+      color: (t.task as any)?.color || undefined,
+    }));
+    setPreStartTasks(tasks);
+    setPreStartRoutine(routine);
+  };
+
+  const handleStartFromPreview = () => {
+    if (!preStartRoutine) return;
     haptic.medium();
     startRoutine({
-      routineId: routine.id,
-      routineTitle: routine.title,
-      routineEmoji: routine.emoji || '✨',
-      tasks: data.map(t => ({
-        id: t.id,
-        title: t.title,
-        emoji: t.emoji || '📝',
-        targetSeconds: (t.task as any)?.goal_target || (t.duration_minutes ? t.duration_minutes * 60 : 300),
-        color: (t.task as any)?.color || undefined,
-      })),
+      routineId: preStartRoutine.id,
+      routineTitle: preStartRoutine.title,
+      routineEmoji: preStartRoutine.emoji || '✨',
+      tasks: preStartTasks,
     });
+    setPreStartRoutine(null);
+    setPreStartTasks([]);
   };
 
   return (
