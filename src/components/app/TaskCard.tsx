@@ -305,6 +305,7 @@ export const TaskCard = memo(function TaskCard({
         toast.success('Weight logged!');
         setWeightValue('');
         setWeightOpen(false);
+        autoCompleteWeight();
       } else {
         toast.error('Failed to log weight');
       }
