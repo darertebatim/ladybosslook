@@ -1,11 +1,10 @@
-import { memo, useState } from 'react';
-import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus, RotateCcw } from 'lucide-react';
+import { memo, useState, useCallback, useEffect } from 'react';
+import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus } from 'lucide-react';
 import { format, addSeconds } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { FocusRoutineSummary } from './FocusRoutineSummary';
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import type { FocusRoutineConfig } from '@/hooks/useFocusRoutinePlayer';
 import type { SessionTaskResult } from './FocusRoutineSummary';
 
@@ -70,6 +69,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   const [showAdjustSheet, setShowAdjustSheet] = useState(false);
   const [showSkipSheet, setShowSkipSheet] = useState(false);
   const [showEndDialog, setShowEndDialog] = useState(false);
+  const [showCompletionFlash, setShowCompletionFlash] = useState(false);
 
   const nextTask = config.tasks[currentTaskIndex + 1] || null;
   const progressPercent = currentTask
@@ -104,8 +104,29 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   const taskEndTime = addSeconds(taskStartedAt, currentTask?.targetSeconds || 0);
   const isPaused = phase === 'paused';
 
+  const handleComplete = () => {
+    haptic.success();
+    setShowCompletionFlash(true);
+    setTimeout(() => {
+      setShowCompletionFlash(false);
+      onCompleteTask();
+    }, 500);
+  };
+
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col bg-[#f5f3ef]">
+      {/* Completion flash overlay */}
+      {showCompletionFlash && (
+        <div className="absolute inset-0 z-[10] pointer-events-none animate-in fade-in-0 duration-200">
+          <div className="absolute inset-0 bg-emerald-400/20" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-28 h-28 rounded-full bg-emerald-500 flex items-center justify-center animate-in zoom-in-50 duration-300">
+              <Check className="w-14 h-14 text-white" strokeWidth={3} />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div
         className="flex items-center justify-between px-4 pt-3"
@@ -126,7 +147,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
         </button>
       </div>
 
-      {/* Task title + time range — ABOVE circle */}
+      {/* Task title + time range */}
       <div className="px-6 mt-4">
         <h2 className="text-xl font-bold text-foreground text-center leading-snug max-w-xs mx-auto">
           {currentTask?.title}
@@ -138,43 +159,27 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
 
       {/* Main circle area */}
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        {/* Timer circle with emoji + time + adjuster inside */}
         <div className="relative w-64 h-64 flex items-center justify-center">
-          {/* Background filled circle */}
           <div className="absolute inset-3 rounded-full bg-foreground/[0.04]" />
 
-          {/* Progress ring — thick gold arc */}
+          {/* Progress ring */}
           <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 256 256">
-            {/* Track */}
+            <circle cx="128" cy="128" r="120" fill="none" stroke="currentColor" strokeWidth="14" className="text-transparent" />
             <circle
               cx="128" cy="128" r="120"
-              fill="none" stroke="currentColor" strokeWidth="14"
-              className="text-transparent"
-            />
-            {/* Active arc */}
-            <circle
-              cx="128" cy="128" r="120"
-              fill="none"
-              strokeWidth="14"
+              fill="none" strokeWidth="14"
               strokeDasharray={`${2 * Math.PI * 120}`}
               strokeDashoffset={`${2 * Math.PI * 120 * (1 - progressPercent / 100)}`}
               strokeLinecap="round"
-              className={cn(
-                "transition-all duration-1000 ease-linear",
-                isOvertime ? "stroke-amber-400" : "stroke-amber-400"
-              )}
-              style={{
-                filter: isOvertime ? undefined : 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.4))',
-              }}
+              className="stroke-amber-400 transition-all duration-1000 ease-linear"
+              style={{ filter: 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.4))' }}
             />
           </svg>
 
           {/* Circle content */}
           <div className="relative flex flex-col items-center z-10">
-            {/* 3D Emoji */}
             <FluentEmoji emoji={currentTask?.emoji || '📝'} size={56} className="mb-2" />
 
-            {/* Timer */}
             {isPaused ? (
               <>
                 <p className="text-[42px] font-extrabold text-foreground/25 tracking-tight tabular-nums leading-none">
@@ -187,7 +192,6 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
                 <p className="text-[42px] font-extrabold text-red-500 tracking-tight tabular-nums leading-none">
                   +{formatTime(overtimeSeconds)}
                 </p>
-                {/* Time adjuster inside circle */}
                 <button
                   onClick={() => { haptic.light(); setShowAdjustSheet(true); }}
                   className="flex items-center gap-3 mt-2 px-3 py-1 rounded-full active:bg-foreground/5"
@@ -204,7 +208,6 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
                 <p className="text-[42px] font-extrabold text-foreground tracking-tight tabular-nums leading-none">
                   {formatTime(timeLeft)}
                 </p>
-                {/* Time adjuster inside circle */}
                 <button
                   onClick={() => { haptic.light(); setShowAdjustSheet(true); }}
                   className="flex items-center gap-3 mt-2 px-3 py-1 rounded-full active:bg-foreground/5"
@@ -224,7 +227,6 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
       {/* Controls section */}
       <div className="px-6 pb-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
         {isPaused ? (
-          /* Paused state: pause counter + Resume outside circle */
           <div className="flex flex-col items-center gap-3 mb-4">
             <p className="text-[36px] font-extrabold text-blue-500 tabular-nums leading-none">
               {formatTime(pauseElapsed)}
@@ -237,7 +239,6 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
             </button>
           </div>
         ) : (
-          /* Running state: Pause / Complete / Skip */
           <div className="flex items-center justify-center gap-8 mb-4">
             <button
               onClick={() => { haptic.medium(); onTogglePause(); }}
@@ -247,7 +248,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
             </button>
 
             <button
-              onClick={() => { haptic.success(); onCompleteTask(); }}
+              onClick={handleComplete}
               className="w-[72px] h-[72px] rounded-full bg-foreground flex items-center justify-center active:scale-95 transition-transform shadow-lg"
             >
               <Check className="w-8 h-8 text-background" strokeWidth={3} />
@@ -262,7 +263,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
           </div>
         )}
 
-        {/* Next task preview — below buttons */}
+        {/* Next task preview */}
         {nextTask && !isPaused && (
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-foreground/5 rounded px-1.5 py-0.5">
@@ -273,7 +274,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
           </div>
         )}
 
-        {/* Bottom card: All ends time + Rearrange */}
+        {/* Bottom card */}
         {endTime && (
           <div className="flex items-center justify-between bg-foreground/[0.04] rounded-2xl px-5 py-3.5 mt-1">
             <div>
@@ -287,78 +288,85 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
         )}
       </div>
 
-      {/* Adjust Time Bottom Sheet */}
-      <Sheet open={showAdjustSheet} onOpenChange={setShowAdjustSheet}>
-        <SheetContent side="bottom" className="rounded-t-3xl px-6 pb-8" hideCloseButton>
-          <SheetTitle className="text-center text-lg font-bold mt-3 mb-6">Adjust time</SheetTitle>
-          <div className="grid grid-cols-4 gap-3">
-            {[
-              { icon: '—', label: '10 min', delta: -10 },
-              { icon: '—', label: '1 min', delta: -1 },
-              { icon: '+', label: '1 min', delta: 1 },
-              { icon: '+', label: '10 min', delta: 10 },
-            ].map(({ icon, label, delta }) => (
-              <button
-                key={`${icon}${label}`}
-                onClick={() => { haptic.light(); onAdjustTime(delta); }}
-                className="flex flex-col items-center gap-1 py-4 rounded-2xl bg-foreground/[0.06] active:bg-foreground/10"
-              >
-                <span className="text-lg font-semibold text-foreground/70">{icon}</span>
-                <span className="text-xs text-foreground/60 font-medium">{label}</span>
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() => { haptic.light(); onResetTime(); setShowAdjustSheet(false); }}
-            className="w-full mt-4 py-4 rounded-2xl bg-foreground/[0.04] text-red-500 font-semibold text-base active:bg-foreground/[0.08]"
+      {/* Adjust Time Bottom Sheet — inline to inherit z-index */}
+      {showAdjustSheet && (
+        <>
+          <div
+            className="absolute inset-0 bg-black/40 z-[10] animate-in fade-in-0 duration-200"
+            onClick={() => setShowAdjustSheet(false)}
+          />
+          <div className="absolute bottom-0 left-0 right-0 z-[11] bg-background rounded-t-3xl px-6 pb-8 pt-2 animate-in slide-in-from-bottom duration-300"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 32px)' }}
           >
-            Reset
-          </button>
-        </SheetContent>
-      </Sheet>
-
-      {/* Skip Confirmation Bottom Sheet */}
-      <Sheet open={showSkipSheet} onOpenChange={setShowSkipSheet}>
-        <SheetContent side="bottom" className="rounded-t-3xl px-6 pb-8" hideCloseButton>
-          <SheetTitle className="text-center text-lg font-bold mt-3 mb-6">Should we skip?</SheetTitle>
-          <div className="space-y-2.5">
+            <div className="w-10 h-1 bg-foreground/10 rounded-full mx-auto mb-4" />
+            <h3 className="text-center text-lg font-bold mb-6">Adjust time</h3>
+            <div className="grid grid-cols-4 gap-3">
+              {[
+                { icon: '—', label: '10 min', delta: -10 },
+                { icon: '—', label: '1 min', delta: -1 },
+                { icon: '+', label: '1 min', delta: 1 },
+                { icon: '+', label: '10 min', delta: 10 },
+              ].map(({ icon, label, delta }) => (
+                <button
+                  key={`${icon}${label}`}
+                  onClick={() => { haptic.light(); onAdjustTime(delta); }}
+                  className="flex flex-col items-center gap-1 py-4 rounded-2xl bg-foreground/[0.06] active:bg-foreground/10"
+                >
+                  <span className="text-lg font-semibold text-foreground/70">{icon}</span>
+                  <span className="text-xs text-foreground/60 font-medium">{label}</span>
+                </button>
+              ))}
+            </div>
             <button
-              onClick={() => {
-                haptic.light();
-                setShowSkipSheet(false);
-              }}
-              className="w-full py-4 rounded-2xl bg-foreground/[0.06] text-foreground font-semibold text-base active:bg-foreground/10"
+              onClick={() => { haptic.light(); onResetTime(); setShowAdjustSheet(false); }}
+              className="w-full mt-4 py-4 rounded-2xl bg-foreground/[0.04] text-red-500 font-semibold text-base active:bg-foreground/[0.08]"
             >
-              Rearrange order
-            </button>
-            <button
-              onClick={() => {
-                haptic.light();
-                setShowSkipSheet(false);
-                onMoveTaskToEnd();
-              }}
-              className="w-full py-4 rounded-2xl bg-foreground/[0.06] text-foreground font-semibold text-base active:bg-foreground/10"
-            >
-              Move task to end
-            </button>
-            <button
-              onClick={() => {
-                haptic.medium();
-                setShowSkipSheet(false);
-                onSkipTask();
-              }}
-              className="w-full py-4 rounded-2xl bg-foreground/[0.06] text-foreground/60 font-semibold text-base active:bg-foreground/10"
-            >
-              Skip
+              Reset
             </button>
           </div>
-        </SheetContent>
-      </Sheet>
+        </>
+      )}
+
+      {/* Skip Confirmation Bottom Sheet — inline */}
+      {showSkipSheet && (
+        <>
+          <div
+            className="absolute inset-0 bg-black/40 z-[10] animate-in fade-in-0 duration-200"
+            onClick={() => setShowSkipSheet(false)}
+          />
+          <div className="absolute bottom-0 left-0 right-0 z-[11] bg-background rounded-t-3xl px-6 pb-8 pt-2 animate-in slide-in-from-bottom duration-300"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 32px)' }}
+          >
+            <div className="w-10 h-1 bg-foreground/10 rounded-full mx-auto mb-4" />
+            <h3 className="text-center text-lg font-bold mb-6">Should we skip?</h3>
+            <div className="space-y-2.5">
+              <button
+                onClick={() => { haptic.light(); setShowSkipSheet(false); }}
+                className="w-full py-4 rounded-2xl bg-foreground/[0.06] text-foreground font-semibold text-base active:bg-foreground/10"
+              >
+                Rearrange order
+              </button>
+              <button
+                onClick={() => { haptic.light(); setShowSkipSheet(false); onMoveTaskToEnd(); }}
+                className="w-full py-4 rounded-2xl bg-foreground/[0.06] text-foreground font-semibold text-base active:bg-foreground/10"
+              >
+                Move task to end
+              </button>
+              <button
+                onClick={() => { haptic.medium(); setShowSkipSheet(false); onSkipTask(); }}
+                className="w-full py-4 rounded-2xl bg-foreground/[0.06] text-foreground/60 font-semibold text-base active:bg-foreground/10"
+              >
+                Skip
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* End Routine Confirmation Dialog */}
       {showEndDialog && (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50">
-          <div className="bg-background rounded-2xl p-6 mx-8 max-w-sm w-full shadow-xl">
+        <div className="absolute inset-0 z-[10] flex items-center justify-center bg-black/50 animate-in fade-in-0 duration-200">
+          <div className="bg-background rounded-2xl p-6 mx-8 max-w-sm w-full shadow-xl animate-in zoom-in-95 duration-200">
             <h3 className="text-lg font-bold text-foreground text-center">End the routine?</h3>
             <p className="text-sm text-muted-foreground text-center mt-2">
               Completed tasks will be saved.
@@ -371,11 +379,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  haptic.medium();
-                  setShowEndDialog(false);
-                  onEndRoutineEarly();
-                }}
+                onClick={() => { haptic.medium(); setShowEndDialog(false); onEndRoutineEarly(); }}
                 className="flex-1 py-3 rounded-xl bg-foreground text-background font-medium text-sm active:opacity-90"
               >
                 End
