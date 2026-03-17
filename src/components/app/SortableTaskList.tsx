@@ -596,6 +596,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
                     </button>
                   );
                 })}
+                </div>
               </div>
             </div>
           </DialogPortal>
