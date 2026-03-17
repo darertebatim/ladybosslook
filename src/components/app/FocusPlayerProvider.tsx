@@ -44,6 +44,7 @@ export function FocusPlayerProvider({ children }: { children: ReactNode }) {
             onAdjustTime={player.adjustTime}
             onResetTime={player.resetTaskTime}
             onMoveTaskToEnd={player.moveTaskToEnd}
+            onReorderTasks={player.reorderTasks}
             onEndRoutineEarly={player.endRoutineEarly}
             onClose={player.closePlayer}
             onCancel={player.cancelPlayer}
