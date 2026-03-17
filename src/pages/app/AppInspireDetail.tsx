@@ -102,6 +102,7 @@ export default function AppInspireDetail() {
   
   const isChallenge = (routine as any)?.schedule_type === 'challenge';
   const isProject = (routine as any)?.schedule_type === 'project';
+  const isFocus = (routine as any)?.is_focus === true;
   const userChallenge = useMemo(() => {
     if (!planId || !isChallenge) return null;
     return userChallenges.find(c => c.routineId === planId) || null;
