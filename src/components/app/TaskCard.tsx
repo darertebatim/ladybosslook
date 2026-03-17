@@ -65,6 +65,7 @@ export const TaskCard = memo(function TaskCard({
   const { data: subtasks = [] } = useSubtasks(task.id);
   const completeTask = useCompleteTask();
   const uncompleteTask = useUncompleteTask();
+  const { autoCompleteWeight } = useAutoCompleteProTask();
 
   const completedCount = subtasks.filter(s => completedSubtaskIds.includes(s.id)).length;
   const totalSubtasks = subtasks.length;
