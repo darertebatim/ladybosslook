@@ -1159,8 +1159,8 @@ export default function RoutinesBank() {
                         <>
                           <span>•</span>
                           <span className="flex items-center gap-1">
-                            {routine.schedule_type === 'weekly' ? <Calendar className="h-3 w-3" /> : <Flame className="h-3 w-3" />}
-                            {routine.schedule_type === 'weekly' ? 'Weekly' : 'Challenge'}
+                            {routine.schedule_type === 'weekly' ? <Calendar className="h-3 w-3" /> : routine.schedule_type === 'project' ? '🎯' : <Flame className="h-3 w-3" />}
+                            {routine.schedule_type === 'weekly' ? 'Weekly' : routine.schedule_type === 'project' ? 'Project' : 'Challenge'}
                           </span>
                         </>
                       )}
