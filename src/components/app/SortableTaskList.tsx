@@ -333,7 +333,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
     } else if (selectedCategory !== 'all') {
       items = items.filter(t => t.category === selectedCategory);
     }
-    return items.slice(0, 20);
+    return items;
   }, [templates, selectedCategory]);
 
   useEffect(() => {
@@ -518,7 +518,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
               style={{ top: SUGGESTIONS_ANCHOR_TOP }}
             >
               {/* Category pills */}
-              <div className="w-full overflow-x-auto shrink-0 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+              <div className="w-full overflow-x-auto shrink-0" style={{ WebkitOverflowScrolling: 'touch' }}>
                 <div className="flex gap-1.5 pb-2 w-max">
                   <button
                     onClick={() => { haptic.light(); setSelectedCategory('popular'); }}
