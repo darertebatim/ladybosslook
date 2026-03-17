@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Headphones, List, Lock, CheckCircle, Play, CalendarPlus, Check, Download, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, Headphones, List, Lock, CheckCircle, Play, CalendarPlus, Check, Download, CheckCircle2, Share2 } from "lucide-react";
 import { BackButton } from "@/components/app/BackButton";
 import { AudioControls } from "@/components/audio/AudioControls";
 import { ProgressBar } from "@/components/audio/ProgressBar";
@@ -29,6 +29,7 @@ import { haptic } from "@/lib/haptics";
 
 import { CachedImage } from "@/components/ui/CachedImage";
 import heroStormVideo from "@/assets/watch-hero-storm.mp4";
+import { useShareContent } from "@/hooks/useShareContent";
 
 export default function AppAudioPlayer() {
   const { audioId } = useParams();
@@ -69,6 +70,7 @@ export default function AppAudioPlayer() {
   const addRoutinePlan = useAddRoutinePlan();
 
 
+
   // Fetch audio content
   const { data: audio, isLoading } = useQuery({
     queryKey: ['audio-content', audioId],
@@ -83,6 +85,12 @@ export default function AppAudioPlayer() {
       return data;
     },
     enabled: !!audioId,
+  });
+
+  const { handleShare } = useShareContent({
+    title: audio?.title || 'Audio',
+    text: `🎧 I'm listening to '${audio?.title || 'something great'}' on Routine Ladyboss 💫`,
+    imageUrl: audio?.cover_image_url,
   });
 
   // Fetch playlist info for current audio
@@ -529,6 +537,18 @@ export default function AppAudioPlayer() {
             )}
           </div>
 
+          {/* Share Button */}
+          {audio && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 text-white hover:bg-white/10"
+              onClick={handleShare}
+              aria-label="Share"
+            >
+              <Share2 className="h-5 w-5" />
+            </Button>
+          )}
 
           {/* Add to Routine Button */}
           {audio && (

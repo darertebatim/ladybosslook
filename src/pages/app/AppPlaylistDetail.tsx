@@ -26,6 +26,8 @@ import { PaywallSheet } from "@/components/app/PaywallSheet";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import heroStormVideo from "@/assets/watch-hero-storm.mp4";
+import { Share2 } from "lucide-react";
+import { useShareContent } from "@/hooks/useShareContent";
 export default function AppPlaylistDetail() {
   const { playlistId } = useParams();
   const { user } = useAuth();
@@ -74,6 +76,12 @@ export default function AppPlaylistDetail() {
       if (error) throw error;
       return data;
     },
+  });
+
+  const { handleShare } = useShareContent({
+    title: playlist?.name || 'Playlist',
+    text: `🎵 Check out the '${playlist?.name || 'this'}' playlist on Routine Ladyboss 💫`,
+    imageUrl: playlist?.cover_image_url,
   });
 
   // Fetch tracks in playlist
@@ -635,11 +643,20 @@ export default function AppPlaylistDetail() {
       >
         <div className="pt-1 pb-2 px-4 flex items-center justify-between">
           <BackButton to={cameFromPlanner ? '/app/home' : '/app/player'} label={cameFromPlanner ? 'Home' : 'Library'} className="text-white" />
-          {startTour && (
-            <button onClick={startTour} className="h-9 w-9 flex items-center justify-center rounded-full" aria-label="Start page tour">
-              <HelpCircle className="h-5 w-5 text-white/60" />
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handleShare}
+              className="h-9 w-9 flex items-center justify-center rounded-full active:scale-95 transition-transform"
+              aria-label="Share"
+            >
+              <Share2 className="h-5 w-5 text-white/60" />
             </button>
-          )}
+            {startTour && (
+              <button onClick={startTour} className="h-9 w-9 flex items-center justify-center rounded-full" aria-label="Start page tour">
+                <HelpCircle className="h-5 w-5 text-white/60" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

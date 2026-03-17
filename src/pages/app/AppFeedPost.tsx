@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loader2, Pin, Megaphone, Music, Calendar, FileText, MessageSquare } from 'lucide-react';
+import { Loader2, Pin, Megaphone, Music, Calendar, FileText, MessageSquare, Share2 } from 'lucide-react';
 import { BackButton } from '@/components/app/BackButton';
 import { useFeedPost, usePostComments, useAddComment, useDeleteComment, useMarkPostRead } from '@/hooks/useFeed';
 import { useFeedRealtime, usePostCommentsRealtime } from '@/hooks/useFeedRealtime';
@@ -15,6 +15,7 @@ import { FeedReplyInput } from '@/components/feed/FeedReplyInput';
 import { SEOHead } from '@/components/SEOHead';
 import { cn } from '@/lib/utils';
 import { useBilingualText } from '@/components/ui/BilingualText';
+import { useShareContent } from '@/hooks/useShareContent';
 
 const POST_TYPE_ICONS = {
   announcement: Megaphone,
@@ -143,6 +144,12 @@ export default function AppFeedPost() {
   // Bilingual support - MUST be called before any early returns
   const { direction: contentDirection, className: contentBilingualClassName } = useBilingualText(post?.content || '');
   const { direction: titleDirection, className: titleBilingualClassName } = useBilingualText(post?.title || '');
+
+  const { handleShare } = useShareContent({
+    title: post?.title || 'Post',
+    text: `💬 Check out this post on Routine Ladyboss 💫`,
+    imageUrl: post?.image_url,
+  });
 
   // Mark post as read
   useEffect(() => {
@@ -274,6 +281,13 @@ export default function AppFeedPost() {
               {post.channel?.name || 'Post'}
             </h1>
           </div>
+          <button
+            onClick={handleShare}
+            className="h-9 w-9 flex items-center justify-center rounded-full active:scale-95 transition-transform"
+            aria-label="Share"
+          >
+            <Share2 className="h-5 w-5 text-muted-foreground" />
+          </button>
         </div>
       </header>
 

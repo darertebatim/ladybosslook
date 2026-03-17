@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Play, CheckCircle2, Circle, Lock } from "lucide-react";
+import { Play, CheckCircle2, Circle, Lock, Share2 } from "lucide-react";
 import { BackButton } from "@/components/app/BackButton";
 import { AppVideoPlayer } from "@/components/app/AppVideoPlayer";
 import { useEnrollments } from "@/hooks/useAppData";
@@ -19,6 +19,7 @@ import { useAddRoutinePlan, RoutinePlanTask } from "@/hooks/useRoutinePlans";
 import { haptic } from "@/lib/haptics";
 import { toast } from "sonner";
 import heroStormVideo from "@/assets/watch-hero-storm.mp4";
+import { useShareContent } from "@/hooks/useShareContent";
 
 export default function AppVideoPlaylistDetail() {
   const { playlistId } = useParams();
@@ -74,6 +75,12 @@ export default function AppVideoPlaylistDetail() {
   // Add to routines via RoutinePreviewSheet
   const { data: existingTask } = useExistingVideoPlaylistTask(playlistId);
   const addRoutinePlan = useAddRoutinePlan();
+
+  const { handleShare } = useShareContent({
+    title: playlist?.name || 'Video Playlist',
+    text: `🎬 Check out '${playlist?.name || 'this playlist'}' on Routine Ladyboss 💫`,
+    imageUrl: playlist?.cover_image_url,
+  });
 
   const syntheticPlaylistTask: RoutinePlanTask | null = playlist ? {
     id: `video-playlist-${playlist.id}`,
@@ -180,12 +187,21 @@ export default function AppVideoPlaylistDetail() {
         style={{ paddingTop: 'env(safe-area-inset-top)', height: 'calc(48px + env(safe-area-inset-top))' }}
       >
         <BackButton className="text-white" />
-        <AddedToRoutineButton
-          isAdded={!!existingTask}
-          onAddClick={handleAddToRoutines}
-          isLoading={addRoutinePlan.isPending}
-          iconOnly
-        />
+        <div className="flex items-center gap-1">
+          <button
+            onClick={handleShare}
+            className="h-10 w-10 flex items-center justify-center rounded-full text-white active:scale-95 transition-transform"
+            aria-label="Share"
+          >
+            <Share2 className="h-5 w-5" />
+          </button>
+          <AddedToRoutineButton
+            isAdded={!!existingTask}
+            onAddClick={handleAddToRoutines}
+            isLoading={addRoutinePlan.isPending}
+            iconOnly
+          />
+        </div>
       </div>
 
       {/* Spacer for fixed header */}

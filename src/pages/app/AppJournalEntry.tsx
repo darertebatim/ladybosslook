@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Trash2, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -12,6 +12,7 @@ import { JournalEntrySkeleton } from '@/components/app/skeletons/JournalSkeleton
 import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
 import { toast } from 'sonner';
+import { useShareContent } from '@/hooks/useShareContent';
 import { useBilingualText } from '@/components/ui/BilingualText';
 import { cn } from '@/lib/utils';
 import {
@@ -57,6 +58,11 @@ const AppJournalEntry = () => {
   // Detect Persian text for proper font and direction
   const { className: contentBilingualClassName, direction: contentDirection } = useBilingualText(content);
   const { className: titleBilingualClassName, direction: titleDirection } = useBilingualText(title);
+
+  const { handleShare } = useShareContent({
+    title: 'Journal Entry',
+    text: `📝 I just journaled on Routine Ladyboss — try it! 💫`,
+  });
 
   // Load existing entry data
   useEffect(() => {
@@ -226,11 +232,18 @@ const AppJournalEntry = () => {
             </h1>
           </div>
           
-          {/* Done button + save status */}
+          {/* Done button + share + save status */}
           <div className="flex items-center gap-2">
             {saveStatus === 'saving' && (
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             )}
+            <button
+              onClick={handleShare}
+              className="h-9 w-9 flex items-center justify-center rounded-full active:scale-95 transition-transform"
+              aria-label="Share"
+            >
+              <Share2 className="h-4 w-4 text-muted-foreground" />
+            </button>
             <Button 
               size="sm"
               onClick={handleDone}

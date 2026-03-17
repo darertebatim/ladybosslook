@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, Pencil, Trash2, Share2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { useShareContent } from '@/hooks/useShareContent';
 
 export default function AppReflectionNoteDetail() {
   const { reflectionId } = useParams<{ reflectionId: string }>();
@@ -20,6 +21,11 @@ export default function AppReflectionNoteDetail() {
 
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [editText, setEditText] = useState('');
+
+  const { handleShare } = useShareContent({
+    title: 'Reflection',
+    text: `🪞 I just reflected on Routine Ladyboss 💫`,
+  });
 
   const { data, isLoading } = useQuery({
     queryKey: ['reflection-note-detail', reflectionId, user?.id],
@@ -118,21 +124,30 @@ export default function AppReflectionNoteDetail() {
         <button onClick={() => navigate(-1)} className="active:scale-95 transition-transform p-1">
           <ArrowLeft className="h-5 w-5" />
         </button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="active:scale-95 transition-transform p-1">
-              <MoreHorizontal className="h-5 w-5" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => handleEdit(0)} disabled={!data?.qaPairs.length}>
-              <Pencil className="h-4 w-4 mr-2" /> Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDelete} className="text-destructive focus:text-destructive">
-              <Trash2 className="h-4 w-4 mr-2" /> Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={handleShare}
+            className="active:scale-95 transition-transform p-1"
+            aria-label="Share"
+          >
+            <Share2 className="h-5 w-5 text-muted-foreground" />
+          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="active:scale-95 transition-transform p-1">
+                <MoreHorizontal className="h-5 w-5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleEdit(0)} disabled={!data?.qaPairs.length}>
+                <Pencil className="h-4 w-4 mr-2" /> Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDelete} className="text-destructive focus:text-destructive">
+                <Trash2 className="h-4 w-4 mr-2" /> Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       {isLoading ? (
