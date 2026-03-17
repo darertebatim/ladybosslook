@@ -1267,6 +1267,7 @@ const AppHome = () => {
           onSkipTask={handleSkipTask}
           onOpenGoalInput={handleOpenGoalInput}
           onOpenTimer={handleOpenTimer}
+          onStepUnlocked={handleStepUnlocked}
           showStreakModal={showStreakModal}
           setShowStreakModal={setShowStreakModal}
           isFirstActionCelebration={isFirstActionCelebration}
