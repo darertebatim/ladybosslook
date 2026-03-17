@@ -50,7 +50,7 @@ interface TaskDetailModalProps {
   onEdit: (task: UserTask) => void;
   onDelete?: (task: UserTask) => void;
   onStreakIncrease?: () => void;
-  onStepUnlocked?: (completedStep: number, newTaskCount: number) => void;
+  onStepUnlocked?: (result: import('@/hooks/useProjectStepUnlock').StepUnlockResult) => void;
   onOpenGoalInput?: (task: UserTask) => void;
   onOpenTimer?: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
