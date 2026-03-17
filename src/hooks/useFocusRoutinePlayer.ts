@@ -223,12 +223,10 @@ export function useFocusRoutinePlayer() {
 
   const moveTaskToEnd = useCallback(() => {
     if (!config || !currentTask) return;
-    // Move current task to end of tasks array
     const newTasks = [...config.tasks];
     const [movedTask] = newTasks.splice(currentTaskIndex, 1);
     newTasks.push(movedTask);
     setConfig({ ...config, tasks: newTasks });
-    // Start the task that's now at currentTaskIndex
     const nextTask = newTasks[currentTaskIndex];
     if (nextTask) {
       const target = nextTask.targetSeconds;
@@ -239,6 +237,11 @@ export function useFocusRoutinePlayer() {
       setPhase('running');
     }
   }, [config, currentTask, currentTaskIndex]);
+
+  const reorderTasks = useCallback((newTasks: FocusTask[]) => {
+    if (!config) return;
+    setConfig({ ...config, tasks: newTasks });
+  }, [config]);
 
   const endRoutineEarly = useCallback(() => {
     if (!config) return;
@@ -335,6 +338,7 @@ export function useFocusRoutinePlayer() {
     completeTask,
     skipTask,
     moveTaskToEnd,
+    reorderTasks,
     endRoutineEarly,
     togglePause,
     adjustTime,
