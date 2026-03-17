@@ -401,6 +401,13 @@ export default function AppInspireDetail() {
             />
           )}
 
+          {/* Challenge progress card - shown when user has added this challenge */}
+          {isAdded && userChallenge && (
+            <div className="mt-5">
+              <ChallengeRoutineCard challenge={userChallenge} />
+            </div>
+          )}
+
           {/* Tasks display */}
           {isProject ? (
             /* Project: show tasks as sequential steps */
