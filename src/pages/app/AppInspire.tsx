@@ -298,6 +298,63 @@ export default function AppInspire() {
                 );
               })()}
 
+              {/* Challenges Section */}
+              {challengeRoutines.length > 0 && (
+                <section id="routine-category-challenges">
+                  <div className="flex items-center justify-between mb-2 px-4">
+                    <h2 className="text-xl font-bold text-foreground flex items-center gap-1.5">
+                      <Flame className="h-5 w-5 text-orange-500" />
+                      Challenges
+                    </h2>
+                    <button
+                      onClick={() => navigate(`/app/routines/category/challenges`, { state: { from: location.pathname } })}
+                      className="text-sm text-primary font-medium flex items-center gap-0.5"
+                    >
+                      All <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
+                    {challengeRoutines.map((routine) => (
+                      <div key={routine.id} className="shrink-0 w-40">
+                        <RoutineBankCard
+                          routine={routine}
+                          onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Projects Section */}
+              {projectRoutines.length > 0 && (
+                <section id="routine-category-projects">
+                  <div className="flex items-center justify-between mb-2 px-4">
+                    <h2 className="text-xl font-bold text-foreground flex items-center gap-1.5">
+                      <Target className="h-5 w-5 text-blue-500" />
+                      Projects
+                    </h2>
+                    <button
+                      onClick={() => navigate(`/app/routines/category/projects`, { state: { from: location.pathname } })}
+                      className="text-sm text-primary font-medium flex items-center gap-0.5"
+                    >
+                      All <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
+                    {projectRoutines.map((routine) => (
+                      <div key={routine.id} className="shrink-0 w-40">
+                        <RoutineBankCard
+                          routine={routine}
+                          onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                          isCompleted={completedRoutines?.has(routine.id)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
               {/* CTA to support chat */}
               <div className="px-4 pt-4 pb-2">
                 <p className="text-sm text-muted-foreground">Not any routines you want above?</p>
