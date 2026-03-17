@@ -79,7 +79,7 @@ interface RoutinePreviewSheetProps {
   tasks: RoutinePlanTask[];
   routineTitle: string;
   defaultTag?: string | null;
-  scheduleType?: 'daily' | 'weekly' | 'challenge';
+  scheduleType?: 'daily' | 'weekly' | 'challenge' | 'project';
   challengeStartDate?: string | null;
   startDayOfWeek?: number | null;
   endMode?: string | null;
