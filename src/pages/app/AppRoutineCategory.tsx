@@ -19,8 +19,9 @@ export default function AppRoutineCategory() {
   const displayedRoutines = useMemo(() => {
     if (!routines) return [];
     if (isChallenges) return routines.filter(r => r.schedule_type === 'challenge');
+    if (isProjects) return routines.filter(r => r.schedule_type === 'project');
     return routines;
-  }, [routines, isChallenges]);
+  }, [routines, isChallenges, isProjects]);
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">

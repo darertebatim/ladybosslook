@@ -263,6 +263,34 @@ export default function AppInspire() {
                 </section>
               )}
 
+              {/* Projects Section */}
+              {projectRoutines.length > 0 && (
+                <section id="routine-category-projects">
+                  <div className="flex items-center justify-between mb-2 px-4">
+                    <h2 className="text-xl font-bold text-foreground flex items-center gap-1.5">
+                      <Target className="h-5 w-5 text-blue-500" />
+                      Projects
+                    </h2>
+                    <button
+                      onClick={() => navigate(`/app/routines/category/projects`, { state: { from: location.pathname } })}
+                      className="text-sm text-primary font-medium flex items-center gap-0.5"
+                    >
+                      All <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
+                    {projectRoutines.map((routine) => (
+                      <div key={routine.id} className="shrink-0 w-40">
+                        <RoutineBankCard
+                          routine={routine}
+                          onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
               {/* Per-category sections */}
               {nonEmptyCategories?.filter(c => c.slug !== 'pro').map((category) => {
                 const catRoutines = routinesByCategory[category.slug]?.filter(matchesSearch) || [];

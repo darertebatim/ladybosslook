@@ -20,7 +20,7 @@ export interface RoutineBankItem {
   sort_order: number | null;
   created_at: string | null;
   updated_at: string | null;
-  schedule_type?: string; // 'daily' | 'challenge'
+  schedule_type?: string; // 'daily' | 'challenge' | 'project'
   challenge_start_date?: string | null;
   start_day_of_week?: number | null;
 }
