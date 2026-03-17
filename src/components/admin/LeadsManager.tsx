@@ -1167,7 +1167,7 @@ export function LeadsManager() {
                       </div>
                     )}
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">
                         Joined: {new Date(searchResults.profile.created_at).toLocaleDateString()}
                       </span>
@@ -1301,7 +1301,7 @@ export function LeadsManager() {
                               </p>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
+                              <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                               <p className="text-xs text-muted-foreground">
                                 {new Date(order.created_at).toLocaleString()}
                               </p>
@@ -1379,7 +1379,7 @@ export function LeadsManager() {
                                     </p>
                                   )}
                                   <div className="flex items-center gap-2">
-                                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                                    <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                                     <p className="text-xs text-muted-foreground">
                                       Enrolled: {new Date(enrollment.enrolled_at).toLocaleDateString()}
                                     </p>
