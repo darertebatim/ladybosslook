@@ -577,6 +577,16 @@ const AppHome = () => {
 
   const { maybeRequestReview } = useAppReview();
 
+  const handleStepUnlocked = useCallback((completedStep: number, newTaskCount: number) => {
+    setStepCelebration({ completedStep, newTaskCount });
+  }, []);
+
+  const handleCloseStepCelebration = useCallback(() => {
+    setStepCelebration(null);
+    // Now refresh task lists so new step tasks appear
+    queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
+    queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+  }, [queryClient]);
 
 
   const handleGoalInputConfirm = useCallback((amount: number) => {
