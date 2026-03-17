@@ -139,6 +139,7 @@ export function useFocusRoutinePlayer() {
     }
   }, [user]);
 
+  /** @deprecated Breathing intro removed */
   const onBreathComplete = useCallback(() => {
     setPhase('running');
     setTaskStartedAt(new Date());

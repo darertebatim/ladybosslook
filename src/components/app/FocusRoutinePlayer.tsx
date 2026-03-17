@@ -78,16 +78,10 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
       : Math.max(0, Math.min(100, ((currentTask.targetSeconds - timeLeft) / currentTask.targetSeconds) * 100))
     : 0;
 
-  // Breathe intro phase
+  // Breathe phase removed — go straight to running
   if (phase === 'breathe') {
-    return (
-      <FocusRoutineBreathIntro
-        routineTitle={config.routineTitle}
-        routineEmoji={config.routineEmoji}
-        onComplete={onBreathComplete}
-        onCancel={onCancel}
-      />
-    );
+    onBreathComplete();
+    return null;
   }
 
   // Summary phase
