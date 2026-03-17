@@ -897,7 +897,10 @@ export const useCompleteTask = () => {
       // Update presence metrics
       await updatePresence(user.id, dateStr);
 
-      return { completion: data, streakIncreased: streakResult.increased };
+      // Check if this unlocks next project step
+      const stepResult = await checkAndUnlockNextProjectStep(user.id, taskId, dateStr);
+
+      return { completion: data, streakIncreased: streakResult.increased, unlockedStep: stepResult };
     },
     onSuccess: (_, variables) => {
       const dateStr = format(variables.date, 'yyyy-MM-dd');
