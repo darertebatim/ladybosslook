@@ -1,11 +1,11 @@
 import { memo, useState, useCallback, useEffect } from 'react';
-import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus } from 'lucide-react';
+import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus, GripVertical } from 'lucide-react';
 import { format, addSeconds } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { FocusRoutineSummary } from './FocusRoutineSummary';
-import type { FocusRoutineConfig } from '@/hooks/useFocusRoutinePlayer';
+import type { FocusRoutineConfig, FocusTask } from '@/hooks/useFocusRoutinePlayer';
 import type { SessionTaskResult } from './FocusRoutineSummary';
 
 interface FocusRoutinePlayerProps {
