@@ -65,6 +65,10 @@ const AppHome = () => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [stepCelebration, setStepCelebration] = useState<{ completedStep: number; newTaskCount: number } | null>(null);
+  const [projectCompletion, setProjectCompletion] = useState<{
+    routineId: string; routineTitle: string; routineEmoji: string;
+    totalSteps: number; totalTasks: number; badgeImageUrl: string | null;
+  } | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
   const [showQuickStart, setShowQuickStart] = useState(false);
