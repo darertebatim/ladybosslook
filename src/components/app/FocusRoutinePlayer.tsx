@@ -183,15 +183,9 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
 
             {/* Timer */}
             {isPaused ? (
-              <>
-                <p className="text-[42px] font-extrabold text-foreground/25 tracking-tight tabular-nums leading-none">
-                  {formatTime(Math.max(0, timeLeft))}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1.5">Paused</p>
-                <p className="text-sm font-semibold text-blue-500 tabular-nums mt-0.5">
-                  {formatTime(pauseElapsed)}
-                </p>
-              </>
+              <p className="text-[42px] font-extrabold text-foreground/25 tracking-tight tabular-nums leading-none">
+                {formatTime(Math.max(0, timeLeft))}
+              </p>
             ) : isOvertime ? (
               <>
                 <p className="text-[42px] font-extrabold text-red-500 tracking-tight tabular-nums leading-none">
