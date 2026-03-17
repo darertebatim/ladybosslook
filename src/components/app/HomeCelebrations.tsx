@@ -130,6 +130,10 @@ interface HomeCelebrationsProps {
   } | null;
   closeChallengeDayCelebration: () => void;
   showChallengeDayCelebration: boolean;
+
+  // Step completion
+  stepCelebration: { completedStep: number; newTaskCount: number } | null;
+  onCloseStepCelebration: () => void;
 }
 
 export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebrationsProps) {
