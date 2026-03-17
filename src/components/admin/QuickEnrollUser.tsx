@@ -170,7 +170,51 @@ export const QuickEnrollUser = () => {
           </div>
         )}
 
-        <Button 
+        <div className="space-y-2">
+          <Label>Expiration Date</Label>
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              type="button"
+              variant={!expiresAt ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setExpiresAt(undefined)}
+            >
+              Default (1yr)
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => setExpiresAt(addDays(new Date(), 30))}>
+              30 days
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => setExpiresAt(addMonths(new Date(), 3))}>
+              3 months
+            </Button>
+          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn("w-full justify-start text-left font-normal", !expiresAt && "text-muted-foreground")}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {expiresAt ? format(expiresAt, 'PPP') : 'Or pick a custom date...'}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={expiresAt}
+                onSelect={setExpiresAt}
+                disabled={(date) => date < new Date()}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+          <p className="text-xs text-muted-foreground">
+            {expiresAt ? `Expires: ${format(expiresAt, 'PPP')}` : 'Default: 1 year (subscription programs)'}
+          </p>
+        </div>
+
+        <Button
           onClick={handleEnroll} 
           disabled={isLoading || !email || !selectedCourse}
           className="w-full"
