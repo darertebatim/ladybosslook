@@ -15,6 +15,7 @@ import { FeedReplyInput } from '@/components/feed/FeedReplyInput';
 import { SEOHead } from '@/components/SEOHead';
 import { cn } from '@/lib/utils';
 import { useBilingualText } from '@/components/ui/BilingualText';
+import { useShareContent } from '@/hooks/useShareContent';
 
 const POST_TYPE_ICONS = {
   announcement: Megaphone,
