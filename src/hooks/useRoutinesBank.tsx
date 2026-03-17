@@ -348,6 +348,29 @@ export function useUserAddedBankRoutines() {
   });
 }
 
+// Fetch completed project routine IDs
+export function useCompletedRoutines() {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['completed-routines', user?.id],
+    queryFn: async () => {
+      if (!user) return new Set<string>();
+
+      const { data, error } = await supabase
+        .from('user_routines_bank')
+        .select('routine_id')
+        .eq('user_id', user.id)
+        .not('completed_at', 'is', null);
+
+      if (error) throw error;
+      return new Set(data.map(d => d.routine_id));
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
 // Add routine from bank to user's planner
 export function useAddRoutineFromBank() {
   const queryClient = useQueryClient();
