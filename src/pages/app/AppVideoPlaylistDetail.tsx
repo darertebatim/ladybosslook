@@ -19,6 +19,7 @@ import { useAddRoutinePlan, RoutinePlanTask } from "@/hooks/useRoutinePlans";
 import { haptic } from "@/lib/haptics";
 import { toast } from "sonner";
 import heroStormVideo from "@/assets/watch-hero-storm.mp4";
+import { useShareContent } from "@/hooks/useShareContent";
 
 export default function AppVideoPlaylistDetail() {
   const { playlistId } = useParams();
