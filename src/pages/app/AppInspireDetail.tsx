@@ -1,9 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { AddToRoutineHandHint, useAddToRoutineHint } from '@/components/app/AddToRoutineHandHint';
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Share2 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
@@ -144,6 +144,41 @@ export default function AppInspireDetail() {
     return null;
   }, [routine]);
 
+  const handleShare = useCallback(async () => {
+    const title = routine?.title || 'Routine';
+    const shareText = `Hey! Join me in the '${title}' routine on Routine Ladyboss 💫\nDownload the app: https://apps.apple.com/app/id6755076134`;
+    const shareUrl = 'https://apps.apple.com/app/id6755076134';
+
+    try {
+      // Try sharing with cover image
+      if (routine?.cover_image_url && navigator.canShare) {
+        const response = await fetch(routine.cover_image_url);
+        const blob = await response.blob();
+        const file = new File([blob], 'routine.jpg', { type: blob.type || 'image/jpeg' });
+        
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title, text: shareText });
+          return;
+        }
+      }
+
+      // Fallback: text + url only
+      if (navigator.share) {
+        await navigator.share({ title, text: shareText, url: shareUrl });
+        return;
+      }
+
+      // Final fallback: copy to clipboard
+      await navigator.clipboard.writeText(`${shareText}`);
+      toast.success('Link copied to clipboard!');
+    } catch (err: any) {
+      // User cancelled share — ignore AbortError
+      if (err?.name !== 'AbortError') {
+        console.error('Share failed:', err);
+      }
+    }
+  }, [routine?.title, routine?.cover_image_url]);
+
   const handleAddClick = () => {
     if (!routine?.tasks?.length) {
       toast.error('No tasks in this routine');
@@ -211,12 +246,18 @@ export default function AppInspireDetail() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
-      {/* Fixed Header - Back button only */}
+      {/* Fixed Header - Back button + Share */}
       <header 
-        className="fixed top-0 left-0 right-0 z-50 flex items-center px-4"
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
       >
         <BackButtonCircle to={(location.state as any)?.from || '/app/routines'} />
+        <button
+          onClick={handleShare}
+          className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
+        >
+          <Share2 className="h-5 w-5" />
+        </button>
       </header>
 
       {/* Scroll Container */}
