@@ -6,9 +6,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Calendar as CalendarIcon } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { usePrograms } from '@/hooks/usePrograms';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { format, addDays, addMonths } from 'date-fns';
 
 export const QuickEnrollUser = () => {
   const { toast } = useToast();
@@ -18,6 +22,7 @@ export const QuickEnrollUser = () => {
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedRound, setSelectedRound] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [expiresAt, setExpiresAt] = useState<Date | undefined>(undefined);
 
   // Fetch available rounds for selected course
   const { data: rounds } = useQuery({
@@ -62,6 +67,7 @@ export const QuickEnrollUser = () => {
           programSlug: selectedProgram?.slug,
           roundId: selectedRound || null,
           fullName: fullName.trim() || null,
+          expiresAt: expiresAt ? expiresAt.toISOString() : null,
         },
       });
 
@@ -77,6 +83,7 @@ export const QuickEnrollUser = () => {
       setFullName('');
       setSelectedCourse('');
       setSelectedRound('');
+      setExpiresAt(undefined);
     } catch (error: any) {
       console.error('Error enrolling user:', error);
       toast({
@@ -163,7 +170,51 @@ export const QuickEnrollUser = () => {
           </div>
         )}
 
-        <Button 
+        <div className="space-y-2">
+          <Label>Expiration Date</Label>
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              type="button"
+              variant={!expiresAt ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setExpiresAt(undefined)}
+            >
+              Default (1yr)
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => setExpiresAt(addDays(new Date(), 30))}>
+              30 days
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => setExpiresAt(addMonths(new Date(), 3))}>
+              3 months
+            </Button>
+          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn("w-full justify-start text-left font-normal", !expiresAt && "text-muted-foreground")}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {expiresAt ? format(expiresAt, 'PPP') : 'Or pick a custom date...'}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={expiresAt}
+                onSelect={setExpiresAt}
+                disabled={(date) => date < new Date()}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+          <p className="text-xs text-muted-foreground">
+            {expiresAt ? `Expires: ${format(expiresAt, 'PPP')}` : 'Default: 1 year (subscription programs)'}
+          </p>
+        </div>
+
+        <Button
           onClick={handleEnroll} 
           disabled={isLoading || !email || !selectedCourse}
           className="w-full"

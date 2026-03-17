@@ -12,6 +12,7 @@ interface EnrollmentRequest {
   programSlug?: string;
   roundId?: string;
   fullName?: string;
+  expiresAt?: string; // ISO date string for custom expiration
 }
 
 // Generate cryptographically secure random password
@@ -27,7 +28,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, courseName, programSlug, roundId, fullName }: EnrollmentRequest = await req.json();
+    const { email, courseName, programSlug, roundId, fullName, expiresAt }: EnrollmentRequest = await req.json();
 
     if (!email || !courseName) {
       return new Response(
@@ -272,7 +273,12 @@ const handler = async (req: Request): Promise<Response> => {
         .single();
 
       if (programInfo?.requires_subscription || programInfo?.type === 'subscription') {
-        console.log(`Creating user_subscriptions record for: ${programSlug}`);
+        // Use custom expiration if provided, otherwise default to 1 year
+        const subscriptionExpiresAt = expiresAt 
+          ? new Date(expiresAt).toISOString()
+          : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+        
+        console.log(`Creating user_subscriptions record for: ${programSlug}, expires: ${subscriptionExpiresAt}`);
         const { error: subError } = await supabase
           .from('user_subscriptions')
           .upsert({
@@ -282,7 +288,7 @@ const handler = async (req: Request): Promise<Response> => {
             platform: 'admin',
             product_id: null,
             revenuecat_id: null,
-            expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+            expires_at: subscriptionExpiresAt,
             updated_at: new Date().toISOString(),
           }, {
             onConflict: 'user_id,program_slug',
