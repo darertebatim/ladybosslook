@@ -1,58 +1,38 @@
 
 
-## Calm-Style Animated Background for Watch Page
+## Expand Share Button Across the App
 
-Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
+### Summary
+Create a reusable `useShareContent` hook and add Share2 buttons to 7 more places across the app. Also fix "Simora" branding in ChallengeCompleteSummary.
 
-### What You'll Get
+### 1. New file: `src/hooks/useShareContent.ts`
+Reusable hook that extracts the share logic from `AppInspireDetail.tsx`:
+- Accepts `{ title, text, imageUrl? }`
+- Returns `{ handleShare, isSharing }`
+- Logic: fetch image → File → `navigator.share({ files, title, text })` → fallback text-only → fallback clipboard
+- All messages append `\nDownload the app: https://apps.apple.com/app/id6755076134`
 
-- A deep dark blue gradient background on the Watch page header area
-- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
-- Subtle lightning flashes that pulse periodically
-- All text updated to white/light colors for contrast
-- Lightweight implementation using CSS keyframes (no extra dependencies)
+### 2. Refactor `AppInspireDetail.tsx`
+Replace inline share logic with `useShareContent` hook (remove Instagram button too).
 
-### Design Details
+### 3. Pages to add Share2 button
 
-- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
-- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
-- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
-- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
-- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
+| Page | Button Location | Image | Share Message |
+|---|---|---|---|
+| **AppVideoPlaylistDetail** | Header (next to AddedToRoutineButton) | `playlist.cover_image_url` | "🎬 Check out '{name}' on Routine Ladyboss 💫" |
+| **AppPlaylistDetail** | Header (next to AddedToRoutineButton) | cover from hero | "🎵 Check out the '{name}' playlist on Routine Ladyboss 💫" |
+| **AppAudioPlayer** | Header area | playlist/track cover | "🎧 I'm listening to '{track}' on Routine Ladyboss 💫" |
+| **AppCourseDetail** | Header area | program cover image | "📚 I'm taking '{course}' on Routine Ladyboss 💫" |
+| **AppJournalEntry** | Header (next to Done button) | No image (text only) | "📝 I just journaled on Routine Ladyboss — try it! 💫" |
+| **AppFeedPost** | Header area | No image | "💬 Check out this post on Routine Ladyboss 💫" |
+| **AppReflectionNoteDetail** | Header area | No image | "🪞 I just reflected on Routine Ladyboss 💫" |
 
-### Technical Approach
+### 4. Fix branding: `ChallengeCompleteSummary.tsx`
+Replace `#Simora` → `#RoutineLadyboss` in the share text (line 74).
 
-**Files to modify:**
-
-1. **`src/pages/app/AppWatch.tsx`**
-   - Replace the header `bg-[#E8F4FE]` with the dark gradient
-   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
-   - Add a lightning flash overlay div
-   - Update all text classes to white variants (`text-white`, `text-white/60`)
-   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
-   - Extend the gradient into the page background behind the content area
-
-2. **`tailwind.config.ts`**
-   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
-   - Register corresponding animation utilities
-
-### Visual Structure
-
-```text
-+----------------------------------+
-|  [dark blue gradient header]     |
-|  ~~~ cloud layer 1 (slow) ~~~   |
-|  ~~~ cloud layer 2 (slower) ~~~ |
-|  * lightning flash (periodic) *  |
-|                                  |
-|  Watch          [icons]          |
-|  [categories row]                |
-|  [filters]              [lang]   |
-+----------------------------------+
-|  [normal white content area]     |
-|  [playlist cards grid]           |
-+----------------------------------+
-```
-
-The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
+### Implementation order
+1. Create `useShareContent` hook
+2. Refactor `AppInspireDetail` to use it (remove Instagram button)
+3. Add share to each page one by one
+4. Fix ChallengeCompleteSummary branding
 
