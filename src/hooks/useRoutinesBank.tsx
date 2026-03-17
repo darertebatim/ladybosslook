@@ -336,12 +336,35 @@ export function useUserAddedBankRoutines() {
 
       const { data, error } = await supabase
         .from('user_routines_bank')
-        .select('routine_id')
+        .select('routine_id, completed_at')
         .eq('user_id', user.id)
         .eq('is_active', true);
 
       if (error) throw error;
       return data.map(d => d.routine_id);
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+// Fetch completed project routine IDs
+export function useCompletedRoutines() {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['completed-routines', user?.id],
+    queryFn: async () => {
+      if (!user) return new Set<string>();
+
+      const { data, error } = await supabase
+        .from('user_routines_bank')
+        .select('routine_id')
+        .eq('user_id', user.id)
+        .not('completed_at', 'is', null);
+
+      if (error) throw error;
+      return new Set(data.map(d => d.routine_id));
     },
     enabled: !!user,
     staleTime: 1000 * 60 * 5,

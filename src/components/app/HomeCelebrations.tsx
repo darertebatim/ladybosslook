@@ -11,6 +11,7 @@ import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebration';
 import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
 import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebration';
+import { ProjectCompletionCelebration } from '@/components/app/ProjectCompletionCelebration';
 import { GoalInputSheet } from '@/components/app/GoalInputSheet';
 import { TaskTimerScreen } from '@/components/app/TaskTimerScreen';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
@@ -48,7 +49,7 @@ interface HomeCelebrationsProps {
   onSkipTask: (t: UserTask) => void;
   onOpenGoalInput: (t: UserTask) => void;
   onOpenTimer: (t: UserTask) => void;
-  onStepUnlocked: (completedStep: number, newTaskCount: number) => void;
+  onStepUnlocked: (result: import('@/hooks/useProjectStepUnlock').StepUnlockResult) => void;
 
   // Streak
   showStreakModal: boolean;
@@ -135,6 +136,13 @@ interface HomeCelebrationsProps {
   // Step completion
   stepCelebration: { completedStep: number; newTaskCount: number } | null;
   onCloseStepCelebration: () => void;
+
+  // Project completion
+  projectCompletion: {
+    routineId: string; routineTitle: string; routineEmoji: string;
+    totalSteps: number; totalTasks: number; badgeImageUrl: string | null;
+  } | null;
+  onCloseProjectCompletion: () => void;
 }
 
 export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebrationsProps) {
@@ -158,6 +166,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     userId, showNotificationFlow, setShowNotificationFlow,
     challengeDayCelebration, closeChallengeDayCelebration, showChallengeDayCelebration,
     stepCelebration, onCloseStepCelebration,
+    projectCompletion, onCloseProjectCompletion,
   } = props;
 
   const { hasAccessToProgram } = useSubscription();
@@ -367,6 +376,16 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         onClose={onCloseStepCelebration}
         completedStep={stepCelebration?.completedStep || 1}
         newTaskCount={stepCelebration?.newTaskCount || 0}
+      />
+
+      <ProjectCompletionCelebration
+        open={!!projectCompletion}
+        onClose={onCloseProjectCompletion}
+        projectTitle={projectCompletion?.routineTitle || ''}
+        projectEmoji={projectCompletion?.routineEmoji || '🎯'}
+        totalSteps={projectCompletion?.totalSteps || 0}
+        totalTasks={projectCompletion?.totalTasks || 0}
+        badgeImageUrl={projectCompletion?.badgeImageUrl}
       />
     </OverlayPortal>
   );

@@ -10,6 +10,7 @@ import {
   useRoutinesBank,
   usePopularRoutinesBank,
   useFeaturedRoutinesBank,
+  useCompletedRoutines,
 } from '@/hooks/useRoutinesBank';
 import { RoutinesTour, TourHelpButton } from '@/components/app/tour';
 import { PromoBanner } from '@/components/app/PromoBanner';
@@ -30,6 +31,7 @@ export default function AppInspire() {
   const { data: allRoutines, isLoading: routinesLoading } = useRoutinesBank();
   const { data: popularRoutines, isLoading: popularLoading } = usePopularRoutinesBank();
   const { data: featuredRoutines = [] } = useFeaturedRoutinesBank();
+  const { data: completedRoutines } = useCompletedRoutines();
 
   const isLoading = categoriesLoading || routinesLoading || popularLoading;
 
@@ -284,6 +286,7 @@ export default function AppInspire() {
                         <RoutineBankCard
                           routine={routine}
                           onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                          isCompleted={completedRoutines?.has(routine.id)}
                         />
                       </div>
                     ))}

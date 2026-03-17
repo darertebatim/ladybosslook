@@ -3834,6 +3834,7 @@ export type Database = {
       user_routines_bank: {
         Row: {
           added_at: string
+          completed_at: string | null
           current_step: number | null
           id: string
           is_active: boolean
@@ -3842,6 +3843,7 @@ export type Database = {
         }
         Insert: {
           added_at?: string
+          completed_at?: string | null
           current_step?: number | null
           id?: string
           is_active?: boolean
@@ -3850,6 +3852,7 @@ export type Database = {
         }
         Update: {
           added_at?: string
+          completed_at?: string | null
           current_step?: number | null
           id?: string
           is_active?: boolean

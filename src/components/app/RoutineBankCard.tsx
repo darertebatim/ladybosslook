@@ -5,7 +5,7 @@ import { haptic } from '@/lib/haptics';
 import { RoutineBankItem } from '@/hooks/useRoutinesBank';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { isEmoji } from '@/lib/fluentEmoji';
-import { X, Crown } from 'lucide-react';
+import { X, Crown, CheckCircle } from 'lucide-react';
 import { CachedImage } from '@/components/ui/CachedImage';
 
 interface RoutineBankCardProps {
@@ -16,6 +16,8 @@ interface RoutineBankCardProps {
   /** Show only square cover image with badge, no title header */
   coverOnly?: boolean;
   className?: string;
+  /** Show a completed badge overlay */
+  isCompleted?: boolean;
 }
 
 const colorGradients: Record<string, string> = {
@@ -55,6 +57,7 @@ export function RoutineBankCard({
   variant = 'default',
   coverOnly = false,
   className,
+  isCompleted = false,
 }: RoutineBankCardProps) {
   const color = routine.color || 'purple';
   const gradient = colorGradients[color] || colorGradients.purple;
@@ -159,6 +162,16 @@ export function RoutineBankCard({
             >
               <X className="h-3.5 w-3.5 text-white" />
             </button>
+          )}
+
+          {/* Completed overlay */}
+          {isCompleted && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
+              <div className="flex items-center gap-1.5 bg-emerald-500 rounded-full px-3 py-1.5 shadow-lg">
+                <CheckCircle className="h-4 w-4 text-white" />
+                <span className="text-white text-xs font-bold">Completed</span>
+              </div>
+            </div>
           )}
         </div>
       </button>

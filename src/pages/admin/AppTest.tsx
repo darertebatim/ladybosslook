@@ -48,6 +48,7 @@ import { ChallengeCompleteSummary } from '@/components/app/ChallengeCompleteSumm
 import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebration';
 import { PlusGateSheet } from '@/components/app/PlusGateSheet';
 import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebration';
+import { ProjectCompletionCelebration } from '@/components/app/ProjectCompletionCelebration';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
@@ -92,6 +93,7 @@ export default function AppTest() {
   const [challengeDayTest, setChallengeDayTest] = useState(3);
   const [showStepCelebration, setShowStepCelebration] = useState(false);
   const [testCompletedStep, setTestCompletedStep] = useState(1);
+  const [showProjectCompletion, setShowProjectCompletion] = useState(false);
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
     return (
@@ -660,6 +662,14 @@ export default function AppTest() {
             completedStep={testCompletedStep}
             newTaskCount={4}
           />
+          <ProjectCompletionCelebration
+            open={showProjectCompletion}
+            onClose={() => setShowProjectCompletion(false)}
+            projectTitle="Morning Routine Makeover"
+            projectEmoji="🌅"
+            totalSteps={4}
+            totalTasks={12}
+          />
         </CardContent>
       </Card>
 
@@ -689,6 +699,24 @@ export default function AppTest() {
           <p className="text-xs text-muted-foreground">
             Shows confetti + step transition indicator. New tasks appear in planner after dismissal.
           </p>
+        </CardContent>
+      </Card>
+
+      {/* Project Completion */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-violet-500" />
+            Project Completion
+          </CardTitle>
+          <CardDescription>
+            Big celebration when user finishes ALL steps of a project. Posts to feed + badge on card.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Button onClick={() => setShowProjectCompletion(true)} variant="outline">
+            🎯 Complete Project
+          </Button>
         </CardContent>
       </Card>
 

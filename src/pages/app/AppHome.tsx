@@ -65,6 +65,10 @@ const AppHome = () => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [stepCelebration, setStepCelebration] = useState<{ completedStep: number; newTaskCount: number } | null>(null);
+  const [projectCompletion, setProjectCompletion] = useState<{
+    routineId: string; routineTitle: string; routineEmoji: string;
+    totalSteps: number; totalTasks: number; badgeImageUrl: string | null;
+  } | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
   const [showQuickStart, setShowQuickStart] = useState(false);
@@ -579,15 +583,32 @@ const AppHome = () => {
 
   const { maybeRequestReview } = useAppReview();
 
-  const handleStepUnlocked = useCallback((completedStep: number, newTaskCount: number) => {
-    setStepCelebration({ completedStep, newTaskCount });
+  const handleStepUnlocked = useCallback((result: import('@/hooks/useProjectStepUnlock').StepUnlockResult) => {
+    if (result.type === 'step_unlocked') {
+      setStepCelebration({ completedStep: result.unlockedStep - 1, newTaskCount: result.taskCount });
+    } else if (result.type === 'project_completed') {
+      setProjectCompletion({
+        routineId: result.routineId,
+        routineTitle: result.routineTitle,
+        routineEmoji: result.routineEmoji,
+        totalSteps: result.totalSteps,
+        totalTasks: result.totalTasks,
+        badgeImageUrl: result.badgeImageUrl,
+      });
+    }
   }, []);
 
   const handleCloseStepCelebration = useCallback(() => {
     setStepCelebration(null);
-    // Now refresh task lists so new step tasks appear
     queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
     queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+  }, [queryClient]);
+
+  const handleCloseProjectCompletion = useCallback(() => {
+    setProjectCompletion(null);
+    queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
+    queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+    queryClient.invalidateQueries({ queryKey: ['user-routines-bank'] });
   }, [queryClient]);
 
 
@@ -1326,6 +1347,8 @@ const AppHome = () => {
           showChallengeDayCelebration={showChallengeDayCelebration}
           stepCelebration={stepCelebration}
           onCloseStepCelebration={handleCloseStepCelebration}
+          projectCompletion={projectCompletion}
+          onCloseProjectCompletion={handleCloseProjectCompletion}
         />
 
         {/* New Interactive Home Tour */}

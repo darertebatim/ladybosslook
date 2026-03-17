@@ -35,7 +35,7 @@ interface TaskCardProps {
   goalProgress?: number;
   onTap?: (task: UserTask) => void;
   onStreakIncrease?: () => void;
-  onStepUnlocked?: (completedStep: number, newTaskCount: number) => void;
+  onStepUnlocked?: (result: import('@/hooks/useProjectStepUnlock').StepUnlockResult) => void;
   onOpenGoalInput?: (task: UserTask) => void;
   onOpenTimer?: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
@@ -177,7 +177,7 @@ export const TaskCard = memo(function TaskCard({
         onStreakIncrease();
       }
       if (result.unlockedStep && onStepUnlocked) {
-        onStepUnlocked(result.unlockedStep.unlockedStep - 1, result.unlockedStep.taskCount);
+        onStepUnlocked(result.unlockedStep);
       }
     }
   };

@@ -50,7 +50,7 @@ interface TaskDetailModalProps {
   onEdit: (task: UserTask) => void;
   onDelete?: (task: UserTask) => void;
   onStreakIncrease?: () => void;
-  onStepUnlocked?: (completedStep: number, newTaskCount: number) => void;
+  onStepUnlocked?: (result: import('@/hooks/useProjectStepUnlock').StepUnlockResult) => void;
   onOpenGoalInput?: (task: UserTask) => void;
   onOpenTimer?: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
@@ -151,7 +151,7 @@ export const TaskDetailModal = ({
         onStreakIncrease();
       }
       if (result.unlockedStep && onStepUnlocked) {
-        onStepUnlocked(result.unlockedStep.unlockedStep - 1, result.unlockedStep.taskCount);
+        onStepUnlocked(result.unlockedStep);
       }
     }
   };
