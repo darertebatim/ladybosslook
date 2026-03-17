@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { Switch } from '@/components/ui/switch';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -117,6 +118,7 @@ interface LocalTask {
   drip_day: number | null;
   monthly_day: number | null;
   is_once: boolean;
+  duration_minutes: number | null;
 }
 
 export default function RoutinesBank() {
@@ -163,6 +165,7 @@ export default function RoutinesBank() {
     end_date: null as Date | null,
     end_after_days: null as number | null,
     badge_image_url: '',
+    is_focus: false,
   });
   const [localSections, setLocalSections] = useState<LocalSection[]>([]);
   const [localTasks, setLocalTasks] = useState<LocalTask[]>([]);
@@ -251,6 +254,7 @@ export default function RoutinesBank() {
           end_date: data.formData.end_mode === 'date' && data.formData.end_date ? data.formData.end_date.toISOString().split('T')[0] : null,
            end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
            badge_image_url: data.formData.badge_image_url || null,
+           is_focus: data.formData.is_focus,
         })
         .select()
         .single();
@@ -329,6 +333,7 @@ export default function RoutinesBank() {
           end_date: data.formData.end_mode === 'date' && data.formData.end_date ? data.formData.end_date.toISOString().split('T')[0] : null,
            end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
            badge_image_url: data.formData.badge_image_url || null,
+           is_focus: data.formData.is_focus,
         })
         .eq('id', data.id);
       if (error) throw error;
@@ -494,6 +499,7 @@ export default function RoutinesBank() {
       drip_day: (t as any).drip_day ?? null,
       monthly_day: (t as any).monthly_day ?? null,
       is_once: (t as any).is_once ?? false,
+      duration_minutes: t.duration_minutes ?? null,
     }));
 
     return { sections, tasks };
@@ -519,6 +525,7 @@ export default function RoutinesBank() {
       end_date: null,
       end_after_days: null,
       badge_image_url: '',
+      is_focus: false,
     });
     setLocalSections([]);
     setLocalTasks([]);
@@ -546,6 +553,7 @@ export default function RoutinesBank() {
       end_date: (routine as any).end_date ? new Date((routine as any).end_date) : null,
       end_after_days: (routine as any).end_after_days ?? null,
       badge_image_url: (routine as any).badge_image_url || '',
+      is_focus: (routine as any).is_focus ?? false,
     });
     const { sections, tasks } = await fetchRoutineData(routine.id);
     setLocalSections(sections);
@@ -680,6 +688,7 @@ export default function RoutinesBank() {
       drip_day: formData.schedule_type === 'challenge' ? localTasks.length + 1 : formData.schedule_type === 'project' ? localTasks.length + 1 : null,
       monthly_day: null,
       is_once: task.repeat_pattern === 'none',
+      duration_minutes: (task as any).duration_minutes ?? null,
     };
     setLocalTasks([...localTasks, newTask]);
     setTaskSearchOpen(false);
@@ -1652,6 +1661,18 @@ export default function RoutinesBank() {
                     </div>
                   )}
 
+                  {/* Focus Routine Toggle */}
+                  <div className="flex items-center justify-between border-t pt-4">
+                    <div>
+                      <Label className="text-xs font-medium">🎯 Focus Routine</Label>
+                      <p className="text-xs text-muted-foreground">Tasks have timer goals based on duration</p>
+                    </div>
+                    <Switch
+                      checked={formData.is_focus}
+                      onCheckedChange={(checked) => setFormData({ ...formData, is_focus: checked })}
+                    />
+                  </div>
+
                   {/* Summary stats */}
                   <div className="flex items-center gap-4 text-sm text-muted-foreground border-t pt-4">
                     <span className="flex items-center gap-1">
@@ -1682,6 +1703,7 @@ export default function RoutinesBank() {
                         for (const task of unlinked) {
                           const scheduleDays = task.schedule_days || [];
                           const repeatPattern = task.is_once ? 'none' : scheduleDays.length === 7 ? 'daily' : scheduleDays.length > 0 ? 'weekly' : 'daily';
+                          const hasDuration = task.duration_minutes && task.duration_minutes > 0;
                           const { data: inserted, error } = await supabase
                             .from('admin_task_bank')
                             .insert({
@@ -1691,6 +1713,10 @@ export default function RoutinesBank() {
                               color: task.color || formData.color || 'sky',
                               repeat_pattern: repeatPattern,
                               repeat_days: scheduleDays.length > 0 && scheduleDays.length < 7 ? scheduleDays : null,
+                              duration_minutes: task.duration_minutes || null,
+                              goal_enabled: hasDuration ? true : false,
+                              goal_type: hasDuration ? 'timer' : null,
+                              goal_target: hasDuration ? task.duration_minutes * 60 : null,
                               is_active: true,
                               is_popular: false,
                               sort_order: 0,

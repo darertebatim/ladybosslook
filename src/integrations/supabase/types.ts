@@ -3122,6 +3122,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_featured: boolean
+          is_focus: boolean
           is_free: boolean
           is_popular: boolean | null
           is_welcome_popup: boolean
@@ -3150,6 +3151,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_featured?: boolean
+          is_focus?: boolean
           is_free?: boolean
           is_popular?: boolean | null
           is_welcome_popup?: boolean
@@ -3178,6 +3180,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_featured?: boolean
+          is_focus?: boolean
           is_free?: boolean
           is_popular?: boolean | null
           is_welcome_popup?: boolean
