@@ -194,14 +194,10 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
                   +{formatTime(overtimeSeconds)}
                 </p>
                 <button
-                  onClick={() => { haptic.light(); setShowAdjustSheet(true); }}
-                  className="flex items-center gap-3 mt-2 px-3 py-1 rounded-full active:bg-foreground/5"
+                  onClick={() => { haptic.light(); setShowNotifySheet(true); }}
+                  className="mt-2 px-3 py-1 rounded-full active:bg-foreground/5"
                 >
-                  <Minus className="w-3.5 h-3.5 text-foreground/40" />
-                  <span className="text-xs text-muted-foreground font-medium tabular-nums">
-                    {Math.ceil(Math.max(0, timeLeft) / 60)}m
-                  </span>
-                  <Plus className="w-3.5 h-3.5 text-foreground/40" />
+                  <span className="text-sm text-muted-foreground underline underline-offset-2">Notify again</span>
                 </button>
               </>
             ) : (
