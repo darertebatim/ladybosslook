@@ -12,6 +12,7 @@ interface EnrollmentRequest {
   programSlug?: string;
   roundId?: string;
   fullName?: string;
+  expiresAt?: string; // ISO date string for custom expiration
 }
 
 // Generate cryptographically secure random password
