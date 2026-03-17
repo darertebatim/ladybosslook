@@ -62,6 +62,7 @@ const AppHome = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [showStreakModal, setShowStreakModal] = useState(false);
+  const [stepCelebration, setStepCelebration] = useState<{ completedStep: number; newTaskCount: number } | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
   const [showQuickStart, setShowQuickStart] = useState(false);
