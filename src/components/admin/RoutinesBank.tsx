@@ -253,6 +253,7 @@ export default function RoutinesBank() {
           end_date: data.formData.end_mode === 'date' && data.formData.end_date ? data.formData.end_date.toISOString().split('T')[0] : null,
            end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
            badge_image_url: data.formData.badge_image_url || null,
+           is_focus: data.formData.is_focus,
         })
         .select()
         .single();
