@@ -159,6 +159,18 @@ export default function AppInspire() {
                       }}
                     />
                   )}
+                  {projectRoutines.length > 0 && (
+                    <CategoryCircle
+                      name="Projects"
+                      icon="Target"
+                      emoji="🎯"
+                      color="blue"
+                      onClick={() => {
+                        const el = document.getElementById('routine-category-projects');
+                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }}
+                    />
+                  )}
                   {filteredPopular && filteredPopular.length > 0 && (
                     <CategoryCircle
                       name="Popular"
