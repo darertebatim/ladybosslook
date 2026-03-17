@@ -145,79 +145,11 @@ export default function AppInspireDetail() {
     return null;
   }, [routine]);
 
-  const handleShare = useCallback(async () => {
-    const title = routine?.title || 'Routine';
-    const shareText = `Hey! Join me in the '${title}' routine on Routine Ladyboss 💫\nDownload the app: https://apps.apple.com/app/id6755076134`;
-    const shareUrl = 'https://apps.apple.com/app/id6755076134';
-
-    try {
-      // Try sharing with cover image
-      if (routine?.cover_image_url && navigator.canShare) {
-        const response = await fetch(routine.cover_image_url);
-        const blob = await response.blob();
-        // Use descriptive filename with routine title for better iOS preview
-        const safeName = title.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '-').substring(0, 40);
-        const extension = blob.type?.includes('png') ? 'png' : 'jpg';
-        const mimeType = extension === 'png' ? 'image/png' : 'image/jpeg';
-        const file = new File([blob], `${safeName}.${extension}`, { type: mimeType });
-        
-        if (navigator.canShare({ files: [file] })) {
-          // Share image + text together — shows in Messages, WhatsApp, Mail, etc.
-          // Instagram will also appear since we include a file
-          await navigator.share({ 
-            files: [file], 
-            title,
-            text: shareText,
-          });
-          return;
-        }
-      }
-
-      // Fallback: text + url only
-      if (navigator.share) {
-        await navigator.share({ title, text: shareText, url: shareUrl });
-        return;
-      }
-
-      // Final fallback: copy to clipboard
-      await navigator.clipboard.writeText(`${shareText}`);
-      toast.success('Link copied to clipboard!');
-    } catch (err: any) {
-      if (err?.name === 'AbortError') return;
-      try {
-        await navigator.clipboard.writeText(shareText);
-        toast.success('Link copied to clipboard!');
-      } catch {
-        toast.error('Sharing is not supported in this browser');
-      }
-    }
-  }, [routine?.title, routine?.cover_image_url]);
-
-  const handleShareInstagram = useCallback(async () => {
-    const title = routine?.title || 'Routine';
-    try {
-      if (!routine?.cover_image_url) {
-        toast.error('No image to share');
-        return;
-      }
-      const response = await fetch(routine.cover_image_url);
-      const blob = await response.blob();
-      const safeName = title.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '-').substring(0, 40);
-      const extension = blob.type?.includes('png') ? 'png' : 'jpg';
-      const mimeType = extension === 'png' ? 'image/png' : 'image/jpeg';
-      const file = new File([blob], `${safeName}.${extension}`, { type: mimeType });
-
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        // Share ONLY the image file — no text/url so Instagram appears
-        await navigator.share({ files: [file] });
-        return;
-      }
-      toast.error('Image sharing not supported on this device');
-    } catch (err: any) {
-      if (err?.name === 'AbortError') return;
-      toast.error('Could not share image');
-    }
-  }, [routine?.title, routine?.cover_image_url]);
+  const { handleShare } = useShareContent({
+    title: routine?.title || 'Routine',
+    text: `Hey! Join me in the '${routine?.title || 'Routine'}' routine on Routine Ladyboss 💫`,
+    imageUrl: routine?.cover_image_url,
+  });
 
   const handleAddClick = () => {
     if (!routine?.tasks?.length) {
