@@ -51,8 +51,8 @@ export function BreathingExerciseScreen({
   // Layout toggle
   const [layout, setLayout] = useState<LayoutMode>(() => {
     try {
-      return (localStorage.getItem('simora_breathe_layout') as LayoutMode) || 'classic';
-    } catch { return 'classic'; }
+      return (localStorage.getItem('simora_breathe_layout') as LayoutMode) || 'immersive';
+    } catch { return 'immersive'; }
   });
 
   const toggleLayout = useCallback(() => {
@@ -68,7 +68,7 @@ export function BreathingExerciseScreen({
   const [durationMode, setDurationMode] = useState<DurationMode>('cycles');
   const [selectedMinutes, setSelectedMinutes] = useState(3);
   // Cycle-based length
-  const [selectedCycles, setSelectedCycles] = useState(3);
+  const [selectedCycles, setSelectedCycles] = useState(5);
   const [showInfoSheet, setShowInfoSheet] = useState(false);
   const [showCompleteSheet, setShowCompleteSheet] = useState(false);
   const [completedDuration, setCompletedDuration] = useState(0);
