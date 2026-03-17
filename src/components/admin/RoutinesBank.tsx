@@ -1661,6 +1661,18 @@ export default function RoutinesBank() {
                     </div>
                   )}
 
+                  {/* Focus Routine Toggle */}
+                  <div className="flex items-center justify-between border-t pt-4">
+                    <div>
+                      <Label className="text-xs font-medium">🎯 Focus Routine</Label>
+                      <p className="text-xs text-muted-foreground">Tasks have timer goals based on duration</p>
+                    </div>
+                    <Switch
+                      checked={formData.is_focus}
+                      onCheckedChange={(checked) => setFormData({ ...formData, is_focus: checked })}
+                    />
+                  </div>
+
                   {/* Summary stats */}
                   <div className="flex items-center gap-4 text-sm text-muted-foreground border-t pt-4">
                     <span className="flex items-center gap-1">
