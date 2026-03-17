@@ -211,12 +211,18 @@ export default function AppInspireDetail() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
-      {/* Fixed Header - Back button only */}
+      {/* Fixed Header - Back button + Share */}
       <header 
-        className="fixed top-0 left-0 right-0 z-50 flex items-center px-4"
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
       >
         <BackButtonCircle to={(location.state as any)?.from || '/app/routines'} />
+        <button
+          onClick={handleShare}
+          className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
+        >
+          <Share2 className="h-5 w-5" />
+        </button>
       </header>
 
       {/* Scroll Container */}
