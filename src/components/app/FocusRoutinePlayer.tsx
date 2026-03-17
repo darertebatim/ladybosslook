@@ -344,7 +344,10 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
                     key={mins}
                     onClick={() => {
                       haptic.medium();
-                      onAdjustTime(mins);
+                      // Set timer to exactly N minutes by computing the right delta
+                      const targetSeconds = mins * 60;
+                      const deltaMinutes = (targetSeconds - timeLeft) / 60;
+                      onAdjustTime(deltaMinutes);
                       setShowNotifySheet(false);
                     }}
                     className="flex flex-col items-center gap-1 py-5 rounded-2xl bg-foreground/[0.06] active:bg-foreground/10"
