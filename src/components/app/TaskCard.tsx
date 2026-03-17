@@ -12,6 +12,7 @@ import {
   useCompleteTask,
   useUncompleteTask,
 } from '@/hooks/useTaskPlanner';
+import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { haptic } from '@/lib/haptics';
 import { playCompletionSound } from '@/lib/completionSound';
 import { TaskIcon } from './IconPicker';
