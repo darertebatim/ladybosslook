@@ -333,7 +333,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
     } else if (selectedCategory !== 'all') {
       items = items.filter(t => t.category === selectedCategory);
     }
-    return items.slice(0, 5);
+    return items.slice(0, 20);
   }, [templates, selectedCategory]);
 
   useEffect(() => {
