@@ -377,6 +377,16 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         completedStep={stepCelebration?.completedStep || 1}
         newTaskCount={stepCelebration?.newTaskCount || 0}
       />
+
+      <ProjectCompletionCelebration
+        open={!!projectCompletion}
+        onClose={onCloseProjectCompletion}
+        projectTitle={projectCompletion?.routineTitle || ''}
+        projectEmoji={projectCompletion?.routineEmoji || '🎯'}
+        totalSteps={projectCompletion?.totalSteps || 0}
+        totalTasks={projectCompletion?.totalTasks || 0}
+        badgeImageUrl={projectCompletion?.badgeImageUrl}
+      />
     </OverlayPortal>
   );
 });

@@ -1347,6 +1347,8 @@ const AppHome = () => {
           showChallengeDayCelebration={showChallengeDayCelebration}
           stepCelebration={stepCelebration}
           onCloseStepCelebration={handleCloseStepCelebration}
+          projectCompletion={projectCompletion}
+          onCloseProjectCompletion={handleCloseProjectCompletion}
         />
 
         {/* New Interactive Home Tour */}
