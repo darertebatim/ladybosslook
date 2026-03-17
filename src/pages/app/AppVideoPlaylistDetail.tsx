@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Play, CheckCircle2, Circle, Lock } from "lucide-react";
+import { Play, CheckCircle2, Circle, Lock, Share2 } from "lucide-react";
 import { BackButton } from "@/components/app/BackButton";
 import { AppVideoPlayer } from "@/components/app/AppVideoPlayer";
 import { useEnrollments } from "@/hooks/useAppData";
