@@ -191,6 +191,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         onOpenGoalInput={onOpenGoalInput}
         onOpenTimer={onOpenTimer}
         onSkip={onSkipTask}
+        onStepUnlocked={onStepUnlocked}
       />
 
       <StreakCelebration
