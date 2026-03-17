@@ -30,9 +30,13 @@ export function useFocusRoutinePlayer() {
   const [taskResults, setTaskResults] = useState<SessionTaskResult[]>([]);
   const [startedAt, setStartedAt] = useState<Date>(new Date());
   const [sessionId, setSessionId] = useState<string | null>(null);
-  
+  const [taskStartedAt, setTaskStartedAt] = useState<Date>(new Date());
+  const [pauseStartedAt, setPauseStartedAt] = useState<Date | null>(null);
+  const [pauseElapsed, setPauseElapsed] = useState(0);
+
   const elapsedRef = useRef(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const originalTargetRef = useRef(0);
 
   // Fetch session stats for this routine
   const { data: sessionStats } = useQuery({
@@ -51,34 +55,30 @@ export function useFocusRoutinePlayer() {
       if (error || !data) return { total: 0, streak: 0 };
 
       const total = data.length;
-      
-      // Calculate streak (consecutive days)
       let streak = 0;
       if (data.length > 0) {
         streak = 1;
         const dates = data.map(d => new Date(d.started_at).toDateString());
         const uniqueDates = [...new Set(dates)];
-        
         for (let i = 1; i < uniqueDates.length; i++) {
           const prev = new Date(uniqueDates[i - 1]);
           const curr = new Date(uniqueDates[i]);
           const diffDays = (prev.getTime() - curr.getTime()) / (1000 * 60 * 60 * 24);
-          if (diffDays <= 1.5) {
-            streak++;
-          } else {
-            break;
-          }
+          if (diffDays <= 1.5) streak++;
+          else break;
         }
       }
 
-      return { total: total + 1, streak: streak + 1 }; // +1 for current session
+      return { total: total + 1, streak: streak + 1 };
     },
     enabled: !!user && !!config && phase === 'summary',
   });
 
   const currentTask = config?.tasks[currentTaskIndex] || null;
+  const isOvertime = timeLeft < 0;
+  const overtimeSeconds = isOvertime ? Math.abs(timeLeft) : 0;
 
-  // Timer logic
+  // Timer logic - now allows going negative for overtime
   useEffect(() => {
     if (phase !== 'running') {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -87,7 +87,7 @@ export function useFocusRoutinePlayer() {
 
     intervalRef.current = setInterval(() => {
       elapsedRef.current += 1;
-      setTimeLeft(prev => Math.max(0, prev - 1));
+      setTimeLeft(prev => prev - 1); // Allow going negative
     }, 1000);
 
     return () => {
@@ -95,16 +95,32 @@ export function useFocusRoutinePlayer() {
     };
   }, [phase]);
 
+  // Pause duration tracker
+  useEffect(() => {
+    if (phase !== 'paused') {
+      setPauseElapsed(0);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setPauseElapsed(prev => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [phase]);
+
   const startRoutine = useCallback(async (cfg: FocusRoutineConfig) => {
     setConfig(cfg);
     setCurrentTaskIndex(0);
     setTaskResults([]);
     setStartedAt(new Date());
+    setTaskStartedAt(new Date());
     elapsedRef.current = 0;
-    setTimeLeft(cfg.tasks[0]?.targetSeconds || 0);
+    const target = cfg.tasks[0]?.targetSeconds || 0;
+    setTimeLeft(target);
+    originalTargetRef.current = target;
     setPhase('breathe');
 
-    // Create session in DB
     if (user) {
       const { data } = await supabase
         .from('routine_sessions')
@@ -124,24 +140,21 @@ export function useFocusRoutinePlayer() {
 
   const onBreathComplete = useCallback(() => {
     setPhase('running');
+    setTaskStartedAt(new Date());
     elapsedRef.current = 0;
   }, []);
 
-  const completeTask = useCallback(() => {
-    if (!config || !currentTask) return;
+  const saveTaskResult = useCallback((status: 'completed' | 'skipped') => {
+    if (!config || !currentTask) return null;
 
     const result: SessionTaskResult = {
       title: currentTask.title,
       emoji: currentTask.emoji,
       targetSeconds: currentTask.targetSeconds,
       actualSeconds: elapsedRef.current,
-      status: 'completed',
+      status,
     };
 
-    const newResults = [...taskResults, result];
-    setTaskResults(newResults);
-
-    // Save to DB
     if (sessionId) {
       supabase.from('routine_session_tasks').insert({
         session_id: sessionId,
@@ -150,28 +163,98 @@ export function useFocusRoutinePlayer() {
         task_order: currentTaskIndex,
         target_seconds: currentTask.targetSeconds,
         actual_seconds: elapsedRef.current,
-        status: 'completed',
+        status,
       }).then(() => {});
     }
 
-    moveToNext(newResults);
-  }, [config, currentTask, taskResults, currentTaskIndex, sessionId]);
+    return result;
+  }, [config, currentTask, currentTaskIndex, sessionId]);
 
-  const skipTask = useCallback(() => {
-    if (!config || !currentTask) return;
+  const finishSession = useCallback((results: SessionTaskResult[]) => {
+    if (!sessionId) return;
+    const endTime = new Date();
+    const totalSeconds = results.reduce((s, r) => s + r.actualSeconds, 0);
+    const completed = results.filter(r => r.status === 'completed').length;
+    const skipped = results.filter(r => r.status === 'skipped').length;
 
-    const result: SessionTaskResult = {
-      title: currentTask.title,
-      emoji: currentTask.emoji,
-      targetSeconds: currentTask.targetSeconds,
-      actualSeconds: elapsedRef.current,
-      status: 'skipped',
-    };
+    supabase.from('routine_sessions').update({
+      ended_at: endTime.toISOString(),
+      total_seconds: totalSeconds,
+      tasks_completed: completed,
+      tasks_skipped: skipped,
+    }).eq('id', sessionId).then(() => {});
+  }, [sessionId]);
 
+  const moveToNext = useCallback((results: SessionTaskResult[]) => {
+    if (!config) return;
+
+    const nextIndex = currentTaskIndex + 1;
+    if (nextIndex >= config.tasks.length) {
+      finishSession(results);
+      setPhase('summary');
+    } else {
+      setCurrentTaskIndex(nextIndex);
+      const target = config.tasks[nextIndex].targetSeconds;
+      setTimeLeft(target);
+      originalTargetRef.current = target;
+      elapsedRef.current = 0;
+      setTaskStartedAt(new Date());
+      setPhase('running');
+    }
+  }, [config, currentTaskIndex, finishSession]);
+
+  const completeTask = useCallback(() => {
+    const result = saveTaskResult('completed');
+    if (!result) return;
     const newResults = [...taskResults, result];
     setTaskResults(newResults);
+    moveToNext(newResults);
+  }, [saveTaskResult, taskResults, moveToNext]);
 
-    if (sessionId) {
+  const skipTask = useCallback(() => {
+    const result = saveTaskResult('skipped');
+    if (!result) return;
+    const newResults = [...taskResults, result];
+    setTaskResults(newResults);
+    moveToNext(newResults);
+  }, [saveTaskResult, taskResults, moveToNext]);
+
+  const moveTaskToEnd = useCallback(() => {
+    if (!config || !currentTask) return;
+    // Move current task to end of tasks array
+    const newTasks = [...config.tasks];
+    const [movedTask] = newTasks.splice(currentTaskIndex, 1);
+    newTasks.push(movedTask);
+    setConfig({ ...config, tasks: newTasks });
+    // Start the task that's now at currentTaskIndex
+    const nextTask = newTasks[currentTaskIndex];
+    if (nextTask) {
+      const target = nextTask.targetSeconds;
+      setTimeLeft(target);
+      originalTargetRef.current = target;
+      elapsedRef.current = 0;
+      setTaskStartedAt(new Date());
+      setPhase('running');
+    }
+  }, [config, currentTask, currentTaskIndex]);
+
+  const endRoutineEarly = useCallback(() => {
+    if (!config) return;
+    // Mark remaining tasks as skipped
+    const remainingResults: SessionTaskResult[] = [];
+    for (let i = currentTaskIndex; i < config.tasks.length; i++) {
+      const t = config.tasks[i];
+      remainingResults.push({
+        title: t.title,
+        emoji: t.emoji,
+        targetSeconds: t.targetSeconds,
+        actualSeconds: i === currentTaskIndex ? elapsedRef.current : 0,
+        status: 'skipped',
+      });
+    }
+
+    // Save current task to DB
+    if (sessionId && currentTask) {
       supabase.from('routine_session_tasks').insert({
         session_id: sessionId,
         task_title: currentTask.title,
@@ -183,44 +266,30 @@ export function useFocusRoutinePlayer() {
       }).then(() => {});
     }
 
-    moveToNext(newResults);
-  }, [config, currentTask, taskResults, currentTaskIndex, sessionId]);
-
-  const moveToNext = useCallback((results: SessionTaskResult[]) => {
-    if (!config) return;
-
-    const nextIndex = currentTaskIndex + 1;
-    if (nextIndex >= config.tasks.length) {
-      // Routine complete
-      const endTime = new Date();
-      const totalSeconds = results.reduce((s, r) => s + r.actualSeconds, 0);
-      const completed = results.filter(r => r.status === 'completed').length;
-      const skipped = results.filter(r => r.status === 'skipped').length;
-
-      if (sessionId) {
-        supabase.from('routine_sessions').update({
-          ended_at: endTime.toISOString(),
-          total_seconds: totalSeconds,
-          tasks_completed: completed,
-          tasks_skipped: skipped,
-        }).eq('id', sessionId).then(() => {});
-      }
-
-      setPhase('summary');
-    } else {
-      setCurrentTaskIndex(nextIndex);
-      setTimeLeft(config.tasks[nextIndex].targetSeconds);
-      elapsedRef.current = 0;
-      setPhase('running');
-    }
-  }, [config, currentTaskIndex, sessionId]);
+    const allResults = [...taskResults, ...remainingResults];
+    setTaskResults(allResults);
+    finishSession(allResults);
+    setPhase('summary');
+  }, [config, currentTask, currentTaskIndex, taskResults, sessionId, finishSession]);
 
   const togglePause = useCallback(() => {
-    setPhase(prev => prev === 'running' ? 'paused' : 'running');
+    setPhase(prev => {
+      if (prev === 'running') {
+        setPauseStartedAt(new Date());
+        setPauseElapsed(0);
+        return 'paused';
+      }
+      setPauseStartedAt(null);
+      return 'running';
+    });
   }, []);
 
   const adjustTime = useCallback((deltaMinutes: number) => {
-    setTimeLeft(prev => Math.max(0, prev + deltaMinutes * 60));
+    setTimeLeft(prev => prev + deltaMinutes * 60);
+  }, []);
+
+  const resetTaskTime = useCallback(() => {
+    setTimeLeft(originalTargetRef.current);
   }, []);
 
   const closePlayer = useCallback(() => {
@@ -231,7 +300,6 @@ export function useFocusRoutinePlayer() {
   }, []);
 
   const cancelPlayer = useCallback(() => {
-    // Delete incomplete session
     if (sessionId) {
       supabase.from('routine_sessions').delete().eq('id', sessionId).then(() => {});
     }
@@ -242,7 +310,7 @@ export function useFocusRoutinePlayer() {
     const remaining = config.tasks
       .slice(currentTaskIndex)
       .reduce((s, t) => s + t.targetSeconds, 0);
-    const adjustedRemaining = remaining - (config.tasks[currentTaskIndex]?.targetSeconds || 0) + timeLeft;
+    const adjustedRemaining = remaining - (config.tasks[currentTaskIndex]?.targetSeconds || 0) + Math.max(0, timeLeft);
     return new Date(Date.now() + adjustedRemaining * 1000);
   })() : null;
 
@@ -252,16 +320,23 @@ export function useFocusRoutinePlayer() {
     currentTask,
     currentTaskIndex,
     timeLeft,
+    isOvertime,
+    overtimeSeconds,
     taskResults,
     startedAt,
     endTime,
     sessionStats,
+    taskStartedAt,
+    pauseElapsed,
     startRoutine,
     onBreathComplete,
     completeTask,
     skipTask,
+    moveTaskToEnd,
+    endRoutineEarly,
     togglePause,
     adjustTime,
+    resetTaskTime,
     closePlayer,
     cancelPlayer,
   };
