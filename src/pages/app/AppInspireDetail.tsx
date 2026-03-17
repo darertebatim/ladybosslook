@@ -154,10 +154,20 @@ export default function AppInspireDetail() {
       if (routine?.cover_image_url && navigator.canShare) {
         const response = await fetch(routine.cover_image_url);
         const blob = await response.blob();
-        const file = new File([blob], 'routine.jpg', { type: blob.type || 'image/jpeg' });
+        // Use descriptive filename with routine title for better iOS preview
+        const safeName = title.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '-').substring(0, 40);
+        const extension = blob.type?.includes('png') ? 'png' : 'jpg';
+        const mimeType = extension === 'png' ? 'image/png' : 'image/jpeg';
+        const file = new File([blob], `${safeName}.${extension}`, { type: mimeType });
         
         if (navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title, text: shareText });
+          // Share image + text together — shows in Messages, WhatsApp, Mail, etc.
+          // Instagram will also appear since we include a file
+          await navigator.share({ 
+            files: [file], 
+            title,
+            text: shareText,
+          });
           return;
         }
       }
@@ -173,7 +183,6 @@ export default function AppInspireDetail() {
       toast.success('Link copied to clipboard!');
     } catch (err: any) {
       if (err?.name === 'AbortError') return;
-      // Fallback for environments where share is blocked (e.g. iframe preview)
       try {
         await navigator.clipboard.writeText(shareText);
         toast.success('Link copied to clipboard!');
