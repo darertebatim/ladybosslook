@@ -8,6 +8,7 @@ import { scheduleUrgentAlarm, cancelUrgentAlarms, isUrgentAlarmAvailable } from 
 import { scheduleTaskReminder, cancelTaskReminder, isLocalNotificationsAvailable } from '@/lib/localNotifications';
 import { getTimePeriodSortOrder, TimePeriod } from '@/lib/taskScheduling';
 import { updatePresence } from '@/hooks/useUserPresence';
+import { checkAndUnlockNextProjectStep } from '@/hooks/useProjectStepUnlock';
 import type { ProLinkType } from '@/lib/proTaskTypes';
 
 // ============================================
@@ -896,9 +897,12 @@ export const useCompleteTask = () => {
       // Update presence metrics
       await updatePresence(user.id, dateStr);
 
-      return { completion: data, streakIncreased: streakResult.increased };
+      // Check if this unlocks next project step
+      const stepResult = await checkAndUnlockNextProjectStep(user.id, taskId, dateStr);
+
+      return { completion: data, streakIncreased: streakResult.increased, unlockedStep: stepResult };
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (result, variables) => {
       const dateStr = format(variables.date, 'yyyy-MM-dd');
       queryClient.invalidateQueries({ queryKey: ['planner-completions', user?.id, dateStr] });
       queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
@@ -913,6 +917,11 @@ export const useCompleteTask = () => {
       // Update challenge progress
       queryClient.invalidateQueries({ queryKey: ['user-challenges'] });
       queryClient.invalidateQueries({ queryKey: ['challenge-routine-infos'] });
+      // If a project step was unlocked, refresh task lists
+      if (result?.unlockedStep) {
+        queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
+        queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+      }
     },
     onError: (error) => {
       console.error('Complete task error:', error);

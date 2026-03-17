@@ -3834,6 +3834,7 @@ export type Database = {
       user_routines_bank: {
         Row: {
           added_at: string
+          current_step: number | null
           id: string
           is_active: boolean
           routine_id: string
@@ -3841,6 +3842,7 @@ export type Database = {
         }
         Insert: {
           added_at?: string
+          current_step?: number | null
           id?: string
           is_active?: boolean
           routine_id: string
@@ -3848,6 +3850,7 @@ export type Database = {
         }
         Update: {
           added_at?: string
+          current_step?: number | null
           id?: string
           is_active?: boolean
           routine_id?: string
@@ -4038,6 +4041,7 @@ export type Database = {
           order_index: number
           pro_link_type: string | null
           pro_link_value: string | null
+          project_step: number | null
           reminder_enabled: boolean
           reminder_offset: number
           repeat_days: number[] | null
@@ -4046,6 +4050,7 @@ export type Database = {
           repeat_pattern: string
           scheduled_date: string | null
           scheduled_time: string | null
+          source_routine_id: string | null
           tag: string | null
           time_period: string | null
           title: string
@@ -4068,6 +4073,7 @@ export type Database = {
           order_index?: number
           pro_link_type?: string | null
           pro_link_value?: string | null
+          project_step?: number | null
           reminder_enabled?: boolean
           reminder_offset?: number
           repeat_days?: number[] | null
@@ -4076,6 +4082,7 @@ export type Database = {
           repeat_pattern?: string
           scheduled_date?: string | null
           scheduled_time?: string | null
+          source_routine_id?: string | null
           tag?: string | null
           time_period?: string | null
           title: string
@@ -4098,6 +4105,7 @@ export type Database = {
           order_index?: number
           pro_link_type?: string | null
           pro_link_value?: string | null
+          project_step?: number | null
           reminder_enabled?: boolean
           reminder_offset?: number
           repeat_days?: number[] | null
@@ -4106,6 +4114,7 @@ export type Database = {
           repeat_pattern?: string
           scheduled_date?: string | null
           scheduled_time?: string | null
+          source_routine_id?: string | null
           tag?: string | null
           time_period?: string | null
           title?: string
