@@ -824,6 +824,74 @@ export function LeadsManager() {
                                 </Select>
                               </div>
                             )}
+
+                            {/* Expiration date picker for subscription programs */}
+                            <div className="space-y-2">
+                              <Label>Expiration Date</Label>
+                              <div className="flex gap-2 flex-wrap">
+                                <Button
+                                  type="button"
+                                  variant={!enrollExpiresAt ? 'default' : 'outline'}
+                                  size="sm"
+                                  onClick={() => setEnrollExpiresAt(undefined)}
+                                >
+                                  Default (1 year)
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setEnrollExpiresAt(addDays(new Date(), 30))}
+                                >
+                                  30 days
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setEnrollExpiresAt(addMonths(new Date(), 3))}
+                                >
+                                  3 months
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setEnrollExpiresAt(addMonths(new Date(), 6))}
+                                >
+                                  6 months
+                                </Button>
+                              </div>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className={cn(
+                                      "w-full justify-start text-left font-normal",
+                                      !enrollExpiresAt && "text-muted-foreground"
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {enrollExpiresAt ? format(enrollExpiresAt, 'PPP') : 'Or pick a custom date...'}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <Calendar
+                                    mode="single"
+                                    selected={enrollExpiresAt}
+                                    onSelect={setEnrollExpiresAt}
+                                    disabled={(date) => date < new Date()}
+                                    initialFocus
+                                    className={cn("p-3 pointer-events-auto")}
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                              <p className="text-xs text-muted-foreground">
+                                {enrollExpiresAt
+                                  ? `Access expires: ${format(enrollExpiresAt, 'PPP')}`
+                                  : 'Default: 1 year from enrollment (for subscription programs)'}
+                              </p>
+                            </div>
                           </div>
                           <DialogFooter>
                             <Button
@@ -832,6 +900,7 @@ export function LeadsManager() {
                                 setIsEnrollDialogOpen(false);
                                 setSelectedCourse('');
                                 setSelectedEnrollRound('');
+                                setEnrollExpiresAt(undefined);
                               }}
                               disabled={isEnrolling}
                             >
