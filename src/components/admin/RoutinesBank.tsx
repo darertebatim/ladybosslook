@@ -538,7 +538,7 @@ export default function RoutinesBank() {
       category: routine.category,
       color: routine.color,
       emoji: routine.emoji,
-      schedule_type: ((routine.schedule_type === 'challenge' ? 'challenge' : 'daily') as 'daily' | 'challenge'),
+      schedule_type: (['challenge', 'project'].includes(routine.schedule_type) ? routine.schedule_type : 'daily') as 'daily' | 'challenge' | 'project',
       challenge_start_date: (routine as any).challenge_start_date ? new Date((routine as any).challenge_start_date) : null,
       start_day_of_week: (routine as any).start_day_of_week ?? null,
       start_mode: (routine as any).start_day_of_week != null ? 'weekday' : ((routine as any).challenge_start_date ? 'date' : 'none'),
