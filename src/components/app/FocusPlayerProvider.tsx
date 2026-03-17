@@ -29,15 +29,22 @@ export function FocusPlayerProvider({ children }: { children: ReactNode }) {
             currentTask={player.currentTask}
             currentTaskIndex={player.currentTaskIndex}
             timeLeft={player.timeLeft}
+            isOvertime={player.isOvertime}
+            overtimeSeconds={player.overtimeSeconds}
             taskResults={player.taskResults}
             startedAt={player.startedAt}
             endTime={player.endTime}
             sessionStats={player.sessionStats}
+            taskStartedAt={player.taskStartedAt}
+            pauseElapsed={player.pauseElapsed}
             onBreathComplete={player.onBreathComplete}
             onCompleteTask={player.completeTask}
             onSkipTask={player.skipTask}
             onTogglePause={player.togglePause}
             onAdjustTime={player.adjustTime}
+            onResetTime={player.resetTaskTime}
+            onMoveTaskToEnd={player.moveTaskToEnd}
+            onEndRoutineEarly={player.endRoutineEarly}
             onClose={player.closePlayer}
             onCancel={player.cancelPlayer}
           />
