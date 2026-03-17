@@ -687,6 +687,7 @@ export default function RoutinesBank() {
       drip_day: formData.schedule_type === 'challenge' ? localTasks.length + 1 : formData.schedule_type === 'project' ? localTasks.length + 1 : null,
       monthly_day: null,
       is_once: task.repeat_pattern === 'none',
+      duration_minutes: (task as any).duration_minutes ?? null,
     };
     setLocalTasks([...localTasks, newTask]);
     setTaskSearchOpen(false);
