@@ -124,9 +124,15 @@ export function BreathingExerciseScreen({
 
   const currentPhase = phases[currentPhaseIndex];
   const totalTargetSeconds = durationMode === 'minutes' ? selectedMinutes * 60 : 0;
+  // Smooth progress: completed cycles + fractional progress through current cycle
+  const totalPhaseDuration = phases.reduce((sum, p) => sum + p.duration, 0);
+  const currentPhaseElapsed = currentPhase ? currentPhase.duration - phaseTimeRemaining : 0;
+  const elapsedInCurrentCycle = phases.slice(0, currentPhaseIndex).reduce((sum, p) => sum + p.duration, 0) + currentPhaseElapsed;
+  const cycleFraction = totalPhaseDuration > 0 ? elapsedInCurrentCycle / totalPhaseDuration : 0;
+  
   const progressPercent = isActive
     ? durationMode === 'cycles'
-      ? (cycleCount / selectedCycles) * 100
+      ? ((cycleCount + cycleFraction) / selectedCycles) * 100
       : Math.min((totalElapsed / totalTargetSeconds) * 100, 100)
     : 0;
 
