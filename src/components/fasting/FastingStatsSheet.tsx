@@ -207,6 +207,7 @@ function WeightKeypad({ value, unit, onValueChange, onConfirm, onClose }: {
 export function FastingStatsSheet({ open, onOpenChange, sessions, onDeleteSession }: FastingStatsSheetProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { autoCompleteWeight } = useAutoCompleteProTask();
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [weightValue, setWeightValue] = useState('');
   const [weightLogs, setWeightLogs] = useState<WeightLog[]>([]);
