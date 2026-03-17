@@ -524,6 +524,7 @@ export default function RoutinesBank() {
       end_date: null,
       end_after_days: null,
       badge_image_url: '',
+      is_focus: false,
     });
     setLocalSections([]);
     setLocalTasks([]);
