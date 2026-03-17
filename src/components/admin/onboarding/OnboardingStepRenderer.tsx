@@ -2068,6 +2068,8 @@ function buildUserTask(t: StarterTask, index: number, taskId?: string): import('
     goal_type: null,
     goal_target: null,
     goal_unit: null,
+    source_routine_id: null,
+    project_step: null,
   };
 }
 
