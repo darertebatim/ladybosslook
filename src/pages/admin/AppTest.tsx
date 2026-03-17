@@ -654,6 +654,41 @@ export default function AppTest() {
             currentDay={challengeDayTest}
             totalDays={28}
           />
+          <StepCompletionCelebration
+            open={showStepCelebration}
+            onClose={() => setShowStepCelebration(false)}
+            completedStep={testCompletedStep}
+            newTaskCount={4}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Project Step Completion */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-emerald-500" />
+            Project Step Completion
+          </CardTitle>
+          <CardDescription>
+            Celebration when user completes all tasks in a project step, unlocking the next step
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => { setTestCompletedStep(1); setShowStepCelebration(true); }} variant="outline">
+              ✅ Step 1 → 2
+            </Button>
+            <Button onClick={() => { setTestCompletedStep(2); setShowStepCelebration(true); }} variant="outline">
+              ✅ Step 2 → 3
+            </Button>
+            <Button onClick={() => { setTestCompletedStep(3); setShowStepCelebration(true); }} variant="outline">
+              ✅ Step 3 → 4
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Shows confetti + step transition indicator. New tasks appear in planner after dismissal.
+          </p>
         </CardContent>
       </Card>
 
