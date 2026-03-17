@@ -336,7 +336,7 @@ export default function AppInspireDetail() {
               )}
               {routine.category && (
                 <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-muted text-muted-foreground">
-                  {routine.category}
+                  {categories.find(c => c.slug === routine.category)?.name || routine.category}
                 </span>
               )}
               {routine.tasks && routine.tasks.length > 0 && (
