@@ -328,6 +328,11 @@ export default function AppInspireDetail() {
             )}
             
             <div className="flex items-center gap-2 mt-3 flex-wrap">
+              {isFocus && (
+                <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300">
+                  🎯 Focus
+                </span>
+              )}
               {isProject && (
                 <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
                   🎯 Project
