@@ -167,6 +167,7 @@ export function useUpsertPeriodSettings() {
 export function useLogPeriodDay() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { autoCompletePeriod } = useAutoCompleteProTask();
   
   return useMutation({
     mutationFn: async ({
