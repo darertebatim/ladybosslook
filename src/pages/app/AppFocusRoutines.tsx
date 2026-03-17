@@ -221,15 +221,27 @@ export default function AppFocusRoutines() {
                             )}
                           </div>
 
-                          {/* Play / Replay button */}
+                          {/* Play / Progress badge */}
                           <button
                             onClick={() => handlePlay(routine)}
-                            className="w-12 h-12 rounded-full bg-muted flex items-center justify-center active:scale-95 transition-transform shrink-0 ml-3"
+                            disabled={loadingRoutineId === routine.id}
+                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted active:scale-95 transition-transform shrink-0 ml-3"
                           >
-                            {completion?.isComplete ? (
-                              <RotateCw className="w-5 h-5 text-foreground" />
+                            {loadingRoutineId === routine.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin text-foreground" />
+                            ) : completion ? (
+                              <>
+                                {completion.isComplete ? (
+                                  <RotateCw className="w-4 h-4 text-foreground" />
+                                ) : (
+                                  <Play className="w-4 h-4 text-foreground fill-foreground" />
+                                )}
+                                <span className="text-sm font-semibold text-foreground">{completion.pct}%</span>
+                              </>
                             ) : (
-                              <Play className="w-5 h-5 text-foreground fill-foreground ml-0.5" />
+                              <>
+                                <Play className="w-4 h-4 text-foreground fill-foreground" />
+                              </>
                             )}
                           </button>
                         </div>
