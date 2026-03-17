@@ -415,6 +415,11 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
       {/* Trigger button */}
       <button
         onClick={() => {
+          // Capture screen height NOW before keyboard opens
+          const screenH = window.innerHeight;
+          const topPx = Math.round(screenH * 0.25);
+          setAnchorTop(`${topPx}px`);
+          setSuggestionsTop(`${topPx + 220}px`);
           setIsOpen(true);
           haptic.light();
         }}
