@@ -119,7 +119,8 @@ export function useFocusRoutinePlayer() {
     const target = cfg.tasks[0]?.targetSeconds || 0;
     setTimeLeft(target);
     originalTargetRef.current = target;
-    setPhase('breathe');
+    setTaskStartedAt(new Date());
+    setPhase('running');
 
     if (user) {
       const { data } = await supabase
