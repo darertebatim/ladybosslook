@@ -100,6 +100,7 @@ export function LeadsManager() {
   const [isEnrollDialogOpen, setIsEnrollDialogOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedEnrollRound, setSelectedEnrollRound] = useState('');
+  const [enrollExpiresAt, setEnrollExpiresAt] = useState<Date | undefined>(undefined);
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
