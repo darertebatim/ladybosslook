@@ -59,5 +59,32 @@ export function useShareContent({ title, text, imageUrl }: UseShareContentOption
     }
   }, [title, fullText, imageUrl]);
 
-  return { handleShare, isSharing };
+  const handleShareInstagram = useCallback(async () => {
+    if (!imageUrl) {
+      toast.error('No image available to share');
+      return;
+    }
+    setIsSharing(true);
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const safeName = title.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '-').substring(0, 40);
+      const extension = blob.type?.includes('png') ? 'png' : 'jpg';
+      const mimeType = extension === 'png' ? 'image/png' : 'image/jpeg';
+      const file = new File([blob], `${safeName}.${extension}`, { type: mimeType });
+
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file] });
+        return;
+      }
+      toast('Open Instagram and share from your gallery', { duration: 3000 });
+    } catch (err: any) {
+      if (err?.name === 'AbortError') return;
+      toast('Open Instagram and share from your gallery', { duration: 3000 });
+    } finally {
+      setIsSharing(false);
+    }
+  }, [title, imageUrl]);
+
+  return { handleShare, handleShareInstagram, isSharing };
 }

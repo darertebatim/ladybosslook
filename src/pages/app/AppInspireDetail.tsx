@@ -3,7 +3,7 @@ import { AddToRoutineHandHint, useAddToRoutineHint } from '@/components/app/AddT
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Loader2, Share2 } from 'lucide-react';
+import { Loader2, Share2, Instagram } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
@@ -145,7 +145,7 @@ export default function AppInspireDetail() {
     return null;
   }, [routine]);
 
-  const { handleShare } = useShareContent({
+  const { handleShare, handleShareInstagram } = useShareContent({
     title: routine?.title || 'Routine',
     text: `Hey! Join me in the '${routine?.title || 'Routine'}' routine on Routine Ladyboss 💫`,
     imageUrl: routine?.cover_image_url,
@@ -224,13 +224,22 @@ export default function AppInspireDetail() {
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
       >
         <BackButtonCircle to={(location.state as any)?.from || '/app/routines'} />
-        <button
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleShareInstagram}
+            className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
+            aria-label="Share to Instagram"
+          >
+            <Instagram className="h-5 w-5" />
+          </button>
+          <button
             onClick={handleShare}
             className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
             aria-label="Share"
           >
             <Share2 className="h-5 w-5" />
           </button>
+        </div>
       </header>
 
       {/* Scroll Container */}
