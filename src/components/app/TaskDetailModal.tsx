@@ -68,6 +68,7 @@ export const TaskDetailModal = ({
   onEdit,
   onDelete,
   onStreakIncrease,
+  onStepUnlocked,
   onOpenGoalInput,
   onOpenTimer,
   onOpenWaterTracking,
