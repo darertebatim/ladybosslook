@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft } from 'lucide-react';
+import { format, addMinutes } from 'date-fns';
 import { useRoutinesBank, useUserAddedBankRoutines, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
@@ -94,7 +95,15 @@ export default function AppFocusRoutines() {
     return { pct, isComplete: pct === 100 };
   };
 
+  // Pre-start state
+  const [preStartRoutine, setPreStartRoutine] = useState<(typeof allRoutines extends (infer T)[] | undefined ? T : never) | null>(null);
+  const [preStartTasks, setPreStartTasks] = useState<{ id: string; title: string; emoji: string; targetSeconds: number; color?: string }[]>([]);
+  const [loadingRoutineId, setLoadingRoutineId] = useState<string | null>(null);
+
+  const totalPreStartSeconds = preStartTasks.reduce((s, t) => s + t.targetSeconds, 0);
+
   const handlePlay = async (routine: typeof allRoutines extends (infer T)[] | undefined ? T : never) => {
+    setLoadingRoutineId(routine.id);
     const { data } = await supabase
       .from('routines_bank_tasks')
       .select(`
@@ -104,25 +113,37 @@ export default function AppFocusRoutines() {
       .eq('routine_id', routine.id)
       .order('task_order', { ascending: true });
 
+    setLoadingRoutineId(null);
+
     if (!data || data.length === 0) {
       const { toast } = await import('sonner');
       toast.error('No tasks found in this routine');
       return;
     }
 
+    haptic.light();
+    const tasks = data.map(t => ({
+      id: t.id,
+      title: t.title,
+      emoji: t.emoji || '📝',
+      targetSeconds: (t.task as any)?.goal_target || (t.duration_minutes ? t.duration_minutes * 60 : 300),
+      color: (t.task as any)?.color || undefined,
+    }));
+    setPreStartTasks(tasks);
+    setPreStartRoutine(routine);
+  };
+
+  const handleStartFromPreview = () => {
+    if (!preStartRoutine) return;
     haptic.medium();
     startRoutine({
-      routineId: routine.id,
-      routineTitle: routine.title,
-      routineEmoji: routine.emoji || '✨',
-      tasks: data.map(t => ({
-        id: t.id,
-        title: t.title,
-        emoji: t.emoji || '📝',
-        targetSeconds: (t.task as any)?.goal_target || (t.duration_minutes ? t.duration_minutes * 60 : 300),
-        color: (t.task as any)?.color || undefined,
-      })),
+      routineId: preStartRoutine.id,
+      routineTitle: preStartRoutine.title,
+      routineEmoji: preStartRoutine.emoji || '✨',
+      tasks: preStartTasks,
     });
+    setPreStartRoutine(null);
+    setPreStartTasks([]);
   };
 
   return (
@@ -200,15 +221,27 @@ export default function AppFocusRoutines() {
                             )}
                           </div>
 
-                          {/* Play / Replay button */}
+                          {/* Play / Progress badge */}
                           <button
                             onClick={() => handlePlay(routine)}
-                            className="w-12 h-12 rounded-full bg-muted flex items-center justify-center active:scale-95 transition-transform shrink-0 ml-3"
+                            disabled={loadingRoutineId === routine.id}
+                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted active:scale-95 transition-transform shrink-0 ml-3"
                           >
-                            {completion?.isComplete ? (
-                              <RotateCw className="w-5 h-5 text-foreground" />
+                            {loadingRoutineId === routine.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin text-foreground" />
+                            ) : completion ? (
+                              <>
+                                {completion.isComplete ? (
+                                  <RotateCw className="w-4 h-4 text-foreground" />
+                                ) : (
+                                  <Play className="w-4 h-4 text-foreground fill-foreground" />
+                                )}
+                                <span className="text-sm font-semibold text-foreground">{completion.pct}%</span>
+                              </>
                             ) : (
-                              <Play className="w-5 h-5 text-foreground fill-foreground ml-0.5" />
+                              <>
+                                <Play className="w-4 h-4 text-foreground fill-foreground" />
+                              </>
                             )}
                           </button>
                         </div>
@@ -257,6 +290,56 @@ export default function AppFocusRoutines() {
           </div>
         )}
       </div>
+
+      {/* Pre-start overlay */}
+      {preStartRoutine && (
+        <div className="fixed inset-0 z-[9999] bg-background flex flex-col">
+          <header
+            className="flex items-center justify-between px-4 pt-3 pb-3"
+            style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
+          >
+            <button onClick={() => setPreStartRoutine(null)} className="p-1 active:opacity-70">
+              <ChevronLeft className="w-5 h-5 text-foreground" />
+            </button>
+            <div className="w-7" />
+          </header>
+
+          <div className="flex-1 overflow-y-auto px-5 pb-32">
+            <h1 className="text-2xl font-bold text-foreground mt-2">{preStartRoutine.title}</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {format(new Date(), 'h:mma')} – {format(addMinutes(new Date(), Math.ceil(totalPreStartSeconds / 60)), 'h:mma')} ({Math.ceil(totalPreStartSeconds / 60)}m)
+            </p>
+
+            <div className="space-y-2.5 mt-6">
+              {preStartTasks.map((task, i) => (
+                <div
+                  key={task.id}
+                  className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5"
+                >
+                  <span className="text-xs text-muted-foreground font-medium w-4 shrink-0">{i + 1}</span>
+                  <FluentEmoji emoji={task.emoji} size={28} />
+                  <p className="flex-1 text-sm font-medium text-foreground leading-snug">{task.title}</p>
+                  <span className="text-xs text-muted-foreground shrink-0">{Math.ceil(task.targetSeconds / 60)}m</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Start button */}
+          <div
+            className="fixed bottom-0 left-0 right-0 px-5 pb-4 pt-2 bg-background"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}
+          >
+            <button
+              onClick={handleStartFromPreview}
+              className="w-full flex items-center justify-center gap-2 h-14 rounded-2xl bg-amber-400 text-black font-bold text-base active:scale-[0.98] transition-transform"
+            >
+              <Play className="w-5 h-5 fill-current" />
+              Start
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
