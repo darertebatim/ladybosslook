@@ -324,6 +324,51 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
         </>
       )}
 
+      {/* Notify Again Bottom Sheet (overtime) */}
+      {showNotifySheet && (
+        <>
+          <div
+            className="absolute inset-0 bg-black/40 z-[10] animate-in fade-in-0 duration-200"
+            onClick={() => setShowNotifySheet(false)}
+          />
+          <div className="absolute bottom-0 left-0 right-0 z-[11] bg-background rounded-t-3xl px-6 pb-8 pt-2 animate-in slide-in-from-bottom duration-300"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 32px)' }}
+          >
+            <div className="w-10 h-1 bg-foreground/10 rounded-full mx-auto mb-4" />
+            <h3 className="text-center text-lg font-bold mb-6">Notify again</h3>
+            <div className="grid grid-cols-3 gap-3">
+              {[1, 5, 10].map((mins) => {
+                const notifyTime = addSeconds(new Date(), mins * 60);
+                return (
+                  <button
+                    key={mins}
+                    onClick={() => {
+                      haptic.medium();
+                      onAdjustTime(mins);
+                      setShowNotifySheet(false);
+                    }}
+                    className="flex flex-col items-center gap-1 py-5 rounded-2xl bg-foreground/[0.06] active:bg-foreground/10"
+                  >
+                    <span className="text-xl font-bold text-foreground">{mins} min</span>
+                    <span className="text-xs text-muted-foreground">({format(notifyTime, 'H:mm')})</span>
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => {
+                haptic.medium();
+                setShowNotifySheet(false);
+                onCompleteTask();
+              }}
+              className="w-full mt-4 py-4 rounded-2xl bg-foreground text-background font-semibold text-base active:opacity-90"
+            >
+              Move to next task
+            </button>
+          </div>
+        </>
+      )}
+
       {/* Skip Confirmation Bottom Sheet — inline */}
       {showSkipSheet && (
         <>
