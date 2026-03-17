@@ -299,29 +299,29 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
 
       {/* Adjust Time Bottom Sheet */}
       <Sheet open={showAdjustSheet} onOpenChange={setShowAdjustSheet}>
-        <SheetContent side="bottom" className="rounded-t-2xl px-6 pb-8" hideCloseButton>
-          <SheetTitle className="text-center text-base font-semibold mt-2 mb-5">Adjust time</SheetTitle>
-          <div className="grid grid-cols-2 gap-3">
+        <SheetContent side="bottom" className="rounded-t-3xl px-6 pb-8" hideCloseButton>
+          <SheetTitle className="text-center text-lg font-bold mt-3 mb-6">Adjust time</SheetTitle>
+          <div className="grid grid-cols-4 gap-3">
             {[
-              { label: '-10 min', delta: -10 },
-              { label: '-1 min', delta: -1 },
-              { label: '+1 min', delta: 1 },
-              { label: '+10 min', delta: 10 },
-            ].map(({ label, delta }) => (
+              { icon: '—', label: '10 min', delta: -10 },
+              { icon: '—', label: '1 min', delta: -1 },
+              { icon: '+', label: '1 min', delta: 1 },
+              { icon: '+', label: '10 min', delta: 10 },
+            ].map(({ icon, label, delta }) => (
               <button
-                key={label}
+                key={`${icon}${label}`}
                 onClick={() => { haptic.light(); onAdjustTime(delta); }}
-                className="py-3 rounded-xl bg-foreground/5 text-foreground font-medium text-sm active:bg-foreground/10"
+                className="flex flex-col items-center gap-1 py-4 rounded-2xl bg-foreground/[0.06] active:bg-foreground/10"
               >
-                {label}
+                <span className="text-lg font-semibold text-foreground/70">{icon}</span>
+                <span className="text-xs text-foreground/60 font-medium">{label}</span>
               </button>
             ))}
           </div>
           <button
             onClick={() => { haptic.light(); onResetTime(); setShowAdjustSheet(false); }}
-            className="w-full mt-3 py-3 rounded-xl border border-border text-muted-foreground font-medium text-sm flex items-center justify-center gap-2 active:bg-foreground/5"
+            className="w-full mt-4 py-4 rounded-2xl bg-foreground/[0.04] text-red-500 font-semibold text-base active:bg-foreground/[0.08]"
           >
-            <RotateCcw className="w-4 h-4" />
             Reset
           </button>
         </SheetContent>
@@ -329,16 +329,25 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
 
       {/* Skip Confirmation Bottom Sheet */}
       <Sheet open={showSkipSheet} onOpenChange={setShowSkipSheet}>
-        <SheetContent side="bottom" className="rounded-t-2xl px-6 pb-8" hideCloseButton>
-          <SheetTitle className="text-center text-base font-semibold mt-2 mb-5">Should we skip?</SheetTitle>
-          <div className="space-y-2">
+        <SheetContent side="bottom" className="rounded-t-3xl px-6 pb-8" hideCloseButton>
+          <SheetTitle className="text-center text-lg font-bold mt-3 mb-6">Should we skip?</SheetTitle>
+          <div className="space-y-2.5">
+            <button
+              onClick={() => {
+                haptic.light();
+                setShowSkipSheet(false);
+              }}
+              className="w-full py-4 rounded-2xl bg-foreground/[0.06] text-foreground font-semibold text-base active:bg-foreground/10"
+            >
+              Rearrange order
+            </button>
             <button
               onClick={() => {
                 haptic.light();
                 setShowSkipSheet(false);
                 onMoveTaskToEnd();
               }}
-              className="w-full py-3.5 rounded-xl bg-foreground/5 text-foreground font-medium text-sm active:bg-foreground/10"
+              className="w-full py-4 rounded-2xl bg-foreground/[0.06] text-foreground font-semibold text-base active:bg-foreground/10"
             >
               Move task to end
             </button>
@@ -348,15 +357,9 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
                 setShowSkipSheet(false);
                 onSkipTask();
               }}
-              className="w-full py-3.5 rounded-xl bg-foreground/5 text-red-500 font-medium text-sm active:bg-foreground/10"
+              className="w-full py-4 rounded-2xl bg-foreground/[0.06] text-foreground/60 font-semibold text-base active:bg-foreground/10"
             >
               Skip
-            </button>
-            <button
-              onClick={() => setShowSkipSheet(false)}
-              className="w-full py-3.5 rounded-xl text-muted-foreground font-medium text-sm"
-            >
-              Cancel
             </button>
           </div>
         </SheetContent>
