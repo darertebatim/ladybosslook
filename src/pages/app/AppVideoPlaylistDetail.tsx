@@ -76,15 +76,13 @@ export default function AppVideoPlaylistDetail() {
   const { data: existingTask } = useExistingVideoPlaylistTask(playlistId);
   const addRoutinePlan = useAddRoutinePlan();
 
-  const syntheticPlaylistTask: RoutinePlanTask | null = playlist ? {
-
   const { handleShare } = useShareContent({
     title: playlist?.name || 'Video Playlist',
     text: `🎬 Check out '${playlist?.name || 'this playlist'}' on Routine Ladyboss 💫`,
     imageUrl: playlist?.cover_image_url,
   });
 
-  const syntheticPlaylistTaskData: RoutinePlanTask | null = playlist ? {
+  const syntheticPlaylistTask: RoutinePlanTask | null = playlist ? {
     id: `video-playlist-${playlist.id}`,
     plan_id: `synthetic-video-playlist-${playlist.id}`,
     title: `Watch ${playlist.name}`,
