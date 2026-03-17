@@ -300,14 +300,15 @@ const TIME_PERIOD_LABELS: Record<string, string> = {
 };
 
 function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
-  const QUICK_ADD_ANCHOR_TOP = '25%';
-  const SUGGESTIONS_ANCHOR_TOP = 'calc(25% + 220px)';
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [showIdeas, setShowIdeas] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsLayerRef = useRef<HTMLDivElement>(null);
+  // Capture full screen height before keyboard opens to prevent shifting
+  const [anchorTop, setAnchorTop] = useState<string>('25%');
+  const [suggestionsTop, setSuggestionsTop] = useState<string>('calc(25% + 220px)');
   const createTask = useCreateTask();
   const navigate = useNavigate();
   const { data: templates = [] } = useTaskTemplates();
