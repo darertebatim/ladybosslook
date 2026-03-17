@@ -469,6 +469,10 @@ export function useAddRoutinePlan() {
             const taskDate = new Date(today);
             taskDate.setDate(taskDate.getDate() + (dripDay - 1));
             scheduledDate = getLocalDateStr(taskDate);
+          } else if (planScheduleType === 'project') {
+            // Project: all tasks one-time, no drip scheduling
+            repeatPattern = 'none';
+            scheduledDate = getLocalDateStr(today);
           }
 
           return {

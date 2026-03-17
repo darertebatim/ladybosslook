@@ -155,7 +155,7 @@ export default function RoutinesBank() {
     category: 'general',
     color: 'yellow',
     emoji: '✨',
-    schedule_type: 'daily' as 'daily' | 'challenge',
+    schedule_type: 'daily' as 'daily' | 'challenge' | 'project',
     challenge_start_date: null as Date | null,
     start_day_of_week: null as number | null,
     start_mode: 'none' as 'none' | 'date' | 'weekday',
@@ -511,7 +511,7 @@ export default function RoutinesBank() {
       category: 'general',
       color: 'yellow',
       emoji: '✨',
-      schedule_type: 'daily',
+      schedule_type: 'daily' as 'daily' | 'challenge' | 'project',
       challenge_start_date: null,
       start_day_of_week: null,
       start_mode: 'none',
@@ -538,7 +538,7 @@ export default function RoutinesBank() {
       category: routine.category,
       color: routine.color,
       emoji: routine.emoji,
-      schedule_type: ((routine.schedule_type === 'challenge' ? 'challenge' : 'daily') as 'daily' | 'challenge'),
+      schedule_type: (['challenge', 'project'].includes(routine.schedule_type) ? routine.schedule_type : 'daily') as 'daily' | 'challenge' | 'project',
       challenge_start_date: (routine as any).challenge_start_date ? new Date((routine as any).challenge_start_date) : null,
       start_day_of_week: (routine as any).start_day_of_week ?? null,
       start_mode: (routine as any).start_day_of_week != null ? 'weekday' : ((routine as any).challenge_start_date ? 'date' : 'none'),
@@ -677,7 +677,7 @@ export default function RoutinesBank() {
       section_id: sectionId,
       task_order: localTasks.filter(t => t.section_id === sectionId).length,
       schedule_days: [],
-      drip_day: formData.schedule_type === 'challenge' ? localTasks.length + 1 : null,
+      drip_day: formData.schedule_type === 'challenge' ? localTasks.length + 1 : formData.schedule_type === 'project' ? localTasks.length + 1 : null,
       monthly_day: null,
       is_once: task.repeat_pattern === 'none',
     };
@@ -932,6 +932,8 @@ export default function RoutinesBank() {
     ? routines.filter(r => r.is_featured)
     : selectedCategory === 'challenges'
     ? routines.filter(r => r.schedule_type === 'challenge')
+    : selectedCategory === 'projects'
+    ? routines.filter(r => r.schedule_type === 'project')
     : routines.filter(r => r.category === selectedCategory);
 
   const filteredTaskBank = taskBank.filter(t => 
@@ -958,6 +960,23 @@ export default function RoutinesBank() {
       return (
         <div className="flex items-center gap-1">
           <span className="text-[10px] text-muted-foreground">Day</span>
+          <Input
+            type="number"
+            min={1}
+            value={task.drip_day ?? ''}
+            onChange={(e) => {
+              const val = e.target.value ? parseInt(e.target.value) : null;
+              setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, drip_day: val } : t));
+            }}
+            className="w-12 h-6 text-xs text-center p-0"
+          />
+        </div>
+      );
+    }
+    if (formData.schedule_type === 'project') {
+      return (
+        <div className="flex items-center gap-1">
+          <span className="text-[10px] text-muted-foreground">Step</span>
           <Input
             type="number"
             min={1}
@@ -1088,6 +1107,9 @@ export default function RoutinesBank() {
             <TabsTrigger value="challenges" className="flex items-center gap-1">
               🔥 Challenges
             </TabsTrigger>
+            <TabsTrigger value="projects" className="flex items-center gap-1">
+              🎯 Projects
+            </TabsTrigger>
             {routineCategories.map((cat) => (
               <TabsTrigger 
                 key={cat.slug} 
@@ -1137,8 +1159,8 @@ export default function RoutinesBank() {
                         <>
                           <span>•</span>
                           <span className="flex items-center gap-1">
-                            {routine.schedule_type === 'weekly' ? <Calendar className="h-3 w-3" /> : <Flame className="h-3 w-3" />}
-                            {routine.schedule_type === 'weekly' ? 'Weekly' : 'Challenge'}
+                            {routine.schedule_type === 'weekly' ? <Calendar className="h-3 w-3" /> : routine.schedule_type === 'project' ? '🎯' : <Flame className="h-3 w-3" />}
+                            {routine.schedule_type === 'weekly' ? 'Weekly' : routine.schedule_type === 'project' ? 'Project' : 'Challenge'}
                           </span>
                         </>
                       )}
@@ -1424,15 +1446,23 @@ export default function RoutinesBank() {
                   {/* Schedule Type */}
                   <div className="space-y-2 border-t pt-4">
                     <Label>Routine Type</Label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       {[
                         { value: 'daily', label: 'Normal', desc: 'Tasks with their own repeat settings', icon: '☀️' },
                         { value: 'challenge', label: 'Challenge', desc: 'Sequential drip (Day 1, 2...)', icon: '🔥' },
+                        { value: 'project', label: 'Project', desc: 'Ordered steps toward a goal', icon: '🎯' },
                       ].map(opt => (
                         <button
                           key={opt.value}
                           type="button"
-                          onClick={() => setFormData({ ...formData, schedule_type: opt.value as any })}
+                          onClick={() => {
+                            const updates: any = { schedule_type: opt.value as any };
+                            if (opt.value === 'project') {
+                              updates.end_mode = 'never';
+                              updates.start_mode = 'none';
+                            }
+                            setFormData(prev => ({ ...prev, ...updates }));
+                          }}
                           className={cn(
                             "flex flex-col items-center gap-1 p-3 rounded-lg border-2 text-center transition-all",
                             formData.schedule_type === opt.value 
@@ -1946,15 +1976,16 @@ export default function RoutinesBank() {
                       </div>
                     );};
 
-                    // For challenge mode, show flat list as before
-                    if (formData.schedule_type === 'challenge') {
+                    // For challenge/project mode, show flat list
+                    if (formData.schedule_type === 'challenge' || formData.schedule_type === 'project') {
+                      const modeLabel = formData.schedule_type === 'project' ? 'Steps' : 'Tasks';
                       return (uncategorizedTasks.length > 0 || localSections.length === 0) && (
                         <div className="border rounded-lg overflow-hidden border-dashed">
                           <div className="flex items-center gap-2 p-3 bg-muted/30 border-b border-dashed">
                             <h4 className="font-medium text-sm text-muted-foreground flex-1">
-                              {localSections.length === 0 ? 'Tasks' : 'Uncategorized Tasks'}
+                              {localSections.length === 0 ? modeLabel : `Uncategorized ${modeLabel}`}
                             </h4>
-                            <span className="text-xs text-muted-foreground">{uncategorizedTasks.length} task{uncategorizedTasks.length !== 1 ? 's' : ''}</span>
+                            <span className="text-xs text-muted-foreground">{uncategorizedTasks.length} {modeLabel.toLowerCase()}</span>
                           </div>
                           <div className="p-2 space-y-1">
                             {uncategorizedTasks.map((task, tIdx) => renderTaskRow(task, tIdx, uncategorizedTasks.length, null))}
@@ -1979,7 +2010,7 @@ export default function RoutinesBank() {
                             ) : (
                               <div className="flex gap-1">
                                 <Button type="button" variant="ghost" size="sm" onClick={() => setAddingTaskToSection('uncategorized')} className="flex-1 h-7 text-xs gap-1">
-                                   <Plus className="h-3 w-3" /> Add Task
+                                   <Plus className="h-3 w-3" /> Add Step
                                 </Button>
                                 <Button type="button" variant="outline" size="sm" onClick={() => openCreateActionSheet(null)} className="h-7 text-xs gap-1">
                                   <Sparkles className="h-3 w-3" /> Create New

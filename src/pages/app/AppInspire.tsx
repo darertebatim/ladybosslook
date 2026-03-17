@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, Heart, Loader2, CalendarPlus, ChevronRight, Flame } from 'lucide-react';
+import { Search, Heart, Loader2, CalendarPlus, ChevronRight, Flame, Target } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
@@ -62,6 +62,12 @@ export default function AppInspire() {
   const challengeRoutines = useMemo(() => {
     if (!allRoutines) return [];
     return allRoutines.filter(r => r.schedule_type === 'challenge').filter(matchesSearch);
+  }, [allRoutines, searchQuery]);
+
+  // Project routines
+  const projectRoutines = useMemo(() => {
+    if (!allRoutines) return [];
+    return allRoutines.filter(r => r.schedule_type === 'project').filter(matchesSearch);
   }, [allRoutines, searchQuery]);
 
   // Only show categories that have routines
@@ -153,6 +159,18 @@ export default function AppInspire() {
                       }}
                     />
                   )}
+                  {projectRoutines.length > 0 && (
+                    <CategoryCircle
+                      name="Projects"
+                      icon="Target"
+                      emoji="🎯"
+                      color="blue"
+                      onClick={() => {
+                        const el = document.getElementById('routine-category-projects');
+                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }}
+                    />
+                  )}
                   {filteredPopular && filteredPopular.length > 0 && (
                     <CategoryCircle
                       name="Popular"
@@ -234,6 +252,34 @@ export default function AppInspire() {
                   </div>
                   <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
                     {challengeRoutines.map((routine) => (
+                      <div key={routine.id} className="shrink-0 w-40">
+                        <RoutineBankCard
+                          routine={routine}
+                          onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Projects Section */}
+              {projectRoutines.length > 0 && (
+                <section id="routine-category-projects">
+                  <div className="flex items-center justify-between mb-2 px-4">
+                    <h2 className="text-xl font-bold text-foreground flex items-center gap-1.5">
+                      <Target className="h-5 w-5 text-blue-500" />
+                      Projects
+                    </h2>
+                    <button
+                      onClick={() => navigate(`/app/routines/category/projects`, { state: { from: location.pathname } })}
+                      className="text-sm text-primary font-medium flex items-center gap-0.5"
+                    >
+                      All <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
+                    {projectRoutines.map((routine) => (
                       <div key={routine.id} className="shrink-0 w-40">
                         <RoutineBankCard
                           routine={routine}

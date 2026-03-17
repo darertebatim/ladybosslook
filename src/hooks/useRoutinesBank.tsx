@@ -20,7 +20,7 @@ export interface RoutineBankItem {
   sort_order: number | null;
   created_at: string | null;
   updated_at: string | null;
-  schedule_type?: string; // 'daily' | 'challenge'
+  schedule_type?: string; // 'daily' | 'challenge' | 'project'
   challenge_start_date?: string | null;
   start_day_of_week?: number | null;
 }
@@ -502,13 +502,10 @@ export function useAddRoutineFromBank() {
             const taskScheduleDays = (task as any).schedule_days as number[] | null;
             
             if (taskScheduleDays && taskScheduleDays.length > 0) {
-              // Challenge with per-task weekly schedule (e.g. Ladyboss Workout Plan)
               repeatPattern = 'weekly';
               repeatDays = taskScheduleDays;
-              // Set scheduled_date to the effective start date so tasks don't appear before it
               scheduledDate = getLocalDateStr(effectiveStartDate);
             } else if (dripDay) {
-              // Sequential drip challenge
               repeatPattern = 'none';
               const taskDate = new Date(effectiveStartDate);
               taskDate.setDate(taskDate.getDate() + (dripDay - 1));
@@ -516,6 +513,10 @@ export function useAddRoutineFromBank() {
             } else {
               repeatPattern = 'none';
             }
+          } else if (scheduleType === 'project') {
+            // Project: all tasks are one-time, ordered sequentially, no scheduled date drip
+            repeatPattern = 'none';
+            scheduledDate = getLocalDateStr(new Date());
           } else {
             // Normal routines: use per-task repeat from bank, allow user edits to override
             const monthlyDay = (task as any).monthly_day as number | null;
