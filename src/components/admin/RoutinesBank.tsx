@@ -1976,15 +1976,16 @@ export default function RoutinesBank() {
                       </div>
                     );};
 
-                    // For challenge mode, show flat list as before
-                    if (formData.schedule_type === 'challenge') {
+                    // For challenge/project mode, show flat list
+                    if (formData.schedule_type === 'challenge' || formData.schedule_type === 'project') {
+                      const modeLabel = formData.schedule_type === 'project' ? 'Steps' : 'Tasks';
                       return (uncategorizedTasks.length > 0 || localSections.length === 0) && (
                         <div className="border rounded-lg overflow-hidden border-dashed">
                           <div className="flex items-center gap-2 p-3 bg-muted/30 border-b border-dashed">
                             <h4 className="font-medium text-sm text-muted-foreground flex-1">
-                              {localSections.length === 0 ? 'Tasks' : 'Uncategorized Tasks'}
+                              {localSections.length === 0 ? modeLabel : `Uncategorized ${modeLabel}`}
                             </h4>
-                            <span className="text-xs text-muted-foreground">{uncategorizedTasks.length} task{uncategorizedTasks.length !== 1 ? 's' : ''}</span>
+                            <span className="text-xs text-muted-foreground">{uncategorizedTasks.length} {modeLabel.toLowerCase()}</span>
                           </div>
                           <div className="p-2 space-y-1">
                             {uncategorizedTasks.map((task, tIdx) => renderTaskRow(task, tIdx, uncategorizedTasks.length, null))}
@@ -2009,7 +2010,7 @@ export default function RoutinesBank() {
                             ) : (
                               <div className="flex gap-1">
                                 <Button type="button" variant="ghost" size="sm" onClick={() => setAddingTaskToSection('uncategorized')} className="flex-1 h-7 text-xs gap-1">
-                                   <Plus className="h-3 w-3" /> Add Task
+                                   <Plus className="h-3 w-3" /> Add Step
                                 </Button>
                                 <Button type="button" variant="outline" size="sm" onClick={() => openCreateActionSheet(null)} className="h-7 text-xs gap-1">
                                   <Sparkles className="h-3 w-3" /> Create New
