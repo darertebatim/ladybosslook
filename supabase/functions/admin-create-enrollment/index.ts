@@ -282,7 +282,7 @@ const handler = async (req: Request): Promise<Response> => {
             platform: 'admin',
             product_id: null,
             revenuecat_id: null,
-            expires_at: null,
+            expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
             updated_at: new Date().toISOString(),
           }, {
             onConflict: 'user_id,program_slug',

@@ -5,6 +5,10 @@ import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallMa
 import { useRevenueCat } from '@/hooks/useRevenueCat';
 import { PurchaseCelebration } from '@/components/app/PurchaseCelebration';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
+import { Capacitor } from '@capacitor/core';
+import { useState, useCallback } from 'react';
+import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 const VARIANT_MAP: Record<PaywallVariantId, React.ComponentType<any>> = {
   classic: PaywallClassic,
@@ -20,6 +24,7 @@ const VARIANT_MAP: Record<PaywallVariantId, React.ComponentType<any>> = {
 };
 
 const SIMORA_PLUS_SLUG = 'simora-plus';
+const SIMORA_PLUS_ANNUAL_SLUG = 'simora-plus-annual';
 
 interface PaywallSheetProps {
   open: boolean;
@@ -28,7 +33,10 @@ interface PaywallSheetProps {
 
 export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
   const { variant: defaultVariant } = useDefaultPaywall();
-  const { handlePurchase, handleRestore, showCelebration, purchasedPlan, dismissCelebration } = useRevenueCat();
+  const { handlePurchase: handleIAPPurchase, handleRestore, showCelebration, purchasedPlan, dismissCelebration } = useRevenueCat();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const queryClient = useQueryClient();
+  const isNative = Capacitor.isNativePlatform();
 
   // First-time users see 'mascot-v2', then the default variant on subsequent views
   const PAYWALL_SEEN_KEY = 'paywall_seen_once';
@@ -65,8 +73,44 @@ export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
     staleTime: 1000 * 60 * 5,
   });
 
+  // Web Stripe checkout handler
+  const handleWebPurchase = useCallback(async (_productId: string, plan: 'monthly' | 'annual') => {
+    if (isRedirecting) return;
+    setIsRedirecting(true);
+
+    try {
+      const programSlug = plan === 'annual' ? SIMORA_PLUS_ANNUAL_SLUG : SIMORA_PLUS_SLUG;
+      console.log('[Paywall] Web purchase:', programSlug, plan);
+
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: { program: programSlug },
+      });
+
+      if (error) {
+        console.error('[Paywall] Stripe checkout error:', error);
+        toast.error('Failed to start checkout. Please try again.');
+        return;
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error('Failed to create checkout session.');
+      }
+    } catch (err) {
+      console.error('[Paywall] Checkout error:', err);
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setIsRedirecting(false);
+    }
+  }, [isRedirecting]);
+
   const onPurchaseComplete = async (productId: string, plan: 'monthly' | 'annual') => {
-    await handlePurchase(productId, plan);
+    if (isNative) {
+      await handleIAPPurchase(productId, plan);
+    } else {
+      await handleWebPurchase(productId, plan);
+    }
   };
 
   const onRestoreComplete = async () => {
