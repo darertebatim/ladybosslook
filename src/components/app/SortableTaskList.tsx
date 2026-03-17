@@ -56,6 +56,7 @@ const SortableTaskItem = ({
   goalProgress,
   onTap,
   onStreakIncrease,
+  onStepUnlocked,
   onOpenGoalInput,
   onOpenTimer,
   onOpenWaterTracking,
