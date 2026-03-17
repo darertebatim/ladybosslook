@@ -1,58 +1,52 @@
 
 
-## Calm-Style Animated Background for Watch Page
+## Add "Project" as Third Routine Type
 
-Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
+**Concept**: A "Project" routine has ordered/sequential tasks that lead toward a specific goal — like a challenge but without the daily drip mechanic. Tasks have a fixed order (Step 1, Step 2, Step 3...) and users complete them sequentially at their own pace.
 
-### What You'll Get
+### Key Difference from Existing Types
 
-- A deep dark blue gradient background on the Watch page header area
-- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
-- Subtle lightning flashes that pulse periodically
-- All text updated to white/light colors for contrast
-- Lightweight implementation using CSS keyframes (no extra dependencies)
+| Type | Tasks | Pace | End |
+|------|-------|------|-----|
+| **Normal** | Independent, each has own repeat | Flexible | Ongoing |
+| **Challenge** | Sequential by day (Day 1, 2...) | 1/day drip | After N days |
+| **Project** | Sequential steps (Step 1, 2...) | Own pace | When all steps done |
 
-### Design Details
+### Changes
 
-- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
-- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
-- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
-- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
-- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
+#### 1. Database: `routines_bank.schedule_type`
+No schema migration needed — `schedule_type` is already a `TEXT` column. We just start storing `'project'` as a new value.
 
-### Technical Approach
+#### 2. Admin Builder (`RoutinesBank.tsx`)
+- Add `'project'` to the `schedule_type` union type (`'daily' | 'challenge' | 'project'`)
+- Add third button in the "Routine Type" grid: `{ value: 'project', label: 'Project', desc: 'Ordered steps toward a goal', icon: '🎯' }` — change grid to `grid-cols-3`
+- For project type tasks: show "Step N" label (similar to challenge's "Day N" but labeled "Step") and enforce ordering
+- New tasks auto-get `step_number` (reuse `drip_day` field or `task_order`)
+- Hide challenge-specific fields (badge, start mode options) for project type; optionally show a "Goal" text field
 
-**Files to modify:**
+#### 3. Task Schedule Config (`renderTaskScheduleConfig`)
+- When `schedule_type === 'project'`, render a "Step N" indicator (similar to challenge's "Day N")
+- Tasks don't have repeat settings — each is a one-time step
 
-1. **`src/pages/app/AppWatch.tsx`**
-   - Replace the header `bg-[#E8F4FE]` with the dark gradient
-   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
-   - Add a lightning flash overlay div
-   - Update all text classes to white variants (`text-white`, `text-white/60`)
-   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
-   - Extend the gradient into the page background behind the content area
+#### 4. Routine Card Badge (`RoutinesBank.tsx` list)
+- Show `🎯 Project` badge alongside existing `🔥 Challenge` badge when `schedule_type === 'project'`
 
-2. **`tailwind.config.ts`**
-   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
-   - Register corresponding animation utilities
+#### 5. User-Facing Discovery (`AppInspire.tsx`, `AppRoutineCategory.tsx`)
+- Add project routines to the discovery feed (they already show since they're in `routines_bank`)
+- Optionally add a "🎯 Projects" filter tab alongside "🔥 Challenges"
 
-### Visual Structure
+#### 6. Adoption Logic (`useAddRoutinePlan.tsx` / routine adoption hooks)
+- When `schedule_type === 'project'`: create tasks with `repeat_pattern: 'none'` (one-time), ordered by `task_order`
+- Tasks get sequential `order_index` so they appear in order in the planner
 
-```text
-+----------------------------------+
-|  [dark blue gradient header]     |
-|  ~~~ cloud layer 1 (slow) ~~~   |
-|  ~~~ cloud layer 2 (slower) ~~~ |
-|  * lightning flash (periodic) *  |
-|                                  |
-|  Watch          [icons]          |
-|  [categories row]                |
-|  [filters]              [lang]   |
-+----------------------------------+
-|  [normal white content area]     |
-|  [playlist cards grid]           |
-+----------------------------------+
-```
+#### 7. Form Data Defaults
+- When switching to project type: set `end_mode` to `'never'` (user completes at own pace), clear challenge-specific fields
+- Default new project tasks to `is_once: true`
 
-The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
+### Files to Edit
+1. **`src/components/admin/RoutinesBank.tsx`** — add project type option, task step config, card badge
+2. **`src/pages/app/AppInspire.tsx`** — add project filter option
+3. **`src/pages/app/AppRoutineCategory.tsx`** — handle project type in display
+4. **`src/hooks/useRoutinePlans.tsx`** — handle project schedule_type in adoption
+5. **`src/hooks/useUserChallenges.tsx`** — exclude project type (it's not a challenge)
 
