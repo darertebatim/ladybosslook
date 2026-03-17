@@ -11,6 +11,7 @@ import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebration';
 import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
 import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebration';
+import { ProjectCompletionCelebration } from '@/components/app/ProjectCompletionCelebration';
 import { GoalInputSheet } from '@/components/app/GoalInputSheet';
 import { TaskTimerScreen } from '@/components/app/TaskTimerScreen';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
