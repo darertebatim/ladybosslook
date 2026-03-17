@@ -357,6 +357,7 @@ export function LeadsManager() {
           programSlug: selectedProgram?.slug,
           roundId: selectedEnrollRound || null,
           fullName: searchResults.profile.full_name || null,
+          expiresAt: enrollExpiresAt ? enrollExpiresAt.toISOString() : null,
         },
       });
 
