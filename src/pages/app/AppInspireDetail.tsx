@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
-import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask, useUserAddedBankRoutines } from '@/hooks/useRoutinesBank';
+import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask, useUserAddedBankRoutines, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
 import { useShareContent } from '@/hooks/useShareContent';
@@ -91,6 +91,7 @@ export default function AppInspireDetail() {
   const { data: addedRoutineIds = [] } = useUserAddedBankRoutines();
   const addRoutineFromBank = useAddRoutineFromBank();
   const { data: userChallenges = [] } = useUserChallenges();
+  const { data: categories = [] } = useRoutineBankCategories();
   
   // Check if routine was already added
   const isAlreadyAdded = planId ? addedRoutineIds.includes(planId) : false;
@@ -335,7 +336,7 @@ export default function AppInspireDetail() {
               )}
               {routine.category && (
                 <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-muted text-muted-foreground">
-                  {routine.category}
+                  {categories.find(c => c.slug === routine.category)?.name || routine.category}
                 </span>
               )}
               {routine.tasks && routine.tasks.length > 0 && (
