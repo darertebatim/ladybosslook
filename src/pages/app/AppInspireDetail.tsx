@@ -3,7 +3,7 @@ import { AddToRoutineHandHint, useAddToRoutineHint } from '@/components/app/AddT
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Loader2, Share2, Instagram } from 'lucide-react';
+import { Loader2, Share2, Instagram, Play } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
@@ -15,6 +15,8 @@ import { toast } from 'sonner';
 import { useShareContent } from '@/hooks/useShareContent';
 import { cn } from '@/lib/utils';
 import { TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { haptic } from '@/lib/haptics';
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400 to-amber-600',
