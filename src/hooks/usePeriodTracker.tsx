@@ -209,6 +209,7 @@ export function useLogPeriodDay() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['period-logs'] });
       queryClient.invalidateQueries({ queryKey: ['period-logs-all'] });
+      autoCompletePeriod();
     },
   });
 }

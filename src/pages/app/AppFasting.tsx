@@ -74,11 +74,14 @@ export default function AppFasting() {
   const isEating = mode === 'eating';
   const currentProtocol = FASTING_PROTOCOLS.find(p => p.id === selectedProtocol);
 
+  const { autoCompleteFasting } = useAutoCompleteProTask();
+
   const handleEndFast = async () => {
     const ended = await endFast();
     if (ended) {
       setCompletedSession(ended);
       setCompletionOpen(true);
+      autoCompleteFasting();
     }
   };
 
