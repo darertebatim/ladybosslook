@@ -1,9 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { AddToRoutineHandHint, useAddToRoutineHint } from '@/components/app/AddToRoutineHandHint';
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Share2 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
