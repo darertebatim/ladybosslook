@@ -488,6 +488,7 @@ const App = () => (
                     <Route path="routines/category/:categorySlug" element={<AppRoutineCategory />} />
                     <Route path="routines/:planId" element={<AppInspireDetail />} />
                     <Route path="actions" element={<AppActions />} />
+                    <Route path="my-tasks" element={<AppMyTasks />} />
                     {/* Redirects for backward compatibility with older app versions */}
                     <Route path="rituals" element={<Navigate to="/app/routines" replace />} />
                     <Route path="rituals/:planId" element={<RitualRedirect />} />
