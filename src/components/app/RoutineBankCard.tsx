@@ -163,6 +163,16 @@ export function RoutineBankCard({
               <X className="h-3.5 w-3.5 text-white" />
             </button>
           )}
+
+          {/* Completed overlay */}
+          {isCompleted && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
+              <div className="flex items-center gap-1.5 bg-emerald-500 rounded-full px-3 py-1.5 shadow-lg">
+                <CheckCircle className="h-4 w-4 text-white" />
+                <span className="text-white text-xs font-bold">Completed</span>
+              </div>
+            </div>
+          )}
         </div>
       </button>
     </div>
