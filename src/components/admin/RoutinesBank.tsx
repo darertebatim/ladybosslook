@@ -155,7 +155,7 @@ export default function RoutinesBank() {
     category: 'general',
     color: 'yellow',
     emoji: '✨',
-    schedule_type: 'daily' as 'daily' | 'challenge',
+    schedule_type: 'daily' as 'daily' | 'challenge' | 'project',
     challenge_start_date: null as Date | null,
     start_day_of_week: null as number | null,
     start_mode: 'none' as 'none' | 'date' | 'weekday',
