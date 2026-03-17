@@ -73,6 +73,10 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   const [showSkipSheet, setShowSkipSheet] = useState(false);
   const [showEndDialog, setShowEndDialog] = useState(false);
   const [showCompletionFlash, setShowCompletionFlash] = useState(false);
+  const [showPlaylistSheet, setShowPlaylistSheet] = useState(false);
+  const [showRearrangeSheet, setShowRearrangeSheet] = useState(false);
+  const [rearrangeTasks, setRearrangeTasks] = useState<FocusTask[]>([]);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
 
   const nextTask = config.tasks[currentTaskIndex + 1] || null;
   const progressPercent = currentTask
