@@ -677,7 +677,7 @@ export default function RoutinesBank() {
       section_id: sectionId,
       task_order: localTasks.filter(t => t.section_id === sectionId).length,
       schedule_days: [],
-      drip_day: formData.schedule_type === 'challenge' ? localTasks.length + 1 : null,
+      drip_day: formData.schedule_type === 'challenge' ? localTasks.length + 1 : formData.schedule_type === 'project' ? localTasks.length + 1 : null,
       monthly_day: null,
       is_once: task.repeat_pattern === 'none',
     };
