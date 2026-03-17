@@ -150,13 +150,22 @@ export const useAutoCompleteProTask = () => {
           if (task.repeat_pattern === 'daily') return true;
           
           if (task.repeat_pattern === 'weekly' && task.repeat_days) {
-            // repeat_days is array of day numbers (0-6)
             return (task.repeat_days as number[]).includes(dayOfWeek);
           }
           
           if (task.repeat_pattern === 'weekdays') {
             return dayOfWeek >= 1 && dayOfWeek <= 5;
           }
+
+          if (task.repeat_pattern === 'weekend') {
+            return dayOfWeek === 0 || dayOfWeek === 6;
+          }
+
+          if (task.repeat_pattern === 'custom' && task.repeat_days) {
+            return (task.repeat_days as number[]).includes(dayOfWeek);
+          }
+
+          if (task.repeat_pattern === 'monthly') return true;
         }
 
         return false;
@@ -284,6 +293,30 @@ export const useAutoCompleteProTask = () => {
     return autoComplete('reflection', reflectionId);
   }, [autoComplete]);
 
+  const autoCompleteFocusTimer = useCallback(async (): Promise<number> => {
+    return autoComplete('focus_timer');
+  }, [autoComplete]);
+
+  const autoCompleteFasting = useCallback(async (): Promise<number> => {
+    return autoComplete('fasting');
+  }, [autoComplete]);
+
+  const autoCompleteWeight = useCallback(async (): Promise<number> => {
+    return autoComplete('weight');
+  }, [autoComplete]);
+
+  const autoCompletePeriod = useCallback(async (): Promise<number> => {
+    return autoComplete('period');
+  }, [autoComplete]);
+
+  const autoCompleteVideo = useCallback(async (videoId?: string): Promise<number> => {
+    return autoComplete('video', videoId);
+  }, [autoComplete]);
+
+  const autoCompleteVideoPlaylist = useCallback(async (playlistId?: string): Promise<number> => {
+    return autoComplete('video_playlist', playlistId);
+  }, [autoComplete]);
+
   return {
     autoComplete,
     autoCompleteJournal,
@@ -292,5 +325,11 @@ export const useAutoCompleteProTask = () => {
     autoCompleteEmotion,
     autoCompleteMood,
     autoCompleteReflection,
+    autoCompleteFocusTimer,
+    autoCompleteFasting,
+    autoCompleteWeight,
+    autoCompletePeriod,
+    autoCompleteVideo,
+    autoCompleteVideoPlaylist,
   };
 };

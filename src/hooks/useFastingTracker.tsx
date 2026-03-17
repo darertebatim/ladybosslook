@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { haptic } from '@/lib/haptics';
 import { getCurrentZone, FASTING_PROTOCOLS, type FastingZone } from '@/lib/fastingZones';
+import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 
 interface FastingSession {
   id: string;

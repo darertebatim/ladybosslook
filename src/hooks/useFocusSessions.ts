@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns';
+import { useAutoCompleteProTask } from './useAutoCompleteProTask';
 
 interface SaveSessionParams {
   durationSeconds: number;
@@ -15,6 +16,7 @@ interface SaveSessionParams {
 export const useSaveFocusSession = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { autoCompleteFocusTimer } = useAutoCompleteProTask();
 
   return useMutation({
     mutationFn: async (params: SaveSessionParams) => {
@@ -32,6 +34,8 @@ export const useSaveFocusSession = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['focus-sessions'] });
+      // Auto-complete any focus_timer pro tasks
+      autoCompleteFocusTimer();
     },
   });
 };

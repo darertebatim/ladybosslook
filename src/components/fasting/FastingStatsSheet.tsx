@@ -14,6 +14,7 @@ import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreview
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import { toast } from 'sonner';
+import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 
 interface FastingSession {
   id: string;
@@ -206,6 +207,7 @@ function WeightKeypad({ value, unit, onValueChange, onConfirm, onClose }: {
 export function FastingStatsSheet({ open, onOpenChange, sessions, onDeleteSession }: FastingStatsSheetProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { autoCompleteWeight } = useAutoCompleteProTask();
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [weightValue, setWeightValue] = useState('');
   const [weightLogs, setWeightLogs] = useState<WeightLog[]>([]);
@@ -277,6 +279,7 @@ export function FastingStatsSheet({ open, onOpenChange, sessions, onDeleteSessio
       setWeightValue('');
       setShowKeypad(false);
       toast.success('Weight logged!');
+      autoCompleteWeight();
     }
     setIsLoggingWeight(false);
   };

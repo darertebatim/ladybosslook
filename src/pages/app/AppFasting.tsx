@@ -17,6 +17,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
+import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 
 export default function AppFasting() {
   const navigate = useNavigate();
@@ -73,11 +74,14 @@ export default function AppFasting() {
   const isEating = mode === 'eating';
   const currentProtocol = FASTING_PROTOCOLS.find(p => p.id === selectedProtocol);
 
+  const { autoCompleteFasting } = useAutoCompleteProTask();
+
   const handleEndFast = async () => {
     const ended = await endFast();
     if (ended) {
       setCompletedSession(ended);
       setCompletionOpen(true);
+      autoCompleteFasting();
     }
   };
 

@@ -10,6 +10,7 @@ import { FastingSettingsSheet } from '@/components/fasting/FastingSettingsSheet'
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Delete } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 
 type CardMode = 'idle' | 'fasting' | 'eating';
 
@@ -27,6 +28,7 @@ function formatRemaining(totalSeconds: number): string {
 export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { autoCompleteWeight } = useAutoCompleteProTask();
   const [mode, setMode] = useState<CardMode>('idle');
   const [progress, setProgress] = useState(0);
   const [title, setTitle] = useState('Ready to fast');
@@ -205,6 +207,7 @@ export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
       toast.success('Weight logged!');
       setWeightValue('');
       setWeightOpen(false);
+      autoCompleteWeight();
     } else {
       toast.error('Failed to log weight');
     }
