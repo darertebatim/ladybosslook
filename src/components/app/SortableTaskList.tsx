@@ -44,7 +44,6 @@ interface SortableTaskItemProps {
   onStepUnlocked?: (completedStep: number, newTaskCount: number) => void;
   onOpenGoalInput: (task: UserTask) => void;
   onOpenTimer: (task: UserTask) => void;
-  onStepUnlocked?: (completedStep: number, newTaskCount: number) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
   isDragging?: boolean;
 }
