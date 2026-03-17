@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import { Check, Plus, Play, Droplets, FastForward, Pencil, Trash2 } from 'lucide-react';
 import SealCheck from './SealCheck';
 import { parseISO, isBefore, startOfDay, format as fnsFormat } from 'date-fns';
@@ -146,6 +147,10 @@ export const TaskDetailModal = ({
       if (result.streakIncreased && onStreakIncrease) {
         haptic.medium();
         onStreakIncrease();
+      }
+      if (result.unlockedStep) {
+        haptic.medium();
+        toast.success(`🎉 Step ${result.unlockedStep.unlockedStep - 1} complete! ${result.unlockedStep.taskCount} new tasks unlocked.`, { duration: 4000 });
       }
     }
   };
