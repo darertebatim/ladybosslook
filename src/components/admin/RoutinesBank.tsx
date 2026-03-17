@@ -1682,6 +1682,7 @@ export default function RoutinesBank() {
                         for (const task of unlinked) {
                           const scheduleDays = task.schedule_days || [];
                           const repeatPattern = task.is_once ? 'none' : scheduleDays.length === 7 ? 'daily' : scheduleDays.length > 0 ? 'weekly' : 'daily';
+                          const hasDuration = task.duration_minutes && task.duration_minutes > 0;
                           const { data: inserted, error } = await supabase
                             .from('admin_task_bank')
                             .insert({
@@ -1691,6 +1692,10 @@ export default function RoutinesBank() {
                               color: task.color || formData.color || 'sky',
                               repeat_pattern: repeatPattern,
                               repeat_days: scheduleDays.length > 0 && scheduleDays.length < 7 ? scheduleDays : null,
+                              duration_minutes: task.duration_minutes || null,
+                              goal_enabled: hasDuration ? true : false,
+                              goal_type: hasDuration ? 'timer' : null,
+                              goal_target: hasDuration ? task.duration_minutes * 60 : null,
                               is_active: true,
                               is_popular: false,
                               sort_order: 0,
