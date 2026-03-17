@@ -61,6 +61,7 @@ const SortableTaskItem = ({
   onOpenGoalInput,
   onOpenTimer,
   onOpenWaterTracking,
+  onStepUnlocked,
   isDragging,
 }: SortableTaskItemProps) => {
   const {
