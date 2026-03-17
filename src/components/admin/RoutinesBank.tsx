@@ -932,6 +932,8 @@ export default function RoutinesBank() {
     ? routines.filter(r => r.is_featured)
     : selectedCategory === 'challenges'
     ? routines.filter(r => r.schedule_type === 'challenge')
+    : selectedCategory === 'projects'
+    ? routines.filter(r => r.schedule_type === 'project')
     : routines.filter(r => r.category === selectedCategory);
 
   const filteredTaskBank = taskBank.filter(t => 
