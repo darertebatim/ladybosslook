@@ -592,22 +592,48 @@ export default function AppInspireDetail() {
       {/* Animated hand hint for new users — outside footer so fixed positioning works */}
       <AddToRoutineHandHint show={showHint && !isAdded} />
 
-      {/* Sticky Add Button */}
+      {/* Sticky Footer: Play button (for focus routines already added) OR Add button */}
       <div 
         className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}
       >
-        <AddedToRoutineButton
-          isAdded={isAdded}
-          onAddClick={() => {
-            dismissHint();
-            handleAddClick();
-          }}
-          isLoading={addRoutineFromBank.isPending}
-          size="lg"
-          addText="Add to my routines"
-          className="bg-urgency text-urgency-foreground"
-        />
+        {isFocus && isAdded && routine?.tasks?.length ? (
+          <div className="flex gap-3">
+            <Button
+              onClick={() => {
+                haptic.medium();
+                startFocusRoutine({
+                  routineId: planId!,
+                  routineTitle: routine.title,
+                  routineEmoji: routine.emoji || '✨',
+                  tasks: (routine.tasks || []).map(t => ({
+                    id: t.id,
+                    title: t.title,
+                    emoji: t.emoji || '📝',
+                    targetSeconds: t.goal_target || (t.duration_minutes ? t.duration_minutes * 60 : 300),
+                    color: t.color || undefined,
+                  })),
+                });
+              }}
+              className="flex-1 h-12 rounded-xl text-base font-semibold gap-2"
+            >
+              <Play className="w-5 h-5" />
+              Start Routine
+            </Button>
+          </div>
+        ) : (
+          <AddedToRoutineButton
+            isAdded={isAdded}
+            onAddClick={() => {
+              dismissHint();
+              handleAddClick();
+            }}
+            isLoading={addRoutineFromBank.isPending}
+            size="lg"
+            addText="Add to my routines"
+            className="bg-urgency text-urgency-foreground"
+          />
+        )}
       </div>
 
       {/* Preview Sheet */}
