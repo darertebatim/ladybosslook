@@ -96,8 +96,8 @@ export default function AppInspireDetail() {
   const isAlreadyAdded = planId ? addedRoutineIds.includes(planId) : false;
   const isAdded = isAlreadyAdded || justAdded;
   
-  // Find this routine's challenge data if it's been added
   const isChallenge = (routine as any)?.schedule_type === 'challenge';
+  const isProject = (routine as any)?.schedule_type === 'project';
   const userChallenge = useMemo(() => {
     if (!planId || !isChallenge) return null;
     return userChallenges.find(c => c.routineId === planId) || null;
@@ -323,6 +323,16 @@ export default function AppInspireDetail() {
             )}
             
             <div className="flex items-center gap-2 mt-3 flex-wrap">
+              {isProject && (
+                <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                  🎯 Project
+                </span>
+              )}
+              {isChallenge && (
+                <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300">
+                  🔥 Challenge
+                </span>
+              )}
               {routine.category && (
                 <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-muted text-muted-foreground">
                   {routine.category}
@@ -330,7 +340,7 @@ export default function AppInspireDetail() {
               )}
               {routine.tasks && routine.tasks.length > 0 && (
                <span className="text-sm text-foreground">
-                   {routine.tasks.length} task{routine.tasks.length !== 1 ? 's' : ''}
+                   {routine.tasks.length} {isProject ? 'step' : 'task'}{routine.tasks.length !== 1 ? 's' : ''}
                 </span>
               )}
             </div>
@@ -394,8 +404,62 @@ export default function AppInspireDetail() {
             />
           )}
 
-          {/* Tasks by Section */}
-          {routine.sections && routine.sections.length > 0 ? (
+          {/* Tasks display */}
+          {isProject ? (
+            /* Project: show tasks as sequential steps */
+            <div className="mt-6 space-y-4">
+              <h3 className="text-lg font-semibold text-foreground">Steps</h3>
+              {(() => {
+                const allTasks = routine.tasks || [];
+                // Group by drip_day (step number)
+                const stepGroups = new Map<number, RoutineBankTask[]>();
+                allTasks.forEach((task, idx) => {
+                  const step = (task as any).drip_day ?? (idx + 1);
+                  if (!stepGroups.has(step)) stepGroups.set(step, []);
+                  stepGroups.get(step)!.push(task);
+                });
+                const sortedSteps = Array.from(stepGroups.keys()).sort((a, b) => a - b);
+                return sortedSteps.map(step => (
+                  <div key={step}>
+                    <p className="text-sm font-semibold text-muted-foreground mb-2">
+                      🎯 Step {step}
+                    </p>
+                    <div className="space-y-3">
+                      {stepGroups.get(step)!.map((task) => {
+                        const bgColor = TASK_COLORS[(task.color as TaskColor) || 'mint'] || TASK_COLORS.mint;
+                        return (
+                          <div
+                            key={task.id}
+                            className="rounded-xl border border-border/50 overflow-hidden"
+                            style={{ backgroundColor: bgColor }}
+                          >
+                            <div className="flex items-center gap-3 p-3">
+                              <span className="text-2xl shrink-0">
+                                {task.emoji && isEmoji(task.emoji) ? task.emoji : '📝'}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-black truncate">{task.title}</p>
+                                <p className="text-xs text-black/70 truncate">
+                                  {task.category || 'General'} • One-time step
+                                </p>
+                              </div>
+                            </div>
+                            {task.description && (
+                              <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
+                                <p className="text-xs text-black/80 leading-relaxed">
+                                  {task.description}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ));
+              })()}
+            </div>
+          ) : routine.sections && routine.sections.length > 0 ? (
             <div className="mt-6 space-y-6">
               {routine.sections.map((section) => {
                 const sectionTasks = tasksBySection[section.id] || [];
