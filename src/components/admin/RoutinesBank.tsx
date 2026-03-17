@@ -973,6 +973,23 @@ export default function RoutinesBank() {
         </div>
       );
     }
+    if (formData.schedule_type === 'project') {
+      return (
+        <div className="flex items-center gap-1">
+          <span className="text-[10px] text-muted-foreground">Step</span>
+          <Input
+            type="number"
+            min={1}
+            value={task.drip_day ?? ''}
+            onChange={(e) => {
+              const val = e.target.value ? parseInt(e.target.value) : null;
+              setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, drip_day: val } : t));
+            }}
+            className="w-12 h-6 text-xs text-center p-0"
+          />
+        </div>
+      );
+    }
     // Normal mode: show Daily / Weekly / Monthly / Once selector
     const days = task.schedule_days || [];
     const isWeekly = days.length > 0;
