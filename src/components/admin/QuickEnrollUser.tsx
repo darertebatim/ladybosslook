@@ -83,6 +83,7 @@ export const QuickEnrollUser = () => {
       setFullName('');
       setSelectedCourse('');
       setSelectedRound('');
+      setExpiresAt(undefined);
     } catch (error: any) {
       console.error('Error enrolling user:', error);
       toast({
