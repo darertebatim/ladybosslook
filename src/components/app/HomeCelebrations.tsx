@@ -165,6 +165,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     userId, showNotificationFlow, setShowNotificationFlow,
     challengeDayCelebration, closeChallengeDayCelebration, showChallengeDayCelebration,
     stepCelebration, onCloseStepCelebration,
+    projectCompletion, onCloseProjectCompletion,
   } = props;
 
   const { hasAccessToProgram } = useSubscription();
