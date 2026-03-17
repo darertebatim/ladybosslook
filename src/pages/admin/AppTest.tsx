@@ -662,6 +662,14 @@ export default function AppTest() {
             completedStep={testCompletedStep}
             newTaskCount={4}
           />
+          <ProjectCompletionCelebration
+            open={showProjectCompletion}
+            onClose={() => setShowProjectCompletion(false)}
+            projectTitle="Morning Routine Makeover"
+            projectEmoji="🌅"
+            totalSteps={4}
+            totalTasks={12}
+          />
         </CardContent>
       </Card>
 
@@ -691,6 +699,24 @@ export default function AppTest() {
           <p className="text-xs text-muted-foreground">
             Shows confetti + step transition indicator. New tasks appear in planner after dismissal.
           </p>
+        </CardContent>
+      </Card>
+
+      {/* Project Completion */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-violet-500" />
+            Project Completion
+          </CardTitle>
+          <CardDescription>
+            Big celebration when user finishes ALL steps of a project. Posts to feed + badge on card.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Button onClick={() => setShowProjectCompletion(true)} variant="outline">
+            🎯 Complete Project
+          </Button>
         </CardContent>
       </Card>
 
