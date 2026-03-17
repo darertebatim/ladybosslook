@@ -518,8 +518,8 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
               style={{ top: SUGGESTIONS_ANCHOR_TOP }}
             >
               {/* Category pills */}
-              <ScrollArea className="w-full shrink-0" type="scroll">
-                <div className="flex gap-1.5 pb-2">
+              <div className="w-full overflow-x-auto shrink-0 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+                <div className="flex gap-1.5 pb-2 w-max">
                   <button
                     onClick={() => { haptic.light(); setSelectedCategory('popular'); }}
                     className={cn(
@@ -547,8 +547,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
                     </button>
                   ))}
                 </div>
-                <ScrollBar orientation="horizontal" className="invisible" />
-              </ScrollArea>
+              </div>
 
               {/* Task cards */}
               <div className="overflow-y-auto overscroll-contain space-y-1.5 max-h-[40vh]" style={{ WebkitOverflowScrolling: 'touch' }}>
