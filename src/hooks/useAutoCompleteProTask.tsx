@@ -284,6 +284,30 @@ export const useAutoCompleteProTask = () => {
     return autoComplete('reflection', reflectionId);
   }, [autoComplete]);
 
+  const autoCompleteFocusTimer = useCallback(async (): Promise<number> => {
+    return autoComplete('focus_timer');
+  }, [autoComplete]);
+
+  const autoCompleteFasting = useCallback(async (): Promise<number> => {
+    return autoComplete('fasting');
+  }, [autoComplete]);
+
+  const autoCompleteWeight = useCallback(async (): Promise<number> => {
+    return autoComplete('weight');
+  }, [autoComplete]);
+
+  const autoCompletePeriod = useCallback(async (): Promise<number> => {
+    return autoComplete('period');
+  }, [autoComplete]);
+
+  const autoCompleteVideo = useCallback(async (videoId?: string): Promise<number> => {
+    return autoComplete('video', videoId);
+  }, [autoComplete]);
+
+  const autoCompleteVideoPlaylist = useCallback(async (playlistId?: string): Promise<number> => {
+    return autoComplete('video_playlist', playlistId);
+  }, [autoComplete]);
+
   return {
     autoComplete,
     autoCompleteJournal,
@@ -292,5 +316,11 @@ export const useAutoCompleteProTask = () => {
     autoCompleteEmotion,
     autoCompleteMood,
     autoCompleteReflection,
+    autoCompleteFocusTimer,
+    autoCompleteFasting,
+    autoCompleteWeight,
+    autoCompletePeriod,
+    autoCompleteVideo,
+    autoCompleteVideoPlaylist,
   };
 };
