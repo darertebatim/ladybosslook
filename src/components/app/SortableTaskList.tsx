@@ -432,7 +432,8 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
           className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !translate-y-0"
           style={{ top: QUICK_ADD_ANCHOR_TOP }}
           onInteractOutside={(event) => {
-            if (showIdeas && suggestionsLayerRef.current?.contains(event.target as Node)) {
+            const target = event.target as HTMLElement | null;
+            if (showIdeas && target?.closest('[data-suggestions-content="true"]')) {
               event.preventDefault();
             }
           }}
