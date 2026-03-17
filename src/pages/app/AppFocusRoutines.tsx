@@ -290,6 +290,56 @@ export default function AppFocusRoutines() {
           </div>
         )}
       </div>
+
+      {/* Pre-start overlay */}
+      {preStartRoutine && (
+        <div className="fixed inset-0 z-[9999] bg-background flex flex-col">
+          <header
+            className="flex items-center justify-between px-4 pt-3 pb-3"
+            style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
+          >
+            <button onClick={() => setPreStartRoutine(null)} className="p-1 active:opacity-70">
+              <ChevronLeft className="w-5 h-5 text-foreground" />
+            </button>
+            <div className="w-7" />
+          </header>
+
+          <div className="flex-1 overflow-y-auto px-5 pb-32">
+            <h1 className="text-2xl font-bold text-foreground mt-2">{preStartRoutine.title}</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {format(new Date(), 'h:mma')} – {format(addMinutes(new Date(), Math.ceil(totalPreStartSeconds / 60)), 'h:mma')} ({Math.ceil(totalPreStartSeconds / 60)}m)
+            </p>
+
+            <div className="space-y-2.5 mt-6">
+              {preStartTasks.map((task, i) => (
+                <div
+                  key={task.id}
+                  className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5"
+                >
+                  <span className="text-xs text-muted-foreground font-medium w-4 shrink-0">{i + 1}</span>
+                  <FluentEmoji emoji={task.emoji} size={28} />
+                  <p className="flex-1 text-sm font-medium text-foreground leading-snug">{task.title}</p>
+                  <span className="text-xs text-muted-foreground shrink-0">{Math.ceil(task.targetSeconds / 60)}m</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Start button */}
+          <div
+            className="fixed bottom-0 left-0 right-0 px-5 pb-4 pt-2 bg-background"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}
+          >
+            <button
+              onClick={handleStartFromPreview}
+              className="w-full flex items-center justify-center gap-2 h-14 rounded-2xl bg-amber-400 text-black font-bold text-base active:scale-[0.98] transition-transform"
+            >
+              <Play className="w-5 h-5 fill-current" />
+              Start
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
