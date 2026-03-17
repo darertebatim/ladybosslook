@@ -97,9 +97,9 @@ const SortableTaskItem = ({
         goalProgress={goalProgress}
         onTap={onTap}
         onStreakIncrease={onStreakIncrease}
+        onStepUnlocked={onStepUnlocked}
         onOpenGoalInput={onOpenGoalInput}
         onOpenTimer={onOpenTimer}
-        onOpenWaterTracking={onOpenWaterTracking}
       />
     </div>
   );
