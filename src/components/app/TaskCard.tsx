@@ -67,6 +67,26 @@ export const TaskCard = memo(function TaskCard({
   const uncompleteTask = useUncompleteTask();
   const { autoCompleteWeight } = useAutoCompleteProTask();
 
+  const completedCount = subtasks.filter(s => completedSubtaskIds.includes(s.id)).length;
+  const totalSubtasks = subtasks.length;
+  const hasSubtasks = totalSubtasks > 0;
+  
+  // Check if this is a Pro Task (has pro_link_type or legacy linked_playlist_id)
+  const isProTask = !!task.pro_link_type || !!task.linked_playlist_id;
+  const proLinkType: ProLinkType | null = task.pro_link_type || (task.linked_playlist_id ? 'playlist' : null);
+  const proLinkValue = task.pro_link_value || task.linked_playlist_id;
+  const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
+
+  // Check if this is a future date (after today)
+  const isFutureDate = !isToday(date) && !isBefore(startOfDay(date), startOfDay(new Date()));
+  
+  // Check if this task has a goal
+  const hasGoal = task.goal_enabled && task.goal_target && task.goal_target > 0;
+  const isTimerGoal = hasGoal && task.goal_type === 'timer';
+  const isCountGoal = hasGoal && task.goal_type === 'count';
+  const isWater = isWaterTask(task);
+  const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
+
   // Detect if this task was just auto-completed while user was away
   useEffect(() => {
     if (!isCompleted && !goalReached) return;
@@ -90,25 +110,6 @@ export const TaskCard = memo(function TaskCard({
       return () => clearTimeout(timer);
     }
   }, [isCompleted, goalReached, task.id]);
-
-  const totalSubtasks = subtasks.length;
-  const hasSubtasks = totalSubtasks > 0;
-  
-  // Check if this is a Pro Task (has pro_link_type or legacy linked_playlist_id)
-  const isProTask = !!task.pro_link_type || !!task.linked_playlist_id;
-  const proLinkType: ProLinkType | null = task.pro_link_type || (task.linked_playlist_id ? 'playlist' : null);
-  const proLinkValue = task.pro_link_value || task.linked_playlist_id;
-  const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
-
-  // Check if this is a future date (after today)
-  const isFutureDate = !isToday(date) && !isBefore(startOfDay(date), startOfDay(new Date()));
-  
-  // Check if this task has a goal
-  const hasGoal = task.goal_enabled && task.goal_target && task.goal_target > 0;
-  const isTimerGoal = hasGoal && task.goal_type === 'timer';
-  const isCountGoal = hasGoal && task.goal_type === 'count';
-  const isWater = isWaterTask(task);
-  const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
   
   // Format time display using task scheduling helper
   const formatTime = (task: UserTask) => {
