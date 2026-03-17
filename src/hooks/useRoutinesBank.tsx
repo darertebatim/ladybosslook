@@ -568,7 +568,7 @@ export function useAddRoutineFromBank() {
             linked_playlist_id: proLinkType === 'playlist' ? proLinkValue : null,
             pro_link_type: proLinkType,
             pro_link_value: proLinkValue,
-            is_active: true,
+            is_active: scheduleType === 'project' ? (projectStep === 1 || projectStep === null) : true,
             order_index: startOrderIndex + index,
             // Copy goal settings from admin task bank
             goal_enabled: bankTask?.goal_enabled ?? false,
@@ -576,6 +576,9 @@ export function useAddRoutineFromBank() {
             goal_type: bankTask?.goal_type ?? null,
             goal_unit: bankTask?.goal_unit ?? null,
             repeat_end_date: repeatEndDate,
+            // Project tracking
+            source_routine_id: scheduleType === 'project' ? routineId : null,
+            project_step: projectStep,
           };
         });
 
