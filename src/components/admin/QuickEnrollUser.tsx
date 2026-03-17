@@ -187,6 +187,12 @@ export const QuickEnrollUser = () => {
             <Button type="button" variant="outline" size="sm" onClick={() => setExpiresAt(addMonths(new Date(), 3))}>
               3 months
             </Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => setExpiresAt(addMonths(new Date(), 6))}>
+              6 months
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => setExpiresAt(addYears(new Date(), 100))}>
+              Lifetime
+            </Button>
           </div>
           <Popover>
             <PopoverTrigger asChild>
@@ -210,7 +216,11 @@ export const QuickEnrollUser = () => {
             </PopoverContent>
           </Popover>
           <p className="text-xs text-muted-foreground">
-            {expiresAt ? `Expires: ${format(expiresAt, 'PPP')}` : 'Default: 1 year (subscription programs)'}
+            {expiresAt
+              ? expiresAt.getFullYear() > 2090
+                ? 'Lifetime access (never expires)'
+                : `Expires: ${format(expiresAt, 'PPP')}`
+              : 'Default: 1 year (subscription programs)'}
           </p>
         </div>
 
