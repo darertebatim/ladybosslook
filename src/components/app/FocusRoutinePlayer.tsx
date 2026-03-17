@@ -126,19 +126,6 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
         </button>
       </div>
 
-      {/* Progress bar */}
-      <div className="px-4 mt-2">
-        <div className="h-1 bg-foreground/5 rounded-full overflow-hidden">
-          <div
-            className={cn(
-              "h-full rounded-full transition-all duration-1000 ease-linear",
-              isOvertime ? "bg-amber-400" : "bg-foreground/70"
-            )}
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
-      </div>
-
       {/* Task title + time range — ABOVE circle */}
       <div className="px-6 mt-4">
         <h2 className="text-xl font-bold text-foreground text-center leading-snug max-w-xs mx-auto">
