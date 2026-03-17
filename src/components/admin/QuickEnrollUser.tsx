@@ -6,9 +6,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Calendar as CalendarIcon } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { usePrograms } from '@/hooks/usePrograms';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { format, addDays, addMonths } from 'date-fns';
 
 export const QuickEnrollUser = () => {
   const { toast } = useToast();
@@ -18,6 +22,7 @@ export const QuickEnrollUser = () => {
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedRound, setSelectedRound] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [expiresAt, setExpiresAt] = useState<Date | undefined>(undefined);
 
   // Fetch available rounds for selected course
   const { data: rounds } = useQuery({
