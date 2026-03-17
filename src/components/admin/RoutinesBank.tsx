@@ -117,6 +117,7 @@ interface LocalTask {
   drip_day: number | null;
   monthly_day: number | null;
   is_once: boolean;
+  duration_minutes: number | null;
 }
 
 export default function RoutinesBank() {
