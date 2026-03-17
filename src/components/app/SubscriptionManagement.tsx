@@ -81,9 +81,22 @@ export function SubscriptionCard() {
   // Find the active subscription details
   const activeSub = subscriptions[0];
   const isAnnual = activeSub?.product_id?.toLowerCase().includes('annual') || activeSub?.product_id?.toLowerCase().includes('yearly');
+  const isMonthly = !isAnnual;
   const planLabel = isAnnual ? 'SimoraPlus Yearly' : 'SimoraPlus Monthly';
+  const planPrice = isAnnual ? '$99.99/year' : '$13.99/month';
   const expiresAt = activeSub?.expires_at;
   const platform = activeSub?.platform;
+
+  // Calculate progress through billing period
+  const getProgressPercent = () => {
+    if (!expiresAt || !activeSub?.created_at) return 15;
+    const start = new Date(activeSub.created_at).getTime();
+    const end = new Date(expiresAt).getTime();
+    const now = Date.now();
+    const total = end - start;
+    if (total <= 0) return 15;
+    return Math.min(Math.max(((now - start) / total) * 100, 5), 100);
+  };
 
   return (
     <>
@@ -97,19 +110,19 @@ export function SubscriptionCard() {
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <p className="font-bold text-foreground text-base">{planLabel}</p>
-            <p className="text-foreground/70 text-xs mt-0.5">Enjoy all premium features & contents</p>
+            <p className="text-foreground/70 text-xs mt-0.5">{planPrice} • Enjoy all premium features</p>
           </div>
           <div className="h-14 w-14 rounded-full bg-yellow-300/40 flex items-center justify-center">
             <Crown className="h-7 w-7 text-foreground" />
           </div>
         </div>
-        {/* Progress bar decoration */}
+        {/* Progress bar */}
         <div className="mt-3 h-1.5 bg-foreground/20 rounded-full overflow-hidden">
-          <div className="h-full bg-foreground/50 rounded-full" style={{ width: '15%' }} />
+          <div className="h-full bg-foreground/50 rounded-full transition-all" style={{ width: `${getProgressPercent()}%` }} />
         </div>
         <div className="flex items-center justify-between mt-2">
           <p className="text-foreground/70 text-xs">
-            {expiresAt ? `Expiration: ${format(new Date(expiresAt), 'yyyy-MM-dd')}` : 'Active Subscription'}
+            {expiresAt ? `Renews: ${format(new Date(expiresAt), 'MMM d, yyyy')}` : 'Active Subscription'}
           </p>
           <div className="flex items-center gap-1">
             <span className="text-foreground text-xs font-semibold">Manage</span>
@@ -122,6 +135,8 @@ export function SubscriptionCard() {
         open={showManage}
         onOpenChange={setShowManage}
         planLabel={planLabel}
+        planPrice={planPrice}
+        isMonthly={isMonthly}
         expiresAt={expiresAt}
         platform={platform}
       />
