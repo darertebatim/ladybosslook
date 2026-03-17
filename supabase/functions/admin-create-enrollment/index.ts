@@ -28,7 +28,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, courseName, programSlug, roundId, fullName }: EnrollmentRequest = await req.json();
+    const { email, courseName, programSlug, roundId, fullName, expiresAt }: EnrollmentRequest = await req.json();
 
     if (!email || !courseName) {
       return new Response(
