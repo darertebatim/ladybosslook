@@ -1,58 +1,27 @@
 
 
-## Calm-Style Animated Background for Watch Page
+## Focus Routine Player - Implementation (Completed)
 
-Transform the Watch page header and background into a premium, Calm-inspired dark blue atmosphere with animated clouds and subtle lightning effects.
+A **Routinery-style Focus Routine Player** — a sequential task runner that plays through a routine's tasks one by one with countdown timers.
 
-### What You'll Get
+### Flow
+1. User opens a focus routine detail page → sees "▶ Start Routine" button (if already added)
+2. Pre-start breathing intro (3 cycles, skippable)
+3. Full-screen timer player cycling tasks sequentially (pause/complete/skip controls)
+4. Completion summary with streaks, total time, per-task breakdown
 
-- A deep dark blue gradient background on the Watch page header area
-- Soft, slowly drifting cloud layers (pure CSS animations, no video needed)
-- Subtle lightning flashes that pulse periodically
-- All text updated to white/light colors for contrast
-- Lightweight implementation using CSS keyframes (no extra dependencies)
+### Files Created
+- `src/components/app/FocusRoutineBreathIntro.tsx` — Breathing intro screen
+- `src/components/app/FocusRoutinePlayer.tsx` — Main timer player component
+- `src/components/app/FocusRoutineSummary.tsx` — Post-routine summary
+- `src/components/app/FocusPlayerProvider.tsx` — Context provider + overlay mount
+- `src/hooks/useFocusRoutinePlayer.ts` — State management hook
 
-### Design Details
+### Files Modified
+- `src/layouts/NativeAppLayout.tsx` — Wrapped with FocusPlayerProvider
+- `src/pages/app/AppInspireDetail.tsx` — Added Play button for focus routines
+- `src/hooks/useRoutinesBank.tsx` — Added `is_focus` and `duration_minutes` to types
 
-- **Background**: Deep navy-to-indigo gradient (`#0a1628` to `#1a2744`)
-- **Clouds**: 2-3 semi-transparent radial gradient "blobs" that slowly drift horizontally using CSS translate animations (15-25s loop)
-- **Lightning**: A brief white flash overlay that triggers every ~8 seconds using a CSS opacity keyframe
-- **Header**: The fixed header becomes transparent/dark blue instead of the current light blue `#E8F4FE`
-- **Text**: Title, filters, and category labels switch to white/white-alpha for readability
-
-### Technical Approach
-
-**Files to modify:**
-
-1. **`src/pages/app/AppWatch.tsx`**
-   - Replace the header `bg-[#E8F4FE]` with the dark gradient
-   - Add animated cloud `div` layers (absolute positioned, CSS-animated)
-   - Add a lightning flash overlay div
-   - Update all text classes to white variants (`text-white`, `text-white/60`)
-   - Update filter buttons to use dark-friendly styles (`bg-white/10` instead of `bg-muted`)
-   - Extend the gradient into the page background behind the content area
-
-2. **`tailwind.config.ts`**
-   - Add custom keyframes: `cloud-drift-1`, `cloud-drift-2`, `lightning-flash`
-   - Register corresponding animation utilities
-
-### Visual Structure
-
-```text
-+----------------------------------+
-|  [dark blue gradient header]     |
-|  ~~~ cloud layer 1 (slow) ~~~   |
-|  ~~~ cloud layer 2 (slower) ~~~ |
-|  * lightning flash (periodic) *  |
-|                                  |
-|  Watch          [icons]          |
-|  [categories row]                |
-|  [filters]              [lang]   |
-+----------------------------------+
-|  [normal white content area]     |
-|  [playlist cards grid]           |
-+----------------------------------+
-```
-
-The clouds are CSS-only (radial-gradient blobs with `animation: cloud-drift`), keeping performance smooth on mobile. No video files or heavy assets needed.
-
+### Database
+- `routine_sessions` — Tracks focus routine play sessions
+- `routine_session_tasks` — Per-task results within a session
