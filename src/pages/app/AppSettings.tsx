@@ -550,6 +550,23 @@ const AppSettings = () => {
           </Collapsible>
         )}
 
+        {/* Redeem Code */}
+        <button
+          onClick={() => {
+            const url = 'https://apps.apple.com/redeem?ctx=offercodes&id=6755076134';
+            window.open(url, '_blank');
+          }}
+          className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+              <Download className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <span className="font-medium text-sm">Redeem Code</span>
+          </div>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </button>
+
         {/* Rate Simora - Native only */}
         {showNativeSettings && (
           <button onClick={() => navigate('/app/rate')} className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
