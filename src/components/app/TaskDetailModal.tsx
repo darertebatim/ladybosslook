@@ -151,7 +151,7 @@ export const TaskDetailModal = ({
         onStreakIncrease();
       }
       if (result.unlockedStep && onStepUnlocked) {
-        onStepUnlocked(result.unlockedStep.unlockedStep - 1, result.unlockedStep.taskCount);
+        onStepUnlocked(result.unlockedStep);
       }
     }
   };
