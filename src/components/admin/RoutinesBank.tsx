@@ -1107,6 +1107,9 @@ export default function RoutinesBank() {
             <TabsTrigger value="challenges" className="flex items-center gap-1">
               🔥 Challenges
             </TabsTrigger>
+            <TabsTrigger value="projects" className="flex items-center gap-1">
+              🎯 Projects
+            </TabsTrigger>
             {routineCategories.map((cat) => (
               <TabsTrigger 
                 key={cat.slug} 
