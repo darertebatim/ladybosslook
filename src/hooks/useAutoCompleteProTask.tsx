@@ -150,13 +150,22 @@ export const useAutoCompleteProTask = () => {
           if (task.repeat_pattern === 'daily') return true;
           
           if (task.repeat_pattern === 'weekly' && task.repeat_days) {
-            // repeat_days is array of day numbers (0-6)
             return (task.repeat_days as number[]).includes(dayOfWeek);
           }
           
           if (task.repeat_pattern === 'weekdays') {
             return dayOfWeek >= 1 && dayOfWeek <= 5;
           }
+
+          if (task.repeat_pattern === 'weekend') {
+            return dayOfWeek === 0 || dayOfWeek === 6;
+          }
+
+          if (task.repeat_pattern === 'custom' && task.repeat_days) {
+            return (task.repeat_days as number[]).includes(dayOfWeek);
+          }
+
+          if (task.repeat_pattern === 'monthly') return true;
         }
 
         return false;
