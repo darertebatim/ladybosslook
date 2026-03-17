@@ -111,6 +111,7 @@ interface SortableTaskListProps {
   goalProgressMap: Map<string, number>;
   onTaskTap: (task: UserTask) => void;
   onStreakIncrease: () => void;
+  onStepUnlocked?: (completedStep: number, newTaskCount: number) => void;
   onOpenGoalInput: (task: UserTask) => void;
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
