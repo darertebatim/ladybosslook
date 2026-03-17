@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format, startOfMonth, endOfMonth, parseISO } from 'date-fns';
+import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { 
   PeriodLog, 
   PeriodSettings, 
