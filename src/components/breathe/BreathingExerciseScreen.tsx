@@ -51,8 +51,8 @@ export function BreathingExerciseScreen({
   // Layout toggle
   const [layout, setLayout] = useState<LayoutMode>(() => {
     try {
-      return (localStorage.getItem('simora_breathe_layout') as LayoutMode) || 'classic';
-    } catch { return 'classic'; }
+      return (localStorage.getItem('simora_breathe_layout') as LayoutMode) || 'immersive';
+    } catch { return 'immersive'; }
   });
 
   const toggleLayout = useCallback(() => {
