@@ -10,6 +10,7 @@ import { FastingSettingsSheet } from '@/components/fasting/FastingSettingsSheet'
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Delete } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 
 type CardMode = 'idle' | 'fasting' | 'eating';
 
