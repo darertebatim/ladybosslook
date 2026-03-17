@@ -286,6 +286,7 @@ export default function AppInspire() {
                         <RoutineBankCard
                           routine={routine}
                           onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                          isCompleted={completedRoutines?.has(routine.id)}
                         />
                       </div>
                     ))}
