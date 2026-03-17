@@ -33,6 +33,7 @@ interface FocusRoutinePlayerProps {
   onEndRoutineEarly: () => void;
   onClose: () => void;
   onCancel: () => void;
+  onMinimize: () => void;
 }
 
 function formatTime(seconds: number): string {
