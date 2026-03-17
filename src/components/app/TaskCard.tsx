@@ -444,12 +444,12 @@ export const TaskCard = memo(function TaskCard({
                   )}
                 </AnimatePresence>
                 <button
-                  onClick={handleOpenGoalInput}
+                  onClick={handleProCircleClick}
                   className="w-9 h-9 flex items-center justify-center shrink-0"
                 >
                   {goalReached ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
                     <CircleProgressButton progress={goalProgress} target={task.goal_target || 1}>
-                      {isWater ? <Droplets className="h-4 w-4 text-sky-500" /> : <Plus className="h-4 w-4" />}
+                      {isWater ? <Droplets className="h-4 w-4 text-sky-500" /> : <ProIcon className={cn("h-4 w-4", proConfig.iconColorClass)} />}
                     </CircleProgressButton>
                   )}
                 </button>
