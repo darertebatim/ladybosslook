@@ -234,8 +234,11 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
       {/* Controls section */}
       <div className="px-6 pb-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
         {isPaused ? (
-          /* Paused state: single Resume button */
-          <div className="flex justify-center mb-4">
+          /* Paused state: pause counter + Resume outside circle */
+          <div className="flex flex-col items-center gap-3 mb-4">
+            <p className="text-[36px] font-extrabold text-blue-500 tabular-nums leading-none">
+              {formatTime(pauseElapsed)}
+            </p>
             <button
               onClick={() => { haptic.medium(); onTogglePause(); }}
               className="px-10 py-3.5 rounded-full bg-blue-500 text-white font-semibold text-base active:scale-95 transition-transform shadow-lg"
@@ -281,7 +284,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
         )}
 
         {/* Bottom card: All ends time + Rearrange */}
-        {endTime && !isPaused && (
+        {endTime && (
           <div className="flex items-center justify-between bg-foreground/[0.04] rounded-2xl px-5 py-3.5 mt-1">
             <div>
               <p className="text-xs text-muted-foreground">All ends</p>
