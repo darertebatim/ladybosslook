@@ -189,12 +189,21 @@ export default function AppVideoPlaylistDetail() {
         style={{ paddingTop: 'env(safe-area-inset-top)', height: 'calc(48px + env(safe-area-inset-top))' }}
       >
         <BackButton className="text-white" />
-        <AddedToRoutineButton
-          isAdded={!!existingTask}
-          onAddClick={handleAddToRoutines}
-          isLoading={addRoutinePlan.isPending}
-          iconOnly
-        />
+        <div className="flex items-center gap-1">
+          <button
+            onClick={handleShare}
+            className="h-10 w-10 flex items-center justify-center rounded-full text-white active:scale-95 transition-transform"
+            aria-label="Share"
+          >
+            <Share2 className="h-5 w-5" />
+          </button>
+          <AddedToRoutineButton
+            isAdded={!!existingTask}
+            onAddClick={handleAddToRoutines}
+            isLoading={addRoutinePlan.isPending}
+            iconOnly
+          />
+        </div>
       </div>
 
       {/* Spacer for fixed header */}

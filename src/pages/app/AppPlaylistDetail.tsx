@@ -26,6 +26,8 @@ import { PaywallSheet } from "@/components/app/PaywallSheet";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import heroStormVideo from "@/assets/watch-hero-storm.mp4";
+import { Share2 } from "lucide-react";
+import { useShareContent } from "@/hooks/useShareContent";
 export default function AppPlaylistDetail() {
   const { playlistId } = useParams();
   const { user } = useAuth();

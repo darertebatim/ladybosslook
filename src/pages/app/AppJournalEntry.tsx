@@ -12,6 +12,7 @@ import { JournalEntrySkeleton } from '@/components/app/skeletons/JournalSkeleton
 import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
 import { toast } from 'sonner';
+import { useShareContent } from '@/hooks/useShareContent';
 import { useBilingualText } from '@/components/ui/BilingualText';
 import { cn } from '@/lib/utils';
 import {

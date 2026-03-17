@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { useShareContent } from '@/hooks/useShareContent';
 
 export default function AppReflectionNoteDetail() {
   const { reflectionId } = useParams<{ reflectionId: string }>();
