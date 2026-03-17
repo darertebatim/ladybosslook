@@ -359,6 +359,13 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         totalDays={challengeDayCelebration?.totalDays || 0}
         badgeImageUrl={challengeDayCelebration?.badgeImageUrl}
       />
+
+      <StepCompletionCelebration
+        open={!!stepCelebration}
+        onClose={onCloseStepCelebration}
+        completedStep={stepCelebration?.completedStep || 1}
+        newTaskCount={stepCelebration?.newTaskCount || 0}
+      />
     </OverlayPortal>
   );
 });
