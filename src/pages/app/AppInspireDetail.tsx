@@ -145,7 +145,7 @@ export default function AppInspireDetail() {
     return null;
   }, [routine]);
 
-  const { handleShare } = useShareContent({
+  const { handleShare, handleShareInstagram } = useShareContent({
     title: routine?.title || 'Routine',
     text: `Hey! Join me in the '${routine?.title || 'Routine'}' routine on Routine Ladyboss 💫`,
     imageUrl: routine?.cover_image_url,
