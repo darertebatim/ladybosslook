@@ -182,6 +182,7 @@ export function useSmartActionNudges(userId: string | undefined) {
         const waterCount = 3 + Math.floor(Math.random() * 2); // 3-4
         for (let i = 0; i < waterCount; i++) {
           const time = randomTimeBetween(8, 20);
+          if (!time) continue; // No available time slot
           const scheduleAt = getScheduleDate(time.hour, time.minute);
           
           notifications.push({
