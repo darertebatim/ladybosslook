@@ -139,92 +139,103 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
         </div>
       </div>
 
-      {/* Main content */}
+      {/* Task title + time range — ABOVE circle */}
+      <div className="px-6 mt-4">
+        <h2 className="text-xl font-bold text-foreground text-center leading-snug max-w-xs mx-auto">
+          {currentTask?.title}
+        </h2>
+        <p className="text-sm text-muted-foreground text-center mt-1">
+          {format(taskStartedAt, 'h:mma').toLowerCase()}  →  {format(taskEndTime, 'h:mma').toLowerCase()}
+        </p>
+      </div>
+
+      {/* Main circle area */}
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        {/* Timer circle */}
-        <div className="relative w-56 h-56 flex items-center justify-center">
-          <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 224 224">
+        {/* Timer circle with emoji + time + adjuster inside */}
+        <div className="relative w-60 h-60 flex items-center justify-center">
+          {/* Background filled circle */}
+          <div className="absolute inset-0 rounded-full bg-foreground/[0.04]" />
+
+          {/* Progress ring */}
+          <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 240 240">
             <circle
-              cx="112" cy="112" r="104"
+              cx="120" cy="120" r="114"
               fill="none" stroke="currentColor" strokeWidth="4"
-              className="text-foreground/5"
+              className="text-foreground/[0.06]"
             />
             <circle
-              cx="112" cy="112" r="104"
+              cx="120" cy="120" r="114"
               fill="none" stroke="currentColor" strokeWidth="4"
-              strokeDasharray={`${2 * Math.PI * 104}`}
-              strokeDashoffset={`${2 * Math.PI * 104 * (1 - progressPercent / 100)}`}
+              strokeDasharray={`${2 * Math.PI * 114}`}
+              strokeDashoffset={`${2 * Math.PI * 114 * (1 - progressPercent / 100)}`}
               strokeLinecap="round"
               className={cn(
                 "transition-all duration-1000 ease-linear",
-                isOvertime ? "text-amber-400" : "text-foreground/50"
+                isOvertime ? "text-amber-400" : "text-foreground/40"
               )}
             />
           </svg>
 
-          <div className="flex flex-col items-center">
-            <span className="text-5xl mb-3">{currentTask?.emoji || '📝'}</span>
+          {/* Circle content */}
+          <div className="relative flex flex-col items-center z-10">
+            {/* 3D Emoji */}
+            <FluentEmoji emoji={currentTask?.emoji || '📝'} size={56} className="mb-2" />
+
+            {/* Timer */}
             {isPaused ? (
               <>
-                <p className="text-4xl font-bold text-foreground/30 tracking-tight tabular-nums">
+                <p className="text-[42px] font-extrabold text-foreground/25 tracking-tight tabular-nums leading-none">
                   {formatTime(Math.max(0, timeLeft))}
                 </p>
-                <p className="text-sm text-muted-foreground mt-1">Paused</p>
+                <p className="text-xs text-muted-foreground mt-1.5">Paused</p>
                 <p className="text-sm font-semibold text-blue-500 tabular-nums mt-0.5">
                   {formatTime(pauseElapsed)}
                 </p>
               </>
             ) : isOvertime ? (
-              <p className="text-4xl font-bold text-red-500 tracking-tight tabular-nums">
-                +{formatTime(overtimeSeconds)}
-              </p>
+              <>
+                <p className="text-[42px] font-extrabold text-red-500 tracking-tight tabular-nums leading-none">
+                  +{formatTime(overtimeSeconds)}
+                </p>
+                {/* Time adjuster inside circle */}
+                <button
+                  onClick={() => { haptic.light(); setShowAdjustSheet(true); }}
+                  className="flex items-center gap-3 mt-2 px-3 py-1 rounded-full active:bg-foreground/5"
+                >
+                  <Minus className="w-3.5 h-3.5 text-foreground/40" />
+                  <span className="text-xs text-muted-foreground font-medium tabular-nums">
+                    {Math.ceil(Math.max(0, timeLeft) / 60)}m
+                  </span>
+                  <Plus className="w-3.5 h-3.5 text-foreground/40" />
+                </button>
+              </>
             ) : (
-              <p className="text-4xl font-bold text-foreground tracking-tight tabular-nums">
-                {formatTime(timeLeft)}
-              </p>
+              <>
+                <p className="text-[42px] font-extrabold text-foreground tracking-tight tabular-nums leading-none">
+                  {formatTime(timeLeft)}
+                </p>
+                {/* Time adjuster inside circle */}
+                <button
+                  onClick={() => { haptic.light(); setShowAdjustSheet(true); }}
+                  className="flex items-center gap-3 mt-2 px-3 py-1 rounded-full active:bg-foreground/5"
+                >
+                  <Minus className="w-3.5 h-3.5 text-foreground/40" />
+                  <span className="text-xs text-muted-foreground font-medium tabular-nums">
+                    {Math.ceil(Math.max(0, timeLeft) / 60)}m
+                  </span>
+                  <Plus className="w-3.5 h-3.5 text-foreground/40" />
+                </button>
+              </>
             )}
           </div>
         </div>
-
-        {/* Task title */}
-        <p className="mt-4 text-lg font-semibold text-foreground text-center max-w-xs">
-          {currentTask?.title}
-        </p>
-
-        {/* Task time range */}
-        <p className="text-xs text-muted-foreground mt-1">
-          {format(taskStartedAt, 'h:mma').toLowerCase()} → {format(taskEndTime, 'h:mma').toLowerCase()}
-        </p>
-
-        {/* Time adjuster trigger */}
-        {!isPaused && (
-          <button
-            onClick={() => { haptic.light(); setShowAdjustSheet(true); }}
-            className="flex items-center gap-4 mt-4 px-4 py-2 rounded-full bg-foreground/5 active:bg-foreground/10"
-          >
-            <Minus className="w-4 h-4 text-foreground/50" />
-            <span className="text-sm text-muted-foreground font-medium tabular-nums">
-              {Math.ceil(Math.max(0, timeLeft) / 60)}m
-            </span>
-            <Plus className="w-4 h-4 text-foreground/50" />
-          </button>
-        )}
       </div>
 
-      {/* Controls */}
-      <div className="px-6 pb-6" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)' }}>
-        {/* Next task preview */}
-        {nextTask && !isPaused && (
-          <div className="flex items-center justify-center gap-2 mb-5 opacity-60">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Next</span>
-            <span className="text-sm">{nextTask.emoji}</span>
-            <span className="text-sm text-foreground/70 truncate max-w-[180px]">{nextTask.title}</span>
-          </div>
-        )}
-
+      {/* Controls section */}
+      <div className="px-6 pb-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
         {isPaused ? (
           /* Paused state: single Resume button */
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-4">
             <button
               onClick={() => { haptic.medium(); onTogglePause(); }}
               className="px-10 py-3.5 rounded-full bg-blue-500 text-white font-semibold text-base active:scale-95 transition-transform shadow-lg"
@@ -233,13 +244,13 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
             </button>
           </div>
         ) : (
-          /* Running state: standard controls */
-          <div className="flex items-center justify-center gap-8">
+          /* Running state: Pause / Complete / Skip */
+          <div className="flex items-center justify-center gap-8 mb-4">
             <button
               onClick={() => { haptic.medium(); onTogglePause(); }}
               className="w-14 h-14 rounded-full bg-foreground/5 flex items-center justify-center active:bg-foreground/10"
             >
-              <Pause className="w-6 h-6 text-foreground/70" />
+              <Pause className="w-6 h-6 text-foreground/60" />
             </button>
 
             <button
@@ -253,16 +264,33 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
               onClick={() => { haptic.light(); setShowSkipSheet(true); }}
               className="w-14 h-14 rounded-full bg-foreground/5 flex items-center justify-center active:bg-foreground/10"
             >
-              <SkipForward className="w-6 h-6 text-foreground/70" />
+              <SkipForward className="w-6 h-6 text-foreground/60" />
             </button>
           </div>
         )}
 
-        {/* End time */}
+        {/* Next task preview — below buttons */}
+        {nextTask && !isPaused && (
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-foreground/5 rounded px-1.5 py-0.5">
+              Next
+            </span>
+            <FluentEmoji emoji={nextTask.emoji} size={18} />
+            <span className="text-sm text-foreground/60 truncate max-w-[200px]">{nextTask.title}</span>
+          </div>
+        )}
+
+        {/* Bottom card: All ends time + Rearrange */}
         {endTime && !isPaused && (
-          <p className="text-center text-xs text-muted-foreground mt-4">
-            All ends {format(endTime, 'h:mm a')}
-          </p>
+          <div className="flex items-center justify-between bg-foreground/[0.04] rounded-2xl px-5 py-3.5 mt-1">
+            <div>
+              <p className="text-xs text-muted-foreground">All ends</p>
+              <p className="text-base font-bold text-foreground">{format(endTime, 'h:mma').toLowerCase()}</p>
+            </div>
+            <button className="text-sm font-medium text-muted-foreground px-4 py-2 rounded-xl bg-foreground/5 active:bg-foreground/10">
+              Rearrange
+            </button>
+          </div>
         )}
       </div>
 
