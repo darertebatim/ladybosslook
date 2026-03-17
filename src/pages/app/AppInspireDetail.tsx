@@ -310,12 +310,8 @@ export default function AppInspireDetail() {
         })()}
 
         <div className="px-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 160px)' }}>
-          {/* Challenge progress card - shown when user has added this challenge */}
-          {isAdded && userChallenge && (
-            <div className="pt-4">
-              <ChallengeRoutineCard challenge={userChallenge} />
-            </div>
-          )}
+
+
 
           {/* Subtitle & Badges */}
           <div className="pt-4">
