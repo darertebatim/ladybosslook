@@ -1,4 +1,4 @@
-import { useState, memo, useCallback } from 'react';
+import { useState, useEffect, memo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Plus, Play, Droplets, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -86,6 +86,30 @@ export const TaskCard = memo(function TaskCard({
   const isCountGoal = hasGoal && task.goal_type === 'count';
   const isWater = isWaterTask(task);
   const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
+
+  // Detect if this task was just auto-completed while user was away
+  useEffect(() => {
+    if (!isCompleted && !goalReached) return;
+    const recentKey = 'pro_tasks_just_completed';
+    const recent = JSON.parse(sessionStorage.getItem(recentKey) || '[]') as string[];
+    if (recent.includes(task.id)) {
+      // Remove this task from the list
+      const updated = recent.filter(id => id !== task.id);
+      if (updated.length > 0) {
+        sessionStorage.setItem(recentKey, JSON.stringify(updated));
+      } else {
+        sessionStorage.removeItem(recentKey);
+      }
+      // Trigger celebration animation with a small delay for visual impact
+      const timer = setTimeout(() => {
+        playCompletionSound();
+        haptic.medium();
+        setIsAnimating(true);
+        setTimeout(() => setIsAnimating(false), 2500);
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [isCompleted, goalReached, task.id]);
   
   // Format time display using task scheduling helper
   const formatTime = (task: UserTask) => {
