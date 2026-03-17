@@ -142,7 +142,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     showPaywall, setShowPaywall, showActionLimit, setShowActionLimit,
     showQuickStart, setShowQuickStart, onQuickStartContinue,
     selectedTask, setSelectedTask, selectedDate, completedTaskIds, completedSubtaskIds,
-    goalProgressMap, onEditTask, onDeleteTask, onSkipTask, onOpenGoalInput, onOpenTimer,
+    goalProgressMap, onEditTask, onDeleteTask, onSkipTask, onOpenGoalInput, onOpenTimer, onStepUnlocked,
     showStreakModal, setShowStreakModal, isFirstActionCelebration, setIsFirstActionCelebration,
     setShowTapCoachMark, streak, shouldShowGoalSelection,
     showGoalSelection, setShowGoalSelection, isStreakUpgrade, setIsStreakUpgrade,
