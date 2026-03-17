@@ -460,15 +460,17 @@ export function useAddRoutinePlan() {
           let repeatDays: number[] | null = null;
           let scheduledDate: string | null = null;
 
-          if (planScheduleType === 'weekly' && (task as any).schedule_days?.length > 0) {
-            repeatPattern = 'custom';
-            repeatDays = (task as any).schedule_days;
-          } else if (planScheduleType === 'challenge' && (task as any).drip_day) {
+          if (planScheduleType === 'challenge' && (task as any).drip_day) {
             repeatPattern = 'none';
             const dripDay = (task as any).drip_day as number;
             const taskDate = new Date(today);
             taskDate.setDate(taskDate.getDate() + (dripDay - 1));
             scheduledDate = getLocalDateStr(taskDate);
+          } else if (planScheduleType === 'project') {
+            // Project: all tasks one-time, no drip scheduling
+            repeatPattern = 'none';
+            scheduledDate = getLocalDateStr(today);
+          } else if (planScheduleType === 'weekly' && (task as any).schedule_days?.length > 0) {
           }
 
           return {
