@@ -300,14 +300,15 @@ const TIME_PERIOD_LABELS: Record<string, string> = {
 };
 
 function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
-  const QUICK_ADD_ANCHOR_TOP = '25%';
-  const SUGGESTIONS_ANCHOR_TOP = 'calc(25% + 220px)';
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [showIdeas, setShowIdeas] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsLayerRef = useRef<HTMLDivElement>(null);
+  // Capture full screen height before keyboard opens to prevent shifting
+  const [anchorTop, setAnchorTop] = useState<string>('25%');
+  const [suggestionsTop, setSuggestionsTop] = useState<string>('calc(25% + 220px)');
   const createTask = useCreateTask();
   const navigate = useNavigate();
   const { data: templates = [] } = useTaskTemplates();
@@ -414,6 +415,11 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
       {/* Trigger button */}
       <button
         onClick={() => {
+          // Capture screen height NOW before keyboard opens
+          const screenH = window.innerHeight;
+          const topPx = Math.round(screenH * 0.25);
+          setAnchorTop(`${topPx}px`);
+          setSuggestionsTop(`${topPx + 220}px`);
           setIsOpen(true);
           haptic.light();
         }}
@@ -430,7 +436,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
         <DialogContent
           hideCloseButton
           className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !translate-y-0"
-          style={{ top: QUICK_ADD_ANCHOR_TOP }}
+          style={{ top: anchorTop }}
           onInteractOutside={(event) => {
             if (showIdeas && suggestionsLayerRef.current?.contains(event.target as Node)) {
               event.preventDefault();
@@ -515,7 +521,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
             <div
               ref={suggestionsLayerRef}
               className="fixed left-[50%] -translate-x-1/2 z-[100] w-[calc(100%-32px)] max-w-[calc(100%-32px)] flex flex-col gap-2.5 pointer-events-auto"
-              style={{ top: SUGGESTIONS_ANCHOR_TOP }}
+              style={{ top: suggestionsTop }}
             >
               {/* Category pills */}
               <ScrollArea className="w-full shrink-0">
