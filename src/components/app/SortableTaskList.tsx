@@ -333,7 +333,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
     } else if (selectedCategory !== 'all') {
       items = items.filter(t => t.category === selectedCategory);
     }
-    return items.slice(0, 5);
+    return items.slice(0, 20);
   }, [templates, selectedCategory]);
 
   useEffect(() => {
@@ -518,8 +518,8 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
               style={{ top: SUGGESTIONS_ANCHOR_TOP }}
             >
               {/* Category pills */}
-              <ScrollArea className="w-full shrink-0">
-                <div className="flex gap-1.5">
+              <ScrollArea className="w-full shrink-0" type="scroll">
+                <div className="flex gap-1.5 pb-2">
                   <button
                     onClick={() => { haptic.light(); setSelectedCategory('popular'); }}
                     className={cn(
