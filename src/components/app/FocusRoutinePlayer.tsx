@@ -29,6 +29,7 @@ interface FocusRoutinePlayerProps {
   onAdjustTime: (deltaMins: number) => void;
   onResetTime: () => void;
   onMoveTaskToEnd: () => void;
+  onReorderTasks: (tasks: FocusTask[]) => void;
   onEndRoutineEarly: () => void;
   onClose: () => void;
   onCancel: () => void;
