@@ -1446,15 +1446,23 @@ export default function RoutinesBank() {
                   {/* Schedule Type */}
                   <div className="space-y-2 border-t pt-4">
                     <Label>Routine Type</Label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       {[
                         { value: 'daily', label: 'Normal', desc: 'Tasks with their own repeat settings', icon: '☀️' },
                         { value: 'challenge', label: 'Challenge', desc: 'Sequential drip (Day 1, 2...)', icon: '🔥' },
+                        { value: 'project', label: 'Project', desc: 'Ordered steps toward a goal', icon: '🎯' },
                       ].map(opt => (
                         <button
                           key={opt.value}
                           type="button"
-                          onClick={() => setFormData({ ...formData, schedule_type: opt.value as any })}
+                          onClick={() => {
+                            const updates: any = { schedule_type: opt.value as any };
+                            if (opt.value === 'project') {
+                              updates.end_mode = 'never';
+                              updates.start_mode = 'none';
+                            }
+                            setFormData(prev => ({ ...prev, ...updates }));
+                          }}
                           className={cn(
                             "flex flex-col items-center gap-1 p-3 rounded-lg border-2 text-center transition-all",
                             formData.schedule_type === opt.value 
