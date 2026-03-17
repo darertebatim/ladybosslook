@@ -91,6 +91,7 @@ export default function AppInspireDetail() {
   const { data: addedRoutineIds = [] } = useUserAddedBankRoutines();
   const addRoutineFromBank = useAddRoutineFromBank();
   const { data: userChallenges = [] } = useUserChallenges();
+  const { data: categories = [] } = useRoutineBankCategories();
   
   // Check if routine was already added
   const isAlreadyAdded = planId ? addedRoutineIds.includes(planId) : false;
