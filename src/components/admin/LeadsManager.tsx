@@ -1301,7 +1301,7 @@ export function LeadsManager() {
                               </p>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
+                              <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                               <p className="text-xs text-muted-foreground">
                                 {new Date(order.created_at).toLocaleString()}
                               </p>
