@@ -76,6 +76,7 @@ const AppReflectionFlow = lazy(() => import("@/pages/app/AppReflectionFlow"));
 const AppReflectionNotes = lazy(() => import("@/pages/app/AppReflectionNotes"));
 const AppReflectionNoteDetail = lazy(() => import("@/pages/app/AppReflectionNoteDetail"));
 const AppAICoach = lazy(() => import("@/pages/app/AppAICoach"));
+const AppMyTasks = lazy(() => import("@/pages/app/AppMyTasks"));
 
 const Users = lazy(() => import("@/pages/admin/Users"));
 const Enrollment = lazy(() => import("@/pages/admin/Enrollment"));
