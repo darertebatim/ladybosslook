@@ -192,6 +192,32 @@ export default function AppInspireDetail() {
     }
   }, [routine?.title, routine?.cover_image_url]);
 
+  const handleShareInstagram = useCallback(async () => {
+    const title = routine?.title || 'Routine';
+    try {
+      if (!routine?.cover_image_url) {
+        toast.error('No image to share');
+        return;
+      }
+      const response = await fetch(routine.cover_image_url);
+      const blob = await response.blob();
+      const safeName = title.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '-').substring(0, 40);
+      const extension = blob.type?.includes('png') ? 'png' : 'jpg';
+      const mimeType = extension === 'png' ? 'image/png' : 'image/jpeg';
+      const file = new File([blob], `${safeName}.${extension}`, { type: mimeType });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        // Share ONLY the image file — no text/url so Instagram appears
+        await navigator.share({ files: [file] });
+        return;
+      }
+      toast.error('Image sharing not supported on this device');
+    } catch (err: any) {
+      if (err?.name === 'AbortError') return;
+      toast.error('Could not share image');
+    }
+  }, [routine?.title, routine?.cover_image_url]);
+
   const handleAddClick = () => {
     if (!routine?.tasks?.length) {
       toast.error('No tasks in this routine');
