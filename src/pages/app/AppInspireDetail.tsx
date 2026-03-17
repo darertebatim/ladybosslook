@@ -12,6 +12,7 @@ import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { useRoutineBankDetail, useAddRoutineFromBank, RoutineBankTask, useUserAddedBankRoutines } from '@/hooks/useRoutinesBank';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
+import { useShareContent } from '@/hooks/useShareContent';
 import { cn } from '@/lib/utils';
 import { TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 
