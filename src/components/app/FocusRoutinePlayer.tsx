@@ -284,14 +284,15 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
               <p className="text-xs text-muted-foreground">All ends</p>
               <p className="text-base font-bold text-foreground">{format(endTime, 'h:mma').toLowerCase()}</p>
             </div>
-            <button className="text-sm font-medium text-muted-foreground px-4 py-2 rounded-xl bg-foreground/5 active:bg-foreground/10">
+            <button
+              onClick={() => { haptic.light(); setShowPlaylistSheet(true); }}
+              className="text-sm font-medium text-muted-foreground px-4 py-2 rounded-xl bg-foreground/5 active:bg-foreground/10"
+            >
               Rearrange
             </button>
           </div>
         )}
       </div>
-
-      {/* Adjust Time Bottom Sheet — inline to inherit z-index */}
       {showAdjustSheet && (
         <>
           <div
