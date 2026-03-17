@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
-export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | 'video' | 'video_playlist' | 'focus_timer';
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | 'video' | 'video_playlist' | 'focus_timer' | 'focus_routine';
 
 export interface ProLinkConfig {
   value: ProLinkType;
@@ -285,6 +285,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Open the focus timer',
     requiresValue: false,
   },
+  focus_routine: {
+    value: 'focus_routine',
+    label: 'Focus Routine',
+    icon: Clock,
+    badgeText: 'Focus',
+    color: 'amber',
+    gradientClass: 'bg-gradient-to-br from-amber-100 to-yellow-100 dark:from-amber-900/40 dark:to-yellow-900/40',
+    iconColorClass: 'text-amber-600 dark:text-amber-400',
+    badgeColorClass: 'bg-amber-500/20 text-amber-700 dark:text-amber-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Link to a focus routine',
+    requiresValue: true,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
@@ -330,6 +343,8 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return linkValue ? `/app/reflections/${linkValue}` : '/app/reflections';
     case 'focus_timer':
       return '/app/timer';
+    case 'focus_routine':
+      return '/app/focus';
     default:
       return '/app/home';
   }

@@ -615,6 +615,33 @@ export function useAddRoutineFromBank() {
         if (insertError) throw insertError;
       }
 
+      // For focus routines, also create a parent pro-linked task
+      if ((routine as any).is_focus) {
+        const totalMinutes = tasks.reduce((sum, t) => {
+          const bankTask = t.task_id ? taskDetails[t.task_id] : null;
+          const secs = bankTask?.goal_target || ((t as any).duration_minutes ? (t as any).duration_minutes * 60 : 300);
+          return sum + Math.ceil(secs / 60);
+        }, 0);
+
+        await supabase.from('user_tasks').insert({
+          user_id: user.id,
+          title: routine.title,
+          emoji: routine.emoji || '🎯',
+          color: 'amber',
+          repeat_pattern: 'daily',
+          repeat_days: [1, 2, 3, 4, 5], // weekdays default
+          tag: 'pro',
+          pro_link_type: 'focus_routine',
+          pro_link_value: routineId,
+          is_active: true,
+          order_index: startOrderIndex + tasks.length,
+          goal_enabled: true,
+          goal_target: totalMinutes,
+          goal_type: 'timer',
+          goal_unit: 'minutes',
+        });
+      }
+
       // Track that user added this routine from bank
       const { error: trackError } = await supabase
         .from('user_routines_bank')
