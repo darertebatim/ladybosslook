@@ -67,6 +67,7 @@ export const QuickEnrollUser = () => {
           programSlug: selectedProgram?.slug,
           roundId: selectedRound || null,
           fullName: fullName.trim() || null,
+          expiresAt: expiresAt ? expiresAt.toISOString() : null,
         },
       });
 
