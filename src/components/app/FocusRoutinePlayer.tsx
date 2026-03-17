@@ -440,6 +440,145 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
           </div>
         </div>
       )}
+
+      {/* Playlist Bottom Sheet */}
+      {showPlaylistSheet && (
+        <>
+          <div
+            className="absolute inset-0 bg-black/40 z-[10] animate-in fade-in-0 duration-200"
+            onClick={() => setShowPlaylistSheet(false)}
+          />
+          <div className="absolute bottom-0 left-0 right-0 z-[11] bg-background rounded-t-3xl px-6 pb-6 pt-2 animate-in slide-in-from-bottom duration-300 max-h-[70vh] flex flex-col"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)' }}
+          >
+            <div className="w-10 h-1 bg-foreground/10 rounded-full mx-auto mb-4" />
+            <div className="text-center mb-4">
+              <p className="text-lg font-bold text-foreground">
+                {endTime ? format(endTime, 'h:mma').toLowerCase() : ''}
+              </p>
+              <p className="text-sm text-muted-foreground">Estimated end time</p>
+            </div>
+            <div className="flex-1 overflow-y-auto space-y-2 mb-4">
+              {(() => {
+                let accTime = new Date();
+                // For remaining tasks (from current+1 onward), compute start times
+                const remainingTasks = config.tasks.slice(currentTaskIndex + 1);
+                // Current task remaining time
+                accTime = new Date(Date.now() + Math.max(0, timeLeft) * 1000);
+                return remainingTasks.map((task, i) => {
+                  const taskTime = accTime;
+                  accTime = addSeconds(accTime, task.targetSeconds);
+                  return (
+                    <div key={task.id} className="flex items-center gap-3 bg-foreground/[0.04] rounded-2xl px-4 py-3">
+                      <span className="text-xs text-muted-foreground tabular-nums w-10">
+                        {format(taskTime, 'H:mm')}
+                      </span>
+                      <FluentEmoji emoji={task.emoji} size={28} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{task.title}</p>
+                        <p className="text-xs text-muted-foreground">{Math.round(task.targetSeconds / 60)}m</p>
+                      </div>
+                      <div className="w-9 h-9 rounded-full bg-foreground/[0.06] flex items-center justify-center">
+                        <Play className="w-4 h-4 text-foreground/50 ml-0.5" />
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
+              {config.tasks.slice(currentTaskIndex + 1).length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-6">No more tasks remaining</p>
+              )}
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  haptic.light();
+                  setShowPlaylistSheet(false);
+                  setRearrangeTasks([...config.tasks.slice(currentTaskIndex + 1)]);
+                  setShowRearrangeSheet(true);
+                }}
+                className="flex-1 py-4 rounded-2xl bg-foreground/[0.06] text-foreground font-semibold text-base active:bg-foreground/10"
+              >
+                Rearrange
+              </button>
+              <button
+                onClick={() => {
+                  haptic.light();
+                  setShowPlaylistSheet(false);
+                  // TODO: open quick add task
+                }}
+                className="flex-1 py-4 rounded-2xl bg-foreground text-background font-semibold text-base active:opacity-90"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Rearrange Bottom Sheet */}
+      {showRearrangeSheet && (
+        <>
+          <div
+            className="absolute inset-0 bg-black/40 z-[10] animate-in fade-in-0 duration-200"
+            onClick={() => setShowRearrangeSheet(false)}
+          />
+          <div className="absolute bottom-0 left-0 right-0 z-[11] bg-background rounded-t-3xl px-6 pb-6 pt-2 animate-in slide-in-from-bottom duration-300 max-h-[75vh] flex flex-col"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)' }}
+          >
+            <div className="w-10 h-1 bg-foreground/10 rounded-full mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-foreground mb-4">Rearrange</h3>
+            <div className="flex-1 overflow-y-auto space-y-2 mb-4">
+              {/* Current task (greyed out) */}
+              {currentTask && (
+                <div className="flex items-center gap-3 bg-foreground/[0.04] rounded-2xl px-4 py-3.5 opacity-40">
+                  <FluentEmoji emoji={currentTask.emoji} size={28} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground/50 truncate">{currentTask.title}</p>
+                  </div>
+                  <span className="text-xs text-muted-foreground tabular-nums">{Math.round(currentTask.targetSeconds / 60)}m</span>
+                </div>
+              )}
+              {/* Remaining tasks (draggable via simple move buttons) */}
+              {rearrangeTasks.map((task, i) => (
+                <div key={task.id} className="flex items-center gap-3 bg-foreground/[0.04] rounded-2xl px-4 py-3.5">
+                  <FluentEmoji emoji={task.emoji} size={28} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{task.title}</p>
+                  </div>
+                  <span className="text-xs text-muted-foreground tabular-nums">{Math.round(task.targetSeconds / 60)}m</span>
+                  <button
+                    className="p-1 active:opacity-50"
+                    onPointerDown={() => {
+                      // Simple move: swap with previous
+                      if (i > 0) {
+                        haptic.light();
+                        const newArr = [...rearrangeTasks];
+                        [newArr[i - 1], newArr[i]] = [newArr[i], newArr[i - 1]];
+                        setRearrangeTasks(newArr);
+                      }
+                    }}
+                  >
+                    <GripVertical className="w-5 h-5 text-foreground/30" />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => {
+                haptic.medium();
+                // Apply rearranged tasks: keep tasks up to currentTaskIndex, then new order
+                const kept = config.tasks.slice(0, currentTaskIndex + 1);
+                onReorderTasks([...kept, ...rearrangeTasks]);
+                setShowRearrangeSheet(false);
+              }}
+              className="w-full py-4 rounded-2xl bg-foreground text-background font-semibold text-base active:opacity-90"
+            >
+              Done
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 });
