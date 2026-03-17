@@ -207,6 +207,7 @@ export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
       toast.success('Weight logged!');
       setWeightValue('');
       setWeightOpen(false);
+      autoCompleteWeight();
     } else {
       toast.error('Failed to log weight');
     }
