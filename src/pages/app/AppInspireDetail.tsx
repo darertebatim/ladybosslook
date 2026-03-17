@@ -172,9 +172,13 @@ export default function AppInspireDetail() {
       await navigator.clipboard.writeText(`${shareText}`);
       toast.success('Link copied to clipboard!');
     } catch (err: any) {
-      // User cancelled share — ignore AbortError
-      if (err?.name !== 'AbortError') {
-        console.error('Share failed:', err);
+      if (err?.name === 'AbortError') return;
+      // Fallback for environments where share is blocked (e.g. iframe preview)
+      try {
+        await navigator.clipboard.writeText(shareText);
+        toast.success('Link copied to clipboard!');
+      } catch {
+        toast.error('Sharing is not supported in this browser');
       }
     }
   }, [routine?.title, routine?.cover_image_url]);
