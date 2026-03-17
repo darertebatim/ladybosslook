@@ -49,6 +49,7 @@ export const TaskCard = memo(function TaskCard({
   goalProgress = 0,
   onTap,
   onStreakIncrease,
+  onStepUnlocked,
   onOpenGoalInput,
   onOpenTimer,
   onOpenWaterTracking,
