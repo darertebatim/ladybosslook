@@ -463,6 +463,29 @@ export function RoutinePreviewSheet({
                     ));
                   })()}
                 </>
+              ) : scheduleType === 'project' ? (
+                <>
+                  {(() => {
+                    // Group tasks by drip_day as step number
+                    const stepGroups = new Map<number, { task: RoutinePlanTask; index: number }[]>();
+                    tasks.forEach((task, index) => {
+                      const step = (task as any).drip_day ?? (index + 1);
+                      if (!stepGroups.has(step)) stepGroups.set(step, []);
+                      stepGroups.get(step)!.push({ task, index });
+                    });
+                    const sortedSteps = Array.from(stepGroups.keys()).sort((a, b) => a - b);
+                    return sortedSteps.map(step => (
+                      <div key={step} className="mb-4">
+                        <p className="text-base font-semibold text-foreground mb-3">
+                          🎯 Step {step}
+                        </p>
+                        <div className="space-y-3">
+                          {stepGroups.get(step)!.map(({ task, index }) => renderTaskCard(task, index))}
+                        </div>
+                      </div>
+                    ));
+                  })()}
+                </>
               ) : (
                 <>
                   {/* Group tasks by repeat_pattern */}
