@@ -93,6 +93,7 @@ export default function AppTest() {
   const [challengeDayTest, setChallengeDayTest] = useState(3);
   const [showStepCelebration, setShowStepCelebration] = useState(false);
   const [testCompletedStep, setTestCompletedStep] = useState(1);
+  const [showProjectCompletion, setShowProjectCompletion] = useState(false);
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
     return (
