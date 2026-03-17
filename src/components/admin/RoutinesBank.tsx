@@ -495,6 +495,7 @@ export default function RoutinesBank() {
       drip_day: (t as any).drip_day ?? null,
       monthly_day: (t as any).monthly_day ?? null,
       is_once: (t as any).is_once ?? false,
+      duration_minutes: t.duration_minutes ?? null,
     }));
 
     return { sections, tasks };
