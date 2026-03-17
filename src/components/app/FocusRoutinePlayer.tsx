@@ -3,7 +3,7 @@ import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus, RotateCcw
 import { format, addSeconds } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
-import { FocusRoutineBreathIntro } from './FocusRoutineBreathIntro';
+
 import { FocusRoutineSummary } from './FocusRoutineSummary';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import type { FocusRoutineConfig } from '@/hooks/useFocusRoutinePlayer';
@@ -78,16 +78,10 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
       : Math.max(0, Math.min(100, ((currentTask.targetSeconds - timeLeft) / currentTask.targetSeconds) * 100))
     : 0;
 
-  // Breathe intro phase
+  // Breathe phase removed — go straight to running
   if (phase === 'breathe') {
-    return (
-      <FocusRoutineBreathIntro
-        routineTitle={config.routineTitle}
-        routineEmoji={config.routineEmoji}
-        onComplete={onBreathComplete}
-        onCancel={onCancel}
-      />
-    );
+    onBreathComplete();
+    return null;
   }
 
   // Summary phase
