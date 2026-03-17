@@ -224,13 +224,22 @@ export default function AppInspireDetail() {
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
       >
         <BackButtonCircle to={(location.state as any)?.from || '/app/routines'} />
-        <button
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleShareInstagram}
+            className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
+            aria-label="Share to Instagram"
+          >
+            <Instagram className="h-5 w-5" />
+          </button>
+          <button
             onClick={handleShare}
             className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
             aria-label="Share"
           >
             <Share2 className="h-5 w-5" />
           </button>
+        </div>
       </header>
 
       {/* Scroll Container */}
