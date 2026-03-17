@@ -47,6 +47,7 @@ import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { ChallengeCompleteSummary } from '@/components/app/ChallengeCompleteSummary';
 import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebration';
 import { PlusGateSheet } from '@/components/app/PlusGateSheet';
+import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebration';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
