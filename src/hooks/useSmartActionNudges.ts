@@ -161,16 +161,18 @@ export function useSmartActionNudges(userId: string | undefined) {
         const selected = pickRandom(proTasks, 1)[0];
         const msgConfig = PROACTION_MESSAGES[selected.pro_link_type!] || PROACTION_MESSAGES.playlist;
         const time = randomTimeBetween(8, 20);
-        const scheduleAt = getScheduleDate(time.hour, time.minute);
-        
-        notifications.push({
-          id: ID_RANGES.PROACTION.start,
-          title: `${msgConfig.emoji} ${msgConfig.title}`,
-          body: msgConfig.body,
-          schedule: { at: scheduleAt },
-          sound: 'default',
-          extra: { type: 'proaction_nudge', url: '/app/home', taskId: selected.id },
-        });
+        if (time) {
+          const scheduleAt = getScheduleDate(time.hour, time.minute);
+          
+          notifications.push({
+            id: ID_RANGES.PROACTION.start,
+            title: `${msgConfig.emoji} ${msgConfig.title}`,
+            body: msgConfig.body,
+            schedule: { at: scheduleAt },
+            sound: 'default',
+            extra: { type: 'proaction_nudge', url: '/app/home', taskId: selected.id },
+          });
+        }
       }
 
       // 2c. Water Reminders (always show if water task exists, even if completed — hydration is recurring)
