@@ -135,6 +135,13 @@ interface HomeCelebrationsProps {
   // Step completion
   stepCelebration: { completedStep: number; newTaskCount: number } | null;
   onCloseStepCelebration: () => void;
+
+  // Project completion
+  projectCompletion: {
+    routineId: string; routineTitle: string; routineEmoji: string;
+    totalSteps: number; totalTasks: number; badgeImageUrl: string | null;
+  } | null;
+  onCloseProjectCompletion: () => void;
 }
 
 export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebrationsProps) {
