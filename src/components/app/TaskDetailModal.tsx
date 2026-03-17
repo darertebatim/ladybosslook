@@ -150,9 +150,8 @@ export const TaskDetailModal = ({
         haptic.medium();
         onStreakIncrease();
       }
-      if (result.unlockedStep) {
-        haptic.medium();
-        toast.success(`🎉 Step ${result.unlockedStep.unlockedStep - 1} complete! ${result.unlockedStep.taskCount} new tasks unlocked.`, { duration: 4000 });
+      if (result.unlockedStep && onStepUnlocked) {
+        onStepUnlocked(result.unlockedStep.unlockedStep - 1, result.unlockedStep.taskCount);
       }
     }
   };

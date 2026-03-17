@@ -127,6 +127,7 @@ export const SortableTaskList = ({
   goalProgressMap,
   onTaskTap,
   onStreakIncrease,
+  onStepUnlocked,
   onOpenGoalInput,
   onOpenTimer,
   onOpenWaterTracking,
