@@ -152,27 +152,33 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
       {/* Main circle area */}
       <div className="flex-1 flex flex-col items-center justify-center px-6">
         {/* Timer circle with emoji + time + adjuster inside */}
-        <div className="relative w-60 h-60 flex items-center justify-center">
+        <div className="relative w-64 h-64 flex items-center justify-center">
           {/* Background filled circle */}
-          <div className="absolute inset-0 rounded-full bg-foreground/[0.04]" />
+          <div className="absolute inset-3 rounded-full bg-foreground/[0.04]" />
 
-          {/* Progress ring */}
-          <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 240 240">
+          {/* Progress ring — thick gold arc */}
+          <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 256 256">
+            {/* Track */}
             <circle
-              cx="120" cy="120" r="114"
-              fill="none" stroke="currentColor" strokeWidth="4"
-              className="text-foreground/[0.06]"
+              cx="128" cy="128" r="120"
+              fill="none" stroke="currentColor" strokeWidth="14"
+              className="text-transparent"
             />
+            {/* Active arc */}
             <circle
-              cx="120" cy="120" r="114"
-              fill="none" stroke="currentColor" strokeWidth="4"
-              strokeDasharray={`${2 * Math.PI * 114}`}
-              strokeDashoffset={`${2 * Math.PI * 114 * (1 - progressPercent / 100)}`}
+              cx="128" cy="128" r="120"
+              fill="none"
+              strokeWidth="14"
+              strokeDasharray={`${2 * Math.PI * 120}`}
+              strokeDashoffset={`${2 * Math.PI * 120 * (1 - progressPercent / 100)}`}
               strokeLinecap="round"
               className={cn(
                 "transition-all duration-1000 ease-linear",
-                isOvertime ? "text-amber-400" : "text-foreground/40"
+                isOvertime ? "stroke-amber-400" : "stroke-amber-400"
               )}
+              style={{
+                filter: isOvertime ? undefined : 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.4))',
+              }}
             />
           </svg>
 
