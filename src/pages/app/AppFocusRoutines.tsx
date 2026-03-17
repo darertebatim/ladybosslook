@@ -24,7 +24,7 @@ export default function AppFocusRoutines() {
 
   const categoryNameMap = useMemo(() => {
     const map = new Map<string, string>();
-    routineCategories.forEach(c => map.set(c.slug, c.label));
+    routineCategories.forEach(c => map.set(c.slug, c.name));
     return map;
   }, [routineCategories]);
 
