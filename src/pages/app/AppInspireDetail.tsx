@@ -323,6 +323,16 @@ export default function AppInspireDetail() {
             )}
             
             <div className="flex items-center gap-2 mt-3 flex-wrap">
+              {isProject && (
+                <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                  🎯 Project
+                </span>
+              )}
+              {isChallenge && (
+                <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300">
+                  🔥 Challenge
+                </span>
+              )}
               {routine.category && (
                 <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-muted text-muted-foreground">
                   {routine.category}
@@ -330,7 +340,7 @@ export default function AppInspireDetail() {
               )}
               {routine.tasks && routine.tasks.length > 0 && (
                <span className="text-sm text-foreground">
-                   {routine.tasks.length} task{routine.tasks.length !== 1 ? 's' : ''}
+                   {routine.tasks.length} {isProject ? 'step' : 'task'}{routine.tasks.length !== 1 ? 's' : ''}
                 </span>
               )}
             </div>
