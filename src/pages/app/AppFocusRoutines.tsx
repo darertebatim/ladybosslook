@@ -1,13 +1,15 @@
 import { useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Play, Loader2, ChevronRight, Plus, RotateCw, ChevronLeft } from 'lucide-react';
-import { useRoutinesBank, useUserAddedBankRoutines } from '@/hooks/useRoutinesBank';
+import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft } from 'lucide-react';
+import { useRoutinesBank, useUserAddedBankRoutines, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { haptic } from '@/lib/haptics';
-import { format, addMinutes, startOfDay, endOfDay } from 'date-fns';
+import { startOfDay, endOfDay } from 'date-fns';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 
 export default function AppFocusRoutines() {
   const navigate = useNavigate();
@@ -15,9 +17,16 @@ export default function AppFocusRoutines() {
   const { user } = useAuth();
   const { data: allRoutines, isLoading: routinesLoading } = useRoutinesBank();
   const { data: userAddedIds, isLoading: userLoading } = useUserAddedBankRoutines();
+  const { data: routineCategories = [] } = useRoutineBankCategories();
   const { startRoutine } = useFocusPlayer();
 
   const isLoading = routinesLoading || userLoading;
+
+  const categoryNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    routineCategories.forEach(c => map.set(c.slug, c.label));
+    return map;
+  }, [routineCategories]);
 
   // Fetch today's session completion data
   const { data: todaySessions } = useQuery({
@@ -176,19 +185,14 @@ export default function AppFocusRoutines() {
                                 </span>
                               )}
                             </div>
-                            {routine.subtitle && (
-                              <p className="text-sm text-muted-foreground mt-0.5 line-clamp-1">
-                                {routine.subtitle}
-                              </p>
-                            )}
-                            {/* Task emoji chain */}
+                            {/* Task 3D emoji chain */}
                             {emojis.length > 0 && (
-                              <div className="flex items-center gap-0.5 mt-2 flex-wrap">
+                              <div className="flex items-center gap-1 mt-2.5 flex-wrap">
                                 {emojis.map((emoji, i) => (
                                   <span key={i} className="flex items-center">
-                                    <span className="text-base">{emoji}</span>
+                                    <FluentEmoji emoji={emoji} size={24} />
                                     {i < emojis.length - 1 && (
-                                      <ChevronRight className="w-3 h-3 text-muted-foreground/40 mx-0.5" />
+                                      <ChevronRight className="w-3 h-3 text-muted-foreground/30 mx-0.5" />
                                     )}
                                   </span>
                                 ))}
@@ -218,7 +222,7 @@ export default function AppFocusRoutines() {
             {/* Empty state */}
             {activatedFocusRoutines.length === 0 && (
               <div className="text-center py-12">
-                <div className="text-4xl mb-3">🎯</div>
+                <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
                 <h3 className="font-semibold text-foreground mb-1">No focus routines yet</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Browse and add focus routines to start your timed sessions
@@ -226,28 +230,19 @@ export default function AppFocusRoutines() {
               </div>
             )}
 
-            {/* Discover more */}
+            {/* Discover more - using FeaturedRoutineCard */}
             {availableFocusRoutines.length > 0 && (
               <section>
                 <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wide">
                   Discover
                 </p>
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {availableFocusRoutines.map(routine => (
-                    <button
+                    <FeaturedRoutineCard
                       key={routine.id}
-                      onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
-                      className="w-full flex items-center gap-3 p-3 rounded-xl bg-card border border-border active:bg-muted/50 transition-colors text-left"
-                    >
-                      <span className="text-2xl">{routine.emoji || '✨'}</span>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-foreground text-sm">{routine.title}</h4>
-                        {routine.subtitle && (
-                          <p className="text-xs text-muted-foreground line-clamp-1">{routine.subtitle}</p>
-                        )}
-                      </div>
-                      <Plus className="w-4 h-4 text-muted-foreground shrink-0" />
-                    </button>
+                      routine={routine}
+                      categoryName={categoryNameMap.get(routine.category)}
+                    />
                   ))}
                 </div>
               </section>
