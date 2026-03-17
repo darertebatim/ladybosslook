@@ -68,6 +68,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   onEndRoutineEarly,
   onClose,
   onCancel,
+  onMinimize,
 }: FocusRoutinePlayerProps) {
   const [showAdjustSheet, setShowAdjustSheet] = useState(false);
   const [showNotifySheet, setShowNotifySheet] = useState(false);
