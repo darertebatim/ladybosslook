@@ -281,6 +281,13 @@ export default function AppFeedPost() {
               {post.channel?.name || 'Post'}
             </h1>
           </div>
+          <button
+            onClick={handleShare}
+            className="h-9 w-9 flex items-center justify-center rounded-full active:scale-95 transition-transform"
+            aria-label="Share"
+          >
+            <Share2 className="h-5 w-5 text-muted-foreground" />
+          </button>
         </div>
       </header>
 
