@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils';
 import { UserTask, useReorderTasks, useCreateTask, useTaskTemplates, TaskTemplate, TASK_COLORS, TASK_COLOR_CLASSES } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { Dialog, DialogContent, DialogPortal } from '@/components/ui/dialog';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
 import { Plus, MoreHorizontal } from 'lucide-react';
@@ -432,7 +432,8 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
           className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !translate-y-0"
           style={{ top: QUICK_ADD_ANCHOR_TOP }}
           onInteractOutside={(event) => {
-            if (showIdeas && suggestionsLayerRef.current?.contains(event.target as Node)) {
+            const target = event.target as HTMLElement | null;
+            if (showIdeas && target?.closest('[data-suggestions-content="true"]')) {
               event.preventDefault();
             }
           }}
@@ -514,43 +515,52 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
           <DialogPortal>
             <div
               ref={suggestionsLayerRef}
-              className="fixed left-[50%] -translate-x-1/2 z-[100] w-[calc(100%-32px)] max-w-[calc(100%-32px)] flex flex-col gap-2.5 pointer-events-auto"
+              className="fixed left-[50%] -translate-x-1/2 z-[100] w-[calc(100%-32px)] max-w-[calc(100%-32px)] pointer-events-none"
               style={{ top: SUGGESTIONS_ANCHOR_TOP }}
             >
-              {/* Category pills */}
-              <div className="w-full overflow-x-auto shrink-0" style={{ WebkitOverflowScrolling: 'touch' }}>
-                <div className="flex gap-1.5 pb-2 w-max">
-                  <button
-                    onClick={() => { haptic.light(); setSelectedCategory('popular'); }}
-                    className={cn(
-                      "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border",
-                      selectedCategory === 'popular'
-                        ? "bg-white text-black border-white/50"
-                        : "bg-white/20 text-white/80 border-transparent"
-                    )}
-                  >
-                    ⭐ Popular
-                  </button>
-                  {categories.map((cat) => (
+              <div data-suggestions-content="true" className="pointer-events-auto flex flex-col gap-2.5">
+                {/* Category pills */}
+                <div
+                  className="w-full overflow-x-auto shrink-0 touch-pan-x"
+                  style={{ WebkitOverflowScrolling: 'touch' }}
+                  onWheel={(e) => {
+                    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                      e.currentTarget.scrollLeft += e.deltaY;
+                    }
+                  }}
+                >
+                  <div className="flex gap-1.5 pb-2 w-max">
                     <button
-                      key={cat.slug}
-                      onClick={() => { haptic.light(); setSelectedCategory(cat.slug); }}
+                      onClick={() => { haptic.light(); setSelectedCategory('popular'); }}
                       className={cn(
                         "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border",
-                        selectedCategory === cat.slug
+                        selectedCategory === 'popular'
                           ? "bg-white text-black border-white/50"
                           : "bg-white/20 text-white/80 border-transparent"
                       )}
                     >
-                      {cat.emoji && <span className="mr-0.5">{cat.emoji}</span>}
-                      {cat.name}
+                      ⭐ Popular
                     </button>
-                  ))}
+                    {categories.map((cat) => (
+                      <button
+                        key={cat.slug}
+                        onClick={() => { haptic.light(); setSelectedCategory(cat.slug); }}
+                        className={cn(
+                          "px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border",
+                          selectedCategory === cat.slug
+                            ? "bg-white text-black border-white/50"
+                            : "bg-white/20 text-white/80 border-transparent"
+                        )}
+                      >
+                        {cat.emoji && <span className="mr-0.5">{cat.emoji}</span>}
+                        {cat.name}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Task cards */}
-              <div className="overflow-y-auto overscroll-contain space-y-1.5 max-h-[40vh]" style={{ WebkitOverflowScrolling: 'touch' }}>
+                {/* Task cards */}
+                <div className="overflow-y-auto overscroll-contain space-y-1.5 max-h-[40vh] touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
                 {filteredSuggestions.map((template) => {
                   const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
                   const timePeriodLabel = template.time_period 
@@ -586,6 +596,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
                     </button>
                   );
                 })}
+                </div>
               </div>
             </div>
           </DialogPortal>
