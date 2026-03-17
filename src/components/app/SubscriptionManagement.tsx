@@ -161,7 +161,7 @@ function ManageSubscriptionSheet({
 
   return (
     <>
-      <Dialog open={open && !showHelp} onOpenChange={onOpenChange}>
+      <Dialog open={open && !showHelp && !showPaywall} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-[400px] h-[85vh] p-0 rounded-2xl overflow-hidden border-0 [&>button]:hidden flex flex-col">
           <VisuallyHidden><DialogTitle>Manage Subscription</DialogTitle></VisuallyHidden>
           <div className="h-full flex flex-col bg-[#F4ECFE] dark:bg-background">
@@ -183,7 +183,7 @@ function ManageSubscriptionSheet({
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-bold text-foreground text-base">{planLabel}</p>
-                    <p className="text-foreground/70 text-xs mt-0.5">Enjoy all premium features & contents</p>
+                    <p className="text-foreground/70 text-xs mt-0.5">{planPrice} • All premium features</p>
                   </div>
                   <div className="h-14 w-14 rounded-full bg-yellow-300/40 flex items-center justify-center">
                     <Crown className="h-7 w-7 text-foreground" />
@@ -193,9 +193,31 @@ function ManageSubscriptionSheet({
                   <div className="h-full bg-foreground/50 rounded-full" style={{ width: '15%' }} />
                 </div>
                 <p className="text-foreground/70 text-xs mt-2">
-                  {expiresAt ? `Expiration Date: ${format(new Date(expiresAt), 'yyyy-MM-dd')}` : 'Active Subscription'}
+                  {expiresAt ? `Renews: ${format(new Date(expiresAt), 'MMM d, yyyy')}` : 'Active Subscription'}
                 </p>
               </div>
+
+              {/* Annual savings upsell for monthly subscribers */}
+              {isMonthly && (
+                <button
+                  onClick={() => setShowPaywall(true)}
+                  className="w-full rounded-2xl p-4 shadow-sm text-left transition-transform active:scale-[0.98]"
+                  style={{ background: 'linear-gradient(135deg, hsl(145, 60%, 95%) 0%, hsl(160, 50%, 92%) 100%)' }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="h-5 w-5 text-emerald-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-bold text-emerald-800 text-sm">Save 40% with Annual</p>
+                      <p className="text-emerald-700/70 text-xs mt-0.5">
+                        Switch to yearly for just $8.33/mo instead of $13.99/mo
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                  </div>
+                </button>
+              )}
 
               {/* Premium features */}
               <div className="bg-card rounded-2xl p-4 shadow-sm">
@@ -228,6 +250,7 @@ function ManageSubscriptionSheet({
         </DialogContent>
       </Dialog>
 
+      <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
       <HelpCenterSheet open={showHelp} onOpenChange={setShowHelp} platform={platform} />
     </>
   );
