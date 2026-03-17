@@ -10,7 +10,8 @@ export default function AppRoutineCategory() {
   const location = useLocation();
   const { data: categories } = useRoutineBankCategories();
   const isChallenges = categorySlug === 'challenges';
-  const { data: routines, isLoading } = useRoutinesBank(isChallenges ? undefined : categorySlug);
+  const isProjects = categorySlug === 'projects';
+  const { data: routines, isLoading } = useRoutinesBank(isChallenges || isProjects ? undefined : categorySlug);
 
   const category = categories?.find(c => c.slug === categorySlug);
   const title = isChallenges ? 'Challenges' : (category?.name || 'Routines');
