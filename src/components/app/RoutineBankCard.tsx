@@ -57,6 +57,7 @@ export function RoutineBankCard({
   variant = 'default',
   coverOnly = false,
   className,
+  isCompleted = false,
 }: RoutineBankCardProps) {
   const color = routine.color || 'purple';
   const gradient = colorGradients[color] || colorGradients.purple;
