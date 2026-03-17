@@ -48,6 +48,7 @@ import { ChallengeCompleteSummary } from '@/components/app/ChallengeCompleteSumm
 import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebration';
 import { PlusGateSheet } from '@/components/app/PlusGateSheet';
 import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebration';
+import { ProjectCompletionCelebration } from '@/components/app/ProjectCompletionCelebration';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
