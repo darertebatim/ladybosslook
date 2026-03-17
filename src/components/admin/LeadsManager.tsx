@@ -1167,7 +1167,7 @@ export function LeadsManager() {
                       </div>
                     )}
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">
                         Joined: {new Date(searchResults.profile.created_at).toLocaleDateString()}
                       </span>
