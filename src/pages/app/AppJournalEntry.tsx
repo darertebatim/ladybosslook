@@ -59,6 +59,11 @@ const AppJournalEntry = () => {
   const { className: contentBilingualClassName, direction: contentDirection } = useBilingualText(content);
   const { className: titleBilingualClassName, direction: titleDirection } = useBilingualText(title);
 
+  const { handleShare } = useShareContent({
+    title: 'Journal Entry',
+    text: `📝 I just journaled on Routine Ladyboss — try it! 💫`,
+  });
+
   // Load existing entry data
   useEffect(() => {
     if (existingEntry) {

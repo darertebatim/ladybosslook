@@ -22,6 +22,11 @@ export default function AppReflectionNoteDetail() {
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [editText, setEditText] = useState('');
 
+  const { handleShare } = useShareContent({
+    title: 'Reflection',
+    text: `🪞 I just reflected on Routine Ladyboss 💫`,
+  });
+
   const { data, isLoading } = useQuery({
     queryKey: ['reflection-note-detail', reflectionId, user?.id],
     enabled: !!reflectionId && !!user?.id,
