@@ -5,8 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar, DollarSign, Key, Edit2, Trash2, UserPlus, Smartphone, Send, RotateCcw, GitMerge, MessageCircle, Lock, Unlock } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { Search, User, Mail, Phone, MapPin, ShoppingCart, GraduationCap, Calendar as CalendarIcon, DollarSign, Key, Edit2, Trash2, UserPlus, Smartphone, Send, RotateCcw, GitMerge, MessageCircle, Lock, Unlock } from 'lucide-react';
+import { formatDistanceToNow, format, addDays, addMonths, addYears } from 'date-fns';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
