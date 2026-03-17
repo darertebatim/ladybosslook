@@ -329,7 +329,9 @@ const NativeAppLayout = () => {
 const NativeAppLayoutWithProvider = () => (
   <AudioPlayerProvider>
     <UnseenContentProvider>
-      <NativeAppLayout />
+      <FocusPlayerProvider>
+        <NativeAppLayout />
+      </FocusPlayerProvider>
     </UnseenContentProvider>
   </AudioPlayerProvider>
 );

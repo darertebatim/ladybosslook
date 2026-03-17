@@ -17,6 +17,7 @@ export interface RoutineBankItem {
   is_active: boolean | null;
   is_popular: boolean | null;
   is_free?: boolean;
+  is_focus?: boolean;
   sort_order: number | null;
   created_at: string | null;
   updated_at: string | null;
