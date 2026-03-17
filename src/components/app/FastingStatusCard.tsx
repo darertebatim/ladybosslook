@@ -28,6 +28,7 @@ function formatRemaining(totalSeconds: number): string {
 export const FastingStatusCard = ({ className }: FastingStatusCardProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { autoCompleteWeight } = useAutoCompleteProTask();
   const [mode, setMode] = useState<CardMode>('idle');
   const [progress, setProgress] = useState(0);
   const [title, setTitle] = useState('Ready to fast');
