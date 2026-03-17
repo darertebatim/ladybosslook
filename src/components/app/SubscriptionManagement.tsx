@@ -146,15 +146,18 @@ export function SubscriptionCard() {
 
 // Manage Subscription Dialog
 function ManageSubscriptionSheet({
-  open, onOpenChange, planLabel, expiresAt, platform,
+  open, onOpenChange, planLabel, planPrice, isMonthly, expiresAt, platform,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   planLabel: string;
+  planPrice: string;
+  isMonthly: boolean;
   expiresAt: string | null;
   platform?: string;
 }) {
   const [showHelp, setShowHelp] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   return (
     <>
