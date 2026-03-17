@@ -1,14 +1,29 @@
 import { supabase } from '@/integrations/supabase/client';
 
+export type StepUnlockResult = {
+  type: 'step_unlocked';
+  unlockedStep: number;
+  taskCount: number;
+} | {
+  type: 'project_completed';
+  routineId: string;
+  routineTitle: string;
+  routineEmoji: string;
+  totalSteps: number;
+  totalTasks: number;
+  badgeImageUrl: string | null;
+};
+
 /**
  * After completing a project task, check if all tasks in the current step
- * are completed. If so, activate the next step's tasks.
+ * are completed. If so, activate the next step's tasks — or mark the project
+ * as complete if there is no next step.
  */
 export async function checkAndUnlockNextProjectStep(
   userId: string,
   taskId: string,
   completedDate: string
-) {
+): Promise<StepUnlockResult | undefined> {
   // 1. Get the completed task to check if it's a project task
   const { data: task } = await supabase
     .from('user_tasks')
@@ -44,7 +59,7 @@ export async function checkAndUnlockNextProjectStep(
 
   if (!allCompleted) return;
 
-  // 4. All tasks in current step completed! Activate next step's tasks
+  // 4. All tasks in current step completed! Check if there's a next step
   const nextStep = currentStep + 1;
 
   const { data: nextStepTasks } = await supabase
@@ -55,27 +70,69 @@ export async function checkAndUnlockNextProjectStep(
     .eq('project_step', nextStep)
     .eq('is_active', false);
 
-  if (!nextStepTasks || nextStepTasks.length === 0) return;
+  if (nextStepTasks && nextStepTasks.length > 0) {
+    // Activate next step tasks
+    const { error } = await supabase
+      .from('user_tasks')
+      .update({ is_active: true, scheduled_date: completedDate })
+      .eq('user_id', userId)
+      .eq('source_routine_id', routineId)
+      .eq('project_step', nextStep);
 
-  // Activate next step tasks
-  const { error } = await supabase
-    .from('user_tasks')
-    .update({ is_active: true, scheduled_date: completedDate })
-    .eq('user_id', userId)
-    .eq('source_routine_id', routineId)
-    .eq('project_step', nextStep);
+    if (error) {
+      console.error('Error unlocking next project step:', error);
+      return;
+    }
 
-  if (error) {
-    console.error('Error unlocking next project step:', error);
-    return;
+    // Update current_step on user_routines_bank
+    await supabase
+      .from('user_routines_bank')
+      .update({ current_step: nextStep } as any)
+      .eq('user_id', userId)
+      .eq('routine_id', routineId);
+
+    return { type: 'step_unlocked', unlockedStep: nextStep, taskCount: nextStepTasks.length };
   }
 
-  // Update current_step on user_routines_bank
+  // 5. No next step — project is complete!
+  // Get total task count and routine info
+  const { data: allProjectTasks } = await supabase
+    .from('user_tasks')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('source_routine_id', routineId);
+
+  const { data: routine } = await supabase
+    .from('routines_bank')
+    .select('title, emoji, badge_image_url')
+    .eq('id', routineId)
+    .single();
+
+  // Mark project as completed
   await supabase
     .from('user_routines_bank')
-    .update({ current_step: nextStep } as any)
+    .update({ completed_at: new Date().toISOString() } as any)
     .eq('user_id', userId)
     .eq('routine_id', routineId);
 
-  return { unlockedStep: nextStep, taskCount: nextStepTasks.length };
+  // Post to community feed
+  const generalChannel = '40c7c499-ab87-4cc6-9d3e-85d35ed8c83b'; // Simora general channel
+  await supabase.from('feed_posts').insert({
+    channel_id: generalChannel,
+    author_id: userId,
+    content: `🎯 Just completed the **${routine?.title || 'project'}** project! ${allProjectTasks?.length || 0} tasks across ${currentStep} steps. 💪`,
+    post_type: 'text',
+    is_system: true,
+    display_name: null,
+  });
+
+  return {
+    type: 'project_completed',
+    routineId,
+    routineTitle: routine?.title || 'Project',
+    routineEmoji: routine?.emoji || '🎯',
+    totalSteps: currentStep,
+    totalTasks: allProjectTasks?.length || 0,
+    badgeImageUrl: routine?.badge_image_url || null,
+  };
 }
