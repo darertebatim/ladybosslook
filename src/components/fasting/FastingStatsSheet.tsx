@@ -279,6 +279,7 @@ export function FastingStatsSheet({ open, onOpenChange, sessions, onDeleteSessio
       setWeightValue('');
       setShowKeypad(false);
       toast.success('Weight logged!');
+      autoCompleteWeight();
     }
     setIsLoggingWeight(false);
   };
