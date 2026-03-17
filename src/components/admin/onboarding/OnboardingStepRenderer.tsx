@@ -2491,25 +2491,29 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                     </>
                   )}
 
-                  {/* Finger hint on breathe/mood card */}
-                  {showHintOnCard && (
+                  {/* Finger hint on breathe/mood pro-link circle */}
+                  {showHintOnProCircle && (
                     <>
+                      <button
+                        className="absolute top-0 right-0 w-16 h-full z-50"
+                        onClick={i === BREATHE_IDX ? handleBreatheTap : handleMoodTap}
+                      />
                       <div
-                        className="pointer-events-none absolute z-[55] rounded-xl animate-pulse"
+                        className="pointer-events-none absolute z-[55] rounded-full animate-pulse"
                         style={{
                           top: '50%',
-                          right: '56px',
-                          width: '60px',
-                          height: '40px',
+                          right: '10px',
+                          width: '44px',
+                          height: '44px',
                           transform: 'translateY(-50%)',
-                          boxShadow: '0 0 0 3px hsl(var(--primary) / 0.5), 0 0 20px 8px hsl(var(--primary) / 0.2)',
+                          boxShadow: '0 0 0 4px hsl(var(--primary) / 0.5), 0 0 20px 8px hsl(var(--primary) / 0.2)',
                         }}
                       />
                       <div
                         className="pointer-events-none absolute z-[60]"
                         style={{
                           top: '-40px',
-                          right: '58px',
+                          right: '6px',
                           filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
                           animation: 'onboardingHandBounce 1.4s ease-in-out infinite',
                         }}
