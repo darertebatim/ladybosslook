@@ -496,6 +496,7 @@ export function useAddRoutineFromBank() {
           let repeatPattern: string;
           let repeatDays: number[] | null = null;
           let scheduledDate: string | null = null;
+          let projectStep: number | null = null;
 
           if (scheduleType === 'challenge') {
             const dripDay = (task as any).drip_day as number;
