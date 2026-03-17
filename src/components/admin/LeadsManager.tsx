@@ -861,6 +861,14 @@ export function LeadsManager() {
                                 >
                                   6 months
                                 </Button>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setEnrollExpiresAt(addYears(new Date(), 100))}
+                                >
+                                  Lifetime
+                                </Button>
                               </div>
                               <Popover>
                                 <PopoverTrigger asChild>
@@ -888,7 +896,9 @@ export function LeadsManager() {
                               </Popover>
                               <p className="text-xs text-muted-foreground">
                                 {enrollExpiresAt
-                                  ? `Access expires: ${format(enrollExpiresAt, 'PPP')}`
+                                  ? enrollExpiresAt.getFullYear() > 2090
+                                    ? 'Lifetime access (never expires)'
+                                    : `Access expires: ${format(enrollExpiresAt, 'PPP')}`
                                   : 'Default: 1 year from enrollment (for subscription programs)'}
                               </p>
                             </div>
