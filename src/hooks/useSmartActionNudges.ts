@@ -53,27 +53,38 @@ function avoidRoundedMinute(minute: number): number {
   return minute;
 }
 
-function randomTimeBetween(startHour: number, endHour: number): { hour: number; minute: number } {
-  // Schedule between 8:03 and 19:47 to avoid exact boundary times
-  const effectiveStart = startHour === 8 ? 8 : startHour;
+function randomTimeBetween(startHour: number, endHour: number): { hour: number; minute: number } | null {
+  const now = new Date();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+
+  // Effective range: 8:03 - 19:47
+  const effectiveStart = Math.max(startHour, currentHour);
   const effectiveEnd = endHour === 20 ? 20 : endHour;
+
+  // If we're past the end window, no time slot available today
+  if (effectiveStart >= effectiveEnd) return null;
+
   const hour = effectiveStart + Math.floor(Math.random() * (effectiveEnd - effectiveStart));
   let minute = Math.floor(Math.random() * 60);
   minute = avoidRoundedMinute(minute);
-  // Clamp to 8:03 - 19:47 range
+
+  // Clamp to safe boundaries
   if (hour === 8 && minute < 3) minute = 3 + Math.floor(Math.random() * 10);
   if (hour === 19 && minute > 47) minute = 40 + Math.floor(Math.random() * 8);
+
+  // If this exact hour is the current hour, ensure minute is in the future
+  if (hour === currentHour && minute <= currentMinute) {
+    minute = currentMinute + 2 + Math.floor(Math.random() * 10);
+    if (minute >= 60) return null; // No room left in this hour
+  }
+
   return { hour, minute };
 }
 
 function getScheduleDate(hour: number, minute: number): Date {
   const now = new Date();
-  const scheduled = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute);
-  // If time already passed today, schedule for tomorrow
-  if (scheduled <= now) {
-    scheduled.setDate(scheduled.getDate() + 1);
-  }
-  return scheduled;
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute);
 }
 
 function pickRandom<T>(arr: T[], count: number): T[] {
@@ -131,6 +142,7 @@ export function useSmartActionNudges(userId: string | undefined) {
       
       selectedTasks.forEach((task, idx) => {
         const time = randomTimeBetween(8, 20);
+        if (!time) return; // No available time slot today
         const scheduleAt = getScheduleDate(time.hour, time.minute);
         
         notifications.push({
@@ -149,16 +161,18 @@ export function useSmartActionNudges(userId: string | undefined) {
         const selected = pickRandom(proTasks, 1)[0];
         const msgConfig = PROACTION_MESSAGES[selected.pro_link_type!] || PROACTION_MESSAGES.playlist;
         const time = randomTimeBetween(8, 20);
-        const scheduleAt = getScheduleDate(time.hour, time.minute);
-        
-        notifications.push({
-          id: ID_RANGES.PROACTION.start,
-          title: `${msgConfig.emoji} ${msgConfig.title}`,
-          body: msgConfig.body,
-          schedule: { at: scheduleAt },
-          sound: 'default',
-          extra: { type: 'proaction_nudge', url: '/app/home', taskId: selected.id },
-        });
+        if (time) {
+          const scheduleAt = getScheduleDate(time.hour, time.minute);
+          
+          notifications.push({
+            id: ID_RANGES.PROACTION.start,
+            title: `${msgConfig.emoji} ${msgConfig.title}`,
+            body: msgConfig.body,
+            schedule: { at: scheduleAt },
+            sound: 'default',
+            extra: { type: 'proaction_nudge', url: '/app/home', taskId: selected.id },
+          });
+        }
       }
 
       // 2c. Water Reminders (always show if water task exists, even if completed — hydration is recurring)
@@ -168,6 +182,7 @@ export function useSmartActionNudges(userId: string | undefined) {
         const waterCount = 3 + Math.floor(Math.random() * 2); // 3-4
         for (let i = 0; i < waterCount; i++) {
           const time = randomTimeBetween(8, 20);
+          if (!time) continue; // No available time slot
           const scheduleAt = getScheduleDate(time.hour, time.minute);
           
           notifications.push({
