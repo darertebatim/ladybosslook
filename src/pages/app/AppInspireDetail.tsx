@@ -96,8 +96,8 @@ export default function AppInspireDetail() {
   const isAlreadyAdded = planId ? addedRoutineIds.includes(planId) : false;
   const isAdded = isAlreadyAdded || justAdded;
   
-  // Find this routine's challenge data if it's been added
   const isChallenge = (routine as any)?.schedule_type === 'challenge';
+  const isProject = (routine as any)?.schedule_type === 'project';
   const userChallenge = useMemo(() => {
     if (!planId || !isChallenge) return null;
     return userChallenges.find(c => c.routineId === planId) || null;
