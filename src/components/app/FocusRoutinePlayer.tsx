@@ -3,7 +3,7 @@ import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus, RotateCcw
 import { format, addSeconds } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
-
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { FocusRoutineSummary } from './FocusRoutineSummary';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import type { FocusRoutineConfig } from '@/hooks/useFocusRoutinePlayer';
