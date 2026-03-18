@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Pause, Play, HelpCircle, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -8,6 +9,7 @@ import { BreathingInfoSheet } from './BreathingInfoSheet';
 import { CloseButton } from '@/components/app/CloseButton';
 import { BreathingExercise, useSaveBreathingSession } from '@/hooks/useBreathingExercises';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { BreathingCompleteSheet } from './BreathingCompleteSheet';
