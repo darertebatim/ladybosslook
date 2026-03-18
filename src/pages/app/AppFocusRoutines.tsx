@@ -99,9 +99,12 @@ export default function AppFocusRoutines() {
   const [preStartRoutine, setPreStartRoutine] = useState<(typeof allRoutines extends (infer T)[] | undefined ? T : never) | null>(null);
   const [preStartTasks, setPreStartTasks] = useState<{ id: string; title: string; emoji: string; targetSeconds: number; color?: string }[]>([]);
   const [loadingRoutineId, setLoadingRoutineId] = useState<string | null>(null);
+  const [completedTaskIds, setCompletedTaskIds] = useState<Set<string>>(new Set());
+  const [resumeSessionId, setResumeSessionId] = useState<string | null>(null);
+  const [resumeTaskResults, setResumeTaskResults] = useState<import('@/components/app/FocusRoutineSummary').SessionTaskResult[]>([]);
 
-  const totalPreStartSeconds = preStartTasks.reduce((s, t) => s + t.targetSeconds, 0);
-
+  const remainingPreStartTasks = preStartTasks.filter(t => !completedTaskIds.has(t.id));
+  const totalPreStartSeconds = remainingPreStartTasks.reduce((s, t) => s + t.targetSeconds, 0);
 
   const handlePlay = async (routine: typeof allRoutines extends (infer T)[] | undefined ? T : never) => {
     if (isActive) {
@@ -135,6 +138,41 @@ export default function AppFocusRoutines() {
       targetSeconds: (t.task as any)?.goal_target || (t.duration_minutes ? t.duration_minutes * 60 : 300),
       color: (t.task as any)?.color || undefined,
     }));
+
+    // Check for incomplete session (started today, no ended_at)
+    const incompleteSession = todaySessions?.find(s => s.routine_id === routine.id && !s.ended_at);
+    if (incompleteSession) {
+      // Fetch completed tasks for this session
+      const { data: completedTasks } = await supabase
+        .from('routine_session_tasks')
+        .select('task_title, task_emoji, target_seconds, actual_seconds, status')
+        .eq('session_id', incompleteSession.id)
+        .order('task_order', { ascending: true });
+
+      const doneSet = new Set<string>();
+      const prevResults: import('@/components/app/FocusRoutineSummary').SessionTaskResult[] = [];
+      (completedTasks || []).forEach(ct => {
+        // Match by title since task IDs may differ
+        const matchingTask = tasks.find(t => t.title === ct.task_title);
+        if (matchingTask) doneSet.add(matchingTask.id);
+        prevResults.push({
+          title: ct.task_title,
+          emoji: ct.task_emoji,
+          targetSeconds: ct.target_seconds,
+          actualSeconds: ct.actual_seconds,
+          status: ct.status as 'completed' | 'skipped',
+        });
+      });
+
+      setCompletedTaskIds(doneSet);
+      setResumeSessionId(incompleteSession.id);
+      setResumeTaskResults(prevResults);
+    } else {
+      setCompletedTaskIds(new Set());
+      setResumeSessionId(null);
+      setResumeTaskResults([]);
+    }
+
     setPreStartTasks(tasks);
     setPreStartRoutine(routine);
   };
@@ -142,14 +180,39 @@ export default function AppFocusRoutines() {
   const handleStartFromPreview = () => {
     if (!preStartRoutine) return;
     haptic.medium();
-    startRoutine({
-      routineId: preStartRoutine.id,
-      routineTitle: preStartRoutine.title,
-      routineEmoji: preStartRoutine.emoji || '✨',
-      tasks: preStartTasks,
-    });
+
+    // Filter to remaining tasks only
+    const remaining = preStartTasks.filter(t => !completedTaskIds.has(t.id));
+
+    if (resumeSessionId && remaining.length < preStartTasks.length) {
+      // Resume: start with remaining tasks, pass previous results
+      startRoutine(
+        {
+          routineId: preStartRoutine.id,
+          routineTitle: preStartRoutine.title,
+          routineEmoji: preStartRoutine.emoji || '✨',
+          tasks: remaining,
+        },
+        {
+          startFromIndex: 0,
+          previousResults: resumeTaskResults,
+          existingSessionId: resumeSessionId,
+        }
+      );
+    } else {
+      startRoutine({
+        routineId: preStartRoutine.id,
+        routineTitle: preStartRoutine.title,
+        routineEmoji: preStartRoutine.emoji || '✨',
+        tasks: preStartTasks,
+      });
+    }
+
     setPreStartRoutine(null);
     setPreStartTasks([]);
+    setCompletedTaskIds(new Set());
+    setResumeSessionId(null);
+    setResumeTaskResults([]);
   };
 
   return (
