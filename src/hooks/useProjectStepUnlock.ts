@@ -103,10 +103,11 @@ export async function checkAndUnlockNextProjectStep(
     .eq('source_routine_id', routineId);
 
   const { data: routine } = await supabase
-    .from('routines_bank')
-    .select('title, emoji, badge_image_url')
-    .eq('id', routineId)
-    .single();
+    .from('user_routines_bank')
+    .select('title, emoji')
+    .eq('user_id', userId)
+    .eq('routine_id', routineId)
+    .maybeSingle();
 
   // Mark project as completed
   await supabase
@@ -133,6 +134,6 @@ export async function checkAndUnlockNextProjectStep(
     routineEmoji: routine?.emoji || '🎯',
     totalSteps: currentStep,
     totalTasks: allProjectTasks?.length || 0,
-    badgeImageUrl: routine?.badge_image_url || null,
+    badgeImageUrl: null,
   };
 }

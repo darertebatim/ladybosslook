@@ -3926,29 +3926,50 @@ export type Database = {
       user_routines_bank: {
         Row: {
           added_at: string
+          category: string | null
+          color: string | null
           completed_at: string | null
+          cover_image_url: string | null
           current_step: number | null
+          emoji: string | null
           id: string
           is_active: boolean
+          is_focus: boolean | null
           routine_id: string
+          schedule_type: string | null
+          title: string | null
           user_id: string
         }
         Insert: {
           added_at?: string
+          category?: string | null
+          color?: string | null
           completed_at?: string | null
+          cover_image_url?: string | null
           current_step?: number | null
+          emoji?: string | null
           id?: string
           is_active?: boolean
+          is_focus?: boolean | null
           routine_id: string
+          schedule_type?: string | null
+          title?: string | null
           user_id: string
         }
         Update: {
           added_at?: string
+          category?: string | null
+          color?: string | null
           completed_at?: string | null
+          cover_image_url?: string | null
           current_step?: number | null
+          emoji?: string | null
           id?: string
           is_active?: boolean
+          is_focus?: boolean | null
           routine_id?: string
+          schedule_type?: string | null
+          title?: string | null
           user_id?: string
         }
         Relationships: [

@@ -55,6 +55,7 @@ export function useUserChallenges() {
       const routineIds = userRoutines.map(r => r.routine_id);
 
       // 2. Get only challenge-type routines with scheduling fields
+      // Still need routines_bank for schedule metadata not copied to user_routines_bank
       const { data: routines, error: rError } = await supabase
         .from('routines_bank')
         .select('id, title, emoji, schedule_type, challenge_start_date, start_day_of_week, end_after_days, end_mode, badge_image_url')
@@ -112,14 +113,15 @@ export function useUserChallenges() {
         }
         // else: "Immediately" mode → hasStarted = true, computedStartDate = addedAt
 
-        // Count completions
+        // Count completions using source_routine_id instead of title-matching
         let completedDays = 0;
-        if (hasStarted && titles.length > 0) {
+        if (hasStarted) {
           const { data: matchingUserTasks } = await supabase
             .from('user_tasks')
             .select('id')
             .eq('user_id', user.id)
-            .in('title', titles);
+            .eq('source_routine_id', routine.id)
+            .eq('is_active', true);
 
           const matchingTaskIds = (matchingUserTasks || []).map(t => t.id);
 
