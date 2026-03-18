@@ -23,6 +23,7 @@ type PlayerPhase = 'idle' | 'breathe' | 'running' | 'paused' | 'summary';
 
 export function useFocusRoutinePlayer() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [phase, setPhase] = useState<PlayerPhase>('idle');
   const [config, setConfig] = useState<FocusRoutineConfig | null>(null);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
