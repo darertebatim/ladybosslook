@@ -303,7 +303,9 @@ export function useFocusRoutinePlayer() {
     setPhase('idle');
     setConfig(null);
     setSessionId(null);
-  }, []);
+    // Refresh progress data on the focus routines page
+    queryClient.invalidateQueries({ queryKey: ['focus-today-sessions'] });
+  }, [queryClient]);
 
   const cancelPlayer = useCallback(() => {
     if (sessionId) {
