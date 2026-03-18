@@ -20,17 +20,16 @@ export default function AppFocusRoutines() {
   const { user } = useAuth();
   const { startRoutine, isActive } = useFocusPlayer();
 
-  // Fetch user's own focus routines from user_routines_bank (user-owned copies)
+  // Fetch ALL user routines from user_routines_bank (user-owned copies)
   const { data: myFocusRoutines, isLoading } = useQuery({
-    queryKey: ['user-focus-routines', user?.id],
+    queryKey: ['user-routines-all', user?.id],
     queryFn: async () => {
       if (!user) return [];
       const { data, error } = await supabase
         .from('user_routines_bank')
         .select('id, routine_id, title, emoji, cover_image_url, category, color, is_focus, is_active')
         .eq('user_id', user.id)
-        .eq('is_active', true)
-        .eq('is_focus', true);
+        .eq('is_active', true);
       if (error) throw error;
       return (data || []) as any[];
     },
