@@ -185,6 +185,7 @@ export default function AppFocusRoutines() {
     handlePlay(playId, routine);
   }, [searchParams, allRoutines, routinesLoading]);
 
+  const handleStartFromPreview = () => {
     if (!preStartRoutine) return;
     haptic.medium();
     startRoutine({
