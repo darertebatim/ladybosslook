@@ -241,6 +241,12 @@ export default function AppFocusRoutines() {
 
     const remaining = preStartTasks.filter(t => !completedTaskIds.has(t.id));
 
+    if (remaining.length === 0) {
+      const { toast } = await import('sonner');
+      toast('All tasks in this routine are already completed for today ✅');
+      return;
+    }
+
     if (resumeSessionId && remaining.length < preStartTasks.length) {
       startRoutine(
         {
@@ -260,7 +266,7 @@ export default function AppFocusRoutines() {
         routineId: preStartRoutine.routine_id,
         routineTitle: preStartRoutine.title,
         routineEmoji: preStartRoutine.emoji || '✨',
-        tasks: preStartTasks,
+        tasks: remaining,
       });
     }
 
