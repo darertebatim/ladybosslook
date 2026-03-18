@@ -12,6 +12,7 @@ export interface FocusTask {
   emoji: string;
   targetSeconds: number;
   color?: string;
+  userTaskId?: string; // maps to user_tasks.id for planner completion sync
 }
 
 export interface FocusRoutineConfig {
