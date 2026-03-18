@@ -508,7 +508,9 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
                 onClick={() => {
                   haptic.light();
                   setShowPlaylistSheet(false);
-                  // TODO: open quick add task
+                  setShowAddTaskForm(true);
+                  setNewTaskTitle('');
+                  setNewTaskMinutes(1);
                 }}
                 className="flex-1 py-4 rounded-2xl bg-foreground text-background font-semibold text-base active:opacity-90"
               >
