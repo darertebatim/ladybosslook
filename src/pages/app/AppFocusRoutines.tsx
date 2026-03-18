@@ -363,21 +363,31 @@ export default function AppFocusRoutines() {
             </p>
 
             <div className="space-y-2.5 mt-6">
-              {preStartTasks.map((task, i) => (
-                <div
-                  key={task.id}
-                  className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5"
-                >
-                  <span className="text-xs text-muted-foreground font-medium w-4 shrink-0">{i + 1}</span>
-                  <FluentEmoji emoji={task.emoji} size={28} />
-                  <p className="flex-1 text-sm font-medium text-foreground leading-snug">{task.title}</p>
-                  <span className="text-xs text-muted-foreground shrink-0">{Math.ceil(task.targetSeconds / 60)}m</span>
-                </div>
-              ))}
+              {preStartTasks.map((task, i) => {
+                const isDone = completedTaskIds.has(task.id);
+                return (
+                  <div
+                    key={task.id}
+                    className={`flex items-center gap-3 rounded-2xl px-4 py-3.5 ${isDone ? 'bg-muted/60' : 'bg-muted'}`}
+                  >
+                    <span className="text-xs text-muted-foreground font-medium w-4 shrink-0">{i + 1}</span>
+                    <FluentEmoji emoji={task.emoji} size={28} />
+                    <p className={`flex-1 text-sm font-medium leading-snug ${isDone ? 'text-muted-foreground line-through' : 'text-foreground'}`}>{task.title}</p>
+                    <span className="text-xs text-muted-foreground shrink-0">{Math.ceil(task.targetSeconds / 60)}m</span>
+                    {isDone ? (
+                      <div className="w-6 h-6 rounded-full bg-foreground flex items-center justify-center shrink-0">
+                        <Check className="w-3.5 h-3.5 text-background" />
+                      </div>
+                    ) : (
+                      <div className="w-6 h-6 rounded-full border-2 border-border shrink-0" />
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Start button */}
+          {/* Start / Resume button */}
           <div
             className="fixed bottom-0 left-0 right-0 px-5 pb-4 pt-2 bg-background"
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}
@@ -387,7 +397,7 @@ export default function AppFocusRoutines() {
               className="w-full flex items-center justify-center gap-2 h-14 rounded-2xl bg-amber-400 text-black font-bold text-base active:scale-[0.98] transition-transform"
             >
               <Play className="w-5 h-5 fill-current" />
-              Start
+              {completedTaskIds.size > 0 ? `Resume (${remainingPreStartTasks.length} remaining)` : 'Start'}
             </button>
           </div>
         </div>
