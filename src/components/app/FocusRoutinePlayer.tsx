@@ -357,8 +357,23 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
 
         {/* Controls section — anchored to the circle cluster */}
         <div className="px-6 pt-3 pb-4 relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
-          {/* Normal running controls (always rendered, invisible when paused) */}
-          <div className={cn("flex items-center justify-center gap-8 mb-3", isPaused && "invisible")}>
+          {/* Pause overlay — covers controls + next task area */}
+          {isPaused && (
+            <div className="absolute inset-x-0 top-0 z-10 flex flex-col items-center justify-center gap-3 pt-3" style={{ height: 'calc(100% - 72px)' }}>
+              <p className="text-[36px] font-extrabold text-blue-500 tabular-nums leading-none">
+                {formatTime(pauseElapsed)}
+              </p>
+              <button
+                onClick={() => { haptic.medium(); onTogglePause(); }}
+                className="px-10 py-3.5 rounded-full bg-blue-500 text-white font-semibold text-base active:scale-95 transition-transform shadow-lg"
+              >
+                Resume
+              </button>
+            </div>
+          )}
+
+          {/* Normal running controls (always rendered for stable layout) */}
+          <div className={cn("flex items-center justify-center gap-8 mb-3", isPaused && "opacity-0 pointer-events-none")}>
             <button
               onClick={() => { haptic.medium(); onTogglePause(); }}
               className="w-14 h-14 rounded-full bg-foreground/5 flex items-center justify-center active:bg-foreground/10"
@@ -381,8 +396,8 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
             </button>
           </div>
 
-          {/* Next task preview (invisible when paused, but keeps space) */}
-          <div className={cn("flex items-center justify-center gap-2 mb-3", (!nextTask || isPaused) && "invisible")}>
+          {/* Next task preview (always rendered for stable layout) */}
+          <div className={cn("flex items-center justify-center gap-2 mb-3", (!nextTask || isPaused) && "opacity-0 pointer-events-none")}>
             {nextTask ? (
               <>
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-foreground/5 rounded px-1.5 py-0.5">
@@ -395,21 +410,6 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
               <span className="text-sm">&nbsp;</span>
             )}
           </div>
-
-          {/* Pause overlay — positioned on top of controls area */}
-          {isPaused && (
-            <div className="absolute inset-x-0 top-0 bottom-[72px] flex flex-col items-center justify-center gap-3">
-              <p className="text-[36px] font-extrabold text-blue-500 tabular-nums leading-none">
-                {formatTime(pauseElapsed)}
-              </p>
-              <button
-                onClick={() => { haptic.medium(); onTogglePause(); }}
-                className="px-10 py-3.5 rounded-full bg-blue-500 text-white font-semibold text-base active:scale-95 transition-transform shadow-lg"
-              >
-                Resume
-              </button>
-            </div>
-          )}
 
           {/* Bottom card */}
           {endTime && (
