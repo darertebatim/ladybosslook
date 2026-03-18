@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { updatePresence } from '@/hooks/useUserPresence';
+import { updateStreak } from '@/hooks/useTaskPlanner';
 import type { SessionTaskResult } from '@/components/app/FocusRoutineSummary';
 
 export interface FocusTask {
