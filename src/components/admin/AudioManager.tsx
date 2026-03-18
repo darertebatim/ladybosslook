@@ -164,12 +164,22 @@ export const AudioManager = () => {
 
         // Add to playlist if selected
         if (formData.playlist_id && newAudio) {
+          // Get max sort_order to add at end
+          const { data: maxItem } = await supabase
+            .from('audio_playlist_items')
+            .select('sort_order')
+            .eq('playlist_id', formData.playlist_id)
+            .order('sort_order', { ascending: false })
+            .limit(1)
+            .single();
+          const nextOrder = (maxItem?.sort_order ?? -1) + 1;
+
           const { error: playlistError } = await supabase
             .from('audio_playlist_items')
             .insert({
               playlist_id: formData.playlist_id,
               audio_id: newAudio.id,
-              sort_order: 0,
+              sort_order: nextOrder,
             });
 
           if (playlistError) throw playlistError;
@@ -233,12 +243,22 @@ export const AudioManager = () => {
 
         // Then add new assignment if playlist selected
         if (playlistId) {
+          // Get max sort_order to add at end
+          const { data: maxItem } = await supabase
+            .from('audio_playlist_items')
+            .select('sort_order')
+            .eq('playlist_id', playlistId)
+            .order('sort_order', { ascending: false })
+            .limit(1)
+            .single();
+          const nextOrder = (maxItem?.sort_order ?? -1) + 1;
+
           const { error: playlistError } = await supabase
             .from('audio_playlist_items')
             .insert({
               playlist_id: playlistId,
               audio_id: id,
-              sort_order: 0,
+              sort_order: nextOrder,
             });
 
           if (playlistError) throw playlistError;
