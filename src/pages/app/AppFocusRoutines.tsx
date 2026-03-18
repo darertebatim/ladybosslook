@@ -14,7 +14,7 @@ import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { toast } from 'sonner';
 
-const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
 
 export default function AppFocusRoutines() {
   const navigate = useNavigate();
