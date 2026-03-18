@@ -206,10 +206,13 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   const [newTaskMinutes, setNewTaskMinutes] = useState(1);
 
   const nextTask = config.tasks[currentTaskIndex + 1] || null;
+  const isCountUp = (currentTask as any)?.hasTimerGoal === false;
   const progressPercent = currentTask
-    ? isOvertime
-      ? 100
-      : Math.max(0, Math.min(100, ((currentTask.targetSeconds - timeLeft) / currentTask.targetSeconds) * 100))
+    ? isCountUp
+      ? 0 // no progress ring for count-up tasks
+      : isOvertime
+        ? 100
+        : Math.max(0, Math.min(100, ((currentTask.targetSeconds - timeLeft) / currentTask.targetSeconds) * 100))
     : 0;
 
   // Breathe phase removed — go straight to running
