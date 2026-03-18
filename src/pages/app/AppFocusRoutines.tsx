@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Bell, CalendarDays } from 'lucide-react';
+import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft } from 'lucide-react';
 import { format, addMinutes } from 'date-fns';
 import { useRoutinesBank, useUserAddedBankRoutines, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
@@ -11,8 +11,6 @@ import { haptic } from '@/lib/haptics';
 import { startOfDay, endOfDay } from 'date-fns';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
-
-const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 export default function AppFocusRoutines() {
   const navigate = useNavigate();
@@ -30,22 +28,6 @@ export default function AppFocusRoutines() {
     routineCategories.forEach(c => map.set(c.slug, c.name));
     return map;
   }, [routineCategories]);
-
-  // Fetch pro-linked focus routine tasks from user_tasks
-  const { data: focusRoutineTasks = [] } = useQuery({
-    queryKey: ['focus-routine-pro-tasks', user?.id],
-    queryFn: async () => {
-      if (!user) return [];
-      const { data } = await supabase
-        .from('user_tasks')
-        .select('id, title, emoji, pro_link_value, scheduled_time, repeat_pattern, repeat_days, is_active')
-        .eq('user_id', user.id)
-        .eq('pro_link_type', 'focus_routine')
-        .eq('is_active', true);
-      return data || [];
-    },
-    enabled: !!user,
-  });
 
   // Fetch today's session completion data
   const { data: todaySessions } = useQuery({
@@ -90,25 +72,11 @@ export default function AppFocusRoutines() {
     enabled: focusRoutineIds.length > 0,
   });
 
-  // Build activated routines from pro-linked tasks
-  const activatedRoutineCards = useMemo(() => {
-    return focusRoutineTasks.map(task => {
-      const routineId = task.pro_link_value;
-      const routine = allRoutines?.find(r => r.id === routineId);
-      const emojis = routineId ? (routineTasks?.[routineId] || []) : [];
-      return {
-        taskId: task.id,
-        routineId: routineId || '',
-        title: task.title,
-        emoji: task.emoji,
-        scheduledTime: task.scheduled_time,
-        repeatPattern: task.repeat_pattern,
-        repeatDays: task.repeat_days || [],
-        emojis,
-        routine,
-      };
-    });
-  }, [focusRoutineTasks, allRoutines, routineTasks]);
+  // User's activated focus routines
+  const activatedFocusRoutines = useMemo(() => {
+    if (!allRoutines || !userAddedIds) return [];
+    return allRoutines.filter(r => r.is_focus && userAddedIds.includes(r.id));
+  }, [allRoutines, userAddedIds]);
 
   // All available focus routines (not yet added)
   const availableFocusRoutines = useMemo(() => {
@@ -134,15 +102,15 @@ export default function AppFocusRoutines() {
 
   const totalPreStartSeconds = preStartTasks.reduce((s, t) => s + t.targetSeconds, 0);
 
-  const handlePlay = async (routineId: string, routine: any) => {
-    setLoadingRoutineId(routineId);
+  const handlePlay = async (routine: typeof allRoutines extends (infer T)[] | undefined ? T : never) => {
+    setLoadingRoutineId(routine.id);
     const { data } = await supabase
       .from('routines_bank_tasks')
       .select(`
         id, title, emoji, task_order, duration_minutes,
         task:admin_task_bank(goal_target, goal_type, color)
       `)
-      .eq('routine_id', routineId)
+      .eq('routine_id', routine.id)
       .order('task_order', { ascending: true });
 
     setLoadingRoutineId(null);
@@ -162,7 +130,7 @@ export default function AppFocusRoutines() {
       color: (t.task as any)?.color || undefined,
     }));
     setPreStartTasks(tasks);
-    setPreStartRoutine(routine || { id: routineId, title: 'Routine', emoji: '🎯' });
+    setPreStartRoutine(routine);
   };
 
   const handleStartFromPreview = () => {
@@ -176,11 +144,6 @@ export default function AppFocusRoutines() {
     });
     setPreStartRoutine(null);
     setPreStartTasks([]);
-  };
-
-  const formatRepeatDays = (days: number[]) => {
-    if (!days || days.length === 0 || days.length === 7) return 'Every day';
-    return days.map(d => WEEKDAY_LABELS[d]).join('·');
   };
 
   return (
@@ -211,96 +174,77 @@ export default function AppFocusRoutines() {
           </div>
         ) : (
           <div className="space-y-6 mt-4">
-            {/* Activated routines from pro-linked tasks */}
-            {activatedRoutineCards.length > 0 && (
+            {/* Activated routines */}
+            {activatedFocusRoutines.length > 0 && (
               <section>
                 <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wide">
                   Your routines
                 </p>
                 <div className="space-y-3">
-                  {activatedRoutineCards.map(card => {
-                    const completion = getCompletionInfo(card.routineId);
+                  {activatedFocusRoutines.map(routine => {
+                    const completion = getCompletionInfo(routine.id);
+                    const emojis = routineTasks?.[routine.id] || [];
 
                     return (
                       <div
-                        key={card.taskId}
+                        key={routine.id}
                         className="bg-card rounded-2xl border border-border p-4"
                       >
-                        {/* Schedule info row */}
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-1.5">
-                          {card.scheduledTime && (
-                            <span className="flex items-center gap-1">
-                              <Bell className="w-3 h-3" />
-                              {card.scheduledTime}
-                            </span>
-                          )}
-                          {card.repeatDays.length > 0 && (
-                            <span className="flex items-center gap-1">
-                              <CalendarDays className="w-3 h-3" />
-                              {formatRepeatDays(card.repeatDays)}
-                            </span>
-                          )}
-                        </div>
-
                         <div className="flex items-start justify-between">
-                          {/* Tappable card area -> opens task detail */}
-                          <button
-                            onClick={() => {
-                              haptic.light();
-                              navigate(`/app/home/edit/${card.taskId}`);
-                            }}
-                            className="flex-1 min-w-0 text-left active:opacity-70"
-                          >
-                            <h3 className="font-bold text-foreground text-lg leading-snug">
-                              {card.title}
-                            </h3>
-                            {/* Emoji chain */}
-                            {card.emojis.length > 0 && (
-                              <div className="flex items-center gap-0.5 mt-2.5">
-                                {card.emojis.slice(0, 3).map((emoji, i) => (
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-bold text-foreground text-lg">
+                                {routine.title}
+                              </h3>
+                              {completion && (
+                                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                                  completion.isComplete
+                                    ? 'bg-emerald-100 text-emerald-700'
+                                    : 'bg-amber-100 text-amber-700'
+                                }`}>
+                                  {completion.pct}%
+                                </span>
+                              )}
+                            </div>
+                            {/* Task 3D emoji chain */}
+                            {emojis.length > 0 && (
+                              <div className="flex items-center gap-1 mt-2.5 flex-wrap">
+                                {emojis.map((emoji, i) => (
                                   <span key={i} className="flex items-center">
-                                    <FluentEmoji emoji={emoji} size={28} />
-                                    {i < Math.min(card.emojis.length, 3) - 1 && (
+                                    <FluentEmoji emoji={emoji} size={24} />
+                                    {i < emojis.length - 1 && (
                                       <ChevronRight className="w-3 h-3 text-muted-foreground/30 mx-0.5" />
                                     )}
                                   </span>
                                 ))}
                               </div>
                             )}
-                          </button>
+                          </div>
 
-                          {/* Play button */}
+                          {/* Play / Progress badge */}
                           <button
-                            onClick={() => handlePlay(card.routineId, card.routine)}
-                            disabled={loadingRoutineId === card.routineId}
-                            className="w-14 h-14 rounded-full bg-muted flex items-center justify-center active:scale-95 transition-transform shrink-0 ml-3"
+                            onClick={() => handlePlay(routine)}
+                            disabled={loadingRoutineId === routine.id}
+                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted active:scale-95 transition-transform shrink-0 ml-3"
                           >
-                            {loadingRoutineId === card.routineId ? (
-                              <Loader2 className="w-5 h-5 animate-spin text-foreground" />
+                            {loadingRoutineId === routine.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin text-foreground" />
                             ) : completion ? (
-                              completion.isComplete ? (
-                                <RotateCw className="w-5 h-5 text-foreground" />
-                              ) : (
-                                <Play className="w-5 h-5 text-foreground fill-foreground" />
-                              )
+                              <>
+                                {completion.isComplete ? (
+                                  <RotateCw className="w-4 h-4 text-foreground" />
+                                ) : (
+                                  <Play className="w-4 h-4 text-foreground fill-foreground" />
+                                )}
+                                <span className="text-sm font-semibold text-foreground">{completion.pct}%</span>
+                              </>
                             ) : (
-                              <Play className="w-5 h-5 text-foreground fill-foreground" />
+                              <>
+                                <Play className="w-4 h-4 text-foreground fill-foreground" />
+                              </>
                             )}
                           </button>
                         </div>
-
-                        {/* Completion badge */}
-                        {completion && (
-                          <div className="mt-2">
-                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                              completion.isComplete
-                                ? 'bg-emerald-100 text-emerald-700'
-                                : 'bg-amber-100 text-amber-700'
-                            }`}>
-                              {completion.isComplete ? '✓' : '▶'} {completion.pct}%
-                            </span>
-                          </div>
-                        )}
                       </div>
                     );
                   })}
@@ -309,7 +253,7 @@ export default function AppFocusRoutines() {
             )}
 
             {/* Empty state */}
-            {activatedRoutineCards.length === 0 && (
+            {activatedFocusRoutines.length === 0 && (
               <div className="text-center py-12">
                 <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
                 <h3 className="font-semibold text-foreground mb-1">No focus routines yet</h3>

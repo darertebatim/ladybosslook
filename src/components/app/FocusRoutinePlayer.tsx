@@ -33,7 +33,6 @@ interface FocusRoutinePlayerProps {
   onEndRoutineEarly: () => void;
   onClose: () => void;
   onCancel: () => void;
-  onMinimize: () => void;
 }
 
 function formatTime(seconds: number): string {
@@ -68,7 +67,6 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   onEndRoutineEarly,
   onClose,
   onCancel,
-  onMinimize,
 }: FocusRoutinePlayerProps) {
   const [showAdjustSheet, setShowAdjustSheet] = useState(false);
   const [showNotifySheet, setShowNotifySheet] = useState(false);
@@ -141,7 +139,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
         className="flex items-center justify-between px-4 pt-3"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 8px)' }}
       >
-        <button onClick={onMinimize} className="p-2 active:opacity-70">
+        <button onClick={onCancel} className="p-2 active:opacity-70">
           <ChevronDown className="w-5 h-5 text-foreground/70" />
         </button>
         <div className="flex items-center gap-1.5 bg-foreground/5 rounded-full px-3 py-1">
