@@ -38,9 +38,10 @@ export function FocusPlayerProvider({ children }: { children: ReactNode }) {
   const handleMinimize = () => setMinimized(true);
   const handleMaximize = () => setMinimized(false);
 
-  // Auto-expand on summary
+  // Auto-expand on summary so user sees results
   const isActive = player.phase !== 'idle';
-  const showFullPlayer = isActive && player.config && !minimized;
+  const isSummary = player.phase === 'summary';
+  const showFullPlayer = isActive && player.config && (!minimized || isSummary);
 
   return (
     <FocusPlayerContext.Provider value={{
