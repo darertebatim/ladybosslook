@@ -1,5 +1,5 @@
 import { memo, useState, useCallback, useEffect } from 'react';
-import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus, GripVertical } from 'lucide-react';
+import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus, GripVertical, ExternalLink } from 'lucide-react';
 import { format, addSeconds } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
@@ -7,6 +7,7 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { FocusRoutineSummary } from './FocusRoutineSummary';
 import type { FocusRoutineConfig, FocusTask } from '@/hooks/useFocusRoutinePlayer';
 import type { SessionTaskResult } from './FocusRoutineSummary';
+import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import {
   DndContext,
   closestCenter,
@@ -50,6 +51,7 @@ interface FocusRoutinePlayerProps {
   onClose: () => void;
   onCancel: () => void;
   onMinimize: () => void;
+  onOpenProTask: () => void;
 }
 
 function formatTime(seconds: number): string {
@@ -191,6 +193,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   onClose,
   onCancel,
   onMinimize,
+  onOpenProTask,
 }: FocusRoutinePlayerProps) {
   const [showAdjustSheet, setShowAdjustSheet] = useState(false);
   const [showNotifySheet, setShowNotifySheet] = useState(false);
@@ -207,6 +210,8 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
 
   const nextTask = config.tasks[currentTaskIndex + 1] || null;
   const isCountUp = (currentTask as any)?.hasTimerGoal === false;
+  const proLinkType = (currentTask as any)?.proLinkType as ProLinkType | null;
+  const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
   const progressPercent = currentTask
     ? isCountUp
       ? 0 // no progress ring for count-up tasks
@@ -285,12 +290,20 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
       </div>
 
       <div className="flex-1 flex flex-col justify-center">
-        {/* Task title + time range */}
+        {/* Task title + pro badge + time range */}
         <div className="px-6 pb-2">
           <h2 className="text-xl font-bold text-foreground text-center leading-snug max-w-xs mx-auto">
             {currentTask?.title}
           </h2>
-          {!isCountUp && (
+          {proConfig && (
+            <div className="flex items-center justify-center gap-1.5 mt-1.5">
+              <proConfig.icon className={cn("w-3.5 h-3.5", proConfig.iconColorClass)} />
+              <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full", proConfig.badgeColorClass)}>
+                {proConfig.badgeText}
+              </span>
+            </div>
+          )}
+          {!isCountUp && !proConfig && (
             <p className="text-sm text-muted-foreground text-center mt-1">
               {`${format(taskStartedAt, 'h:mma').toLowerCase()}  →  ${format(taskEndTime, 'h:mma').toLowerCase()}`}
             </p>
@@ -371,6 +384,23 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
             </div>
           </div>
         </div>
+
+        {/* Pro Task "Open" button — between circle and controls */}
+        {proConfig && !isPaused && (
+          <div className="flex justify-center px-6 pb-2">
+            <button
+              onClick={() => { haptic.medium(); onOpenProTask(); }}
+              className={cn(
+                "flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm active:scale-95 transition-transform shadow-sm",
+                proConfig.buttonClass
+              )}
+            >
+              <proConfig.icon className="w-4 h-4" />
+              Open {proConfig.label}
+              <ExternalLink className="w-3.5 h-3.5 opacity-50" />
+            </button>
+          </div>
+        )}
 
         {/* Controls section — anchored to the circle cluster */}
         <div className="px-6 pt-3 pb-4 relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>

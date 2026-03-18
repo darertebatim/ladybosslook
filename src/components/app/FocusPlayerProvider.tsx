@@ -1,7 +1,9 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useFocusRoutinePlayer, type FocusRoutineConfig } from '@/hooks/useFocusRoutinePlayer';
 import { FocusRoutinePlayer } from '@/components/app/FocusRoutinePlayer';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
+import { getProTaskNavigationPath, type ProLinkType } from '@/lib/proTaskTypes';
 
 type ResumeOptions = {
   startFromIndex: number;
@@ -20,6 +22,7 @@ type FocusPlayerContextType = {
   phase: string;
   togglePause: () => void;
   completeTask: () => void;
+  openProTask: () => void;
 };
 
 const FocusPlayerContext = createContext<FocusPlayerContextType>({
@@ -33,6 +36,7 @@ const FocusPlayerContext = createContext<FocusPlayerContextType>({
   phase: 'idle',
   togglePause: () => {},
   completeTask: () => {},
+  openProTask: () => {},
 });
 
 export const useFocusPlayer = () => useContext(FocusPlayerContext);
@@ -40,9 +44,18 @@ export const useFocusPlayer = () => useContext(FocusPlayerContext);
 export function FocusPlayerProvider({ children }: { children: ReactNode }) {
   const player = useFocusRoutinePlayer();
   const [minimized, setMinimized] = useState(false);
+  const navigate = useNavigate();
 
   const handleMinimize = () => setMinimized(true);
   const handleMaximize = () => setMinimized(false);
+
+  const openProTask = useCallback(() => {
+    const task = player.currentTask;
+    if (!task?.proLinkType) return;
+    const path = getProTaskNavigationPath(task.proLinkType as ProLinkType, task.proLinkValue || null);
+    setMinimized(true);
+    navigate(path);
+  }, [player.currentTask, navigate]);
 
   // Auto-expand on summary so user sees results
   const isActive = player.phase !== 'idle';
@@ -61,6 +74,7 @@ export function FocusPlayerProvider({ children }: { children: ReactNode }) {
       phase: player.phase,
       togglePause: player.togglePause,
       completeTask: player.completeTask,
+      openProTask,
     }}>
       {children}
       {showFullPlayer && (
@@ -91,6 +105,7 @@ export function FocusPlayerProvider({ children }: { children: ReactNode }) {
             onClose={player.closePlayer}
             onCancel={player.cancelPlayer}
             onMinimize={handleMinimize}
+            onOpenProTask={openProTask}
           />
         </OverlayPortal>
       )}

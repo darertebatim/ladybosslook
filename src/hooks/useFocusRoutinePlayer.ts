@@ -18,6 +18,8 @@ export interface FocusTask {
   goalType?: string | null;
   goalTarget?: number | null;
   hasTimerGoal?: boolean; // true = firm countdown, false = estimated duration
+  proLinkType?: string | null;
+  proLinkValue?: string | null;
 }
 
 export interface FocusRoutineConfig {

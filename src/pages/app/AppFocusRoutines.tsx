@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft } from 'lucide-react';
+import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import { format, addMinutes } from 'date-fns';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
 import SealCheck from '@/components/app/SealCheck';
@@ -168,7 +169,7 @@ export default function AppFocusRoutines() {
     // Fetch user's own tasks for this routine — no bank lookup needed
     const { data: userTasks } = await supabase
       .from('user_tasks')
-      .select('id, title, emoji, color, goal_target, goal_type, order_index')
+      .select('id, title, emoji, color, goal_target, goal_type, order_index, pro_link_type, pro_link_value')
       .eq('user_id', user!.id)
       .eq('source_routine_id', routine.routine_id)
       .eq('is_active', true)
@@ -196,6 +197,8 @@ export default function AppFocusRoutines() {
         goalType: t.goal_type || null,
         goalTarget: t.goal_target || null,
         hasTimerGoal: isTimer,
+        proLinkType: t.pro_link_type || null,
+        proLinkValue: t.pro_link_value || null,
       };
     });
 
@@ -474,8 +477,19 @@ export default function AppFocusRoutines() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] text-black/60">{isEstimate ? `⏱️` : `⏱️ ${mins}m`}</span>
-                    {!isEstimate && startTime && endTime && (
+                    {(() => {
+                      const taskProType = (task as any).proLinkType as ProLinkType | null;
+                      const taskProConfig = taskProType ? PRO_LINK_CONFIGS[taskProType] : null;
+                      if (taskProConfig) {
+                        return (
+                          <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded-full", taskProConfig.badgeColorClass)}>
+                            {taskProConfig.badgeText}
+                          </span>
+                        );
+                      }
+                      return <span className="text-[11px] text-black/60">{isEstimate ? `⏱️` : `⏱️ ${mins}m`}</span>;
+                    })()}
+                    {!isEstimate && !(task as any).proLinkType && startTime && endTime && (
                       <>
                         <span className="text-[11px] text-black/40">•</span>
                         <span className="text-[11px] text-black/60">

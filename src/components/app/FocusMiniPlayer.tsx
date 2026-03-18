@@ -1,9 +1,10 @@
-import { Pause, Play, Check } from 'lucide-react';
+import { Pause, Play, Check, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { haptic } from '@/lib/haptics';
 import { TASK_COLORS, type TaskColor } from '@/hooks/useTaskPlanner';
+import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 
 // Secondary (darker) palette matching task colors
 const TASK_COLORS_DARK: Record<string, string> = {
@@ -39,12 +40,15 @@ export function FocusMiniPlayer() {
     phase,
     togglePause,
     completeTask,
+    openProTask,
   } = useFocusPlayer();
 
   if (!isActive || !isMinimized || !currentTask || phase === 'summary') return null;
 
   const isPaused = phase === 'paused';
   const colorKey = (currentTask.color || 'yellow') as TaskColor;
+  const proLinkType = (currentTask as any)?.proLinkType as ProLinkType | null;
+  const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
 
   // Resolve colors from task palette
   const taskBg = TASK_COLORS[colorKey] || TASK_COLORS.yellow;
@@ -105,6 +109,22 @@ export function FocusMiniPlayer() {
             <Pause className="h-4.5 w-4.5 text-black" />
           )}
         </button>
+
+        {/* Pro task open button */}
+        {!isPaused && proConfig && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              haptic.medium();
+              openProTask();
+            }}
+            className="flex-shrink-0 h-10 px-3 rounded-full flex items-center justify-center gap-1.5 active:opacity-80"
+            style={{ backgroundColor: buttonBg }}
+          >
+            <ExternalLink className="h-3.5 w-3.5 text-black" />
+            <span className="text-xs font-semibold text-black">Open</span>
+          </button>
+        )}
 
         {/* Complete — only show when running */}
         {!isPaused && (
