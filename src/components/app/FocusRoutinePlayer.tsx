@@ -313,16 +313,20 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
                 { icon: '—', label: '1 min', delta: -1 },
                 { icon: '+', label: '1 min', delta: 1 },
                 { icon: '+', label: '10 min', delta: 10 },
-              ].map(({ icon, label, delta }) => (
-                <button
-                  key={`${icon}${label}`}
-                  onClick={() => { haptic.light(); onAdjustTime(delta); }}
-                  className="flex flex-col items-center gap-1 py-4 rounded-2xl bg-foreground/[0.06] active:bg-foreground/10"
-                >
+              ].map(({ icon, label, delta }) => {
+                const wouldGoBelowZero = delta < 0 && timeLeft + delta * 60 < 0;
+                return (
+                  <button
+                    key={`${icon}${label}`}
+                    disabled={wouldGoBelowZero}
+                    onClick={() => { haptic.light(); onAdjustTime(delta); }}
+                    className="flex flex-col items-center gap-1 py-4 rounded-2xl bg-foreground/[0.06] active:bg-foreground/10 disabled:opacity-30 disabled:active:bg-foreground/[0.06]"
+                  >
                   <span className="text-lg font-semibold text-foreground/70">{icon}</span>
                   <span className="text-xs text-foreground/60 font-medium">{label}</span>
                 </button>
-              ))}
+                );
+              })}
             </div>
             <button
               onClick={() => { haptic.light(); onResetTime(); setShowAdjustSheet(false); }}
