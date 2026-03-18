@@ -288,7 +288,10 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
             {currentTask?.title}
           </h2>
           <p className="text-sm text-muted-foreground text-center mt-1">
-            {format(taskStartedAt, 'h:mma').toLowerCase()}  →  {format(taskEndTime, 'h:mma').toLowerCase()}
+            {currentTask && (currentTask as any).hasTimerGoal === false
+              ? `~${Math.ceil((currentTask.targetSeconds) / 60)}m estimate`
+              : `${format(taskStartedAt, 'h:mma').toLowerCase()}  →  ${format(taskEndTime, 'h:mma').toLowerCase()}`
+            }
           </p>
         </div>
 

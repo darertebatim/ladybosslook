@@ -20,17 +20,16 @@ export default function AppFocusRoutines() {
   const { user } = useAuth();
   const { startRoutine, isActive } = useFocusPlayer();
 
-  // Fetch user's own focus routines from user_routines_bank (user-owned copies)
+  // Fetch ALL user routines from user_routines_bank (user-owned copies)
   const { data: myFocusRoutines, isLoading } = useQuery({
-    queryKey: ['user-focus-routines', user?.id],
+    queryKey: ['user-routines-all', user?.id],
     queryFn: async () => {
       if (!user) return [];
       const { data, error } = await supabase
         .from('user_routines_bank')
         .select('id, routine_id, title, emoji, cover_image_url, category, color, is_focus, is_active')
         .eq('user_id', user.id)
-        .eq('is_active', true)
-        .eq('is_focus', true);
+        .eq('is_active', true);
       if (error) throw error;
       return (data || []) as any[];
     },
@@ -185,16 +184,20 @@ export default function AppFocusRoutines() {
 
     haptic.light();
 
-    const tasks = userTasks.map((t: any) => ({
-      id: t.id,           // This IS the user_task ID
-      title: t.title,
-      emoji: t.emoji || '📝',
-      targetSeconds: t.goal_target || 300,
-      color: t.color || undefined,
-      userTaskId: t.id,   // Same ID — no mapping needed!
-      goalType: t.goal_type || null,
-      goalTarget: t.goal_target || null,
-    }));
+    const tasks = userTasks.map((t: any) => {
+      const isTimer = t.goal_type === 'timer';
+      return {
+        id: t.id,
+        title: t.title,
+        emoji: t.emoji || '📝',
+        targetSeconds: isTimer ? (t.goal_target || 300) : 300, // non-timer tasks get 5m estimate
+        color: t.color || undefined,
+        userTaskId: t.id,
+        goalType: t.goal_type || null,
+        goalTarget: t.goal_target || null,
+        hasTimerGoal: isTimer,
+      };
+    });
 
     // Start with planner-completed tasks for today
     const doneSet = new Set<string>(
@@ -290,7 +293,7 @@ export default function AppFocusRoutines() {
           </button>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500" />
-            <h1 className="text-base font-bold text-foreground">Focus Routines</h1>
+            <h1 className="text-base font-bold text-foreground">My Routines</h1>
           </div>
           <div className="w-7" />
         </div>
@@ -392,9 +395,9 @@ export default function AppFocusRoutines() {
             {(myFocusRoutines || []).filter((r: any) => (routineTasksMap?.[r.routine_id] || []).length > 0).length === 0 && (
               <div className="text-center py-12">
                 <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
-                <h3 className="font-semibold text-foreground mb-1">No focus routines yet</h3>
+                <h3 className="font-semibold text-foreground mb-1">No routines yet</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Browse and add focus routines to start your timed sessions
+                  Browse and add routines to start your sessions
                 </p>
               </div>
             )}
@@ -424,9 +427,15 @@ export default function AppFocusRoutines() {
 
           <div className="flex-1 overflow-y-auto px-5 pb-32">
             <h1 className="text-2xl font-bold text-foreground mt-2">{preStartRoutine.title}</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {format(new Date(), 'h:mma')} – {format(addMinutes(new Date(), Math.ceil(totalPreStartSeconds / 60)), 'h:mma')} ({Math.ceil(totalPreStartSeconds / 60)}m)
-            </p>
+            {(() => {
+              const totalMins = Math.ceil(totalPreStartSeconds / 60);
+              const hasEstimates = remainingPreStartTasks.some(t => !(t as any).hasTimerGoal);
+              return (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {format(new Date(), 'h:mma')} – {hasEstimates ? '~' : ''}{format(addMinutes(new Date(), totalMins), 'h:mma')} ({hasEstimates ? '~' : ''}{totalMins}m)
+                </p>
+              );
+            })()}
 
             <div className="space-y-2.5 mt-6">
               {(() => {
@@ -446,6 +455,7 @@ export default function AppFocusRoutines() {
                   const colorKey = (task.color || 'yellow') as TaskColor;
                   const colorClass = TASK_COLOR_CLASSES[colorKey] || TASK_COLOR_CLASSES.yellow;
                   const mins = Math.ceil(task.targetSeconds / 60);
+                  const isEstimate = !(task as any).hasTimerGoal;
                   return (
                     <div
                       key={task.id}
@@ -461,7 +471,7 @@ export default function AppFocusRoutines() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[11px] text-black/60">⏱️ {mins}m</span>
+                            <span className="text-[11px] text-black/60">{isEstimate ? `~${mins}m` : `⏱️ ${mins}m`}</span>
                             {startTime && endTime && (
                               <>
                                 <span className="text-[11px] text-black/40">•</span>
