@@ -19,7 +19,7 @@ export default function AppFocusRoutines() {
   const { data: allRoutines, isLoading: routinesLoading } = useRoutinesBank();
   const { data: userAddedIds, isLoading: userLoading } = useUserAddedBankRoutines();
   const { data: routineCategories = [] } = useRoutineBankCategories();
-  const { startRoutine } = useFocusPlayer();
+  const { startRoutine, isActive } = useFocusPlayer();
 
   const isLoading = routinesLoading || userLoading;
 
@@ -102,7 +102,13 @@ export default function AppFocusRoutines() {
 
   const totalPreStartSeconds = preStartTasks.reduce((s, t) => s + t.targetSeconds, 0);
 
+
   const handlePlay = async (routine: typeof allRoutines extends (infer T)[] | undefined ? T : never) => {
+    if (isActive) {
+      const { toast } = await import('sonner');
+      toast('A routine is already running. Finish or cancel it first.');
+      return;
+    }
     setLoadingRoutineId(routine.id);
     const { data } = await supabase
       .from('routines_bank_tasks')
