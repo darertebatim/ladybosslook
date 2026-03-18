@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Check } from 'lucide-react';
 import { format, addMinutes } from 'date-fns';
 import { useRoutinesBank, useUserAddedBankRoutines, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
+import { TASK_COLORS, type TaskColor } from '@/hooks/useTaskPlanner';
+import SealCheck from '@/components/app/SealCheck';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
