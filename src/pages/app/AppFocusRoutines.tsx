@@ -80,25 +80,22 @@ export default function AppFocusRoutines() {
     enabled: focusRoutineIds.length > 0,
   });
 
-  // Build activated routines from pro-linked tasks (filter out malformed)
+  // Build activated routines from userAddedIds (focus routines the user has added)
   const activatedRoutineCards = useMemo(() => {
-    return focusRoutineTasks.filter(t => !!t.pro_link_value).map(task => {
-      const routineId = task.pro_link_value;
-      const routine = allRoutines?.find(r => r.id === routineId);
-      const emojis = routineId ? (routineTasks?.[routineId] || []) : [];
-      return {
-        taskId: task.id,
-        routineId: routineId || '',
-        title: task.title,
-        emoji: task.emoji,
-        scheduledTime: task.scheduled_time,
-        repeatPattern: task.repeat_pattern,
-        repeatDays: task.repeat_days || [],
-        emojis,
-        routine,
-      };
-    });
-  }, [focusRoutineTasks, allRoutines, routineTasks]);
+    if (!allRoutines || !userAddedIds) return [];
+    return allRoutines
+      .filter(r => r.is_focus && userAddedIds.includes(r.id))
+      .map(routine => {
+        const emojis = routineTasks?.[routine.id] || [];
+        return {
+          routineId: routine.id,
+          title: routine.title,
+          emoji: routine.emoji,
+          emojis,
+          routine,
+        };
+      });
+  }, [allRoutines, userAddedIds, routineTasks]);
 
   // All available focus routines (not yet added)
   const availableFocusRoutines = useMemo(() => {
