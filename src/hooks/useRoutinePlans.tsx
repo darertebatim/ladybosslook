@@ -493,6 +493,7 @@ export function useAddRoutinePlan() {
             is_active: true,
             order_index: startOrderIndex + index,
             repeat_end_date: planEndDate,
+            source_routine_id: isSyntheticPlan ? null : planId,
           };
         });
 
