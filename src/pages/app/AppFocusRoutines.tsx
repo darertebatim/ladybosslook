@@ -102,7 +102,6 @@ export default function AppFocusRoutines() {
 
   const totalPreStartSeconds = preStartTasks.reduce((s, t) => s + t.targetSeconds, 0);
 
-  const { isActive } = useFocusPlayer();
 
   const handlePlay = async (routine: typeof allRoutines extends (infer T)[] | undefined ? T : never) => {
     if (isActive) {
