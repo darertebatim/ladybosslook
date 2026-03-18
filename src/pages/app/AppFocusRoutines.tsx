@@ -293,7 +293,7 @@ export default function AppFocusRoutines() {
           </button>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500" />
-            <h1 className="text-base font-bold text-foreground">Focus Routines</h1>
+            <h1 className="text-base font-bold text-foreground">My Routines</h1>
           </div>
           <div className="w-7" />
         </div>
