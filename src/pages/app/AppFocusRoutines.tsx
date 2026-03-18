@@ -36,23 +36,6 @@ export default function AppFocusRoutines() {
     return map;
   }, [routineCategories]);
 
-  // Fetch pro-linked focus routine tasks from user_tasks
-  const { data: focusRoutineTasks = [] } = useQuery({
-    queryKey: ['focus-routine-pro-tasks', user?.id],
-    queryFn: async () => {
-      if (!user) return [];
-      const { data } = await supabase
-        .from('user_tasks')
-        .select('id, title, emoji, pro_link_value, scheduled_time, repeat_pattern, repeat_days, is_active')
-        .eq('user_id', user.id)
-        .eq('pro_link_type', 'focus_routine')
-        .eq('is_active', true);
-      return data || [];
-    },
-    enabled: !!user,
-  });
-  const queryClient = useQueryClient();
-
 
   // Fetch today's session completion data
   const { data: todaySessions } = useQuery({
