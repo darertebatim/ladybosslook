@@ -395,9 +395,9 @@ export default function AppFocusRoutines() {
             {(myFocusRoutines || []).filter((r: any) => (routineTasksMap?.[r.routine_id] || []).length > 0).length === 0 && (
               <div className="text-center py-12">
                 <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
-                <h3 className="font-semibold text-foreground mb-1">No focus routines yet</h3>
+                <h3 className="font-semibold text-foreground mb-1">No routines yet</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Browse and add focus routines to start your timed sessions
+                  Browse and add routines to start your sessions
                 </p>
               </div>
             )}
