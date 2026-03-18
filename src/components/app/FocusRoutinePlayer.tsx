@@ -282,7 +282,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
       </div>
 
       {/* Task title + time range */}
-      <div className="px-6 mt-2">
+      <div className="px-6 mb-0">
         <h2 className="text-xl font-bold text-foreground text-center leading-snug max-w-xs mx-auto">
           {currentTask?.title}
         </h2>
@@ -292,7 +292,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
       </div>
 
       {/* Main circle area */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 -mt-2">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 mt-2 mb-2">
         <div className="relative w-64 h-64 flex items-center justify-center">
           <div className="absolute inset-3 rounded-full bg-foreground/[0.04]" />
 
@@ -355,7 +355,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
       </div>
 
       {/* Controls section — always render running layout for stable positioning */}
-      <div className="px-6 pb-4 relative -mt-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
+      <div className="px-6 pb-4 relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
         {/* Normal running controls (always rendered, invisible when paused) */}
         <div className={cn("flex items-center justify-center gap-8 mb-4", isPaused && "invisible")}>
           <button
