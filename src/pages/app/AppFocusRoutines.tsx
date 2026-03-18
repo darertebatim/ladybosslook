@@ -365,17 +365,12 @@ export default function AppFocusRoutines() {
                             >
                               <Settings2 className="w-4 h-4 text-muted-foreground" />
                             </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                haptic.light();
-                                navigate(`/app/routines/bank/${card.routineId}`);
-                              }}
-                              className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center active:scale-95 transition-transform"
-                              title="Add to my routines"
-                            >
-                              <CalendarPlus className="w-4 h-4 text-muted-foreground" />
-                            </button>
+                            <AddedToRoutineButton
+                              isAdded={userAddedIds?.includes(card.routineId) || false}
+                              onAddClick={() => handleAddToRoutine(card.routineId)}
+                              isLoading={addingRoutineId === card.routineId}
+                              iconOnly
+                            />
                           </div>
                         </div>
                       </div>
