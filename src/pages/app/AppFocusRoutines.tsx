@@ -191,6 +191,8 @@ export default function AppFocusRoutines() {
       targetSeconds: t.goal_target || 300,
       color: t.color || undefined,
       userTaskId: t.id,   // Same ID — no mapping needed!
+      goalType: t.goal_type || null,
+      goalTarget: t.goal_target || null,
     }));
 
     // Check for incomplete session (started today, no ended_at)
