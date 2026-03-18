@@ -226,8 +226,25 @@ export default function AppFocusRoutines() {
     setPreStartRoutine(null);
     setPreStartTasks([]);
   };
+  const handleAddToRoutine = async (routineId: string) => {
+    const routine = allRoutines?.find(r => r.id === routineId);
+    if (!routine) return;
+    setAddingRoutineId(routineId);
+    try {
+      await addRoutineFromBank.mutateAsync({
+        routine,
+        tasks: [],
+        editedTasks: [],
+      });
+      toast.success('Added to your routines!');
+    } catch (e) {
+      toast.error('Failed to add routine');
+    } finally {
+      setAddingRoutineId(null);
+    }
+  };
 
-  const formatRepeatDays = (days: number[]) => {
+
     if (!days || days.length === 0 || days.length === 7) return 'Every day';
     return days.map(d => WEEKDAY_LABELS[d]).join('·');
   };
