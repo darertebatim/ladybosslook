@@ -1,5 +1,5 @@
 import { memo, useState, useCallback, useEffect } from 'react';
-import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus, GripVertical } from 'lucide-react';
+import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus, GripVertical, ChevronUp, ArrowUp, ArrowDown } from 'lucide-react';
 import { format, addSeconds } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
@@ -77,6 +77,9 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   const [showRearrangeSheet, setShowRearrangeSheet] = useState(false);
   const [rearrangeTasks, setRearrangeTasks] = useState<FocusTask[]>([]);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [showAddTaskForm, setShowAddTaskForm] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskMinutes, setNewTaskMinutes] = useState(1);
 
   const nextTask = config.tasks[currentTaskIndex + 1] || null;
   const progressPercent = currentTask
@@ -505,7 +508,9 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
                 onClick={() => {
                   haptic.light();
                   setShowPlaylistSheet(false);
-                  // TODO: open quick add task
+                  setShowAddTaskForm(true);
+                  setNewTaskTitle('');
+                  setNewTaskMinutes(1);
                 }}
                 className="flex-1 py-4 rounded-2xl bg-foreground text-background font-semibold text-base active:opacity-90"
               >
@@ -547,20 +552,32 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
                     <p className="text-sm font-semibold text-foreground truncate">{task.title}</p>
                   </div>
                   <span className="text-xs text-muted-foreground tabular-nums">{Math.round(task.targetSeconds / 60)}m</span>
-                  <button
-                    className="p-1 active:opacity-50"
-                    onPointerDown={() => {
-                      // Simple move: swap with previous
-                      if (i > 0) {
+                  <div className="flex flex-col gap-0.5">
+                    <button
+                      className="p-0.5 active:opacity-50 disabled:opacity-15"
+                      disabled={i === 0}
+                      onClick={() => {
                         haptic.light();
                         const newArr = [...rearrangeTasks];
                         [newArr[i - 1], newArr[i]] = [newArr[i], newArr[i - 1]];
                         setRearrangeTasks(newArr);
-                      }
-                    }}
-                  >
-                    <GripVertical className="w-5 h-5 text-foreground/30" />
-                  </button>
+                      }}
+                    >
+                      <ArrowUp className="w-4 h-4 text-foreground/50" />
+                    </button>
+                    <button
+                      className="p-0.5 active:opacity-50 disabled:opacity-15"
+                      disabled={i === rearrangeTasks.length - 1}
+                      onClick={() => {
+                        haptic.light();
+                        const newArr = [...rearrangeTasks];
+                        [newArr[i], newArr[i + 1]] = [newArr[i + 1], newArr[i]];
+                        setRearrangeTasks(newArr);
+                      }}
+                    >
+                      <ArrowDown className="w-4 h-4 text-foreground/50" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -575,6 +592,68 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
               className="w-full py-4 rounded-2xl bg-foreground text-background font-semibold text-base active:opacity-90"
             >
               Done
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Quick Add Task Sheet */}
+      {showAddTaskForm && (
+        <>
+          <div
+            className="absolute inset-0 bg-black/40 z-[10] animate-in fade-in-0 duration-200"
+            onClick={() => setShowAddTaskForm(false)}
+          />
+          <div className="absolute bottom-0 left-0 right-0 z-[11] bg-background rounded-t-3xl px-6 pb-6 pt-2 animate-in slide-in-from-bottom duration-300"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)' }}
+          >
+            <div className="w-10 h-1 bg-foreground/10 rounded-full mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-foreground mb-4">Add task</h3>
+            <input
+              type="text"
+              value={newTaskTitle}
+              onChange={(e) => setNewTaskTitle(e.target.value)}
+              placeholder="Task name"
+              autoFocus
+              className="w-full px-4 py-3 rounded-xl bg-foreground/[0.06] text-foreground placeholder:text-muted-foreground text-base outline-none focus:ring-2 focus:ring-primary/30 mb-3"
+            />
+            <div className="flex items-center gap-3 mb-5">
+              <span className="text-sm text-muted-foreground">Duration</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setNewTaskMinutes(m => Math.max(1, m - 1))}
+                  className="w-9 h-9 rounded-xl bg-foreground/[0.06] flex items-center justify-center active:bg-foreground/10"
+                >
+                  <Minus className="w-4 h-4 text-foreground" />
+                </button>
+                <span className="text-base font-semibold text-foreground w-10 text-center tabular-nums">{newTaskMinutes}m</span>
+                <button
+                  onClick={() => setNewTaskMinutes(m => m + 1)}
+                  className="w-9 h-9 rounded-xl bg-foreground/[0.06] flex items-center justify-center active:bg-foreground/10"
+                >
+                  <Plus className="w-4 h-4 text-foreground" />
+                </button>
+              </div>
+            </div>
+            <button
+              disabled={!newTaskTitle.trim()}
+              onClick={() => {
+                haptic.medium();
+                const newTask: FocusTask = {
+                  id: `quick-${Date.now()}`,
+                  title: newTaskTitle.trim(),
+                  emoji: '⚡',
+                  targetSeconds: newTaskMinutes * 60,
+                };
+                const updatedTasks = [...config.tasks, newTask];
+                onReorderTasks(updatedTasks);
+                setShowAddTaskForm(false);
+                setNewTaskTitle('');
+                setNewTaskMinutes(1);
+              }}
+              className="w-full py-4 rounded-2xl bg-foreground text-background font-semibold text-base active:opacity-90 disabled:opacity-40"
+            >
+              Add to routine
             </button>
           </div>
         </>
