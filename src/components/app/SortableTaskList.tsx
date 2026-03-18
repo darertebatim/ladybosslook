@@ -4,6 +4,7 @@ import {
   DndContext,
   closestCenter,
   KeyboardSensor,
+  MouseSensor,
   TouchSensor,
   useSensor,
   useSensors,
@@ -164,8 +165,13 @@ export const SortableTaskList = ({
     setLocalTasks(tasks);
   }
 
-  // Custom touch sensor with delay for long press
+  // Long-press drag on touch, drag-by-move on mouse
   const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 6,
+      },
+    }),
     useSensor(TouchSensor, {
       activationConstraint: {
         delay: 300, // 300ms long press to activate
