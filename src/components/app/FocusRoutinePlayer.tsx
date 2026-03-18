@@ -552,20 +552,32 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
                     <p className="text-sm font-semibold text-foreground truncate">{task.title}</p>
                   </div>
                   <span className="text-xs text-muted-foreground tabular-nums">{Math.round(task.targetSeconds / 60)}m</span>
-                  <button
-                    className="p-1 active:opacity-50"
-                    onPointerDown={() => {
-                      // Simple move: swap with previous
-                      if (i > 0) {
+                  <div className="flex flex-col gap-0.5">
+                    <button
+                      className="p-0.5 active:opacity-50 disabled:opacity-15"
+                      disabled={i === 0}
+                      onClick={() => {
                         haptic.light();
                         const newArr = [...rearrangeTasks];
                         [newArr[i - 1], newArr[i]] = [newArr[i], newArr[i - 1]];
                         setRearrangeTasks(newArr);
-                      }
-                    }}
-                  >
-                    <GripVertical className="w-5 h-5 text-foreground/30" />
-                  </button>
+                      }}
+                    >
+                      <ArrowUp className="w-4 h-4 text-foreground/50" />
+                    </button>
+                    <button
+                      className="p-0.5 active:opacity-50 disabled:opacity-15"
+                      disabled={i === rearrangeTasks.length - 1}
+                      onClick={() => {
+                        haptic.light();
+                        const newArr = [...rearrangeTasks];
+                        [newArr[i], newArr[i + 1]] = [newArr[i + 1], newArr[i]];
+                        setRearrangeTasks(newArr);
+                      }}
+                    >
+                      <ArrowDown className="w-4 h-4 text-foreground/50" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
