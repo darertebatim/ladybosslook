@@ -3,8 +3,14 @@ import { useFocusRoutinePlayer, type FocusRoutineConfig } from '@/hooks/useFocus
 import { FocusRoutinePlayer } from '@/components/app/FocusRoutinePlayer';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
 
+type ResumeOptions = {
+  startFromIndex: number;
+  previousResults: import('@/components/app/FocusRoutineSummary').SessionTaskResult[];
+  existingSessionId: string;
+};
+
 type FocusPlayerContextType = {
-  startRoutine: (config: FocusRoutineConfig) => void;
+  startRoutine: (config: FocusRoutineConfig, resumeOptions?: ResumeOptions) => void;
   isActive: boolean;
   isMinimized: boolean;
   maximize: () => void;
