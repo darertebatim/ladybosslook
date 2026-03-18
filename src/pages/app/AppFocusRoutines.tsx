@@ -243,7 +243,6 @@ export default function AppFocusRoutines() {
     const remaining = preStartTasks.filter(t => !completedTaskIds.has(t.id));
 
     if (remaining.length === 0) {
-      const { toast } = await import('sonner');
       toast('All tasks in this routine are already completed for today ✅');
       return;
     }
