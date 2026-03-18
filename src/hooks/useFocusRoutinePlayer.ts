@@ -194,10 +194,7 @@ export function useFocusRoutinePlayer() {
           return;
         }
         // Update streak & presence in background
-        import('@/hooks/useTaskPlanner').then(mod => {
-          // We can't easily call updateStreak from here since it's not exported,
-          // so we just update presence and invalidate queries
-        }).catch(() => {});
+        updateStreak(user.id, dateStr).catch(() => {});
         updatePresence(user.id, dateStr).catch(() => {});
         // Invalidate planner queries so UI updates
         queryClient.invalidateQueries({ queryKey: ['planner-completions'] });
