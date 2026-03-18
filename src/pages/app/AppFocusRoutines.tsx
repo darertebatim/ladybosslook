@@ -238,7 +238,7 @@ export default function AppFocusRoutines() {
     }
   };
 
-
+  const formatRepeatDays = (days: number[]) => {
     if (!days || days.length === 0 || days.length === 7) return 'Every day';
     return days.map(d => WEEKDAY_LABELS[d]).join('·');
   };
