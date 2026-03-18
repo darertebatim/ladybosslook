@@ -184,16 +184,20 @@ export default function AppFocusRoutines() {
 
     haptic.light();
 
-    const tasks = userTasks.map((t: any) => ({
-      id: t.id,           // This IS the user_task ID
-      title: t.title,
-      emoji: t.emoji || '📝',
-      targetSeconds: t.goal_target || 300,
-      color: t.color || undefined,
-      userTaskId: t.id,   // Same ID — no mapping needed!
-      goalType: t.goal_type || null,
-      goalTarget: t.goal_target || null,
-    }));
+    const tasks = userTasks.map((t: any) => {
+      const isTimer = t.goal_type === 'timer';
+      return {
+        id: t.id,
+        title: t.title,
+        emoji: t.emoji || '📝',
+        targetSeconds: isTimer ? (t.goal_target || 300) : 300, // non-timer tasks get 5m estimate
+        color: t.color || undefined,
+        userTaskId: t.id,
+        goalType: t.goal_type || null,
+        goalTarget: t.goal_target || null,
+        hasTimerGoal: isTimer,
+      };
+    });
 
     // Start with planner-completed tasks for today
     const doneSet = new Set<string>(
