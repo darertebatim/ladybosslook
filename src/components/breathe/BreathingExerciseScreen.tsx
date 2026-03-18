@@ -50,6 +50,9 @@ export function BreathingExerciseScreen({
   exercise,
   onClose,
 }: BreathingExerciseScreenProps) {
+  const location = useLocation();
+  const { isProTaskActive, completeProTask } = useFocusPlayer();
+  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
   // Layout toggle
   const [layout, setLayout] = useState<LayoutMode>(() => {
     try {
