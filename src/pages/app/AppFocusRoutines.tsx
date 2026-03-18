@@ -477,8 +477,19 @@ export default function AppFocusRoutines() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] text-black/60">{isEstimate ? `⏱️` : `⏱️ ${mins}m`}</span>
-                    {!isEstimate && startTime && endTime && (
+                    {(() => {
+                      const taskProType = (task as any).proLinkType as ProLinkType | null;
+                      const taskProConfig = taskProType ? PRO_LINK_CONFIGS[taskProType] : null;
+                      if (taskProConfig) {
+                        return (
+                          <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded-full", taskProConfig.badgeColorClass)}>
+                            {taskProConfig.badgeText}
+                          </span>
+                        );
+                      }
+                      return <span className="text-[11px] text-black/60">{isEstimate ? `⏱️` : `⏱️ ${mins}m`}</span>;
+                    })()}
+                    {!isEstimate && !(task as any).proLinkType && startTime && endTime && (
                       <>
                         <span className="text-[11px] text-black/40">•</span>
                         <span className="text-[11px] text-black/60">
