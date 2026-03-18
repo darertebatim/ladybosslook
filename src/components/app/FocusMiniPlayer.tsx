@@ -82,21 +82,23 @@ export function FocusMiniPlayer() {
           )}
         </button>
 
-        {/* Complete */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            haptic.success();
-            completeTask();
-          }}
-          className={cn(
-            "flex-shrink-0 h-10 w-10 rounded-full",
-            "flex items-center justify-center",
-            "bg-black text-white active:opacity-90"
-          )}
-        >
-          <Check className="h-5 w-5" />
-        </button>
+        {/* Complete — only show when running (not paused) */}
+        {!isPaused && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              haptic.success();
+              completeTask();
+            }}
+            className={cn(
+              "flex-shrink-0 h-10 w-10 rounded-full",
+              "flex items-center justify-center",
+              "bg-black text-white active:opacity-90"
+            )}
+          >
+            <Check className="h-5 w-5" />
+          </button>
+        )}
       </div>
     </div>
   );
