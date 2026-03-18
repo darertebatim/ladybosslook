@@ -547,78 +547,18 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
 
       {/* Rearrange Bottom Sheet */}
       {showRearrangeSheet && (
-        <>
-          <div
-            className="absolute inset-0 bg-black/40 z-[10] animate-in fade-in-0 duration-200"
-            onClick={() => setShowRearrangeSheet(false)}
-          />
-          <div className="absolute bottom-0 left-0 right-0 z-[11] bg-background rounded-t-3xl px-6 pb-6 pt-2 animate-in slide-in-from-bottom duration-300 max-h-[75vh] flex flex-col"
-            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)' }}
-          >
-            <div className="w-10 h-1 bg-foreground/10 rounded-full mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-foreground mb-4">Rearrange</h3>
-            <div className="flex-1 overflow-y-auto space-y-2 mb-4">
-              {/* Current task (greyed out) */}
-              {currentTask && (
-                <div className="flex items-center gap-3 bg-foreground/[0.04] rounded-2xl px-4 py-3.5 opacity-40">
-                  <FluentEmoji emoji={currentTask.emoji} size={28} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground/50 truncate">{currentTask.title}</p>
-                  </div>
-                  <span className="text-xs text-muted-foreground tabular-nums">{Math.round(currentTask.targetSeconds / 60)}m</span>
-                </div>
-              )}
-              {/* Remaining tasks (draggable via simple move buttons) */}
-              {rearrangeTasks.map((task, i) => (
-                <div key={task.id} className="flex items-center gap-3 bg-foreground/[0.04] rounded-2xl px-4 py-3.5">
-                  <FluentEmoji emoji={task.emoji} size={28} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate">{task.title}</p>
-                  </div>
-                  <span className="text-xs text-muted-foreground tabular-nums">{Math.round(task.targetSeconds / 60)}m</span>
-                  <div className="flex flex-col gap-0.5">
-                    <button
-                      className="p-0.5 active:opacity-50 disabled:opacity-15"
-                      disabled={i === 0}
-                      onClick={() => {
-                        haptic.light();
-                        const newArr = [...rearrangeTasks];
-                        [newArr[i - 1], newArr[i]] = [newArr[i], newArr[i - 1]];
-                        setRearrangeTasks(newArr);
-                      }}
-                    >
-                      <ArrowUp className="w-4 h-4 text-foreground/50" />
-                    </button>
-                    <button
-                      className="p-0.5 active:opacity-50 disabled:opacity-15"
-                      disabled={i === rearrangeTasks.length - 1}
-                      onClick={() => {
-                        haptic.light();
-                        const newArr = [...rearrangeTasks];
-                        [newArr[i], newArr[i + 1]] = [newArr[i + 1], newArr[i]];
-                        setRearrangeTasks(newArr);
-                      }}
-                    >
-                      <ArrowDown className="w-4 h-4 text-foreground/50" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={() => {
-                haptic.medium();
-                // Apply rearranged tasks: keep tasks up to currentTaskIndex, then new order
-                const kept = config.tasks.slice(0, currentTaskIndex + 1);
-                onReorderTasks([...kept, ...rearrangeTasks]);
-                setShowRearrangeSheet(false);
-              }}
-              className="w-full py-4 rounded-2xl bg-foreground text-background font-semibold text-base active:opacity-90"
-            >
-              Done
-            </button>
-          </div>
-        </>
+        <RearrangeSheet
+          currentTask={currentTask}
+          rearrangeTasks={rearrangeTasks}
+          setRearrangeTasks={setRearrangeTasks}
+          onDone={() => {
+            haptic.medium();
+            const kept = config.tasks.slice(0, currentTaskIndex + 1);
+            onReorderTasks([...kept, ...rearrangeTasks]);
+            setShowRearrangeSheet(false);
+          }}
+          onClose={() => setShowRearrangeSheet(false)}
+        />
       )}
 
       {/* Quick Add Task Sheet */}
