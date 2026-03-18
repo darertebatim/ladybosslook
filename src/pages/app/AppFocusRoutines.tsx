@@ -465,16 +465,12 @@ export default function AppFocusRoutines() {
               <Play className="w-5 h-5 fill-current" />
               Start
             </button>
-            <button
-              onClick={() => {
-                haptic.light();
-                navigate(`/app/routines/bank/${preStartRoutine.id}`);
-              }}
-              className="w-full flex items-center justify-center gap-2 h-10 mt-2 rounded-xl text-sm font-medium text-muted-foreground active:opacity-70"
-            >
-              <CalendarPlus className="w-4 h-4" />
-              Add to My Routines
-            </button>
+            <AddedToRoutineButton
+              isAdded={userAddedIds?.includes(preStartRoutine.id) || false}
+              onAddClick={() => handleAddToRoutine(preStartRoutine.id)}
+              isLoading={addingRoutineId === preStartRoutine.id}
+              addText="Add to My Routines"
+            />
           </div>
         </div>
       )}
