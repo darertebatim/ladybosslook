@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Bell, CalendarDays } from 'lucide-react';
 import { format, addMinutes } from 'date-fns';
 import { useRoutinesBank, useUserAddedBankRoutines, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { haptic } from '@/lib/haptics';
 import { startOfDay, endOfDay } from 'date-fns';
@@ -46,6 +46,50 @@ export default function AppFocusRoutines() {
     },
     enabled: !!user,
   });
+  const queryClient = useQueryClient();
+
+  // Backfill: create pro-linked tasks for focus routines activated before the pro-link system
+  const backfillRan = useRef(false);
+  useEffect(() => {
+    if (!user || !allRoutines || !userAddedIds || backfillRan.current) return;
+    if (routinesLoading || userLoading) return;
+
+    const activatedFocusIds = userAddedIds.filter(id => {
+      const r = allRoutines.find(rt => rt.id === id);
+      return r?.is_focus;
+    });
+
+    const proLinkedIds = new Set(focusRoutineTasks.map(t => t.pro_link_value));
+    const missing = activatedFocusIds.filter(id => !proLinkedIds.has(id));
+
+    if (missing.length === 0) return;
+    backfillRan.current = true;
+
+    (async () => {
+      for (const routineId of missing) {
+        const routine = allRoutines.find(r => r.id === routineId);
+        if (!routine) continue;
+
+        await supabase.from('user_tasks').insert({
+          user_id: user.id,
+          title: routine.title,
+          emoji: routine.emoji || '🎯',
+          color: 'amber',
+          repeat_pattern: 'daily',
+          repeat_days: [1, 2, 3, 4, 5],
+          tag: 'pro',
+          pro_link_type: 'focus_routine',
+          pro_link_value: routineId,
+          is_active: true,
+          order_index: 999,
+          goal_enabled: true,
+          goal_type: 'timer',
+          goal_unit: 'minutes',
+        });
+      }
+      queryClient.invalidateQueries({ queryKey: ['focus-routine-pro-tasks'] });
+    })();
+  }, [user, allRoutines, userAddedIds, focusRoutineTasks, routinesLoading, userLoading, queryClient]);
 
   // Fetch today's session completion data
   const { data: todaySessions } = useQuery({
