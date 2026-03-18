@@ -306,11 +306,16 @@ export default function AppFocusRoutines() {
         ) : (
           <div className="space-y-6 mt-4">
             {/* Activated routines — reading from user-owned data */}
-            {(myFocusRoutines || []).length > 0 && (
+            {(() => {
+              const activeRoutines = (myFocusRoutines || []).filter((r: any) => {
+                const tasks = routineTasksMap?.[r.routine_id] || [];
+                return tasks.length > 0;
+              });
+              return activeRoutines.length > 0 ? (
               <section>
                 <p className="text-base font-bold text-foreground mb-3">My Routines</p>
                 <div className="space-y-3">
-                  {(myFocusRoutines || []).map((routine: any) => {
+                  {activeRoutines.map((routine: any) => {
                     const completion = getCompletionInfo(routine.routine_id);
                     const allTasks = routineTasksMap?.[routine.routine_id] || [];
                     // Use planner completions to determine which tasks are done
@@ -380,10 +385,11 @@ export default function AppFocusRoutines() {
                   })}
                 </div>
               </section>
-            )}
+              ) : null;
+            })()}
 
             {/* Empty state */}
-            {(myFocusRoutines || []).length === 0 && (
+            {(myFocusRoutines || []).filter((r: any) => (routineTasksMap?.[r.routine_id] || []).length > 0).length === 0 && (
               <div className="text-center py-12">
                 <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
                 <h3 className="font-semibold text-foreground mb-1">No focus routines yet</h3>
