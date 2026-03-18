@@ -1,8 +1,8 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Bell, CalendarDays } from 'lucide-react';
 import { format, addMinutes } from 'date-fns';
-import { useRoutinesBank, useUserAddedBankRoutines, useRoutineBankCategories, useAddRoutineFromBank } from '@/hooks/useRoutinesBank';
+import { useRoutinesBank, useUserAddedBankRoutines, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -11,22 +11,17 @@ import { haptic } from '@/lib/haptics';
 import { startOfDay, endOfDay } from 'date-fns';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
-import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
-import { toast } from 'sonner';
 
-
+const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 export default function AppFocusRoutines() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const { data: allRoutines, isLoading: routinesLoading } = useRoutinesBank();
   const { data: userAddedIds, isLoading: userLoading } = useUserAddedBankRoutines();
   const { data: routineCategories = [] } = useRoutineBankCategories();
   const { startRoutine } = useFocusPlayer();
-  const addRoutineFromBank = useAddRoutineFromBank();
-  const [addingRoutineId, setAddingRoutineId] = useState<string | null>(null);
 
   const isLoading = routinesLoading || userLoading;
 
@@ -36,6 +31,21 @@ export default function AppFocusRoutines() {
     return map;
   }, [routineCategories]);
 
+  // Fetch pro-linked focus routine tasks from user_tasks
+  const { data: focusRoutineTasks = [] } = useQuery({
+    queryKey: ['focus-routine-pro-tasks', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data } = await supabase
+        .from('user_tasks')
+        .select('id, title, emoji, pro_link_value, scheduled_time, repeat_pattern, repeat_days, is_active')
+        .eq('user_id', user.id)
+        .eq('pro_link_type', 'focus_routine')
+        .eq('is_active', true);
+      return data || [];
+    },
+    enabled: !!user,
+  });
 
   // Fetch today's session completion data
   const { data: todaySessions } = useQuery({
@@ -80,22 +90,25 @@ export default function AppFocusRoutines() {
     enabled: focusRoutineIds.length > 0,
   });
 
-  // Build activated routines from userAddedIds (focus routines the user has added)
+  // Build activated routines from pro-linked tasks
   const activatedRoutineCards = useMemo(() => {
-    if (!allRoutines || !userAddedIds) return [];
-    return allRoutines
-      .filter(r => r.is_focus && userAddedIds.includes(r.id))
-      .map(routine => {
-        const emojis = routineTasks?.[routine.id] || [];
-        return {
-          routineId: routine.id,
-          title: routine.title,
-          emoji: routine.emoji,
-          emojis,
-          routine,
-        };
-      });
-  }, [allRoutines, userAddedIds, routineTasks]);
+    return focusRoutineTasks.map(task => {
+      const routineId = task.pro_link_value;
+      const routine = allRoutines?.find(r => r.id === routineId);
+      const emojis = routineId ? (routineTasks?.[routineId] || []) : [];
+      return {
+        taskId: task.id,
+        routineId: routineId || '',
+        title: task.title,
+        emoji: task.emoji,
+        scheduledTime: task.scheduled_time,
+        repeatPattern: task.repeat_pattern,
+        repeatDays: task.repeat_days || [],
+        emojis,
+        routine,
+      };
+    });
+  }, [focusRoutineTasks, allRoutines, routineTasks]);
 
   // All available focus routines (not yet added)
   const availableFocusRoutines = useMemo(() => {
@@ -152,19 +165,6 @@ export default function AppFocusRoutines() {
     setPreStartRoutine(routine || { id: routineId, title: 'Routine', emoji: '🎯' });
   };
 
-  // Auto-play from ?play=routineId (when navigating from a pro-linked task)
-  const autoPlayTriggered = useRef(false);
-  useEffect(() => {
-    const playId = searchParams.get('play');
-    if (!playId || autoPlayTriggered.current || !allRoutines || routinesLoading) return;
-    autoPlayTriggered.current = true;
-    // Clear the param
-    searchParams.delete('play');
-    setSearchParams(searchParams, { replace: true });
-    const routine = allRoutines.find(r => r.id === playId);
-    handlePlay(playId, routine);
-  }, [searchParams, allRoutines, routinesLoading]);
-
   const handleStartFromPreview = () => {
     if (!preStartRoutine) return;
     haptic.medium();
@@ -177,18 +177,11 @@ export default function AppFocusRoutines() {
     setPreStartRoutine(null);
     setPreStartTasks([]);
   };
-  const handleAddToRoutine = async (routineId: string) => {
-    setAddingRoutineId(routineId);
-    try {
-      await addRoutineFromBank.mutateAsync({ routineId });
-      toast.success('Added to your routines!');
-    } catch (e) {
-      toast.error('Failed to add routine');
-    } finally {
-      setAddingRoutineId(null);
-    }
-  };
 
+  const formatRepeatDays = (days: number[]) => {
+    if (!days || days.length === 0 || days.length === 7) return 'Every day';
+    return days.map(d => WEEKDAY_LABELS[d]).join('·');
+  };
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
@@ -230,17 +223,34 @@ export default function AppFocusRoutines() {
 
                     return (
                       <div
-                        key={card.routineId}
+                        key={card.taskId}
                         className="bg-card rounded-2xl border border-border p-4"
                       >
+                        {/* Schedule info row */}
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-1.5">
+                          {card.scheduledTime && (
+                            <span className="flex items-center gap-1">
+                              <Bell className="w-3 h-3" />
+                              {card.scheduledTime}
+                            </span>
+                          )}
+                          {card.repeatDays.length > 0 && (
+                            <span className="flex items-center gap-1">
+                              <CalendarDays className="w-3 h-3" />
+                              {formatRepeatDays(card.repeatDays)}
+                            </span>
+                          )}
+                        </div>
 
-                        {/* Tappable card area -> plays routine */}
-                        <button
-                          onClick={() => handlePlay(card.routineId, card.routine)}
-                          disabled={loadingRoutineId === card.routineId}
-                          className="w-full flex items-start justify-between text-left active:opacity-70"
-                        >
-                          <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          {/* Tappable card area -> opens task detail */}
+                          <button
+                            onClick={() => {
+                              haptic.light();
+                              navigate(`/app/home/edit/${card.taskId}`);
+                            }}
+                            className="flex-1 min-w-0 text-left active:opacity-70"
+                          >
                             <h3 className="font-bold text-foreground text-lg leading-snug">
                               {card.title}
                             </h3>
@@ -257,24 +267,31 @@ export default function AppFocusRoutines() {
                                 ))}
                               </div>
                             )}
-                          </div>
+                          </button>
 
-                          {/* Play indicator */}
-                          <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center shrink-0 ml-3">
+                          {/* Play button */}
+                          <button
+                            onClick={() => handlePlay(card.routineId, card.routine)}
+                            disabled={loadingRoutineId === card.routineId}
+                            className="w-14 h-14 rounded-full bg-muted flex items-center justify-center active:scale-95 transition-transform shrink-0 ml-3"
+                          >
                             {loadingRoutineId === card.routineId ? (
                               <Loader2 className="w-5 h-5 animate-spin text-foreground" />
-                            ) : completion?.isComplete ? (
-                              <RotateCw className="w-5 h-5 text-foreground" />
+                            ) : completion ? (
+                              completion.isComplete ? (
+                                <RotateCw className="w-5 h-5 text-foreground" />
+                              ) : (
+                                <Play className="w-5 h-5 text-foreground fill-foreground" />
+                              )
                             ) : (
                               <Play className="w-5 h-5 text-foreground fill-foreground" />
                             )}
-                          </div>
-                        </button>
+                          </button>
+                        </div>
 
-                        {/* Bottom row: completion badge + action buttons */}
-                        <div className="flex items-center justify-between mt-3">
-                          {/* Completion badge */}
-                          {completion ? (
+                        {/* Completion badge */}
+                        {completion && (
+                          <div className="mt-2">
                             <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                               completion.isComplete
                                 ? 'bg-emerald-100 text-emerald-700'
@@ -282,18 +299,8 @@ export default function AppFocusRoutines() {
                             }`}>
                               {completion.isComplete ? '✓' : '▶'} {completion.pct}%
                             </span>
-                          ) : <div />}
-
-                          {/* Edit + Add to routine buttons */}
-                          <div className="flex items-center gap-2">
-                            <AddedToRoutineButton
-                              isAdded={userAddedIds?.includes(card.routineId) || false}
-                              onAddClick={() => handleAddToRoutine(card.routineId)}
-                              isLoading={addingRoutineId === card.routineId}
-                              iconOnly
-                            />
                           </div>
-                        </div>
+                        )}
                       </div>
                     );
                   })}
@@ -374,7 +381,7 @@ export default function AppFocusRoutines() {
             </div>
           </div>
 
-          {/* Start button + Add to routine */}
+          {/* Start button */}
           <div
             className="fixed bottom-0 left-0 right-0 px-5 pb-4 pt-2 bg-background"
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}
@@ -386,12 +393,6 @@ export default function AppFocusRoutines() {
               <Play className="w-5 h-5 fill-current" />
               Start
             </button>
-            <AddedToRoutineButton
-              isAdded={userAddedIds?.includes(preStartRoutine.id) || false}
-              onAddClick={() => handleAddToRoutine(preStartRoutine.id)}
-              isLoading={addingRoutineId === preStartRoutine.id}
-              addText="Add to My Routines"
-            />
           </div>
         </div>
       )}
