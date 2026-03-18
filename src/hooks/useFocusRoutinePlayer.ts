@@ -2,6 +2,9 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { updatePresence } from '@/hooks/useUserPresence';
+import { updateStreak } from '@/hooks/useTaskPlanner';
 import type { SessionTaskResult } from '@/components/app/FocusRoutineSummary';
 
 export interface FocusTask {
@@ -10,6 +13,7 @@ export interface FocusTask {
   emoji: string;
   targetSeconds: number;
   color?: string;
+  userTaskId?: string; // maps to user_tasks.id for planner completion sync
 }
 
 export interface FocusRoutineConfig {
@@ -176,8 +180,36 @@ export function useFocusRoutinePlayer() {
       }).then(() => {});
     }
 
+    // Sync with planner: create task_completion when task is completed
+    if (status === 'completed' && currentTask.userTaskId && user) {
+      const dateStr = format(new Date(), 'yyyy-MM-dd');
+      supabase.from('task_completions').insert({
+        task_id: currentTask.userTaskId,
+        user_id: user.id,
+        completed_date: dateStr,
+      }).then(({ error }) => {
+        if (error) {
+          // Likely duplicate — task already completed today, ignore
+          console.log('task_completions insert (may be duplicate):', error.message);
+          return;
+        }
+        // Update streak & presence in background
+        updateStreak(user.id, dateStr).catch(() => {});
+        updatePresence(user.id, dateStr).catch(() => {});
+        // Invalidate planner queries so UI updates
+        queryClient.invalidateQueries({ queryKey: ['planner-completions'] });
+        queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
+        queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
+        queryClient.invalidateQueries({ queryKey: ['new-home-data', user.id] });
+        queryClient.invalidateQueries({ queryKey: ['weekly-task-completion'] });
+        queryClient.invalidateQueries({ queryKey: ['user-presence'] });
+        queryClient.invalidateQueries({ queryKey: ['presence-stats'] });
+        queryClient.invalidateQueries({ queryKey: ['focus-today-sessions'] });
+      });
+    }
+
     return result;
-  }, [config, currentTask, currentTaskIndex, sessionId]);
+  }, [config, currentTask, currentTaskIndex, sessionId, user, queryClient]);
 
   const finishSession = useCallback((results: SessionTaskResult[]) => {
     if (!sessionId) return;
