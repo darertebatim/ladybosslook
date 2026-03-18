@@ -398,6 +398,18 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
 
           {/* Next task preview (always rendered for stable layout) */}
           <div className={cn("flex items-center justify-center gap-2 mb-3", (!nextTask || isPaused) && "opacity-0 pointer-events-none")}>
+            {nextTask ? (
+              <>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-foreground/5 rounded px-1.5 py-0.5">
+                  Next
+                </span>
+                <FluentEmoji emoji={nextTask.emoji} size={18} />
+                <span className="text-sm text-foreground/60 truncate max-w-[200px]">{nextTask.title}</span>
+              </>
+            ) : (
+              <span className="text-sm">&nbsp;</span>
+            )}
+          </div>
 
           {/* Bottom card */}
           {endTime && (
