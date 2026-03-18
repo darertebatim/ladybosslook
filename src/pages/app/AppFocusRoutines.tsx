@@ -48,7 +48,7 @@ export default function AppFocusRoutines() {
   });
   const queryClient = useQueryClient();
 
-  // Backfill: create pro-linked tasks for focus routines activated before the pro-link system
+  // Safety-net backfill: create pro-linked tasks for focus routines missing them
   const backfillRan = useRef(false);
   useEffect(() => {
     if (!user || !allRoutines || !userAddedIds || backfillRan.current) return;
@@ -61,8 +61,6 @@ export default function AppFocusRoutines() {
 
     const proLinkedIds = new Set(focusRoutineTasks.map(t => t.pro_link_value));
     const missing = activatedFocusIds.filter(id => !proLinkedIds.has(id));
-
-    console.log('[FocusBackfill] activatedFocusIds:', activatedFocusIds, 'proLinkedIds:', [...proLinkedIds], 'missing:', missing);
 
     if (missing.length === 0) return;
     backfillRan.current = true;
@@ -88,8 +86,7 @@ export default function AppFocusRoutines() {
           goal_type: 'timer',
           goal_unit: 'minutes',
         });
-        if (error) console.error('[FocusBackfill] Insert error:', error);
-        else console.log('[FocusBackfill] Created pro-linked task for', routine.title);
+        if (error) console.error('[FocusBackfill] Insert error for', routineId, error);
       }
       queryClient.invalidateQueries({ queryKey: ['focus-routine-pro-tasks'] });
     })();
@@ -138,9 +135,9 @@ export default function AppFocusRoutines() {
     enabled: focusRoutineIds.length > 0,
   });
 
-  // Build activated routines from pro-linked tasks
+  // Build activated routines from pro-linked tasks (filter out malformed)
   const activatedRoutineCards = useMemo(() => {
-    return focusRoutineTasks.map(task => {
+    return focusRoutineTasks.filter(t => !!t.pro_link_value).map(task => {
       const routineId = task.pro_link_value;
       const routine = allRoutines?.find(r => r.id === routineId);
       const emojis = routineId ? (routineTasks?.[routineId] || []) : [];
