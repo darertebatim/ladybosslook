@@ -139,9 +139,10 @@ export const SortableTaskList = ({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
   const reorderTasks = useReorderTasks();
+  const reorderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const skipSyncRef = useRef(false);
 
-  // Sync local tasks when props change (compare full task data, not just IDs)
-  // This ensures edits to task properties (title, color, time) are reflected
+  // Sync local tasks when props change, but skip right after a reorder
   const tasksKey = JSON.stringify(tasks.map(t => ({ 
     id: t.id, 
     title: t.title, 
@@ -161,7 +162,7 @@ export const SortableTaskList = ({
     updated_at: t.updated_at 
   })));
 
-  if (tasksKey !== localKey) {
+  if (tasksKey !== localKey && !skipSyncRef.current) {
     setLocalTasks(tasks);
   }
 
