@@ -189,10 +189,6 @@ export default function AppFocusRoutines() {
     }
   };
 
-  const formatRepeatDays = (days: number[]) => {
-    if (!days || days.length === 0 || days.length === 7) return 'Every day';
-    return days.map(d => WEEKDAY_LABELS[d]).join('·');
-  };
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
