@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft } from 'lucide-react';
+import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import { format, addMinutes } from 'date-fns';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
 import SealCheck from '@/components/app/SealCheck';
