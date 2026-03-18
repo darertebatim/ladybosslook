@@ -2,6 +2,8 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { updatePresence } from '@/hooks/useUserPresence';
 import type { SessionTaskResult } from '@/components/app/FocusRoutineSummary';
 
 export interface FocusTask {
