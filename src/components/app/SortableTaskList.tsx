@@ -202,6 +202,13 @@ export const SortableTaskList = ({
       const reorderedTasks = arrayMove(localTasks, oldIndex, newIndex);
       setLocalTasks(reorderedTasks);
 
+      // Prevent prop sync from reverting the optimistic update
+      skipSyncRef.current = true;
+      if (reorderTimerRef.current) clearTimeout(reorderTimerRef.current);
+      reorderTimerRef.current = setTimeout(() => {
+        skipSyncRef.current = false;
+      }, 2000);
+
       // Haptic feedback on drop
       haptic.light();
 
