@@ -56,8 +56,113 @@ function formatTime(seconds: number): string {
   const s = abs % 60;
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
+// Sortable item for rearrange
+function SortableRearrangeItem({ task }: { task: FocusTask }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: task.id });
 
-export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={cn(
+        'flex items-center gap-3 bg-foreground/[0.04] rounded-2xl px-4 py-3.5 touch-manipulation',
+        isDragging && 'opacity-50 scale-[1.02] z-50 shadow-lg'
+      )}
+    >
+      <FluentEmoji emoji={task.emoji} size={28} />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-foreground truncate">{task.title}</p>
+      </div>
+      <span className="text-xs text-muted-foreground tabular-nums">{Math.round(task.targetSeconds / 60)}m</span>
+      <GripVertical className="w-5 h-5 text-foreground/30 flex-shrink-0" />
+    </div>
+  );
+}
+
+// Rearrange bottom sheet with dnd-kit
+function RearrangeSheet({
+  currentTask,
+  rearrangeTasks,
+  setRearrangeTasks,
+  onDone,
+  onClose,
+}: {
+  currentTask: FocusTask | null;
+  rearrangeTasks: FocusTask[];
+  setRearrangeTasks: (tasks: FocusTask[]) => void;
+  onDone: () => void;
+  onClose: () => void;
+}) {
+  const sensors = useSensors(
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      haptic.light();
+      const oldIndex = rearrangeTasks.findIndex(t => t.id === active.id);
+      const newIndex = rearrangeTasks.findIndex(t => t.id === over.id);
+      setRearrangeTasks(arrayMove(rearrangeTasks, oldIndex, newIndex));
+    }
+  };
+
+  return (
+    <>
+      <div
+        className="absolute inset-0 bg-black/40 z-[10] animate-in fade-in-0 duration-200"
+        onClick={onClose}
+      />
+      <div
+        className="absolute bottom-0 left-0 right-0 z-[11] bg-background rounded-t-3xl px-6 pb-6 pt-2 animate-in slide-in-from-bottom duration-300 max-h-[75vh] flex flex-col"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)' }}
+      >
+        <div className="w-10 h-1 bg-foreground/10 rounded-full mx-auto mb-4" />
+        <h3 className="text-xl font-bold text-foreground mb-4">Rearrange</h3>
+        <div className="flex-1 overflow-y-auto space-y-2 mb-4">
+          {currentTask && (
+            <div className="flex items-center gap-3 bg-foreground/[0.04] rounded-2xl px-4 py-3.5 opacity-40">
+              <FluentEmoji emoji={currentTask.emoji} size={28} />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground/50 truncate">{currentTask.title}</p>
+              </div>
+              <span className="text-xs text-muted-foreground tabular-nums">{Math.round(currentTask.targetSeconds / 60)}m</span>
+            </div>
+          )}
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={rearrangeTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+              {rearrangeTasks.map((task) => (
+                <SortableRearrangeItem key={task.id} task={task} />
+              ))}
+            </SortableContext>
+          </DndContext>
+        </div>
+        <button
+          onClick={onDone}
+          className="w-full py-4 rounded-2xl bg-foreground text-background font-semibold text-base active:opacity-90"
+        >
+          Done
+        </button>
+      </div>
+    </>
+  );
+}
+
+
   phase,
   config,
   currentTask,
