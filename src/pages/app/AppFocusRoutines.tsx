@@ -281,7 +281,13 @@ export default function AppFocusRoutines() {
                 <div className="space-y-3">
                   {activatedFocusRoutines.map(routine => {
                     const completion = getCompletionInfo(routine.id);
-                    const emojis = routineTasks?.[routine.id] || [];
+                    const allTasks = routineTasks?.[routine.id] || [];
+                    const completedTitles = completedTaskTitlesMap?.[routine.id];
+                    // Show only remaining task emojis if there's an incomplete session
+                    const remainingTasks = completedTitles
+                      ? allTasks.filter(t => !completedTitles.has(t.title))
+                      : allTasks;
+                    const categoryName = routine.category ? (categoryNameMap.get(routine.category) || routine.category) : null;
 
                     return (
                       <div
@@ -304,13 +310,17 @@ export default function AppFocusRoutines() {
                                 </span>
                               )}
                             </div>
-                            {/* Task 3D emoji chain */}
-                            {emojis.length > 0 && (
+                            {/* Category label */}
+                            {categoryName && (
+                              <p className="text-xs text-muted-foreground mt-0.5">{categoryName}</p>
+                            )}
+                            {/* Remaining task emoji chain */}
+                            {remainingTasks.length > 0 && (
                               <div className="flex items-center gap-1 mt-2.5 flex-wrap">
-                                {emojis.map((emoji, i) => (
+                                {remainingTasks.map((task, i) => (
                                   <span key={i} className="flex items-center">
-                                    <FluentEmoji emoji={emoji} size={24} />
-                                    {i < emojis.length - 1 && (
+                                    <FluentEmoji emoji={task.emoji} size={24} />
+                                    {i < remainingTasks.length - 1 && (
                                       <ChevronRight className="w-3 h-3 text-muted-foreground/30 mx-0.5" />
                                     )}
                                   </span>
