@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { format } from 'date-fns';
 import { X, Share2 } from 'lucide-react';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { useShareContent } from '@/hooks/useShareContent';
