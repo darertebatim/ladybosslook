@@ -269,23 +269,6 @@ export default function AppFocusRoutines() {
               </div>
             )}
 
-            {/* Discover more - using FeaturedRoutineCard */}
-            {availableFocusRoutines.length > 0 && (
-              <section>
-                <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                  Discover
-                </p>
-                <div className="space-y-2.5">
-                  {availableFocusRoutines.map(routine => (
-                    <FeaturedRoutineCard
-                      key={routine.id}
-                      routine={routine}
-                      categoryName={categoryNameMap.get(routine.category)}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
 
             <button
               onClick={() => navigate('/app/routines')}
