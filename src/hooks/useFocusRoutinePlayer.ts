@@ -17,6 +17,7 @@ export interface FocusTask {
   goalEnabled?: boolean;
   goalType?: string | null;
   goalTarget?: number | null;
+  hasTimerGoal?: boolean; // true = firm countdown, false = estimated duration
 }
 
 export interface FocusRoutineConfig {

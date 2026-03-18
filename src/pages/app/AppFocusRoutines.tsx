@@ -427,9 +427,15 @@ export default function AppFocusRoutines() {
 
           <div className="flex-1 overflow-y-auto px-5 pb-32">
             <h1 className="text-2xl font-bold text-foreground mt-2">{preStartRoutine.title}</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {format(new Date(), 'h:mma')} – {format(addMinutes(new Date(), Math.ceil(totalPreStartSeconds / 60)), 'h:mma')} ({Math.ceil(totalPreStartSeconds / 60)}m)
-            </p>
+            {(() => {
+              const totalMins = Math.ceil(totalPreStartSeconds / 60);
+              const hasEstimates = remainingPreStartTasks.some(t => !(t as any).hasTimerGoal);
+              return (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {format(new Date(), 'h:mma')} – {hasEstimates ? '~' : ''}{format(addMinutes(new Date(), totalMins), 'h:mma')} ({hasEstimates ? '~' : ''}{totalMins}m)
+                </p>
+              );
+            })()}
 
             <div className="space-y-2.5 mt-6">
               {(() => {
