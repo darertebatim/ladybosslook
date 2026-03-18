@@ -1,0 +1,1 @@
+DELETE FROM public.user_tasks WHERE pro_link_type = 'focus_routine'
