@@ -24,6 +24,8 @@ export default function AppFocusRoutines() {
   const { data: userAddedIds, isLoading: userLoading } = useUserAddedBankRoutines();
   const { data: routineCategories = [] } = useRoutineBankCategories();
   const { startRoutine } = useFocusPlayer();
+  const addRoutineFromBank = useAddRoutineFromBank();
+  const [addingRoutineId, setAddingRoutineId] = useState<string | null>(null);
 
   const isLoading = routinesLoading || userLoading;
 
