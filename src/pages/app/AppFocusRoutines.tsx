@@ -52,49 +52,6 @@ export default function AppFocusRoutines() {
   });
   const queryClient = useQueryClient();
 
-  // Safety-net backfill: create pro-linked tasks for focus routines missing them
-  const backfillRan = useRef(false);
-  useEffect(() => {
-    if (!user || !allRoutines || !userAddedIds || backfillRan.current) return;
-    if (routinesLoading || userLoading) return;
-
-    const activatedFocusIds = userAddedIds.filter(id => {
-      const r = allRoutines.find(rt => rt.id === id);
-      return r?.is_focus;
-    });
-
-    const proLinkedIds = new Set(focusRoutineTasks.map(t => t.pro_link_value));
-    const missing = activatedFocusIds.filter(id => !proLinkedIds.has(id));
-
-    if (missing.length === 0) return;
-    backfillRan.current = true;
-
-    (async () => {
-      for (const routineId of missing) {
-        const routine = allRoutines.find(r => r.id === routineId);
-        if (!routine) continue;
-
-        const { error } = await supabase.from('user_tasks').insert({
-          user_id: user.id,
-          title: routine.title,
-          emoji: routine.emoji || '🎯',
-          color: 'amber',
-          repeat_pattern: 'daily',
-          repeat_days: [1, 2, 3, 4, 5],
-          tag: 'pro',
-          pro_link_type: 'focus_routine',
-          pro_link_value: routineId,
-          is_active: true,
-          order_index: 999,
-          goal_enabled: true,
-          goal_type: 'timer',
-          goal_unit: 'minutes',
-        });
-        if (error) console.error('[FocusBackfill] Insert error for', routineId, error);
-      }
-      queryClient.invalidateQueries({ queryKey: ['focus-routine-pro-tasks'] });
-    })();
-  }, [user, allRoutines, userAddedIds, focusRoutineTasks, routinesLoading, userLoading, queryClient]);
 
   // Fetch today's session completion data
   const { data: todaySessions } = useQuery({

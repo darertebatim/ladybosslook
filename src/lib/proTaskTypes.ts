@@ -344,7 +344,7 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
     case 'focus_timer':
       return '/app/timer';
     case 'focus_routine':
-      return '/app/focus';
+      return linkValue ? `/app/focus?play=${linkValue}` : '/app/focus';
     default:
       return '/app/home';
   }
