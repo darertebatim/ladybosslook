@@ -1,20 +1,20 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft } from 'lucide-react';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
-import { format, addMinutes } from 'date-fns';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
-import SealCheck from '@/components/app/SealCheck';
-import { TaskIcon } from '@/components/app/IconPicker';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { haptic } from '@/lib/haptics';
-import { startOfDay, endOfDay } from 'date-fns';
+import { startOfDay, endOfDay, format } from 'date-fns';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { toast } from 'sonner';
+import { SortableTaskList } from '@/components/app/SortableTaskList';
+import { useTasksForDate, useCompletionsForDate, UserTask, useAddGoalProgress } from '@/hooks/useTaskPlanner';
+import { isWaterTask } from '@/lib/waterTracking';
 
 export default function AppFocusRoutines() {
   const navigate = useNavigate();
@@ -83,13 +83,6 @@ export default function AppFocusRoutines() {
     enabled: !!user,
   });
 
-  // Collect all user_task IDs for focus routines (for completion queries)
-  const allFocusTaskIds = useMemo(() => {
-    if (!routineTasksMap) return [];
-    // We need actual IDs, not just titles — fetch separately
-    return [];
-  }, [routineTasksMap]);
-
   // Fetch user_task IDs for all focus routines
   const { data: userTasksByRoutine } = useQuery({
     queryKey: ['focus-user-task-ids', user?.id, focusRoutineIds],
@@ -114,7 +107,7 @@ export default function AppFocusRoutines() {
     enabled: !!user && focusRoutineIds.length > 0,
   });
 
-  // Fetch today's task_completions for all focus routine tasks (planner-synced progress)
+  // Fetch today's task_completions for all focus routine tasks
   const allUserTaskIds = useMemo(() => {
     if (!userTasksByRoutine) return [];
     return Object.values(userTasksByRoutine).flat();
@@ -147,68 +140,94 @@ export default function AppFocusRoutines() {
     return { pct, isComplete: pct === 100 };
   };
 
-  // Pre-start state
+  // Pre-start state — now just stores the routine to show planner-style overlay
   const [preStartRoutine, setPreStartRoutine] = useState<any | null>(null);
-  const [preStartTasks, setPreStartTasks] = useState<{ id: string; title: string; emoji: string; targetSeconds: number; color?: string; userTaskId?: string; goalType?: string | null; goalTarget?: number | null }[]>([]);
   const [loadingRoutineId, setLoadingRoutineId] = useState<string | null>(null);
-  const [completedTaskIds, setCompletedTaskIds] = useState<Set<string>>(new Set());
-  const [resumeSessionId, setResumeSessionId] = useState<string | null>(null);
-  const [resumeTaskResults, setResumeTaskResults] = useState<import('@/components/app/FocusRoutineSummary').SessionTaskResult[]>([]);
 
-  const remainingPreStartTasks = preStartTasks.filter(t => !completedTaskIds.has(t.id));
-  const totalPreStartSeconds = remainingPreStartTasks.reduce((s, t) => s + t.targetSeconds, 0);
+  // Planner hooks for the pre-start overlay (uses today's date)
+  const today = useMemo(() => new Date(), []);
+  const { data: plannerTasks = [] } = useTasksForDate(today);
+  const { data: plannerCompletions } = useCompletionsForDate(today);
+  const addGoalProgress = useAddGoalProgress();
+
+  const plannerCompletedTaskIds = useMemo(() => {
+    return new Set(plannerCompletions?.tasks.map(c => c.task_id) || []);
+  }, [plannerCompletions]);
+
+  const plannerCompletedSubtaskIds = useMemo(() => {
+    return plannerCompletions?.subtasks.map(c => c.subtask_id) || [];
+  }, [plannerCompletions]);
+
+  const plannerGoalProgressMap = useMemo(() => {
+    const map = new Map<string, number>();
+    plannerCompletions?.tasks.forEach(c => {
+      if ((c as any).goal_progress) {
+        map.set(c.task_id, (c as any).goal_progress);
+      }
+    });
+    return map;
+  }, [plannerCompletions]);
+
+  // Filter planner tasks to only the selected routine's tasks
+  const routineFilteredTasks = useMemo(() => {
+    if (!preStartRoutine) return [];
+    return plannerTasks.filter(t => t.source_routine_id === preStartRoutine.routine_id);
+  }, [plannerTasks, preStartRoutine]);
+
+  // Calculate routine duration for header
+  const routineDurationLabel = useMemo(() => {
+    if (!routineFilteredTasks.length) return '';
+    const timedSeconds = routineFilteredTasks
+      .filter(t => t.goal_type === 'timer')
+      .reduce((s, t) => s + (t.goal_target || 0), 0);
+    const totalMins = Math.ceil(timedSeconds / 60);
+    const hasUntimed = routineFilteredTasks.some(t => t.goal_type !== 'timer');
+    if (totalMins > 0 && hasUntimed) return `${totalMins}m timed + untimed tasks`;
+    if (totalMins > 0) return `${totalMins}m`;
+    return 'Untimed tasks';
+  }, [routineFilteredTasks]);
+
+  // Remaining (uncompleted) tasks for start button
+  const remainingTasks = useMemo(() => {
+    return routineFilteredTasks.filter(t => !plannerCompletedTaskIds.has(t.id));
+  }, [routineFilteredTasks, plannerCompletedTaskIds]);
 
   const handlePlay = async (routine: any) => {
     if (isActive) {
-      const { toast } = await import('sonner');
       toast('A routine is already running. Finish or cancel it first.');
       return;
     }
-    setLoadingRoutineId(routine.routine_id);
+    haptic.light();
+    setPreStartRoutine(routine);
+  };
 
-    // Fetch user's own tasks for this routine — no bank lookup needed
-    const { data: userTasks } = await supabase
-      .from('user_tasks')
-      .select('id, title, emoji, color, goal_target, goal_type, order_index, pro_link_type, pro_link_value')
-      .eq('user_id', user!.id)
-      .eq('source_routine_id', routine.routine_id)
-      .eq('is_active', true)
-      .order('order_index', { ascending: true });
+  const handleStartFromPreview = async () => {
+    if (!preStartRoutine) return;
+    haptic.medium();
 
-    setLoadingRoutineId(null);
-
-    if (!userTasks || userTasks.length === 0) {
-      const { toast } = await import('sonner');
-      toast.error('No tasks found in this routine');
+    if (remainingTasks.length === 0) {
+      toast('All tasks in this routine are already completed for today ✅');
       return;
     }
 
-    haptic.light();
+    // Build focus player tasks from remaining planner tasks
+    const focusTasks = remainingTasks.map(t => ({
+      id: t.id,
+      title: t.title,
+      emoji: t.emoji || '📝',
+      targetSeconds: t.goal_type === 'timer' ? (t.goal_target || 300) : 0,
+      color: t.color || undefined,
+      userTaskId: t.id,
+      goalType: t.goal_type || null,
+      goalTarget: t.goal_target || null,
+      hasTimerGoal: t.goal_type === 'timer',
+      proLinkType: t.pro_link_type || null,
+      proLinkValue: t.pro_link_value || null,
+    }));
 
-    const tasks = userTasks.map((t: any) => {
-      const isTimer = t.goal_type === 'timer';
-      return {
-        id: t.id,
-        title: t.title,
-        emoji: t.emoji || '📝',
-        targetSeconds: isTimer ? (t.goal_target || 300) : 0, // non-timer tasks count up from 0
-        color: t.color || undefined,
-        userTaskId: t.id,
-        goalType: t.goal_type || null,
-        goalTarget: t.goal_target || null,
-        hasTimerGoal: isTimer,
-        proLinkType: t.pro_link_type || null,
-        proLinkValue: t.pro_link_value || null,
-      };
-    });
-
-    // Start with planner-completed tasks for today
-    const doneSet = new Set<string>(
-      tasks.filter(t => todayCompletions?.has(t.id)).map(t => t.id)
-    );
-
-    // If there's an incomplete session, merge its completed tasks for resume context
-    const incompleteSession = todaySessions?.find(s => s.routine_id === routine.routine_id && !s.ended_at);
+    // Check for incomplete session to resume
+    const incompleteSession = todaySessions?.find(s => s.routine_id === preStartRoutine.routine_id && !s.ended_at);
+    
     if (incompleteSession) {
       const { data: completedTasks } = await supabase
         .from('routine_session_tasks')
@@ -216,55 +235,26 @@ export default function AppFocusRoutines() {
         .eq('session_id', incompleteSession.id)
         .order('task_order', { ascending: true });
 
-      const prevResults: import('@/components/app/FocusRoutineSummary').SessionTaskResult[] = [];
-      (completedTasks || []).forEach(ct => {
-        const matchingTask = tasks.find(t => t.title === ct.task_title);
-        if (matchingTask) doneSet.add(matchingTask.id);
-        prevResults.push({
+      const prevResults: import('@/components/app/FocusRoutineSummary').SessionTaskResult[] = 
+        (completedTasks || []).map(ct => ({
           title: ct.task_title,
           emoji: ct.task_emoji,
           targetSeconds: ct.target_seconds,
           actualSeconds: ct.actual_seconds,
           status: ct.status as 'completed' | 'skipped',
-        });
-      });
+        }));
 
-      setResumeSessionId(incompleteSession.id);
-      setResumeTaskResults(prevResults);
-    } else {
-      setResumeSessionId(null);
-      setResumeTaskResults([]);
-    }
-
-    setCompletedTaskIds(doneSet);
-
-    setPreStartTasks(tasks);
-    setPreStartRoutine(routine);
-  };
-
-  const handleStartFromPreview = () => {
-    if (!preStartRoutine) return;
-    haptic.medium();
-
-    const remaining = preStartTasks.filter(t => !completedTaskIds.has(t.id));
-
-    if (remaining.length === 0) {
-      toast('All tasks in this routine are already completed for today ✅');
-      return;
-    }
-
-    if (resumeSessionId && remaining.length < preStartTasks.length) {
       startRoutine(
         {
           routineId: preStartRoutine.routine_id,
           routineTitle: preStartRoutine.title,
           routineEmoji: preStartRoutine.emoji || '✨',
-          tasks: remaining,
+          tasks: focusTasks,
         },
         {
           startFromIndex: 0,
-          previousResults: resumeTaskResults,
-          existingSessionId: resumeSessionId,
+          previousResults: prevResults,
+          existingSessionId: incompleteSession.id,
         }
       );
     } else {
@@ -272,16 +262,36 @@ export default function AppFocusRoutines() {
         routineId: preStartRoutine.routine_id,
         routineTitle: preStartRoutine.title,
         routineEmoji: preStartRoutine.emoji || '✨',
-        tasks: remaining,
+        tasks: focusTasks,
       });
     }
 
     setPreStartRoutine(null);
-    setPreStartTasks([]);
-    setCompletedTaskIds(new Set());
-    setResumeSessionId(null);
-    setResumeTaskResults([]);
   };
+
+  const handleOpenGoalInput = useCallback((task: UserTask) => {
+    const isSmallCountGoal = task.goal_enabled && task.goal_type === 'count' && (task.goal_target || 0) < 10 && !isWaterTask(task);
+    if (isSmallCountGoal) {
+      addGoalProgress.mutate(
+        { taskId: task.id, date: today, amount: 1 },
+        {
+          onSuccess: (result) => {
+            haptic.success();
+            const unit = task.goal_unit || 'times';
+            toast(`+1 ${unit}`, {
+              description: `Progress: ${result.newProgress}/${task.goal_target}`,
+              duration: 2000,
+            });
+          },
+        }
+      );
+      return;
+    }
+  }, [today, addGoalProgress]);
+
+  const handleOpenTimer = useCallback((_task: UserTask) => {
+    // Timer handled by focus player, no-op here
+  }, []);
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
@@ -311,7 +321,7 @@ export default function AppFocusRoutines() {
           </div>
         ) : (
           <div className="space-y-6 mt-4">
-            {/* Activated routines — reading from user-owned data */}
+            {/* Activated routines */}
             {(() => {
               const activeRoutines = (myFocusRoutines || []).filter((r: any) => {
                 const tasks = routineTasksMap?.[r.routine_id] || [];
@@ -324,10 +334,9 @@ export default function AppFocusRoutines() {
                   {activeRoutines.map((routine: any) => {
                     const completion = getCompletionInfo(routine.routine_id);
                     const allTasks = routineTasksMap?.[routine.routine_id] || [];
-                    // Use planner completions to determine which tasks are done
                     const completedIds = todayCompletions || new Set<string>();
                     const taskIdsForRoutine = userTasksByRoutine?.[routine.routine_id] || [];
-                    const remainingTasks = allTasks.filter((t, idx) => {
+                    const remainingTasksForCard = allTasks.filter((t, idx) => {
                       const taskId = taskIdsForRoutine[idx];
                       return !taskId || !completedIds.has(taskId);
                     });
@@ -351,12 +360,12 @@ export default function AppFocusRoutines() {
                             {routine.category && (
                               <p className="text-xs text-muted-foreground mt-0.5">{routine.category}</p>
                             )}
-                            {remainingTasks.length > 0 && (
+                            {remainingTasksForCard.length > 0 && (
                               <div className="flex items-center gap-1 mt-2.5 flex-wrap">
-                                {remainingTasks.map((task, i) => (
+                                {remainingTasksForCard.map((task, i) => (
                                   <span key={i} className="flex items-center">
                                     <FluentEmoji emoji={task.emoji} size={24} />
-                                    {i < remainingTasks.length - 1 && (
+                                    {i < remainingTasksForCard.length - 1 && (
                                       <ChevronRight className="w-3 h-3 text-muted-foreground/30 mx-0.5" />
                                     )}
                                   </span>
@@ -415,109 +424,45 @@ export default function AppFocusRoutines() {
         )}
       </div>
 
-      {/* Pre-start overlay */}
+      {/* Pre-start overlay — planner-style filtered view */}
       {preStartRoutine && (
         <div className="fixed inset-0 z-[9999] bg-background flex flex-col">
           <header
-            className="flex items-center justify-between px-4 pt-3 pb-3"
+            className="flex items-center justify-between px-4 pt-3 pb-3 border-b border-border/50"
             style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
           >
             <button onClick={() => setPreStartRoutine(null)} className="p-1 active:opacity-70">
               <ChevronLeft className="w-5 h-5 text-foreground" />
             </button>
+            <div className="text-center">
+              <h1 className="text-base font-bold text-foreground">{preStartRoutine.title}</h1>
+              {routineDurationLabel && (
+                <p className="text-xs text-muted-foreground">{routineDurationLabel}</p>
+              )}
+            </div>
             <div className="w-7" />
           </header>
 
-          <div className="flex-1 overflow-y-auto px-5 pb-32">
-            <h1 className="text-2xl font-bold text-foreground mt-2">{preStartRoutine.title}</h1>
-            {(() => {
-              const timedSeconds = remainingPreStartTasks.filter(t => (t as any).hasTimerGoal).reduce((s, t) => s + t.targetSeconds, 0);
-              const totalMins = Math.ceil(timedSeconds / 60);
-              const hasUntimed = remainingPreStartTasks.some(t => !(t as any).hasTimerGoal);
-              return totalMins > 0 ? (
-                <p className="text-sm text-muted-foreground mt-1">
-                  {totalMins}m timed{hasUntimed ? ' + untimed tasks' : ''}
-                </p>
-              ) : hasUntimed ? (
-                <p className="text-sm text-muted-foreground mt-1">Untimed tasks</p>
-              ) : null;
-            })()}
-
-            <div className="space-y-2.5 mt-6">
-              {(() => {
-                // Calculate cumulative start times for each task
-                let cumulativeSeconds = 0;
-                const now = new Date();
-                // Skip already-done tasks for time calculation
-                const taskTimings = preStartTasks.map((task) => {
-                  const isDone = completedTaskIds.has(task.id);
-                  const startTime = isDone ? null : new Date(now.getTime() + cumulativeSeconds * 1000);
-                  const endTime = isDone ? null : new Date(now.getTime() + (cumulativeSeconds + task.targetSeconds) * 1000);
-                  if (!isDone) cumulativeSeconds += task.targetSeconds;
-                  return { task, isDone, startTime, endTime };
-                });
-
-                return taskTimings.map(({ task, isDone, startTime, endTime }) => {
-                  const colorKey = (task.color || 'yellow') as TaskColor;
-                  const colorClass = TASK_COLOR_CLASSES[colorKey] || TASK_COLOR_CLASSES.yellow;
-                  const mins = Math.ceil(task.targetSeconds / 60);
-                  const isEstimate = !(task as any).hasTimerGoal;
-                  return (
-                    <div
-                      key={task.id}
-                      className={cn(
-                        'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
-                        colorClass,
-                        isDone && 'opacity-60'
-                      )}
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 flex items-center justify-center shrink-0">
-                          <TaskIcon iconName={task.emoji} size={32} className="text-black/80" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5">
-                    {(() => {
-                      const taskProType = (task as any).proLinkType as ProLinkType | null;
-                      const taskProConfig = taskProType ? PRO_LINK_CONFIGS[taskProType] : null;
-                      if (taskProConfig) {
-                        return (
-                          <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded-full", taskProConfig.badgeColorClass)}>
-                            {taskProConfig.badgeText}
-                          </span>
-                        );
-                      }
-                      return <span className="text-[11px] text-black/60">{isEstimate ? `⏱️` : `⏱️ ${mins}m`}</span>;
-                    })()}
-                    {!isEstimate && !(task as any).proLinkType && startTime && endTime && (
-                      <>
-                        <span className="text-[11px] text-black/40">•</span>
-                        <span className="text-[11px] text-black/60">
-                          {format(startTime, 'h:mm')}–{format(endTime, 'h:mma')}
-                        </span>
-                      </>
-                    )}
-                          </div>
-                          <p className={cn(
-                            'text-black text-[15px] font-semibold leading-tight transition-all',
-                            isDone && 'line-through'
-                          )}>
-                            {task.title}
-                          </p>
-                        </div>
-                        <div className="w-9 h-9 flex items-center justify-center shrink-0">
-                          {isDone ? (
-                            <SealCheck className="w-9 h-9 text-teal-400" />
-                          ) : (
-                            <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                });
-              })()}
-            </div>
+          <div className="flex-1 overflow-y-auto px-4 pb-32 pt-4">
+            {routineFilteredTasks.length > 0 ? (
+              <SortableTaskList
+                tasks={routineFilteredTasks}
+                date={today}
+                completedTaskIds={plannerCompletedTaskIds}
+                completedSubtaskIds={plannerCompletedSubtaskIds}
+                goalProgressMap={plannerGoalProgressMap}
+                onTaskTap={() => {}}
+                onStreakIncrease={() => {}}
+                onOpenGoalInput={handleOpenGoalInput}
+                onOpenTimer={handleOpenTimer}
+                hideQuickAdd
+              />
+            ) : (
+              <div className="text-center py-12">
+                <FluentEmoji emoji="📝" size={48} className="mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">No tasks found for this routine</p>
+              </div>
+            )}
           </div>
 
           {/* Start / Resume button */}
@@ -530,7 +475,9 @@ export default function AppFocusRoutines() {
               className="w-full flex items-center justify-center gap-2 h-14 rounded-2xl bg-amber-400 text-black font-bold text-base active:scale-[0.98] transition-transform"
             >
               <Play className="w-5 h-5 fill-current" />
-              {completedTaskIds.size > 0 ? `Resume (${remainingPreStartTasks.length} remaining)` : 'Start'}
+              {plannerCompletedTaskIds.size > 0 && remainingTasks.length < routineFilteredTasks.length
+                ? `Resume (${remainingTasks.length} remaining)`
+                : 'Start'}
             </button>
           </div>
         </div>
