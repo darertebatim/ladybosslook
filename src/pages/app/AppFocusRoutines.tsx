@@ -148,7 +148,7 @@ export default function AppFocusRoutines() {
 
   // Pre-start state
   const [preStartRoutine, setPreStartRoutine] = useState<any | null>(null);
-  const [preStartTasks, setPreStartTasks] = useState<{ id: string; title: string; emoji: string; targetSeconds: number; color?: string; userTaskId?: string }[]>([]);
+  const [preStartTasks, setPreStartTasks] = useState<{ id: string; title: string; emoji: string; targetSeconds: number; color?: string; userTaskId?: string; goalType?: string | null; goalTarget?: number | null }[]>([]);
   const [loadingRoutineId, setLoadingRoutineId] = useState<string | null>(null);
   const [completedTaskIds, setCompletedTaskIds] = useState<Set<string>>(new Set());
   const [resumeSessionId, setResumeSessionId] = useState<string | null>(null);
