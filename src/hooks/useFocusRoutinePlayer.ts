@@ -110,20 +110,26 @@ export function useFocusRoutinePlayer() {
     return () => clearInterval(timer);
   }, [phase]);
 
-  const startRoutine = useCallback(async (cfg: FocusRoutineConfig) => {
+  const startRoutine = useCallback(async (cfg: FocusRoutineConfig, resumeOptions?: {
+    startFromIndex: number;
+    previousResults: SessionTaskResult[];
+    existingSessionId: string;
+  }) => {
     setConfig(cfg);
-    setCurrentTaskIndex(0);
-    setTaskResults([]);
+    const startIdx = resumeOptions?.startFromIndex ?? 0;
+    setCurrentTaskIndex(startIdx);
+    setTaskResults(resumeOptions?.previousResults ?? []);
     setStartedAt(new Date());
     setTaskStartedAt(new Date());
     elapsedRef.current = 0;
-    const target = cfg.tasks[0]?.targetSeconds || 0;
+    const target = cfg.tasks[startIdx]?.targetSeconds || 0;
     setTimeLeft(target);
     originalTargetRef.current = target;
-    setTaskStartedAt(new Date());
     setPhase('running');
 
-    if (user) {
+    if (resumeOptions?.existingSessionId) {
+      setSessionId(resumeOptions.existingSessionId);
+    } else if (user) {
       const { data } = await supabase
         .from('routine_sessions')
         .insert({

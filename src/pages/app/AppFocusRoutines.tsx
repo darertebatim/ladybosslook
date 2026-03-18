@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft } from 'lucide-react';
+import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Check } from 'lucide-react';
 import { format, addMinutes } from 'date-fns';
 import { useRoutinesBank, useUserAddedBankRoutines, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
@@ -37,7 +37,7 @@ export default function AppFocusRoutines() {
       const today = new Date();
       const { data } = await supabase
         .from('routine_sessions')
-        .select('routine_id, tasks_completed, tasks_total, ended_at')
+        .select('id, routine_id, tasks_completed, tasks_total, ended_at')
         .eq('user_id', user.id)
         .gte('started_at', startOfDay(today).toISOString())
         .lte('started_at', endOfDay(today).toISOString());
@@ -99,9 +99,12 @@ export default function AppFocusRoutines() {
   const [preStartRoutine, setPreStartRoutine] = useState<(typeof allRoutines extends (infer T)[] | undefined ? T : never) | null>(null);
   const [preStartTasks, setPreStartTasks] = useState<{ id: string; title: string; emoji: string; targetSeconds: number; color?: string }[]>([]);
   const [loadingRoutineId, setLoadingRoutineId] = useState<string | null>(null);
+  const [completedTaskIds, setCompletedTaskIds] = useState<Set<string>>(new Set());
+  const [resumeSessionId, setResumeSessionId] = useState<string | null>(null);
+  const [resumeTaskResults, setResumeTaskResults] = useState<import('@/components/app/FocusRoutineSummary').SessionTaskResult[]>([]);
 
-  const totalPreStartSeconds = preStartTasks.reduce((s, t) => s + t.targetSeconds, 0);
-
+  const remainingPreStartTasks = preStartTasks.filter(t => !completedTaskIds.has(t.id));
+  const totalPreStartSeconds = remainingPreStartTasks.reduce((s, t) => s + t.targetSeconds, 0);
 
   const handlePlay = async (routine: typeof allRoutines extends (infer T)[] | undefined ? T : never) => {
     if (isActive) {
@@ -135,6 +138,41 @@ export default function AppFocusRoutines() {
       targetSeconds: (t.task as any)?.goal_target || (t.duration_minutes ? t.duration_minutes * 60 : 300),
       color: (t.task as any)?.color || undefined,
     }));
+
+    // Check for incomplete session (started today, no ended_at)
+    const incompleteSession = todaySessions?.find(s => s.routine_id === routine.id && !s.ended_at);
+    if (incompleteSession) {
+      // Fetch completed tasks for this session
+      const { data: completedTasks } = await supabase
+        .from('routine_session_tasks')
+        .select('task_title, task_emoji, target_seconds, actual_seconds, status')
+        .eq('session_id', incompleteSession.id)
+        .order('task_order', { ascending: true });
+
+      const doneSet = new Set<string>();
+      const prevResults: import('@/components/app/FocusRoutineSummary').SessionTaskResult[] = [];
+      (completedTasks || []).forEach(ct => {
+        // Match by title since task IDs may differ
+        const matchingTask = tasks.find(t => t.title === ct.task_title);
+        if (matchingTask) doneSet.add(matchingTask.id);
+        prevResults.push({
+          title: ct.task_title,
+          emoji: ct.task_emoji,
+          targetSeconds: ct.target_seconds,
+          actualSeconds: ct.actual_seconds,
+          status: ct.status as 'completed' | 'skipped',
+        });
+      });
+
+      setCompletedTaskIds(doneSet);
+      setResumeSessionId(incompleteSession.id);
+      setResumeTaskResults(prevResults);
+    } else {
+      setCompletedTaskIds(new Set());
+      setResumeSessionId(null);
+      setResumeTaskResults([]);
+    }
+
     setPreStartTasks(tasks);
     setPreStartRoutine(routine);
   };
@@ -142,14 +180,39 @@ export default function AppFocusRoutines() {
   const handleStartFromPreview = () => {
     if (!preStartRoutine) return;
     haptic.medium();
-    startRoutine({
-      routineId: preStartRoutine.id,
-      routineTitle: preStartRoutine.title,
-      routineEmoji: preStartRoutine.emoji || '✨',
-      tasks: preStartTasks,
-    });
+
+    // Filter to remaining tasks only
+    const remaining = preStartTasks.filter(t => !completedTaskIds.has(t.id));
+
+    if (resumeSessionId && remaining.length < preStartTasks.length) {
+      // Resume: start with remaining tasks, pass previous results
+      startRoutine(
+        {
+          routineId: preStartRoutine.id,
+          routineTitle: preStartRoutine.title,
+          routineEmoji: preStartRoutine.emoji || '✨',
+          tasks: remaining,
+        },
+        {
+          startFromIndex: 0,
+          previousResults: resumeTaskResults,
+          existingSessionId: resumeSessionId,
+        }
+      );
+    } else {
+      startRoutine({
+        routineId: preStartRoutine.id,
+        routineTitle: preStartRoutine.title,
+        routineEmoji: preStartRoutine.emoji || '✨',
+        tasks: preStartTasks,
+      });
+    }
+
     setPreStartRoutine(null);
     setPreStartTasks([]);
+    setCompletedTaskIds(new Set());
+    setResumeSessionId(null);
+    setResumeTaskResults([]);
   };
 
   return (
@@ -300,21 +363,31 @@ export default function AppFocusRoutines() {
             </p>
 
             <div className="space-y-2.5 mt-6">
-              {preStartTasks.map((task, i) => (
-                <div
-                  key={task.id}
-                  className="flex items-center gap-3 bg-muted rounded-2xl px-4 py-3.5"
-                >
-                  <span className="text-xs text-muted-foreground font-medium w-4 shrink-0">{i + 1}</span>
-                  <FluentEmoji emoji={task.emoji} size={28} />
-                  <p className="flex-1 text-sm font-medium text-foreground leading-snug">{task.title}</p>
-                  <span className="text-xs text-muted-foreground shrink-0">{Math.ceil(task.targetSeconds / 60)}m</span>
-                </div>
-              ))}
+              {preStartTasks.map((task, i) => {
+                const isDone = completedTaskIds.has(task.id);
+                return (
+                  <div
+                    key={task.id}
+                    className={`flex items-center gap-3 rounded-2xl px-4 py-3.5 ${isDone ? 'bg-muted/60' : 'bg-muted'}`}
+                  >
+                    <span className="text-xs text-muted-foreground font-medium w-4 shrink-0">{i + 1}</span>
+                    <FluentEmoji emoji={task.emoji} size={28} />
+                    <p className={`flex-1 text-sm font-medium leading-snug ${isDone ? 'text-muted-foreground line-through' : 'text-foreground'}`}>{task.title}</p>
+                    <span className="text-xs text-muted-foreground shrink-0">{Math.ceil(task.targetSeconds / 60)}m</span>
+                    {isDone ? (
+                      <div className="w-6 h-6 rounded-full bg-foreground flex items-center justify-center shrink-0">
+                        <Check className="w-3.5 h-3.5 text-background" />
+                      </div>
+                    ) : (
+                      <div className="w-6 h-6 rounded-full border-2 border-border shrink-0" />
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Start button */}
+          {/* Start / Resume button */}
           <div
             className="fixed bottom-0 left-0 right-0 px-5 pb-4 pt-2 bg-background"
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}
@@ -324,7 +397,7 @@ export default function AppFocusRoutines() {
               className="w-full flex items-center justify-center gap-2 h-14 rounded-2xl bg-amber-400 text-black font-bold text-base active:scale-[0.98] transition-transform"
             >
               <Play className="w-5 h-5 fill-current" />
-              Start
+              {completedTaskIds.size > 0 ? `Resume (${remainingPreStartTasks.length} remaining)` : 'Start'}
             </button>
           </div>
         </div>
