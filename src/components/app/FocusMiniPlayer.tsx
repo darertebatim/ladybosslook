@@ -34,11 +34,13 @@ export function FocusMiniPlayer() {
         "fixed bottom-[calc(64px+env(safe-area-inset-bottom))] left-2 right-2 z-40",
         "rounded-2xl overflow-hidden cursor-pointer",
         "animate-in slide-in-from-bottom-4 duration-300",
-        isOvertime
-          ? "bg-amber-50 border border-amber-200/50"
-          : "bg-primary/10 border border-primary/20",
         "shadow-lg"
       )}
+      style={{
+        backgroundColor: isOvertime
+          ? 'hsl(45, 93%, 94%)'
+          : currentTask.color || 'hsl(48, 96%, 89%)',
+      }}
       onClick={maximize}
     >
       <div className="flex items-center gap-3 px-3 py-2.5">
