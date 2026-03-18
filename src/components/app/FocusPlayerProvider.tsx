@@ -72,9 +72,11 @@ export function FocusPlayerProvider({ children }: { children: ReactNode }) {
   // Complete pro task: mark as done and move to next
   const completeProTask = useCallback(() => {
     setProTaskActive(false);
+    setMinimized(false);
     player.completeTask();
-    // After completing, the next task will be evaluated by the auto-nav effect
-  }, [player]);
+    // Navigate back to focus page so the player overlay is visible
+    navigate('/app/focus');
+  }, [player, navigate]);
 
   // Auto-navigate to pro tool when a pro-linked task becomes current
   useEffect(() => {
