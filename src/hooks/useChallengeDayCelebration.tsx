@@ -63,16 +63,21 @@ export function useChallengeDayCelebration(
 
       if (!routines?.length) return [];
 
-      const { data: routineTasks } = await supabase
-        .from('routines_bank_tasks')
-        .select('routine_id, title')
-        .in('routine_id', routines.map(r => r.id));
+      // Fetch user's own tasks by source_routine_id (not bank templates)
+      const { data: userTasks } = await supabase
+        .from('user_tasks')
+        .select('id, source_routine_id, title')
+        .eq('user_id', user!.id)
+        .eq('is_active', true)
+        .in('source_routine_id', routines.map(r => r.id));
 
-      const taskTitlesByRoutine = new Map<string, string[]>();
-      (routineTasks || []).forEach(t => {
-        const titles = taskTitlesByRoutine.get(t.routine_id) || [];
-        titles.push(t.title);
-        taskTitlesByRoutine.set(t.routine_id, titles);
+      const taskIdsByRoutine = new Map<string, string[]>();
+      (userTasks || []).forEach(t => {
+        const rid = (t as any).source_routine_id;
+        if (!rid) return;
+        const ids = taskIdsByRoutine.get(rid) || [];
+        ids.push(t.id);
+        taskIdsByRoutine.set(rid, ids);
       });
 
       return routines.map(r => ({
