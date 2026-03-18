@@ -234,24 +234,9 @@ export default function AppFocusRoutines() {
 
                     return (
                       <div
-                        key={card.taskId}
+                        key={card.routineId}
                         className="bg-card rounded-2xl border border-border p-4"
                       >
-                        {/* Schedule info row */}
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-1.5">
-                          {card.scheduledTime && (
-                            <span className="flex items-center gap-1">
-                              <Bell className="w-3 h-3" />
-                              {card.scheduledTime}
-                            </span>
-                          )}
-                          {card.repeatDays.length > 0 && (
-                            <span className="flex items-center gap-1">
-                              <CalendarDays className="w-3 h-3" />
-                              {formatRepeatDays(card.repeatDays)}
-                            </span>
-                          )}
-                        </div>
 
                         {/* Tappable card area -> plays routine */}
                         <button
