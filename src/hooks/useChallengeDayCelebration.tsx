@@ -17,7 +17,7 @@ interface ChallengeRoutineInfo {
   title: string;
   emoji: string;
   totalDays: number;
-  taskTitles: string[];
+  taskIds: string[];
   hasStarted: boolean;
   badgeImageUrl: string | null;
 }
@@ -63,24 +63,29 @@ export function useChallengeDayCelebration(
 
       if (!routines?.length) return [];
 
-      const { data: routineTasks } = await supabase
-        .from('routines_bank_tasks')
-        .select('routine_id, title')
-        .in('routine_id', routines.map(r => r.id));
+      // Fetch user's own tasks by source_routine_id (not bank templates)
+      const { data: userTasks } = await supabase
+        .from('user_tasks')
+        .select('id, source_routine_id, title')
+        .eq('user_id', user!.id)
+        .eq('is_active', true)
+        .in('source_routine_id', routines.map(r => r.id));
 
-      const taskTitlesByRoutine = new Map<string, string[]>();
-      (routineTasks || []).forEach(t => {
-        const titles = taskTitlesByRoutine.get(t.routine_id) || [];
-        titles.push(t.title);
-        taskTitlesByRoutine.set(t.routine_id, titles);
+      const taskIdsByRoutine = new Map<string, string[]>();
+      (userTasks || []).forEach(t => {
+        const rid = (t as any).source_routine_id;
+        if (!rid) return;
+        const ids = taskIdsByRoutine.get(rid) || [];
+        ids.push(t.id);
+        taskIdsByRoutine.set(rid, ids);
       });
 
       return routines.map(r => ({
         routineId: r.id,
         title: r.title,
         emoji: r.emoji || '✨',
-        totalDays: (r as any).end_after_days || (taskTitlesByRoutine.get(r.id)?.length || 0),
-        taskTitles: taskTitlesByRoutine.get(r.id) || [],
+        totalDays: (r as any).end_after_days || (taskIdsByRoutine.get(r.id)?.length || 0),
+        taskIds: taskIdsByRoutine.get(r.id) || [],
         hasStarted: true,
         badgeImageUrl: (r as any).badge_image_url || null,
       }));
@@ -121,24 +126,15 @@ export function useChallengeDayCelebration(
     prevCompletedCountRef.current = totalCompleted;
     if (!isNewCompletion) return;
 
-    // Build a map of task title → task id
-    const titleToTaskId = new Map<string, string>();
-    allTasks.forEach(t => titleToTaskId.set(t.title, t.id));
-
-    // Check each challenge
+    // Check each challenge — now using task IDs directly
     for (const challenge of challengeInfos) {
-      if (!challenge.hasStarted || challenge.taskTitles.length === 0) continue;
+      if (!challenge.hasStarted || challenge.taskIds.length === 0) continue;
 
       const celebratedKey = `simora_challenge_day_celebrated_${challenge.routineId}_${dateKey}`;
       if (localStorage.getItem(celebratedKey) === 'true') continue;
 
-      const matchingTaskIds = challenge.taskTitles
-        .map(title => titleToTaskId.get(title))
-        .filter(Boolean) as string[];
-
-      if (matchingTaskIds.length === 0) continue;
-
-      const allCompleted = matchingTaskIds.every(id => completedTaskIds.has(id));
+      // Direct ID matching — no title lookup needed
+      const allCompleted = challenge.taskIds.every(id => completedTaskIds.has(id));
 
       if (allCompleted) {
         localStorage.setItem(celebratedKey, 'true');
