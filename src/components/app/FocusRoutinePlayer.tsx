@@ -355,7 +355,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
       </div>
 
       {/* Controls section — always render running layout for stable positioning */}
-      <div className="px-6 pb-4 relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
+      <div className="px-6 pb-4 relative -mt-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
         {/* Normal running controls (always rendered, invisible when paused) */}
         <div className={cn("flex items-center justify-center gap-8 mb-4", isPaused && "invisible")}>
           <button
