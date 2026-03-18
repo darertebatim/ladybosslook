@@ -354,10 +354,50 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
         </div>
       </div>
 
-      {/* Controls section */}
-      <div className="px-6 pb-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
-        {isPaused ? (
-          <div className="flex flex-col items-center gap-3 mb-4">
+      {/* Controls section — always render running layout for stable positioning */}
+      <div className="px-6 pb-4 relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
+        {/* Normal running controls (always rendered, invisible when paused) */}
+        <div className={cn("flex items-center justify-center gap-8 mb-4", isPaused && "invisible")}>
+          <button
+            onClick={() => { haptic.medium(); onTogglePause(); }}
+            className="w-14 h-14 rounded-full bg-foreground/5 flex items-center justify-center active:bg-foreground/10"
+          >
+            <Pause className="w-6 h-6 text-foreground/60" />
+          </button>
+
+          <button
+            onClick={handleComplete}
+            className="w-[72px] h-[72px] rounded-full bg-foreground flex items-center justify-center active:scale-95 transition-transform shadow-lg"
+          >
+            <Check className="w-8 h-8 text-background" strokeWidth={3} />
+          </button>
+
+          <button
+            onClick={() => { haptic.light(); setShowSkipSheet(true); }}
+            className="w-14 h-14 rounded-full bg-foreground/5 flex items-center justify-center active:bg-foreground/10"
+          >
+            <SkipForward className="w-6 h-6 text-foreground/60" />
+          </button>
+        </div>
+
+        {/* Next task preview (invisible when paused, but keeps space) */}
+        <div className={cn("flex items-center justify-center gap-2 mb-4", (!nextTask || isPaused) && "invisible")}>
+          {nextTask ? (
+            <>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-foreground/5 rounded px-1.5 py-0.5">
+                Next
+              </span>
+              <FluentEmoji emoji={nextTask.emoji} size={18} />
+              <span className="text-sm text-foreground/60 truncate max-w-[200px]">{nextTask.title}</span>
+            </>
+          ) : (
+            <span className="text-sm">&nbsp;</span>
+          )}
+        </div>
+
+        {/* Pause overlay — positioned on top of controls area */}
+        {isPaused && (
+          <div className="absolute inset-x-0 top-0 bottom-[72px] flex flex-col items-center justify-center gap-3">
             <p className="text-[36px] font-extrabold text-blue-500 tabular-nums leading-none">
               {formatTime(pauseElapsed)}
             </p>
@@ -367,40 +407,6 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
             >
               Resume
             </button>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center gap-8 mb-4">
-            <button
-              onClick={() => { haptic.medium(); onTogglePause(); }}
-              className="w-14 h-14 rounded-full bg-foreground/5 flex items-center justify-center active:bg-foreground/10"
-            >
-              <Pause className="w-6 h-6 text-foreground/60" />
-            </button>
-
-            <button
-              onClick={handleComplete}
-              className="w-[72px] h-[72px] rounded-full bg-foreground flex items-center justify-center active:scale-95 transition-transform shadow-lg"
-            >
-              <Check className="w-8 h-8 text-background" strokeWidth={3} />
-            </button>
-
-            <button
-              onClick={() => { haptic.light(); setShowSkipSheet(true); }}
-              className="w-14 h-14 rounded-full bg-foreground/5 flex items-center justify-center active:bg-foreground/10"
-            >
-              <SkipForward className="w-6 h-6 text-foreground/60" />
-            </button>
-          </div>
-        )}
-
-        {/* Next task preview */}
-        {nextTask && !isPaused && (
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-foreground/5 rounded px-1.5 py-0.5">
-              Next
-            </span>
-            <FluentEmoji emoji={nextTask.emoji} size={18} />
-            <span className="text-sm text-foreground/60 truncate max-w-[200px]">{nextTask.title}</span>
           </div>
         )}
 
