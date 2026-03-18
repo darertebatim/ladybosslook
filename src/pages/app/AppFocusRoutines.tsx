@@ -168,7 +168,7 @@ export default function AppFocusRoutines() {
     // Fetch user's own tasks for this routine — no bank lookup needed
     const { data: userTasks } = await supabase
       .from('user_tasks')
-      .select('id, title, emoji, color, goal_target, goal_type, order_index')
+      .select('id, title, emoji, color, goal_target, goal_type, order_index, pro_link_type, pro_link_value')
       .eq('user_id', user!.id)
       .eq('source_routine_id', routine.routine_id)
       .eq('is_active', true)
