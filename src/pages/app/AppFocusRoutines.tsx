@@ -37,7 +37,7 @@ export default function AppFocusRoutines() {
       const today = new Date();
       const { data } = await supabase
         .from('routine_sessions')
-        .select('routine_id, tasks_completed, tasks_total, ended_at')
+        .select('id, routine_id, tasks_completed, tasks_total, ended_at')
         .eq('user_id', user.id)
         .gte('started_at', startOfDay(today).toISOString())
         .lte('started_at', endOfDay(today).toISOString());
