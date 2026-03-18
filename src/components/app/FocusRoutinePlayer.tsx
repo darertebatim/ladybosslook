@@ -325,7 +325,8 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
                   <span className="text-lg font-semibold text-foreground/70">{icon}</span>
                   <span className="text-xs text-foreground/60 font-medium">{label}</span>
                 </button>
-              ))}
+                );
+              })}
             </div>
             <button
               onClick={() => { haptic.light(); onResetTime(); setShowAdjustSheet(false); }}
