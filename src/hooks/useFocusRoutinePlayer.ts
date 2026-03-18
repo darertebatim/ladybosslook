@@ -14,6 +14,9 @@ export interface FocusTask {
   targetSeconds: number;
   color?: string;
   userTaskId?: string; // maps to user_tasks.id for planner completion sync
+  goalEnabled?: boolean;
+  goalType?: string | null;
+  goalTarget?: number | null;
 }
 
 export interface FocusRoutineConfig {
