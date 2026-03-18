@@ -186,20 +186,15 @@ export function useFocusRoutinePlayer() {
     // Sync with planner: create task_completion when task is completed
     if (status === 'completed' && currentTask.userTaskId && user) {
       const dateStr = format(new Date(), 'yyyy-MM-dd');
-      supabase.from('task_completions').insert({
-        task_id: currentTask.userTaskId,
-        user_id: user.id,
-        completed_date: dateStr,
-      }).then(({ error }) => {
-        if (error) {
-          // Likely duplicate — task already completed today, ignore
-          console.log('task_completions insert (may be duplicate):', error.message);
-          return;
-        }
-        // Update streak & presence in background
-        updateStreak(user.id, dateStr).catch(() => {});
-        updatePresence(user.id, dateStr).catch(() => {});
-        // Invalidate planner queries so UI updates
+      const targetProgress = currentTask.goalType === 'timer'
+        ? (currentTask.goalTarget ?? currentTask.targetSeconds)
+        : currentTask.goalType === 'count'
+          ? (currentTask.goalTarget ?? 1)
+          : 0;
+
+      const invalidatePlanner = () => {
+        // Specific + broad invalidation for reliability
+        queryClient.invalidateQueries({ queryKey: ['planner-completions', user.id, dateStr] });
         queryClient.invalidateQueries({ queryKey: ['planner-completions'] });
         queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
         queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
@@ -209,6 +204,32 @@ export function useFocusRoutinePlayer() {
         queryClient.invalidateQueries({ queryKey: ['presence-stats'] });
         queryClient.invalidateQueries({ queryKey: ['focus-today-sessions'] });
         queryClient.invalidateQueries({ queryKey: ['focus-today-completions'] });
+      };
+
+      supabase.from('task_completions').insert({
+        task_id: currentTask.userTaskId,
+        user_id: user.id,
+        completed_date: dateStr,
+        goal_progress: targetProgress,
+      }).then(async ({ error }) => {
+        if (error) {
+          // Duplicate row for same day: upgrade goal_progress so timer goals show as completed
+          if ((error as any).code === '23505' && targetProgress > 0) {
+            await supabase
+              .from('task_completions')
+              .update({ goal_progress: targetProgress })
+              .eq('task_id', currentTask.userTaskId)
+              .eq('user_id', user.id)
+              .eq('completed_date', dateStr);
+            invalidatePlanner();
+          }
+          return;
+        }
+
+        // Update streak & presence in background
+        updateStreak(user.id, dateStr).catch(() => {});
+        updatePresence(user.id, dateStr).catch(() => {});
+        invalidatePlanner();
       });
     }
 
