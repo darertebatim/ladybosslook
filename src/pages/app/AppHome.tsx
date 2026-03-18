@@ -497,6 +497,13 @@ const AppHome = () => {
     return Array.from(tags);
   }, [tasks]);
 
+  // Auto-reset tag filter when the selected tag no longer has any tasks
+  useEffect(() => {
+    if (selectedTag && !taskTags.includes(selectedTag)) {
+      setSelectedTag(null);
+    }
+  }, [selectedTag, taskTags]);
+
   // Completed task IDs for this date
   const completedTaskIds = useMemo(() => {
     return new Set(completions?.tasks.map(c => c.task_id) || []);
