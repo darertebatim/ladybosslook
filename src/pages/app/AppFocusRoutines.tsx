@@ -65,7 +65,7 @@ export default function AppFocusRoutines() {
     enabled: !!user && focusRoutineIds.length > 0,
   });
 
-  // Fetch today's session completion data
+  // Fetch today's session data (for resume logic only)
   const { data: todaySessions } = useQuery({
     queryKey: ['focus-today-sessions', user?.id],
     queryFn: async () => {
@@ -82,39 +82,67 @@ export default function AppFocusRoutines() {
     enabled: !!user,
   });
 
-  // Fetch completed task titles for incomplete sessions
-  const { data: completedTaskTitlesMap } = useQuery({
-    queryKey: ['focus-completed-task-titles', todaySessions?.map(s => s.id)],
+  // Collect all user_task IDs for focus routines (for completion queries)
+  const allFocusTaskIds = useMemo(() => {
+    if (!routineTasksMap) return [];
+    // We need actual IDs, not just titles — fetch separately
+    return [];
+  }, [routineTasksMap]);
+
+  // Fetch user_task IDs for all focus routines
+  const { data: userTasksByRoutine } = useQuery({
+    queryKey: ['focus-user-task-ids', user?.id, focusRoutineIds],
     queryFn: async () => {
-      if (!todaySessions) return {};
-      const incompleteSessions = todaySessions.filter(s => !s.ended_at);
-      if (incompleteSessions.length === 0) return {};
-
+      if (!user || focusRoutineIds.length === 0) return {};
       const { data } = await supabase
-        .from('routine_session_tasks')
-        .select('session_id, task_title')
-        .in('session_id', incompleteSessions.map(s => s.id));
+        .from('user_tasks')
+        .select('id, source_routine_id, title')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .in('source_routine_id', focusRoutineIds);
 
-      const map: Record<string, Set<string>> = {};
-      (data || []).forEach(t => {
-        const session = incompleteSessions.find(s => s.id === t.session_id);
-        if (session) {
-          if (!map[session.routine_id]) map[session.routine_id] = new Set();
-          map[session.routine_id].add(t.task_title);
-        }
+      const map: Record<string, string[]> = {};
+      (data || []).forEach((t: any) => {
+        const rid = t.source_routine_id;
+        if (!rid) return;
+        if (!map[rid]) map[rid] = [];
+        map[rid].push(t.id);
       });
       return map;
     },
-    enabled: !!todaySessions && todaySessions.some(s => !s.ended_at),
+    enabled: !!user && focusRoutineIds.length > 0,
   });
 
+  // Fetch today's task_completions for all focus routine tasks (planner-synced progress)
+  const allUserTaskIds = useMemo(() => {
+    if (!userTasksByRoutine) return [];
+    return Object.values(userTasksByRoutine).flat();
+  }, [userTasksByRoutine]);
+
+  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
+
+  const { data: todayCompletions } = useQuery({
+    queryKey: ['focus-today-completions', user?.id, todayStr, allUserTaskIds],
+    queryFn: async () => {
+      if (!user || allUserTaskIds.length === 0) return new Set<string>();
+      const { data } = await supabase
+        .from('task_completions')
+        .select('task_id')
+        .eq('user_id', user.id)
+        .eq('completed_date', todayStr)
+        .in('task_id', allUserTaskIds);
+      return new Set((data || []).map(d => d.task_id));
+    },
+    enabled: !!user && allUserTaskIds.length > 0,
+  });
+
+  // Progress based on real planner completions
   const getCompletionInfo = (routineId: string) => {
-    if (!todaySessions) return null;
-    const session = todaySessions.find(s => s.routine_id === routineId && s.ended_at);
-    if (!session) return null;
-    const pct = session.tasks_total > 0
-      ? Math.round((session.tasks_completed / session.tasks_total) * 100)
-      : 0;
+    const taskIds = userTasksByRoutine?.[routineId];
+    if (!taskIds || taskIds.length === 0) return null;
+    const completed = taskIds.filter(id => todayCompletions?.has(id)).length;
+    if (completed === 0) return null;
+    const pct = Math.round((completed / taskIds.length) * 100);
     return { pct, isComplete: pct === 100 };
   };
 

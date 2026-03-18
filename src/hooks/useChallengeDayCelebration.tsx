@@ -84,8 +84,8 @@ export function useChallengeDayCelebration(
         routineId: r.id,
         title: r.title,
         emoji: r.emoji || '✨',
-        totalDays: (r as any).end_after_days || (taskTitlesByRoutine.get(r.id)?.length || 0),
-        taskTitles: taskTitlesByRoutine.get(r.id) || [],
+        totalDays: (r as any).end_after_days || (taskIdsByRoutine.get(r.id)?.length || 0),
+        taskIds: taskIdsByRoutine.get(r.id) || [],
         hasStarted: true,
         badgeImageUrl: (r as any).badge_image_url || null,
       }));

@@ -608,18 +608,34 @@ export default function AppInspireDetail() {
         {isFocus && isAdded && routine?.tasks?.length ? (
           <div className="flex gap-3">
             <Button
-              onClick={() => {
+              onClick={async () => {
                 haptic.medium();
+                if (!user) return;
+                // Fetch user's OWN tasks by source_routine_id
+                const { data: userTasks } = await supabase
+                  .from('user_tasks')
+                  .select('id, title, emoji, color, goal_target, order_index')
+                  .eq('user_id', user.id)
+                  .eq('source_routine_id', planId!)
+                  .eq('is_active', true)
+                  .order('order_index', { ascending: true });
+
+                if (!userTasks || userTasks.length === 0) {
+                  toast.error('No tasks found. Try removing and re-adding this routine.');
+                  return;
+                }
+
                 startFocusRoutine({
                   routineId: planId!,
                   routineTitle: routine.title,
                   routineEmoji: routine.emoji || '✨',
-                  tasks: (routine.tasks || []).map(t => ({
+                  tasks: userTasks.map((t: any) => ({
                     id: t.id,
                     title: t.title,
                     emoji: t.emoji || '📝',
-                    targetSeconds: t.goal_target || (t.duration_minutes ? t.duration_minutes * 60 : 300),
+                    targetSeconds: t.goal_target || 300,
                     color: t.color || undefined,
+                    userTaskId: t.id, // Key fix: pass real user_task ID for planner sync
                   })),
                 });
               }}
