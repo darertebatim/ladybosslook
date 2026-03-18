@@ -622,7 +622,14 @@ export function useAddRoutineFromBank() {
           user_id: user.id,
           routine_id: routineId,
           is_active: true,
-        }, {
+          title: routine.title,
+          emoji: routine.emoji,
+          cover_image_url: routine.cover_image_url,
+          category: routine.category,
+          color: routine.color,
+          schedule_type: scheduleType,
+          is_focus: (routine as any).is_focus ?? false,
+        } as any, {
           onConflict: 'user_id,routine_id',
         });
 
