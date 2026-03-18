@@ -1,9 +1,10 @@
-import { Pause, Play, Check } from 'lucide-react';
+import { Pause, Play, Check, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { haptic } from '@/lib/haptics';
 import { TASK_COLORS, type TaskColor } from '@/hooks/useTaskPlanner';
+import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 
 // Secondary (darker) palette matching task colors
 const TASK_COLORS_DARK: Record<string, string> = {
