@@ -17,7 +17,7 @@ interface ChallengeRoutineInfo {
   title: string;
   emoji: string;
   totalDays: number;
-  taskTitles: string[];
+  taskIds: string[];
   hasStarted: boolean;
   badgeImageUrl: string | null;
 }
