@@ -51,7 +51,7 @@ export function FocusPlayerProvider({ children }: { children: ReactNode }) {
 
   return (
     <FocusPlayerContext.Provider value={{
-      startRoutine: (cfg) => { setMinimized(false); player.startRoutine(cfg); },
+      startRoutine: (cfg, resumeOpts) => { setMinimized(false); player.startRoutine(cfg, resumeOpts); },
       isActive,
       isMinimized: isActive && minimized,
       maximize: handleMaximize,
