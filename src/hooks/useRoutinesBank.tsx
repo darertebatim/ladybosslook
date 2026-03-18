@@ -623,13 +623,13 @@ export function useAddRoutineFromBank() {
           return sum + Math.ceil(secs / 60);
         }, 0);
 
-        await supabase.from('user_tasks').insert({
+        const { error: focusInsertError } = await supabase.from('user_tasks').insert({
           user_id: user.id,
           title: routine.title,
           emoji: routine.emoji || '🎯',
           color: 'amber',
           repeat_pattern: 'daily',
-          repeat_days: [1, 2, 3, 4, 5], // weekdays default
+          repeat_days: [1, 2, 3, 4, 5],
           tag: 'pro',
           pro_link_type: 'focus_routine',
           pro_link_value: routineId,
@@ -640,6 +640,10 @@ export function useAddRoutineFromBank() {
           goal_type: 'timer',
           goal_unit: 'minutes',
         });
+
+        if (focusInsertError) {
+          console.error('[useAddRoutineFromBank] Failed to create focus parent task:', focusInsertError);
+        }
       }
 
       // Track that user added this routine from bank

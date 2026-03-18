@@ -135,9 +135,9 @@ export default function AppFocusRoutines() {
     enabled: focusRoutineIds.length > 0,
   });
 
-  // Build activated routines from pro-linked tasks
+  // Build activated routines from pro-linked tasks (filter out malformed)
   const activatedRoutineCards = useMemo(() => {
-    return focusRoutineTasks.map(task => {
+    return focusRoutineTasks.filter(t => !!t.pro_link_value).map(task => {
       const routineId = task.pro_link_value;
       const routine = allRoutines?.find(r => r.id === routineId);
       const emojis = routineId ? (routineTasks?.[routineId] || []) : [];
