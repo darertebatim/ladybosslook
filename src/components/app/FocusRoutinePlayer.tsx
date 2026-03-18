@@ -332,6 +332,12 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
                   <p className="text-[42px] font-extrabold text-foreground tracking-tight tabular-nums leading-none">
                     {formatTime(overtimeSeconds)}
                   </p>
+                  <button
+                    onClick={() => { haptic.light(); setShowNotifySheet(true); }}
+                    className="mt-2 px-3 py-1 rounded-full active:bg-foreground/5"
+                  >
+                    <span className="text-sm text-muted-foreground underline underline-offset-2">Notify again</span>
+                  </button>
                 </>
               ) : isOvertime ? (
                 <>
