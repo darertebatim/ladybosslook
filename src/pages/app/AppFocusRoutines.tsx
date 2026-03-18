@@ -385,10 +385,11 @@ export default function AppFocusRoutines() {
                   })}
                 </div>
               </section>
-            )}
+              ) : null;
+            })()}
 
             {/* Empty state */}
-            {(myFocusRoutines || []).length === 0 && (
+            {(myFocusRoutines || []).filter((r: any) => (routineTasksMap?.[r.routine_id] || []).length > 0).length === 0 && (
               <div className="text-center py-12">
                 <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
                 <h3 className="font-semibold text-foreground mb-1">No focus routines yet</h3>
