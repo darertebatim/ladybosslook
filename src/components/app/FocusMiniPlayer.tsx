@@ -75,7 +75,7 @@ export function FocusMiniPlayer() {
           )}>
             {isOvertime && '+'}{formatMiniTime(timeLeft)}
             {isPaused && (
-              <span className="ml-1.5 text-[10px] font-semibold bg-black/10 text-black/60 rounded px-1.5 py-0.5 align-middle">
+              <span className="ml-1.5 text-[10px] font-semibold rounded px-1.5 py-0.5 align-middle" style={{ backgroundColor: buttonBg, color: 'black' }}>
                 Paused
               </span>
             )}
