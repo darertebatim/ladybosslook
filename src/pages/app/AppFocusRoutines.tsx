@@ -227,15 +227,9 @@ export default function AppFocusRoutines() {
     setPreStartTasks([]);
   };
   const handleAddToRoutine = async (routineId: string) => {
-    const routine = allRoutines?.find(r => r.id === routineId);
-    if (!routine) return;
     setAddingRoutineId(routineId);
     try {
-      await addRoutineFromBank.mutateAsync({
-        routine,
-        tasks: [],
-        editedTasks: [],
-      });
+      await addRoutineFromBank.mutateAsync({ routineId });
       toast.success('Added to your routines!');
     } catch (e) {
       toast.error('Failed to add routine');
