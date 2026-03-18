@@ -143,7 +143,7 @@ function RearrangeSheet({
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground/50 truncate">{currentTask.title}</p>
               </div>
-              <span className="text-xs text-muted-foreground tabular-nums">{Math.round(currentTask.targetSeconds / 60)}m</span>
+              <span className="text-xs text-muted-foreground tabular-nums">{currentTask.targetSeconds > 0 ? `${Math.round(currentTask.targetSeconds / 60)}m` : '⏱️'}</span>
             </div>
           )}
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
