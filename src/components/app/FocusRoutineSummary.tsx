@@ -110,7 +110,7 @@ export const FocusRoutineSummary = memo(function FocusRoutineSummary({
               const delta = formatDelta(task.targetSeconds, task.actualSeconds);
               return (
                 <div key={i} className="flex items-center gap-3 px-4 py-3">
-                  <span className="text-lg shrink-0">{task.emoji}</span>
+                  <FluentEmoji emoji={task.emoji} size={24} className="shrink-0" />
                   <p className="flex-1 text-sm text-foreground truncate">{task.title}</p>
                   <div className="text-right shrink-0">
                     <p className="text-sm font-medium text-foreground">
