@@ -290,12 +290,20 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
       </div>
 
       <div className="flex-1 flex flex-col justify-center">
-        {/* Task title + time range */}
+        {/* Task title + pro badge + time range */}
         <div className="px-6 pb-2">
           <h2 className="text-xl font-bold text-foreground text-center leading-snug max-w-xs mx-auto">
             {currentTask?.title}
           </h2>
-          {!isCountUp && (
+          {proConfig && (
+            <div className="flex items-center justify-center gap-1.5 mt-1.5">
+              <proConfig.icon className={cn("w-3.5 h-3.5", proConfig.iconColorClass)} />
+              <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full", proConfig.badgeColorClass)}>
+                {proConfig.badgeText}
+              </span>
+            </div>
+          )}
+          {!isCountUp && !proConfig && (
             <p className="text-sm text-muted-foreground text-center mt-1">
               {`${format(taskStartedAt, 'h:mma').toLowerCase()}  →  ${format(taskEndTime, 'h:mma').toLowerCase()}`}
             </p>
