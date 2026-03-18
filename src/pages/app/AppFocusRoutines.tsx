@@ -196,6 +196,8 @@ export default function AppFocusRoutines() {
         goalType: t.goal_type || null,
         goalTarget: t.goal_target || null,
         hasTimerGoal: isTimer,
+        proLinkType: t.pro_link_type || null,
+        proLinkValue: t.pro_link_value || null,
       };
     });
 
