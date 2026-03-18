@@ -1,11 +1,11 @@
-import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Bell, CalendarDays, Settings2 } from 'lucide-react';
+import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft } from 'lucide-react';
 import { format, addMinutes } from 'date-fns';
 import { useRoutinesBank, useUserAddedBankRoutines, useRoutineBankCategories, useAddRoutineFromBank } from '@/hooks/useRoutinesBank';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { haptic } from '@/lib/haptics';
 import { startOfDay, endOfDay } from 'date-fns';
