@@ -5,6 +5,22 @@ import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { haptic } from '@/lib/haptics';
 import { TASK_COLORS, type TaskColor } from '@/hooks/useTaskPlanner';
 
+// Secondary (darker) palette matching task colors
+const TASK_COLORS_DARK: Record<string, string> = {
+  pink: '#FFC2EA',
+  peach: '#FFD2A1',
+  yellow: '#FFEA4E',
+  lime: '#C3F1E1',
+  sky: '#B9D6FF',
+  mint: '#C9F588',
+  lavender: '#DEC1FF',
+  purple: '#DEC1FF',
+  blue: '#B9D6FF',
+  red: '#FFC2EA',
+  orange: '#FFD2A1',
+  green: '#C3F1E1',
+};
+
 function formatMiniTime(seconds: number): string {
   const abs = Math.abs(seconds);
   const m = Math.floor(abs / 60);
@@ -28,11 +44,11 @@ export function FocusMiniPlayer() {
   if (!isActive || !isMinimized || !currentTask || phase === 'summary') return null;
 
   const isPaused = phase === 'paused';
+  const colorKey = (currentTask.color || 'yellow') as TaskColor;
 
-  // Resolve color from task palette — always use the task's own color, even in overtime
-  const taskBg = currentTask.color
-    ? (TASK_COLORS[currentTask.color as TaskColor] || currentTask.color)
-    : TASK_COLORS.yellow;
+  // Resolve colors from task palette
+  const taskBg = TASK_COLORS[colorKey] || TASK_COLORS.yellow;
+  const buttonBg = TASK_COLORS_DARK[colorKey] || TASK_COLORS_DARK.yellow;
 
   return (
     <div
@@ -69,11 +85,8 @@ export function FocusMiniPlayer() {
             haptic.light();
             togglePause();
           }}
-          className={cn(
-            "flex-shrink-0 h-10 w-10 rounded-full",
-            "flex items-center justify-center",
-            "bg-black/10 active:bg-black/20"
-          )}
+          className="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center active:opacity-80"
+          style={{ backgroundColor: buttonBg }}
         >
           {isPaused ? (
             <Play className="h-4.5 w-4.5 ml-0.5 text-black" />
@@ -82,7 +95,7 @@ export function FocusMiniPlayer() {
           )}
         </button>
 
-        {/* Complete — only show when running (not paused) */}
+        {/* Complete — only show when running */}
         {!isPaused && (
           <button
             onClick={(e) => {
@@ -90,13 +103,10 @@ export function FocusMiniPlayer() {
               haptic.success();
               completeTask();
             }}
-            className={cn(
-              "flex-shrink-0 h-10 w-10 rounded-full",
-              "flex items-center justify-center",
-              "bg-black text-white active:opacity-90"
-            )}
+            className="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center active:opacity-80"
+            style={{ backgroundColor: buttonBg }}
           >
-            <Check className="h-5 w-5" />
+            <Check className="h-5 w-5 text-black" />
           </button>
         )}
       </div>
