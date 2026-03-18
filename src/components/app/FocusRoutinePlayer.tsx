@@ -193,6 +193,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   onClose,
   onCancel,
   onMinimize,
+  onOpenProTask,
 }: FocusRoutinePlayerProps) {
   const [showAdjustSheet, setShowAdjustSheet] = useState(false);
   const [showNotifySheet, setShowNotifySheet] = useState(false);
@@ -209,6 +210,8 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
 
   const nextTask = config.tasks[currentTaskIndex + 1] || null;
   const isCountUp = (currentTask as any)?.hasTimerGoal === false;
+  const proLinkType = (currentTask as any)?.proLinkType as ProLinkType | null;
+  const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
   const progressPercent = currentTask
     ? isCountUp
       ? 0 // no progress ring for count-up tasks
