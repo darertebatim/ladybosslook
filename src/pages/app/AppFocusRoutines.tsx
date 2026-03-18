@@ -190,7 +190,7 @@ export default function AppFocusRoutines() {
         id: t.id,
         title: t.title,
         emoji: t.emoji || '📝',
-        targetSeconds: isTimer ? (t.goal_target || 300) : 300, // non-timer tasks get 5m estimate
+        targetSeconds: isTimer ? (t.goal_target || 300) : 0, // non-timer tasks count up from 0
         color: t.color || undefined,
         userTaskId: t.id,
         goalType: t.goal_type || null,
