@@ -80,7 +80,6 @@ export function FocusMiniPlayer() {
               </span>
             )}
           </p>
-          </p>
           <p className="text-xs text-black/60 truncate">{currentTask.title}</p>
         </div>
 
