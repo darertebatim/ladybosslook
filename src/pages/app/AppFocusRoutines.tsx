@@ -411,45 +411,67 @@ export default function AppFocusRoutines() {
             </p>
 
             <div className="space-y-2.5 mt-6">
-              {preStartTasks.map((task, i) => {
-                const isDone = completedTaskIds.has(task.id);
-                const colorKey = (task.color || 'yellow') as TaskColor;
-                const colorClass = TASK_COLOR_CLASSES[colorKey] || TASK_COLOR_CLASSES.yellow;
-                return (
-                  <div
-                    key={task.id}
-                    className={cn(
-                      'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
-                      colorClass,
-                      isDone && 'opacity-60'
-                    )}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 flex items-center justify-center shrink-0">
-                        <TaskIcon iconName={task.emoji} size={32} className="text-black/80" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[11px] text-black/80">⏱️ {Math.ceil(task.targetSeconds / 60)}m</span>
+              {(() => {
+                // Calculate cumulative start times for each task
+                let cumulativeSeconds = 0;
+                const now = new Date();
+                // Skip already-done tasks for time calculation
+                const taskTimings = preStartTasks.map((task) => {
+                  const isDone = completedTaskIds.has(task.id);
+                  const startTime = isDone ? null : new Date(now.getTime() + cumulativeSeconds * 1000);
+                  const endTime = isDone ? null : new Date(now.getTime() + (cumulativeSeconds + task.targetSeconds) * 1000);
+                  if (!isDone) cumulativeSeconds += task.targetSeconds;
+                  return { task, isDone, startTime, endTime };
+                });
+
+                return taskTimings.map(({ task, isDone, startTime, endTime }) => {
+                  const colorKey = (task.color || 'yellow') as TaskColor;
+                  const colorClass = TASK_COLOR_CLASSES[colorKey] || TASK_COLOR_CLASSES.yellow;
+                  const mins = Math.ceil(task.targetSeconds / 60);
+                  return (
+                    <div
+                      key={task.id}
+                      className={cn(
+                        'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+                        colorClass,
+                        isDone && 'opacity-60'
+                      )}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="w-10 h-10 flex items-center justify-center shrink-0">
+                          <TaskIcon iconName={task.emoji} size={32} className="text-black/80" />
                         </div>
-                        <p className={cn(
-                          'text-black text-[15px] font-semibold leading-tight transition-all',
-                          isDone && 'line-through'
-                        )}>
-                          {task.title}
-                        </p>
-                      </div>
-                      <div className="w-9 h-9 flex items-center justify-center shrink-0">
-                        {isDone ? (
-                          <SealCheck className="w-9 h-9 text-teal-400" />
-                        ) : (
-                          <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
-                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[11px] text-black/60">⏱️ {mins}m</span>
+                            {startTime && endTime && (
+                              <>
+                                <span className="text-[11px] text-black/40">•</span>
+                                <span className="text-[11px] text-black/60">
+                                  {format(startTime, 'h:mm')}–{format(endTime, 'h:mma')}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                          <p className={cn(
+                            'text-black text-[15px] font-semibold leading-tight transition-all',
+                            isDone && 'line-through'
+                          )}>
+                            {task.title}
+                          </p>
+                        </div>
+                        <div className="w-9 h-9 flex items-center justify-center shrink-0">
+                          {isDone ? (
+                            <SealCheck className="w-9 h-9 text-teal-400" />
+                          ) : (
+                            <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                });
+              })()}
             </div>
           </div>
 
