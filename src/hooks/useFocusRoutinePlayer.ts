@@ -191,7 +191,7 @@ export function useFocusRoutinePlayer() {
         ? (currentTask.goalTarget ?? currentTask.targetSeconds)
         : currentTask.goalType === 'count'
           ? (currentTask.goalTarget ?? 1)
-          : 0;
+          : 1; // no-goal tasks: mark as done with progress=1
 
       const invalidatePlanner = () => {
         // Specific + broad invalidation for reliability
