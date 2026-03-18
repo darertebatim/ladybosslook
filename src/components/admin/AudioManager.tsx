@@ -183,6 +183,9 @@ export const AudioManager = () => {
             });
 
           if (playlistError) throw playlistError;
+
+          // Send push notification to playlist subscribers (fire & forget)
+          notifyPlaylistSubscribers(formData.playlist_id, formData.title || audioFiles[0]?.name || 'New track');
         }
       }
     },
