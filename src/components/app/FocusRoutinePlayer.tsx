@@ -281,150 +281,152 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
         </button>
       </div>
 
-      {/* Task title + time range */}
-      <div className="px-6 mb-0">
-        <h2 className="text-xl font-bold text-foreground text-center leading-snug max-w-xs mx-auto">
-          {currentTask?.title}
-        </h2>
-        <p className="text-sm text-muted-foreground text-center mt-1">
-          {format(taskStartedAt, 'h:mma').toLowerCase()}  →  {format(taskEndTime, 'h:mma').toLowerCase()}
-        </p>
-      </div>
+      <div className="flex-1 flex flex-col justify-center">
+        {/* Task title + time range */}
+        <div className="px-6 pb-2">
+          <h2 className="text-xl font-bold text-foreground text-center leading-snug max-w-xs mx-auto">
+            {currentTask?.title}
+          </h2>
+          <p className="text-sm text-muted-foreground text-center mt-1">
+            {format(taskStartedAt, 'h:mma').toLowerCase()}  →  {format(taskEndTime, 'h:mma').toLowerCase()}
+          </p>
+        </div>
 
-      {/* Main circle area */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 mt-2 mb-2">
-        <div className="relative w-64 h-64 flex items-center justify-center">
-          <div className="absolute inset-3 rounded-full bg-foreground/[0.04]" />
+        {/* Main circle area */}
+        <div className="flex flex-col items-center justify-center px-6">
+          <div className="relative w-64 h-64 flex items-center justify-center">
+            <div className="absolute inset-3 rounded-full bg-foreground/[0.04]" />
 
-          {/* Progress ring */}
-          <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 256 256">
-            <circle cx="128" cy="128" r="120" fill="none" stroke="currentColor" strokeWidth="14" className="text-transparent" />
-            <circle
-              cx="128" cy="128" r="120"
-              fill="none" strokeWidth="14"
-              strokeDasharray={`${2 * Math.PI * 120}`}
-              strokeDashoffset={`${2 * Math.PI * 120 * (1 - progressPercent / 100)}`}
-              strokeLinecap="round"
-              className="stroke-amber-400 transition-all duration-1000 ease-linear"
-              style={{ filter: 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.4))' }}
-            />
-          </svg>
+            {/* Progress ring */}
+            <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 256 256">
+              <circle cx="128" cy="128" r="120" fill="none" stroke="currentColor" strokeWidth="14" className="text-transparent" />
+              <circle
+                cx="128" cy="128" r="120"
+                fill="none" strokeWidth="14"
+                strokeDasharray={`${2 * Math.PI * 120}`}
+                strokeDashoffset={`${2 * Math.PI * 120 * (1 - progressPercent / 100)}`}
+                strokeLinecap="round"
+                className="stroke-amber-400 transition-all duration-1000 ease-linear"
+                style={{ filter: 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.4))' }}
+              />
+            </svg>
 
-          {/* Circle content */}
-          <div className="relative flex flex-col items-center z-10">
-            <FluentEmoji emoji={currentTask?.emoji || '📝'} size={56} className="mb-2" />
+            {/* Circle content */}
+            <div className="relative flex flex-col items-center z-10">
+              <FluentEmoji emoji={currentTask?.emoji || '📝'} size={56} className="mb-2" />
 
-            {isPaused ? (
-              <>
-                <p className="text-[42px] font-extrabold text-foreground/25 tracking-tight tabular-nums leading-none">
-                  {formatTime(Math.max(0, timeLeft))}
-                </p>
-                <p className="text-xs text-foreground/30 mt-1.5 font-medium">Paused</p>
-              </>
-            ) : isOvertime ? (
-              <>
-                <p className="text-[42px] font-extrabold text-red-500 tracking-tight tabular-nums leading-none">
-                  +{formatTime(overtimeSeconds)}
-                </p>
-                <button
-                  onClick={() => { haptic.light(); setShowNotifySheet(true); }}
-                  className="mt-2 px-3 py-1 rounded-full active:bg-foreground/5"
-                >
-                  <span className="text-sm text-muted-foreground underline underline-offset-2">Notify again</span>
-                </button>
-              </>
-            ) : (
-              <>
-                <p className="text-[42px] font-extrabold text-foreground tracking-tight tabular-nums leading-none">
-                  {formatTime(timeLeft)}
-                </p>
-                <button
-                  onClick={() => { haptic.light(); setShowAdjustSheet(true); }}
-                  className="flex items-center gap-3 mt-2 px-3 py-1 rounded-full active:bg-foreground/5"
-                >
-                  <Minus className="w-3.5 h-3.5 text-foreground/40" />
-                  <span className="text-xs text-muted-foreground font-medium tabular-nums">
-                    {Math.ceil(Math.max(0, timeLeft) / 60)}m
-                  </span>
-                  <Plus className="w-3.5 h-3.5 text-foreground/40" />
-                </button>
-              </>
-            )}
+              {isPaused ? (
+                <>
+                  <p className="text-[42px] font-extrabold text-foreground/25 tracking-tight tabular-nums leading-none">
+                    {formatTime(Math.max(0, timeLeft))}
+                  </p>
+                  <p className="text-xs text-foreground/30 mt-1.5 font-medium">Paused</p>
+                </>
+              ) : isOvertime ? (
+                <>
+                  <p className="text-[42px] font-extrabold text-red-500 tracking-tight tabular-nums leading-none">
+                    +{formatTime(overtimeSeconds)}
+                  </p>
+                  <button
+                    onClick={() => { haptic.light(); setShowNotifySheet(true); }}
+                    className="mt-2 px-3 py-1 rounded-full active:bg-foreground/5"
+                  >
+                    <span className="text-sm text-muted-foreground underline underline-offset-2">Notify again</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="text-[42px] font-extrabold text-foreground tracking-tight tabular-nums leading-none">
+                    {formatTime(timeLeft)}
+                  </p>
+                  <button
+                    onClick={() => { haptic.light(); setShowAdjustSheet(true); }}
+                    className="flex items-center gap-3 mt-2 px-3 py-1 rounded-full active:bg-foreground/5"
+                  >
+                    <Minus className="w-3.5 h-3.5 text-foreground/40" />
+                    <span className="text-xs text-muted-foreground font-medium tabular-nums">
+                      {Math.ceil(Math.max(0, timeLeft) / 60)}m
+                    </span>
+                    <Plus className="w-3.5 h-3.5 text-foreground/40" />
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Controls section — always render running layout for stable positioning */}
-      <div className="px-6 pb-4 relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
-        {/* Normal running controls (always rendered, invisible when paused) */}
-        <div className={cn("flex items-center justify-center gap-8 mb-4", isPaused && "invisible")}>
-          <button
-            onClick={() => { haptic.medium(); onTogglePause(); }}
-            className="w-14 h-14 rounded-full bg-foreground/5 flex items-center justify-center active:bg-foreground/10"
-          >
-            <Pause className="w-6 h-6 text-foreground/60" />
-          </button>
-
-          <button
-            onClick={handleComplete}
-            className="w-[72px] h-[72px] rounded-full bg-foreground flex items-center justify-center active:scale-95 transition-transform shadow-lg"
-          >
-            <Check className="w-8 h-8 text-background" strokeWidth={3} />
-          </button>
-
-          <button
-            onClick={() => { haptic.light(); setShowSkipSheet(true); }}
-            className="w-14 h-14 rounded-full bg-foreground/5 flex items-center justify-center active:bg-foreground/10"
-          >
-            <SkipForward className="w-6 h-6 text-foreground/60" />
-          </button>
-        </div>
-
-        {/* Next task preview (invisible when paused, but keeps space) */}
-        <div className={cn("flex items-center justify-center gap-2 mb-4", (!nextTask || isPaused) && "invisible")}>
-          {nextTask ? (
-            <>
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-foreground/5 rounded px-1.5 py-0.5">
-                Next
-              </span>
-              <FluentEmoji emoji={nextTask.emoji} size={18} />
-              <span className="text-sm text-foreground/60 truncate max-w-[200px]">{nextTask.title}</span>
-            </>
-          ) : (
-            <span className="text-sm">&nbsp;</span>
-          )}
-        </div>
-
-        {/* Pause overlay — positioned on top of controls area */}
-        {isPaused && (
-          <div className="absolute inset-x-0 top-0 bottom-[72px] flex flex-col items-center justify-center gap-3">
-            <p className="text-[36px] font-extrabold text-blue-500 tabular-nums leading-none">
-              {formatTime(pauseElapsed)}
-            </p>
+        {/* Controls section — anchored to the circle cluster */}
+        <div className="px-6 pt-3 pb-4 relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
+          {/* Normal running controls (always rendered, invisible when paused) */}
+          <div className={cn("flex items-center justify-center gap-8 mb-3", isPaused && "invisible")}>
             <button
               onClick={() => { haptic.medium(); onTogglePause(); }}
-              className="px-10 py-3.5 rounded-full bg-blue-500 text-white font-semibold text-base active:scale-95 transition-transform shadow-lg"
+              className="w-14 h-14 rounded-full bg-foreground/5 flex items-center justify-center active:bg-foreground/10"
             >
-              Resume
+              <Pause className="w-6 h-6 text-foreground/60" />
             </button>
-          </div>
-        )}
 
-        {/* Bottom card */}
-        {endTime && (
-          <div className="flex items-center justify-between bg-foreground/[0.04] rounded-2xl px-5 py-3.5 mt-1">
-            <div>
-              <p className="text-xs text-muted-foreground">All ends</p>
-              <p className="text-base font-bold text-foreground">{format(endTime, 'h:mma').toLowerCase()}</p>
-            </div>
             <button
-              onClick={() => { haptic.light(); setShowPlaylistSheet(true); }}
-              className="text-sm font-medium text-muted-foreground px-4 py-2 rounded-xl bg-foreground/5 active:bg-foreground/10"
+              onClick={handleComplete}
+              className="w-[72px] h-[72px] rounded-full bg-foreground flex items-center justify-center active:scale-95 transition-transform shadow-lg"
             >
-              Rearrange
+              <Check className="w-8 h-8 text-background" strokeWidth={3} />
+            </button>
+
+            <button
+              onClick={() => { haptic.light(); setShowSkipSheet(true); }}
+              className="w-14 h-14 rounded-full bg-foreground/5 flex items-center justify-center active:bg-foreground/10"
+            >
+              <SkipForward className="w-6 h-6 text-foreground/60" />
             </button>
           </div>
-        )}
+
+          {/* Next task preview (invisible when paused, but keeps space) */}
+          <div className={cn("flex items-center justify-center gap-2 mb-3", (!nextTask || isPaused) && "invisible")}>
+            {nextTask ? (
+              <>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest bg-foreground/5 rounded px-1.5 py-0.5">
+                  Next
+                </span>
+                <FluentEmoji emoji={nextTask.emoji} size={18} />
+                <span className="text-sm text-foreground/60 truncate max-w-[200px]">{nextTask.title}</span>
+              </>
+            ) : (
+              <span className="text-sm">&nbsp;</span>
+            )}
+          </div>
+
+          {/* Pause overlay — positioned on top of controls area */}
+          {isPaused && (
+            <div className="absolute inset-x-0 top-0 bottom-[72px] flex flex-col items-center justify-center gap-3">
+              <p className="text-[36px] font-extrabold text-blue-500 tabular-nums leading-none">
+                {formatTime(pauseElapsed)}
+              </p>
+              <button
+                onClick={() => { haptic.medium(); onTogglePause(); }}
+                className="px-10 py-3.5 rounded-full bg-blue-500 text-white font-semibold text-base active:scale-95 transition-transform shadow-lg"
+              >
+                Resume
+              </button>
+            </div>
+          )}
+
+          {/* Bottom card */}
+          {endTime && (
+            <div className="flex items-center justify-between bg-foreground/[0.04] rounded-2xl px-5 py-3.5 mt-0">
+              <div>
+                <p className="text-xs text-muted-foreground">All ends</p>
+                <p className="text-base font-bold text-foreground">{format(endTime, 'h:mma').toLowerCase()}</p>
+              </div>
+              <button
+                onClick={() => { haptic.light(); setShowPlaylistSheet(true); }}
+                className="text-sm font-medium text-muted-foreground px-4 py-2 rounded-xl bg-foreground/5 active:bg-foreground/10"
+              >
+                Rearrange
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       {showAdjustSheet && (
         <>
