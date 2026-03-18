@@ -603,7 +603,7 @@ export function useAddRoutineFromBank() {
             goal_unit: bankTask?.goal_unit ?? null,
             repeat_end_date: repeatEndDate,
             // Project tracking
-            source_routine_id: scheduleType === 'project' ? routineId : null,
+            source_routine_id: routineId,
             project_step: projectStep,
           };
         });
