@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { haptic } from '@/lib/haptics';
+import { TASK_COLORS, type TaskColor } from '@/hooks/useTaskPlanner';
 
 function formatMiniTime(seconds: number): string {
   const abs = Math.abs(seconds);
@@ -28,6 +29,11 @@ export function FocusMiniPlayer() {
 
   const isPaused = phase === 'paused';
 
+  // Resolve color from task palette — always use the task's own color, even in overtime
+  const taskBg = currentTask.color
+    ? (TASK_COLORS[currentTask.color as TaskColor] || currentTask.color)
+    : TASK_COLORS.yellow;
+
   return (
     <div
       className={cn(
@@ -36,11 +42,7 @@ export function FocusMiniPlayer() {
         "animate-in slide-in-from-bottom-4 duration-300",
         "shadow-lg"
       )}
-      style={{
-        backgroundColor: isOvertime
-          ? 'hsl(45, 93%, 94%)'
-          : currentTask.color || 'hsl(48, 96%, 89%)',
-      }}
+      style={{ backgroundColor: taskBg }}
       onClick={maximize}
     >
       <div className="flex items-center gap-3 px-3 py-2.5">
@@ -52,12 +54,12 @@ export function FocusMiniPlayer() {
         {/* Timer + task name */}
         <div className="flex-1 min-w-0">
           <p className={cn(
-            "font-bold text-lg tabular-nums leading-tight",
-            isOvertime ? "text-amber-600" : "text-foreground"
+            "font-bold text-lg tabular-nums leading-tight text-black",
+            isOvertime && "text-red-600"
           )}>
             {isOvertime && '+'}{formatMiniTime(timeLeft)}
           </p>
-          <p className="text-xs text-muted-foreground truncate">{currentTask.title}</p>
+          <p className="text-xs text-black/60 truncate">{currentTask.title}</p>
         </div>
 
         {/* Pause / Play */}
@@ -70,13 +72,13 @@ export function FocusMiniPlayer() {
           className={cn(
             "flex-shrink-0 h-10 w-10 rounded-full",
             "flex items-center justify-center",
-            "bg-foreground/10 active:bg-foreground/20"
+            "bg-black/10 active:bg-black/20"
           )}
         >
           {isPaused ? (
-            <Play className="h-4.5 w-4.5 ml-0.5 text-foreground" />
+            <Play className="h-4.5 w-4.5 ml-0.5 text-black" />
           ) : (
-            <Pause className="h-4.5 w-4.5 text-foreground" />
+            <Pause className="h-4.5 w-4.5 text-black" />
           )}
         </button>
 
@@ -90,7 +92,7 @@ export function FocusMiniPlayer() {
           className={cn(
             "flex-shrink-0 h-10 w-10 rounded-full",
             "flex items-center justify-center",
-            "bg-primary text-primary-foreground active:opacity-90"
+            "bg-black text-white active:opacity-90"
           )}
         >
           <Check className="h-5 w-5" />
