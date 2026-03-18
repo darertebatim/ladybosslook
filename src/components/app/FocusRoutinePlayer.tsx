@@ -396,7 +396,12 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
             <h3 className="text-center text-lg font-bold mb-6">Should we skip?</h3>
             <div className="space-y-2.5">
               <button
-                onClick={() => { haptic.light(); setShowSkipSheet(false); }}
+                onClick={() => {
+                  haptic.light();
+                  setShowSkipSheet(false);
+                  setRearrangeTasks([...config.tasks.slice(currentTaskIndex + 1)]);
+                  setShowRearrangeSheet(true);
+                }}
                 className="w-full py-4 rounded-2xl bg-foreground/[0.06] text-foreground font-semibold text-base active:bg-foreground/10"
               >
                 Rearrange order
