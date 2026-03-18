@@ -443,7 +443,7 @@ export default function AppFocusRoutines() {
             </div>
           </div>
 
-          {/* Start button */}
+          {/* Start button + Add to routine */}
           <div
             className="fixed bottom-0 left-0 right-0 px-5 pb-4 pt-2 bg-background"
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}
@@ -454,6 +454,16 @@ export default function AppFocusRoutines() {
             >
               <Play className="w-5 h-5 fill-current" />
               Start
+            </button>
+            <button
+              onClick={() => {
+                haptic.light();
+                navigate(`/app/routines/bank/${preStartRoutine.id}`);
+              }}
+              className="w-full flex items-center justify-center gap-2 h-10 mt-2 rounded-xl text-sm font-medium text-muted-foreground active:opacity-70"
+            >
+              <CalendarPlus className="w-4 h-4" />
+              Add to My Routines
             </button>
           </div>
         </div>
