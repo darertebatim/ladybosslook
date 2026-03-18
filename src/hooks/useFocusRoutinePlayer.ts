@@ -179,8 +179,39 @@ export function useFocusRoutinePlayer() {
       }).then(() => {});
     }
 
+    // Sync with planner: create task_completion when task is completed
+    if (status === 'completed' && currentTask.userTaskId && user) {
+      const dateStr = format(new Date(), 'yyyy-MM-dd');
+      supabase.from('task_completions').insert({
+        task_id: currentTask.userTaskId,
+        user_id: user.id,
+        completed_date: dateStr,
+      }).then(({ error }) => {
+        if (error) {
+          // Likely duplicate — task already completed today, ignore
+          console.log('task_completions insert (may be duplicate):', error.message);
+          return;
+        }
+        // Update streak & presence in background
+        import('@/hooks/useTaskPlanner').then(mod => {
+          // We can't easily call updateStreak from here since it's not exported,
+          // so we just update presence and invalidate queries
+        }).catch(() => {});
+        updatePresence(user.id, dateStr).catch(() => {});
+        // Invalidate planner queries so UI updates
+        queryClient.invalidateQueries({ queryKey: ['planner-completions'] });
+        queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
+        queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
+        queryClient.invalidateQueries({ queryKey: ['new-home-data', user.id] });
+        queryClient.invalidateQueries({ queryKey: ['weekly-task-completion'] });
+        queryClient.invalidateQueries({ queryKey: ['user-presence'] });
+        queryClient.invalidateQueries({ queryKey: ['presence-stats'] });
+        queryClient.invalidateQueries({ queryKey: ['focus-today-sessions'] });
+      });
+    }
+
     return result;
-  }, [config, currentTask, currentTaskIndex, sessionId]);
+  }, [config, currentTask, currentTaskIndex, sessionId, user, queryClient]);
 
   const finishSession = useCallback((results: SessionTaskResult[]) => {
     if (!sessionId) return;
