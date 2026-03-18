@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { SessionTaskResult } from '@/components/app/FocusRoutineSummary';
 
 export interface FocusTask {
@@ -23,6 +23,7 @@ type PlayerPhase = 'idle' | 'breathe' | 'running' | 'paused' | 'summary';
 
 export function useFocusRoutinePlayer() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [phase, setPhase] = useState<PlayerPhase>('idle');
   const [config, setConfig] = useState<FocusRoutineConfig | null>(null);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
@@ -302,7 +303,9 @@ export function useFocusRoutinePlayer() {
     setPhase('idle');
     setConfig(null);
     setSessionId(null);
-  }, []);
+    // Refresh progress data on the focus routines page
+    queryClient.invalidateQueries({ queryKey: ['focus-today-sessions'] });
+  }, [queryClient]);
 
   const cancelPlayer = useCallback(() => {
     if (sessionId) {
