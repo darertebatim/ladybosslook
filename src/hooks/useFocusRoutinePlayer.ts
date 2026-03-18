@@ -205,6 +205,7 @@ export function useFocusRoutinePlayer() {
         queryClient.invalidateQueries({ queryKey: ['user-presence'] });
         queryClient.invalidateQueries({ queryKey: ['presence-stats'] });
         queryClient.invalidateQueries({ queryKey: ['focus-today-sessions'] });
+        queryClient.invalidateQueries({ queryKey: ['focus-today-completions'] });
       });
     }
 
