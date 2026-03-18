@@ -290,17 +290,6 @@ export default function AppFocusRoutines() {
 
                           {/* Edit + Add to routine buttons */}
                           <div className="flex items-center gap-2">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                haptic.light();
-                                navigate(`/app/home/edit/${card.taskId}`);
-                              }}
-                              className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center active:scale-95 transition-transform"
-                              title="Edit task settings"
-                            >
-                              <Settings2 className="w-4 h-4 text-muted-foreground" />
-                            </button>
                             <AddedToRoutineButton
                               isAdded={userAddedIds?.includes(card.routineId) || false}
                               onAddClick={() => handleAddToRoutine(card.routineId)}
