@@ -8,7 +8,7 @@ type FocusPlayerContextType = {
   isActive: boolean;
   isMinimized: boolean;
   maximize: () => void;
-  currentTask: { emoji: string; title: string } | null;
+  currentTask: { emoji: string; title: string; color?: string } | null;
   timeLeft: number;
   isOvertime: boolean;
   phase: string;
