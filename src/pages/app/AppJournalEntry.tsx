@@ -172,6 +172,12 @@ const AppJournalEntry = () => {
       toast.success('Entry saved');
     }
     
+    // If opened from focus routine, complete the pro task and return to player
+    if (fromFocusRoutine && isProTaskActive) {
+      completeProTask();
+      return;
+    }
+    
     // Navigate back to journal list
     navigate('/app/journal');
   };
