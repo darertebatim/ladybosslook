@@ -449,6 +449,7 @@ export default function AppFocusRoutines() {
                   const colorKey = (task.color || 'yellow') as TaskColor;
                   const colorClass = TASK_COLOR_CLASSES[colorKey] || TASK_COLOR_CLASSES.yellow;
                   const mins = Math.ceil(task.targetSeconds / 60);
+                  const isEstimate = !(task as any).hasTimerGoal;
                   return (
                     <div
                       key={task.id}
@@ -464,7 +465,7 @@ export default function AppFocusRoutines() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[11px] text-black/60">⏱️ {mins}m</span>
+                            <span className="text-[11px] text-black/60">{isEstimate ? `~${mins}m` : `⏱️ ${mins}m`}</span>
                             {startTime && endTime && (
                               <>
                                 <span className="text-[11px] text-black/40">•</span>
