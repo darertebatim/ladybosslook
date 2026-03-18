@@ -1,11 +1,11 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Bell, CalendarDays, Settings2 } from 'lucide-react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft } from 'lucide-react';
 import { format, addMinutes } from 'date-fns';
 import { useRoutinesBank, useUserAddedBankRoutines, useRoutineBankCategories, useAddRoutineFromBank } from '@/hooks/useRoutinesBank';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { haptic } from '@/lib/haptics';
 import { startOfDay, endOfDay } from 'date-fns';
@@ -14,11 +14,12 @@ import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { toast } from 'sonner';
 
-const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
 
 export default function AppFocusRoutines() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const { data: allRoutines, isLoading: routinesLoading } = useRoutinesBank();
   const { data: userAddedIds, isLoading: userLoading } = useUserAddedBankRoutines();
@@ -35,66 +36,6 @@ export default function AppFocusRoutines() {
     return map;
   }, [routineCategories]);
 
-  // Fetch pro-linked focus routine tasks from user_tasks
-  const { data: focusRoutineTasks = [] } = useQuery({
-    queryKey: ['focus-routine-pro-tasks', user?.id],
-    queryFn: async () => {
-      if (!user) return [];
-      const { data } = await supabase
-        .from('user_tasks')
-        .select('id, title, emoji, pro_link_value, scheduled_time, repeat_pattern, repeat_days, is_active')
-        .eq('user_id', user.id)
-        .eq('pro_link_type', 'focus_routine')
-        .eq('is_active', true);
-      return data || [];
-    },
-    enabled: !!user,
-  });
-  const queryClient = useQueryClient();
-
-  // Safety-net backfill: create pro-linked tasks for focus routines missing them
-  const backfillRan = useRef(false);
-  useEffect(() => {
-    if (!user || !allRoutines || !userAddedIds || backfillRan.current) return;
-    if (routinesLoading || userLoading) return;
-
-    const activatedFocusIds = userAddedIds.filter(id => {
-      const r = allRoutines.find(rt => rt.id === id);
-      return r?.is_focus;
-    });
-
-    const proLinkedIds = new Set(focusRoutineTasks.map(t => t.pro_link_value));
-    const missing = activatedFocusIds.filter(id => !proLinkedIds.has(id));
-
-    if (missing.length === 0) return;
-    backfillRan.current = true;
-
-    (async () => {
-      for (const routineId of missing) {
-        const routine = allRoutines.find(r => r.id === routineId);
-        if (!routine) continue;
-
-        const { error } = await supabase.from('user_tasks').insert({
-          user_id: user.id,
-          title: routine.title,
-          emoji: routine.emoji || '🎯',
-          color: 'amber',
-          repeat_pattern: 'daily',
-          repeat_days: [1, 2, 3, 4, 5],
-          tag: 'pro',
-          pro_link_type: 'focus_routine',
-          pro_link_value: routineId,
-          is_active: true,
-          order_index: 999,
-          goal_enabled: true,
-          goal_type: 'timer',
-          goal_unit: 'minutes',
-        });
-        if (error) console.error('[FocusBackfill] Insert error for', routineId, error);
-      }
-      queryClient.invalidateQueries({ queryKey: ['focus-routine-pro-tasks'] });
-    })();
-  }, [user, allRoutines, userAddedIds, focusRoutineTasks, routinesLoading, userLoading, queryClient]);
 
   // Fetch today's session completion data
   const { data: todaySessions } = useQuery({
@@ -139,25 +80,22 @@ export default function AppFocusRoutines() {
     enabled: focusRoutineIds.length > 0,
   });
 
-  // Build activated routines from pro-linked tasks (filter out malformed)
+  // Build activated routines from userAddedIds (focus routines the user has added)
   const activatedRoutineCards = useMemo(() => {
-    return focusRoutineTasks.filter(t => !!t.pro_link_value).map(task => {
-      const routineId = task.pro_link_value;
-      const routine = allRoutines?.find(r => r.id === routineId);
-      const emojis = routineId ? (routineTasks?.[routineId] || []) : [];
-      return {
-        taskId: task.id,
-        routineId: routineId || '',
-        title: task.title,
-        emoji: task.emoji,
-        scheduledTime: task.scheduled_time,
-        repeatPattern: task.repeat_pattern,
-        repeatDays: task.repeat_days || [],
-        emojis,
-        routine,
-      };
-    });
-  }, [focusRoutineTasks, allRoutines, routineTasks]);
+    if (!allRoutines || !userAddedIds) return [];
+    return allRoutines
+      .filter(r => r.is_focus && userAddedIds.includes(r.id))
+      .map(routine => {
+        const emojis = routineTasks?.[routine.id] || [];
+        return {
+          routineId: routine.id,
+          title: routine.title,
+          emoji: routine.emoji,
+          emojis,
+          routine,
+        };
+      });
+  }, [allRoutines, userAddedIds, routineTasks]);
 
   // All available focus routines (not yet added)
   const availableFocusRoutines = useMemo(() => {
@@ -214,6 +152,19 @@ export default function AppFocusRoutines() {
     setPreStartRoutine(routine || { id: routineId, title: 'Routine', emoji: '🎯' });
   };
 
+  // Auto-play from ?play=routineId (when navigating from a pro-linked task)
+  const autoPlayTriggered = useRef(false);
+  useEffect(() => {
+    const playId = searchParams.get('play');
+    if (!playId || autoPlayTriggered.current || !allRoutines || routinesLoading) return;
+    autoPlayTriggered.current = true;
+    // Clear the param
+    searchParams.delete('play');
+    setSearchParams(searchParams, { replace: true });
+    const routine = allRoutines.find(r => r.id === playId);
+    handlePlay(playId, routine);
+  }, [searchParams, allRoutines, routinesLoading]);
+
   const handleStartFromPreview = () => {
     if (!preStartRoutine) return;
     haptic.medium();
@@ -238,10 +189,6 @@ export default function AppFocusRoutines() {
     }
   };
 
-  const formatRepeatDays = (days: number[]) => {
-    if (!days || days.length === 0 || days.length === 7) return 'Every day';
-    return days.map(d => WEEKDAY_LABELS[d]).join('·');
-  };
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
@@ -283,24 +230,9 @@ export default function AppFocusRoutines() {
 
                     return (
                       <div
-                        key={card.taskId}
+                        key={card.routineId}
                         className="bg-card rounded-2xl border border-border p-4"
                       >
-                        {/* Schedule info row */}
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-1.5">
-                          {card.scheduledTime && (
-                            <span className="flex items-center gap-1">
-                              <Bell className="w-3 h-3" />
-                              {card.scheduledTime}
-                            </span>
-                          )}
-                          {card.repeatDays.length > 0 && (
-                            <span className="flex items-center gap-1">
-                              <CalendarDays className="w-3 h-3" />
-                              {formatRepeatDays(card.repeatDays)}
-                            </span>
-                          )}
-                        </div>
 
                         {/* Tappable card area -> plays routine */}
                         <button
@@ -354,17 +286,6 @@ export default function AppFocusRoutines() {
 
                           {/* Edit + Add to routine buttons */}
                           <div className="flex items-center gap-2">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                haptic.light();
-                                navigate(`/app/home/edit/${card.taskId}`);
-                              }}
-                              className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center active:scale-95 transition-transform"
-                              title="Edit task settings"
-                            >
-                              <Settings2 className="w-4 h-4 text-muted-foreground" />
-                            </button>
                             <AddedToRoutineButton
                               isAdded={userAddedIds?.includes(card.routineId) || false}
                               onAddClick={() => handleAddToRoutine(card.routineId)}
