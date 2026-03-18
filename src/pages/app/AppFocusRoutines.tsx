@@ -428,13 +428,16 @@ export default function AppFocusRoutines() {
           <div className="flex-1 overflow-y-auto px-5 pb-32">
             <h1 className="text-2xl font-bold text-foreground mt-2">{preStartRoutine.title}</h1>
             {(() => {
-              const totalMins = Math.ceil(totalPreStartSeconds / 60);
-              const hasEstimates = remainingPreStartTasks.some(t => !(t as any).hasTimerGoal);
-              return (
+              const timedSeconds = remainingPreStartTasks.filter(t => (t as any).hasTimerGoal).reduce((s, t) => s + t.targetSeconds, 0);
+              const totalMins = Math.ceil(timedSeconds / 60);
+              const hasUntimed = remainingPreStartTasks.some(t => !(t as any).hasTimerGoal);
+              return totalMins > 0 ? (
                 <p className="text-sm text-muted-foreground mt-1">
-                  {format(new Date(), 'h:mma')} – {hasEstimates ? '~' : ''}{format(addMinutes(new Date(), totalMins), 'h:mma')} ({hasEstimates ? '~' : ''}{totalMins}m)
+                  {totalMins}m timed{hasUntimed ? ' + untimed tasks' : ''}
                 </p>
-              );
+              ) : hasUntimed ? (
+                <p className="text-sm text-muted-foreground mt-1">Untimed tasks</p>
+              ) : null;
             })()}
 
             <div className="space-y-2.5 mt-6">
