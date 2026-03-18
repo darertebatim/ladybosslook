@@ -243,6 +243,11 @@ export function BreathingExerciseScreen({
       {
         onSuccess: async () => {
           await autoCompleteBreathe(exercise.id);
+          // If inside a focus routine, skip the completion sheet and return to player
+          if (fromFocusRoutine && isProTaskActive) {
+            completeProTask();
+            return;
+          }
           setCompletedDuration(elapsed);
           setShowCompleteSheet(true);
         },
