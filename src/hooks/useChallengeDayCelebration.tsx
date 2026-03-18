@@ -126,24 +126,15 @@ export function useChallengeDayCelebration(
     prevCompletedCountRef.current = totalCompleted;
     if (!isNewCompletion) return;
 
-    // Build a map of task title → task id
-    const titleToTaskId = new Map<string, string>();
-    allTasks.forEach(t => titleToTaskId.set(t.title, t.id));
-
-    // Check each challenge
+    // Check each challenge — now using task IDs directly
     for (const challenge of challengeInfos) {
-      if (!challenge.hasStarted || challenge.taskTitles.length === 0) continue;
+      if (!challenge.hasStarted || challenge.taskIds.length === 0) continue;
 
       const celebratedKey = `simora_challenge_day_celebrated_${challenge.routineId}_${dateKey}`;
       if (localStorage.getItem(celebratedKey) === 'true') continue;
 
-      const matchingTaskIds = challenge.taskTitles
-        .map(title => titleToTaskId.get(title))
-        .filter(Boolean) as string[];
-
-      if (matchingTaskIds.length === 0) continue;
-
-      const allCompleted = matchingTaskIds.every(id => completedTaskIds.has(id));
+      // Direct ID matching — no title lookup needed
+      const allCompleted = challenge.taskIds.every(id => completedTaskIds.has(id));
 
       if (allCompleted) {
         localStorage.setItem(celebratedKey, 'true');
