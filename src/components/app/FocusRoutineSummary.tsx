@@ -81,7 +81,7 @@ export const FocusRoutineSummary = memo(function FocusRoutineSummary({
       <div className="flex-1 overflow-y-auto px-5 pb-8" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
         {/* Title + time range */}
         <div className="text-center mt-4">
-          <span className="text-4xl">{routineEmoji}</span>
+          <FluentEmoji emoji={routineEmoji} size={48} />
           <h2 className="text-xl font-bold text-foreground mt-2">{routineTitle}</h2>
           <p className="text-sm text-muted-foreground mt-1">
             {format(startedAt, 'h:mm a')} – {format(endedAt, 'h:mm a')}
