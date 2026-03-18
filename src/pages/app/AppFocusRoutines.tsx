@@ -60,18 +60,45 @@ export default function AppFocusRoutines() {
       if (focusRoutineIds.length === 0) return {};
       const { data } = await supabase
         .from('routines_bank_tasks')
-        .select('routine_id, emoji, task_order')
+        .select('routine_id, title, emoji, task_order')
         .in('routine_id', focusRoutineIds)
         .order('task_order', { ascending: true });
       
-      const map: Record<string, string[]> = {};
+      const map: Record<string, { title: string; emoji: string }[]> = {};
       (data || []).forEach(t => {
         if (!map[t.routine_id]) map[t.routine_id] = [];
-        map[t.routine_id].push(t.emoji || '📝');
+        map[t.routine_id].push({ title: t.title, emoji: t.emoji || '📝' });
       });
       return map;
     },
     enabled: focusRoutineIds.length > 0,
+  });
+
+  // Fetch completed task titles for incomplete sessions to show remaining emojis
+  const { data: completedTaskTitlesMap } = useQuery({
+    queryKey: ['focus-completed-task-titles', todaySessions?.map(s => s.id)],
+    queryFn: async () => {
+      if (!todaySessions) return {};
+      const incompleteSessions = todaySessions.filter(s => !s.ended_at);
+      if (incompleteSessions.length === 0) return {};
+      
+      const { data } = await supabase
+        .from('routine_session_tasks')
+        .select('session_id, task_title')
+        .in('session_id', incompleteSessions.map(s => s.id));
+      
+      // Map routine_id -> Set of completed task titles
+      const map: Record<string, Set<string>> = {};
+      (data || []).forEach(t => {
+        const session = incompleteSessions.find(s => s.id === t.session_id);
+        if (session) {
+          if (!map[session.routine_id]) map[session.routine_id] = new Set();
+          map[session.routine_id].add(t.task_title);
+        }
+      });
+      return map;
+    },
+    enabled: !!todaySessions && todaySessions.some(s => !s.ended_at),
   });
 
   // User's activated focus routines
