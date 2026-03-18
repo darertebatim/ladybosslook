@@ -10,6 +10,7 @@ import type { SessionTaskResult } from './FocusRoutineSummary';
 import {
   DndContext,
   closestCenter,
+  MouseSensor,
   TouchSensor,
   useSensor,
   useSensors,
