@@ -74,6 +74,12 @@ export function FocusMiniPlayer() {
             isOvertime && "text-red-600"
           )}>
             {isOvertime && '+'}{formatMiniTime(timeLeft)}
+            {isPaused && (
+              <span className="ml-1.5 text-[10px] font-semibold bg-black/10 text-black/60 rounded px-1.5 py-0.5 align-middle">
+                Paused
+              </span>
+            )}
+          </p>
           </p>
           <p className="text-xs text-black/60 truncate">{currentTask.title}</p>
         </div>
