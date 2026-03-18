@@ -474,15 +474,15 @@ export default function AppFocusRoutines() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[11px] text-black/60">{isEstimate ? `⏱️` : `⏱️ ${mins}m`}</span>
-                            {startTime && endTime && (
-                              <>
-                                <span className="text-[11px] text-black/40">•</span>
-                                <span className="text-[11px] text-black/60">
-                                  {format(startTime, 'h:mm')}–{format(endTime, 'h:mma')}
-                                </span>
-                              </>
-                            )}
+                    <span className="text-[11px] text-black/60">{isEstimate ? `⏱️` : `⏱️ ${mins}m`}</span>
+                    {!isEstimate && startTime && endTime && (
+                      <>
+                        <span className="text-[11px] text-black/40">•</span>
+                        <span className="text-[11px] text-black/60">
+                          {format(startTime, 'h:mm')}–{format(endTime, 'h:mma')}
+                        </span>
+                      </>
+                    )}
                           </div>
                           <p className={cn(
                             'text-black text-[15px] font-semibold leading-tight transition-all',
