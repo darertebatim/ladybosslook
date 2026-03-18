@@ -62,6 +62,8 @@ export default function AppFocusRoutines() {
     const proLinkedIds = new Set(focusRoutineTasks.map(t => t.pro_link_value));
     const missing = activatedFocusIds.filter(id => !proLinkedIds.has(id));
 
+    console.log('[FocusBackfill] activatedFocusIds:', activatedFocusIds, 'proLinkedIds:', [...proLinkedIds], 'missing:', missing);
+
     if (missing.length === 0) return;
     backfillRan.current = true;
 
@@ -70,7 +72,7 @@ export default function AppFocusRoutines() {
         const routine = allRoutines.find(r => r.id === routineId);
         if (!routine) continue;
 
-        await supabase.from('user_tasks').insert({
+        const { error } = await supabase.from('user_tasks').insert({
           user_id: user.id,
           title: routine.title,
           emoji: routine.emoji || '🎯',
@@ -86,6 +88,8 @@ export default function AppFocusRoutines() {
           goal_type: 'timer',
           goal_unit: 'minutes',
         });
+        if (error) console.error('[FocusBackfill] Insert error:', error);
+        else console.log('[FocusBackfill] Created pro-linked task for', routine.title);
       }
       queryClient.invalidateQueries({ queryKey: ['focus-routine-pro-tasks'] });
     })();
