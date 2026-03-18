@@ -1,5 +1,5 @@
 import { memo, useState, useCallback, useEffect } from 'react';
-import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus, GripVertical } from 'lucide-react';
+import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus, GripVertical, ChevronUp, ArrowUp, ArrowDown } from 'lucide-react';
 import { format, addSeconds } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
