@@ -282,7 +282,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
       </div>
 
       {/* Task title + time range */}
-      <div className="px-6 mt-2">
+      <div className="px-6 mb-0">
         <h2 className="text-xl font-bold text-foreground text-center leading-snug max-w-xs mx-auto">
           {currentTask?.title}
         </h2>
