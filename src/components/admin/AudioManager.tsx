@@ -35,6 +35,55 @@ import {
 } from "@/components/ui/dialog";
 import { PlaylistManager } from "./PlaylistManager";
 
+// Notify users who have access to a playlist about a new track
+async function notifyPlaylistSubscribers(playlistId: string, trackTitle: string) {
+  try {
+    // Get the playlist info (program_slug, requires_subscription, name)
+    const { data: playlist } = await supabase
+      .from('audio_playlists')
+      .select('name, program_slug, requires_subscription')
+      .eq('id', playlistId)
+      .single();
+    if (!playlist) return;
+
+    let userIds: string[] = [];
+
+    if (playlist.program_slug) {
+      // Get users enrolled in this program
+      const { data: enrollments } = await supabase
+        .from('course_enrollments')
+        .select('user_id')
+        .eq('program_slug', playlist.program_slug)
+        .eq('status', 'active');
+      userIds = (enrollments || []).map(e => e.user_id);
+    }
+
+    if (playlist.requires_subscription) {
+      // Also get subscription users (Simora Plus)
+      const { data: subs } = await supabase
+        .from('user_subscriptions' as any)
+        .select('user_id')
+        .eq('status', 'active');
+      const subIds = (subs || []).map((s: any) => s.user_id);
+      userIds = [...new Set([...userIds, ...subIds])];
+    }
+
+    if (userIds.length === 0) return;
+
+    await supabase.functions.invoke('send-push-notification', {
+      body: {
+        userIds,
+        title: `🎧 New in "${playlist.name}"`,
+        body: trackTitle,
+        url: '/app/listen',
+      },
+    });
+    console.log(`📨 PN sent to ${userIds.length} users for new track in playlist`);
+  } catch (err) {
+    console.error('Failed to send playlist PN:', err);
+  }
+}
+
 export const AudioManager = () => {
   const queryClient = useQueryClient();
   const { programs } = usePrograms();
