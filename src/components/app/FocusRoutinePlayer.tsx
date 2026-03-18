@@ -10,6 +10,7 @@ import type { SessionTaskResult } from './FocusRoutineSummary';
 import {
   DndContext,
   closestCenter,
+  MouseSensor,
   TouchSensor,
   useSensor,
   useSensors,
@@ -108,6 +109,7 @@ function RearrangeSheet({
   onClose: () => void;
 }) {
   const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
   );
 
