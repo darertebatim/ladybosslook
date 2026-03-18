@@ -290,12 +290,11 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
           <h2 className="text-xl font-bold text-foreground text-center leading-snug max-w-xs mx-auto">
             {currentTask?.title}
           </h2>
-          <p className="text-sm text-muted-foreground text-center mt-1">
-            {currentTask && (currentTask as any).hasTimerGoal === false
-              ? `~${Math.ceil((currentTask.targetSeconds) / 60)}m estimate`
-              : `${format(taskStartedAt, 'h:mma').toLowerCase()}  →  ${format(taskEndTime, 'h:mma').toLowerCase()}`
-            }
-          </p>
+          {!isCountUp && (
+            <p className="text-sm text-muted-foreground text-center mt-1">
+              {`${format(taskStartedAt, 'h:mma').toLowerCase()}  →  ${format(taskEndTime, 'h:mma').toLowerCase()}`}
+            </p>
+          )}
         </div>
 
         {/* Main circle area */}
