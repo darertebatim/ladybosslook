@@ -30,6 +30,8 @@ import {
 const AppJournalEntry = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isProTaskActive, completeProTask } = useFocusPlayer();
+  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
   const { entryId } = useParams<{ entryId: string }>();
   const isNewEntry = !entryId || entryId === 'new';
   
