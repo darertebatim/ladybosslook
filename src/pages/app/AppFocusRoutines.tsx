@@ -172,7 +172,19 @@ export default function AppFocusRoutines() {
     setPreStartRoutine(routine || { id: routineId, title: 'Routine', emoji: '🎯' });
   };
 
-  const handleStartFromPreview = () => {
+  // Auto-play from ?play=routineId (when navigating from a pro-linked task)
+  const autoPlayTriggered = useRef(false);
+  useEffect(() => {
+    const playId = searchParams.get('play');
+    if (!playId || autoPlayTriggered.current || !allRoutines || routinesLoading) return;
+    autoPlayTriggered.current = true;
+    // Clear the param
+    searchParams.delete('play');
+    setSearchParams(searchParams, { replace: true });
+    const routine = allRoutines.find(r => r.id === playId);
+    handlePlay(playId, routine);
+  }, [searchParams, allRoutines, routinesLoading]);
+
     if (!preStartRoutine) return;
     haptic.medium();
     startRoutine({
