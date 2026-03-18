@@ -1192,7 +1192,7 @@ export const useCreateTaskFromTemplate = () => {
 /**
  * Update user streak on task completion
  */
-async function updateStreak(userId: string, completedDateStr: string): Promise<{ increased: boolean }> {
+export async function updateStreak(userId: string, completedDateStr: string): Promise<{ increased: boolean }> {
   // Get current streak
   const { data: streak } = await supabase
     .from('user_streaks')
