@@ -838,6 +838,7 @@ export const useUpdateTask = () => {
  */
 export const useDeleteTask = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (taskId: string) => {
@@ -846,16 +847,47 @@ export const useDeleteTask = () => {
         await cancelTaskReminder(taskId);
       }
 
+      // Check if this task belongs to a routine before deleting
+      const { data: taskData } = await supabase
+        .from('user_tasks')
+        .select('source_routine_id')
+        .eq('id', taskId)
+        .single();
+
+      const routineId = taskData?.source_routine_id;
+
       const { error } = await supabase
         .from('user_tasks')
         .delete()
         .eq('id', taskId);
 
       if (error) throw error;
+
+      // If this task belonged to a routine, check if any tasks remain
+      if (routineId && user) {
+        const { count } = await supabase
+          .from('user_tasks')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('source_routine_id', routineId)
+          .eq('is_active', true);
+
+        if (count === 0) {
+          // No tasks left — remove the routine from user's bank
+          await supabase
+            .from('user_routines_bank')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('routine_id', routineId);
+        }
+      }
+
       return taskId;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
+      queryClient.invalidateQueries({ queryKey: ['user-added-bank-routines'] });
       toast({ title: 'Task deleted' });
     },
     onError: (error) => {
