@@ -1,8 +1,8 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Bell, CalendarDays, Settings2, CalendarPlus } from 'lucide-react';
+import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Bell, CalendarDays, Settings2 } from 'lucide-react';
 import { format, addMinutes } from 'date-fns';
-import { useRoutinesBank, useUserAddedBankRoutines, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
+import { useRoutinesBank, useUserAddedBankRoutines, useRoutineBankCategories, useAddRoutineFromBank } from '@/hooks/useRoutinesBank';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -11,6 +11,8 @@ import { haptic } from '@/lib/haptics';
 import { startOfDay, endOfDay } from 'date-fns';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
+import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
+import { toast } from 'sonner';
 
 const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
@@ -22,6 +24,8 @@ export default function AppFocusRoutines() {
   const { data: userAddedIds, isLoading: userLoading } = useUserAddedBankRoutines();
   const { data: routineCategories = [] } = useRoutineBankCategories();
   const { startRoutine } = useFocusPlayer();
+  const addRoutineFromBank = useAddRoutineFromBank();
+  const [addingRoutineId, setAddingRoutineId] = useState<string | null>(null);
 
   const isLoading = routinesLoading || userLoading;
 
@@ -222,8 +226,19 @@ export default function AppFocusRoutines() {
     setPreStartRoutine(null);
     setPreStartTasks([]);
   };
+  const handleAddToRoutine = async (routineId: string) => {
+    setAddingRoutineId(routineId);
+    try {
+      await addRoutineFromBank.mutateAsync({ routineId });
+      toast.success('Added to your routines!');
+    } catch (e) {
+      toast.error('Failed to add routine');
+    } finally {
+      setAddingRoutineId(null);
+    }
+  };
 
-  const formatRepeatDays = (days: number[]) => {
+
     if (!days || days.length === 0 || days.length === 7) return 'Every day';
     return days.map(d => WEEKDAY_LABELS[d]).join('·');
   };
@@ -350,17 +365,12 @@ export default function AppFocusRoutines() {
                             >
                               <Settings2 className="w-4 h-4 text-muted-foreground" />
                             </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                haptic.light();
-                                navigate(`/app/routines/bank/${card.routineId}`);
-                              }}
-                              className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center active:scale-95 transition-transform"
-                              title="Add to my routines"
-                            >
-                              <CalendarPlus className="w-4 h-4 text-muted-foreground" />
-                            </button>
+                            <AddedToRoutineButton
+                              isAdded={userAddedIds?.includes(card.routineId) || false}
+                              onAddClick={() => handleAddToRoutine(card.routineId)}
+                              isLoading={addingRoutineId === card.routineId}
+                              iconOnly
+                            />
                           </div>
                         </div>
                       </div>
@@ -455,16 +465,12 @@ export default function AppFocusRoutines() {
               <Play className="w-5 h-5 fill-current" />
               Start
             </button>
-            <button
-              onClick={() => {
-                haptic.light();
-                navigate(`/app/routines/bank/${preStartRoutine.id}`);
-              }}
-              className="w-full flex items-center justify-center gap-2 h-10 mt-2 rounded-xl text-sm font-medium text-muted-foreground active:opacity-70"
-            >
-              <CalendarPlus className="w-4 h-4" />
-              Add to My Routines
-            </button>
+            <AddedToRoutineButton
+              isAdded={userAddedIds?.includes(preStartRoutine.id) || false}
+              onAddClick={() => handleAddToRoutine(preStartRoutine.id)}
+              isLoading={addingRoutineId === preStartRoutine.id}
+              addText="Add to My Routines"
+            />
           </div>
         </div>
       )}
