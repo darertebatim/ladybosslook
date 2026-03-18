@@ -596,6 +596,67 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
           </div>
         </>
       )}
-    </div>
+
+      {/* Quick Add Task Sheet */}
+      {showAddTaskForm && (
+        <>
+          <div
+            className="absolute inset-0 bg-black/40 z-[10] animate-in fade-in-0 duration-200"
+            onClick={() => setShowAddTaskForm(false)}
+          />
+          <div className="absolute bottom-0 left-0 right-0 z-[11] bg-background rounded-t-3xl px-6 pb-6 pt-2 animate-in slide-in-from-bottom duration-300"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)' }}
+          >
+            <div className="w-10 h-1 bg-foreground/10 rounded-full mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-foreground mb-4">Add task</h3>
+            <input
+              type="text"
+              value={newTaskTitle}
+              onChange={(e) => setNewTaskTitle(e.target.value)}
+              placeholder="Task name"
+              autoFocus
+              className="w-full px-4 py-3 rounded-xl bg-foreground/[0.06] text-foreground placeholder:text-muted-foreground text-base outline-none focus:ring-2 focus:ring-primary/30 mb-3"
+            />
+            <div className="flex items-center gap-3 mb-5">
+              <span className="text-sm text-muted-foreground">Duration</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setNewTaskMinutes(m => Math.max(1, m - 1))}
+                  className="w-9 h-9 rounded-xl bg-foreground/[0.06] flex items-center justify-center active:bg-foreground/10"
+                >
+                  <Minus className="w-4 h-4 text-foreground" />
+                </button>
+                <span className="text-base font-semibold text-foreground w-10 text-center tabular-nums">{newTaskMinutes}m</span>
+                <button
+                  onClick={() => setNewTaskMinutes(m => m + 1)}
+                  className="w-9 h-9 rounded-xl bg-foreground/[0.06] flex items-center justify-center active:bg-foreground/10"
+                >
+                  <Plus className="w-4 h-4 text-foreground" />
+                </button>
+              </div>
+            </div>
+            <button
+              disabled={!newTaskTitle.trim()}
+              onClick={() => {
+                haptic.medium();
+                const newTask: FocusTask = {
+                  id: `quick-${Date.now()}`,
+                  title: newTaskTitle.trim(),
+                  emoji: '⚡',
+                  targetSeconds: newTaskMinutes * 60,
+                };
+                const updatedTasks = [...config.tasks, newTask];
+                onReorderTasks(updatedTasks);
+                setShowAddTaskForm(false);
+                setNewTaskTitle('');
+                setNewTaskMinutes(1);
+              }}
+              className="w-full py-4 rounded-2xl bg-foreground text-background font-semibold text-base active:opacity-90 disabled:opacity-40"
+            >
+              Add to routine
+            </button>
+          </div>
+        </>
+      )}
   );
 });
