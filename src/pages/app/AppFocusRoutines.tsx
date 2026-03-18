@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Check } from 'lucide-react';
+import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft } from 'lucide-react';
 import { format, addMinutes } from 'date-fns';
 import { useRoutinesBank, useUserAddedBankRoutines, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
+import { TASK_COLORS, type TaskColor } from '@/hooks/useTaskPlanner';
+import SealCheck from '@/components/app/SealCheck';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -365,22 +367,32 @@ export default function AppFocusRoutines() {
             <div className="space-y-2.5 mt-6">
               {preStartTasks.map((task, i) => {
                 const isDone = completedTaskIds.has(task.id);
+                const colorKey = (task.color || 'yellow') as TaskColor;
+                const bgColor = TASK_COLORS[colorKey] || TASK_COLORS.yellow;
                 return (
                   <div
                     key={task.id}
-                    className={`flex items-center gap-3 rounded-2xl px-4 py-3.5 ${isDone ? 'bg-muted/60' : 'bg-muted'}`}
+                    className="rounded-3xl pl-3 pr-4 py-3 active:scale-[0.98] transition-transform"
+                    style={{ backgroundColor: isDone ? `${bgColor}80` : bgColor }}
                   >
-                    <span className="text-xs text-muted-foreground font-medium w-4 shrink-0">{i + 1}</span>
-                    <FluentEmoji emoji={task.emoji} size={28} />
-                    <p className={`flex-1 text-sm font-medium leading-snug ${isDone ? 'text-muted-foreground line-through' : 'text-foreground'}`}>{task.title}</p>
-                    <span className="text-xs text-muted-foreground shrink-0">{Math.ceil(task.targetSeconds / 60)}m</span>
-                    {isDone ? (
-                      <div className="w-6 h-6 rounded-full bg-foreground flex items-center justify-center shrink-0">
-                        <Check className="w-3.5 h-3.5 text-background" />
+                    <div className="flex items-center gap-2">
+                      <div className="w-10 h-10 flex items-center justify-center shrink-0">
+                        <FluentEmoji emoji={task.emoji} size={32} />
                       </div>
-                    ) : (
-                      <div className="w-6 h-6 rounded-full border-2 border-border shrink-0" />
-                    )}
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[11px] text-black/60">{Math.ceil(task.targetSeconds / 60)}m</span>
+                        <p className={`text-black text-[15px] font-semibold leading-tight ${isDone ? 'line-through' : ''}`}>
+                          {task.title}
+                        </p>
+                      </div>
+                      <div className="w-9 h-9 flex items-center justify-center shrink-0">
+                        {isDone ? (
+                          <SealCheck className="w-9 h-9 text-teal-400" />
+                        ) : (
+                          <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
+                        )}
+                      </div>
+                    </div>
                   </div>
                 );
               })}
