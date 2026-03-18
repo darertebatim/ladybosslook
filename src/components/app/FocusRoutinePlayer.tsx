@@ -658,5 +658,6 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
           </div>
         </>
       )}
+    </div>
   );
 });
