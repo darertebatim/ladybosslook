@@ -69,17 +69,23 @@ export function FocusMiniPlayer() {
 
         {/* Timer + task name */}
         <div className="flex-1 min-w-0">
-          <p className={cn(
-            "font-bold text-lg tabular-nums leading-tight text-black",
-            isOvertime && "text-red-600"
-          )}>
-            {isOvertime && '+'}{formatMiniTime(timeLeft)}
-            {isPaused && (
-              <span className="ml-1.5 text-[10px] font-semibold rounded px-1.5 py-0.5 align-middle" style={{ backgroundColor: buttonBg, color: 'black' }}>
-                Paused
-              </span>
-            )}
-          </p>
+          {(() => {
+            const isCountUp = (currentTask as any)?.hasTimerGoal === false;
+            const displayTime = isCountUp ? Math.abs(timeLeft) : timeLeft;
+            return (
+              <p className={cn(
+                "font-bold text-lg tabular-nums leading-tight text-black",
+                !isCountUp && isOvertime && "text-red-600"
+              )}>
+                {!isCountUp && isOvertime && '+'}{formatMiniTime(displayTime)}
+                {isPaused && (
+                  <span className="ml-1.5 text-[10px] font-semibold rounded px-1.5 py-0.5 align-middle" style={{ backgroundColor: buttonBg, color: 'black' }}>
+                    Paused
+                  </span>
+                )}
+              </p>
+            );
+          })()}
           <p className="text-xs text-black/60 truncate">{currentTask.title}</p>
         </div>
 

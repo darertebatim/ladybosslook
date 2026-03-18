@@ -190,7 +190,7 @@ export default function AppFocusRoutines() {
         id: t.id,
         title: t.title,
         emoji: t.emoji || '📝',
-        targetSeconds: isTimer ? (t.goal_target || 300) : 300, // non-timer tasks get 5m estimate
+        targetSeconds: isTimer ? (t.goal_target || 300) : 0, // non-timer tasks count up from 0
         color: t.color || undefined,
         userTaskId: t.id,
         goalType: t.goal_type || null,
@@ -428,13 +428,16 @@ export default function AppFocusRoutines() {
           <div className="flex-1 overflow-y-auto px-5 pb-32">
             <h1 className="text-2xl font-bold text-foreground mt-2">{preStartRoutine.title}</h1>
             {(() => {
-              const totalMins = Math.ceil(totalPreStartSeconds / 60);
-              const hasEstimates = remainingPreStartTasks.some(t => !(t as any).hasTimerGoal);
-              return (
+              const timedSeconds = remainingPreStartTasks.filter(t => (t as any).hasTimerGoal).reduce((s, t) => s + t.targetSeconds, 0);
+              const totalMins = Math.ceil(timedSeconds / 60);
+              const hasUntimed = remainingPreStartTasks.some(t => !(t as any).hasTimerGoal);
+              return totalMins > 0 ? (
                 <p className="text-sm text-muted-foreground mt-1">
-                  {format(new Date(), 'h:mma')} – {hasEstimates ? '~' : ''}{format(addMinutes(new Date(), totalMins), 'h:mma')} ({hasEstimates ? '~' : ''}{totalMins}m)
+                  {totalMins}m timed{hasUntimed ? ' + untimed tasks' : ''}
                 </p>
-              );
+              ) : hasUntimed ? (
+                <p className="text-sm text-muted-foreground mt-1">Untimed tasks</p>
+              ) : null;
             })()}
 
             <div className="space-y-2.5 mt-6">
@@ -471,15 +474,15 @@ export default function AppFocusRoutines() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[11px] text-black/60">{isEstimate ? `~${mins}m` : `⏱️ ${mins}m`}</span>
-                            {startTime && endTime && (
-                              <>
-                                <span className="text-[11px] text-black/40">•</span>
-                                <span className="text-[11px] text-black/60">
-                                  {format(startTime, 'h:mm')}–{format(endTime, 'h:mma')}
-                                </span>
-                              </>
-                            )}
+                    <span className="text-[11px] text-black/60">{isEstimate ? `⏱️` : `⏱️ ${mins}m`}</span>
+                    {!isEstimate && startTime && endTime && (
+                      <>
+                        <span className="text-[11px] text-black/40">•</span>
+                        <span className="text-[11px] text-black/60">
+                          {format(startTime, 'h:mm')}–{format(endTime, 'h:mma')}
+                        </span>
+                      </>
+                    )}
                           </div>
                           <p className={cn(
                             'text-black text-[15px] font-semibold leading-tight transition-all',

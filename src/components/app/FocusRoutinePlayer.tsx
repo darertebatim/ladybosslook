@@ -89,7 +89,7 @@ function SortableRearrangeItem({ task }: { task: FocusTask }) {
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-foreground truncate">{task.title}</p>
       </div>
-      <span className="text-xs text-muted-foreground tabular-nums">{Math.round(task.targetSeconds / 60)}m</span>
+      <span className="text-xs text-muted-foreground tabular-nums">{task.targetSeconds > 0 ? `${Math.round(task.targetSeconds / 60)}m` : '⏱️'}</span>
       <GripVertical className="w-5 h-5 text-foreground/30 flex-shrink-0" />
     </div>
   );
@@ -143,7 +143,7 @@ function RearrangeSheet({
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground/50 truncate">{currentTask.title}</p>
               </div>
-              <span className="text-xs text-muted-foreground tabular-nums">{Math.round(currentTask.targetSeconds / 60)}m</span>
+              <span className="text-xs text-muted-foreground tabular-nums">{currentTask.targetSeconds > 0 ? `${Math.round(currentTask.targetSeconds / 60)}m` : '⏱️'}</span>
             </div>
           )}
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -206,10 +206,13 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   const [newTaskMinutes, setNewTaskMinutes] = useState(1);
 
   const nextTask = config.tasks[currentTaskIndex + 1] || null;
+  const isCountUp = (currentTask as any)?.hasTimerGoal === false;
   const progressPercent = currentTask
-    ? isOvertime
-      ? 100
-      : Math.max(0, Math.min(100, ((currentTask.targetSeconds - timeLeft) / currentTask.targetSeconds) * 100))
+    ? isCountUp
+      ? 0 // no progress ring for count-up tasks
+      : isOvertime
+        ? 100
+        : Math.max(0, Math.min(100, ((currentTask.targetSeconds - timeLeft) / currentTask.targetSeconds) * 100))
     : 0;
 
   // Breathe phase removed — go straight to running
@@ -287,12 +290,11 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
           <h2 className="text-xl font-bold text-foreground text-center leading-snug max-w-xs mx-auto">
             {currentTask?.title}
           </h2>
-          <p className="text-sm text-muted-foreground text-center mt-1">
-            {currentTask && (currentTask as any).hasTimerGoal === false
-              ? `~${Math.ceil((currentTask.targetSeconds) / 60)}m estimate`
-              : `${format(taskStartedAt, 'h:mma').toLowerCase()}  →  ${format(taskEndTime, 'h:mma').toLowerCase()}`
-            }
-          </p>
+          {!isCountUp && (
+            <p className="text-sm text-muted-foreground text-center mt-1">
+              {`${format(taskStartedAt, 'h:mma').toLowerCase()}  →  ${format(taskEndTime, 'h:mma').toLowerCase()}`}
+            </p>
+          )}
         </div>
 
         {/* Main circle area */}
@@ -321,9 +323,15 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
               {isPaused ? (
                 <>
                   <p className="text-[42px] font-extrabold text-foreground/25 tracking-tight tabular-nums leading-none">
-                    {formatTime(Math.max(0, timeLeft))}
+                    {isCountUp ? formatTime(overtimeSeconds) : formatTime(Math.max(0, timeLeft))}
                   </p>
                   <p className="text-xs text-foreground/30 mt-1.5 font-medium">Paused</p>
+                </>
+              ) : isCountUp ? (
+                <>
+                  <p className="text-[42px] font-extrabold text-foreground tracking-tight tabular-nums leading-none">
+                    {formatTime(overtimeSeconds)}
+                  </p>
                 </>
               ) : isOvertime ? (
                 <>
