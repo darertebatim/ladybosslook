@@ -19,6 +19,7 @@ const WEEKDAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 export default function AppFocusRoutines() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const { data: allRoutines, isLoading: routinesLoading } = useRoutinesBank();
   const { data: userAddedIds, isLoading: userLoading } = useUserAddedBankRoutines();
