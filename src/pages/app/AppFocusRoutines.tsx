@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Bell, CalendarDays } from 'lucide-react';
+import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Bell, CalendarDays, Settings2, CalendarPlus } from 'lucide-react';
 import { format, addMinutes } from 'date-fns';
 import { useRoutinesBank, useUserAddedBankRoutines, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
@@ -287,15 +287,13 @@ export default function AppFocusRoutines() {
                           )}
                         </div>
 
-                        <div className="flex items-start justify-between">
-                          {/* Tappable card area -> opens task detail */}
-                          <button
-                            onClick={() => {
-                              haptic.light();
-                              navigate(`/app/home/edit/${card.taskId}`);
-                            }}
-                            className="flex-1 min-w-0 text-left active:opacity-70"
-                          >
+                        {/* Tappable card area -> plays routine */}
+                        <button
+                          onClick={() => handlePlay(card.routineId, card.routine)}
+                          disabled={loadingRoutineId === card.routineId}
+                          className="w-full flex items-start justify-between text-left active:opacity-70"
+                        >
+                          <div className="flex-1 min-w-0">
                             <h3 className="font-bold text-foreground text-lg leading-snug">
                               {card.title}
                             </h3>
@@ -312,31 +310,24 @@ export default function AppFocusRoutines() {
                                 ))}
                               </div>
                             )}
-                          </button>
+                          </div>
 
-                          {/* Play button */}
-                          <button
-                            onClick={() => handlePlay(card.routineId, card.routine)}
-                            disabled={loadingRoutineId === card.routineId}
-                            className="w-14 h-14 rounded-full bg-muted flex items-center justify-center active:scale-95 transition-transform shrink-0 ml-3"
-                          >
+                          {/* Play indicator */}
+                          <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center shrink-0 ml-3">
                             {loadingRoutineId === card.routineId ? (
                               <Loader2 className="w-5 h-5 animate-spin text-foreground" />
-                            ) : completion ? (
-                              completion.isComplete ? (
-                                <RotateCw className="w-5 h-5 text-foreground" />
-                              ) : (
-                                <Play className="w-5 h-5 text-foreground fill-foreground" />
-                              )
+                            ) : completion?.isComplete ? (
+                              <RotateCw className="w-5 h-5 text-foreground" />
                             ) : (
                               <Play className="w-5 h-5 text-foreground fill-foreground" />
                             )}
-                          </button>
-                        </div>
+                          </div>
+                        </button>
 
-                        {/* Completion badge */}
-                        {completion && (
-                          <div className="mt-2">
+                        {/* Bottom row: completion badge + action buttons */}
+                        <div className="flex items-center justify-between mt-3">
+                          {/* Completion badge */}
+                          {completion ? (
                             <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                               completion.isComplete
                                 ? 'bg-emerald-100 text-emerald-700'
@@ -344,8 +335,34 @@ export default function AppFocusRoutines() {
                             }`}>
                               {completion.isComplete ? '✓' : '▶'} {completion.pct}%
                             </span>
+                          ) : <div />}
+
+                          {/* Edit + Add to routine buttons */}
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                haptic.light();
+                                navigate(`/app/home/edit/${card.taskId}`);
+                              }}
+                              className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center active:scale-95 transition-transform"
+                              title="Edit task settings"
+                            >
+                              <Settings2 className="w-4 h-4 text-muted-foreground" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                haptic.light();
+                                navigate(`/app/routines/bank/${card.routineId}`);
+                              }}
+                              className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center active:scale-95 transition-transform"
+                              title="Add to my routines"
+                            >
+                              <CalendarPlus className="w-4 h-4 text-muted-foreground" />
+                            </button>
                           </div>
-                        )}
+                        </div>
                       </div>
                     );
                   })}
@@ -426,7 +443,7 @@ export default function AppFocusRoutines() {
             </div>
           </div>
 
-          {/* Start button */}
+          {/* Start button + Add to routine */}
           <div
             className="fixed bottom-0 left-0 right-0 px-5 pb-4 pt-2 bg-background"
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}
@@ -437,6 +454,16 @@ export default function AppFocusRoutines() {
             >
               <Play className="w-5 h-5 fill-current" />
               Start
+            </button>
+            <button
+              onClick={() => {
+                haptic.light();
+                navigate(`/app/routines/bank/${preStartRoutine.id}`);
+              }}
+              className="w-full flex items-center justify-center gap-2 h-10 mt-2 rounded-xl text-sm font-medium text-muted-foreground active:opacity-70"
+            >
+              <CalendarPlus className="w-4 h-4" />
+              Add to My Routines
             </button>
           </div>
         </div>
