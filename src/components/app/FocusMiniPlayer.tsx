@@ -110,6 +110,22 @@ export function FocusMiniPlayer() {
           )}
         </button>
 
+        {/* Pro task open button */}
+        {!isPaused && proConfig && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              haptic.medium();
+              openProTask();
+            }}
+            className="flex-shrink-0 h-10 px-3 rounded-full flex items-center justify-center gap-1.5 active:opacity-80"
+            style={{ backgroundColor: buttonBg }}
+          >
+            <ExternalLink className="h-3.5 w-3.5 text-black" />
+            <span className="text-xs font-semibold text-black">Open</span>
+          </button>
+        )}
+
         {/* Complete — only show when running */}
         {!isPaused && (
           <button
