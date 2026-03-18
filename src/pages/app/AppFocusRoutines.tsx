@@ -162,12 +162,24 @@ export default function AppFocusRoutines() {
     }
 
     haptic.light();
+
+    // Fetch user's active tasks to map routine tasks → planner task IDs
+    const { data: userTasks } = await supabase
+      .from('user_tasks')
+      .select('id, title')
+      .eq('user_id', user!.id)
+      .eq('is_active', true);
+
+    const titleToUserTaskId = new Map<string, string>();
+    (userTasks || []).forEach((ut: any) => titleToUserTaskId.set(ut.title, ut.id));
+
     const tasks = data.map(t => ({
       id: t.id,
       title: t.title,
       emoji: t.emoji || '📝',
       targetSeconds: (t.task as any)?.goal_target || (t.duration_minutes ? t.duration_minutes * 60 : 300),
       color: (t.task as any)?.color || undefined,
+      userTaskId: titleToUserTaskId.get(t.title) || undefined,
     }));
 
     // Check for incomplete session (started today, no ended_at)
