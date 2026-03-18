@@ -8,6 +8,7 @@ import { AudioPlayerProvider, useAudioPlayer } from '@/contexts/AudioPlayerConte
 import { FocusPlayerProvider } from '@/components/app/FocusPlayerProvider';
 import { useTrackAppReturn } from '@/hooks/useUserPresence';
 import { MiniPlayer } from '@/components/audio/MiniPlayer';
+import { FocusMiniPlayer } from '@/components/app/FocusMiniPlayer';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
