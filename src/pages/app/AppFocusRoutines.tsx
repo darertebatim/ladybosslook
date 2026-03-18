@@ -195,7 +195,12 @@ export default function AppFocusRoutines() {
       goalTarget: t.goal_target || null,
     }));
 
-    // Check for incomplete session (started today, no ended_at)
+    // Start with planner-completed tasks for today
+    const doneSet = new Set<string>(
+      tasks.filter(t => todayCompletions?.has(t.id)).map(t => t.id)
+    );
+
+    // If there's an incomplete session, merge its completed tasks for resume context
     const incompleteSession = todaySessions?.find(s => s.routine_id === routine.routine_id && !s.ended_at);
     if (incompleteSession) {
       const { data: completedTasks } = await supabase
@@ -204,7 +209,6 @@ export default function AppFocusRoutines() {
         .eq('session_id', incompleteSession.id)
         .order('task_order', { ascending: true });
 
-      const doneSet = new Set<string>();
       const prevResults: import('@/components/app/FocusRoutineSummary').SessionTaskResult[] = [];
       (completedTasks || []).forEach(ct => {
         const matchingTask = tasks.find(t => t.title === ct.task_title);
@@ -218,14 +222,14 @@ export default function AppFocusRoutines() {
         });
       });
 
-      setCompletedTaskIds(doneSet);
       setResumeSessionId(incompleteSession.id);
       setResumeTaskResults(prevResults);
     } else {
-      setCompletedTaskIds(new Set());
       setResumeSessionId(null);
       setResumeTaskResults([]);
     }
+
+    setCompletedTaskIds(doneSet);
 
     setPreStartTasks(tasks);
     setPreStartRoutine(routine);
