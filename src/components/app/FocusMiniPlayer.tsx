@@ -40,12 +40,15 @@ export function FocusMiniPlayer() {
     phase,
     togglePause,
     completeTask,
+    openProTask,
   } = useFocusPlayer();
 
   if (!isActive || !isMinimized || !currentTask || phase === 'summary') return null;
 
   const isPaused = phase === 'paused';
   const colorKey = (currentTask.color || 'yellow') as TaskColor;
+  const proLinkType = (currentTask as any)?.proLinkType as ProLinkType | null;
+  const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
 
   // Resolve colors from task palette
   const taskBg = TASK_COLORS[colorKey] || TASK_COLORS.yellow;
