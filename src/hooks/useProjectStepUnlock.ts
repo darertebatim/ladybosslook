@@ -134,6 +134,6 @@ export async function checkAndUnlockNextProjectStep(
     routineEmoji: routine?.emoji || '🎯',
     totalSteps: currentStep,
     totalTasks: allProjectTasks?.length || 0,
-    badgeImageUrl: routine?.badge_image_url || null,
+    badgeImageUrl: null,
   };
 }
