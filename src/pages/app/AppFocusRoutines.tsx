@@ -3,7 +3,6 @@ import { cn } from '@/lib/utils';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft } from 'lucide-react';
 import { format, addMinutes } from 'date-fns';
-import { useRoutinesBank, useUserAddedBankRoutines, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
 import SealCheck from '@/components/app/SealCheck';
 import { TaskIcon } from '@/components/app/IconPicker';
@@ -14,24 +13,57 @@ import { supabase } from '@/integrations/supabase/client';
 import { haptic } from '@/lib/haptics';
 import { startOfDay, endOfDay } from 'date-fns';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 
 export default function AppFocusRoutines() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { user } = useAuth();
-  const { data: allRoutines, isLoading: routinesLoading } = useRoutinesBank();
-  const { data: userAddedIds, isLoading: userLoading } = useUserAddedBankRoutines();
-  const { data: routineCategories = [] } = useRoutineBankCategories();
   const { startRoutine, isActive } = useFocusPlayer();
 
-  const isLoading = routinesLoading || userLoading;
+  // Fetch user's own focus routines from user_routines_bank (user-owned copies)
+  const { data: myFocusRoutines, isLoading } = useQuery({
+    queryKey: ['user-focus-routines', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('user_routines_bank')
+        .select('id, routine_id, title, emoji, cover_image_url, category, color, is_focus, is_active')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .eq('is_focus', true);
+      if (error) throw error;
+      return (data || []) as any[];
+    },
+    enabled: !!user,
+  });
 
-  const categoryNameMap = useMemo(() => {
-    const map = new Map<string, string>();
-    routineCategories.forEach(c => map.set(c.slug, c.name));
-    return map;
-  }, [routineCategories]);
+  // Fetch user_tasks grouped by source_routine_id for emoji chains
+  const focusRoutineIds = useMemo(() => {
+    return (myFocusRoutines || []).map((r: any) => r.routine_id);
+  }, [myFocusRoutines]);
+
+  const { data: routineTasksMap } = useQuery({
+    queryKey: ['focus-user-tasks-emojis', user?.id, focusRoutineIds],
+    queryFn: async () => {
+      if (!user || focusRoutineIds.length === 0) return {};
+      const { data } = await supabase
+        .from('user_tasks')
+        .select('source_routine_id, title, emoji, order_index')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .in('source_routine_id', focusRoutineIds)
+        .order('order_index', { ascending: true });
+
+      const map: Record<string, { title: string; emoji: string }[]> = {};
+      (data || []).forEach((t: any) => {
+        const rid = t.source_routine_id;
+        if (!rid) return;
+        if (!map[rid]) map[rid] = [];
+        map[rid].push({ title: t.title, emoji: t.emoji || '📝' });
+      });
+      return map;
+    },
+    enabled: !!user && focusRoutineIds.length > 0,
+  });
 
   // Fetch today's session completion data
   const { data: todaySessions } = useQuery({
@@ -50,46 +82,19 @@ export default function AppFocusRoutines() {
     enabled: !!user,
   });
 
-  // Fetch routine tasks for emoji chains
-  const focusRoutineIds = useMemo(() => {
-    if (!allRoutines) return [];
-    return allRoutines.filter(r => r.is_focus).map(r => r.id);
-  }, [allRoutines]);
-
-  const { data: routineTasks } = useQuery({
-    queryKey: ['focus-routine-tasks', focusRoutineIds],
-    queryFn: async () => {
-      if (focusRoutineIds.length === 0) return {};
-      const { data } = await supabase
-        .from('routines_bank_tasks')
-        .select('routine_id, title, emoji, task_order')
-        .in('routine_id', focusRoutineIds)
-        .order('task_order', { ascending: true });
-      
-      const map: Record<string, { title: string; emoji: string }[]> = {};
-      (data || []).forEach(t => {
-        if (!map[t.routine_id]) map[t.routine_id] = [];
-        map[t.routine_id].push({ title: t.title, emoji: t.emoji || '📝' });
-      });
-      return map;
-    },
-    enabled: focusRoutineIds.length > 0,
-  });
-
-  // Fetch completed task titles for incomplete sessions to show remaining emojis
+  // Fetch completed task titles for incomplete sessions
   const { data: completedTaskTitlesMap } = useQuery({
     queryKey: ['focus-completed-task-titles', todaySessions?.map(s => s.id)],
     queryFn: async () => {
       if (!todaySessions) return {};
       const incompleteSessions = todaySessions.filter(s => !s.ended_at);
       if (incompleteSessions.length === 0) return {};
-      
+
       const { data } = await supabase
         .from('routine_session_tasks')
         .select('session_id, task_title')
         .in('session_id', incompleteSessions.map(s => s.id));
-      
-      // Map routine_id -> Set of completed task titles
+
       const map: Record<string, Set<string>> = {};
       (data || []).forEach(t => {
         const session = incompleteSessions.find(s => s.id === t.session_id);
@@ -103,19 +108,6 @@ export default function AppFocusRoutines() {
     enabled: !!todaySessions && todaySessions.some(s => !s.ended_at),
   });
 
-  // User's activated focus routines
-  const activatedFocusRoutines = useMemo(() => {
-    if (!allRoutines || !userAddedIds) return [];
-    return allRoutines.filter(r => r.is_focus && userAddedIds.includes(r.id));
-  }, [allRoutines, userAddedIds]);
-
-  // All available focus routines (not yet added)
-  const availableFocusRoutines = useMemo(() => {
-    if (!allRoutines || !userAddedIds) return [];
-    return allRoutines.filter(r => r.is_focus && !userAddedIds.includes(r.id));
-  }, [allRoutines, userAddedIds]);
-
-  // Get completion % for a routine
   const getCompletionInfo = (routineId: string) => {
     if (!todaySessions) return null;
     const session = todaySessions.find(s => s.routine_id === routineId && s.ended_at);
@@ -127,7 +119,7 @@ export default function AppFocusRoutines() {
   };
 
   // Pre-start state
-  const [preStartRoutine, setPreStartRoutine] = useState<(typeof allRoutines extends (infer T)[] | undefined ? T : never) | null>(null);
+  const [preStartRoutine, setPreStartRoutine] = useState<any | null>(null);
   const [preStartTasks, setPreStartTasks] = useState<{ id: string; title: string; emoji: string; targetSeconds: number; color?: string; userTaskId?: string }[]>([]);
   const [loadingRoutineId, setLoadingRoutineId] = useState<string | null>(null);
   const [completedTaskIds, setCompletedTaskIds] = useState<Set<string>>(new Set());
@@ -137,25 +129,26 @@ export default function AppFocusRoutines() {
   const remainingPreStartTasks = preStartTasks.filter(t => !completedTaskIds.has(t.id));
   const totalPreStartSeconds = remainingPreStartTasks.reduce((s, t) => s + t.targetSeconds, 0);
 
-  const handlePlay = async (routine: typeof allRoutines extends (infer T)[] | undefined ? T : never) => {
+  const handlePlay = async (routine: any) => {
     if (isActive) {
       const { toast } = await import('sonner');
       toast('A routine is already running. Finish or cancel it first.');
       return;
     }
-    setLoadingRoutineId(routine.id);
-    const { data } = await supabase
-      .from('routines_bank_tasks')
-      .select(`
-        id, title, emoji, task_order, duration_minutes,
-        task:admin_task_bank(goal_target, goal_type, color)
-      `)
-      .eq('routine_id', routine.id)
-      .order('task_order', { ascending: true });
+    setLoadingRoutineId(routine.routine_id);
+
+    // Fetch user's own tasks for this routine — no bank lookup needed
+    const { data: userTasks } = await supabase
+      .from('user_tasks')
+      .select('id, title, emoji, color, goal_target, goal_type, order_index')
+      .eq('user_id', user!.id)
+      .eq('source_routine_id', routine.routine_id)
+      .eq('is_active', true)
+      .order('order_index', { ascending: true });
 
     setLoadingRoutineId(null);
 
-    if (!data || data.length === 0) {
+    if (!userTasks || userTasks.length === 0) {
       const { toast } = await import('sonner');
       toast.error('No tasks found in this routine');
       return;
@@ -163,29 +156,18 @@ export default function AppFocusRoutines() {
 
     haptic.light();
 
-    // Fetch user's active tasks to map routine tasks → planner task IDs
-    const { data: userTasks } = await supabase
-      .from('user_tasks')
-      .select('id, title')
-      .eq('user_id', user!.id)
-      .eq('is_active', true);
-
-    const titleToUserTaskId = new Map<string, string>();
-    (userTasks || []).forEach((ut: any) => titleToUserTaskId.set(ut.title, ut.id));
-
-    const tasks = data.map(t => ({
-      id: t.id,
+    const tasks = userTasks.map((t: any) => ({
+      id: t.id,           // This IS the user_task ID
       title: t.title,
       emoji: t.emoji || '📝',
-      targetSeconds: (t.task as any)?.goal_target || (t.duration_minutes ? t.duration_minutes * 60 : 300),
-      color: (t.task as any)?.color || undefined,
-      userTaskId: titleToUserTaskId.get(t.title) || undefined,
+      targetSeconds: t.goal_target || 300,
+      color: t.color || undefined,
+      userTaskId: t.id,   // Same ID — no mapping needed!
     }));
 
     // Check for incomplete session (started today, no ended_at)
-    const incompleteSession = todaySessions?.find(s => s.routine_id === routine.id && !s.ended_at);
+    const incompleteSession = todaySessions?.find(s => s.routine_id === routine.routine_id && !s.ended_at);
     if (incompleteSession) {
-      // Fetch completed tasks for this session
       const { data: completedTasks } = await supabase
         .from('routine_session_tasks')
         .select('task_title, task_emoji, target_seconds, actual_seconds, status')
@@ -195,7 +177,6 @@ export default function AppFocusRoutines() {
       const doneSet = new Set<string>();
       const prevResults: import('@/components/app/FocusRoutineSummary').SessionTaskResult[] = [];
       (completedTasks || []).forEach(ct => {
-        // Match by title since task IDs may differ
         const matchingTask = tasks.find(t => t.title === ct.task_title);
         if (matchingTask) doneSet.add(matchingTask.id);
         prevResults.push({
@@ -224,14 +205,12 @@ export default function AppFocusRoutines() {
     if (!preStartRoutine) return;
     haptic.medium();
 
-    // Filter to remaining tasks only
     const remaining = preStartTasks.filter(t => !completedTaskIds.has(t.id));
 
     if (resumeSessionId && remaining.length < preStartTasks.length) {
-      // Resume: start with remaining tasks, pass previous results
       startRoutine(
         {
-          routineId: preStartRoutine.id,
+          routineId: preStartRoutine.routine_id,
           routineTitle: preStartRoutine.title,
           routineEmoji: preStartRoutine.emoji || '✨',
           tasks: remaining,
@@ -244,7 +223,7 @@ export default function AppFocusRoutines() {
       );
     } else {
       startRoutine({
-        routineId: preStartRoutine.id,
+        routineId: preStartRoutine.routine_id,
         routineTitle: preStartRoutine.title,
         routineEmoji: preStartRoutine.emoji || '✨',
         tasks: preStartTasks,
@@ -286,34 +265,25 @@ export default function AppFocusRoutines() {
           </div>
         ) : (
           <div className="space-y-6 mt-4">
-            {/* Activated routines */}
-            {activatedFocusRoutines.length > 0 && (
+            {/* Activated routines — reading from user-owned data */}
+            {(myFocusRoutines || []).length > 0 && (
               <section>
-                <p className="text-base font-bold text-foreground mb-3">
-                  My Routines
-                </p>
+                <p className="text-base font-bold text-foreground mb-3">My Routines</p>
                 <div className="space-y-3">
-                  {activatedFocusRoutines.map(routine => {
-                    const completion = getCompletionInfo(routine.id);
-                    const allTasks = routineTasks?.[routine.id] || [];
-                    const completedTitles = completedTaskTitlesMap?.[routine.id];
-                    // Show only remaining task emojis if there's an incomplete session
+                  {(myFocusRoutines || []).map((routine: any) => {
+                    const completion = getCompletionInfo(routine.routine_id);
+                    const allTasks = routineTasksMap?.[routine.routine_id] || [];
+                    const completedTitles = completedTaskTitlesMap?.[routine.routine_id];
                     const remainingTasks = completedTitles
                       ? allTasks.filter(t => !completedTitles.has(t.title))
                       : allTasks;
-                    const categoryName = routine.category ? (categoryNameMap.get(routine.category) || routine.category) : null;
 
                     return (
-                      <div
-                        key={routine.id}
-                        className="bg-card rounded-2xl border border-border p-4"
-                      >
+                      <div key={routine.id} className="bg-card rounded-2xl border border-border p-4">
                         <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <h3 className="font-bold text-foreground text-lg">
-                                {routine.title}
-                              </h3>
+                              <h3 className="font-bold text-foreground text-lg">{routine.title}</h3>
                               {completion && (
                                 <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                                   completion.isComplete
@@ -324,11 +294,9 @@ export default function AppFocusRoutines() {
                                 </span>
                               )}
                             </div>
-                            {/* Category label */}
-                            {categoryName && (
-                              <p className="text-xs text-muted-foreground mt-0.5">{categoryName}</p>
+                            {routine.category && (
+                              <p className="text-xs text-muted-foreground mt-0.5">{routine.category}</p>
                             )}
-                            {/* Remaining task emoji chain */}
                             {remainingTasks.length > 0 && (
                               <div className="flex items-center gap-1 mt-2.5 flex-wrap">
                                 {remainingTasks.map((task, i) => (
@@ -343,13 +311,12 @@ export default function AppFocusRoutines() {
                             )}
                           </div>
 
-                          {/* Play / Progress badge */}
                           <button
                             onClick={() => handlePlay(routine)}
-                            disabled={loadingRoutineId === routine.id}
+                            disabled={loadingRoutineId === routine.routine_id}
                             className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted active:scale-95 transition-transform shrink-0 ml-3"
                           >
-                            {loadingRoutineId === routine.id ? (
+                            {loadingRoutineId === routine.routine_id ? (
                               <Loader2 className="w-4 h-4 animate-spin text-foreground" />
                             ) : completion ? (
                               <>
@@ -361,9 +328,7 @@ export default function AppFocusRoutines() {
                                 <span className="text-sm font-semibold text-foreground">{completion.pct}%</span>
                               </>
                             ) : (
-                              <>
-                                <Play className="w-4 h-4 text-foreground fill-foreground" />
-                              </>
+                              <Play className="w-4 h-4 text-foreground fill-foreground" />
                             )}
                           </button>
                         </div>
@@ -375,7 +340,7 @@ export default function AppFocusRoutines() {
             )}
 
             {/* Empty state */}
-            {activatedFocusRoutines.length === 0 && (
+            {(myFocusRoutines || []).length === 0 && (
               <div className="text-center py-12">
                 <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
                 <h3 className="font-semibold text-foreground mb-1">No focus routines yet</h3>
@@ -384,7 +349,6 @@ export default function AppFocusRoutines() {
                 </p>
               </div>
             )}
-
 
             <button
               onClick={() => navigate('/app/routines')}
