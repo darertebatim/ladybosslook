@@ -385,6 +385,23 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
           </div>
         </div>
 
+        {/* Pro Task "Open" button — between circle and controls */}
+        {proConfig && !isPaused && (
+          <div className="flex justify-center px-6 pb-2">
+            <button
+              onClick={() => { haptic.medium(); onOpenProTask(); }}
+              className={cn(
+                "flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm active:scale-95 transition-transform shadow-sm",
+                proConfig.buttonClass
+              )}
+            >
+              <proConfig.icon className="w-4 h-4" />
+              Open {proConfig.label}
+              <ExternalLink className="w-3.5 h-3.5 opacity-50" />
+            </button>
+          </div>
+        )}
+
         {/* Controls section — anchored to the circle cluster */}
         <div className="px-6 pt-3 pb-4 relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
           {/* Pause overlay — covers controls + next task area */}
