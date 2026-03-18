@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { haptic } from '@/lib/haptics';
 import { startOfDay, endOfDay } from 'date-fns';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { toast } from 'sonner';
 
 export default function AppFocusRoutines() {
   const navigate = useNavigate();
