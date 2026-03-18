@@ -406,20 +406,28 @@ export default function AppFocusRoutines() {
               {preStartTasks.map((task, i) => {
                 const isDone = completedTaskIds.has(task.id);
                 const colorKey = (task.color || 'yellow') as TaskColor;
-                const bgColor = TASK_COLORS[colorKey] || TASK_COLORS.yellow;
+                const colorClass = TASK_COLOR_CLASSES[colorKey] || TASK_COLOR_CLASSES.yellow;
                 return (
                   <div
                     key={task.id}
-                    className="rounded-3xl pl-3 pr-4 py-3 active:scale-[0.98] transition-transform"
-                    style={{ backgroundColor: isDone ? `${bgColor}80` : bgColor }}
+                    className={cn(
+                      'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+                      colorClass,
+                      isDone && 'opacity-60'
+                    )}
                   >
                     <div className="flex items-center gap-2">
                       <div className="w-10 h-10 flex items-center justify-center shrink-0">
-                        <FluentEmoji emoji={task.emoji} size={32} />
+                        <TaskIcon iconName={task.emoji} size={32} className="text-black/80" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className="text-[11px] text-black/60">{Math.ceil(task.targetSeconds / 60)}m</span>
-                        <p className={`text-black text-[15px] font-semibold leading-tight ${isDone ? 'line-through' : ''}`}>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-black/80">⏱️ {Math.ceil(task.targetSeconds / 60)}m</span>
+                        </div>
+                        <p className={cn(
+                          'text-black text-[15px] font-semibold leading-tight transition-all',
+                          isDone && 'line-through'
+                        )}>
                           {task.title}
                         </p>
                       </div>
