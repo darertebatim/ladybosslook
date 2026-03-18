@@ -301,10 +301,13 @@ export default function AppFocusRoutines() {
                   {(myFocusRoutines || []).map((routine: any) => {
                     const completion = getCompletionInfo(routine.routine_id);
                     const allTasks = routineTasksMap?.[routine.routine_id] || [];
-                    const completedTitles = completedTaskTitlesMap?.[routine.routine_id];
-                    const remainingTasks = completedTitles
-                      ? allTasks.filter(t => !completedTitles.has(t.title))
-                      : allTasks;
+                    // Use planner completions to determine which tasks are done
+                    const completedIds = todayCompletions || new Set<string>();
+                    const taskIdsForRoutine = userTasksByRoutine?.[routine.routine_id] || [];
+                    const remainingTasks = allTasks.filter((t, idx) => {
+                      const taskId = taskIdsForRoutine[idx];
+                      return !taskId || !completedIds.has(taskId);
+                    });
 
                     return (
                       <div key={routine.id} className="bg-card rounded-2xl border border-border p-4">
