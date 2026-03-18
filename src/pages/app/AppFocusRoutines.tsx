@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { haptic } from '@/lib/haptics';
 import { startOfDay, endOfDay } from 'date-fns';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { toast } from 'sonner';
 
 export default function AppFocusRoutines() {
   const navigate = useNavigate();
@@ -148,7 +149,7 @@ export default function AppFocusRoutines() {
 
   // Pre-start state
   const [preStartRoutine, setPreStartRoutine] = useState<any | null>(null);
-  const [preStartTasks, setPreStartTasks] = useState<{ id: string; title: string; emoji: string; targetSeconds: number; color?: string; userTaskId?: string }[]>([]);
+  const [preStartTasks, setPreStartTasks] = useState<{ id: string; title: string; emoji: string; targetSeconds: number; color?: string; userTaskId?: string; goalType?: string | null; goalTarget?: number | null }[]>([]);
   const [loadingRoutineId, setLoadingRoutineId] = useState<string | null>(null);
   const [completedTaskIds, setCompletedTaskIds] = useState<Set<string>>(new Set());
   const [resumeSessionId, setResumeSessionId] = useState<string | null>(null);
@@ -191,9 +192,16 @@ export default function AppFocusRoutines() {
       targetSeconds: t.goal_target || 300,
       color: t.color || undefined,
       userTaskId: t.id,   // Same ID — no mapping needed!
+      goalType: t.goal_type || null,
+      goalTarget: t.goal_target || null,
     }));
 
-    // Check for incomplete session (started today, no ended_at)
+    // Start with planner-completed tasks for today
+    const doneSet = new Set<string>(
+      tasks.filter(t => todayCompletions?.has(t.id)).map(t => t.id)
+    );
+
+    // If there's an incomplete session, merge its completed tasks for resume context
     const incompleteSession = todaySessions?.find(s => s.routine_id === routine.routine_id && !s.ended_at);
     if (incompleteSession) {
       const { data: completedTasks } = await supabase
@@ -202,7 +210,6 @@ export default function AppFocusRoutines() {
         .eq('session_id', incompleteSession.id)
         .order('task_order', { ascending: true });
 
-      const doneSet = new Set<string>();
       const prevResults: import('@/components/app/FocusRoutineSummary').SessionTaskResult[] = [];
       (completedTasks || []).forEach(ct => {
         const matchingTask = tasks.find(t => t.title === ct.task_title);
@@ -216,14 +223,14 @@ export default function AppFocusRoutines() {
         });
       });
 
-      setCompletedTaskIds(doneSet);
       setResumeSessionId(incompleteSession.id);
       setResumeTaskResults(prevResults);
     } else {
-      setCompletedTaskIds(new Set());
       setResumeSessionId(null);
       setResumeTaskResults([]);
     }
+
+    setCompletedTaskIds(doneSet);
 
     setPreStartTasks(tasks);
     setPreStartRoutine(routine);
@@ -234,6 +241,11 @@ export default function AppFocusRoutines() {
     haptic.medium();
 
     const remaining = preStartTasks.filter(t => !completedTaskIds.has(t.id));
+
+    if (remaining.length === 0) {
+      toast('All tasks in this routine are already completed for today ✅');
+      return;
+    }
 
     if (resumeSessionId && remaining.length < preStartTasks.length) {
       startRoutine(
@@ -254,7 +266,7 @@ export default function AppFocusRoutines() {
         routineId: preStartRoutine.routine_id,
         routineTitle: preStartRoutine.title,
         routineEmoji: preStartRoutine.emoji || '✨',
-        tasks: preStartTasks,
+        tasks: remaining,
       });
     }
 
