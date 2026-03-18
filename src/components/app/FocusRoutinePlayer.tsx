@@ -1,5 +1,5 @@
 import { memo, useState, useCallback, useEffect } from 'react';
-import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus, GripVertical, ChevronUp, ArrowUp, ArrowDown } from 'lucide-react';
+import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus, GripVertical } from 'lucide-react';
 import { format, addSeconds } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
@@ -7,6 +7,21 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { FocusRoutineSummary } from './FocusRoutineSummary';
 import type { FocusRoutineConfig, FocusTask } from '@/hooks/useFocusRoutinePlayer';
 import type { SessionTaskResult } from './FocusRoutineSummary';
+import {
+  DndContext,
+  closestCenter,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface FocusRoutinePlayerProps {
   phase: 'breathe' | 'running' | 'paused' | 'summary';
