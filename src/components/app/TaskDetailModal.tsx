@@ -211,19 +211,13 @@ export const TaskDetailModal = ({
 
               {isTimerGoal ? (
                 <button
-                  onClick={() => {
-                    haptic.light();
-                    onOpenTimer?.(task);
-                    onClose();
-                  }}
+                  onClick={handleToggleComplete}
                   className="w-9 h-9 flex items-center justify-center shrink-0"
                 >
-                  {goalReached ? (
+                  {(goalReached || isCompleted) ? (
                     <SealCheck className="w-9 h-9 text-teal-400" />
                   ) : (
-                    <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center">
-                      <Play className="h-4 w-4 ml-0.5" />
-                    </span>
+                    <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
                   )}
                 </button>
               ) : isCountGoal ? (
