@@ -27,7 +27,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 interface RoutinePlayerProps {
-  phase: 'breathe' | 'running' | 'paused' | 'summary';
+  phase: 'breathe' | 'countdown' | 'running' | 'paused' | 'summary';
   config: RoutinePlayerConfig;
   currentTask: { id: string; title: string; emoji: string; targetSeconds: number; color?: string } | null;
   currentTaskIndex: number;
