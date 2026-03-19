@@ -1058,44 +1058,13 @@ const AppHome = () => {
                     <h2 className="text-sm font-semibold text-foreground tracking-wide shrink-0">
                       My Tasks
                     </h2>
-                    <Select value={taskFilter} onValueChange={setTaskFilter}>
-                      <SelectTrigger className="h-7 min-w-0 w-auto max-w-[160px] gap-1 border-border bg-background px-2.5 py-0 text-[11px] font-medium rounded-full [&>svg]:h-3 [&>svg]:w-3">
-                        <Filter className="h-3 w-3 shrink-0 opacity-60" />
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent align="start" className="min-w-[180px]">
-                        <SelectItem value="all">All Tasks</SelectItem>
-                        <SelectItem value="one-time">One-time Tasks</SelectItem>
-                        <SelectItem value="unlinked">Unlinked Tasks</SelectItem>
-                        {routineNamesInTasks.size > 0 && (
-                          <>
-                            <SelectSeparator />
-                            <SelectGroup>
-                              <SelectLabel className="text-[10px] uppercase tracking-wider text-muted-foreground pl-3">Routines</SelectLabel>
-                              {Array.from(routineNamesInTasks.entries()).map(([rid, name]) => (
-                                <SelectItem key={rid} value={`routine:${rid}`}>
-                                  {name}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          </>
-                        )}
-                        {taskTags.length > 0 && (
-                          <>
-                            <SelectSeparator />
-                            <SelectGroup>
-                              <SelectLabel className="text-[10px] uppercase tracking-wider text-muted-foreground pl-3">Categories</SelectLabel>
-                              {taskTags.map(tag => (
-                                <SelectItem key={tag} value={`cat:${tag}`}>
-                                  {categoryNameMap.get(tag) || tag}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          </>
-                        )}
-                      </SelectContent>
-                    </Select>
-                    
+                    <TaskFilterDropdown
+                      value={taskFilter}
+                      onValueChange={setTaskFilter}
+                      routineNames={routineNamesInTasks}
+                      taskTags={taskTags}
+                      categoryNameMap={categoryNameMap}
+                    />
                   </div>
 
                   {filteredTasks.length === 0 ? (
