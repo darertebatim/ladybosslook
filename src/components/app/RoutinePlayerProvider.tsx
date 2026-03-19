@@ -101,7 +101,7 @@ export function RoutinePlayerProvider({ children }: { children: ReactNode }) {
   const autoOpenedTaskRef = useRef<string | null>(null);
   useEffect(() => {
     const task = player.currentTask;
-    if (!task?.proLinkType || !isActive || minimized) return;
+    if (!task?.proLinkType || !isActive || minimized || player.phase === 'countdown') return;
     const taskKey = `${task.userTaskId || task.title}-${player.currentTaskIndex}`;
     if (autoOpenedTaskRef.current === taskKey) return;
     autoOpenedTaskRef.current = taskKey;
