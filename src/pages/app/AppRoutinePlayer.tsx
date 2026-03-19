@@ -867,8 +867,8 @@ export default function AppRoutinePlayer() {
 
           {/* Start / Resume button */}
           <div
-            className="fixed bottom-0 left-0 right-0 px-5 pb-4 pt-2 bg-background"
-            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}
+            className="fixed bottom-0 left-0 right-0 px-5 pt-2 bg-background"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}
           >
             <button
               onClick={handleStartFromPreview}
