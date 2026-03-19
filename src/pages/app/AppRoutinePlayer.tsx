@@ -1,7 +1,8 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2, CalendarPlus, Bell, Calendar } from 'lucide-react';
+import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2, CalendarPlus } from 'lucide-react';
+import { RoutinePlayerFilter, FilterValue } from '@/components/app/RoutinePlayerFilter';
 import { useQueryClient } from '@tanstack/react-query';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
