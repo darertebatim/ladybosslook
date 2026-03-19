@@ -46,7 +46,7 @@ interface RoutinePlayerProps {
   onAdjustTime: (deltaMins: number) => void;
   onResetTime: () => void;
   onMoveTaskToEnd: () => void;
-  onReorderTasks: (tasks: FocusTask[]) => void;
+  onReorderTasks: (tasks: RoutineTask[]) => void;
   onEndRoutineEarly: () => void;
   onClose: () => void;
   onCancel: () => void;
