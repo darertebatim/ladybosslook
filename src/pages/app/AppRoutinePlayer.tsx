@@ -5,6 +5,7 @@ import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2, CalendarPlu
 import { useQueryClient } from '@tanstack/react-query';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
+import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -45,6 +46,13 @@ export default function AppRoutinePlayer() {
   // Check if routine player page is already added as a task
   const { data: isPageAdded } = useExistingProTask('route', '/app/routineplayer');
 
+  // Category slug → name map
+  const { data: routineCategories = [] } = useRoutineBankCategories();
+  const categoryNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    routineCategories.forEach(cat => map.set(cat.slug, cat.name));
+    return map;
+  }, [routineCategories]);
   // Fetch ALL user routines from user_routines_bank (user-owned copies)
   const { data: myRoutines, isLoading } = useQuery({
     queryKey: ['user-routines-all', user?.id],
@@ -567,7 +575,7 @@ export default function AppRoutinePlayer() {
                             {routine.category && (
                               <span className="flex items-center gap-1 text-[11px] font-semibold text-black">
                                 <Calendar className="w-3 h-3" />
-                                {routine.category}
+                                {categoryNameMap.get(routine.category) || routine.category}
                               </span>
                             )}
                           </div>
