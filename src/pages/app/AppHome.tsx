@@ -1267,7 +1267,7 @@ const AppHome = () => {
                 </div>}
 
               {/* Tour Banner & Promo - always visible regardless of routine cards */}
-              {selectedTag === null && <>
+              {taskFilter === 'all' && <>
                 {!showWelcomeCard && <OnboardingBanner />}
                 <div id="tour-banner-slot" className="mt-4" />
                 <PromoBanner location="home_rituals" className="mt-4" />
