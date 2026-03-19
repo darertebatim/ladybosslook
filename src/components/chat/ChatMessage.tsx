@@ -192,21 +192,15 @@ export function ChatMessage({
     return generateWaveformBars(attachmentUrl || 'default', 28);
   }, [attachmentUrl]);
 
-  const openExternalUrl = async (url: string) => {
-    try {
-      if (Capacitor.isNativePlatform()) {
-        await Browser.open({ url });
-      } else {
-        window.open(url, '_blank');
-      }
-    } catch {
-      window.open(url, '_blank');
-    }
-  };
+  const navigate = useNavigate();
+
+  const handleOpenUrl = useCallback((url: string) => {
+    smartOpenUrl(url, navigate);
+  }, [navigate]);
 
   const handleDownload = () => {
     if (attachmentUrl) {
-      openExternalUrl(attachmentUrl);
+      handleOpenUrl(attachmentUrl);
     }
   };
 
