@@ -449,7 +449,7 @@ export function ChatMessage({
               className={cn("text-[15px] leading-relaxed whitespace-pre-wrap break-words", bilingualClassName)}
               dir={direction}
             >
-              {linkifyText(displayText)}
+              {linkifyText(displayText, navigate)}
             </p>
           </div>
         )}
