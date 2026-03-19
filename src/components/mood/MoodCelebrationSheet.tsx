@@ -104,9 +104,9 @@ export function MoodCelebrationSheet({
   const navigate = useNavigate();
   const moodData = mood ? MOOD_CONFIG[mood] : null;
 
-  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void; completeTask: () => void } | null = null;
-  try { focusPlayer = useRoutinePlayerContext(); } catch { /* provider not available */ }
-  const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
+  let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void; completeTask: () => void } | null = null;
+  try { routinePlayer = useRoutinePlayerContext(); } catch { /* provider not available */ }
+  const hasActivePlayer = routinePlayer?.isActive && routinePlayer?.isMinimized;
 
   const handleAction = (action: typeof ACTIONS[number]) => {
     haptic.medium();
