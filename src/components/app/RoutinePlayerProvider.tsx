@@ -14,8 +14,8 @@ type ResumeOptions = {
   existingSessionId: string;
 };
 
-type FocusPlayerContextType = {
-  startRoutine: (config: FocusRoutineConfig, resumeOptions?: ResumeOptions) => void;
+type RoutinePlayerContextType = {
+  startRoutine: (config: RoutinePlayerConfig, resumeOptions?: ResumeOptions) => void;
   isActive: boolean;
   isMinimized: boolean;
   maximize: () => void;
