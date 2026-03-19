@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { smartOpenUrl } from '@/lib/navigation-utils';
 import { supabase } from '@/integrations/supabase/client';
 import { X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
