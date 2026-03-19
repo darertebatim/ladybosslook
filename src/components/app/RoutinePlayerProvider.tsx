@@ -3,19 +3,19 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
-import { useFocusRoutinePlayer, type FocusRoutineConfig } from '@/hooks/useFocusRoutinePlayer';
-import { FocusRoutinePlayer } from '@/components/app/FocusRoutinePlayer';
+import { useRoutinePlayer, type RoutinePlayerConfig } from '@/hooks/useRoutinePlayer';
+import { RoutinePlayer } from '@/components/app/RoutinePlayer';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
 import { getProTaskNavigationPath, type ProLinkType } from '@/lib/proTaskTypes';
 
 type ResumeOptions = {
   startFromIndex: number;
-  previousResults: import('@/components/app/FocusRoutineSummary').SessionTaskResult[];
+  previousResults: import('@/components/app/RoutinePlayerSummary').SessionTaskResult[];
   existingSessionId: string;
 };
 
-type FocusPlayerContextType = {
-  startRoutine: (config: FocusRoutineConfig, resumeOptions?: ResumeOptions) => void;
+type RoutinePlayerContextType = {
+  startRoutine: (config: RoutinePlayerConfig, resumeOptions?: ResumeOptions) => void;
   isActive: boolean;
   isMinimized: boolean;
   maximize: () => void;
@@ -28,7 +28,7 @@ type FocusPlayerContextType = {
   openProTask: () => void;
 };
 
-const FocusPlayerContext = createContext<FocusPlayerContextType>({
+const RoutinePlayerContext = createContext<RoutinePlayerContextType>({
   startRoutine: () => {},
   isActive: false,
   isMinimized: false,
@@ -42,10 +42,10 @@ const FocusPlayerContext = createContext<FocusPlayerContextType>({
   openProTask: () => {},
 });
 
-export const useFocusPlayer = () => useContext(FocusPlayerContext);
+export const useRoutinePlayerContext = () => useContext(RoutinePlayerContext);
 
-export function FocusPlayerProvider({ children }: { children: ReactNode }) {
-  const player = useFocusRoutinePlayer();
+export function RoutinePlayerProvider({ children }: { children: ReactNode }) {
+  const player = useRoutinePlayer();
   const { user } = useAuth();
   const [minimized, setMinimized] = useState(false);
   const navigate = useNavigate();
@@ -119,7 +119,7 @@ export function FocusPlayerProvider({ children }: { children: ReactNode }) {
   }, [isActive]);
 
   return (
-    <FocusPlayerContext.Provider value={{
+    <RoutinePlayerContext.Provider value={{
       startRoutine: (cfg, resumeOpts) => { setMinimized(false); player.startRoutine(cfg, resumeOpts); },
       isActive,
       isMinimized: isActive && minimized,
@@ -135,7 +135,7 @@ export function FocusPlayerProvider({ children }: { children: ReactNode }) {
       {children}
       {showFullPlayer && (
         <OverlayPortal>
-          <FocusRoutinePlayer
+          <RoutinePlayer
             phase={player.phase as 'breathe' | 'running' | 'paused' | 'summary'}
             config={player.config!}
             currentTask={player.currentTask}
@@ -165,6 +165,6 @@ export function FocusPlayerProvider({ children }: { children: ReactNode }) {
           />
         </OverlayPortal>
       )}
-    </FocusPlayerContext.Provider>
+    </RoutinePlayerContext.Provider>
   );
 }

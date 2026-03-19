@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft } from 'lucide-react';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
-import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,7 +19,7 @@ import { isWaterTask } from '@/lib/waterTracking';
 export default function AppFocusRoutines() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { startRoutine, isActive } = useFocusPlayer();
+  const { startRoutine, isActive } = useRoutinePlayerContext();
 
   // Fetch ALL user routines from user_routines_bank (user-owned copies)
   const { data: myFocusRoutines, isLoading } = useQuery({
@@ -235,7 +235,7 @@ export default function AppFocusRoutines() {
         .eq('session_id', incompleteSession.id)
         .order('task_order', { ascending: true });
 
-      const prevResults: import('@/components/app/FocusRoutineSummary').SessionTaskResult[] = 
+      const prevResults: import('@/components/app/RoutinePlayerSummary').SessionTaskResult[] = 
         (completedTasks || []).map(ct => ({
           title: ct.task_title,
           emoji: ct.task_emoji,

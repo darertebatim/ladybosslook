@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { X, Search, BookOpen, NotebookPen, CalendarPlus, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { JournalPromptMarquee } from '@/components/app/JournalPromptMarquee';
@@ -35,7 +35,7 @@ const calculateMonthlyPresence = (entries: any[]): number => {
 const AppJournal = () => {
   const navigate = useNavigate();
   let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
-  try { focusPlayer = useFocusPlayer(); } catch { /* not available */ }
+  try { focusPlayer = useRoutinePlayerContext(); } catch { /* not available */ }
 
   const goHome = useCallback(() => {
     if (focusPlayer?.isActive && focusPlayer?.isMinimized) {

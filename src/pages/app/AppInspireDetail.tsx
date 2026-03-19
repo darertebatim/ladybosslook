@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 import { useShareContent } from '@/hooks/useShareContent';
 import { cn } from '@/lib/utils';
 import { TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
-import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { haptic } from '@/lib/haptics';
 
 const colorGradients: Record<string, string> = {
@@ -96,7 +96,7 @@ export default function AppInspireDetail() {
   const addRoutineFromBank = useAddRoutineFromBank();
   const { data: userChallenges = [] } = useUserChallenges();
   const { data: categories = [] } = useRoutineBankCategories();
-  const { startRoutine: startFocusRoutine } = useFocusPlayer();
+  const { startRoutine: startFocusRoutine } = useRoutinePlayerContext();
   const { user } = useAuth();
   
   // Check if routine was already added

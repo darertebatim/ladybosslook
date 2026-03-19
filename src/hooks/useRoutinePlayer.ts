@@ -5,9 +5,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { updatePresence } from '@/hooks/useUserPresence';
 import { updateStreak } from '@/hooks/useTaskPlanner';
-import type { SessionTaskResult } from '@/components/app/FocusRoutineSummary';
+import type { SessionTaskResult } from '@/components/app/RoutinePlayerSummary';
 
-export interface FocusTask {
+export interface RoutineTask {
   id: string;
   title: string;
   emoji: string;
@@ -22,20 +22,20 @@ export interface FocusTask {
   proLinkValue?: string | null;
 }
 
-export interface FocusRoutineConfig {
+export interface RoutinePlayerConfig {
   routineId: string;
   routineTitle: string;
   routineEmoji: string;
-  tasks: FocusTask[];
+  tasks: RoutineTask[];
 }
 
 type PlayerPhase = 'idle' | 'breathe' | 'running' | 'paused' | 'summary';
 
-export function useFocusRoutinePlayer() {
+export function useRoutinePlayer() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [phase, setPhase] = useState<PlayerPhase>('idle');
-  const [config, setConfig] = useState<FocusRoutineConfig | null>(null);
+  const [config, setConfig] = useState<RoutinePlayerConfig | null>(null);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
   const [taskResults, setTaskResults] = useState<SessionTaskResult[]>([]);
@@ -120,7 +120,7 @@ export function useFocusRoutinePlayer() {
     return () => clearInterval(timer);
   }, [phase]);
 
-  const startRoutine = useCallback(async (cfg: FocusRoutineConfig, resumeOptions?: {
+  const startRoutine = useCallback(async (cfg: RoutinePlayerConfig, resumeOptions?: {
     startFromIndex: number;
     previousResults: SessionTaskResult[];
     existingSessionId: string;
@@ -305,7 +305,7 @@ export function useFocusRoutinePlayer() {
     }
   }, [config, currentTask, currentTaskIndex]);
 
-  const reorderTasks = useCallback((newTasks: FocusTask[]) => {
+  const reorderTasks = useCallback((newTasks: RoutineTask[]) => {
     if (!config) return;
     setConfig({ ...config, tasks: newTasks });
   }, [config]);

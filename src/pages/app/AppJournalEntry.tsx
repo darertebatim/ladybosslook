@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 import { useShareContent } from '@/hooks/useShareContent';
 import { useBilingualText } from '@/components/ui/BilingualText';
 import { cn } from '@/lib/utils';
-import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import {
   AlertDialog,
@@ -35,7 +35,7 @@ const AppJournalEntry = () => {
   const isNewEntry = !entryId || entryId === 'new';
 
   let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
-  try { focusPlayer = useFocusPlayer(); } catch { /* not available */ }
+  try { focusPlayer = useRoutinePlayerContext(); } catch { /* not available */ }
   const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
   const { autoCompleteJournal } = useAutoCompleteProTask();
   

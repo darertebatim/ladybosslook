@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
-import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 
 interface BackButtonProps {
   /** Fallback navigation path if no history state. If not provided, uses browser history */
@@ -34,7 +34,7 @@ export function BackButton({
   const from = (location.state as any)?.from;
 
   let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
-  try { focusPlayer = useFocusPlayer(); } catch { /* provider not available */ }
+  try { focusPlayer = useRoutinePlayerContext(); } catch { /* provider not available */ }
 
   const handleClick = () => {
     haptic.light();
@@ -100,7 +100,7 @@ export function BackButtonCircle({
   const from = (location.state as any)?.from;
 
   let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
-  try { focusPlayer = useFocusPlayer(); } catch { /* provider not available */ }
+  try { focusPlayer = useRoutinePlayerContext(); } catch { /* provider not available */ }
 
   const handleClick = () => {
     haptic.light();

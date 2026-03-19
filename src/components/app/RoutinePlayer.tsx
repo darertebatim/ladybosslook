@@ -4,9 +4,9 @@ import { format, addSeconds } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { FocusRoutineSummary } from './FocusRoutineSummary';
-import type { FocusRoutineConfig, FocusTask } from '@/hooks/useFocusRoutinePlayer';
-import type { SessionTaskResult } from './FocusRoutineSummary';
+import { RoutinePlayerSummary } from './RoutinePlayerSummary';
+import type { RoutinePlayerConfig, RoutineTask } from '@/hooks/useRoutinePlayer';
+import type { SessionTaskResult } from './RoutinePlayerSummary';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import {
   DndContext,
@@ -25,9 +25,9 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-interface FocusRoutinePlayerProps {
+interface RoutinePlayerProps {
   phase: 'breathe' | 'running' | 'paused' | 'summary';
-  config: FocusRoutineConfig;
+  config: RoutinePlayerConfig;
   currentTask: { id: string; title: string; emoji: string; targetSeconds: number; color?: string } | null;
   currentTaskIndex: number;
   timeLeft: number;
@@ -46,7 +46,7 @@ interface FocusRoutinePlayerProps {
   onAdjustTime: (deltaMins: number) => void;
   onResetTime: () => void;
   onMoveTaskToEnd: () => void;
-  onReorderTasks: (tasks: FocusTask[]) => void;
+  onReorderTasks: (tasks: RoutineTask[]) => void;
   onEndRoutineEarly: () => void;
   onClose: () => void;
   onCancel: () => void;
@@ -61,7 +61,7 @@ function formatTime(seconds: number): string {
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 // Sortable item for rearrange
-function SortableRearrangeItem({ task }: { task: FocusTask }) {
+function SortableRearrangeItem({ task }: { task: RoutineTask }) {
   const {
     attributes,
     listeners,
@@ -105,9 +105,9 @@ function RearrangeSheet({
   onDone,
   onClose,
 }: {
-  currentTask: FocusTask | null;
-  rearrangeTasks: FocusTask[];
-  setRearrangeTasks: (tasks: FocusTask[]) => void;
+  currentTask: RoutineTask | null;
+  rearrangeTasks: RoutineTask[];
+  setRearrangeTasks: (tasks: RoutineTask[]) => void;
   onDone: () => void;
   onClose: () => void;
 }) {
@@ -167,7 +167,7 @@ function RearrangeSheet({
   );
 }
 
-export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
+export const RoutinePlayer = memo(function RoutinePlayer({
   phase,
   config,
   currentTask,
@@ -194,7 +194,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   onCancel,
   onMinimize,
   onOpenProTask,
-}: FocusRoutinePlayerProps) {
+}: RoutinePlayerProps) {
   const [showAdjustSheet, setShowAdjustSheet] = useState(false);
   const [showNotifySheet, setShowNotifySheet] = useState(false);
   const [showSkipSheet, setShowSkipSheet] = useState(false);
@@ -202,7 +202,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   const [showCompletionFlash, setShowCompletionFlash] = useState(false);
   const [showPlaylistSheet, setShowPlaylistSheet] = useState(false);
   const [showRearrangeSheet, setShowRearrangeSheet] = useState(false);
-  const [rearrangeTasks, setRearrangeTasks] = useState<FocusTask[]>([]);
+  const [rearrangeTasks, setRearrangeTasks] = useState<RoutineTask[]>([]);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [showAddTaskForm, setShowAddTaskForm] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -229,7 +229,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   // Summary phase
   if (phase === 'summary') {
     return (
-      <FocusRoutineSummary
+      <RoutinePlayerSummary
         routineTitle={config.routineTitle}
         routineEmoji={config.routineEmoji}
         startedAt={startedAt}
@@ -767,7 +767,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
               disabled={!newTaskTitle.trim()}
               onClick={() => {
                 haptic.medium();
-                const newTask: FocusTask = {
+                const newTask: RoutineTask = {
                   id: `quick-${Date.now()}`,
                   title: newTaskTitle.trim(),
                   emoji: '⚡',

@@ -7,7 +7,7 @@ import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/Unsee
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { useTrackAppReturn } from '@/hooks/useUserPresence';
 import { MiniPlayer } from '@/components/audio/MiniPlayer';
-import { FocusMiniPlayer } from '@/components/app/FocusMiniPlayer';
+import { RoutineMiniPlayer } from '@/components/app/RoutineMiniPlayer';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
@@ -195,7 +195,7 @@ const NativeAppLayout = () => {
 
       {/* Mini Player - show when audio is playing and not on player page or chat page */}
       {!isOnPlayerPage && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen && <MiniPlayer />}
-      {!isOnChatPage && !isFullScreenTool && !isKeyboardOpen && <FocusMiniPlayer />}
+      {!isOnChatPage && !isFullScreenTool && !isKeyboardOpen && <RoutineMiniPlayer />}
 
       {/* Bottom Navigation - hidden on chat page for full-screen experience */}
       {!isOnChatPage && !isFullScreenTool && !isKeyboardOpen && (
