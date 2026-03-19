@@ -462,7 +462,8 @@ const App = () => (
                     <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                       <Route index element={<Navigate to="/app/home" replace />} />
                       <Route path="home" element={<AppHome />} />
-                      <Route path="programs" element={<AppPrograms />} />
+                      <Route path="myprograms" element={<AppPrograms />} />
+                      <Route path="programs" element={<Navigate to="/app/myprograms" replace />} />
                       <Route path="explore" element={<AppStore />} />
                       <Route path="browse" element={<Navigate to="/app/explore" replace />} />
                       <Route path="academy" element={<AppBrowsePrograms />} />
