@@ -15,11 +15,22 @@ import { toast } from 'sonner';
 import { SortableTaskList } from '@/components/app/SortableTaskList';
 import { useTasksForDate, useCompletionsForDate, UserTask, useAddGoalProgress } from '@/hooks/useTaskPlanner';
 import { isWaterTask } from '@/lib/waterTracking';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function AppRoutinePlayer() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { startRoutine, isActive } = useRoutinePlayerContext();
+  const [showRestartDialog, setShowRestartDialog] = useState(false);
 
   // Fetch ALL user routines from user_routines_bank (user-owned copies)
   const { data: myRoutines, isLoading } = useQuery({
@@ -206,9 +217,56 @@ export default function AppRoutinePlayer() {
     haptic.medium();
 
     if (remainingTasks.length === 0) {
-      toast('All tasks in this routine are already completed for today ✅');
+      setShowRestartDialog(true);
       return;
     }
+
+    launchRoutine();
+  };
+
+  const handleRestartRoutine = async () => {
+    if (!preStartRoutine) return;
+    setShowRestartDialog(false);
+    haptic.medium();
+
+    // Delete today's completions for this routine's tasks so they can be re-done
+    const taskIds = userTasksByRoutine?.[preStartRoutine.routine_id] || [];
+    if (taskIds.length > 0) {
+      await supabase
+        .from('task_completions')
+        .delete()
+        .eq('user_id', user!.id)
+        .eq('completed_date', format(today, 'yyyy-MM-dd'))
+        .in('task_id', taskIds);
+    }
+
+    // Build all tasks (not just remaining since we reset)
+    const allTasks = routineFilteredTasks.map(t => ({
+      id: t.id,
+      title: t.title,
+      emoji: t.emoji || '📝',
+      targetSeconds: t.goal_type === 'timer' ? (t.goal_target || 300) : 0,
+      color: t.color || undefined,
+      userTaskId: t.id,
+      goalType: t.goal_type || null,
+      goalTarget: t.goal_target || null,
+      hasTimerGoal: t.goal_type === 'timer',
+      proLinkType: t.pro_link_type || null,
+      proLinkValue: t.pro_link_value || null,
+    }));
+
+    startRoutine({
+      routineId: preStartRoutine.routine_id,
+      routineTitle: preStartRoutine.title,
+      routineEmoji: preStartRoutine.emoji || '✨',
+      tasks: allTasks,
+    });
+
+    setPreStartRoutine(null);
+  };
+
+  const launchRoutine = async () => {
+    if (!preStartRoutine) return;
 
     // Build focus player tasks from remaining planner tasks
     const focusTasks = remainingTasks.map(t => ({
@@ -482,6 +540,31 @@ export default function AppRoutinePlayer() {
           </div>
         </div>
       )}
+
+      {/* Restart confirmation dialog */}
+      <AlertDialog open={showRestartDialog} onOpenChange={setShowRestartDialog}>
+        <AlertDialogContent className="rounded-3xl max-w-[320px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold text-center leading-snug">
+              You've already completed this routine.
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-muted-foreground">
+              Do you want to reset the existing data and run the routine again?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-3 sm:justify-center">
+            <AlertDialogCancel className="flex-1 rounded-full font-semibold">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleRestartRoutine}
+              className="flex-1 rounded-full font-bold"
+            >
+              Restart
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
