@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { X, ArrowLeft, ChevronRight, ChevronLeft, Settings, CalendarPlus, Check, AlertCircle, Music, Maximize, Bell, Coffee, Timer as TimerIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';

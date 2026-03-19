@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { useReflections, Reflection } from '@/hooks/useReflections';
 import { ArrowLeft, BookOpen, Crown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
