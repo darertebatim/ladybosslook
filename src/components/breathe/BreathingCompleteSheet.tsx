@@ -92,7 +92,13 @@ export function BreathingCompleteSheet({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={(isOpen) => {
+      if (!isOpen) {
+        handleDone();
+        return;
+      }
+      onOpenChange(isOpen);
+    }}>
       <SheetContent
         side="bottom"
         className={cn(
