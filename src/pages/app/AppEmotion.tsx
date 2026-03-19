@@ -64,8 +64,12 @@ const AppEmotion = () => {
   }, [state, createLog, autoCompleteEmotion]);
 
   const handleDone = useCallback(() => {
+    if (fromFocusRoutine && isProTaskActive) {
+      completeProTask();
+      return;
+    }
     navigate('/app/home');
-  }, [navigate]);
+  }, [navigate, fromFocusRoutine, isProTaskActive, completeProTask]);
 
   const handleBack = useCallback(() => {
     switch (step) {
