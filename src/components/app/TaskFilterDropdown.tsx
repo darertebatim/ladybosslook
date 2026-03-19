@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Check, ChevronDown, Filter } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
 
 interface FilterOption {
   value: string;
@@ -94,7 +94,7 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
           "overflow-hidden"
         )}
       >
-        <ScrollArea className="max-h-[320px]">
+        <div className="max-h-[320px] overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
           <div className="py-1.5">
             {/* Base options */}
             {baseOptions.map(option => (
@@ -125,7 +125,7 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
               </div>
             ))}
           </div>
-        </ScrollArea>
+        </div>
       </PopoverContent>
     </Popover>
   );
