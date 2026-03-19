@@ -53,6 +53,152 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
+interface RoutineCardProps {
+  routine: any;
+  routineTasksMap: any;
+  userTasksByRoutine: any;
+  todayCompletions: Set<string> | undefined;
+  getCompletionInfo: (routineId: string) => { pct: number; isComplete: boolean } | null;
+  categoryNameMap: Map<string, string>;
+  loadingRoutineId: string | null;
+  onPlay: (routine: any) => void;
+  onOpenAddSheet: (routine: any) => void;
+  onDeleteRoutine: (routine: any) => void;
+}
+
+function RoutineCardContent({
+  routine,
+  routineTasksMap,
+  userTasksByRoutine,
+  todayCompletions,
+  getCompletionInfo,
+  categoryNameMap,
+  loadingRoutineId,
+  onPlay,
+  onOpenAddSheet,
+  onDeleteRoutine,
+}: RoutineCardProps) {
+  const completion = getCompletionInfo(routine.routine_id);
+  const allTasks = routineTasksMap?.[routine.routine_id] || [];
+  const MAX_EMOJIS = 3;
+  const visibleTasks = allTasks.slice(0, MAX_EMOJIS);
+  const overflowCount = allTasks.length - MAX_EMOJIS;
+  const cardColor = TASK_COLOR_CLASSES[(routine.color as TaskColor) || 'peach'] || TASK_COLOR_CLASSES.peach;
+
+  return (
+    <div
+      onClick={() => onPlay(routine)}
+      className={cn(
+        'rounded-2xl p-4 pb-3.5 active:scale-[0.98] transition-transform cursor-pointer relative overflow-hidden',
+        cardColor
+      )}
+    >
+      <div className="flex items-center justify-between mb-1.5">
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1 text-[11px] font-semibold text-black">
+            <Bell className="w-3 h-3" />
+            {allTasks.length} tasks
+          </span>
+          {routine.category && (
+            <span className="flex items-center gap-1 text-[11px] font-semibold text-black">
+              <Calendar className="w-3 h-3" />
+              {categoryNameMap.get(routine.category) || routine.category}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => { e.stopPropagation(); onOpenAddSheet(routine); }}
+            className="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+            title="Add to planner"
+          >
+            <CalendarPlus className="w-4 h-4 text-white" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); onDeleteRoutine(routine); }}
+            className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center active:scale-95 transition-all"
+          >
+            <Trash2 className="w-3.5 h-3.5 text-destructive" />
+          </button>
+        </div>
+      </div>
+      <h3 className="font-bold text-black text-[17px] leading-snug mb-3">
+        {routine.title}
+      </h3>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1">
+          {visibleTasks.map((task: any, i: number) => (
+            <span key={i} className="flex items-center">
+              <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center">
+                <FluentEmoji emoji={task.emoji} size={20} />
+              </span>
+              {i < visibleTasks.length - 1 && (
+                <ChevronRight className="w-3 h-3 text-black mx-0.5" />
+              )}
+            </span>
+          ))}
+          {overflowCount > 0 && (
+            <>
+              <ChevronRight className="w-3 h-3 text-black mx-0.5" />
+              <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center text-xs font-bold text-black">
+                +{overflowCount}
+              </span>
+            </>
+          )}
+        </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); onPlay(routine); }}
+          disabled={loadingRoutineId === routine.routine_id}
+          className="flex items-center justify-center gap-2 h-12 min-w-[48px] px-5 rounded-full bg-secondary active:scale-95 transition-transform shrink-0"
+        >
+          {loadingRoutineId === routine.routine_id ? (
+            <Loader2 className="w-5 h-5 animate-spin text-black" />
+          ) : completion ? (
+            <>
+              {completion.isComplete ? (
+                <RotateCw className="w-5 h-5 text-black" />
+              ) : (
+                <Play className="w-5 h-5 text-black fill-black" />
+              )}
+              <span className="text-sm font-bold text-black">{completion.pct}%</span>
+            </>
+          ) : (
+            <Play className="w-5 h-5 text-black fill-black" />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function SortableRoutineCard(props: RoutineCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: props.routine.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={cn('touch-manipulation', isDragging && 'opacity-50 scale-[1.02]')}
+    >
+      <RoutineCardContent {...props} />
+    </div>
+  );
+}
+
 export default function AppRoutinePlayer() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
