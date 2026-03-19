@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 
 interface BackButtonProps {
   /** Fallback navigation path if no history state. If not provided, uses browser history */
@@ -19,6 +20,7 @@ interface BackButtonProps {
 /**
  * iOS-style back button with ChevronLeft icon and optional label.
  * Uses location.state.from when available to return to the actual previous page.
+ * If a focus routine is active & minimized, maximizes the player instead.
  */
 export function BackButton({ 
   to, 
@@ -31,11 +33,20 @@ export function BackButton({
   const location = useLocation();
   const from = (location.state as any)?.from;
 
+  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
+  try { focusPlayer = useFocusPlayer(); } catch { /* provider not available */ }
+
   const handleClick = () => {
     haptic.light();
     
     if (onClick) {
       onClick();
+    }
+
+    // If focus player is running & minimized, show the player instead of navigating away
+    if (focusPlayer?.isActive && focusPlayer?.isMinimized) {
+      focusPlayer.maximize();
+      return;
     }
     
     if (from) {
