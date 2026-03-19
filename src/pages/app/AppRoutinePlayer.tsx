@@ -771,3 +771,5 @@ export default function AppRoutinePlayer() {
         />
       )}
     </div>
+  );
+}
