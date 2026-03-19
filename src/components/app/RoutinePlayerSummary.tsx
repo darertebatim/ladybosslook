@@ -14,7 +14,7 @@ export interface SessionTaskResult {
   status: 'completed' | 'skipped';
 }
 
-interface FocusRoutineSummaryProps {
+interface RoutinePlayerSummaryProps {
   routineTitle: string;
   routineEmoji: string;
   startedAt: Date;

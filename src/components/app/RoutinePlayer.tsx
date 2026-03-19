@@ -194,7 +194,7 @@ export const RoutinePlayer = memo(function RoutinePlayer({
   onCancel,
   onMinimize,
   onOpenProTask,
-}: FocusRoutinePlayerProps) {
+}: RoutinePlayerProps) {
   const [showAdjustSheet, setShowAdjustSheet] = useState(false);
   const [showNotifySheet, setShowNotifySheet] = useState(false);
   const [showSkipSheet, setShowSkipSheet] = useState(false);
