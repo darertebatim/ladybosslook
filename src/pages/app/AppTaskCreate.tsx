@@ -508,6 +508,21 @@ const AppTaskCreate = ({
     },
   });
 
+  // Fetch routines for linking
+  const { data: linkableRoutines = [] } = useQuery({
+    queryKey: ['linkable-routines'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routines_bank')
+        .select('id, title, emoji, category')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return data as { id: string; title: string; emoji: string | null; category: string }[];
+    },
+  });
+
   // Fetch routine categories for tags (dynamic instead of hardcoded)
   const { data: routineCategories = [] } = useQuery({
     queryKey: ['routine-categories-for-tags'],
