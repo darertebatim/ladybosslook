@@ -17,11 +17,12 @@ import {
   Brain,
   Video,
   Clapperboard,
+  ListChecks,
   Clock
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
-export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | 'video' | 'video_playlist' | 'focus_timer';
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | 'video' | 'video_playlist' | 'focus_timer' | 'routine';
 
 export interface ProLinkConfig {
   value: ProLinkType;
@@ -285,6 +286,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Open the focus timer',
     requiresValue: false,
   },
+  routine: {
+    value: 'routine',
+    label: 'Routine Player',
+    icon: ListChecks,
+    badgeText: 'Play',
+    color: 'emerald',
+    gradientClass: 'bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40',
+    iconColorClass: 'text-emerald-600 dark:text-emerald-400',
+    badgeColorClass: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open a routine in the player',
+    requiresValue: true,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
@@ -330,6 +344,8 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return linkValue ? `/app/reflections/${linkValue}` : '/app/reflections';
     case 'focus_timer':
       return '/app/timer';
+    case 'routine':
+      return linkValue ? `/app/routineplayer?routine=${linkValue}` : '/app/routineplayer';
     default:
       return '/app/home';
   }

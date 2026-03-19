@@ -1,6 +1,6 @@
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft } from 'lucide-react';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
@@ -29,6 +29,7 @@ import {
 
 export default function AppRoutinePlayer() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const { startRoutine, isActive } = useRoutinePlayerContext();
   const [showRestartDialog, setShowRestartDialog] = useState(false);
@@ -156,6 +157,20 @@ export default function AppRoutinePlayer() {
   const [preStartRoutine, setPreStartRoutine] = useState<any | null>(null);
   const [loadingRoutineId, setLoadingRoutineId] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
+
+  // Auto-open routine from ?routine= query param (e.g. from pro link)
+  const autoOpenedRef = useRef(false);
+  useEffect(() => {
+    const routineParam = searchParams.get('routine');
+    if (!routineParam || !myRoutines || autoOpenedRef.current) return;
+    const match = myRoutines.find((r: any) => r.routine_id === routineParam);
+    if (match) {
+      autoOpenedRef.current = true;
+      setPreStartRoutine(match);
+      // Clean up URL
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, myRoutines, setSearchParams]);
 
   // Planner hooks for the pre-start overlay (uses today's date)
   const today = useMemo(() => new Date(), []);
