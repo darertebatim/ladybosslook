@@ -229,7 +229,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
   // Summary phase
   if (phase === 'summary') {
     return (
-      <FocusRoutineSummary
+      <RoutinePlayerSummary
         routineTitle={config.routineTitle}
         routineEmoji={config.routineEmoji}
         startedAt={startedAt}
