@@ -325,6 +325,10 @@ export default function AppTimer() {
 
   const goBack = () => {
     haptic.light();
+    if (fromFocusRoutine && isProTaskActive) {
+      completeProTask();
+      return;
+    }
     navigate(-1);
   };
 
