@@ -472,8 +472,8 @@ export default function AppFocusRoutines() {
                 completedTaskIds={plannerCompletedTaskIds}
                 completedSubtaskIds={plannerCompletedSubtaskIds}
                 goalProgressMap={plannerGoalProgressMap}
-                onTaskTap={() => {}}
-                onStreakIncrease={() => {}}
+                onTaskTap={handleTaskTap}
+                onStreakIncrease={() => setShowStreakModal(true)}
                 onOpenGoalInput={handleOpenGoalInput}
                 onOpenTimer={handleOpenTimer}
                 hideQuickAdd
@@ -501,6 +501,27 @@ export default function AppFocusRoutines() {
                 : 'Start'}
             </button>
           </div>
+
+          {/* Task Detail Modal — same as Home planner */}
+          <TaskDetailModal
+            task={selectedTask}
+            open={!!selectedTask}
+            onClose={() => setSelectedTask(null)}
+            date={today}
+            isCompleted={selectedTask ? plannerCompletedTaskIds.has(selectedTask.id) : false}
+            completedSubtaskIds={plannerCompletedSubtaskIds}
+            goalProgress={selectedTask ? (plannerGoalProgressMap.get(selectedTask.id) || 0) : 0}
+            onEdit={handleEditTask}
+            onDelete={handleDeleteTask}
+            onStreakIncrease={() => setShowStreakModal(true)}
+            onOpenGoalInput={handleOpenGoalInput}
+            onOpenTimer={handleOpenTimer}
+          />
+
+          <StreakCelebration
+            open={showStreakModal}
+            onClose={() => setShowStreakModal(false)}
+          />
         </div>
       )}
     </div>
