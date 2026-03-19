@@ -167,7 +167,7 @@ function RearrangeSheet({
   );
 }
 
-export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
+export const RoutinePlayer = memo(function RoutinePlayer({
   phase,
   config,
   currentTask,
