@@ -45,7 +45,7 @@ export function ProLinkPicker({
 }: ProLinkPickerProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const showValueInput = proLinkType && ['channel', 'program', 'route'].includes(proLinkType);
+  const showValueInput = proLinkType && proLinkType === 'route';
 
   // Filter by search
   const matchesSearch = (config: typeof PRO_LINK_TYPES[number]) => {
