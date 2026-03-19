@@ -3935,6 +3935,7 @@ export type Database = {
           id: string
           is_active: boolean
           is_focus: boolean | null
+          order_index: number | null
           routine_id: string
           schedule_type: string | null
           title: string | null
@@ -3951,6 +3952,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_focus?: boolean | null
+          order_index?: number | null
           routine_id: string
           schedule_type?: string | null
           title?: string | null
@@ -3967,6 +3969,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_focus?: boolean | null
+          order_index?: number | null
           routine_id?: string
           schedule_type?: string | null
           title?: string | null
