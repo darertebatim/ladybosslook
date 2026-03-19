@@ -175,6 +175,56 @@ export default function AppRoutinePlayer() {
     }
   }, [searchParams, myRoutines, setSearchParams]);
 
+  // Auto-cleanup orphaned routines (no active tasks)
+  useEffect(() => {
+    if (!user || !myRoutines || !routineTasksMap) return;
+    const orphanedRoutines = myRoutines.filter((r: any) => {
+      const tasks = routineTasksMap[r.routine_id] || [];
+      return tasks.length === 0;
+    });
+    if (orphanedRoutines.length === 0) return;
+    
+    const deleteOrphans = async () => {
+      const orphanIds = orphanedRoutines.map((r: any) => r.id);
+      await supabase
+        .from('user_routines_bank')
+        .delete()
+        .in('id', orphanIds);
+      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
+      queryClient.invalidateQueries({ queryKey: ['linkable-user-routines'] });
+    };
+    deleteOrphans();
+  }, [user, myRoutines, routineTasksMap, queryClient]);
+
+  // Delete routine and all its tasks
+  const handleDeleteRoutine = async (routine: any) => {
+    if (!user) return;
+    try {
+      // Delete all user_tasks linked to this routine
+      await supabase
+        .from('user_tasks')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('source_routine_id', routine.routine_id);
+
+      // Delete the routine record
+      await supabase
+        .from('user_routines_bank')
+        .delete()
+        .eq('id', routine.id);
+
+      toast.success(`"${routine.title}" deleted`);
+      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
+      queryClient.invalidateQueries({ queryKey: ['linkable-user-routines'] });
+      queryClient.invalidateQueries({ queryKey: ['routine-user-tasks-emojis'] });
+      queryClient.invalidateQueries({ queryKey: ['routine-user-task-ids'] });
+      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+    } catch (err) {
+      toast.error('Failed to delete routine');
+    }
+    setDeleteRoutine(null);
+  };
+
   // Planner hooks for the pre-start overlay (uses today's date)
   const today = useMemo(() => new Date(), []);
   const { data: plannerTasks = [] } = useTasksForDate(today);
