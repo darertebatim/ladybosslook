@@ -625,15 +625,15 @@ export default function AppRoutinePlayer() {
                             className="flex items-center gap-1.5 h-9 px-4 rounded-full bg-black/10 active:scale-95 transition-transform shrink-0"
                           >
                             {loadingRoutineId === routine.routine_id ? (
-                              <Loader2 className="w-4 h-4 animate-spin text-foreground" />
+                              <Loader2 className="w-4 h-4 animate-spin text-black" />
                             ) : completion ? (
                               <>
                                 {completion.isComplete ? (
-                                  <RotateCw className="w-3.5 h-3.5 text-foreground" />
+                                  <RotateCw className="w-3.5 h-3.5 text-black" />
                                 ) : (
-                                  <Play className="w-3.5 h-3.5 text-foreground fill-foreground" />
+                                  <Play className="w-3.5 h-3.5 text-black fill-black" />
                                 )}
-                                <span className="text-xs font-bold text-foreground">{completion.pct}%</span>
+                                <span className="text-xs font-bold text-black">{completion.pct}%</span>
                               </>
                             ) : (
                               <Play className="w-3.5 h-3.5 text-foreground fill-foreground" />
