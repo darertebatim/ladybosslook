@@ -329,6 +329,20 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   // Capture full screen height before keyboard opens to prevent shifting
   const [anchorTop, setAnchorTop] = useState<string>('25%');
   const [suggestionsTop, setSuggestionsTop] = useState<string>('calc(25% + 220px)');
+
+  // Listen for external trigger (e.g. FAB button)
+  useEffect(() => {
+    const handleOpen = () => {
+      const screenH = window.innerHeight;
+      const topPx = Math.round(screenH * 0.25);
+      setAnchorTop(`${topPx}px`);
+      setSuggestionsTop(`${topPx + 220}px`);
+      setIsOpen(true);
+      haptic.light();
+    };
+    window.addEventListener('quick-add-open', handleOpen);
+    return () => window.removeEventListener('quick-add-open', handleOpen);
+  }, []);
   const createTask = useCreateTask();
   const navigate = useNavigate();
   const { data: templates = [] } = useTaskTemplates();
