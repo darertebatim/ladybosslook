@@ -49,7 +49,7 @@ export function PresenceProfileCard() {
 
   return (
     <button
-      onClick={() => navigate('/app/profile', { state: { from: '/app/presence' } })}
+      onClick={() => navigate('/app/myprofile', { state: { from: '/app/presence' } })}
       className="w-full bg-white rounded-2xl p-4 shadow-sm active:scale-[0.98] transition-transform text-left"
     >
       {isLoading ? (

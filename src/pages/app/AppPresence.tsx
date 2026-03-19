@@ -76,7 +76,7 @@ const AppPresence = () => {
             />
             <div className="flex items-center gap-2">
               <button
-                onClick={() => navigate('/app/profile', { state: { from: '/app/presence' } })}
+                onClick={() => navigate('/app/myprofile', { state: { from: '/app/presence' } })}
                 className="w-9 h-9 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
               >
                 <User className="w-4.5 h-4.5 text-orange-700" />

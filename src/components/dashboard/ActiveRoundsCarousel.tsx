@@ -80,7 +80,7 @@ export function ActiveRoundsCarousel({
             {isCollapsed ? 'tap to expand' : 'tap to collapse'}
           </span>
         </div>
-        <Link to="/app/programs" className="text-xs text-primary font-medium flex items-center gap-0.5" onClick={e => e.stopPropagation()}>
+        <Link to="/app/myprograms" className="text-xs text-primary font-medium flex items-center gap-0.5" onClick={e => e.stopPropagation()}>
           View All
           <ChevronRight className="h-3.5 w-3.5" />
         </Link>

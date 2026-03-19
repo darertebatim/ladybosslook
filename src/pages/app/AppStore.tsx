@@ -190,7 +190,7 @@ const AppStore = () => {
       } else {
         toast.success('Enrolled successfully!');
         invalidateAllEnrollmentData();
-        navigate('/app/programs');
+        navigate('/app/myprograms');
       }
     } finally {
       setEnrollingSlug(null);

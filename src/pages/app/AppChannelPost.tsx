@@ -360,7 +360,7 @@ export default function AppChannelPost() {
 
   const handleBack = () => {
     const from = (location.state as any)?.from;
-    navigate(from || '/app/profile');
+    navigate(from || '/app/myprofile');
   };
 
   const handleSubmit = () => {

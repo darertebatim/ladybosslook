@@ -25,11 +25,11 @@ interface NotificationFormProps {
 // Common in-app link options
 const IN_APP_LINKS = [
   { value: '/app/home', label: 'Home' },
-  { value: '/app/programs', label: 'My Programs' },
+  { value: '/app/myprograms', label: 'My Programs' },
   { value: '/app/explore', label: 'Explore' },
   { value: '/app/player', label: 'Audio Player' },
   { value: '/app/chat', label: 'Support Chat' },
-  { value: '/app/profile', label: 'Profile' },
+  { value: '/app/myprofile', label: 'Profile' },
   { value: 'custom', label: '✏️ Custom URL...' },
 ];
 
