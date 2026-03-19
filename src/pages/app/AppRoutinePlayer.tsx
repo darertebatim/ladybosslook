@@ -590,7 +590,7 @@ export default function AppRoutinePlayer() {
                         </div>
 
                         {/* Title */}
-                        <h3 className="font-bold text-foreground text-[17px] leading-snug mb-3">
+                        <h3 className="font-bold text-black text-[17px] leading-snug mb-3">
                           {routine.title}
                         </h3>
 
