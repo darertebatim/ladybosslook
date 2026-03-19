@@ -1347,7 +1347,7 @@ export default function RoutinesBank() {
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="z-[9999]">
                           {routineCategories.map((cat) => (
                             <SelectItem key={cat.slug} value={cat.slug}>
                               <span className="flex items-center gap-2">
