@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { X, Play, Megaphone, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { smartOpenUrl } from '@/lib/navigation-utils';
 import { detectVideoType, extractYouTubeId } from '@/lib/videoUtils';
 import { BUILD_INFO } from '@/lib/buildInfo';
 import { AppVideoPlayer } from '@/components/app/AppVideoPlayer';
@@ -92,11 +93,7 @@ export function HomeBanner() {
   };
 
   const handleButtonClick = (url: string) => {
-    if (url.startsWith('http')) {
-      window.open(url, '_blank');
-    } else {
-      navigate(url);
-    }
+    smartOpenUrl(url, navigate);
   };
 
   const visibleBanners = banners.filter(b => !dismissedIds.has(b.id));

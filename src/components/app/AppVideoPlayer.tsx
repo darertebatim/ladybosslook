@@ -3,8 +3,8 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { X, Loader2, ExternalLink, Gauge, SkipForward } from 'lucide-react';
 import { detectVideoType, extractYouTubeId, extractVimeoId, getVideoPlatformLabel, isVerticalVideo } from '@/lib/videoUtils';
-import { isNativeApp } from '@/lib/platform';
-import { Browser } from '@capacitor/browser';
+import { useNavigate } from 'react-router-dom';
+import { smartOpenUrl } from '@/lib/navigation-utils';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { useExistingVideoTask } from '@/hooks/useVideoRoutine';
@@ -79,12 +79,10 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
     }
   }, [hasNext, playNext]);
 
+  const navigate = useNavigate();
+
   const handleOpenExternal = async () => {
-    if (isNativeApp()) {
-      await Browser.open({ url });
-    } else {
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
+    smartOpenUrl(url, navigate);
   };
 
   const cycleSpeed = () => {

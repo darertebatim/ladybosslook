@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { smartOpenUrl } from '@/lib/navigation-utils';
 import { supabase } from '@/integrations/supabase/client';
 import { X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -327,11 +328,11 @@ export function PromoBanner({
       case 'profile': navigate('/app/myprofile'); break;
       case 'custom_url':
         if (banner.custom_url) {
-          banner.custom_url.startsWith('http') ? window.open(banner.custom_url, '_blank') : navigate(banner.custom_url);
+          smartOpenUrl(banner.custom_url, navigate);
         }
         break;
       case 'external_url':
-        if (banner.custom_url) window.open(banner.custom_url, '_blank');
+        if (banner.custom_url) smartOpenUrl(banner.custom_url, navigate);
         break;
       case 'rate': navigate('/app/rate'); break;
       case 'onboarding':
