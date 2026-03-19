@@ -3,16 +3,16 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
 import { logLocalNotificationEvent } from '@/lib/localNotificationLogger';
-import { getLocalDateStr } from '@/lib/localDate';
+import { getLocalDateStr, taskAppliesToDate } from '@/lib/localDate';
 
 /**
  * Smart Task Nudges - Local Notification Scheduler
- * 
+ *
  * Schedules random notifications from user's actual planner data:
  * - Task Reminders: 1-3 random incomplete tasks (IDs: 200001-200010)
  * - ProTask Nudges: 1 random proaction (IDs: 200011-200020)
  * - Water Reminders: 3-4 random times (IDs: 200021-200030)
- * 
+ *
  * All scheduled between 8 AM and 8 PM local time.
  * Reschedules daily on app open.
  */
@@ -102,15 +102,16 @@ export function useSmartActionNudges(userId: string | undefined) {
       for (let i = ID_RANGES.ACTION.start; i <= ID_RANGES.ACTION.end; i++) allIds.push({ id: i });
       for (let i = ID_RANGES.PROACTION.start; i <= ID_RANGES.PROACTION.end; i++) allIds.push({ id: i });
       for (let i = ID_RANGES.WATER.start; i <= ID_RANGES.WATER.end; i++) allIds.push({ id: i });
-      
+
       await LocalNotifications.cancel({ notifications: allIds });
 
-      // Fetch user's active tasks AND today's completions in parallel
       const todayStr = getLocalDateStr();
+
+      // Fetch all active tasks + today's completions
       const [{ data: tasks }, { data: completions }] = await Promise.all([
         supabase
           .from('user_tasks')
-          .select('id, title, emoji, pro_link_type, goal_type, is_active')
+          .select('id, title, emoji, pro_link_type, goal_type, is_active, repeat_pattern, repeat_days, scheduled_date, created_at, repeat_end_date')
           .eq('user_id', userId)
           .eq('is_active', true),
         supabase
@@ -125,26 +126,58 @@ export function useSmartActionNudges(userId: string | undefined) {
         return;
       }
 
+      // For one-time tasks, track if they were ever completed (so completed one-time tasks never re-nudge)
+      const oneTimeTaskIds = tasks
+        .filter((t) => t.repeat_pattern === 'none')
+        .map((t) => t.id);
+
+      let oneTimeCompletedSet = new Set<string>();
+      if (oneTimeTaskIds.length > 0) {
+        const { data: oneTimeCompletions } = await supabase
+          .from('task_completions')
+          .select('task_id')
+          .eq('user_id', userId)
+          .in('task_id', oneTimeTaskIds);
+
+        oneTimeCompletedSet = new Set((oneTimeCompletions || []).map((c) => c.task_id));
+      }
+
+      // Mirror Home behavior: include tasks that apply today + carry-forward uncompleted one-time tasks
+      const applicableTasks = tasks.filter((task) => {
+        if (task.repeat_pattern === 'none') {
+          if (!task.scheduled_date) return false;
+          if (task.scheduled_date === todayStr) return true;
+          return task.scheduled_date < todayStr && !oneTimeCompletedSet.has(task.id);
+        }
+
+        return taskAppliesToDate(task, todayStr);
+      });
+
+      if (applicableTasks.length === 0) {
+        console.log('[SmartNudges] No applicable tasks for today, skipping');
+        return;
+      }
+
       // Filter out tasks already completed today
-      const completedTaskIds = new Set((completions || []).map(c => c.task_id));
-      const incompleteTasks = tasks.filter(t => !completedTaskIds.has(t.id));
+      const completedTaskIds = new Set((completions || []).map((c) => c.task_id));
+      const incompleteTasks = applicableTasks.filter((t) => !completedTaskIds.has(t.id));
 
       if (incompleteTasks.length === 0) {
-        console.log('[SmartNudges] All tasks completed today, skipping');
+        console.log('[SmartNudges] All applicable tasks completed today, skipping');
         return;
       }
 
       const notifications: any[] = [];
 
       // 2a. Random Action Reminders (non-proaction, incomplete tasks)
-      const regularTasks = incompleteTasks.filter(t => !t.pro_link_type);
+      const regularTasks = incompleteTasks.filter((t) => !t.pro_link_type);
       const selectedTasks = pickRandom(regularTasks, 3);
-      
+
       selectedTasks.forEach((task, idx) => {
         const time = randomTimeBetween(8, 20);
         if (!time) return; // No available time slot today
         const scheduleAt = getScheduleDate(time.hour, time.minute);
-        
+
         notifications.push({
           id: ID_RANGES.ACTION.start + idx,
           title: `${task.emoji} ${task.title}`,
@@ -156,14 +189,14 @@ export function useSmartActionNudges(userId: string | undefined) {
       });
 
       // 2b. ProAction Nudges (incomplete only)
-      const proTasks = incompleteTasks.filter(t => t.pro_link_type && t.pro_link_type !== 'water');
+      const proTasks = incompleteTasks.filter((t) => t.pro_link_type && t.pro_link_type !== 'water');
       if (proTasks.length > 0) {
         const selected = pickRandom(proTasks, 1)[0];
         const msgConfig = PROACTION_MESSAGES[selected.pro_link_type!] || PROACTION_MESSAGES.playlist;
         const time = randomTimeBetween(8, 20);
         if (time) {
           const scheduleAt = getScheduleDate(time.hour, time.minute);
-          
+
           notifications.push({
             id: ID_RANGES.PROACTION.start,
             title: `${msgConfig.emoji} ${msgConfig.title}`,
@@ -176,15 +209,15 @@ export function useSmartActionNudges(userId: string | undefined) {
       }
 
       // 2c. Water Reminders (always show if water task exists, even if completed — hydration is recurring)
-      const hasWater = incompleteTasks.some(t => t.pro_link_type === 'water' || t.goal_type === 'water')
-        || tasks.some(t => t.pro_link_type === 'water' || t.goal_type === 'water');
+      const hasWater = incompleteTasks.some((t) => t.pro_link_type === 'water' || t.goal_type === 'water')
+        || applicableTasks.some((t) => t.pro_link_type === 'water' || t.goal_type === 'water');
       if (hasWater) {
         const waterCount = 3 + Math.floor(Math.random() * 2); // 3-4
         for (let i = 0; i < waterCount; i++) {
           const time = randomTimeBetween(8, 20);
           if (!time) continue; // No available time slot
           const scheduleAt = getScheduleDate(time.hour, time.minute);
-          
+
           notifications.push({
             id: ID_RANGES.WATER.start + i,
             title: '💧 Water Reminder',
@@ -199,7 +232,7 @@ export function useSmartActionNudges(userId: string | undefined) {
       if (notifications.length > 0) {
         await LocalNotifications.schedule({ notifications });
         console.log(`[SmartNudges] ✅ Scheduled ${notifications.length} nudges`);
-        
+
         // Log scheduled events
         for (const n of notifications) {
           logLocalNotificationEvent({
@@ -217,7 +250,7 @@ export function useSmartActionNudges(userId: string | undefined) {
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform() || !userId) return;
-    
+
     // Schedule on app launch with a small delay
     const timer = setTimeout(scheduleNudges, 5000);
     return () => clearTimeout(timer);
