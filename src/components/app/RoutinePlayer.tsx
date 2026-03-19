@@ -223,6 +223,17 @@ export const RoutinePlayer = memo(function RoutinePlayer({
         : Math.max(0, Math.min(100, ((currentTask.targetSeconds - timeLeft) / currentTask.targetSeconds) * 100))
     : 0;
 
+  // Countdown phase — 3-2-1-GO
+  if (phase === 'countdown') {
+    return (
+      <RoutineCountdown
+        routineEmoji={config.routineEmoji}
+        routineTitle={config.routineTitle}
+        onComplete={onCountdownComplete}
+      />
+    );
+  }
+
   // Breathe phase removed — go straight to running
   if (phase === 'breathe') {
     onBreathComplete();

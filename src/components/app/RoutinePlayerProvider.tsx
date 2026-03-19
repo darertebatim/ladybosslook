@@ -150,6 +150,7 @@ export function RoutinePlayerProvider({ children }: { children: ReactNode }) {
             taskStartedAt={player.taskStartedAt}
             pauseElapsed={player.pauseElapsed}
             onBreathComplete={player.onBreathComplete}
+            onCountdownComplete={player.onCountdownComplete}
             onCompleteTask={player.completeTask}
             onSkipTask={player.skipTask}
             onTogglePause={player.togglePause}
