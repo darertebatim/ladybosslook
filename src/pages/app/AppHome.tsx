@@ -1037,11 +1037,11 @@ const AppHome = () => {
               )}
 
               {/* Personal Actions Section - hide empty state when welcome card is shown */}
-              {!isNewUser && filteredTasks.length === 0 && (taskFilter !== 'all' || programEvents.length === 0) ? (
+              {!isNewUser && filteredTasks.length === 0 && taskFilter === 'all' && programEvents.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-4xl mb-3">✨</div>
                   <p className="text-muted-foreground mb-2">
-                    {taskFilter !== 'all' ? 'No tasks match this filter' : 'Your day is open'}
+                    Your day is open
                   </p>
                   <p className="text-xs text-muted-foreground/70 mb-4">
                     One small task is enough
@@ -1050,7 +1050,7 @@ const AppHome = () => {
                     Add your first task
                   </button>
                 </div>
-              ) : filteredTasks.length > 0 ? (
+              ) : filteredTasks.length > 0 || (!isNewUser && taskFilter !== 'all') ? (
                 <div>
                    {/* My Tasks header with filter dropdown */}
                   <div className="flex items-center gap-2 mb-3">
@@ -1097,140 +1097,154 @@ const AppHome = () => {
                     </Select>
                     
                   </div>
-                  
-                  {/* Coach mark spotlight for first-ever action */}
-                  {(() => {
-                    const isFirstActionPending = localStorage.getItem('simora_first_action_celebrated') !== 'true' && completedTaskIds.size === 0 && totalCompletions === 0;
-                    return isFirstActionPending ? (
-                      <>
-                        {/* Dark overlay behind everything */}
-                        <div className="fixed inset-0 bg-black/60 z-[100] pointer-events-none animate-fade-in" />
-                        
-                        {/* Spotlighted task card + hint — disable body tap so only checkbox works */}
-                        <div className="relative z-[101]">
-                          <div className="relative">
-                            <SortableTaskList tasks={filteredTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
-                          
-                            {/* Glowing ring around the checkbox */}
-                            <div
-                              className="absolute pointer-events-none"
-                              style={{
-                                top: '50%',
-                                right: '10px',
-                                width: '48px',
-                                height: '48px',
-                                transform: 'translateY(-50%)',
-                                borderRadius: '50%',
-                                boxShadow: '0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35)',
-                                animation: 'checkboxGlow 1.6s ease-in-out infinite',
-                              }}
-                            />
 
-                            {/* Bouncing hand hint pointing at the checkbox — positioned relative to the card */}
-                            <div
-                              className="absolute pointer-events-none"
-                              style={{
-                                top: '50%',
-                                right: '52px',
-                                transform: 'translateY(-100%) rotate(-45deg)',
-                                filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
-                                animation: 'coachHandBounce 1.4s ease-in-out infinite',
-                              }}
-                            >
-                              <FluentEmoji emoji="👇" size={64} />
-                            </div>
-                          </div>
-                          <style>{`
-                            @keyframes coachHandBounce {
-                              0%   { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
-                              40%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
-                              55%  { transform: translateY(-100%) rotate(-45deg) translateY(5px); }
-                              70%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
-                              100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
-                            }
-                            @keyframes checkboxGlow {
-                              0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
-                              50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
-                            }
-                          `}</style>
-                          
-                          <p className="text-center text-sm text-white/90 mt-5 mb-2 animate-fade-in font-medium">
-                            Mark off your first task to start your journey! 💪
-                          </p>
-                        </div>
-                      </>
-                    ) : showTapCoachMark ? (
-                      <>
-                        {/* Dark overlay for "tap to manage" coach mark */}
-                        <div className="fixed inset-0 bg-black/60 z-[100] animate-fade-in" onClick={() => setShowTapCoachMark(false)} />
-                        
-                        {/* Spotlight the first UNCOMPLETED action, fallback to first task */}
-                        {filteredTasks.length > 0 && (() => {
-                          const spotlightTask = filteredTasks.find(t => !completedTaskIds.has(t.id)) || filteredTasks[0];
-                          return (
-                          <div className="relative z-[101]">
-                            <div className="relative">
-                              <SortableTaskList tasks={[spotlightTask]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                  {filteredTasks.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-10">
+                      <p className="text-sm text-muted-foreground mb-2">No tasks match this filter</p>
+                      <button
+                        onClick={() => setTaskFilter('all')}
+                        className="text-xs font-medium text-primary"
+                      >
+                        Show all tasks
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Coach mark spotlight for first-ever action */}
+                      {(() => {
+                        const isFirstActionPending = localStorage.getItem('simora_first_action_celebrated') !== 'true' && completedTaskIds.size === 0 && totalCompletions === 0;
+                        return isFirstActionPending ? (
+                          <>
+                            {/* Dark overlay behind everything */}
+                            <div className="fixed inset-0 bg-black/60 z-[100] pointer-events-none animate-fade-in" />
+                            
+                            {/* Spotlighted task card + hint — disable body tap so only checkbox works */}
+                            <div className="relative z-[101]">
+                              <div className="relative">
+                                <SortableTaskList tasks={filteredTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                               
-                              {/* Glowing highlight around the action name area */}
-                              <div
-                                className="absolute pointer-events-none"
-                                style={{
-                                  top: '50%',
-                                  left: '50px',
-                                  width: '160px',
-                                  height: '36px',
-                                  transform: 'translateY(-50%)',
-                                  borderRadius: '12px',
-                                  boxShadow: '0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35)',
-                                  animation: 'checkboxGlow 1.6s ease-in-out infinite',
-                                }}
-                              />
+                                {/* Glowing ring around the checkbox */}
+                                <div
+                                  className="absolute pointer-events-none"
+                                  style={{
+                                    top: '50%',
+                                    right: '10px',
+                                    width: '48px',
+                                    height: '48px',
+                                    transform: 'translateY(-50%)',
+                                    borderRadius: '50%',
+                                    boxShadow: '0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35)',
+                                    animation: 'checkboxGlow 1.6s ease-in-out infinite',
+                                  }}
+                                />
 
-                              {/* Bouncing hand hint pointing at the action name — same style as first spotlight */}
-                              <div
-                                className="absolute pointer-events-none"
-                                style={{
-                                  top: '50%',
-                                  left: '70px',
-                                  transform: 'translateY(-100%) rotate(-45deg)',
-                                  filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
-                                  animation: 'tapCoachBounce 1.4s ease-in-out infinite',
-                                }}
-                              >
-                                <FluentEmoji emoji="👇" size={64} />
+                                {/* Bouncing hand hint pointing at the checkbox — positioned relative to the card */}
+                                <div
+                                  className="absolute pointer-events-none"
+                                  style={{
+                                    top: '50%',
+                                    right: '52px',
+                                    transform: 'translateY(-100%) rotate(-45deg)',
+                                    filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
+                                    animation: 'coachHandBounce 1.4s ease-in-out infinite',
+                                  }}
+                                >
+                                  <FluentEmoji emoji="👇" size={64} />
+                                </div>
                               </div>
+                              <style>{`
+                                @keyframes coachHandBounce {
+                                  0%   { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
+                                  40%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
+                                  55%  { transform: translateY(-100%) rotate(-45deg) translateY(5px); }
+                                  70%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
+                                  100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
+                                }
+                                @keyframes checkboxGlow {
+                                  0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
+                                  50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
+                                }
+                              `}</style>
+                              
+                              <p className="text-center text-sm text-white/90 mt-5 mb-2 animate-fade-in font-medium">
+                                Mark off your first task to start your journey! 💪
+                              </p>
                             </div>
-                            <style>{`
-                              @keyframes tapCoachBounce {
-                                0%   { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
-                                40%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
-                                55%  { transform: translateY(-100%) rotate(-45deg) translateY(5px); }
-                                70%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
-                                100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
-                              }
-                              @keyframes checkboxGlow {
-                                0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
-                                50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
-                              }
-                            `}</style>
-                            <p className="text-center text-sm text-white/90 mt-3 mb-2 animate-fade-in font-medium">
-                              Tap on an action to edit, skip, or delete it
-                            </p>
-                          </div>
-                          );
-                        })()}
-                        {/* Remaining tasks behind the overlay */}
-                        {filteredTasks.length > 1 && (
-                          <div className="relative z-[1]">
-                            <SortableTaskList tasks={filteredTasks.slice(1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
-                    );
-                  })()}
+                          </>
+                        ) : showTapCoachMark ? (
+                          <>
+                            {/* Dark overlay for "tap to manage" coach mark */}
+                            <div className="fixed inset-0 bg-black/60 z-[100] animate-fade-in" onClick={() => setShowTapCoachMark(false)} />
+                            
+                            {/* Spotlight the first UNCOMPLETED action, fallback to first task */}
+                            {filteredTasks.length > 0 && (() => {
+                              const spotlightTask = filteredTasks.find(t => !completedTaskIds.has(t.id)) || filteredTasks[0];
+                              return (
+                              <div className="relative z-[101]">
+                                <div className="relative">
+                                  <SortableTaskList tasks={[spotlightTask]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                                  
+                                  {/* Glowing highlight around the action name area */}
+                                  <div
+                                    className="absolute pointer-events-none"
+                                    style={{
+                                      top: '50%',
+                                      left: '50px',
+                                      width: '160px',
+                                      height: '36px',
+                                      transform: 'translateY(-50%)',
+                                      borderRadius: '12px',
+                                      boxShadow: '0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35)',
+                                      animation: 'checkboxGlow 1.6s ease-in-out infinite',
+                                    }}
+                                  />
+
+                                  {/* Bouncing hand hint pointing at the action name — same style as first spotlight */}
+                                  <div
+                                    className="absolute pointer-events-none"
+                                    style={{
+                                      top: '50%',
+                                      left: '70px',
+                                      transform: 'translateY(-100%) rotate(-45deg)',
+                                      filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
+                                      animation: 'tapCoachBounce 1.4s ease-in-out infinite',
+                                    }}
+                                  >
+                                    <FluentEmoji emoji="👇" size={64} />
+                                  </div>
+                                </div>
+                                <style>{`
+                                  @keyframes tapCoachBounce {
+                                    0%   { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
+                                    40%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
+                                    55%  { transform: translateY(-100%) rotate(-45deg) translateY(5px); }
+                                    70%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
+                                    100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
+                                  }
+                                  @keyframes checkboxGlow {
+                                    0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
+                                    50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
+                                  }
+                                `}</style>
+                                <p className="text-center text-sm text-white/90 mt-3 mb-2 animate-fade-in font-medium">
+                                  Tap on an action to edit, skip, or delete it
+                                </p>
+                              </div>
+                              );
+                            })()}
+                            {/* Remaining tasks behind the overlay */}
+                            {filteredTasks.length > 1 && (
+                              <div className="relative z-[1]">
+                                <SortableTaskList tasks={filteredTasks.slice(1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                        );
+                      })()}
+                    </>
+                  )}
                   {/* Onboarding banner moved below routine section */}
                 </div>
               ) : (
