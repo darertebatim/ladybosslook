@@ -58,8 +58,9 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
 
   // Find current label
   const currentLabel = (() => {
-    const base = baseOptions.find(o => o.value === value);
-    if (base) return base.label;
+    const all = [...baseOptions, ...endOptions];
+    const found = all.find(o => o.value === value);
+    if (found) return found.label;
     for (const group of groups) {
       const found = group.options.find(o => o.value === value);
       if (found) return found.label;
