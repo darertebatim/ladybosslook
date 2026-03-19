@@ -622,7 +622,7 @@ export default function AppRoutinePlayer() {
                           <button
                             onClick={(e) => { e.stopPropagation(); handlePlay(routine); }}
                             disabled={loadingRoutineId === routine.routine_id}
-                            className="flex items-center gap-1.5 h-9 px-4 rounded-full bg-foreground/10 active:scale-95 transition-transform shrink-0"
+                            className="flex items-center gap-1.5 h-9 px-4 rounded-full bg-black/10 active:scale-95 transition-transform shrink-0"
                           >
                             {loadingRoutineId === routine.routine_id ? (
                               <Loader2 className="w-4 h-4 animate-spin text-foreground" />
