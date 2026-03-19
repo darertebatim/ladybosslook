@@ -189,7 +189,7 @@ const AppJournal = () => {
         className="flex items-center justify-between px-4 pb-2"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}
       >
-        <button onClick={() => navigate('/app/home')} className="p-2 -ml-2">
+        <button onClick={goHome} className="p-2 -ml-2">
           <X className="h-5 w-5 text-foreground" />
         </button>
         <h1 className="text-lg font-semibold text-foreground">My Journal</h1>
