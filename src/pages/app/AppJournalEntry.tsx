@@ -34,9 +34,9 @@ const AppJournalEntry = () => {
   const { entryId } = useParams<{ entryId: string }>();
   const isNewEntry = !entryId || entryId === 'new';
 
-  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
-  try { focusPlayer = useRoutinePlayerContext(); } catch { /* not available */ }
-  const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
+  let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
+  try { routinePlayer = useRoutinePlayerContext(); } catch { /* not available */ }
+  const hasActivePlayer = routinePlayer?.isActive && routinePlayer?.isMinimized;
   const { autoCompleteJournal } = useAutoCompleteProTask();
   
   // Get mood from URL params for new entries (e.g., /app/journal/new?mood=great)
