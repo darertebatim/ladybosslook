@@ -306,7 +306,7 @@ export function PromoBanner({
         if (banner.destination_id) navigate(`/app/player/playlist/${banner.destination_id}`);
         break;
       case 'journal': navigate('/app/journal'); break;
-      case 'programs': navigate('/app/programs'); break;
+      case 'programs': navigate('/app/myprograms'); break;
       case 'breathe': navigate('/app/breathe'); break;
       case 'water': navigate('/app/water'); break;
       case 'channels': navigate('/app/channels'); break;
