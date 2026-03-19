@@ -286,6 +286,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Open the focus timer',
     requiresValue: false,
   },
+  routine: {
+    value: 'routine',
+    label: 'Routine Player',
+    icon: ListChecks,
+    badgeText: 'Play',
+    color: 'emerald',
+    gradientClass: 'bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40',
+    iconColorClass: 'text-emerald-600 dark:text-emerald-400',
+    badgeColorClass: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open a routine in the player',
+    requiresValue: true,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
