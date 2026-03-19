@@ -29,7 +29,7 @@ export interface RoutinePlayerConfig {
   tasks: RoutineTask[];
 }
 
-type PlayerPhase = 'idle' | 'breathe' | 'running' | 'paused' | 'summary';
+type PlayerPhase = 'idle' | 'breathe' | 'countdown' | 'running' | 'paused' | 'summary';
 
 export function useRoutinePlayer() {
   const { user } = useAuth();
