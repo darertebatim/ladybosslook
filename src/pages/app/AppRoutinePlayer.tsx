@@ -575,7 +575,7 @@ export default function AppRoutinePlayer() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={(e) => { e.stopPropagation(); handleOpenAddSheet(routine); }}
-                              className="w-9 h-9 rounded-full bg-primary flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+                              className="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
                               title="Add to planner"
                             >
                               <CalendarPlus className="w-4 h-4 text-primary-foreground" />
