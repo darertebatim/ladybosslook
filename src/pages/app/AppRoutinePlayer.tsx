@@ -236,7 +236,7 @@ export default function AppRoutinePlayer() {
         .from('task_completions')
         .delete()
         .eq('user_id', user!.id)
-        .eq('completed_date', today)
+        .eq('completed_date', format(today, 'yyyy-MM-dd'))
         .in('task_id', taskIds);
     }
 
