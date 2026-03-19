@@ -135,7 +135,7 @@ export function RoutinePlayerProvider({ children }: { children: ReactNode }) {
       {children}
       {showFullPlayer && (
         <OverlayPortal>
-          <FocusRoutinePlayer
+          <RoutinePlayer
             phase={player.phase as 'breathe' | 'running' | 'paused' | 'summary'}
             config={player.config!}
             currentTask={player.currentTask}
