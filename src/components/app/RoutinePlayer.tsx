@@ -25,9 +25,9 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-interface FocusRoutinePlayerProps {
+interface RoutinePlayerProps {
   phase: 'breathe' | 'running' | 'paused' | 'summary';
-  config: FocusRoutineConfig;
+  config: RoutinePlayerConfig;
   currentTask: { id: string; title: string; emoji: string; targetSeconds: number; color?: string } | null;
   currentTaskIndex: number;
   timeLeft: number;
