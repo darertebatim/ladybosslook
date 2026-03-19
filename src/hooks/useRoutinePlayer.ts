@@ -22,11 +22,11 @@ export interface RoutineTask {
   proLinkValue?: string | null;
 }
 
-export interface FocusRoutineConfig {
+export interface RoutinePlayerConfig {
   routineId: string;
   routineTitle: string;
   routineEmoji: string;
-  tasks: FocusTask[];
+  tasks: RoutineTask[];
 }
 
 type PlayerPhase = 'idle' | 'breathe' | 'running' | 'paused' | 'summary';
