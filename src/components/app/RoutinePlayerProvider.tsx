@@ -109,7 +109,7 @@ export function RoutinePlayerProvider({ children }: { children: ReactNode }) {
       openProTask();
     }, 800);
     return () => clearTimeout(timer);
-  }, [player.currentTask, player.currentTaskIndex, isActive, minimized, openProTask]);
+  }, [player.currentTask, player.currentTaskIndex, isActive, minimized, player.phase, openProTask]);
 
   // Reset auto-open ref when routine ends
   useEffect(() => {
