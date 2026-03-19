@@ -134,12 +134,12 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'programs',
-    name: 'Programs',
+    name: 'My Programs',
     icon: 'GraduationCap',
     emoji: '🎓',
     bgColor: 'bg-[#FFF492]',
     iconColor: 'text-amber-600',
-    route: '/app/programs',
+    route: '/app/myprograms',
     description: 'Courses & coaching',
   },
   {
