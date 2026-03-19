@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink, Loader2, FileText, ChevronLeft, ChevronRight, Check, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { isNativeApp } from "@/lib/platform";
 import { cn } from "@/lib/utils";
 import { smartOpenUrl } from "@/lib/navigation-utils";
 import { AppVideoPlayer } from "@/components/app/AppVideoPlayer";
