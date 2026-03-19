@@ -543,7 +543,7 @@ export default function AppRoutinePlayer() {
 
       {/* Restart confirmation dialog */}
       <AlertDialog open={showRestartDialog} onOpenChange={setShowRestartDialog}>
-        <AlertDialogContent className="rounded-3xl max-w-[320px] z-[10000]">
+        <AlertDialogContent className="rounded-3xl max-w-[320px]" style={{ zIndex: 10001 }}>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold text-center leading-snug">
               You've already completed this routine.
