@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { useShareContent } from '@/hooks/useShareContent';
 import { useBilingualText } from '@/components/ui/BilingualText';
 import { cn } from '@/lib/utils';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import {
   AlertDialog,
   AlertDialogAction,
