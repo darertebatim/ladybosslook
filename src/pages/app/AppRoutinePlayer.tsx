@@ -198,6 +198,8 @@ export default function AppRoutinePlayer() {
   const [deleteRoutine, setDeleteRoutine] = useState<any | null>(null);
   const queryClient = useQueryClient();
   const [showPageRoutineSheet, setShowPageRoutineSheet] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<FilterValue>({ type: 'all', label: 'All' });
 
   // Check if routine player page is already added as a task
   const { data: isPageAdded } = useExistingProTask('route', '/app/routineplayer');
