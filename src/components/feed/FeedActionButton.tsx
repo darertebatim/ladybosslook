@@ -1,20 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Play, Video, FileText, ExternalLink, Star } from 'lucide-react';
-import { Browser } from '@capacitor/browser';
-import { Capacitor } from '@capacitor/core';
-
-const openUrl = async (url: string) => {
-  try {
-    if (Capacitor.isNativePlatform()) {
-      await Browser.open({ url });
-    } else {
-      window.open(url, '_blank');
-    }
-  } catch {
-    window.open(url, '_blank');
-  }
-};
+import { smartOpenUrl } from '@/lib/navigation-utils';
 
 interface FeedActionButtonProps {
   actionType: 'none' | 'play_audio' | 'join_session' | 'view_materials' | 'external_link' | 'rate_app';
@@ -37,19 +24,19 @@ export function FeedActionButton({ actionType, actionData }: FeedActionButtonPro
         break;
       case 'join_session':
         if (actionData.meetingUrl) {
-          openUrl(actionData.meetingUrl);
+          smartOpenUrl(actionData.meetingUrl, navigate);
         }
         break;
       case 'view_materials':
         if (actionData.courseSlug) {
           navigate(`/app/programs/${actionData.courseSlug}`);
         } else if (actionData.url) {
-          openUrl(actionData.url);
+          smartOpenUrl(actionData.url, navigate);
         }
         break;
       case 'external_link':
         if (actionData.url) {
-          openUrl(actionData.url);
+          smartOpenUrl(actionData.url, navigate);
         }
         break;
       case 'rate_app':

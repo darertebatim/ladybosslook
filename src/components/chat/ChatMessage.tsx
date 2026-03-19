@@ -3,10 +3,10 @@ import { format } from "date-fns";
 import { FileText, Download, ExternalLink, Megaphone, Check, CheckCheck, Play, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useBilingualText } from "@/components/ui/BilingualText";
-import { Browser } from '@capacitor/browser';
-import { Capacitor } from '@capacitor/core';
+import { smartOpenUrl, getInternalPath } from "@/lib/navigation-utils";
 
 interface ChatMessageProps {
   content: string;
@@ -35,8 +35,8 @@ function formatTime(seconds: number) {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-// Function to make URLs clickable
-function linkifyText(text: string) {
+// Function to make URLs clickable - internal links navigate in-app
+function linkifyText(text: string, navigate: (path: string) => void) {
   const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\/[^\s]*)?)/gi;
   
   const parts: (string | JSX.Element)[] = [];
@@ -55,18 +55,41 @@ function linkifyText(text: string) {
     // Add the link
     const url = match[0];
     const href = url.startsWith('http') ? url : `https://${url}`;
-    parts.push(
-      <a 
-        key={match.index}
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="underline decoration-1 underline-offset-2 hover:opacity-80 transition-opacity"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {url}
-      </a>
-    );
+    const internalPath = getInternalPath(href);
+    
+    if (internalPath) {
+      // Internal app link — navigate in-app
+      parts.push(
+        <span
+          key={match.index}
+          role="link"
+          tabIndex={0}
+          className="underline decoration-1 underline-offset-2 cursor-pointer active:opacity-70 transition-opacity"
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(internalPath);
+          }}
+        >
+          {url}
+        </span>
+      );
+    } else {
+      // External link — open in browser
+      parts.push(
+        <span
+          key={match.index}
+          role="link"
+          tabIndex={0}
+          className="underline decoration-1 underline-offset-2 cursor-pointer active:opacity-70 transition-opacity"
+          onClick={(e) => {
+            e.stopPropagation();
+            smartOpenUrl(href, navigate);
+          }}
+        >
+          {url}
+        </span>
+      );
+    }
     
     lastIndex = urlRegex.lastIndex;
   }
@@ -169,21 +192,15 @@ export function ChatMessage({
     return generateWaveformBars(attachmentUrl || 'default', 28);
   }, [attachmentUrl]);
 
-  const openExternalUrl = async (url: string) => {
-    try {
-      if (Capacitor.isNativePlatform()) {
-        await Browser.open({ url });
-      } else {
-        window.open(url, '_blank');
-      }
-    } catch {
-      window.open(url, '_blank');
-    }
-  };
+  const navigate = useNavigate();
+
+  const handleOpenUrl = useCallback((url: string) => {
+    smartOpenUrl(url, navigate);
+  }, [navigate]);
 
   const handleDownload = () => {
     if (attachmentUrl) {
-      openExternalUrl(attachmentUrl);
+      handleOpenUrl(attachmentUrl);
     }
   };
 
@@ -239,7 +256,7 @@ export function ChatMessage({
 
   const handleLinkClick = () => {
     if (linkUrl) {
-      openExternalUrl(linkUrl);
+      handleOpenUrl(linkUrl);
     }
   };
 
@@ -432,7 +449,7 @@ export function ChatMessage({
               className={cn("text-[15px] leading-relaxed whitespace-pre-wrap break-words", bilingualClassName)}
               dir={direction}
             >
-              {linkifyText(displayText)}
+              {linkifyText(displayText, navigate)}
             </p>
           </div>
         )}
