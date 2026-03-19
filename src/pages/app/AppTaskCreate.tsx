@@ -430,6 +430,7 @@ const AppTaskCreate = ({
   const [showPlaylistPicker, setShowPlaylistPicker] = useState(false);
   const [showBreathingPicker, setShowBreathingPicker] = useState(false);
   const [showReflectionPicker, setShowReflectionPicker] = useState(false);
+  const [showRoutinePicker, setShowRoutinePicker] = useState(false);
   const [showGoalSettings, setShowGoalSettings] = useState(false);
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
   
@@ -504,6 +505,21 @@ const AppTaskCreate = ({
       
       if (error) throw error;
       return data as unknown as { id: string; title: string; subtitle: string | null; cover_image_url: string | null }[];
+    },
+  });
+
+  // Fetch routines for linking
+  const { data: linkableRoutines = [] } = useQuery({
+    queryKey: ['linkable-routines'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routines_bank')
+        .select('id, title, emoji, category')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return data as { id: string; title: string; emoji: string | null; category: string }[];
     },
   });
 
@@ -1856,6 +1872,10 @@ const AppTaskCreate = ({
                           // Show reflection picker
                           setShowProLinkPicker(false);
                           setShowReflectionPicker(true);
+                        } else if (config.value === 'routine') {
+                          // Show routine picker
+                          setShowProLinkPicker(false);
+                          setShowRoutinePicker(true);
                         }
                       }}
                       className={cn(
@@ -2091,6 +2111,47 @@ const AppTaskCreate = ({
                       {reflection.subtitle && (
                         <p className="text-xs text-muted-foreground truncate">{reflection.subtitle}</p>
                       )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Routine Picker Sheet */}
+      <Sheet open={showRoutinePicker} onOpenChange={setShowRoutinePicker}>
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
+          <SheetHeader>
+            <SheetTitle>Select Routine</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Choose a routine to link to this task.
+            </p>
+            
+            <ScrollArea className="h-[45vh]">
+              <div className="space-y-2 pr-4">
+                {linkableRoutines.map((routine) => (
+                  <button
+                    key={routine.id}
+                    onClick={() => {
+                      setProLinkType('routine');
+                      setProLinkValue(routine.id);
+                      setShowRoutinePicker(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
+                      proLinkValue === routine.id && proLinkType === 'routine' && 'bg-emerald-100 dark:bg-emerald-900/30'
+                    )}
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 flex items-center justify-center">
+                      <span className="text-xl">{routine.emoji || '✨'}</span>
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="font-medium truncate">{routine.title}</p>
+                      <p className="text-xs text-muted-foreground capitalize">{routine.category}</p>
                     </div>
                   </button>
                 ))}
