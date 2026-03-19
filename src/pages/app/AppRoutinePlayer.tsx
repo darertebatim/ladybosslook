@@ -350,8 +350,25 @@ export default function AppRoutinePlayer() {
   }, [today, addGoalProgress]);
 
   const handleOpenTimer = useCallback((_task: UserTask) => {
-    // Timer handled by focus player, no-op here
+    // Timer handled by routine player, no-op here
   }, []);
+
+  const handleTaskTap = useCallback((task: UserTask) => {
+    setSelectedTask(task);
+  }, []);
+
+  const deleteTask = useDeleteTask();
+  const handleEditTask = useCallback((task: UserTask) => {
+    setSelectedTask(null);
+    navigate(`/app/home/edit/${task.id}`);
+  }, [navigate]);
+
+  const handleDeleteTask = useCallback((task: UserTask) => {
+    setSelectedTask(null);
+    deleteTask.mutate(task.id, {
+      onSuccess: () => toast.success('Task deleted'),
+    });
+  }, [deleteTask]);
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
