@@ -429,6 +429,63 @@ export function UpdateNotificationSender() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Update Popup Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Download className="h-5 w-5" />
+            App Update Popup
+            {currentPopup?.active && (
+              <Badge variant="default" className="ml-2">Active</Badge>
+            )}
+          </CardTitle>
+          <CardDescription>
+            A centered popup shown to all users on app open — links to App Store
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Popup Title</Label>
+            <Input value={popupTitle} onChange={(e) => setPopupTitle(e.target.value)} />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Popup Description</Label>
+            <Textarea value={popupDescription} onChange={(e) => setPopupDescription(e.target.value)} rows={2} />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Button Text</Label>
+            <Input value={popupButtonText} onChange={(e) => setPopupButtonText(e.target.value)} />
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            Links to: apps.apple.com/app/routine-ladybosslook/id6755076134
+          </p>
+
+          <div className="flex gap-2">
+            <Button
+              onClick={() => activatePopupMutation.mutate()}
+              disabled={activatePopupMutation.isPending || !popupTitle}
+              className="flex-1"
+            >
+              {activatePopupMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              <Sparkles className="h-4 w-4 mr-2" />
+              {currentPopup?.active ? 'Update & Reactivate' : 'Activate Popup'}
+            </Button>
+            {currentPopup?.active && (
+              <Button
+                variant="outline"
+                onClick={() => deactivatePopupMutation.mutate()}
+                disabled={deactivatePopupMutation.isPending}
+              >
+                Deactivate
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
