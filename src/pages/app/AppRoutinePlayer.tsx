@@ -22,7 +22,7 @@ export default function AppRoutinePlayer() {
   const { startRoutine, isActive } = useRoutinePlayerContext();
 
   // Fetch ALL user routines from user_routines_bank (user-owned copies)
-  const { data: myFocusRoutines, isLoading } = useQuery({
+  const { data: myRoutines, isLoading } = useQuery({
     queryKey: ['user-routines-all', user?.id],
     queryFn: async () => {
       if (!user) return [];
