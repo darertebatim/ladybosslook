@@ -169,9 +169,21 @@ export function ChatMessage({
     return generateWaveformBars(attachmentUrl || 'default', 28);
   }, [attachmentUrl]);
 
+  const openExternalUrl = async (url: string) => {
+    try {
+      if (Capacitor.isNativePlatform()) {
+        await Browser.open({ url });
+      } else {
+        window.open(url, '_blank');
+      }
+    } catch {
+      window.open(url, '_blank');
+    }
+  };
+
   const handleDownload = () => {
     if (attachmentUrl) {
-      window.open(attachmentUrl, '_blank');
+      openExternalUrl(attachmentUrl);
     }
   };
 
