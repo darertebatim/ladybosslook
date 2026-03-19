@@ -17,7 +17,7 @@ export default function AppReflectionFlow() {
   const { autoCompleteReflection } = useAutoCompleteProTask();
 
   let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
-  try { focusPlayer = useFocusPlayer(); } catch { /* not available */ }
+  try { focusPlayer = useRoutinePlayerContext(); } catch { /* not available */ }
   const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
 
   const [currentIndex, setCurrentIndex] = useState(0);

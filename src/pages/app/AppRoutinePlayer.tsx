@@ -19,7 +19,7 @@ import { isWaterTask } from '@/lib/waterTracking';
 export default function AppFocusRoutines() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { startRoutine, isActive } = useFocusPlayer();
+  const { startRoutine, isActive } = useRoutinePlayerContext();
 
   // Fetch ALL user routines from user_routines_bank (user-owned copies)
   const { data: myFocusRoutines, isLoading } = useQuery({

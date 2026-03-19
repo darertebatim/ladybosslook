@@ -31,7 +31,7 @@ export function CloseButton({
   const location = useLocation();
   
   let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
-  try { focusPlayer = useFocusPlayer(); } catch { /* provider not available */ }
+  try { focusPlayer = useRoutinePlayerContext(); } catch { /* provider not available */ }
 
   // Determine destination: explicit to > referrer state > fallback home
   const destination = to || (location.state as { from?: string })?.from || '/app/home';

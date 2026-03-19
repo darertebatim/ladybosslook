@@ -41,7 +41,7 @@ export function FocusMiniPlayer() {
     togglePause,
     completeTask,
     openProTask,
-  } = useFocusPlayer();
+  } = useRoutinePlayerContext();
 
   if (!isActive || !isMinimized || !currentTask || phase === 'summary') return null;
 

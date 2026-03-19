@@ -96,7 +96,7 @@ export default function AppInspireDetail() {
   const addRoutineFromBank = useAddRoutineFromBank();
   const { data: userChallenges = [] } = useUserChallenges();
   const { data: categories = [] } = useRoutineBankCategories();
-  const { startRoutine: startFocusRoutine } = useFocusPlayer();
+  const { startRoutine: startFocusRoutine } = useRoutinePlayerContext();
   const { user } = useAuth();
   
   // Check if routine was already added

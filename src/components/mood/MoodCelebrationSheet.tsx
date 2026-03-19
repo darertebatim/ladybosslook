@@ -105,7 +105,7 @@ export function MoodCelebrationSheet({
   const moodData = mood ? MOOD_CONFIG[mood] : null;
 
   let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void; completeTask: () => void } | null = null;
-  try { focusPlayer = useFocusPlayer(); } catch { /* provider not available */ }
+  try { focusPlayer = useRoutinePlayerContext(); } catch { /* provider not available */ }
   const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
 
   const handleAction = (action: typeof ACTIONS[number]) => {
