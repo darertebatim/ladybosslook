@@ -176,11 +176,11 @@ const AppJournalEntry = () => {
       toast.success('Entry saved');
     }
     
-    // If focus player is active, ensure task_completions is written before maximizing
+    // If routine player is active, ensure task_completions is written before maximizing
     if (hasActivePlayer) {
       await autoCompleteJournal();
       navigate('/app/home');
-      focusPlayer!.maximize();
+      routinePlayer!.maximize();
       return;
     }
     

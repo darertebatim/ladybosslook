@@ -129,7 +129,7 @@ export function MoodCelebrationSheet({
     onOpenChange(false);
     if (hasActivePlayer) {
       navigate('/app/home');
-      focusPlayer!.maximize();
+      routinePlayer!.maximize();
       return;
     }
     if (onActionClick?.('/app/home')) {

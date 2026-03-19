@@ -70,7 +70,7 @@ export default function AppReflectionFlow() {
         }
         if (hasActivePlayer) {
           navigate('/app/home');
-          focusPlayer!.maximize();
+          routinePlayer!.maximize();
         } else {
           navigate(-1);
         }
