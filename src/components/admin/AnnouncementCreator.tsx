@@ -7,10 +7,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
-import { Megaphone, Bell, Mail, MessageCircle, Link as LinkIcon } from 'lucide-react';
+import { Megaphone, Bell, Mail, MessageCircle, Link as LinkIcon, X, UserMinus, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAIAssistant } from '@/contexts/AIAssistantContext';
+import { Badge } from '@/components/ui/badge';
 
 interface Program {
   id: string;
@@ -29,6 +30,12 @@ const IN_APP_LINKS = [
   { value: '/app/chat', label: '💬 Support Chat' },
   { value: '/app/myprofile', label: '👤 Profile' },
   { value: '/app/rate', label: '⭐ Rate the App' },
+  { value: '/app/journal', label: '📓 Journal' },
+  { value: '/app/breathing', label: '🌬️ Breathing' },
+  { value: '/app/focus', label: '🎯 Focus Timer' },
+  { value: '/app/fasting', label: '⏰ Fasting Tracker' },
+  { value: '/app/emotions', label: '🧠 Emotion Log' },
+  { value: '/app/channels', label: '💬 Community Chats' },
   { value: 'custom', label: '✏️ Custom URL...' },
 ];
 
@@ -44,6 +51,13 @@ export function AnnouncementCreator() {
   const [linkText, setLinkText] = useState('');
   const [loading, setLoading] = useState(false);
   const [programs, setPrograms] = useState<Program[]>([]);
+  
+  // Exclusion state
+  const [excludeUserSearch, setExcludeUserSearch] = useState('');
+  const [excludedUsers, setExcludedUsers] = useState<{ id: string; name: string; email: string }[]>([]);
+  const [excludedPrograms, setExcludedPrograms] = useState<string[]>([]);
+  const [showExclude, setShowExclude] = useState(false);
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { registerFormHandler, unregisterFormHandler } = useAIAssistant();
@@ -62,25 +76,67 @@ export function AnnouncementCreator() {
     return () => unregisterFormHandler('broadcast');
   }, [registerFormHandler, unregisterFormHandler, handleAIFill]);
 
-  // Compute actual link URL (empty if 'none' selected)
+  // Compute actual link URL
   const linkUrl = linkType === 'none' ? '' : (linkType === 'custom' ? customLinkUrl : linkType);
+
+  // Fetch playlists
+  const { data: playlists } = useQuery({
+    queryKey: ['all-playlists-for-broadcast'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_playlists')
+        .select('id, name, program_slug')
+        .eq('is_hidden', false)
+        .order('name');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch routines
+  const { data: routines } = useQuery({
+    queryKey: ['all-routines-for-broadcast'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routines_bank')
+        .select('id, title, emoji')
+        .eq('is_active', true)
+        .order('title');
+      if (error) throw error;
+      return data;
+    },
+  });
 
   // Fetch rounds for the selected course
   const { data: rounds } = useQuery({
     queryKey: ["program-rounds", targetCourse],
     queryFn: async () => {
       if (targetCourse === "all") return [];
-      
       const { data, error } = await supabase
         .from("program_rounds")
         .select("*")
         .eq("program_slug", targetCourse)
         .order("round_number", { ascending: false });
-      
       if (error) throw error;
       return data;
     },
     enabled: targetCourse !== "all",
+  });
+
+  // Search users for exclusion
+  const { data: searchResults } = useQuery({
+    queryKey: ['user-search-exclude', excludeUserSearch],
+    queryFn: async () => {
+      if (excludeUserSearch.length < 2) return [];
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .or(`full_name.ilike.%${excludeUserSearch}%,email.ilike.%${excludeUserSearch}%`)
+        .limit(8);
+      if (error) throw error;
+      return data;
+    },
+    enabled: excludeUserSearch.length >= 2,
   });
 
   useEffect(() => {
@@ -90,12 +146,8 @@ export function AnnouncementCreator() {
         .select('id, title, type, slug')
         .eq('is_active', true)
         .order('title');
-
-      if (!error && data) {
-        setPrograms(data);
-      }
+      if (!error && data) setPrograms(data);
     };
-
     fetchPrograms();
   }, []);
 
@@ -104,32 +156,36 @@ export function AnnouncementCreator() {
     setTargetRoundId('all');
   }, [targetCourse]);
 
+  const addExcludedUser = (user: { id: string; full_name: string | null; email: string }) => {
+    if (excludedUsers.some(u => u.id === user.id)) return;
+    setExcludedUsers(prev => [...prev, { id: user.id, name: user.full_name || 'Unknown', email: user.email }]);
+    setExcludeUserSearch('');
+  };
+
+  const removeExcludedUser = (userId: string) => {
+    setExcludedUsers(prev => prev.filter(u => u.id !== userId));
+  };
+
+  const toggleExcludedProgram = (slug: string) => {
+    setExcludedPrograms(prev =>
+      prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]
+    );
+  };
+
   const handleSubmit = async () => {
     if (!title.trim() || !message.trim()) {
-      toast({
-        title: "Error",
-        description: "Please fill in title and message",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Please fill in title and message", variant: "destructive" });
       return;
     }
 
-    // Validate custom link URL if provided
     if (linkType === 'custom' && customLinkUrl.trim() && !customLinkUrl.match(/^(https?:\/\/|\/app\/).+/)) {
-      toast({
-        title: "Error",
-        description: "Please enter a valid URL (https://... or /app/...)",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Please enter a valid URL (https://... or /app/...)", variant: "destructive" });
       return;
     }
 
     setLoading(true);
     
     try {
-      console.log('📢 Sending broadcast message...');
-      
-      // Determine target type
       let targetType: 'all' | 'course' | 'round' = 'all';
       if (targetRoundId !== 'all' && targetRoundId) {
         targetType = 'round';
@@ -137,7 +193,6 @@ export function AnnouncementCreator() {
         targetType = 'course';
       }
 
-      // Call the broadcast edge function
       const { data, error } = await supabase.functions.invoke('send-broadcast-message', {
         body: {
           title: title.trim(),
@@ -149,15 +204,12 @@ export function AnnouncementCreator() {
           sendEmail,
           linkUrl: linkUrl.trim() || undefined,
           linkText: linkText.trim() || undefined,
+          excludeUserIds: excludedUsers.length > 0 ? excludedUsers.map(u => u.id) : undefined,
+          excludeProgramSlugs: excludedPrograms.length > 0 ? excludedPrograms : undefined,
         }
       });
 
-      if (error) {
-        console.error('❌ Broadcast error:', error);
-        throw error;
-      }
-
-      console.log('✅ Broadcast sent:', data);
+      if (error) throw error;
 
       const { messagesSent, pushSent, emailsSent } = data;
       
@@ -165,12 +217,8 @@ export function AnnouncementCreator() {
       if (sendPush && pushSent > 0) description += `, ${pushSent} push notifications`;
       if (sendEmail && emailsSent > 0) description += `, ${emailsSent} emails`;
       
-      toast({
-        title: "🎉 Broadcast Sent!",
-        description
-      });
+      toast({ title: "🎉 Broadcast Sent!", description });
 
-      // Refresh broadcast history
       queryClient.invalidateQueries({ queryKey: ['broadcast-history'] });
 
       // Reset form
@@ -183,14 +231,12 @@ export function AnnouncementCreator() {
       setLinkType('none');
       setCustomLinkUrl('');
       setLinkText('');
+      setExcludedUsers([]);
+      setExcludedPrograms([]);
+      setShowExclude(false);
       
     } catch (error: any) {
-      console.error('❌ Error sending broadcast:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to send broadcast",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: error.message || "Failed to send broadcast", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -211,21 +257,12 @@ export function AnnouncementCreator() {
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label>Title</Label>
-          <Input
-            placeholder="Announcement title..."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+          <Input placeholder="Announcement title..." value={title} onChange={(e) => setTitle(e.target.value)} />
         </div>
 
         <div className="space-y-2">
           <Label>Message</Label>
-          <Textarea
-            placeholder="Your message to all users..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            rows={4}
-          />
+          <Textarea placeholder="Your message to all users..." value={message} onChange={(e) => setMessage(e.target.value)} rows={4} />
         </div>
 
         {/* Link Button Section */}
@@ -241,16 +278,45 @@ export function AnnouncementCreator() {
                 <SelectTrigger>
                   <SelectValue placeholder="Select destination..." />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-[300px]">
                   {IN_APP_LINKS.map((link) => (
                     <SelectItem key={link.value || 'none'} value={link.value}>
                       {link.label}
                     </SelectItem>
                   ))}
-                  {/* Dynamic course links */}
+
+                  {/* Playlists */}
+                  {playlists && playlists.length > 0 && (
+                    <>
+                      <SelectItem value="divider-playlists" disabled className="text-xs text-muted-foreground">
+                        ── Playlists ──
+                      </SelectItem>
+                      {playlists.map((pl) => (
+                        <SelectItem key={`pl-${pl.id}`} value={`/app/playlist/${pl.id}`}>
+                          🎵 {pl.name}
+                        </SelectItem>
+                      ))}
+                    </>
+                  )}
+
+                  {/* Routines */}
+                  {routines && routines.length > 0 && (
+                    <>
+                      <SelectItem value="divider-routines" disabled className="text-xs text-muted-foreground">
+                        ── Routines ──
+                      </SelectItem>
+                      {routines.map((r) => (
+                        <SelectItem key={`rt-${r.id}`} value={`/app/explore/routine/${r.id}`}>
+                          {r.emoji || '✨'} {r.title}
+                        </SelectItem>
+                      ))}
+                    </>
+                  )}
+
+                  {/* Course Pages */}
                   {programs.length > 0 && (
                     <>
-                      <SelectItem value="divider" disabled className="text-xs text-muted-foreground">
+                      <SelectItem value="divider-courses" disabled className="text-xs text-muted-foreground">
                         ── Course Pages ──
                       </SelectItem>
                       {programs.map((program) => (
@@ -263,7 +329,6 @@ export function AnnouncementCreator() {
                 </SelectContent>
               </Select>
               
-              {/* Custom URL input */}
               {linkType === 'custom' && (
                 <Input
                   value={customLinkUrl}
@@ -284,12 +349,11 @@ export function AnnouncementCreator() {
             </div>
           </div>
           {linkUrl && (
-            <p className="text-xs text-muted-foreground">
-              → {linkUrl}
-            </p>
+            <p className="text-xs text-muted-foreground">→ {linkUrl}</p>
           )}
         </div>
 
+        {/* Target Audience */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Target Audience</Label>
@@ -311,11 +375,7 @@ export function AnnouncementCreator() {
           {targetCourse !== "all" && rounds && rounds.length > 0 && (
             <div className="space-y-2">
               <Label htmlFor="targetRound">Target Round</Label>
-              <Select 
-                value={targetRoundId} 
-                onValueChange={setTargetRoundId}
-                key={targetCourse}
-              >
+              <Select value={targetRoundId} onValueChange={setTargetRoundId} key={targetCourse}>
                 <SelectTrigger id="targetRound">
                   <SelectValue placeholder="Select round" />
                 </SelectTrigger>
@@ -328,6 +388,85 @@ export function AnnouncementCreator() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          )}
+        </div>
+
+        {/* Exclusion Section */}
+        <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium flex items-center gap-2">
+              <UserMinus className="h-4 w-4" />
+              Exclude from Broadcast
+            </Label>
+            <Switch checked={showExclude} onCheckedChange={setShowExclude} />
+          </div>
+
+          {showExclude && (
+            <div className="space-y-4 pt-2">
+              {/* Exclude specific users */}
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Exclude Users</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by name or email..."
+                    value={excludeUserSearch}
+                    onChange={(e) => setExcludeUserSearch(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+                
+                {/* Search results */}
+                {searchResults && searchResults.length > 0 && excludeUserSearch.length >= 2 && (
+                  <div className="border rounded-md bg-background max-h-[160px] overflow-y-auto">
+                    {searchResults
+                      .filter(u => !excludedUsers.some(eu => eu.id === u.id))
+                      .map((user) => (
+                        <button
+                          key={user.id}
+                          onClick={() => addExcludedUser(user)}
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-muted/50 flex items-center justify-between border-b last:border-b-0"
+                        >
+                          <span>{user.full_name || 'Unknown'}</span>
+                          <span className="text-xs text-muted-foreground">{user.email}</span>
+                        </button>
+                      ))}
+                  </div>
+                )}
+                
+                {/* Excluded users badges */}
+                {excludedUsers.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {excludedUsers.map((user) => (
+                      <Badge key={user.id} variant="secondary" className="gap-1 pr-1">
+                        {user.name}
+                        <button onClick={() => removeExcludedUser(user.id)} className="ml-1 hover:bg-muted rounded-full p-0.5">
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Exclude programs */}
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Exclude Program Groups</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {programs.map((program) => (
+                    <Badge
+                      key={program.slug}
+                      variant={excludedPrograms.includes(program.slug) ? "destructive" : "outline"}
+                      className="cursor-pointer select-none"
+                      onClick={() => toggleExcludedProgram(program.slug)}
+                    >
+                      {excludedPrograms.includes(program.slug) && <X className="h-3 w-3 mr-1" />}
+                      {program.title}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>

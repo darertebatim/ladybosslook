@@ -18,6 +18,8 @@ interface BroadcastRequest {
   sendEmail: boolean;
   linkUrl?: string;
   linkText?: string;
+  excludeUserIds?: string[];
+  excludeProgramSlugs?: string[];
 }
 
 // Helper function to convert PEM format to ArrayBuffer
@@ -130,9 +132,9 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { title, content, targetType, targetCourse, targetRoundId, sendPush, sendEmail, linkUrl, linkText }: BroadcastRequest = await req.json();
+    const { title, content, targetType, targetCourse, targetRoundId, sendPush, sendEmail, linkUrl, linkText, excludeUserIds, excludeProgramSlugs }: BroadcastRequest = await req.json();
 
-    console.log('📢 Broadcast request:', { title, targetType, targetCourse, targetRoundId, sendPush, sendEmail, linkUrl });
+    console.log('📢 Broadcast request:', { title, targetType, targetCourse, targetRoundId, sendPush, sendEmail, linkUrl, excludeUserIds: excludeUserIds?.length, excludeProgramSlugs });
 
     if (!title || !content) {
       return new Response(
@@ -229,7 +231,30 @@ const handler = async (req: Request): Promise<Response> => {
       targetUserIds = [...new Set(enrollments?.map(e => e.user_id) || [])];
     }
 
-    console.log(`📊 Found ${targetUserIds.length} target users`);
+    // Step 2b: Apply exclusions
+    if (excludeUserIds && excludeUserIds.length > 0) {
+      const excludeSet = new Set(excludeUserIds);
+      targetUserIds = targetUserIds.filter(id => !excludeSet.has(id));
+      console.log(`🚫 Excluded ${excludeUserIds.length} specific users`);
+    }
+
+    if (excludeProgramSlugs && excludeProgramSlugs.length > 0) {
+      // Get all user IDs enrolled in excluded programs
+      const { data: excludedEnrollments } = await supabase
+        .from('course_enrollments')
+        .select('user_id')
+        .in('program_slug', excludeProgramSlugs)
+        .eq('status', 'active');
+      
+      if (excludedEnrollments && excludedEnrollments.length > 0) {
+        const excludeSet = new Set(excludedEnrollments.map(e => e.user_id));
+        const before = targetUserIds.length;
+        targetUserIds = targetUserIds.filter(id => !excludeSet.has(id));
+        console.log(`🚫 Excluded ${before - targetUserIds.length} users from ${excludeProgramSlugs.length} program(s)`);
+      }
+    }
+
+    console.log(`📊 Found ${targetUserIds.length} target users after exclusions`);
 
     if (targetUserIds.length === 0) {
       return new Response(
@@ -384,7 +409,6 @@ const handler = async (req: Request): Promise<Response> => {
         console.log('📧 Sending emails...');
         const resend = new Resend(resendApiKey);
 
-        // Get user emails
         const { data: profiles } = await supabase
           .from('profiles')
           .select('id, email')
