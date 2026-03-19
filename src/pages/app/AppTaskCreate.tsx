@@ -1872,6 +1872,10 @@ const AppTaskCreate = ({
                           // Show reflection picker
                           setShowProLinkPicker(false);
                           setShowReflectionPicker(true);
+                        } else if (config.value === 'routine') {
+                          // Show routine picker
+                          setShowProLinkPicker(false);
+                          setShowRoutinePicker(true);
                         }
                       }}
                       className={cn(
