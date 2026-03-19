@@ -19,6 +19,9 @@ interface EmotionState {
 
 const AppEmotion = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isProTaskActive, completeProTask } = useFocusPlayer();
+  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
   const [searchParams, setSearchParams] = useSearchParams();
   const { createLog } = useEmotionLogs();
   const { autoCompleteEmotion } = useAutoCompleteProTask();
