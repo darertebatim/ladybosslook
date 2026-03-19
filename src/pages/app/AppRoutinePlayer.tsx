@@ -528,7 +528,7 @@ export default function AppRoutinePlayer() {
                 completedTaskIds={plannerCompletedTaskIds}
                 completedSubtaskIds={plannerCompletedSubtaskIds}
                 goalProgressMap={plannerGoalProgressMap}
-                onTaskTap={() => {}}
+                onTaskTap={handleTaskTap}
                 onStreakIncrease={() => {}}
                 onOpenGoalInput={handleOpenGoalInput}
                 onOpenTimer={handleOpenTimer}
