@@ -43,15 +43,15 @@ export default function AppRoutinePlayer() {
   }, [myRoutines]);
 
   const { data: routineTasksMap } = useQuery({
-    queryKey: ['focus-user-tasks-emojis', user?.id, focusRoutineIds],
+    queryKey: ['routine-user-tasks-emojis', user?.id, routineIds],
     queryFn: async () => {
-      if (!user || focusRoutineIds.length === 0) return {};
+      if (!user || routineIds.length === 0) return {};
       const { data } = await supabase
         .from('user_tasks')
         .select('source_routine_id, title, emoji, order_index')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .in('source_routine_id', focusRoutineIds)
+        .in('source_routine_id', routineIds)
         .order('order_index', { ascending: true });
 
       const map: Record<string, { title: string; emoji: string }[]> = {};
@@ -63,7 +63,7 @@ export default function AppRoutinePlayer() {
       });
       return map;
     },
-    enabled: !!user && focusRoutineIds.length > 0,
+    enabled: !!user && routineIds.length > 0,
   });
 
   // Fetch today's session data (for resume logic only)
