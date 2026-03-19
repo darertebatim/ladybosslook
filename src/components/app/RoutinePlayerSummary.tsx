@@ -39,7 +39,7 @@ function formatDelta(target: number, actual: number): { text: string; color: str
   return { text: `-${formatDuration(Math.abs(diff))}`, color: 'text-blue-500' };
 }
 
-export const FocusRoutineSummary = memo(function FocusRoutineSummary({
+export const RoutinePlayerSummary = memo(function RoutinePlayerSummary({
   routineTitle,
   routineEmoji,
   startedAt,
@@ -48,7 +48,7 @@ export const FocusRoutineSummary = memo(function FocusRoutineSummary({
   totalSessions,
   streak,
   onClose,
-}: FocusRoutineSummaryProps) {
+}: RoutinePlayerSummaryProps) {
   const totalTargetSeconds = taskResults.reduce((s, t) => s + t.targetSeconds, 0);
   const totalActualSeconds = taskResults.reduce((s, t) => s + t.actualSeconds, 0);
   const totalDelta = formatDelta(totalTargetSeconds, totalActualSeconds);
