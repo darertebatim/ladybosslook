@@ -472,19 +472,36 @@ const AppHome = () => {
   // Fetch badge data for expanded month calendar
   const { data: monthBadgeData } = useDateRangeTaskCompletion(dateRange.start, dateRange.end);
 
-  // Build routine name map from tasks' source_routine_id
+  // Collect unique routine IDs from tasks
+  const uniqueRoutineIds = useMemo(() => {
+    const ids = new Set<string>();
+    tasks.forEach(task => {
+      if (task.source_routine_id) ids.add(task.source_routine_id);
+    });
+    return Array.from(ids);
+  }, [tasks]);
+
+  // Fetch routine names for dropdown labels
+  const { data: routineNameData = [] } = useQuery({
+    queryKey: ['routine-names-for-filter', uniqueRoutineIds],
+    queryFn: async () => {
+      if (uniqueRoutineIds.length === 0) return [];
+      const { data } = await supabase
+        .from('routines_bank')
+        .select('id, title, emoji')
+        .in('id', uniqueRoutineIds);
+      return data || [];
+    },
+    enabled: uniqueRoutineIds.length > 0,
+  });
+
   const routineNamesInTasks = useMemo(() => {
     const map = new Map<string, string>();
-    tasks.forEach(task => {
-      if (task.source_routine_id && task.tag) {
-        // Use tag as a fallback routine grouping label
-        if (!map.has(task.source_routine_id)) {
-          map.set(task.source_routine_id, categoryNameMap.get(task.tag) || task.tag);
-        }
-      }
+    routineNameData.forEach((r: any) => {
+      map.set(r.id, `${r.emoji || '📋'} ${r.title}`);
     });
     return map;
-  }, [tasks, categoryNameMap]);
+  }, [routineNameData]);
 
   // Filter tasks by the selected filter and exclude skipped tasks
   const filteredTasks = useMemo(() => {
