@@ -15,6 +15,16 @@ import { toast } from 'sonner';
 import { SortableTaskList } from '@/components/app/SortableTaskList';
 import { useTasksForDate, useCompletionsForDate, UserTask, useAddGoalProgress } from '@/hooks/useTaskPlanner';
 import { isWaterTask } from '@/lib/waterTracking';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function AppRoutinePlayer() {
   const navigate = useNavigate();
