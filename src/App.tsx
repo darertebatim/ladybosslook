@@ -428,73 +428,76 @@ const App = () => (
                   <Route path="/rathus" element={<RathusAssessment />} />
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                   
-                  {/* Full-screen pages - Outside of AppLayout so no tab bar */}
-                  <Route path="/app/journal/new" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
-                  <Route path="/app/journal/:entryId" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
-                  <Route path="/app/home/new" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
-                  <Route path="/app/home/edit/:taskId" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
-                  <Route path="/app/channels/post/:postId" element={<ProtectedRoute><AppFeedPost /></ProtectedRoute>} />
-                  <Route path="/app/breathe" element={<ProtectedRoute><AppBreathe /></ProtectedRoute>} />
-                  <Route path="/app/water" element={<ProtectedRoute><AppWater /></ProtectedRoute>} />
-                  <Route path="/app/period" element={<ProtectedRoute><AppPeriod /></ProtectedRoute>} />
-                  <Route path="/app/emotion" element={<ProtectedRoute><AppEmotion /></ProtectedRoute>} />
-                  <Route path="/app/emotion/history" element={<ProtectedRoute><AppEmotionHistory /></ProtectedRoute>} />
-                  <Route path="/app/mood" element={<ProtectedRoute><AppMood /></ProtectedRoute>} />
-                  <Route path="/app/mood/history" element={<ProtectedRoute><AppMoodHistory /></ProtectedRoute>} />
-                  <Route path="/app/presence" element={<ProtectedRoute><AppPresence /></ProtectedRoute>} />
-                  <Route path="/app/action-stats" element={<ProtectedRoute><AppActionStats /></ProtectedRoute>} />
-                  <Route path="/app/fasting" element={<ProtectedRoute><AppFasting /></ProtectedRoute>} />
-                  <Route path="/app/timer" element={<ProtectedRoute><AppTimer /></ProtectedRoute>} />
-                  <Route path="/app/support" element={<ProtectedRoute><AppAdminSupport /></ProtectedRoute>} />
-                  <Route path="/app/channels/new" element={<ProtectedRoute><AppChannelPost /></ProtectedRoute>} />
-                  <Route path="/app/rate" element={<ProtectedRoute><AppRate /></ProtectedRoute>} />
-                  <Route path="/app/settings" element={<ProtectedRoute><AppSettings /></ProtectedRoute>} />
-                  <Route path="/app/onboarding/:flowId" element={<AppOnboarding />} />
-                  <Route path="/app/reflections/notes/:reflectionId" element={<ProtectedRoute><AppReflectionNoteDetail /></ProtectedRoute>} />
-                  <Route path="/app/reflections/:reflectionId" element={<ProtectedRoute><AppReflectionFlow /></ProtectedRoute>} />
-                  <Route path="/app/ai" element={<ProtectedRoute><AppAICoach /></ProtectedRoute>} />
-                  {/* Redirect old feed post route */}
-                  <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
-                  
-                  {/* App Routes */}
-                  <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-                    <Route index element={<Navigate to="/app/home" replace />} />
-                    <Route path="home" element={<AppHome />} />
-                    <Route path="programs" element={<AppPrograms />} />
-                    <Route path="explore" element={<AppStore />} />
-                    <Route path="browse" element={<Navigate to="/app/explore" replace />} />
-                    <Route path="academy" element={<AppBrowsePrograms />} />
-                    <Route path="browse-programs" element={<Navigate to="/app/academy" replace />} />
-                    <Route path="programs/:slug" element={<AppCourseDetail />} />
-                    <Route path="programs/:slug/:roundId" element={<AppCourseDetail />} />
-                    {/* Backward compat redirects for old /app/course/ URLs */}
-                    <Route path="course/:slug/:roundId" element={<CourseRedirect />} />
-                    <Route path="course/:slug" element={<CourseRedirect />} />
-                    <Route path="player" element={<AppPlayer />} />
-                    <Route path="player/playlist/:playlistId" element={<AppPlaylistDetail />} />
-                    <Route path="player/:audioId" element={<AppAudioPlayer />} />
-                    <Route path="watch" element={<AppWatch />} />
-                    <Route path="watch/playlist/:playlistId" element={<AppVideoPlaylistDetail />} />
-                    <Route path="watch/video/:videoId" element={<AppVideoDetail />} />
-                    <Route path="chat" element={<AppChat />} />
-                    <Route path="coach-chat" element={<AppCoachChat />} />
-                    <Route path="channels" element={<AppChannelsList />} />
-                    <Route path="channels/:slug" element={<AppChannelDetail />} />
-                    {/* Redirect old feed route */}
-                    <Route path="feed" element={<Navigate to="/app/channels" replace />} />
-                    <Route path="journal" element={<AppJournal />} />
-                    <Route path="reflections" element={<AppReflections />} />
-                    <Route path="reflections/notes" element={<AppReflectionNotes />} />
-                    <Route path="routines" element={<AppInspire />} />
-                    <Route path="routines/category/:categorySlug" element={<AppRoutineCategory />} />
-                    <Route path="routines/:planId" element={<AppInspireDetail />} />
-                    <Route path="actions" element={<AppActions />} />
-                    <Route path="focus" element={<AppFocusRoutines />} />
-                    {/* Redirects for backward compatibility with older app versions */}
-                    <Route path="rituals" element={<Navigate to="/app/routines" replace />} />
-                    <Route path="rituals/:planId" element={<RitualRedirect />} />
-                    <Route path="profile" element={<AppProfile />} />
-                    {/* Legacy routes - redirect to home */}
+                  {/* All /app/* routes wrapped with Audio + Focus player providers */}
+                  <Route element={<AppProvidersLayout />}>
+                    {/* Full-screen pages - Outside of AppLayout so no tab bar */}
+                    <Route path="/app/journal/new" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
+                    <Route path="/app/journal/:entryId" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
+                    <Route path="/app/home/new" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
+                    <Route path="/app/home/edit/:taskId" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
+                    <Route path="/app/channels/post/:postId" element={<ProtectedRoute><AppFeedPost /></ProtectedRoute>} />
+                    <Route path="/app/breathe" element={<ProtectedRoute><AppBreathe /></ProtectedRoute>} />
+                    <Route path="/app/water" element={<ProtectedRoute><AppWater /></ProtectedRoute>} />
+                    <Route path="/app/period" element={<ProtectedRoute><AppPeriod /></ProtectedRoute>} />
+                    <Route path="/app/emotion" element={<ProtectedRoute><AppEmotion /></ProtectedRoute>} />
+                    <Route path="/app/emotion/history" element={<ProtectedRoute><AppEmotionHistory /></ProtectedRoute>} />
+                    <Route path="/app/mood" element={<ProtectedRoute><AppMood /></ProtectedRoute>} />
+                    <Route path="/app/mood/history" element={<ProtectedRoute><AppMoodHistory /></ProtectedRoute>} />
+                    <Route path="/app/presence" element={<ProtectedRoute><AppPresence /></ProtectedRoute>} />
+                    <Route path="/app/action-stats" element={<ProtectedRoute><AppActionStats /></ProtectedRoute>} />
+                    <Route path="/app/fasting" element={<ProtectedRoute><AppFasting /></ProtectedRoute>} />
+                    <Route path="/app/timer" element={<ProtectedRoute><AppTimer /></ProtectedRoute>} />
+                    <Route path="/app/support" element={<ProtectedRoute><AppAdminSupport /></ProtectedRoute>} />
+                    <Route path="/app/channels/new" element={<ProtectedRoute><AppChannelPost /></ProtectedRoute>} />
+                    <Route path="/app/rate" element={<ProtectedRoute><AppRate /></ProtectedRoute>} />
+                    <Route path="/app/settings" element={<ProtectedRoute><AppSettings /></ProtectedRoute>} />
+                    <Route path="/app/onboarding/:flowId" element={<AppOnboarding />} />
+                    <Route path="/app/reflections/notes/:reflectionId" element={<ProtectedRoute><AppReflectionNoteDetail /></ProtectedRoute>} />
+                    <Route path="/app/reflections/:reflectionId" element={<ProtectedRoute><AppReflectionFlow /></ProtectedRoute>} />
+                    <Route path="/app/ai" element={<ProtectedRoute><AppAICoach /></ProtectedRoute>} />
+                    {/* Redirect old feed post route */}
+                    <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
+                    
+                    {/* App Routes */}
+                    <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+                      <Route index element={<Navigate to="/app/home" replace />} />
+                      <Route path="home" element={<AppHome />} />
+                      <Route path="programs" element={<AppPrograms />} />
+                      <Route path="explore" element={<AppStore />} />
+                      <Route path="browse" element={<Navigate to="/app/explore" replace />} />
+                      <Route path="academy" element={<AppBrowsePrograms />} />
+                      <Route path="browse-programs" element={<Navigate to="/app/academy" replace />} />
+                      <Route path="programs/:slug" element={<AppCourseDetail />} />
+                      <Route path="programs/:slug/:roundId" element={<AppCourseDetail />} />
+                      {/* Backward compat redirects for old /app/course/ URLs */}
+                      <Route path="course/:slug/:roundId" element={<CourseRedirect />} />
+                      <Route path="course/:slug" element={<CourseRedirect />} />
+                      <Route path="player" element={<AppPlayer />} />
+                      <Route path="player/playlist/:playlistId" element={<AppPlaylistDetail />} />
+                      <Route path="player/:audioId" element={<AppAudioPlayer />} />
+                      <Route path="watch" element={<AppWatch />} />
+                      <Route path="watch/playlist/:playlistId" element={<AppVideoPlaylistDetail />} />
+                      <Route path="watch/video/:videoId" element={<AppVideoDetail />} />
+                      <Route path="chat" element={<AppChat />} />
+                      <Route path="coach-chat" element={<AppCoachChat />} />
+                      <Route path="channels" element={<AppChannelsList />} />
+                      <Route path="channels/:slug" element={<AppChannelDetail />} />
+                      {/* Redirect old feed route */}
+                      <Route path="feed" element={<Navigate to="/app/channels" replace />} />
+                      <Route path="journal" element={<AppJournal />} />
+                      <Route path="reflections" element={<AppReflections />} />
+                      <Route path="reflections/notes" element={<AppReflectionNotes />} />
+                      <Route path="routines" element={<AppInspire />} />
+                      <Route path="routines/category/:categorySlug" element={<AppRoutineCategory />} />
+                      <Route path="routines/:planId" element={<AppInspireDetail />} />
+                      <Route path="actions" element={<AppActions />} />
+                      <Route path="focus" element={<AppFocusRoutines />} />
+                      {/* Redirects for backward compatibility with older app versions */}
+                      <Route path="rituals" element={<Navigate to="/app/routines" replace />} />
+                      <Route path="rituals/:planId" element={<RitualRedirect />} />
+                      <Route path="profile" element={<AppProfile />} />
+                      {/* Legacy routes - redirect to home */}
+                    </Route>
                   </Route>
                   
                   <Route path="/calendar" element={<CalendarRedirect />} />
