@@ -636,7 +636,7 @@ export default function AppRoutinePlayer() {
                                 <span className="text-xs font-bold text-black">{completion.pct}%</span>
                               </>
                             ) : (
-                              <Play className="w-3.5 h-3.5 text-foreground fill-foreground" />
+                              <Play className="w-3.5 h-3.5 text-black fill-black" />
                             )}
                           </button>
                         </div>
