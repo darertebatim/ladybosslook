@@ -1,7 +1,8 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft } from 'lucide-react';
+import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2 } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
@@ -33,6 +34,8 @@ export default function AppRoutinePlayer() {
   const { user } = useAuth();
   const { startRoutine, isActive } = useRoutinePlayerContext();
   const [showRestartDialog, setShowRestartDialog] = useState(false);
+  const [deleteRoutine, setDeleteRoutine] = useState<any | null>(null);
+  const queryClient = useQueryClient();
 
   // Fetch ALL user routines from user_routines_bank (user-owned copies)
   const { data: myRoutines, isLoading } = useQuery({
@@ -171,6 +174,56 @@ export default function AppRoutinePlayer() {
       setSearchParams({}, { replace: true });
     }
   }, [searchParams, myRoutines, setSearchParams]);
+
+  // Auto-cleanup orphaned routines (no active tasks)
+  useEffect(() => {
+    if (!user || !myRoutines || !routineTasksMap) return;
+    const orphanedRoutines = myRoutines.filter((r: any) => {
+      const tasks = routineTasksMap[r.routine_id] || [];
+      return tasks.length === 0;
+    });
+    if (orphanedRoutines.length === 0) return;
+    
+    const deleteOrphans = async () => {
+      const orphanIds = orphanedRoutines.map((r: any) => r.id);
+      await supabase
+        .from('user_routines_bank')
+        .delete()
+        .in('id', orphanIds);
+      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
+      queryClient.invalidateQueries({ queryKey: ['linkable-user-routines'] });
+    };
+    deleteOrphans();
+  }, [user, myRoutines, routineTasksMap, queryClient]);
+
+  // Delete routine and all its tasks
+  const handleDeleteRoutine = async (routine: any) => {
+    if (!user) return;
+    try {
+      // Delete all user_tasks linked to this routine
+      await supabase
+        .from('user_tasks')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('source_routine_id', routine.routine_id);
+
+      // Delete the routine record
+      await supabase
+        .from('user_routines_bank')
+        .delete()
+        .eq('id', routine.id);
+
+      toast.success(`"${routine.title}" deleted`);
+      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
+      queryClient.invalidateQueries({ queryKey: ['linkable-user-routines'] });
+      queryClient.invalidateQueries({ queryKey: ['routine-user-tasks-emojis'] });
+      queryClient.invalidateQueries({ queryKey: ['routine-user-task-ids'] });
+      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+    } catch (err) {
+      toast.error('Failed to delete routine');
+    }
+    setDeleteRoutine(null);
+  };
 
   // Planner hooks for the pre-start overlay (uses today's date)
   const today = useMemo(() => new Date(), []);
@@ -466,26 +519,34 @@ export default function AppRoutinePlayer() {
                             )}
                           </div>
 
-                          <button
-                            onClick={() => handlePlay(routine)}
-                            disabled={loadingRoutineId === routine.routine_id}
-                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted active:scale-95 transition-transform shrink-0 ml-3"
-                          >
-                            {loadingRoutineId === routine.routine_id ? (
-                              <Loader2 className="w-4 h-4 animate-spin text-foreground" />
-                            ) : completion ? (
-                              <>
-                                {completion.isComplete ? (
-                                  <RotateCw className="w-4 h-4 text-foreground" />
-                                ) : (
-                                  <Play className="w-4 h-4 text-foreground fill-foreground" />
-                                )}
-                                <span className="text-sm font-semibold text-foreground">{completion.pct}%</span>
-                              </>
-                            ) : (
-                              <Play className="w-4 h-4 text-foreground fill-foreground" />
-                            )}
-                          </button>
+                          <div className="flex items-center gap-2 shrink-0 ml-3">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setDeleteRoutine(routine); }}
+                              className="p-2 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 active:scale-95 transition-all"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handlePlay(routine)}
+                              disabled={loadingRoutineId === routine.routine_id}
+                              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted active:scale-95 transition-transform"
+                            >
+                              {loadingRoutineId === routine.routine_id ? (
+                                <Loader2 className="w-4 h-4 animate-spin text-foreground" />
+                              ) : completion ? (
+                                <>
+                                  {completion.isComplete ? (
+                                    <RotateCw className="w-4 h-4 text-foreground" />
+                                  ) : (
+                                    <Play className="w-4 h-4 text-foreground fill-foreground" />
+                                  )}
+                                  <span className="text-sm font-semibold text-foreground">{completion.pct}%</span>
+                                </>
+                              ) : (
+                                <Play className="w-4 h-4 text-foreground fill-foreground" />
+                              )}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );
@@ -611,6 +672,31 @@ export default function AppRoutinePlayer() {
               className="flex-1 rounded-full font-bold"
             >
               Restart
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete routine confirmation dialog */}
+      <AlertDialog open={!!deleteRoutine} onOpenChange={(open) => !open && setDeleteRoutine(null)}>
+        <AlertDialogContent className="rounded-3xl max-w-[320px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold text-center leading-snug">
+              Delete "{deleteRoutine?.title}"?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-muted-foreground">
+              This will remove the routine and all its tasks from your planner. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-3 sm:justify-center">
+            <AlertDialogCancel className="flex-1 rounded-full font-semibold">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteRoutine && handleDeleteRoutine(deleteRoutine)}
+              className="flex-1 rounded-full font-bold bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
