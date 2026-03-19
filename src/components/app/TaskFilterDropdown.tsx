@@ -125,7 +125,7 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
               </div>
             ))}
           </div>
-        </ScrollArea>
+        </div>
       </PopoverContent>
     </Popover>
   );
