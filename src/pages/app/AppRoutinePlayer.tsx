@@ -622,21 +622,21 @@ export default function AppRoutinePlayer() {
                           <button
                             onClick={(e) => { e.stopPropagation(); handlePlay(routine); }}
                             disabled={loadingRoutineId === routine.routine_id}
-                            className="flex items-center gap-1.5 h-9 px-4 rounded-full bg-black/10 active:scale-95 transition-transform shrink-0"
+                            className="flex items-center justify-center gap-2 h-12 min-w-[48px] px-5 rounded-full bg-secondary active:scale-95 transition-transform shrink-0"
                           >
                             {loadingRoutineId === routine.routine_id ? (
-                              <Loader2 className="w-4 h-4 animate-spin text-black" />
+                              <Loader2 className="w-5 h-5 animate-spin text-black" />
                             ) : completion ? (
                               <>
                                 {completion.isComplete ? (
-                                  <RotateCw className="w-3.5 h-3.5 text-black" />
+                                  <RotateCw className="w-5 h-5 text-black" />
                                 ) : (
-                                  <Play className="w-3.5 h-3.5 text-black fill-black" />
+                                  <Play className="w-5 h-5 text-black fill-black" />
                                 )}
-                                <span className="text-xs font-bold text-black">{completion.pct}%</span>
+                                <span className="text-sm font-bold text-black">{completion.pct}%</span>
                               </>
                             ) : (
-                              <Play className="w-3.5 h-3.5 text-black fill-black" />
+                              <Play className="w-5 h-5 text-black fill-black" />
                             )}
                           </button>
                         </div>
