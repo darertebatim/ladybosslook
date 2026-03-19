@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { useReflections, Reflection } from '@/hooks/useReflections';
 import { ArrowLeft, BookOpen, Crown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -29,6 +30,9 @@ const SYNTHETIC_REFLECTION_TASK: RoutinePlanTask = {
 
 export default function AppReflections() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isProTaskActive, completeProTask } = useFocusPlayer();
+  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
   const { data: reflections, isLoading } = useReflections();
   const { isSubscribed } = useSubscription();
 
@@ -50,7 +54,13 @@ export default function AppReflections() {
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center justify-between pt-1 pb-2 px-4">
-          <button onClick={() => navigate(-1)} className="active:scale-95 transition-transform">
+          <button onClick={() => {
+            if (fromFocusRoutine && isProTaskActive) {
+              completeProTask();
+              return;
+            }
+            navigate(-1);
+          }} className="active:scale-95 transition-transform">
             <ArrowLeft className="h-6 w-6" />
           </button>
           <h1 className="text-lg font-semibold">Reflection</h1>
