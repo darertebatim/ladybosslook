@@ -135,7 +135,7 @@ export function useRoutinePlayer() {
     const target = cfg.tasks[startIdx]?.targetSeconds || 0;
     setTimeLeft(target);
     originalTargetRef.current = target;
-    setPhase('running');
+    setPhase(resumeOptions ? 'running' : 'countdown');
 
     if (resumeOptions?.existingSessionId) {
       setSessionId(resumeOptions.existingSessionId);
