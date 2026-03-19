@@ -557,6 +557,22 @@ export default function AppRoutinePlayer() {
                 : 'Start'}
             </button>
           </div>
+
+          {/* Task Detail Modal */}
+          <TaskDetailModal
+            task={selectedTask}
+            open={!!selectedTask}
+            onClose={() => setSelectedTask(null)}
+            date={today}
+            isCompleted={selectedTask ? plannerCompletedTaskIds.has(selectedTask.id) : false}
+            completedSubtaskIds={plannerCompletedSubtaskIds}
+            goalProgress={selectedTask ? (plannerGoalProgressMap.get(selectedTask.id) || 0) : 0}
+            onEdit={handleEditTask}
+            onDelete={handleDeleteTask}
+            onStreakIncrease={() => {}}
+            onOpenGoalInput={handleOpenGoalInput}
+            onOpenTimer={handleOpenTimer}
+          />
         </div>
       )}
 
