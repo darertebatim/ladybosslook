@@ -1090,6 +1090,44 @@ export default function AppTest() {
           toast.info('Would navigate to /app/onboarding/me-plus-v1');
         }}
       />
+
+      {/* New Message Popup */}
+      <AlertDialog open={showNewMessagePopup} onOpenChange={() => setShowNewMessagePopup(false)}>
+        <AlertDialogContent className="max-w-[300px] p-0 rounded-3xl border-0 shadow-2xl overflow-hidden bg-gradient-to-b from-background to-muted/30">
+          <AlertDialogHeader className="pt-6 pb-4 px-5">
+            <div className="flex justify-center mb-4">
+              <div className="relative">
+                <div className="rounded-full bg-gradient-to-br from-primary/20 to-primary/5 p-4">
+                  <MessageCircle className="h-7 w-7 text-primary" />
+                </div>
+                <div className="absolute -top-1 -right-1 h-5 w-5 bg-primary rounded-full flex items-center justify-center text-[11px] font-bold text-primary-foreground">
+                  {testUnreadCount}
+                </div>
+              </div>
+            </div>
+            <AlertDialogTitle className="text-center text-lg font-semibold leading-tight">
+              You have a message! 💬
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-sm text-muted-foreground mt-2">
+              Our support team has replied to your conversation
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col gap-0 sm:flex-col p-4 pt-2">
+            <AlertDialogAction 
+              onClick={() => setShowNewMessagePopup(false)} 
+              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-base font-medium shadow-md"
+            >
+              View Message
+            </AlertDialogAction>
+            <AlertDialogCancel 
+              onClick={() => setShowNewMessagePopup(false)} 
+              className="w-full h-10 rounded-xl border-0 m-0 mt-2 bg-transparent hover:bg-muted/50 text-sm font-normal text-muted-foreground"
+            >
+              Maybe later
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
