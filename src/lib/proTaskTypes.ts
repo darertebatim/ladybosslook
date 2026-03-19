@@ -17,6 +17,7 @@ import {
   Brain,
   Video,
   Clapperboard,
+  ListChecks,
   Clock
 } from 'lucide-react';
 
