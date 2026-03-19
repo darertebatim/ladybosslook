@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useRef, useMemo } from "react";
 import { useBilingualText } from "@/components/ui/BilingualText";
+import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
 
 interface ChatMessageProps {
   content: string;
@@ -167,9 +169,21 @@ export function ChatMessage({
     return generateWaveformBars(attachmentUrl || 'default', 28);
   }, [attachmentUrl]);
 
+  const openExternalUrl = async (url: string) => {
+    try {
+      if (Capacitor.isNativePlatform()) {
+        await Browser.open({ url });
+      } else {
+        window.open(url, '_blank');
+      }
+    } catch {
+      window.open(url, '_blank');
+    }
+  };
+
   const handleDownload = () => {
     if (attachmentUrl) {
-      window.open(attachmentUrl, '_blank');
+      openExternalUrl(attachmentUrl);
     }
   };
 
@@ -225,7 +239,7 @@ export function ChatMessage({
 
   const handleLinkClick = () => {
     if (linkUrl) {
-      window.open(linkUrl, '_blank');
+      openExternalUrl(linkUrl);
     }
   };
 
