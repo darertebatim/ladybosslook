@@ -786,9 +786,22 @@ export default function AppRoutinePlayer() {
           </div>
         ) : (
           <div className="space-y-6 mt-4">
-            {/* Activated routines */}
-            {(() => {
-              const activeRoutines = localRoutines.filter((r: any) => {
+            {/* Title row with filter */}
+            <div className="flex items-center gap-2">
+              <p className="text-base font-bold text-foreground">My Tasks</p>
+              <RoutinePlayerFilter
+                categories={routineCategories.map(c => ({ slug: c.slug, name: c.name }))}
+                routines={(myRoutines || []).filter((r: any) => (routineTasksMap?.[r.routine_id] || []).length > 0)}
+                selected={activeFilter}
+                onSelect={setActiveFilter}
+                open={filterOpen}
+                onOpenChange={setFilterOpen}
+              />
+            </div>
+
+            {/* Show routine cards for all/category/routine filters */}
+            {(activeFilter.type === 'all' || activeFilter.type === 'category' || activeFilter.type === 'routine') && (() => {
+              const activeRoutines = filteredLocalRoutines.filter((r: any) => {
                 const tasks = routineTasksMap?.[r.routine_id] || [];
                 return tasks.length > 0;
               });
@@ -797,7 +810,6 @@ export default function AppRoutinePlayer() {
 
               return activeRoutines.length > 0 ? (
               <section>
-                <p className="text-base font-bold text-foreground mb-3">My Routines</p>
                 <DndContext
                   sensors={routineSensors}
                   collisionDetection={closestCenter}
@@ -843,11 +855,41 @@ export default function AppRoutinePlayer() {
                   </DragOverlay>
                 </DndContext>
               </section>
-              ) : null;
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-sm text-muted-foreground">No routines found</p>
+                </div>
+              );
             })()}
 
-            {/* Empty state */}
-            {(myRoutines || []).filter((r: any) => (routineTasksMap?.[r.routine_id] || []).length > 0).length === 0 && (
+            {/* Show standalone tasks for one-time / unlinked filters */}
+            {(activeFilter.type === 'one-time' || activeFilter.type === 'unlinked') && (
+              <section>
+                {filteredStandaloneTasks.length > 0 ? (
+                  <SortableTaskList
+                    tasks={filteredStandaloneTasks}
+                    date={today}
+                    completedTaskIds={plannerCompletedTaskIds}
+                    completedSubtaskIds={plannerCompletedSubtaskIds}
+                    goalProgressMap={plannerGoalProgressMap}
+                    onTaskTap={handleTaskTap}
+                    onStreakIncrease={() => {}}
+                    onOpenGoalInput={handleOpenGoalInput}
+                    onOpenTimer={handleOpenTimer}
+                    hideQuickAdd
+                  />
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-muted-foreground">
+                      {activeFilter.type === 'one-time' ? 'No one-time tasks' : 'No unlinked tasks'}
+                    </p>
+                  </div>
+                )}
+              </section>
+            )}
+
+            {/* Empty state — only when showing all and nothing exists */}
+            {activeFilter.type === 'all' && (myRoutines || []).filter((r: any) => (routineTasksMap?.[r.routine_id] || []).length > 0).length === 0 && (
               <div className="text-center py-12">
                 <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
                 <h3 className="font-semibold text-foreground mb-1">No routines yet</h3>
