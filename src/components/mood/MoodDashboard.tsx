@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ChartColumn, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -11,44 +11,44 @@ import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreview
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { MoodCelebrationSheet } from './MoodCelebrationSheet';
 import { MoodRoutinePromptSheet } from './MoodRoutinePromptSheet';
-import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { useProTaskRoutineReturn } from '@/hooks/useProTaskRoutineReturn';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
 // 5-level mood system
 const MOODS = [
-  { 
-    value: 'great', 
-    emoji: '😄', 
+  {
+    value: 'great',
+    emoji: '😄',
     label: 'Great',
     bgColor: 'bg-yellow-200',
     buttonText: 'I feel great!!!',
   },
-  { 
-    value: 'good', 
-    emoji: '🙂', 
+  {
+    value: 'good',
+    emoji: '🙂',
     label: 'Good',
     bgColor: 'bg-green-200',
     buttonText: 'I feel good!',
   },
-  { 
-    value: 'okay', 
-    emoji: '😐', 
+  {
+    value: 'okay',
+    emoji: '😐',
     label: 'Okay',
     bgColor: 'bg-blue-200',
     buttonText: 'I feel just Okay.',
   },
-  { 
-    value: 'not_great', 
-    emoji: '😔', 
+  {
+    value: 'not_great',
+    emoji: '😔',
     label: 'Not Great',
     bgColor: 'bg-purple-200',
     buttonText: 'I feel not great...',
   },
-  { 
-    value: 'bad', 
-    emoji: '😢', 
+  {
+    value: 'bad',
+    emoji: '😢',
     label: 'Bad',
     bgColor: 'bg-red-200',
     buttonText: 'I feel bad...',
@@ -74,15 +74,13 @@ const SYNTHETIC_MOOD_TASK: RoutinePlanTask = {
 
 export function MoodDashboard() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { isProTaskActive, completeProTask } = useFocusPlayer();
-  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
+  const { shouldReturnToRoutine, returnToRoutinePlayer } = useProTaskRoutineReturn();
   const { autoCompleteMood } = useAutoCompleteProTask();
   const { data: todayMood } = useTodayMood();
   const createMoodLog = useCreateMoodLog();
   const { data: existingTask } = useExistingProTask('mood');
   const addRoutinePlan = useAddRoutinePlan();
-  
+
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
@@ -101,10 +99,10 @@ export function MoodDashboard() {
 
   const handleSubmit = useCallback(async () => {
     if (!selectedMood) return;
-    
+
     setIsSubmitting(true);
     haptic.medium();
-    
+
     try {
       // Save mood check-in in emotion logs (separate from journal entries)
       const moodLabel = MOODS.find(m => m.value === selectedMood)?.label || selectedMood;
@@ -113,18 +111,18 @@ export function MoodDashboard() {
         content: `Feeling ${moodLabel.toLowerCase()} today.`,
       });
 
-      // Auto-complete any mood pro tasks for today
-      await autoCompleteMood();
-      
       haptic.success();
 
-      // In focus routine mode, immediately complete and return to player
-      if (fromFocusRoutine && isProTaskActive) {
-        completeProTask();
+      // In focus routine mode, the Focus player is the single source of completion truth
+      if (shouldReturnToRoutine) {
+        returnToRoutinePlayer();
         setIsSubmitting(false);
         return;
       }
-      
+
+      // Auto-complete standalone mood pro tasks for today (outside focus routine mode)
+      await autoCompleteMood();
+
       // Default flow outside focus routine: show celebration
       setShowCelebration(true);
       setIsSubmitting(false);
@@ -133,21 +131,21 @@ export function MoodDashboard() {
       toast.error('Failed to log mood');
       setIsSubmitting(false);
     }
-  }, [selectedMood, autoCompleteMood, createMoodLog, fromFocusRoutine, isProTaskActive, completeProTask]);
+  }, [selectedMood, createMoodLog, shouldReturnToRoutine, returnToRoutinePlayer, autoCompleteMood]);
 
   const handleCelebrationDone = useCallback(() => {
-    if (fromFocusRoutine && isProTaskActive) {
-      completeProTask();
+    if (shouldReturnToRoutine) {
+      returnToRoutinePlayer();
       return;
     }
     navigate('/app/home');
-  }, [navigate, fromFocusRoutine, isProTaskActive, completeProTask]);
+  }, [navigate, shouldReturnToRoutine, returnToRoutinePlayer]);
 
   // Intercept action clicks from celebration to show routine prompt
   const handleCelebrationAction = useCallback((route: string): boolean => {
     // In focus routine mode, always complete task and return to player
-    if (fromFocusRoutine && isProTaskActive) {
-      completeProTask();
+    if (shouldReturnToRoutine) {
+      returnToRoutinePlayer();
       return true;
     }
 
@@ -157,7 +155,7 @@ export function MoodDashboard() {
       return true; // intercept
     }
     return false; // let celebration handle navigation
-  }, [isAdded, neverPrompt, fromFocusRoutine, isProTaskActive, completeProTask]);
+  }, [isAdded, neverPrompt, shouldReturnToRoutine, returnToRoutinePlayer]);
 
   const handleRoutinePromptAdd = useCallback(() => {
     setShowRoutinePrompt(false);
@@ -184,8 +182,8 @@ export function MoodDashboard() {
   const handleRoutineClick = () => {
     haptic.light();
     if (isAdded) {
-      if (fromFocusRoutine && isProTaskActive) {
-        completeProTask();
+      if (shouldReturnToRoutine) {
+        returnToRoutinePlayer();
         return;
       }
       navigate('/app/home');
@@ -217,7 +215,6 @@ export function MoodDashboard() {
   };
 
   const selectedMoodData = selectedMood ? MOODS.find(m => m.value === selectedMood) : null;
-
   return (
     <>
       <div className="flex flex-col h-full">
