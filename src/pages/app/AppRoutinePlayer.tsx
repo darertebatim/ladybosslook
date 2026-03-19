@@ -8,7 +8,7 @@ import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { haptic } from '@/lib/haptics';
 import { startOfDay, endOfDay, format } from 'date-fns';
@@ -23,6 +23,26 @@ import { TaskDetailModal } from '@/components/app/TaskDetailModal';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import {
+  DndContext,
+  closestCenter,
+  MouseSensor,
+  TouchSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -32,6 +52,152 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+
+interface RoutineCardProps {
+  routine: any;
+  routineTasksMap: any;
+  userTasksByRoutine: any;
+  todayCompletions: Set<string> | undefined;
+  getCompletionInfo: (routineId: string) => { pct: number; isComplete: boolean } | null;
+  categoryNameMap: Map<string, string>;
+  loadingRoutineId: string | null;
+  onPlay: (routine: any) => void;
+  onOpenAddSheet: (routine: any) => void;
+  onDeleteRoutine: (routine: any) => void;
+}
+
+function RoutineCardContent({
+  routine,
+  routineTasksMap,
+  userTasksByRoutine,
+  todayCompletions,
+  getCompletionInfo,
+  categoryNameMap,
+  loadingRoutineId,
+  onPlay,
+  onOpenAddSheet,
+  onDeleteRoutine,
+}: RoutineCardProps) {
+  const completion = getCompletionInfo(routine.routine_id);
+  const allTasks = routineTasksMap?.[routine.routine_id] || [];
+  const MAX_EMOJIS = 3;
+  const visibleTasks = allTasks.slice(0, MAX_EMOJIS);
+  const overflowCount = allTasks.length - MAX_EMOJIS;
+  const cardColor = TASK_COLOR_CLASSES[(routine.color as TaskColor) || 'peach'] || TASK_COLOR_CLASSES.peach;
+
+  return (
+    <div
+      onClick={() => onPlay(routine)}
+      className={cn(
+        'rounded-2xl p-4 pb-3.5 active:scale-[0.98] transition-transform cursor-pointer relative overflow-hidden',
+        cardColor
+      )}
+    >
+      <div className="flex items-center justify-between mb-1.5">
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1 text-[11px] font-semibold text-black">
+            <Bell className="w-3 h-3" />
+            {allTasks.length} tasks
+          </span>
+          {routine.category && (
+            <span className="flex items-center gap-1 text-[11px] font-semibold text-black">
+              <Calendar className="w-3 h-3" />
+              {categoryNameMap.get(routine.category) || routine.category}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => { e.stopPropagation(); onOpenAddSheet(routine); }}
+            className="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+            title="Add to planner"
+          >
+            <CalendarPlus className="w-4 h-4 text-white" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); onDeleteRoutine(routine); }}
+            className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center active:scale-95 transition-all"
+          >
+            <Trash2 className="w-3.5 h-3.5 text-destructive" />
+          </button>
+        </div>
+      </div>
+      <h3 className="font-bold text-black text-[17px] leading-snug mb-3">
+        {routine.title}
+      </h3>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1">
+          {visibleTasks.map((task: any, i: number) => (
+            <span key={i} className="flex items-center">
+              <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center">
+                <FluentEmoji emoji={task.emoji} size={20} />
+              </span>
+              {i < visibleTasks.length - 1 && (
+                <ChevronRight className="w-3 h-3 text-black mx-0.5" />
+              )}
+            </span>
+          ))}
+          {overflowCount > 0 && (
+            <>
+              <ChevronRight className="w-3 h-3 text-black mx-0.5" />
+              <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center text-xs font-bold text-black">
+                +{overflowCount}
+              </span>
+            </>
+          )}
+        </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); onPlay(routine); }}
+          disabled={loadingRoutineId === routine.routine_id}
+          className="flex items-center justify-center gap-2 h-12 min-w-[48px] px-5 rounded-full bg-secondary active:scale-95 transition-transform shrink-0"
+        >
+          {loadingRoutineId === routine.routine_id ? (
+            <Loader2 className="w-5 h-5 animate-spin text-black" />
+          ) : completion ? (
+            <>
+              {completion.isComplete ? (
+                <RotateCw className="w-5 h-5 text-black" />
+              ) : (
+                <Play className="w-5 h-5 text-black fill-black" />
+              )}
+              <span className="text-sm font-bold text-black">{completion.pct}%</span>
+            </>
+          ) : (
+            <Play className="w-5 h-5 text-black fill-black" />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function SortableRoutineCard(props: RoutineCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: props.routine.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={cn('touch-manipulation', isDragging && 'opacity-50 scale-[1.02]')}
+    >
+      <RoutineCardContent {...props} />
+    </div>
+  );
+}
 
 export default function AppRoutinePlayer() {
   const navigate = useNavigate();
@@ -53,22 +219,79 @@ export default function AppRoutinePlayer() {
     routineCategories.forEach(cat => map.set(cat.slug, cat.name));
     return map;
   }, [routineCategories]);
-  // Fetch ALL user routines from user_routines_bank (user-owned copies)
+   // Fetch ALL user routines from user_routines_bank (user-owned copies)
   const { data: myRoutines, isLoading } = useQuery({
     queryKey: ['user-routines-all', user?.id],
     queryFn: async () => {
       if (!user) return [];
       const { data, error } = await supabase
         .from('user_routines_bank')
-        .select('id, routine_id, title, emoji, cover_image_url, category, color, is_focus, is_active')
+        .select('id, routine_id, title, emoji, cover_image_url, category, color, is_focus, is_active, order_index')
         .eq('user_id', user.id)
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .order('order_index', { ascending: true });
       if (error) throw error;
       return (data || []) as any[];
     },
     enabled: !!user,
   });
 
+  // Reorder routines mutation
+  const reorderRoutinesMutation = useMutation({
+    mutationFn: async (updates: { id: string; order_index: number }[]) => {
+      for (const u of updates) {
+        await supabase
+          .from('user_routines_bank')
+          .update({ order_index: u.order_index } as any)
+          .eq('id', u.id);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
+    },
+  });
+
+  // Local routine order state for optimistic drag updates
+  const [localRoutines, setLocalRoutines] = useState<any[]>([]);
+  const skipRoutineSyncRef = useRef(false);
+  const routineReorderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sync local routines from query data
+  const routinesKey = JSON.stringify((myRoutines || []).map((r: any) => r.id));
+  const localRoutinesKey = JSON.stringify(localRoutines.map((r: any) => r.id));
+  if (routinesKey !== localRoutinesKey && !skipRoutineSyncRef.current) {
+    setLocalRoutines(myRoutines || []);
+  }
+
+  // DnD sensors for routine reordering
+  const routineSensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+  const [activeRoutineId, setActiveRoutineId] = useState<string | null>(null);
+
+  const handleRoutineDragStart = useCallback((event: DragStartEvent) => {
+    setActiveRoutineId(event.active.id as string);
+    haptic.medium();
+  }, []);
+
+  const handleRoutineDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveRoutineId(null);
+    if (over && active.id !== over.id) {
+      const oldIndex = localRoutines.findIndex((r: any) => r.id === active.id);
+      const newIndex = localRoutines.findIndex((r: any) => r.id === over.id);
+      const reordered = arrayMove(localRoutines, oldIndex, newIndex);
+      setLocalRoutines(reordered);
+      skipRoutineSyncRef.current = true;
+      if (routineReorderTimerRef.current) clearTimeout(routineReorderTimerRef.current);
+      routineReorderTimerRef.current = setTimeout(() => { skipRoutineSyncRef.current = false; }, 2000);
+      haptic.light();
+      const updates = reordered.map((r: any, i: number) => ({ id: r.id, order_index: i }));
+      reorderRoutinesMutation.mutate(updates);
+    }
+  }, [localRoutines, reorderRoutinesMutation]);
   // Fetch user_tasks grouped by source_routine_id for emoji chains
   const routineIds = useMemo(() => {
     return (myRoutines || []).map((r: any) => r.routine_id);
@@ -533,125 +756,60 @@ export default function AppRoutinePlayer() {
           <div className="space-y-6 mt-4">
             {/* Activated routines */}
             {(() => {
-              const activeRoutines = (myRoutines || []).filter((r: any) => {
+              const activeRoutines = localRoutines.filter((r: any) => {
                 const tasks = routineTasksMap?.[r.routine_id] || [];
                 return tasks.length > 0;
               });
+              const sortableIds = activeRoutines.map((r: any) => r.id);
+              const activeRoutineData = activeRoutineId ? activeRoutines.find((r: any) => r.id === activeRoutineId) : null;
+
               return activeRoutines.length > 0 ? (
               <section>
                 <p className="text-base font-bold text-foreground mb-3">My Routines</p>
-                <div className="space-y-3">
-                  {activeRoutines.map((routine: any) => {
-                    const completion = getCompletionInfo(routine.routine_id);
-                    const allTasks = routineTasksMap?.[routine.routine_id] || [];
-                    const completedIds = todayCompletions || new Set<string>();
-                    const taskIdsForRoutine = userTasksByRoutine?.[routine.routine_id] || [];
-                    const remainingTasksForCard = allTasks.filter((t, idx) => {
-                      const taskId = taskIdsForRoutine[idx];
-                      return !taskId || !completedIds.has(taskId);
-                    });
-
-                    const MAX_EMOJIS = 3;
-                    const visibleTasks = allTasks.slice(0, MAX_EMOJIS);
-                    const overflowCount = allTasks.length - MAX_EMOJIS;
-                    const cardColor = TASK_COLOR_CLASSES[(routine.color as TaskColor) || 'peach'] || TASK_COLOR_CLASSES.peach;
-
-                    return (
-                      <div
-                        key={routine.id}
-                        onClick={() => handlePlay(routine)}
-                        className={cn(
-                          'rounded-2xl p-4 pb-3.5 active:scale-[0.98] transition-transform cursor-pointer relative overflow-hidden',
-                          cardColor
-                        )}
-                      >
-                        {/* Top row: schedule hints + action buttons top-right */}
-                        <div className="flex items-center justify-between mb-1.5">
-                          <div className="flex items-center gap-3">
-                            <span className="flex items-center gap-1 text-[11px] font-semibold text-black">
-                              <Bell className="w-3 h-3" />
-                              {allTasks.length} tasks
-                            </span>
-                            {routine.category && (
-                              <span className="flex items-center gap-1 text-[11px] font-semibold text-black">
-                                <Calendar className="w-3 h-3" />
-                                {categoryNameMap.get(routine.category) || routine.category}
-                              </span>
-                            )}
-                          </div>
-                          {/* Top-right action buttons */}
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handleOpenAddSheet(routine); }}
-                              className="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
-                              title="Add to planner"
-                            >
-                              <CalendarPlus className="w-4 h-4 text-white" />
-                            </button>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); setDeleteRoutine(routine); }}
-                              className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center active:scale-95 transition-all"
-                            >
-                              <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Title */}
-                        <h3 className="font-bold text-black text-[17px] leading-snug mb-3">
-                          {routine.title}
-                        </h3>
-
-                        {/* Bottom row: emoji bubbles + play button */}
-                        <div className="flex items-center justify-between">
-                          {/* Emoji chain */}
-                          <div className="flex items-center gap-1">
-                            {visibleTasks.map((task, i) => (
-                              <span key={i} className="flex items-center">
-                                <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center">
-                                  <FluentEmoji emoji={task.emoji} size={20} />
-                                </span>
-                                {i < visibleTasks.length - 1 && (
-                                  <ChevronRight className="w-3 h-3 text-black mx-0.5" />
-                                )}
-                              </span>
-                            ))}
-                            {overflowCount > 0 && (
-                              <>
-                                <ChevronRight className="w-3 h-3 text-black mx-0.5" />
-                                <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center text-xs font-bold text-black">
-                                  +{overflowCount}
-                                </span>
-                              </>
-                            )}
-                          </div>
-
-                          {/* Play button */}
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handlePlay(routine); }}
-                            disabled={loadingRoutineId === routine.routine_id}
-                            className="flex items-center justify-center gap-2 h-12 min-w-[48px] px-5 rounded-full bg-secondary active:scale-95 transition-transform shrink-0"
-                          >
-                            {loadingRoutineId === routine.routine_id ? (
-                              <Loader2 className="w-5 h-5 animate-spin text-black" />
-                            ) : completion ? (
-                              <>
-                                {completion.isComplete ? (
-                                  <RotateCw className="w-5 h-5 text-black" />
-                                ) : (
-                                  <Play className="w-5 h-5 text-black fill-black" />
-                                )}
-                                <span className="text-sm font-bold text-black">{completion.pct}%</span>
-                              </>
-                            ) : (
-                              <Play className="w-5 h-5 text-black fill-black" />
-                            )}
-                          </button>
-                        </div>
+                <DndContext
+                  sensors={routineSensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleRoutineDragStart}
+                  onDragEnd={handleRoutineDragEnd}
+                >
+                  <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
+                    <div className="space-y-3">
+                      {activeRoutines.map((routine: any) => (
+                        <SortableRoutineCard
+                          key={routine.id}
+                          routine={routine}
+                          routineTasksMap={routineTasksMap}
+                          userTasksByRoutine={userTasksByRoutine}
+                          todayCompletions={todayCompletions}
+                          getCompletionInfo={getCompletionInfo}
+                          categoryNameMap={categoryNameMap}
+                          loadingRoutineId={loadingRoutineId}
+                          onPlay={handlePlay}
+                          onOpenAddSheet={handleOpenAddSheet}
+                          onDeleteRoutine={setDeleteRoutine}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                  <DragOverlay>
+                    {activeRoutineData ? (
+                      <div className="opacity-90 scale-105 shadow-2xl rounded-2xl">
+                        <RoutineCardContent
+                          routine={activeRoutineData}
+                          routineTasksMap={routineTasksMap}
+                          userTasksByRoutine={userTasksByRoutine}
+                          todayCompletions={todayCompletions}
+                          getCompletionInfo={getCompletionInfo}
+                          categoryNameMap={categoryNameMap}
+                          loadingRoutineId={loadingRoutineId}
+                          onPlay={handlePlay}
+                          onOpenAddSheet={handleOpenAddSheet}
+                          onDeleteRoutine={setDeleteRoutine}
+                        />
                       </div>
-                    );
-                  })}
-                </div>
+                    ) : null}
+                  </DragOverlay>
+                </DndContext>
               </section>
               ) : null;
             })()}
