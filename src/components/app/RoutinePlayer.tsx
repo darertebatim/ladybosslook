@@ -184,6 +184,7 @@ export const RoutinePlayer = memo(function RoutinePlayer({
   taskStartedAt,
   pauseElapsed,
   onBreathComplete,
+  onCountdownComplete,
   onCompleteTask,
   onSkipTask,
   onTogglePause,
