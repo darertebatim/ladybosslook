@@ -267,7 +267,7 @@ export function BreathingExerciseScreen({
     cycleCountRef.current = 0;
     currentPhaseIndexRef.current = 0;
     phaseTimeRemainingRef.current = 0;
-  }, [exercise.id, saveSession, autoCompleteBreathe]);
+  }, [exercise.id, saveSession, autoCompleteBreathe, fromFocusRoutine, isProTaskActive, completeProTask]);
 
   const handleStart = useCallback(() => {
     setCycleCount(0);
