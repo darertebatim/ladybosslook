@@ -217,9 +217,56 @@ export default function AppRoutinePlayer() {
     haptic.medium();
 
     if (remainingTasks.length === 0) {
-      toast('All tasks in this routine are already completed for today ✅');
+      setShowRestartDialog(true);
       return;
     }
+
+    launchRoutine();
+  };
+
+  const handleRestartRoutine = async () => {
+    if (!preStartRoutine) return;
+    setShowRestartDialog(false);
+    haptic.medium();
+
+    // Delete today's completions for this routine's tasks so they can be re-done
+    const taskIds = userTasksByRoutine?.[preStartRoutine.routine_id] || [];
+    if (taskIds.length > 0) {
+      await supabase
+        .from('task_completions')
+        .delete()
+        .eq('user_id', user!.id)
+        .eq('completed_date', today)
+        .in('task_id', taskIds);
+    }
+
+    // Build all tasks (not just remaining since we reset)
+    const allTasks = routineFilteredTasks.map(t => ({
+      id: t.id,
+      title: t.title,
+      emoji: t.emoji || '📝',
+      targetSeconds: t.goal_type === 'timer' ? (t.goal_target || 300) : 0,
+      color: t.color || undefined,
+      userTaskId: t.id,
+      goalType: t.goal_type || null,
+      goalTarget: t.goal_target || null,
+      hasTimerGoal: t.goal_type === 'timer',
+      proLinkType: t.pro_link_type || null,
+      proLinkValue: t.pro_link_value || null,
+    }));
+
+    startRoutine({
+      routineId: preStartRoutine.routine_id,
+      routineTitle: preStartRoutine.title,
+      routineEmoji: preStartRoutine.emoji || '✨',
+      tasks: allTasks,
+    });
+
+    setPreStartRoutine(null);
+  };
+
+  const launchRoutine = async () => {
+    if (!preStartRoutine) return;
 
     // Build focus player tasks from remaining planner tasks
     const focusTasks = remainingTasks.map(t => ({
