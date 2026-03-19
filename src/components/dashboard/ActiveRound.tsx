@@ -107,7 +107,7 @@ export function ActiveRound() {
           <div className="text-center py-6">
             <GraduationCap className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
             <p className="text-muted-foreground">No active rounds yet</p>
-            <Link to="/app/programs">
+            <Link to="/app/myprograms">
               <Button className="mt-4" variant="outline">
                 Browse Programs
               </Button>
