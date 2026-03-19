@@ -20,6 +20,25 @@ function calculateBadgeLevel(completed: number, total: number): BadgeLevel {
   return 'bronze';
 }
 
+function buildTaskIdSetByDate(
+  rows: Array<{ task_id: string; [key: string]: string }>,
+  dateField: string
+): Record<string, Set<string>> {
+  const map: Record<string, Set<string>> = {};
+
+  rows.forEach((row) => {
+    const dateKey = row[dateField];
+    if (!dateKey) return;
+
+    if (!map[dateKey]) {
+      map[dateKey] = new Set<string>();
+    }
+    map[dateKey].add(row.task_id);
+  });
+
+  return map;
+}
+
 export function useWeeklyTaskCompletion() {
   const { user } = useAuth();
   const today = new Date();
@@ -30,50 +49,47 @@ export function useWeeklyTaskCompletion() {
     queryFn: async (): Promise<Record<string, DailyTaskCompletion>> => {
       if (!user?.id) throw new Error('User not authenticated');
 
-      const weekDates = Array.from({ length: 7 }, (_, i) => 
+      const weekDates = Array.from({ length: 7 }, (_, i) =>
         format(addDays(weekStart, i), 'yyyy-MM-dd')
       );
 
-      // Fetch ALL active user tasks (including repeating ones and their creation date)
-      const { data: tasks, error: tasksError } = await supabase
-        .from('user_tasks')
-        .select('id, scheduled_date, repeat_pattern, repeat_days, created_at')
-        .eq('user_id', user.id)
-        .eq('is_active', true);
+      const [tasksResult, completionsResult, skipsResult] = await Promise.all([
+        supabase
+          .from('user_tasks')
+          .select('id, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date')
+          .eq('user_id', user.id)
+          .eq('is_active', true),
+        supabase
+          .from('task_completions')
+          .select('task_id, completed_date')
+          .eq('user_id', user.id)
+          .in('completed_date', weekDates),
+        supabase
+          .from('task_skips')
+          .select('task_id, skipped_date')
+          .eq('user_id', user.id)
+          .in('skipped_date', weekDates),
+      ]);
 
-      if (tasksError) throw tasksError;
+      if (tasksResult.error) throw tasksResult.error;
+      if (completionsResult.error) throw completionsResult.error;
+      if (skipsResult.error) throw skipsResult.error;
 
-      // Fetch completions for the week
-      const { data: completions, error: completionsError } = await supabase
-        .from('task_completions')
-        .select('task_id, completed_date')
-        .eq('user_id', user.id)
-        .in('completed_date', weekDates);
+      const tasks = tasksResult.data || [];
+      const completionsByDate = buildTaskIdSetByDate(completionsResult.data || [], 'completed_date');
+      const skipsByDate = buildTaskIdSetByDate(skipsResult.data || [], 'skipped_date');
 
-      if (completionsError) throw completionsError;
-
-      // Build a map of completions by date
-      const completionsByDate: Record<string, Set<string>> = {};
-      completions?.forEach(c => {
-        if (!completionsByDate[c.completed_date]) {
-          completionsByDate[c.completed_date] = new Set();
-        }
-        completionsByDate[c.completed_date].add(c.task_id);
-      });
-
-      // Calculate stats per day
       const result: Record<string, DailyTaskCompletion> = {};
 
-      weekDates.forEach(dateStr => {
-        // Filter tasks that apply to this specific date
-        const dayTasks = (tasks || []).filter(task => 
-          taskAppliesToDate(task, dateStr)
+      weekDates.forEach((dateStr) => {
+        const dayCompletions = completionsByDate[dateStr] || new Set<string>();
+        const skippedTaskIds = skipsByDate[dateStr] || new Set<string>();
+
+        const dayTasks = tasks.filter((task) =>
+          !skippedTaskIds.has(task.id) && taskAppliesToDate(task, dateStr)
         );
-        
-        const dayCompletions = completionsByDate[dateStr] || new Set();
-        
-        // Count completed tasks for this day
-        const completedCount = dayTasks.filter(t => dayCompletions.has(t.id)).length;
+
+        const completedCount = dayTasks.filter((t) => dayCompletions.has(t.id)).length;
         const totalCount = dayTasks.length;
 
         result[dateStr] = {
@@ -87,7 +103,7 @@ export function useWeeklyTaskCompletion() {
       return result;
     },
     enabled: !!user?.id,
-    staleTime: 30 * 1000, // 30 seconds - refresh more often for live updates
+    staleTime: 30 * 1000,
   });
 }
 
@@ -112,47 +128,45 @@ export function useDateRangeTaskCompletion(startDate: Date, endDate: Date) {
         current = addDays(current, 1);
       }
 
-      // Fetch ALL active user tasks (including repeating ones and their creation date)
-      const { data: tasks, error: tasksError } = await supabase
-        .from('user_tasks')
-        .select('id, scheduled_date, repeat_pattern, repeat_days, created_at')
-        .eq('user_id', user.id)
-        .eq('is_active', true);
+      const [tasksResult, completionsResult, skipsResult] = await Promise.all([
+        supabase
+          .from('user_tasks')
+          .select('id, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date')
+          .eq('user_id', user.id)
+          .eq('is_active', true),
+        supabase
+          .from('task_completions')
+          .select('task_id, completed_date')
+          .eq('user_id', user.id)
+          .gte('completed_date', startStr)
+          .lte('completed_date', endStr),
+        supabase
+          .from('task_skips')
+          .select('task_id, skipped_date')
+          .eq('user_id', user.id)
+          .gte('skipped_date', startStr)
+          .lte('skipped_date', endStr),
+      ]);
 
-      if (tasksError) throw tasksError;
+      if (tasksResult.error) throw tasksResult.error;
+      if (completionsResult.error) throw completionsResult.error;
+      if (skipsResult.error) throw skipsResult.error;
 
-      // Fetch completions for the date range
-      const { data: completions, error: completionsError } = await supabase
-        .from('task_completions')
-        .select('task_id, completed_date')
-        .eq('user_id', user.id)
-        .gte('completed_date', startStr)
-        .lte('completed_date', endStr);
+      const tasks = tasksResult.data || [];
+      const completionsByDate = buildTaskIdSetByDate(completionsResult.data || [], 'completed_date');
+      const skipsByDate = buildTaskIdSetByDate(skipsResult.data || [], 'skipped_date');
 
-      if (completionsError) throw completionsError;
-
-      // Build a map of completions by date
-      const completionsByDate: Record<string, Set<string>> = {};
-      completions?.forEach(c => {
-        if (!completionsByDate[c.completed_date]) {
-          completionsByDate[c.completed_date] = new Set();
-        }
-        completionsByDate[c.completed_date].add(c.task_id);
-      });
-
-      // Calculate stats per day
       const result: Record<string, DailyTaskCompletion> = {};
 
-      dates.forEach(dateStr => {
-        // Filter tasks that apply to this specific date
-        const dayTasks = (tasks || []).filter(task => 
-          taskAppliesToDate(task, dateStr)
+      dates.forEach((dateStr) => {
+        const dayCompletions = completionsByDate[dateStr] || new Set<string>();
+        const skippedTaskIds = skipsByDate[dateStr] || new Set<string>();
+
+        const dayTasks = tasks.filter((task) =>
+          !skippedTaskIds.has(task.id) && taskAppliesToDate(task, dateStr)
         );
-        
-        const dayCompletions = completionsByDate[dateStr] || new Set();
-        
-        // Count completed tasks for this day
-        const completedCount = dayTasks.filter(t => dayCompletions.has(t.id)).length;
+
+        const completedCount = dayTasks.filter((t) => dayCompletions.has(t.id)).length;
         const totalCount = dayTasks.length;
 
         result[dateStr] = {
@@ -166,6 +180,6 @@ export function useDateRangeTaskCompletion(startDate: Date, endDate: Date) {
       return result;
     },
     enabled: !!user?.id,
-    staleTime: 60 * 1000, // 1 minute for expanded calendar
+    staleTime: 60 * 1000,
   });
 }

@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { format, subDays, parseISO, startOfWeek, endOfWeek, isSameDay } from 'date-fns';
+import { format, subDays, parseISO, startOfWeek, endOfWeek } from 'date-fns';
+import { taskAppliesToDate } from '@/lib/localDate';
 
 export interface GoldStreakData {
   currentGoldStreak: number;
@@ -27,7 +28,7 @@ export const useGoldStreak = () => {
         .maybeSingle();
 
       if (error) throw error;
-      
+
       return data ? {
         currentGoldStreak: data.current_gold_streak || 0,
         longestGoldStreak: data.longest_gold_streak || 0,
@@ -53,63 +54,67 @@ export const useGoldDatesThisWeek = () => {
       const today = new Date();
       const weekStart = startOfWeek(today, { weekStartsOn: 0 });
       const weekEnd = endOfWeek(today, { weekStartsOn: 0 });
+      const weekStartStr = format(weekStart, 'yyyy-MM-dd');
+      const weekEndStr = format(weekEnd, 'yyyy-MM-dd');
 
-      // Get all tasks for the week
+      // Get all task completions for the week
       const { data: completions, error } = await supabase
         .from('task_completions')
         .select('completed_date, task_id')
         .eq('user_id', user.id)
-        .gte('completed_date', format(weekStart, 'yyyy-MM-dd'))
-        .lte('completed_date', format(weekEnd, 'yyyy-MM-dd'));
+        .gte('completed_date', weekStartStr)
+        .lte('completed_date', weekEndStr);
 
       if (error) throw error;
 
-      // Get user's recurring tasks to calculate total tasks per day
-      const { data: tasks } = await supabase
-        .from('user_tasks')
-        .select('id, repeat_pattern, repeat_days, scheduled_date')
-        .eq('user_id', user.id)
-        .eq('is_active', true);
+      // Get active tasks + skipped tasks for the week
+      const [{ data: tasks }, { data: skips }] = await Promise.all([
+        supabase
+          .from('user_tasks')
+          .select('id, repeat_pattern, repeat_days, scheduled_date, created_at, repeat_end_date')
+          .eq('user_id', user.id)
+          .eq('is_active', true),
+        supabase
+          .from('task_skips')
+          .select('task_id, skipped_date')
+          .eq('user_id', user.id)
+          .gte('skipped_date', weekStartStr)
+          .lte('skipped_date', weekEndStr),
+      ]);
 
       if (!tasks) return [];
 
       // For each day, calculate if it was a gold day (100% completion)
       const goldDates: Date[] = [];
-      
+
       // Group completions by date
       const completionsByDate = new Map<string, Set<string>>();
-      completions?.forEach(c => {
+      completions?.forEach((c) => {
         if (!completionsByDate.has(c.completed_date)) {
           completionsByDate.set(c.completed_date, new Set());
         }
         completionsByDate.get(c.completed_date)!.add(c.task_id);
       });
 
-      // Check each day
+      // Group skips by date
+      const skippedByDate = new Map<string, Set<string>>();
+      skips?.forEach((s) => {
+        if (!skippedByDate.has(s.skipped_date)) {
+          skippedByDate.set(s.skipped_date, new Set());
+        }
+        skippedByDate.get(s.skipped_date)!.add(s.task_id);
+      });
+
+      // Check each day where user has completions
       completionsByDate.forEach((taskIds, dateStr) => {
         const date = parseISO(dateStr);
-        const dayOfWeek = date.getDay();
-        
-        // Count tasks that apply to this day
-        const tasksForDay = tasks.filter(task => {
-          if (task.repeat_pattern === 'none') {
-            return task.scheduled_date === dateStr;
-          }
-          if (task.repeat_pattern === 'daily') return true;
-          if (task.repeat_pattern === 'weekend') {
-            return dayOfWeek === 0 || dayOfWeek === 6;
-          }
-          if (task.repeat_pattern === 'weekly' && task.scheduled_date) {
-            const originalDay = parseISO(task.scheduled_date).getDay();
-            return dayOfWeek === originalDay;
-          }
-          if (task.repeat_pattern === 'custom' && task.repeat_days) {
-            return task.repeat_days.includes(dayOfWeek);
-          }
-          return false;
-        });
+        const skippedTaskIds = skippedByDate.get(dateStr) || new Set<string>();
 
-        // Gold = completed all tasks for that day
+        const tasksForDay = tasks.filter((task) =>
+          !skippedTaskIds.has(task.id) && taskAppliesToDate(task, dateStr)
+        );
+
+        // Gold = completed all applicable non-skipped tasks for that day
         if (tasksForDay.length > 0 && taskIds.size >= tasksForDay.length) {
           goldDates.push(date);
         }
