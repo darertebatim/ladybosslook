@@ -138,13 +138,13 @@ export function BreathingCompleteSheet({
           ))}
         </div>
 
-        {/* Back to Home */}
+        {/* Back to Home / Back to Player */}
         <Button
           onClick={handleDone}
           variant="ghost"
           className="w-full h-10 rounded-full text-sm bg-orange-200/60 text-orange-900 hover:bg-orange-200/80"
         >
-          Back to Home
+          {hasActivePlayer ? 'Continue Routine ▶' : 'Back to Home'}
         </Button>
       </SheetContent>
     </Sheet>
