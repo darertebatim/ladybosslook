@@ -74,15 +74,23 @@ const AppEmotion = () => {
   const handleBack = useCallback(() => {
     switch (step) {
       case 'select':
+        if (fromFocusRoutine && isProTaskActive) {
+          completeProTask();
+          return;
+        }
         setStep('dashboard');
         break;
       case 'context':
         setStep('select');
         break;
       default:
+        if (fromFocusRoutine && isProTaskActive) {
+          completeProTask();
+          return;
+        }
         navigate('/app/home');
     }
-  }, [step, navigate]);
+  }, [step, navigate, fromFocusRoutine, isProTaskActive, completeProTask]);
 
   const renderStep = () => {
     switch (step) {
