@@ -39,7 +39,7 @@ export const wellnessTools: ToolConfig[] = [
     emoji: '🎯',
     bgColor: 'bg-[#DBEAFE]',
     iconColor: 'text-blue-600',
-    route: '/app/focus',
+    route: '/app/routineplayer',
     description: 'Routine player',
   },
   {
