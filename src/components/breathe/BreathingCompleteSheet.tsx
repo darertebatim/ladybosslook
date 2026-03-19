@@ -6,6 +6,7 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 
 import journalImg from '@/assets/mood-card-journal.png';
 import reflectImg from '@/assets/mood-card-reflect.png';
@@ -50,6 +51,10 @@ export function BreathingCompleteSheet({
 }: BreathingCompleteSheetProps) {
   const navigate = useNavigate();
 
+  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void; completeTask: () => void } | null = null;
+  try { focusPlayer = useFocusPlayer(); } catch { /* provider not available */ }
+  const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
+
   useEffect(() => {
     if (open) {
       haptic.success();
@@ -78,11 +83,22 @@ export function BreathingCompleteSheet({
   const handleDone = () => {
     haptic.light();
     onOpenChange(false);
+    if (hasActivePlayer) {
+      focusPlayer!.completeTask();
+      focusPlayer!.maximize();
+      return;
+    }
     navigate('/app/home');
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={(isOpen) => {
+      if (!isOpen) {
+        handleDone();
+        return;
+      }
+      onOpenChange(isOpen);
+    }}>
       <SheetContent
         side="bottom"
         className={cn(
@@ -128,13 +144,13 @@ export function BreathingCompleteSheet({
           ))}
         </div>
 
-        {/* Back to Home */}
+        {/* Back to Home / Back to Player */}
         <Button
           onClick={handleDone}
           variant="ghost"
           className="w-full h-10 rounded-full text-sm bg-orange-200/60 text-orange-900 hover:bg-orange-200/80"
         >
-          Back to Home
+          {hasActivePlayer ? 'Continue Routine ▶' : 'Back to Home'}
         </Button>
       </SheetContent>
     </Sheet>

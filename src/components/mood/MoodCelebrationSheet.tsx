@@ -7,6 +7,7 @@ import {
   Sheet,
   SheetContent,
 } from '@/components/ui/sheet';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 
 import journalImg from '@/assets/mood-card-journal.png';
 import breathingImg from '@/assets/mood-card-breathing.png';
@@ -103,6 +104,10 @@ export function MoodCelebrationSheet({
   const navigate = useNavigate();
   const moodData = mood ? MOOD_CONFIG[mood] : null;
 
+  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void; completeTask: () => void } | null = null;
+  try { focusPlayer = useFocusPlayer(); } catch { /* provider not available */ }
+  const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
+
   const handleAction = (action: typeof ACTIONS[number]) => {
     haptic.medium();
     const route = action.routeKey === 'journal' 
@@ -121,12 +126,15 @@ export function MoodCelebrationSheet({
 
   const handleDone = () => {
     haptic.light();
-    const homeRoute = '/app/home';
-    if (onActionClick?.(homeRoute)) {
-      onOpenChange(false);
+    onOpenChange(false);
+    if (hasActivePlayer) {
+      focusPlayer!.completeTask();
+      focusPlayer!.maximize();
       return;
     }
-    onOpenChange(false);
+    if (onActionClick?.('/app/home')) {
+      return;
+    }
     onDone();
   };
 
@@ -193,7 +201,7 @@ export function MoodCelebrationSheet({
           onClick={handleDone}
           className="w-full h-10 rounded-full text-foreground/40 hover:bg-foreground/5 text-sm"
         >
-          Back to Home
+          {hasActivePlayer ? 'Continue Routine ▶' : 'Back to Home'}
         </Button>
       </SheetContent>
     </Sheet>
