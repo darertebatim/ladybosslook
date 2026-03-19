@@ -676,6 +676,31 @@ export default function AppRoutinePlayer() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Delete routine confirmation dialog */}
+      <AlertDialog open={!!deleteRoutine} onOpenChange={(open) => !open && setDeleteRoutine(null)}>
+        <AlertDialogContent className="rounded-3xl max-w-[320px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold text-center leading-snug">
+              Delete "{deleteRoutine?.title}"?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-muted-foreground">
+              This will remove the routine and all its tasks from your planner. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-3 sm:justify-center">
+            <AlertDialogCancel className="flex-1 rounded-full font-semibold">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteRoutine && handleDeleteRoutine(deleteRoutine)}
+              className="flex-1 rounded-full font-bold bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
