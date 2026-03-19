@@ -519,26 +519,34 @@ export default function AppRoutinePlayer() {
                             )}
                           </div>
 
-                          <button
-                            onClick={() => handlePlay(routine)}
-                            disabled={loadingRoutineId === routine.routine_id}
-                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted active:scale-95 transition-transform shrink-0 ml-3"
-                          >
-                            {loadingRoutineId === routine.routine_id ? (
-                              <Loader2 className="w-4 h-4 animate-spin text-foreground" />
-                            ) : completion ? (
-                              <>
-                                {completion.isComplete ? (
-                                  <RotateCw className="w-4 h-4 text-foreground" />
-                                ) : (
-                                  <Play className="w-4 h-4 text-foreground fill-foreground" />
-                                )}
-                                <span className="text-sm font-semibold text-foreground">{completion.pct}%</span>
-                              </>
-                            ) : (
-                              <Play className="w-4 h-4 text-foreground fill-foreground" />
-                            )}
-                          </button>
+                          <div className="flex items-center gap-2 shrink-0 ml-3">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setDeleteRoutine(routine); }}
+                              className="p-2 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 active:scale-95 transition-all"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handlePlay(routine)}
+                              disabled={loadingRoutineId === routine.routine_id}
+                              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted active:scale-95 transition-transform"
+                            >
+                              {loadingRoutineId === routine.routine_id ? (
+                                <Loader2 className="w-4 h-4 animate-spin text-foreground" />
+                              ) : completion ? (
+                                <>
+                                  {completion.isComplete ? (
+                                    <RotateCw className="w-4 h-4 text-foreground" />
+                                  ) : (
+                                    <Play className="w-4 h-4 text-foreground fill-foreground" />
+                                  )}
+                                  <span className="text-sm font-semibold text-foreground">{completion.pct}%</span>
+                                </>
+                              ) : (
+                                <Play className="w-4 h-4 text-foreground fill-foreground" />
+                              )}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );
