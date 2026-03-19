@@ -35,8 +35,8 @@ function formatTime(seconds: number) {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-// Function to make URLs clickable
-function linkifyText(text: string) {
+// Function to make URLs clickable - internal links navigate in-app
+function linkifyText(text: string, navigate: (path: string) => void) {
   const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\/[^\s]*)?)/gi;
   
   const parts: (string | JSX.Element)[] = [];
@@ -55,18 +55,41 @@ function linkifyText(text: string) {
     // Add the link
     const url = match[0];
     const href = url.startsWith('http') ? url : `https://${url}`;
-    parts.push(
-      <a 
-        key={match.index}
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="underline decoration-1 underline-offset-2 hover:opacity-80 transition-opacity"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {url}
-      </a>
-    );
+    const internalPath = getInternalPath(href);
+    
+    if (internalPath) {
+      // Internal app link — navigate in-app
+      parts.push(
+        <span
+          key={match.index}
+          role="link"
+          tabIndex={0}
+          className="underline decoration-1 underline-offset-2 cursor-pointer active:opacity-70 transition-opacity"
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(internalPath);
+          }}
+        >
+          {url}
+        </span>
+      );
+    } else {
+      // External link — open in browser
+      parts.push(
+        <span
+          key={match.index}
+          role="link"
+          tabIndex={0}
+          className="underline decoration-1 underline-offset-2 cursor-pointer active:opacity-70 transition-opacity"
+          onClick={(e) => {
+            e.stopPropagation();
+            smartOpenUrl(href, navigate);
+          }}
+        >
+          {url}
+        </span>
+      );
+    }
     
     lastIndex = urlRegex.lastIndex;
   }
