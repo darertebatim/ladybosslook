@@ -610,125 +610,60 @@ export default function AppRoutinePlayer() {
           <div className="space-y-6 mt-4">
             {/* Activated routines */}
             {(() => {
-              const activeRoutines = (myRoutines || []).filter((r: any) => {
+              const activeRoutines = localRoutines.filter((r: any) => {
                 const tasks = routineTasksMap?.[r.routine_id] || [];
                 return tasks.length > 0;
               });
+              const sortableIds = activeRoutines.map((r: any) => r.id);
+              const activeRoutineData = activeRoutineId ? activeRoutines.find((r: any) => r.id === activeRoutineId) : null;
+
               return activeRoutines.length > 0 ? (
               <section>
                 <p className="text-base font-bold text-foreground mb-3">My Routines</p>
-                <div className="space-y-3">
-                  {activeRoutines.map((routine: any) => {
-                    const completion = getCompletionInfo(routine.routine_id);
-                    const allTasks = routineTasksMap?.[routine.routine_id] || [];
-                    const completedIds = todayCompletions || new Set<string>();
-                    const taskIdsForRoutine = userTasksByRoutine?.[routine.routine_id] || [];
-                    const remainingTasksForCard = allTasks.filter((t, idx) => {
-                      const taskId = taskIdsForRoutine[idx];
-                      return !taskId || !completedIds.has(taskId);
-                    });
-
-                    const MAX_EMOJIS = 3;
-                    const visibleTasks = allTasks.slice(0, MAX_EMOJIS);
-                    const overflowCount = allTasks.length - MAX_EMOJIS;
-                    const cardColor = TASK_COLOR_CLASSES[(routine.color as TaskColor) || 'peach'] || TASK_COLOR_CLASSES.peach;
-
-                    return (
-                      <div
-                        key={routine.id}
-                        onClick={() => handlePlay(routine)}
-                        className={cn(
-                          'rounded-2xl p-4 pb-3.5 active:scale-[0.98] transition-transform cursor-pointer relative overflow-hidden',
-                          cardColor
-                        )}
-                      >
-                        {/* Top row: schedule hints + action buttons top-right */}
-                        <div className="flex items-center justify-between mb-1.5">
-                          <div className="flex items-center gap-3">
-                            <span className="flex items-center gap-1 text-[11px] font-semibold text-black">
-                              <Bell className="w-3 h-3" />
-                              {allTasks.length} tasks
-                            </span>
-                            {routine.category && (
-                              <span className="flex items-center gap-1 text-[11px] font-semibold text-black">
-                                <Calendar className="w-3 h-3" />
-                                {categoryNameMap.get(routine.category) || routine.category}
-                              </span>
-                            )}
-                          </div>
-                          {/* Top-right action buttons */}
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handleOpenAddSheet(routine); }}
-                              className="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
-                              title="Add to planner"
-                            >
-                              <CalendarPlus className="w-4 h-4 text-white" />
-                            </button>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); setDeleteRoutine(routine); }}
-                              className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center active:scale-95 transition-all"
-                            >
-                              <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Title */}
-                        <h3 className="font-bold text-black text-[17px] leading-snug mb-3">
-                          {routine.title}
-                        </h3>
-
-                        {/* Bottom row: emoji bubbles + play button */}
-                        <div className="flex items-center justify-between">
-                          {/* Emoji chain */}
-                          <div className="flex items-center gap-1">
-                            {visibleTasks.map((task, i) => (
-                              <span key={i} className="flex items-center">
-                                <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center">
-                                  <FluentEmoji emoji={task.emoji} size={20} />
-                                </span>
-                                {i < visibleTasks.length - 1 && (
-                                  <ChevronRight className="w-3 h-3 text-black mx-0.5" />
-                                )}
-                              </span>
-                            ))}
-                            {overflowCount > 0 && (
-                              <>
-                                <ChevronRight className="w-3 h-3 text-black mx-0.5" />
-                                <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center text-xs font-bold text-black">
-                                  +{overflowCount}
-                                </span>
-                              </>
-                            )}
-                          </div>
-
-                          {/* Play button */}
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handlePlay(routine); }}
-                            disabled={loadingRoutineId === routine.routine_id}
-                            className="flex items-center justify-center gap-2 h-12 min-w-[48px] px-5 rounded-full bg-secondary active:scale-95 transition-transform shrink-0"
-                          >
-                            {loadingRoutineId === routine.routine_id ? (
-                              <Loader2 className="w-5 h-5 animate-spin text-black" />
-                            ) : completion ? (
-                              <>
-                                {completion.isComplete ? (
-                                  <RotateCw className="w-5 h-5 text-black" />
-                                ) : (
-                                  <Play className="w-5 h-5 text-black fill-black" />
-                                )}
-                                <span className="text-sm font-bold text-black">{completion.pct}%</span>
-                              </>
-                            ) : (
-                              <Play className="w-5 h-5 text-black fill-black" />
-                            )}
-                          </button>
-                        </div>
+                <DndContext
+                  sensors={routineSensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleRoutineDragStart}
+                  onDragEnd={handleRoutineDragEnd}
+                >
+                  <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
+                    <div className="space-y-3">
+                      {activeRoutines.map((routine: any) => (
+                        <SortableRoutineCard
+                          key={routine.id}
+                          routine={routine}
+                          routineTasksMap={routineTasksMap}
+                          userTasksByRoutine={userTasksByRoutine}
+                          todayCompletions={todayCompletions}
+                          getCompletionInfo={getCompletionInfo}
+                          categoryNameMap={categoryNameMap}
+                          loadingRoutineId={loadingRoutineId}
+                          onPlay={handlePlay}
+                          onOpenAddSheet={handleOpenAddSheet}
+                          onDeleteRoutine={setDeleteRoutine}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                  <DragOverlay>
+                    {activeRoutineData ? (
+                      <div className="opacity-90 scale-105 shadow-2xl rounded-2xl">
+                        <RoutineCardContent
+                          routine={activeRoutineData}
+                          routineTasksMap={routineTasksMap}
+                          userTasksByRoutine={userTasksByRoutine}
+                          todayCompletions={todayCompletions}
+                          getCompletionInfo={getCompletionInfo}
+                          categoryNameMap={categoryNameMap}
+                          loadingRoutineId={loadingRoutineId}
+                          onPlay={handlePlay}
+                          onOpenAddSheet={handleOpenAddSheet}
+                          onDeleteRoutine={setDeleteRoutine}
+                        />
                       </div>
-                    );
-                  })}
-                </div>
+                    ) : null}
+                  </DragOverlay>
+                </DndContext>
               </section>
               ) : null;
             })()}
