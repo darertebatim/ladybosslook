@@ -327,15 +327,11 @@ const NativeAppLayout = () => {
   );
 };
 
-// Wrap with providers
+// Wrap with unseen content provider only (Audio + Focus providers moved to AppProvidersLayout)
 const NativeAppLayoutWithProvider = () => (
-  <AudioPlayerProvider>
-    <UnseenContentProvider>
-      <FocusPlayerProvider>
-        <NativeAppLayout />
-      </FocusPlayerProvider>
-    </UnseenContentProvider>
-  </AudioPlayerProvider>
+  <UnseenContentProvider>
+    <NativeAppLayout />
+  </UnseenContentProvider>
 );
 
 export default NativeAppLayoutWithProvider;
