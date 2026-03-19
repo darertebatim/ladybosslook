@@ -17,6 +17,7 @@ import { useDeepLinks, checkInitialDeepLink } from "@/hooks/useDeepLinks";
 import { initializeRevenueCat } from "@/lib/revenueCat";
 import { initializeSocialLogin } from "@/lib/nativeSocialAuth";
 import AppLayout from "@/layouts/NativeAppLayout";
+import { AppProvidersLayout } from "@/layouts/AppProvidersLayout";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
