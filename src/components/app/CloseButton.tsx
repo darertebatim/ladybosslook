@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 
 interface CloseButtonProps {
   /** Explicit destination. If not provided, checks location.state.from, then falls back to /app/home */
@@ -18,6 +19,7 @@ interface CloseButtonProps {
  * iOS-style close button for tool dashboards.
  * 44px minimum tap target, circular background, no hover effects.
  * Supports referrer tracking via location.state.from.
+ * If a focus routine is active & minimized, maximizes the player instead.
  */
 export function CloseButton({ 
   to, 
@@ -28,12 +30,22 @@ export function CloseButton({
   const navigate = useNavigate();
   const location = useLocation();
   
+  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
+  try { focusPlayer = useFocusPlayer(); } catch { /* provider not available */ }
+
   // Determine destination: explicit to > referrer state > fallback home
   const destination = to || (location.state as { from?: string })?.from || '/app/home';
 
   const handleClick = () => {
     haptic.light();
     onClick?.();
+
+    // If focus player is running & minimized, show the player instead of navigating away
+    if (focusPlayer?.isActive && focusPlayer?.isMinimized) {
+      focusPlayer.maximize();
+      return;
+    }
+
     navigate(destination);
   };
 
