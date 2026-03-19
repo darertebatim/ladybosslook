@@ -120,7 +120,7 @@ export function useRoutinePlayer() {
     return () => clearInterval(timer);
   }, [phase]);
 
-  const startRoutine = useCallback(async (cfg: FocusRoutineConfig, resumeOptions?: {
+  const startRoutine = useCallback(async (cfg: RoutinePlayerConfig, resumeOptions?: {
     startFromIndex: number;
     previousResults: SessionTaskResult[];
     existingSessionId: string;
