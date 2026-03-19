@@ -165,6 +165,6 @@ export function RoutinePlayerProvider({ children }: { children: ReactNode }) {
           />
         </OverlayPortal>
       )}
-    </FocusPlayerContext.Provider>
+    </RoutinePlayerContext.Provider>
   );
 }
