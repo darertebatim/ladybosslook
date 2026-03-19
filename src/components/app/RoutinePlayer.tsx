@@ -4,9 +4,9 @@ import { format, addSeconds } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { FocusRoutineSummary } from './FocusRoutineSummary';
-import type { FocusRoutineConfig, FocusTask } from '@/hooks/useFocusRoutinePlayer';
-import type { SessionTaskResult } from './FocusRoutineSummary';
+import { RoutinePlayerSummary } from './RoutinePlayerSummary';
+import type { RoutinePlayerConfig, RoutineTask } from '@/hooks/useRoutinePlayer';
+import type { SessionTaskResult } from './RoutinePlayerSummary';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import {
   DndContext,
