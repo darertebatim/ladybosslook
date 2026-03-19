@@ -427,7 +427,47 @@ export default function AppRoutinePlayer() {
     deleteOrphans();
   }, [user, myRoutines, routineTasksMap, queryClient]);
 
-  // Delete routine and all its tasks
+  // Fetch standalone tasks (not linked to any routine) for filter views
+  const { data: standaloneTasks = [] } = useQuery({
+    queryKey: ['standalone-user-tasks', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('user_tasks')
+        .select('id, title, emoji, color, repeat_pattern, source_routine_id, is_active, order_index, goal_type, goal_target, goal_unit, goal_enabled, pro_link_type, pro_link_value, scheduled_time, tag')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .is('source_routine_id', null)
+        .order('order_index', { ascending: true });
+      if (error) throw error;
+      return (data || []) as UserTask[];
+    },
+    enabled: !!user && (activeFilter.type === 'one-time' || activeFilter.type === 'unlinked'),
+  });
+
+  const filteredStandaloneTasks = useMemo(() => {
+    if (activeFilter.type === 'one-time') {
+      return standaloneTasks.filter((t: any) => t.repeat_pattern === 'none');
+    }
+    if (activeFilter.type === 'unlinked') {
+      return standaloneTasks;
+    }
+    return [];
+  }, [standaloneTasks, activeFilter]);
+
+  // Filter routines based on active filter
+  const filteredLocalRoutines = useMemo(() => {
+    if (activeFilter.type === 'all') return localRoutines;
+    if (activeFilter.type === 'category') {
+      return localRoutines.filter((r: any) => r.category === activeFilter.value);
+    }
+    if (activeFilter.type === 'routine') {
+      return localRoutines.filter((r: any) => r.routine_id === activeFilter.value);
+    }
+    return []; // one-time and unlinked show tasks, not routines
+  }, [localRoutines, activeFilter]);
+
+
   const handleDeleteRoutine = async (routine: any) => {
     if (!user) return;
     try {
