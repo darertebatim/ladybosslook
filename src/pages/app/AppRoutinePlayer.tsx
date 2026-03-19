@@ -5,6 +5,7 @@ import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2, CalendarPlu
 import { useQueryClient } from '@tanstack/react-query';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
+import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
