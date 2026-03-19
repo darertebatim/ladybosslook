@@ -35,8 +35,8 @@ const toolItems: NavItem[] = [
 ];
 
 const accountItems: NavItem[] = [
-  { id: 'programs', name: 'My Programs', icon: <GraduationCap className="h-4 w-4" />, route: '/app/programs', color: 'text-amber-600 bg-amber-100' },
-  { id: 'profile', name: 'My Profile', icon: <User className="h-4 w-4" />, route: '/app/profile', color: 'text-slate-600 bg-slate-100' },
+  { id: 'programs', name: 'My Programs', icon: <GraduationCap className="h-4 w-4" />, route: '/app/myprograms', color: 'text-amber-600 bg-amber-100' },
+  { id: 'profile', name: 'My Profile', icon: <User className="h-4 w-4" />, route: '/app/myprofile', color: 'text-slate-600 bg-slate-100' },
   { id: 'settings', name: 'Settings', icon: <Settings className="h-4 w-4" />, route: '/app/settings', color: 'text-gray-600 bg-gray-100' },
 ];
 

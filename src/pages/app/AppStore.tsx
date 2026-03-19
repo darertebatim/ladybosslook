@@ -190,7 +190,7 @@ const AppStore = () => {
       } else {
         toast.success('Enrolled successfully!');
         invalidateAllEnrollmentData();
-        navigate('/app/programs');
+        navigate('/app/myprograms');
       }
     } finally {
       setEnrollingSlug(null);
@@ -345,7 +345,7 @@ const AppStore = () => {
                       return (
                         <button
                           key={program.slug}
-                          onClick={() => navigate(`/app/programs/${program.slug}`, { state: { from: location.pathname } })}
+                          onClick={() => navigate(`/app/myprograms/${program.slug}`, { state: { from: location.pathname } })}
                           className="relative shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
                         >
                           <div className="relative h-32 w-32 overflow-visible mb-1.5">

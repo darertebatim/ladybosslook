@@ -306,7 +306,7 @@ export function PromoBanner({
         if (banner.destination_id) navigate(`/app/player/playlist/${banner.destination_id}`);
         break;
       case 'journal': navigate('/app/journal'); break;
-      case 'programs': navigate('/app/programs'); break;
+      case 'programs': navigate('/app/myprograms'); break;
       case 'breathe': navigate('/app/breathe'); break;
       case 'water': navigate('/app/water'); break;
       case 'channels': navigate('/app/channels'); break;
@@ -324,7 +324,7 @@ export function PromoBanner({
       case 'mood': navigate('/app/mood'); break;
       case 'period': navigate('/app/period'); break;
       case 'chat': navigate('/app/chat'); break;
-      case 'profile': navigate('/app/profile'); break;
+      case 'profile': navigate('/app/myprofile'); break;
       case 'custom_url':
         if (banner.custom_url) {
           banner.custom_url.startsWith('http') ? window.open(banner.custom_url, '_blank') : navigate(banner.custom_url);

@@ -643,7 +643,7 @@ const AppProfile = () => {
                 {enrollments && enrollments.length > 0 ? (
                   <div className="space-y-2">
                     {enrollments.map((enrollment) => (
-                      <Link key={enrollment.id} to={`/app/programs/${enrollment.program_slug || enrollment.course_name}`} className="flex items-center justify-between p-3 bg-muted/30 rounded-xl active:bg-muted/50 transition-colors">
+                      <Link key={enrollment.id} to={`/app/myprograms/${enrollment.program_slug || enrollment.course_name}`} className="flex items-center justify-between p-3 bg-muted/30 rounded-xl active:bg-muted/50 transition-colors">
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium truncate">{enrollment.course_name}</p>
                           <p className="text-xs text-muted-foreground">Enrolled {format(new Date(enrollment.enrolled_at), 'MMM d, yyyy')}</p>

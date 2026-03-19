@@ -107,7 +107,7 @@ export function ActiveRound() {
           <div className="text-center py-6">
             <GraduationCap className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50" />
             <p className="text-muted-foreground">No active rounds yet</p>
-            <Link to="/app/programs">
+            <Link to="/app/myprograms">
               <Button className="mt-4" variant="outline">
                 Browse Programs
               </Button>
@@ -159,7 +159,7 @@ export function ActiveRound() {
     return (
       <Link 
         key={enrollment.id} 
-        to={`/app/programs/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`}
+        to={`/app/myprograms/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`}
         onClick={() => {
           if (isEnrollmentUnseen && markEnrollmentViewed) {
             markEnrollmentViewed(enrollment.id);
@@ -336,7 +336,7 @@ export function ActiveRound() {
             <div className="text-center">
               <GraduationCap className="h-10 w-10 mx-auto mb-2 text-muted-foreground opacity-50" />
               <p className="text-sm text-muted-foreground">No active rounds right now</p>
-              <Link to="/app/programs">
+              <Link to="/app/myprograms">
                 <Button className="mt-3" variant="outline" size="sm">
                   Browse New Programs
                 </Button>

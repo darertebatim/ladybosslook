@@ -326,7 +326,7 @@ const RitualRedirect = () => {
 // Redirect component for old /app/course/:slug routes
 const CourseRedirect = () => {
   const { slug, roundId } = useParams();
-  return <Navigate to={`/app/programs/${slug}${roundId ? `/${roundId}` : ''}`} replace />;
+  return <Navigate to={`/app/myprograms/${slug}${roundId ? `/${roundId}` : ''}`} replace />;
 };
 
 // Clear old cache key to prevent crash on app update
@@ -462,13 +462,17 @@ const App = () => (
                     <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                       <Route index element={<Navigate to="/app/home" replace />} />
                       <Route path="home" element={<AppHome />} />
-                      <Route path="programs" element={<AppPrograms />} />
+                      <Route path="myprograms" element={<AppPrograms />} />
+                      <Route path="programs" element={<Navigate to="/app/myprograms" replace />} />
                       <Route path="explore" element={<AppStore />} />
                       <Route path="browse" element={<Navigate to="/app/explore" replace />} />
                       <Route path="academy" element={<AppBrowsePrograms />} />
                       <Route path="browse-programs" element={<Navigate to="/app/academy" replace />} />
-                      <Route path="programs/:slug" element={<AppCourseDetail />} />
-                      <Route path="programs/:slug/:roundId" element={<AppCourseDetail />} />
+                      <Route path="myprograms/:slug" element={<AppCourseDetail />} />
+                      <Route path="myprograms/:slug/:roundId" element={<AppCourseDetail />} />
+                      {/* Backward compat redirects for old /app/programs/ and /app/course/ URLs */}
+                      <Route path="programs/:slug/:roundId" element={<CourseRedirect />} />
+                      <Route path="programs/:slug" element={<CourseRedirect />} />
                       {/* Backward compat redirects for old /app/course/ URLs */}
                       <Route path="course/:slug/:roundId" element={<CourseRedirect />} />
                       <Route path="course/:slug" element={<CourseRedirect />} />
@@ -495,7 +499,8 @@ const App = () => (
                       {/* Redirects for backward compatibility with older app versions */}
                       <Route path="rituals" element={<Navigate to="/app/routines" replace />} />
                       <Route path="rituals/:planId" element={<RitualRedirect />} />
-                      <Route path="profile" element={<AppProfile />} />
+                      <Route path="myprofile" element={<AppProfile />} />
+                      <Route path="profile" element={<Navigate to="/app/myprofile" replace />} />
                       {/* Legacy routes - redirect to home */}
                     </Route>
                   </Route>

@@ -140,7 +140,7 @@ export default function AppAdminSupport() {
       if (from) {
         navigate(from);
       } else {
-        navigate('/app/profile');
+        navigate('/app/myprofile');
       }
     }
   };
