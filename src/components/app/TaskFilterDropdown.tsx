@@ -28,6 +28,9 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
   const baseOptions: FilterOption[] = [
     { value: 'all', label: 'All Tasks' },
     { value: 'one-time', label: 'One-time Tasks' },
+  ];
+
+  const endOptions: FilterOption[] = [
     { value: 'unlinked', label: 'Unlinked Tasks' },
   ];
 
