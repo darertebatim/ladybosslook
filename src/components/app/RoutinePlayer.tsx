@@ -61,7 +61,7 @@ function formatTime(seconds: number): string {
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 // Sortable item for rearrange
-function SortableRearrangeItem({ task }: { task: FocusTask }) {
+function SortableRearrangeItem({ task }: { task: RoutineTask }) {
   const {
     attributes,
     listeners,
