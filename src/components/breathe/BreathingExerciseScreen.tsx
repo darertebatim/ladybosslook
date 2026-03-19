@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
 import { Pause, Play, HelpCircle, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -9,7 +8,7 @@ import { BreathingInfoSheet } from './BreathingInfoSheet';
 import { CloseButton } from '@/components/app/CloseButton';
 import { BreathingExercise, useSaveBreathingSession } from '@/hooks/useBreathingExercises';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
-import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { useProTaskRoutineReturn } from '@/hooks/useProTaskRoutineReturn';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { BreathingCompleteSheet } from './BreathingCompleteSheet';
@@ -50,9 +49,7 @@ export function BreathingExerciseScreen({
   exercise,
   onClose,
 }: BreathingExerciseScreenProps) {
-  const location = useLocation();
-  const { isProTaskActive, completeProTask } = useFocusPlayer();
-  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
+  const { shouldReturnToRoutine, returnToRoutinePlayer } = useProTaskRoutineReturn();
   // Layout toggle
   const [layout, setLayout] = useState<LayoutMode>(() => {
     try {
@@ -77,7 +74,7 @@ export function BreathingExerciseScreen({
   const [showInfoSheet, setShowInfoSheet] = useState(false);
   const [showCompleteSheet, setShowCompleteSheet] = useState(false);
   const [completedDuration, setCompletedDuration] = useState(0);
-  
+
   // Active session state
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -87,11 +84,11 @@ export function BreathingExerciseScreen({
   const [totalElapsed, setTotalElapsed] = useState(0);
   const [isCountingDown, setIsCountingDown] = useState(false);
   const [countdown, setCountdown] = useState(3);
-  
+
   const saveSession = useSaveBreathingSession();
   const { autoCompleteBreathe } = useAutoCompleteProTask();
   const startTimeRef = useRef<number>(0);
-  
+
   // Refs for values used inside the stable interval (single timer source of truth)
   const totalElapsedRef = useRef(totalElapsed);
   totalElapsedRef.current = totalElapsed;
@@ -134,7 +131,7 @@ export function BreathingExerciseScreen({
   const currentPhaseElapsed = currentPhase ? currentPhase.duration - phaseTimeRemaining : 0;
   const elapsedInCurrentCycle = phases.slice(0, currentPhaseIndex).reduce((sum, p) => sum + p.duration, 0) + currentPhaseElapsed;
   const cycleFraction = totalPhaseDuration > 0 ? elapsedInCurrentCycle / totalPhaseDuration : 0;
-  
+
   const progressPercent = isActive
     ? durationMode === 'cycles'
       ? ((cycleCount + cycleFraction) / selectedCycles) * 100
@@ -242,12 +239,13 @@ export function BreathingExerciseScreen({
       { exerciseId: exercise.id, durationSeconds: elapsed },
       {
         onSuccess: async () => {
-          await autoCompleteBreathe(exercise.id);
-          // If inside a focus routine, skip the completion sheet and return to player
-          if (fromFocusRoutine && isProTaskActive) {
-            completeProTask();
+          // In routine mode, let the Focus player complete/advance the task to avoid race conditions
+          if (shouldReturnToRoutine) {
+            returnToRoutinePlayer();
             return;
           }
+
+          await autoCompleteBreathe(exercise.id);
           setCompletedDuration(elapsed);
           setShowCompleteSheet(true);
         },
@@ -267,7 +265,7 @@ export function BreathingExerciseScreen({
     cycleCountRef.current = 0;
     currentPhaseIndexRef.current = 0;
     phaseTimeRemainingRef.current = 0;
-  }, [exercise.id, saveSession, autoCompleteBreathe, fromFocusRoutine, isProTaskActive, completeProTask]);
+  }, [exercise.id, saveSession, shouldReturnToRoutine, returnToRoutinePlayer, autoCompleteBreathe]);
 
   const handleStart = useCallback(() => {
     setCycleCount(0);
