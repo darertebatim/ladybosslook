@@ -93,20 +93,12 @@ function RoutineCardContent({
         cardColor
       )}
     >
-      <div className="flex items-center justify-between mb-1.5">
-        <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1 text-[11px] font-semibold text-black">
-            <Bell className="w-3 h-3" />
-            {allTasks.length} tasks
-          </span>
-          {routine.category && (
-            <span className="flex items-center gap-1 text-[11px] font-semibold text-black">
-              <Calendar className="w-3 h-3" />
-              {categoryNameMap.get(routine.category) || routine.category}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
+      {/* Title row with action buttons */}
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-bold text-black text-[17px] leading-snug flex-1 min-w-0 truncate mr-2">
+          {routine.title}
+        </h3>
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={(e) => { e.stopPropagation(); onOpenAddSheet(routine); }}
             className="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
@@ -122,9 +114,6 @@ function RoutineCardContent({
           </button>
         </div>
       </div>
-      <h3 className="font-bold text-black text-[17px] leading-snug mb-3">
-        {routine.title}
-      </h3>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
           {visibleTasks.map((task: any, i: number) => (
