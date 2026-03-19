@@ -305,7 +305,7 @@ export function useRoutinePlayer() {
     }
   }, [config, currentTask, currentTaskIndex]);
 
-  const reorderTasks = useCallback((newTasks: FocusTask[]) => {
+  const reorderTasks = useCallback((newTasks: RoutineTask[]) => {
     if (!config) return;
     setConfig({ ...config, tasks: newTasks });
   }, [config]);
