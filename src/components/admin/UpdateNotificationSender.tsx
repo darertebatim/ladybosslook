@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Loader2, Send, AlertTriangle, CheckCircle, Users, Megaphone, Bell, BellOff } from 'lucide-react';
+import { Loader2, Send, AlertTriangle, CheckCircle, Users, Megaphone, Bell, BellOff, Download, Sparkles } from 'lucide-react';
 
 interface VersionStats {
   version: string;
