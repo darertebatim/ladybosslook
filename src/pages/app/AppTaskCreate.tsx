@@ -2336,6 +2336,10 @@ const AppTaskCreate = ({
           </div>
         </SheetContent>
       </Sheet>
+    </>
+  );
+
+  // Sheet mode - render inside a Sheet
   if (isSheet) {
     return (
       <>
