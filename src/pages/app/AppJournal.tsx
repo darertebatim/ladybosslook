@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { X, Search, BookOpen, NotebookPen, CalendarPlus, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { JournalPromptMarquee } from '@/components/app/JournalPromptMarquee';
