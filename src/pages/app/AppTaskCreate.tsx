@@ -2119,6 +2119,47 @@ const AppTaskCreate = ({
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Routine Picker Sheet */}
+      <Sheet open={showRoutinePicker} onOpenChange={setShowRoutinePicker}>
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
+          <SheetHeader>
+            <SheetTitle>Select Routine</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Choose a routine to link to this task.
+            </p>
+            
+            <ScrollArea className="h-[45vh]">
+              <div className="space-y-2 pr-4">
+                {linkableRoutines.map((routine) => (
+                  <button
+                    key={routine.id}
+                    onClick={() => {
+                      setProLinkType('routine');
+                      setProLinkValue(routine.id);
+                      setShowRoutinePicker(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
+                      proLinkValue === routine.id && proLinkType === 'routine' && 'bg-emerald-100 dark:bg-emerald-900/30'
+                    )}
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 flex items-center justify-center">
+                      <span className="text-xl">{routine.emoji || '✨'}</span>
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="font-medium truncate">{routine.title}</p>
+                      <p className="text-xs text-muted-foreground capitalize">{routine.category}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </SheetContent>
+      </Sheet>
     </>
   );
 
