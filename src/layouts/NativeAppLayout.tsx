@@ -195,7 +195,7 @@ const NativeAppLayout = () => {
 
       {/* Mini Player - show when audio is playing and not on player page or chat page */}
       {!isOnPlayerPage && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen && <MiniPlayer />}
-      {!isOnChatPage && !isFullScreenTool && !isKeyboardOpen && <FocusMiniPlayer />}
+      {!isOnChatPage && !isFullScreenTool && !isKeyboardOpen && <RoutineMiniPlayer />}
 
       {/* Bottom Navigation - hidden on chat page for full-screen experience */}
       {!isOnChatPage && !isFullScreenTool && !isKeyboardOpen && (

@@ -29,7 +29,7 @@ function formatMiniTime(seconds: number): string {
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
-export function FocusMiniPlayer() {
+export function RoutineMiniPlayer() {
   const {
     isActive,
     isMinimized,
