@@ -808,6 +808,54 @@ export default function AppRoutinePlayer() {
           isSaving={addRoutinePlan.isPending}
         />
       )}
+
+      {/* Page-level add to planner sheet */}
+      <RoutinePreviewSheet
+        open={showPageRoutineSheet}
+        onOpenChange={setShowPageRoutineSheet}
+        tasks={[{
+          id: 'synthetic-routineplayer-page',
+          plan_id: 'synthetic-routineplayer-page',
+          title: 'My Routines',
+          icon: '🎯',
+          color: 'amber',
+          task_order: 0,
+          is_active: true,
+          created_at: new Date().toISOString(),
+          linked_playlist_id: null,
+          pro_link_type: 'route' as any,
+          pro_link_value: '/app/routineplayer',
+          linked_playlist: null,
+        }]}
+        routineTitle="My Routines"
+        onSave={async (selectedTaskIds, editedTasks) => {
+          try {
+            await addRoutinePlan.mutateAsync({
+              planId: 'synthetic-routineplayer-page',
+              syntheticTasks: [{
+                id: 'synthetic-routineplayer-page',
+                plan_id: 'synthetic-routineplayer-page',
+                title: 'My Routines',
+                icon: '🎯',
+                color: 'amber',
+                task_order: 0,
+                is_active: true,
+                created_at: new Date().toISOString(),
+                linked_playlist_id: null,
+                pro_link_type: 'route' as any,
+                pro_link_value: '/app/routineplayer',
+                linked_playlist: null,
+              }],
+              editedTasks,
+            });
+            setShowPageRoutineSheet(false);
+            toast.success('Added to your planner! 🎯');
+          } catch (error) {
+            toast.error('Failed to add to planner');
+          }
+        }}
+        isSaving={addRoutinePlan.isPending}
+      />
     </div>
   );
 }
