@@ -540,6 +540,31 @@ export default function AppRoutinePlayer() {
           </div>
         </div>
       )}
+
+      {/* Restart confirmation dialog */}
+      <AlertDialog open={showRestartDialog} onOpenChange={setShowRestartDialog}>
+        <AlertDialogContent className="rounded-3xl max-w-[320px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold text-center leading-snug">
+              You've already completed this routine.
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-muted-foreground">
+              Do you want to reset the existing data and run the routine again?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-3 sm:justify-center">
+            <AlertDialogCancel className="flex-1 rounded-full font-semibold">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleRestartRoutine}
+              className="flex-1 rounded-full font-bold"
+            >
+              Restart
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
