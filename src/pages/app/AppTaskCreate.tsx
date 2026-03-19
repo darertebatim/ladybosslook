@@ -1879,8 +1879,23 @@ const AppTaskCreate = ({
           } else if (type === 'routine') {
             setShowProLinkPicker(false);
             setShowRoutinePicker(true);
+          } else if (type === 'audio') {
+            setShowProLinkPicker(false);
+            setShowAudioPicker(true);
+          } else if (type === 'channel') {
+            setShowProLinkPicker(false);
+            setShowChannelPicker(true);
+          } else if (type === 'video') {
+            setShowProLinkPicker(false);
+            setShowVideoPicker(true);
+          } else if (type === 'video_playlist') {
+            setShowProLinkPicker(false);
+            setShowVideoPlaylistPicker(true);
+          } else if (type === 'program') {
+            setShowProLinkPicker(false);
+            setShowProgramPicker(true);
           }
-          // channel, program, route handled by the picker's built-in value input
+          // route handled by the picker's built-in value input
         }}
         onClear={() => {
           setProLinkType(null);
@@ -1893,10 +1908,13 @@ const AppTaskCreate = ({
         onDone={() => setShowProLinkPicker(false)}
       />
 
-      {/* Playlist Picker Sheet (for Pro Task playlist selection) */}
+      {/* Playlist Picker Sheet */}
       <Sheet open={showPlaylistPicker} onOpenChange={setShowPlaylistPicker}>
         <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
-          <SheetHeader>
+          <SheetHeader className="flex-row items-center gap-2">
+            <button onClick={() => { setShowPlaylistPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
             <SheetTitle>Select Playlist</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
@@ -1919,7 +1937,7 @@ const AppTaskCreate = ({
                     }}
                     className={cn(
                       'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
-                      proLinkValue === playlist.id && 'bg-emerald-100 dark:bg-emerald-900/30'
+                      proLinkValue === playlist.id && 'bg-primary/10 ring-1 ring-primary/30'
                     )}
                   >
                     {playlist.cover_image_url ? (
@@ -1946,7 +1964,10 @@ const AppTaskCreate = ({
       {/* Breathing Exercise Picker Sheet */}
       <Sheet open={showBreathingPicker} onOpenChange={setShowBreathingPicker}>
         <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
-          <SheetHeader>
+          <SheetHeader className="flex-row items-center gap-2">
+            <button onClick={() => { setShowBreathingPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
             <SheetTitle>Select Breathing Exercise</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
@@ -1954,7 +1975,6 @@ const AppTaskCreate = ({
               Choose a breathing exercise to link to this task.
             </p>
             
-            {/* Option for generic breathe (no specific exercise) */}
             <button
               onClick={() => {
                 setProLinkType('breathe');
@@ -1963,7 +1983,7 @@ const AppTaskCreate = ({
               }}
               className={cn(
                 'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
-                proLinkType === 'breathe' && !proLinkValue && 'bg-indigo-100 dark:bg-indigo-900/30'
+                proLinkType === 'breathe' && !proLinkValue && 'bg-primary/10 ring-1 ring-primary/30'
               )}
             >
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 flex items-center justify-center">
@@ -1979,7 +1999,7 @@ const AppTaskCreate = ({
               <p className="text-xs text-muted-foreground mb-2">Or select a specific exercise:</p>
             </div>
             
-            <ScrollArea className="h-[40vh]">
+            <ScrollArea className="h-[35vh]">
               <div className="space-y-2 pr-4">
                 {breathingExercises.map((exercise) => (
                   <button
@@ -1991,7 +2011,7 @@ const AppTaskCreate = ({
                     }}
                     className={cn(
                       'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
-                      proLinkValue === exercise.id && 'bg-indigo-100 dark:bg-indigo-900/30'
+                      proLinkValue === exercise.id && 'bg-primary/10 ring-1 ring-primary/30'
                     )}
                   >
                     <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 flex items-center justify-center">
@@ -2012,15 +2032,13 @@ const AppTaskCreate = ({
       {/* Reflection Picker Sheet */}
       <Sheet open={showReflectionPicker} onOpenChange={setShowReflectionPicker}>
         <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
-          <SheetHeader>
+          <SheetHeader className="flex-row items-center gap-2">
+            <button onClick={() => { setShowReflectionPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
             <SheetTitle>Select Reflection</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
-            <p className="text-sm text-muted-foreground">
-              Choose a reflection exercise to link to this task.
-            </p>
-            
-            {/* Option for generic reflections page */}
             <button
               onClick={() => {
                 setProLinkType('reflection');
@@ -2029,7 +2047,7 @@ const AppTaskCreate = ({
               }}
               className={cn(
                 'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
-                proLinkType === 'reflection' && !proLinkValue && 'bg-teal-100 dark:bg-teal-900/30'
+                proLinkType === 'reflection' && !proLinkValue && 'bg-primary/10 ring-1 ring-primary/30'
               )}
             >
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-100 to-cyan-100 dark:from-teal-900/40 dark:to-cyan-900/40 flex items-center justify-center">
@@ -2057,7 +2075,7 @@ const AppTaskCreate = ({
                     }}
                     className={cn(
                       'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
-                      proLinkValue === reflection.id && 'bg-teal-100 dark:bg-teal-900/30'
+                      proLinkValue === reflection.id && 'bg-primary/10 ring-1 ring-primary/30'
                     )}
                   >
                     {reflection.cover_image_url ? (
@@ -2084,7 +2102,10 @@ const AppTaskCreate = ({
       {/* Routine Picker Sheet */}
       <Sheet open={showRoutinePicker} onOpenChange={setShowRoutinePicker}>
         <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
-          <SheetHeader>
+          <SheetHeader className="flex-row items-center gap-2">
+            <button onClick={() => { setShowRoutinePicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
             <SheetTitle>Select Routine</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
@@ -2104,7 +2125,7 @@ const AppTaskCreate = ({
                     }}
                     className={cn(
                       'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
-                      proLinkValue === routine.id && proLinkType === 'routine' && 'bg-emerald-100 dark:bg-emerald-900/30'
+                      proLinkValue === routine.id && proLinkType === 'routine' && 'bg-primary/10 ring-1 ring-primary/30'
                     )}
                   >
                     <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 flex items-center justify-center">
@@ -2121,10 +2142,200 @@ const AppTaskCreate = ({
           </div>
         </SheetContent>
       </Sheet>
-    </>
-  );
 
-  // Sheet mode - render inside a Sheet
+      {/* Audio Track Picker Sheet */}
+      <Sheet open={showAudioPicker} onOpenChange={setShowAudioPicker}>
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
+          <SheetHeader className="flex-row items-center gap-2">
+            <button onClick={() => { setShowAudioPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <SheetTitle>Select Audio Track</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-3">
+            <Input
+              value={audioSearchQuery}
+              onChange={(e) => setAudioSearchQuery(e.target.value)}
+              placeholder="Search audio tracks..."
+              className="mb-2"
+            />
+            <ScrollArea className="h-[45vh]">
+              <div className="space-y-2 pr-4">
+                {audioTracks
+                  .filter(a => a.title.toLowerCase().includes(audioSearchQuery.toLowerCase()))
+                  .map((audio) => (
+                  <button
+                    key={audio.id}
+                    onClick={() => {
+                      setProLinkType('audio');
+                      setProLinkValue(audio.id);
+                      setShowAudioPicker(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
+                      proLinkValue === audio.id && 'bg-primary/10 ring-1 ring-primary/30'
+                    )}
+                  >
+                    {audio.cover_image_url ? (
+                      <img src={audio.cover_image_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40 flex items-center justify-center">
+                        <Headphones className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                    )}
+                    <div className="flex-1 text-left">
+                      <p className="font-medium truncate">{audio.title}</p>
+                      <p className="text-xs text-muted-foreground capitalize">
+                        {audio.category} • {Math.floor(audio.duration_seconds / 60)}min
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Community Channel Picker Sheet */}
+      <Sheet open={showChannelPicker} onOpenChange={setShowChannelPicker}>
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
+          <SheetHeader className="flex-row items-center gap-2">
+            <button onClick={() => { setShowChannelPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <SheetTitle>Select Channel</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-3">
+            <Input
+              value={channelSearchQuery}
+              onChange={(e) => setChannelSearchQuery(e.target.value)}
+              placeholder="Search channels..."
+              className="mb-2"
+            />
+            <ScrollArea className="h-[45vh]">
+              <div className="space-y-2 pr-4">
+                {feedChannels
+                  .filter(c => c.name.toLowerCase().includes(channelSearchQuery.toLowerCase()))
+                  .map((channel) => (
+                  <button
+                    key={channel.id}
+                    onClick={() => {
+                      setProLinkType('channel');
+                      setProLinkValue(channel.slug);
+                      setShowChannelPicker(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
+                      proLinkValue === channel.slug && 'bg-primary/10 ring-1 ring-primary/30'
+                    )}
+                  >
+                    {channel.cover_image_url && !channel.cover_image_url.startsWith('emoji:') ? (
+                      <img src={channel.cover_image_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-100 to-sky-100 dark:from-blue-900/40 dark:to-sky-900/40 flex items-center justify-center">
+                        {channel.cover_image_url?.startsWith('emoji:') ? (
+                          <span className="text-xl">{channel.cover_image_url.replace('emoji:', '')}</span>
+                        ) : (
+                          <MessageCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        )}
+                      </div>
+                    )}
+                    <div className="flex-1 text-left">
+                      <p className="font-medium truncate">{channel.name}</p>
+                      <p className="text-xs text-muted-foreground capitalize">{channel.type}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Video Picker Sheet */}
+      <Sheet open={showVideoPicker} onOpenChange={setShowVideoPicker}>
+        <SheetContent side="bottom" className="h-[60vh] rounded-t-3xl">
+          <SheetHeader className="flex-row items-center gap-2">
+            <button onClick={() => { setShowVideoPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <SheetTitle>Link Video</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-4">
+            <p className="text-sm text-muted-foreground">Enter the video ID to link to this task.</p>
+            <Input
+              value={proLinkValue || ''}
+              onChange={(e) => setProLinkValue(e.target.value || null)}
+              placeholder="Video ID"
+              autoFocus
+            />
+            <Button
+              onClick={() => setShowVideoPicker(false)}
+              className="w-full rounded-xl"
+              disabled={!proLinkValue}
+            >
+              Done
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Video Playlist Picker Sheet */}
+      <Sheet open={showVideoPlaylistPicker} onOpenChange={setShowVideoPlaylistPicker}>
+        <SheetContent side="bottom" className="h-[60vh] rounded-t-3xl">
+          <SheetHeader className="flex-row items-center gap-2">
+            <button onClick={() => { setShowVideoPlaylistPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <SheetTitle>Link Video Playlist</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-4">
+            <p className="text-sm text-muted-foreground">Enter the video playlist ID to link to this task.</p>
+            <Input
+              value={proLinkValue || ''}
+              onChange={(e) => setProLinkValue(e.target.value || null)}
+              placeholder="Video Playlist ID"
+              autoFocus
+            />
+            <Button
+              onClick={() => setShowVideoPlaylistPicker(false)}
+              className="w-full rounded-xl"
+              disabled={!proLinkValue}
+            >
+              Done
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Program Picker Sheet */}
+      <Sheet open={showProgramPicker} onOpenChange={setShowProgramPicker}>
+        <SheetContent side="bottom" className="h-[60vh] rounded-t-3xl">
+          <SheetHeader className="flex-row items-center gap-2">
+            <button onClick={() => { setShowProgramPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <SheetTitle>Link Program</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-4">
+            <p className="text-sm text-muted-foreground">Enter the program slug to link to this task.</p>
+            <Input
+              value={proLinkValue || ''}
+              onChange={(e) => setProLinkValue(e.target.value || null)}
+              placeholder="Program slug (e.g., mindset-reset)"
+              autoFocus
+            />
+            <Button
+              onClick={() => setShowProgramPicker(false)}
+              className="w-full rounded-xl"
+              disabled={!proLinkValue}
+            >
+              Done
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
   if (isSheet) {
     return (
       <>
