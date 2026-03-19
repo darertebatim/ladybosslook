@@ -436,15 +436,25 @@ export function useAddRoutinePlan() {
       // Create a map of edited task data
       const editedTasksMap = new Map(editedTasks?.map(t => [t.id, t]) || []);
 
-      // Get current max order_index for user's tasks
+      // Shift existing tasks' order_index to make room at the top
       const { data: existingTasks } = await supabase
         .from('user_tasks')
-        .select('order_index')
+        .select('id, order_index')
         .eq('user_id', user.id)
-        .order('order_index', { ascending: false })
-        .limit(1);
+        .order('order_index', { ascending: true });
 
-      const startOrderIndex = (existingTasks?.[0]?.order_index ?? -1) + 1;
+      if (existingTasks && existingTasks.length > 0) {
+        // Shift all existing tasks down by the number of new tasks
+        const shiftAmount = tasks.length;
+        for (const t of existingTasks) {
+          await supabase
+            .from('user_tasks')
+            .update({ order_index: (t.order_index ?? 0) + shiftAmount })
+            .eq('id', t.id);
+        }
+      }
+
+      const startOrderIndex = 0;
 
       // Create individual tasks for each routine plan task
       const today = new Date();
