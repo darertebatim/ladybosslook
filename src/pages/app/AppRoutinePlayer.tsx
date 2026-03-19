@@ -6,6 +6,22 @@ import { useQueryClient } from '@tanstack/react-query';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
+
+// Secondary (darker) palette matching task card colors
+const TASK_COLORS_SECONDARY: Record<string, string> = {
+  pink: '#FFC2EA',
+  peach: '#FFD2A1',
+  yellow: '#FFEA4E',
+  lime: '#C3F1E1',
+  sky: '#B9D6FF',
+  mint: '#C9F588',
+  lavender: '#DEC1FF',
+  purple: '#DEC1FF',
+  blue: '#B9D6FF',
+  red: '#FFC2EA',
+  orange: '#FFD2A1',
+  green: '#C3F1E1',
+};
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
