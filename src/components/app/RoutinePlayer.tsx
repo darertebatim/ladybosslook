@@ -105,9 +105,9 @@ function RearrangeSheet({
   onDone,
   onClose,
 }: {
-  currentTask: FocusTask | null;
-  rearrangeTasks: FocusTask[];
-  setRearrangeTasks: (tasks: FocusTask[]) => void;
+  currentTask: RoutineTask | null;
+  rearrangeTasks: RoutineTask[];
+  setRearrangeTasks: (tasks: RoutineTask[]) => void;
   onDone: () => void;
   onClose: () => void;
 }) {
