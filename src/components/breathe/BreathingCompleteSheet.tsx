@@ -84,7 +84,7 @@ export function BreathingCompleteSheet({
     haptic.light();
     onOpenChange(false);
     if (hasActivePlayer) {
-      // Just maximize — player will auto-detect the task_completion record
+      navigate('/app/home');
       focusPlayer!.maximize();
       return;
     }
