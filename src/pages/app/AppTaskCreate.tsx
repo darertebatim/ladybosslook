@@ -430,6 +430,7 @@ const AppTaskCreate = ({
   const [showPlaylistPicker, setShowPlaylistPicker] = useState(false);
   const [showBreathingPicker, setShowBreathingPicker] = useState(false);
   const [showReflectionPicker, setShowReflectionPicker] = useState(false);
+  const [showRoutinePicker, setShowRoutinePicker] = useState(false);
   const [showGoalSettings, setShowGoalSettings] = useState(false);
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
   
