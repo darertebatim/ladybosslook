@@ -197,6 +197,22 @@ export default function AppFocusRoutines() {
     return routineFilteredTasks.filter(t => !plannerCompletedTaskIds.has(t.id));
   }, [routineFilteredTasks, plannerCompletedTaskIds]);
 
+  const handleTaskTap = useCallback((task: UserTask) => {
+    setSelectedTask(task);
+  }, []);
+
+  const handleEditTask = useCallback((task: UserTask) => {
+    setSelectedTask(null);
+    navigate(`/app/home/edit/${task.id}`);
+  }, [navigate]);
+
+  const handleDeleteTask = useCallback((task: UserTask) => {
+    setSelectedTask(null);
+    deleteTask.mutate(task.id, {
+      onSuccess: () => toast.success('Task deleted'),
+    });
+  }, [deleteTask]);
+
   const handlePlay = async (routine: any) => {
     if (isActive) {
       toast('A routine is already running. Finish or cancel it first.');
