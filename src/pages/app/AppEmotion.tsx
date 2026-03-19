@@ -6,6 +6,7 @@ import { EmotionContext } from '@/components/emotion/EmotionContext';
 import { EmotionComplete } from '@/components/emotion/EmotionComplete';
 import { useEmotionLogs } from '@/hooks/useEmotionLogs';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import type { Valence } from '@/lib/emotionData';
 
 type Step = 'dashboard' | 'select' | 'context' | 'complete';
