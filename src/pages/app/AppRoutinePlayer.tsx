@@ -1,7 +1,7 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2, CalendarPlus } from 'lucide-react';
+import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2, CalendarPlus, Bell, Calendar } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
@@ -533,40 +533,65 @@ export default function AppRoutinePlayer() {
                       return !taskId || !completedIds.has(taskId);
                     });
 
+                    const MAX_EMOJIS = 3;
+                    const visibleTasks = allTasks.slice(0, MAX_EMOJIS);
+                    const overflowCount = allTasks.length - MAX_EMOJIS;
+                    const cardColor = TASK_COLOR_CLASSES[(routine.color as TaskColor) || 'peach'] || TASK_COLOR_CLASSES.peach;
+
                     return (
-                      <div key={routine.id} className="bg-card rounded-2xl border border-border p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-bold text-foreground text-lg">{routine.title}</h3>
-                              {completion && (
-                                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                                  completion.isComplete
-                                    ? 'bg-emerald-100 text-emerald-700'
-                                    : 'bg-amber-100 text-amber-700'
-                                }`}>
-                                  {completion.pct}%
+                      <div
+                        key={routine.id}
+                        onClick={() => handlePlay(routine)}
+                        className={cn(
+                          'rounded-2xl p-4 pb-3.5 active:scale-[0.98] transition-transform cursor-pointer relative overflow-hidden',
+                          cardColor
+                        )}
+                      >
+                        {/* Top row: schedule hints */}
+                        <div className="flex items-center gap-3 mb-1.5">
+                          <span className="flex items-center gap-1 text-[11px] font-medium text-foreground/50">
+                            <Bell className="w-3 h-3" />
+                            {allTasks.length} tasks
+                          </span>
+                          {routine.category && (
+                            <span className="flex items-center gap-1 text-[11px] font-medium text-foreground/50">
+                              <Calendar className="w-3 h-3" />
+                              {routine.category}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Title */}
+                        <h3 className="font-bold text-foreground text-[17px] leading-snug mb-3 pr-12">
+                          {routine.title}
+                        </h3>
+
+                        {/* Bottom row: emoji bubbles + actions */}
+                        <div className="flex items-center justify-between">
+                          {/* Emoji chain */}
+                          <div className="flex items-center gap-1">
+                            {visibleTasks.map((task, i) => (
+                              <span key={i} className="flex items-center">
+                                <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center">
+                                  <FluentEmoji emoji={task.emoji} size={20} />
                                 </span>
-                              )}
-                            </div>
-                            {routine.category && (
-                              <p className="text-xs text-muted-foreground mt-0.5">{routine.category}</p>
-                            )}
-                            {remainingTasksForCard.length > 0 && (
-                              <div className="flex items-center gap-1 mt-2.5 flex-wrap">
-                                {remainingTasksForCard.map((task, i) => (
-                                  <span key={i} className="flex items-center">
-                                    <FluentEmoji emoji={task.emoji} size={24} />
-                                    {i < remainingTasksForCard.length - 1 && (
-                                      <ChevronRight className="w-3 h-3 text-muted-foreground/30 mx-0.5" />
-                                    )}
-                                  </span>
-                                ))}
-                              </div>
+                                {i < visibleTasks.length - 1 && (
+                                  <ChevronRight className="w-3 h-3 text-foreground/20 mx-0.5" />
+                                )}
+                              </span>
+                            ))}
+                            {overflowCount > 0 && (
+                              <>
+                                <ChevronRight className="w-3 h-3 text-foreground/20 mx-0.5" />
+                                <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center text-xs font-semibold text-foreground/50">
+                                  +{overflowCount}
+                                </span>
+                              </>
                             )}
                           </div>
 
-                          <div className="flex items-center gap-1.5 shrink-0 ml-3">
+                          {/* Action buttons */}
+                          <div className="flex items-center gap-1.5">
                             <button
                               onClick={(e) => { e.stopPropagation(); handleOpenAddSheet(routine); }}
                               className="w-9 h-9 rounded-full bg-primary flex items-center justify-center active:scale-95 transition-transform shadow-sm"
@@ -576,28 +601,28 @@ export default function AppRoutinePlayer() {
                             </button>
                             <button
                               onClick={(e) => { e.stopPropagation(); setDeleteRoutine(routine); }}
-                              className="p-2 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 active:scale-95 transition-all"
+                              className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center active:scale-95 transition-all"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-3.5 h-3.5 text-foreground/40" />
                             </button>
                             <button
-                              onClick={() => handlePlay(routine)}
+                              onClick={(e) => { e.stopPropagation(); handlePlay(routine); }}
                               disabled={loadingRoutineId === routine.routine_id}
-                              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-muted active:scale-95 transition-transform"
+                              className="flex items-center gap-1.5 h-9 px-4 rounded-full bg-foreground/10 active:scale-95 transition-transform"
                             >
                               {loadingRoutineId === routine.routine_id ? (
                                 <Loader2 className="w-4 h-4 animate-spin text-foreground" />
                               ) : completion ? (
                                 <>
                                   {completion.isComplete ? (
-                                    <RotateCw className="w-4 h-4 text-foreground" />
+                                    <RotateCw className="w-3.5 h-3.5 text-foreground" />
                                   ) : (
-                                    <Play className="w-4 h-4 text-foreground fill-foreground" />
+                                    <Play className="w-3.5 h-3.5 text-foreground fill-foreground" />
                                   )}
-                                  <span className="text-sm font-semibold text-foreground">{completion.pct}%</span>
+                                  <span className="text-xs font-bold text-foreground">{completion.pct}%</span>
                                 </>
                               ) : (
-                                <Play className="w-4 h-4 text-foreground fill-foreground" />
+                                <Play className="w-3.5 h-3.5 text-foreground fill-foreground" />
                               )}
                             </button>
                           </div>
