@@ -144,7 +144,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'profile',
-    name: 'My Profile',
+    name: 'MyProfile',
     icon: 'User',
     emoji: '👤',
     bgColor: 'bg-[#E2F9F0]',
