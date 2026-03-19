@@ -432,8 +432,15 @@ const AppTaskCreate = ({
   const [showBreathingPicker, setShowBreathingPicker] = useState(false);
   const [showReflectionPicker, setShowReflectionPicker] = useState(false);
   const [showRoutinePicker, setShowRoutinePicker] = useState(false);
+  const [showAudioPicker, setShowAudioPicker] = useState(false);
+  const [showChannelPicker, setShowChannelPicker] = useState(false);
+  const [showVideoPicker, setShowVideoPicker] = useState(false);
+  const [showVideoPlaylistPicker, setShowVideoPlaylistPicker] = useState(false);
+  const [showProgramPicker, setShowProgramPicker] = useState(false);
   const [showGoalSettings, setShowGoalSettings] = useState(false);
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
+  const [audioSearchQuery, setAudioSearchQuery] = useState('');
+  const [channelSearchQuery, setChannelSearchQuery] = useState('');
   
   // Refs for inputs to scroll into view
   const newSubtaskInputRef = useRef<HTMLInputElement>(null);
