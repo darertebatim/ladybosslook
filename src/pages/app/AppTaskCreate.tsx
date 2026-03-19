@@ -508,19 +508,21 @@ const AppTaskCreate = ({
     },
   });
 
-  // Fetch routines for linking
+  // Fetch user's own routines for linking
   const { data: linkableRoutines = [] } = useQuery({
-    queryKey: ['linkable-routines'],
+    queryKey: ['linkable-user-routines', user?.id],
     queryFn: async () => {
+      if (!user) return [];
       const { data, error } = await supabase
-        .from('routines_bank')
-        .select('id, title, emoji, category')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
+        .from('user_routines_bank')
+        .select('routine_id, title, emoji, category')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
       
       if (error) throw error;
-      return data as { id: string; title: string; emoji: string | null; category: string }[];
+      return (data || []).map((r: any) => ({ id: r.routine_id, title: r.title, emoji: r.emoji, category: r.category })) as { id: string; title: string; emoji: string | null; category: string }[];
     },
+    enabled: !!user,
   });
 
   // Fetch routine categories for tags (dynamic instead of hardcoded)
