@@ -578,7 +578,7 @@ export default function AppRoutinePlayer() {
                               className="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
                               title="Add to planner"
                             >
-                              <CalendarPlus className="w-4 h-4 text-primary-foreground" />
+                              <CalendarPlus className="w-4 h-4 text-white" />
                             </button>
                             <button
                               onClick={(e) => { e.stopPropagation(); setDeleteRoutine(routine); }}
