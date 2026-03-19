@@ -145,7 +145,7 @@ export function UpdateNotificationSender() {
           title: bannerTitle,
           description: bannerDescription,
           button_text: bannerButtonText,
-          button_url: 'https://apps.apple.com/app/simora-ladybosslook/id6755076134',
+          button_url: 'https://apps.apple.com/app/routine-ladybosslook/id6755076134',
           is_active: true,
           priority: 100,
           icon: 'sparkles',
