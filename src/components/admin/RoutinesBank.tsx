@@ -1099,38 +1099,46 @@ export default function RoutinesBank() {
         </Button>
       </CardHeader>
       <CardContent>
-        <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-4">
-          <TabsList className="flex-wrap h-auto gap-1">
-            <TabsTrigger value="all" className="flex items-center gap-1">
-              <Layers className="h-3 w-3" />
-              All
-            </TabsTrigger>
-            <TabsTrigger value="popular" className="flex items-center gap-1">
-              <Star className="h-3 w-3" />
-              Popular
-            </TabsTrigger>
-            <TabsTrigger value="featured" className="flex items-center gap-1">
-              <Flame className="h-3 w-3" />
-              Featured
-            </TabsTrigger>
-            <TabsTrigger value="challenges" className="flex items-center gap-1">
-              🔥 Challenges
-            </TabsTrigger>
-            <TabsTrigger value="projects" className="flex items-center gap-1">
-              🎯 Projects
-            </TabsTrigger>
-            {routineCategories.map((cat) => (
-              <TabsTrigger 
-                key={cat.slug} 
-                value={cat.slug}
-                className="flex items-center gap-1"
-              >
-                <TaskIcon iconName={cat.icon || '📋'} size={14} />
-                {cat.name}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+        <div className="flex flex-wrap gap-1 mb-4">
+          {[
+            { value: 'all', label: 'All', icon: <Layers className="h-3 w-3" /> },
+            { value: 'popular', label: 'Popular', icon: <Star className="h-3 w-3" /> },
+            { value: 'featured', label: 'Featured', icon: <Flame className="h-3 w-3" /> },
+            { value: 'challenges', label: '🔥 Challenges', icon: null },
+            { value: 'projects', label: '🎯 Projects', icon: null },
+          ].map((item) => (
+            <button
+              key={item.value}
+              type="button"
+              onClick={() => setSelectedCategory(item.value)}
+              className={cn(
+                "inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+                selectedCategory === item.value
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              )}
+            >
+              {item.icon}
+              {item.label}
+            </button>
+          ))}
+          {routineCategories.map((cat) => (
+            <button
+              key={cat.slug}
+              type="button"
+              onClick={() => setSelectedCategory(cat.slug)}
+              className={cn(
+                "inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+                selectedCategory === cat.slug
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              )}
+            >
+              <TaskIcon iconName={cat.icon || '📋'} size={14} />
+              {cat.name}
+            </button>
+          ))}
+        </div>
 
         {isLoading ? (
           <div className="text-center py-8 text-muted-foreground">Loading...</div>
