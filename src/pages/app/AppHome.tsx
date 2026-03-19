@@ -1035,52 +1035,49 @@ const AppHome = () => {
                 </div>
               ) : filteredTasks.length > 0 ? (
                 <div>
-                   {/* My Tasks header with category pills */}
+                   {/* My Tasks header with filter dropdown */}
                   <div className="flex items-center gap-2 mb-3">
                     <Zap className="h-4 w-4 text-amber-500 shrink-0" />
                     <h2 className="text-sm font-semibold text-foreground tracking-wide shrink-0">
                       My Tasks
                     </h2>
-                    {taskTags.length > 0 && (
-                      <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
-                        <button
-                          onClick={() => setSelectedTag(null)}
-                          className={cn(
-                            'px-2.5 py-0.5 rounded-full text-[11px] whitespace-nowrap transition-all font-medium',
-                            selectedTag === null
-                              ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                              : 'bg-white text-muted-foreground dark:bg-white/10 border border-border'
-                          )}
-                        >
-                          All
-                        </button>
-                        {taskTags.map((tag, i) => {
-                          const pillColors = [
-                            'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-                            'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
-                            'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
-                            'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400',
-                            'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-                            'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
-                          ];
-                          const activeColor = pillColors[i % pillColors.length];
-                          return (
-                            <button
-                              key={tag}
-                              onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
-                              className={cn(
-                                'px-2.5 py-0.5 rounded-full text-[11px] whitespace-nowrap transition-all capitalize font-medium',
-                                selectedTag === tag
-                                  ? activeColor
-                                  : 'bg-white text-muted-foreground dark:bg-white/10 border border-border'
-                              )}
-                            >
-                              {categoryNameMap.get(tag) || tag}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
+                    <Select value={taskFilter} onValueChange={setTaskFilter}>
+                      <SelectTrigger className="h-7 min-w-0 w-auto max-w-[160px] gap-1 border-border bg-background px-2.5 py-0 text-[11px] font-medium rounded-full [&>svg]:h-3 [&>svg]:w-3">
+                        <Filter className="h-3 w-3 shrink-0 opacity-60" />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent align="start" className="min-w-[180px]">
+                        <SelectItem value="all">All Tasks</SelectItem>
+                        <SelectItem value="one-time">One-time Tasks</SelectItem>
+                        <SelectItem value="unlinked">Unlinked Tasks</SelectItem>
+                        {routineNamesInTasks.size > 0 && (
+                          <>
+                            <SelectSeparator />
+                            <SelectGroup>
+                              <SelectLabel className="text-[10px] uppercase tracking-wider text-muted-foreground pl-3">Routines</SelectLabel>
+                              {Array.from(routineNamesInTasks.entries()).map(([rid, name]) => (
+                                <SelectItem key={rid} value={`routine:${rid}`}>
+                                  {name}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </>
+                        )}
+                        {taskTags.length > 0 && (
+                          <>
+                            <SelectSeparator />
+                            <SelectGroup>
+                              <SelectLabel className="text-[10px] uppercase tracking-wider text-muted-foreground pl-3">Categories</SelectLabel>
+                              {taskTags.map(tag => (
+                                <SelectItem key={tag} value={`cat:${tag}`}>
+                                  {categoryNameMap.get(tag) || tag}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </>
+                        )}
+                      </SelectContent>
+                    </Select>
                     
                   </div>
                   
