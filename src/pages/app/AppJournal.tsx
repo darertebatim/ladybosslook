@@ -37,7 +37,7 @@ const AppJournal = () => {
   const location = useLocation();
   const { isProTaskActive, completeProTask } = useFocusPlayer();
   const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
-  
+  const [searchQuery, setSearchQuery] = useState('');
   const handleClose = () => {
     if (fromFocusRoutine && isProTaskActive) {
       completeProTask();
