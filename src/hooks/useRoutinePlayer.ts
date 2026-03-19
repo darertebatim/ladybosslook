@@ -31,7 +31,7 @@ export interface RoutinePlayerConfig {
 
 type PlayerPhase = 'idle' | 'breathe' | 'running' | 'paused' | 'summary';
 
-export function useFocusRoutinePlayer() {
+export function useRoutinePlayer() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [phase, setPhase] = useState<PlayerPhase>('idle');
