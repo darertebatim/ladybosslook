@@ -610,8 +610,8 @@ export default function AppRoutinePlayer() {
                             ))}
                             {overflowCount > 0 && (
                               <>
-                                <ChevronRight className="w-3 h-3 text-black/20 mx-0.5" />
-                                <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center text-xs font-semibold text-black/50">
+                                <ChevronRight className="w-3 h-3 text-black mx-0.5" />
+                                <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center text-xs font-bold text-black">
                                   +{overflowCount}
                                 </span>
                               </>
