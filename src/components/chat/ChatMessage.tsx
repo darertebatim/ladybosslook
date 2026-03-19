@@ -3,10 +3,10 @@ import { format } from "date-fns";
 import { FileText, Download, ExternalLink, Megaphone, Check, CheckCheck, Play, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useBilingualText } from "@/components/ui/BilingualText";
-import { Browser } from '@capacitor/browser';
-import { Capacitor } from '@capacitor/core';
+import { smartOpenUrl, getInternalPath } from "@/lib/navigation-utils";
 
 interface ChatMessageProps {
   content: string;
