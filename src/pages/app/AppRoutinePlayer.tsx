@@ -604,7 +604,7 @@ export default function AppRoutinePlayer() {
                                   <FluentEmoji emoji={task.emoji} size={20} />
                                 </span>
                                 {i < visibleTasks.length - 1 && (
-                                  <ChevronRight className="w-3 h-3 text-foreground/20 mx-0.5" />
+                                  <ChevronRight className="w-3 h-3 text-black/20 mx-0.5" />
                                 )}
                               </span>
                             ))}
