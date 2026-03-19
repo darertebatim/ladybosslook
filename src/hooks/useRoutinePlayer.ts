@@ -410,6 +410,7 @@ export function useRoutinePlayer() {
     pauseElapsed,
     startRoutine,
     onBreathComplete,
+    onCountdownComplete,
     completeTask,
     skipTask,
     moveTaskToEnd,
