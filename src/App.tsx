@@ -496,7 +496,8 @@ const App = () => (
                       {/* Redirects for backward compatibility with older app versions */}
                       <Route path="rituals" element={<Navigate to="/app/routines" replace />} />
                       <Route path="rituals/:planId" element={<RitualRedirect />} />
-                      <Route path="profile" element={<AppProfile />} />
+                      <Route path="myprofile" element={<AppProfile />} />
+                      <Route path="profile" element={<Navigate to="/app/myprofile" replace />} />
                       {/* Legacy routes - redirect to home */}
                     </Route>
                   </Route>
