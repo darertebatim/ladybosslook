@@ -584,7 +584,7 @@ export default function AppRoutinePlayer() {
                               onClick={(e) => { e.stopPropagation(); setDeleteRoutine(routine); }}
                               className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center active:scale-95 transition-all"
                             >
-                              <Trash2 className="w-3.5 h-3.5 text-foreground/40" />
+                              <Trash2 className="w-3.5 h-3.5 text-black/40" />
                             </button>
                           </div>
                         </div>
