@@ -239,7 +239,7 @@ export function ChatMessage({
 
   const handleLinkClick = () => {
     if (linkUrl) {
-      window.open(linkUrl, '_blank');
+      openExternalUrl(linkUrl);
     }
   };
 
