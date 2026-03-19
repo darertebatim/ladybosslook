@@ -45,7 +45,7 @@ export function ProLinkPicker({
 }: ProLinkPickerProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const showValueInput = proLinkType && ['channel', 'program', 'route'].includes(proLinkType);
+  const showValueInput = proLinkType && proLinkType === 'route';
 
   // Filter by search
   const matchesSearch = (config: typeof PRO_LINK_TYPES[number]) => {
@@ -163,11 +163,7 @@ export function ProLinkPicker({
                   <Input
                     value={proLinkValue || ''}
                     onChange={(e) => onValueChange(e.target.value || null)}
-                    placeholder={
-                      proLinkType === 'channel' ? 'Channel slug (e.g., general)' :
-                      proLinkType === 'program' ? 'Program slug' :
-                      'Route path (e.g., /app/profile)'
-                    }
+                    placeholder="Route path (e.g., /app/profile)"
                     className="rounded-xl"
                     autoFocus
                   />
