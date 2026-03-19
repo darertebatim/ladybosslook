@@ -470,8 +470,9 @@ const App = () => (
                       <Route path="browse-programs" element={<Navigate to="/app/academy" replace />} />
                       <Route path="myprograms/:slug" element={<AppCourseDetail />} />
                       <Route path="myprograms/:slug/:roundId" element={<AppCourseDetail />} />
-                      <Route path="programs/:slug" element={<Navigate to="/app/myprograms/:slug" replace />} />
-                      <Route path="programs/:slug/:roundId" element={<Navigate to="/app/myprograms/:slug/:roundId" replace />} />
+                      {/* Backward compat redirects for old /app/programs/ and /app/course/ URLs */}
+                      <Route path="programs/:slug/:roundId" element={<CourseRedirect />} />
+                      <Route path="programs/:slug" element={<CourseRedirect />} />
                       {/* Backward compat redirects for old /app/course/ URLs */}
                       <Route path="course/:slug/:roundId" element={<CourseRedirect />} />
                       <Route path="course/:slug" element={<CourseRedirect />} />
