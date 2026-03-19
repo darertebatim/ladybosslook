@@ -94,7 +94,7 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
           "overflow-hidden"
         )}
       >
-        <ScrollArea className="max-h-[320px]">
+        <div className="max-h-[320px] overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
           <div className="py-1.5">
             {/* Base options */}
             {baseOptions.map(option => (
