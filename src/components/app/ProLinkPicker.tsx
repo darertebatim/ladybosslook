@@ -163,11 +163,7 @@ export function ProLinkPicker({
                   <Input
                     value={proLinkValue || ''}
                     onChange={(e) => onValueChange(e.target.value || null)}
-                    placeholder={
-                      proLinkType === 'channel' ? 'Channel slug (e.g., general)' :
-                      proLinkType === 'program' ? 'Program slug' :
-                      'Route path (e.g., /app/profile)'
-                    }
+                    placeholder="Route path (e.g., /app/profile)"
                     className="rounded-xl"
                     autoFocus
                   />
