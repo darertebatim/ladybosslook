@@ -144,12 +144,12 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'profile',
-    name: 'Profile',
+    name: 'My Profile',
     icon: 'User',
     emoji: '👤',
     bgColor: 'bg-[#E2F9F0]',
     iconColor: 'text-slate-600',
-    route: '/app/profile',
+    route: '/app/myprofile',
     description: 'Settings & account',
   },
 ];
