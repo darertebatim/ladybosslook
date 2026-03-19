@@ -92,10 +92,33 @@ export function FocusPlayerProvider({ children }: { children: ReactNode }) {
     navigate(path);
   }, [player.currentTask, navigate]);
 
+  // Auto-navigate to pro-task tool when a pro-task becomes current
+  const autoOpenedTaskRef = useRef<string | null>(null);
+  useEffect(() => {
+    const task = player.currentTask;
+    if (!task?.proLinkType || !isActive || minimized) return;
+    // Don't auto-open the same task twice
+    const taskKey = `${task.userTaskId || task.title}-${player.currentTaskIndex}`;
+    if (autoOpenedTaskRef.current === taskKey) return;
+    autoOpenedTaskRef.current = taskKey;
+    // Brief delay so the user sees the task card before navigating
+    const timer = setTimeout(() => {
+      openProTask();
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [player.currentTask, player.currentTaskIndex, isActive, minimized, openProTask]);
+
+  // Reset auto-open ref when routine ends
+  useEffect(() => {
+    if (!isActive) {
+      autoOpenedTaskRef.current = null;
+    }
+  }, [isActive]);
+
   // Auto-expand on summary so user sees results
-  const isActive = player.phase !== 'idle';
+  const isActive2 = player.phase !== 'idle';
   const isSummary = player.phase === 'summary';
-  const showFullPlayer = isActive && player.config && (!minimized || isSummary);
+  const showFullPlayer = isActive2 && player.config && (!minimized || isSummary);
 
   return (
     <FocusPlayerContext.Provider value={{
