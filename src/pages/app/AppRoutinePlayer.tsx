@@ -158,6 +158,20 @@ export default function AppRoutinePlayer() {
   const [loadingRoutineId, setLoadingRoutineId] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
 
+  // Auto-open routine from ?routine= query param (e.g. from pro link)
+  const autoOpenedRef = useRef(false);
+  useEffect(() => {
+    const routineParam = searchParams.get('routine');
+    if (!routineParam || !myRoutines || autoOpenedRef.current) return;
+    const match = myRoutines.find((r: any) => r.routine_id === routineParam);
+    if (match) {
+      autoOpenedRef.current = true;
+      setPreStartRoutine(match);
+      // Clean up URL
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, myRoutines, setSearchParams]);
+
   // Planner hooks for the pre-start overlay (uses today's date)
   const today = useMemo(() => new Date(), []);
   const { data: plannerTasks = [] } = useTasksForDate(today);
