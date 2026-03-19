@@ -799,7 +799,29 @@ export default function AppTest() {
         </CardContent>
       </Card>
 
-      {/* App Update Banner */}
+      {/* New Message Popup */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageCircle className="h-5 w-5 text-primary" />
+            New Message Popup
+          </CardTitle>
+          <CardDescription>
+            The popup users see when they have unread messages from Support
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            {[1, 3, 5].map(count => (
+              <Button key={count} onClick={() => { setTestUnreadCount(count); setShowNewMessagePopup(true); }} variant="outline">
+                <MessageCircle className="h-4 w-4 mr-2" />
+                {count} Unread
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
