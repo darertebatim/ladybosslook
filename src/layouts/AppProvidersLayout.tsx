@@ -10,9 +10,9 @@ import { RoutinePlayerProvider } from '@/components/app/RoutinePlayerProvider';
 export function AppProvidersLayout() {
   return (
     <AudioPlayerProvider>
-      <FocusPlayerProvider>
+      <RoutinePlayerProvider>
         <Outlet />
-      </FocusPlayerProvider>
+      </RoutinePlayerProvider>
     </AudioPlayerProvider>
   );
 }
