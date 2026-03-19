@@ -24,19 +24,19 @@ export function FeedActionButton({ actionType, actionData }: FeedActionButtonPro
         break;
       case 'join_session':
         if (actionData.meetingUrl) {
-          openUrl(actionData.meetingUrl);
+          smartOpenUrl(actionData.meetingUrl, navigate);
         }
         break;
       case 'view_materials':
         if (actionData.courseSlug) {
           navigate(`/app/programs/${actionData.courseSlug}`);
         } else if (actionData.url) {
-          openUrl(actionData.url);
+          smartOpenUrl(actionData.url, navigate);
         }
         break;
       case 'external_link':
         if (actionData.url) {
-          openUrl(actionData.url);
+          smartOpenUrl(actionData.url, navigate);
         }
         break;
       case 'rate_app':
