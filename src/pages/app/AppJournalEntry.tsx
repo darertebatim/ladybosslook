@@ -15,6 +15,8 @@ import { toast } from 'sonner';
 import { useShareContent } from '@/hooks/useShareContent';
 import { useBilingualText } from '@/components/ui/BilingualText';
 import { cn } from '@/lib/utils';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +33,11 @@ const AppJournalEntry = () => {
   const location = useLocation();
   const { entryId } = useParams<{ entryId: string }>();
   const isNewEntry = !entryId || entryId === 'new';
+
+  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
+  try { focusPlayer = useFocusPlayer(); } catch { /* not available */ }
+  const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
+  const { autoCompleteJournal } = useAutoCompleteProTask();
   
   // Get mood from URL params for new entries (e.g., /app/journal/new?mood=great)
   const urlParams = new URLSearchParams(window.location.search);
@@ -169,7 +176,15 @@ const AppJournalEntry = () => {
       toast.success('Entry saved');
     }
     
-    // Navigate back to journal list
+    // If focus player is active, ensure task_completions is written before maximizing
+    if (hasActivePlayer) {
+      await autoCompleteJournal();
+      navigate('/app/home');
+      focusPlayer!.maximize();
+      return;
+    }
+    
+    // Otherwise navigate back to journal list
     navigate('/app/journal');
   };
 
