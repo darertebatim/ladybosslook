@@ -823,7 +823,25 @@ export default function AppTest() {
         </CardContent>
       </Card>
 
+      {/* App Update Popup */}
       <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Download className="h-5 w-5 text-emerald-500" />
+            App Update Popup
+          </CardTitle>
+          <CardDescription>
+            The popup users see when a new app version is available — links to App Store
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={() => setShowUpdatePopup(true)} variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Preview Update Popup
+          </Button>
+        </CardContent>
+      </Card>
+
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Download className="h-5 w-5 text-green-500" />
