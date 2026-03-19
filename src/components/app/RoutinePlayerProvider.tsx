@@ -119,7 +119,7 @@ export function RoutinePlayerProvider({ children }: { children: ReactNode }) {
   }, [isActive]);
 
   return (
-    <FocusPlayerContext.Provider value={{
+    <RoutinePlayerContext.Provider value={{
       startRoutine: (cfg, resumeOpts) => { setMinimized(false); player.startRoutine(cfg, resumeOpts); },
       isActive,
       isMinimized: isActive && minimized,
