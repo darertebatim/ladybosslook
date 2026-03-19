@@ -446,12 +446,12 @@ export function useAddRoutinePlan() {
       if (existingTasks && existingTasks.length > 0) {
         // Shift all existing tasks down by the number of new tasks
         const shiftAmount = tasks.length;
-        const updates = existingTasks.map(t => ({
-          id: t.id,
-          user_id: user.id,
-          order_index: (t.order_index ?? 0) + shiftAmount,
-        }));
-        await supabase.from('user_tasks').upsert(updates, { onConflict: 'id' });
+        for (const t of existingTasks) {
+          await supabase
+            .from('user_tasks')
+            .update({ order_index: (t.order_index ?? 0) + shiftAmount })
+            .eq('id', t.id);
+        }
       }
 
       const startOrderIndex = 0;
