@@ -46,6 +46,13 @@ export default function AppRoutinePlayer() {
   // Check if routine player page is already added as a task
   const { data: isPageAdded } = useExistingProTask('route', '/app/routineplayer');
 
+  // Category slug → name map
+  const { data: routineCategories = [] } = useRoutineBankCategories();
+  const categoryNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    routineCategories.forEach(cat => map.set(cat.slug, cat.name));
+    return map;
+  }, [routineCategories]);
   // Fetch ALL user routines from user_routines_bank (user-owned copies)
   const { data: myRoutines, isLoading } = useQuery({
     queryKey: ['user-routines-all', user?.id],
