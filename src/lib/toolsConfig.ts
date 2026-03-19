@@ -134,7 +134,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'programs',
-    name: 'My Programs',
+    name: 'MyPrograms',
     icon: 'GraduationCap',
     emoji: '🎓',
     bgColor: 'bg-[#FFF492]',
