@@ -62,7 +62,7 @@ const AppHome = () => {
     user
   } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [taskFilter, setTaskFilter] = useState<string>('all');
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [stepCelebration, setStepCelebration] = useState<{ completedStep: number; newTaskCount: number } | null>(null);
   const [projectCompletion, setProjectCompletion] = useState<{
