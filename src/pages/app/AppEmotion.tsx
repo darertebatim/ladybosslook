@@ -65,8 +65,13 @@ const AppEmotion = () => {
   }, [state, createLog, autoCompleteEmotion]);
 
   const handleDone = useCallback(() => {
+    if (hasActivePlayer) {
+      navigate('/app/home');
+      focusPlayer!.maximize();
+      return;
+    }
     navigate('/app/home');
-  }, [navigate]);
+  }, [navigate, hasActivePlayer, focusPlayer]);
 
   const handleBack = useCallback(() => {
     switch (step) {
