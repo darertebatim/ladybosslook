@@ -533,6 +533,35 @@ const AppTaskCreate = ({
     },
   });
 
+  // Fetch audio content for linking
+  const { data: audioTracks = [] } = useQuery({
+    queryKey: ['linkable-audio-tracks'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_content')
+        .select('id, title, cover_image_url, category, duration_seconds')
+        .order('title', { ascending: true });
+      
+      if (error) throw error;
+      return data as { id: string; title: string; cover_image_url: string | null; category: string; duration_seconds: number }[];
+    },
+  });
+
+  // Fetch community channels for linking
+  const { data: feedChannels = [] } = useQuery({
+    queryKey: ['linkable-feed-channels'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('feed_channels')
+        .select('id, name, slug, cover_image_url, type')
+        .eq('is_archived', false)
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return data as { id: string; name: string; slug: string; cover_image_url: string | null; type: string }[];
+    },
+  });
+
   // Fetch routine categories for tags (dynamic instead of hardcoded)
   const { data: routineCategories = [] } = useQuery({
     queryKey: ['routine-categories-for-tags'],
