@@ -570,7 +570,14 @@ export default function AppRoutinePlayer() {
                             )}
                           </div>
 
-                          <div className="flex items-center gap-2 shrink-0 ml-3">
+                          <div className="flex items-center gap-1.5 shrink-0 ml-3">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleAddToPlanner(routine); }}
+                              className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 active:scale-95 transition-all"
+                              title="Add to planner"
+                            >
+                              <CalendarPlus className="w-4 h-4" />
+                            </button>
                             <button
                               onClick={(e) => { e.stopPropagation(); setDeleteRoutine(routine); }}
                               className="p-2 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 active:scale-95 transition-all"
