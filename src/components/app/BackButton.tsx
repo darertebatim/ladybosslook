@@ -2,7 +2,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
-import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 
 interface BackButtonProps {
   /** Fallback navigation path if no history state. If not provided, uses browser history */
@@ -20,7 +19,6 @@ interface BackButtonProps {
 /**
  * iOS-style back button with ChevronLeft icon and optional label.
  * Uses location.state.from when available to return to the actual previous page.
- * When opened from a focus routine, completes the pro task instead of navigating.
  */
 export function BackButton({ 
   to, 
@@ -31,21 +29,13 @@ export function BackButton({
 }: BackButtonProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isProTaskActive, completeProTask } = useFocusPlayer();
   const from = (location.state as any)?.from;
-  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
 
   const handleClick = () => {
     haptic.light();
     
     if (onClick) {
       onClick();
-    }
-    
-    // If opened from focus routine, complete the pro task and return to player
-    if (fromFocusRoutine && isProTaskActive) {
-      completeProTask();
-      return;
     }
     
     if (from) {
@@ -87,7 +77,6 @@ interface BackButtonCircleProps {
 /**
  * Circular back button for overlay headers (e.g., over images).
  * Semi-transparent background with blur effect.
- * When opened from a focus routine, completes the pro task instead of navigating.
  */
 export function BackButtonCircle({ 
   to,
@@ -96,21 +85,13 @@ export function BackButtonCircle({
 }: BackButtonCircleProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isProTaskActive, completeProTask } = useFocusPlayer();
   const from = (location.state as any)?.from;
-  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
 
   const handleClick = () => {
     haptic.light();
     
     if (onClick) {
       onClick();
-    }
-    
-    // If opened from focus routine, complete the pro task and return to player
-    if (fromFocusRoutine && isProTaskActive) {
-      completeProTask();
-      return;
     }
     
     if (from) {

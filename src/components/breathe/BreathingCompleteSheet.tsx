@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
@@ -6,7 +6,6 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
-import { useProTaskRoutineReturn } from '@/hooks/useProTaskRoutineReturn';
 
 import journalImg from '@/assets/mood-card-journal.png';
 import reflectImg from '@/assets/mood-card-reflect.png';
@@ -50,7 +49,6 @@ export function BreathingCompleteSheet({
   durationSeconds,
 }: BreathingCompleteSheetProps) {
   const navigate = useNavigate();
-  const { shouldReturnToRoutine, returnToRoutinePlayer } = useProTaskRoutineReturn();
 
   useEffect(() => {
     if (open) {
@@ -71,46 +69,25 @@ export function BreathingCompleteSheet({
     return secs > 0 ? `${mins}m ${secs}s` : `${mins} min`;
   };
 
-  const handleAction = useCallback((route: string) => {
+  const handleAction = (route: string) => {
     haptic.medium();
     onOpenChange(false);
-
-    if (shouldReturnToRoutine) {
-      returnToRoutinePlayer();
-      return;
-    }
-
     navigate(route);
-  }, [onOpenChange, shouldReturnToRoutine, returnToRoutinePlayer, navigate]);
+  };
 
-  const handleDone = useCallback(() => {
+  const handleDone = () => {
     haptic.light();
     onOpenChange(false);
-
-    if (shouldReturnToRoutine) {
-      returnToRoutinePlayer();
-      return;
-    }
-
     navigate('/app/home');
-  }, [onOpenChange, shouldReturnToRoutine, returnToRoutinePlayer, navigate]);
-
-  const handleSheetOpenChange = useCallback((isOpen: boolean) => {
-    if (!isOpen) {
-      handleDone();
-      return;
-    }
-
-    onOpenChange(true);
-  }, [handleDone, onOpenChange]);
+  };
 
   return (
-    <Sheet open={open} onOpenChange={handleSheetOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
         className={cn(
-          'rounded-t-3xl border-0 px-5 pt-8 pb-6',
-          'bg-emerald-100'
+          "rounded-t-3xl border-0 px-5 pt-8 pb-6",
+          "bg-emerald-100"
         )}
         style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}
       >
@@ -134,9 +111,9 @@ export function BreathingCompleteSheet({
               key={action.label}
               onClick={() => handleAction(action.route)}
               className={cn(
-                'flex flex-col items-center rounded-2xl p-3 pt-4',
-                'bg-background/90 backdrop-blur-sm',
-                'active:scale-[0.96] transition-all',
+                "flex flex-col items-center rounded-2xl p-3 pt-4",
+                "bg-background/90 backdrop-blur-sm",
+                "active:scale-[0.96] transition-all",
               )}
             >
               <img

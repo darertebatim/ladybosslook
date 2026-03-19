@@ -1,6 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { useNavigate } from 'react-router-dom';
 import { X, Search, BookOpen, NotebookPen, CalendarPlus, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { JournalPromptMarquee } from '@/components/app/JournalPromptMarquee';
@@ -34,17 +33,7 @@ const calculateMonthlyPresence = (entries: any[]): number => {
 
 const AppJournal = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { isProTaskActive, completeProTask } = useFocusPlayer();
-  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
   const [searchQuery, setSearchQuery] = useState('');
-  const handleClose = () => {
-    if (fromFocusRoutine && isProTaskActive) {
-      completeProTask();
-      return;
-    }
-    navigate('/app/home');
-  };
   const [showSearch, setShowSearch] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
@@ -167,7 +156,7 @@ const AppJournal = () => {
           className="flex items-center justify-between px-4 pb-2"
           style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}
         >
-          <button onClick={handleClose} className="p-2 -ml-2">
+          <button onClick={() => navigate('/app/home')} className="p-2 -ml-2">
             <X className="h-5 w-5 text-foreground" />
           </button>
           <h1 className="text-lg font-semibold text-foreground">My Journal</h1>
@@ -188,7 +177,7 @@ const AppJournal = () => {
         className="flex items-center justify-between px-4 pb-2"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}
       >
-        <button onClick={handleClose} className="p-2 -ml-2">
+        <button onClick={() => navigate('/app/home')} className="p-2 -ml-2">
           <X className="h-5 w-5 text-foreground" />
         </button>
         <h1 className="text-lg font-semibold text-foreground">My Journal</h1>

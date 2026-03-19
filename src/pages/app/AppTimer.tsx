@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { useNavigate } from 'react-router-dom';
 import { X, ArrowLeft, ChevronRight, ChevronLeft, Settings, CalendarPlus, Check, AlertCircle, Music, Maximize, Bell, Coffee, Timer as TimerIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
@@ -40,9 +39,6 @@ const SYNTHETIC_TIMER_TASK: RoutinePlanTask = {
 
 export default function AppTimer() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { isProTaskActive, completeProTask } = useFocusPlayer();
-  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
   const [screen, setScreen] = useState<Screen>('setup');
   const [minutes, setMinutes] = useState(25);
   const [selectedTheme, setSelectedTheme] = useState('Focus');
@@ -325,10 +321,6 @@ export default function AppTimer() {
 
   const goBack = () => {
     haptic.light();
-    if (fromFocusRoutine && isProTaskActive) {
-      completeProTask();
-      return;
-    }
     navigate(-1);
   };
 

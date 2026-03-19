@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { Loader2, Trash2, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,8 +29,6 @@ import {
 const AppJournalEntry = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isProTaskActive, completeProTask } = useFocusPlayer();
-  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
   const { entryId } = useParams<{ entryId: string }>();
   const isNewEntry = !entryId || entryId === 'new';
   
@@ -170,12 +167,6 @@ const AppJournalEntry = () => {
     if (content.trim()) {
       await saveEntry();
       toast.success('Entry saved');
-    }
-    
-    // If opened from focus routine, complete the pro task and return to player
-    if (fromFocusRoutine && isProTaskActive) {
-      completeProTask();
-      return;
     }
     
     // Navigate back to journal list

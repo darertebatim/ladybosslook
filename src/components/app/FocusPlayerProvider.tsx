@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useFocusRoutinePlayer, type FocusRoutineConfig } from '@/hooks/useFocusRoutinePlayer';
 import { FocusRoutinePlayer } from '@/components/app/FocusRoutinePlayer';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
@@ -23,10 +23,6 @@ type FocusPlayerContextType = {
   togglePause: () => void;
   completeTask: () => void;
   openProTask: () => void;
-  /** True when the current task is a pro-linked task and user is inside the tool */
-  isProTaskActive: boolean;
-  /** Complete the pro task and return to the player / next task */
-  completeProTask: () => void;
 };
 
 const FocusPlayerContext = createContext<FocusPlayerContextType>({
@@ -41,8 +37,6 @@ const FocusPlayerContext = createContext<FocusPlayerContextType>({
   togglePause: () => {},
   completeTask: () => {},
   openProTask: () => {},
-  isProTaskActive: false,
-  completeProTask: () => {},
 });
 
 export const useFocusPlayer = () => useContext(FocusPlayerContext);
@@ -51,11 +45,6 @@ export function FocusPlayerProvider({ children }: { children: ReactNode }) {
   const player = useFocusRoutinePlayer();
   const [minimized, setMinimized] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-
-  // Track which task id we already auto-navigated to (prevent loops)
-  const autoNavTaskIdRef = useRef<string | null>(null);
-  const [proTaskActive, setProTaskActive] = useState(false);
 
   const handleMinimize = () => setMinimized(true);
   const handleMaximize = () => setMinimized(false);
@@ -65,66 +54,17 @@ export function FocusPlayerProvider({ children }: { children: ReactNode }) {
     if (!task?.proLinkType) return;
     const path = getProTaskNavigationPath(task.proLinkType as ProLinkType, task.proLinkValue || null);
     setMinimized(true);
-    setProTaskActive(true);
-    navigate(path, { state: { fromFocusRoutine: true } });
+    navigate(path);
   }, [player.currentTask, navigate]);
-
-  // Complete pro task: mark as done and move to next
-  const completeProTask = useCallback(() => {
-    setProTaskActive(false);
-    setMinimized(false);
-    player.completeTask();
-    // Navigate back to focus page so the player overlay is visible
-    navigate('/app/focus');
-  }, [player, navigate]);
-
-  // Auto-navigate to pro tool when a pro-linked task becomes current
-  useEffect(() => {
-    if (player.phase !== 'running') return;
-    const task = player.currentTask;
-    if (!task?.proLinkType) {
-      // Non-pro task: make sure player is visible
-      if (autoNavTaskIdRef.current) {
-        autoNavTaskIdRef.current = null;
-        setMinimized(false);
-        setProTaskActive(false);
-      }
-      return;
-    }
-    // Already navigated for this task
-    if (autoNavTaskIdRef.current === task.id) return;
-    autoNavTaskIdRef.current = task.id;
-
-    // Auto-navigate to the tool
-    const path = getProTaskNavigationPath(task.proLinkType as ProLinkType, task.proLinkValue || null);
-    setMinimized(true);
-    setProTaskActive(true);
-    // Small delay to let state settle
-    setTimeout(() => {
-      navigate(path, { state: { fromFocusRoutine: true } });
-    }, 100);
-  }, [player.phase, player.currentTask, navigate]);
-
-  // Reset auto-nav tracking when routine ends
-  useEffect(() => {
-    if (player.phase === 'idle' || player.phase === 'summary') {
-      autoNavTaskIdRef.current = null;
-      setProTaskActive(false);
-    }
-  }, [player.phase]);
 
   // Auto-expand on summary so user sees results
   const isActive = player.phase !== 'idle';
   const isSummary = player.phase === 'summary';
-  const showFullPlayer = isActive && player.config && (!minimized || isSummary) && !proTaskActive;
+  const showFullPlayer = isActive && player.config && (!minimized || isSummary);
 
   return (
     <FocusPlayerContext.Provider value={{
-      startRoutine: (cfg, resumeOpts) => {
-        setMinimized(false);
-        autoNavTaskIdRef.current = null;
-        player.startRoutine(cfg, resumeOpts);
-      },
+      startRoutine: (cfg, resumeOpts) => { setMinimized(false); player.startRoutine(cfg, resumeOpts); },
       isActive,
       isMinimized: isActive && minimized,
       maximize: handleMaximize,
@@ -135,8 +75,6 @@ export function FocusPlayerProvider({ children }: { children: ReactNode }) {
       togglePause: player.togglePause,
       completeTask: player.completeTask,
       openProTask,
-      isProTaskActive: proTaskActive,
-      completeProTask,
     }}>
       {children}
       {showFullPlayer && (

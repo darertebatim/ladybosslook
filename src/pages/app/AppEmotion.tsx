@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
-import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { EmotionDashboard } from '@/components/emotion/EmotionDashboard';
 import { EmotionSelector } from '@/components/emotion/EmotionSelector';
 import { EmotionContext } from '@/components/emotion/EmotionContext';
@@ -19,9 +18,6 @@ interface EmotionState {
 
 const AppEmotion = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { isProTaskActive, completeProTask } = useFocusPlayer();
-  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
   const [searchParams, setSearchParams] = useSearchParams();
   const { createLog } = useEmotionLogs();
   const { autoCompleteEmotion } = useAutoCompleteProTask();
@@ -64,33 +60,21 @@ const AppEmotion = () => {
   }, [state, createLog, autoCompleteEmotion]);
 
   const handleDone = useCallback(() => {
-    if (fromFocusRoutine && isProTaskActive) {
-      completeProTask();
-      return;
-    }
     navigate('/app/home');
-  }, [navigate, fromFocusRoutine, isProTaskActive, completeProTask]);
+  }, [navigate]);
 
   const handleBack = useCallback(() => {
     switch (step) {
       case 'select':
-        if (fromFocusRoutine && isProTaskActive) {
-          completeProTask();
-          return;
-        }
         setStep('dashboard');
         break;
       case 'context':
         setStep('select');
         break;
       default:
-        if (fromFocusRoutine && isProTaskActive) {
-          completeProTask();
-          return;
-        }
         navigate('/app/home');
     }
-  }, [step, navigate, fromFocusRoutine, isProTaskActive, completeProTask]);
+  }, [step, navigate]);
 
   const renderStep = () => {
     switch (step) {
