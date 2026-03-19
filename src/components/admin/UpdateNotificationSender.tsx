@@ -162,6 +162,82 @@ export function UpdateNotificationSender() {
     },
   });
 
+  // Fetch current popup status
+  const { data: currentPopup } = useQuery({
+    queryKey: ['app-update-popup-config'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('app_settings')
+        .select('value')
+        .eq('key', 'app_update_popup')
+        .maybeSingle();
+      if (!data?.value) return null;
+      try {
+        return JSON.parse(data.value);
+      } catch {
+        return null;
+      }
+    },
+  });
+
+  // Activate update popup mutation
+  const activatePopupMutation = useMutation({
+    mutationFn: async () => {
+      const config = {
+        id: crypto.randomUUID(),
+        title: popupTitle,
+        description: popupDescription,
+        buttonText: popupButtonText,
+        active: true,
+      };
+      
+      // Upsert into app_settings
+      const { data: existing } = await supabase
+        .from('app_settings')
+        .select('id')
+        .eq('key', 'app_update_popup')
+        .maybeSingle();
+
+      if (existing) {
+        const { error } = await supabase
+          .from('app_settings')
+          .update({ value: JSON.stringify(config) })
+          .eq('key', 'app_update_popup');
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('app_settings')
+          .insert({ key: 'app_update_popup', value: JSON.stringify(config), description: 'App update popup configuration' });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success('Update popup activated! Users will see it on next app open.');
+      queryClient.invalidateQueries({ queryKey: ['app-update-popup-config'] });
+    },
+    onError: (error: any) => {
+      toast.error('Failed: ' + error.message);
+    },
+  });
+
+  // Deactivate popup mutation
+  const deactivatePopupMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('app_settings')
+        .update({ value: JSON.stringify({ ...currentPopup, active: false }) })
+        .eq('key', 'app_update_popup');
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Update popup deactivated');
+      queryClient.invalidateQueries({ queryKey: ['app-update-popup-config'] });
+    },
+    onError: (error: any) => {
+      toast.error('Failed: ' + error.message);
+    },
+  });
+
   const totalDevices = versionStats?.reduce((sum, v) => sum + v.count, 0) || 0;
   const outdatedCount = versionStats
     ?.filter((v) => {
