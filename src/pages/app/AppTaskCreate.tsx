@@ -57,6 +57,7 @@ import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { TaskIcon } from '@/components/app/IconPicker';
 import { TimeWheelPicker } from '@/components/app/TimeWheelPicker';
 import { PRO_LINK_TYPES, ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
+import { ProLinkPicker } from '@/components/app/ProLinkPicker';
 import { GoalSettingsSheet, GoalSettings, formatGoalTarget } from '@/components/app/GoalSettingsSheet';
 import { TimePeriod, TIME_PERIODS, TimeMode, getTimeMode, formatTimeLabel, formatTimeRange, getTimePeriodConfig, normalizeTimePeriod } from '@/lib/taskScheduling';
 
@@ -1820,119 +1821,41 @@ const AppTaskCreate = ({
         </SheetContent>
       </Sheet>
 
-      {/* Pro Task Link Picker Sheet */}
-      <Sheet open={showProLinkPicker} onOpenChange={setShowProLinkPicker}>
-        <SheetContent side="bottom" className="h-[75vh] rounded-t-3xl">
-          <SheetHeader>
-            <SheetTitle>Pro Action Link</SheetTitle>
-          </SheetHeader>
-          <div className="p-4 space-y-3">
-            <p className="text-sm text-muted-foreground">
-              Make this a Pro Task that links directly to an app feature.
-            </p>
-            
-            {/* Clear option */}
-            {proLinkType && (
-              <button
-                onClick={() => {
-                  setProLinkType(null);
-                  setProLinkValue(null);
-                  setLinkedPlaylistId(null);
-                  setShowProLinkPicker(false);
-                }}
-                className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/10 text-destructive active:bg-destructive/20"
-              >
-                <XCircle className="h-5 w-5" />
-                <span>Remove Pro Action link</span>
-              </button>
-            )}
-
-            <ScrollArea className="h-[50vh]">
-              <div className="space-y-2 pr-4">
-                {/* Link type options */}
-                {PRO_LINK_TYPES.map((config) => {
-                  const Icon = config.icon;
-                  const isSelected = proLinkType === config.value;
-                  
-                  return (
-                    <button
-                      key={config.value}
-                      onClick={() => {
-                        setProLinkType(config.value);
-                        if (!config.requiresValue) {
-                          setProLinkValue(null);
-                          setShowProLinkPicker(false);
-                        } else if (config.value === 'playlist') {
-                          // Show playlist picker
-                          setShowProLinkPicker(false);
-                          setShowPlaylistPicker(true);
-                        } else if (config.value === 'breathe') {
-                          // Show breathing exercise picker
-                          setShowProLinkPicker(false);
-                          setShowBreathingPicker(true);
-                        } else if (config.value === 'reflection') {
-                          // Show reflection picker
-                          setShowProLinkPicker(false);
-                          setShowReflectionPicker(true);
-                        } else if (config.value === 'routine') {
-                          // Show routine picker
-                          setShowProLinkPicker(false);
-                          setShowRoutinePicker(true);
-                        }
-                      }}
-                      className={cn(
-                        'w-full flex items-center gap-3 p-4 rounded-xl active:bg-muted/80 text-left',
-                        isSelected && 'bg-violet-100 dark:bg-violet-900/30 ring-2 ring-violet-500'
-                      )}
-                    >
-                      <div className={cn(
-                        'w-10 h-10 rounded-xl flex items-center justify-center',
-                        config.gradientClass
-                      )}>
-                        <Icon className="h-5 w-5 text-foreground/80" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium">{config.label}</p>
-                        <p className="text-xs text-muted-foreground">{config.description}</p>
-                      </div>
-                      {isSelected && (
-                        <span className={cn(
-                          'px-2 py-1 rounded-full text-xs font-medium',
-                          `bg-${config.color}-500/20 text-${config.color}-700 dark:text-${config.color}-300`
-                        )}>
-                          {config.badgeText}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </ScrollArea>
-
-            {/* Value input for link types that need it */}
-            {proLinkType && ['channel', 'program', 'route'].includes(proLinkType) && (
-              <div className="pt-2 border-t space-y-2">
-                <Input
-                  value={proLinkValue || ''}
-                  onChange={(e) => setProLinkValue(e.target.value || null)}
-                  placeholder={
-                    proLinkType === 'channel' ? 'Channel slug (e.g., general)' :
-                    proLinkType === 'program' ? 'Program slug' :
-                    'Route path (e.g., /app/profile)'
-                  }
-                />
-                <Button
-                  onClick={() => setShowProLinkPicker(false)}
-                  className="w-full"
-                  disabled={!proLinkValue}
-                >
-                  Done
-                </Button>
-              </div>
-            )}
-          </div>
-        </SheetContent>
-      </Sheet>
+      {/* Pro Task Link Picker */}
+      <ProLinkPicker
+        open={showProLinkPicker}
+        onOpenChange={setShowProLinkPicker}
+        proLinkType={proLinkType as ProLinkType | null}
+        onSelect={(type) => {
+          setProLinkType(type);
+          if (!PRO_LINK_CONFIGS[type].requiresValue) {
+            setProLinkValue(null);
+            setShowProLinkPicker(false);
+          } else if (type === 'playlist') {
+            setShowProLinkPicker(false);
+            setShowPlaylistPicker(true);
+          } else if (type === 'breathe') {
+            setShowProLinkPicker(false);
+            setShowBreathingPicker(true);
+          } else if (type === 'reflection') {
+            setShowProLinkPicker(false);
+            setShowReflectionPicker(true);
+          } else if (type === 'routine') {
+            setShowProLinkPicker(false);
+            setShowRoutinePicker(true);
+          }
+          // channel, program, route handled by the picker's built-in value input
+        }}
+        onClear={() => {
+          setProLinkType(null);
+          setProLinkValue(null);
+          setLinkedPlaylistId(null);
+          setShowProLinkPicker(false);
+        }}
+        proLinkValue={proLinkValue}
+        onValueChange={(val) => setProLinkValue(val)}
+        onDone={() => setShowProLinkPicker(false)}
+      />
 
       {/* Playlist Picker Sheet (for Pro Task playlist selection) */}
       <Sheet open={showPlaylistPicker} onOpenChange={setShowPlaylistPicker}>
