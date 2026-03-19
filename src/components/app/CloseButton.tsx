@@ -40,8 +40,9 @@ export function CloseButton({
     haptic.light();
     onClick?.();
 
-    // If focus player is running & minimized, show the player instead of navigating away
+    // If focus player is running & minimized, navigate home then show the player
     if (focusPlayer?.isActive && focusPlayer?.isMinimized) {
+      navigate('/app/home');
       focusPlayer.maximize();
       return;
     }

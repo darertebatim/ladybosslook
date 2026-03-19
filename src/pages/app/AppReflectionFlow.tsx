@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { useBilingualText } from '@/components/ui/BilingualText';
 import { cn } from '@/lib/utils';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 
 export default function AppReflectionFlow() {
   const { reflectionId } = useParams<{ reflectionId: string }>();
@@ -14,6 +15,10 @@ export default function AppReflectionFlow() {
   const { data: pages, isLoading } = useReflectionPages(reflectionId);
   const saveResponse = useSaveReflectionResponse();
   const { autoCompleteReflection } = useAutoCompleteProTask();
+
+  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
+  try { focusPlayer = useFocusPlayer(); } catch { /* not available */ }
+  const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -61,9 +66,14 @@ export default function AppReflectionFlow() {
         toast.success('Reflection completed ✨');
         // Auto-complete any pro-linked tasks for this reflection
         if (reflectionId) {
-          autoCompleteReflection(reflectionId);
+          await autoCompleteReflection(reflectionId);
         }
-        navigate(-1);
+        if (hasActivePlayer) {
+          navigate('/app/home');
+          focusPlayer!.maximize();
+        } else {
+          navigate(-1);
+        }
       } else {
         setCurrentIndex((i) => i + 1);
       }

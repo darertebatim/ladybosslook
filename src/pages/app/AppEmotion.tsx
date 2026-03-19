@@ -6,6 +6,7 @@ import { EmotionContext } from '@/components/emotion/EmotionContext';
 import { EmotionComplete } from '@/components/emotion/EmotionComplete';
 import { useEmotionLogs } from '@/hooks/useEmotionLogs';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import type { Valence } from '@/lib/emotionData';
 
 type Step = 'dashboard' | 'select' | 'context' | 'complete';
@@ -21,6 +22,10 @@ const AppEmotion = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { createLog } = useEmotionLogs();
   const { autoCompleteEmotion } = useAutoCompleteProTask();
+
+  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
+  try { focusPlayer = useFocusPlayer(); } catch { /* not available */ }
+  const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
   
   const initialStep = searchParams.get('step') === 'select' ? 'select' : 'dashboard';
   const [step, setStep] = useState<Step>(initialStep);
@@ -60,8 +65,13 @@ const AppEmotion = () => {
   }, [state, createLog, autoCompleteEmotion]);
 
   const handleDone = useCallback(() => {
+    if (hasActivePlayer) {
+      navigate('/app/home');
+      focusPlayer!.maximize();
+      return;
+    }
     navigate('/app/home');
-  }, [navigate]);
+  }, [navigate, hasActivePlayer, focusPlayer]);
 
   const handleBack = useCallback(() => {
     switch (step) {
