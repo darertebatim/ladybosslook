@@ -27,6 +27,11 @@ export function UpdateNotificationSender() {
   const [bannerDescription, setBannerDescription] = useState('Tap to update to the latest version with new features!');
   const [bannerButtonText, setBannerButtonText] = useState('Update Now');
 
+  // Update popup form state
+  const [popupTitle, setPopupTitle] = useState('New Update Available! 🎉');
+  const [popupDescription, setPopupDescription] = useState('A new version is ready with exciting features and improvements. Update now for the best experience!');
+  const [popupButtonText, setPopupButtonText] = useState('Update Now');
+
   // Fetch version distribution from push_subscriptions
   const { data: versionStats, isLoading: loadingStats } = useQuery({
     queryKey: ['push-version-stats'],
