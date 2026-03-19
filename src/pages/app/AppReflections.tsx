@@ -30,6 +30,9 @@ const SYNTHETIC_REFLECTION_TASK: RoutinePlanTask = {
 
 export default function AppReflections() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isProTaskActive, completeProTask } = useFocusPlayer();
+  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
   const { data: reflections, isLoading } = useReflections();
   const { isSubscribed } = useSubscription();
 
