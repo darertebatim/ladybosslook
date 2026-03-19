@@ -179,6 +179,7 @@ const AppJournalEntry = () => {
     // If focus player is active, ensure task_completions is written before maximizing
     if (hasActivePlayer) {
       await autoCompleteJournal();
+      navigate('/app/home');
       focusPlayer!.maximize();
       return;
     }
