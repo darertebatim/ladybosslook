@@ -13,8 +13,9 @@ import { startOfDay, endOfDay, format } from 'date-fns';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { toast } from 'sonner';
 import { SortableTaskList } from '@/components/app/SortableTaskList';
-import { useTasksForDate, useCompletionsForDate, UserTask, useAddGoalProgress } from '@/hooks/useTaskPlanner';
+import { useTasksForDate, useCompletionsForDate, UserTask, useAddGoalProgress, useDeleteTask } from '@/hooks/useTaskPlanner';
 import { isWaterTask } from '@/lib/waterTracking';
+import { TaskDetailModal } from '@/components/app/TaskDetailModal';
 import {
   AlertDialog,
   AlertDialogAction,
