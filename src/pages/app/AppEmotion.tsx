@@ -22,6 +22,10 @@ const AppEmotion = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { createLog } = useEmotionLogs();
   const { autoCompleteEmotion } = useAutoCompleteProTask();
+
+  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
+  try { focusPlayer = useFocusPlayer(); } catch { /* not available */ }
+  const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
   
   const initialStep = searchParams.get('step') === 'select' ? 'select' : 'dashboard';
   const [step, setStep] = useState<Step>(initialStep);
