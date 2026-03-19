@@ -34,7 +34,17 @@ const calculateMonthlyPresence = (entries: any[]): number => {
 
 const AppJournal = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
+  const location = useLocation();
+  const { isProTaskActive, completeProTask } = useFocusPlayer();
+  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
+  
+  const handleClose = () => {
+    if (fromFocusRoutine && isProTaskActive) {
+      completeProTask();
+      return;
+    }
+    navigate('/app/home');
+  };
   const [showSearch, setShowSearch] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
