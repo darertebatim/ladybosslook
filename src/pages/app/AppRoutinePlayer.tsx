@@ -83,17 +83,17 @@ export default function AppRoutinePlayer() {
     enabled: !!user,
   });
 
-  // Fetch user_task IDs for all focus routines
+  // Fetch user_task IDs for all routines
   const { data: userTasksByRoutine } = useQuery({
-    queryKey: ['focus-user-task-ids', user?.id, focusRoutineIds],
+    queryKey: ['routine-user-task-ids', user?.id, routineIds],
     queryFn: async () => {
-      if (!user || focusRoutineIds.length === 0) return {};
+      if (!user || routineIds.length === 0) return {};
       const { data } = await supabase
         .from('user_tasks')
         .select('id, source_routine_id, title')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .in('source_routine_id', focusRoutineIds);
+        .in('source_routine_id', routineIds);
 
       const map: Record<string, string[]> = {};
       (data || []).forEach((t: any) => {
@@ -104,7 +104,7 @@ export default function AppRoutinePlayer() {
       });
       return map;
     },
-    enabled: !!user && focusRoutineIds.length > 0,
+    enabled: !!user && routineIds.length > 0,
   });
 
   // Fetch today's task_completions for all focus routine tasks
