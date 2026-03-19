@@ -256,7 +256,7 @@ export function ChatMessage({
 
   const handleLinkClick = () => {
     if (linkUrl) {
-      openExternalUrl(linkUrl);
+      handleOpenUrl(linkUrl);
     }
   };
 
