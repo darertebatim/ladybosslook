@@ -842,6 +842,8 @@ export default function AppTest() {
         </CardContent>
       </Card>
 
+      {/* App Update Banner */}
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Download className="h-5 w-5 text-green-500" />
