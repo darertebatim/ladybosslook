@@ -560,12 +560,12 @@ export default function AppRoutinePlayer() {
                         {/* Top row: schedule hints + action buttons top-right */}
                         <div className="flex items-center justify-between mb-1.5">
                           <div className="flex items-center gap-3">
-                            <span className="flex items-center gap-1 text-[11px] font-medium text-foreground/50">
+                            <span className="flex items-center gap-1 text-[11px] font-medium text-black/50">
                               <Bell className="w-3 h-3" />
                               {allTasks.length} tasks
                             </span>
                             {routine.category && (
-                              <span className="flex items-center gap-1 text-[11px] font-medium text-foreground/50">
+                              <span className="flex items-center gap-1 text-[11px] font-medium text-black/50">
                                 <Calendar className="w-3 h-3" />
                                 {routine.category}
                               </span>
@@ -575,22 +575,22 @@ export default function AppRoutinePlayer() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={(e) => { e.stopPropagation(); handleOpenAddSheet(routine); }}
-                              className="w-9 h-9 rounded-full bg-primary flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+                              className="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
                               title="Add to planner"
                             >
-                              <CalendarPlus className="w-4 h-4 text-primary-foreground" />
+                              <CalendarPlus className="w-4 h-4 text-white" />
                             </button>
                             <button
                               onClick={(e) => { e.stopPropagation(); setDeleteRoutine(routine); }}
                               className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center active:scale-95 transition-all"
                             >
-                              <Trash2 className="w-3.5 h-3.5 text-foreground/40" />
+                              <Trash2 className="w-3.5 h-3.5 text-black/40" />
                             </button>
                           </div>
                         </div>
 
                         {/* Title */}
-                        <h3 className="font-bold text-foreground text-[17px] leading-snug mb-3">
+                        <h3 className="font-bold text-black text-[17px] leading-snug mb-3">
                           {routine.title}
                         </h3>
 
@@ -604,14 +604,14 @@ export default function AppRoutinePlayer() {
                                   <FluentEmoji emoji={task.emoji} size={20} />
                                 </span>
                                 {i < visibleTasks.length - 1 && (
-                                  <ChevronRight className="w-3 h-3 text-foreground/20 mx-0.5" />
+                                  <ChevronRight className="w-3 h-3 text-black/20 mx-0.5" />
                                 )}
                               </span>
                             ))}
                             {overflowCount > 0 && (
                               <>
-                                <ChevronRight className="w-3 h-3 text-foreground/20 mx-0.5" />
-                                <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center text-xs font-semibold text-foreground/50">
+                                <ChevronRight className="w-3 h-3 text-black/20 mx-0.5" />
+                                <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center text-xs font-semibold text-black/50">
                                   +{overflowCount}
                                 </span>
                               </>
@@ -622,21 +622,21 @@ export default function AppRoutinePlayer() {
                           <button
                             onClick={(e) => { e.stopPropagation(); handlePlay(routine); }}
                             disabled={loadingRoutineId === routine.routine_id}
-                            className="flex items-center gap-1.5 h-9 px-4 rounded-full bg-foreground/10 active:scale-95 transition-transform shrink-0"
+                            className="flex items-center gap-1.5 h-9 px-4 rounded-full bg-black/10 active:scale-95 transition-transform shrink-0"
                           >
                             {loadingRoutineId === routine.routine_id ? (
-                              <Loader2 className="w-4 h-4 animate-spin text-foreground" />
+                              <Loader2 className="w-4 h-4 animate-spin text-black" />
                             ) : completion ? (
                               <>
                                 {completion.isComplete ? (
-                                  <RotateCw className="w-3.5 h-3.5 text-foreground" />
+                                  <RotateCw className="w-3.5 h-3.5 text-black" />
                                 ) : (
-                                  <Play className="w-3.5 h-3.5 text-foreground fill-foreground" />
+                                  <Play className="w-3.5 h-3.5 text-black fill-black" />
                                 )}
-                                <span className="text-xs font-bold text-foreground">{completion.pct}%</span>
+                                <span className="text-xs font-bold text-black">{completion.pct}%</span>
                               </>
                             ) : (
-                              <Play className="w-3.5 h-3.5 text-foreground fill-foreground" />
+                              <Play className="w-3.5 h-3.5 text-black fill-black" />
                             )}
                           </button>
                         </div>
