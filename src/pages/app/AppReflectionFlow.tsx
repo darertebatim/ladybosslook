@@ -66,9 +66,14 @@ export default function AppReflectionFlow() {
         toast.success('Reflection completed ✨');
         // Auto-complete any pro-linked tasks for this reflection
         if (reflectionId) {
-          autoCompleteReflection(reflectionId);
+          await autoCompleteReflection(reflectionId);
         }
-        navigate(-1);
+        if (hasActivePlayer) {
+          navigate('/app/home');
+          focusPlayer!.maximize();
+        } else {
+          navigate(-1);
+        }
       } else {
         setCurrentIndex((i) => i + 1);
       }
