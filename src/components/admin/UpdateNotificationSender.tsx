@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Loader2, Send, AlertTriangle, CheckCircle, Users, Megaphone, Bell, BellOff } from 'lucide-react';
+import { Loader2, Send, AlertTriangle, CheckCircle, Users, Megaphone, Bell, BellOff, Download, Sparkles } from 'lucide-react';
 
 interface VersionStats {
   version: string;
@@ -26,6 +26,11 @@ export function UpdateNotificationSender() {
   const [bannerTitle, setBannerTitle] = useState('🆕 Update Available');
   const [bannerDescription, setBannerDescription] = useState('Tap to update to the latest version with new features!');
   const [bannerButtonText, setBannerButtonText] = useState('Update Now');
+
+  // Update popup form state
+  const [popupTitle, setPopupTitle] = useState('New Update Available! 🎉');
+  const [popupDescription, setPopupDescription] = useState('A new version is ready with exciting features and improvements. Update now for the best experience!');
+  const [popupButtonText, setPopupButtonText] = useState('Update Now');
 
   // Fetch version distribution from push_subscriptions
   const { data: versionStats, isLoading: loadingStats } = useQuery({
@@ -140,7 +145,7 @@ export function UpdateNotificationSender() {
           title: bannerTitle,
           description: bannerDescription,
           button_text: bannerButtonText,
-          button_url: 'https://apps.apple.com/app/simora-ladybosslook/id6755076134',
+          button_url: 'https://apps.apple.com/app/routine-ladybosslook/id6755076134',
           is_active: true,
           priority: 100,
           icon: 'sparkles',
@@ -154,6 +159,82 @@ export function UpdateNotificationSender() {
     },
     onError: (error: any) => {
       toast.error('Failed to create banner: ' + error.message);
+    },
+  });
+
+  // Fetch current popup status
+  const { data: currentPopup } = useQuery({
+    queryKey: ['app-update-popup-config'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('app_settings')
+        .select('value')
+        .eq('key', 'app_update_popup')
+        .maybeSingle();
+      if (!data?.value) return null;
+      try {
+        return JSON.parse(data.value);
+      } catch {
+        return null;
+      }
+    },
+  });
+
+  // Activate update popup mutation
+  const activatePopupMutation = useMutation({
+    mutationFn: async () => {
+      const config = {
+        id: crypto.randomUUID(),
+        title: popupTitle,
+        description: popupDescription,
+        buttonText: popupButtonText,
+        active: true,
+      };
+      
+      // Upsert into app_settings
+      const { data: existing } = await supabase
+        .from('app_settings')
+        .select('id')
+        .eq('key', 'app_update_popup')
+        .maybeSingle();
+
+      if (existing) {
+        const { error } = await supabase
+          .from('app_settings')
+          .update({ value: JSON.stringify(config) })
+          .eq('key', 'app_update_popup');
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('app_settings')
+          .insert({ key: 'app_update_popup', value: JSON.stringify(config), description: 'App update popup configuration' });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success('Update popup activated! Users will see it on next app open.');
+      queryClient.invalidateQueries({ queryKey: ['app-update-popup-config'] });
+    },
+    onError: (error: any) => {
+      toast.error('Failed: ' + error.message);
+    },
+  });
+
+  // Deactivate popup mutation
+  const deactivatePopupMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('app_settings')
+        .update({ value: JSON.stringify({ ...currentPopup, active: false }) })
+        .eq('key', 'app_update_popup');
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Update popup deactivated');
+      queryClient.invalidateQueries({ queryKey: ['app-update-popup-config'] });
+    },
+    onError: (error: any) => {
+      toast.error('Failed: ' + error.message);
     },
   });
 
@@ -346,6 +427,63 @@ export function UpdateNotificationSender() {
             <Megaphone className="h-4 w-4 mr-2" />
             Create Update Banner
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Update Popup Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Download className="h-5 w-5" />
+            App Update Popup
+            {currentPopup?.active && (
+              <Badge variant="default" className="ml-2">Active</Badge>
+            )}
+          </CardTitle>
+          <CardDescription>
+            A centered popup shown to all users on app open — links to App Store
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Popup Title</Label>
+            <Input value={popupTitle} onChange={(e) => setPopupTitle(e.target.value)} />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Popup Description</Label>
+            <Textarea value={popupDescription} onChange={(e) => setPopupDescription(e.target.value)} rows={2} />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Button Text</Label>
+            <Input value={popupButtonText} onChange={(e) => setPopupButtonText(e.target.value)} />
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            Links to: apps.apple.com/app/routine-ladybosslook/id6755076134
+          </p>
+
+          <div className="flex gap-2">
+            <Button
+              onClick={() => activatePopupMutation.mutate()}
+              disabled={activatePopupMutation.isPending || !popupTitle}
+              className="flex-1"
+            >
+              {activatePopupMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              <Sparkles className="h-4 w-4 mr-2" />
+              {currentPopup?.active ? 'Update & Reactivate' : 'Activate Popup'}
+            </Button>
+            {currentPopup?.active && (
+              <Button
+                variant="outline"
+                onClick={() => deactivatePopupMutation.mutate()}
+                disabled={deactivatePopupMutation.isPending}
+              >
+                Deactivate
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
