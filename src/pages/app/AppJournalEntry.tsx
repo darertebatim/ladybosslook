@@ -174,7 +174,13 @@ const AppJournalEntry = () => {
       toast.success('Entry saved');
     }
     
-    // Navigate back to journal list
+    // If focus player is active, maximize it (auto-sync will detect completion)
+    if (hasActivePlayer) {
+      focusPlayer!.maximize();
+      return;
+    }
+    
+    // Otherwise navigate back to journal list
     navigate('/app/journal');
   };
 
