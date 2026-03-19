@@ -67,10 +67,7 @@ export function RoutineCountdown({ routineEmoji, routineTitle, onComplete }: Rou
             initial={{ scale: 0.3, opacity: 0, rotate: -15 }}
             animate={{ scale: 1, opacity: 1, rotate: 0 }}
             exit={{ scale: 2.5, opacity: 0 }}
-            transition={{
-              enter: { type: 'spring', stiffness: 300, damping: 15 },
-              exit: { duration: 0.3, ease: 'easeIn' },
-            }}
+            transition={{ type: 'spring', stiffness: 300, damping: 15 }}
             className="relative flex items-center justify-center"
           >
             {current.value === '🚀' ? (
