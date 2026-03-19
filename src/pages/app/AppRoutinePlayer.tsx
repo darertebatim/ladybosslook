@@ -560,12 +560,12 @@ export default function AppRoutinePlayer() {
                         {/* Top row: schedule hints + action buttons top-right */}
                         <div className="flex items-center justify-between mb-1.5">
                           <div className="flex items-center gap-3">
-                            <span className="flex items-center gap-1 text-[11px] font-medium text-black/50">
+                            <span className="flex items-center gap-1 text-[11px] font-semibold text-black">
                               <Bell className="w-3 h-3" />
                               {allTasks.length} tasks
                             </span>
                             {routine.category && (
-                              <span className="flex items-center gap-1 text-[11px] font-medium text-black/50">
+                              <span className="flex items-center gap-1 text-[11px] font-semibold text-black">
                                 <Calendar className="w-3 h-3" />
                                 {routine.category}
                               </span>
@@ -604,14 +604,14 @@ export default function AppRoutinePlayer() {
                                   <FluentEmoji emoji={task.emoji} size={20} />
                                 </span>
                                 {i < visibleTasks.length - 1 && (
-                                  <ChevronRight className="w-3 h-3 text-black/20 mx-0.5" />
+                                  <ChevronRight className="w-3 h-3 text-black mx-0.5" />
                                 )}
                               </span>
                             ))}
                             {overflowCount > 0 && (
                               <>
-                                <ChevronRight className="w-3 h-3 text-black/20 mx-0.5" />
-                                <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center text-xs font-semibold text-black/50">
+                                <ChevronRight className="w-3 h-3 text-black mx-0.5" />
+                                <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center text-xs font-bold text-black">
                                   +{overflowCount}
                                 </span>
                               </>
