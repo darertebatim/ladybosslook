@@ -42,10 +42,10 @@ const RoutinePlayerContext = createContext<RoutinePlayerContextType>({
   openProTask: () => {},
 });
 
-export const useFocusPlayer = () => useContext(FocusPlayerContext);
+export const useRoutinePlayerContext = () => useContext(RoutinePlayerContext);
 
-export function FocusPlayerProvider({ children }: { children: ReactNode }) {
-  const player = useFocusRoutinePlayer();
+export function RoutinePlayerProvider({ children }: { children: ReactNode }) {
+  const player = useRoutinePlayer();
   const { user } = useAuth();
   const [minimized, setMinimized] = useState(false);
   const navigate = useNavigate();
