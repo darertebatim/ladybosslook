@@ -6,6 +6,22 @@ import { useQueryClient } from '@tanstack/react-query';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
+
+// Secondary (darker) palette matching task card colors
+const TASK_COLORS_SECONDARY: Record<string, string> = {
+  pink: '#FFC2EA',
+  peach: '#FFD2A1',
+  yellow: '#FFEA4E',
+  lime: '#C3F1E1',
+  sky: '#B9D6FF',
+  mint: '#C9F588',
+  lavender: '#DEC1FF',
+  purple: '#DEC1FF',
+  blue: '#B9D6FF',
+  red: '#FFC2EA',
+  orange: '#FFD2A1',
+  green: '#C3F1E1',
+};
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -630,7 +646,8 @@ export default function AppRoutinePlayer() {
                           <button
                             onClick={(e) => { e.stopPropagation(); handlePlay(routine); }}
                             disabled={loadingRoutineId === routine.routine_id}
-                            className="flex items-center justify-center gap-2 h-12 min-w-[48px] px-5 rounded-full bg-secondary active:scale-95 transition-transform shrink-0"
+                            className="flex items-center justify-center gap-2 h-12 min-w-[48px] px-5 rounded-full active:scale-95 transition-transform shrink-0"
+                            style={{ backgroundColor: TASK_COLORS_SECONDARY[(routine.color as string) || 'peach'] || TASK_COLORS_SECONDARY.peach }}
                           >
                             {loadingRoutineId === routine.routine_id ? (
                               <Loader2 className="w-5 h-5 animate-spin text-black" />
