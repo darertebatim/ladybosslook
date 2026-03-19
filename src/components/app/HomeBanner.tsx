@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { X, Play, Megaphone, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { smartOpenUrl } from '@/lib/navigation-utils';
 import { detectVideoType, extractYouTubeId } from '@/lib/videoUtils';
 import { BUILD_INFO } from '@/lib/buildInfo';
 import { AppVideoPlayer } from '@/components/app/AppVideoPlayer';
