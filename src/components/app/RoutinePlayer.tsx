@@ -767,7 +767,7 @@ export const FocusRoutinePlayer = memo(function FocusRoutinePlayer({
               disabled={!newTaskTitle.trim()}
               onClick={() => {
                 haptic.medium();
-                const newTask: FocusTask = {
+                const newTask: RoutineTask = {
                   id: `quick-${Date.now()}`,
                   title: newTaskTitle.trim(),
                   emoji: '⚡',
