@@ -471,7 +471,21 @@ const AppHome = () => {
   // Fetch badge data for expanded month calendar
   const { data: monthBadgeData } = useDateRangeTaskCompletion(dateRange.start, dateRange.end);
 
-  // Filter tasks by tag and exclude skipped tasks, merge carry-forward tasks for today
+  // Build routine name map from tasks' source_routine_id
+  const routineNamesInTasks = useMemo(() => {
+    const map = new Map<string, string>();
+    tasks.forEach(task => {
+      if (task.source_routine_id && task.tag) {
+        // Use tag as a fallback routine grouping label
+        if (!map.has(task.source_routine_id)) {
+          map.set(task.source_routine_id, categoryNameMap.get(task.tag) || task.tag);
+        }
+      }
+    });
+    return map;
+  }, [tasks, categoryNameMap]);
+
+  // Filter tasks by the selected filter and exclude skipped tasks
   const filteredTasks = useMemo(() => {
     let result = tasks.filter(task => !skippedTaskIds.has(task.id));
     
@@ -482,11 +496,19 @@ const AppHome = () => {
       result = [...result, ...newCarryForward];
     }
     
-    if (selectedTag) {
-      result = result.filter(task => task.tag === selectedTag);
+    if (taskFilter === 'all') return result;
+    if (taskFilter === 'one-time') return result.filter(t => t.repeat_pattern === 'none');
+    if (taskFilter === 'unlinked') return result.filter(t => !t.source_routine_id);
+    if (taskFilter.startsWith('routine:')) {
+      const routineId = taskFilter.replace('routine:', '');
+      return result.filter(t => t.source_routine_id === routineId);
+    }
+    if (taskFilter.startsWith('cat:')) {
+      const tag = taskFilter.replace('cat:', '');
+      return result.filter(t => t.tag === tag);
     }
     return result;
-  }, [tasks, selectedTag, skippedTaskIds, selectedDate, carryForwardTasks]);
+  }, [tasks, taskFilter, skippedTaskIds, selectedDate, carryForwardTasks]);
 
   // Get unique tags from tasks
   const taskTags = useMemo(() => {
@@ -497,12 +519,17 @@ const AppHome = () => {
     return Array.from(tags);
   }, [tasks]);
 
-  // Auto-reset tag filter when the selected tag no longer has any tasks
+  // Auto-reset filter when the filter target no longer exists
   useEffect(() => {
-    if (selectedTag && !taskTags.includes(selectedTag)) {
-      setSelectedTag(null);
+    if (taskFilter === 'all' || taskFilter === 'one-time' || taskFilter === 'unlinked') return;
+    if (taskFilter.startsWith('routine:')) {
+      const rid = taskFilter.replace('routine:', '');
+      if (!routineNamesInTasks.has(rid)) setTaskFilter('all');
+    } else if (taskFilter.startsWith('cat:')) {
+      const tag = taskFilter.replace('cat:', '');
+      if (!taskTags.includes(tag)) setTaskFilter('all');
     }
-  }, [selectedTag, taskTags]);
+  }, [taskFilter, taskTags, routineNamesInTasks]);
 
   // Completed task IDs for this date
   const completedTaskIds = useMemo(() => {
