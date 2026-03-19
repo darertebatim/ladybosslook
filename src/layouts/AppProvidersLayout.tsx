@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { AudioPlayerProvider } from '@/contexts/AudioPlayerContext';
-import { FocusPlayerProvider } from '@/components/app/FocusPlayerProvider';
+import { RoutinePlayerProvider } from '@/components/app/RoutinePlayerProvider';
 
 /**
  * Wraps ALL /app/* routes with AudioPlayer and FocusPlayer providers.

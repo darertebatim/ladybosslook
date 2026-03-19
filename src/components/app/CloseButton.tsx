@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
-import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 
 interface CloseButtonProps {
   /** Explicit destination. If not provided, checks location.state.from, then falls back to /app/home */

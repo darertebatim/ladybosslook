@@ -1,7 +1,7 @@
 import { Pause, Play, Check, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { haptic } from '@/lib/haptics';
 import { TASK_COLORS, type TaskColor } from '@/hooks/useTaskPlanner';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';

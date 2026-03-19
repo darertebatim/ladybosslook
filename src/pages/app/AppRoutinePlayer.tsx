@@ -235,7 +235,7 @@ export default function AppFocusRoutines() {
         .eq('session_id', incompleteSession.id)
         .order('task_order', { ascending: true });
 
-      const prevResults: import('@/components/app/FocusRoutineSummary').SessionTaskResult[] = 
+      const prevResults: import('@/components/app/RoutinePlayerSummary').SessionTaskResult[] = 
         (completedTasks || []).map(ct => ({
           title: ct.task_title,
           emoji: ct.task_emoji,

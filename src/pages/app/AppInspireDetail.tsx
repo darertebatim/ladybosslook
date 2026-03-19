@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 import { useShareContent } from '@/hooks/useShareContent';
 import { cn } from '@/lib/utils';
 import { TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
-import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
+import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { haptic } from '@/lib/haptics';
 
 const colorGradients: Record<string, string> = {
