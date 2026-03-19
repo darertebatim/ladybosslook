@@ -29,6 +29,7 @@ import {
 
 export default function AppRoutinePlayer() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const { startRoutine, isActive } = useRoutinePlayerContext();
   const [showRestartDialog, setShowRestartDialog] = useState(false);
