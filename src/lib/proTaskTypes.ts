@@ -344,6 +344,8 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return linkValue ? `/app/reflections/${linkValue}` : '/app/reflections';
     case 'focus_timer':
       return '/app/timer';
+    case 'routine':
+      return linkValue ? `/app/routineplayer?routine=${linkValue}` : '/app/routineplayer';
     default:
       return '/app/home';
   }
