@@ -40,6 +40,10 @@ export default function AppRoutinePlayer() {
   const [showRestartDialog, setShowRestartDialog] = useState(false);
   const [deleteRoutine, setDeleteRoutine] = useState<any | null>(null);
   const queryClient = useQueryClient();
+  const [showPageRoutineSheet, setShowPageRoutineSheet] = useState(false);
+
+  // Check if routine player page is already added as a task
+  const { data: isPageAdded } = useExistingProTask('route', '/app/routineplayer');
 
   // Fetch ALL user routines from user_routines_bank (user-owned copies)
   const { data: myRoutines, isLoading } = useQuery({
