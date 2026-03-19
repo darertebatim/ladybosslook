@@ -7,7 +7,7 @@ import { updatePresence } from '@/hooks/useUserPresence';
 import { updateStreak } from '@/hooks/useTaskPlanner';
 import type { SessionTaskResult } from '@/components/app/RoutinePlayerSummary';
 
-export interface FocusTask {
+export interface RoutineTask {
   id: string;
   title: string;
   emoji: string;
