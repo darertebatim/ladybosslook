@@ -225,6 +225,57 @@ export default function AppRoutinePlayer() {
     setDeleteRoutine(null);
   };
 
+  // Add routine as a task to the planner
+  const handleAddToPlanner = async (routine: any) => {
+    if (!user) return;
+    try {
+      // Check if already exists
+      const { data: existing } = await supabase
+        .from('user_tasks')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('pro_link_type', 'routine')
+        .eq('pro_link_value', routine.routine_id)
+        .eq('is_active', true)
+        .limit(1);
+
+      if (existing && existing.length > 0) {
+        toast('Already in your planner', { description: routine.title });
+        return;
+      }
+
+      // Get next order_index
+      const { data: tasks } = await supabase
+        .from('user_tasks')
+        .select('order_index')
+        .eq('user_id', user.id)
+        .order('order_index', { ascending: false })
+        .limit(1);
+
+      const nextOrder = (tasks?.[0]?.order_index ?? -1) + 1;
+
+      await supabase.from('user_tasks').insert({
+        user_id: user.id,
+        title: routine.title,
+        emoji: routine.emoji || '✨',
+        color: routine.color || 'amber',
+        repeat_pattern: 'daily',
+        pro_link_type: 'routine',
+        pro_link_value: routine.routine_id,
+        is_active: true,
+        order_index: nextOrder,
+        tag: 'pro',
+      });
+
+      haptic.success();
+      toast.success('Added to your planner! 📋');
+      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+    } catch (err) {
+      toast.error('Failed to add to planner');
+    }
+  };
+
   // Planner hooks for the pre-start overlay (uses today's date)
   const today = useMemo(() => new Date(), []);
   const { data: plannerTasks = [] } = useTasksForDate(today);
