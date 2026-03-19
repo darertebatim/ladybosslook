@@ -24,7 +24,18 @@ import {
   Crown,
   Shield,
   RefreshCw,
+  MessageCircle,
 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from '@/components/ui/alert-dialog';
 
 // Import all testable components
 import { StreakCelebration } from '@/components/app/StreakCelebration';
