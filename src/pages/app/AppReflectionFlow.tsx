@@ -16,9 +16,9 @@ export default function AppReflectionFlow() {
   const saveResponse = useSaveReflectionResponse();
   const { autoCompleteReflection } = useAutoCompleteProTask();
 
-  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
-  try { focusPlayer = useRoutinePlayerContext(); } catch { /* not available */ }
-  const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
+  let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
+  try { routinePlayer = useRoutinePlayerContext(); } catch { /* not available */ }
+  const hasActivePlayer = routinePlayer?.isActive && routinePlayer?.isMinimized;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -70,7 +70,7 @@ export default function AppReflectionFlow() {
         }
         if (hasActivePlayer) {
           navigate('/app/home');
-          focusPlayer!.maximize();
+          routinePlayer!.maximize();
         } else {
           navigate(-1);
         }

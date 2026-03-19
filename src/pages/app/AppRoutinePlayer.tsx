@@ -16,13 +16,13 @@ import { SortableTaskList } from '@/components/app/SortableTaskList';
 import { useTasksForDate, useCompletionsForDate, UserTask, useAddGoalProgress } from '@/hooks/useTaskPlanner';
 import { isWaterTask } from '@/lib/waterTracking';
 
-export default function AppFocusRoutines() {
+export default function AppRoutinePlayer() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { startRoutine, isActive } = useRoutinePlayerContext();
 
   // Fetch ALL user routines from user_routines_bank (user-owned copies)
-  const { data: myFocusRoutines, isLoading } = useQuery({
+  const { data: myRoutines, isLoading } = useQuery({
     queryKey: ['user-routines-all', user?.id],
     queryFn: async () => {
       if (!user) return [];
@@ -38,20 +38,20 @@ export default function AppFocusRoutines() {
   });
 
   // Fetch user_tasks grouped by source_routine_id for emoji chains
-  const focusRoutineIds = useMemo(() => {
-    return (myFocusRoutines || []).map((r: any) => r.routine_id);
-  }, [myFocusRoutines]);
+  const routineIds = useMemo(() => {
+    return (myRoutines || []).map((r: any) => r.routine_id);
+  }, [myRoutines]);
 
   const { data: routineTasksMap } = useQuery({
-    queryKey: ['focus-user-tasks-emojis', user?.id, focusRoutineIds],
+    queryKey: ['routine-user-tasks-emojis', user?.id, routineIds],
     queryFn: async () => {
-      if (!user || focusRoutineIds.length === 0) return {};
+      if (!user || routineIds.length === 0) return {};
       const { data } = await supabase
         .from('user_tasks')
         .select('source_routine_id, title, emoji, order_index')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .in('source_routine_id', focusRoutineIds)
+        .in('source_routine_id', routineIds)
         .order('order_index', { ascending: true });
 
       const map: Record<string, { title: string; emoji: string }[]> = {};
@@ -63,7 +63,7 @@ export default function AppFocusRoutines() {
       });
       return map;
     },
-    enabled: !!user && focusRoutineIds.length > 0,
+    enabled: !!user && routineIds.length > 0,
   });
 
   // Fetch today's session data (for resume logic only)
@@ -83,17 +83,17 @@ export default function AppFocusRoutines() {
     enabled: !!user,
   });
 
-  // Fetch user_task IDs for all focus routines
+  // Fetch user_task IDs for all routines
   const { data: userTasksByRoutine } = useQuery({
-    queryKey: ['focus-user-task-ids', user?.id, focusRoutineIds],
+    queryKey: ['routine-user-task-ids', user?.id, routineIds],
     queryFn: async () => {
-      if (!user || focusRoutineIds.length === 0) return {};
+      if (!user || routineIds.length === 0) return {};
       const { data } = await supabase
         .from('user_tasks')
         .select('id, source_routine_id, title')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .in('source_routine_id', focusRoutineIds);
+        .in('source_routine_id', routineIds);
 
       const map: Record<string, string[]> = {};
       (data || []).forEach((t: any) => {
@@ -104,7 +104,7 @@ export default function AppFocusRoutines() {
       });
       return map;
     },
-    enabled: !!user && focusRoutineIds.length > 0,
+    enabled: !!user && routineIds.length > 0,
   });
 
   // Fetch today's task_completions for all focus routine tasks
@@ -323,7 +323,7 @@ export default function AppFocusRoutines() {
           <div className="space-y-6 mt-4">
             {/* Activated routines */}
             {(() => {
-              const activeRoutines = (myFocusRoutines || []).filter((r: any) => {
+              const activeRoutines = (myRoutines || []).filter((r: any) => {
                 const tasks = routineTasksMap?.[r.routine_id] || [];
                 return tasks.length > 0;
               });
@@ -404,7 +404,7 @@ export default function AppFocusRoutines() {
             })()}
 
             {/* Empty state */}
-            {(myFocusRoutines || []).filter((r: any) => (routineTasksMap?.[r.routine_id] || []).length > 0).length === 0 && (
+            {(myRoutines || []).filter((r: any) => (routineTasksMap?.[r.routine_id] || []).length > 0).length === 0 && (
               <div className="text-center py-12">
                 <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
                 <h3 className="font-semibold text-foreground mb-1">No routines yet</h3>

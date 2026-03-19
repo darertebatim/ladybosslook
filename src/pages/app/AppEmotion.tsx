@@ -23,9 +23,9 @@ const AppEmotion = () => {
   const { createLog } = useEmotionLogs();
   const { autoCompleteEmotion } = useAutoCompleteProTask();
 
-  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
-  try { focusPlayer = useRoutinePlayerContext(); } catch { /* not available */ }
-  const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
+  let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
+  try { routinePlayer = useRoutinePlayerContext(); } catch { /* not available */ }
+  const hasActivePlayer = routinePlayer?.isActive && routinePlayer?.isMinimized;
   
   const initialStep = searchParams.get('step') === 'select' ? 'select' : 'dashboard';
   const [step, setStep] = useState<Step>(initialStep);
@@ -67,11 +67,11 @@ const AppEmotion = () => {
   const handleDone = useCallback(() => {
     if (hasActivePlayer) {
       navigate('/app/home');
-      focusPlayer!.maximize();
+      routinePlayer!.maximize();
       return;
     }
     navigate('/app/home');
-  }, [navigate, hasActivePlayer, focusPlayer]);
+  }, [navigate, hasActivePlayer, routinePlayer]);
 
   const handleBack = useCallback(() => {
     switch (step) {

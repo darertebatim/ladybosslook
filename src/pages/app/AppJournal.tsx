@@ -34,16 +34,16 @@ const calculateMonthlyPresence = (entries: any[]): number => {
 
 const AppJournal = () => {
   const navigate = useNavigate();
-  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
-  try { focusPlayer = useRoutinePlayerContext(); } catch { /* not available */ }
+  let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
+  try { routinePlayer = useRoutinePlayerContext(); } catch { /* not available */ }
 
   const goHome = useCallback(() => {
-    if (focusPlayer?.isActive && focusPlayer?.isMinimized) {
-      focusPlayer.maximize();
+    if (routinePlayer?.isActive && routinePlayer?.isMinimized) {
+      routinePlayer.maximize();
       return;
     }
     navigate('/app/home');
-  }, [focusPlayer, navigate]);
+  }, [routinePlayer, navigate]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
