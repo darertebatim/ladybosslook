@@ -34,6 +34,8 @@ export default function AppRoutinePlayer() {
   const { user } = useAuth();
   const { startRoutine, isActive } = useRoutinePlayerContext();
   const [showRestartDialog, setShowRestartDialog] = useState(false);
+  const [deleteRoutine, setDeleteRoutine] = useState<any | null>(null);
+  const queryClient = useQueryClient();
 
   // Fetch ALL user routines from user_routines_bank (user-owned copies)
   const { data: myRoutines, isLoading } = useQuery({
