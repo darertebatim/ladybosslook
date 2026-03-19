@@ -34,7 +34,7 @@ export function BackButton({
   const from = (location.state as any)?.from;
 
   let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
-  try { focusPlayer = useFocusPlayer(); } catch { /* provider not available */ }
+  try { focusPlayer = useRoutinePlayerContext(); } catch { /* provider not available */ }
 
   const handleClick = () => {
     haptic.light();
