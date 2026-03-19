@@ -1,5 +1,4 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
-
 import { cn } from '@/lib/utils';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2, CalendarPlus, Bell, Calendar } from 'lucide-react';
@@ -9,7 +8,7 @@ import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { haptic } from '@/lib/haptics';
 import { startOfDay, endOfDay, format } from 'date-fns';
@@ -23,6 +22,26 @@ import { isWaterTask } from '@/lib/waterTracking';
 import { TaskDetailModal } from '@/components/app/TaskDetailModal';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
+import {
+  DndContext,
+  closestCenter,
+  MouseSensor,
+  TouchSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import {
   AlertDialog,
   AlertDialogAction,
