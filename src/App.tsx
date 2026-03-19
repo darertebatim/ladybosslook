@@ -326,7 +326,7 @@ const RitualRedirect = () => {
 // Redirect component for old /app/course/:slug routes
 const CourseRedirect = () => {
   const { slug, roundId } = useParams();
-  return <Navigate to={`/app/programs/${slug}${roundId ? `/${roundId}` : ''}`} replace />;
+  return <Navigate to={`/app/myprograms/${slug}${roundId ? `/${roundId}` : ''}`} replace />;
 };
 
 // Clear old cache key to prevent crash on app update
