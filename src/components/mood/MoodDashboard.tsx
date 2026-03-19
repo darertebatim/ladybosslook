@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ChartColumn, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -11,6 +11,7 @@ import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreview
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { MoodCelebrationSheet } from './MoodCelebrationSheet';
 import { MoodRoutinePromptSheet } from './MoodRoutinePromptSheet';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -73,6 +74,9 @@ const SYNTHETIC_MOOD_TASK: RoutinePlanTask = {
 
 export function MoodDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isProTaskActive, completeProTask } = useFocusPlayer();
+  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
   const { autoCompleteMood } = useAutoCompleteProTask();
   const { data: todayMood } = useTodayMood();
   const createMoodLog = useCreateMoodLog();
@@ -113,8 +117,15 @@ export function MoodDashboard() {
       await autoCompleteMood();
       
       haptic.success();
+
+      // In focus routine mode, immediately complete and return to player
+      if (fromFocusRoutine && isProTaskActive) {
+        completeProTask();
+        setIsSubmitting(false);
+        return;
+      }
       
-      // Always show celebration first
+      // Default flow outside focus routine: show celebration
       setShowCelebration(true);
       setIsSubmitting(false);
     } catch (error) {
@@ -122,21 +133,31 @@ export function MoodDashboard() {
       toast.error('Failed to log mood');
       setIsSubmitting(false);
     }
-  }, [selectedMood, autoCompleteMood, createMoodLog]);
+  }, [selectedMood, autoCompleteMood, createMoodLog, fromFocusRoutine, isProTaskActive, completeProTask]);
 
   const handleCelebrationDone = useCallback(() => {
+    if (fromFocusRoutine && isProTaskActive) {
+      completeProTask();
+      return;
+    }
     navigate('/app/home');
-  }, [navigate]);
+  }, [navigate, fromFocusRoutine, isProTaskActive, completeProTask]);
 
   // Intercept action clicks from celebration to show routine prompt
   const handleCelebrationAction = useCallback((route: string): boolean => {
+    // In focus routine mode, always complete task and return to player
+    if (fromFocusRoutine && isProTaskActive) {
+      completeProTask();
+      return true;
+    }
+
     if (!isAdded && !neverPrompt) {
       setPendingRoute(route);
       setShowRoutinePrompt(true);
       return true; // intercept
     }
     return false; // let celebration handle navigation
-  }, [isAdded, neverPrompt]);
+  }, [isAdded, neverPrompt, fromFocusRoutine, isProTaskActive, completeProTask]);
 
   const handleRoutinePromptAdd = useCallback(() => {
     setShowRoutinePrompt(false);
@@ -163,6 +184,10 @@ export function MoodDashboard() {
   const handleRoutineClick = () => {
     haptic.light();
     if (isAdded) {
+      if (fromFocusRoutine && isProTaskActive) {
+        completeProTask();
+        return;
+      }
       navigate('/app/home');
     } else {
       setShowRoutineSheet(true);
