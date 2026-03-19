@@ -28,7 +28,7 @@ type RoutinePlayerContextType = {
   openProTask: () => void;
 };
 
-const FocusPlayerContext = createContext<FocusPlayerContextType>({
+const RoutinePlayerContext = createContext<RoutinePlayerContextType>({
   startRoutine: () => {},
   isActive: false,
   isMinimized: false,
