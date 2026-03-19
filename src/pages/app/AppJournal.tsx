@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { X, Search, BookOpen, NotebookPen, CalendarPlus, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { JournalPromptMarquee } from '@/components/app/JournalPromptMarquee';
@@ -33,6 +34,17 @@ const calculateMonthlyPresence = (entries: any[]): number => {
 
 const AppJournal = () => {
   const navigate = useNavigate();
+  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
+  try { focusPlayer = useFocusPlayer(); } catch { /* not available */ }
+
+  const goHome = useCallback(() => {
+    if (focusPlayer?.isActive && focusPlayer?.isMinimized) {
+      focusPlayer.maximize();
+      return;
+    }
+    navigate('/app/home');
+  }, [focusPlayer, navigate]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [showStats, setShowStats] = useState(false);
@@ -67,7 +79,7 @@ const AppJournal = () => {
   const handleRoutineClick = () => {
     haptic.light();
     if (isAdded) {
-      navigate('/app/home');
+      goHome();
     } else {
       setShowRoutineSheet(true);
     }
@@ -156,7 +168,7 @@ const AppJournal = () => {
           className="flex items-center justify-between px-4 pb-2"
           style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}
         >
-          <button onClick={() => navigate('/app/home')} className="p-2 -ml-2">
+          <button onClick={goHome} className="p-2 -ml-2">
             <X className="h-5 w-5 text-foreground" />
           </button>
           <h1 className="text-lg font-semibold text-foreground">My Journal</h1>
@@ -177,7 +189,7 @@ const AppJournal = () => {
         className="flex items-center justify-between px-4 pb-2"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}
       >
-        <button onClick={() => navigate('/app/home')} className="p-2 -ml-2">
+        <button onClick={goHome} className="p-2 -ml-2">
           <X className="h-5 w-5 text-foreground" />
         </button>
         <h1 className="text-lg font-semibold text-foreground">My Journal</h1>
