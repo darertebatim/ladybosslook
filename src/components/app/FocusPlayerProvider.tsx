@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useRef, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, useEffect, type ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
@@ -96,6 +96,27 @@ export function FocusPlayerProvider({ children }: { children: ReactNode }) {
   const isActive = player.phase !== 'idle';
   const isSummary = player.phase === 'summary';
   const showFullPlayer = isActive && player.config && (!minimized || isSummary);
+
+  // Auto-navigate to pro-task tool when a pro-task becomes current
+  const autoOpenedTaskRef = useRef<string | null>(null);
+  useEffect(() => {
+    const task = player.currentTask;
+    if (!task?.proLinkType || !isActive || minimized) return;
+    const taskKey = `${task.userTaskId || task.title}-${player.currentTaskIndex}`;
+    if (autoOpenedTaskRef.current === taskKey) return;
+    autoOpenedTaskRef.current = taskKey;
+    const timer = setTimeout(() => {
+      openProTask();
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [player.currentTask, player.currentTaskIndex, isActive, minimized, openProTask]);
+
+  // Reset auto-open ref when routine ends
+  useEffect(() => {
+    if (!isActive) {
+      autoOpenedTaskRef.current = null;
+    }
+  }, [isActive]);
 
   return (
     <FocusPlayerContext.Provider value={{
