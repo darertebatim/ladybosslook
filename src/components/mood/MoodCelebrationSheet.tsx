@@ -7,6 +7,7 @@ import {
   Sheet,
   SheetContent,
 } from '@/components/ui/sheet';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 
 import journalImg from '@/assets/mood-card-journal.png';
 import breathingImg from '@/assets/mood-card-breathing.png';
