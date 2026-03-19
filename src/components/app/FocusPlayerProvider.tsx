@@ -46,11 +46,43 @@ export const useFocusPlayer = () => useContext(FocusPlayerContext);
 
 export function FocusPlayerProvider({ children }: { children: ReactNode }) {
   const player = useFocusRoutinePlayer();
+  const { user } = useAuth();
   const [minimized, setMinimized] = useState(false);
   const navigate = useNavigate();
+  const syncingRef = useRef(false);
 
   const handleMinimize = () => setMinimized(true);
-  const handleMaximize = () => setMinimized(false);
+
+  // When maximizing, check if the current task was already completed
+  // by autoComplete (e.g. breathing/mood/journal wrote to task_completions).
+  // If so, auto-advance the player — single source of truth.
+  const handleMaximize = useCallback(async () => {
+    setMinimized(false);
+
+    const task = player.currentTask;
+    if (!task?.userTaskId || !user?.id || syncingRef.current) return;
+
+    syncingRef.current = true;
+    try {
+      const today = format(new Date(), 'yyyy-MM-dd');
+      const { data } = await supabase
+        .from('task_completions')
+        .select('id')
+        .eq('task_id', task.userTaskId)
+        .eq('user_id', user.id)
+        .eq('completed_date', today)
+        .maybeSingle();
+
+      if (data) {
+        // Task was already completed by the tool — advance the player
+        player.completeTask();
+      }
+    } catch {
+      // ignore — player will still show, user can manually complete
+    } finally {
+      syncingRef.current = false;
+    }
+  }, [player, user?.id]);
 
   const openProTask = useCallback(() => {
     const task = player.currentTask;

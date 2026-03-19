@@ -128,7 +128,7 @@ export function MoodCelebrationSheet({
     haptic.light();
     onOpenChange(false);
     if (hasActivePlayer) {
-      focusPlayer!.completeTask();
+      // Just maximize — player will auto-detect the task_completion record
       focusPlayer!.maximize();
       return;
     }
