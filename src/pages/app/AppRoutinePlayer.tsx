@@ -323,7 +323,7 @@ export default function AppRoutinePlayer() {
           <div className="space-y-6 mt-4">
             {/* Activated routines */}
             {(() => {
-              const activeRoutines = (myFocusRoutines || []).filter((r: any) => {
+              const activeRoutines = (myRoutines || []).filter((r: any) => {
                 const tasks = routineTasksMap?.[r.routine_id] || [];
                 return tasks.length > 0;
               });
