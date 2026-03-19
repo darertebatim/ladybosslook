@@ -625,7 +625,7 @@ export default function AppInspireDetail() {
                   return;
                 }
 
-                startFocusRoutine({
+                startRoutine({
                   routineId: planId!,
                   routineTitle: routine.title,
                   routineEmoji: routine.emoji || '✨',

@@ -85,7 +85,7 @@ export function BreathingCompleteSheet({
     onOpenChange(false);
     if (hasActivePlayer) {
       navigate('/app/home');
-      focusPlayer!.maximize();
+      routinePlayer!.maximize();
       return;
     }
     navigate('/app/home');

@@ -33,8 +33,8 @@ export function BackButton({
   const location = useLocation();
   const from = (location.state as any)?.from;
 
-  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
-  try { focusPlayer = useRoutinePlayerContext(); } catch { /* provider not available */ }
+  let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
+  try { routinePlayer = useRoutinePlayerContext(); } catch { /* provider not available */ }
 
   const handleClick = () => {
     haptic.light();
@@ -43,10 +43,10 @@ export function BackButton({
       onClick();
     }
 
-    // If focus player is running & minimized, navigate home then show the player
-    if (focusPlayer?.isActive && focusPlayer?.isMinimized) {
+    // If routine player is running & minimized, navigate home then show the player
+    if (routinePlayer?.isActive && routinePlayer?.isMinimized) {
       navigate('/app/home');
-      focusPlayer.maximize();
+      routinePlayer.maximize();
       return;
     }
     

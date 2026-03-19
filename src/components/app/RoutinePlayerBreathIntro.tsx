@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 
-interface FocusRoutineBreathIntroProps {
+interface RoutinePlayerBreathIntroProps {
   routineTitle: string;
   routineEmoji: string;
   onComplete: () => void;
@@ -14,12 +14,12 @@ const PHASES = ['Inhale', 'Hold', 'Exhale'] as const;
 const PHASE_DURATIONS = [4, 2, 4]; // seconds
 const TOTAL_CYCLES = 3;
 
-export function FocusRoutineBreathIntro({
+export function RoutinePlayerBreathIntro({
   routineTitle,
   routineEmoji,
   onComplete,
   onCancel,
-}: FocusRoutineBreathIntroProps) {
+}: RoutinePlayerBreathIntroProps) {
   const [currentPhase, setCurrentPhase] = useState(0);
   const [currentCycle, setCurrentCycle] = useState(0);
   const [countdown, setCountdown] = useState(PHASE_DURATIONS[0]);
