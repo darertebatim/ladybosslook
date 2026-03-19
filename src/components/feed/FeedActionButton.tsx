@@ -37,19 +37,19 @@ export function FeedActionButton({ actionType, actionData }: FeedActionButtonPro
         break;
       case 'join_session':
         if (actionData.meetingUrl) {
-          window.open(actionData.meetingUrl, '_blank');
+          openUrl(actionData.meetingUrl);
         }
         break;
       case 'view_materials':
         if (actionData.courseSlug) {
           navigate(`/app/programs/${actionData.courseSlug}`);
         } else if (actionData.url) {
-          window.open(actionData.url, '_blank');
+          openUrl(actionData.url);
         }
         break;
       case 'external_link':
         if (actionData.url) {
-          window.open(actionData.url, '_blank');
+          openUrl(actionData.url);
         }
         break;
       case 'rate_app':
