@@ -32,6 +32,10 @@ const AppJournalEntry = () => {
   const location = useLocation();
   const { entryId } = useParams<{ entryId: string }>();
   const isNewEntry = !entryId || entryId === 'new';
+
+  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
+  try { focusPlayer = useFocusPlayer(); } catch { /* not available */ }
+  const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
   
   // Get mood from URL params for new entries (e.g., /app/journal/new?mood=great)
   const urlParams = new URLSearchParams(window.location.search);
