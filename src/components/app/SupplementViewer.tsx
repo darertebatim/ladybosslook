@@ -63,12 +63,10 @@ export function SupplementViewer({ isOpen, onClose, supplement, moduleContext }:
   const isLastModule = currentIndex === totalModules - 1;
   const isCurrentCompleted = moduleContext?.isCompleted ?? false;
 
+  const navigate = useNavigate();
+
   const handleOpenExternal = async () => {
-    if (isNativeApp()) {
-      await Browser.open({ url: supplement.url });
-    } else {
-      window.open(supplement.url, '_blank', 'noopener,noreferrer');
-    }
+    smartOpenUrl(supplement.url, navigate);
   };
 
   const handleComplete = () => {

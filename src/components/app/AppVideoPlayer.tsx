@@ -79,12 +79,10 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
     }
   }, [hasNext, playNext]);
 
+  const navigate = useNavigate();
+
   const handleOpenExternal = async () => {
-    if (isNativeApp()) {
-      await Browser.open({ url });
-    } else {
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
+    smartOpenUrl(url, navigate);
   };
 
   const cycleSpeed = () => {

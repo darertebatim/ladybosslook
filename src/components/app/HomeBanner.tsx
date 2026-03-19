@@ -93,11 +93,7 @@ export function HomeBanner() {
   };
 
   const handleButtonClick = (url: string) => {
-    if (url.startsWith('http')) {
-      window.open(url, '_blank');
-    } else {
-      navigate(url);
-    }
+    smartOpenUrl(url, navigate);
   };
 
   const visibleBanners = banners.filter(b => !dismissedIds.has(b.id));

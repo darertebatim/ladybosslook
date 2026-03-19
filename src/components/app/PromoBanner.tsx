@@ -328,11 +328,11 @@ export function PromoBanner({
       case 'profile': navigate('/app/myprofile'); break;
       case 'custom_url':
         if (banner.custom_url) {
-          banner.custom_url.startsWith('http') ? window.open(banner.custom_url, '_blank') : navigate(banner.custom_url);
+          smartOpenUrl(banner.custom_url, navigate);
         }
         break;
       case 'external_url':
-        if (banner.custom_url) window.open(banner.custom_url, '_blank');
+        if (banner.custom_url) smartOpenUrl(banner.custom_url, navigate);
         break;
       case 'rate': navigate('/app/rate'); break;
       case 'onboarding':
