@@ -24,7 +24,18 @@ import {
   Crown,
   Shield,
   RefreshCw,
+  MessageCircle,
 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from '@/components/ui/alert-dialog';
 
 // Import all testable components
 import { StreakCelebration } from '@/components/app/StreakCelebration';
@@ -94,6 +105,8 @@ export default function AppTest() {
   const [showStepCelebration, setShowStepCelebration] = useState(false);
   const [testCompletedStep, setTestCompletedStep] = useState(1);
   const [showProjectCompletion, setShowProjectCompletion] = useState(false);
+  const [showNewMessagePopup, setShowNewMessagePopup] = useState(false);
+  const [testUnreadCount, setTestUnreadCount] = useState(1);
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
     return (
@@ -786,7 +799,29 @@ export default function AppTest() {
         </CardContent>
       </Card>
 
-      {/* App Update Banner */}
+      {/* New Message Popup */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageCircle className="h-5 w-5 text-primary" />
+            New Message Popup
+          </CardTitle>
+          <CardDescription>
+            The popup users see when they have unread messages from Support
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            {[1, 3, 5].map(count => (
+              <Button key={count} onClick={() => { setTestUnreadCount(count); setShowNewMessagePopup(true); }} variant="outline">
+                <MessageCircle className="h-4 w-4 mr-2" />
+                {count} Unread
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -1055,6 +1090,44 @@ export default function AppTest() {
           toast.info('Would navigate to /app/onboarding/me-plus-v1');
         }}
       />
+
+      {/* New Message Popup */}
+      <AlertDialog open={showNewMessagePopup} onOpenChange={() => setShowNewMessagePopup(false)}>
+        <AlertDialogContent className="max-w-[300px] p-0 rounded-3xl border-0 shadow-2xl overflow-hidden bg-gradient-to-b from-background to-muted/30">
+          <AlertDialogHeader className="pt-6 pb-4 px-5">
+            <div className="flex justify-center mb-4">
+              <div className="relative">
+                <div className="rounded-full bg-gradient-to-br from-primary/20 to-primary/5 p-4">
+                  <MessageCircle className="h-7 w-7 text-primary" />
+                </div>
+                <div className="absolute -top-1 -right-1 h-5 w-5 bg-primary rounded-full flex items-center justify-center text-[11px] font-bold text-primary-foreground">
+                  {testUnreadCount}
+                </div>
+              </div>
+            </div>
+            <AlertDialogTitle className="text-center text-lg font-semibold leading-tight">
+              You have a message! 💬
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-sm text-muted-foreground mt-2">
+              Our support team has replied to your conversation
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col gap-0 sm:flex-col p-4 pt-2">
+            <AlertDialogAction 
+              onClick={() => setShowNewMessagePopup(false)} 
+              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-base font-medium shadow-md"
+            >
+              View Message
+            </AlertDialogAction>
+            <AlertDialogCancel 
+              onClick={() => setShowNewMessagePopup(false)} 
+              className="w-full h-10 rounded-xl border-0 m-0 mt-2 bg-transparent hover:bg-muted/50 text-sm font-normal text-muted-foreground"
+            >
+              Maybe later
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
