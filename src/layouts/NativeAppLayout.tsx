@@ -4,8 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef, useState } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
-import { AudioPlayerProvider, useAudioPlayer } from '@/contexts/AudioPlayerContext';
-import { FocusPlayerProvider } from '@/components/app/FocusPlayerProvider';
+import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { useTrackAppReturn } from '@/hooks/useUserPresence';
 import { MiniPlayer } from '@/components/audio/MiniPlayer';
 import { FocusMiniPlayer } from '@/components/app/FocusMiniPlayer';
@@ -327,15 +326,11 @@ const NativeAppLayout = () => {
   );
 };
 
-// Wrap with providers
+// Wrap with unseen content provider only (Audio + Focus providers moved to AppProvidersLayout)
 const NativeAppLayoutWithProvider = () => (
-  <AudioPlayerProvider>
-    <UnseenContentProvider>
-      <FocusPlayerProvider>
-        <NativeAppLayout />
-      </FocusPlayerProvider>
-    </UnseenContentProvider>
-  </AudioPlayerProvider>
+  <UnseenContentProvider>
+    <NativeAppLayout />
+  </UnseenContentProvider>
 );
 
 export default NativeAppLayoutWithProvider;
