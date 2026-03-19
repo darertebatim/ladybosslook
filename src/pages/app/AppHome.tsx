@@ -192,7 +192,7 @@ const AppHome = () => {
   const { data: carryForwardTasks = [] } = useCarryForwardTasks();
 
   const handleFabClick = useCallback(() => {
-    setShowQuickStart(true);
+    window.dispatchEvent(new Event('quick-add-open'));
   }, []);
 
   // Streak data now comes from useNewHomeData (consolidated RPC)
