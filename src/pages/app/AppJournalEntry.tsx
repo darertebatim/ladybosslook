@@ -37,6 +37,7 @@ const AppJournalEntry = () => {
   let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
   try { focusPlayer = useFocusPlayer(); } catch { /* not available */ }
   const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
+  const { autoCompleteJournal } = useAutoCompleteProTask();
   
   // Get mood from URL params for new entries (e.g., /app/journal/new?mood=great)
   const urlParams = new URLSearchParams(window.location.search);
