@@ -105,6 +105,8 @@ export default function AppTest() {
   const [showStepCelebration, setShowStepCelebration] = useState(false);
   const [testCompletedStep, setTestCompletedStep] = useState(1);
   const [showProjectCompletion, setShowProjectCompletion] = useState(false);
+  const [showNewMessagePopup, setShowNewMessagePopup] = useState(false);
+  const [testUnreadCount, setTestUnreadCount] = useState(1);
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
     return (
