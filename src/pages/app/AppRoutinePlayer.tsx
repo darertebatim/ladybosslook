@@ -73,22 +73,79 @@ export default function AppRoutinePlayer() {
     routineCategories.forEach(cat => map.set(cat.slug, cat.name));
     return map;
   }, [routineCategories]);
-  // Fetch ALL user routines from user_routines_bank (user-owned copies)
+   // Fetch ALL user routines from user_routines_bank (user-owned copies)
   const { data: myRoutines, isLoading } = useQuery({
     queryKey: ['user-routines-all', user?.id],
     queryFn: async () => {
       if (!user) return [];
       const { data, error } = await supabase
         .from('user_routines_bank')
-        .select('id, routine_id, title, emoji, cover_image_url, category, color, is_focus, is_active')
+        .select('id, routine_id, title, emoji, cover_image_url, category, color, is_focus, is_active, order_index')
         .eq('user_id', user.id)
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .order('order_index', { ascending: true });
       if (error) throw error;
       return (data || []) as any[];
     },
     enabled: !!user,
   });
 
+  // Reorder routines mutation
+  const reorderRoutinesMutation = useMutation({
+    mutationFn: async (updates: { id: string; order_index: number }[]) => {
+      for (const u of updates) {
+        await supabase
+          .from('user_routines_bank')
+          .update({ order_index: u.order_index } as any)
+          .eq('id', u.id);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
+    },
+  });
+
+  // Local routine order state for optimistic drag updates
+  const [localRoutines, setLocalRoutines] = useState<any[]>([]);
+  const skipRoutineSyncRef = useRef(false);
+  const routineReorderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sync local routines from query data
+  const routinesKey = JSON.stringify((myRoutines || []).map((r: any) => r.id));
+  const localRoutinesKey = JSON.stringify(localRoutines.map((r: any) => r.id));
+  if (routinesKey !== localRoutinesKey && !skipRoutineSyncRef.current) {
+    setLocalRoutines(myRoutines || []);
+  }
+
+  // DnD sensors for routine reordering
+  const routineSensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+  const [activeRoutineId, setActiveRoutineId] = useState<string | null>(null);
+
+  const handleRoutineDragStart = useCallback((event: DragStartEvent) => {
+    setActiveRoutineId(event.active.id as string);
+    haptic.medium();
+  }, []);
+
+  const handleRoutineDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveRoutineId(null);
+    if (over && active.id !== over.id) {
+      const oldIndex = localRoutines.findIndex((r: any) => r.id === active.id);
+      const newIndex = localRoutines.findIndex((r: any) => r.id === over.id);
+      const reordered = arrayMove(localRoutines, oldIndex, newIndex);
+      setLocalRoutines(reordered);
+      skipRoutineSyncRef.current = true;
+      if (routineReorderTimerRef.current) clearTimeout(routineReorderTimerRef.current);
+      routineReorderTimerRef.current = setTimeout(() => { skipRoutineSyncRef.current = false; }, 2000);
+      haptic.light();
+      const updates = reordered.map((r: any, i: number) => ({ id: r.id, order_index: i }));
+      reorderRoutinesMutation.mutate(updates);
+    }
+  }, [localRoutines, reorderRoutinesMutation]);
   // Fetch user_tasks grouped by source_routine_id for emoji chains
   const routineIds = useMemo(() => {
     return (myRoutines || []).map((r: any) => r.routine_id);
