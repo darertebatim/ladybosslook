@@ -19,6 +19,8 @@ import { SortableTaskList } from '@/components/app/SortableTaskList';
 import { useTasksForDate, useCompletionsForDate, UserTask, useAddGoalProgress, useDeleteTask } from '@/hooks/useTaskPlanner';
 import { isWaterTask } from '@/lib/waterTracking';
 import { TaskDetailModal } from '@/components/app/TaskDetailModal';
+import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
+import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +40,10 @@ export default function AppRoutinePlayer() {
   const [showRestartDialog, setShowRestartDialog] = useState(false);
   const [deleteRoutine, setDeleteRoutine] = useState<any | null>(null);
   const queryClient = useQueryClient();
+  const [showPageRoutineSheet, setShowPageRoutineSheet] = useState(false);
+
+  // Check if routine player page is already added as a task
+  const { data: isPageAdded } = useExistingProTask('route', '/app/routineplayer');
 
   // Fetch ALL user routines from user_routines_bank (user-owned copies)
   const { data: myRoutines, isLoading } = useQuery({
@@ -500,7 +506,11 @@ export default function AppRoutinePlayer() {
             <div className="w-2 h-2 rounded-full bg-emerald-500" />
             <h1 className="text-base font-bold text-foreground">My Routines</h1>
           </div>
-          <div className="w-7" />
+          <AddedToRoutineButton
+            isAdded={!!isPageAdded}
+            onAddClick={() => { haptic.medium(); setShowPageRoutineSheet(true); }}
+            iconOnly
+          />
         </div>
       </header>
 
@@ -798,6 +808,54 @@ export default function AppRoutinePlayer() {
           isSaving={addRoutinePlan.isPending}
         />
       )}
+
+      {/* Page-level add to planner sheet */}
+      <RoutinePreviewSheet
+        open={showPageRoutineSheet}
+        onOpenChange={setShowPageRoutineSheet}
+        tasks={[{
+          id: 'synthetic-routineplayer-page',
+          plan_id: 'synthetic-routineplayer-page',
+          title: 'My Routines',
+          icon: '🎯',
+          color: 'amber',
+          task_order: 0,
+          is_active: true,
+          created_at: new Date().toISOString(),
+          linked_playlist_id: null,
+          pro_link_type: 'route' as any,
+          pro_link_value: '/app/routineplayer',
+          linked_playlist: null,
+        }]}
+        routineTitle="My Routines"
+        onSave={async (selectedTaskIds, editedTasks) => {
+          try {
+            await addRoutinePlan.mutateAsync({
+              planId: 'synthetic-routineplayer-page',
+              syntheticTasks: [{
+                id: 'synthetic-routineplayer-page',
+                plan_id: 'synthetic-routineplayer-page',
+                title: 'My Routines',
+                icon: '🎯',
+                color: 'amber',
+                task_order: 0,
+                is_active: true,
+                created_at: new Date().toISOString(),
+                linked_playlist_id: null,
+                pro_link_type: 'route' as any,
+                pro_link_value: '/app/routineplayer',
+                linked_playlist: null,
+              }],
+              editedTasks,
+            });
+            setShowPageRoutineSheet(false);
+            toast.success('Added to your planner! 🎯');
+          } catch (error) {
+            toast.error('Failed to add to planner');
+          }
+        }}
+        isSaving={addRoutinePlan.isPending}
+      />
     </div>
   );
 }
