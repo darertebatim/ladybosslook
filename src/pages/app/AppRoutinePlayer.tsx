@@ -227,53 +227,47 @@ export default function AppRoutinePlayer() {
     setDeleteRoutine(null);
   };
 
-  // Add routine as a task to the planner
-  const handleAddToPlanner = async (routine: any) => {
-    if (!user) return;
+  // RoutinePreviewSheet state for adding routine as planner task
+  const [addRoutineTarget, setAddRoutineTarget] = useState<any | null>(null);
+  const [showAddSheet, setShowAddSheet] = useState(false);
+  const addRoutinePlan = useAddRoutinePlan();
+
+  const handleOpenAddSheet = (routine: any) => {
+    haptic.light();
+    setAddRoutineTarget(routine);
+    setShowAddSheet(true);
+  };
+
+  const addSheetSyntheticTask: RoutinePlanTask | null = addRoutineTarget ? {
+    id: `synthetic-routine-${addRoutineTarget.routine_id}`,
+    plan_id: `synthetic-routine-player`,
+    title: addRoutineTarget.title,
+    icon: addRoutineTarget.emoji || '✨',
+    color: addRoutineTarget.color || 'amber',
+    task_order: 0,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    linked_playlist_id: null,
+    pro_link_type: 'routine' as any,
+    pro_link_value: addRoutineTarget.routine_id,
+    tag: 'pro',
+    linked_playlist: null,
+  } : null;
+
+  const handleSaveAddSheet = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
+    if (!addRoutineTarget || !addSheetSyntheticTask) return;
     try {
-      // Check if already exists
-      const { data: existing } = await supabase
-        .from('user_tasks')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('pro_link_type', 'routine')
-        .eq('pro_link_value', routine.routine_id)
-        .eq('is_active', true)
-        .limit(1);
-
-      if (existing && existing.length > 0) {
-        toast('Already in your planner', { description: routine.title });
-        return;
-      }
-
-      // Get next order_index
-      const { data: tasks } = await supabase
-        .from('user_tasks')
-        .select('order_index')
-        .eq('user_id', user.id)
-        .order('order_index', { ascending: false })
-        .limit(1);
-
-      const nextOrder = (tasks?.[0]?.order_index ?? -1) + 1;
-
-      await supabase.from('user_tasks').insert({
-        user_id: user.id,
-        title: routine.title,
-        emoji: routine.emoji || '✨',
-        color: routine.color || 'amber',
-        repeat_pattern: 'daily',
-        pro_link_type: 'routine',
-        pro_link_value: routine.routine_id,
-        is_active: true,
-        order_index: nextOrder,
-        tag: 'pro',
+      await addRoutinePlan.mutateAsync({
+        planId: 'synthetic-routine-player',
+        selectedTaskIds,
+        editedTasks,
+        syntheticTasks: [addSheetSyntheticTask],
       });
-
-      haptic.success();
       toast.success('Added to your planner! 📋');
-      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
-    } catch (err) {
+      setShowAddSheet(false);
+      setAddRoutineTarget(null);
+    } catch (error) {
+      console.error('Failed to add routine task:', error);
       toast.error('Failed to add to planner');
     }
   };
