@@ -547,26 +547,44 @@ export default function AppRoutinePlayer() {
                           cardColor
                         )}
                       >
-                        {/* Top row: schedule hints */}
-                        <div className="flex items-center gap-3 mb-1.5">
-                          <span className="flex items-center gap-1 text-[11px] font-medium text-foreground/50">
-                            <Bell className="w-3 h-3" />
-                            {allTasks.length} tasks
-                          </span>
-                          {routine.category && (
+                        {/* Top row: schedule hints + action buttons top-right */}
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="flex items-center gap-3">
                             <span className="flex items-center gap-1 text-[11px] font-medium text-foreground/50">
-                              <Calendar className="w-3 h-3" />
-                              {routine.category}
+                              <Bell className="w-3 h-3" />
+                              {allTasks.length} tasks
                             </span>
-                          )}
+                            {routine.category && (
+                              <span className="flex items-center gap-1 text-[11px] font-medium text-foreground/50">
+                                <Calendar className="w-3 h-3" />
+                                {routine.category}
+                              </span>
+                            )}
+                          </div>
+                          {/* Top-right action buttons */}
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleOpenAddSheet(routine); }}
+                              className="w-9 h-9 rounded-full bg-primary flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+                              title="Add to planner"
+                            >
+                              <CalendarPlus className="w-4 h-4 text-primary-foreground" />
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setDeleteRoutine(routine); }}
+                              className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center active:scale-95 transition-all"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-foreground/40" />
+                            </button>
+                          </div>
                         </div>
 
                         {/* Title */}
-                        <h3 className="font-bold text-foreground text-[17px] leading-snug mb-3 pr-12">
+                        <h3 className="font-bold text-foreground text-[17px] leading-snug mb-3">
                           {routine.title}
                         </h3>
 
-                        {/* Bottom row: emoji bubbles + actions */}
+                        {/* Bottom row: emoji bubbles + play button */}
                         <div className="flex items-center justify-between">
                           {/* Emoji chain */}
                           <div className="flex items-center gap-1">
@@ -590,42 +608,27 @@ export default function AppRoutinePlayer() {
                             )}
                           </div>
 
-                          {/* Action buttons */}
-                          <div className="flex items-center gap-1.5">
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handleOpenAddSheet(routine); }}
-                              className="w-9 h-9 rounded-full bg-primary flex items-center justify-center active:scale-95 transition-transform shadow-sm"
-                              title="Add to planner"
-                            >
-                              <CalendarPlus className="w-4 h-4 text-primary-foreground" />
-                            </button>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); setDeleteRoutine(routine); }}
-                              className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center active:scale-95 transition-all"
-                            >
-                              <Trash2 className="w-3.5 h-3.5 text-foreground/40" />
-                            </button>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handlePlay(routine); }}
-                              disabled={loadingRoutineId === routine.routine_id}
-                              className="flex items-center gap-1.5 h-9 px-4 rounded-full bg-foreground/10 active:scale-95 transition-transform"
-                            >
-                              {loadingRoutineId === routine.routine_id ? (
-                                <Loader2 className="w-4 h-4 animate-spin text-foreground" />
-                              ) : completion ? (
-                                <>
-                                  {completion.isComplete ? (
-                                    <RotateCw className="w-3.5 h-3.5 text-foreground" />
-                                  ) : (
-                                    <Play className="w-3.5 h-3.5 text-foreground fill-foreground" />
-                                  )}
-                                  <span className="text-xs font-bold text-foreground">{completion.pct}%</span>
-                                </>
-                              ) : (
-                                <Play className="w-3.5 h-3.5 text-foreground fill-foreground" />
-                              )}
-                            </button>
-                          </div>
+                          {/* Play button */}
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handlePlay(routine); }}
+                            disabled={loadingRoutineId === routine.routine_id}
+                            className="flex items-center gap-1.5 h-9 px-4 rounded-full bg-foreground/10 active:scale-95 transition-transform shrink-0"
+                          >
+                            {loadingRoutineId === routine.routine_id ? (
+                              <Loader2 className="w-4 h-4 animate-spin text-foreground" />
+                            ) : completion ? (
+                              <>
+                                {completion.isComplete ? (
+                                  <RotateCw className="w-3.5 h-3.5 text-foreground" />
+                                ) : (
+                                  <Play className="w-3.5 h-3.5 text-foreground fill-foreground" />
+                                )}
+                                <span className="text-xs font-bold text-foreground">{completion.pct}%</span>
+                              </>
+                            ) : (
+                              <Play className="w-3.5 h-3.5 text-foreground fill-foreground" />
+                            )}
+                          </button>
                         </div>
                       </div>
                     );
