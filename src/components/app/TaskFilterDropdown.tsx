@@ -129,10 +129,20 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
                   ))}
                 </div>
               ))}
+
+              {/* End options */}
+              {endOptions.map(option => (
+                <FilterItem
+                  key={option.value}
+                  label={option.label}
+                  selected={value === option.value}
+                  onSelect={() => handleSelect(option.value)}
+                />
+              ))}
             </div>
           </div>
           {/* Bottom fade gradient to hint scrollability */}
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-popover to-transparent pointer-events-none rounded-b-2xl" />
+          <div className="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-popover to-transparent pointer-events-none rounded-b-2xl" />
         </div>
       </PopoverContent>
     </Popover>
