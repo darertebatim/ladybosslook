@@ -79,7 +79,7 @@ const AppJournal = () => {
   const handleRoutineClick = () => {
     haptic.light();
     if (isAdded) {
-      navigate('/app/home');
+      goHome();
     } else {
       setShowRoutineSheet(true);
     }
