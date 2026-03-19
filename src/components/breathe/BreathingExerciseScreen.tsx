@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Pause, Play, HelpCircle, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -8,6 +9,7 @@ import { BreathingInfoSheet } from './BreathingInfoSheet';
 import { CloseButton } from '@/components/app/CloseButton';
 import { BreathingExercise, useSaveBreathingSession } from '@/hooks/useBreathingExercises';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { BreathingCompleteSheet } from './BreathingCompleteSheet';
@@ -48,6 +50,9 @@ export function BreathingExerciseScreen({
   exercise,
   onClose,
 }: BreathingExerciseScreenProps) {
+  const location = useLocation();
+  const { isProTaskActive, completeProTask } = useFocusPlayer();
+  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
   // Layout toggle
   const [layout, setLayout] = useState<LayoutMode>(() => {
     try {
@@ -238,6 +243,11 @@ export function BreathingExerciseScreen({
       {
         onSuccess: async () => {
           await autoCompleteBreathe(exercise.id);
+          // If inside a focus routine, skip the completion sheet and return to player
+          if (fromFocusRoutine && isProTaskActive) {
+            completeProTask();
+            return;
+          }
           setCompletedDuration(elapsed);
           setShowCompleteSheet(true);
         },
@@ -257,7 +267,7 @@ export function BreathingExerciseScreen({
     cycleCountRef.current = 0;
     currentPhaseIndexRef.current = 0;
     phaseTimeRemainingRef.current = 0;
-  }, [exercise.id, saveSession, autoCompleteBreathe]);
+  }, [exercise.id, saveSession, autoCompleteBreathe, fromFocusRoutine, isProTaskActive, completeProTask]);
 
   const handleStart = useCallback(() => {
     setCycleCount(0);

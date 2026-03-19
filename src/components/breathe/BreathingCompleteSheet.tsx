@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 
 import journalImg from '@/assets/mood-card-journal.png';
 import reflectImg from '@/assets/mood-card-reflect.png';
@@ -49,6 +50,9 @@ export function BreathingCompleteSheet({
   durationSeconds,
 }: BreathingCompleteSheetProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isProTaskActive, completeProTask } = useFocusPlayer();
+  const fromFocusRoutine = (location.state as { fromFocusRoutine?: boolean })?.fromFocusRoutine;
 
   useEffect(() => {
     if (open) {
@@ -72,12 +76,20 @@ export function BreathingCompleteSheet({
   const handleAction = (route: string) => {
     haptic.medium();
     onOpenChange(false);
+    if (fromFocusRoutine && isProTaskActive) {
+      completeProTask();
+      return;
+    }
     navigate(route);
   };
 
   const handleDone = () => {
     haptic.light();
     onOpenChange(false);
+    if (fromFocusRoutine && isProTaskActive) {
+      completeProTask();
+      return;
+    }
     navigate('/app/home');
   };
 
