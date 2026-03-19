@@ -1233,7 +1233,7 @@ const AppHome = () => {
               )}
 
               {/* Popular Routine Suggestions - only show routines user hasn't added */}
-              {suggestedRoutines.length > 0 && selectedTag === null && !showWelcomeCard && <div className="tour-suggested-routine mt-6">
+              {suggestedRoutines.length > 0 && taskFilter === 'all' && !showWelcomeCard && <div className="tour-suggested-routine mt-6">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <CalendarPlus className="h-4 w-4 text-violet-500" />
