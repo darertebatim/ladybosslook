@@ -35,7 +35,7 @@ export function useRoutinePlayer() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [phase, setPhase] = useState<PlayerPhase>('idle');
-  const [config, setConfig] = useState<FocusRoutineConfig | null>(null);
+  const [config, setConfig] = useState<RoutinePlayerConfig | null>(null);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
   const [taskResults, setTaskResults] = useState<SessionTaskResult[]>([]);
