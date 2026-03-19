@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 import { EmotionDashboard } from '@/components/emotion/EmotionDashboard';
 import { EmotionSelector } from '@/components/emotion/EmotionSelector';
 import { EmotionContext } from '@/components/emotion/EmotionContext';
