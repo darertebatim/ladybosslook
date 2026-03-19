@@ -35,7 +35,7 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
 
   if (routineNames.size > 0) {
     groups.push({
-      label: 'Routines',
+      label: 'My Routines',
       options: Array.from(routineNames.entries()).map(([rid, name]) => ({
         value: `routine:${rid}`,
         label: name,
@@ -94,37 +94,41 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
           "overflow-hidden"
         )}
       >
-        <div className="max-h-[320px] overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
-          <div className="py-1.5">
-            {/* Base options */}
-            {baseOptions.map(option => (
-              <FilterItem
-                key={option.value}
-                label={option.label}
-                selected={value === option.value}
-                onSelect={() => handleSelect(option.value)}
-              />
-            ))}
+        <div className="relative">
+          <div className="max-h-[320px] overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="py-1.5 pb-6">
+              {/* Base options */}
+              {baseOptions.map(option => (
+                <FilterItem
+                  key={option.value}
+                  label={option.label}
+                  selected={value === option.value}
+                  onSelect={() => handleSelect(option.value)}
+                />
+              ))}
 
-            {/* Grouped options */}
-            {groups.map(group => (
-              <div key={group.label}>
-                <div className="px-4 pt-3 pb-1.5">
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-                    {group.label}
-                  </p>
+              {/* Grouped options */}
+              {groups.map(group => (
+                <div key={group.label}>
+                  <div className="px-4 pt-3 pb-1.5">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-foreground">
+                      {group.label}
+                    </p>
+                  </div>
+                  {group.options.map(option => (
+                    <FilterItem
+                      key={option.value}
+                      label={option.label}
+                      selected={value === option.value}
+                      onSelect={() => handleSelect(option.value)}
+                    />
+                  ))}
                 </div>
-                {group.options.map(option => (
-                  <FilterItem
-                    key={option.value}
-                    label={option.label}
-                    selected={value === option.value}
-                    onSelect={() => handleSelect(option.value)}
-                  />
-                ))}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+          {/* Bottom fade gradient to hint scrollability */}
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-popover to-transparent pointer-events-none rounded-b-2xl" />
         </div>
       </PopoverContent>
     </Popover>
