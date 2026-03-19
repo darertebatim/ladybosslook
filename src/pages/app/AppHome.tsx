@@ -1020,11 +1020,11 @@ const AppHome = () => {
               )}
 
               {/* Personal Actions Section - hide empty state when welcome card is shown */}
-              {!isNewUser && filteredTasks.length === 0 && (selectedTag !== null || programEvents.length === 0) ? (
+              {!isNewUser && filteredTasks.length === 0 && (taskFilter !== 'all' || programEvents.length === 0) ? (
                 <div className="text-center py-12">
                   <div className="text-4xl mb-3">✨</div>
                   <p className="text-muted-foreground mb-2">
-                    {selectedTag ? `No ${selectedTag} actions for this day` : 'Your day is open'}
+                    {taskFilter !== 'all' ? 'No tasks match this filter' : 'Your day is open'}
                   </p>
                   <p className="text-xs text-muted-foreground/70 mb-4">
                     One small task is enough
