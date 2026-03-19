@@ -755,6 +755,19 @@ export default function AppRoutinePlayer() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Add routine to planner sheet */}
+      {addSheetSyntheticTask && (
+        <RoutinePreviewSheet
+          open={showAddSheet}
+          onOpenChange={(open) => {
+            setShowAddSheet(open);
+            if (!open) setAddRoutineTarget(null);
+          }}
+          tasks={[addSheetSyntheticTask]}
+          routineTitle={addRoutineTarget?.title || 'Routine'}
+          onSave={handleSaveAddSheet}
+          isSaving={addRoutinePlan.isPending}
+        />
+      )}
     </div>
-  );
-}
