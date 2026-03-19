@@ -575,7 +575,7 @@ export default function AppRoutinePlayer() {
                             {routine.category && (
                               <span className="flex items-center gap-1 text-[11px] font-semibold text-black">
                                 <Calendar className="w-3 h-3" />
-                                {routine.category}
+                                {categoryNameMap.get(routine.category) || routine.category}
                               </span>
                             )}
                           </div>
