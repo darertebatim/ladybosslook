@@ -6,6 +6,7 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
+import { useFocusPlayer } from '@/components/app/FocusPlayerProvider';
 
 import journalImg from '@/assets/mood-card-journal.png';
 import reflectImg from '@/assets/mood-card-reflect.png';
@@ -50,6 +51,10 @@ export function BreathingCompleteSheet({
 }: BreathingCompleteSheetProps) {
   const navigate = useNavigate();
 
+  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void; completeTask: () => void } | null = null;
+  try { focusPlayer = useFocusPlayer(); } catch { /* provider not available */ }
+  const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
+
   useEffect(() => {
     if (open) {
       haptic.success();
@@ -78,6 +83,11 @@ export function BreathingCompleteSheet({
   const handleDone = () => {
     haptic.light();
     onOpenChange(false);
+    if (hasActivePlayer) {
+      focusPlayer!.completeTask();
+      focusPlayer!.maximize();
+      return;
+    }
     navigate('/app/home');
   };
 
