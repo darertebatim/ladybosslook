@@ -16,7 +16,7 @@ import { SortableTaskList } from '@/components/app/SortableTaskList';
 import { useTasksForDate, useCompletionsForDate, UserTask, useAddGoalProgress } from '@/hooks/useTaskPlanner';
 import { isWaterTask } from '@/lib/waterTracking';
 
-export default function AppFocusRoutines() {
+export default function AppRoutinePlayer() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { startRoutine, isActive } = useRoutinePlayerContext();
