@@ -291,6 +291,23 @@ export const TaskDetailModal = ({
             </div>
           )}
 
+          {/* Timer goal: Start button */}
+          {isTimerGoal && !goalReached && onOpenTimer && (
+            <div className="px-4 pb-4 pt-1">
+              <Button
+                onClick={() => {
+                  haptic.light();
+                  onClose();
+                  onOpenTimer(task);
+                }}
+                className="w-full gap-2 h-10 rounded-xl text-sm bg-black text-white hover:bg-black/90"
+              >
+                <Play className="h-4 w-4" />
+                Start Timer
+              </Button>
+            </div>
+          )}
+
           {/* Pro Task: Navigation button */}
           {isProTask && proConfig && (
             <div className="px-4 pb-4 pt-1">
