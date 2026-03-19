@@ -1,8 +1,7 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2, CalendarPlus } from 'lucide-react';
-import { RoutinePlayerFilter, FilterValue } from '@/components/app/RoutinePlayerFilter';
+import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2, CalendarPlus, Bell, Calendar } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
@@ -198,8 +197,6 @@ export default function AppRoutinePlayer() {
   const [deleteRoutine, setDeleteRoutine] = useState<any | null>(null);
   const queryClient = useQueryClient();
   const [showPageRoutineSheet, setShowPageRoutineSheet] = useState(false);
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<FilterValue>({ type: 'all', label: 'All' });
 
   // Check if routine player page is already added as a task
   const { data: isPageAdded } = useExistingProTask('route', '/app/routineplayer');
@@ -427,47 +424,7 @@ export default function AppRoutinePlayer() {
     deleteOrphans();
   }, [user, myRoutines, routineTasksMap, queryClient]);
 
-  // Fetch standalone tasks (not linked to any routine) for filter views
-  const { data: standaloneTasks = [] } = useQuery({
-    queryKey: ['standalone-user-tasks', user?.id],
-    queryFn: async () => {
-      if (!user) return [];
-      const { data, error } = await supabase
-        .from('user_tasks')
-        .select('id, title, emoji, color, repeat_pattern, source_routine_id, is_active, order_index, goal_type, goal_target, goal_unit, goal_enabled, pro_link_type, pro_link_value, scheduled_time, tag')
-        .eq('user_id', user.id)
-        .eq('is_active', true)
-        .is('source_routine_id', null)
-        .order('order_index', { ascending: true });
-      if (error) throw error;
-      return (data || []) as UserTask[];
-    },
-    enabled: !!user && (activeFilter.type === 'one-time' || activeFilter.type === 'unlinked'),
-  });
-
-  const filteredStandaloneTasks = useMemo(() => {
-    if (activeFilter.type === 'one-time') {
-      return standaloneTasks.filter((t: any) => t.repeat_pattern === 'none');
-    }
-    if (activeFilter.type === 'unlinked') {
-      return standaloneTasks;
-    }
-    return [];
-  }, [standaloneTasks, activeFilter]);
-
-  // Filter routines based on active filter
-  const filteredLocalRoutines = useMemo(() => {
-    if (activeFilter.type === 'all') return localRoutines;
-    if (activeFilter.type === 'category') {
-      return localRoutines.filter((r: any) => r.category === activeFilter.value);
-    }
-    if (activeFilter.type === 'routine') {
-      return localRoutines.filter((r: any) => r.routine_id === activeFilter.value);
-    }
-    return []; // one-time and unlinked show tasks, not routines
-  }, [localRoutines, activeFilter]);
-
-
+  // Delete routine and all its tasks
   const handleDeleteRoutine = async (routine: any) => {
     if (!user) return;
     try {
@@ -786,22 +743,9 @@ export default function AppRoutinePlayer() {
           </div>
         ) : (
           <div className="space-y-6 mt-4">
-            {/* Title row with filter */}
-            <div className="flex items-center gap-2">
-              <p className="text-base font-bold text-foreground">My Tasks</p>
-              <RoutinePlayerFilter
-                categories={routineCategories.map(c => ({ slug: c.slug, name: c.name }))}
-                routines={(myRoutines || []).filter((r: any) => (routineTasksMap?.[r.routine_id] || []).length > 0)}
-                selected={activeFilter}
-                onSelect={setActiveFilter}
-                open={filterOpen}
-                onOpenChange={setFilterOpen}
-              />
-            </div>
-
-            {/* Show routine cards for all/category/routine filters */}
-            {(activeFilter.type === 'all' || activeFilter.type === 'category' || activeFilter.type === 'routine') && (() => {
-              const activeRoutines = filteredLocalRoutines.filter((r: any) => {
+            {/* Activated routines */}
+            {(() => {
+              const activeRoutines = localRoutines.filter((r: any) => {
                 const tasks = routineTasksMap?.[r.routine_id] || [];
                 return tasks.length > 0;
               });
@@ -810,6 +754,7 @@ export default function AppRoutinePlayer() {
 
               return activeRoutines.length > 0 ? (
               <section>
+                <p className="text-base font-bold text-foreground mb-3">My Routines</p>
                 <DndContext
                   sensors={routineSensors}
                   collisionDetection={closestCenter}
@@ -855,41 +800,11 @@ export default function AppRoutinePlayer() {
                   </DragOverlay>
                 </DndContext>
               </section>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-sm text-muted-foreground">No routines found</p>
-                </div>
-              );
+              ) : null;
             })()}
 
-            {/* Show standalone tasks for one-time / unlinked filters */}
-            {(activeFilter.type === 'one-time' || activeFilter.type === 'unlinked') && (
-              <section>
-                {filteredStandaloneTasks.length > 0 ? (
-                  <SortableTaskList
-                    tasks={filteredStandaloneTasks}
-                    date={today}
-                    completedTaskIds={plannerCompletedTaskIds}
-                    completedSubtaskIds={plannerCompletedSubtaskIds}
-                    goalProgressMap={plannerGoalProgressMap}
-                    onTaskTap={handleTaskTap}
-                    onStreakIncrease={() => {}}
-                    onOpenGoalInput={handleOpenGoalInput}
-                    onOpenTimer={handleOpenTimer}
-                    hideQuickAdd
-                  />
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-sm text-muted-foreground">
-                      {activeFilter.type === 'one-time' ? 'No one-time tasks' : 'No unlinked tasks'}
-                    </p>
-                  </div>
-                )}
-              </section>
-            )}
-
-            {/* Empty state — only when showing all and nothing exists */}
-            {activeFilter.type === 'all' && (myRoutines || []).filter((r: any) => (routineTasksMap?.[r.routine_id] || []).length > 0).length === 0 && (
+            {/* Empty state */}
+            {(myRoutines || []).filter((r: any) => (routineTasksMap?.[r.routine_id] || []).length > 0).length === 0 && (
               <div className="text-center py-12">
                 <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
                 <h3 className="font-semibold text-foreground mb-1">No routines yet</h3>
