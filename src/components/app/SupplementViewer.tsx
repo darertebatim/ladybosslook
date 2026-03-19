@@ -2,9 +2,9 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Loader2, FileText, ChevronLeft, ChevronRight, Check, X } from "lucide-react";
 import { useState, useEffect } from "react";
-import { isNativeApp } from "@/lib/platform";
-import { Browser } from "@capacitor/browser";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { smartOpenUrl } from "@/lib/navigation-utils";
 import { AppVideoPlayer } from "@/components/app/AppVideoPlayer";
 
 interface Module {
