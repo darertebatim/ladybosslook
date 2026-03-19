@@ -163,6 +163,12 @@ export function useRoutinePlayer() {
     elapsedRef.current = 0;
   }, []);
 
+  const onCountdownComplete = useCallback(() => {
+    setPhase('running');
+    setTaskStartedAt(new Date());
+    elapsedRef.current = 0;
+  }, []);
+
   const saveTaskResult = useCallback((status: 'completed' | 'skipped') => {
     if (!config || !currentTask) return null;
 
