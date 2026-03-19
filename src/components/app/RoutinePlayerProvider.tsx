@@ -3,8 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
-import { useFocusRoutinePlayer, type FocusRoutineConfig } from '@/hooks/useFocusRoutinePlayer';
-import { FocusRoutinePlayer } from '@/components/app/FocusRoutinePlayer';
+import { useRoutinePlayer, type RoutinePlayerConfig } from '@/hooks/useRoutinePlayer';
+import { RoutinePlayer } from '@/components/app/RoutinePlayer';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
 import { getProTaskNavigationPath, type ProLinkType } from '@/lib/proTaskTypes';
 
