@@ -145,6 +145,9 @@ export default function AppFocusRoutines() {
   // Pre-start state — now just stores the routine to show planner-style overlay
   const [preStartRoutine, setPreStartRoutine] = useState<any | null>(null);
   const [loadingRoutineId, setLoadingRoutineId] = useState<string | null>(null);
+  const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
+  const [showStreakModal, setShowStreakModal] = useState(false);
+  const deleteTask = useDeleteTask();
 
   // Planner hooks for the pre-start overlay (uses today's date)
   const today = useMemo(() => new Date(), []);
