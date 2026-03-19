@@ -38,9 +38,9 @@ export default function AppRoutinePlayer() {
   });
 
   // Fetch user_tasks grouped by source_routine_id for emoji chains
-  const focusRoutineIds = useMemo(() => {
-    return (myFocusRoutines || []).map((r: any) => r.routine_id);
-  }, [myFocusRoutines]);
+  const routineIds = useMemo(() => {
+    return (myRoutines || []).map((r: any) => r.routine_id);
+  }, [myRoutines]);
 
   const { data: routineTasksMap } = useQuery({
     queryKey: ['focus-user-tasks-emojis', user?.id, focusRoutineIds],
