@@ -104,6 +104,10 @@ export function MoodCelebrationSheet({
   const navigate = useNavigate();
   const moodData = mood ? MOOD_CONFIG[mood] : null;
 
+  let focusPlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void; completeTask: () => void } | null = null;
+  try { focusPlayer = useFocusPlayer(); } catch { /* provider not available */ }
+  const hasActivePlayer = focusPlayer?.isActive && focusPlayer?.isMinimized;
+
   const handleAction = (action: typeof ACTIONS[number]) => {
     haptic.medium();
     const route = action.routeKey === 'journal' 
@@ -122,12 +126,15 @@ export function MoodCelebrationSheet({
 
   const handleDone = () => {
     haptic.light();
-    const homeRoute = '/app/home';
-    if (onActionClick?.(homeRoute)) {
-      onOpenChange(false);
+    onOpenChange(false);
+    if (hasActivePlayer) {
+      focusPlayer!.completeTask();
+      focusPlayer!.maximize();
       return;
     }
-    onOpenChange(false);
+    if (onActionClick?.('/app/home')) {
+      return;
+    }
     onDone();
   };
 
