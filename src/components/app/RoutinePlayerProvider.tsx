@@ -10,7 +10,7 @@ import { getProTaskNavigationPath, type ProLinkType } from '@/lib/proTaskTypes';
 
 type ResumeOptions = {
   startFromIndex: number;
-  previousResults: import('@/components/app/FocusRoutineSummary').SessionTaskResult[];
+  previousResults: import('@/components/app/RoutinePlayerSummary').SessionTaskResult[];
   existingSessionId: string;
 };
 
