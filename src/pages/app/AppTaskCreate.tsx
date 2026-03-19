@@ -57,6 +57,7 @@ import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { TaskIcon } from '@/components/app/IconPicker';
 import { TimeWheelPicker } from '@/components/app/TimeWheelPicker';
 import { PRO_LINK_TYPES, ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
+import { ProLinkPicker } from '@/components/app/ProLinkPicker';
 import { GoalSettingsSheet, GoalSettings, formatGoalTarget } from '@/components/app/GoalSettingsSheet';
 import { TimePeriod, TIME_PERIODS, TimeMode, getTimeMode, formatTimeLabel, formatTimeRange, getTimePeriodConfig, normalizeTimePeriod } from '@/lib/taskScheduling';
 
