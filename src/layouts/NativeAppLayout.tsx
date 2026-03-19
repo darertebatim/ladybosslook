@@ -323,6 +323,9 @@ const NativeAppLayout = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* App Update Popup */}
+      <AppUpdatePopup />
     </div>
   );
 };
