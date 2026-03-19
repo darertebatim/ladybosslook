@@ -28,6 +28,9 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
   const baseOptions: FilterOption[] = [
     { value: 'all', label: 'All Tasks' },
     { value: 'one-time', label: 'One-time Tasks' },
+  ];
+
+  const endOptions: FilterOption[] = [
     { value: 'unlinked', label: 'Unlinked Tasks' },
   ];
 
@@ -55,8 +58,9 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
 
   // Find current label
   const currentLabel = (() => {
-    const base = baseOptions.find(o => o.value === value);
-    if (base) return base.label;
+    const all = [...baseOptions, ...endOptions];
+    const found = all.find(o => o.value === value);
+    if (found) return found.label;
     for (const group of groups) {
       const found = group.options.find(o => o.value === value);
       if (found) return found.label;
@@ -125,10 +129,20 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
                   ))}
                 </div>
               ))}
+
+              {/* End options */}
+              {endOptions.map(option => (
+                <FilterItem
+                  key={option.value}
+                  label={option.label}
+                  selected={value === option.value}
+                  onSelect={() => handleSelect(option.value)}
+                />
+              ))}
             </div>
           </div>
           {/* Bottom fade gradient to hint scrollability */}
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-popover to-transparent pointer-events-none rounded-b-2xl" />
+          <div className="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-popover to-transparent pointer-events-none rounded-b-2xl" />
         </div>
       </PopoverContent>
     </Popover>
