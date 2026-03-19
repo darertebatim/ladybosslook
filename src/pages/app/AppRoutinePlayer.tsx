@@ -560,7 +560,7 @@ export default function AppRoutinePlayer() {
                         {/* Top row: schedule hints + action buttons top-right */}
                         <div className="flex items-center justify-between mb-1.5">
                           <div className="flex items-center gap-3">
-                            <span className="flex items-center gap-1 text-[11px] font-medium text-foreground/50">
+                            <span className="flex items-center gap-1 text-[11px] font-medium text-black/50">
                               <Bell className="w-3 h-3" />
                               {allTasks.length} tasks
                             </span>
