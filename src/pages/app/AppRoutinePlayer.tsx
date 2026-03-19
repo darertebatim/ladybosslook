@@ -13,8 +13,9 @@ import { startOfDay, endOfDay, format } from 'date-fns';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { toast } from 'sonner';
 import { SortableTaskList } from '@/components/app/SortableTaskList';
-import { useTasksForDate, useCompletionsForDate, UserTask, useAddGoalProgress } from '@/hooks/useTaskPlanner';
+import { useTasksForDate, useCompletionsForDate, UserTask, useAddGoalProgress, useDeleteTask } from '@/hooks/useTaskPlanner';
 import { isWaterTask } from '@/lib/waterTracking';
+import { TaskDetailModal } from '@/components/app/TaskDetailModal';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -154,6 +155,7 @@ export default function AppRoutinePlayer() {
   // Pre-start state — now just stores the routine to show planner-style overlay
   const [preStartRoutine, setPreStartRoutine] = useState<any | null>(null);
   const [loadingRoutineId, setLoadingRoutineId] = useState<string | null>(null);
+  const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
 
   // Planner hooks for the pre-start overlay (uses today's date)
   const today = useMemo(() => new Date(), []);
@@ -348,8 +350,25 @@ export default function AppRoutinePlayer() {
   }, [today, addGoalProgress]);
 
   const handleOpenTimer = useCallback((_task: UserTask) => {
-    // Timer handled by focus player, no-op here
+    // Timer handled by routine player, no-op here
   }, []);
+
+  const handleTaskTap = useCallback((task: UserTask) => {
+    setSelectedTask(task);
+  }, []);
+
+  const deleteTask = useDeleteTask();
+  const handleEditTask = useCallback((task: UserTask) => {
+    setSelectedTask(null);
+    navigate(`/app/home/edit/${task.id}`);
+  }, [navigate]);
+
+  const handleDeleteTask = useCallback((task: UserTask) => {
+    setSelectedTask(null);
+    deleteTask.mutate(task.id, {
+      onSuccess: () => toast.success('Task deleted'),
+    });
+  }, [deleteTask]);
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
@@ -509,7 +528,7 @@ export default function AppRoutinePlayer() {
                 completedTaskIds={plannerCompletedTaskIds}
                 completedSubtaskIds={plannerCompletedSubtaskIds}
                 goalProgressMap={plannerGoalProgressMap}
-                onTaskTap={() => {}}
+                onTaskTap={handleTaskTap}
                 onStreakIncrease={() => {}}
                 onOpenGoalInput={handleOpenGoalInput}
                 onOpenTimer={handleOpenTimer}
@@ -538,6 +557,22 @@ export default function AppRoutinePlayer() {
                 : 'Start'}
             </button>
           </div>
+
+          {/* Task Detail Modal */}
+          <TaskDetailModal
+            task={selectedTask}
+            open={!!selectedTask}
+            onClose={() => setSelectedTask(null)}
+            date={today}
+            isCompleted={selectedTask ? plannerCompletedTaskIds.has(selectedTask.id) : false}
+            completedSubtaskIds={plannerCompletedSubtaskIds}
+            goalProgress={selectedTask ? (plannerGoalProgressMap.get(selectedTask.id) || 0) : 0}
+            onEdit={handleEditTask}
+            onDelete={handleDeleteTask}
+            onStreakIncrease={() => {}}
+            onOpenGoalInput={handleOpenGoalInput}
+            onOpenTimer={handleOpenTimer}
+          />
         </div>
       )}
 
