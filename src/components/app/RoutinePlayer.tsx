@@ -1,4 +1,5 @@
 import { memo, useState, useCallback, useEffect } from 'react';
+import { RoutineCountdown } from './RoutineCountdown';
 import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus, GripVertical, ExternalLink } from 'lucide-react';
 import { format, addSeconds } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -26,7 +27,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 interface RoutinePlayerProps {
-  phase: 'breathe' | 'running' | 'paused' | 'summary';
+  phase: 'breathe' | 'countdown' | 'running' | 'paused' | 'summary';
   config: RoutinePlayerConfig;
   currentTask: { id: string; title: string; emoji: string; targetSeconds: number; color?: string } | null;
   currentTaskIndex: number;
@@ -40,6 +41,7 @@ interface RoutinePlayerProps {
   taskStartedAt: Date;
   pauseElapsed: number;
   onBreathComplete: () => void;
+  onCountdownComplete: () => void;
   onCompleteTask: () => void;
   onSkipTask: () => void;
   onTogglePause: () => void;
@@ -182,6 +184,7 @@ export const RoutinePlayer = memo(function RoutinePlayer({
   taskStartedAt,
   pauseElapsed,
   onBreathComplete,
+  onCountdownComplete,
   onCompleteTask,
   onSkipTask,
   onTogglePause,
@@ -219,6 +222,17 @@ export const RoutinePlayer = memo(function RoutinePlayer({
         ? 100
         : Math.max(0, Math.min(100, ((currentTask.targetSeconds - timeLeft) / currentTask.targetSeconds) * 100))
     : 0;
+
+  // Countdown phase — 3-2-1-GO
+  if (phase === 'countdown') {
+    return (
+      <RoutineCountdown
+        routineEmoji={config.routineEmoji}
+        routineTitle={config.routineTitle}
+        onComplete={onCountdownComplete}
+      />
+    );
+  }
 
   // Breathe phase removed — go straight to running
   if (phase === 'breathe') {

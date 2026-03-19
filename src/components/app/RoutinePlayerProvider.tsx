@@ -101,7 +101,7 @@ export function RoutinePlayerProvider({ children }: { children: ReactNode }) {
   const autoOpenedTaskRef = useRef<string | null>(null);
   useEffect(() => {
     const task = player.currentTask;
-    if (!task?.proLinkType || !isActive || minimized) return;
+    if (!task?.proLinkType || !isActive || minimized || player.phase === 'countdown') return;
     const taskKey = `${task.userTaskId || task.title}-${player.currentTaskIndex}`;
     if (autoOpenedTaskRef.current === taskKey) return;
     autoOpenedTaskRef.current = taskKey;
@@ -136,7 +136,7 @@ export function RoutinePlayerProvider({ children }: { children: ReactNode }) {
       {showFullPlayer && (
         <OverlayPortal>
           <RoutinePlayer
-            phase={player.phase as 'breathe' | 'running' | 'paused' | 'summary'}
+            phase={player.phase as 'breathe' | 'countdown' | 'running' | 'paused' | 'summary'}
             config={player.config!}
             currentTask={player.currentTask}
             currentTaskIndex={player.currentTaskIndex}
@@ -150,6 +150,7 @@ export function RoutinePlayerProvider({ children }: { children: ReactNode }) {
             taskStartedAt={player.taskStartedAt}
             pauseElapsed={player.pauseElapsed}
             onBreathComplete={player.onBreathComplete}
+            onCountdownComplete={player.onCountdownComplete}
             onCompleteTask={player.completeTask}
             onSkipTask={player.skipTask}
             onTogglePause={player.togglePause}

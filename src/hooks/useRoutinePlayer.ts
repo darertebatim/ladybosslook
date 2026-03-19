@@ -29,7 +29,7 @@ export interface RoutinePlayerConfig {
   tasks: RoutineTask[];
 }
 
-type PlayerPhase = 'idle' | 'breathe' | 'running' | 'paused' | 'summary';
+type PlayerPhase = 'idle' | 'breathe' | 'countdown' | 'running' | 'paused' | 'summary';
 
 export function useRoutinePlayer() {
   const { user } = useAuth();
@@ -135,7 +135,7 @@ export function useRoutinePlayer() {
     const target = cfg.tasks[startIdx]?.targetSeconds || 0;
     setTimeLeft(target);
     originalTargetRef.current = target;
-    setPhase('running');
+    setPhase(resumeOptions ? 'running' : 'countdown');
 
     if (resumeOptions?.existingSessionId) {
       setSessionId(resumeOptions.existingSessionId);
@@ -158,6 +158,12 @@ export function useRoutinePlayer() {
 
   /** @deprecated Breathing intro removed */
   const onBreathComplete = useCallback(() => {
+    setPhase('running');
+    setTaskStartedAt(new Date());
+    elapsedRef.current = 0;
+  }, []);
+
+  const onCountdownComplete = useCallback(() => {
     setPhase('running');
     setTaskStartedAt(new Date());
     elapsedRef.current = 0;
@@ -404,6 +410,7 @@ export function useRoutinePlayer() {
     pauseElapsed,
     startRoutine,
     onBreathComplete,
+    onCountdownComplete,
     completeTask,
     skipTask,
     moveTaskToEnd,
