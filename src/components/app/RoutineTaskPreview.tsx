@@ -20,12 +20,13 @@ function useRoutinePreviewData(routineId: string) {
       if (!user) return [];
       const { data } = await supabase
         .from('user_tasks')
-        .select('emoji, title, order_index')
+        .select('emoji, title, order_index, pro_link_type')
         .eq('user_id', user.id)
         .eq('source_routine_id', routineId)
         .eq('is_active', true)
         .order('order_index', { ascending: true });
-      return (data || []).map((t: any) => ({ emoji: t.emoji || '📝', title: t.title }));
+      // Exclude pro-task launchers from the emoji chain
+      return (data || []).filter((t: any) => t.pro_link_type !== 'routine').map((t: any) => ({ emoji: t.emoji || '📝', title: t.title }));
     },
     enabled: !!user && !!routineId,
     staleTime: 60_000,

@@ -324,10 +324,11 @@ export default function AppRoutinePlayer() {
       if (!user || routineIds.length === 0) return {};
       const { data } = await supabase
         .from('user_tasks')
-        .select('source_routine_id, title, emoji, order_index')
+        .select('source_routine_id, title, emoji, order_index, pro_link_type')
         .eq('user_id', user.id)
         .eq('is_active', true)
         .in('source_routine_id', routineIds)
+        .neq('pro_link_type', 'routine')
         .order('order_index', { ascending: true });
 
       const map: Record<string, { title: string; emoji: string }[]> = {};
@@ -366,10 +367,11 @@ export default function AppRoutinePlayer() {
       if (!user || routineIds.length === 0) return {};
       const { data } = await supabase
         .from('user_tasks')
-        .select('id, source_routine_id, title, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date')
+        .select('id, source_routine_id, title, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date, pro_link_type')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .in('source_routine_id', routineIds);
+        .in('source_routine_id', routineIds)
+        .neq('pro_link_type', 'routine');
 
       const map: Record<string, { id: string; scheduled_date: string | null; repeat_pattern: string; repeat_days: number[] | null; created_at: string; repeat_end_date: string | null }[]> = {};
       (data || []).forEach((t: any) => {
@@ -567,7 +569,7 @@ export default function AppRoutinePlayer() {
   // Filter planner tasks to only the selected routine's tasks
   const routineFilteredTasks = useMemo(() => {
     if (!preStartRoutine) return [];
-    return plannerTasks.filter(t => t.source_routine_id === preStartRoutine.routine_id);
+    return plannerTasks.filter(t => t.source_routine_id === preStartRoutine.routine_id && (t as any).pro_link_type !== 'routine');
   }, [plannerTasks, preStartRoutine]);
 
   // Calculate routine duration for header
