@@ -1,39 +1,40 @@
 
 
-## Plan: Auto-insert Routine Pro-Task in Edit Routine Sheet
+# Fix Pro-Task (Routine Launcher) Root Issues
 
-### What
-When a user opens the Edit Routine sheet and the routine has **more than 1 task**, automatically insert a "▶️ Play Routine" pro-task as the first item. It's selected by default but users can toggle it off. Single-task routines (like adding individual tools) are excluded.
+## Problem
+1. The routine launcher pro-task is inserted with `source_routine_id = routineId`, making it appear as a member task of the routine it launches
+2. When playing a routine, tasks with `pro_link_type = 'routine'` (pointing back to routine player) are included in the play session, causing loops and wrong percentages
 
-### How
+## Changes
 
-**File: `src/components/app/RoutinePreviewSheet.tsx`**
+### 1. Separate launcher from routine tasks at insert time
+**File: `src/hooks/useRoutinesBank.tsx` (line 643)**
+- Change `source_routine_id: routineId` to `source_routine_id: null` in the pro-task insert block
+- This makes the launcher a standalone planner shortcut, not a routine member
 
-1. **Accept new props**: `routineBankId` (the routine's bank ID) passed from parent pages.
+### 2. Exclude routine-launcher tasks from play session
+**File: `src/pages/app/AppRoutinePlayer.tsx` (line 629-631)**
+- In `routineFilteredTasks`, add filter: exclude tasks where `pro_link_type === 'routine'`
+- This prevents any routine-launcher task from appearing in the pre-start list or being sent to `startRoutine()`
 
-2. **Generate a synthetic pro-task**: When `tasks.length > 1`, create a synthetic `RoutinePlanTask` at the top of the list:
-   - ID: `__pro_task_routine__` (synthetic, distinguishable)
-   - Title: `"▶️ ${routineTitle}"` (or use the routine title with a Play emoji)
-   - Icon: `▶️`
-   - `pro_link_type`: `'routine'`
-   - `pro_link_value`: the routine bank ID
-   - `repeat_pattern`: `'daily'`
+### 3. Delete launcher alongside routine
+**File: `src/pages/app/AppRoutinePlayer.tsx` (line 529-538)**
+- In `handleDeleteRoutine`, add a second delete call to remove standalone launcher tasks: `pro_link_type = 'routine'` AND `pro_link_value = routine.routine_id`
+- Since the launcher now has `source_routine_id = null`, the existing delete by `source_routine_id` won't catch it
 
-3. **Merge into task list**: Use `useMemo` to prepend the synthetic task to the real tasks array. It participates in the same selection/toggle logic as other tasks.
+### 4. Fix orphan cleanup to not delete routines with launchers only
+**File: `src/pages/app/AppRoutinePlayer.tsx` (line 504-527)**
+- The orphan cleanup counts tasks by `source_routine_id`. Since launcher now has `source_routine_id = null`, it won't inflate the count. This is correct behavior — a routine with only a launcher and no real tasks should be cleanable.
 
-4. **Visual distinction**: Render the pro-task card with a subtle "Routine Launcher" label or a distinct style (e.g., a play icon badge) so users understand it opens the routine player.
+### 5. Fix existing bad data
+- Run a data update: `UPDATE user_tasks SET source_routine_id = NULL WHERE pro_link_type = 'routine' AND source_routine_id IS NOT NULL`
+- This repairs previously inserted launcher tasks
 
-5. **On save**: The synthetic pro-task flows through the existing `onSave(selectedTaskIds, editedTasks)` pipeline. The parent (`AppInspireDetail`, etc.) already handles `pro_link_type: 'routine'` tasks — no changes needed there.
-
-**File: `src/pages/app/AppInspireDetail.tsx`**
-- Pass `routineBankId={routine.id}` to `RoutinePreviewSheet`.
-
-**Files with other RoutinePreviewSheet usages** (AppRoutinePlayer, AppReflections, AppAudioPlayer, AppChannelsList):
-- These pass single synthetic tasks, so no `routineBankId` → pro-task won't appear (tasks.length ≤ 1 guard).
-
-### Technical Details
-
-- The synthetic task ID uses a `__pro_task_` prefix to avoid collision with real UUIDs
-- The `tasks.length > 1` check on the **original** tasks array (before prepending) ensures single-tool additions are excluded
-- The pro-task is included in `selectedTaskIds` by default via the existing `useEffect` sync
+## Technical Summary
+```
+Before: launcher has source_routine_id = routineId → counted as routine step
+After:  launcher has source_routine_id = null → standalone planner shortcut
+        + routineFilteredTasks excludes pro_link_type='routine' defensively
+```
 
