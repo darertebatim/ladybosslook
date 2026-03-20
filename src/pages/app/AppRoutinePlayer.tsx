@@ -424,7 +424,7 @@ export default function AppRoutinePlayer() {
         .select('id, source_routine_id, title, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .is('pro_link_type', null)
+        .or('pro_link_type.is.null,pro_link_type.neq.routine')
         .in('source_routine_id', routineIds);
 
       const map: Record<string, { id: string; scheduled_date: string | null; repeat_pattern: string; repeat_days: number[] | null; created_at: string; repeat_end_date: string | null }[]> = {};
