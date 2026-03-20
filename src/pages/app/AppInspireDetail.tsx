@@ -614,7 +614,7 @@ export default function AppInspireDetail() {
                 // Fetch user's OWN tasks by source_routine_id
                 const { data: userTasks } = await supabase
                   .from('user_tasks')
-                  .select('id, title, emoji, color, goal_target, order_index')
+                  .select('id, title, emoji, color, goal_target, goal_type, duration_minutes, order_index')
                   .eq('user_id', user.id)
                   .eq('source_routine_id', planId!)
                   .eq('is_active', true)
@@ -625,18 +625,34 @@ export default function AppInspireDetail() {
                   return;
                 }
 
+                // Fetch smart estimates
+                const { fetchSmartEstimates } = await import('@/lib/smartEstimate');
+                const estimateInputs = userTasks.map((t: any) => ({
+                  taskTitle: t.title,
+                  durationMinutes: t.duration_minutes ?? null,
+                  goalType: t.goal_type || null,
+                  goalTarget: t.goal_target || null,
+                }));
+                const estimates = await fetchSmartEstimates(user.id, estimateInputs);
+
                 startRoutine({
                   routineId: planId!,
                   routineTitle: routine.title,
                   routineEmoji: routine.emoji || '✨',
-                  tasks: userTasks.map((t: any) => ({
-                    id: t.id,
-                    title: t.title,
-                    emoji: t.emoji || '📝',
-                    targetSeconds: t.goal_target || 300,
-                    color: t.color || undefined,
-                    userTaskId: t.id, // Key fix: pass real user_task ID for planner sync
-                  })),
+                  tasks: userTasks.map((t: any) => {
+                    const isTimer = t.goal_type === 'timer';
+                    const estimate = estimates.get(t.title);
+                    return {
+                      id: t.id,
+                      title: t.title,
+                      emoji: t.emoji || '📝',
+                      targetSeconds: isTimer ? (t.goal_target || 300) : (estimate || 60),
+                      color: t.color || undefined,
+                      userTaskId: t.id,
+                      hasTimerGoal: isTimer,
+                      isEstimate: !isTimer,
+                    };
+                  }),
                 });
               }}
               className="flex-1 h-12 rounded-xl text-base font-semibold gap-2"
