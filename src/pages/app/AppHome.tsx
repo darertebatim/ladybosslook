@@ -66,6 +66,7 @@ const AppHome = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchParams, setSearchParams] = useSearchParams();
   const taskFilter = searchParams.get('filter') || 'all';
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const setTaskFilter = useCallback((val: string) => {
     setSearchParams(prev => {
       const next = new URLSearchParams(prev);
