@@ -676,6 +676,8 @@ export function useAddRoutineFromBank() {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['user-routines-bank'] });
+      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
+      queryClient.invalidateQueries({ queryKey: ['linkable-user-routines'] });
       queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
     },
   });
