@@ -513,23 +513,6 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => {
                 haptic.light();
-                const idx = TIME_OPTIONS.indexOf(quickTime);
-                setQuickTime(TIME_OPTIONS[(idx + 1) % TIME_OPTIONS.length]);
-              }}
-              className={cn(
-                "h-9 px-3.5 rounded-full text-[13px] font-semibold flex items-center gap-1.5 active:scale-95 transition-all",
-                quickTime !== 'Anytime'
-                  ? "bg-white text-black shadow-sm"
-                  : "bg-white/20 text-white/80"
-              )}
-            >
-              <Clock className="h-3.5 w-3.5" />
-              {quickTime.toUpperCase()}
-            </button>
-            <button
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => {
-                haptic.light();
                 const idx = REPEAT_OPTIONS.indexOf(quickRepeat);
                 setQuickRepeat(REPEAT_OPTIONS[(idx + 1) % REPEAT_OPTIONS.length]);
               }}
@@ -542,6 +525,23 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
             >
               <Repeat className="h-3.5 w-3.5" />
               {quickRepeat.toUpperCase()}
+            </button>
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                haptic.light();
+                const idx = TIME_OPTIONS.indexOf(quickTime);
+                setQuickTime(TIME_OPTIONS[(idx + 1) % TIME_OPTIONS.length]);
+              }}
+              className={cn(
+                "h-9 px-3.5 rounded-full text-[13px] font-semibold flex items-center gap-1.5 active:scale-95 transition-all",
+                quickTime !== 'Anytime'
+                  ? "bg-white text-black shadow-sm"
+                  : "bg-white/20 text-white/80"
+              )}
+            >
+              <Clock className="h-3.5 w-3.5" />
+              {quickTime.toUpperCase()}
             </button>
             <button
               onMouseDown={(e) => e.preventDefault()}
