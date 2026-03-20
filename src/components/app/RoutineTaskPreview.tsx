@@ -73,12 +73,10 @@ function useRoutinePreviewData(routineId: string) {
 
       const manualCompleted = completedCount || 0;
 
-      // Use whichever gives higher completion (session or manual)
-      let pct = totalTasks > 0 ? Math.round((manualCompleted / totalTasks) * 100) : 0;
-      if (session && session.tasks_total > 0) {
-        const sessionPct = Math.round((session.tasks_completed / session.tasks_total) * 100);
-        pct = Math.max(pct, sessionPct);
-      }
+      // Compare completed counts using the same denominator (current routine tasks)
+      const sessionCompleted = session ? Math.max(session.tasks_completed, 0) : 0;
+      const completedCount = Math.max(manualCompleted, Math.min(sessionCompleted, totalTasks));
+      const pct = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
 
       return { pct, isComplete: pct >= 100 };
     },
