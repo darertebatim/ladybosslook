@@ -1399,6 +1399,47 @@ const AppTaskCreate = ({
             </button>
           </div>
           <div className="px-5 pt-4 pb-6 overflow-y-auto h-[calc(50vh-56px)]">
+            {/* History average banner */}
+            {durationHistory && (
+              <button
+                onClick={() => {
+                  const newVal = !useHistoryDuration;
+                  setUseHistoryDuration(newVal);
+                  if (newVal) {
+                    setDurationMinutes(durationHistory.avgMinutes);
+                  }
+                }}
+                className={cn(
+                  "w-full flex items-center justify-between px-4 py-3 rounded-2xl mb-4 transition-all border-2",
+                  useHistoryDuration
+                    ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-400"
+                    : "bg-muted/30 border-transparent"
+                )}
+              >
+                <div className="flex items-center gap-2.5 text-left">
+                  <span className="text-lg">⏱️</span>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      Avg from history: <span className="tabular-nums font-bold">{durationHistory.avgMinutes} min</span>
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">
+                      Based on {durationHistory.count} routine sessions
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={useHistoryDuration}
+                  onCheckedChange={(checked) => {
+                    setUseHistoryDuration(checked);
+                    if (checked) {
+                      setDurationMinutes(durationHistory.avgMinutes);
+                    }
+                  }}
+                  className="pointer-events-none"
+                />
+              </button>
+            )}
+
             <p className="text-xs text-muted-foreground text-center mb-4">
               Countdown estimate for the Routine Player
             </p>
