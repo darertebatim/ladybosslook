@@ -349,10 +349,13 @@ const AppTaskCreate = ({
   sheetOpen = false, 
   onSheetOpenChange, 
   initialData,
-  onSaveSheet 
+  onSaveSheet,
+  editTaskId: editTaskIdProp,
+  createParams,
 }: AppTaskCreateProps) => {
   const navigate = useNavigate();
-  const { taskId } = useParams<{ taskId?: string }>();
+  const { taskId: routeTaskId } = useParams<{ taskId?: string }>();
+  const taskId = editTaskIdProp || routeTaskId;
   const [searchParams] = useSearchParams();
   
   // Get URL params for pre-filled data from quick start
