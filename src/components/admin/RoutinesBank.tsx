@@ -1995,47 +1995,53 @@ export default function RoutinesBank() {
                       const taskColor = getTaskColor(task);
                       const colorHex = colorHexMap[taskColor] || '#C5E8FA';
                       return (
-                      <div key={task.id} className="rounded border overflow-hidden" style={{ backgroundColor: `${colorHex}30` }}>
-                        <div className="flex items-center gap-2 p-2">
-                          <div className="flex flex-col">
-                            <button type="button" onClick={() => moveTaskUp(task.id, sectionId)} disabled={tIdx === 0} className="text-muted-foreground hover:text-foreground disabled:opacity-30">
-                              <ChevronUp className="h-3 w-3" />
+                      <SortableTaskRowItem key={task.id} id={task.id}>
+                        {(dragHandleProps) => (
+                        <div className="rounded border overflow-hidden" style={{ backgroundColor: `${colorHex}30` }}>
+                          <div className="flex items-center gap-2 p-2">
+                            <button type="button" {...dragHandleProps} className="cursor-grab active:cursor-grabbing touch-none text-muted-foreground hover:text-foreground p-0.5">
+                              <GripVertical className="h-4 w-4" />
                             </button>
-                            <button type="button" onClick={() => moveTaskDown(task.id, sectionId)} disabled={tIdx === listLength - 1} className="text-muted-foreground hover:text-foreground disabled:opacity-30">
-                              <ChevronDown className="h-3 w-3" />
+                            <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: colorHex }} />
+                            <TaskIcon iconName={task.emoji} size={16} />
+                            <span className="flex-1 text-sm truncate">{task.title}</span>
+                            {renderTaskScheduleConfig(task)}
+                            {localSections.length > 0 && (
+                              <Select value="" onValueChange={(sid) => { setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, section_id: sid } : t)); }}>
+                                <SelectTrigger className="w-[100px] h-7 text-xs"><span className="text-muted-foreground">Move to...</span></SelectTrigger>
+                                <SelectContent>
+                                  {localSections.map((s) => (
+                                    <SelectItem key={s.id} value={s.id} className="text-xs">{s.title}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                            {task.task_id && (
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); openEditActionSheet(task.task_id!); }}
+                                className="p-1 text-muted-foreground hover:text-foreground rounded hover:bg-accent"
+                                title="Edit task"
+                              >
+                                <Pencil className="h-3 w-3" />
+                              </button>
+                            )}
+                            <button type="button" onClick={() => removeTask(task.id)} className="p-1 text-destructive hover:bg-destructive/10 rounded">
+                              <X className="h-3 w-3" />
                             </button>
                           </div>
-                          <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: colorHex }} />
-                          <TaskIcon iconName={task.emoji} size={16} />
-                          <span className="flex-1 text-sm truncate">{task.title}</span>
-                          {renderTaskScheduleConfig(task)}
-                          {localSections.length > 0 && (
-                            <Select value="" onValueChange={(sid) => { setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, section_id: sid } : t)); }}>
-                              <SelectTrigger className="w-[100px] h-7 text-xs"><span className="text-muted-foreground">Move to...</span></SelectTrigger>
-                              <SelectContent>
-                                {localSections.map((s) => (
-                                  <SelectItem key={s.id} value={s.id} className="text-xs">{s.title}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          )}
-                          {task.task_id && (
-                            <button
-                              type="button"
-                              onClick={(e) => { e.stopPropagation(); openEditActionSheet(task.task_id!); }}
-                              className="p-1 text-muted-foreground hover:text-foreground rounded hover:bg-accent"
-                              title="Edit task"
-                            >
-                              <Pencil className="h-3 w-3" />
-                            </button>
-                          )}
-                          <button type="button" onClick={() => removeTask(task.id)} className="p-1 text-destructive hover:bg-destructive/10 rounded">
-                            <X className="h-3 w-3" />
-                          </button>
                         </div>
-                      </div>
+                        )}
+                      </SortableTaskRowItem>
                     );};
 
+                    const renderSortableList = (tasks: LocalTask[], sectionId: string | null) => (
+                      <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={(e) => handleTaskDragEnd(e, tasks, sectionId)}>
+                        <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                          {tasks.map((task, tIdx) => renderTaskRow(task, tIdx, tasks.length, sectionId))}
+                        </SortableContext>
+                      </DndContext>
+                    );
                     // For challenge/project mode, show flat list
                     if (formData.schedule_type === 'challenge' || formData.schedule_type === 'project') {
                       const modeLabel = formData.schedule_type === 'project' ? 'Steps' : 'Tasks';
