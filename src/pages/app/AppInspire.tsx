@@ -15,6 +15,7 @@ import {
 import { RoutinesTour, TourHelpButton } from '@/components/app/tour';
 import { PromoBanner } from '@/components/app/PromoBanner';
 import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
+import { useScrollRestore } from '@/hooks/useScrollRestore';
 
 export default function AppInspire() {
   const navigate = useNavigate();
