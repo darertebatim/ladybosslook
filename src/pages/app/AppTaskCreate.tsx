@@ -61,6 +61,7 @@ import { ProLinkPicker } from '@/components/app/ProLinkPicker';
 import { GoalSettingsSheet, GoalSettings, formatGoalTarget } from '@/components/app/GoalSettingsSheet';
 import { NumberKeypad } from '@/components/app/NumberKeypad';
 import { TimePeriod, TIME_PERIODS, TimeMode, getTimeMode, formatTimeLabel, formatTimeRange, getTimePeriodConfig, normalizeTimePeriod } from '@/lib/taskScheduling';
+import SubtaskEditorSheet from '@/components/app/SubtaskEditorSheet';
 
 // Me+ style pastel color options with hex values
 const COLOR_OPTIONS: { name: TaskColor; hex: string }[] = [
