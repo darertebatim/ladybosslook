@@ -61,6 +61,7 @@ import { ProLinkPicker } from '@/components/app/ProLinkPicker';
 import { GoalSettingsSheet, GoalSettings, formatGoalTarget } from '@/components/app/GoalSettingsSheet';
 import { NumberKeypad } from '@/components/app/NumberKeypad';
 import { TimePeriod, TIME_PERIODS, TimeMode, getTimeMode, formatTimeLabel, formatTimeRange, getTimePeriodConfig, normalizeTimePeriod } from '@/lib/taskScheduling';
+import SubtaskEditorSheet from '@/components/app/SubtaskEditorSheet';
 
 // Me+ style pastel color options with hex values
 const COLOR_OPTIONS: { name: TaskColor; hex: string }[] = [
@@ -486,6 +487,7 @@ const AppTaskCreate = ({
   const [showVideoPicker, setShowVideoPicker] = useState(false);
   const [showVideoPlaylistPicker, setShowVideoPlaylistPicker] = useState(false);
   const [showProgramPicker, setShowProgramPicker] = useState(false);
+  const [showSubtaskEditor, setShowSubtaskEditor] = useState(false);
   const [showGoalSettings, setShowGoalSettings] = useState(false);
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
   const [audioSearchQuery, setAudioSearchQuery] = useState('');
@@ -1244,38 +1246,20 @@ const AppTaskCreate = ({
         </button>
       </div>
 
-      {/* Subtasks Card - Sortable */}
-      <div className="mx-4 mt-2 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">
-        <DndContext
-          sensors={subtaskSensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleSubtaskDragEnd}
-        >
-          <SortableContext items={subtasks.map((_, i) => `subtask-${i}`)} strategy={verticalListSortingStrategy}>
-            {subtasks.map((subtask, index) => (
-              <SortableSubtaskItem
-                key={`subtask-${index}`}
-                id={`subtask-${index}`}
-                subtask={subtask}
-                onRemove={() => removeSubtask(index)}
-              />
-            ))}
-          </SortableContext>
-        </DndContext>
-
-        <div className="flex items-center gap-3 px-4 py-3">
-          <Plus className="h-5 w-5 text-black shrink-0" />
-          <Input
-            ref={newSubtaskInputRef}
-            value={newSubtask}
-            onChange={(e) => setNewSubtask(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && addSubtask()}
-            onFocus={handleNewSubtaskFocus}
-            placeholder="Subtasks"
-            className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto text-base text-black placeholder:text-black/50"
-          />
-        </div>
-      </div>
+      {/* Subtasks - Opens sub-sheet */}
+      <button
+        onClick={() => setShowSubtaskEditor(true)}
+        className="mx-4 mt-2 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm px-4 py-3.5 flex items-center gap-3 w-[calc(100%-2rem)] active:scale-[0.98] transition-transform"
+      >
+        <Plus className="h-5 w-5 text-muted-foreground shrink-0" />
+        <span className={cn(
+          "flex-1 text-left text-base",
+          subtasks.length > 0 ? "text-foreground font-medium" : "text-muted-foreground/50"
+        )}>
+          {subtasks.length > 0 ? `${subtasks.length} subtask${subtasks.length > 1 ? 's' : ''}` : 'Subtasks'}
+        </span>
+        <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+      </button>
 
       {/* Subtasks hint text */}
       <p className="text-center text-sm text-black mt-3 px-6">
@@ -1296,6 +1280,14 @@ const AppTaskCreate = ({
         onOpenChange={setShowIconPicker}
         selectedEmoji={icon}
         onSelect={setIcon}
+      />
+
+      {/* Subtask Editor Sheet */}
+      <SubtaskEditorSheet
+        open={showSubtaskEditor}
+        onOpenChange={setShowSubtaskEditor}
+        subtasks={subtasks}
+        onSave={setSubtasks}
       />
 
       {/* Goal Settings Sheet */}
