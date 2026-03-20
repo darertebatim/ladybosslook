@@ -1371,7 +1371,7 @@ const AppTaskCreate = ({
               Countdown estimate for the Routine Player
             </p>
             <div className="grid grid-cols-3 gap-2">
-              {[1, 2, 3, 5, 10, 15, 20, 30, 45].map(mins => (
+              {[1, 2, 3, 5, 10, 15, 20, 30].map(mins => (
                 <button
                   key={mins}
                   onClick={() => {
@@ -1389,6 +1389,32 @@ const AppTaskCreate = ({
                   <span className="text-[11px] text-muted-foreground block -mt-0.5">min</span>
                 </button>
               ))}
+              {/* Custom duration input */}
+              <div className="relative">
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  max={480}
+                  placeholder="—"
+                  value={durationMinutes && ![1,2,3,5,10,15,20,30].includes(durationMinutes) ? durationMinutes : ''}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value);
+                    if (!isNaN(val) && val > 0 && val <= 480) {
+                      setDurationMinutes(val);
+                    } else if (e.target.value === '') {
+                      setDurationMinutes(null);
+                    }
+                  }}
+                  className={cn(
+                    "w-full py-3.5 rounded-2xl font-semibold text-center transition-all border-2 outline-none bg-muted/30 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+                    durationMinutes && ![1,2,3,5,10,15,20,30].includes(durationMinutes)
+                      ? "bg-primary/10 border-primary text-primary ring-2 ring-primary/20"
+                      : "border-transparent text-foreground"
+                  )}
+                />
+                <span className="text-[11px] text-muted-foreground block text-center -mt-1 pb-1">custom</span>
+              </div>
             </div>
           </div>
         </SheetContent>
