@@ -85,8 +85,12 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
           className={cn(
             "inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full text-[11px] font-medium",
             "bg-muted/60 text-foreground/80 active:scale-95 transition-transform",
-            "border border-border/50"
+            "border border-border/50",
+            "animate-[filter-nudge_4s_ease-in-out_infinite]"
           )}
+          style={{
+            animationDelay: '2s',
+          }}
         >
           <Filter className="h-3 w-3 opacity-50" />
           <span className="truncate max-w-[120px]">{currentLabel}</span>

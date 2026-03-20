@@ -208,6 +208,10 @@ export default {
 					'96%': { opacity: '0.15' },
 					'97%': { opacity: '0' },
 					'98%': { opacity: '0.08' },
+				'filter-nudge': {
+					'0%, 85%, 100%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(0,0,0,0)' },
+					'90%': { transform: 'scale(1.08)', boxShadow: '0 0 0 4px rgba(0,0,0,0.06)' },
+					'95%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(0,0,0,0)' },
 				},
 			},
 			animation: {
