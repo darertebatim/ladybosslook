@@ -73,6 +73,7 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
 }) => {
   const [localSubtasks, setLocalSubtasks] = useState<string[]>([]);
   const [newSubtask, setNewSubtask] = useState('');
+  const [activeId, setActiveId] = useState<string | null>(null);
   const newInputRef = useRef<HTMLInputElement>(null);
   const itemRefs = useRef<(HTMLInputElement | null)[]>([]);
 
