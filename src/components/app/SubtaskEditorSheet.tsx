@@ -172,7 +172,7 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
           </div>
 
           {/* Subtitle */}
-          {localSubtasks.length === 0 && (
+          {items.length === 0 && (
             <p className="text-center text-sm text-muted-foreground px-6 py-6">
               Subtasks can be set as your daily routine or checklist
             </p>
