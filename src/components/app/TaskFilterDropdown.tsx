@@ -43,7 +43,7 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
 
   if (routineNames.size > 0) {
     groups.push({
-      label: 'My Routines',
+      label: 'Routines',
       options: Array.from(routineNames.entries()).map(([rid, name]) => ({
         value: `routine:${rid}`,
         label: name,
