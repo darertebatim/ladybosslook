@@ -641,9 +641,10 @@ const AppTaskCreate = ({
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
 
-  // Load existing task data for editing (page mode only)
-  const { data: existingTask } = useTask(isSheet ? undefined : taskId);
-  const { data: existingSubtasks } = useSubtasks(isSheet ? undefined : taskId);
+  // Load existing task data for editing (page mode, or sheet mode with editTaskId)
+  const shouldLoadFromDb = !!taskId && (!isSheet || !!editTaskIdProp);
+  const { data: existingTask } = useTask(shouldLoadFromDb ? taskId : undefined);
+  const { data: existingSubtasks } = useSubtasks(shouldLoadFromDb ? taskId : undefined);
   const { data: userTags = [] } = useUserTags();
   const createTag = useCreateTag();
 
