@@ -103,7 +103,7 @@ export const RoutinePlayBadge = memo(function RoutinePlayBadge({ routineId }: Ro
   const { completion } = useRoutinePreviewData(routineId);
 
   return (
-    <span className="flex items-center justify-center gap-0.5 mt-1 text-[11px] font-semibold text-black/50">
+    <span className="flex items-center justify-center gap-0.5 mt-1 text-[11px] font-semibold text-black">
       {completion?.isComplete ? (
         <RotateCw className="w-3 h-3" />
       ) : (
