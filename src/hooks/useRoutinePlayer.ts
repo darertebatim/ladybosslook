@@ -340,7 +340,7 @@ export function useRoutinePlayer() {
     const nextIndex = currentTaskIndex + 1;
     if (nextIndex >= config.tasks.length) {
       finishSession(results);
-      setPhase('summary');
+      setPhase('completing');
     } else {
       setCurrentTaskIndex(nextIndex);
       const target = config.tasks[nextIndex].targetSeconds;
