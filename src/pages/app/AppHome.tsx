@@ -1116,7 +1116,24 @@ const AppHome = () => {
                       >
                         Show all tasks
                       </button>
-                      <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} defaultRepeatOverride={taskFilter === 'one-time' ? 'No' : undefined} />
+                      {(taskFilter === 'all-routines' || taskFilter.startsWith('routine:')) ? (
+                        <div className="flex gap-2 mt-3 w-full">
+                          <button
+                            onClick={() => navigate('/app/routines')}
+                            className="flex-1 rounded-3xl py-2.5 bg-card border-2 border-urgency/30 text-[14px] font-semibold text-foreground active:scale-[0.98] transition-all"
+                          >
+                            Manage Routines
+                          </button>
+                          <button
+                            onClick={() => navigate('/app/inspire')}
+                            className="flex-1 rounded-3xl py-2.5 bg-card border-2 border-urgency/30 text-[14px] font-semibold text-foreground active:scale-[0.98] transition-all"
+                          >
+                            Browse Library
+                          </button>
+                        </div>
+                      ) : (
+                        <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} defaultRepeatOverride={taskFilter === 'one-time' ? 'No' : undefined} />
+                      )}
                     </div>
                   ) : (
                     <>
