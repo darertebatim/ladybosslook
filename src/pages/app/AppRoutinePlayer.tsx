@@ -531,6 +531,7 @@ export default function AppRoutinePlayer() {
         syntheticTasks: [addSheetSyntheticTask],
       });
       toast.success('Added to your planner! 📋');
+      queryClient.invalidateQueries({ queryKey: ['added-routine-tasks'] });
       setShowAddSheet(false);
       setAddRoutineTarget(null);
     } catch (error) {
