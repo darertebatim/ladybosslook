@@ -37,6 +37,17 @@ export default function AppInspire() {
     setStartTour(() => tourStart);
   }, []);
 
+  const saveScroll = useCallback(() => {
+    if (scrollRef.current) {
+      sessionStorage.setItem('routines_scroll', String(scrollRef.current.scrollTop));
+    }
+  }, []);
+
+  const navigateWithScroll = useCallback((path: string) => {
+    saveScroll();
+    navigate(path, { state: { from: location.pathname } });
+  }, [saveScroll, navigate, location.pathname]);
+
   const { data: categories, isLoading: categoriesLoading } = useRoutineBankCategories();
   const { data: allRoutines, isLoading: routinesLoading } = useRoutinesBank();
   const { data: popularRoutines, isLoading: popularLoading } = usePopularRoutinesBank();
