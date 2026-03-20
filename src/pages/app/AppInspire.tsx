@@ -136,7 +136,7 @@ export default function AppInspire() {
       {/* Header Spacer */}
       <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} />
 
-      <div className="flex-1 overflow-y-auto overflow-x-hidden w-full">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-hidden w-full">
         <div className="pb-safe w-full max-w-full">
           {/* Promo Banner - Top */}
           <PromoBanner location="routines_top" className="px-4 pt-3" carousel />
