@@ -1036,7 +1036,7 @@ const AppTaskCreate = ({
             maxLength={50}
           />
           {/* Tiny pen indicator for title */}
-          <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-muted flex items-center justify-center">
+          <div className="absolute bottom-0 left-0 w-5 h-5 rounded-full bg-muted flex items-center justify-center">
             <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
           </div>
         </div>
