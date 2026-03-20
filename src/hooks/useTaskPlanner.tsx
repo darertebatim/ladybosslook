@@ -951,6 +951,8 @@ export const useCompleteTask = () => {
       // Update challenge progress
       queryClient.invalidateQueries({ queryKey: ['user-challenges'] });
       queryClient.invalidateQueries({ queryKey: ['challenge-routine-infos'] });
+      // Update routine pro-task completion percentage
+      queryClient.invalidateQueries({ queryKey: ['routine-preview-completion'] });
       // Step unlock query refresh is handled by the UI celebration callback
       // to allow the celebration modal to show before tasks appear
     },
