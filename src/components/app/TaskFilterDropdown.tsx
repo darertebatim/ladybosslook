@@ -20,10 +20,14 @@ interface TaskFilterDropdownProps {
   routineNames: Map<string, string>;
   taskTags: string[];
   categoryNameMap: Map<string, string>;
+  externalOpen?: boolean;
+  onExternalOpenChange?: (open: boolean) => void;
 }
 
-export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTags, categoryNameMap }: TaskFilterDropdownProps) {
-  const [open, setOpen] = useState(false);
+export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTags, categoryNameMap, externalOpen, onExternalOpenChange }: TaskFilterDropdownProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = externalOpen ?? internalOpen;
+  const setOpen = (v: boolean) => { setInternalOpen(v); onExternalOpenChange?.(v); };
 
   const baseOptions: FilterOption[] = [
     { value: 'all', label: 'All Tasks' },
