@@ -119,6 +119,7 @@ export interface TaskFormData {
   goalType: 'timer' | 'count';
   goalTarget: number;
   goalUnit: string;
+  durationMinutes?: number | null;
 }
 
 // Playlist type for the picker
@@ -708,6 +709,7 @@ const AppTaskCreate = ({
         target: initialData.goalTarget ?? 1,
         unit: initialData.goalUnit ?? 'times',
       });
+      setDurationMinutes(initialData.durationMinutes ?? null);
     }
   }, [isSheet, initialData, sheetOpen]);
 

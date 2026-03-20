@@ -828,6 +828,7 @@ export default function RoutinesBank() {
       goalType: (task.goal_type as 'timer' | 'count') || 'count',
       goalTarget: task.goal_target || 2,
       goalUnit: task.goal_unit || 'times',
+      durationMinutes: task.duration_minutes || null,
     });
     setEditActionSheetOpen(true);
   };
@@ -853,6 +854,7 @@ export default function RoutinesBank() {
         tag: data.formData.tag,
         description: data.formData.description || null,
         time_period: data.formData.timePeriod || null,
+        duration_minutes: data.formData.durationMinutes || null,
       };
 
       const { error } = await supabase.from('admin_task_bank').update(taskData).eq('id', data.id);
