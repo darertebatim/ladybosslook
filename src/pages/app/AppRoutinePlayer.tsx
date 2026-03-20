@@ -236,6 +236,7 @@ export default function AppRoutinePlayer() {
 
   // Category slug → name map
   const { data: routineCategories = [] } = useRoutineBankCategories();
+  const { data: featuredRoutines = [] } = useFeaturedRoutinesBank();
   const categoryNameMap = useMemo(() => {
     const map = new Map<string, string>();
     routineCategories.forEach(cat => map.set(cat.slug, cat.name));
