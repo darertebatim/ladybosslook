@@ -1128,7 +1128,7 @@ const AppHome = () => {
                             onClick={() => navigate('/app/inspire')}
                             className="flex-1 rounded-3xl py-2.5 bg-card border-2 border-urgency/30 text-[14px] font-semibold text-foreground active:scale-[0.98] transition-all"
                           >
-                            Browse Library
+                            Browse Routines Library
                           </button>
                         </div>
                       ) : (
