@@ -324,10 +324,11 @@ export default function AppRoutinePlayer() {
       if (!user || routineIds.length === 0) return {};
       const { data } = await supabase
         .from('user_tasks')
-        .select('source_routine_id, title, emoji, order_index')
+        .select('source_routine_id, title, emoji, order_index, pro_link_type')
         .eq('user_id', user.id)
         .eq('is_active', true)
         .in('source_routine_id', routineIds)
+        .neq('pro_link_type', 'routine')
         .order('order_index', { ascending: true });
 
       const map: Record<string, { title: string; emoji: string }[]> = {};
