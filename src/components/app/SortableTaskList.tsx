@@ -27,7 +27,7 @@ import { Dialog, DialogContent, DialogPortal } from '@/components/ui/dialog';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
-import { Plus, MoreHorizontal } from 'lucide-react';
+import { Plus, MoreHorizontal, Clock, Repeat } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -324,6 +324,12 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   const [title, setTitle] = useState('');
   const [showIdeas, setShowIdeas] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
+  
+  // Quick shortcut states
+  const TIME_OPTIONS = ['Anytime', 'Morning', 'Afternoon', 'Evening', 'Bedtime'] as const;
+  const REPEAT_OPTIONS = ['No', 'Daily', 'Weekly'] as const;
+  const [quickTime, setQuickTime] = useState<typeof TIME_OPTIONS[number]>('Anytime');
+  const [quickRepeat, setQuickRepeat] = useState<typeof REPEAT_OPTIONS[number]>('No');
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsLayerRef = useRef<HTMLDivElement>(null);
   // Capture full screen height before keyboard opens to prevent shifting
@@ -384,12 +390,31 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
     setTitle('');
     setShowIdeas(false);
     setSelectedCategory('popular');
+    setQuickTime('Anytime');
+    setQuickRepeat('No');
+  };
+
+  // Map quick shortcut values to task params
+  const getQuickParams = () => {
+    const params: Record<string, any> = {};
+    if (quickTime !== 'Anytime') {
+      const timeMap: Record<string, string> = { Morning: 'morning', Afternoon: 'afternoon', Evening: 'evening', Bedtime: 'night' };
+      params.time_period = timeMap[quickTime];
+    }
+    if (quickRepeat === 'Daily') {
+      params.repeat_pattern = 'daily';
+    } else if (quickRepeat === 'Weekly') {
+      params.repeat_pattern = 'weekly';
+      params.repeat_days = [new Date().getDay()];
+    }
+    return params;
   };
 
   const handleSubmit = () => {
     const trimmed = title.trim();
     if (!trimmed) return;
     const variant = QUICK_ADD_VARIANTS[taskCount % QUICK_ADD_VARIANTS.length];
+    const qp = getQuickParams();
     haptic.medium();
     createTask.mutate({
       title: trimmed,
@@ -397,6 +422,9 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
       emoji: variant.emoji,
       color: variant.color,
       order_index: -1,
+      ...(qp.time_period ? { time_period: qp.time_period } : {}),
+      ...(qp.repeat_pattern ? { repeat_pattern: qp.repeat_pattern as any } : {}),
+      ...(qp.repeat_days ? { repeat_days: JSON.parse(qp.repeat_days) } : {}),
     });
     setTitle('');
     handleClose();
@@ -406,8 +434,10 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
     const trimmed = title.trim();
     if (!trimmed) return;
     haptic.light();
+    const qp = getQuickParams();
+    const urlParams = new URLSearchParams({ name: trimmed, ...Object.fromEntries(Object.entries(qp).map(([k, v]) => [k, typeof v === 'object' ? JSON.stringify(v) : String(v)])) });
     handleClose();
-    navigate(`/app/home/new?name=${encodeURIComponent(trimmed)}`);
+    navigate(`/app/home/new?${urlParams.toString()}`);
   };
 
   const handleTemplateSelect = (template: TaskTemplate) => {
@@ -477,6 +507,44 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
             }
           }}
         >
+          {/* Quick shortcut pills */}
+          <div className="flex gap-2 mb-2.5">
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                haptic.light();
+                const idx = TIME_OPTIONS.indexOf(quickTime);
+                setQuickTime(TIME_OPTIONS[(idx + 1) % TIME_OPTIONS.length]);
+              }}
+              className={cn(
+                "h-9 px-3.5 rounded-full text-[13px] font-semibold flex items-center gap-1.5 active:scale-95 transition-all",
+                quickTime !== 'Anytime'
+                  ? "bg-white text-black shadow-sm"
+                  : "bg-white/20 text-white/80"
+              )}
+            >
+              <Clock className="h-3.5 w-3.5" />
+              {quickTime.toUpperCase()}
+            </button>
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                haptic.light();
+                const idx = REPEAT_OPTIONS.indexOf(quickRepeat);
+                setQuickRepeat(REPEAT_OPTIONS[(idx + 1) % REPEAT_OPTIONS.length]);
+              }}
+              className={cn(
+                "h-9 px-3.5 rounded-full text-[13px] font-semibold flex items-center gap-1.5 active:scale-95 transition-all",
+                quickRepeat !== 'No'
+                  ? "bg-white text-black shadow-sm"
+                  : "bg-white/20 text-white/80"
+              )}
+            >
+              <Repeat className="h-3.5 w-3.5" />
+              {quickRepeat.toUpperCase()}
+            </button>
+          </div>
+
           {/* Card — two-tone */}
           <div className="rounded-3xl overflow-hidden bg-[#FFF5E6]">
             <div className="px-4 pt-4 pb-3">
