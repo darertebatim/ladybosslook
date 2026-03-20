@@ -1282,6 +1282,14 @@ const AppTaskCreate = ({
         onSelect={setIcon}
       />
 
+      {/* Subtask Editor Sheet */}
+      <SubtaskEditorSheet
+        open={showSubtaskEditor}
+        onOpenChange={setShowSubtaskEditor}
+        subtasks={subtasks}
+        onSave={setSubtasks}
+      />
+
       {/* Goal Settings Sheet */}
       <GoalSettingsSheet
         open={showGoalSettings}
