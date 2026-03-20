@@ -49,7 +49,7 @@ export function WelcomeSection() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/app/explore')}>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/app/tools')}>
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center gap-3">
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">

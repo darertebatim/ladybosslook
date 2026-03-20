@@ -39,7 +39,7 @@ export const PaywallGate = ({ programSlug, children, fallback }: PaywallGateProp
         This content requires an active subscription. Subscribe to unlock full access.
       </p>
       <Button 
-        onClick={() => navigate(programSlug ? `/${programSlug}` : '/app/explore')}
+        onClick={() => navigate(programSlug ? `/${programSlug}` : '/app/tools')}
         className="gap-2"
       >
         <Sparkles className="h-4 w-4" />
