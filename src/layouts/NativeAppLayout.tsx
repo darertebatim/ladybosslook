@@ -66,6 +66,9 @@ const NativeAppLayout = () => {
   // Sync onboarding answers (nickname, gender) to user profile
   useOnboardingProfileSync(user?.id);
 
+  // Prefetch secondary page chunks after user settles on a tab
+  useRoutePreloader();
+
   // Defer non-critical hooks — mount DeferredLayoutHooks after 5s delay
   const [deferredReady, setDeferredReady] = useState(false);
   useEffect(() => {
