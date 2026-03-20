@@ -824,7 +824,7 @@ const AppTaskCreate = ({
       await createTask.mutateAsync(taskData);
     }
 
-    navigate('/app/home');
+    navigate(-1);
   };
 
   const handleDelete = async () => {
