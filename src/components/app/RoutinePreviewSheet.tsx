@@ -89,6 +89,7 @@ interface RoutinePreviewSheetProps {
   onSave: (selectedTaskIds: string[], editedTasks: EditedTask[]) => void;
   isSaving?: boolean;
   isFree?: boolean;
+  routineBankId?: string | null;
 }
 
 export function RoutinePreviewSheet({

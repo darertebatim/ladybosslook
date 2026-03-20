@@ -697,6 +697,7 @@ export default function AppInspireDetail() {
           onSave={handleSaveRoutine}
           isSaving={addRoutineFromBank.isPending}
           isFree={(routine as any).is_free ?? false}
+          routineBankId={planId || null}
         />
       )}
     </div>
