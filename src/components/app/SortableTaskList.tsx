@@ -447,7 +447,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   const handleTemplateSelect = (template: TaskTemplate) => {
     haptic.light();
     handleClose();
-    const params = new URLSearchParams({
+    const createParams: Record<string, string> = {
       name: template.title,
       emoji: template.emoji,
       color: template.color,
@@ -465,11 +465,13 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
         pro_link_value: template.pro_link_value || ''
       } : {}),
       ...(template.linked_playlist_id ? { linked_playlist_id: template.linked_playlist_id } : {}),
-    });
-    navigate(`/app/home/new?${params.toString()}`);
+    };
+    if (onOpenTaskSheet) {
+      onOpenTaskSheet({ createParams });
+    } else {
+      navigate(`/app/home/new?${new URLSearchParams(createParams).toString()}`);
+    }
   };
-
-  const handleShowIdeas = () => {
     haptic.light();
     setShowIdeas(true);
     inputRef.current?.blur();
