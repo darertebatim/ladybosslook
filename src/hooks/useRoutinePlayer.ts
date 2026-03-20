@@ -18,6 +18,7 @@ export interface RoutineTask {
   goalType?: string | null;
   goalTarget?: number | null;
   hasTimerGoal?: boolean; // true = firm countdown, false = estimated duration
+  isEstimate?: boolean; // true = smart estimate (countdown with overtime), not a firm goal
   proLinkType?: string | null;
   proLinkValue?: string | null;
 }

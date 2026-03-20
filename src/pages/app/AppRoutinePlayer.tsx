@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import { fetchSmartEstimates, type SmartEstimateInput } from '@/lib/smartEstimate';
 import { cn } from '@/lib/utils';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2, CalendarPlus, Bell, Calendar } from 'lucide-react';
