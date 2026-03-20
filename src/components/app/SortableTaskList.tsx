@@ -543,6 +543,23 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
               <Repeat className="h-3.5 w-3.5" />
               {quickRepeat.toUpperCase()}
             </button>
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                haptic.light();
+                const qp = getQuickParams();
+                const trimmed = title.trim();
+                const urlParams = new URLSearchParams({
+                  ...(trimmed ? { name: trimmed } : {}),
+                  ...Object.fromEntries(Object.entries(qp).map(([k, v]) => [k, typeof v === 'object' ? JSON.stringify(v) : String(v)]))
+                });
+                handleClose();
+                navigate(`/app/home/new?${urlParams.toString()}`);
+              }}
+              className="h-9 w-9 rounded-full bg-white/20 text-white/80 flex items-center justify-center active:scale-95 transition-all ml-auto"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </button>
           </div>
 
           {/* Card — two-tone */}
