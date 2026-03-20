@@ -601,6 +601,8 @@ export function useAddRoutineFromBank() {
             goal_target: bankTask?.goal_target ?? null,
             goal_type: bankTask?.goal_type ?? null,
             goal_unit: bankTask?.goal_unit ?? null,
+            // Copy duration for smart estimate support
+            duration_minutes: bankTask?.duration_minutes ?? null,
             repeat_end_date: repeatEndDate,
             // Project tracking
             source_routine_id: routineId,
