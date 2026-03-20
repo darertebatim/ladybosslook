@@ -1415,10 +1415,30 @@ const AppTaskCreate = ({
       {/* Custom Duration Number Keypad */}
       <NumberKeypad
         open={showCustomDurationKeypad}
-        onOpenChange={setShowCustomDurationKeypad}
-        value={durationMinutes && ![1,2,3,5,10,15,20,30].includes(durationMinutes) ? String(durationMinutes) : ''}
-        onChange={() => {}}
-        onConfirm={() => {}}
+        onOpenChange={(open) => {
+          if (!open) {
+            const num = parseInt(customDurationValue) || 0;
+            if (num > 0 && num <= 480) {
+              setDurationMinutes(num);
+              setShowDurationPicker(false);
+            }
+          } else {
+            setCustomDurationValue(
+              durationMinutes && ![1,2,3,5,10,15,20,30].includes(durationMinutes) ? String(durationMinutes) : ''
+            );
+          }
+          setShowCustomDurationKeypad(open);
+        }}
+        value={customDurationValue}
+        onChange={setCustomDurationValue}
+        onConfirm={() => {
+          const num = parseInt(customDurationValue) || 0;
+          if (num > 0 && num <= 480) {
+            setDurationMinutes(num);
+            setShowDurationPicker(false);
+          }
+          setShowCustomDurationKeypad(false);
+        }}
         title="Duration (minutes)"
         maxLength={3}
       />
