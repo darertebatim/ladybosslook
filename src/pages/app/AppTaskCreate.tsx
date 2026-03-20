@@ -960,7 +960,7 @@ const AppTaskCreate = ({
   const content = (
     <div className="min-h-full transition-colors duration-300" style={{ backgroundColor: bgColor }}>
       {/* Task Icon & Name - Compact inline layout */}
-      <div className="flex items-center gap-3 pt-5 pb-3 px-4">
+      <div className="flex items-center gap-3 pt-2 pb-3 px-4">
         <button
           onClick={() => setShowIconPicker(true)}
           className="relative flex-shrink-0 active:scale-95 transition-transform"
@@ -989,14 +989,14 @@ const AppTaskCreate = ({
       </div>
 
       {/* Color picker - Horizontal circles with checkmark */}
-      <div className="px-6 pb-4">
-        <div className="flex justify-center gap-3">
+      <div className="px-6 pb-3">
+        <div className="flex justify-center gap-2">
           {COLOR_OPTIONS.map((c) => (
             <button
               key={c.name}
               onClick={() => setColor(c.name)}
               className={cn(
-                'w-11 h-11 rounded-full transition-all flex items-center justify-center border-[3px]',
+                'w-10 h-10 rounded-full transition-all flex items-center justify-center border-[3px]',
                 color === c.name ? 'border-white ring-2 ring-white' : 'border-white'
               )}
               style={{ backgroundColor: c.hex }}
@@ -1018,7 +1018,7 @@ const AppTaskCreate = ({
           onFocus={handleDescriptionFocus}
           placeholder="Add a description or notes..."
           className="w-full bg-white/60 dark:bg-slate-700/60 border-0 rounded-xl resize-none text-sm placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-foreground/20 min-h-0"
-          rows={2}
+          rows={1}
         />
       </div>
 
