@@ -2,10 +2,10 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
 import { updatePresence } from '@/hooks/useUserPresence';
 import { updateStreak } from '@/hooks/useTaskPlanner';
 import type { SessionTaskResult } from '@/components/app/RoutinePlayerSummary';
+import { getLocalDateStr, taskAppliesToDate } from '@/lib/localDate';
 
 export interface RoutineTask {
   id: string;
