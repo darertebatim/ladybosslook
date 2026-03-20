@@ -66,6 +66,7 @@ const AppHome = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchParams, setSearchParams] = useSearchParams();
   const taskFilter = searchParams.get('filter') || 'all';
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const setTaskFilter = useCallback((val: string) => {
     setSearchParams(prev => {
       const next = new URLSearchParams(prev);
@@ -1085,7 +1086,10 @@ const AppHome = () => {
                   <div className="flex items-center gap-2 mb-3">
                     <Zap className="h-4 w-4 text-amber-500 shrink-0" />
                     <button 
-                      onClick={() => { if (taskFilter !== 'all') setTaskFilter('all'); }}
+                      onClick={() => { 
+                        if (taskFilter !== 'all') setTaskFilter('all');
+                        else setFilterDropdownOpen(prev => !prev);
+                      }}
                       className="text-sm font-semibold text-foreground tracking-wide shrink-0 active:opacity-70"
                     >
                       My Tasks
@@ -1096,6 +1100,8 @@ const AppHome = () => {
                       routineNames={routineNamesInTasks}
                       taskTags={taskTags}
                       categoryNameMap={categoryNameMap}
+                      externalOpen={filterDropdownOpen}
+                      onExternalOpenChange={setFilterDropdownOpen}
                     />
                   </div>
 
