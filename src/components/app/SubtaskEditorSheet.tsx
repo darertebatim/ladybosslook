@@ -92,8 +92,14 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
   );
 
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+    haptic.medium();
+  }, []);
+
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
+    setActiveId(null);
     if (!over || active.id === over.id) return;
     const oldIndex = localSubtasks.findIndex((_, i) => `st-${i}` === active.id);
     const newIndex = localSubtasks.findIndex((_, i) => `st-${i}` === over.id);
