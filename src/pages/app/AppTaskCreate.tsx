@@ -989,8 +989,8 @@ const AppTaskCreate = ({
       </div>
 
       {/* Color picker - Horizontal circles with checkmark */}
-      <div className="px-6 pb-4">
-        <div className="flex justify-center gap-3">
+      <div className="px-6 pb-3">
+        <div className="flex justify-center gap-2">
           {COLOR_OPTIONS.map((c) => (
             <button
               key={c.name}
