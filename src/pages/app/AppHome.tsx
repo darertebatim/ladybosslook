@@ -537,6 +537,7 @@ const AppHome = () => {
     if (taskFilter === 'all') return result;
     if (taskFilter === 'one-time') return result.filter(t => t.repeat_pattern === 'none');
     if (taskFilter === 'unlinked') return result.filter(t => !t.source_routine_id);
+    if (taskFilter === 'all-routines') return result.filter(t => !!t.source_routine_id);
     if (taskFilter.startsWith('routine:')) {
       const routineId = taskFilter.replace('routine:', '');
       return result.filter(t => t.source_routine_id === routineId);
