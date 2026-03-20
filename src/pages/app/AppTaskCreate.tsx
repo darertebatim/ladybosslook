@@ -1021,7 +1021,7 @@ const AppTaskCreate = ({
         >
           <TaskIcon iconName={icon} size={48} className="text-foreground/70" />
           {/* Tiny pen indicator */}
-          <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-muted flex items-center justify-center">
+          <div className="absolute -bottom-0.5 -left-0.5 w-5 h-5 rounded-full bg-muted flex items-center justify-center">
             <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
           </div>
         </button>
