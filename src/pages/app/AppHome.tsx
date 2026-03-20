@@ -1119,7 +1119,7 @@ const AppHome = () => {
                       {(taskFilter === 'all-routines' || taskFilter.startsWith('routine:')) ? (
                         <div className="flex gap-2 mt-3 w-full">
                           <button
-                            onClick={() => navigate('/app/routines')}
+                            onClick={() => navigate('/app/routineplayer')}
                             className="flex-1 rounded-3xl py-2.5 bg-card border-2 border-urgency/30 text-[14px] font-semibold text-foreground active:scale-[0.98] transition-all"
                           >
                             Manage My Routines
