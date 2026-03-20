@@ -558,7 +558,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
               }}
               className="h-7 w-7 rounded-full bg-white/20 text-white/80 flex items-center justify-center active:scale-95 transition-all"
             >
-              <MoreHorizontal className="h-4 w-4" />
+              <MoreHorizontal className="h-3.5 w-3.5" />
             </button>
           </div>
 
