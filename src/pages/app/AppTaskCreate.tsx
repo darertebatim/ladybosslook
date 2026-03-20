@@ -421,9 +421,33 @@ const AppTaskCreate = ({
   
   // Duration estimate (minutes) for smart estimate in routine player
   const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
+  const [useHistoryDuration, setUseHistoryDuration] = useState(false);
   const [showDurationPicker, setShowDurationPicker] = useState(false);
   const [showCustomDurationKeypad, setShowCustomDurationKeypad] = useState(false);
   const [customDurationValue, setCustomDurationValue] = useState('');
+
+  // Query routine player history for this task's average duration
+  const { data: durationHistory } = useQuery({
+    queryKey: ['task-duration-history', taskId],
+    queryFn: async () => {
+      if (!taskId) return null;
+      const { data } = await supabase
+        .from('routine_session_tasks')
+        .select('actual_seconds')
+        .eq('user_task_id' as any, taskId)
+        .eq('status', 'completed')
+        .not('actual_seconds', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      
+      if (!data || data.length < 3) return null;
+      
+      const avgSeconds = data.reduce((sum, r) => sum + (r.actual_seconds || 0), 0) / data.length;
+      const avgMinutes = Math.round(avgSeconds / 60);
+      return { avgMinutes: Math.max(1, avgMinutes), count: data.length };
+    },
+    enabled: !!taskId,
+  });
 
 
   const [showIconPicker, setShowIconPicker] = useState(false);
