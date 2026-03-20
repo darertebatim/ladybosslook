@@ -24,7 +24,7 @@ function useRoutinePreviewData(routineId: string) {
         .eq('user_id', user.id)
         .eq('source_routine_id', routineId)
         .eq('is_active', true)
-        .is('pro_link_type', null) // exclude the pro-task itself
+        .or('pro_link_type.is.null,pro_link_type.neq.routine') // include member pro-tasks, exclude launcher
         .order('order_index', { ascending: true });
       return (data || []).map((t: any) => ({ emoji: t.emoji || '📝', title: t.title }));
     },
@@ -58,7 +58,7 @@ function useRoutinePreviewData(routineId: string) {
         .eq('user_id', user.id)
         .eq('source_routine_id', routineId)
         .eq('is_active', true)
-        .is('pro_link_type', null); // exclude the pro-task itself
+        .or('pro_link_type.is.null,pro_link_type.neq.routine'); // include member pro-tasks, exclude launcher
 
       const totalTasks = routineTasks?.length || 0;
       if (totalTasks === 0) return session ? { pct: Math.round((session.tasks_completed / session.tasks_total) * 100), isComplete: session.tasks_completed >= session.tasks_total } : null;
