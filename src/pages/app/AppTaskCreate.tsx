@@ -832,7 +832,7 @@ const AppTaskCreate = ({
     
     if (confirm('Delete this task?')) {
       await deleteTask.mutateAsync(taskId);
-      navigate('/app/home');
+      navigate(-1);
     }
   };
 
