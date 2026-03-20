@@ -2598,7 +2598,8 @@ const AppTaskCreate = ({
         <Sheet open={sheetOpen} onOpenChange={onSheetOpenChange}>
           <SheetContent 
             side="bottom" 
-            className="h-[90vh] rounded-t-3xl px-0 pt-0 pb-0 border-0"
+            className="h-[90vh] rounded-t-3xl px-0 pt-0 pb-0 border-0 z-[60]"
+            overlayClassName="z-[60]"
             style={{ backgroundColor: bgColor }}
             hideCloseButton
           >
