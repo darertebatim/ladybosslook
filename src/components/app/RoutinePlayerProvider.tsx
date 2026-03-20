@@ -136,7 +136,7 @@ export function RoutinePlayerProvider({ children }: { children: ReactNode }) {
       {showFullPlayer && (
         <OverlayPortal>
           <RoutinePlayer
-            phase={player.phase as 'breathe' | 'countdown' | 'running' | 'paused' | 'summary'}
+            phase={player.phase as 'breathe' | 'countdown' | 'running' | 'paused' | 'completing' | 'summary'}
             config={player.config!}
             currentTask={player.currentTask}
             currentTaskIndex={player.currentTaskIndex}
@@ -151,6 +151,7 @@ export function RoutinePlayerProvider({ children }: { children: ReactNode }) {
             pauseElapsed={player.pauseElapsed}
             onBreathComplete={player.onBreathComplete}
             onCountdownComplete={player.onCountdownComplete}
+            onCompletionCelebrationDone={player.onCompletionCelebrationDone}
             onCompleteTask={player.completeTask}
             onSkipTask={player.skipTask}
             onTogglePause={player.togglePause}

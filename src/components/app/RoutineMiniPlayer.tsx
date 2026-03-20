@@ -43,7 +43,7 @@ export function RoutineMiniPlayer() {
     openProTask,
   } = useRoutinePlayerContext();
 
-  if (!isActive || !isMinimized || !currentTask || phase === 'summary') return null;
+  if (!isActive || !isMinimized || !currentTask || phase === 'summary' || phase === 'completing') return null;
 
   const isPaused = phase === 'paused';
   const colorKey = (currentTask.color || 'yellow') as TaskColor;

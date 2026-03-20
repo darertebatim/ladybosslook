@@ -29,7 +29,7 @@ export interface RoutinePlayerConfig {
   tasks: RoutineTask[];
 }
 
-type PlayerPhase = 'idle' | 'breathe' | 'countdown' | 'running' | 'paused' | 'summary';
+type PlayerPhase = 'idle' | 'breathe' | 'countdown' | 'running' | 'paused' | 'completing' | 'summary';
 
 export function useRoutinePlayer() {
   const { user } = useAuth();
@@ -167,6 +167,10 @@ export function useRoutinePlayer() {
     setPhase('running');
     setTaskStartedAt(new Date());
     elapsedRef.current = 0;
+  }, []);
+
+  const onCompletionCelebrationDone = useCallback(() => {
+    setPhase('summary');
   }, []);
 
   const saveTaskResult = useCallback((status: 'completed' | 'skipped') => {
@@ -340,7 +344,7 @@ export function useRoutinePlayer() {
     const nextIndex = currentTaskIndex + 1;
     if (nextIndex >= config.tasks.length) {
       finishSession(results);
-      setPhase('summary');
+      setPhase('completing');
     } else {
       setCurrentTaskIndex(nextIndex);
       const target = config.tasks[nextIndex].targetSeconds;
@@ -421,7 +425,8 @@ export function useRoutinePlayer() {
     const allResults = [...taskResults, ...remainingResults];
     setTaskResults(allResults);
     finishSession(allResults);
-    setPhase('summary');
+    const hasCompletedTasks = allResults.some(r => r.status === 'completed');
+    setPhase(hasCompletedTasks ? 'completing' : 'summary');
   }, [config, currentTask, currentTaskIndex, taskResults, sessionId, finishSession]);
 
   const togglePause = useCallback(() => {
@@ -485,6 +490,7 @@ export function useRoutinePlayer() {
     startRoutine,
     onBreathComplete,
     onCountdownComplete,
+    onCompletionCelebrationDone,
     completeTask,
     skipTask,
     moveTaskToEnd,
