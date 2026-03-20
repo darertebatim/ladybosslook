@@ -103,13 +103,23 @@ function RoutineCardContent({
           {routine.title}
         </h3>
         <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={(e) => { e.stopPropagation(); onOpenAddSheet(routine); }}
-            className="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
-            title="Add to planner"
-          >
-            <CalendarPlus className="w-4 h-4 text-white" />
-          </button>
+          {addedRoutineIds.has(routine.routine_id) ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); }}
+              className="w-9 h-9 rounded-full bg-success/20 flex items-center justify-center"
+              title="Added to planner"
+            >
+              <Check className="w-4 h-4 text-success" />
+            </button>
+          ) : (
+            <button
+              onClick={(e) => { e.stopPropagation(); onOpenAddSheet(routine); }}
+              className="w-9 h-9 rounded-full bg-urgency flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+              title="Add to planner"
+            >
+              <CalendarPlus className="w-4 h-4 text-urgency-foreground" />
+            </button>
+          )}
           <button
             onClick={(e) => { e.stopPropagation(); onDeleteRoutine(routine); }}
             className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center active:scale-95 transition-all"
