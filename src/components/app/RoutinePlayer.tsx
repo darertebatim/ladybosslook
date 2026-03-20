@@ -1,5 +1,6 @@
 import { memo, useState, useCallback, useEffect } from 'react';
 import { RoutineCountdown } from './RoutineCountdown';
+import { RoutineCompletionCelebration } from './RoutineCompletionCelebration';
 import { Pause, Play, Check, SkipForward, X, ChevronDown, Plus, Minus, GripVertical, ExternalLink } from 'lucide-react';
 import { format, addSeconds } from 'date-fns';
 import { cn } from '@/lib/utils';
