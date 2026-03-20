@@ -116,9 +116,9 @@ export function RoutinePreviewSheet({
       const proTask: RoutinePlanTask = {
         id: `__pro_task_routine_${routineBankId}`,
         plan_id: routineBankId,
-        title: `▶️ ${routineTitle}`,
-        icon: '▶️',
-        color: 'emerald',
+        title: routineTitle,
+        icon: '🎬',
+        color: 'mint',
         task_order: -1,
         is_active: true,
         created_at: new Date().toISOString(),
@@ -131,7 +131,6 @@ export function RoutinePreviewSheet({
         goal_unit: null,
         linked_playlist: null,
       };
-      // Attach repeat_pattern for display
       (proTask as any).repeat_pattern = 'daily';
       return [proTask, ...tasks];
     }
