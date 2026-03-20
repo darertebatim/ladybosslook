@@ -8,7 +8,7 @@ import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useSensors, useSensor, TouchSensor, MouseSensor } from '@dnd-kit/core';
-import { haptic } from '@/utils/haptics';
+import { haptic } from '@/lib/haptics';
 
 interface SubtaskEditorSheetProps {
   open: boolean;
