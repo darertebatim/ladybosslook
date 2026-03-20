@@ -1853,64 +1853,48 @@ export default function RoutinesBank() {
                           {sectionTasks.length === 0 ? (
                             <p className="text-center text-muted-foreground text-xs py-2">No tasks in this section</p>
                           ) : (
-                            sectionTasks.map((task, tIdx) => (
-                              <div key={task.id} className="rounded bg-background border">
-                                <div className="flex items-center gap-2 p-2">
-                                  <div className="flex flex-col">
-                                    <button
-                                      type="button"
-                                      onClick={() => moveTaskUp(task.id, section.id)}
-                                      disabled={tIdx === 0}
-                                      className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                                    >
-                                      <ChevronUp className="h-3 w-3" />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => moveTaskDown(task.id, section.id)}
-                                      disabled={tIdx === sectionTasks.length - 1}
-                                      className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                                    >
-                                      <ChevronDown className="h-3 w-3" />
-                                    </button>
-                                  </div>
-                                  <TaskIcon iconName={task.emoji} size={16} />
-                                  <span className="flex-1 text-sm truncate">{task.title}</span>
-                                  {renderTaskScheduleConfig(task)}
-                                  {/* Move to section dropdown */}
-                                  <Select
-                                    value=""
-                                    onValueChange={(targetSectionId) => {
-                                      const newSectionId = targetSectionId === '_uncategorized' ? null : targetSectionId;
-                                      setLocalTasks(localTasks.map(t =>
-                                        t.id === task.id ? { ...t, section_id: newSectionId } : t
-                                      ));
-                                    }}
-                                  >
-                                    <SelectTrigger className="w-[100px] h-7 text-xs">
-                                      <span className="text-muted-foreground">Move to...</span>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="_uncategorized" className="text-xs">
-                                        Uncategorized
-                                      </SelectItem>
-                                      {localSections.filter(s => s.id !== section.id).map((s) => (
-                                        <SelectItem key={s.id} value={s.id} className="text-xs">
-                                          {s.title}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                  <button
-                                    type="button"
-                                    onClick={() => removeTask(task.id)}
-                                    className="p-1 text-destructive hover:bg-destructive/10 rounded"
-                                  >
-                                    <X className="h-3 w-3" />
-                                  </button>
-                                </div>
-                              </div>
-                            ))
+                            <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={(e) => handleTaskDragEnd(e, sectionTasks, section.id)}>
+                              <SortableContext items={sectionTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                                {sectionTasks.map((task, tIdx) => (
+                                  <SortableTaskRowItem key={task.id} id={task.id}>
+                                    {(dragHandleProps) => (
+                                      <div className="rounded bg-background border">
+                                        <div className="flex items-center gap-2 p-2">
+                                          <button type="button" {...dragHandleProps} className="cursor-grab active:cursor-grabbing touch-none text-muted-foreground hover:text-foreground p-0.5">
+                                            <GripVertical className="h-4 w-4" />
+                                          </button>
+                                          <TaskIcon iconName={task.emoji} size={16} />
+                                          <span className="flex-1 text-sm truncate">{task.title}</span>
+                                          {renderTaskScheduleConfig(task)}
+                                          <Select
+                                            value=""
+                                            onValueChange={(targetSectionId) => {
+                                              const newSectionId = targetSectionId === '_uncategorized' ? null : targetSectionId;
+                                              setLocalTasks(localTasks.map(t =>
+                                                t.id === task.id ? { ...t, section_id: newSectionId } : t
+                                              ));
+                                            }}
+                                          >
+                                            <SelectTrigger className="w-[100px] h-7 text-xs">
+                                              <span className="text-muted-foreground">Move to...</span>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="_uncategorized" className="text-xs">Uncategorized</SelectItem>
+                                              {localSections.filter(s => s.id !== section.id).map((s) => (
+                                                <SelectItem key={s.id} value={s.id} className="text-xs">{s.title}</SelectItem>
+                                              ))}
+                                            </SelectContent>
+                                          </Select>
+                                          <button type="button" onClick={() => removeTask(task.id)} className="p-1 text-destructive hover:bg-destructive/10 rounded">
+                                            <X className="h-3 w-3" />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </SortableTaskRowItem>
+                                ))}
+                              </SortableContext>
+                            </DndContext>
                           )}
                           
                           {/* Add task to section */}
