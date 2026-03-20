@@ -169,6 +169,10 @@ export function useRoutinePlayer() {
     elapsedRef.current = 0;
   }, []);
 
+  const onCompletionCelebrationDone = useCallback(() => {
+    setPhase('summary');
+  }, []);
+
   const saveTaskResult = useCallback((status: 'completed' | 'skipped') => {
     if (!config || !currentTask) return null;
 
