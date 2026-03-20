@@ -1068,6 +1068,21 @@ const AppTaskCreate = ({
           </div>
         </button>
 
+        {/* Duration */}
+        <button
+          onClick={() => setShowDurationPicker(true)}
+          className="w-full flex items-center justify-between py-2 px-4 active:bg-muted/50 border-b border-muted/30"
+        >
+          <div className="flex items-center gap-3">
+            <Timer className="h-5 w-5 text-black" />
+            <span className="font-medium text-black">Duration</span>
+          </div>
+          <div className="flex items-center gap-2 text-black">
+            <span>{durationMinutes ? `${durationMinutes} min` : 'Not set'}</span>
+            <ChevronRight className="h-4 w-4 text-black" />
+          </div>
+        </button>
+
         {/* Reminder */}
         <button
           onClick={() => setShowReminderPicker(true)}
