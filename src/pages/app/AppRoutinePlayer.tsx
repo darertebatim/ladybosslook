@@ -245,14 +245,68 @@ export default function AppRoutinePlayer() {
     queryKey: ['user-routines-all', user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const { data, error } = await supabase
-        .from('user_routines_bank')
-        .select('id, routine_id, title, emoji, cover_image_url, category, color, is_focus, is_active, order_index')
+
+      const fetchUserRoutines = async () => {
+        const { data, error } = await supabase
+          .from('user_routines_bank')
+          .select('id, routine_id, title, emoji, cover_image_url, category, color, is_focus, is_active, order_index')
+          .eq('user_id', user.id)
+          .or('is_active.eq.true,is_active.is.null')
+          .order('order_index', { ascending: true });
+        if (error) throw error;
+        return (data || []) as any[];
+      };
+
+      const existing = await fetchUserRoutines();
+      const existingRoutineIds = new Set(existing.map((r: any) => r.routine_id));
+
+      const { data: userTaskRows, error: userTaskError } = await supabase
+        .from('user_tasks')
+        .select('source_routine_id')
         .eq('user_id', user.id)
-        .eq('is_active', true)
-        .order('order_index', { ascending: true });
-      if (error) throw error;
-      return (data || []) as any[];
+        .not('source_routine_id', 'is', null);
+
+      if (userTaskError) throw userTaskError;
+
+      const taskRoutineIds = Array.from(
+        new Set((userTaskRows || []).map((t: any) => t.source_routine_id).filter(Boolean))
+      );
+
+      const missingRoutineIds = taskRoutineIds.filter((rid) => !existingRoutineIds.has(rid));
+
+      if (missingRoutineIds.length > 0) {
+        const { data: bankRoutines } = await supabase
+          .from('routines_bank')
+          .select('id, title, emoji, cover_image_url, category, color, is_focus')
+          .in('id', missingRoutineIds);
+
+        const maxOrder = existing.reduce((max: number, r: any) => Math.max(max, r.order_index ?? 0), -1);
+        const recoveredRows = missingRoutineIds.map((routineId, index) => {
+          const bank = bankRoutines?.find((b: any) => b.id === routineId);
+          return {
+            user_id: user.id,
+            routine_id: routineId,
+            title: bank?.title ?? 'Routine',
+            emoji: bank?.emoji ?? '✨',
+            cover_image_url: bank?.cover_image_url ?? null,
+            category: bank?.category ?? null,
+            color: bank?.color ?? null,
+            is_focus: bank?.is_focus ?? false,
+            is_active: true,
+            order_index: maxOrder + index + 1,
+          };
+        });
+
+        const { error: upsertError } = await supabase
+          .from('user_routines_bank')
+          .upsert(recoveredRows as any, { onConflict: 'user_id,routine_id' });
+
+        if (upsertError) throw upsertError;
+
+        return await fetchUserRoutines();
+      }
+
+      return existing;
     },
     enabled: !!user,
   });
