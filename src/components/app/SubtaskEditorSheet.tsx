@@ -180,6 +180,7 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
             >
               <SortableContext items={localSubtasks.map((_, i) => `st-${i}`)} strategy={verticalListSortingStrategy}>
@@ -200,6 +201,19 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
                   />
                 ))}
               </SortableContext>
+
+              <DragOverlay>
+                {activeId ? (() => {
+                  const idx = localSubtasks.findIndex((_, i) => `st-${i}` === activeId);
+                  return idx !== -1 ? (
+                    <div className="opacity-90 scale-105 shadow-2xl rounded-xl bg-white dark:bg-slate-800 flex items-center gap-2 px-4 py-3">
+                      <GripVertical className="h-4 w-4 text-muted-foreground/40" />
+                      <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30 shrink-0" />
+                      <span className="flex-1 text-base">{localSubtasks[idx]}</span>
+                    </div>
+                  ) : null;
+                })() : null}
+              </DragOverlay>
             </DndContext>
           </div>
 
