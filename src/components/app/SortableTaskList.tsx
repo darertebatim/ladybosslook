@@ -118,6 +118,7 @@ interface SortableTaskListProps {
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
   hideQuickAdd?: boolean;
+  defaultRepeatOverride?: 'Daily' | 'No' | 'Weekly';
   onOpenTaskSheet?: (params: { editTaskId?: string; createParams?: Record<string, string> }) => void;
 }
 
