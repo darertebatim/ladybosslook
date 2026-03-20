@@ -391,7 +391,7 @@ export function RoutinePreviewSheet({
         >
           <div className="flex flex-col h-full">
             <SheetHeader className="text-left pb-2 flex-shrink-0">
-              <SheetTitle className="text-xl font-bold">Edit Routine</SheetTitle>
+              <SheetTitle className="text-xl font-bold">Preview Routine</SheetTitle>
               <p className="text-sm text-muted-foreground">
                 Edit it to create your personalized routine.
               </p>
