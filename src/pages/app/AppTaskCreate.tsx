@@ -422,6 +422,7 @@ const AppTaskCreate = ({
   // Duration estimate (minutes) for smart estimate in routine player
   const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
   const [showDurationPicker, setShowDurationPicker] = useState(false);
+  const [showCustomDurationKeypad, setShowCustomDurationKeypad] = useState(false);
 
 
   const [showIconPicker, setShowIconPicker] = useState(false);
