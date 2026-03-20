@@ -280,7 +280,7 @@ export default function AppInspireDetail() {
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center z-20">
-                <span className="text-8xl opacity-40">{routineIcon}</span>
+                <FluentEmoji emoji={routineIcon} size={110} className="opacity-60" />
               </div>
             )}
             {/* Title overlay layer */}
