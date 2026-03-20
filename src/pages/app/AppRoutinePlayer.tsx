@@ -2,7 +2,7 @@ import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { fetchSmartEstimates, type SmartEstimateInput } from '@/lib/smartEstimate';
 import { cn } from '@/lib/utils';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2, CalendarPlus, Bell, Calendar } from 'lucide-react';
+import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2, CalendarPlus, Bell, Calendar, Check } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
@@ -63,6 +63,7 @@ interface RoutineCardProps {
   getCompletionInfo: (routineId: string) => { pct: number; isComplete: boolean } | null;
   categoryNameMap: Map<string, string>;
   loadingRoutineId: string | null;
+  addedRoutineIds: Set<string>;
   onPlay: (routine: any) => void;
   onOpenAddSheet: (routine: any) => void;
   onDeleteRoutine: (routine: any) => void;
@@ -76,6 +77,7 @@ function RoutineCardContent({
   getCompletionInfo,
   categoryNameMap,
   loadingRoutineId,
+  addedRoutineIds,
   onPlay,
   onOpenAddSheet,
   onDeleteRoutine,
@@ -101,13 +103,23 @@ function RoutineCardContent({
           {routine.title}
         </h3>
         <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={(e) => { e.stopPropagation(); onOpenAddSheet(routine); }}
-            className="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center active:scale-95 transition-transform shadow-sm"
-            title="Add to planner"
-          >
-            <CalendarPlus className="w-4 h-4 text-white" />
-          </button>
+          {addedRoutineIds.has(routine.routine_id) ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); }}
+              className="w-9 h-9 rounded-full bg-success/20 flex items-center justify-center"
+              title="Added to planner"
+            >
+              <Check className="w-4 h-4 text-success" />
+            </button>
+          ) : (
+            <button
+              onClick={(e) => { e.stopPropagation(); onOpenAddSheet(routine); }}
+              className="w-9 h-9 rounded-full bg-urgency flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+              title="Add to planner"
+            >
+              <CalendarPlus className="w-4 h-4 text-urgency-foreground" />
+            </button>
+          )}
           <button
             onClick={(e) => { e.stopPropagation(); onDeleteRoutine(routine); }}
             className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center active:scale-95 transition-all"
@@ -202,6 +214,24 @@ export default function AppRoutinePlayer() {
 
   // Check if routine player page is already added as a task
   const { data: isPageAdded } = useExistingProTask('route', '/app/routineplayer');
+
+  // Check which individual routines are already added to planner
+  const { data: addedRoutineIdsData } = useQuery({
+    queryKey: ['added-routine-tasks', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('user_tasks')
+        .select('pro_link_value')
+        .eq('user_id', user.id)
+        .eq('pro_link_type', 'routine')
+        .eq('is_active', true);
+      if (error) return [];
+      return (data || []).map(t => t.pro_link_value).filter(Boolean) as string[];
+    },
+    enabled: !!user,
+  });
+  const addedRoutineIds = useMemo(() => new Set(addedRoutineIdsData || []), [addedRoutineIdsData]);
 
   // Category slug → name map
   const { data: routineCategories = [] } = useRoutineBankCategories();
@@ -501,6 +531,7 @@ export default function AppRoutinePlayer() {
         syntheticTasks: [addSheetSyntheticTask],
       });
       toast.success('Added to your planner! 📋');
+      queryClient.invalidateQueries({ queryKey: ['added-routine-tasks'] });
       setShowAddSheet(false);
       setAddRoutineTarget(null);
     } catch (error) {
@@ -813,6 +844,7 @@ export default function AppRoutinePlayer() {
                           getCompletionInfo={getCompletionInfo}
                           categoryNameMap={categoryNameMap}
                           loadingRoutineId={loadingRoutineId}
+                          addedRoutineIds={addedRoutineIds}
                           onPlay={handlePlay}
                           onOpenAddSheet={handleOpenAddSheet}
                           onDeleteRoutine={setDeleteRoutine}
@@ -831,6 +863,7 @@ export default function AppRoutinePlayer() {
                           getCompletionInfo={getCompletionInfo}
                           categoryNameMap={categoryNameMap}
                           loadingRoutineId={loadingRoutineId}
+                          addedRoutineIds={addedRoutineIds}
                           onPlay={handlePlay}
                           onOpenAddSheet={handleOpenAddSheet}
                           onDeleteRoutine={setDeleteRoutine}
