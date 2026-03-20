@@ -2562,15 +2562,14 @@ const AppTaskCreate = ({
         <Sheet open={sheetOpen} onOpenChange={onSheetOpenChange}>
           <SheetContent 
             side="bottom" 
-            className="h-[90vh] rounded-t-3xl px-0 border-0"
+            className="h-[90vh] rounded-t-3xl px-0 pt-0 pb-0 border-0"
             style={{ backgroundColor: bgColor }}
             hideCloseButton
           >
             <div className="flex flex-col h-full">
-              {/* Header - dynamic color */}
+              {/* Header - sits inside the rounded top area */}
               <div 
-                className="flex items-center justify-between px-4 py-3 flex-shrink-0 transition-colors duration-300"
-                style={{ backgroundColor: bgColor }}
+                className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0"
               >
                 <div className="flex items-center gap-1">
                   <button onClick={handleClose} className="p-2 -ml-2">
