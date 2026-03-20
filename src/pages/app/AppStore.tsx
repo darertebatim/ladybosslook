@@ -441,9 +441,13 @@ const AppStore = () => {
                         <div className="h-full w-full rounded-2xl bg-muted flex items-center justify-center shadow-lg">
                           <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} />
                         </div>
-                        {exercise.is_premium && (
+                        {exercise.is_premium ? (
                           <div className="absolute -top-2.5 left-0 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
                             <Crown className="h-2.5 w-2.5" /> PLUS
+                          </div>
+                        ) : (
+                          <div className="absolute -top-2.5 left-0 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                            <FluentEmoji emoji="🔥" size={10} /> FREE
                           </div>
                         )}
                       </div>
