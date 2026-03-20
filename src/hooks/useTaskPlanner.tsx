@@ -990,6 +990,7 @@ export const useUncompleteTask = () => {
       queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
       // Update weekly task completion badges
       queryClient.invalidateQueries({ queryKey: ['weekly-task-completion'] });
+      queryClient.invalidateQueries({ queryKey: ['routine-preview-completion'] });
     },
     onError: (error) => {
       console.error('Uncomplete task error:', error);
