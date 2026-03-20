@@ -745,10 +745,16 @@ const AppTaskCreate = ({
     }
   }, [isSheet, sheetOpen, createParams, editTaskIdProp]);
 
-  // Populate form when editing (page mode) - only once when task first loads
+  // Populate form when editing - works for both page mode and sheet mode with editTaskIdProp
   const hasPopulatedRef = useRef(false);
+  const lastPopulatedTaskId = useRef<string | undefined>(undefined);
   useEffect(() => {
-    if (!isSheet && existingTask && !hasPopulatedRef.current) {
+    // Reset populated flag when taskId changes (e.g. editing a different task in sheet mode)
+    if (taskId !== lastPopulatedTaskId.current) {
+      hasPopulatedRef.current = false;
+      lastPopulatedTaskId.current = taskId;
+    }
+    if (existingTask && !hasPopulatedRef.current) {
       hasPopulatedRef.current = true;
       setTitle(existingTask.title);
       setDescription(existingTask.description ?? null);
@@ -768,6 +774,8 @@ const AppTaskCreate = ({
         if (['daily', 'weekly', 'monthly'].includes(existingTask.repeat_pattern)) {
           setRepeatPattern(existingTask.repeat_pattern as 'daily' | 'weekly' | 'monthly');
         }
+      } else {
+        setRepeatEnabled(false);
       }
       
       if (existingTask.reminder_enabled) {
@@ -775,6 +783,8 @@ const AppTaskCreate = ({
         if (existingTask.scheduled_time) {
           setReminderTime(existingTask.scheduled_time);
         }
+      } else {
+        setReminderEnabled(false);
       }
       
       setIsUrgent(existingTask.is_urgent ?? false);
@@ -794,13 +804,13 @@ const AppTaskCreate = ({
       // Duration estimate
       setDurationMinutes((existingTask as any).duration_minutes ?? null);
     }
-  }, [existingTask, isSheet]);
+  }, [existingTask, taskId]);
 
   useEffect(() => {
-    if (!isSheet && existingSubtasks) {
+    if (existingSubtasks && shouldLoadFromDb) {
       setSubtasks(existingSubtasks.map(s => s.title));
     }
-  }, [existingSubtasks, isSheet]);
+  }, [existingSubtasks, shouldLoadFromDb]);
 
   const handleSubmit = async () => {
     if (!title.trim()) return;
