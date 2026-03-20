@@ -425,7 +425,8 @@ export function useRoutinePlayer() {
     const allResults = [...taskResults, ...remainingResults];
     setTaskResults(allResults);
     finishSession(allResults);
-    setPhase('summary');
+    const hasCompletedTasks = allResults.some(r => r.status === 'completed');
+    setPhase(hasCompletedTasks ? 'completing' : 'summary');
   }, [config, currentTask, currentTaskIndex, taskResults, sessionId, finishSession]);
 
   const togglePause = useCallback(() => {
