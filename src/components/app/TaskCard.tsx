@@ -26,6 +26,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Delete } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { RoutineTaskPreview } from './RoutineTaskPreview';
 
 interface TaskCardProps {
   task: UserTask;
@@ -417,6 +418,10 @@ export const TaskCard = memo(function TaskCard({
               )}>
                 {task.title}
               </p>
+              {/* Routine preview row - shows emoji chain + completion % */}
+              {proLinkType === 'routine' && proLinkValue && (
+                <RoutineTaskPreview routineId={proLinkValue} />
+              )}
             </div>
 
             {/* Circle with tool icon inside — navigates to the tool */}
