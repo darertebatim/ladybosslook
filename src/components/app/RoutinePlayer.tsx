@@ -372,7 +372,7 @@ export const RoutinePlayer = memo(function RoutinePlayer({
               ) : isCountUp ? (
                 <>
                   <p className="text-[42px] font-extrabold text-foreground tracking-tight tabular-nums leading-none">
-                    {formatTime(overtimeSeconds)}
+                    {formatTime(countUpElapsed)}
                   </p>
                   <button
                     onClick={() => { haptic.light(); setShowNotifySheet(true); }}
