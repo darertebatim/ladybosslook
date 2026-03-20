@@ -314,7 +314,7 @@ export function RoutinePreviewSheet({
   };
 
   // Find the task being edited
-  const editingTask = editingTaskId ? tasks.find(t => t.id === editingTaskId) : null;
+  const editingTask = editingTaskId ? displayTasks.find(t => t.id === editingTaskId) : null;
 
   const renderTaskCard = (task: RoutinePlanTask, index: number) => {
     const isSelected = selectedTaskIds.has(task.id);
