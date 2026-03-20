@@ -472,6 +472,8 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
       navigate(`/app/home/new?${new URLSearchParams(createParams).toString()}`);
     }
   };
+
+  const handleShowIdeas = () => {
     haptic.light();
     setShowIdeas(true);
     inputRef.current?.blur();
