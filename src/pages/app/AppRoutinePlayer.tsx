@@ -957,7 +957,7 @@ export default function AppRoutinePlayer() {
               onClick={() => navigate('/app/routines')}
               className="w-full flex items-center justify-center gap-1 text-sm text-primary font-medium py-3"
             >
-              Browse all routines <ChevronRight className="w-4 h-4" />
+              Browse Routines Library <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         )}
