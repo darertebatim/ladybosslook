@@ -386,7 +386,7 @@ const AppTaskCreate = ({
   // Derive time mode from state
   const derivedTimeMode: TimeMode = timePeriod ? 'part_of_day' : scheduledTime ? 'specific' : 'anytime';
   const [repeatEnabled, setRepeatEnabled] = useState(
-    initialData?.repeatEnabled ?? (urlRepeatPattern && urlRepeatPattern !== 'none') ?? false
+    initialData?.repeatEnabled ?? (urlRepeatPattern && urlRepeatPattern !== 'none') ?? !taskId
   );
   const [repeatPattern, setRepeatPattern] = useState<'daily' | 'weekly' | 'monthly'>(
     initialData?.repeatPattern || (urlRepeatPattern && urlRepeatPattern !== 'none' ? urlRepeatPattern : 'daily')
