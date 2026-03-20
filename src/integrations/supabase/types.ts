@@ -4148,6 +4148,7 @@ export type Database = {
           color: string
           created_at: string
           description: string | null
+          duration_minutes: number | null
           emoji: string
           goal_enabled: boolean
           goal_target: number | null
@@ -4180,6 +4181,7 @@ export type Database = {
           color?: string
           created_at?: string
           description?: string | null
+          duration_minutes?: number | null
           emoji?: string
           goal_enabled?: boolean
           goal_target?: number | null
@@ -4212,6 +4214,7 @@ export type Database = {
           color?: string
           created_at?: string
           description?: string | null
+          duration_minutes?: number | null
           emoji?: string
           goal_enabled?: boolean
           goal_target?: number | null
