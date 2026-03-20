@@ -59,6 +59,7 @@ import { TimeWheelPicker } from '@/components/app/TimeWheelPicker';
 import { PRO_LINK_TYPES, ProLinkType, PRO_LINK_CONFIGS } from '@/lib/proTaskTypes';
 import { ProLinkPicker } from '@/components/app/ProLinkPicker';
 import { GoalSettingsSheet, GoalSettings, formatGoalTarget } from '@/components/app/GoalSettingsSheet';
+import { NumberKeypad } from '@/components/app/NumberKeypad';
 import { TimePeriod, TIME_PERIODS, TimeMode, getTimeMode, formatTimeLabel, formatTimeRange, getTimePeriodConfig, normalizeTimePeriod } from '@/lib/taskScheduling';
 
 // Me+ style pastel color options with hex values
@@ -421,6 +422,8 @@ const AppTaskCreate = ({
   // Duration estimate (minutes) for smart estimate in routine player
   const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
   const [showDurationPicker, setShowDurationPicker] = useState(false);
+  const [showCustomDurationKeypad, setShowCustomDurationKeypad] = useState(false);
+  const [customDurationValue, setCustomDurationValue] = useState('');
 
 
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -1389,38 +1392,57 @@ const AppTaskCreate = ({
                   <span className="text-[11px] text-muted-foreground block -mt-0.5">min</span>
                 </button>
               ))}
-              {/* Custom duration input */}
-              <div className="relative">
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  min={1}
-                  max={480}
-                  placeholder="—"
-                  value={durationMinutes && ![1,2,3,5,10,15,20,30].includes(durationMinutes) ? durationMinutes : ''}
-                  onChange={(e) => {
-                    const val = parseInt(e.target.value);
-                    if (!isNaN(val) && val > 0 && val <= 480) {
-                      setDurationMinutes(val);
-                    } else if (e.target.value === '') {
-                      setDurationMinutes(null);
-                    }
-                  }}
-                  className={cn(
-                    "w-full py-3.5 rounded-2xl font-semibold text-center transition-all border-2 outline-none bg-muted/30 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
-                    durationMinutes && ![1,2,3,5,10,15,20,30].includes(durationMinutes)
-                      ? "bg-primary/10 border-primary text-primary ring-2 ring-primary/20"
-                      : "border-transparent text-foreground"
-                  )}
-                />
-                <span className="text-[11px] text-muted-foreground block text-center -mt-1 pb-1">custom</span>
-              </div>
+              {/* Custom duration button */}
+              <button
+                onClick={() => setShowCustomDurationKeypad(true)}
+                className={cn(
+                  "relative py-3.5 rounded-2xl font-semibold text-center transition-all border-2 outline-none",
+                  durationMinutes && ![1,2,3,5,10,15,20,30].includes(durationMinutes)
+                    ? "bg-primary/10 border-primary text-primary ring-2 ring-primary/20"
+                    : "bg-muted/30 border-transparent text-foreground active:scale-95"
+                )}
+              >
+                <span className="text-lg tabular-nums">
+                  {durationMinutes && ![1,2,3,5,10,15,20,30].includes(durationMinutes) ? durationMinutes : '···'}
+                </span>
+                <span className="text-[11px] text-muted-foreground block -mt-0.5">custom</span>
+              </button>
             </div>
           </div>
         </SheetContent>
       </Sheet>
 
-      {/* Repeat Picker Sheet - Me+ Style Bottom Sheet */}
+      {/* Custom Duration Number Keypad */}
+      <NumberKeypad
+        open={showCustomDurationKeypad}
+        onOpenChange={(open) => {
+          if (!open) {
+            const num = parseInt(customDurationValue) || 0;
+            if (num > 0 && num <= 480) {
+              setDurationMinutes(num);
+              setShowDurationPicker(false);
+            }
+          } else {
+            setCustomDurationValue(
+              durationMinutes && ![1,2,3,5,10,15,20,30].includes(durationMinutes) ? String(durationMinutes) : ''
+            );
+          }
+          setShowCustomDurationKeypad(open);
+        }}
+        value={customDurationValue}
+        onChange={setCustomDurationValue}
+        onConfirm={() => {
+          const num = parseInt(customDurationValue) || 0;
+          if (num > 0 && num <= 480) {
+            setDurationMinutes(num);
+            setShowDurationPicker(false);
+          }
+          setShowCustomDurationKeypad(false);
+        }}
+        title="Duration (minutes)"
+        maxLength={3}
+      />
+
       <Sheet open={showRepeatPicker} onOpenChange={setShowRepeatPicker}>
         <SheetContent side="bottom" className="h-auto rounded-t-3xl" hideCloseButton>
           <div className="flex items-center justify-between px-4 py-3 border-b">
