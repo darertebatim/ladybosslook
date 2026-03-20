@@ -155,6 +155,18 @@ export default function AppInspire() {
                       onClick={() => navigate(`/app/routines/category/pro`, { state: { from: location.pathname } })}
                     />
                   )}
+                  {resetRoutines.length > 0 && (
+                    <CategoryCircle
+                      name="Reset"
+                      icon="RotateCcw"
+                      emoji="🔄"
+                      color="violet"
+                      onClick={() => {
+                        const el = document.getElementById('routine-category-reset');
+                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }}
+                    />
+                  )}
                   {challengeRoutines.length > 0 && (
                     <CategoryCircle
                       name="Challenges"
