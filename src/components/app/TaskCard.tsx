@@ -256,6 +256,15 @@ export const TaskCard = memo(function TaskCard({
   };
 
   const colorClass = TASK_COLOR_CLASSES[task.color] || TASK_COLOR_CLASSES.yellow;
+  const isRoutineLauncher = proLinkType === 'routine' && !!(proLinkValue || task.source_routine_id);
+
+  const ROUTINE_BORDER_COLORS: Record<string, string> = {
+    pink: 'border-[#F5B8E0]', peach: 'border-[#F5C89A]', yellow: 'border-[#E8D86A]',
+    lime: 'border-[#B0DFC8]', sky: 'border-[#A8C8EE]', mint: 'border-[#BDE89A]',
+    lavender: 'border-[#D4B8F0]', purple: 'border-[#D4B8F0]', blue: 'border-[#A8C8EE]',
+    red: 'border-[#F5B8E0]', orange: 'border-[#F5C89A]', green: 'border-[#B0DFC8]',
+  };
+  const routineBorderClass = isRoutineLauncher ? `border ${ROUTINE_BORDER_COLORS[task.color] || 'border-[#E8D86A]'}` : '';
   
   // Animated goal progress number component - only animates when this card is actively animating
   const AnimatedProgress = ({ value }: { value: number }) => (
@@ -381,7 +390,8 @@ export const TaskCard = memo(function TaskCard({
           onClick={handleCardClick}
           className={cn(
             'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
-            colorClass
+            colorClass,
+            routineBorderClass
           )}
         >
           {/* Main row */}
@@ -543,7 +553,8 @@ export const TaskCard = memo(function TaskCard({
       onClick={handleCardClick}
       className={cn(
         'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
-        colorClass
+        colorClass,
+        routineBorderClass
       )}
     >
       {/* Main row */}
