@@ -1411,7 +1411,23 @@ const AppTaskCreate = ({
         </SheetContent>
       </Sheet>
 
-      {/* Repeat Picker Sheet - Me+ Style Bottom Sheet */}
+      {/* Custom Duration Number Keypad */}
+      <NumberKeypad
+        open={showCustomDurationKeypad}
+        onOpenChange={setShowCustomDurationKeypad}
+        value={durationMinutes && ![1,2,3,5,10,15,20,30].includes(durationMinutes) ? durationMinutes : 0}
+        onChange={(val) => {
+          if (val > 0 && val <= 480) {
+            setDurationMinutes(val);
+            setShowDurationPicker(false);
+          } else if (val === 0) {
+            setDurationMinutes(null);
+          }
+        }}
+        label="Duration (minutes)"
+        maxLength={3}
+      />
+
       <Sheet open={showRepeatPicker} onOpenChange={setShowRepeatPicker}>
         <SheetContent side="bottom" className="h-auto rounded-t-3xl" hideCloseButton>
           <div className="flex items-center justify-between px-4 py-3 border-b">
