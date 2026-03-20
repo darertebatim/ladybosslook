@@ -134,7 +134,7 @@ export const SortableTaskList = ({
   onOpenTimer,
   onOpenWaterTracking,
   hideQuickAdd = false,
-  
+  onOpenTaskSheet,
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
