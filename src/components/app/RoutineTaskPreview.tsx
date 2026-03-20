@@ -75,8 +75,8 @@ function useRoutinePreviewData(routineId: string) {
 
       // Compare completed counts using the same denominator (current routine tasks)
       const sessionCompleted = session ? Math.max(session.tasks_completed, 0) : 0;
-      const completedCount = Math.max(manualCompleted, Math.min(sessionCompleted, totalTasks));
-      const pct = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
+      const resolvedCompletedCount = Math.max(manualCompleted, Math.min(sessionCompleted, totalTasks));
+      const pct = totalTasks > 0 ? Math.round((resolvedCompletedCount / totalTasks) * 100) : 0;
 
       return { pct, isComplete: pct >= 100 };
     },
