@@ -1108,15 +1108,7 @@ const AppHome = () => {
                       >
                         Show all tasks
                       </button>
-                      <button
-                        onClick={handleFabClick}
-                        className="mt-3 w-full max-w-sm rounded-3xl pl-3 pr-4 py-1.5 bg-card border-2 border-urgency/30 flex items-center gap-2 active:scale-[0.98] transition-all"
-                      >
-                        <div className="w-8 h-8 flex items-center justify-center shrink-0">
-                          <Plus className="h-5 w-5 text-urgency" strokeWidth={3} />
-                        </div>
-                        <span className="text-[15px] font-semibold text-foreground">Quick add task...</span>
-                      </button>
+                      <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                     </div>
                   ) : (
                     <>
