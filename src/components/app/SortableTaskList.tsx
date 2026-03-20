@@ -554,7 +554,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
           <DialogPortal>
             <div
               ref={suggestionsLayerRef}
-              className="fixed left-[50%] -translate-x-1/2 z-[100] w-[calc(100%-32px)] max-w-[calc(100%-32px)] flex flex-col gap-2.5 pointer-events-auto"
+              className="fixed left-[50%] -translate-x-1/2 z-[10001] w-[calc(100%-32px)] max-w-[calc(100%-32px)] flex flex-col gap-2.5 pointer-events-auto"
               style={{ top: suggestionsTop }}
             >
               {/* Category pills */}
