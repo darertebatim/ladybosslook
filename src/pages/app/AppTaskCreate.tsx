@@ -1386,7 +1386,7 @@ const AppTaskCreate = ({
 
       {/* Duration Picker Sheet */}
       <Sheet open={showDurationPicker} onOpenChange={setShowDurationPicker}>
-        <SheetContent side="bottom" className="h-[50vh] rounded-t-3xl" hideCloseButton>
+        <SheetContent side="bottom" className="h-auto max-h-[65vh] rounded-t-3xl" hideCloseButton>
           <div className="flex items-center justify-between px-4 py-3 border-b">
             <button onClick={() => setShowDurationPicker(false)} className="p-2 -ml-2">
               <X className="h-5 w-5" />
