@@ -151,6 +151,7 @@ export function RoutinePlayerProvider({ children }: { children: ReactNode }) {
             pauseElapsed={player.pauseElapsed}
             onBreathComplete={player.onBreathComplete}
             onCountdownComplete={player.onCountdownComplete}
+            onCompletionCelebrationDone={player.onCompletionCelebrationDone}
             onCompleteTask={player.completeTask}
             onSkipTask={player.skipTask}
             onTogglePause={player.togglePause}
