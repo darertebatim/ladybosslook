@@ -108,7 +108,36 @@ export function RoutinePreviewSheet({
   onSave,
   isSaving,
   isFree,
+  routineBankId,
 }: RoutinePreviewSheetProps) {
+  // Generate synthetic pro-task for multi-task routines
+  const displayTasks = useMemo(() => {
+    if (tasks.length > 1 && routineBankId) {
+      const proTask: RoutinePlanTask = {
+        id: `__pro_task_routine_${routineBankId}`,
+        plan_id: routineBankId,
+        title: `▶️ ${routineTitle}`,
+        icon: '▶️',
+        color: 'emerald',
+        task_order: -1,
+        is_active: true,
+        created_at: new Date().toISOString(),
+        linked_playlist_id: null,
+        pro_link_type: 'routine' as any,
+        pro_link_value: routineBankId,
+        goal_enabled: false,
+        goal_target: null,
+        goal_type: null,
+        goal_unit: null,
+        linked_playlist: null,
+      };
+      // Attach repeat_pattern for display
+      (proTask as any).repeat_pattern = 'daily';
+      return [proTask, ...tasks];
+    }
+    return tasks;
+  }, [tasks, routineBankId, routineTitle]);
+
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(
     new Set(tasks.map(t => t.id))
   );
@@ -125,10 +154,10 @@ export function RoutinePreviewSheet({
 
   // Sync selectedTaskIds when tasks change (e.g., when data loads async)
   useEffect(() => {
-    if (tasks.length > 0 && selectedTaskIds.size === 0) {
-      setSelectedTaskIds(new Set(tasks.map(t => t.id)));
+    if (displayTasks.length > 0 && selectedTaskIds.size === 0) {
+      setSelectedTaskIds(new Set(displayTasks.map(t => t.id)));
     }
-  }, [tasks]);
+  }, [displayTasks]);
 
   const allSelected = selectedTaskIds.size === tasks.length;
 
