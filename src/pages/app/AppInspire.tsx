@@ -316,6 +316,34 @@ export default function AppInspire() {
                 );
               })()}
 
+              {/* Reset Section */}
+              {resetRoutines.length > 0 && (
+                <section id="routine-category-reset">
+                  <div className="flex items-center justify-between mb-2 px-4">
+                    <h2 className="text-xl font-bold text-foreground flex items-center gap-1.5">
+                      <RotateCcw className="h-5 w-5 text-violet-500" />
+                      Reset
+                    </h2>
+                    <button
+                      onClick={() => navigate(`/app/routines/category/reset`, { state: { from: location.pathname } })}
+                      className="text-sm text-primary font-medium flex items-center gap-0.5"
+                    >
+                      All <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
+                    {resetRoutines.slice(0, 8).map((routine) => (
+                      <div key={routine.id} className="shrink-0 w-40">
+                        <RoutineBankCard
+                          routine={routine}
+                          onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
               {/* Challenges Section */}
               {challengeRoutines.length > 0 && (
                 <section id="routine-category-challenges">
