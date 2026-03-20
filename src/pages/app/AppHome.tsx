@@ -1237,7 +1237,7 @@ const AppHome = () => {
                             )}
                           </>
                         ) : (
-                          <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                          <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenTaskSheet={handleOpenTaskSheet} />
                         );
                       })()}
                     </>
