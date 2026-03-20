@@ -62,6 +62,7 @@ export default function AppPlayer() {
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
   const [scrollY, setScrollY] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollRef: listenScrollRef } = useScrollRestore('listen_scroll', { autoSave: true });
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setScrollY(e.currentTarget.scrollTop);
   }, []);
