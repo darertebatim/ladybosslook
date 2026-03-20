@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
@@ -66,8 +66,8 @@ export function RoutineCountdown({ routineEmoji, routineTitle, onComplete }: Rou
             key={step}
             initial={{ scale: 0.3, opacity: 0, rotate: -15 }}
             animate={{ scale: 1, opacity: 1, rotate: 0 }}
-            exit={{ scale: 2.5, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+            exit={{ scale: 1.8, opacity: 0, transition: { duration: 0.2, ease: 'easeOut' } }}
+            transition={{ type: 'spring', stiffness: 300, damping: 18 }}
             className="relative flex items-center justify-center"
           >
             {current.value === '🚀' ? (
