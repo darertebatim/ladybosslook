@@ -663,7 +663,7 @@ const AppTaskCreate = ({
       if (error) return false;
       return (data?.length ?? 0) > 0;
     },
-    enabled: !!taskId && !isSheet,
+    enabled: !!taskId && shouldLoadFromDb,
   });
 
   // Handler to reset progress when goal type/unit changes
