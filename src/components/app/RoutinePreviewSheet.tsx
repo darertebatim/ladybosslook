@@ -159,7 +159,7 @@ export function RoutinePreviewSheet({
     }
   }, [displayTasks]);
 
-  const allSelected = selectedTaskIds.size === tasks.length;
+  const allSelected = selectedTaskIds.size === displayTasks.length;
 
   const toggleTask = (taskId: string) => {
     const newSet = new Set(selectedTaskIds);
@@ -175,9 +175,11 @@ export function RoutinePreviewSheet({
     if (allSelected) {
       setSelectedTaskIds(new Set());
     } else {
-      setSelectedTaskIds(new Set(tasks.map(t => t.id)));
+      setSelectedTaskIds(new Set(displayTasks.map(t => t.id)));
     }
   };
+
+  const isProTask = (taskId: string) => taskId.startsWith('__pro_task_routine_');
 
   const openTaskEditor = (task: RoutinePlanTask, index: number) => {
     setEditingTaskId(task.id);
