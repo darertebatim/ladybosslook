@@ -290,7 +290,7 @@ export function useRoutinePlayer() {
       );
 
       const inserts: Array<{ task_id: string; user_id: string; completed_date: string; goal_progress: number }> = [];
-      const updates: Promise<any>[] = [];
+      const updates: any[] = [];
 
       for (const task of applicableTasks) {
         const targetProgress = task.goal_enabled && (task.goal_target || 0) > 0
