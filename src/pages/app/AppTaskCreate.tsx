@@ -1511,6 +1511,7 @@ const AppTaskCreate = ({
           const num = parseInt(customDurationValue) || 0;
           if (num > 0 && num <= 480) {
             setDurationMinutes(num);
+            setUseHistoryDuration(false);
             setShowDurationPicker(false);
           }
           setShowCustomDurationKeypad(false);
