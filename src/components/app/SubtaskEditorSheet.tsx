@@ -165,7 +165,10 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
           </div>
 
           {/* Add new subtask input - pinned at top for keyboard visibility */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-muted/20 flex-shrink-0">
+          <div 
+            className="flex items-center gap-3 px-4 py-3 border-b border-muted/20 flex-shrink-0 cursor-text"
+            onClick={() => newInputRef.current?.focus()}
+          >
             <Plus className="h-5 w-5 text-muted-foreground shrink-0" />
             <Input
               ref={newInputRef}
