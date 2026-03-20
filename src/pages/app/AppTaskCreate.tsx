@@ -840,7 +840,7 @@ const AppTaskCreate = ({
     if (isSheet && onSheetOpenChange) {
       onSheetOpenChange(false);
     } else {
-      navigate('/app/home');
+      navigate(-1);
     }
   };
 
