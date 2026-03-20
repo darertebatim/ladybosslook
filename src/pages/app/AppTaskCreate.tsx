@@ -358,20 +358,21 @@ const AppTaskCreate = ({
   const taskId = editTaskIdProp || routeTaskId;
   const [searchParams] = useSearchParams();
   
-  // Get URL params for pre-filled data from quick start
-  const urlName = searchParams.get('name') || '';
-  const urlEmoji = searchParams.get('emoji') || '';
-  const urlColor = searchParams.get('color') as TaskColor | null;
-  const urlRepeatPattern = searchParams.get('repeat_pattern') as 'none' | 'daily' | 'weekly' | 'monthly' | null;
-  const urlRepeatDays = searchParams.get('repeat_days');
-  const urlTag = searchParams.get('tag');
-  const urlGoalEnabled = searchParams.get('goal_enabled') === 'true';
-  const urlGoalType = searchParams.get('goal_type') as 'count' | 'timer' | null;
-  const urlGoalTarget = searchParams.get('goal_target');
-  const urlGoalUnit = searchParams.get('goal_unit');
-  const urlProLinkType = searchParams.get('pro_link_type') as ProLinkType | null;
-  const urlProLinkValue = searchParams.get('pro_link_value');
-  const urlLinkedPlaylistId = searchParams.get('linked_playlist_id');
+  // Get URL params for pre-filled data from quick start (or createParams in sheet mode)
+  const getParam = (key: string) => createParams?.[key] || searchParams.get(key) || '';
+  const urlName = getParam('name');
+  const urlEmoji = getParam('emoji');
+  const urlColor = (getParam('color') || null) as TaskColor | null;
+  const urlRepeatPattern = (getParam('repeat_pattern') || null) as 'none' | 'daily' | 'weekly' | 'monthly' | null;
+  const urlRepeatDays = getParam('repeat_days') || null;
+  const urlTag = getParam('tag') || null;
+  const urlGoalEnabled = getParam('goal_enabled') === 'true';
+  const urlGoalType = (getParam('goal_type') || null) as 'count' | 'timer' | null;
+  const urlGoalTarget = getParam('goal_target') || null;
+  const urlGoalUnit = getParam('goal_unit') || null;
+  const urlProLinkType = (getParam('pro_link_type') || null) as ProLinkType | null;
+  const urlProLinkValue = getParam('pro_link_value') || null;
+  const urlLinkedPlaylistId = getParam('linked_playlist_id') || null;
   
   const isEditing = !!taskId || !!initialData;
   const { effectiveInset, isKeyboardOpen } = useKeyboard();
