@@ -45,7 +45,7 @@ const AppPlayer = lazy(() => appPlayerImport);
 const AppChannelsList = lazy(() => appChannelsListImport);
 const AppPresence = lazy(() => appPresenceImport);
 const AppPrograms = lazy(() => import("@/pages/app/AppPrograms"));
-const AppStore = lazy(() => import("@/pages/app/AppStore"));
+// AppStore eagerly imported above
 const AppBrowsePrograms = lazy(() => import("@/pages/app/AppBrowsePrograms"));
 const AppCourseDetail = lazy(() => import("@/pages/app/AppCourseDetail"));
 const AppProfile = lazy(() => import("@/pages/app/AppProfile"));
