@@ -1250,7 +1250,25 @@ const AppHome = () => {
                             )}
                           </>
                         ) : (
-                          <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenTaskSheet={handleOpenTaskSheet} />
+                          <>
+                            <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenTaskSheet={handleOpenTaskSheet} hideQuickAdd={taskFilter === 'all-routines' || taskFilter.startsWith('routine:')} />
+                            {(taskFilter === 'all-routines' || taskFilter.startsWith('routine:')) && (
+                              <div className="flex gap-2 mt-3">
+                                <button
+                                  onClick={() => navigate('/app/routines')}
+                                  className="flex-1 rounded-3xl py-2.5 bg-card border-2 border-urgency/30 text-[14px] font-semibold text-foreground active:scale-[0.98] transition-all"
+                                >
+                                  Manage Routines
+                                </button>
+                                <button
+                                  onClick={() => navigate('/app/inspire')}
+                                  className="flex-1 rounded-3xl py-2.5 bg-card border-2 border-urgency/30 text-[14px] font-semibold text-foreground active:scale-[0.98] transition-all"
+                                >
+                                  Browse Library
+                                </button>
+                              </div>
+                            )}
+                          </>
                         );
                       })()}
                     </>
