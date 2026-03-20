@@ -278,7 +278,7 @@ export default function AppInspireDetail() {
                 )}
               />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center z-10">
                 <span className="text-8xl opacity-30">{routineIcon}</span>
               </div>
             )}
