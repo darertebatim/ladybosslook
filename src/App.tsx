@@ -75,7 +75,7 @@ const AppEmotion = lazy(() => import("@/pages/app/AppEmotion"));
 const AppEmotionHistory = lazy(() => import("@/pages/app/AppEmotionHistory"));
 const AppMood = lazy(() => import("@/pages/app/AppMood"));
 const AppMoodHistory = lazy(() => import("@/pages/app/AppMoodHistory"));
-const AppPresence = lazy(() => import("@/pages/app/AppPresence"));
+// AppPresence eagerly imported above
 const AppActionStats = lazy(() => import("@/pages/app/AppActionStats"));
 const AppFasting = lazy(() => import("@/pages/app/AppFasting"));
 const AppTimer = lazy(() => import("@/pages/app/AppTimer"));
