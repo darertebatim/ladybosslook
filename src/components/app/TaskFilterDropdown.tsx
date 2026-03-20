@@ -27,8 +27,8 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
 
   const baseOptions: FilterOption[] = [
     { value: 'all', label: 'All Tasks' },
-    { value: 'one-time', label: 'One-time Tasks' },
     ...(routineNames.size > 0 ? [{ value: 'all-routines', label: 'My Routines' }] : []),
+    { value: 'one-time', label: 'One-time Tasks' },
   ];
 
   const endOptions: FilterOption[] = [
