@@ -423,6 +423,7 @@ const AppTaskCreate = ({
   const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
   const [showDurationPicker, setShowDurationPicker] = useState(false);
   const [showCustomDurationKeypad, setShowCustomDurationKeypad] = useState(false);
+  const [customDurationValue, setCustomDurationValue] = useState('');
 
 
   const [showIconPicker, setShowIconPicker] = useState(false);
