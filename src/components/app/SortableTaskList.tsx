@@ -435,9 +435,13 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
     if (!trimmed) return;
     haptic.light();
     const qp = getQuickParams();
-    const urlParams = new URLSearchParams({ name: trimmed, ...Object.fromEntries(Object.entries(qp).map(([k, v]) => [k, typeof v === 'object' ? JSON.stringify(v) : String(v)])) });
+    const createParams: Record<string, string> = { name: trimmed, ...Object.fromEntries(Object.entries(qp).map(([k, v]) => [k, typeof v === 'object' ? JSON.stringify(v) : String(v)])) };
     handleClose();
-    navigate(`/app/home/new?${urlParams.toString()}`);
+    if (onOpenTaskSheet) {
+      onOpenTaskSheet({ createParams });
+    } else {
+      navigate(`/app/home/new?${new URLSearchParams(createParams).toString()}`);
+    }
   };
 
   const handleTemplateSelect = (template: TaskTemplate) => {
