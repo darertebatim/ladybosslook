@@ -176,7 +176,7 @@ export default function AppInspire() {
                       icon={category.icon}
                       emoji={category.emoji}
                       color={category.color}
-                      onClick={() => navigate(`/app/routines/category/${category.slug}`, { state: { from: location.pathname } })}
+                      onClick={() => navigateWithScroll(`/app/routines/category/${category.slug}`, { state: { from: location.pathname } })}
                     />
                   ))}
                   {nonEmptyCategories.find(c => c.slug === 'pro') && (
@@ -185,7 +185,7 @@ export default function AppInspire() {
                       icon={nonEmptyCategories.find(c => c.slug === 'pro')!.icon}
                       emoji={nonEmptyCategories.find(c => c.slug === 'pro')!.emoji}
                       color={nonEmptyCategories.find(c => c.slug === 'pro')!.color}
-                      onClick={() => navigate(`/app/routines/category/pro`, { state: { from: location.pathname } })}
+                      onClick={() => navigateWithScroll(`/app/routines/category/pro`, { state: { from: location.pathname } })}
                     />
                   )}
                   {challengeRoutines.length > 0 && (
@@ -262,7 +262,7 @@ export default function AppInspire() {
                   <div className="flex items-center justify-between mb-2 px-4">
                     <h2 className="text-xl font-bold text-foreground">Popular</h2>
                     <button
-                      onClick={() => navigate(`/app/routines/category/popular`, { state: { from: location.pathname } })}
+                      onClick={() => navigateWithScroll(`/app/routines/category/popular`, { state: { from: location.pathname } })}
                       className="text-sm text-primary font-medium flex items-center gap-0.5"
                     >
                       All <ChevronRight className="h-4 w-4" />
@@ -273,7 +273,7 @@ export default function AppInspire() {
                       <div key={routine.id} className="shrink-0 w-40">
                         <RoutineBankCard
                           routine={routine}
-                          onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                          onClick={() => navigateWithScroll(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
                           className={index === 0 ? 'tour-routine-card' : undefined}
                         />
                       </div>
@@ -292,7 +292,7 @@ export default function AppInspire() {
                     <div className="flex items-center justify-between mb-2 px-4">
                       <h2 className="text-xl font-bold text-foreground">{category.name}</h2>
                       <button
-                        onClick={() => navigate(`/app/routines/category/${category.slug}`, { state: { from: location.pathname } })}
+                        onClick={() => navigateWithScroll(`/app/routines/category/${category.slug}`, { state: { from: location.pathname } })}
                         className="text-sm text-primary font-medium flex items-center gap-0.5"
                       >
                         All <ChevronRight className="h-4 w-4" />
@@ -303,7 +303,7 @@ export default function AppInspire() {
                         <div key={routine.id} className="shrink-0 w-40">
                           <RoutineBankCard
                             routine={routine}
-                            onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                            onClick={() => navigateWithScroll(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
                           />
                         </div>
                       ))}
@@ -323,7 +323,7 @@ export default function AppInspire() {
                     <div className="flex items-center justify-between mb-2 px-4">
                       <h2 className="text-xl font-bold text-foreground">{proCat.name}</h2>
                       <button
-                        onClick={() => navigate(`/app/routines/category/pro`, { state: { from: location.pathname } })}
+                        onClick={() => navigateWithScroll(`/app/routines/category/pro`, { state: { from: location.pathname } })}
                         className="text-sm text-primary font-medium flex items-center gap-0.5"
                       >
                         All <ChevronRight className="h-4 w-4" />
@@ -334,7 +334,7 @@ export default function AppInspire() {
                         <div key={routine.id} className="shrink-0 w-40">
                           <RoutineBankCard
                             routine={routine}
-                            onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                            onClick={() => navigateWithScroll(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
                           />
                         </div>
                       ))}
@@ -352,7 +352,7 @@ export default function AppInspire() {
                       Reset
                     </h2>
                     <button
-                      onClick={() => navigate(`/app/routines/category/reset`, { state: { from: location.pathname } })}
+                      onClick={() => navigateWithScroll(`/app/routines/category/reset`, { state: { from: location.pathname } })}
                       className="text-sm text-primary font-medium flex items-center gap-0.5"
                     >
                       All <ChevronRight className="h-4 w-4" />
@@ -363,7 +363,7 @@ export default function AppInspire() {
                       <div key={routine.id} className="shrink-0 w-40">
                         <RoutineBankCard
                           routine={routine}
-                          onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                          onClick={() => navigateWithScroll(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
                         />
                       </div>
                     ))}
@@ -380,7 +380,7 @@ export default function AppInspire() {
                       Challenges
                     </h2>
                     <button
-                      onClick={() => navigate(`/app/routines/category/challenges`, { state: { from: location.pathname } })}
+                      onClick={() => navigateWithScroll(`/app/routines/category/challenges`, { state: { from: location.pathname } })}
                       className="text-sm text-primary font-medium flex items-center gap-0.5"
                     >
                       All <ChevronRight className="h-4 w-4" />
@@ -391,7 +391,7 @@ export default function AppInspire() {
                       <div key={routine.id} className="shrink-0 w-40">
                         <RoutineBankCard
                           routine={routine}
-                          onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                          onClick={() => navigateWithScroll(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
                         />
                       </div>
                     ))}
@@ -408,7 +408,7 @@ export default function AppInspire() {
                       Projects
                     </h2>
                     <button
-                      onClick={() => navigate(`/app/routines/category/projects`, { state: { from: location.pathname } })}
+                      onClick={() => navigateWithScroll(`/app/routines/category/projects`, { state: { from: location.pathname } })}
                       className="text-sm text-primary font-medium flex items-center gap-0.5"
                     >
                       All <ChevronRight className="h-4 w-4" />
@@ -419,7 +419,7 @@ export default function AppInspire() {
                       <div key={routine.id} className="shrink-0 w-40">
                         <RoutineBankCard
                           routine={routine}
-                          onClick={() => navigate(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
+                          onClick={() => navigateWithScroll(`/app/routines/${routine.id}`, { state: { from: location.pathname } })}
                           isCompleted={completedRoutines?.has(routine.id)}
                         />
                       </div>
