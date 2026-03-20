@@ -257,6 +257,74 @@ export default function AppRoutinePlayer() {
     enabled: !!user,
   });
 
+  // Auto-restore missing routine snapshots if they were accidentally removed
+  const restoringMissingRoutinesRef = useRef(false);
+  useEffect(() => {
+    if (!user || !myRoutines || restoringMissingRoutinesRef.current) return;
+
+    const restoreMissingRoutineCards = async () => {
+      restoringMissingRoutinesRef.current = true;
+      try {
+        const existingRoutineIds = new Set((myRoutines || []).map((r: any) => r.routine_id));
+
+        const { data: taskRoutineRows, error: tasksError } = await supabase
+          .from('user_tasks')
+          .select('source_routine_id')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .not('source_routine_id', 'is', null);
+
+        if (tasksError) return;
+
+        const routineIdsFromTasks = [...new Set((taskRoutineRows || [])
+          .map((row: any) => row.source_routine_id)
+          .filter(Boolean))] as string[];
+
+        const missingRoutineIds = routineIdsFromTasks.filter((id) => !existingRoutineIds.has(id));
+        if (missingRoutineIds.length === 0) return;
+
+        const { data: sourceRoutines, error: sourceError } = await supabase
+          .from('routines_bank')
+          .select('id, title, emoji, cover_image_url, category, color, is_focus, schedule_type')
+          .in('id', missingRoutineIds);
+
+        if (sourceError || !sourceRoutines || sourceRoutines.length === 0) return;
+
+        const maxOrderIndex = (myRoutines || []).reduce(
+          (max, routine: any) => Math.max(max, routine.order_index ?? -1),
+          -1
+        );
+
+        const restoredRows = sourceRoutines.map((routine: any, index: number) => ({
+          user_id: user.id,
+          routine_id: routine.id,
+          title: routine.title,
+          emoji: routine.emoji,
+          cover_image_url: routine.cover_image_url,
+          category: routine.category,
+          color: routine.color,
+          is_focus: routine.is_focus,
+          schedule_type: routine.schedule_type,
+          is_active: true,
+          order_index: maxOrderIndex + index + 1,
+        }));
+
+        const { error: restoreError } = await supabase
+          .from('user_routines_bank')
+          .upsert(restoredRows, { onConflict: 'user_id,routine_id' });
+
+        if (restoreError) return;
+
+        queryClient.invalidateQueries({ queryKey: ['user-routines-all', user.id] });
+        queryClient.invalidateQueries({ queryKey: ['linkable-user-routines'] });
+      } finally {
+        restoringMissingRoutinesRef.current = false;
+      }
+    };
+
+    restoreMissingRoutineCards();
+  }, [user, myRoutines, queryClient]);
+
   // Reorder routines mutation
   const reorderRoutinesMutation = useMutation({
     mutationFn: async (updates: { id: string; order_index: number }[]) => {
