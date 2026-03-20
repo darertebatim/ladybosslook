@@ -16,6 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import heroStormVideo from '@/assets/watch-hero-storm.mp4';
+import { useScrollRestore } from '@/hooks/useScrollRestore';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
