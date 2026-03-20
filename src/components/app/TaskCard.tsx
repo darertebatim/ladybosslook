@@ -398,7 +398,7 @@ export const TaskCard = memo(function TaskCard({
             {/* Content */}
             <div className={cn("flex-1 min-w-0", isAnimating && "animate-ripple-wave [animation-delay:0.6s]")}>
               {/* Top line: Time + Goal (if applicable) */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-[11px] text-black/80">{formatTime(task)}</span>
                 <span className="text-[11px] text-black/80">• {repeatLabel}</span>
                 {hasGoal && (
@@ -408,6 +408,11 @@ export const TaskCard = memo(function TaskCard({
                     if (label) return <>{label.prefix}<AnimatedProgress value={label.progress} />{label.suffix}</>;
                     return null;
                   })()}</span>
+                )}
+                {proLinkType === 'routine' && (proLinkValue || task.source_routine_id) && (
+                  <span className="text-[10px] font-semibold text-secondary-foreground bg-secondary rounded px-1.5 py-0.5 leading-none whitespace-nowrap">
+                    Routine Launcher
+                  </span>
                 )}
               </div>
               
