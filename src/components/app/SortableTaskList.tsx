@@ -557,12 +557,16 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet }: { date: Date; taskCo
                 haptic.light();
                 const qp = getQuickParams();
                 const trimmed = title.trim();
-                const urlParams = new URLSearchParams({
+                const createParams: Record<string, string> = {
                   ...(trimmed ? { name: trimmed } : {}),
                   ...Object.fromEntries(Object.entries(qp).map(([k, v]) => [k, typeof v === 'object' ? JSON.stringify(v) : String(v)]))
-                });
+                };
                 handleClose();
-                navigate(`/app/home/new?${urlParams.toString()}`);
+                if (onOpenTaskSheet) {
+                  onOpenTaskSheet({ createParams });
+                } else {
+                  navigate(`/app/home/new?${new URLSearchParams(createParams).toString()}`);
+                }
               }}
               className="h-7 w-7 rounded-full bg-white/20 text-white/80 flex items-center justify-center active:scale-95 transition-all"
             >
