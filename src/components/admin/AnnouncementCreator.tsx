@@ -25,7 +25,7 @@ const IN_APP_LINKS = [
   { value: 'none', label: 'No link' },
   { value: '/app/home', label: '🏠 Home' },
   { value: '/app/programs', label: '📚 My Programs' },
-  { value: '/app/explore', label: '🔍 Explore' },
+  { value: '/app/tools', label: '🔍 Tools' },
   { value: '/app/player', label: '🎧 Audio Player' },
   { value: '/app/chat', label: '💬 Support Chat' },
   { value: '/app/myprofile', label: '👤 Profile' },
@@ -306,7 +306,7 @@ export function AnnouncementCreator() {
                         ── Routines ──
                       </SelectItem>
                       {routines.map((r) => (
-                        <SelectItem key={`rt-${r.id}`} value={`/app/explore/routine/${r.id}`}>
+                        <SelectItem key={`rt-${r.id}`} value={`/app/tools/routine/${r.id}`}>
                           {r.emoji || '✨'} {r.title}
                         </SelectItem>
                       ))}

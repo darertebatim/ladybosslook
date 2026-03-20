@@ -464,8 +464,9 @@ const App = () => (
                       <Route path="home" element={<AppHome />} />
                       <Route path="myprograms" element={<AppPrograms />} />
                       <Route path="programs" element={<Navigate to="/app/myprograms" replace />} />
-                      <Route path="explore" element={<AppStore />} />
-                      <Route path="browse" element={<Navigate to="/app/explore" replace />} />
+                      <Route path="tools" element={<AppStore />} />
+                      <Route path="explore" element={<Navigate to="/app/tools" replace />} />
+                      <Route path="browse" element={<Navigate to="/app/tools" replace />} />
                       <Route path="academy" element={<AppBrowsePrograms />} />
                       <Route path="browse-programs" element={<Navigate to="/app/academy" replace />} />
                       <Route path="myprograms/:slug" element={<AppCourseDetail />} />

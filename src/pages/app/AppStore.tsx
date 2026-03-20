@@ -234,7 +234,7 @@ const AppStore = () => {
             </div>
           ) : (
             <>
-              <h1 className="text-xl font-bold text-foreground">Explore Simora</h1>
+              <h1 className="text-xl font-bold text-foreground">Tools</h1>
               <div className="flex items-center">
                 {startTour && (
                   <TourHelpButton onClick={startTour} />
