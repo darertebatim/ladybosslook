@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Check, ChevronDown, Filter } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
@@ -26,8 +26,16 @@ interface TaskFilterDropdownProps {
 
 export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTags, categoryNameMap, externalOpen, onExternalOpenChange }: TaskFilterDropdownProps) {
   const [internalOpen, setInternalOpen] = useState(false);
+  const [hasBeenTapped, setHasBeenTapped] = useState(() => localStorage.getItem('filter-nudge-tapped') === '1');
   const open = externalOpen ?? internalOpen;
-  const setOpen = (v: boolean) => { setInternalOpen(v); onExternalOpenChange?.(v); };
+  const setOpen = (v: boolean) => {
+    if (v && !hasBeenTapped) {
+      setHasBeenTapped(true);
+      localStorage.setItem('filter-nudge-tapped', '1');
+    }
+    setInternalOpen(v);
+    onExternalOpenChange?.(v);
+  };
 
   const baseOptions: FilterOption[] = [
     { value: 'all', label: 'All Tasks' },
@@ -86,11 +94,9 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
             "inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full text-[11px] font-medium",
             "bg-muted/60 text-foreground/80 active:scale-95 transition-transform",
             "border border-border/50",
-            "animate-[filter-nudge_4s_ease-in-out_infinite]"
+            !hasBeenTapped && "animate-[filter-nudge_4s_ease-in-out_infinite]"
           )}
-          style={{
-            animationDelay: '2s',
-          }}
+          style={!hasBeenTapped ? { animationDelay: '2s' } : undefined}
         >
           <Filter className="h-3 w-3 opacity-50" />
           <span className="truncate max-w-[120px]">{currentLabel}</span>
