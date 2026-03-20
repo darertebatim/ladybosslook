@@ -756,6 +756,7 @@ const AppHome = () => {
     setTaskSheetOpen(true);
   }, []);
 
+  const deleteTask = useDeleteTask();
   const handleDeleteTask = useCallback((task: UserTask) => {
     setSelectedTask(null);
     deleteTask.mutate(task.id, {
