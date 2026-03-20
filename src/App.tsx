@@ -63,7 +63,7 @@ const AppFeedPost = lazy(() => import("@/pages/app/AppFeedPost"));
 const AppJournal = lazy(() => import("@/pages/app/AppJournal"));
 const AppJournalEntry = lazy(() => import("@/pages/app/AppJournalEntry"));
 const AppTaskCreate = lazy(() => import("@/pages/app/AppTaskCreate"));
-const AppInspire = lazy(() => import("@/pages/app/AppInspire"));
+// AppInspire eagerly imported above
 const AppInspireDetail = lazy(() => import("@/pages/app/AppInspireDetail"));
 const AppRoutineCategory = lazy(() => import("@/pages/app/AppRoutineCategory"));
 const AppActions = lazy(() => import("@/pages/app/AppActions"));
