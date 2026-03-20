@@ -86,8 +86,8 @@ export const RoutineTaskPreview = memo(function RoutineTaskPreview({ routineId }
       ))}
       {overflow > 0 && (
         <>
-          <ChevronRight className="w-3 h-3 text-black/40 mx-0.5" />
-          <span className="w-7 h-7 rounded-full bg-background/60 flex items-center justify-center text-[11px] font-bold text-black/60">
+          <ChevronRight className="w-3 h-3 text-black mx-0.5" />
+          <span className="w-7 h-7 rounded-full bg-background/60 flex items-center justify-center text-[11px] font-bold text-black">
             +{overflow}
           </span>
         </>
