@@ -854,6 +854,7 @@ export default function RoutinesBank() {
         tag: data.formData.tag,
         description: data.formData.description || null,
         time_period: data.formData.timePeriod || null,
+        duration_minutes: data.formData.durationMinutes || null,
       };
 
       const { error } = await supabase.from('admin_task_bank').update(taskData).eq('id', data.id);
