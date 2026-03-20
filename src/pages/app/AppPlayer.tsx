@@ -17,6 +17,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { PaywallSheet } from "@/components/app/PaywallSheet";
 import { haptic } from "@/lib/haptics";
 import { PersianFlag } from "@/components/ui/PersianFlag";
+import { useScrollRestore } from "@/hooks/useScrollRestore";
 import heroStormVideo from "@/assets/watch-hero-storm.mp4";
 import { WatchCategoryPill } from "@/components/video/WatchCategoryPill";
 
@@ -62,6 +63,7 @@ export default function AppPlayer() {
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
   const [scrollY, setScrollY] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollRef: listenScrollRef } = useScrollRestore('listen_scroll', { autoSave: true });
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setScrollY(e.currentTarget.scrollTop);
   }, []);
@@ -401,7 +403,7 @@ export default function AppPlayer() {
       <div style={{ height: 'calc(190px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto overscroll-contain relative z-10" onScroll={handleScroll} style={{ maskImage: 'linear-gradient(to bottom, transparent 0px, black 24px)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0px, black 24px)' }}>
+      <div ref={listenScrollRef} className="flex-1 overflow-y-auto overscroll-contain relative z-10" onScroll={handleScroll} style={{ maskImage: 'linear-gradient(to bottom, transparent 0px, black 24px)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0px, black 24px)' }}>
         <div className="p-4 pb-safe space-y-6">
           {/* Continue Learning Section */}
           {progressFilter === "all" && selectedCategory === "all" && !searchQuery && continueListening.length > 0 && (

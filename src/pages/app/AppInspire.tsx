@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, Heart, Loader2, CalendarPlus, ChevronRight, Flame, Target, RotateCcw } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -15,6 +15,7 @@ import {
 import { RoutinesTour, TourHelpButton } from '@/components/app/tour';
 import { PromoBanner } from '@/components/app/PromoBanner';
 import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
+import { useScrollRestore } from '@/hooks/useScrollRestore';
 
 export default function AppInspire() {
   const navigate = useNavigate();
@@ -22,25 +23,10 @@ export default function AppInspire() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  // Restore scroll position on mount
-  useEffect(() => {
-    const saved = sessionStorage.getItem('routines_scroll');
-    if (saved && scrollRef.current) {
-      scrollRef.current.scrollTop = parseInt(saved, 10);
-      sessionStorage.removeItem('routines_scroll');
-    }
-  }, []);
+  const { scrollRef, saveScroll } = useScrollRestore('routines_scroll');
 
   const handleTourReady = useCallback((tourStart: () => void) => {
     setStartTour(() => tourStart);
-  }, []);
-
-  const saveScroll = useCallback(() => {
-    if (scrollRef.current) {
-      sessionStorage.setItem('routines_scroll', String(scrollRef.current.scrollTop));
-    }
   }, []);
 
   const navigateWithScroll = useCallback((path: string) => {

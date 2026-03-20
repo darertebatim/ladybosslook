@@ -28,6 +28,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { useFeaturedRoutinesBank, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 import { haptic } from '@/lib/haptics';
+import { useScrollRestore } from '@/hooks/useScrollRestore';
 import { isWaterTask } from '@/lib/waterTracking';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { FastingStatusCard } from '@/components/app/FastingStatusCard';
@@ -60,6 +61,7 @@ const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
 const AppHome = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { scrollRef: homeScrollRef } = useScrollRestore('home_scroll', { autoSave: true });
   const {
     user
   } = useAuth();
@@ -995,7 +997,7 @@ const AppHome = () => {
       }} />
 
         {/* Scroll container */}
-        <div className="flex-1 overflow-y-auto overscroll-contain" data-home-scroll-container="true">
+        <div ref={homeScrollRef} className="flex-1 overflow-y-auto overscroll-contain" data-home-scroll-container="true">
           <div className="px-4 pt-6 pb-4 pb-safe">
             {/* Notification Banner - prompts users to enable notifications */}
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />

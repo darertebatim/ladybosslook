@@ -16,6 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import heroStormVideo from '@/assets/watch-hero-storm.mp4';
+import { useScrollRestore } from '@/hooks/useScrollRestore';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
@@ -147,6 +148,7 @@ const AppBrowsePrograms = () => {
   const [selectedType, setSelectedType] = useState('all');
   const [scrollY, setScrollY] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollRef: academyScrollRef } = useScrollRestore('academy_scroll', { autoSave: true });
   const [preferredLanguage, setPreferredLanguage] = useState(() => {
     return localStorage.getItem('academy-language') || 'all';
   });
@@ -377,6 +379,7 @@ const AppBrowsePrograms = () => {
 
       {/* Scrollable Content */}
       <div
+        ref={academyScrollRef}
         className="flex-1 overflow-y-auto overscroll-contain relative z-10"
         onScroll={handleScroll}
         style={{
