@@ -11,17 +11,19 @@ export default function AppRoutineCategory() {
   const { data: categories } = useRoutineBankCategories();
   const isChallenges = categorySlug === 'challenges';
   const isProjects = categorySlug === 'projects';
-  const { data: routines, isLoading } = useRoutinesBank(isChallenges || isProjects ? undefined : categorySlug);
+  const isReset = categorySlug === 'reset';
+  const { data: routines, isLoading } = useRoutinesBank(isChallenges || isProjects || isReset ? undefined : categorySlug);
 
   const category = categories?.find(c => c.slug === categorySlug);
-  const title = isChallenges ? 'Challenges' : isProjects ? 'Projects' : (category?.name || 'Routines');
+  const title = isChallenges ? 'Challenges' : isProjects ? 'Projects' : isReset ? 'Reset' : (category?.name || 'Routines');
 
   const displayedRoutines = useMemo(() => {
     if (!routines) return [];
     if (isChallenges) return routines.filter(r => r.schedule_type === 'challenge');
     if (isProjects) return routines.filter(r => r.schedule_type === 'project');
+    if (isReset) return routines.filter(r => (r as any).is_focus === true);
     return routines;
-  }, [routines, isChallenges, isProjects]);
+  }, [routines, isChallenges, isProjects, isReset]);
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
