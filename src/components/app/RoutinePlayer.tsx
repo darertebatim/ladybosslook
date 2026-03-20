@@ -243,6 +243,17 @@ export const RoutinePlayer = memo(function RoutinePlayer({
     return null;
   }
 
+  // Completion celebration phase
+  if (phase === 'completing') {
+    return (
+      <RoutineCompletionCelebration
+        routineEmoji={config.routineEmoji}
+        routineTitle={config.routineTitle}
+        onComplete={onCompletionCelebrationDone}
+      />
+    );
+  }
+
   // Summary phase
   if (phase === 'summary') {
     return (
