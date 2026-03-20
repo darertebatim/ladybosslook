@@ -1100,13 +1100,19 @@ const AppHome = () => {
                   </div>
 
                   {filteredTasks.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-10">
-                      <p className="text-sm text-muted-foreground mb-2">No tasks match this filter</p>
+                    <div className="flex flex-col items-center justify-center py-10 gap-2">
+                      <p className="text-sm text-muted-foreground">No tasks match this filter</p>
                       <button
                         onClick={() => setTaskFilter('all')}
                         className="text-xs font-medium text-primary"
                       >
                         Show all tasks
+                      </button>
+                      <button
+                        onClick={handleFabClick}
+                        className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-semibold active:scale-95 transition-transform"
+                      >
+                        + Quick Add Task
                       </button>
                     </div>
                   ) : (
