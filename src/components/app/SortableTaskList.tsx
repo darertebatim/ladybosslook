@@ -327,7 +327,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet }: { date: Date; taskCo
   
   // Quick shortcut states
   const TIME_OPTIONS = ['Anytime', 'Morning', 'Afternoon', 'Evening', 'Bedtime'] as const;
-  const REPEAT_OPTIONS = ['No', 'Daily', 'Weekly'] as const;
+  const REPEAT_OPTIONS = ['Daily', 'No', 'Weekly'] as const;
   const [quickTime, setQuickTime] = useState<typeof TIME_OPTIONS[number]>('Anytime');
   const [quickRepeat, setQuickRepeat] = useState<typeof REPEAT_OPTIONS[number]>('Daily');
   const inputRef = useRef<HTMLInputElement>(null);
