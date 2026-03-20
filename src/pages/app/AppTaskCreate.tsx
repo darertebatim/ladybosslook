@@ -135,6 +135,8 @@ interface AppTaskCreateProps {
   onSheetOpenChange?: (open: boolean) => void;
   initialData?: Partial<TaskFormData>;
   onSaveSheet?: (data: TaskFormData) => void;
+  editTaskId?: string;
+  createParams?: Record<string, string>;
 }
 
 /** Buffered Time Picker Sheet - uses local state so changes only commit on Save */
