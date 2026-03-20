@@ -135,7 +135,9 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={(isOpen) => {
+        if (!isOpen) handleSave();
+      }}>
       <SheetContent 
         side="bottom" 
         className="h-[70vh] rounded-t-3xl px-0 pt-0 pb-0 border-0"
