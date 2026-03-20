@@ -26,8 +26,16 @@ interface TaskFilterDropdownProps {
 
 export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTags, categoryNameMap, externalOpen, onExternalOpenChange }: TaskFilterDropdownProps) {
   const [internalOpen, setInternalOpen] = useState(false);
+  const [hasBeenTapped, setHasBeenTapped] = useState(() => localStorage.getItem('filter-nudge-tapped') === '1');
   const open = externalOpen ?? internalOpen;
-  const setOpen = (v: boolean) => { setInternalOpen(v); onExternalOpenChange?.(v); };
+  const setOpen = (v: boolean) => {
+    if (v && !hasBeenTapped) {
+      setHasBeenTapped(true);
+      localStorage.setItem('filter-nudge-tapped', '1');
+    }
+    setInternalOpen(v);
+    onExternalOpenChange?.(v);
+  };
 
   const baseOptions: FilterOption[] = [
     { value: 'all', label: 'All Tasks' },
