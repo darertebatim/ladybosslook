@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format, addDays, nextMonday, startOfDay } from 'date-fns';
-import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag, AlarmClock, Target, Wind, Pencil, Brain, GripVertical, Headphones, MessageCircle, Clapperboard, Video, GraduationCap } from 'lucide-react';
+import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag, AlarmClock, Target, Wind, Pencil, Brain, GripVertical, Headphones, MessageCircle, Clapperboard, Video, GraduationCap, Timer } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   DndContext,
@@ -417,8 +417,12 @@ const AppTaskCreate = ({
     target: initialData?.goalTarget ?? (urlGoalTarget ? parseInt(urlGoalTarget) : 2),
     unit: initialData?.goalUnit ?? urlGoalUnit ?? 'times',
   });
+  
+  // Duration estimate (minutes) for smart estimate in routine player
+  const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
+  const [showDurationPicker, setShowDurationPicker] = useState(false);
 
-  // Sheet states
+
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -704,6 +708,9 @@ const AppTaskCreate = ({
         target: (existingTask as any).goal_target ?? 1,
         unit: (existingTask as any).goal_unit ?? 'times',
       });
+      
+      // Duration estimate
+      setDurationMinutes((existingTask as any).duration_minutes ?? null);
     }
   }, [existingTask, isSheet]);
 
@@ -769,6 +776,7 @@ const AppTaskCreate = ({
       goal_type: goalSettings.enabled ? goalSettings.type : null,
       goal_target: goalSettings.enabled ? goalSettings.target : null,
       goal_unit: goalSettings.enabled ? goalSettings.unit : null,
+      duration_minutes: durationMinutes,
     };
 
     if (taskId) {
@@ -1061,6 +1069,21 @@ const AppTaskCreate = ({
           </div>
         </button>
 
+        {/* Duration */}
+        <button
+          onClick={() => setShowDurationPicker(true)}
+          className="w-full flex items-center justify-between py-2 px-4 active:bg-muted/50 border-b border-muted/30"
+        >
+          <div className="flex items-center gap-3">
+            <Timer className="h-5 w-5 text-black" />
+            <span className="font-medium text-black">Duration</span>
+          </div>
+          <div className="flex items-center gap-2 text-black">
+            <span>{durationMinutes ? `${durationMinutes} min` : 'Not set'}</span>
+            <ChevronRight className="h-4 w-4 text-black" />
+          </div>
+        </button>
+
         {/* Reminder */}
         <button
           onClick={() => setShowReminderPicker(true)}
@@ -1324,6 +1347,53 @@ const AppTaskCreate = ({
           setTimePeriod(newPeriod);
         }}
       />
+
+      {/* Duration Picker Sheet */}
+      <Sheet open={showDurationPicker} onOpenChange={setShowDurationPicker}>
+        <SheetContent side="bottom" className="h-auto rounded-t-3xl" hideCloseButton>
+          <div className="flex items-center justify-between px-4 py-3 border-b">
+            <button onClick={() => setShowDurationPicker(false)} className="p-2 -ml-2">
+              <X className="h-5 w-5" />
+            </button>
+            <span className="text-base font-medium">Estimated Duration</span>
+            <div className="w-9" />
+          </div>
+          <div className="px-6 py-4 space-y-2">
+            <p className="text-xs text-muted-foreground mb-3">
+              Used as countdown estimate in the Routine Player. Timer will continue into overtime when reached.
+            </p>
+            {[
+              { label: 'Not set', value: null },
+              { label: '1 min', value: 1 },
+              { label: '2 min', value: 2 },
+              { label: '3 min', value: 3 },
+              { label: '5 min', value: 5 },
+              { label: '10 min', value: 10 },
+              { label: '15 min', value: 15 },
+              { label: '20 min', value: 20 },
+              { label: '30 min', value: 30 },
+              { label: '45 min', value: 45 },
+              { label: '60 min', value: 60 },
+            ].map(opt => (
+              <button
+                key={opt.label}
+                onClick={() => {
+                  setDurationMinutes(opt.value);
+                  setShowDurationPicker(false);
+                }}
+                className={cn(
+                  "w-full py-3 px-4 rounded-2xl text-left font-medium transition-all",
+                  durationMinutes === opt.value
+                    ? "bg-primary/10 text-primary"
+                    : "text-foreground active:bg-muted/50"
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Repeat Picker Sheet - Me+ Style Bottom Sheet */}
       <Sheet open={showRepeatPicker} onOpenChange={setShowRepeatPicker}>
