@@ -568,7 +568,7 @@ export default function AppRoutinePlayer() {
   // Filter planner tasks to only the selected routine's tasks
   const routineFilteredTasks = useMemo(() => {
     if (!preStartRoutine) return [];
-    return plannerTasks.filter(t => t.source_routine_id === preStartRoutine.routine_id);
+    return plannerTasks.filter(t => t.source_routine_id === preStartRoutine.routine_id && (t as any).pro_link_type !== 'routine');
   }, [plannerTasks, preStartRoutine]);
 
   // Calculate routine duration for header
