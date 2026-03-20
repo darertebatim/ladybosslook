@@ -77,6 +77,7 @@ function RoutineCardContent({
   getCompletionInfo,
   categoryNameMap,
   loadingRoutineId,
+  addedRoutineIds,
   onPlay,
   onOpenAddSheet,
   onDeleteRoutine,
