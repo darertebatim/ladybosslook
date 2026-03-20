@@ -540,7 +540,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
                   : "bg-white/20 text-white/80"
               )}
             >
-              <Clock className="h-3.5 w-3.5" />
+              <Clock className="h-3 w-3" />
               {quickTime.toUpperCase()}
             </button>
             <button
