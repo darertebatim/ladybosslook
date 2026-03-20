@@ -36,7 +36,10 @@ function useRoutinePreviewData(routineId: string) {
     queryFn: async () => {
       if (!user) return null;
       const today = new Date();
-      const { data } = await supabase
+      const todayStr = today.toISOString().slice(0, 10);
+
+      // 1) Check routine_sessions first (from Routine Player)
+      const { data: session } = await supabase
         .from('routine_sessions')
         .select('tasks_completed, tasks_total')
         .eq('user_id', user.id)
@@ -46,8 +49,36 @@ function useRoutinePreviewData(routineId: string) {
         .order('started_at', { ascending: false })
         .limit(1)
         .maybeSingle();
-      if (!data) return null;
-      const pct = data.tasks_total > 0 ? Math.round((data.tasks_completed / data.tasks_total) * 100) : 0;
+
+      // 2) Also check manual task_completions for this routine's tasks
+      const { data: routineTasks } = await supabase
+        .from('user_tasks')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('source_routine_id', routineId)
+        .eq('is_active', true)
+        .is('pro_link_type', null); // exclude the pro-task itself
+
+      const totalTasks = routineTasks?.length || 0;
+      if (totalTasks === 0) return session ? { pct: Math.round((session.tasks_completed / session.tasks_total) * 100), isComplete: session.tasks_completed >= session.tasks_total } : null;
+
+      const taskIds = routineTasks!.map(t => t.id);
+      const { count: completedCount } = await supabase
+        .from('task_completions')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('completed_date', todayStr)
+        .in('task_id', taskIds);
+
+      const manualCompleted = completedCount || 0;
+
+      // Use whichever gives higher completion (session or manual)
+      let pct = totalTasks > 0 ? Math.round((manualCompleted / totalTasks) * 100) : 0;
+      if (session && session.tasks_total > 0) {
+        const sessionPct = Math.round((session.tasks_completed / session.tasks_total) * 100);
+        pct = Math.max(pct, sessionPct);
+      }
+
       return { pct, isComplete: pct >= 100 };
     },
     enabled: !!user && !!routineId,

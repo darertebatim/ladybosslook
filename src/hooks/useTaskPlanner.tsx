@@ -951,6 +951,8 @@ export const useCompleteTask = () => {
       // Update challenge progress
       queryClient.invalidateQueries({ queryKey: ['user-challenges'] });
       queryClient.invalidateQueries({ queryKey: ['challenge-routine-infos'] });
+      // Update routine pro-task completion percentage
+      queryClient.invalidateQueries({ queryKey: ['routine-preview-completion'] });
       // Step unlock query refresh is handled by the UI celebration callback
       // to allow the celebration modal to show before tasks appear
     },
@@ -988,6 +990,7 @@ export const useUncompleteTask = () => {
       queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
       // Update weekly task completion badges
       queryClient.invalidateQueries({ queryKey: ['weekly-task-completion'] });
+      queryClient.invalidateQueries({ queryKey: ['routine-preview-completion'] });
     },
     onError: (error) => {
       console.error('Uncomplete task error:', error);
