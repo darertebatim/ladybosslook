@@ -1415,16 +1415,10 @@ const AppTaskCreate = ({
       <NumberKeypad
         open={showCustomDurationKeypad}
         onOpenChange={setShowCustomDurationKeypad}
-        value={durationMinutes && ![1,2,3,5,10,15,20,30].includes(durationMinutes) ? durationMinutes : 0}
-        onChange={(val) => {
-          if (val > 0 && val <= 480) {
-            setDurationMinutes(val);
-            setShowDurationPicker(false);
-          } else if (val === 0) {
-            setDurationMinutes(null);
-          }
-        }}
-        label="Duration (minutes)"
+        value={durationMinutes && ![1,2,3,5,10,15,20,30].includes(durationMinutes) ? String(durationMinutes) : ''}
+        onChange={() => {}}
+        onConfirm={() => {}}
+        title="Duration (minutes)"
         maxLength={3}
       />
 
