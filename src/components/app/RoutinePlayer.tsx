@@ -42,6 +42,7 @@ interface RoutinePlayerProps {
   pauseElapsed: number;
   onBreathComplete: () => void;
   onCountdownComplete: () => void;
+  onCompletionCelebrationDone: () => void;
   onCompleteTask: () => void;
   onSkipTask: () => void;
   onTogglePause: () => void;
