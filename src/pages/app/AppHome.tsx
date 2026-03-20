@@ -1120,15 +1120,17 @@ const AppHome = () => {
                         <div className="flex gap-2 mt-3 w-full">
                           <button
                             onClick={() => navigate('/app/routineplayer')}
-                            className="flex-1 rounded-3xl py-2.5 bg-card border-2 border-urgency/30 text-[14px] font-semibold text-foreground active:scale-[0.98] transition-all"
+                            className="flex-1 rounded-3xl py-2.5 px-3 bg-card border-2 border-urgency/30 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
                           >
-                            Manage My Routines
+                            <Settings2 className="w-3.5 h-3.5 text-urgency" />
+                            Manage Routines
                           </button>
                           <button
                             onClick={() => navigate('/app/routines')}
-                            className="flex-1 rounded-3xl py-2.5 bg-card border-2 border-urgency/30 text-[14px] font-semibold text-foreground active:scale-[0.98] transition-all"
+                            className="flex-1 rounded-3xl py-2.5 px-3 bg-card border-2 border-urgency/30 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
                           >
-                            Browse Routines Library
+                            <Search className="w-3.5 h-3.5 text-urgency" />
+                            Browse Library
                           </button>
                         </div>
                       ) : (
