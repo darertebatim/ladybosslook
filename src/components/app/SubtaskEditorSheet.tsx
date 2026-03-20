@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2, GripVertical, X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, closestCenter, DragEndEvent, DragStartEvent, DragOverlay } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useSensors, useSensor, TouchSensor, MouseSensor } from '@dnd-kit/core';
@@ -73,6 +73,7 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
 }) => {
   const [localSubtasks, setLocalSubtasks] = useState<string[]>([]);
   const [newSubtask, setNewSubtask] = useState('');
+  const [activeId, setActiveId] = useState<string | null>(null);
   const newInputRef = useRef<HTMLInputElement>(null);
   const itemRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -91,8 +92,14 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
   );
 
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+    haptic.medium();
+  }, []);
+
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
+    setActiveId(null);
     if (!over || active.id === over.id) return;
     const oldIndex = localSubtasks.findIndex((_, i) => `st-${i}` === active.id);
     const newIndex = localSubtasks.findIndex((_, i) => `st-${i}` === over.id);
@@ -173,6 +180,7 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
             >
               <SortableContext items={localSubtasks.map((_, i) => `st-${i}`)} strategy={verticalListSortingStrategy}>
@@ -193,6 +201,19 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
                   />
                 ))}
               </SortableContext>
+
+              <DragOverlay>
+                {activeId ? (() => {
+                  const idx = localSubtasks.findIndex((_, i) => `st-${i}` === activeId);
+                  return idx !== -1 ? (
+                    <div className="opacity-90 scale-105 shadow-2xl rounded-xl bg-white dark:bg-slate-800 flex items-center gap-2 px-4 py-3">
+                      <GripVertical className="h-4 w-4 text-muted-foreground/40" />
+                      <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30 shrink-0" />
+                      <span className="flex-1 text-base">{localSubtasks[idx]}</span>
+                    </div>
+                  ) : null;
+                })() : null}
+              </DragOverlay>
             </DndContext>
           </div>
 
