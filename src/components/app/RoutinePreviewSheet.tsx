@@ -482,13 +482,19 @@ export function RoutinePreviewSheet({
             <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4 min-h-0">
             {scheduleType === 'challenge' ? (
                 <>
+                  {/* Pro-task at top for challenges */}
+                  {displayTasks.length > tasks.length && (
+                    <div className="space-y-3 mb-4">
+                      {renderTaskCard(displayTasks[0], 0)}
+                    </div>
+                  )}
                   {(() => {
                     // Group tasks by drip_day
                     const dayGroups = new Map<number, { task: RoutinePlanTask; index: number }[]>();
                     tasks.forEach((task, index) => {
                       const day = (task as any).drip_day ?? 1;
                       if (!dayGroups.has(day)) dayGroups.set(day, []);
-                      dayGroups.get(day)!.push({ task, index });
+                      dayGroups.get(day)!.push({ task, index: index + (displayTasks.length > tasks.length ? 1 : 0) });
                     });
                     const sortedDays = Array.from(dayGroups.keys()).sort((a, b) => a - b);
                     return sortedDays.map(day => (
@@ -505,13 +511,19 @@ export function RoutinePreviewSheet({
                 </>
               ) : scheduleType === 'project' ? (
                 <>
+                  {/* Pro-task at top for projects */}
+                  {displayTasks.length > tasks.length && (
+                    <div className="space-y-3 mb-4">
+                      {renderTaskCard(displayTasks[0], 0)}
+                    </div>
+                  )}
                   {(() => {
                     // Group tasks by drip_day as step number
                     const stepGroups = new Map<number, { task: RoutinePlanTask; index: number }[]>();
                     tasks.forEach((task, index) => {
                       const step = (task as any).drip_day ?? (index + 1);
                       if (!stepGroups.has(step)) stepGroups.set(step, []);
-                      stepGroups.get(step)!.push({ task, index });
+                      stepGroups.get(step)!.push({ task, index: index + (displayTasks.length > tasks.length ? 1 : 0) });
                     });
                     const sortedSteps = Array.from(stepGroups.keys()).sort((a, b) => a - b);
                     return sortedSteps.map(step => (
@@ -549,7 +561,7 @@ export function RoutinePreviewSheet({
                       }},
                     ];
                     return groups.map(group => {
-                      const groupTasks = tasks.filter(group.filter);
+                      const groupTasks = displayTasks.filter(group.filter);
                       if (groupTasks.length === 0) return null;
                       return (
                         <div key={group.key} className="mb-4">
@@ -558,7 +570,7 @@ export function RoutinePreviewSheet({
                           </p>
                           <div className="space-y-3">
                             {groupTasks.map((task) => {
-                              const originalIndex = tasks.indexOf(task);
+                              const originalIndex = displayTasks.indexOf(task);
                               return renderTaskCard(task, originalIndex);
                             })}
                           </div>
