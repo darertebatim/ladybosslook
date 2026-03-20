@@ -517,13 +517,13 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
                 setQuickRepeat(REPEAT_OPTIONS[(idx + 1) % REPEAT_OPTIONS.length]);
               }}
               className={cn(
-                "h-9 px-3.5 rounded-full text-[13px] font-semibold flex items-center gap-1.5 active:scale-95 transition-all",
+                "h-7 px-2.5 rounded-full text-[11px] font-semibold flex items-center gap-1 active:scale-95 transition-all",
                 quickRepeat !== 'No'
                   ? "bg-white text-black shadow-sm"
                   : "bg-white/20 text-white/80"
               )}
             >
-              <Repeat className="h-3.5 w-3.5" />
+              <Repeat className="h-3 w-3" />
               {quickRepeat.toUpperCase()}
             </button>
             <button
@@ -534,13 +534,13 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
                 setQuickTime(TIME_OPTIONS[(idx + 1) % TIME_OPTIONS.length]);
               }}
               className={cn(
-                "h-9 px-3.5 rounded-full text-[13px] font-semibold flex items-center gap-1.5 active:scale-95 transition-all",
+                "h-7 px-2.5 rounded-full text-[11px] font-semibold flex items-center gap-1 active:scale-95 transition-all",
                 quickTime !== 'Anytime'
                   ? "bg-white text-black shadow-sm"
                   : "bg-white/20 text-white/80"
               )}
             >
-              <Clock className="h-3.5 w-3.5" />
+              <Clock className="h-3 w-3" />
               {quickTime.toUpperCase()}
             </button>
             <button
@@ -556,9 +556,9 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
                 handleClose();
                 navigate(`/app/home/new?${urlParams.toString()}`);
               }}
-              className="h-9 w-9 rounded-full bg-white/20 text-white/80 flex items-center justify-center active:scale-95 transition-all"
+              className="h-7 w-7 rounded-full bg-white/20 text-white/80 flex items-center justify-center active:scale-95 transition-all"
             >
-              <MoreHorizontal className="h-4 w-4" />
+              <MoreHorizontal className="h-3.5 w-3.5" />
             </button>
           </div>
 
@@ -625,7 +625,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
               onMouseDown={(e) => e.preventDefault()}
               onClick={handleShowIdeas}
               className={cn(
-                "text-[13px] text-white/70 font-medium text-center active:text-white/90 transition-colors",
+                "text-lg text-white/70 font-medium text-center active:text-white/90 transition-colors",
                 showIdeas && "opacity-0 pointer-events-none"
               )}
             >
