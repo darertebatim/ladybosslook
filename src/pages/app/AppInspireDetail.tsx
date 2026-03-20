@@ -278,8 +278,8 @@ export default function AppInspireDetail() {
                 )}
               />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center z-[1]">
-                <span className="text-8xl opacity-50">{routineIcon}</span>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-8xl opacity-30">{routineIcon}</span>
               </div>
             )}
             {/* Title overlay at bottom */}
