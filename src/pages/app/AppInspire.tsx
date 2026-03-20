@@ -72,6 +72,12 @@ export default function AppInspire() {
     return allRoutines.filter(r => r.schedule_type === 'project').filter(matchesSearch);
   }, [allRoutines, searchQuery]);
 
+  // Reset routines (is_focus)
+  const resetRoutines = useMemo(() => {
+    if (!allRoutines) return [];
+    return allRoutines.filter(r => r.is_focus === true).filter(matchesSearch);
+  }, [allRoutines, searchQuery]);
+
   // Only show categories that have routines
   const nonEmptyCategories = useMemo(() => {
     if (!categories || !allRoutines) return [];
