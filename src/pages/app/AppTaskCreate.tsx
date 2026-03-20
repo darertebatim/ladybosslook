@@ -454,6 +454,13 @@ const AppTaskCreate = ({
     enabled: !!taskId,
   });
 
+  // Auto-enable history duration when data is available
+  useEffect(() => {
+    if (durationHistory && !durationMinutes) {
+      setUseHistoryDuration(true);
+      setDurationMinutes(durationHistory.avgMinutes);
+    }
+  }, [durationHistory]);
 
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
