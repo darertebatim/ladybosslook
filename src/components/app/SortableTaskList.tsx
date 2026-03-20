@@ -523,7 +523,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
                   : "bg-white/20 text-white/80"
               )}
             >
-              <Repeat className="h-3.5 w-3.5" />
+              <Repeat className="h-3 w-3" />
               {quickRepeat.toUpperCase()}
             </button>
             <button
