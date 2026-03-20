@@ -843,6 +843,7 @@ export default function AppRoutinePlayer() {
                           getCompletionInfo={getCompletionInfo}
                           categoryNameMap={categoryNameMap}
                           loadingRoutineId={loadingRoutineId}
+                          addedRoutineIds={addedRoutineIds}
                           onPlay={handlePlay}
                           onOpenAddSheet={handleOpenAddSheet}
                           onDeleteRoutine={setDeleteRoutine}
