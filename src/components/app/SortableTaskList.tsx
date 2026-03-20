@@ -329,7 +329,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
   const TIME_OPTIONS = ['Anytime', 'Morning', 'Afternoon', 'Evening', 'Bedtime'] as const;
   const REPEAT_OPTIONS = ['No', 'Daily', 'Weekly'] as const;
   const [quickTime, setQuickTime] = useState<typeof TIME_OPTIONS[number]>('Anytime');
-  const [quickRepeat, setQuickRepeat] = useState<typeof REPEAT_OPTIONS[number]>('No');
+  const [quickRepeat, setQuickRepeat] = useState<typeof REPEAT_OPTIONS[number]>('Daily');
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsLayerRef = useRef<HTMLDivElement>(null);
   // Capture full screen height before keyboard opens to prevent shifting
@@ -391,7 +391,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
     setShowIdeas(false);
     setSelectedCategory('popular');
     setQuickTime('Anytime');
-    setQuickRepeat('No');
+    setQuickRepeat('Daily');
   };
 
   // Map quick shortcut values to task params
