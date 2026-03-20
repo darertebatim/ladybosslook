@@ -278,12 +278,14 @@ export default function AppInspireDetail() {
                 )}
               />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center z-10">
-                <span className="text-8xl opacity-30">{routineIcon}</span>
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <span className="text-8xl opacity-40">{routineIcon}</span>
               </div>
             )}
-            {/* Title overlay at bottom */}
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent pt-16 pb-4 px-4">
+            {/* Title overlay layer */}
+            <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/70 via-black/40 to-transparent pt-16 pb-4 px-4" />
+            {/* Title text */}
+            <div className="absolute inset-x-0 bottom-0 z-30 pt-16 pb-4 px-4">
               <h1 className="text-2xl font-bold text-white leading-tight drop-shadow-lg">
                 {routine.title}
               </h1>
