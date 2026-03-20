@@ -930,6 +930,28 @@ export default function RoutinesBank() {
     }));
   };
 
+  // Drag-and-drop sensors and handler
+  const dndSensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
+  );
+
+  const handleTaskDragEnd = (event: DragEndEvent, taskList: LocalTask[], sectionId: string | null) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = taskList.findIndex(t => t.id === active.id);
+    const newIndex = taskList.findIndex(t => t.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = arrayMove(taskList, oldIndex, newIndex);
+    setLocalTasks(prev => {
+      const otherTasks = prev.filter(t => !taskList.some(tl => tl.id === t.id));
+      const updated = reordered.map((t, i) => ({ ...t, task_order: i + 1 }));
+      return [...otherTasks, ...updated];
+    });
+  };
+
   const getCategoryInfo = (cat: string) => {
     const found = routineCategories.find(c => c.slug === cat);
     return found ? { value: found.slug, label: found.name, icon: found.icon || '📋' } : { value: cat, label: cat, icon: '📋' };
