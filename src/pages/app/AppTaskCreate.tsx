@@ -776,6 +776,7 @@ const AppTaskCreate = ({
       goal_type: goalSettings.enabled ? goalSettings.type : null,
       goal_target: goalSettings.enabled ? goalSettings.target : null,
       goal_unit: goalSettings.enabled ? goalSettings.unit : null,
+      duration_minutes: durationMinutes,
     };
 
     if (taskId) {
