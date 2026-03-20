@@ -49,7 +49,7 @@ const AppPrograms = lazy(() => import("@/pages/app/AppPrograms"));
 const AppBrowsePrograms = lazy(() => import("@/pages/app/AppBrowsePrograms"));
 const AppCourseDetail = lazy(() => import("@/pages/app/AppCourseDetail"));
 const AppProfile = lazy(() => import("@/pages/app/AppProfile"));
-const AppPlayer = lazy(() => import("@/pages/app/AppPlayer"));
+// AppPlayer eagerly imported above
 const AppWatch = lazy(() => import("@/pages/app/AppWatch"));
 const AppVideoPlaylistDetail = lazy(() => import("@/pages/app/AppVideoPlaylistDetail"));
 const AppVideoDetail = lazy(() => import("@/pages/app/AppVideoDetail"));
