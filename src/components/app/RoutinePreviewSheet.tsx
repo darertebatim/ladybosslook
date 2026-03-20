@@ -318,6 +318,7 @@ export function RoutinePreviewSheet({
 
   const renderTaskCard = (task: RoutinePlanTask, index: number) => {
     const isSelected = selectedTaskIds.has(task.id);
+    const isPro = isProTask(task.id);
     const display = getTaskDisplay(task, index);
     const colorClass = TASK_COLOR_CLASSES[display.color];
     const darkColorClass = TASK_COLOR_DARK_CLASSES[display.color] || 'bg-black/10';
@@ -344,26 +345,33 @@ export function RoutinePreviewSheet({
         </button>
         <div className={cn(
           'flex-1 rounded-2xl overflow-hidden',
+          isPro ? 'ring-2 ring-emerald-400/60' : '',
           colorClass
         )}>
           {/* Main content area */}
           <div className="flex items-center gap-3 px-3 pt-3 pb-2.5">
             <FluentEmoji emoji={display.icon || '📝'} size={40} className="shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-black mb-0.5">{timeLabel}</p>
+              {isPro ? (
+                <p className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide mb-0.5">Routine Launcher</p>
+              ) : (
+                <p className="text-xs font-medium text-black mb-0.5">{timeLabel}</p>
+              )}
               <p className="font-semibold text-[15px] text-black leading-snug line-clamp-2">{display.title}</p>
             </div>
-            <button 
-              className={cn("shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-black/60 active:scale-95 transition-transform", darkColorClass)}
-              onClick={() => openTaskEditor(task, index)}
-            >
-              <Pencil className="w-3.5 h-3.5" />
-            </button>
+            {!isPro && (
+              <button 
+                className={cn("shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-black/60 active:scale-95 transition-transform", darkColorClass)}
+                onClick={() => openTaskEditor(task, index)}
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
           {/* Footer strip with repeat info */}
           <div className={cn('px-4 py-3.5', darkColorClass)}>
             <p className="text-[13px] font-medium text-black text-center">
-              {getRepeatLabel(task, display.repeatPattern)}
+              {isPro ? 'Opens the routine player' : getRepeatLabel(task, display.repeatPattern)}
             </p>
           </div>
         </div>
