@@ -136,6 +136,18 @@ export default function AppInspire() {
             <div className="mt-4">
               <ScrollArea className="w-full tour-routine-categories">
                 <div className="flex gap-2 px-4 pb-2">
+                  {resetRoutines.length > 0 && (
+                    <CategoryCircle
+                      name="Reset"
+                      icon="RotateCcw"
+                      emoji="🔄"
+                      color="violet"
+                      onClick={() => {
+                        const el = document.getElementById('routine-category-reset');
+                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }}
+                    />
+                  )}
                   {nonEmptyCategories.filter(c => c.slug !== 'pro').map((category) => (
                     <CategoryCircle
                       key={category.slug}
@@ -153,18 +165,6 @@ export default function AppInspire() {
                       emoji={nonEmptyCategories.find(c => c.slug === 'pro')!.emoji}
                       color={nonEmptyCategories.find(c => c.slug === 'pro')!.color}
                       onClick={() => navigate(`/app/routines/category/pro`, { state: { from: location.pathname } })}
-                    />
-                  )}
-                  {resetRoutines.length > 0 && (
-                    <CategoryCircle
-                      name="Reset"
-                      icon="RotateCcw"
-                      emoji="🔄"
-                      color="violet"
-                      onClick={() => {
-                        const el = document.getElementById('routine-category-reset');
-                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }}
                     />
                   )}
                   {challengeRoutines.length > 0 && (
