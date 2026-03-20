@@ -744,8 +744,10 @@ const AppHome = () => {
 
   const handleEditTask = useCallback((task: UserTask) => {
     setSelectedTask(null);
-    navigate(`/app/home/edit/${task.id}`);
-  }, [navigate]);
+    setTaskSheetCreateParams(undefined);
+    setTaskSheetEditId(task.id);
+    setTaskSheetOpen(true);
+  }, []);
 
   const deleteTask = useDeleteTask();
   const handleDeleteTask = useCallback((task: UserTask) => {
