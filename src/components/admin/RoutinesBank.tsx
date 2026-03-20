@@ -828,6 +828,7 @@ export default function RoutinesBank() {
       goalType: (task.goal_type as 'timer' | 'count') || 'count',
       goalTarget: task.goal_target || 2,
       goalUnit: task.goal_unit || 'times',
+      durationMinutes: task.duration_minutes || null,
     });
     setEditActionSheetOpen(true);
   };

@@ -708,6 +708,7 @@ const AppTaskCreate = ({
         target: initialData.goalTarget ?? 1,
         unit: initialData.goalUnit ?? 'times',
       });
+      setDurationMinutes(initialData.durationMinutes ?? null);
     }
   }, [isSheet, initialData, sheetOpen]);
 
