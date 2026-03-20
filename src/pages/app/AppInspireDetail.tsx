@@ -18,6 +18,7 @@ import { useShareContent } from '@/hooks/useShareContent';
 import { cn } from '@/lib/utils';
 import { TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 
 const colorGradients: Record<string, string> = {
