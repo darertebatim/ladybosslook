@@ -63,6 +63,7 @@ interface RoutineCardProps {
   getCompletionInfo: (routineId: string) => { pct: number; isComplete: boolean } | null;
   categoryNameMap: Map<string, string>;
   loadingRoutineId: string | null;
+  addedRoutineIds: Set<string>;
   onPlay: (routine: any) => void;
   onOpenAddSheet: (routine: any) => void;
   onDeleteRoutine: (routine: any) => void;
