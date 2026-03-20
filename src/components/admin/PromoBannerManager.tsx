@@ -774,7 +774,7 @@ export function PromoBannerManager() {
               {/* Custom URL */}
               {destinationType === 'custom_url' && (
                 <div className="space-y-2">
-                  <Label>Custom URL (e.g., /app/explore)</Label>
+                  <Label>Custom URL (e.g., /app/tools)</Label>
                   <Input
                     value={customUrl}
                     onChange={(e) => setCustomUrl(e.target.value)}
