@@ -1414,6 +1414,21 @@ const AppHome = () => {
           hasWelcomeCard={showWelcomeCard}
           onTourReady={handleHomeTourReady}
         />
+
+        {/* Task Create/Edit Sheet */}
+        <AppTaskCreate
+          isSheet
+          sheetOpen={taskSheetOpen}
+          onSheetOpenChange={(open) => {
+            setTaskSheetOpen(open);
+            if (!open) {
+              setTaskSheetEditId(undefined);
+              setTaskSheetCreateParams(undefined);
+            }
+          }}
+          editTaskId={taskSheetEditId}
+          createParams={taskSheetCreateParams}
+        />
       </div>
     </>
   );
