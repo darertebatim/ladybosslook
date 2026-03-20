@@ -396,15 +396,16 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
 
   // Map quick shortcut values to task params
   const getQuickParams = () => {
-    const params: Record<string, string> = {};
+    const params: Record<string, any> = {};
     if (quickTime !== 'Anytime') {
-      params.time_period = quickTime.toLowerCase();
+      const timeMap: Record<string, string> = { Morning: 'morning', Afternoon: 'afternoon', Evening: 'evening', Bedtime: 'night' };
+      params.time_period = timeMap[quickTime];
     }
     if (quickRepeat === 'Daily') {
       params.repeat_pattern = 'daily';
     } else if (quickRepeat === 'Weekly') {
       params.repeat_pattern = 'weekly';
-      params.repeat_days = JSON.stringify([new Date().getDay()]);
+      params.repeat_days = [new Date().getDay()];
     }
     return params;
   };
