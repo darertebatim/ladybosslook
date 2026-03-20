@@ -18,6 +18,7 @@ import { useShareContent } from '@/hooks/useShareContent';
 import { cn } from '@/lib/utils';
 import { TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 
 const colorGradients: Record<string, string> = {
@@ -279,7 +280,7 @@ export default function AppInspireDetail() {
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center z-20">
-                <span className="text-8xl opacity-40">{routineIcon}</span>
+                <FluentEmoji emoji={routineIcon} size={110} className="opacity-60" />
               </div>
             )}
             {/* Title overlay layer */}
