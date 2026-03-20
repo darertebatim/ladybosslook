@@ -2054,7 +2054,7 @@ export default function RoutinesBank() {
                             <span className="text-xs text-muted-foreground">{uncategorizedTasks.length} {modeLabel.toLowerCase()}</span>
                           </div>
                           <div className="p-2 space-y-1">
-                            {uncategorizedTasks.map((task, tIdx) => renderTaskRow(task, tIdx, uncategorizedTasks.length, null))}
+                            {renderSortableList(uncategorizedTasks, null)}
                             {addingTaskToSection === 'uncategorized' ? (
                               <div className="border rounded p-2 space-y-2 bg-muted/30">
                                 <div className="relative">
