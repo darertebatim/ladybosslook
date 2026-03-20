@@ -768,8 +768,8 @@ const AppTaskCreate = ({
   const handleSubmit = async () => {
     if (!title.trim()) return;
 
-    // Sheet mode - return data via callback
-    if (isSheet && onSaveSheet) {
+    // Sheet mode with onSaveSheet callback (admin bank pattern) — but NOT when editTaskIdProp is set
+    if (isSheet && onSaveSheet && !editTaskIdProp) {
       onSaveSheet({
         title: title.trim(),
         description,
