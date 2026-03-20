@@ -147,7 +147,7 @@ export default function AppInspire() {
                     <CategoryCircle
                       name="Reset"
                       icon="RotateCcw"
-                      emoji="🔄"
+                      emoji="🫧"
                       color="violet"
                       onClick={() => {
                         const el = document.getElementById('routine-category-reset');
