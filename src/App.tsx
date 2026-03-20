@@ -30,9 +30,20 @@ const PageLoader = () => (
 );
 
 // Lazy load app pages (most-used pages in native app)
-// Preload AppHome immediately for native — it's always the first screen
+// Preload tab-bar pages immediately for native — ensures instant navigation
 const appHomeImport = import("@/pages/app/AppHome");
+const appStoreImport = import("@/pages/app/AppStore");
+const appInspireImport = import("@/pages/app/AppInspire");
+const appPlayerImport = import("@/pages/app/AppPlayer");
+const appChannelsListImport = import("@/pages/app/AppChannelsList");
+const appPresenceImport = import("@/pages/app/AppPresence");
+
 const AppHome = lazy(() => appHomeImport);
+const AppStore = lazy(() => appStoreImport);
+const AppInspire = lazy(() => appInspireImport);
+const AppPlayer = lazy(() => appPlayerImport);
+const AppChannelsList = lazy(() => appChannelsListImport);
+const AppPresence = lazy(() => appPresenceImport);
 const AppPrograms = lazy(() => import("@/pages/app/AppPrograms"));
 const AppStore = lazy(() => import("@/pages/app/AppStore"));
 const AppBrowsePrograms = lazy(() => import("@/pages/app/AppBrowsePrograms"));
