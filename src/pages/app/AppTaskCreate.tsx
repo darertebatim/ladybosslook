@@ -487,6 +487,7 @@ const AppTaskCreate = ({
   const [showVideoPicker, setShowVideoPicker] = useState(false);
   const [showVideoPlaylistPicker, setShowVideoPlaylistPicker] = useState(false);
   const [showProgramPicker, setShowProgramPicker] = useState(false);
+  const [showSubtaskEditor, setShowSubtaskEditor] = useState(false);
   const [showGoalSettings, setShowGoalSettings] = useState(false);
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
   const [audioSearchQuery, setAudioSearchQuery] = useState('');
