@@ -80,14 +80,14 @@ export const RoutineTaskPreview = memo(function RoutineTaskPreview({ routineId }
             <FluentEmoji emoji={task.emoji} size={18} />
           </span>
           {i < visible.length - 1 && (
-            <ChevronRight className="w-3 h-3 text-black/40 mx-0.5" />
+            <ChevronRight className="w-3 h-3 text-black mx-0.5" />
           )}
         </span>
       ))}
       {overflow > 0 && (
         <>
-          <ChevronRight className="w-3 h-3 text-black/40 mx-0.5" />
-          <span className="w-7 h-7 rounded-full bg-background/60 flex items-center justify-center text-[11px] font-bold text-black/60">
+          <ChevronRight className="w-3 h-3 text-black mx-0.5" />
+          <span className="w-7 h-7 rounded-full bg-background/60 flex items-center justify-center text-[11px] font-bold text-black">
             +{overflow}
           </span>
         </>
@@ -103,7 +103,7 @@ export const RoutinePlayBadge = memo(function RoutinePlayBadge({ routineId }: Ro
   const { completion } = useRoutinePreviewData(routineId);
 
   return (
-    <span className="flex items-center justify-center gap-0.5 mt-1 text-[11px] font-semibold text-black/50">
+    <span className="flex items-center justify-center gap-0.5 mt-1 text-[11px] font-semibold text-black">
       {completion?.isComplete ? (
         <RotateCw className="w-3 h-3" />
       ) : (
