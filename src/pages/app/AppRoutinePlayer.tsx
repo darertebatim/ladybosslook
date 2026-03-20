@@ -444,17 +444,22 @@ export default function AppRoutinePlayer() {
     }
   }, [searchParams, myRoutines, setSearchParams]);
 
-  // Auto-cleanup orphaned routines (no active tasks)
+  // Auto-cleanup orphaned routines (no active tasks) — DB-verified
   useEffect(() => {
-    if (!user || !myRoutines || !routineTasksMap) return;
-    const orphanedRoutines = myRoutines.filter((r: any) => {
-      const tasks = routineTasksMap[r.routine_id] || [];
-      return tasks.length === 0;
-    });
-    if (orphanedRoutines.length === 0) return;
-    
-    const deleteOrphans = async () => {
-      const orphanIds = orphanedRoutines.map((r: any) => r.id);
+    if (!user || !myRoutines || myRoutines.length === 0) return;
+    const verifyAndCleanup = async () => {
+      // Verify each routine actually has zero tasks in DB before deleting
+      const orphanIds: string[] = [];
+      for (const r of myRoutines) {
+        const { count } = await supabase
+          .from('user_tasks')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('source_routine_id', r.routine_id)
+          .eq('is_active', true);
+        if (count === 0) orphanIds.push(r.id);
+      }
+      if (orphanIds.length === 0) return;
       await supabase
         .from('user_routines_bank')
         .delete()
@@ -462,8 +467,8 @@ export default function AppRoutinePlayer() {
       queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
       queryClient.invalidateQueries({ queryKey: ['linkable-user-routines'] });
     };
-    deleteOrphans();
-  }, [user, myRoutines, routineTasksMap, queryClient]);
+    verifyAndCleanup();
+  }, [user, myRoutines, queryClient]);
 
   // Delete routine and all its tasks
   const handleDeleteRoutine = async (routine: any) => {
@@ -816,10 +821,7 @@ export default function AppRoutinePlayer() {
           <div className="space-y-6 mt-4">
             {/* Activated routines */}
             {(() => {
-              const activeRoutines = localRoutines.filter((r: any) => {
-                const tasks = routineTasksMap?.[r.routine_id] || [];
-                return tasks.length > 0;
-              });
+              const activeRoutines = localRoutines;
               const sortableIds = activeRoutines.map((r: any) => r.id);
               const activeRoutineData = activeRoutineId ? activeRoutines.find((r: any) => r.id === activeRoutineId) : null;
 
@@ -877,7 +879,7 @@ export default function AppRoutinePlayer() {
             })()}
 
             {/* Empty state */}
-            {(myRoutines || []).filter((r: any) => (routineTasksMap?.[r.routine_id] || []).length > 0).length === 0 && (
+            {(myRoutines || []).length === 0 && (
               <div className="text-center py-12">
                 <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
                 <h3 className="font-semibold text-foreground mb-1">No routines yet</h3>
