@@ -197,7 +197,6 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
           {/* Bottom safe area */}
           <div className="flex-shrink-0" style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }} />
         </div>
-        </div>
       </SheetContent>
     </Sheet>
   );
