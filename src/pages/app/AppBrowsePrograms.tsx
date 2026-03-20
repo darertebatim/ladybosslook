@@ -148,6 +148,7 @@ const AppBrowsePrograms = () => {
   const [selectedType, setSelectedType] = useState('all');
   const [scrollY, setScrollY] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollRef: academyScrollRef } = useScrollRestore('academy_scroll', { autoSave: true });
   const [preferredLanguage, setPreferredLanguage] = useState(() => {
     return localStorage.getItem('academy-language') || 'all';
   });
