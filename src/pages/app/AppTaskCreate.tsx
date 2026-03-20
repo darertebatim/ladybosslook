@@ -1111,7 +1111,11 @@ const AppTaskCreate = ({
             <span className="font-medium text-black">Duration</span>
           </div>
           <div className="flex items-center gap-2 text-black">
-            <span>{durationMinutes ? `${durationMinutes} min` : 'Not set'}</span>
+            <span>
+              {durationMinutes 
+                ? `${durationMinutes} min${useHistoryDuration ? ' (avg)' : ''}` 
+                : 'Not set'}
+            </span>
             <ChevronRight className="h-4 w-4 text-black" />
           </div>
         </button>
