@@ -517,7 +517,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
                 setQuickRepeat(REPEAT_OPTIONS[(idx + 1) % REPEAT_OPTIONS.length]);
               }}
               className={cn(
-                "h-9 px-3.5 rounded-full text-[13px] font-semibold flex items-center gap-1.5 active:scale-95 transition-all",
+                "h-7 px-2.5 rounded-full text-[11px] font-semibold flex items-center gap-1 active:scale-95 transition-all",
                 quickRepeat !== 'No'
                   ? "bg-white text-black shadow-sm"
                   : "bg-white/20 text-white/80"
