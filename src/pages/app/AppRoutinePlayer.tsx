@@ -537,6 +537,14 @@ export default function AppRoutinePlayer() {
         .eq('user_id', user.id)
         .eq('source_routine_id', routine.routine_id);
 
+      // Also delete standalone launcher pro-task (source_routine_id is null)
+      await supabase
+        .from('user_tasks')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('pro_link_type', 'routine')
+        .eq('pro_link_value', routine.routine_id);
+
       // Delete the routine record
       await supabase
         .from('user_routines_bank')

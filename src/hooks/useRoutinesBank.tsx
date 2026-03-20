@@ -640,7 +640,7 @@ export function useAddRoutineFromBank() {
             pro_link_value: routineId,
             is_active: true,
             order_index: -1,
-            source_routine_id: routineId,
+            source_routine_id: null,
           });
         if (proError) {
           console.error('Error inserting pro-task:', proError);
