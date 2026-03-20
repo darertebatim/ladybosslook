@@ -24,6 +24,7 @@ function useRoutinePreviewData(routineId: string) {
         .eq('user_id', user.id)
         .eq('source_routine_id', routineId)
         .eq('is_active', true)
+        .is('pro_link_type', null) // exclude the pro-task itself
         .order('order_index', { ascending: true });
       return (data || []).map((t: any) => ({ emoji: t.emoji || '📝', title: t.title }));
     },
