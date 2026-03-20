@@ -891,10 +891,7 @@ export default function AppRoutinePlayer() {
           <div className="space-y-6 mt-4">
             {/* Activated routines */}
             {(() => {
-              const activeRoutines = localRoutines.filter((r: any) => {
-                const tasks = routineTasksMap?.[r.routine_id] || [];
-                return tasks.length > 0;
-              });
+              const activeRoutines = localRoutines;
               const sortableIds = activeRoutines.map((r: any) => r.id);
               const activeRoutineData = activeRoutineId ? activeRoutines.find((r: any) => r.id === activeRoutineId) : null;
 
@@ -952,7 +949,7 @@ export default function AppRoutinePlayer() {
             })()}
 
             {/* Empty state */}
-            {(myRoutines || []).filter((r: any) => (routineTasksMap?.[r.routine_id] || []).length > 0).length === 0 && (
+            {(localRoutines || []).length === 0 && (
               <div className="text-center py-12">
                 <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
                 <h3 className="font-semibold text-foreground mb-1">No routines yet</h3>
