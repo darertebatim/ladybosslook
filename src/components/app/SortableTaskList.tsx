@@ -625,7 +625,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
               onMouseDown={(e) => e.preventDefault()}
               onClick={handleShowIdeas}
               className={cn(
-                "text-[13px] text-white/70 font-medium text-center active:text-white/90 transition-colors",
+                "text-lg text-white/70 font-medium text-center active:text-white/90 transition-colors",
                 showIdeas && "opacity-0 pointer-events-none"
               )}
             >
