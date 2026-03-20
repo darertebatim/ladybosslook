@@ -1101,14 +1101,14 @@ const AppHome = () => {
 
                   {filteredTasks.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-10 gap-2">
-                      <p className="text-sm text-muted-foreground">No tasks match this filter</p>
+                      <p className="text-sm text-muted-foreground">Nothing here yet — add your first task!</p>
                       <button
                         onClick={() => setTaskFilter('all')}
                         className="text-xs font-medium text-primary"
                       >
                         Show all tasks
                       </button>
-                      <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                      <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} defaultRepeatOverride={taskFilter === 'one-time' ? 'No' : undefined} />
                     </div>
                   ) : (
                     <>
