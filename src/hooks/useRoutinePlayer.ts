@@ -421,7 +421,8 @@ export function useRoutinePlayer() {
         target_seconds: currentTask.targetSeconds,
         actual_seconds: elapsedRef.current,
         status: 'skipped',
-      }).then(() => {});
+        user_task_id: currentTask.userTaskId || null,
+      } as any).then(() => {});
     }
 
     const allResults = [...taskResults, ...remainingResults];
