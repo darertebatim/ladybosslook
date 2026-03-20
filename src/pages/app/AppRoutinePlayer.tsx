@@ -446,26 +446,31 @@ export default function AppRoutinePlayer() {
     }
   }, [searchParams, myRoutines, setSearchParams]);
 
-  // Auto-cleanup orphaned routines (no active tasks)
+  // Auto-cleanup orphaned routines (no active tasks — including pro-tasks)
   useEffect(() => {
-    if (!user || !myRoutines || !routineTasksMap) return;
-    const orphanedRoutines = myRoutines.filter((r: any) => {
-      const tasks = routineTasksMap[r.routine_id] || [];
-      return tasks.length === 0;
-    });
-    if (orphanedRoutines.length === 0) return;
-    
-    const deleteOrphans = async () => {
+    if (!user || !myRoutines || myRoutines.length === 0) return;
+    const checkOrphans = async () => {
+      const rIds = myRoutines.map((r: any) => r.routine_id);
+      // Count ALL tasks per routine (including pro-tasks) to avoid false orphan detection
+      const { data: allTasks } = await supabase
+        .from('user_tasks')
+        .select('source_routine_id')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .in('source_routine_id', rIds);
+      const taskCountMap = new Map<string, number>();
+      (allTasks || []).forEach((t: any) => {
+        taskCountMap.set(t.source_routine_id, (taskCountMap.get(t.source_routine_id) || 0) + 1);
+      });
+      const orphanedRoutines = myRoutines.filter((r: any) => (taskCountMap.get(r.routine_id) || 0) === 0);
+      if (orphanedRoutines.length === 0) return;
       const orphanIds = orphanedRoutines.map((r: any) => r.id);
-      await supabase
-        .from('user_routines_bank')
-        .delete()
-        .in('id', orphanIds);
+      await supabase.from('user_routines_bank').delete().in('id', orphanIds);
       queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
       queryClient.invalidateQueries({ queryKey: ['linkable-user-routines'] });
     };
-    deleteOrphans();
-  }, [user, myRoutines, routineTasksMap, queryClient]);
+    checkOrphans();
+  }, [user, myRoutines, queryClient]);
 
   // Delete routine and all its tasks
   const handleDeleteRoutine = async (routine: any) => {
