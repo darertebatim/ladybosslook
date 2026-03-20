@@ -257,74 +257,6 @@ export default function AppRoutinePlayer() {
     enabled: !!user,
   });
 
-  // Auto-restore missing routine snapshots if they were accidentally removed
-  const restoringMissingRoutinesRef = useRef(false);
-  useEffect(() => {
-    if (!user || !myRoutines || restoringMissingRoutinesRef.current) return;
-
-    const restoreMissingRoutineCards = async () => {
-      restoringMissingRoutinesRef.current = true;
-      try {
-        const existingRoutineIds = new Set((myRoutines || []).map((r: any) => r.routine_id));
-
-        const { data: taskRoutineRows, error: tasksError } = await supabase
-          .from('user_tasks')
-          .select('source_routine_id')
-          .eq('user_id', user.id)
-          .eq('is_active', true)
-          .not('source_routine_id', 'is', null);
-
-        if (tasksError) return;
-
-        const routineIdsFromTasks = [...new Set((taskRoutineRows || [])
-          .map((row: any) => row.source_routine_id)
-          .filter(Boolean))] as string[];
-
-        const missingRoutineIds = routineIdsFromTasks.filter((id) => !existingRoutineIds.has(id));
-        if (missingRoutineIds.length === 0) return;
-
-        const { data: sourceRoutines, error: sourceError } = await supabase
-          .from('routines_bank')
-          .select('id, title, emoji, cover_image_url, category, color, is_focus, schedule_type')
-          .in('id', missingRoutineIds);
-
-        if (sourceError || !sourceRoutines || sourceRoutines.length === 0) return;
-
-        const maxOrderIndex = (myRoutines || []).reduce(
-          (max, routine: any) => Math.max(max, routine.order_index ?? -1),
-          -1
-        );
-
-        const restoredRows = sourceRoutines.map((routine: any, index: number) => ({
-          user_id: user.id,
-          routine_id: routine.id,
-          title: routine.title,
-          emoji: routine.emoji,
-          cover_image_url: routine.cover_image_url,
-          category: routine.category,
-          color: routine.color,
-          is_focus: routine.is_focus,
-          schedule_type: routine.schedule_type,
-          is_active: true,
-          order_index: maxOrderIndex + index + 1,
-        }));
-
-        const { error: restoreError } = await supabase
-          .from('user_routines_bank')
-          .upsert(restoredRows, { onConflict: 'user_id,routine_id' });
-
-        if (restoreError) return;
-
-        queryClient.invalidateQueries({ queryKey: ['user-routines-all', user.id] });
-        queryClient.invalidateQueries({ queryKey: ['linkable-user-routines'] });
-      } finally {
-        restoringMissingRoutinesRef.current = false;
-      }
-    };
-
-    restoreMissingRoutineCards();
-  }, [user, myRoutines, queryClient]);
-
   // Reorder routines mutation
   const reorderRoutinesMutation = useMutation({
     mutationFn: async (updates: { id: string; order_index: number }[]) => {
@@ -392,11 +324,10 @@ export default function AppRoutinePlayer() {
       if (!user || routineIds.length === 0) return {};
       const { data } = await supabase
         .from('user_tasks')
-        .select('source_routine_id, title, emoji, order_index, pro_link_type')
+        .select('source_routine_id, title, emoji, order_index')
         .eq('user_id', user.id)
         .eq('is_active', true)
         .in('source_routine_id', routineIds)
-        .neq('pro_link_type', 'routine')
         .order('order_index', { ascending: true });
 
       const map: Record<string, { title: string; emoji: string }[]> = {};
@@ -435,11 +366,10 @@ export default function AppRoutinePlayer() {
       if (!user || routineIds.length === 0) return {};
       const { data } = await supabase
         .from('user_tasks')
-        .select('id, source_routine_id, title, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date, pro_link_type')
+        .select('id, source_routine_id, title, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .in('source_routine_id', routineIds)
-        .neq('pro_link_type', 'routine');
+        .in('source_routine_id', routineIds);
 
       const map: Record<string, { id: string; scheduled_date: string | null; repeat_pattern: string; repeat_days: number[] | null; created_at: string; repeat_end_date: string | null }[]> = {};
       (data || []).forEach((t: any) => {
@@ -514,31 +444,26 @@ export default function AppRoutinePlayer() {
     }
   }, [searchParams, myRoutines, setSearchParams]);
 
-  // Auto-cleanup orphaned routines (no active tasks — including pro-tasks)
+  // Auto-cleanup orphaned routines (no active tasks)
   useEffect(() => {
-    if (!user || !myRoutines || myRoutines.length === 0) return;
-    const checkOrphans = async () => {
-      const rIds = myRoutines.map((r: any) => r.routine_id);
-      // Count ALL tasks per routine (including pro-tasks) to avoid false orphan detection
-      const { data: allTasks } = await supabase
-        .from('user_tasks')
-        .select('source_routine_id')
-        .eq('user_id', user.id)
-        .eq('is_active', true)
-        .in('source_routine_id', rIds);
-      const taskCountMap = new Map<string, number>();
-      (allTasks || []).forEach((t: any) => {
-        taskCountMap.set(t.source_routine_id, (taskCountMap.get(t.source_routine_id) || 0) + 1);
-      });
-      const orphanedRoutines = myRoutines.filter((r: any) => (taskCountMap.get(r.routine_id) || 0) === 0);
-      if (orphanedRoutines.length === 0) return;
+    if (!user || !myRoutines || !routineTasksMap) return;
+    const orphanedRoutines = myRoutines.filter((r: any) => {
+      const tasks = routineTasksMap[r.routine_id] || [];
+      return tasks.length === 0;
+    });
+    if (orphanedRoutines.length === 0) return;
+    
+    const deleteOrphans = async () => {
       const orphanIds = orphanedRoutines.map((r: any) => r.id);
-      await supabase.from('user_routines_bank').delete().in('id', orphanIds);
+      await supabase
+        .from('user_routines_bank')
+        .delete()
+        .in('id', orphanIds);
       queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
       queryClient.invalidateQueries({ queryKey: ['linkable-user-routines'] });
     };
-    checkOrphans();
-  }, [user, myRoutines, queryClient]);
+    deleteOrphans();
+  }, [user, myRoutines, routineTasksMap, queryClient]);
 
   // Delete routine and all its tasks
   const handleDeleteRoutine = async (routine: any) => {
@@ -642,7 +567,7 @@ export default function AppRoutinePlayer() {
   // Filter planner tasks to only the selected routine's tasks
   const routineFilteredTasks = useMemo(() => {
     if (!preStartRoutine) return [];
-    return plannerTasks.filter(t => t.source_routine_id === preStartRoutine.routine_id && (t as any).pro_link_type !== 'routine');
+    return plannerTasks.filter(t => t.source_routine_id === preStartRoutine.routine_id);
   }, [plannerTasks, preStartRoutine]);
 
   // Calculate routine duration for header
@@ -891,7 +816,10 @@ export default function AppRoutinePlayer() {
           <div className="space-y-6 mt-4">
             {/* Activated routines */}
             {(() => {
-              const activeRoutines = localRoutines;
+              const activeRoutines = localRoutines.filter((r: any) => {
+                const tasks = routineTasksMap?.[r.routine_id] || [];
+                return tasks.length > 0;
+              });
               const sortableIds = activeRoutines.map((r: any) => r.id);
               const activeRoutineData = activeRoutineId ? activeRoutines.find((r: any) => r.id === activeRoutineId) : null;
 
@@ -949,7 +877,7 @@ export default function AppRoutinePlayer() {
             })()}
 
             {/* Empty state */}
-            {(localRoutines || []).length === 0 && (
+            {(myRoutines || []).filter((r: any) => (routineTasksMap?.[r.routine_id] || []).length > 0).length === 0 && (
               <div className="text-center py-12">
                 <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
                 <h3 className="font-semibold text-foreground mb-1">No routines yet</h3>

@@ -623,9 +623,10 @@ export function useAddRoutineFromBank() {
         if (insertError) throw insertError;
       }
 
-      // Insert synthetic pro-task (routine launcher) if selected — as a standalone planner task (not part of the routine)
+      // Insert synthetic pro-task (routine launcher) if selected — placed at top of planner
       if (hasProTask) {
         const proTaskEdited = editedTasks?.find(t => t.id.startsWith(proTaskPrefix));
+        // Use order_index = -1 to sort above all existing tasks (which start at 0+)
         const { error: proError } = await supabase
           .from('user_tasks')
           .insert({
@@ -639,6 +640,7 @@ export function useAddRoutineFromBank() {
             pro_link_value: routineId,
             is_active: true,
             order_index: -1,
+            source_routine_id: routineId,
           });
         if (proError) {
           console.error('Error inserting pro-task:', proError);
@@ -674,8 +676,6 @@ export function useAddRoutineFromBank() {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['user-routines-bank'] });
-      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
-      queryClient.invalidateQueries({ queryKey: ['linkable-user-routines'] });
       queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
     },
   });
