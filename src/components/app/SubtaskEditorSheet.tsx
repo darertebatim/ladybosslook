@@ -65,13 +65,17 @@ const SortableSubtaskRow = ({
   );
 };
 
+type SubtaskItem = { id: string; title: string };
+let subtaskIdCounter = 0;
+const makeSubtaskItem = (title: string): SubtaskItem => ({ id: `si-${++subtaskIdCounter}`, title });
+
 const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
   open,
   onOpenChange,
   subtasks: initialSubtasks,
   onSave,
 }) => {
-  const [localSubtasks, setLocalSubtasks] = useState<string[]>([]);
+  const [items, setItems] = useState<SubtaskItem[]>([]);
   const [newSubtask, setNewSubtask] = useState('');
   const [activeId, setActiveId] = useState<string | null>(null);
   const newInputRef = useRef<HTMLInputElement>(null);
@@ -80,9 +84,8 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
   // Sync on open
   useEffect(() => {
     if (open) {
-      setLocalSubtasks([...initialSubtasks]);
+      setItems(initialSubtasks.map(makeSubtaskItem));
       setNewSubtask('');
-      // Auto-focus the input after sheet animation completes
       setTimeout(() => newInputRef.current?.focus(), 400);
     }
   }, [open, initialSubtasks]);
@@ -101,33 +104,33 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
     const { active, over } = event;
     setActiveId(null);
     if (!over || active.id === over.id) return;
-    const oldIndex = localSubtasks.findIndex((_, i) => `st-${i}` === active.id);
-    const newIndex = localSubtasks.findIndex((_, i) => `st-${i}` === over.id);
+    const oldIndex = items.findIndex(item => item.id === active.id);
+    const newIndex = items.findIndex(item => item.id === over.id);
     if (oldIndex !== -1 && newIndex !== -1) {
-      setLocalSubtasks(arrayMove(localSubtasks, oldIndex, newIndex));
+      setItems(arrayMove(items, oldIndex, newIndex));
       haptic.light();
     }
-  }, [localSubtasks]);
+  }, [items]);
 
   const addSubtask = () => {
     if (newSubtask.trim()) {
-      setLocalSubtasks(prev => [...prev, newSubtask.trim()]);
+      setItems(prev => [...prev, makeSubtaskItem(newSubtask.trim())]);
       setNewSubtask('');
       setTimeout(() => newInputRef.current?.focus(), 50);
     }
   };
 
-  const removeSubtask = (index: number) => {
-    setLocalSubtasks(prev => prev.filter((_, i) => i !== index));
+  const removeSubtask = (id: string) => {
+    setItems(prev => prev.filter(item => item.id !== id));
     haptic.light();
   };
 
-  const updateSubtask = (index: number, value: string) => {
-    setLocalSubtasks(prev => prev.map((s, i) => i === index ? value : s));
+  const updateSubtask = (id: string, value: string) => {
+    setItems(prev => prev.map(item => item.id === id ? { ...item, title: value } : item));
   };
 
   const handleSave = () => {
-    onSave(localSubtasks.filter(s => s.trim()));
+    onSave(items.map(i => i.title).filter(s => s.trim()));
     onOpenChange(false);
   };
 
