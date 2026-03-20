@@ -163,7 +163,7 @@ const AppHome = () => {
   // Handle quick start continue
   const handleQuickStartContinue = useCallback((taskName: string, template?: TaskTemplate) => {
     if (template) {
-      const params = new URLSearchParams({
+      const params: Record<string, string> = {
         name: template.title,
         emoji: template.emoji,
         color: template.color,
@@ -181,12 +181,16 @@ const AppHome = () => {
           pro_link_value: template.pro_link_value || ''
         } : {}),
         ...(template.linked_playlist_id ? { linked_playlist_id: template.linked_playlist_id } : {}),
-      });
-      navigate(`/app/home/new?${params.toString()}`);
+      };
+      setTaskSheetEditId(undefined);
+      setTaskSheetCreateParams(params);
+      setTaskSheetOpen(true);
     } else {
-      navigate(`/app/home/new?name=${encodeURIComponent(taskName)}`);
+      setTaskSheetEditId(undefined);
+      setTaskSheetCreateParams({ name: taskName });
+      setTaskSheetOpen(true);
     }
-  }, [navigate]);
+  }, []);
 
   // Subscription & task limit (per-day, not total)
   const { hasAccessToProgram } = useSubscription();
