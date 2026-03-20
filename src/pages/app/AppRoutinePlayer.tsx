@@ -367,10 +367,11 @@ export default function AppRoutinePlayer() {
       if (!user || routineIds.length === 0) return {};
       const { data } = await supabase
         .from('user_tasks')
-        .select('id, source_routine_id, title, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date')
+        .select('id, source_routine_id, title, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date, pro_link_type')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .in('source_routine_id', routineIds);
+        .in('source_routine_id', routineIds)
+        .neq('pro_link_type', 'routine');
 
       const map: Record<string, { id: string; scheduled_date: string | null; repeat_pattern: string; repeat_days: number[] | null; created_at: string; repeat_end_date: string | null }[]> = {};
       (data || []).forEach((t: any) => {
