@@ -422,6 +422,7 @@ export const TaskCard = memo(function TaskCard({
               {proLinkType === 'routine' && proLinkValue && (
                 <RoutineTaskPreview routineId={proLinkValue} />
               )}
+            </div>
 
             {/* Circle with tool icon inside — navigates to the tool */}
             {isTimerGoal ? (
