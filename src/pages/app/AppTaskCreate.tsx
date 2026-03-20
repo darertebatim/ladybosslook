@@ -708,6 +708,9 @@ const AppTaskCreate = ({
         target: (existingTask as any).goal_target ?? 1,
         unit: (existingTask as any).goal_unit ?? 'times',
       });
+      
+      // Duration estimate
+      setDurationMinutes((existingTask as any).duration_minutes ?? null);
     }
   }, [existingTask, isSheet]);
 
