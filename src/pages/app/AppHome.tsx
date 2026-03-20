@@ -560,7 +560,7 @@ const AppHome = () => {
 
   // Auto-reset filter when the filter target no longer exists
   useEffect(() => {
-    if (taskFilter === 'all' || taskFilter === 'one-time' || taskFilter === 'unlinked') return;
+    if (taskFilter === 'all' || taskFilter === 'one-time' || taskFilter === 'unlinked' || taskFilter === 'all-routines') return;
     if (taskFilter.startsWith('routine:')) {
       const rid = taskFilter.replace('routine:', '');
       if (!routineNamesInTasks.has(rid)) setTaskFilter('all');
