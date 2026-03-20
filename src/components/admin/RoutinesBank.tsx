@@ -2132,7 +2132,7 @@ export default function RoutinesBank() {
                             {monthlyTasks.length === 0 && (
                               <p className="text-center text-muted-foreground text-xs py-2">No monthly actions</p>
                             )}
-                            {monthlyTasks.map((task, tIdx) => renderTaskRow(task, tIdx, monthlyTasks.length, null))}
+                            {renderSortableList(monthlyTasks, null)}
                           </div>
                         </div>
 
