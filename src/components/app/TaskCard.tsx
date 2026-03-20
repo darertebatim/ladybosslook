@@ -418,7 +418,10 @@ export const TaskCard = memo(function TaskCard({
               )}>
                 {task.title}
               </p>
-            </div>
+              {/* Routine preview row - shows emoji chain + completion % */}
+              {proLinkType === 'routine' && proLinkValue && (
+                <RoutineTaskPreview routineId={proLinkValue} />
+              )}
 
             {/* Circle with tool icon inside — navigates to the tool */}
             {isTimerGoal ? (
