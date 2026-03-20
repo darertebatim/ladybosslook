@@ -11,9 +11,8 @@ export interface SmartEstimateInput {
 }
 
 /**
- * Fetch smart time estimates for non-timer tasks.
+ * Fetch smart time estimates for tasks.
  * Waterfall: user history avg (3+ completions) → duration_minutes → 60s fallback.
- * Timer-goal tasks are excluded (they use goalTarget directly).
  */
 export async function fetchSmartEstimates(
   userId: string,

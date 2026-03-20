@@ -643,17 +643,17 @@ export default function AppInspireDetail() {
                   routineTitle: routine.title,
                   routineEmoji: routine.emoji || '✨',
                   tasks: userTasks.map((t: any) => {
-                    const isTimer = t.goal_type === 'timer';
+                    const durationSeconds = t.duration_minutes ? t.duration_minutes * 60 : null;
                     const estimate = estimates.get(t.title);
                     return {
                       id: t.id,
                       title: t.title,
                       emoji: t.emoji || '📝',
-                      targetSeconds: isTimer ? (t.goal_target || 300) : (estimate || 60),
+                      targetSeconds: durationSeconds || estimate || 60,
                       color: t.color || undefined,
                       userTaskId: t.id,
-                      hasTimerGoal: isTimer,
-                      isEstimate: !isTimer,
+                      hasTimerGoal: true,
+                      isEstimate: !durationSeconds,
                     };
                   }),
                 });

@@ -44,6 +44,8 @@ export interface UserTask {
   goal_type: 'timer' | 'count' | null;
   goal_target: number | null;
   goal_unit: string | null;
+  // Duration
+  duration_minutes: number | null;
   // Routine link
   source_routine_id: string | null;
   // Joined data (optional, populated by queries)

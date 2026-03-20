@@ -642,12 +642,9 @@ export default function AppRoutinePlayer() {
   // Calculate routine duration for header
   const routineDurationLabel = useMemo(() => {
     if (!routineFilteredTasks.length) return '';
-    const timedSeconds = routineFilteredTasks
-      .filter(t => t.goal_type === 'timer')
-      .reduce((s, t) => s + (t.goal_target || 0), 0);
-    const totalMins = Math.ceil(timedSeconds / 60);
-    const hasUntimed = routineFilteredTasks.some(t => t.goal_type !== 'timer');
-    if (totalMins > 0 && hasUntimed) return `${totalMins}m timed + untimed tasks`;
+    const totalMins = routineFilteredTasks.reduce((s, t) => s + (t.duration_minutes || 0), 0);
+    const hasUntimed = routineFilteredTasks.some(t => !t.duration_minutes);
+    if (totalMins > 0 && hasUntimed) return `${totalMins}m + untimed tasks`;
     if (totalMins > 0) return `${totalMins}m`;
     return 'Untimed tasks';
   }, [routineFilteredTasks]);
@@ -697,28 +694,29 @@ export default function AppRoutinePlayer() {
 
     // Build all tasks (not just remaining since we reset)
     // Fetch smart estimates for non-timer tasks
+    // Build smart estimate inputs using duration_minutes
     const estimateInputs: SmartEstimateInput[] = routineFilteredTasks.map(t => ({
       taskTitle: t.title,
-      durationMinutes: (t as any).duration_minutes ?? null,
-      goalType: t.goal_type || null,
-      goalTarget: t.goal_target || null,
+      durationMinutes: t.duration_minutes ?? null,
+      goalType: null, // no longer using timer goals
+      goalTarget: null,
     }));
     const estimates = user ? await fetchSmartEstimates(user.id, estimateInputs) : new Map();
 
     const allTasks = routineFilteredTasks.map(t => {
-      const isTimer = t.goal_type === 'timer';
+      const durationSeconds = t.duration_minutes ? t.duration_minutes * 60 : null;
       const estimate = estimates.get(t.title);
       return {
         id: t.id,
         title: t.title,
         emoji: t.emoji || '📝',
-        targetSeconds: isTimer ? (t.goal_target || 300) : (estimate || 60),
+        targetSeconds: durationSeconds || estimate || 60,
         color: t.color || undefined,
         userTaskId: t.id,
         goalType: t.goal_type || null,
         goalTarget: t.goal_target || null,
-        hasTimerGoal: isTimer,
-        isEstimate: !isTimer,
+        hasTimerGoal: true, // always countdown
+        isEstimate: !durationSeconds,
         proLinkType: t.pro_link_type || null,
         proLinkValue: t.pro_link_value || null,
       };
@@ -737,30 +735,30 @@ export default function AppRoutinePlayer() {
   const launchRoutine = async () => {
     if (!preStartRoutine) return;
 
-    // Fetch smart estimates for non-timer tasks
+    // Fetch smart estimates for tasks
     const estimateInputs: SmartEstimateInput[] = remainingTasks.map(t => ({
       taskTitle: t.title,
-      durationMinutes: (t as any).duration_minutes ?? null,
-      goalType: t.goal_type || null,
-      goalTarget: t.goal_target || null,
+      durationMinutes: t.duration_minutes ?? null,
+      goalType: null,
+      goalTarget: null,
     }));
     const estimates = user ? await fetchSmartEstimates(user.id, estimateInputs) : new Map();
 
     // Build focus player tasks from remaining planner tasks
     const focusTasks = remainingTasks.map(t => {
-      const isTimer = t.goal_type === 'timer';
+      const durationSeconds = t.duration_minutes ? t.duration_minutes * 60 : null;
       const estimate = estimates.get(t.title);
       return {
         id: t.id,
         title: t.title,
         emoji: t.emoji || '📝',
-        targetSeconds: isTimer ? (t.goal_target || 300) : (estimate || 60),
+        targetSeconds: durationSeconds || estimate || 60,
         color: t.color || undefined,
         userTaskId: t.id,
         goalType: t.goal_type || null,
         goalTarget: t.goal_target || null,
-        hasTimerGoal: isTimer,
-        isEstimate: !isTimer,
+        hasTimerGoal: true, // always countdown
+        isEstimate: !durationSeconds,
         proLinkType: t.pro_link_type || null,
         proLinkValue: t.pro_link_value || null,
       };
