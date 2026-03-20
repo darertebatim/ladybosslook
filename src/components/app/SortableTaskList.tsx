@@ -390,6 +390,23 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
     setTitle('');
     setShowIdeas(false);
     setSelectedCategory('popular');
+    setQuickTime('Anytime');
+    setQuickRepeat('No');
+  };
+
+  // Map quick shortcut values to task params
+  const getQuickParams = () => {
+    const params: Record<string, string> = {};
+    if (quickTime !== 'Anytime') {
+      params.time_period = quickTime.toLowerCase();
+    }
+    if (quickRepeat === 'Daily') {
+      params.repeat_pattern = 'daily';
+    } else if (quickRepeat === 'Weekly') {
+      params.repeat_pattern = 'weekly';
+      params.repeat_days = JSON.stringify([new Date().getDay()]);
+    }
+    return params;
   };
 
   const handleSubmit = () => {
