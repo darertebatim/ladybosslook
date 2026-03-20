@@ -135,6 +135,8 @@ interface AppTaskCreateProps {
   onSheetOpenChange?: (open: boolean) => void;
   initialData?: Partial<TaskFormData>;
   onSaveSheet?: (data: TaskFormData) => void;
+  editTaskId?: string;
+  createParams?: Record<string, string>;
 }
 
 /** Buffered Time Picker Sheet - uses local state so changes only commit on Save */
@@ -347,26 +349,30 @@ const AppTaskCreate = ({
   sheetOpen = false, 
   onSheetOpenChange, 
   initialData,
-  onSaveSheet 
+  onSaveSheet,
+  editTaskId: editTaskIdProp,
+  createParams,
 }: AppTaskCreateProps) => {
   const navigate = useNavigate();
-  const { taskId } = useParams<{ taskId?: string }>();
+  const { taskId: routeTaskId } = useParams<{ taskId?: string }>();
+  const taskId = editTaskIdProp || routeTaskId;
   const [searchParams] = useSearchParams();
   
-  // Get URL params for pre-filled data from quick start
-  const urlName = searchParams.get('name') || '';
-  const urlEmoji = searchParams.get('emoji') || '';
-  const urlColor = searchParams.get('color') as TaskColor | null;
-  const urlRepeatPattern = searchParams.get('repeat_pattern') as 'none' | 'daily' | 'weekly' | 'monthly' | null;
-  const urlRepeatDays = searchParams.get('repeat_days');
-  const urlTag = searchParams.get('tag');
-  const urlGoalEnabled = searchParams.get('goal_enabled') === 'true';
-  const urlGoalType = searchParams.get('goal_type') as 'count' | 'timer' | null;
-  const urlGoalTarget = searchParams.get('goal_target');
-  const urlGoalUnit = searchParams.get('goal_unit');
-  const urlProLinkType = searchParams.get('pro_link_type') as ProLinkType | null;
-  const urlProLinkValue = searchParams.get('pro_link_value');
-  const urlLinkedPlaylistId = searchParams.get('linked_playlist_id');
+  // Get URL params for pre-filled data from quick start (or createParams in sheet mode)
+  const getParam = (key: string) => createParams?.[key] || searchParams.get(key) || '';
+  const urlName = getParam('name');
+  const urlEmoji = getParam('emoji');
+  const urlColor = (getParam('color') || null) as TaskColor | null;
+  const urlRepeatPattern = (getParam('repeat_pattern') || null) as 'none' | 'daily' | 'weekly' | 'monthly' | null;
+  const urlRepeatDays = getParam('repeat_days') || null;
+  const urlTag = getParam('tag') || null;
+  const urlGoalEnabled = getParam('goal_enabled') === 'true';
+  const urlGoalType = (getParam('goal_type') || null) as 'count' | 'timer' | null;
+  const urlGoalTarget = getParam('goal_target') || null;
+  const urlGoalUnit = getParam('goal_unit') || null;
+  const urlProLinkType = (getParam('pro_link_type') || null) as ProLinkType | null;
+  const urlProLinkValue = getParam('pro_link_value') || null;
+  const urlLinkedPlaylistId = getParam('linked_playlist_id') || null;
   
   const isEditing = !!taskId || !!initialData;
   const { effectiveInset, isKeyboardOpen } = useKeyboard();
@@ -636,9 +642,10 @@ const AppTaskCreate = ({
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
 
-  // Load existing task data for editing (page mode only)
-  const { data: existingTask } = useTask(isSheet ? undefined : taskId);
-  const { data: existingSubtasks } = useSubtasks(isSheet ? undefined : taskId);
+  // Load existing task data for editing (page mode, or sheet mode with editTaskId)
+  const shouldLoadFromDb = !!taskId && (!isSheet || !!editTaskIdProp);
+  const { data: existingTask } = useTask(shouldLoadFromDb ? taskId : undefined);
+  const { data: existingSubtasks } = useSubtasks(shouldLoadFromDb ? taskId : undefined);
   const { data: userTags = [] } = useUserTags();
   const createTag = useCreateTag();
 
@@ -657,7 +664,7 @@ const AppTaskCreate = ({
       if (error) return false;
       return (data?.length ?? 0) > 0;
     },
-    enabled: !!taskId && !isSheet,
+    enabled: !!taskId && shouldLoadFromDb,
   });
 
   // Handler to reset progress when goal type/unit changes
@@ -762,8 +769,8 @@ const AppTaskCreate = ({
   const handleSubmit = async () => {
     if (!title.trim()) return;
 
-    // Sheet mode - return data via callback
-    if (isSheet && onSaveSheet) {
+    // Sheet mode with onSaveSheet callback (admin bank pattern) — but NOT when editTaskIdProp is set
+    if (isSheet && onSaveSheet && !editTaskIdProp) {
       onSaveSheet({
         title: title.trim(),
         description,
@@ -824,7 +831,11 @@ const AppTaskCreate = ({
       await createTask.mutateAsync(taskData);
     }
 
-    navigate(-1);
+    if (isSheet && onSheetOpenChange) {
+      onSheetOpenChange(false);
+    } else {
+      navigate(-1);
+    }
   };
 
   const handleDelete = async () => {
@@ -832,7 +843,11 @@ const AppTaskCreate = ({
     
     if (confirm('Delete this task?')) {
       await deleteTask.mutateAsync(taskId);
-      navigate(-1);
+      if (isSheet && onSheetOpenChange) {
+        onSheetOpenChange(false);
+      } else {
+        navigate(-1);
+      }
     }
   };
 

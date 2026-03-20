@@ -1,11 +1,12 @@
 // AppHome - Main home page component
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay, subDays } from 'date-fns';
 import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, Headset, ArrowLeft, Heart, Zap } from 'lucide-react';
 import { TaskFilterDropdown } from '@/components/app/TaskFilterDropdown';
+import AppTaskCreate from '@/pages/app/AppTaskCreate';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { HomeMenu } from '@/components/app/HomeMenu';
 import { cn } from '@/lib/utils';
@@ -77,6 +78,9 @@ const AppHome = () => {
     }, { replace: true });
   }, [setSearchParams]);
   const [showStreakModal, setShowStreakModal] = useState(false);
+  const [taskSheetOpen, setTaskSheetOpen] = useState(false);
+  const [taskSheetEditId, setTaskSheetEditId] = useState<string | undefined>(undefined);
+  const [taskSheetCreateParams, setTaskSheetCreateParams] = useState<Record<string, string> | undefined>(undefined);
   const [stepCelebration, setStepCelebration] = useState<{ completedStep: number; newTaskCount: number } | null>(null);
   const [projectCompletion, setProjectCompletion] = useState<{
     routineId: string; routineTitle: string; routineEmoji: string;
@@ -160,7 +164,7 @@ const AppHome = () => {
   // Handle quick start continue
   const handleQuickStartContinue = useCallback((taskName: string, template?: TaskTemplate) => {
     if (template) {
-      const params = new URLSearchParams({
+      const params: Record<string, string> = {
         name: template.title,
         emoji: template.emoji,
         color: template.color,
@@ -178,12 +182,16 @@ const AppHome = () => {
           pro_link_value: template.pro_link_value || ''
         } : {}),
         ...(template.linked_playlist_id ? { linked_playlist_id: template.linked_playlist_id } : {}),
-      });
-      navigate(`/app/home/new?${params.toString()}`);
+      };
+      setTaskSheetEditId(undefined);
+      setTaskSheetCreateParams(params);
+      setTaskSheetOpen(true);
     } else {
-      navigate(`/app/home/new?name=${encodeURIComponent(taskName)}`);
+      setTaskSheetEditId(undefined);
+      setTaskSheetCreateParams({ name: taskName });
+      setTaskSheetOpen(true);
     }
-  }, [navigate]);
+  }, []);
 
   // Subscription & task limit (per-day, not total)
   const { hasAccessToProgram } = useSubscription();
@@ -737,8 +745,16 @@ const AppHome = () => {
 
   const handleEditTask = useCallback((task: UserTask) => {
     setSelectedTask(null);
-    navigate(`/app/home/edit/${task.id}`);
-  }, [navigate]);
+    setTaskSheetCreateParams(undefined);
+    setTaskSheetEditId(task.id);
+    setTaskSheetOpen(true);
+  }, []);
+
+  const handleOpenTaskSheet = useCallback((params: { editTaskId?: string; createParams?: Record<string, string> }) => {
+    setTaskSheetEditId(params.editTaskId);
+    setTaskSheetCreateParams(params.createParams);
+    setTaskSheetOpen(true);
+  }, []);
 
   const deleteTask = useDeleteTask();
   const handleDeleteTask = useCallback((task: UserTask) => {
@@ -1221,7 +1237,7 @@ const AppHome = () => {
                             )}
                           </>
                         ) : (
-                          <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                          <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenTaskSheet={handleOpenTaskSheet} />
                         );
                       })()}
                     </>
@@ -1403,6 +1419,21 @@ const AppHome = () => {
           hasSuggestedRoutines={suggestedRoutines.length > 0}
           hasWelcomeCard={showWelcomeCard}
           onTourReady={handleHomeTourReady}
+        />
+
+        {/* Task Create/Edit Sheet */}
+        <AppTaskCreate
+          isSheet
+          sheetOpen={taskSheetOpen}
+          onSheetOpenChange={(open) => {
+            setTaskSheetOpen(open);
+            if (!open) {
+              setTaskSheetEditId(undefined);
+              setTaskSheetCreateParams(undefined);
+            }
+          }}
+          editTaskId={taskSheetEditId}
+          createParams={taskSheetCreateParams}
         />
       </div>
     </>

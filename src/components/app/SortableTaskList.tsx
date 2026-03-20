@@ -118,7 +118,7 @@ interface SortableTaskListProps {
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
   hideQuickAdd?: boolean;
-  
+  onOpenTaskSheet?: (params: { editTaskId?: string; createParams?: Record<string, string> }) => void;
 }
 
 export const SortableTaskList = ({
@@ -134,7 +134,7 @@ export const SortableTaskList = ({
   onOpenTimer,
   onOpenWaterTracking,
   hideQuickAdd = false,
-  
+  onOpenTaskSheet,
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
@@ -276,7 +276,7 @@ export const SortableTaskList = ({
         )}
 
         {/* Quick Add Card */}
-        {!hideQuickAdd && <QuickAddCard date={date} taskCount={localTasks.length} />}
+        {!hideQuickAdd && <QuickAddCard date={date} taskCount={localTasks.length} onOpenTaskSheet={onOpenTaskSheet} />}
       </SortableContext>
 
       {/* Drag overlay */}
@@ -319,7 +319,7 @@ const TIME_PERIOD_LABELS: Record<string, string> = {
   night: 'Bedtime',
 };
 
-function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
+function QuickAddCard({ date, taskCount, onOpenTaskSheet }: { date: Date; taskCount: number; onOpenTaskSheet?: (params: { editTaskId?: string; createParams?: Record<string, string> }) => void }) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [showIdeas, setShowIdeas] = useState(false);
@@ -435,15 +435,19 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
     if (!trimmed) return;
     haptic.light();
     const qp = getQuickParams();
-    const urlParams = new URLSearchParams({ name: trimmed, ...Object.fromEntries(Object.entries(qp).map(([k, v]) => [k, typeof v === 'object' ? JSON.stringify(v) : String(v)])) });
+    const createParams: Record<string, string> = { name: trimmed, ...Object.fromEntries(Object.entries(qp).map(([k, v]) => [k, typeof v === 'object' ? JSON.stringify(v) : String(v)])) };
     handleClose();
-    navigate(`/app/home/new?${urlParams.toString()}`);
+    if (onOpenTaskSheet) {
+      onOpenTaskSheet({ createParams });
+    } else {
+      navigate(`/app/home/new?${new URLSearchParams(createParams).toString()}`);
+    }
   };
 
   const handleTemplateSelect = (template: TaskTemplate) => {
     haptic.light();
     handleClose();
-    const params = new URLSearchParams({
+    const createParams: Record<string, string> = {
       name: template.title,
       emoji: template.emoji,
       color: template.color,
@@ -461,8 +465,12 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
         pro_link_value: template.pro_link_value || ''
       } : {}),
       ...(template.linked_playlist_id ? { linked_playlist_id: template.linked_playlist_id } : {}),
-    });
-    navigate(`/app/home/new?${params.toString()}`);
+    };
+    if (onOpenTaskSheet) {
+      onOpenTaskSheet({ createParams });
+    } else {
+      navigate(`/app/home/new?${new URLSearchParams(createParams).toString()}`);
+    }
   };
 
   const handleShowIdeas = () => {
@@ -549,12 +557,16 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
                 haptic.light();
                 const qp = getQuickParams();
                 const trimmed = title.trim();
-                const urlParams = new URLSearchParams({
+                const createParams: Record<string, string> = {
                   ...(trimmed ? { name: trimmed } : {}),
                   ...Object.fromEntries(Object.entries(qp).map(([k, v]) => [k, typeof v === 'object' ? JSON.stringify(v) : String(v)]))
-                });
+                };
                 handleClose();
-                navigate(`/app/home/new?${urlParams.toString()}`);
+                if (onOpenTaskSheet) {
+                  onOpenTaskSheet({ createParams });
+                } else {
+                  navigate(`/app/home/new?${new URLSearchParams(createParams).toString()}`);
+                }
               }}
               className="h-7 w-7 rounded-full bg-white/20 text-white/80 flex items-center justify-center active:scale-95 transition-all"
             >
