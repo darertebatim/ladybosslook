@@ -434,12 +434,13 @@ export function useAddRoutineFromBank() {
         goal_unit: string | null;
         repeat_pattern: string | null;
         repeat_days: number[] | null;
+        duration_minutes: number | null;
       }> = {};
       
       if (taskIds.length > 0) {
         const { data: bankTasks } = await supabase
           .from('admin_task_bank')
-          .select('id, pro_link_type, pro_link_value, linked_playlist_id, color, category, time_period, goal_enabled, goal_target, goal_type, goal_unit, repeat_pattern, repeat_days')
+          .select('id, pro_link_type, pro_link_value, linked_playlist_id, color, category, time_period, goal_enabled, goal_target, goal_type, goal_unit, repeat_pattern, repeat_days, duration_minutes')
           .in('id', taskIds);
 
         bankTasks?.forEach(bt => {
@@ -456,6 +457,7 @@ export function useAddRoutineFromBank() {
             goal_unit: bt.goal_unit,
             repeat_pattern: bt.repeat_pattern ?? 'daily',
             repeat_days: bt.repeat_days ?? null,
+            duration_minutes: bt.duration_minutes ?? null,
           };
         });
       }
@@ -601,6 +603,8 @@ export function useAddRoutineFromBank() {
             goal_target: bankTask?.goal_target ?? null,
             goal_type: bankTask?.goal_type ?? null,
             goal_unit: bankTask?.goal_unit ?? null,
+            // Copy duration for smart estimate support
+            duration_minutes: bankTask?.duration_minutes ?? null,
             repeat_end_date: repeatEndDate,
             // Project tracking
             source_routine_id: routineId,

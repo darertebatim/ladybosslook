@@ -95,7 +95,7 @@ function SortableRearrangeItem({ task }: { task: RoutineTask }) {
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-foreground truncate">{task.title}</p>
       </div>
-      <span className="text-xs text-muted-foreground tabular-nums">{task.targetSeconds > 0 ? `${Math.round(task.targetSeconds / 60)}m` : '⏱️'}</span>
+      <span className="text-xs text-muted-foreground tabular-nums">{task.targetSeconds > 0 ? `${(task as any).isEstimate ? '~' : ''}${Math.round(task.targetSeconds / 60)}m` : '⏱️'}</span>
       <GripVertical className="w-5 h-5 text-foreground/30 flex-shrink-0" />
     </div>
   );
@@ -149,7 +149,7 @@ function RearrangeSheet({
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground/50 truncate">{currentTask.title}</p>
               </div>
-              <span className="text-xs text-muted-foreground tabular-nums">{currentTask.targetSeconds > 0 ? `${Math.round(currentTask.targetSeconds / 60)}m` : '⏱️'}</span>
+              <span className="text-xs text-muted-foreground tabular-nums">{currentTask.targetSeconds > 0 ? `${(currentTask as any).isEstimate ? '~' : ''}${Math.round(currentTask.targetSeconds / 60)}m` : '⏱️'}</span>
             </div>
           )}
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
