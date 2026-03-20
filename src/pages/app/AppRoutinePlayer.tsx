@@ -864,7 +864,7 @@ export default function AppRoutinePlayer() {
           </button>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500" />
-            <h1 className="text-base font-bold text-foreground">Routine Player</h1>
+            <h1 className="text-base font-bold text-foreground">Routine Launcher</h1>
           </div>
           <AddedToRoutineButton
             isAdded={!!isPageAdded}
@@ -957,7 +957,7 @@ export default function AppRoutinePlayer() {
               onClick={() => navigate('/app/routines')}
               className="w-full flex items-center justify-center gap-1 text-sm text-primary font-medium py-3"
             >
-              Browse all routines <ChevronRight className="w-4 h-4" />
+              Browse Routines Library <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         )}
