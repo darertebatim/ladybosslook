@@ -1449,6 +1449,7 @@ const AppTaskCreate = ({
                   key={mins}
                   onClick={() => {
                     setDurationMinutes(mins);
+                    setUseHistoryDuration(false);
                     setShowDurationPicker(false);
                   }}
                   className={cn(
