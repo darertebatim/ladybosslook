@@ -953,17 +953,23 @@ export default function AppRoutinePlayer() {
               </div>
             )}
 
-            <button
-              onClick={() => navigate('/app/routines')}
-              className="w-full flex items-center justify-center gap-1 text-sm text-primary font-medium py-3"
-            >
-              Browse Routines Library <ChevronRight className="w-4 h-4" />
-            </button>
-
-            {/* Featured Routines */}
+            {/* Try a routine — same style as home planner */}
             {featuredRoutines.length > 0 && (
-              <div className="mt-4">
-                <h3 className="text-sm font-semibold text-foreground/70 mb-3">Featured</h3>
+              <div className="mt-2">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <CalendarPlus className="h-4 w-4 text-violet-500" />
+                    <h2 className="text-sm font-semibold text-foreground/70 tracking-wide">
+                      Try a routine
+                    </h2>
+                  </div>
+                  <button
+                    onClick={() => navigate('/app/routines')}
+                    className="text-xs text-primary font-medium flex items-center gap-0.5"
+                  >
+                    All <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
                 <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory">
                   {featuredRoutines.map((routine) => (
                     <div key={routine.id} className="shrink-0 w-[85%] snap-start">
@@ -972,6 +978,15 @@ export default function AppRoutinePlayer() {
                   ))}
                 </div>
               </div>
+            )}
+
+            {featuredRoutines.length === 0 && (
+              <button
+                onClick={() => navigate('/app/routines')}
+                className="w-full flex items-center justify-center gap-1 text-sm text-primary font-medium py-3"
+              >
+                Browse Routines Library <ChevronRight className="w-4 h-4" />
+              </button>
             )}
           </div>
         )}
