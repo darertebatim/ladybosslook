@@ -42,14 +42,14 @@ const SortableSubtaskRow = ({
     <div
       ref={setNodeRef}
       style={style}
+      {...attributes}
+      {...listeners}
       className={cn(
-        'flex items-center gap-2 px-4 py-3 bg-white dark:bg-slate-800 border-b border-muted/20',
+        'flex items-center gap-2 px-4 py-3 bg-background border-b border-muted/20 touch-manipulation',
         isDragging && 'opacity-50 z-50 shadow-lg'
       )}
     >
-      <button {...attributes} {...listeners} className="touch-none p-1 -ml-1 text-muted-foreground/40">
-        <GripVertical className="h-4 w-4" />
-      </button>
+      <GripVertical className="h-4 w-4 text-muted-foreground/30 shrink-0" />
       <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30 shrink-0" />
       <Input
         ref={inputRef}
@@ -57,8 +57,13 @@ const SortableSubtaskRow = ({
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={onKeyDown}
         className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto text-base"
+        onPointerDown={(e) => e.stopPropagation()}
       />
-      <button onClick={onRemove} className="p-1.5 rounded-full active:bg-muted/50">
+      <button 
+        onClick={onRemove} 
+        onPointerDown={(e) => e.stopPropagation()}
+        className="p-1.5 rounded-full active:bg-muted/50"
+      >
         <Trash2 className="h-4 w-4 text-muted-foreground" />
       </button>
     </div>
