@@ -118,6 +118,7 @@ interface SortableTaskListProps {
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
   hideQuickAdd?: boolean;
+  defaultRepeatOverride?: 'Daily' | 'No' | 'Weekly';
   onOpenTaskSheet?: (params: { editTaskId?: string; createParams?: Record<string, string> }) => void;
 }
 
@@ -134,6 +135,7 @@ export const SortableTaskList = ({
   onOpenTimer,
   onOpenWaterTracking,
   hideQuickAdd = false,
+  defaultRepeatOverride,
   onOpenTaskSheet,
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -276,7 +278,7 @@ export const SortableTaskList = ({
         )}
 
         {/* Quick Add Card */}
-        {!hideQuickAdd && <QuickAddCard date={date} taskCount={localTasks.length} onOpenTaskSheet={onOpenTaskSheet} />}
+        {!hideQuickAdd && <QuickAddCard date={date} taskCount={localTasks.length} onOpenTaskSheet={onOpenTaskSheet} defaultRepeatOverride={defaultRepeatOverride} />}
       </SortableContext>
 
       {/* Drag overlay */}
@@ -319,7 +321,7 @@ const TIME_PERIOD_LABELS: Record<string, string> = {
   night: 'Bedtime',
 };
 
-function QuickAddCard({ date, taskCount, onOpenTaskSheet }: { date: Date; taskCount: number; onOpenTaskSheet?: (params: { editTaskId?: string; createParams?: Record<string, string> }) => void }) {
+function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride }: { date: Date; taskCount: number; onOpenTaskSheet?: (params: { editTaskId?: string; createParams?: Record<string, string> }) => void; defaultRepeatOverride?: 'Daily' | 'No' | 'Weekly' }) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [showIdeas, setShowIdeas] = useState(false);
@@ -491,11 +493,11 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet }: { date: Date; taskCo
       {/* Trigger button */}
       <button
         onClick={() => {
-          // Capture screen height NOW before keyboard opens
           const screenH = window.innerHeight;
           const topPx = Math.round(screenH * 0.25);
           setAnchorTop(`${topPx}px`);
           setSuggestionsTop(`${topPx + 220}px`);
+          if (defaultRepeatOverride) setQuickRepeat(defaultRepeatOverride);
           setIsOpen(true);
           haptic.light();
         }}
