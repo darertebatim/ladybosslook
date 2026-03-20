@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, Heart, Loader2, CalendarPlus, ChevronRight, Flame, Target, RotateCcw } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
