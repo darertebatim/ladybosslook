@@ -464,16 +464,21 @@ export const TaskCard = memo(function TaskCard({
                 </button>
               </div>
             ) : (
-              <button
-                onClick={handleProCircleClick}
-                className="w-9 h-9 flex items-center justify-center shrink-0"
-              >
-                {isCompleted ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
-                  <span className="w-9 h-9 rounded-full border-2 border-black border-dashed bg-white flex items-center justify-center">
-                    <ProIcon className={cn("h-4 w-4", proConfig.iconColorClass)} />
-                  </span>
+              <div className="flex flex-col items-center shrink-0">
+                <button
+                  onClick={handleProCircleClick}
+                  className="w-9 h-9 flex items-center justify-center"
+                >
+                  {isCompleted ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
+                    <span className="w-9 h-9 rounded-full border-2 border-black border-dashed bg-white flex items-center justify-center">
+                      <ProIcon className={cn("h-4 w-4", proConfig.iconColorClass)} />
+                    </span>
+                  )}
+                </button>
+                {proLinkType === 'routine' && (proLinkValue || task.source_routine_id) && (
+                  <RoutinePlayBadge routineId={(proLinkValue || task.source_routine_id)!} />
                 )}
-              </button>
+              </div>
             )}
           </div>
         </div>
