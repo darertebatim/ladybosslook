@@ -2147,7 +2147,7 @@ export default function RoutinesBank() {
                             {onceTasks.length === 0 && (
                               <p className="text-center text-muted-foreground text-xs py-2">No one-time actions</p>
                             )}
-                            {onceTasks.map((task, tIdx) => renderTaskRow(task, tIdx, onceTasks.length, null))}
+                            {renderSortableList(onceTasks, null)}
                           </div>
                         </div>
 
