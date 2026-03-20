@@ -821,10 +821,7 @@ export default function AppRoutinePlayer() {
           <div className="space-y-6 mt-4">
             {/* Activated routines */}
             {(() => {
-              const activeRoutines = localRoutines.filter((r: any) => {
-                const tasks = routineTasksMap?.[r.routine_id] || [];
-                return tasks.length > 0;
-              });
+              const activeRoutines = localRoutines;
               const sortableIds = activeRoutines.map((r: any) => r.id);
               const activeRoutineData = activeRoutineId ? activeRoutines.find((r: any) => r.id === activeRoutineId) : null;
 
