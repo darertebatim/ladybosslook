@@ -160,7 +160,7 @@ export function RoutinePlayerProvider({ children }: { children: ReactNode }) {
             onMoveTaskToEnd={player.moveTaskToEnd}
             onReorderTasks={player.reorderTasks}
             onEndRoutineEarly={player.endRoutineEarly}
-            onClose={player.closePlayer}
+            onClose={() => { player.closePlayer(); navigate('/app/home'); }}
             onCancel={player.cancelPlayer}
             onMinimize={handleMinimize}
             onOpenProTask={openProTask}
