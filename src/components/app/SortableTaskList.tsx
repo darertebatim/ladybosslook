@@ -319,7 +319,7 @@ const TIME_PERIOD_LABELS: Record<string, string> = {
   night: 'Bedtime',
 };
 
-function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
+function QuickAddCard({ date, taskCount, onOpenTaskSheet }: { date: Date; taskCount: number; onOpenTaskSheet?: (params: { editTaskId?: string; createParams?: Record<string, string> }) => void }) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [showIdeas, setShowIdeas] = useState(false);
