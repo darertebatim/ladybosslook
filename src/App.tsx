@@ -30,15 +30,26 @@ const PageLoader = () => (
 );
 
 // Lazy load app pages (most-used pages in native app)
-// Preload AppHome immediately for native — it's always the first screen
+// Preload tab-bar pages immediately for native — ensures instant navigation
 const appHomeImport = import("@/pages/app/AppHome");
+const appStoreImport = import("@/pages/app/AppStore");
+const appInspireImport = import("@/pages/app/AppInspire");
+const appPlayerImport = import("@/pages/app/AppPlayer");
+const appChannelsListImport = import("@/pages/app/AppChannelsList");
+const appPresenceImport = import("@/pages/app/AppPresence");
+
 const AppHome = lazy(() => appHomeImport);
+const AppStore = lazy(() => appStoreImport);
+const AppInspire = lazy(() => appInspireImport);
+const AppPlayer = lazy(() => appPlayerImport);
+const AppChannelsList = lazy(() => appChannelsListImport);
+const AppPresence = lazy(() => appPresenceImport);
 const AppPrograms = lazy(() => import("@/pages/app/AppPrograms"));
-const AppStore = lazy(() => import("@/pages/app/AppStore"));
+// AppStore eagerly imported above
 const AppBrowsePrograms = lazy(() => import("@/pages/app/AppBrowsePrograms"));
 const AppCourseDetail = lazy(() => import("@/pages/app/AppCourseDetail"));
 const AppProfile = lazy(() => import("@/pages/app/AppProfile"));
-const AppPlayer = lazy(() => import("@/pages/app/AppPlayer"));
+// AppPlayer eagerly imported above
 const AppWatch = lazy(() => import("@/pages/app/AppWatch"));
 const AppVideoPlaylistDetail = lazy(() => import("@/pages/app/AppVideoPlaylistDetail"));
 const AppVideoDetail = lazy(() => import("@/pages/app/AppVideoDetail"));
@@ -46,13 +57,13 @@ const AppPlaylistDetail = lazy(() => import("@/pages/app/AppPlaylistDetail"));
 const AppAudioPlayer = lazy(() => import("@/pages/app/AppAudioPlayer"));
 const AppChat = lazy(() => import("@/pages/app/AppChat"));
 const AppCoachChat = lazy(() => import("@/pages/app/AppCoachChat"));
-const AppChannelsList = lazy(() => import("@/pages/app/AppChannelsList"));
+// AppChannelsList eagerly imported above
 const AppChannelDetail = lazy(() => import("@/pages/app/AppChannelDetail"));
 const AppFeedPost = lazy(() => import("@/pages/app/AppFeedPost"));
 const AppJournal = lazy(() => import("@/pages/app/AppJournal"));
 const AppJournalEntry = lazy(() => import("@/pages/app/AppJournalEntry"));
 const AppTaskCreate = lazy(() => import("@/pages/app/AppTaskCreate"));
-const AppInspire = lazy(() => import("@/pages/app/AppInspire"));
+// AppInspire eagerly imported above
 const AppInspireDetail = lazy(() => import("@/pages/app/AppInspireDetail"));
 const AppRoutineCategory = lazy(() => import("@/pages/app/AppRoutineCategory"));
 const AppActions = lazy(() => import("@/pages/app/AppActions"));
@@ -64,7 +75,7 @@ const AppEmotion = lazy(() => import("@/pages/app/AppEmotion"));
 const AppEmotionHistory = lazy(() => import("@/pages/app/AppEmotionHistory"));
 const AppMood = lazy(() => import("@/pages/app/AppMood"));
 const AppMoodHistory = lazy(() => import("@/pages/app/AppMoodHistory"));
-const AppPresence = lazy(() => import("@/pages/app/AppPresence"));
+// AppPresence eagerly imported above
 const AppActionStats = lazy(() => import("@/pages/app/AppActionStats"));
 const AppFasting = lazy(() => import("@/pages/app/AppFasting"));
 const AppTimer = lazy(() => import("@/pages/app/AppTimer"));

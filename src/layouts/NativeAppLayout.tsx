@@ -24,6 +24,7 @@ import { AppUpdatePopup } from '@/components/app/AppUpdatePopup';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { useDailyResetProvisioning } from '@/hooks/useDailyResetProvisioning';
 import { useOnboardingProfileSync } from '@/hooks/useOnboardingProfileSync';
+import { useRoutePreloader } from '@/hooks/useRoutePreloader';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
@@ -64,6 +65,9 @@ const NativeAppLayout = () => {
   
   // Sync onboarding answers (nickname, gender) to user profile
   useOnboardingProfileSync(user?.id);
+
+  // Prefetch secondary page chunks after user settles on a tab
+  useRoutePreloader();
 
   // Defer non-critical hooks — mount DeferredLayoutHooks after 5s delay
   const [deferredReady, setDeferredReady] = useState(false);
