@@ -4,7 +4,7 @@ import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay, subDays } from 'date-fns';
-import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, Headset, ArrowLeft, Heart, Zap } from 'lucide-react';
+import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, Headset, ArrowLeft, Heart, Zap, Settings2, Search } from 'lucide-react';
 import { TaskFilterDropdown } from '@/components/app/TaskFilterDropdown';
 import AppTaskCreate from '@/pages/app/AppTaskCreate';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -1120,15 +1120,17 @@ const AppHome = () => {
                         <div className="flex gap-2 mt-3 w-full">
                           <button
                             onClick={() => navigate('/app/routineplayer')}
-                            className="flex-1 rounded-3xl py-2.5 bg-card border-2 border-urgency/30 text-[14px] font-semibold text-foreground active:scale-[0.98] transition-all"
+                            className="flex-1 rounded-3xl py-2.5 px-3 bg-card border-2 border-urgency/30 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
                           >
-                            Manage My Routines
+                            <Settings2 className="w-3.5 h-3.5 text-urgency" />
+                            Manage Routines
                           </button>
                           <button
                             onClick={() => navigate('/app/routines')}
-                            className="flex-1 rounded-3xl py-2.5 bg-card border-2 border-urgency/30 text-[14px] font-semibold text-foreground active:scale-[0.98] transition-all"
+                            className="flex-1 rounded-3xl py-2.5 px-3 bg-card border-2 border-urgency/30 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
                           >
-                            Browse Routines Library
+                            <Search className="w-3.5 h-3.5 text-urgency" />
+                            Browse Library
                           </button>
                         </div>
                       ) : (
@@ -1273,15 +1275,17 @@ const AppHome = () => {
                               <div className="flex gap-2 mt-3">
                                 <button
                                   onClick={() => navigate('/app/routineplayer')}
-                                  className="flex-1 rounded-3xl py-2.5 bg-card border-2 border-urgency/30 text-[14px] font-semibold text-foreground active:scale-[0.98] transition-all"
+                                  className="flex-1 rounded-3xl py-2.5 px-3 bg-card border-2 border-urgency/30 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
                                 >
-                                  Manage My Routines
+                                  <Settings2 className="w-3.5 h-3.5 text-urgency" />
+                                  Manage Routines
                                 </button>
                                 <button
                                   onClick={() => navigate('/app/routines')}
-                                  className="flex-1 rounded-3xl py-2.5 bg-card border-2 border-urgency/30 text-[14px] font-semibold text-foreground active:scale-[0.98] transition-all"
+                                  className="flex-1 rounded-3xl py-2.5 px-3 bg-card border-2 border-urgency/30 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
                                 >
-                                  Browse Routines Library
+                                  <Search className="w-3.5 h-3.5 text-urgency" />
+                                  Browse Library
                                 </button>
                               </div>
                             )}
