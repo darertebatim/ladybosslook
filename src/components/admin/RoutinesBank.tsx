@@ -1,4 +1,8 @@
 import { useState, useCallback } from 'react';
+import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { useSensors, useSensor, TouchSensor, MouseSensor } from '@dnd-kit/core';
 import { Switch } from '@/components/ui/switch';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,7 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
-import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles, Gift, Calendar, Flame, CalendarIcon, Upload } from 'lucide-react';
+import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles, Gift, Calendar, Flame, CalendarIcon, Upload, GripVertical } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
@@ -119,6 +123,22 @@ interface LocalTask {
   monthly_day: number | null;
   is_once: boolean;
   duration_minutes: number | null;
+}
+
+// Sortable task row wrapper for drag-and-drop
+function SortableTaskRowItem({ id, children }: { id: string; children: (dragHandleProps: Record<string, any>) => React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : undefined,
+  };
+  return (
+    <div ref={setNodeRef} style={style}>
+      {children({ ...attributes, ...listeners })}
+    </div>
+  );
 }
 
 export default function RoutinesBank() {
@@ -924,6 +944,28 @@ export default function RoutinesBank() {
       if (t.id === taskBelow.id) return { ...t, task_order: taskToMove.task_order };
       return t;
     }));
+  };
+
+  // Drag-and-drop sensors and handler
+  const dndSensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
+  );
+
+  const handleTaskDragEnd = (event: DragEndEvent, taskList: LocalTask[], sectionId: string | null) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = taskList.findIndex(t => t.id === active.id);
+    const newIndex = taskList.findIndex(t => t.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = arrayMove(taskList, oldIndex, newIndex);
+    setLocalTasks(prev => {
+      const otherTasks = prev.filter(t => !taskList.some(tl => tl.id === t.id));
+      const updated = reordered.map((t, i) => ({ ...t, task_order: i + 1 }));
+      return [...otherTasks, ...updated];
+    });
   };
 
   const getCategoryInfo = (cat: string) => {
@@ -1811,64 +1853,48 @@ export default function RoutinesBank() {
                           {sectionTasks.length === 0 ? (
                             <p className="text-center text-muted-foreground text-xs py-2">No tasks in this section</p>
                           ) : (
-                            sectionTasks.map((task, tIdx) => (
-                              <div key={task.id} className="rounded bg-background border">
-                                <div className="flex items-center gap-2 p-2">
-                                  <div className="flex flex-col">
-                                    <button
-                                      type="button"
-                                      onClick={() => moveTaskUp(task.id, section.id)}
-                                      disabled={tIdx === 0}
-                                      className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                                    >
-                                      <ChevronUp className="h-3 w-3" />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => moveTaskDown(task.id, section.id)}
-                                      disabled={tIdx === sectionTasks.length - 1}
-                                      className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                                    >
-                                      <ChevronDown className="h-3 w-3" />
-                                    </button>
-                                  </div>
-                                  <TaskIcon iconName={task.emoji} size={16} />
-                                  <span className="flex-1 text-sm truncate">{task.title}</span>
-                                  {renderTaskScheduleConfig(task)}
-                                  {/* Move to section dropdown */}
-                                  <Select
-                                    value=""
-                                    onValueChange={(targetSectionId) => {
-                                      const newSectionId = targetSectionId === '_uncategorized' ? null : targetSectionId;
-                                      setLocalTasks(localTasks.map(t =>
-                                        t.id === task.id ? { ...t, section_id: newSectionId } : t
-                                      ));
-                                    }}
-                                  >
-                                    <SelectTrigger className="w-[100px] h-7 text-xs">
-                                      <span className="text-muted-foreground">Move to...</span>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="_uncategorized" className="text-xs">
-                                        Uncategorized
-                                      </SelectItem>
-                                      {localSections.filter(s => s.id !== section.id).map((s) => (
-                                        <SelectItem key={s.id} value={s.id} className="text-xs">
-                                          {s.title}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                  <button
-                                    type="button"
-                                    onClick={() => removeTask(task.id)}
-                                    className="p-1 text-destructive hover:bg-destructive/10 rounded"
-                                  >
-                                    <X className="h-3 w-3" />
-                                  </button>
-                                </div>
-                              </div>
-                            ))
+                            <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={(e) => handleTaskDragEnd(e, sectionTasks, section.id)}>
+                              <SortableContext items={sectionTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                                {sectionTasks.map((task, tIdx) => (
+                                  <SortableTaskRowItem key={task.id} id={task.id}>
+                                    {(dragHandleProps) => (
+                                      <div className="rounded bg-background border">
+                                        <div className="flex items-center gap-2 p-2">
+                                          <button type="button" {...dragHandleProps} className="cursor-grab active:cursor-grabbing touch-none text-muted-foreground hover:text-foreground p-0.5">
+                                            <GripVertical className="h-4 w-4" />
+                                          </button>
+                                          <TaskIcon iconName={task.emoji} size={16} />
+                                          <span className="flex-1 text-sm truncate">{task.title}</span>
+                                          {renderTaskScheduleConfig(task)}
+                                          <Select
+                                            value=""
+                                            onValueChange={(targetSectionId) => {
+                                              const newSectionId = targetSectionId === '_uncategorized' ? null : targetSectionId;
+                                              setLocalTasks(localTasks.map(t =>
+                                                t.id === task.id ? { ...t, section_id: newSectionId } : t
+                                              ));
+                                            }}
+                                          >
+                                            <SelectTrigger className="w-[100px] h-7 text-xs">
+                                              <span className="text-muted-foreground">Move to...</span>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="_uncategorized" className="text-xs">Uncategorized</SelectItem>
+                                              {localSections.filter(s => s.id !== section.id).map((s) => (
+                                                <SelectItem key={s.id} value={s.id} className="text-xs">{s.title}</SelectItem>
+                                              ))}
+                                            </SelectContent>
+                                          </Select>
+                                          <button type="button" onClick={() => removeTask(task.id)} className="p-1 text-destructive hover:bg-destructive/10 rounded">
+                                            <X className="h-3 w-3" />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </SortableTaskRowItem>
+                                ))}
+                              </SortableContext>
+                            </DndContext>
                           )}
                           
                           {/* Add task to section */}
@@ -1969,47 +1995,53 @@ export default function RoutinesBank() {
                       const taskColor = getTaskColor(task);
                       const colorHex = colorHexMap[taskColor] || '#C5E8FA';
                       return (
-                      <div key={task.id} className="rounded border overflow-hidden" style={{ backgroundColor: `${colorHex}30` }}>
-                        <div className="flex items-center gap-2 p-2">
-                          <div className="flex flex-col">
-                            <button type="button" onClick={() => moveTaskUp(task.id, sectionId)} disabled={tIdx === 0} className="text-muted-foreground hover:text-foreground disabled:opacity-30">
-                              <ChevronUp className="h-3 w-3" />
+                      <SortableTaskRowItem key={task.id} id={task.id}>
+                        {(dragHandleProps) => (
+                        <div className="rounded border overflow-hidden" style={{ backgroundColor: `${colorHex}30` }}>
+                          <div className="flex items-center gap-2 p-2">
+                            <button type="button" {...dragHandleProps} className="cursor-grab active:cursor-grabbing touch-none text-muted-foreground hover:text-foreground p-0.5">
+                              <GripVertical className="h-4 w-4" />
                             </button>
-                            <button type="button" onClick={() => moveTaskDown(task.id, sectionId)} disabled={tIdx === listLength - 1} className="text-muted-foreground hover:text-foreground disabled:opacity-30">
-                              <ChevronDown className="h-3 w-3" />
+                            <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: colorHex }} />
+                            <TaskIcon iconName={task.emoji} size={16} />
+                            <span className="flex-1 text-sm truncate">{task.title}</span>
+                            {renderTaskScheduleConfig(task)}
+                            {localSections.length > 0 && (
+                              <Select value="" onValueChange={(sid) => { setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, section_id: sid } : t)); }}>
+                                <SelectTrigger className="w-[100px] h-7 text-xs"><span className="text-muted-foreground">Move to...</span></SelectTrigger>
+                                <SelectContent>
+                                  {localSections.map((s) => (
+                                    <SelectItem key={s.id} value={s.id} className="text-xs">{s.title}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                            {task.task_id && (
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); openEditActionSheet(task.task_id!); }}
+                                className="p-1 text-muted-foreground hover:text-foreground rounded hover:bg-accent"
+                                title="Edit task"
+                              >
+                                <Pencil className="h-3 w-3" />
+                              </button>
+                            )}
+                            <button type="button" onClick={() => removeTask(task.id)} className="p-1 text-destructive hover:bg-destructive/10 rounded">
+                              <X className="h-3 w-3" />
                             </button>
                           </div>
-                          <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: colorHex }} />
-                          <TaskIcon iconName={task.emoji} size={16} />
-                          <span className="flex-1 text-sm truncate">{task.title}</span>
-                          {renderTaskScheduleConfig(task)}
-                          {localSections.length > 0 && (
-                            <Select value="" onValueChange={(sid) => { setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, section_id: sid } : t)); }}>
-                              <SelectTrigger className="w-[100px] h-7 text-xs"><span className="text-muted-foreground">Move to...</span></SelectTrigger>
-                              <SelectContent>
-                                {localSections.map((s) => (
-                                  <SelectItem key={s.id} value={s.id} className="text-xs">{s.title}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          )}
-                          {task.task_id && (
-                            <button
-                              type="button"
-                              onClick={(e) => { e.stopPropagation(); openEditActionSheet(task.task_id!); }}
-                              className="p-1 text-muted-foreground hover:text-foreground rounded hover:bg-accent"
-                              title="Edit task"
-                            >
-                              <Pencil className="h-3 w-3" />
-                            </button>
-                          )}
-                          <button type="button" onClick={() => removeTask(task.id)} className="p-1 text-destructive hover:bg-destructive/10 rounded">
-                            <X className="h-3 w-3" />
-                          </button>
                         </div>
-                      </div>
+                        )}
+                      </SortableTaskRowItem>
                     );};
 
+                    const renderSortableList = (tasks: LocalTask[], sectionId: string | null) => (
+                      <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={(e) => handleTaskDragEnd(e, tasks, sectionId)}>
+                        <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                          {tasks.map((task, tIdx) => renderTaskRow(task, tIdx, tasks.length, sectionId))}
+                        </SortableContext>
+                      </DndContext>
+                    );
                     // For challenge/project mode, show flat list
                     if (formData.schedule_type === 'challenge' || formData.schedule_type === 'project') {
                       const modeLabel = formData.schedule_type === 'project' ? 'Steps' : 'Tasks';
@@ -2022,7 +2054,7 @@ export default function RoutinesBank() {
                             <span className="text-xs text-muted-foreground">{uncategorizedTasks.length} {modeLabel.toLowerCase()}</span>
                           </div>
                           <div className="p-2 space-y-1">
-                            {uncategorizedTasks.map((task, tIdx) => renderTaskRow(task, tIdx, uncategorizedTasks.length, null))}
+                            {renderSortableList(uncategorizedTasks, null)}
                             {addingTaskToSection === 'uncategorized' ? (
                               <div className="border rounded p-2 space-y-2 bg-muted/30">
                                 <div className="relative">
@@ -2070,7 +2102,7 @@ export default function RoutinesBank() {
                             {dailyTasks.length === 0 && (
                               <p className="text-center text-muted-foreground text-xs py-2">No daily tasks</p>
                             )}
-                            {dailyTasks.map((task, tIdx) => renderTaskRow(task, tIdx, dailyTasks.length, null))}
+                            {renderSortableList(dailyTasks, null)}
                           </div>
                         </div>
 
@@ -2085,7 +2117,7 @@ export default function RoutinesBank() {
                             {weeklyTasks.length === 0 && (
                               <p className="text-center text-muted-foreground text-xs py-2">No weekly actions</p>
                             )}
-                            {weeklyTasks.map((task, tIdx) => renderTaskRow(task, tIdx, weeklyTasks.length, null))}
+                            {renderSortableList(weeklyTasks, null)}
                           </div>
                         </div>
 
@@ -2100,7 +2132,7 @@ export default function RoutinesBank() {
                             {monthlyTasks.length === 0 && (
                               <p className="text-center text-muted-foreground text-xs py-2">No monthly actions</p>
                             )}
-                            {monthlyTasks.map((task, tIdx) => renderTaskRow(task, tIdx, monthlyTasks.length, null))}
+                            {renderSortableList(monthlyTasks, null)}
                           </div>
                         </div>
 
@@ -2115,7 +2147,7 @@ export default function RoutinesBank() {
                             {onceTasks.length === 0 && (
                               <p className="text-center text-muted-foreground text-xs py-2">No one-time actions</p>
                             )}
-                            {onceTasks.map((task, tIdx) => renderTaskRow(task, tIdx, onceTasks.length, null))}
+                            {renderSortableList(onceTasks, null)}
                           </div>
                         </div>
 
