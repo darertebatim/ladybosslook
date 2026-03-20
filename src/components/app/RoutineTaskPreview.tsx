@@ -29,6 +29,7 @@ export const RoutineTaskPreview = memo(function RoutineTaskPreview({ routineId }
         .eq('source_routine_id', routineId)
         .eq('is_active', true)
         .order('order_index', { ascending: true });
+      console.log('[RoutineTaskPreview] routineId:', routineId, 'tasks found:', data?.length);
       return (data || []).map((t: any) => ({ emoji: t.emoji || '📝', title: t.title }));
     },
     enabled: !!user && !!routineId,
