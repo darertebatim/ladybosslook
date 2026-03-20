@@ -278,7 +278,7 @@ export const SortableTaskList = ({
         )}
 
         {/* Quick Add Card */}
-        {!hideQuickAdd && <QuickAddCard date={date} taskCount={localTasks.length} onOpenTaskSheet={onOpenTaskSheet} />}
+        {!hideQuickAdd && <QuickAddCard date={date} taskCount={localTasks.length} onOpenTaskSheet={onOpenTaskSheet} defaultRepeatOverride={defaultRepeatOverride} />}
       </SortableContext>
 
       {/* Drag overlay */}
