@@ -287,7 +287,7 @@ export const RoutinePlayer = memo(function RoutinePlayer({
     <div className="fixed inset-0 z-[9999] flex flex-col bg-[#f5f3ef]">
       {/* Completion flash overlay */}
       {showCompletionFlash && (
-        <div className="absolute inset-0 z-[10] pointer-events-none animate-in fade-in-0 duration-200">
+        <div className="absolute inset-0 z-[50] pointer-events-none animate-in fade-in-0 duration-200">
           <div className="absolute inset-0 bg-emerald-400/20" />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-28 h-28 rounded-full bg-emerald-500 flex items-center justify-center animate-in zoom-in-50 duration-300">
