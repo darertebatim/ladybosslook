@@ -711,6 +711,40 @@ const AppTaskCreate = ({
     }
   }, [isSheet, initialData, sheetOpen]);
 
+  // Reset form when createParams changes (sheet mode - from Quick Add Details button)
+  useEffect(() => {
+    if (isSheet && sheetOpen && createParams && !editTaskIdProp) {
+      setTitle(createParams.name || '');
+      setIcon(createParams.emoji || '☀️');
+      setColor((createParams.color as TaskColor) || 'mint');
+      setDescription(null);
+      setScheduledDate(new Date());
+      setScheduledTime(null);
+      const rp = createParams.repeat_pattern;
+      const hasRepeat = rp && rp !== 'none';
+      setRepeatEnabled(!!hasRepeat);
+      setRepeatPattern(hasRepeat && ['daily', 'weekly', 'monthly'].includes(rp) ? rp as 'daily' | 'weekly' | 'monthly' : 'daily');
+      setRepeatDays(createParams.repeat_days ? JSON.parse(createParams.repeat_days) : []);
+      setRepeatInterval(1);
+      setTag(createParams.tag || null);
+      setReminderEnabled(false);
+      setReminderTime('09:00');
+      setIsUrgent(false);
+      setSubtasks([]);
+      setLinkedPlaylistId(createParams.linked_playlist_id || null);
+      setProLinkType((createParams.pro_link_type as ProLinkType) || null);
+      setProLinkValue(createParams.pro_link_value || null);
+      setTimePeriod(createParams.time_period ? normalizeTimePeriod(createParams.time_period) : null);
+      setGoalSettings({
+        enabled: createParams.goal_enabled === 'true',
+        type: (createParams.goal_type as 'count' | 'timer') || 'count',
+        target: Number(createParams.goal_target) || 1,
+        unit: createParams.goal_unit || 'times',
+      });
+      setDurationMinutes(null);
+    }
+  }, [isSheet, sheetOpen, createParams, editTaskIdProp]);
+
   // Populate form when editing (page mode) - only once when task first loads
   const hasPopulatedRef = useRef(false);
   useEffect(() => {
