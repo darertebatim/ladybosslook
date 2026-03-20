@@ -37,7 +37,7 @@ export function WelcomeSection() {
             </p>
           </div>
           <Button 
-            onClick={() => navigate('/app/explore')} 
+            onClick={() => navigate('/app/tools')} 
             className="w-full"
             size="lg"
           >
