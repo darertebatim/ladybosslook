@@ -2,10 +2,10 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
 import { updatePresence } from '@/hooks/useUserPresence';
 import { updateStreak } from '@/hooks/useTaskPlanner';
 import type { SessionTaskResult } from '@/components/app/RoutinePlayerSummary';
+import { getLocalDateStr, taskAppliesToDate } from '@/lib/localDate';
 
 export interface RoutineTask {
   id: string;
@@ -194,7 +194,7 @@ export function useRoutinePlayer() {
 
     // Sync with planner: create task_completion when task is completed
     if (status === 'completed' && currentTask.userTaskId && user) {
-      const dateStr = format(new Date(), 'yyyy-MM-dd');
+      const dateStr = getLocalDateStr(new Date());
       const targetProgress = currentTask.goalType === 'timer'
         ? (currentTask.goalTarget ?? currentTask.targetSeconds)
         : currentTask.goalType === 'count'
@@ -258,7 +258,81 @@ export function useRoutinePlayer() {
       tasks_completed: completed,
       tasks_skipped: skipped,
     }).eq('id', sessionId).then(() => {});
-  }, [sessionId]);
+
+    const fullyCompleted = !!config && config.tasks.length > 0 && completed === config.tasks.length;
+    if (!fullyCompleted || !config || !user) return;
+
+    const syncRoutineProTaskCompletion = async () => {
+      const todayStr = getLocalDateStr(new Date());
+      const { data: routineProTasks } = await supabase
+        .from('user_tasks')
+        .select('id, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date, goal_enabled, goal_target')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .eq('pro_link_type', 'routine')
+        .eq('pro_link_value', config.routineId);
+
+      const applicableTasks = (routineProTasks || []).filter((task) =>
+        taskAppliesToDate(task, todayStr)
+      );
+      if (applicableTasks.length === 0) return;
+
+      const taskIds = applicableTasks.map((task) => task.id);
+      const { data: existingCompletions } = await supabase
+        .from('task_completions')
+        .select('task_id, goal_progress')
+        .eq('user_id', user.id)
+        .eq('completed_date', todayStr)
+        .in('task_id', taskIds);
+
+      const existingMap = new Map(
+        (existingCompletions || []).map((completion) => [completion.task_id, completion.goal_progress || 0])
+      );
+
+      const inserts: Array<{ task_id: string; user_id: string; completed_date: string; goal_progress: number }> = [];
+      const updates: any[] = [];
+
+      for (const task of applicableTasks) {
+        const targetProgress = task.goal_enabled && (task.goal_target || 0) > 0
+          ? (task.goal_target || 1)
+          : 1;
+        const currentProgress = existingMap.get(task.id);
+
+        if (currentProgress === undefined) {
+          inserts.push({
+            task_id: task.id,
+            user_id: user.id,
+            completed_date: todayStr,
+            goal_progress: targetProgress,
+          });
+          continue;
+        }
+
+        if (currentProgress < targetProgress) {
+          updates.push(
+            supabase
+              .from('task_completions')
+              .update({ goal_progress: targetProgress })
+              .eq('task_id', task.id)
+              .eq('user_id', user.id)
+              .eq('completed_date', todayStr)
+          );
+        }
+      }
+
+      await Promise.all([
+        inserts.length > 0 ? supabase.from('task_completions').insert(inserts) : Promise.resolve(),
+        ...updates,
+      ]);
+
+      queryClient.invalidateQueries({ queryKey: ['planner-completions', user.id, todayStr] });
+      queryClient.invalidateQueries({ queryKey: ['planner-completions'] });
+      queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
+      queryClient.invalidateQueries({ queryKey: ['new-home-data', user.id] });
+    };
+
+    syncRoutineProTaskCompletion().catch(() => {});
+  }, [sessionId, config, user, queryClient]);
 
   const moveToNext = useCallback((results: SessionTaskResult[]) => {
     if (!config) return;
