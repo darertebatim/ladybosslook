@@ -89,6 +89,7 @@ interface RoutinePreviewSheetProps {
   onSave: (selectedTaskIds: string[], editedTasks: EditedTask[]) => void;
   isSaving?: boolean;
   isFree?: boolean;
+  routineBankId?: string | null;
 }
 
 export function RoutinePreviewSheet({
@@ -107,7 +108,36 @@ export function RoutinePreviewSheet({
   onSave,
   isSaving,
   isFree,
+  routineBankId,
 }: RoutinePreviewSheetProps) {
+  // Generate synthetic pro-task for multi-task routines
+  const displayTasks = useMemo(() => {
+    if (tasks.length > 1 && routineBankId) {
+      const proTask: RoutinePlanTask = {
+        id: `__pro_task_routine_${routineBankId}`,
+        plan_id: routineBankId,
+        title: `▶️ ${routineTitle}`,
+        icon: '▶️',
+        color: 'emerald',
+        task_order: -1,
+        is_active: true,
+        created_at: new Date().toISOString(),
+        linked_playlist_id: null,
+        pro_link_type: 'routine' as any,
+        pro_link_value: routineBankId,
+        goal_enabled: false,
+        goal_target: null,
+        goal_type: null,
+        goal_unit: null,
+        linked_playlist: null,
+      };
+      // Attach repeat_pattern for display
+      (proTask as any).repeat_pattern = 'daily';
+      return [proTask, ...tasks];
+    }
+    return tasks;
+  }, [tasks, routineBankId, routineTitle]);
+
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(
     new Set(tasks.map(t => t.id))
   );
@@ -124,12 +154,12 @@ export function RoutinePreviewSheet({
 
   // Sync selectedTaskIds when tasks change (e.g., when data loads async)
   useEffect(() => {
-    if (tasks.length > 0 && selectedTaskIds.size === 0) {
-      setSelectedTaskIds(new Set(tasks.map(t => t.id)));
+    if (displayTasks.length > 0 && selectedTaskIds.size === 0) {
+      setSelectedTaskIds(new Set(displayTasks.map(t => t.id)));
     }
-  }, [tasks]);
+  }, [displayTasks]);
 
-  const allSelected = selectedTaskIds.size === tasks.length;
+  const allSelected = selectedTaskIds.size === displayTasks.length;
 
   const toggleTask = (taskId: string) => {
     const newSet = new Set(selectedTaskIds);
@@ -145,9 +175,11 @@ export function RoutinePreviewSheet({
     if (allSelected) {
       setSelectedTaskIds(new Set());
     } else {
-      setSelectedTaskIds(new Set(tasks.map(t => t.id)));
+      setSelectedTaskIds(new Set(displayTasks.map(t => t.id)));
     }
   };
+
+  const isProTask = (taskId: string) => taskId.startsWith('__pro_task_routine_');
 
   const openTaskEditor = (task: RoutinePlanTask, index: number) => {
     setEditingTaskId(task.id);
@@ -282,10 +314,11 @@ export function RoutinePreviewSheet({
   };
 
   // Find the task being edited
-  const editingTask = editingTaskId ? tasks.find(t => t.id === editingTaskId) : null;
+  const editingTask = editingTaskId ? displayTasks.find(t => t.id === editingTaskId) : null;
 
   const renderTaskCard = (task: RoutinePlanTask, index: number) => {
     const isSelected = selectedTaskIds.has(task.id);
+    const isPro = isProTask(task.id);
     const display = getTaskDisplay(task, index);
     const colorClass = TASK_COLOR_CLASSES[display.color];
     const darkColorClass = TASK_COLOR_DARK_CLASSES[display.color] || 'bg-black/10';
@@ -312,26 +345,33 @@ export function RoutinePreviewSheet({
         </button>
         <div className={cn(
           'flex-1 rounded-2xl overflow-hidden',
+          isPro ? 'ring-2 ring-emerald-400/60' : '',
           colorClass
         )}>
           {/* Main content area */}
           <div className="flex items-center gap-3 px-3 pt-3 pb-2.5">
             <FluentEmoji emoji={display.icon || '📝'} size={40} className="shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-black mb-0.5">{timeLabel}</p>
+              {isPro ? (
+                <p className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide mb-0.5">Routine Launcher</p>
+              ) : (
+                <p className="text-xs font-medium text-black mb-0.5">{timeLabel}</p>
+              )}
               <p className="font-semibold text-[15px] text-black leading-snug line-clamp-2">{display.title}</p>
             </div>
-            <button 
-              className={cn("shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-black/60 active:scale-95 transition-transform", darkColorClass)}
-              onClick={() => openTaskEditor(task, index)}
-            >
-              <Pencil className="w-3.5 h-3.5" />
-            </button>
+            {!isPro && (
+              <button 
+                className={cn("shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-black/60 active:scale-95 transition-transform", darkColorClass)}
+                onClick={() => openTaskEditor(task, index)}
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
           {/* Footer strip with repeat info */}
           <div className={cn('px-4 py-3.5', darkColorClass)}>
             <p className="text-[13px] font-medium text-black text-center">
-              {getRepeatLabel(task, display.repeatPattern)}
+              {isPro ? 'Opens the routine player' : getRepeatLabel(task, display.repeatPattern)}
             </p>
           </div>
         </div>
@@ -442,13 +482,19 @@ export function RoutinePreviewSheet({
             <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4 min-h-0">
             {scheduleType === 'challenge' ? (
                 <>
+                  {/* Pro-task at top for challenges */}
+                  {displayTasks.length > tasks.length && (
+                    <div className="space-y-3 mb-4">
+                      {renderTaskCard(displayTasks[0], 0)}
+                    </div>
+                  )}
                   {(() => {
                     // Group tasks by drip_day
                     const dayGroups = new Map<number, { task: RoutinePlanTask; index: number }[]>();
                     tasks.forEach((task, index) => {
                       const day = (task as any).drip_day ?? 1;
                       if (!dayGroups.has(day)) dayGroups.set(day, []);
-                      dayGroups.get(day)!.push({ task, index });
+                      dayGroups.get(day)!.push({ task, index: index + (displayTasks.length > tasks.length ? 1 : 0) });
                     });
                     const sortedDays = Array.from(dayGroups.keys()).sort((a, b) => a - b);
                     return sortedDays.map(day => (
@@ -465,13 +511,19 @@ export function RoutinePreviewSheet({
                 </>
               ) : scheduleType === 'project' ? (
                 <>
+                  {/* Pro-task at top for projects */}
+                  {displayTasks.length > tasks.length && (
+                    <div className="space-y-3 mb-4">
+                      {renderTaskCard(displayTasks[0], 0)}
+                    </div>
+                  )}
                   {(() => {
                     // Group tasks by drip_day as step number
                     const stepGroups = new Map<number, { task: RoutinePlanTask; index: number }[]>();
                     tasks.forEach((task, index) => {
                       const step = (task as any).drip_day ?? (index + 1);
                       if (!stepGroups.has(step)) stepGroups.set(step, []);
-                      stepGroups.get(step)!.push({ task, index });
+                      stepGroups.get(step)!.push({ task, index: index + (displayTasks.length > tasks.length ? 1 : 0) });
                     });
                     const sortedSteps = Array.from(stepGroups.keys()).sort((a, b) => a - b);
                     return sortedSteps.map(step => (
@@ -509,7 +561,7 @@ export function RoutinePreviewSheet({
                       }},
                     ];
                     return groups.map(group => {
-                      const groupTasks = tasks.filter(group.filter);
+                      const groupTasks = displayTasks.filter(group.filter);
                       if (groupTasks.length === 0) return null;
                       return (
                         <div key={group.key} className="mb-4">
@@ -518,7 +570,7 @@ export function RoutinePreviewSheet({
                           </p>
                           <div className="space-y-3">
                             {groupTasks.map((task) => {
-                              const originalIndex = tasks.indexOf(task);
+                              const originalIndex = displayTasks.indexOf(task);
                               return renderTaskCard(task, originalIndex);
                             })}
                           </div>
