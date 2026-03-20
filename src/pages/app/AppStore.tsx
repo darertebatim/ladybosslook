@@ -358,11 +358,15 @@ const AppStore = () => {
                                 </div>
                               )}
                             </div>
-                            {enrolled && (
+                            {enrolled ? (
                               <div className="absolute -top-2.5 left-1 z-10 bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
                                 <CheckCircle2 className="h-2.5 w-2.5" /> Enrolled
                               </div>
-                            )}
+                            ) : isFree ? (
+                              <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                                <FluentEmoji emoji="🔥" size={10} /> FREE
+                              </div>
+                            ) : null}
                           </div>
                           <p className="text-xs font-medium line-clamp-2 leading-tight">{program.title}</p>
                           {isEnrolling && (
@@ -404,7 +408,11 @@ const AppStore = () => {
                             </div>
                           )}
                         </div>
-                        {!r.is_free && (
+                        {r.is_free ? (
+                          <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                            <FluentEmoji emoji="🔥" size={10} /> FREE
+                          </div>
+                        ) : (
                           <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
                             <Crown className="h-2.5 w-2.5" /> PLUS
                           </div>
@@ -437,9 +445,13 @@ const AppStore = () => {
                         <div className="h-full w-full rounded-2xl bg-muted flex items-center justify-center shadow-lg">
                           <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} />
                         </div>
-                        {exercise.is_premium && (
+                        {exercise.is_premium ? (
                           <div className="absolute -top-2.5 left-0 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
                             <Crown className="h-2.5 w-2.5" /> PLUS
+                          </div>
+                        ) : (
+                          <div className="absolute -top-2.5 left-0 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                            <FluentEmoji emoji="🔥" size={10} /> FREE
                           </div>
                         )}
                       </div>
@@ -477,9 +489,13 @@ const AppStore = () => {
                             </div>
                           )}
                         </div>
-                        {playlist.requires_subscription && (
+                        {playlist.requires_subscription ? (
                           <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
                             <Crown className="h-2.5 w-2.5" /> PLUS
+                          </div>
+                        ) : (
+                          <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                            <FluentEmoji emoji="🔥" size={10} /> FREE
                           </div>
                         )}
                       </div>
@@ -516,9 +532,13 @@ const AppStore = () => {
                             </div>
                           )}
                         </div>
-                        {playlist.requires_subscription && (
+                        {playlist.requires_subscription ? (
                           <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
                             <Crown className="h-2.5 w-2.5" /> PLUS
+                          </div>
+                        ) : (
+                          <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                            <FluentEmoji emoji="🔥" size={10} /> FREE
                           </div>
                         )}
                       </div>
