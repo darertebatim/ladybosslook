@@ -824,7 +824,7 @@ const AppTaskCreate = ({
       await createTask.mutateAsync(taskData);
     }
 
-    navigate('/app/home');
+    navigate(-1);
   };
 
   const handleDelete = async () => {
@@ -832,7 +832,7 @@ const AppTaskCreate = ({
     
     if (confirm('Delete this task?')) {
       await deleteTask.mutateAsync(taskId);
-      navigate('/app/home');
+      navigate(-1);
     }
   };
 
@@ -840,7 +840,7 @@ const AppTaskCreate = ({
     if (isSheet && onSheetOpenChange) {
       onSheetOpenChange(false);
     } else {
-      navigate('/app/home');
+      navigate(-1);
     }
   };
 
