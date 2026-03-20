@@ -119,6 +119,7 @@ export interface TaskFormData {
   goalType: 'timer' | 'count';
   goalTarget: number;
   goalUnit: string;
+  durationMinutes?: number | null;
 }
 
 // Playlist type for the picker
