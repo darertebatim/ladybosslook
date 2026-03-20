@@ -1,20 +1,39 @@
 
 
-## Rearchitect: User-Owned Routines + Focus Player Sync (Completed)
+## Plan: Auto-insert Routine Pro-Task in Edit Routine Sheet
 
-### Architecture Change
-- `user_routines_bank` now stores copied metadata (title, emoji, cover_image_url, category, color, schedule_type, is_focus)
-- `user_tasks.source_routine_id` is always set when adding any routine (not just projects)
-- Focus Routines page reads from `user_routines_bank` + `user_tasks` — no more bank template lookups
-- Player uses real `user_tasks.id` for completions — no more title-matching hacks
+### What
+When a user opens the Edit Routine sheet and the routine has **more than 1 task**, automatically insert a "▶️ Play Routine" pro-task as the first item. It's selected by default but users can toggle it off. Single-task routines (like adding individual tools) are excluded.
 
-### Database Migrations
-1. Added metadata columns to `user_routines_bank` (title, emoji, cover_image_url, category, color, schedule_type, is_focus)
-2. Backfilled existing records from `routines_bank`
-3. Backfilled `source_routine_id` on `user_tasks` for existing routine tasks
+### How
 
-### Files Modified
-- `src/hooks/useRoutinesBank.tsx` — Always set `source_routine_id`, copy metadata on upsert
-- `src/pages/app/AppFocusRoutines.tsx` — Full rewrite: reads from user-owned data
-- `src/hooks/useUserChallenges.tsx` — Uses `source_routine_id` instead of title-matching
-- `src/hooks/useProjectStepUnlock.ts` — Reads routine info from `user_routines_bank`
+**File: `src/components/app/RoutinePreviewSheet.tsx`**
+
+1. **Accept new props**: `routineBankId` (the routine's bank ID) passed from parent pages.
+
+2. **Generate a synthetic pro-task**: When `tasks.length > 1`, create a synthetic `RoutinePlanTask` at the top of the list:
+   - ID: `__pro_task_routine__` (synthetic, distinguishable)
+   - Title: `"▶️ ${routineTitle}"` (or use the routine title with a Play emoji)
+   - Icon: `▶️`
+   - `pro_link_type`: `'routine'`
+   - `pro_link_value`: the routine bank ID
+   - `repeat_pattern`: `'daily'`
+
+3. **Merge into task list**: Use `useMemo` to prepend the synthetic task to the real tasks array. It participates in the same selection/toggle logic as other tasks.
+
+4. **Visual distinction**: Render the pro-task card with a subtle "Routine Launcher" label or a distinct style (e.g., a play icon badge) so users understand it opens the routine player.
+
+5. **On save**: The synthetic pro-task flows through the existing `onSave(selectedTaskIds, editedTasks)` pipeline. The parent (`AppInspireDetail`, etc.) already handles `pro_link_type: 'routine'` tasks — no changes needed there.
+
+**File: `src/pages/app/AppInspireDetail.tsx`**
+- Pass `routineBankId={routine.id}` to `RoutinePreviewSheet`.
+
+**Files with other RoutinePreviewSheet usages** (AppRoutinePlayer, AppReflections, AppAudioPlayer, AppChannelsList):
+- These pass single synthetic tasks, so no `routineBankId` → pro-task won't appear (tasks.length ≤ 1 guard).
+
+### Technical Details
+
+- The synthetic task ID uses a `__pro_task_` prefix to avoid collision with real UUIDs
+- The `tasks.length > 1` check on the **original** tasks array (before prepending) ensures single-tool additions are excluded
+- The pro-task is included in `selectedTaskIds` by default via the existing `useEffect` sync
+
