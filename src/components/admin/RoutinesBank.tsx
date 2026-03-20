@@ -2117,7 +2117,7 @@ export default function RoutinesBank() {
                             {weeklyTasks.length === 0 && (
                               <p className="text-center text-muted-foreground text-xs py-2">No weekly actions</p>
                             )}
-                            {weeklyTasks.map((task, tIdx) => renderTaskRow(task, tIdx, weeklyTasks.length, null))}
+                            {renderSortableList(weeklyTasks, null)}
                           </div>
                         </div>
 
