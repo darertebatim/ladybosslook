@@ -830,7 +830,11 @@ const AppTaskCreate = ({
       await createTask.mutateAsync(taskData);
     }
 
-    navigate(-1);
+    if (isSheet && onSheetOpenChange) {
+      onSheetOpenChange(false);
+    } else {
+      navigate(-1);
+    }
   };
 
   const handleDelete = async () => {
