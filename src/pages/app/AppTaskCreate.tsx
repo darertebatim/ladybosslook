@@ -1402,7 +1402,7 @@ const AppTaskCreate = ({
               Clear
             </button>
           </div>
-          <div className="px-5 pt-4 pb-6 overflow-y-auto h-[calc(50vh-56px)]">
+          <div className="px-5 pt-4 pb-6 overflow-y-auto">
             {/* History average banner */}
             {durationHistory && (
               <button
