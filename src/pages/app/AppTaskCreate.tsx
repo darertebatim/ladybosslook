@@ -417,8 +417,12 @@ const AppTaskCreate = ({
     target: initialData?.goalTarget ?? (urlGoalTarget ? parseInt(urlGoalTarget) : 2),
     unit: initialData?.goalUnit ?? urlGoalUnit ?? 'times',
   });
+  
+  // Duration estimate (minutes) for smart estimate in routine player
+  const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
+  const [showDurationPicker, setShowDurationPicker] = useState(false);
 
-  // Sheet states
+
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
