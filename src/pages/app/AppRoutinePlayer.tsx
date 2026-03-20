@@ -328,24 +328,31 @@ export default function AppRoutinePlayer() {
     enabled: !!user,
   });
 
-  // Fetch user_task IDs for all routines
+  // Fetch user_task IDs (with schedule info) for all routines
   const { data: userTasksByRoutine } = useQuery({
     queryKey: ['routine-user-task-ids', user?.id, routineIds],
     queryFn: async () => {
       if (!user || routineIds.length === 0) return {};
       const { data } = await supabase
         .from('user_tasks')
-        .select('id, source_routine_id, title')
+        .select('id, source_routine_id, title, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date')
         .eq('user_id', user.id)
         .eq('is_active', true)
         .in('source_routine_id', routineIds);
 
-      const map: Record<string, string[]> = {};
+      const map: Record<string, { id: string; scheduled_date: string | null; repeat_pattern: string; repeat_days: number[] | null; created_at: string; repeat_end_date: string | null }[]> = {};
       (data || []).forEach((t: any) => {
         const rid = t.source_routine_id;
         if (!rid) return;
         if (!map[rid]) map[rid] = [];
-        map[rid].push(t.id);
+        map[rid].push({
+          id: t.id,
+          scheduled_date: t.scheduled_date,
+          repeat_pattern: t.repeat_pattern,
+          repeat_days: t.repeat_days,
+          created_at: t.created_at,
+          repeat_end_date: t.repeat_end_date,
+        });
       });
       return map;
     },
@@ -355,7 +362,7 @@ export default function AppRoutinePlayer() {
   // Fetch today's task_completions for all focus routine tasks
   const allUserTaskIds = useMemo(() => {
     if (!userTasksByRoutine) return [];
-    return Object.values(userTasksByRoutine).flat();
+    return Object.values(userTasksByRoutine).flat().map(t => t.id);
   }, [userTasksByRoutine]);
 
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
@@ -375,13 +382,15 @@ export default function AppRoutinePlayer() {
     enabled: !!user && allUserTaskIds.length > 0,
   });
 
-  // Progress based on real planner completions
+  // Progress based on real planner completions — only count tasks scheduled for today
   const getCompletionInfo = (routineId: string) => {
-    const taskIds = userTasksByRoutine?.[routineId];
-    if (!taskIds || taskIds.length === 0) return null;
-    const completed = taskIds.filter(id => todayCompletions?.has(id)).length;
+    const tasks = userTasksByRoutine?.[routineId];
+    if (!tasks || tasks.length === 0) return null;
+    const todayTasks = tasks.filter(t => taskAppliesToDate(t, todayStr));
+    if (todayTasks.length === 0) return null;
+    const completed = todayTasks.filter(t => todayCompletions?.has(t.id)).length;
     if (completed === 0) return null;
-    const pct = Math.round((completed / taskIds.length) * 100);
+    const pct = Math.round((completed / todayTasks.length) * 100);
     return { pct, isComplete: pct === 100 };
   };
 
