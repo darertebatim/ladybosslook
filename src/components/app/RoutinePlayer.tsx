@@ -365,7 +365,7 @@ export const RoutinePlayer = memo(function RoutinePlayer({
               {isPaused ? (
                 <>
                   <p className="text-[42px] font-extrabold text-foreground/25 tracking-tight tabular-nums leading-none">
-                    {isCountUp ? formatTime(overtimeSeconds) : formatTime(Math.max(0, timeLeft))}
+                    {isCountUp ? formatTime(countUpElapsed) : formatTime(Math.max(0, timeLeft))}
                   </p>
                   <p className="text-xs text-foreground/30 mt-1.5 font-medium">Paused</p>
                 </>
