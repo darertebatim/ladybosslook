@@ -3060,6 +3060,7 @@ export type Database = {
           task_emoji: string | null
           task_order: number | null
           task_title: string
+          user_task_id: string | null
         }
         Insert: {
           actual_seconds?: number | null
@@ -3071,6 +3072,7 @@ export type Database = {
           task_emoji?: string | null
           task_order?: number | null
           task_title: string
+          user_task_id?: string | null
         }
         Update: {
           actual_seconds?: number | null
@@ -3082,6 +3084,7 @@ export type Database = {
           task_emoji?: string | null
           task_order?: number | null
           task_title?: string
+          user_task_id?: string | null
         }
         Relationships: [
           {
@@ -3089,6 +3092,13 @@ export type Database = {
             columns: ["session_id"]
             isOneToOne: false
             referencedRelation: "routine_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "routine_session_tasks_user_task_id_fkey"
+            columns: ["user_task_id"]
+            isOneToOne: false
+            referencedRelation: "user_tasks"
             referencedColumns: ["id"]
           },
         ]

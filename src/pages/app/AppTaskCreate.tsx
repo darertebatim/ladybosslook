@@ -421,9 +421,38 @@ const AppTaskCreate = ({
   
   // Duration estimate (minutes) for smart estimate in routine player
   const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
+  const [useHistoryDuration, setUseHistoryDuration] = useState(false);
   const [showDurationPicker, setShowDurationPicker] = useState(false);
   const [showCustomDurationKeypad, setShowCustomDurationKeypad] = useState(false);
   const [customDurationValue, setCustomDurationValue] = useState('');
+
+  // Query routine player history for this task's average duration
+  const { data: durationHistory } = useQuery({
+    queryKey: ['task-duration-history', taskId],
+    queryFn: async () => {
+      if (!taskId) return null;
+      const { data } = await supabase
+        .rpc('get_task_duration_avg' as any, { p_task_id: taskId }) as any;
+      
+      // Fallback: direct query with type cast
+      if (!data) {
+        const { data: rows } = await (supabase
+          .from('routine_session_tasks' as any)
+          .select('actual_seconds')
+          .eq('user_task_id', taskId)
+          .eq('status', 'completed')
+          .not('actual_seconds', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(20) as any);
+        
+        if (!rows || rows.length < 3) return null;
+        const avgSeconds = rows.reduce((sum: number, r: any) => sum + (r.actual_seconds || 0), 0) / rows.length;
+        return { avgMinutes: Math.max(1, Math.round(avgSeconds / 60)), count: rows.length };
+      }
+      return data;
+    },
+    enabled: !!taskId,
+  });
 
 
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -1082,7 +1111,11 @@ const AppTaskCreate = ({
             <span className="font-medium text-black">Duration</span>
           </div>
           <div className="flex items-center gap-2 text-black">
-            <span>{durationMinutes ? `${durationMinutes} min` : 'Not set'}</span>
+            <span>
+              {durationMinutes 
+                ? `${durationMinutes} min${useHistoryDuration ? ' (avg)' : ''}` 
+                : 'Not set'}
+            </span>
             <ChevronRight className="h-4 w-4 text-black" />
           </div>
         </button>
@@ -1353,7 +1386,7 @@ const AppTaskCreate = ({
 
       {/* Duration Picker Sheet */}
       <Sheet open={showDurationPicker} onOpenChange={setShowDurationPicker}>
-        <SheetContent side="bottom" className="h-[50vh] rounded-t-3xl" hideCloseButton>
+        <SheetContent side="bottom" className="h-auto max-h-[65vh] rounded-t-3xl" hideCloseButton>
           <div className="flex items-center justify-between px-4 py-3 border-b">
             <button onClick={() => setShowDurationPicker(false)} className="p-2 -ml-2">
               <X className="h-5 w-5" />
@@ -1369,7 +1402,48 @@ const AppTaskCreate = ({
               Clear
             </button>
           </div>
-          <div className="px-5 pt-4 pb-6 overflow-y-auto h-[calc(50vh-56px)]">
+          <div className="px-5 pt-4 pb-6 overflow-y-auto">
+            {/* History average banner */}
+            {durationHistory && (
+              <button
+                onClick={() => {
+                  const newVal = !useHistoryDuration;
+                  setUseHistoryDuration(newVal);
+                  if (newVal) {
+                    setDurationMinutes(durationHistory.avgMinutes);
+                  }
+                }}
+                className={cn(
+                  "w-full flex items-center justify-between px-4 py-3 rounded-2xl mb-4 transition-all border-2",
+                  useHistoryDuration
+                    ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-400"
+                    : "bg-muted/30 border-transparent"
+                )}
+              >
+                <div className="flex items-center gap-2.5 text-left">
+                  <span className="text-lg">⏱️</span>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      Avg from history: <span className="tabular-nums font-bold">{durationHistory.avgMinutes} min</span>
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">
+                      Based on {durationHistory.count} routine sessions
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={useHistoryDuration}
+                  onCheckedChange={(checked) => {
+                    setUseHistoryDuration(checked);
+                    if (checked) {
+                      setDurationMinutes(durationHistory.avgMinutes);
+                    }
+                  }}
+                  className="pointer-events-none"
+                />
+              </button>
+            )}
+
             <p className="text-xs text-muted-foreground text-center mb-4">
               Countdown estimate for the Routine Player
             </p>
@@ -1379,6 +1453,7 @@ const AppTaskCreate = ({
                   key={mins}
                   onClick={() => {
                     setDurationMinutes(mins);
+                    setUseHistoryDuration(false);
                     setShowDurationPicker(false);
                   }}
                   className={cn(
@@ -1420,6 +1495,7 @@ const AppTaskCreate = ({
             const num = parseInt(customDurationValue) || 0;
             if (num > 0 && num <= 480) {
               setDurationMinutes(num);
+              setUseHistoryDuration(false);
               setShowDurationPicker(false);
             }
           } else {
@@ -1435,6 +1511,7 @@ const AppTaskCreate = ({
           const num = parseInt(customDurationValue) || 0;
           if (num > 0 && num <= 480) {
             setDurationMinutes(num);
+            setUseHistoryDuration(false);
             setShowDurationPicker(false);
           }
           setShowCustomDurationKeypad(false);
