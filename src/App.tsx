@@ -57,7 +57,7 @@ const AppPlaylistDetail = lazy(() => import("@/pages/app/AppPlaylistDetail"));
 const AppAudioPlayer = lazy(() => import("@/pages/app/AppAudioPlayer"));
 const AppChat = lazy(() => import("@/pages/app/AppChat"));
 const AppCoachChat = lazy(() => import("@/pages/app/AppCoachChat"));
-const AppChannelsList = lazy(() => import("@/pages/app/AppChannelsList"));
+// AppChannelsList eagerly imported above
 const AppChannelDetail = lazy(() => import("@/pages/app/AppChannelDetail"));
 const AppFeedPost = lazy(() => import("@/pages/app/AppFeedPost"));
 const AppJournal = lazy(() => import("@/pages/app/AppJournal"));
