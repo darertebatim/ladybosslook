@@ -432,19 +432,24 @@ const AppTaskCreate = ({
     queryFn: async () => {
       if (!taskId) return null;
       const { data } = await supabase
-        .from('routine_session_tasks')
-        .select('actual_seconds')
-        .eq('user_task_id' as any, taskId)
-        .eq('status', 'completed')
-        .not('actual_seconds', 'is', null)
-        .order('created_at', { ascending: false })
-        .limit(20);
+        .rpc('get_task_duration_avg' as any, { p_task_id: taskId }) as any;
       
-      if (!data || data.length < 3) return null;
-      
-      const avgSeconds = data.reduce((sum, r) => sum + (r.actual_seconds || 0), 0) / data.length;
-      const avgMinutes = Math.round(avgSeconds / 60);
-      return { avgMinutes: Math.max(1, avgMinutes), count: data.length };
+      // Fallback: direct query with type cast
+      if (!data) {
+        const { data: rows } = await (supabase
+          .from('routine_session_tasks' as any)
+          .select('actual_seconds')
+          .eq('user_task_id', taskId)
+          .eq('status', 'completed')
+          .not('actual_seconds', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(20) as any);
+        
+        if (!rows || rows.length < 3) return null;
+        const avgSeconds = rows.reduce((sum: number, r: any) => sum + (r.actual_seconds || 0), 0) / rows.length;
+        return { avgMinutes: Math.max(1, Math.round(avgSeconds / 60)), count: rows.length };
+      }
+      return data;
     },
     enabled: !!taskId,
   });
