@@ -215,6 +215,24 @@ export default function AppRoutinePlayer() {
   // Check if routine player page is already added as a task
   const { data: isPageAdded } = useExistingProTask('route', '/app/routineplayer');
 
+  // Check which individual routines are already added to planner
+  const { data: addedRoutineIdsData } = useQuery({
+    queryKey: ['added-routine-tasks', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('user_tasks')
+        .select('pro_link_value')
+        .eq('user_id', user.id)
+        .eq('pro_link_type', 'routine')
+        .eq('is_active', true);
+      if (error) return [];
+      return (data || []).map(t => t.pro_link_value).filter(Boolean) as string[];
+    },
+    enabled: !!user,
+  });
+  const addedRoutineIds = useMemo(() => new Set(addedRoutineIdsData || []), [addedRoutineIdsData]);
+
   // Category slug → name map
   const { data: routineCategories = [] } = useRoutineBankCategories();
   const categoryNameMap = useMemo(() => {
