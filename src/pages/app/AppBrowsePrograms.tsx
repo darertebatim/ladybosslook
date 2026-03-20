@@ -379,6 +379,7 @@ const AppBrowsePrograms = () => {
 
       {/* Scrollable Content */}
       <div
+        ref={academyScrollRef}
         className="flex-1 overflow-y-auto overscroll-contain relative z-10"
         onScroll={handleScroll}
         style={{

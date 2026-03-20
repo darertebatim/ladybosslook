@@ -28,6 +28,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { useFeaturedRoutinesBank, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 import { haptic } from '@/lib/haptics';
+import { useScrollRestore } from '@/hooks/useScrollRestore';
 import { isWaterTask } from '@/lib/waterTracking';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { FastingStatusCard } from '@/components/app/FastingStatusCard';
