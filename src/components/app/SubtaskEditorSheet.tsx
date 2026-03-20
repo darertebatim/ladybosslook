@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useId } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -65,13 +65,17 @@ const SortableSubtaskRow = ({
   );
 };
 
+type SubtaskItem = { id: string; title: string };
+let subtaskIdCounter = 0;
+const makeSubtaskItem = (title: string): SubtaskItem => ({ id: `si-${++subtaskIdCounter}`, title });
+
 const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
   open,
   onOpenChange,
   subtasks: initialSubtasks,
   onSave,
 }) => {
-  const [localSubtasks, setLocalSubtasks] = useState<string[]>([]);
+  const [items, setItems] = useState<SubtaskItem[]>([]);
   const [newSubtask, setNewSubtask] = useState('');
   const [activeId, setActiveId] = useState<string | null>(null);
   const newInputRef = useRef<HTMLInputElement>(null);
@@ -80,9 +84,8 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
   // Sync on open
   useEffect(() => {
     if (open) {
-      setLocalSubtasks([...initialSubtasks]);
+      setItems(initialSubtasks.map(makeSubtaskItem));
       setNewSubtask('');
-      // Auto-focus the input after sheet animation completes
       setTimeout(() => newInputRef.current?.focus(), 400);
     }
   }, [open, initialSubtasks]);
@@ -101,33 +104,33 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
     const { active, over } = event;
     setActiveId(null);
     if (!over || active.id === over.id) return;
-    const oldIndex = localSubtasks.findIndex((_, i) => `st-${i}` === active.id);
-    const newIndex = localSubtasks.findIndex((_, i) => `st-${i}` === over.id);
+    const oldIndex = items.findIndex(item => item.id === active.id);
+    const newIndex = items.findIndex(item => item.id === over.id);
     if (oldIndex !== -1 && newIndex !== -1) {
-      setLocalSubtasks(arrayMove(localSubtasks, oldIndex, newIndex));
+      setItems(arrayMove(items, oldIndex, newIndex));
       haptic.light();
     }
-  }, [localSubtasks]);
+  }, [items]);
 
   const addSubtask = () => {
     if (newSubtask.trim()) {
-      setLocalSubtasks(prev => [...prev, newSubtask.trim()]);
+      setItems(prev => [...prev, makeSubtaskItem(newSubtask.trim())]);
       setNewSubtask('');
       setTimeout(() => newInputRef.current?.focus(), 50);
     }
   };
 
-  const removeSubtask = (index: number) => {
-    setLocalSubtasks(prev => prev.filter((_, i) => i !== index));
+  const removeSubtask = (id: string) => {
+    setItems(prev => prev.filter(item => item.id !== id));
     haptic.light();
   };
 
-  const updateSubtask = (index: number, value: string) => {
-    setLocalSubtasks(prev => prev.map((s, i) => i === index ? value : s));
+  const updateSubtask = (id: string, value: string) => {
+    setItems(prev => prev.map(item => item.id === id ? { ...item, title: value } : item));
   };
 
   const handleSave = () => {
-    onSave(localSubtasks.filter(s => s.trim()));
+    onSave(items.map(i => i.title).filter(s => s.trim()));
     onOpenChange(false);
   };
 
@@ -169,7 +172,7 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
           </div>
 
           {/* Subtitle */}
-          {localSubtasks.length === 0 && (
+          {items.length === 0 && (
             <p className="text-center text-sm text-muted-foreground px-6 py-6">
               Subtasks can be set as your daily routine or checklist
             </p>
@@ -183,14 +186,14 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
             >
-              <SortableContext items={localSubtasks.map((_, i) => `st-${i}`)} strategy={verticalListSortingStrategy}>
-                {localSubtasks.map((subtask, index) => (
+              <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
+                {items.map((item, index) => (
                   <SortableSubtaskRow
-                    key={`st-${index}`}
-                    id={`st-${index}`}
-                    value={subtask}
-                    onRemove={() => removeSubtask(index)}
-                    onChange={(val) => updateSubtask(index, val)}
+                    key={item.id}
+                    id={item.id}
+                    value={item.title}
+                    onRemove={() => removeSubtask(item.id)}
+                    onChange={(val) => updateSubtask(item.id, val)}
                     inputRef={(el) => { itemRefs.current[index] = el; }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
@@ -204,12 +207,12 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
 
               <DragOverlay>
                 {activeId ? (() => {
-                  const idx = localSubtasks.findIndex((_, i) => `st-${i}` === activeId);
-                  return idx !== -1 ? (
-                    <div className="opacity-90 scale-105 shadow-2xl rounded-xl bg-white dark:bg-slate-800 flex items-center gap-2 px-4 py-3">
+                  const item = items.find(i => i.id === activeId);
+                  return item ? (
+                    <div className="opacity-90 scale-105 shadow-2xl rounded-xl bg-background flex items-center gap-2 px-4 py-3">
                       <GripVertical className="h-4 w-4 text-muted-foreground/40" />
                       <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30 shrink-0" />
-                      <span className="flex-1 text-base">{localSubtasks[idx]}</span>
+                      <span className="flex-1 text-base">{item.title}</span>
                     </div>
                   ) : null;
                 })() : null}
