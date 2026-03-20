@@ -413,6 +413,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
     const trimmed = title.trim();
     if (!trimmed) return;
     const variant = QUICK_ADD_VARIANTS[taskCount % QUICK_ADD_VARIANTS.length];
+    const qp = getQuickParams();
     haptic.medium();
     createTask.mutate({
       title: trimmed,
@@ -420,6 +421,9 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
       emoji: variant.emoji,
       color: variant.color,
       order_index: -1,
+      ...(qp.time_period ? { time_period: qp.time_period } : {}),
+      ...(qp.repeat_pattern ? { repeat_pattern: qp.repeat_pattern as any } : {}),
+      ...(qp.repeat_days ? { repeat_days: JSON.parse(qp.repeat_days) } : {}),
     });
     setTitle('');
     handleClose();
