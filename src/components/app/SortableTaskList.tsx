@@ -434,8 +434,10 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
     const trimmed = title.trim();
     if (!trimmed) return;
     haptic.light();
+    const qp = getQuickParams();
+    const urlParams = new URLSearchParams({ name: trimmed, ...Object.fromEntries(Object.entries(qp).map(([k, v]) => [k, typeof v === 'object' ? JSON.stringify(v) : String(v)])) });
     handleClose();
-    navigate(`/app/home/new?name=${encodeURIComponent(trimmed)}`);
+    navigate(`/app/home/new?${urlParams.toString()}`);
   };
 
   const handleTemplateSelect = (template: TaskTemplate) => {
