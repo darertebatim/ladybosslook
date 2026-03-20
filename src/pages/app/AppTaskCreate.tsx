@@ -960,7 +960,7 @@ const AppTaskCreate = ({
   const content = (
     <div className="min-h-full transition-colors duration-300" style={{ backgroundColor: bgColor }}>
       {/* Task Icon & Name - Compact inline layout */}
-      <div className="flex items-center gap-3 pt-5 pb-3 px-4">
+      <div className="flex items-center gap-3 pt-2 pb-3 px-4">
         <button
           onClick={() => setShowIconPicker(true)}
           className="relative flex-shrink-0 active:scale-95 transition-transform"
