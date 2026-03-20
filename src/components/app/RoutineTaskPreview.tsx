@@ -70,7 +70,10 @@ export const RoutineTaskPreview = memo(function RoutineTaskPreview({ routineId }
   const overflow = tasks.length - MAX_EMOJIS;
 
   return (
-    <div className="flex items-center gap-1 mt-0.5">
+    <div className="flex items-center gap-1.5 mt-0.5">
+      <span className="text-[10px] font-semibold text-secondary-foreground bg-secondary rounded px-1.5 py-0.5 leading-none whitespace-nowrap">
+        Routine:
+      </span>
       {visible.map((task, i) => (
         <span key={i} className="flex items-center">
           <span className="w-7 h-7 rounded-full bg-background/60 flex items-center justify-center">
