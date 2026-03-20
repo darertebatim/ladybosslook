@@ -842,7 +842,11 @@ const AppTaskCreate = ({
     
     if (confirm('Delete this task?')) {
       await deleteTask.mutateAsync(taskId);
-      navigate(-1);
+      if (isSheet && onSheetOpenChange) {
+        onSheetOpenChange(false);
+      } else {
+        navigate(-1);
+      }
     }
   };
 
