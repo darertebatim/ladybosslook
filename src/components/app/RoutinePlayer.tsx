@@ -216,6 +216,7 @@ export const RoutinePlayer = memo(function RoutinePlayer({
 
   const nextTask = config.tasks[currentTaskIndex + 1] || null;
   const isCountUp = (currentTask as any)?.hasTimerGoal === false;
+  const countUpElapsed = currentTask ? (currentTask.targetSeconds - timeLeft) : 0;
   const proLinkType = (currentTask as any)?.proLinkType as ProLinkType | null;
   const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
   const progressPercent = currentTask
@@ -364,14 +365,14 @@ export const RoutinePlayer = memo(function RoutinePlayer({
               {isPaused ? (
                 <>
                   <p className="text-[42px] font-extrabold text-foreground/25 tracking-tight tabular-nums leading-none">
-                    {isCountUp ? formatTime(overtimeSeconds) : formatTime(Math.max(0, timeLeft))}
+                    {isCountUp ? formatTime(countUpElapsed) : formatTime(Math.max(0, timeLeft))}
                   </p>
                   <p className="text-xs text-foreground/30 mt-1.5 font-medium">Paused</p>
                 </>
               ) : isCountUp ? (
                 <>
                   <p className="text-[42px] font-extrabold text-foreground tracking-tight tabular-nums leading-none">
-                    {formatTime(overtimeSeconds)}
+                    {formatTime(countUpElapsed)}
                   </p>
                   <button
                     onClick={() => { haptic.light(); setShowNotifySheet(true); }}
