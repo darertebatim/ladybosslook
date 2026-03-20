@@ -1348,6 +1348,53 @@ const AppTaskCreate = ({
         }}
       />
 
+      {/* Duration Picker Sheet */}
+      <Sheet open={showDurationPicker} onOpenChange={setShowDurationPicker}>
+        <SheetContent side="bottom" className="h-auto rounded-t-3xl" hideCloseButton>
+          <div className="flex items-center justify-between px-4 py-3 border-b">
+            <button onClick={() => setShowDurationPicker(false)} className="p-2 -ml-2">
+              <X className="h-5 w-5" />
+            </button>
+            <span className="text-base font-medium">Estimated Duration</span>
+            <div className="w-9" />
+          </div>
+          <div className="px-6 py-4 space-y-2">
+            <p className="text-xs text-muted-foreground mb-3">
+              Used as countdown estimate in the Routine Player. Timer will continue into overtime when reached.
+            </p>
+            {[
+              { label: 'Not set', value: null },
+              { label: '1 min', value: 1 },
+              { label: '2 min', value: 2 },
+              { label: '3 min', value: 3 },
+              { label: '5 min', value: 5 },
+              { label: '10 min', value: 10 },
+              { label: '15 min', value: 15 },
+              { label: '20 min', value: 20 },
+              { label: '30 min', value: 30 },
+              { label: '45 min', value: 45 },
+              { label: '60 min', value: 60 },
+            ].map(opt => (
+              <button
+                key={opt.label}
+                onClick={() => {
+                  setDurationMinutes(opt.value);
+                  setShowDurationPicker(false);
+                }}
+                className={cn(
+                  "w-full py-3 px-4 rounded-2xl text-left font-medium transition-all",
+                  durationMinutes === opt.value
+                    ? "bg-primary/10 text-primary"
+                    : "text-foreground active:bg-muted/50"
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
+
       {/* Repeat Picker Sheet - Me+ Style Bottom Sheet */}
       <Sheet open={showRepeatPicker} onOpenChange={setShowRepeatPicker}>
         <SheetContent side="bottom" className="h-auto rounded-t-3xl" hideCloseButton>
