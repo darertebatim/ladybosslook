@@ -12,18 +12,20 @@ export default function AppRoutineCategory() {
   const isChallenges = categorySlug === 'challenges';
   const isProjects = categorySlug === 'projects';
   const isReset = categorySlug === 'reset';
-  const { data: routines, isLoading } = useRoutinesBank(isChallenges || isProjects || isReset ? undefined : categorySlug);
+  const isPopular = categorySlug === 'popular';
+  const { data: routines, isLoading } = useRoutinesBank(isChallenges || isProjects || isReset || isPopular ? undefined : categorySlug);
 
   const category = categories?.find(c => c.slug === categorySlug);
-  const title = isChallenges ? 'Challenges' : isProjects ? 'Projects' : isReset ? 'Reset' : (category?.name || 'Routines');
+  const title = isChallenges ? 'Challenges' : isProjects ? 'Projects' : isReset ? 'Reset' : isPopular ? 'Popular' : (category?.name || 'Routines');
 
   const displayedRoutines = useMemo(() => {
     if (!routines) return [];
     if (isChallenges) return routines.filter(r => r.schedule_type === 'challenge');
     if (isProjects) return routines.filter(r => r.schedule_type === 'project');
     if (isReset) return routines.filter(r => (r as any).is_focus === true);
+    if (isPopular) return routines.filter(r => r.is_popular === true);
     return routines;
-  }, [routines, isChallenges, isProjects, isReset]);
+  }, [routines, isChallenges, isProjects, isReset, isPopular]);
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
