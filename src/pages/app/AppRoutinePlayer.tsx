@@ -381,7 +381,7 @@ export default function AppRoutinePlayer() {
         .select('source_routine_id, title, emoji, order_index')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .neq('pro_link_type', 'routine')
+        .or('pro_link_type.is.null,pro_link_type.neq.routine')
         .in('source_routine_id', routineIds)
         .order('order_index', { ascending: true });
 
