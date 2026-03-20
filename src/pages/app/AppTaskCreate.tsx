@@ -996,7 +996,7 @@ const AppTaskCreate = ({
               key={c.name}
               onClick={() => setColor(c.name)}
               className={cn(
-                'w-11 h-11 rounded-full transition-all flex items-center justify-center border-[3px]',
+                'w-10 h-10 rounded-full transition-all flex items-center justify-center border-[3px]',
                 color === c.name ? 'border-white ring-2 ring-white' : 'border-white'
               )}
               style={{ backgroundColor: c.hex }}
