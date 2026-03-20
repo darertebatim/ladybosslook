@@ -216,6 +216,7 @@ export const RoutinePlayer = memo(function RoutinePlayer({
 
   const nextTask = config.tasks[currentTaskIndex + 1] || null;
   const isCountUp = (currentTask as any)?.hasTimerGoal === false;
+  const countUpElapsed = currentTask ? (currentTask.targetSeconds - timeLeft) : 0;
   const proLinkType = (currentTask as any)?.proLinkType as ProLinkType | null;
   const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
   const progressPercent = currentTask
