@@ -126,12 +126,12 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
         side="bottom" 
-        className="h-auto max-h-[80vh] rounded-t-3xl px-0 pt-0 pb-0 border-0"
+        className="h-[70vh] rounded-t-3xl px-0 pt-0 pb-0 border-0"
         hideCloseButton
       >
-        <div className="flex flex-col">
+        <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 pt-4 pb-2">
+          <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
             <button onClick={() => onOpenChange(false)} className="p-2 -ml-2">
               <X className="h-5 w-5" />
             </button>
@@ -145,13 +145,29 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
             </Button>
           </div>
 
-          {/* Subtitle */}
-          <p className="text-center text-sm text-muted-foreground px-6 pb-3">
-            Subtasks can be set as your daily routine or checklist
-          </p>
+          {/* Add new subtask input - pinned at top for keyboard visibility */}
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-muted/20 flex-shrink-0">
+            <Plus className="h-5 w-5 text-muted-foreground shrink-0" />
+            <Input
+              ref={newInputRef}
+              value={newSubtask}
+              onChange={(e) => setNewSubtask(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && addSubtask()}
+              placeholder="Add subtask..."
+              className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto text-base placeholder:text-muted-foreground/50"
+              autoFocus
+            />
+          </div>
 
-          {/* Subtask list */}
-          <div className="overflow-y-auto max-h-[50vh]">
+          {/* Subtitle */}
+          {localSubtasks.length === 0 && (
+            <p className="text-center text-sm text-muted-foreground px-6 py-6">
+              Subtasks can be set as your daily routine or checklist
+            </p>
+          )}
+
+          {/* Subtask list - scrollable */}
+          <div className="flex-1 overflow-y-auto overscroll-contain">
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -176,23 +192,10 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
                 ))}
               </SortableContext>
             </DndContext>
-
-            {/* Add new subtask input */}
-            <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-800">
-              <Plus className="h-5 w-5 text-muted-foreground shrink-0" />
-              <Input
-                ref={newInputRef}
-                value={newSubtask}
-                onChange={(e) => setNewSubtask(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && addSubtask()}
-                placeholder="Add subtask..."
-                className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto text-base placeholder:text-muted-foreground/50"
-              />
-            </div>
           </div>
 
           {/* Bottom safe area */}
-          <div style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }} />
+          <div className="flex-shrink-0" style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }} />
         </div>
       </SheetContent>
     </Sheet>
