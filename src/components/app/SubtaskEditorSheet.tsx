@@ -81,6 +81,8 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
     if (open) {
       setLocalSubtasks([...initialSubtasks]);
       setNewSubtask('');
+      // Auto-focus the input after sheet animation completes
+      setTimeout(() => newInputRef.current?.focus(), 400);
     }
   }, [open, initialSubtasks]);
 
