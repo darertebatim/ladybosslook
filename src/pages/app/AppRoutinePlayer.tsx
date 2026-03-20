@@ -6,7 +6,8 @@ import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2, CalendarPlu
 import { useQueryClient } from '@tanstack/react-query';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
-import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
+import { useRoutineBankCategories, useFeaturedRoutinesBank } from '@/hooks/useRoutinesBank';
+import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -235,6 +236,7 @@ export default function AppRoutinePlayer() {
 
   // Category slug → name map
   const { data: routineCategories = [] } = useRoutineBankCategories();
+  const { data: featuredRoutines = [] } = useFeaturedRoutinesBank();
   const categoryNameMap = useMemo(() => {
     const map = new Map<string, string>();
     routineCategories.forEach(cat => map.set(cat.slug, cat.name));
@@ -957,6 +959,20 @@ export default function AppRoutinePlayer() {
             >
               Browse Routines Library <ChevronRight className="w-4 h-4" />
             </button>
+
+            {/* Featured Routines */}
+            {featuredRoutines.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-sm font-semibold text-foreground/70 mb-3">Featured</h3>
+                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory">
+                  {featuredRoutines.map((routine) => (
+                    <div key={routine.id} className="shrink-0 w-[85%] snap-start">
+                      <FeaturedRoutineCard routine={routine} categoryName={categoryNameMap.get(routine.category)} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
