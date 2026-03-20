@@ -63,7 +63,19 @@ const AppHome = () => {
     user
   } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [taskFilter, setTaskFilter] = useState<string>('all');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const taskFilter = searchParams.get('filter') || 'all';
+  const setTaskFilter = useCallback((val: string) => {
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (val === 'all') {
+        next.delete('filter');
+      } else {
+        next.set('filter', val);
+      }
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [stepCelebration, setStepCelebration] = useState<{ completedStep: number; newTaskCount: number } | null>(null);
   const [projectCompletion, setProjectCompletion] = useState<{
