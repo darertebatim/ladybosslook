@@ -583,7 +583,8 @@ export default function AppRoutinePlayer() {
     haptic.medium();
 
     // Delete today's completions for this routine's tasks so they can be re-done
-    const taskIds = userTasksByRoutine?.[preStartRoutine.routine_id] || [];
+    const routineTasks = userTasksByRoutine?.[preStartRoutine.routine_id] || [];
+    const taskIds = routineTasks.map(t => t.id);
     if (taskIds.length > 0) {
       await supabase
         .from('task_completions')
