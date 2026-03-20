@@ -152,12 +152,15 @@ export function RoutinePreviewSheet({
   const { showHint: showSaveHint, dismissHint: dismissSaveHint } = useSaveRoutineHint(open);
   const MAX_FREE_ACTIONS = 6;
 
-  // Sync selectedTaskIds when tasks change (e.g., when data loads async)
+  // Sync selectedTaskIds when displayTasks change (e.g., when data loads async or pro-task is added)
   useEffect(() => {
-    if (displayTasks.length > 0 && selectedTaskIds.size === 0) {
-      setSelectedTaskIds(new Set(displayTasks.map(t => t.id)));
+    const allIds = new Set(displayTasks.map(t => t.id));
+    // If any displayTask id is missing from selection, re-sync to select all
+    const missingIds = displayTasks.filter(t => !selectedTaskIds.has(t.id));
+    if (displayTasks.length > 0 && (selectedTaskIds.size === 0 || missingIds.length > 0)) {
+      setSelectedTaskIds(allIds);
     }
-  }, [displayTasks]);
+  }, [displayTasks.length]);
 
   const allSelected = selectedTaskIds.size === displayTasks.length;
 
