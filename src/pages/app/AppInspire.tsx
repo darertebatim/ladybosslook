@@ -22,6 +22,16 @@ export default function AppInspire() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Restore scroll position on mount
+  useEffect(() => {
+    const saved = sessionStorage.getItem('routines_scroll');
+    if (saved && scrollRef.current) {
+      scrollRef.current.scrollTop = parseInt(saved, 10);
+      sessionStorage.removeItem('routines_scroll');
+    }
+  }, []);
 
   const handleTourReady = useCallback((tourStart: () => void) => {
     setStartTour(() => tourStart);
