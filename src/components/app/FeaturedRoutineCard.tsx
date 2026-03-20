@@ -119,8 +119,8 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
           {/* Badge */}
           <div className="flex items-center gap-1.5 mt-0.5">
             {routine.is_free ? (
-              <Badge className="rounded-full text-[10px] px-1.5 py-0 shadow-sm h-4 font-semibold text-black border-0" style={{ backgroundColor: '#E8F5A3' }}>
-                FREE
+              <Badge className="rounded-full text-[10px] px-1.5 py-0 shadow-sm h-4 font-semibold text-black border-0 flex items-center gap-0.5" style={{ backgroundColor: '#E8F5A3' }}>
+                <FluentEmoji emoji="🔥" size={10} /> FREE
               </Badge>
             ) : (
               <Badge className="bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-[10px] px-1.5 py-0 gap-0.5 shadow-sm h-4">
