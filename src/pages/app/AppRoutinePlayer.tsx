@@ -738,30 +738,30 @@ export default function AppRoutinePlayer() {
   const launchRoutine = async () => {
     if (!preStartRoutine) return;
 
-    // Fetch smart estimates for non-timer tasks
+    // Fetch smart estimates for tasks
     const estimateInputs: SmartEstimateInput[] = remainingTasks.map(t => ({
       taskTitle: t.title,
-      durationMinutes: (t as any).duration_minutes ?? null,
-      goalType: t.goal_type || null,
-      goalTarget: t.goal_target || null,
+      durationMinutes: t.duration_minutes ?? null,
+      goalType: null,
+      goalTarget: null,
     }));
     const estimates = user ? await fetchSmartEstimates(user.id, estimateInputs) : new Map();
 
     // Build focus player tasks from remaining planner tasks
     const focusTasks = remainingTasks.map(t => {
-      const isTimer = t.goal_type === 'timer';
+      const durationSeconds = t.duration_minutes ? t.duration_minutes * 60 : null;
       const estimate = estimates.get(t.title);
       return {
         id: t.id,
         title: t.title,
         emoji: t.emoji || '📝',
-        targetSeconds: isTimer ? (t.goal_target || 300) : (estimate || 60),
+        targetSeconds: durationSeconds || estimate || 60,
         color: t.color || undefined,
         userTaskId: t.id,
         goalType: t.goal_type || null,
         goalTarget: t.goal_target || null,
-        hasTimerGoal: isTimer,
-        isEstimate: !isTimer,
+        hasTimerGoal: true, // always countdown
+        isEstimate: !durationSeconds,
         proLinkType: t.pro_link_type || null,
         proLinkValue: t.pro_link_value || null,
       };
