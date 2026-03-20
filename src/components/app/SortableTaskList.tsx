@@ -135,6 +135,7 @@ export const SortableTaskList = ({
   onOpenTimer,
   onOpenWaterTracking,
   hideQuickAdd = false,
+  defaultRepeatOverride,
   onOpenTaskSheet,
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
