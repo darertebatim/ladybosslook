@@ -10,14 +10,10 @@ interface RoutineTaskPreviewProps {
   routineId: string;
 }
 
-/**
- * Mini preview row showing routine task emojis + completion percentage.
- * Used inside TaskCard for pro-tasks linked to a routine.
- */
-export const RoutineTaskPreview = memo(function RoutineTaskPreview({ routineId }: RoutineTaskPreviewProps) {
+/** Hook to fetch routine preview data (tasks + completion) */
+function useRoutinePreviewData(routineId: string) {
   const { user } = useAuth();
 
-  // Fetch routine's tasks (emojis)
   const { data: tasks } = useQuery({
     queryKey: ['routine-preview-tasks', routineId, user?.id],
     queryFn: async () => {
@@ -29,14 +25,12 @@ export const RoutineTaskPreview = memo(function RoutineTaskPreview({ routineId }
         .eq('source_routine_id', routineId)
         .eq('is_active', true)
         .order('order_index', { ascending: true });
-      console.log('[RoutineTaskPreview] routineId:', routineId, 'tasks found:', data?.length);
       return (data || []).map((t: any) => ({ emoji: t.emoji || '📝', title: t.title }));
     },
     enabled: !!user && !!routineId,
     staleTime: 60_000,
   });
 
-  // Fetch today's session completion
   const { data: completion } = useQuery({
     queryKey: ['routine-preview-completion', routineId, user?.id],
     queryFn: async () => {
@@ -60,6 +54,15 @@ export const RoutineTaskPreview = memo(function RoutineTaskPreview({ routineId }
     staleTime: 30_000,
   });
 
+  return { tasks, completion };
+}
+
+/**
+ * Emoji chain row shown below the task title.
+ */
+export const RoutineTaskPreview = memo(function RoutineTaskPreview({ routineId }: RoutineTaskPreviewProps) {
+  const { tasks } = useRoutinePreviewData(routineId);
+
   if (!tasks || tasks.length === 0) return null;
 
   const MAX_EMOJIS = 3;
@@ -67,33 +70,43 @@ export const RoutineTaskPreview = memo(function RoutineTaskPreview({ routineId }
   const overflow = tasks.length - MAX_EMOJIS;
 
   return (
-    <div className="flex items-center gap-0.5 mt-0.5">
+    <div className="flex items-center gap-1 mt-0.5">
       {visible.map((task, i) => (
         <span key={i} className="flex items-center">
-          <span className="w-5 h-5 rounded-full bg-background/60 flex items-center justify-center">
-            <FluentEmoji emoji={task.emoji} size={12} />
+          <span className="w-7 h-7 rounded-full bg-background/60 flex items-center justify-center">
+            <FluentEmoji emoji={task.emoji} size={18} />
           </span>
           {i < visible.length - 1 && (
-            <ChevronRight className="w-2 h-2 text-black/40 mx-px" />
+            <ChevronRight className="w-3 h-3 text-black/40 mx-0.5" />
           )}
         </span>
       ))}
       {overflow > 0 && (
         <>
-          <ChevronRight className="w-2 h-2 text-black/40 mx-px" />
-          <span className="w-5 h-5 rounded-full bg-background/60 flex items-center justify-center text-[9px] font-bold text-black/60">
+          <ChevronRight className="w-3 h-3 text-black/40 mx-0.5" />
+          <span className="w-7 h-7 rounded-full bg-background/60 flex items-center justify-center text-[11px] font-bold text-black/60">
             +{overflow}
           </span>
         </>
       )}
-      <span className="flex items-center gap-0.5 ml-1.5 text-[10px] font-semibold text-black/60">
-        {completion?.isComplete ? (
-          <RotateCw className="w-2.5 h-2.5" />
-        ) : (
-          <Play className="w-2.5 h-2.5 fill-current" />
-        )}
-        {completion ? `${completion.pct}%` : ''}
-      </span>
     </div>
+  );
+});
+
+/**
+ * Play button + percentage badge shown under the circle button.
+ */
+export const RoutinePlayBadge = memo(function RoutinePlayBadge({ routineId }: RoutineTaskPreviewProps) {
+  const { completion } = useRoutinePreviewData(routineId);
+
+  return (
+    <span className="flex items-center justify-center gap-0.5 mt-1 text-[11px] font-semibold text-black/50">
+      {completion?.isComplete ? (
+        <RotateCw className="w-3 h-3" />
+      ) : (
+        <Play className="w-3 h-3 fill-current" />
+      )}
+      {completion ? `${completion.pct}%` : ''}
+    </span>
   );
 });
