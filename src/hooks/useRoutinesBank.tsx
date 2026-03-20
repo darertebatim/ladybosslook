@@ -462,7 +462,11 @@ export function useAddRoutineFromBank() {
         });
       }
 
-      // Filter tasks if selectedTaskIds provided
+      // Check if synthetic pro-task is selected
+      const proTaskPrefix = '__pro_task_routine_';
+      const hasProTask = selectedTaskIds?.some(id => id.startsWith(proTaskPrefix)) ?? false;
+      
+      // Filter tasks if selectedTaskIds provided (exclude synthetic IDs)
       let tasks = selectedTaskIds
         ? allTasks?.filter(t => selectedTaskIds.includes(t.id)) || []
         : allTasks || [];
