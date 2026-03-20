@@ -1125,7 +1125,7 @@ const AppHome = () => {
                             Manage My Routines
                           </button>
                           <button
-                            onClick={() => navigate('/app/inspire')}
+                            onClick={() => navigate('/app/routines')}
                             className="flex-1 rounded-3xl py-2.5 bg-card border-2 border-urgency/30 text-[14px] font-semibold text-foreground active:scale-[0.98] transition-all"
                           >
                             Browse Routines Library
@@ -1278,7 +1278,7 @@ const AppHome = () => {
                                   Manage My Routines
                                 </button>
                                 <button
-                                  onClick={() => navigate('/app/inspire')}
+                                  onClick={() => navigate('/app/routines')}
                                   className="flex-1 rounded-3xl py-2.5 bg-card border-2 border-urgency/30 text-[14px] font-semibold text-foreground active:scale-[0.98] transition-all"
                                 >
                                   Browse Routines Library
