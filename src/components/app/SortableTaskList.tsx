@@ -338,11 +338,15 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet }: { date: Date; taskCo
 
   // Listen for external trigger (e.g. FAB button)
   useEffect(() => {
-    const handleOpen = () => {
+    const handleOpen = (e: Event) => {
       const screenH = window.innerHeight;
       const topPx = Math.round(screenH * 0.25);
       setAnchorTop(`${topPx}px`);
       setSuggestionsTop(`${topPx + 220}px`);
+      const detail = (e as CustomEvent).detail;
+      if (detail?.defaultRepeat) {
+        setQuickRepeat(detail.defaultRepeat);
+      }
       setIsOpen(true);
       haptic.light();
     };
