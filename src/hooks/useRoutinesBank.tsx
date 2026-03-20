@@ -623,6 +623,30 @@ export function useAddRoutineFromBank() {
         if (insertError) throw insertError;
       }
 
+      // Insert synthetic pro-task (routine launcher) if selected
+      if (hasProTask) {
+        const proTaskEdited = editedTasks?.find(t => t.id.startsWith(proTaskPrefix));
+        const proTaskOrder = (tasks.length > 0 ? startOrderIndex + tasks.length : startOrderIndex);
+        const { error: proError } = await supabase
+          .from('user_tasks')
+          .insert({
+            user_id: user.id,
+            title: proTaskEdited?.title || routine.title,
+            emoji: proTaskEdited?.icon || '🎬',
+            color: proTaskEdited?.color || 'mint',
+            repeat_pattern: 'daily',
+            tag: routine.category,
+            pro_link_type: 'routine',
+            pro_link_value: routineId,
+            is_active: true,
+            order_index: proTaskOrder,
+            source_routine_id: routineId,
+          });
+        if (proError) {
+          console.error('Error inserting pro-task:', proError);
+        }
+      }
+
       // Track that user added this routine from bank
       const { error: trackError } = await supabase
         .from('user_routines_bank')
