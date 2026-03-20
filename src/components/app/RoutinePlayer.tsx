@@ -636,7 +636,17 @@ export const RoutinePlayer = memo(function RoutinePlayer({
                 Cancel
               </button>
               <button
-                onClick={() => { haptic.medium(); setShowEndDialog(false); onEndRoutineEarly(); }}
+                onClick={() => {
+                  haptic.medium();
+                  setShowEndDialog(false);
+                  // If no tasks were completed yet, cancel entirely instead of showing summary
+                  const hasCompletedTasks = taskResults.length > 0;
+                  if (!hasCompletedTasks) {
+                    onCancel();
+                  } else {
+                    onEndRoutineEarly();
+                  }
+                }}
                 className="flex-1 py-3 rounded-xl bg-foreground text-background font-medium text-sm active:opacity-90"
               >
                 End
