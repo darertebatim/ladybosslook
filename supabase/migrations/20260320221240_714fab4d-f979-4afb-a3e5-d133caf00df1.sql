@@ -1,0 +1,1 @@
+UPDATE user_tasks SET source_routine_id = NULL WHERE pro_link_type = 'routine' AND source_routine_id IS NOT NULL;

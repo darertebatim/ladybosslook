@@ -537,6 +537,14 @@ export default function AppRoutinePlayer() {
         .eq('user_id', user.id)
         .eq('source_routine_id', routine.routine_id);
 
+      // Also delete standalone launcher pro-task (source_routine_id is null)
+      await supabase
+        .from('user_tasks')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('pro_link_type', 'routine')
+        .eq('pro_link_value', routine.routine_id);
+
       // Delete the routine record
       await supabase
         .from('user_routines_bank')
@@ -628,7 +636,7 @@ export default function AppRoutinePlayer() {
   // Filter planner tasks to only the selected routine's tasks
   const routineFilteredTasks = useMemo(() => {
     if (!preStartRoutine) return [];
-    return plannerTasks.filter(t => t.source_routine_id === preStartRoutine.routine_id);
+    return plannerTasks.filter(t => t.source_routine_id === preStartRoutine.routine_id && t.pro_link_type !== 'routine');
   }, [plannerTasks, preStartRoutine]);
 
   // Calculate routine duration for header
