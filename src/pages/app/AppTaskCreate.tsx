@@ -2562,7 +2562,8 @@ const AppTaskCreate = ({
         <Sheet open={sheetOpen} onOpenChange={onSheetOpenChange}>
           <SheetContent 
             side="bottom" 
-            className="h-[90vh] rounded-t-3xl px-0"
+            className="h-[90vh] rounded-t-3xl px-0 border-0"
+            style={{ backgroundColor: bgColor }}
             hideCloseButton
           >
             <div className="flex flex-col h-full">
