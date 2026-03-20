@@ -419,8 +419,8 @@ export const TaskCard = memo(function TaskCard({
                 {task.title}
               </p>
               {/* Routine preview row - shows emoji chain + completion % */}
-              {proLinkType === 'routine' && proLinkValue && (
-                <RoutineTaskPreview routineId={proLinkValue} />
+              {proLinkType === 'routine' && (proLinkValue || task.source_routine_id) && (
+                <RoutineTaskPreview routineId={(proLinkValue || task.source_routine_id)!} />
               )}
             </div>
 

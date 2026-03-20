@@ -29,6 +29,7 @@ export const RoutineTaskPreview = memo(function RoutineTaskPreview({ routineId }
         .eq('source_routine_id', routineId)
         .eq('is_active', true)
         .order('order_index', { ascending: true });
+      console.log('[RoutineTaskPreview] routineId:', routineId, 'tasks found:', data?.length);
       return (data || []).map((t: any) => ({ emoji: t.emoji || '📝', title: t.title }));
     },
     enabled: !!user && !!routineId,
@@ -85,16 +86,14 @@ export const RoutineTaskPreview = memo(function RoutineTaskPreview({ routineId }
           </span>
         </>
       )}
-      {completion && (
-        <span className="flex items-center gap-0.5 ml-1.5 text-[10px] font-semibold text-black/60">
-          {completion.isComplete ? (
-            <RotateCw className="w-2.5 h-2.5" />
-          ) : (
-            <Play className="w-2.5 h-2.5 fill-current" />
-          )}
-          {completion.pct}%
-        </span>
-      )}
+      <span className="flex items-center gap-0.5 ml-1.5 text-[10px] font-semibold text-black/60">
+        {completion?.isComplete ? (
+          <RotateCw className="w-2.5 h-2.5" />
+        ) : (
+          <Play className="w-2.5 h-2.5 fill-current" />
+        )}
+        {completion ? `${completion.pct}%` : ''}
+      </span>
     </div>
   );
 });
