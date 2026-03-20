@@ -118,7 +118,7 @@ interface SortableTaskListProps {
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
   hideQuickAdd?: boolean;
-  
+  onOpenTaskSheet?: (params: { editTaskId?: string; createParams?: Record<string, string> }) => void;
 }
 
 export const SortableTaskList = ({
