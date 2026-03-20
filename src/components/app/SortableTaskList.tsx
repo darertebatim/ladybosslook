@@ -391,7 +391,7 @@ function QuickAddCard({ date, taskCount }: { date: Date; taskCount: number }) {
     setShowIdeas(false);
     setSelectedCategory('popular');
     setQuickTime('Anytime');
-    setQuickRepeat('No');
+    setQuickRepeat('Daily');
   };
 
   // Map quick shortcut values to task params
