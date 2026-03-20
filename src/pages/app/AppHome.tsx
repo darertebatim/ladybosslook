@@ -1,7 +1,7 @@
 // AppHome - Main home page component
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay, subDays } from 'date-fns';
 import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, Headset, ArrowLeft, Heart, Zap } from 'lucide-react';
@@ -63,7 +63,19 @@ const AppHome = () => {
     user
   } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [taskFilter, setTaskFilter] = useState<string>('all');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const taskFilter = searchParams.get('filter') || 'all';
+  const setTaskFilter = useCallback((val: string) => {
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (val === 'all') {
+        next.delete('filter');
+      } else {
+        next.set('filter', val);
+      }
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [stepCelebration, setStepCelebration] = useState<{ completedStep: number; newTaskCount: number } | null>(null);
   const [projectCompletion, setProjectCompletion] = useState<{
