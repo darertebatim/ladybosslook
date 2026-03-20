@@ -77,6 +77,9 @@ const AppHome = () => {
     }, { replace: true });
   }, [setSearchParams]);
   const [showStreakModal, setShowStreakModal] = useState(false);
+  const [taskSheetOpen, setTaskSheetOpen] = useState(false);
+  const [taskSheetEditId, setTaskSheetEditId] = useState<string | undefined>(undefined);
+  const [taskSheetCreateParams, setTaskSheetCreateParams] = useState<Record<string, string> | undefined>(undefined);
   const [stepCelebration, setStepCelebration] = useState<{ completedStep: number; newTaskCount: number } | null>(null);
   const [projectCompletion, setProjectCompletion] = useState<{
     routineId: string; routineTitle: string; routineEmoji: string;
