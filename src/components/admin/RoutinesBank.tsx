@@ -141,6 +141,22 @@ function SortableTaskRowItem({ id, children }: { id: string; children: (dragHand
   );
 }
 
+// Sortable routine row wrapper for drag-and-drop reordering in RoutinesBank list
+function SortableRoutineRow({ id, children }: { id: string; children: (dragHandleProps: Record<string, any>) => React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : undefined,
+  };
+  return (
+    <div ref={setNodeRef} style={style}>
+      {children({ ...attributes, ...listeners })}
+    </div>
+  );
+}
+
 export default function RoutinesBank() {
   const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
