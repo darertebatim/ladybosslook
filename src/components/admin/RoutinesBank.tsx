@@ -500,6 +500,40 @@ export default function RoutinesBank() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['routines-bank'] }),
   });
 
+  // Bulk reorder routines
+  const bulkReorderRoutines = useMutation({
+    mutationFn: async (items: { id: string; sort_order: number }[]) => {
+      const updates = items.map(item =>
+        supabase.from('routines_bank').update({ sort_order: item.sort_order }).eq('id', item.id)
+      );
+      await Promise.all(updates);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['routines-bank'] }),
+    onError: (error) => toast.error('Failed to reorder: ' + error.message),
+  });
+
+  const handleRoutineDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = filteredRoutines.findIndex(r => r.id === active.id);
+    const newIndex = filteredRoutines.findIndex(r => r.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = arrayMove(filteredRoutines, oldIndex, newIndex);
+    const updates = reordered.map((r, i) => ({ id: r.id, sort_order: i }));
+
+    // Optimistic update
+    queryClient.setQueryData(['routines-bank'], (old: RoutineBankItem[] | undefined) => {
+      if (!old) return old;
+      const orderMap = new Map(updates.map(u => [u.id, u.sort_order]));
+      return old.map(r => orderMap.has(r.id) ? { ...r, sort_order: orderMap.get(r.id)! } : r)
+        .sort((a, b) => a.sort_order - b.sort_order);
+    });
+
+    bulkReorderRoutines.mutate(updates);
+  };
+
   // Fetch sections and tasks for a routine when editing
   const fetchRoutineData = async (routineId: string) => {
     const [sectionsRes, tasksRes] = await Promise.all([
