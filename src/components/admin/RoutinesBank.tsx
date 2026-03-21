@@ -1241,142 +1241,156 @@ export default function RoutinesBank() {
             No routines yet. Click "New Routine" to create one.
           </div>
         ) : (
-          <div className="space-y-2">
-            {filteredRoutines.map((routine) => {
-              const catInfo = getCategoryInfo(routine.category);
-              const stats = taskCounts[routine.id] || { count: 0, duration: 0 };
-              return (
-                <div
-                  key={routine.id}
-                  className={cn(
-                    'flex items-center gap-3 p-3 rounded-xl border cursor-pointer hover:shadow-sm transition-shadow group',
-                    !routine.is_active && 'opacity-50'
-                  )}
-                  style={{ backgroundColor: COLOR_OPTIONS.find(c => c.name === routine.color)?.hex + '40' }}
-                  onClick={() => openEditDialog(routine)}
-                >
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: COLOR_OPTIONS.find(c => c.name === routine.color)?.hex }}>
-                    <TaskIcon iconName={routine.emoji} size={20} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className={cn("font-medium truncate", !routine.is_active && "line-through")}>{routine.title}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><TaskIcon iconName={catInfo.icon} size={12} /> {catInfo.label}</span>
-                      <span>•</span>
-                      <span>{stats.count} task{stats.count !== 1 ? 's' : ''}</span>
-                      {routine.schedule_type !== 'daily' && (
-                        <>
-                          <span>•</span>
-                          <span className="flex items-center gap-1">
-                            {routine.schedule_type === 'weekly' ? <Calendar className="h-3 w-3" /> : routine.schedule_type === 'project' ? '🎯' : <Flame className="h-3 w-3" />}
-                            {routine.schedule_type === 'weekly' ? 'Weekly' : routine.schedule_type === 'project' ? 'Project' : 'Challenge'}
-                          </span>
-                        </>
+          <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={handleRoutineDragEnd}>
+            <SortableContext items={filteredRoutines.map(r => r.id)} strategy={verticalListSortingStrategy}>
+              <div className="space-y-2">
+                {filteredRoutines.map((routine) => {
+                  const catInfo = getCategoryInfo(routine.category);
+                  const stats = taskCounts[routine.id] || { count: 0, duration: 0 };
+                  return (
+                    <SortableRoutineRow key={routine.id} id={routine.id}>
+                      {(dragHandleProps) => (
+                        <div
+                          className={cn(
+                            'flex items-center gap-3 p-3 rounded-xl border cursor-pointer hover:shadow-sm transition-shadow group',
+                            !routine.is_active && 'opacity-50'
+                          )}
+                          style={{ backgroundColor: COLOR_OPTIONS.find(c => c.name === routine.color)?.hex + '40' }}
+                          onClick={() => openEditDialog(routine)}
+                        >
+                          <div
+                            {...dragHandleProps}
+                            className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground touch-none"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <GripVertical className="h-4 w-4" />
+                          </div>
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: COLOR_OPTIONS.find(c => c.name === routine.color)?.hex }}>
+                            <TaskIcon iconName={routine.emoji} size={20} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className={cn("font-medium truncate", !routine.is_active && "line-through")}>{routine.title}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <span className="flex items-center gap-1"><TaskIcon iconName={catInfo.icon} size={12} /> {catInfo.label}</span>
+                              <span>•</span>
+                              <span>{stats.count} task{stats.count !== 1 ? 's' : ''}</span>
+                              {routine.schedule_type !== 'daily' && (
+                                <>
+                                  <span>•</span>
+                                  <span className="flex items-center gap-1">
+                                    {routine.schedule_type === 'weekly' ? <Calendar className="h-3 w-3" /> : routine.schedule_type === 'project' ? '🎯' : <Flame className="h-3 w-3" />}
+                                    {routine.schedule_type === 'weekly' ? 'Weekly' : routine.schedule_type === 'project' ? 'Project' : 'Challenge'}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          {selectedCategory === 'featured' && (
+                            <input
+                              type="number"
+                              value={routine.sort_order}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value) || 0;
+                                updateSortOrder.mutate({ id: routine.id, sort_order: val });
+                              }}
+                              className="w-14 h-8 text-center text-xs border rounded bg-background"
+                              title="Sort order (lower = first)"
+                            />
+                          )}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleFree.mutate({ id: routine.id, is_free: !routine.is_free });
+                            }}
+                            className={cn(
+                              "p-2 transition-all",
+                              routine.is_free ? "text-green-500" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                            )}
+                            title={routine.is_free ? "Remove free access" : "Mark as free"}
+                          >
+                            <span className={cn("text-xs font-bold", routine.is_free && "text-green-500")}>FREE</span>
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleWelcomePopup.mutate({ id: routine.id, is_welcome_popup: !routine.is_welcome_popup });
+                            }}
+                            className={cn(
+                              "p-2 transition-all",
+                              routine.is_welcome_popup ? "text-violet-500" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                            )}
+                            title={routine.is_welcome_popup ? "Remove as welcome popup" : "Set as welcome popup"}
+                          >
+                            <Gift className={cn("h-4 w-4", routine.is_welcome_popup && "fill-violet-500")} />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              togglePopular.mutate({ id: routine.id, is_popular: !routine.is_popular });
+                            }}
+                            className={cn(
+                              "p-2 transition-all",
+                              routine.is_popular ? "text-amber-500" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                            )}
+                            title={routine.is_popular ? "Remove from popular" : "Mark as popular"}
+                          >
+                            <Star className={cn("h-4 w-4", routine.is_popular && "fill-amber-500")} />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleFeatured.mutate({ id: routine.id, is_featured: !routine.is_featured });
+                            }}
+                            className={cn(
+                              "p-2 transition-all",
+                              routine.is_featured ? "text-emerald-500" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                            )}
+                            title={routine.is_featured ? "Remove from featured (home)" : "Feature on home"}
+                          >
+                            <Flame className={cn("h-4 w-4", routine.is_featured && "fill-emerald-500")} />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleActive.mutate({ id: routine.id, is_active: !routine.is_active });
+                            }}
+                            className={cn(
+                              "p-2 transition-all",
+                              !routine.is_active ? "text-muted-foreground" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                            )}
+                            title={routine.is_active ? "Deactivate" : "Activate"}
+                          >
+                            {routine.is_active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditDialog(routine);
+                            }}
+                            className="p-2 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(routine.id);
+                            }}
+                            className="p-2 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       )}
-                    </div>
-                  </div>
-                  {selectedCategory === 'featured' && (
-                    <input
-                      type="number"
-                      value={routine.sort_order}
-                      onClick={(e) => e.stopPropagation()}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value) || 0;
-                        updateSortOrder.mutate({ id: routine.id, sort_order: val });
-                      }}
-                      className="w-14 h-8 text-center text-xs border rounded bg-background"
-                      title="Sort order (lower = first)"
-                    />
-                  )}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleFree.mutate({ id: routine.id, is_free: !routine.is_free });
-                    }}
-                    className={cn(
-                      "p-2 transition-all",
-                      routine.is_free ? "text-green-500" : "text-muted-foreground opacity-0 group-hover:opacity-100"
-                    )}
-                    title={routine.is_free ? "Remove free access" : "Mark as free"}
-                  >
-                    <span className={cn("text-xs font-bold", routine.is_free && "text-green-500")}>FREE</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleWelcomePopup.mutate({ id: routine.id, is_welcome_popup: !routine.is_welcome_popup });
-                    }}
-                    className={cn(
-                      "p-2 transition-all",
-                      routine.is_welcome_popup ? "text-violet-500" : "text-muted-foreground opacity-0 group-hover:opacity-100"
-                    )}
-                    title={routine.is_welcome_popup ? "Remove as welcome popup" : "Set as welcome popup"}
-                  >
-                    <Gift className={cn("h-4 w-4", routine.is_welcome_popup && "fill-violet-500")} />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      togglePopular.mutate({ id: routine.id, is_popular: !routine.is_popular });
-                    }}
-                    className={cn(
-                      "p-2 transition-all",
-                      routine.is_popular ? "text-amber-500" : "text-muted-foreground opacity-0 group-hover:opacity-100"
-                    )}
-                    title={routine.is_popular ? "Remove from popular" : "Mark as popular"}
-                  >
-                    <Star className={cn("h-4 w-4", routine.is_popular && "fill-amber-500")} />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleFeatured.mutate({ id: routine.id, is_featured: !routine.is_featured });
-                    }}
-                    className={cn(
-                      "p-2 transition-all",
-                      routine.is_featured ? "text-emerald-500" : "text-muted-foreground opacity-0 group-hover:opacity-100"
-                    )}
-                    title={routine.is_featured ? "Remove from featured (home)" : "Feature on home"}
-                  >
-                    <Flame className={cn("h-4 w-4", routine.is_featured && "fill-emerald-500")} />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleActive.mutate({ id: routine.id, is_active: !routine.is_active });
-                    }}
-                    className={cn(
-                      "p-2 transition-all",
-                      !routine.is_active ? "text-muted-foreground" : "text-muted-foreground opacity-0 group-hover:opacity-100"
-                    )}
-                    title={routine.is_active ? "Deactivate" : "Activate"}
-                  >
-                    {routine.is_active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEditDialog(routine);
-                    }}
-                    className="p-2 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(routine.id);
-                    }}
-                    className="p-2 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              );
-            })}
-          </div>
+                    </SortableRoutineRow>
+                  );
+                })}
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
       </CardContent>
 
