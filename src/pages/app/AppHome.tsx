@@ -1169,7 +1169,7 @@ const AppHome = () => {
                       </button>
                       <button
                         className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-background text-foreground shadow-sm"
-                        onClick={() => setFilterDropdownOpen(true)}
+                        onClick={() => taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')}
                       >
                         My Tasks
                       </button>
