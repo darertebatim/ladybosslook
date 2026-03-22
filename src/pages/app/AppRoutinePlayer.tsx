@@ -107,7 +107,7 @@ function RoutineCardContent({
           {routine.title}
         </h3>
         <div className="flex items-center gap-2 shrink-0">
-          {routine.is_user_created && onEditRoutine && (
+          {onEditRoutine && (
             <button
               onClick={(e) => { e.stopPropagation(); onEditRoutine(routine); }}
               className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center active:scale-95 transition-all"
