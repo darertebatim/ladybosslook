@@ -270,14 +270,6 @@ export function RoutineBuilderSheet({
             {/* Top: name input */}
             <div className="bg-[#FFF5E6] dark:bg-amber-950/50 px-4 pt-4 pb-3">
               <div className="flex items-center gap-2">
-                {step === 2 && (
-                  <button
-                    onClick={() => { setStep(1); setShowSuggestions(false); }}
-                    className="w-8 h-8 flex items-center justify-center shrink-0 rounded-full active:bg-black/5 transition-colors"
-                  >
-                    <ChevronLeft className="w-5 h-5 text-black/60 dark:text-foreground/60" />
-                  </button>
-                )}
                 <div className="w-10 h-10 flex items-center justify-center shrink-0">
                   <FluentEmoji emoji={routineEmoji} size={28} />
                 </div>
@@ -296,8 +288,7 @@ export function RoutineBuilderSheet({
                   }}
                   placeholder="Type routine name..."
                   className="flex-1 bg-transparent text-[15px] font-semibold text-black dark:text-foreground placeholder:text-black/40 dark:placeholder:text-muted-foreground/50 outline-none"
-                  readOnly={step === 2}
-                  enterKeyHint="next"
+                  enterKeyHint={step === 1 ? 'next' : 'done'}
                   autoComplete="off"
                 />
               </div>
