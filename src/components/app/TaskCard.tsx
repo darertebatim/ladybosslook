@@ -443,7 +443,7 @@ export const TaskCard = memo(function TaskCard({
             {isTimerGoal ? (
               <button
                 onClick={handleOpenTimer}
-                className="w-9 h-9 flex items-center justify-center shrink-0"
+                className="w-12 h-12 -m-1.5 flex items-center justify-center shrink-0"
               >
                 {goalReached ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
                   <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center">
@@ -469,7 +469,7 @@ export const TaskCard = memo(function TaskCard({
                 </AnimatePresence>
                 <button
                   onClick={handleProCircleClick}
-                  className="w-9 h-9 flex items-center justify-center shrink-0"
+                  className="w-12 h-12 -m-1.5 flex items-center justify-center shrink-0"
                 >
                   {goalReached ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
                     <CircleProgressButton progress={goalProgress} target={task.goal_target || 1}>
@@ -482,7 +482,7 @@ export const TaskCard = memo(function TaskCard({
               <div className="flex flex-col items-center shrink-0">
                 <button
                   onClick={handleProCircleClick}
-                  className="w-9 h-9 flex items-center justify-center"
+                  className="w-12 h-12 -m-1.5 flex items-center justify-center"
                 >
                   {isCompleted ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
                     <span className="w-9 h-9 rounded-full border-[2.5px] border-black bg-white flex items-center justify-center">
@@ -598,7 +598,7 @@ export const TaskCard = memo(function TaskCard({
         {isTimerGoal ? (
           <button
             onClick={handleOpenTimer}
-            className="w-9 h-9 flex items-center justify-center shrink-0"
+            className="w-12 h-12 -m-1.5 flex items-center justify-center shrink-0"
           >
             {goalReached ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
               <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center">
@@ -624,7 +624,7 @@ export const TaskCard = memo(function TaskCard({
             </AnimatePresence>
             <button
               onClick={handleOpenGoalInput}
-              className="w-9 h-9 flex items-center justify-center shrink-0"
+              className="w-12 h-12 -m-1.5 flex items-center justify-center shrink-0"
             >
               {goalReached ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : isWater ? (
                 <CircleProgressButton progress={goalProgress} target={task.goal_target || 1}>
@@ -640,7 +640,7 @@ export const TaskCard = memo(function TaskCard({
         ) : (
           <button
             onClick={handleToggleComplete}
-            className="w-9 h-9 flex items-center justify-center shrink-0"
+            className="w-12 h-12 -m-1.5 flex items-center justify-center shrink-0"
           >
             {isCompleted ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
               <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
