@@ -321,7 +321,7 @@ export const ProgramRoundsManager = () => {
     },
   });
 
-
+  const resetForm = () => {
     setFormData({
       program_slug: "",
       round_name: "",
