@@ -99,7 +99,7 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
           style={!hasBeenTapped ? { animationDelay: '2s' } : undefined}
         >
           <Filter className="h-3 w-3 opacity-50" />
-          <span className="truncate max-w-[120px]">{currentLabel}</span>
+          <span className="truncate max-w-[100px]">{currentLabel}</span>
           <ChevronDown className="h-3 w-3 opacity-40" />
         </button>
       </PopoverTrigger>

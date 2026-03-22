@@ -404,7 +404,7 @@ const AppHome = () => {
   // Map slug → category name for display
   const categoryNameMap = useMemo(() => {
     const map = new Map<string, string>();
-    routineCategories.forEach(cat => map.set(cat.slug, cat.name));
+    routineCategories.forEach(cat => map.set(cat.slug, `${cat.emoji || '📂'} ${cat.name}`));
     return map;
   }, [routineCategories]);
   
