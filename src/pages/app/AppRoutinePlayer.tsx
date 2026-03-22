@@ -843,6 +843,7 @@ export default function AppRoutinePlayer() {
     }));
 
     setBuilderEditRoutine(routine);
+    setBuilderEditTasks(builderTasks);
     setShowBuilder(true);
   }, [user]);
 
