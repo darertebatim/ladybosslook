@@ -12,6 +12,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { TASK_COLOR_CLASSES, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
 
 // Secondary (darker) palette for bottom sections
 const TASK_COLORS_DARK: Record<string, string> = {
