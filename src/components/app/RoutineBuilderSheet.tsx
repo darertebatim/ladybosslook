@@ -303,7 +303,7 @@ export function RoutineBuilderSheet({
               </div>
             ) : (
               /* Step 2 expanded area */
-              <div className="bg-[#FFF5E6] dark:bg-amber-950/50 border-t border-amber-200/40 dark:border-amber-800/20">
+              <div className="bg-[#FFE6C0] dark:bg-amber-900/30">
                 {/* Task list */}
                 <div className="max-h-[35vh] overflow-y-auto px-3 pt-2 pb-1">
                   {tasks.length === 0 ? (
