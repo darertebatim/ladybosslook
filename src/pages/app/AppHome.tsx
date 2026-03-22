@@ -1084,20 +1084,28 @@ const AppHome = () => {
                 </div>
               ) : filteredTasks.length > 0 || (!isNewUser && taskFilter !== 'all') ? (
                 <div>
-                   {/* My Tasks header with filter dropdown */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Zap className="h-4 w-4 text-amber-500 shrink-0" />
-                      <button 
-                        onClick={() => { 
-                          if (taskFilter !== 'all') setTaskFilter('all');
-                          else setFilterDropdownOpen(prev => !prev);
-                        }}
-                        className="text-sm font-semibold text-foreground tracking-wide shrink-0 active:opacity-70"
+                  {/* Switcher: My Tasks / Routine Player */}
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="flex bg-muted rounded-full p-1 w-full max-w-xs">
+                      <button
+                        className="flex-1 flex items-center justify-center gap-1.5 rounded-full py-2 text-sm font-semibold transition-all bg-background text-foreground shadow-sm"
                       >
+                        <Zap className="h-3.5 w-3.5 text-amber-500" />
                         My Tasks
                       </button>
+                      <button
+                        onClick={() => navigate('/app/routineplayer')}
+                        className="flex-1 flex items-center justify-center gap-1.5 rounded-full py-2 text-sm font-medium transition-all text-muted-foreground"
+                      >
+                        <Play className="h-3.5 w-3.5" />
+                        Routines
+                      </button>
                     </div>
+                  </div>
+
+                  {/* Filter dropdown */}
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-semibold text-foreground tracking-wide">My Tasks</span>
                     <TaskFilterDropdown
                       value={taskFilter}
                       onValueChange={setTaskFilter}
