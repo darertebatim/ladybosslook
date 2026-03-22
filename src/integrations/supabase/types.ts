@@ -2780,6 +2780,67 @@ export type Database = {
         }
         Relationships: []
       }
+      round_notification_reads: {
+        Row: {
+          id: string
+          notification_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          notification_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          notification_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "round_notification_reads_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "round_update_notifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      round_update_notifications: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          program_slug: string
+          round_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          program_slug: string
+          round_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          program_slug?: string
+          round_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "round_update_notifications_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "program_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       routine_categories: {
         Row: {
           color: string
