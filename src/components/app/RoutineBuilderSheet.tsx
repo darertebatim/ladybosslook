@@ -549,18 +549,18 @@ export function RoutineBuilderSheet({
 
           {/* Step 1: Inspirations */}
           {step === 1 && showSuggestions && filteredSuggestions.length > 0 && (
-            <div className="mt-3 flex flex-col gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="mt-3 flex flex-col gap-2 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
               <p className="text-sm text-white/70 font-medium text-center">Need inspiration?</p>
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 overflow-hidden">
                 {filteredSuggestions.slice(0, 4).map((s: any) => (
                   <button
                     key={s.id}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => handleSuggestionSelect(s)}
-                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white/10 active:bg-white/20 transition-colors text-left min-w-0"
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white/10 active:bg-white/20 transition-colors text-left overflow-hidden"
                   >
                     <FluentEmoji emoji={s.emoji || '✨'} size={22} className="shrink-0" />
-                    <span className="text-sm font-medium text-white truncate min-w-0">{s.title}</span>
+                    <span className="text-sm font-medium text-white truncate flex-1 min-w-0">{s.title}</span>
                   </button>
                 ))}
               </div>
