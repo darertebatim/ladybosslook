@@ -81,7 +81,7 @@ export function RoutineBuilderSheet({
   const [routineTitle, setRoutineTitle] = useState(initialTitle);
   const [routineEmoji, setRoutineEmoji] = useState(initialEmoji);
   const [routineColor] = useState(initialColor);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  
   const [tasks, setTasks] = useState<BuilderTask[]>(initialTasks);
   const [showTaskPicker, setShowTaskPicker] = useState(false);
   const [pickerTab, setPickerTab] = useState<'my' | 'bank'>('bank');
