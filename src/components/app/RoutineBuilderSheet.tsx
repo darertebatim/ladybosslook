@@ -335,7 +335,7 @@ export function RoutineBuilderSheet({
           {/* Two-tone name card */}
           <div className="rounded-3xl overflow-hidden transition-all duration-300">
             {/* Top: name input */}
-            <div className="bg-[#FFF5E6] dark:bg-amber-950/50 px-4 pt-4 pb-3">
+            <div className="px-4 pt-4 pb-3 transition-colors duration-200" style={{ backgroundColor: TASK_COLORS[routineColor as TaskColor] || TASK_COLORS.peach }}>
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 flex items-center justify-center shrink-0">
                   <FluentEmoji emoji={routineEmoji} size={28} />
@@ -377,14 +377,14 @@ export function RoutineBuilderSheet({
 
             {/* Bottom section — changes per step */}
             {step === 1 ? (
-              <div className="px-4 py-3 bg-[#FFE6C0] dark:bg-amber-900/30">
+              <div className="px-4 py-3 transition-colors duration-200" style={{ backgroundColor: `color-mix(in srgb, ${TASK_COLORS[routineColor as TaskColor] || TASK_COLORS.peach} 70%, #d4a574)` }}>
                 <p className="text-[13px] font-medium text-black/70 dark:text-muted-foreground text-center">
                   Press enter to continue. Tap outside to cancel.
                 </p>
               </div>
             ) : (
               /* Step 2 expanded area */
-              <div className="bg-[#FFE6C0] dark:bg-amber-900/30">
+              <div className="transition-colors duration-200" style={{ backgroundColor: `color-mix(in srgb, ${TASK_COLORS[routineColor as TaskColor] || TASK_COLORS.peach} 70%, #d4a574)` }}>
                 {/* Task list */}
                 <div className="max-h-[35vh] overflow-y-auto px-3 pt-2 pb-1">
                   {tasks.length === 0 ? (
