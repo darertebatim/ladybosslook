@@ -69,6 +69,7 @@ const AppHome = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const taskFilter = searchParams.get('filter') || 'all';
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
+  const [homeView, setHomeView] = useState<'tasks' | 'routines'>('tasks');
   const setTaskFilter = useCallback((val: string) => {
     setSearchParams(prev => {
       const next = new URLSearchParams(prev);
