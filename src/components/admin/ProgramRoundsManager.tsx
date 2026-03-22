@@ -85,6 +85,10 @@ export const ProgramRoundsManager = () => {
   const [managingSessionsRound, setManagingSessionsRound] = useState<ProgramRound | null>(null);
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   
+  // Notify students dialog state
+  const [showNotifyDialog, setShowNotifyDialog] = useState(false);
+  const lastSavedRoundRef = useRef<{ id: string; program_slug: string } | null>(null);
+  
   // Drip adjustment dialog state
   const [adjustingDripRound, setAdjustingDripRound] = useState<ProgramRound | null>(null);
   const [dripAdjustmentType, setDripAdjustmentType] = useState<'freeze' | 'forward'>('freeze');
