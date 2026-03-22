@@ -15,10 +15,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
 import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 
-type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'mood' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist';
+type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'mood' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist' | 'routine_player';
 type DisplayFrequency = 'once' | 'daily' | 'weekly' | 'forever';
 type AspectRatio = '3:1' | '4:1' | '16:9' | '1:1';
-type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch' | 'routines_top' | 'routines_after_categories';
+type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch' | 'routines_top' | 'routines_after_categories' | 'routine_player';
 
 const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
   { value: 'home_top', label: '🏠 Home - Above Tasks' },
