@@ -83,6 +83,7 @@ export function RoutineBuilderSheet({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showMyTasks, setShowMyTasks] = useState(false);
   const [showCreateTask, setShowCreateTask] = useState(false);
+  const [quickAddMode, setQuickAddMode] = useState(false);
   const [quickAddTitle, setQuickAddTitle] = useState('');
   const nameInputRef = useRef<HTMLInputElement>(null);
   const quickAddInputRef = useRef<HTMLInputElement>(null);
