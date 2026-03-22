@@ -90,6 +90,7 @@ export function RoutineBuilderSheet({
   const [quickRepeat, setQuickRepeat] = useState('Daily');
   const [quickTime, setQuickTime] = useState('Anytime');
   const [showCreateTask, setShowCreateTask] = useState(false);
+  const [editingTask, setEditingTask] = useState<BuilderTask | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const quickAddInputRef = useRef<HTMLInputElement>(null);
 
