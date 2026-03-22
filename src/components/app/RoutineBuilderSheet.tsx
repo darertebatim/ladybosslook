@@ -82,11 +82,8 @@ export function RoutineBuilderSheet({
   const [tasks, setTasks] = useState<BuilderTask[]>(initialTasks);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showMyTasks, setShowMyTasks] = useState(false);
-  const [showCreateTask, setShowCreateTask] = useState(false);
-  const [quickAddMode, setQuickAddMode] = useState(false);
-  const [quickAddTitle, setQuickAddTitle] = useState('');
+  const [showQuickStart, setShowQuickStart] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const quickAddInputRef = useRef<HTMLInputElement>(null);
 
   // Reset state when dialog opens/closes
   const handleOpenChange = useCallback((v: boolean) => {
