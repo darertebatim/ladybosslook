@@ -1090,18 +1090,25 @@ const AppHome = () => {
                 </div>
               ) : filteredTasks.length > 0 || (!isNewUser && taskFilter !== 'all') ? (
                 <div>
-                  {/* Switcher: My Tasks / Routine Player */}
+                  {/* Switcher: My Tasks / Routines */}
                   <div className="flex items-center justify-center mb-4">
                     <div className="flex bg-muted rounded-full p-1 w-full max-w-xs">
                       <button
-                        className="flex-1 flex items-center justify-center gap-1.5 rounded-full py-2 text-sm font-semibold transition-all bg-background text-foreground shadow-sm"
+                        onClick={() => setHomeView('tasks')}
+                        className={cn(
+                          "flex-1 flex items-center justify-center gap-1.5 rounded-full py-2 text-sm font-semibold transition-all",
+                          homeView === 'tasks' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+                        )}
                       >
                         <Zap className="h-3.5 w-3.5 text-amber-500" />
                         My Tasks
                       </button>
                       <button
-                        onClick={() => navigate('/app/routineplayer')}
-                        className="flex-1 flex items-center justify-center gap-1.5 rounded-full py-2 text-sm font-medium transition-all text-muted-foreground"
+                        onClick={() => setHomeView('routines')}
+                        className={cn(
+                          "flex-1 flex items-center justify-center gap-1.5 rounded-full py-2 text-sm font-semibold transition-all",
+                          homeView === 'routines' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+                        )}
                       >
                         <Play className="h-3.5 w-3.5" />
                         Routines
@@ -1109,6 +1116,43 @@ const AppHome = () => {
                     </div>
                   </div>
 
+                  {homeView === 'routines' ? (
+                    <>
+                      {routineProTasks.length > 0 ? (
+                        <>
+                          <SortableTaskList tasks={routineProTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                          <div className="flex gap-2 mt-3">
+                            <button
+                              onClick={() => navigate('/app/routineplayer')}
+                              className="flex-1 rounded-3xl py-2.5 px-3 bg-card border-2 border-urgency/30 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+                            >
+                              <Settings2 className="w-3.5 h-3.5 text-urgency" />
+                              Manage Routines
+                            </button>
+                            <button
+                              onClick={() => navigate('/app/routines')}
+                              className="flex-1 rounded-3xl py-2.5 px-3 bg-card border-2 border-urgency/30 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+                            >
+                              <Search className="w-3.5 h-3.5 text-urgency" />
+                              Browse Library
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-10 gap-3">
+                          <FluentEmoji emoji="🎬" size={40} />
+                          <p className="text-sm text-muted-foreground text-center">No routine launchers yet</p>
+                          <button
+                            onClick={() => navigate('/app/routineplayer')}
+                            className="text-sm font-medium text-primary"
+                          >
+                            Set up your first routine →
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                  <>
                   {/* Filter dropdown */}
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-sm font-semibold text-foreground tracking-wide">My Tasks</span>
