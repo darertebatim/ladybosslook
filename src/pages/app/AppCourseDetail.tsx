@@ -732,7 +732,7 @@ const AppCourseDetail = () => {
               emoji: '📅',
               scheduledDate: format(sessionDate, 'yyyy-MM-dd'),
               scheduledTime: format(sessionDate, 'HH:mm'),
-              reminderOffset: settings.reminderMinutes,
+              reminderOffset: Math.max(...settings.reminderMinutes),
               repeatPattern: 'none',
               proLinkType: 'course',
               proLinkValue: slug || null,
