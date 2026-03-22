@@ -227,9 +227,18 @@ export const ProgramRoundsManager = () => {
         }
       }
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["program-rounds"] });
-      toast.success(editingId ? "Round updated" : "Round created");
+      const wasEditing = !!editingId;
+      toast.success(wasEditing ? "Round updated" : "Round created");
+      
+      // Show notify dialog only when editing an existing round
+      if (wasEditing && editingId) {
+        const round = rounds?.find(r => r.id === editingId);
+        lastSavedRoundRef.current = { id: editingId, program_slug: round?.program_slug || variables.program_slug };
+        setShowNotifyDialog(true);
+      }
+      
       resetForm();
       setIsFormDialogOpen(false);
     },
