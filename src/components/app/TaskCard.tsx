@@ -26,7 +26,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Delete } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { RoutineTaskPreview, RoutinePlayBadge } from './RoutineTaskPreview';
+import { RoutineTaskPreview, RoutinePlayBadge, useRoutinePreviewData } from './RoutineTaskPreview';
 
 interface TaskCardProps {
   task: UserTask;
