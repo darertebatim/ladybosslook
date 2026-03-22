@@ -362,7 +362,7 @@ export function RoutineBuilderSheet({
       <Dialog open={open && !showMyTasks && !showQuickAdd} onOpenChange={(v) => { if (!v) handleOpenChange(false); }}>
         <DialogContent
           hideCloseButton
-          className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !translate-y-0"
+          className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !translate-y-0 overflow-hidden"
           style={{ top: '12%' }}
         >
           {/* Two-tone name card */}
