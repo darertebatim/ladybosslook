@@ -151,10 +151,8 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
 
     // Auto-complete on tap (for completable event types)
     if (!event.isCompleted && !isFutureDate && event.type !== 'round_update') {
-      const eventType = event.type as 'session' | 'module' | 'track';
-      if (event.type !== 'enrollment') {
-        completeProgramEvent.mutate({ eventType, eventId: event.id, date });
-      }
+      const eventType = event.type as 'session' | 'module' | 'track' | 'enrollment';
+      completeProgramEvent.mutate({ eventType, eventId: event.id, date });
     }
 
     switch (event.type) {
