@@ -1102,6 +1102,7 @@ const AppHome = () => {
                             My Tasks
                           </button>
                           <button
+                            onClick={() => setFilterDropdownOpen(true)}
                             className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-background text-foreground shadow-sm"
                           >
                             Routine Players
