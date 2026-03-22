@@ -775,6 +775,32 @@ export function RoutineBuilderSheet({
               <div className="h-11" aria-hidden="true" />
             )}
           </div>
+
+          {/* Search-based suggestions while typing */}
+          {quickAddSearchSuggestions.length > 0 && (
+            <div className="mt-3 flex flex-col gap-1.5 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
+              <p className="text-sm text-white/70 font-medium text-center">Need some ideas?</p>
+              {quickAddSearchSuggestions.map((template: any) => {
+                const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
+                return (
+                  <button
+                    key={template.id}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      addTaskFromSource(template);
+                      setQuickAddTitle('');
+                      setShowQuickAdd(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl active:scale-[0.98] transition-transform overflow-hidden"
+                    style={{ backgroundColor: bgColor }}
+                  >
+                    <FluentEmoji emoji={template.emoji || '📝'} size={22} className="shrink-0" />
+                    <span className="text-sm font-semibold text-black truncate flex-1 min-w-0">{template.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
