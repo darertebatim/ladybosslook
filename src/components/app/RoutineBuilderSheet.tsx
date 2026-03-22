@@ -335,6 +335,7 @@ export function RoutineBuilderSheet({
     if (!routineTitle.trim()) return;
     haptic.light();
     setShowSuggestions(false);
+    nameInputRef.current?.blur();
     setStep(2);
   };
 
