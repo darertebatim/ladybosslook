@@ -294,142 +294,89 @@ export function RoutineBuilderSheet({
 
   return (
     <>
-      <Sheet open={open} onOpenChange={handleOpenChange}>
+      {/* Step 1: Dialog overlay — like home quick-add */}
+      <Dialog open={open && step === 1} onOpenChange={(v) => { if (!v) handleOpenChange(false); }}>
+        <DialogContent
+          hideCloseButton
+          className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !translate-y-0"
+          style={{ top: '25%' }}
+        >
+          {/* Name input — two-tone card */}
+          <div className="rounded-3xl overflow-hidden">
+            <div className="bg-[#FFF5E6] dark:bg-amber-950/50 px-4 pt-4 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 flex items-center justify-center shrink-0">
+                  <FluentEmoji emoji={routineEmoji} size={28} />
+                </div>
+                <input
+                  ref={nameInputRef}
+                  value={routineTitle}
+                  onChange={(e) => {
+                    setRoutineTitle(e.target.value.slice(0, 40));
+                    setShowSuggestions(true);
+                  }}
+                  onFocus={() => setShowSuggestions(true)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && routineTitle.trim()) handleNext(); }}
+                  placeholder="Type routine name..."
+                  className="flex-1 bg-transparent text-[15px] font-semibold text-black dark:text-foreground placeholder:text-black/40 dark:placeholder:text-muted-foreground/50 outline-none"
+                  enterKeyHint="next"
+                  autoComplete="off"
+                />
+              </div>
+            </div>
+            <div className="px-4 py-3 bg-[#FFE6C0] dark:bg-amber-900/30">
+              <p className="text-[13px] font-medium text-black/70 dark:text-muted-foreground text-center">
+                Press enter to continue. Tap outside to cancel.
+              </p>
+            </div>
+          </div>
+
+          {/* Next button — appears when title is entered */}
+          <div className="mt-3 min-h-11">
+            {routineTitle.trim() ? (
+              <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                <button
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={handleNext}
+                  className="w-full gap-2 h-11 rounded-2xl text-sm font-bold flex items-center justify-center shadow-sm active:scale-95 transition-transform bg-amber-400 dark:bg-amber-500 text-black"
+                >
+                  Next — Add Tasks
+                </button>
+              </div>
+            ) : (
+              <div className="h-11" aria-hidden="true" />
+            )}
+          </div>
+
+          {/* Inspirations */}
+          {showSuggestions && filteredSuggestions.length > 0 && (
+            <div className="mt-3 flex flex-col gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
+              <p className="text-sm text-white/70 font-medium text-center">Need inspiration?</p>
+              <div className="space-y-1.5">
+                {filteredSuggestions.slice(0, 4).map((s: any) => (
+                  <button
+                    key={s.id}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => handleSuggestionSelect(s)}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white/10 active:bg-white/20 transition-colors text-left"
+                  >
+                    <FluentEmoji emoji={s.emoji || '✨'} size={22} />
+                    <span className="text-sm font-medium text-white truncate">{s.title}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Step 2: Sheet */}
+      <Sheet open={open && step === 2} onOpenChange={(v) => { if (!v) { setStep(1); } }}>
         <SheetContent
           side="bottom"
           className="h-[92vh] rounded-t-3xl px-0 pb-0"
           hideCloseButton
         >
-          <div className="flex flex-col h-full">
-            {/* Header */}
-            <div className="flex items-center gap-3 px-5 pb-3 border-b border-border/30">
-              {step === 2 ? (
-                <button onClick={() => setStep(1)} className="p-1 active:opacity-70">
-                  <ChevronLeft className="w-5 h-5 text-foreground" />
-                </button>
-              ) : (
-                <button onClick={() => handleOpenChange(false)} className="p-1 active:opacity-70">
-                  <X className="w-5 h-5 text-foreground" />
-                </button>
-              )}
-              <h2 className="text-lg font-bold text-foreground flex-1">
-                {editMode ? 'Edit Routine' : 'Build Your Routine'}
-              </h2>
-              <div className="flex items-center gap-1.5 bg-muted/60 px-2.5 py-1 rounded-full">
-                <div className={cn(
-                  "w-1.5 h-1.5 rounded-full transition-colors",
-                  step >= 1 ? "bg-amber-400" : "bg-muted-foreground/30"
-                )} />
-                <div className={cn(
-                  "w-1.5 h-1.5 rounded-full transition-colors",
-                  step >= 2 ? "bg-amber-400" : "bg-muted-foreground/30"
-                )} />
-              </div>
-            </div>
-
-            {/* Step 1: Name + Emoji — Quick-add inspired design */}
-            {step === 1 && (
-              <div className="flex-1 flex flex-col px-5 pt-6">
-                {/* Emoji selector */}
-                <div className="flex flex-col items-center gap-2.5 mb-6">
-                  <button
-                    onClick={() => setShowEmojiPicker(true)}
-                    className="w-20 h-20 rounded-[22px] bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/30 flex items-center justify-center active:scale-95 transition-transform shadow-sm border border-amber-100/50 dark:border-amber-800/30"
-                  >
-                    <FluentEmoji emoji={routineEmoji} size={48} />
-                  </button>
-                  <p className="text-[11px] text-muted-foreground font-medium">Tap to change</p>
-                </div>
-
-                {/* Name input — two-tone card style like quick-add */}
-                <div className="rounded-3xl overflow-hidden shadow-sm border border-amber-100/60 dark:border-amber-800/30">
-                  <div className="bg-gradient-to-br from-amber-50/80 to-orange-50/60 dark:from-amber-950/30 dark:to-orange-950/20 px-4 pt-4 pb-3">
-                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 block">Routine Name</label>
-                    <div className="flex items-center gap-2">
-                      <FluentEmoji emoji={routineEmoji} size={28} className="shrink-0" />
-                      <input
-                        ref={nameInputRef}
-                        value={routineTitle}
-                        onChange={(e) => {
-                          setRoutineTitle(e.target.value.slice(0, 40));
-                          setShowSuggestions(true);
-                        }}
-                        onFocus={() => setShowSuggestions(true)}
-                        onKeyDown={(e) => { if (e.key === 'Enter' && routineTitle.trim()) handleNext(); }}
-                        placeholder="e.g., Morning Power Hour"
-                        className="flex-1 bg-transparent text-[16px] font-semibold text-foreground placeholder:text-muted-foreground/50 outline-none"
-                        enterKeyHint="next"
-                        autoComplete="off"
-                      />
-                    </div>
-                  </div>
-                  <div className="px-4 py-2.5 bg-gradient-to-r from-amber-100/60 to-orange-100/40 dark:from-amber-900/20 dark:to-orange-900/15">
-                    <div className="flex items-center justify-between">
-                      <p className="text-[11px] font-medium text-muted-foreground">
-                        Give your routine a name that inspires you
-                      </p>
-                      <span className="text-[11px] text-muted-foreground/60 font-medium">{routineTitle.length}/40</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Suggestions dropdown */}
-                {showSuggestions && filteredSuggestions.length > 0 && (
-                  <div className="mt-2 rounded-2xl overflow-hidden border border-border/40 bg-card shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="px-3 py-2 border-b border-border/30 flex items-center gap-1.5">
-                      <Sparkles className="w-3 h-3 text-amber-500" />
-                      <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Inspiration</span>
-                    </div>
-                    <div className="max-h-[180px] overflow-y-auto">
-                      {filteredSuggestions.map((s: any) => (
-                        <button
-                          key={s.id}
-                          onClick={() => handleSuggestionSelect(s)}
-                          className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-muted/50 active:bg-muted/70 transition-colors text-left"
-                        >
-                          <FluentEmoji emoji={s.emoji || '✨'} size={22} />
-                          <span className="text-sm font-medium text-foreground truncate">{s.title}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Quick emoji grid */}
-                <div className="mt-5">
-                  <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider mb-2.5">Quick pick</p>
-                  <div className="flex flex-wrap gap-2">
-                    {QUICK_EMOJIS.map(emoji => (
-                      <button
-                        key={emoji}
-                        onClick={() => { haptic.light(); setRoutineEmoji(emoji); }}
-                        className={cn(
-                          'w-11 h-11 rounded-xl flex items-center justify-center transition-all',
-                          routineEmoji === emoji
-                            ? 'bg-amber-100 dark:bg-amber-900/40 ring-2 ring-amber-400 scale-110'
-                            : 'bg-muted/60 active:scale-95'
-                        )}
-                      >
-                        <FluentEmoji emoji={emoji} size={26} />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-auto pb-6">
-                  <Button
-                    onClick={handleNext}
-                    disabled={!routineTitle.trim()}
-                    className="w-full h-13 rounded-2xl text-base font-bold bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black shadow-md shadow-amber-200/40 dark:shadow-amber-900/30 border-0"
-                  >
-                    Next — Add Tasks
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Step 2: Task list builder */}
-            {step === 2 && !showTaskPicker && (
               <div className="flex-1 flex flex-col">
                 {/* Routine header — gradient banner */}
                 <div className="flex items-center gap-3 px-5 py-3.5 bg-gradient-to-r from-amber-50/80 to-orange-50/60 dark:from-amber-950/30 dark:to-orange-950/20 border-b border-amber-100/30 dark:border-amber-800/20">
