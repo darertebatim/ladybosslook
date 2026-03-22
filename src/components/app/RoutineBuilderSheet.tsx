@@ -187,44 +187,30 @@ export function RoutineBuilderSheet({
     setTasks(prev => prev.filter(t => t.id !== taskId));
   };
 
-  const handleCreateNewTask = (data: TaskFormData) => {
+  const handleQuickStartContinue = (taskName: string, template?: TaskTemplate) => {
     haptic.light();
-    const newTask: BuilderTask = {
-      id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      title: data.title,
-      emoji: data.icon || '📝',
-      color: data.color || ROUTINE_COLOR_CYCLE[tasks.length % ROUTINE_COLOR_CYCLE.length],
-      repeat_pattern: data.repeatEnabled ? data.repeatPattern : 'none',
-      repeat_days: data.repeatDays || null,
-      description: data.description || null,
-      pro_link_type: data.proLinkType || null,
-      pro_link_value: data.proLinkValue || null,
-      goal_enabled: data.goalEnabled || false,
-      goal_target: data.goalTarget || null,
-      goal_type: data.goalType || null,
-      goal_unit: data.goalUnit || null,
-      duration_minutes: data.durationMinutes || null,
-      linked_playlist_id: data.linkedPlaylistId || null,
-    };
-    setTasks(prev => [...prev, newTask]);
-    setShowCreateTask(false);
-  };
-
-  const handleQuickAddSubmit = () => {
-    const trimmed = quickAddTitle.trim();
-    if (!trimmed) return;
-    haptic.medium();
     const variant = QUICK_ADD_VARIANTS[tasks.length % QUICK_ADD_VARIANTS.length];
     const newTask: BuilderTask = {
       id: `quick-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      title: trimmed,
-      emoji: variant.emoji,
-      color: variant.color,
-      repeat_pattern: 'daily',
+      title: taskName,
+      emoji: template?.emoji || variant.emoji,
+      color: template?.color || variant.color,
+      repeat_pattern: template?.repeat_pattern || 'daily',
+      repeat_days: template?.repeat_days || null,
+      description: template?.description || null,
+      pro_link_type: template?.pro_link_type || null,
+      pro_link_value: template?.pro_link_value || null,
+      goal_enabled: template?.goal_enabled || false,
+      goal_target: template?.goal_target || null,
+      goal_type: template?.goal_type || null,
+      goal_unit: template?.goal_unit || null,
+      duration_minutes: template?.duration_minutes || null,
+      time_period: template?.time_period || null,
+      linked_playlist_id: template?.linked_playlist_id || null,
+      category: template?.category || null,
     };
     setTasks(prev => [...prev, newTask]);
-    setQuickAddTitle('');
-    setTimeout(() => quickAddInputRef.current?.focus(), 50);
+    setShowQuickStart(false);
   };
 
   const handleNext = () => {
