@@ -353,20 +353,70 @@ export function RoutineBuilderSheet({
                 </div>
 
                 {/* Action buttons */}
-                <div className="px-3 pb-3 pt-2 space-y-1.5">
-                  {/* Quick Add Task button */}
-                  <button
-                    onClick={() => {
-                      haptic.light();
-                      setShowCreateTask(true);
-                    }}
-                    className="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/60 dark:bg-white/10 active:bg-white/80 dark:active:bg-white/20 transition-colors"
-                  >
-                    <div className="w-8 h-8 rounded-xl bg-amber-400/20 flex items-center justify-center">
-                      <Plus className="w-4 h-4 text-amber-600 dark:text-amber-400" strokeWidth={2.5} />
+                <div className="px-3 pb-2 pt-2 space-y-1.5">
+                  {/* Quick Add — inline two-tone card (like home planner) */}
+                  {quickAddMode ? (
+                    <div className="rounded-2xl overflow-hidden border border-amber-200/50 dark:border-amber-800/30 animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="bg-white/80 dark:bg-white/10 px-3.5 py-2.5">
+                        <div className="flex items-center gap-2">
+                          <Plus className="h-5 w-5 text-amber-500 shrink-0" strokeWidth={2.5} />
+                          <input
+                            ref={quickAddInputRef}
+                            value={quickAddTitle}
+                            onChange={(e) => setQuickAddTitle(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleQuickAddSubmit();
+                              if (e.key === 'Escape') { setQuickAddTitle(''); setQuickAddMode(false); }
+                            }}
+                            placeholder="Type task name..."
+                            className="flex-1 bg-transparent text-[14px] font-semibold text-black dark:text-foreground placeholder:text-black/40 dark:placeholder:text-muted-foreground/50 outline-none"
+                            enterKeyHint="done"
+                            autoComplete="off"
+                          />
+                          {quickAddTitle.trim() && (
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <button
+                                onClick={() => {
+                                  haptic.light();
+                                  // Open full task creator with pre-filled title
+                                  setShowCreateTask(true);
+                                  setQuickAddMode(false);
+                                }}
+                                className="h-8 w-8 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center active:scale-95 transition-transform"
+                              >
+                                <MoreHorizontal className="w-4 h-4 text-black/50 dark:text-white/50" />
+                              </button>
+                              <button
+                                onClick={handleQuickAddSubmit}
+                                className="h-8 px-3.5 rounded-xl bg-amber-400 dark:bg-amber-500 text-black text-xs font-bold active:scale-95 transition-transform shadow-sm"
+                              >
+                                Add
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="px-4 py-1.5 bg-[#FFE6C0] dark:bg-amber-900/20">
+                        <p className="text-[11px] font-medium text-black/50 dark:text-muted-foreground text-center">
+                          Press enter to add. Tap ••• for details.
+                        </p>
+                      </div>
                     </div>
-                    <span className="text-[13px] font-semibold text-black/80 dark:text-foreground">Add Quick Task</span>
-                  </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        haptic.light();
+                        setQuickAddMode(true);
+                        setTimeout(() => quickAddInputRef.current?.focus(), 100);
+                      }}
+                      className="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/60 dark:bg-white/10 active:bg-white/80 dark:active:bg-white/20 transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-xl bg-amber-400/20 flex items-center justify-center">
+                        <Plus className="w-4 h-4 text-amber-600 dark:text-amber-400" strokeWidth={2.5} />
+                      </div>
+                      <span className="text-[13px] font-semibold text-black/80 dark:text-foreground">Add Quick Task</span>
+                    </button>
+                  )}
 
                   {/* Add from My Tasks */}
                   <button
