@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Video, BookOpen, Music, ExternalLink, Settings2 } from 'lucide-react';
+import { Video, BookOpen, Music, ExternalLink, Settings2, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   ProgramEvent, 
