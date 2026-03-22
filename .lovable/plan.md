@@ -1,43 +1,56 @@
 
 
-# Fix Routine Card Emojis & Completion % Bugs
+# Plan: Replace "Your Programs" with Enrollment-Day Program Event Cards
 
-## Root Cause
+## Problem
+The "Your Programs" bottom carousel takes up screen space permanently. Users need to know about their programs, but a persistent UI section is overkill when Program Event Cards already exist in the planner.
 
-There are two parallel queries for routine tasks, and they use **different** filters:
+## Approach
 
-- `routineTasksMap` (emojis): `.or('pro_link_type.is.null,pro_link_type.neq.routine')` — correct, includes pro-linked member tasks
-- `userTasksByRoutine` (completion %): `.is('pro_link_type', null)` — **wrong**, excludes ALL pro-linked member tasks (breathe, mood, journal, etc.)
+### 1. Add an "enrollment" event type to ProgramEventCard
+On the day a user enrolls (or re-enrolls), show a special card like:
+- Type: `enrollment` — new gradient (e.g., amber/orange), with a GraduationCap icon
+- Title: the program name
+- Badge: "New Program" or "Welcome"
+- Clicking navigates to `/app/course/{slug}`
+- Not completable (no checkbox, or auto-completed)
 
-This means:
-- Routines with only pro-linked member tasks show **no emojis** (they do now after our fix) but get **wrong completion %** (either null or 100% when it shouldn't be)
-- The completion calculation silently ignores tasks like "Mood Check-in" or "Take 5 Calm breaths" if they have `pro_link_type` set
+### 2. Update the RPC to return enrollment events
+Modify `get_program_events_for_date` to include a 4th result set: `enrollments`. For each active enrollment where `enrolled_at::date = v_date`, return an enrollment event object with program title, slug, and round info.
 
-## Changes
+### 3. Update `usePlannerProgramEvents` hook
+- Process the new `data.enrollments` array from the RPC
+- Create `ProgramEvent` objects with `type: 'enrollment'`
+- Sort them at the top (before sessions)
 
-### 1. Fix `userTasksByRoutine` query filter
-**File: `src/pages/app/AppRoutinePlayer.tsx` (~line 427)**
+### 4. Update ProgramEventCard to handle enrollment type
+- Add `enrollment` to `EVENT_STYLES` (amber gradient, GraduationCap icon, "New Program" badge)
+- Hide the completion checkbox for enrollment events
+- On click, navigate to course detail page
 
-Change:
-```
-.is('pro_link_type', null)
-```
-To:
-```
-.or('pro_link_type.is.null,pro_link_type.neq.routine')
-```
+### 5. Handle schedule changes (session updates)
+When admin changes session dates, the session events will naturally appear on the new dates via the existing system. No extra work needed — the planner already reflects the current schedule.
 
-This mirrors the fix already applied to `routineTasksMap`, ensuring pro-linked member tasks (breathe, mood, journal) are counted for completion tracking while still excluding routine-launcher tasks.
+### 6. Remove the "Your Programs" bottom carousel
+- Remove the `ActiveRoundsCarousel` rendering from `AppHome.tsx` (the fixed bottom section)
+- Remove the extra bottom padding that accounts for it
+- Adjust FAB positioning
+- Clean up the HomeTour step that references it
 
-### 2. Verify Calendar+ flow is correct
-The Calendar+ button already creates a `pro_link_type: 'routine'` launcher task and opens the RoutinePreviewSheet. No change needed here — it already works as the user described.
+### 7. Update `useProgramEventDates` for calendar dots
+Add enrollment dates to the dot indicator so users see activity on their enrollment day in the calendar.
 
-## Technical Summary
-```
-userTasksByRoutine filter:
-  Before: .is('pro_link_type', null)         → misses breathe/mood/journal tasks
-  After:  .or('pro_link_type.is.null,...')    → includes all except routine launchers
-```
+## Technical Details
 
-One-line fix. Completion percentages and emoji display will be consistent.
+**New ProgramEvent type value**: `'enrollment'` added to the union type.
+
+**RPC change** (migration): Add an `enrollment_events` CTE that selects from `course_enrollments` where `enrolled_at::date = v_date`, returning program title, slug, round info.
+
+**Files to modify**:
+- `supabase/migrations/` — new migration updating the RPC
+- `src/hooks/usePlannerProgramEvents.tsx` — process enrollment events, update types
+- `src/components/app/ProgramEventCard.tsx` — add enrollment style, hide checkbox for it
+- `src/pages/app/AppHome.tsx` — remove ActiveRoundsCarousel section + related imports/padding
+- `src/components/app/tour/HomeTour.tsx` — remove programs tour step
+- `src/hooks/usePlannerProgramEvents.tsx` (`useProgramEventDates`) — include enrollment dates
 
