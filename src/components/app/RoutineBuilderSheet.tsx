@@ -291,7 +291,7 @@ export function RoutineBuilderSheet({
         <DialogContent
           hideCloseButton
           className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !translate-y-0"
-          style={{ top: step === 1 ? '25%' : '12%' }}
+          style={{ top: '12%' }}
         >
           {/* Two-tone name card */}
           <div className="rounded-3xl overflow-hidden transition-all duration-300">
