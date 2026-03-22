@@ -120,6 +120,20 @@ export function RoutineBuilderSheet({
     onOpenChange(v);
   }, [onOpenChange, initialTitle, initialEmoji, initialTasks, editMode]);
 
+  // Sync state when dialog opens via props
+  useEffect(() => {
+    if (open) {
+      setRoutineTitle(initialTitle);
+      setRoutineEmoji(initialEmoji);
+      setTasks(initialTasks);
+      if (editMode) {
+        setStep(2);
+      } else {
+        setStep(1);
+      }
+    }
+  }, [open, editMode, initialTitle, initialEmoji, initialTasks]);
+
   // Auto-focus name input
   useEffect(() => {
     if (open && step === 1) {
