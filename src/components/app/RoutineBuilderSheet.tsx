@@ -487,17 +487,12 @@ export function RoutineBuilderSheet({
         </SheetContent>
       </Sheet>
 
-      {/* Create new task sheet */}
-      {showCreateTask && (
-        <AppTaskCreate
-          isSheet={true}
-          sheetOpen={showCreateTask}
-          onSheetOpenChange={(open) => {
-            if (!open) setShowCreateTask(false);
-          }}
-          onSaveSheet={handleCreateNewTask}
-        />
-      )}
+      {/* Quick Start Sheet — same as home page */}
+      <TaskQuickStartSheet
+        open={showQuickStart}
+        onOpenChange={setShowQuickStart}
+        onContinue={handleQuickStartContinue}
+      />
     </>
   );
 }
