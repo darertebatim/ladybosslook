@@ -32,6 +32,7 @@ const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
   { value: 'watch', label: '📺 Watch Page' },
   { value: 'routines_top', label: '✨ Routines - Top' },
   { value: 'routines_after_categories', label: '✨ Routines - Under Categories' },
+  { value: 'routine_player', label: '🎬 Routine Player' },
 ];
 
 interface PromoBanner {
