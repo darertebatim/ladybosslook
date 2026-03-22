@@ -113,20 +113,18 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
     }
   };
 
+  const isEnrollment = event.type === 'enrollment';
+
   const handleCardClick = async () => {
     haptic.light();
 
     switch (event.type) {
+      case 'enrollment':
       case 'session':
-        // Always navigate to course detail page
-        navigate(`/app/course/${event.programSlug}`, { state: { from: location.pathname } });
-        break;
       case 'module':
-        // Navigate to course detail (modules section)
         navigate(`/app/course/${event.programSlug}`, { state: { from: location.pathname } });
         break;
       case 'track':
-        // Navigate to audio player
         if (event.playlistId) {
           navigate(`/app/player/playlist/${event.playlistId}`, { state: { from: location.pathname } });
         }
