@@ -3,14 +3,14 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, Plus, Trash2, ListChecks, MoreHorizontal } from 'lucide-react';
+import { ChevronLeft, Plus, Trash2, ListChecks } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
-import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
+import { TASK_COLOR_CLASSES, TaskColor, TaskTemplate } from '@/hooks/useTaskPlanner';
+import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
 
 // Builder task — intermediate representation
@@ -82,11 +82,8 @@ export function RoutineBuilderSheet({
   const [tasks, setTasks] = useState<BuilderTask[]>(initialTasks);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showMyTasks, setShowMyTasks] = useState(false);
-  const [showCreateTask, setShowCreateTask] = useState(false);
-  const [quickAddMode, setQuickAddMode] = useState(false);
-  const [quickAddTitle, setQuickAddTitle] = useState('');
+  const [showQuickStart, setShowQuickStart] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const quickAddInputRef = useRef<HTMLInputElement>(null);
 
   // Reset state when dialog opens/closes
   const handleOpenChange = useCallback((v: boolean) => {
@@ -98,9 +95,7 @@ export function RoutineBuilderSheet({
         setTasks(initialTasks);
         setShowSuggestions(false);
         setShowMyTasks(false);
-        setShowCreateTask(false);
-        setQuickAddMode(false);
-        setQuickAddTitle('');
+        setShowQuickStart(false);
       }, 300);
     } else {
       setRoutineTitle(initialTitle);
@@ -192,44 +187,30 @@ export function RoutineBuilderSheet({
     setTasks(prev => prev.filter(t => t.id !== taskId));
   };
 
-  const handleCreateNewTask = (data: TaskFormData) => {
+  const handleQuickStartContinue = (taskName: string, template?: TaskTemplate) => {
     haptic.light();
-    const newTask: BuilderTask = {
-      id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      title: data.title,
-      emoji: data.icon || '📝',
-      color: data.color || ROUTINE_COLOR_CYCLE[tasks.length % ROUTINE_COLOR_CYCLE.length],
-      repeat_pattern: data.repeatEnabled ? data.repeatPattern : 'none',
-      repeat_days: data.repeatDays || null,
-      description: data.description || null,
-      pro_link_type: data.proLinkType || null,
-      pro_link_value: data.proLinkValue || null,
-      goal_enabled: data.goalEnabled || false,
-      goal_target: data.goalTarget || null,
-      goal_type: data.goalType || null,
-      goal_unit: data.goalUnit || null,
-      duration_minutes: data.durationMinutes || null,
-      linked_playlist_id: data.linkedPlaylistId || null,
-    };
-    setTasks(prev => [...prev, newTask]);
-    setShowCreateTask(false);
-  };
-
-  const handleQuickAddSubmit = () => {
-    const trimmed = quickAddTitle.trim();
-    if (!trimmed) return;
-    haptic.medium();
     const variant = QUICK_ADD_VARIANTS[tasks.length % QUICK_ADD_VARIANTS.length];
     const newTask: BuilderTask = {
       id: `quick-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      title: trimmed,
-      emoji: variant.emoji,
-      color: variant.color,
-      repeat_pattern: 'daily',
+      title: taskName,
+      emoji: template?.emoji || variant.emoji,
+      color: template?.color || variant.color,
+      repeat_pattern: template?.repeat_pattern || 'daily',
+      repeat_days: template?.repeat_days || null,
+      description: template?.description || null,
+      pro_link_type: template?.pro_link_type || null,
+      pro_link_value: template?.pro_link_value || null,
+      goal_enabled: template?.goal_enabled || false,
+      goal_target: template?.goal_target || null,
+      goal_type: template?.goal_type || null,
+      goal_unit: template?.goal_unit || null,
+      duration_minutes: null,
+      time_period: template?.time_period || null,
+      linked_playlist_id: template?.linked_playlist_id || null,
+      category: template?.category || null,
     };
     setTasks(prev => [...prev, newTask]);
-    setQuickAddTitle('');
-    setTimeout(() => quickAddInputRef.current?.focus(), 50);
+    setShowQuickStart(false);
   };
 
   const handleNext = () => {
@@ -259,7 +240,7 @@ export function RoutineBuilderSheet({
   return (
     <>
       {/* Main Dialog — both steps live here */}
-      <Dialog open={open && !showMyTasks} onOpenChange={(v) => { if (!v) handleOpenChange(false); }}>
+      <Dialog open={open && !showMyTasks && !showQuickStart} onOpenChange={(v) => { if (!v) handleOpenChange(false); }}>
         <DialogContent
           hideCloseButton
           className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !translate-y-0"
@@ -345,69 +326,19 @@ export function RoutineBuilderSheet({
 
                 {/* Action buttons */}
                 <div className="px-3 pb-2 pt-2 space-y-1.5">
-                  {/* Quick Add — inline two-tone card (like home planner) */}
-                  {quickAddMode ? (
-                    <div className="rounded-2xl overflow-hidden border border-amber-200/50 dark:border-amber-800/30 animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="bg-white/80 dark:bg-white/10 px-3.5 py-2.5">
-                        <div className="flex items-center gap-2">
-                          <Plus className="h-5 w-5 text-amber-500 shrink-0" strokeWidth={2.5} />
-                          <input
-                            ref={quickAddInputRef}
-                            value={quickAddTitle}
-                            onChange={(e) => setQuickAddTitle(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') handleQuickAddSubmit();
-                              if (e.key === 'Escape') { setQuickAddTitle(''); setQuickAddMode(false); }
-                            }}
-                            placeholder="Type task name..."
-                            className="flex-1 bg-transparent text-[14px] font-semibold text-black dark:text-foreground placeholder:text-black/40 dark:placeholder:text-muted-foreground/50 outline-none"
-                            enterKeyHint="done"
-                            autoComplete="off"
-                          />
-                          {quickAddTitle.trim() && (
-                            <div className="flex items-center gap-1.5 shrink-0">
-                              <button
-                                onClick={() => {
-                                  haptic.light();
-                                  // Open full task creator with pre-filled title
-                                  setShowCreateTask(true);
-                                  setQuickAddMode(false);
-                                }}
-                                className="h-8 w-8 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center active:scale-95 transition-transform"
-                              >
-                                <MoreHorizontal className="w-4 h-4 text-black/50 dark:text-white/50" />
-                              </button>
-                              <button
-                                onClick={handleQuickAddSubmit}
-                                className="h-8 px-3.5 rounded-xl bg-amber-400 dark:bg-amber-500 text-black text-xs font-bold active:scale-95 transition-transform shadow-sm"
-                              >
-                                Add
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <div className="px-4 py-1.5 bg-[#FFE6C0] dark:bg-amber-900/20">
-                        <p className="text-[11px] font-medium text-black/50 dark:text-muted-foreground text-center">
-                          Press enter to add. Tap ••• for details.
-                        </p>
-                      </div>
+                  {/* Add Quick Task — opens the same TaskQuickStartSheet as home */}
+                  <button
+                    onClick={() => {
+                      haptic.light();
+                      setShowQuickStart(true);
+                    }}
+                    className="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/60 dark:bg-white/10 active:bg-white/80 dark:active:bg-white/20 transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-amber-400/20 flex items-center justify-center">
+                      <Plus className="w-4 h-4 text-amber-600 dark:text-amber-400" strokeWidth={2.5} />
                     </div>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        haptic.light();
-                        setQuickAddMode(true);
-                        setTimeout(() => quickAddInputRef.current?.focus(), 100);
-                      }}
-                      className="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/60 dark:bg-white/10 active:bg-white/80 dark:active:bg-white/20 transition-colors"
-                    >
-                      <div className="w-8 h-8 rounded-xl bg-amber-400/20 flex items-center justify-center">
-                        <Plus className="w-4 h-4 text-amber-600 dark:text-amber-400" strokeWidth={2.5} />
-                      </div>
-                      <span className="text-[13px] font-semibold text-black/80 dark:text-foreground">Add Quick Task</span>
-                    </button>
-                  )}
+                    <span className="text-[13px] font-semibold text-black/80 dark:text-foreground">Add Quick Task</span>
+                  </button>
 
                   {/* Add from My Tasks */}
                   <button
@@ -556,17 +487,12 @@ export function RoutineBuilderSheet({
         </SheetContent>
       </Sheet>
 
-      {/* Create new task sheet */}
-      {showCreateTask && (
-        <AppTaskCreate
-          isSheet={true}
-          sheetOpen={showCreateTask}
-          onSheetOpenChange={(open) => {
-            if (!open) setShowCreateTask(false);
-          }}
-          onSaveSheet={handleCreateNewTask}
-        />
-      )}
+      {/* Quick Start Sheet — same as home page */}
+      <TaskQuickStartSheet
+        open={showQuickStart}
+        onOpenChange={setShowQuickStart}
+        onContinue={handleQuickStartContinue}
+      />
     </>
   );
 }
