@@ -70,6 +70,11 @@ const AppHome = () => {
   const taskFilter = searchParams.get('filter') || 'all';
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const [homeView, setHomeView] = useState<'tasks' | 'routines'>('tasks');
+  useEffect(() => {
+    const handler = () => setHomeView(prev => prev === 'tasks' ? 'routines' : 'tasks');
+    window.addEventListener('home-tab-retap', handler);
+    return () => window.removeEventListener('home-tab-retap', handler);
+  }, []);
   const setTaskFilter = useCallback((val: string) => {
     setSearchParams(prev => {
       const next = new URLSearchParams(prev);
