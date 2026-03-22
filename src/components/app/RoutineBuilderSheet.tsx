@@ -10,6 +10,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TASK_COLOR_CLASSES, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
+import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
+import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
 
 // Secondary (darker) palette for bottom sections
 const TASK_COLORS_DARK: Record<string, string> = {
@@ -26,8 +28,19 @@ const TASK_COLORS_DARK: Record<string, string> = {
   orange: '#FFD2A1',
   green: '#C3F1E1',
 };
-import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
-import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
+
+const ROUTINE_COLOR_ALIASES: Record<string, TaskColor> = {
+  red: 'pink',
+  orange: 'peach',
+  green: 'lime',
+  blue: 'sky',
+  purple: 'lavender',
+};
+
+const normalizeRoutineColor = (color?: string): TaskColor => {
+  const safeColor = (color || 'peach') as TaskColor;
+  return ROUTINE_COLOR_ALIASES[safeColor] || safeColor;
+};
 
 // Builder task — intermediate representation
 export interface BuilderTask {
@@ -96,7 +109,7 @@ export function RoutineBuilderSheet({
   const [step, setStep] = useState<1 | 2>(1);
   const [routineTitle, setRoutineTitle] = useState(initialTitle);
   const [routineEmoji, setRoutineEmoji] = useState(initialEmoji);
-  const [routineColor, setRoutineColor] = useState(initialColor);
+  const [routineColor, setRoutineColor] = useState<TaskColor>(() => normalizeRoutineColor(initialColor));
 
   const [tasks, setTasks] = useState<BuilderTask[]>(initialTasks);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -117,6 +130,7 @@ export function RoutineBuilderSheet({
         setStep(1);
         setRoutineTitle(initialTitle);
         setRoutineEmoji(initialEmoji);
+        setRoutineColor(normalizeRoutineColor(initialColor));
         setTasks(initialTasks);
         setShowSuggestions(false);
         setShowMyTasks(false);
@@ -127,6 +141,7 @@ export function RoutineBuilderSheet({
     } else {
       setRoutineTitle(initialTitle);
       setRoutineEmoji(initialEmoji);
+      setRoutineColor(normalizeRoutineColor(initialColor));
       setTasks(initialTasks);
       if (editMode) {
         setStep(2);
@@ -135,13 +150,14 @@ export function RoutineBuilderSheet({
       }
     }
     onOpenChange(v);
-  }, [onOpenChange, initialTitle, initialEmoji, initialTasks, editMode]);
+  }, [onOpenChange, initialTitle, initialEmoji, initialColor, initialTasks, editMode]);
 
   // Sync state when dialog opens via props
   useEffect(() => {
     if (open) {
       setRoutineTitle(initialTitle);
       setRoutineEmoji(initialEmoji);
+      setRoutineColor(normalizeRoutineColor(initialColor));
       setTasks(initialTasks);
       if (editMode) {
         setStep(2);
@@ -149,7 +165,7 @@ export function RoutineBuilderSheet({
         setStep(1);
       }
     }
-  }, [open, editMode, initialTitle, initialEmoji, initialTasks]);
+  }, [open, editMode, initialTitle, initialEmoji, initialColor, initialTasks]);
 
   // Auto-focus name input
   useEffect(() => {

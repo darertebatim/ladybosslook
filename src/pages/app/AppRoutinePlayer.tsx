@@ -353,8 +353,8 @@ export default function AppRoutinePlayer() {
   const routineReorderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Sync local routines from query data
-  const routinesKey = JSON.stringify((myRoutines || []).map((r: any) => r.id));
-  const localRoutinesKey = JSON.stringify(localRoutines.map((r: any) => r.id));
+  const routinesKey = JSON.stringify((myRoutines || []).map((r: any) => `${r.id}:${r.title}:${r.emoji}:${r.color}:${r.order_index ?? ''}`));
+  const localRoutinesKey = JSON.stringify(localRoutines.map((r: any) => `${r.id}:${r.title}:${r.emoji}:${r.color}:${r.order_index ?? ''}`));
   if (routinesKey !== localRoutinesKey && !skipRoutineSyncRef.current) {
     setLocalRoutines(myRoutines || []);
   }
