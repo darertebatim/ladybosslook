@@ -643,7 +643,7 @@ const AppCourseDetail = () => {
           emoji: '📅',
           scheduledDate: format(sessionDate, 'yyyy-MM-dd'),
           scheduledTime: format(sessionDate, 'HH:mm'),
-          reminderOffset: sessionSettings.reminderMinutes,
+          reminderOffset: Math.max(...sessionSettings.reminderMinutes),
         });
         
         if (result.success) {
