@@ -233,6 +233,11 @@ export default function AppRoutinePlayer() {
   const [showBuilderPreview, setShowBuilderPreview] = useState(false);
   const [builderEditTasks, setBuilderEditTasks] = useState<any[]>([]);
 
+  // Dismissed featured routines
+  const [dismissedFeatured, setDismissedFeatured] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem(DISMISSED_FEATURED_KEY) || '[]'); } catch { return []; }
+  });
+
   // Check if routine player page is already added as a task
   const { data: isPageAdded } = useExistingProTask('route', '/app/routineplayer');
 
