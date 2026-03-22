@@ -69,6 +69,7 @@ interface RoutineCardProps {
   onPlay: (routine: any) => void;
   onOpenAddSheet: (routine: any) => void;
   onDeleteRoutine: (routine: any) => void;
+  onEditRoutine?: (routine: any) => void;
 }
 
 function RoutineCardContent({
