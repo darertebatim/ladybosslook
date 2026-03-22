@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+const DISMISSED_FEATURED_KEY = 'dismissed-featured-routines';
 import { fetchSmartEstimates, type SmartEstimateInput } from '@/lib/smartEstimate';
 import { cn } from '@/lib/utils';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -231,6 +232,11 @@ export default function AppRoutinePlayer() {
   const [builderResult, setBuilderResult] = useState<{ title: string; emoji: string; color: string; tasks: any[] } | null>(null);
   const [showBuilderPreview, setShowBuilderPreview] = useState(false);
   const [builderEditTasks, setBuilderEditTasks] = useState<any[]>([]);
+
+  // Dismissed featured routines
+  const [dismissedFeatured, setDismissedFeatured] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem(DISMISSED_FEATURED_KEY) || '[]'); } catch { return []; }
+  });
 
   // Check if routine player page is already added as a task
   const { data: isPageAdded } = useExistingProTask('route', '/app/routineplayer');
@@ -1239,9 +1245,17 @@ export default function AppRoutinePlayer() {
                   </button>
                 </div>
                 <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4" style={{ WebkitOverflowScrolling: 'touch' }}>
-                  {featuredRoutines.map((routine, i) => (
+                  {featuredRoutines.filter(r => !dismissedFeatured.includes(r.id)).map((routine) => (
                     <div key={routine.id} className={cn('shrink-0 w-[85%] snap-start')}>
-                      <FeaturedRoutineCard routine={routine} categoryName={categoryNameMap.get(routine.category)} />
+                      <FeaturedRoutineCard
+                        routine={routine}
+                        categoryName={categoryNameMap.get(routine.category)}
+                        onDismiss={() => {
+                          const updated = [...dismissedFeatured, routine.id];
+                          setDismissedFeatured(updated);
+                          localStorage.setItem(DISMISSED_FEATURED_KEY, JSON.stringify(updated));
+                        }}
+                      />
                     </div>
                   ))}
                 </div>
