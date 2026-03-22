@@ -10,6 +10,22 @@ import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TASK_COLOR_CLASSES, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
+
+// Secondary (darker) palette for bottom sections
+const TASK_COLORS_DARK: Record<string, string> = {
+  pink: '#FFC2EA',
+  peach: '#FFD2A1',
+  yellow: '#FFEA4E',
+  lime: '#C3F1E1',
+  sky: '#B9D6FF',
+  mint: '#C9F588',
+  lavender: '#DEC1FF',
+  purple: '#DEC1FF',
+  blue: '#B9D6FF',
+  red: '#FFC2EA',
+  orange: '#FFD2A1',
+  green: '#C3F1E1',
+};
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
 
