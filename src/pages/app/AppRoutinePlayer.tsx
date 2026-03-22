@@ -1238,9 +1238,9 @@ export default function AppRoutinePlayer() {
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
-                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory">
-                  {featuredRoutines.map((routine) => (
-                    <div key={routine.id} className="shrink-0 w-[85%] snap-start">
+                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4" style={{ WebkitOverflowScrolling: 'touch' }}>
+                  {featuredRoutines.map((routine, i) => (
+                    <div key={routine.id} className={cn('shrink-0 w-[85%] snap-start')}>
                       <FeaturedRoutineCard routine={routine} categoryName={categoryNameMap.get(routine.category)} />
                     </div>
                   ))}
