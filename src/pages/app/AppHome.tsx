@@ -553,6 +553,11 @@ const AppHome = () => {
     return result;
   }, [tasks, taskFilter, skippedTaskIds, selectedDate, carryForwardTasks]);
 
+  // Routine launcher pro-tasks for the "Routines" view
+  const routineProTasks = useMemo(() => {
+    return tasks.filter(t => t.pro_link_type === 'routine' && !skippedTaskIds.has(t.id));
+  }, [tasks, skippedTaskIds]);
+
   // Get unique tags from tasks
   const taskTags = useMemo(() => {
     const tags = new Set<string>();
