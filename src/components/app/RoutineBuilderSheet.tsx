@@ -38,7 +38,7 @@ const ROUTINE_COLOR_ALIASES: Record<string, TaskColor> = {
 };
 
 const normalizeRoutineColor = (color?: string): TaskColor => {
-  const safeColor = (color || 'peach') as TaskColor;
+  const safeColor = (color || 'mint') as TaskColor;
   return ROUTINE_COLOR_ALIASES[safeColor] || safeColor;
 };
 
