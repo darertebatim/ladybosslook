@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -84,6 +84,10 @@ export const ProgramRoundsManager = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [managingSessionsRound, setManagingSessionsRound] = useState<ProgramRound | null>(null);
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  
+  // Notify students dialog state
+  const [showNotifyDialog, setShowNotifyDialog] = useState(false);
+  const lastSavedRoundRef = useRef<{ id: string; program_slug: string } | null>(null);
   
   // Drip adjustment dialog state
   const [adjustingDripRound, setAdjustingDripRound] = useState<ProgramRound | null>(null);
@@ -223,9 +227,18 @@ export const ProgramRoundsManager = () => {
         }
       }
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["program-rounds"] });
-      toast.success(editingId ? "Round updated" : "Round created");
+      const wasEditing = !!editingId;
+      toast.success(wasEditing ? "Round updated" : "Round created");
+      
+      // Show notify dialog only when editing an existing round
+      if (wasEditing && editingId) {
+        const round = rounds?.find(r => r.id === editingId);
+        lastSavedRoundRef.current = { id: editingId, program_slug: round?.program_slug || variables.program_slug };
+        setShowNotifyDialog(true);
+      }
+      
       resetForm();
       setIsFormDialogOpen(false);
     },
@@ -279,6 +292,29 @@ export const ProgramRoundsManager = () => {
       queryClient.invalidateQueries({ queryKey: ['program-rounds'] });
       toast.success(`Drip offset updated to ${newOffset >= 0 ? '+' : ''}${newOffset} days`);
       setAdjustingDripRound(null);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
+  // Notify students mutation
+  const notifyStudentsMutation = useMutation({
+    mutationFn: async ({ roundId, programSlug }: { roundId: string; programSlug: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from('round_update_notifications')
+        .insert({
+          round_id: roundId,
+          program_slug: programSlug,
+          created_by: user?.id,
+        });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Students will be notified about changes');
+      setShowNotifyDialog(false);
+      lastSavedRoundRef.current = null;
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -950,6 +986,44 @@ export const ProgramRoundsManager = () => {
               disabled={updateDripOffsetMutation.isPending}
             >
               {dripAdjustmentType === 'freeze' ? 'Freeze' : 'Forward'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Notify Students Dialog */}
+      <Dialog open={showNotifyDialog} onOpenChange={(open) => {
+        if (!open) {
+          setShowNotifyDialog(false);
+          lastSavedRoundRef.current = null;
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Notify Students?</DialogTitle>
+            <DialogDescription>
+              Would you like to notify enrolled students about the changes to this round? They'll see a card in their planner today.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowNotifyDialog(false);
+                lastSavedRoundRef.current = null;
+              }}
+            >
+              No, skip
+            </Button>
+            <Button
+              onClick={() => {
+                if (lastSavedRoundRef.current) {
+                  notifyStudentsMutation.mutate({ roundId: lastSavedRoundRef.current.id, programSlug: lastSavedRoundRef.current.program_slug });
+                }
+              }}
+              disabled={notifyStudentsMutation.isPending}
+            >
+              Yes, notify
             </Button>
           </DialogFooter>
         </DialogContent>

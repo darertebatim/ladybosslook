@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Video, BookOpen, Music, ExternalLink, Settings2, GraduationCap } from 'lucide-react';
+import { Video, BookOpen, Music, ExternalLink, Settings2, GraduationCap, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   ProgramEvent, 
@@ -49,6 +49,13 @@ const EVENT_STYLES = {
     badge: 'New Program',
     badgeColor: 'bg-amber-500',
     Icon: GraduationCap,
+  },
+  round_update: {
+    gradient: 'bg-gradient-to-br from-sky-100 to-blue-100',
+    iconBg: 'bg-sky-500',
+    badge: 'Changes in Program',
+    badgeColor: 'bg-sky-500',
+    Icon: RefreshCw,
   },
 };
 
@@ -115,12 +122,31 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
   };
 
   const isEnrollment = event.type === 'enrollment';
+  const isRoundUpdate = event.type === 'round_update';
+  const isSpecialCard = isEnrollment || isRoundUpdate;
 
   const handleCardClick = async () => {
     haptic.light();
 
+    // Mark round_update as read on tap
+    if (isRoundUpdate) {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.from('round_notification_reads').insert({
+            notification_id: event.id,
+            user_id: user.id,
+          });
+        }
+      } catch (err) {
+        console.error('Failed to mark notification as read:', err);
+      }
+    }
+
     switch (event.type) {
       case 'enrollment':
+      case 'round_update':
       case 'session':
       case 'module':
         navigate(`/app/course/${event.programSlug}`, { state: { from: location.pathname } });
@@ -199,7 +225,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
             </p>
             
             {/* Program name - subtle subtitle */}
-            {!isEnrollment && (
+            {!isSpecialCard && (
               <p className="text-xs text-foreground/50 truncate">
                 {event.programTitle}
               </p>
@@ -209,10 +235,15 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
                 Tap to explore your program →
               </p>
             )}
+            {isRoundUpdate && (
+              <p className="text-xs text-foreground/50 truncate">
+                Tap to see changes →
+              </p>
+            )}
           </div>
 
-          {/* Checkbox - hidden for enrollment cards */}
-          {!isEnrollment && (
+          {/* Checkbox - hidden for special cards */}
+          {!isSpecialCard && (
             <button
               onClick={handleToggleComplete}
               className="w-9 h-9 flex items-center justify-center shrink-0"

@@ -5,7 +5,7 @@ import { format, isSameDay, isWithinInterval, startOfDay, endOfDay } from 'date-
 
 export interface ProgramEvent {
   id: string;
-  type: 'session' | 'module' | 'track' | 'enrollment';
+  type: 'session' | 'module' | 'track' | 'enrollment' | 'round_update';
   title: string;
   programSlug: string;
   programTitle: string;
@@ -175,8 +175,21 @@ export function useProgramEventsForDate(date: Date) {
         });
       }
 
+      // Process round update notifications
+      for (const u of (data.round_updates || [])) {
+        events.push({
+          id: u.id,
+          type: 'round_update',
+          title: u.programTitle,
+          programSlug: u.programSlug,
+          programTitle: u.programTitle,
+          roundId: u.roundId,
+          isCompleted: false,
+        });
+      }
+
       // Sort: enrollments first, then sessions, then by time
-      const typePriority: Record<string, number> = { enrollment: 0, session: 1, module: 2, track: 3 };
+      const typePriority: Record<string, number> = { enrollment: 0, round_update: 0.5, session: 1, module: 2, track: 3 };
       events.sort((a, b) => {
         const pa = typePriority[a.type] ?? 9;
         const pb = typePriority[b.type] ?? 9;
