@@ -208,9 +208,9 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
               {/* Settings icon */}
               <button
                 onClick={handleSettingsClick}
-                className="p-1 rounded-full bg-black/5 hover:bg-black/10 active:bg-black/20 transition-colors"
+                className={cn("p-1 rounded-full transition-colors", style.settingsBg)}
               >
-                <Settings2 className="h-3 w-3 text-black/50" />
+                <Settings2 className="h-3 w-3 text-black" />
               </button>
               
               {/* External link indicator for today's sessions */}
