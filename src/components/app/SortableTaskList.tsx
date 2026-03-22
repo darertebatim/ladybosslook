@@ -383,11 +383,18 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
     return items.slice(0, 5);
   }, [templates, selectedCategory]);
 
-  // Search-based suggestions while typing (before ideas panel is open)
+  // Search-based suggestions while typing — matches all query words individually
   const searchSuggestions = useMemo(() => {
     const q = title.trim().toLowerCase();
     if (!q || q.length < 2 || showIdeas) return [];
-    return templates.filter(t => t.title.toLowerCase().includes(q)).slice(0, 4);
+    const words = q.split(/\s+/).filter(w => w.length >= 2);
+    if (words.length === 0) return [];
+    return templates
+      .filter(t => {
+        const tl = t.title.toLowerCase();
+        return words.every(w => tl.includes(w));
+      })
+      .slice(0, 4);
   }, [templates, title, showIdeas]);
 
   useEffect(() => {
