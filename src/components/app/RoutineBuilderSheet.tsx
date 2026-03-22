@@ -713,6 +713,36 @@ export function RoutineBuilderSheet({
           onSaveSheet={handleCreateNewTask}
         />
       )}
+
+      {/* Edit existing task sheet */}
+      {editingTask && (
+        <AppTaskCreate
+          isSheet={true}
+          sheetOpen={!!editingTask}
+          onSheetOpenChange={(v) => {
+            if (!v) setEditingTask(null);
+          }}
+          onSaveSheet={handleEditTaskSave}
+          initialData={{
+            title: editingTask.title,
+            icon: editingTask.emoji,
+            color: (editingTask.color as TaskColor) || 'peach',
+            description: editingTask.description || null,
+            repeatEnabled: editingTask.repeat_pattern !== 'none' && !!editingTask.repeat_pattern,
+            repeatPattern: (editingTask.repeat_pattern === 'daily' || editingTask.repeat_pattern === 'weekly' || editingTask.repeat_pattern === 'monthly') ? editingTask.repeat_pattern : 'daily',
+            repeatDays: editingTask.repeat_days || [],
+            timePeriod: (editingTask.time_period as any) || null,
+            durationMinutes: editingTask.duration_minutes || null,
+            proLinkType: editingTask.pro_link_type as any || null,
+            proLinkValue: editingTask.pro_link_value || null,
+            goalEnabled: editingTask.goal_enabled || false,
+            goalTarget: editingTask.goal_target || 0,
+            goalType: (editingTask.goal_type as any) || 'count',
+            goalUnit: editingTask.goal_unit || '',
+            linkedPlaylistId: editingTask.linked_playlist_id || null,
+          }}
+        />
+      )}
     </>
   );
 }
