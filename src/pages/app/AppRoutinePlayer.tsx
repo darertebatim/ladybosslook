@@ -1424,6 +1424,59 @@ export default function AppRoutinePlayer() {
         }}
         isSaving={addRoutinePlan.isPending}
       />
+
+      {/* Routine Builder Sheet */}
+      <RoutineBuilderSheet
+        open={showBuilder}
+        onOpenChange={(open) => {
+          setShowBuilder(open);
+          if (!open) setBuilderEditRoutine(null);
+        }}
+        onComplete={handleBuilderComplete}
+        editMode={!!builderEditRoutine}
+        initialTitle={builderEditRoutine?.title || ''}
+        initialEmoji={builderEditRoutine?.emoji || '✨'}
+        initialColor={builderEditRoutine?.color || 'peach'}
+        initialTasks={builderEditRoutine ? [] : []}
+        onEditSave={handleBuilderEditSave}
+      />
+
+      {/* Builder Preview Sheet (shown after builder create) */}
+      {builderResult && (
+        <RoutinePreviewSheet
+          open={showBuilderPreview}
+          onOpenChange={(open) => {
+            setShowBuilderPreview(open);
+            if (!open) setBuilderResult(null);
+          }}
+          tasks={builderResult.tasks.map((t, i) => ({
+            id: t.id,
+            plan_id: 'user-created',
+            title: t.title,
+            icon: t.emoji || '📝',
+            color: t.color,
+            task_order: i,
+            is_active: true,
+            created_at: new Date().toISOString(),
+            linked_playlist_id: t.linked_playlist_id || null,
+            pro_link_type: t.pro_link_type as any,
+            pro_link_value: t.pro_link_value || null,
+            tag: builderResult.title,
+            linked_playlist: null,
+            repeat_pattern: t.repeat_pattern,
+            repeat_days: t.repeat_days,
+            goal_enabled: t.goal_enabled,
+            goal_target: t.goal_target,
+            goal_type: t.goal_type,
+            goal_unit: t.goal_unit,
+            description: t.description,
+            time_period: t.time_period,
+          } as any))}
+          routineTitle={builderResult.title}
+          routineBankId="user-created"
+          onSave={handleBuilderPreviewSave}
+        />
+      )}
     </div>
   );
 }
