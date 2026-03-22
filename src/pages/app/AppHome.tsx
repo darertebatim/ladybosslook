@@ -1104,9 +1104,18 @@ const AppHome = () => {
                           <button
                             className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-background text-foreground shadow-sm"
                           >
-                            Routines
+                            Routine Players
                           </button>
                         </div>
+                        <TaskFilterDropdown
+                          value={taskFilter}
+                          onValueChange={setTaskFilter}
+                          routineNames={routineNamesInTasks}
+                          taskTags={taskTags}
+                          categoryNameMap={categoryNameMap}
+                          externalOpen={filterDropdownOpen}
+                          onExternalOpenChange={setFilterDropdownOpen}
+                        />
                       </div>
                       {routineProTasks.length > 0 ? (
                         <>
