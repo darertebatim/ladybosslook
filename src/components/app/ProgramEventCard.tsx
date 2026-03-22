@@ -170,16 +170,16 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
       <div
         onClick={handleCardClick}
         className={cn(
-          'rounded-2xl p-4 transition-all duration-200 cursor-pointer active:scale-[0.98]',
-          style.gradient,
+          'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+          style.bgColor,
           event.isCompleted && 'opacity-60'
         )}
       >
         {/* Main row */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {/* Icon circle */}
           <div className={cn(
-            'w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-sm text-white',
+            'w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white',
             style.iconBg
           )}>
             <Icon className="h-5 w-5" />
@@ -187,66 +187,59 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            {/* Top line: time/release + badge + settings + external link */}
-            <div className="flex items-center gap-2 text-xs text-foreground/60 mb-0.5">
-              {/* Left: Time or "Anytime" */}
-              <span className="font-semibold text-foreground/70">
+            {/* Top line: time + badge + settings */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] text-black/80">
                 {event.time || 'Anytime'}
               </span>
               
-              {/* Center: Badge */}
               <span className={cn(
-                'px-2 py-0.5 rounded-full text-white font-medium text-[10px]',
-                style.badgeColor
+                'text-[10px] font-semibold rounded px-1.5 py-0.5 leading-none whitespace-nowrap',
+                style.badgeClass
               )}>
                 {style.badge}
               </span>
               
-              {/* Settings icon - opens reminder sheet directly */}
+              {/* Settings icon */}
               <button
                 onClick={handleSettingsClick}
-                className="p-1.5 rounded-full bg-foreground/5 hover:bg-foreground/10 active:bg-foreground/20 transition-colors"
+                className="p-1 rounded-full bg-black/5 hover:bg-black/10 active:bg-black/20 transition-colors"
               >
-                <Settings2 className="h-3.5 w-3.5 text-foreground/60" />
+                <Settings2 className="h-3 w-3 text-black/50" />
               </button>
               
               {/* External link indicator for today's sessions */}
               {event.type === 'session' && isToday(date) && event.meetingLink && (
-                <ExternalLink className="h-3 w-3 text-foreground/50" />
+                <ExternalLink className="h-3 w-3 text-black/40" />
               )}
             </div>
             
             {/* Title */}
             <p className={cn(
-              'font-semibold text-foreground truncate transition-all',
-              event.isCompleted && 'line-through text-foreground/50'
+              'text-black text-[15px] font-semibold leading-tight transition-all truncate',
+              event.isCompleted && 'line-through'
             )}>
               {event.title}
             </p>
             
-            {/* Program name - subtle subtitle */}
-            {!isSpecialCard && (
-              <p className="text-xs text-foreground/50 truncate">
-                {event.programTitle}
-              </p>
-            )}
+            {/* Subtitle for special cards only */}
             {isEnrollment && (
-              <p className="text-xs text-foreground/50 truncate">
+              <p className="text-[11px] text-black/50 truncate">
                 Tap to explore your program →
               </p>
             )}
             {isRoundUpdate && (
-              <p className="text-xs text-foreground/50 truncate">
+              <p className="text-[11px] text-black/50 truncate">
                 Tap to see changes →
               </p>
             )}
           </div>
 
-          {/* Checkbox - hidden for special cards */}
+          {/* Checkbox */}
           {!isSpecialCard && (
             <button
               onClick={handleToggleComplete}
-              className="w-9 h-9 flex items-center justify-center shrink-0"
+              className="w-12 h-12 -m-1.5 flex items-center justify-center shrink-0"
             >
               {event.isCompleted ? (
                 <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} />
