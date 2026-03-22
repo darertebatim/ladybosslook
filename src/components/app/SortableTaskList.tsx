@@ -656,7 +656,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => handleTemplateSelect(template)}
                     className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl active:scale-[0.98] transition-transform overflow-hidden"
-                    style={{ backgroundColor: `${bgColor}cc` }}
+                    style={{ backgroundColor: bgColor }}
                   >
                     <FluentEmoji emoji={template.emoji || '📝'} size={22} className="shrink-0" />
                     <span className="text-sm font-semibold text-black truncate flex-1 min-w-0">{template.title}</span>
