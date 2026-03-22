@@ -1142,6 +1142,9 @@ const AppHome = () => {
                       {/* Coach mark spotlight for first-ever action */}
                       {(() => {
                         const isFirstActionPending = localStorage.getItem('simora_first_action_celebrated') !== 'true' && completedTaskIds.size === 0 && totalCompletions === 0;
+                        // Pick the first normal (non-pro) task for the hint, fall back to first task
+                        const hintTask = filteredTasks.find(t => !t.pro_link_type) || filteredTasks[0];
+                        const hintTasks = hintTask ? [hintTask] : filteredTasks.slice(0, 1);
                         return isFirstActionPending ? (
                           <>
                             {/* Dark overlay behind everything */}
@@ -1150,7 +1153,7 @@ const AppHome = () => {
                             {/* Spotlighted task card + hint — disable body tap so only checkbox works */}
                             <div className="relative z-[101]">
                               <div className="relative">
-                                <SortableTaskList tasks={filteredTasks.slice(0, 1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                                <SortableTaskList tasks={hintTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                               
                                 {/* Glowing ring around the checkbox */}
                                 <div
