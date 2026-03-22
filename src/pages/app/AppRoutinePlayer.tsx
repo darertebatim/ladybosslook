@@ -1183,10 +1183,23 @@ export default function AppRoutinePlayer() {
             {/* Create Routine card */}
             <button
               onClick={() => { haptic.light(); setBuilderEditRoutine(null); setShowBuilder(true); }}
-              className="w-full flex items-center justify-center gap-2 h-16 rounded-2xl border-2 border-dashed border-border active:bg-muted/50 transition-colors"
+              className="w-full rounded-2xl overflow-hidden active:scale-[0.98] transition-transform"
             >
-              <Plus className="w-5 h-5 text-muted-foreground" />
-              <span className="text-sm font-bold text-muted-foreground">Create Routine</span>
+              <div className="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 dark:from-amber-950/40 dark:via-orange-950/30 dark:to-rose-950/30 p-5 relative">
+                {/* Decorative circles */}
+                <div className="absolute top-3 right-4 w-16 h-16 rounded-full bg-gradient-to-br from-amber-200/40 to-orange-200/30 dark:from-amber-800/20 dark:to-orange-800/15 blur-sm" />
+                <div className="absolute bottom-2 right-12 w-8 h-8 rounded-full bg-rose-200/30 dark:bg-rose-800/15 blur-sm" />
+                
+                <div className="flex items-center gap-3.5 relative z-10">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-400 dark:from-amber-500 dark:to-orange-500 flex items-center justify-center shadow-md shadow-amber-200/50 dark:shadow-amber-900/30">
+                    <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[15px] font-bold text-foreground">Build Your Routine</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Design your perfect daily flow</p>
+                  </div>
+                </div>
+              </div>
             </button>
 
             {/* Empty state */}
