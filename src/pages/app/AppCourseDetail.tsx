@@ -643,7 +643,7 @@ const AppCourseDetail = () => {
           emoji: '📅',
           scheduledDate: format(sessionDate, 'yyyy-MM-dd'),
           scheduledTime: format(sessionDate, 'HH:mm'),
-          reminderOffset: sessionSettings.reminderMinutes,
+          reminderOffset: Math.max(...sessionSettings.reminderMinutes),
         });
         
         if (result.success) {
@@ -723,7 +723,7 @@ const AppCourseDetail = () => {
               emoji: '📅',
               scheduledDate: format(sessionDate, 'yyyy-MM-dd'),
               scheduledTime: format(sessionDate, 'HH:mm'),
-              reminderOffset: settings.reminderMinutes,
+              reminderOffset: Math.max(...settings.reminderMinutes),
             });
           } else {
             await scheduleTaskReminder({
@@ -732,7 +732,7 @@ const AppCourseDetail = () => {
               emoji: '📅',
               scheduledDate: format(sessionDate, 'yyyy-MM-dd'),
               scheduledTime: format(sessionDate, 'HH:mm'),
-              reminderOffset: settings.reminderMinutes,
+              reminderOffset: Math.max(...settings.reminderMinutes),
               repeatPattern: 'none',
               proLinkType: 'course',
               proLinkValue: slug || null,
@@ -778,7 +778,7 @@ const AppCourseDetail = () => {
               emoji: '🔓',
               scheduledDate: format(unlockDate, 'yyyy-MM-dd'),
               scheduledTime: format(unlockDate, 'HH:mm'),
-              reminderOffset: settings.reminderMinutes,
+              reminderOffset: Math.max(...settings.reminderMinutes),
             });
           } else {
             await scheduleTaskReminder({
@@ -787,7 +787,7 @@ const AppCourseDetail = () => {
               emoji: '🔓',
               scheduledDate: format(unlockDate, 'yyyy-MM-dd'),
               scheduledTime: format(unlockDate, 'HH:mm'),
-              reminderOffset: settings.reminderMinutes,
+              reminderOffset: Math.max(...settings.reminderMinutes),
               repeatPattern: 'none',
               proLinkType: 'playlist',
               proLinkValue: round?.audio_playlist_id || null,
@@ -835,7 +835,7 @@ const AppCourseDetail = () => {
           emoji: '🔓',
           scheduledDate: format(unlockDate, 'yyyy-MM-dd'),
           scheduledTime: format(unlockDate, 'HH:mm'),
-          reminderOffset: contentSettings.reminderMinutes,
+          reminderOffset: Math.max(...contentSettings.reminderMinutes),
         });
         
         if (result.success) {
@@ -851,7 +851,7 @@ const AppCourseDetail = () => {
           emoji: '🔓',
           scheduledDate: format(unlockDate, 'yyyy-MM-dd'),
           scheduledTime: format(unlockDate, 'HH:mm'),
-          reminderOffset: contentSettings.reminderMinutes,
+          reminderOffset: Math.max(...contentSettings.reminderMinutes),
           repeatPattern: 'none',
           proLinkType: 'playlist',
           proLinkValue: round?.audio_playlist_id || null,

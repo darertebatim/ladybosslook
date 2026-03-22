@@ -7,7 +7,7 @@ export interface CalendarEvent {
   startDate: Date;
   endDate: Date;
   location?: string;
-  reminderMinutes?: number; // e.g., 60 = 1 hour before
+  reminderMinutes?: number | number[]; // e.g., 60 = 1 hour before, or [15, 60] for multiple
 }
 
 /**
@@ -69,7 +69,10 @@ export async function addEventToCalendar(event: CalendarEvent): Promise<{ succes
     }
     
     // Build alerts array if reminderMinutes is set (in minutes before event)
-    const alerts = event.reminderMinutes ? [-event.reminderMinutes] : [-60]; // Default: 1 hour before
+    const rmArr = event.reminderMinutes
+      ? (Array.isArray(event.reminderMinutes) ? event.reminderMinutes : [event.reminderMinutes])
+      : [60];
+    const alerts = rmArr.map(m => -m);
     
     // Create the event
     const result = await CapacitorCalendar.createEvent({

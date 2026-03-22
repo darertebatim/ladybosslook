@@ -3,7 +3,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Bell, AlertTriangle } from 'lucide-react';
 import { ReminderSettings } from '@/hooks/useSessionReminderSettings';
 import { isUrgentAlarmAvailable } from '@/lib/taskAlarm';
@@ -18,12 +18,12 @@ interface SessionReminderSheetProps {
 }
 
 const REMINDER_OPTIONS = [
-  { value: '0', label: 'At the time' },
-  { value: '15', label: '15 minutes before' },
-  { value: '30', label: '30 minutes before' },
-  { value: '60', label: '1 hour before' },
-  { value: '120', label: '2 hours before' },
-  { value: '1440', label: '1 day before' },
+  { value: 0, label: 'At the time' },
+  { value: 15, label: '15 minutes before' },
+  { value: 30, label: '30 minutes before' },
+  { value: 60, label: '1 hour before' },
+  { value: 120, label: '2 hours before' },
+  { value: 1440, label: '1 day before' },
 ];
 
 export function SessionReminderSheet({
@@ -35,7 +35,7 @@ export function SessionReminderSheet({
   onSave,
 }: SessionReminderSheetProps) {
   const [enabled, setEnabled] = useState(currentSettings.enabled);
-  const [reminderMinutes, setReminderMinutes] = useState(currentSettings.reminderMinutes.toString());
+  const [selectedMinutes, setSelectedMinutes] = useState<number[]>(currentSettings.reminderMinutes);
   const [isUrgent, setIsUrgent] = useState(currentSettings.isUrgent);
   
   const urgentAvailable = isUrgentAlarmAvailable();
@@ -44,15 +44,26 @@ export function SessionReminderSheet({
   useEffect(() => {
     if (open) {
       setEnabled(currentSettings.enabled);
-      setReminderMinutes(currentSettings.reminderMinutes.toString());
+      setSelectedMinutes(currentSettings.reminderMinutes);
       setIsUrgent(currentSettings.isUrgent);
     }
   }, [currentSettings, open]);
 
+  const toggleMinute = (value: number) => {
+    setSelectedMinutes(prev => {
+      if (prev.includes(value)) {
+        // Don't allow deselecting the last one
+        if (prev.length <= 1) return prev;
+        return prev.filter(v => v !== value);
+      }
+      return [...prev, value].sort((a, b) => a - b);
+    });
+  };
+
   const handleSave = () => {
     const settings: ReminderSettings = {
       enabled,
-      reminderMinutes: parseInt(reminderMinutes),
+      reminderMinutes: selectedMinutes,
       isUrgent,
     };
     onSave(settings);
@@ -61,8 +72,8 @@ export function SessionReminderSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-2xl">
-        <SheetHeader className="text-left">
+      <SheetContent side="bottom" className="rounded-t-2xl max-h-[50vh] flex flex-col">
+        <SheetHeader className="text-left flex-shrink-0">
           <SheetTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5" />
             {title}
@@ -72,7 +83,7 @@ export function SessionReminderSheet({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-6 py-6">
+        <div className="flex-1 overflow-y-auto space-y-5 py-4">
           {/* Enable Toggle */}
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div className="space-y-1">
@@ -87,21 +98,21 @@ export function SessionReminderSheet({
             />
           </div>
 
-          {/* Reminder Time Selection */}
-          <div className={`space-y-3 ${!enabled ? 'opacity-50 pointer-events-none' : ''}`}>
+          {/* Reminder Time Selection - Multi Select */}
+          <div className={`space-y-2 ${!enabled ? 'opacity-50 pointer-events-none' : ''}`}>
             <Label className="text-base font-medium">Remind me</Label>
-            <RadioGroup
-              value={reminderMinutes}
-              onValueChange={setReminderMinutes}
-              className="space-y-2"
-            >
+            <div className="space-y-1.5">
               {REMINDER_OPTIONS.map((option) => (
                 <div
                   key={option.value}
                   className="flex items-center space-x-3 rounded-lg border p-3 cursor-pointer hover:bg-muted/50"
-                  onClick={() => enabled && setReminderMinutes(option.value)}
+                  onClick={() => enabled && toggleMinute(option.value)}
                 >
-                  <RadioGroupItem value={option.value} id={`reminder-${option.value}`} />
+                  <Checkbox
+                    checked={selectedMinutes.includes(option.value)}
+                    onCheckedChange={() => enabled && toggleMinute(option.value)}
+                    id={`reminder-${option.value}`}
+                  />
                   <Label
                     htmlFor={`reminder-${option.value}`}
                     className="flex-1 cursor-pointer font-normal"
@@ -110,7 +121,7 @@ export function SessionReminderSheet({
                   </Label>
                 </div>
               ))}
-            </RadioGroup>
+            </div>
           </div>
 
           {/* Urgent Alarm Toggle - Only show on native */}
@@ -141,7 +152,7 @@ export function SessionReminderSheet({
         </div>
 
         {/* Save Button */}
-        <div className="pb-safe">
+        <div className="pb-safe flex-shrink-0 pt-2">
           <Button onClick={handleSave} className="w-full" size="lg">
             Save Settings
           </Button>
