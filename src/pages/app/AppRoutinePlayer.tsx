@@ -696,10 +696,18 @@ export default function AppRoutinePlayer() {
       toast.success('Routine updated! ✨');
       setShowBuilder(false);
       setBuilderEditRoutine(null);
-      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
-      queryClient.invalidateQueries({ queryKey: ['routine-user-tasks-emojis'] });
-      queryClient.invalidateQueries({ queryKey: ['routine-user-task-ids'] });
-      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+
+      // Update preStartRoutine if it's the same routine being edited
+      if (preStartRoutine && preStartRoutine.routine_id === routineId) {
+        setPreStartRoutine((prev: any) => prev ? { ...prev, title, emoji, color } : prev);
+      }
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['user-routines-all'] }),
+        queryClient.invalidateQueries({ queryKey: ['routine-user-tasks-emojis'] }),
+        queryClient.invalidateQueries({ queryKey: ['routine-user-task-ids'] }),
+        queryClient.invalidateQueries({ queryKey: ['user-tasks'] }),
+      ]);
     } catch (err) {
       console.error('Failed to update routine:', err);
       toast.error('Failed to update routine');
