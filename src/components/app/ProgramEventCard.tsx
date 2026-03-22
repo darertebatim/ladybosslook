@@ -73,7 +73,6 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
   } = useSessionReminderSettings(event.roundId);
 
   const style = EVENT_STYLES[event.type];
-  const Icon = style.Icon;
   
   // Determine which settings to use based on event type
   const isSession = event.type === 'session';
