@@ -169,8 +169,9 @@ const NativeAppLayout = () => {
 
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home', tourClass: 'tour-nav-home' },
+    { path: '/app/routineplayer', icon: CalendarPlus, label: 'MyRoutines', tourClass: 'tour-nav-routines' },
     { path: '/app/tools', icon: Compass, label: 'Tools', tourClass: 'tour-nav-explore' },
-    { path: '/app/routines', icon: CalendarPlus, label: 'Routines', tourClass: 'tour-nav-routines' },
+    { path: '/app/routines', icon: Music, label: 'Routines', tourClass: '' },
     { path: '/app/player', icon: Music, label: 'Listen', tourClass: 'tour-nav-listen' },
     { path: '/app/channels', icon: Users, label: 'Chats', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
   ];
