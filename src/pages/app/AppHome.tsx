@@ -1090,34 +1090,24 @@ const AppHome = () => {
                 </div>
               ) : filteredTasks.length > 0 || (!isNewUser && taskFilter !== 'all') ? (
                 <div>
-                  {/* Switcher: My Tasks / Routines */}
-                  <div className="flex items-center justify-center mb-4">
-                    <div className="flex bg-muted rounded-full p-1 w-full max-w-xs">
-                      <button
-                        onClick={() => setHomeView('tasks')}
-                        className={cn(
-                          "flex-1 flex items-center justify-center gap-1.5 rounded-full py-2 text-sm font-semibold transition-all",
-                          homeView === 'tasks' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-                        )}
-                      >
-                        <Zap className="h-3.5 w-3.5 text-amber-500" />
-                        My Tasks
-                      </button>
-                      <button
-                        onClick={() => setHomeView('routines')}
-                        className={cn(
-                          "flex-1 flex items-center justify-center gap-1.5 rounded-full py-2 text-sm font-semibold transition-all",
-                          homeView === 'routines' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
-                        )}
-                      >
-                        <Play className="h-3.5 w-3.5" />
-                        Routines
-                      </button>
-                    </div>
-                  </div>
-
                   {homeView === 'routines' ? (
                     <>
+                      {/* Switcher + no filter in routines mode */}
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex bg-muted rounded-full p-0.5">
+                          <button
+                            onClick={() => setHomeView('tasks')}
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all text-muted-foreground"
+                          >
+                            My Tasks
+                          </button>
+                          <button
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-background text-foreground shadow-sm"
+                          >
+                            Routines
+                          </button>
+                        </div>
+                      </div>
                       {routineProTasks.length > 0 ? (
                         <>
                           <SortableTaskList tasks={routineProTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
@@ -1153,9 +1143,21 @@ const AppHome = () => {
                     </>
                   ) : (
                   <>
-                  {/* Filter dropdown */}
+                  {/* Switcher + filter dropdown */}
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-semibold text-foreground tracking-wide">My Tasks</span>
+                    <div className="flex bg-muted rounded-full p-0.5">
+                      <button
+                        className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-background text-foreground shadow-sm"
+                      >
+                        My Tasks
+                      </button>
+                      <button
+                        onClick={() => setHomeView('routines')}
+                        className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all text-muted-foreground"
+                      >
+                        Routines
+                      </button>
+                    </div>
                     <TaskFilterDropdown
                       value={taskFilter}
                       onValueChange={setTaskFilter}
