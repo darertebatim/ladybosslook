@@ -11,7 +11,7 @@ interface RoutineTaskPreviewProps {
 }
 
 /** Hook to fetch routine preview data (tasks + completion) */
-function useRoutinePreviewData(routineId: string) {
+export function useRoutinePreviewData(routineId: string) {
   const { user } = useAuth();
 
   const { data: tasks } = useQuery({
