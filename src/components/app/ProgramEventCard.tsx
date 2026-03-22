@@ -223,7 +223,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
             </p>
             
             {/* Subtitle */}
-            <p className="text-[11px] text-black/60 truncate">
+            <p className="text-[11px] text-black truncate">
               {isEnrollment ? 'Tap to explore your program →' :
                isRoundUpdate ? 'Tap to see changes →' :
                event.type === 'session' ? 'Tap to join your session →' :
