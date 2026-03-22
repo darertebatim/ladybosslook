@@ -225,6 +225,12 @@ export default function AppRoutinePlayer() {
   const queryClient = useQueryClient();
   const [showPageRoutineSheet, setShowPageRoutineSheet] = useState(false);
 
+  // Builder state
+  const [showBuilder, setShowBuilder] = useState(false);
+  const [builderEditRoutine, setBuilderEditRoutine] = useState<any | null>(null);
+  const [builderResult, setBuilderResult] = useState<{ title: string; emoji: string; color: string; tasks: any[] } | null>(null);
+  const [showBuilderPreview, setShowBuilderPreview] = useState(false);
+
   // Check if routine player page is already added as a task
   const { data: isPageAdded } = useExistingProTask('route', '/app/routineplayer');
 
