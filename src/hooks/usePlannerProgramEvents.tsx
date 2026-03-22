@@ -189,7 +189,7 @@ export function useProgramEventsForDate(date: Date) {
       }
 
       // Sort: enrollments first, then sessions, then by time
-      const typePriority: Record<string, number> = { enrollment: 0, session: 1, module: 2, track: 3 };
+      const typePriority: Record<string, number> = { enrollment: 0, round_update: 0.5, session: 1, module: 2, track: 3 };
       events.sort((a, b) => {
         const pa = typePriority[a.type] ?? 9;
         const pb = typePriority[b.type] ?? 9;

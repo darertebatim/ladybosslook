@@ -128,8 +128,25 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
   const handleCardClick = async () => {
     haptic.light();
 
+    // Mark round_update as read on tap
+    if (isRoundUpdate) {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.from('round_notification_reads').insert({
+            notification_id: event.id,
+            user_id: user.id,
+          });
+        }
+      } catch (err) {
+        console.error('Failed to mark notification as read:', err);
+      }
+    }
+
     switch (event.type) {
       case 'enrollment':
+      case 'round_update':
       case 'session':
       case 'module':
         navigate(`/app/course/${event.programSlug}`, { state: { from: location.pathname } });
