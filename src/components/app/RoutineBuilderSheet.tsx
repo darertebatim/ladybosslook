@@ -9,7 +9,7 @@ import { haptic } from '@/lib/haptics';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
+import { TASK_COLOR_CLASSES, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
 
