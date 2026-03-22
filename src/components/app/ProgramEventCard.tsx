@@ -14,6 +14,7 @@ import { isToday, isBefore, startOfDay } from 'date-fns';
 import { SessionReminderSheet } from '@/components/app/SessionReminderSheet';
 import { useSessionReminderSettings } from '@/hooks/useSessionReminderSettings';
 import SealCheck from '@/components/app/SealCheck';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { toast } from 'sonner';
 
 interface ProgramEventCardProps {
