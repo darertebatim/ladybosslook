@@ -377,6 +377,18 @@ export function RoutineBuilderSheet({
           className="h-[92vh] rounded-t-3xl px-0 pb-0"
           hideCloseButton
         >
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="flex items-center gap-3 px-5 pb-3 border-b border-border/30">
+              <button onClick={() => setStep(1)} className="p-1 active:opacity-70">
+                <ChevronLeft className="w-5 h-5 text-foreground" />
+              </button>
+              <h2 className="text-lg font-bold text-foreground flex-1">
+                {editMode ? 'Edit Routine' : 'Add Tasks'}
+              </h2>
+            </div>
+
+            {!showTaskPicker ? (
               <div className="flex-1 flex flex-col">
                 {/* Routine header — gradient banner */}
                 <div className="flex items-center gap-3 px-5 py-3.5 bg-gradient-to-r from-amber-50/80 to-orange-50/60 dark:from-amber-950/30 dark:to-orange-950/20 border-b border-amber-100/30 dark:border-amber-800/20">
@@ -411,7 +423,6 @@ export function RoutineBuilderSheet({
                               colorClass
                             )}
                           >
-                            {/* Step number */}
                             <div className="pl-3 shrink-0">
                               <span className="w-6 h-6 rounded-full bg-black/10 flex items-center justify-center text-[11px] font-bold text-black/60">
                                 {i + 1}
@@ -434,9 +445,8 @@ export function RoutineBuilderSheet({
 
                 {/* Quick add inline + Browse */}
                 <div className="px-5 py-3 border-t border-border/30 space-y-2">
-                  {/* Quick add input — two-tone card like home planner */}
                   <div className="rounded-2xl overflow-hidden border border-amber-200/50 dark:border-amber-800/30">
-                    <div className="bg-gradient-to-br from-amber-50/80 to-orange-50/60 dark:from-amber-950/30 dark:to-orange-950/20 px-3.5 py-2.5">
+                    <div className="bg-[#FFF5E6] dark:bg-amber-950/30 px-3.5 py-2.5">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 flex items-center justify-center shrink-0">
                           <Plus className="h-5 w-5 text-amber-500" strokeWidth={2.5} />
@@ -464,14 +474,13 @@ export function RoutineBuilderSheet({
                         )}
                       </div>
                     </div>
-                    <div className="px-4 py-1.5 bg-gradient-to-r from-amber-100/50 to-orange-100/30 dark:from-amber-900/15 dark:to-orange-900/10">
-                      <p className="text-[11px] font-medium text-muted-foreground text-center">
+                    <div className="px-4 py-1.5 bg-[#FFE6C0] dark:bg-amber-900/20">
+                      <p className="text-[11px] font-medium text-black/50 dark:text-muted-foreground text-center">
                         Press enter to add quickly
                       </p>
                     </div>
                   </div>
 
-                  {/* Browse existing tasks */}
                   <button
                     onClick={() => { haptic.light(); setShowTaskPicker(true); setPickerSearch(''); }}
                     className="w-full flex items-center justify-center gap-2 h-10 rounded-xl text-sm font-semibold text-muted-foreground active:bg-muted/50 transition-colors"
@@ -495,10 +504,7 @@ export function RoutineBuilderSheet({
                   </Button>
                 </div>
               </div>
-            )}
-
-            {/* Task Picker overlay */}
-            {step === 2 && showTaskPicker && (
+            ) : (
               <div className="flex-1 flex flex-col">
                 {/* Picker header */}
                 <div className="flex items-center gap-3 px-5 py-3 border-b border-border/30">
