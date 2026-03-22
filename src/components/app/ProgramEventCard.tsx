@@ -98,15 +98,16 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
     setIsAnimating(true);
     setTimeout(() => setIsAnimating(false), 300);
 
+    const eventType = event.type as 'session' | 'module' | 'track';
     if (event.isCompleted) {
       uncompleteProgramEvent.mutate({ 
-        eventType: event.type, 
+        eventType, 
         eventId: event.id, 
         date 
       });
     } else {
       completeProgramEvent.mutate({ 
-        eventType: event.type, 
+        eventType, 
         eventId: event.id, 
         date 
       });
