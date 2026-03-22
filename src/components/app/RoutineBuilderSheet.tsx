@@ -3,14 +3,14 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, Plus, Trash2, ListChecks, MoreHorizontal } from 'lucide-react';
+import { ChevronLeft, Plus, Trash2, ListChecks } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
-import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
+import { TASK_COLOR_CLASSES, TaskColor, TaskTemplate } from '@/hooks/useTaskPlanner';
+import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
 
 // Builder task — intermediate representation
