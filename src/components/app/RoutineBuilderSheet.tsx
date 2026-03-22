@@ -219,6 +219,34 @@ export function RoutineBuilderSheet({
     enabled: !!user && open,
   });
 
+  // Fetch task bank templates for quick-add suggestions
+  const { data: taskBankTemplates = [] } = useQuery({
+    queryKey: ['builder-task-bank'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('admin_task_bank')
+        .select('id, title, emoji, color, category, repeat_pattern, repeat_days, time_period, duration_minutes, goal_enabled, goal_target, goal_type, goal_unit, pro_link_type, pro_link_value, linked_playlist_id, description')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      return data || [];
+    },
+    enabled: open,
+  });
+
+  // Search-based suggestions for quick-add
+  const quickAddSearchSuggestions = useMemo(() => {
+    const q = quickAddTitle.trim().toLowerCase();
+    if (!q || q.length < 2) return [];
+    const words = q.split(/\s+/).filter(w => w.length >= 2);
+    if (words.length === 0) return [];
+    return taskBankTemplates
+      .filter((t: any) => {
+        const tl = t.title.toLowerCase();
+        return words.every((w: string) => tl.includes(w));
+      })
+      .slice(0, 4);
+  }, [taskBankTemplates, quickAddTitle]);
+
   const addedTaskIds = useMemo(() => new Set(tasks.map(t => t.id)), [tasks]);
 
   const addTaskFromSource = (source: any) => {
@@ -747,6 +775,32 @@ export function RoutineBuilderSheet({
               <div className="h-11" aria-hidden="true" />
             )}
           </div>
+
+          {/* Search-based suggestions while typing */}
+          {quickAddSearchSuggestions.length > 0 && (
+            <div className="mt-3 flex flex-col gap-1.5 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
+              <p className="text-sm text-white/70 font-medium text-center">Need some ideas?</p>
+              {quickAddSearchSuggestions.map((template: any) => {
+                const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
+                return (
+                  <button
+                    key={template.id}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      addTaskFromSource(template);
+                      setQuickAddTitle('');
+                      setShowQuickAdd(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl active:scale-[0.98] transition-transform overflow-hidden"
+                    style={{ backgroundColor: bgColor }}
+                  >
+                    <FluentEmoji emoji={template.emoji || '📝'} size={22} className="shrink-0" />
+                    <span className="text-sm font-semibold text-black truncate flex-1 min-w-0">{template.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
