@@ -1113,15 +1113,6 @@ const AppHome = () => {
                             My Tasks
                           </button>
                         </div>
-                        <TaskFilterDropdown
-                          value={taskFilter}
-                          onValueChange={setTaskFilter}
-                          routineNames={routineNamesInTasks}
-                          taskTags={taskTags}
-                          categoryNameMap={categoryNameMap}
-                          externalOpen={filterDropdownOpen}
-                          onExternalOpenChange={setFilterDropdownOpen}
-                        />
                       </div>
                       {routineProTasks.length > 0 ? (
                         <>
