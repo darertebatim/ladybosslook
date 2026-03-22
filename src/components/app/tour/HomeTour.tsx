@@ -87,18 +87,7 @@ export function HomeTour({
       });
     }
 
-    // Conditionally add programs step
-    if (hasEnrolledPrograms) {
-      baseSteps.push({
-        id: 'programs',
-        title: 'Your Programs',
-        target: '.tour-programs-carousel',
-        description: 'Your enrolled courses are here. Tap to access lessons.',
-        position: 'top',
-        action: 'tap',
-        condition: () => !!document.querySelector('.tour-programs-carousel'),
-      });
-    }
+    // Programs carousel removed — program events now appear as planner cards
 
     // ===== BOTTOM NAV EXPLANATIONS =====
     baseSteps.push({

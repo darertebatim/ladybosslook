@@ -22,7 +22,7 @@ import { NotificationBanner } from '@/components/app/NotificationBanner';
 import { HomeCelebrations } from '@/components/app/HomeCelebrations';
 import { HomeTour } from '@/components/app/tour';
 import { useAuth } from '@/hooks/useAuth';
-import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
 import { useFeaturedRoutinesBank, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
@@ -1357,25 +1357,14 @@ const AppHome = () => {
             </>}
           </div>
 
-          {/* Extra padding for fixed bottom dashboard */}
-          <div style={{ height: isKeyboardOpen ? '24px' : '200px' }} />
+          {/* Extra padding for bottom nav */}
+          <div style={{ height: isKeyboardOpen ? '24px' : '120px' }} />
         </div>
 
-        {/* Fixed Bottom Dashboard - only show if user has active programs */}
-        {activeRounds.length > 0 && !isKeyboardOpen && (
-          <div className="tour-programs-carousel fixed bottom-0 left-0 right-0 z-40 rounded-t shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)] bg-primary-foreground rounded-none" style={{
-            paddingBottom: 'max(64px, calc(52px + env(safe-area-inset-bottom)))'
-          }}>
-            <div className="px-1 py-1 bg-primary-foreground">
-              <ActiveRoundsCarousel activeRounds={activeRounds} nextSessionMap={nextSessionMap} />
-            </div>
-          </div>
-        )}
-
-        {/* FAB - positioned above the fixed bottom dashboard */}
+        {/* FAB */}
         {!isKeyboardOpen && (
           <button onClick={handleFabClick} className="tour-add-task fixed right-4 w-14 h-14 rounded-full bg-urgency text-urgency-foreground shadow-cta flex items-center justify-center hover:bg-urgency-dark active:scale-95 transition-all z-50" style={{
-          bottom: 'calc(100px + env(safe-area-inset-bottom))'
+          bottom: 'calc(72px + env(safe-area-inset-bottom))'
         }}>
             <Plus className="h-6 w-6" />
           </button>
@@ -1468,7 +1457,7 @@ const AppHome = () => {
         <HomeTour 
           isFirstOpen={isFirstOpen}
           forceShow={serverIndicatesNewUser}
-          hasEnrolledPrograms={activeRounds.length > 0}
+          hasEnrolledPrograms={false}
           hasSuggestedRoutines={suggestedRoutines.length > 0}
           hasWelcomeCard={showWelcomeCard}
           onTourReady={handleHomeTourReady}

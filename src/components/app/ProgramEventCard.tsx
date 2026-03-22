@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Video, BookOpen, Music, ExternalLink, Settings2 } from 'lucide-react';
+import { Video, BookOpen, Music, ExternalLink, Settings2, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   ProgramEvent, 
@@ -42,6 +42,13 @@ const EVENT_STYLES = {
     badge: 'Audio',
     badgeColor: 'bg-emerald-500',
     Icon: Music,
+  },
+  enrollment: {
+    gradient: 'bg-gradient-to-br from-amber-100 to-orange-100',
+    iconBg: 'bg-amber-500',
+    badge: 'New Program',
+    badgeColor: 'bg-amber-500',
+    Icon: GraduationCap,
   },
 };
 
@@ -91,35 +98,34 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
     setIsAnimating(true);
     setTimeout(() => setIsAnimating(false), 300);
 
+    const eventType = event.type as 'session' | 'module' | 'track';
     if (event.isCompleted) {
       uncompleteProgramEvent.mutate({ 
-        eventType: event.type, 
+        eventType, 
         eventId: event.id, 
         date 
       });
     } else {
       completeProgramEvent.mutate({ 
-        eventType: event.type, 
+        eventType, 
         eventId: event.id, 
         date 
       });
     }
   };
 
+  const isEnrollment = event.type === 'enrollment';
+
   const handleCardClick = async () => {
     haptic.light();
 
     switch (event.type) {
+      case 'enrollment':
       case 'session':
-        // Always navigate to course detail page
-        navigate(`/app/course/${event.programSlug}`, { state: { from: location.pathname } });
-        break;
       case 'module':
-        // Navigate to course detail (modules section)
         navigate(`/app/course/${event.programSlug}`, { state: { from: location.pathname } });
         break;
       case 'track':
-        // Navigate to audio player
         if (event.playlistId) {
           navigate(`/app/player/playlist/${event.playlistId}`, { state: { from: location.pathname } });
         }
@@ -193,22 +199,31 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
             </p>
             
             {/* Program name - subtle subtitle */}
-            <p className="text-xs text-foreground/50 truncate">
-              {event.programTitle}
-            </p>
+            {!isEnrollment && (
+              <p className="text-xs text-foreground/50 truncate">
+                {event.programTitle}
+              </p>
+            )}
+            {isEnrollment && (
+              <p className="text-xs text-foreground/50 truncate">
+                Tap to explore your program →
+              </p>
+            )}
           </div>
 
-          {/* Checkbox */}
-          <button
-            onClick={handleToggleComplete}
-            className="w-9 h-9 flex items-center justify-center shrink-0"
-          >
-            {event.isCompleted ? (
-              <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} />
-            ) : (
-              <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
-            )}
-          </button>
+          {/* Checkbox - hidden for enrollment cards */}
+          {!isEnrollment && (
+            <button
+              onClick={handleToggleComplete}
+              className="w-9 h-9 flex items-center justify-center shrink-0"
+            >
+              {event.isCompleted ? (
+                <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} />
+              ) : (
+                <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
+              )}
+            </button>
+          )}
         </div>
       </div>
 
