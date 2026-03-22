@@ -5,7 +5,7 @@ import { format, isSameDay, isWithinInterval, startOfDay, endOfDay } from 'date-
 
 export interface ProgramEvent {
   id: string;
-  type: 'session' | 'module' | 'track' | 'enrollment';
+  type: 'session' | 'module' | 'track' | 'enrollment' | 'round_update';
   title: string;
   programSlug: string;
   programTitle: string;
