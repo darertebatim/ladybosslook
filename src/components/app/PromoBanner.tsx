@@ -342,6 +342,7 @@ export function PromoBanner({
       case 'video_playlist':
         navigate(banner.destination_id ? `/app/watch/playlist/${banner.destination_id}` : '/app/watch');
         break;
+      case 'routine_player': navigate('/app/routineplayer'); break;
     }
   };
   
