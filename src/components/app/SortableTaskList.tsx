@@ -383,6 +383,13 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
     return items.slice(0, 5);
   }, [templates, selectedCategory]);
 
+  // Search-based suggestions while typing (before ideas panel is open)
+  const searchSuggestions = useMemo(() => {
+    const q = title.trim().toLowerCase();
+    if (!q || q.length < 2 || showIdeas) return [];
+    return templates.filter(t => t.title.toLowerCase().includes(q)).slice(0, 4);
+  }, [templates, title, showIdeas]);
+
   useEffect(() => {
     if (!isOpen) return;
     const t = window.setTimeout(() => {
