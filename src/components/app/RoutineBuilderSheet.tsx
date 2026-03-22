@@ -10,6 +10,22 @@ import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TASK_COLOR_CLASSES, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
+
+// Secondary (darker) palette for bottom sections
+const TASK_COLORS_DARK: Record<string, string> = {
+  pink: '#FFC2EA',
+  peach: '#FFD2A1',
+  yellow: '#FFEA4E',
+  lime: '#C3F1E1',
+  sky: '#B9D6FF',
+  mint: '#C9F588',
+  lavender: '#DEC1FF',
+  purple: '#DEC1FF',
+  blue: '#B9D6FF',
+  red: '#FFC2EA',
+  orange: '#FFD2A1',
+  green: '#C3F1E1',
+};
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
 
@@ -377,14 +393,14 @@ export function RoutineBuilderSheet({
 
             {/* Bottom section — changes per step */}
             {step === 1 ? (
-              <div className="px-4 py-3 transition-colors duration-200" style={{ backgroundColor: `color-mix(in srgb, ${TASK_COLORS[routineColor as TaskColor] || TASK_COLORS.peach} 75%, #888)` }}>
+              <div className="px-4 py-3 transition-colors duration-200" style={{ backgroundColor: TASK_COLORS_DARK[routineColor] || TASK_COLORS_DARK.peach }}>
                 <p className="text-[13px] font-medium text-black/70 dark:text-muted-foreground text-center">
                   Press enter to continue. Tap outside to cancel.
                 </p>
               </div>
             ) : (
               /* Step 2 expanded area */
-              <div className="transition-colors duration-200" style={{ backgroundColor: `color-mix(in srgb, ${TASK_COLORS[routineColor as TaskColor] || TASK_COLORS.peach} 75%, #888)` }}>
+              <div className="transition-colors duration-200" style={{ backgroundColor: TASK_COLORS_DARK[routineColor] || TASK_COLORS_DARK.peach }}>
                 {/* Task list */}
                 <div className="max-h-[35vh] overflow-y-auto px-3 pt-2 pb-1">
                   {tasks.length === 0 ? (
