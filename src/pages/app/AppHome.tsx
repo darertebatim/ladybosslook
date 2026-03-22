@@ -1162,16 +1162,16 @@ const AppHome = () => {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex bg-muted rounded-full p-0.5">
                       <button
-                        className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-background text-foreground shadow-sm"
-                        onClick={() => setFilterDropdownOpen(true)}
-                      >
-                        My Tasks
-                      </button>
-                      <button
                         onClick={() => setHomeView('routines')}
                         className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all text-muted-foreground"
                       >
                         Routine Players
+                      </button>
+                      <button
+                        className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-background text-foreground shadow-sm"
+                        onClick={() => setFilterDropdownOpen(true)}
+                      >
+                        My Tasks
                       </button>
                     </div>
                     <TaskFilterDropdown
