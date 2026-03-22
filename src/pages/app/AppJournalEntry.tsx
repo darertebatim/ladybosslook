@@ -184,6 +184,12 @@ const AppJournalEntry = () => {
       return;
     }
     
+    // If opened from mood check-in or a tool flow, go home instead of journal list
+    if (initialMood) {
+      navigate('/app/home');
+      return;
+    }
+
     // Otherwise navigate back to journal list
     navigate('/app/journal');
   };
