@@ -25,38 +25,33 @@ interface ProgramEventCardProps {
 const EVENT_STYLES = {
   session: {
     bgColor: 'bg-[#D7E9FF]',
-    iconBg: 'bg-[#5B8DEF]',
+    emoji: '📹',
     badge: 'Live Session',
     badgeClass: 'bg-secondary text-secondary-foreground',
-    Icon: Video,
   },
   module: {
     bgColor: 'bg-[#F0E3FF]',
-    iconBg: 'bg-[#9B6FD4]',
+    emoji: '📖',
     badge: 'Module',
     badgeClass: 'bg-secondary text-secondary-foreground',
-    Icon: BookOpen,
   },
   track: {
     bgColor: 'bg-[#E2F9F0]',
-    iconBg: 'bg-[#4CAF82]',
+    emoji: '🎵',
     badge: 'Audio',
     badgeClass: 'bg-secondary text-secondary-foreground',
-    Icon: Music,
   },
   enrollment: {
     bgColor: 'bg-[#FFE6C9]',
-    iconBg: 'bg-[#E8973E]',
+    emoji: '🎓',
     badge: 'New Program',
     badgeClass: 'bg-secondary text-secondary-foreground',
-    Icon: GraduationCap,
   },
   round_update: {
     bgColor: 'bg-[#D7E9FF]',
-    iconBg: 'bg-[#5B8DEF]',
+    emoji: '🔄',
     badge: 'Changes in Program',
     badgeClass: 'bg-secondary text-secondary-foreground',
-    Icon: RefreshCw,
   },
 };
 
