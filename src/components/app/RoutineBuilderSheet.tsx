@@ -684,7 +684,7 @@ export function RoutineBuilderSheet({
         <DialogContent
           hideCloseButton
           className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !translate-y-0"
-          style={{ top: '25%' }}
+          style={{ top: quickAddAnchorTop }}
         >
           {/* Quick shortcut pills */}
           <div className="flex gap-2 mb-2.5">
