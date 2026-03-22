@@ -1268,7 +1268,31 @@ export default function AppRoutinePlayer() {
                 <p className="text-xs text-muted-foreground">{routineDurationLabel}</p>
               )}
             </div>
-            <div className="w-7" />
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => { haptic.light(); handleEditRoutine(preStartRoutine); }}
+                className="w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center active:scale-95 transition-all"
+                title="Edit routine"
+              >
+                <Pencil className="w-3.5 h-3.5 text-foreground/70" />
+              </button>
+              {!addedRoutineIds.has(preStartRoutine.routine_id) && (
+                <button
+                  onClick={() => { haptic.light(); handleOpenAddSheet(preStartRoutine); }}
+                  className="w-8 h-8 rounded-full bg-urgency flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+                  title="Add to planner"
+                >
+                  <CalendarPlus className="w-3.5 h-3.5 text-urgency-foreground" />
+                </button>
+              )}
+              <button
+                onClick={() => { haptic.light(); setDeleteRoutine(preStartRoutine); }}
+                className="w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center active:scale-95 transition-all"
+                title="Delete routine"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-destructive" />
+              </button>
+            </div>
           </header>
 
           <div className="flex-1 overflow-y-auto px-4 pb-32 pt-4">
