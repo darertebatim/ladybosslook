@@ -355,7 +355,7 @@ export function RoutinePreviewSheet({
             <FluentEmoji emoji={display.icon || '📝'} size={40} className="shrink-0" />
             <div className="flex-1 min-w-0">
               {isPro ? (
-                <p className="text-[11px] font-semibold text-teal-700 dark:text-teal-300 uppercase tracking-wide mb-0.5">⚡ Routine Launcher</p>
+                <p className="text-[11px] font-semibold text-teal-700 dark:text-teal-300 uppercase tracking-wide mb-0.5">⚡ Routine Player</p>
               ) : (
                 <p className="text-xs font-medium text-black mb-0.5">{timeLabel}</p>
               )}
@@ -373,7 +373,7 @@ export function RoutinePreviewSheet({
           {/* Footer strip with repeat info */}
           <div className={cn('px-4 py-3.5', darkColorClass)}>
             <p className="text-[13px] font-medium text-black text-center">
-              {isPro ? 'One-tap launcher for this routine' : getRepeatLabel(task, display.repeatPattern)}
+              {isPro ? 'One-tap player for this routine' : getRepeatLabel(task, display.repeatPattern)}
             </p>
           </div>
         </div>
