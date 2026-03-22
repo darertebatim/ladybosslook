@@ -421,7 +421,7 @@ export const TaskCard = memo(function TaskCard({
                 )}
                 {proLinkType === 'routine' && (proLinkValue || task.source_routine_id) && (
                   <span className="text-[10px] font-semibold text-secondary-foreground bg-secondary rounded px-1.5 py-0.5 leading-none whitespace-nowrap">
-                    Routine Launcher
+                    Routine Player
                   </span>
                 )}
               </div>

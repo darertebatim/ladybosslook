@@ -373,7 +373,7 @@ export function RoutinePreviewSheet({
           {/* Footer strip with repeat info */}
           <div className={cn('px-4 py-3.5', darkColorClass)}>
             <p className="text-[13px] font-medium text-black text-center">
-              {isPro ? 'One-tap launcher for this routine' : getRepeatLabel(task, display.repeatPattern)}
+              {isPro ? 'One-tap player for this routine' : getRepeatLabel(task, display.repeatPattern)}
             </p>
           </div>
         </div>
