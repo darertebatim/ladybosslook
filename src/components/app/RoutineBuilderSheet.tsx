@@ -99,6 +99,7 @@ export function RoutineBuilderSheet({
         setShowSuggestions(false);
         setShowMyTasks(false);
         setShowCreateTask(false);
+        setQuickAddMode(false);
         setQuickAddTitle('');
       }, 300);
     } else {
