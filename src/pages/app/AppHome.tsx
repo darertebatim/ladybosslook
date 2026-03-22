@@ -1151,7 +1151,7 @@ const AppHome = () => {
                             {/* Spotlighted task card + hint — disable body tap so only checkbox works */}
                             <div className="relative z-[101]">
                               <div className="relative">
-                                <SortableTaskList tasks={hintTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                                <SortableTaskList tasks={[hintTask!]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                               
                                 {/* Glowing ring around the checkbox */}
                                 <div
