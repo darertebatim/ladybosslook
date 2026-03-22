@@ -1355,6 +1355,8 @@ const AppHome = () => {
                       })()}
                     </>
                   )}
+                  </>
+                  )}
                   {/* Onboarding banner moved below routine section */}
                 </div>
               ) : (
