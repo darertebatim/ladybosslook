@@ -101,7 +101,7 @@ export function RoutineBuilderSheet({
   editMode = false,
   initialTitle = '',
   initialEmoji = '✨',
-  initialColor = 'peach',
+  initialColor = 'mint',
   initialTasks = [],
   onEditSave,
 }: RoutineBuilderSheetProps) {
