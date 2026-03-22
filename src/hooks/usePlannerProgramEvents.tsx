@@ -162,10 +162,25 @@ export function useProgramEventsForDate(date: Date) {
         }
       }
 
-      // Sort: sessions first, then by time
+      // Process enrollments
+      for (const e of (data.enrollments || [])) {
+        events.push({
+          id: e.id,
+          type: 'enrollment',
+          title: e.programTitle,
+          programSlug: e.programSlug,
+          programTitle: e.programTitle,
+          roundId: e.roundId,
+          isCompleted: false,
+        });
+      }
+
+      // Sort: enrollments first, then sessions, then by time
+      const typePriority: Record<string, number> = { enrollment: 0, session: 1, module: 2, track: 3 };
       events.sort((a, b) => {
-        if (a.type === 'session' && b.type !== 'session') return -1;
-        if (a.type !== 'session' && b.type === 'session') return 1;
+        const pa = typePriority[a.type] ?? 9;
+        const pb = typePriority[b.type] ?? 9;
+        if (pa !== pb) return pa - pb;
         if (a.time && b.time) return a.time.localeCompare(b.time);
         return 0;
       });
