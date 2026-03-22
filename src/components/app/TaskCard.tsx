@@ -469,7 +469,7 @@ export const TaskCard = memo(function TaskCard({
                 </AnimatePresence>
                 <button
                   onClick={handleProCircleClick}
-                  className="w-9 h-9 flex items-center justify-center shrink-0"
+                  className="w-12 h-12 -m-1.5 flex items-center justify-center shrink-0"
                 >
                   {goalReached ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
                     <CircleProgressButton progress={goalProgress} target={task.goal_target || 1}>
