@@ -419,7 +419,7 @@ export function RoutineBuilderSheet({
                     setRoutineTitle(e.target.value.slice(0, 40));
                     if (step === 1) setShowSuggestions(true);
                   }}
-                  onFocus={() => { if (step === 1) setShowSuggestions(true); }}
+                  onFocus={() => { handleNameInputFocus(); if (step === 1) setShowSuggestions(true); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && routineTitle.trim()) {
                       if (step === 1) handleNext();
