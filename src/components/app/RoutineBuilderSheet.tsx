@@ -88,7 +88,10 @@ export function RoutineBuilderSheet({
   const [pickerSearch, setPickerSearch] = useState('');
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [quickAddTitle, setQuickAddTitle] = useState('');
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const quickAddInputRef = useRef<HTMLInputElement>(null);
 
   // Reset state when sheet opens/closes
   const handleOpenChange = useCallback((open: boolean) => {
