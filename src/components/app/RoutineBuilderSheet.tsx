@@ -520,6 +520,8 @@ export function RoutineBuilderSheet({
                   <button
                     onClick={() => {
                       haptic.light();
+                      const topPx = Math.round(window.innerHeight * 0.25);
+                      setQuickAddAnchorTop(`${topPx}px`);
                       setShowQuickAdd(true);
                     }}
                     className="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/60 dark:bg-white/10 active:bg-white/80 dark:active:bg-white/20 transition-colors"
