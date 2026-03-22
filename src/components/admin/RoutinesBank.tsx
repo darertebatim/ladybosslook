@@ -1103,8 +1103,8 @@ export default function RoutinesBank() {
     const cycleMode = (e: React.MouseEvent) => {
       e.stopPropagation();
       if (currentMode === 'daily') {
-        // → Weekly
-        setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [1, 3, 5], monthly_day: null, is_once: false } : t));
+        // → Weekly (use sentinel [-1] meaning "weekly, day set when user adds routine")
+        setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [-1], monthly_day: null, is_once: false } : t));
       } else if (currentMode === 'weekly') {
         // → Monthly
         setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [], monthly_day: 1, is_once: false } : t));
@@ -1138,29 +1138,7 @@ export default function RoutinesBank() {
             />
           </div>
         ) : isWeekly ? (
-          <div className="flex gap-0.5">
-            {WEEKDAYS.map((day, idx) => (
-              <button
-                key={day}
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const newDays = days.includes(idx)
-                    ? days.filter(d => d !== idx)
-                    : [...days, idx].sort();
-                  setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: newDays } : t));
-                }}
-                className={cn(
-                  "w-5 h-5 rounded-full text-[9px] font-medium transition-all",
-                  days.includes(idx)
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                )}
-              >
-                {day[0]}
-              </button>
-            ))}
-          </div>
+          <span className="text-[10px] text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded">Weekly</span>
         ) : (
           <span className="text-[10px] text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded">Daily</span>
         )}
