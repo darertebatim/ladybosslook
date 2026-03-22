@@ -880,8 +880,13 @@ export default function AppRoutinePlayer() {
   // Calculate routine duration for header
   const routineDurationLabel = useMemo(() => {
     if (!routineFilteredTasks.length) return '';
-    const totalMins = routineFilteredTasks.reduce((s, t) => s + (t.duration_minutes || 0), 0);
-    const hasUntimed = routineFilteredTasks.some(t => !t.duration_minutes);
+    const getTaskMinutes = (t: any) => {
+      if (t.duration_minutes) return t.duration_minutes;
+      if (t.goal_enabled && t.goal_type === 'timer' && t.goal_target) return Math.round(t.goal_target / 60);
+      return 0;
+    };
+    const totalMins = routineFilteredTasks.reduce((s, t) => s + getTaskMinutes(t), 0);
+    const hasUntimed = routineFilteredTasks.some(t => getTaskMinutes(t) === 0);
     if (totalMins > 0 && hasUntimed) return `${totalMins}m + untimed tasks`;
     if (totalMins > 0) return `${totalMins}m`;
     return 'Untimed tasks';
