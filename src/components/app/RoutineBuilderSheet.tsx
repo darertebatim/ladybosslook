@@ -335,7 +335,7 @@ export function RoutineBuilderSheet({
           {/* Two-tone name card */}
           <div className="rounded-3xl overflow-hidden transition-all duration-300">
             {/* Top: name input */}
-            <div className="bg-[#FFF5E6] dark:bg-amber-950/50 px-4 pt-4 pb-3">
+            <div className="px-4 pt-4 pb-3 transition-colors duration-200" style={{ backgroundColor: TASK_COLORS[routineColor as TaskColor] || TASK_COLORS.peach }}>
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 flex items-center justify-center shrink-0">
                   <FluentEmoji emoji={routineEmoji} size={28} />
