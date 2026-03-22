@@ -629,7 +629,223 @@ export default function AppRoutinePlayer() {
     }
   };
 
-  // Planner hooks for the pre-start overlay (uses today's date)
+  // Builder: handle create flow → opens preview sheet
+  const handleBuilderComplete = (title: string, emoji: string, color: string, tasks: any[]) => {
+    setShowBuilder(false);
+    setBuilderResult({ title, emoji, color, tasks });
+    setShowBuilderPreview(true);
+  };
+
+  // Builder: handle edit flow → direct save
+  const handleBuilderEditSave = async (title: string, emoji: string, color: string, tasks: any[]) => {
+    if (!user || !builderEditRoutine) return;
+    try {
+      const routineId = builderEditRoutine.routine_id;
+
+      // Update routine metadata
+      await supabase
+        .from('user_routines_bank')
+        .update({ title, emoji, color } as any)
+        .eq('id', builderEditRoutine.id);
+
+      // Delete existing tasks for this routine
+      await supabase
+        .from('user_tasks')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('source_routine_id', routineId)
+        .or('pro_link_type.is.null,pro_link_type.neq.routine');
+
+      // Get max order_index
+      const { data: existingTasks } = await supabase
+        .from('user_tasks')
+        .select('order_index')
+        .eq('user_id', user.id)
+        .order('order_index', { ascending: false })
+        .limit(1);
+      const startOrder = (existingTasks?.[0]?.order_index ?? -1) + 1;
+
+      // Insert new tasks
+      if (tasks.length > 0) {
+        const userTasks = tasks.map((task: any, index: number) => ({
+          user_id: user.id,
+          title: task.title,
+          emoji: task.emoji || '📝',
+          color: task.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
+          repeat_pattern: task.repeat_pattern || 'daily',
+          repeat_days: task.repeat_days || null,
+          tag: title,
+          time_period: task.time_period || null,
+          linked_playlist_id: task.pro_link_type === 'playlist' ? task.pro_link_value : null,
+          pro_link_type: task.pro_link_type || null,
+          pro_link_value: task.pro_link_value || null,
+          is_active: true,
+          order_index: startOrder + index,
+          goal_enabled: task.goal_enabled || false,
+          goal_target: task.goal_target || null,
+          goal_type: task.goal_type || null,
+          goal_unit: task.goal_unit || null,
+          duration_minutes: task.duration_minutes || null,
+          source_routine_id: routineId,
+        }));
+
+        await supabase.from('user_tasks').insert(userTasks);
+      }
+
+      toast.success('Routine updated! ✨');
+      setShowBuilder(false);
+      setBuilderEditRoutine(null);
+      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
+      queryClient.invalidateQueries({ queryKey: ['routine-user-tasks-emojis'] });
+      queryClient.invalidateQueries({ queryKey: ['routine-user-task-ids'] });
+      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+    } catch (err) {
+      console.error('Failed to update routine:', err);
+      toast.error('Failed to update routine');
+    }
+  };
+
+  // Builder: handle preview sheet save (create new user routine)
+  const handleBuilderPreviewSave = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
+    if (!user || !builderResult) return;
+    try {
+      // Insert user_routines_bank entry (routine_id auto-generated via default)
+      const { data: newRoutine, error: routineError } = await supabase
+        .from('user_routines_bank')
+        .insert({
+          user_id: user.id,
+          title: builderResult.title,
+          emoji: builderResult.emoji,
+          color: builderResult.color,
+          is_active: true,
+          is_user_created: true,
+          category: null,
+        } as any)
+        .select('id, routine_id')
+        .single();
+
+      if (routineError) throw routineError;
+      const routineId = (newRoutine as any).routine_id;
+
+      // Convert builder tasks to RoutinePlanTask format for filtering
+      const selectedTasks = builderResult.tasks.filter(t => selectedTaskIds.includes(t.id));
+      const editedMap = new Map(editedTasks.map(e => [e.id, e]));
+
+      // Get max order_index
+      const { data: existingTasks } = await supabase
+        .from('user_tasks')
+        .select('order_index')
+        .eq('user_id', user.id)
+        .order('order_index', { ascending: false })
+        .limit(1);
+      const startOrder = (existingTasks?.[0]?.order_index ?? -1) + 1;
+
+      // Check if pro-task was selected
+      const hasProTask = selectedTaskIds.some(id => id.startsWith('__pro_task_routine_'));
+
+      // Insert regular tasks
+      const regularTasks = selectedTasks.filter(t => !t.id.startsWith('__pro_task_routine_'));
+      if (regularTasks.length > 0) {
+        const userTasks = regularTasks.map((task: any, index: number) => {
+          const edited = editedMap.get(task.id);
+          return {
+            user_id: user.id,
+            title: edited?.title || task.title,
+            emoji: edited?.icon || task.emoji || '📝',
+            color: edited?.color || task.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
+            repeat_pattern: edited?.repeatPattern || task.repeat_pattern || 'daily',
+            repeat_days: task.repeat_days || null,
+            scheduled_time: edited?.scheduledTime || null,
+            tag: edited?.tag ?? builderResult.title,
+            time_period: task.time_period || null,
+            linked_playlist_id: (edited?.pro_link_type || task.pro_link_type) === 'playlist' ? (edited?.pro_link_value || task.pro_link_value) : null,
+            pro_link_type: edited?.pro_link_type || task.pro_link_type || null,
+            pro_link_value: edited?.pro_link_value || task.pro_link_value || null,
+            is_active: true,
+            order_index: startOrder + index,
+            goal_enabled: task.goal_enabled || false,
+            goal_target: task.goal_target || null,
+            goal_type: task.goal_type || null,
+            goal_unit: task.goal_unit || null,
+            duration_minutes: task.duration_minutes || null,
+            source_routine_id: routineId,
+          };
+        });
+
+        await supabase.from('user_tasks').insert(userTasks);
+      }
+
+      // Insert pro-task (routine launcher) if selected
+      if (hasProTask) {
+        const proEdited = editedTasks.find(e => e.id.startsWith('__pro_task_routine_'));
+        await supabase.from('user_tasks').insert({
+          user_id: user.id,
+          title: proEdited?.title || builderResult.title,
+          emoji: proEdited?.icon || '🎬',
+          color: proEdited?.color || 'mint',
+          repeat_pattern: 'daily',
+          tag: builderResult.title,
+          pro_link_type: 'routine',
+          pro_link_value: routineId,
+          is_active: true,
+          order_index: -1,
+          source_routine_id: null,
+        });
+      }
+
+      toast.success('Routine created! 🎉');
+      setShowBuilderPreview(false);
+      setBuilderResult(null);
+      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
+      queryClient.invalidateQueries({ queryKey: ['routine-user-tasks-emojis'] });
+      queryClient.invalidateQueries({ queryKey: ['routine-user-task-ids'] });
+      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
+    } catch (err) {
+      console.error('Failed to create routine:', err);
+      toast.error('Failed to create routine');
+    }
+  };
+
+  // Builder: prepare edit mode data
+  const handleEditRoutine = useCallback(async (routine: any) => {
+    if (!user) return;
+    haptic.light();
+    // Load tasks for this routine
+    const { data: tasks } = await supabase
+      .from('user_tasks')
+      .select('id, title, emoji, color, repeat_pattern, repeat_days, description, pro_link_type, pro_link_value, goal_enabled, goal_target, goal_type, goal_unit, duration_minutes, time_period, linked_playlist_id, tag')
+      .eq('user_id', user.id)
+      .eq('source_routine_id', routine.routine_id)
+      .eq('is_active', true)
+      .or('pro_link_type.is.null,pro_link_type.neq.routine')
+      .order('order_index', { ascending: true });
+
+    const builderTasks: any[] = (tasks || []).map(t => ({
+      id: t.id,
+      title: t.title,
+      emoji: t.emoji || '📝',
+      color: t.color || 'peach',
+      repeat_pattern: t.repeat_pattern || 'daily',
+      repeat_days: t.repeat_days || null,
+      description: t.description || null,
+      pro_link_type: t.pro_link_type || null,
+      pro_link_value: t.pro_link_value || null,
+      goal_enabled: t.goal_enabled || false,
+      goal_target: t.goal_target || null,
+      goal_type: t.goal_type || null,
+      goal_unit: t.goal_unit || null,
+      duration_minutes: t.duration_minutes || null,
+      time_period: t.time_period || null,
+      linked_playlist_id: t.linked_playlist_id || null,
+      category: t.tag || null,
+    }));
+
+    setBuilderEditRoutine(routine);
+    setShowBuilder(true);
+  }, [user]);
+
+
   const today = useMemo(() => new Date(), []);
   const { data: plannerTasks = [] } = useTasksForDate(today);
   const { data: plannerCompletions } = useCompletionsForDate(today);
