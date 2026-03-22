@@ -1103,8 +1103,8 @@ export default function RoutinesBank() {
     const cycleMode = (e: React.MouseEvent) => {
       e.stopPropagation();
       if (currentMode === 'daily') {
-        // → Weekly
-        setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [1, 3, 5], monthly_day: null, is_once: false } : t));
+        // → Weekly (use sentinel [-1] meaning "weekly, day set when user adds routine")
+        setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [-1], monthly_day: null, is_once: false } : t));
       } else if (currentMode === 'weekly') {
         // → Monthly
         setLocalTasks(localTasks.map(t => t.id === task.id ? { ...t, schedule_days: [], monthly_day: 1, is_once: false } : t));
