@@ -249,6 +249,24 @@ export function RoutineBuilderSheet({
     setShowCreateTask(false);
   };
 
+  const handleQuickAddSubmit = () => {
+    const trimmed = quickAddTitle.trim();
+    if (!trimmed) return;
+    haptic.medium();
+    const variant = QUICK_ADD_VARIANTS[tasks.length % QUICK_ADD_VARIANTS.length];
+    const newTask: BuilderTask = {
+      id: `quick-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      title: trimmed,
+      emoji: variant.emoji,
+      color: variant.color,
+      repeat_pattern: 'daily',
+    };
+    setTasks(prev => [...prev, newTask]);
+    setQuickAddTitle('');
+    // Keep input focused for rapid entry
+    setTimeout(() => quickAddInputRef.current?.focus(), 50);
+  };
+
   const handleNext = () => {
     if (!routineTitle.trim()) return;
     haptic.light();
