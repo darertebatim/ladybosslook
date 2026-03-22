@@ -298,7 +298,30 @@ export const ProgramRoundsManager = () => {
     },
   });
 
-  const resetForm = () => {
+  // Notify students mutation
+  const notifyStudentsMutation = useMutation({
+    mutationFn: async ({ roundId, programSlug }: { roundId: string; programSlug: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from('round_update_notifications')
+        .insert({
+          round_id: roundId,
+          program_slug: programSlug,
+          created_by: user?.id,
+        });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Students will be notified about changes');
+      setShowNotifyDialog(false);
+      lastSavedRoundRef.current = null;
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
+
     setFormData({
       program_slug: "",
       round_name: "",
