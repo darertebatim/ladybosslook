@@ -95,9 +95,7 @@ export function RoutineBuilderSheet({
         setTasks(initialTasks);
         setShowSuggestions(false);
         setShowMyTasks(false);
-        setShowCreateTask(false);
-        setQuickAddMode(false);
-        setQuickAddTitle('');
+        setShowQuickStart(false);
       }, 300);
     } else {
       setRoutineTitle(initialTitle);
