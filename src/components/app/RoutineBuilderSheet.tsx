@@ -377,14 +377,14 @@ export function RoutineBuilderSheet({
 
             {/* Bottom section — changes per step */}
             {step === 1 ? (
-              <div className="px-4 py-3 transition-colors duration-200" style={{ backgroundColor: `color-mix(in srgb, ${TASK_COLORS[routineColor as TaskColor] || TASK_COLORS.peach} 70%, #d4a574)` }}>
+              <div className="px-4 py-3 transition-colors duration-200" style={{ backgroundColor: `color-mix(in srgb, ${TASK_COLORS[routineColor as TaskColor] || TASK_COLORS.peach} 75%, #888)` }}>
                 <p className="text-[13px] font-medium text-black/70 dark:text-muted-foreground text-center">
                   Press enter to continue. Tap outside to cancel.
                 </p>
               </div>
             ) : (
               /* Step 2 expanded area */
-              <div className="transition-colors duration-200" style={{ backgroundColor: `color-mix(in srgb, ${TASK_COLORS[routineColor as TaskColor] || TASK_COLORS.peach} 70%, #d4a574)` }}>
+              <div className="transition-colors duration-200" style={{ backgroundColor: `color-mix(in srgb, ${TASK_COLORS[routineColor as TaskColor] || TASK_COLORS.peach} 75%, #888)` }}>
                 {/* Task list */}
                 <div className="max-h-[35vh] overflow-y-auto px-3 pt-2 pb-1">
                   {tasks.length === 0 ? (
