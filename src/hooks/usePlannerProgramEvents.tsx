@@ -254,7 +254,7 @@ export function useUncompleteProgramEvent() {
       eventId, 
       date 
     }: { 
-      eventType: 'session' | 'module' | 'track'; 
+      eventType: 'session' | 'module' | 'track' | 'enrollment'; 
       eventId: string; 
       date: Date;
     }) => {
