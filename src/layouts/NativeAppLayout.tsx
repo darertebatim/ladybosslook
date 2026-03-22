@@ -217,52 +217,58 @@ const NativeAppLayout = () => {
             const Icon = item.icon;
             const showChatBadge = item.path === '/app/chat' && unreadCount > 0;
             
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  'flex flex-col items-center justify-center gap-0.5 min-h-[44px] transition-colors',
-                  item.tourClass
-                )}
-              >
-                <div className="relative flex flex-col items-center">
-                    <Icon 
-                      className={cn(
-                        'h-6 w-6',
-                         (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
-                          ? (isActive ? 'text-white' : 'text-white/50')
-                          : (isActive ? 'text-foreground' : 'text-muted-foreground')
-                      )}
-                    strokeWidth={isActive ? 2.5 : 1.5}
-                  />
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={(e) => {
+                    if (isActive && item.path === '/app/home') {
+                      e.preventDefault();
+                      window.dispatchEvent(new CustomEvent('home-tab-retap'));
+                    }
+                  }}
+                  className={cn(
+                    'flex flex-col items-center justify-center gap-0.5 min-h-[44px] transition-colors',
+                    item.tourClass
+                  )}
+                >
+                  <div className="relative flex flex-col items-center">
+                      <Icon 
+                        className={cn(
+                          'h-6 w-6',
+                           (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
+                            ? (isActive ? 'text-white' : 'text-white/50')
+                            : (isActive ? 'text-foreground' : 'text-muted-foreground')
+                        )}
+                      strokeWidth={isActive ? 2.5 : 1.5}
+                    />
+                    
+                    {/* Badges */}
+                    {showChatBadge && (
+                      <span className="absolute -top-1 -right-2 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                    {item.showBadge && !showChatBadge && item.badgeCount && (
+                      <span className="absolute -top-1 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
+                        {item.badgeCount > 9 ? '9+' : item.badgeCount}
+                      </span>
+                    )}
+                    {item.showBadge && !showChatBadge && !item.badgeCount && (
+                      <span className="absolute -top-0.5 -right-0.5 bg-primary w-2 h-2 rounded-full" />
+                    )}
+                    
+                  </div>
                   
-                  {/* Badges */}
-                  {showChatBadge && (
-                    <span className="absolute -top-1 -right-2 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
-                  )}
-                  {item.showBadge && !showChatBadge && item.badgeCount && (
-                    <span className="absolute -top-1 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
-                      {item.badgeCount > 9 ? '9+' : item.badgeCount}
-                    </span>
-                  )}
-                  {item.showBadge && !showChatBadge && !item.badgeCount && (
-                    <span className="absolute -top-0.5 -right-0.5 bg-primary w-2 h-2 rounded-full" />
-                  )}
-                  
-                </div>
-                
-                <span className={cn(
-                  'text-[10px]',
-                  (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
-                    ? (isActive ? 'text-white font-semibold' : 'text-white/50 font-medium')
-                    : (isActive ? 'text-foreground font-semibold' : 'text-muted-foreground font-medium')
-                )}>
-                  {item.label}
-                </span>
-              </Link>
+                  <span className={cn(
+                    'text-[10px]',
+                    (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
+                      ? (isActive ? 'text-white font-semibold' : 'text-white/50 font-medium')
+                      : (isActive ? 'text-foreground font-semibold' : 'text-muted-foreground font-medium')
+                  )}>
+                    {item.label}
+                  </span>
+                </Link>
             );
           })}
 
