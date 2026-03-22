@@ -12,6 +12,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { TASK_COLOR_CLASSES, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
 
 // Secondary (darker) palette for bottom sections
 const TASK_COLORS_DARK: Record<string, string> = {
@@ -122,6 +125,11 @@ export function RoutineBuilderSheet({
   const [editingTask, setEditingTask] = useState<BuilderTask | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const quickAddInputRef = useRef<HTMLInputElement>(null);
+  const [quickAddAnchorTop, setQuickAddAnchorTop] = useState<string>('25%');
+
+  // iOS keyboard scroll fixes
+  const { handleFocus: handleNameInputFocus } = useKeyboardScroll(nameInputRef, { block: 'center' });
+  const { handleFocus: handleQuickAddInputFocus } = useKeyboardScroll(quickAddInputRef, { block: 'center' });
 
   // Reset state when dialog opens/closes
   const handleOpenChange = useCallback((v: boolean) => {
@@ -304,6 +312,9 @@ export function RoutineBuilderSheet({
     setQuickAddTitle('');
     setQuickRepeat('Daily');
     setQuickTime('Anytime');
+    if (Capacitor.isNativePlatform()) {
+      Keyboard.hide();
+    }
   };
 
   const handleQuickAddOpenDetails = () => {
@@ -408,7 +419,7 @@ export function RoutineBuilderSheet({
                     setRoutineTitle(e.target.value.slice(0, 40));
                     if (step === 1) setShowSuggestions(true);
                   }}
-                  onFocus={() => { if (step === 1) setShowSuggestions(true); }}
+                  onFocus={() => { handleNameInputFocus(); if (step === 1) setShowSuggestions(true); }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && routineTitle.trim()) {
                       if (step === 1) handleNext();
@@ -512,6 +523,8 @@ export function RoutineBuilderSheet({
                   <button
                     onClick={() => {
                       haptic.light();
+                      const topPx = Math.round(window.innerHeight * 0.25);
+                      setQuickAddAnchorTop(`${topPx}px`);
                       setShowQuickAdd(true);
                     }}
                     className="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/60 dark:bg-white/10 active:bg-white/80 dark:active:bg-white/20 transition-colors"
@@ -674,7 +687,7 @@ export function RoutineBuilderSheet({
         <DialogContent
           hideCloseButton
           className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !translate-y-0"
-          style={{ top: '25%' }}
+          style={{ top: quickAddAnchorTop }}
         >
           {/* Quick shortcut pills */}
           <div className="flex gap-2 mb-2.5">
@@ -732,6 +745,7 @@ export function RoutineBuilderSheet({
                   ref={quickAddInputRef}
                   value={quickAddTitle}
                   onChange={(e) => setQuickAddTitle(e.target.value)}
+                  onFocus={handleQuickAddInputFocus}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleQuickAddSubmit();
                     if (e.key === 'Escape') handleQuickAddClose();
