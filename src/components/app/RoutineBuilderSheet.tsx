@@ -557,10 +557,10 @@ export function RoutineBuilderSheet({
                     key={s.id}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => handleSuggestionSelect(s)}
-                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white/10 active:bg-white/20 transition-colors text-left"
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white/10 active:bg-white/20 transition-colors text-left min-w-0"
                   >
-                    <FluentEmoji emoji={s.emoji || '✨'} size={22} />
-                    <span className="text-sm font-medium text-white truncate">{s.title}</span>
+                    <FluentEmoji emoji={s.emoji || '✨'} size={22} className="shrink-0" />
+                    <span className="text-sm font-medium text-white truncate min-w-0">{s.title}</span>
                   </button>
                 ))}
               </div>
