@@ -110,7 +110,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
     setIsAnimating(true);
     setTimeout(() => setIsAnimating(false), 300);
 
-    const eventType = event.type as 'session' | 'module' | 'track';
+    const eventType = event.type as 'session' | 'module' | 'track' | 'enrollment';
     if (event.isCompleted) {
       uncompleteProgramEvent.mutate({ 
         eventType, 
