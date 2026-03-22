@@ -1148,6 +1148,7 @@ export default function AppRoutinePlayer() {
                           onPlay={handlePlay}
                           onOpenAddSheet={handleOpenAddSheet}
                           onDeleteRoutine={setDeleteRoutine}
+                          onEditRoutine={handleEditRoutine}
                         />
                       ))}
                     </div>
