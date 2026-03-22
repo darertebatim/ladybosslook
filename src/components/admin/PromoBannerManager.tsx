@@ -725,6 +725,7 @@ export function PromoBannerManager() {
                     <SelectItem value="onboarding">🎯 Onboarding Flow</SelectItem>
                     <SelectItem value="watch">📺 Watch Page</SelectItem>
                     <SelectItem value="video_playlist">🎬 Video Playlist (specific)</SelectItem>
+                    <SelectItem value="routine_player">🎬 Routine Player</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
