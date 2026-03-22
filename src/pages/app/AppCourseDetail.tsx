@@ -787,7 +787,7 @@ const AppCourseDetail = () => {
               emoji: '🔓',
               scheduledDate: format(unlockDate, 'yyyy-MM-dd'),
               scheduledTime: format(unlockDate, 'HH:mm'),
-              reminderOffset: settings.reminderMinutes,
+              reminderOffset: Math.max(...settings.reminderMinutes),
               repeatPattern: 'none',
               proLinkType: 'playlist',
               proLinkValue: round?.audio_playlist_id || null,
