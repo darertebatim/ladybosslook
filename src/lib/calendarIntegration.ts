@@ -7,7 +7,7 @@ export interface CalendarEvent {
   startDate: Date;
   endDate: Date;
   location?: string;
-  reminderMinutes?: number; // e.g., 60 = 1 hour before
+  reminderMinutes?: number | number[]; // e.g., 60 = 1 hour before, or [15, 60] for multiple
 }
 
 /**
