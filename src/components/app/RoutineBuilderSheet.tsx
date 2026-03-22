@@ -745,6 +745,7 @@ export function RoutineBuilderSheet({
                   ref={quickAddInputRef}
                   value={quickAddTitle}
                   onChange={(e) => setQuickAddTitle(e.target.value)}
+                  onFocus={handleQuickAddInputFocus}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleQuickAddSubmit();
                     if (e.key === 'Escape') handleQuickAddClose();
