@@ -340,30 +340,44 @@ export function RoutineBuilderSheet({
                       <p className="text-xs text-black/50 dark:text-muted-foreground">Add tasks to build your routine</p>
                     </div>
                   ) : (
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       {tasks.map((task, i) => {
                         const colorClass = TASK_COLOR_CLASSES[(task.color as TaskColor) || 'peach'] || TASK_COLOR_CLASSES.peach;
+                        const repeatLabel = task.repeat_pattern === 'daily' ? 'Daily'
+                          : task.repeat_pattern === 'weekly' ? 'Weekly'
+                          : task.repeat_pattern === 'monthly' ? 'Monthly'
+                          : task.repeat_pattern === 'weekend' ? 'Weekends'
+                          : task.repeat_pattern === 'none' ? 'Once' : '';
+                        const timeLabel = task.time_period === 'morning' ? 'Morning'
+                          : task.time_period === 'afternoon' ? 'Afternoon'
+                          : task.time_period === 'evening' ? 'Evening'
+                          : task.time_period === 'night' ? 'Bedtime' : 'Anytime';
                         return (
                           <div
                             key={task.id}
                             className={cn(
-                              'flex items-center gap-2.5 rounded-2xl overflow-hidden',
+                              'rounded-3xl pl-3 pr-4 py-3',
                               colorClass
                             )}
                           >
-                            <div className="pl-3 shrink-0">
-                              <span className="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold text-black/60">
-                                {i + 1}
-                              </span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-10 h-10 flex items-center justify-center shrink-0">
+                                <FluentEmoji emoji={task.emoji} size={32} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[11px] text-black/80">{timeLabel}</span>
+                                  {repeatLabel && <span className="text-[11px] text-black/80">• {repeatLabel}</span>}
+                                </div>
+                                <p className="text-black text-[15px] font-semibold leading-tight truncate">{task.title}</p>
+                              </div>
+                              <button
+                                onClick={() => removeTask(task.id)}
+                                className="w-12 h-12 -m-1.5 flex items-center justify-center shrink-0 active:scale-95 transition-transform"
+                              >
+                                <Trash2 className="w-4 h-4 text-black/30" />
+                              </button>
                             </div>
-                            <FluentEmoji emoji={task.emoji} size={24} className="shrink-0" />
-                            <span className="flex-1 font-semibold text-black text-[13px] truncate py-2.5">{task.title}</span>
-                            <button
-                              onClick={() => removeTask(task.id)}
-                              className="shrink-0 p-2 mr-1 rounded-full active:scale-95 transition-transform"
-                            >
-                              <Trash2 className="w-3 h-3 text-black/40" />
-                            </button>
                           </div>
                         );
                       })}
