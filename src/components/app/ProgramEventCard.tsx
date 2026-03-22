@@ -123,7 +123,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
 
   const isEnrollment = event.type === 'enrollment';
   const isRoundUpdate = event.type === 'round_update';
-  const isSpecialCard = isEnrollment || isRoundUpdate;
+  const isSpecialCard = isRoundUpdate;
 
   const handleCardClick = async () => {
     haptic.light();
