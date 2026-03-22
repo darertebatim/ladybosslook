@@ -411,6 +411,12 @@ export function RoutineBuilderSheet({
                                 <p className="text-black text-[15px] font-semibold leading-tight truncate">{task.title}</p>
                               </div>
                               <button
+                                onClick={() => { haptic.light(); setEditingTask(task); }}
+                                className="w-12 h-12 -m-1.5 flex items-center justify-center shrink-0 active:scale-95 transition-transform"
+                              >
+                                <Pencil className="w-3.5 h-3.5 text-black/30" />
+                              </button>
+                              <button
                                 onClick={() => removeTask(task.id)}
                                 className="w-12 h-12 -m-1.5 flex items-center justify-center shrink-0 active:scale-95 transition-transform"
                               >
