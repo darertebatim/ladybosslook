@@ -218,7 +218,7 @@ export function useCompleteProgramEvent() {
       eventId, 
       date 
     }: { 
-      eventType: 'session' | 'module' | 'track'; 
+      eventType: 'session' | 'module' | 'track' | 'enrollment'; 
       eventId: string; 
       date: Date;
     }) => {
