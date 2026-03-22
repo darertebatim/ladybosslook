@@ -1141,10 +1141,8 @@ const AppHome = () => {
                     <>
                       {/* Coach mark spotlight for first-ever action */}
                       {(() => {
-                        const isFirstActionPending = localStorage.getItem('simora_first_action_celebrated') !== 'true' && completedTaskIds.size === 0 && totalCompletions === 0;
-                        // Pick the first normal (non-pro) task for the hint, fall back to first task
-                        const hintTask = filteredTasks.find(t => !t.pro_link_type) || filteredTasks[0];
-                        const hintTasks = hintTask ? [hintTask] : filteredTasks.slice(0, 1);
+                        const hintTask = filteredTasks.find(t => !t.pro_link_type);
+                        const isFirstActionPending = localStorage.getItem('simora_first_action_celebrated') !== 'true' && completedTaskIds.size === 0 && totalCompletions === 0 && !!hintTask;
                         return isFirstActionPending ? (
                           <>
                             {/* Dark overlay behind everything */}
