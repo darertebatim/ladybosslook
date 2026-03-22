@@ -362,7 +362,7 @@ export function RoutineBuilderSheet({
       <Dialog open={open && !showMyTasks && !showQuickAdd} onOpenChange={(v) => { if (!v) handleOpenChange(false); }}>
         <DialogContent
           hideCloseButton
-          className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !translate-y-0"
+          className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !translate-y-0 overflow-hidden"
           style={{ top: '12%' }}
         >
           {/* Two-tone name card */}
@@ -557,10 +557,10 @@ export function RoutineBuilderSheet({
                     key={s.id}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => handleSuggestionSelect(s)}
-                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white/10 active:bg-white/20 transition-colors text-left"
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white/10 active:bg-white/20 transition-colors text-left min-w-0"
                   >
-                    <FluentEmoji emoji={s.emoji || '✨'} size={22} />
-                    <span className="text-sm font-medium text-white truncate">{s.title}</span>
+                    <FluentEmoji emoji={s.emoji || '✨'} size={22} className="shrink-0" />
+                    <span className="text-sm font-medium text-white truncate min-w-0">{s.title}</span>
                   </button>
                 ))}
               </div>
