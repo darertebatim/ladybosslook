@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Video, BookOpen, Music, ExternalLink, Settings2, GraduationCap, RefreshCw } from 'lucide-react';
+import { ExternalLink, Settings2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   ProgramEvent, 
@@ -14,6 +14,7 @@ import { isToday, isBefore, startOfDay } from 'date-fns';
 import { SessionReminderSheet } from '@/components/app/SessionReminderSheet';
 import { useSessionReminderSettings } from '@/hooks/useSessionReminderSettings';
 import SealCheck from '@/components/app/SealCheck';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { toast } from 'sonner';
 
 interface ProgramEventCardProps {
@@ -24,38 +25,33 @@ interface ProgramEventCardProps {
 const EVENT_STYLES = {
   session: {
     bgColor: 'bg-[#D7E9FF]',
-    iconBg: 'bg-[#5B8DEF]',
+    emoji: '📹',
     badge: 'Live Session',
     badgeClass: 'bg-secondary text-secondary-foreground',
-    Icon: Video,
   },
   module: {
     bgColor: 'bg-[#F0E3FF]',
-    iconBg: 'bg-[#9B6FD4]',
+    emoji: '📖',
     badge: 'Module',
     badgeClass: 'bg-secondary text-secondary-foreground',
-    Icon: BookOpen,
   },
   track: {
     bgColor: 'bg-[#E2F9F0]',
-    iconBg: 'bg-[#4CAF82]',
+    emoji: '🎵',
     badge: 'Audio',
     badgeClass: 'bg-secondary text-secondary-foreground',
-    Icon: Music,
   },
   enrollment: {
     bgColor: 'bg-[#FFE6C9]',
-    iconBg: 'bg-[#E8973E]',
+    emoji: '🎓',
     badge: 'New Program',
     badgeClass: 'bg-secondary text-secondary-foreground',
-    Icon: GraduationCap,
   },
   round_update: {
     bgColor: 'bg-[#D7E9FF]',
-    iconBg: 'bg-[#5B8DEF]',
+    emoji: '🔄',
     badge: 'Changes in Program',
     badgeClass: 'bg-secondary text-secondary-foreground',
-    Icon: RefreshCw,
   },
 };
 
@@ -77,7 +73,6 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
   } = useSessionReminderSettings(event.roundId);
 
   const style = EVENT_STYLES[event.type];
-  const Icon = style.Icon;
   
   // Determine which settings to use based on event type
   const isSession = event.type === 'session';
@@ -177,12 +172,9 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
       >
         {/* Main row */}
         <div className="flex items-center gap-2">
-          {/* Icon circle */}
-          <div className={cn(
-            'w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white',
-            style.iconBg
-          )}>
-            <Icon className="h-5 w-5" />
+          {/* 3D Emoji icon */}
+          <div className="w-10 h-10 flex items-center justify-center shrink-0">
+            <FluentEmoji emoji={style.emoji} size={32} />
           </div>
 
           {/* Content */}
