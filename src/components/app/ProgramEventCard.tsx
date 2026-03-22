@@ -183,8 +183,9 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
       <div
         onClick={handleCardClick}
         className={cn(
-          'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+          'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98] border',
           style.bgColor,
+          style.borderColor,
           event.isCompleted && 'opacity-60'
         )}
       >
