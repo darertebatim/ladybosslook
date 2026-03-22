@@ -125,6 +125,11 @@ export function RoutineBuilderSheet({
   const [editingTask, setEditingTask] = useState<BuilderTask | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const quickAddInputRef = useRef<HTMLInputElement>(null);
+  const [quickAddAnchorTop, setQuickAddAnchorTop] = useState<string>('25%');
+
+  // iOS keyboard scroll fixes
+  const { handleFocus: handleNameInputFocus } = useKeyboardScroll(nameInputRef, { block: 'center' });
+  const { handleFocus: handleQuickAddInputFocus } = useKeyboardScroll(quickAddInputRef, { block: 'center' });
 
   // Reset state when dialog opens/closes
   const handleOpenChange = useCallback((v: boolean) => {
