@@ -1240,9 +1240,28 @@ export default function AppRoutinePlayer() {
                   </button>
                 </div>
                 <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4" style={{ WebkitOverflowScrolling: 'touch' }}>
-                  {featuredRoutines.map((routine, i) => (
+                  {featuredRoutines.filter(r => {
+                    try {
+                      const dismissed: string[] = JSON.parse(localStorage.getItem(DISMISSED_FEATURED_KEY) || '[]');
+                      return !dismissed.includes(r.id);
+                    } catch { return true; }
+                  }).map((routine) => (
                     <div key={routine.id} className={cn('shrink-0 w-[85%] snap-start')}>
-                      <FeaturedRoutineCard routine={routine} categoryName={categoryNameMap.get(routine.category)} />
+                      <FeaturedRoutineCard
+                        routine={routine}
+                        categoryName={categoryNameMap.get(routine.category)}
+                        onDismiss={() => {
+                          try {
+                            const dismissed: string[] = JSON.parse(localStorage.getItem(DISMISSED_FEATURED_KEY) || '[]');
+                            if (!dismissed.includes(routine.id)) {
+                              dismissed.push(routine.id);
+                              localStorage.setItem(DISMISSED_FEATURED_KEY, JSON.stringify(dismissed));
+                            }
+                          } catch {}
+                          // Force re-render
+                          window.dispatchEvent(new Event('storage'));
+                        }}
+                      />
                     </div>
                   ))}
                 </div>
