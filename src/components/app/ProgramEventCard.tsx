@@ -25,30 +25,35 @@ interface ProgramEventCardProps {
 const EVENT_STYLES = {
   session: {
     bgColor: 'bg-[#D7E9FF]',
-    emoji: '📹',
+    settingsBg: 'bg-[#B8D4F5]',
+    emoji: '📡',
     badge: 'Live Session',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
   module: {
     bgColor: 'bg-[#F0E3FF]',
+    settingsBg: 'bg-[#DCC8F0]',
     emoji: '📖',
     badge: 'Module',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
   track: {
     bgColor: 'bg-[#E2F9F0]',
+    settingsBg: 'bg-[#C5EDDa]',
     emoji: '🎵',
     badge: 'Audio',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
   enrollment: {
-    bgColor: 'bg-[#FFE6C9]',
+    bgColor: 'bg-[#FFF492]',
+    settingsBg: 'bg-[#F0E46E]',
     emoji: '🎓',
     badge: 'New Program',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
   round_update: {
     bgColor: 'bg-[#D7E9FF]',
+    settingsBg: 'bg-[#B8D4F5]',
     emoji: '🔄',
     badge: 'Changes in Program',
     badgeClass: 'bg-secondary text-secondary-foreground',
@@ -203,9 +208,9 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
               {/* Settings icon */}
               <button
                 onClick={handleSettingsClick}
-                className="p-1 rounded-full bg-black/5 hover:bg-black/10 active:bg-black/20 transition-colors"
+                className={cn("p-1 rounded-full transition-colors", style.settingsBg)}
               >
-                <Settings2 className="h-3 w-3 text-black/50" />
+                <Settings2 className="h-3 w-3 text-black" />
               </button>
               
               {/* External link indicator for today's sessions */}
