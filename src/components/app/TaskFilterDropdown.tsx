@@ -69,14 +69,14 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
     });
   }
 
-  // Find current label
+  // Find current label (strip emojis for trigger display)
   const currentLabel = (() => {
     const all = [...baseOptions, ...endOptions];
     const found = all.find(o => o.value === value);
     if (found) return found.label;
     for (const group of groups) {
       const found = group.options.find(o => o.value === value);
-      if (found) return found.label;
+      if (found) return found.label.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]\s*/gu, '').trim();
     }
     return 'All Tasks';
   })();
