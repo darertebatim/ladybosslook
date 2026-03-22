@@ -25,6 +25,7 @@ interface ProgramEventCardProps {
 const EVENT_STYLES = {
   session: {
     bgColor: 'bg-[#D7E9FF]',
+    borderColor: 'border-[#A8C8EE]',
     settingsBg: 'bg-[#B8D4F5]',
     emoji: '📡',
     badge: 'Live Session',
@@ -32,6 +33,7 @@ const EVENT_STYLES = {
   },
   module: {
     bgColor: 'bg-[#F0E3FF]',
+    borderColor: 'border-[#D4B8F0]',
     settingsBg: 'bg-[#DCC8F0]',
     emoji: '📖',
     badge: 'Module',
@@ -39,6 +41,7 @@ const EVENT_STYLES = {
   },
   track: {
     bgColor: 'bg-[#E2F9F0]',
+    borderColor: 'border-[#B0DFC8]',
     settingsBg: 'bg-[#C5EDDa]',
     emoji: '🎵',
     badge: 'Audio',
@@ -46,6 +49,7 @@ const EVENT_STYLES = {
   },
   enrollment: {
     bgColor: 'bg-[#FFF492]',
+    borderColor: 'border-[#E8D86A]',
     settingsBg: 'bg-[#F0E46E]',
     emoji: '🎓',
     badge: 'New Program',
@@ -53,6 +57,7 @@ const EVENT_STYLES = {
   },
   round_update: {
     bgColor: 'bg-[#D7E9FF]',
+    borderColor: 'border-[#A8C8EE]',
     settingsBg: 'bg-[#B8D4F5]',
     emoji: '🔄',
     badge: 'Changes in Program',
@@ -178,8 +183,9 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
       <div
         onClick={handleCardClick}
         className={cn(
-          'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+          'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98] border',
           style.bgColor,
+          style.borderColor,
           event.isCompleted && 'opacity-60'
         )}
       >
