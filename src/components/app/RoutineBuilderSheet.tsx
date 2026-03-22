@@ -312,6 +312,9 @@ export function RoutineBuilderSheet({
     setQuickAddTitle('');
     setQuickRepeat('Daily');
     setQuickTime('Anytime');
+    if (Capacitor.isNativePlatform()) {
+      Keyboard.hide();
+    }
   };
 
   const handleQuickAddOpenDetails = () => {
