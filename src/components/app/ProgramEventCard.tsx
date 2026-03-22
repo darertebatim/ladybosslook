@@ -172,12 +172,9 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
       >
         {/* Main row */}
         <div className="flex items-center gap-2">
-          {/* Icon circle */}
-          <div className={cn(
-            'w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white',
-            style.iconBg
-          )}>
-            <Icon className="h-5 w-5" />
+          {/* 3D Emoji icon */}
+          <div className="w-10 h-10 flex items-center justify-center shrink-0">
+            <FluentEmoji emoji={style.emoji} size={32} />
           </div>
 
           {/* Content */}
