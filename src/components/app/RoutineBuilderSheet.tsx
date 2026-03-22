@@ -275,6 +275,30 @@ export function RoutineBuilderSheet({
     setShowCreateTask(false);
   };
 
+  const handleEditTaskSave = (data: TaskFormData) => {
+    if (!editingTask) return;
+    haptic.light();
+    setTasks(prev => prev.map(t => t.id === editingTask.id ? {
+      ...t,
+      title: data.title,
+      emoji: data.icon || t.emoji,
+      color: data.color || t.color,
+      repeat_pattern: data.repeatEnabled ? data.repeatPattern : 'none',
+      repeat_days: data.repeatDays || null,
+      description: data.description || null,
+      pro_link_type: data.proLinkType || null,
+      pro_link_value: data.proLinkValue || null,
+      goal_enabled: data.goalEnabled || false,
+      goal_target: data.goalTarget || null,
+      goal_type: data.goalType || null,
+      goal_unit: data.goalUnit || null,
+      duration_minutes: data.durationMinutes || null,
+      time_period: data.timePeriod || null,
+      linked_playlist_id: data.linkedPlaylistId || null,
+    } : t));
+    setEditingTask(null);
+  };
+
   const handleNext = () => {
     if (!routineTitle.trim()) return;
     haptic.light();
