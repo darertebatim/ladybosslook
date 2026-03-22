@@ -359,6 +359,20 @@ export function RoutineBuilderSheet({
                   autoComplete="off"
                 />
               </div>
+              {/* Color picker */}
+              <div className="flex items-center gap-2 mt-2 pl-12">
+                {(['peach', 'pink', 'yellow', 'mint', 'sky', 'lavender'] as TaskColor[]).map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => { haptic.light(); setRoutineColor(color); }}
+                    className={cn(
+                      'w-7 h-7 rounded-full transition-all active:scale-90',
+                      routineColor === color && 'ring-2 ring-offset-2 ring-black/30'
+                    )}
+                    style={{ backgroundColor: TASK_COLORS[color] }}
+                  />
+                ))}
+              </div>
             </div>
 
             {/* Bottom section — changes per step */}
