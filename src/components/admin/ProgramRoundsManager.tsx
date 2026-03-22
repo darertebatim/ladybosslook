@@ -967,6 +967,44 @@ export const ProgramRoundsManager = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Notify Students Dialog */}
+      <Dialog open={showNotifyDialog} onOpenChange={(open) => {
+        if (!open) {
+          setShowNotifyDialog(false);
+          lastSavedRoundRef.current = null;
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Notify Students?</DialogTitle>
+            <DialogDescription>
+              Would you like to notify enrolled students about the changes to this round? They'll see a card in their planner today.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowNotifyDialog(false);
+                lastSavedRoundRef.current = null;
+              }}
+            >
+              No, skip
+            </Button>
+            <Button
+              onClick={() => {
+                if (lastSavedRoundRef.current) {
+                  notifyStudentsMutation.mutate(lastSavedRoundRef.current);
+                }
+              }}
+              disabled={notifyStudentsMutation.isPending}
+            >
+              Yes, notify
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
