@@ -9,7 +9,7 @@ import { haptic } from '@/lib/haptics';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
+import { TASK_COLOR_CLASSES, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
 
@@ -80,7 +80,7 @@ export function RoutineBuilderSheet({
   const [step, setStep] = useState<1 | 2>(1);
   const [routineTitle, setRoutineTitle] = useState(initialTitle);
   const [routineEmoji, setRoutineEmoji] = useState(initialEmoji);
-  const [routineColor] = useState(initialColor);
+  const [routineColor, setRoutineColor] = useState(initialColor);
 
   const [tasks, setTasks] = useState<BuilderTask[]>(initialTasks);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -358,6 +358,20 @@ export function RoutineBuilderSheet({
                   enterKeyHint={step === 1 ? 'next' : 'done'}
                   autoComplete="off"
                 />
+              </div>
+              {/* Color picker */}
+              <div className="flex items-center gap-2 mt-2 pl-12">
+                {(['peach', 'pink', 'yellow', 'mint', 'sky', 'lavender'] as TaskColor[]).map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => { haptic.light(); setRoutineColor(color); }}
+                    className={cn(
+                      'w-7 h-7 rounded-full transition-all active:scale-90',
+                      routineColor === color && 'ring-2 ring-offset-2 ring-black/30'
+                    )}
+                    style={{ backgroundColor: TASK_COLORS[color] }}
+                  />
+                ))}
               </div>
             </div>
 
