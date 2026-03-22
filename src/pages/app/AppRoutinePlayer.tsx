@@ -1439,7 +1439,7 @@ export default function AppRoutinePlayer() {
         initialTitle={builderEditRoutine?.title || ''}
         initialEmoji={builderEditRoutine?.emoji || '✨'}
         initialColor={builderEditRoutine?.color || 'peach'}
-        initialTasks={builderEditRoutine ? [] : []}
+        initialTasks={builderEditRoutine ? builderEditTasks : []}
         onEditSave={handleBuilderEditSave}
       />
 
