@@ -1400,7 +1400,7 @@ const AppHome = () => {
                       All <ChevronRight className="h-3.5 w-3.5" />
                     </button>
                   </div>
-                  <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide snap-x snap-mandatory">
+                  <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide snap-x snap-mandatory scroll-pl-4" style={{ WebkitOverflowScrolling: 'touch' }}>
                     {suggestedRoutines.map((routine) => (
                       <div key={routine.id} className="shrink-0 w-[85%] snap-start">
                         <FeaturedRoutineCard
