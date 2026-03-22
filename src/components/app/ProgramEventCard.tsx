@@ -225,7 +225,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
             </p>
             
             {/* Program name - subtle subtitle */}
-            {!isEnrollment && (
+            {!isSpecialCard && (
               <p className="text-xs text-foreground/50 truncate">
                 {event.programTitle}
               </p>
@@ -235,10 +235,15 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
                 Tap to explore your program →
               </p>
             )}
+            {isRoundUpdate && (
+              <p className="text-xs text-foreground/50 truncate">
+                Tap to see changes →
+              </p>
+            )}
           </div>
 
-          {/* Checkbox - hidden for enrollment cards */}
-          {!isEnrollment && (
+          {/* Checkbox - hidden for special cards */}
+          {!isSpecialCard && (
             <button
               onClick={handleToggleComplete}
               className="w-9 h-9 flex items-center justify-center shrink-0"
