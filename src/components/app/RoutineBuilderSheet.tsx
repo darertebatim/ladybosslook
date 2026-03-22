@@ -410,7 +410,7 @@ export function RoutineBuilderSheet({
                     className={cn(
                       'w-full h-12 rounded-2xl text-[15px] font-bold shadow-md transition-all active:scale-[0.98]',
                       tasks.length > 0
-                        ? 'bg-amber-400 dark:bg-amber-500 text-black shadow-amber-200/40 dark:shadow-amber-900/30'
+                        ? 'bg-urgency text-urgency-foreground shadow-urgency/30'
                         : 'bg-black/10 dark:bg-white/10 text-black/30 dark:text-white/30 shadow-none'
                     )}
                   >
