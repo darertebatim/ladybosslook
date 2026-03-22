@@ -24,7 +24,7 @@ export interface ProgramEvent {
 interface PlannerProgramCompletion {
   id: string;
   user_id: string;
-  event_type: 'session' | 'module' | 'track';
+  event_type: 'session' | 'module' | 'track' | 'enrollment';
   event_id: string;
   completed_date: string;
 }
