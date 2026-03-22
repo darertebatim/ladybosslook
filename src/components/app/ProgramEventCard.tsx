@@ -50,6 +50,13 @@ const EVENT_STYLES = {
     badgeColor: 'bg-amber-500',
     Icon: GraduationCap,
   },
+  round_update: {
+    gradient: 'bg-gradient-to-br from-sky-100 to-blue-100',
+    iconBg: 'bg-sky-500',
+    badge: 'Changes in Program',
+    badgeColor: 'bg-sky-500',
+    Icon: RefreshCw,
+  },
 };
 
 export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
