@@ -198,22 +198,31 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
             </p>
             
             {/* Program name - subtle subtitle */}
-            <p className="text-xs text-foreground/50 truncate">
-              {event.programTitle}
-            </p>
+            {!isEnrollment && (
+              <p className="text-xs text-foreground/50 truncate">
+                {event.programTitle}
+              </p>
+            )}
+            {isEnrollment && (
+              <p className="text-xs text-foreground/50 truncate">
+                Tap to explore your program →
+              </p>
+            )}
           </div>
 
-          {/* Checkbox */}
-          <button
-            onClick={handleToggleComplete}
-            className="w-9 h-9 flex items-center justify-center shrink-0"
-          >
-            {event.isCompleted ? (
-              <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} />
-            ) : (
-              <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
-            )}
-          </button>
+          {/* Checkbox - hidden for enrollment cards */}
+          {!isEnrollment && (
+            <button
+              onClick={handleToggleComplete}
+              className="w-9 h-9 flex items-center justify-center shrink-0"
+            >
+              {event.isCompleted ? (
+                <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} />
+              ) : (
+                <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
+              )}
+            </button>
+          )}
         </div>
       </div>
 

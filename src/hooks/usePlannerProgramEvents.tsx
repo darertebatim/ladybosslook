@@ -310,6 +310,14 @@ export function useProgramEventDates(startDate: Date, endDate: Date) {
       const endIso = rangeEnd.toISOString();
 
       for (const enrollment of enrollments) {
+        // Add enrollment date itself as an event date
+        if (enrollment.enrolled_at) {
+          const enrolledDate = new Date(enrollment.enrolled_at);
+          if (isWithinInterval(enrolledDate, { start: rangeStart, end: rangeEnd })) {
+            eventDates.add(format(enrolledDate, 'yyyy-MM-dd'));
+          }
+        }
+
         const round = enrollment.program_rounds as any;
         if (!round) continue;
 

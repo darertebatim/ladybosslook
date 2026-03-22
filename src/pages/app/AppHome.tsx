@@ -1457,7 +1457,7 @@ const AppHome = () => {
         <HomeTour 
           isFirstOpen={isFirstOpen}
           forceShow={serverIndicatesNewUser}
-          hasEnrolledPrograms={activeRounds.length > 0}
+          hasEnrolledPrograms={false}
           hasSuggestedRoutines={suggestedRoutines.length > 0}
           hasWelcomeCard={showWelcomeCard}
           onTourReady={handleHomeTourReady}
