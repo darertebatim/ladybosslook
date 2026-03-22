@@ -383,6 +383,13 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
     return items.slice(0, 5);
   }, [templates, selectedCategory]);
 
+  // Search-based suggestions while typing (before ideas panel is open)
+  const searchSuggestions = useMemo(() => {
+    const q = title.trim().toLowerCase();
+    if (!q || q.length < 2 || showIdeas) return [];
+    return templates.filter(t => t.title.toLowerCase().includes(q)).slice(0, 4);
+  }, [templates, title, showIdeas]);
+
   useEffect(() => {
     if (!isOpen) return;
     const t = window.setTimeout(() => {
@@ -637,7 +644,30 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
             )}
           </div>
 
+          {/* Search-based suggestions while typing */}
+          {searchSuggestions.length > 0 && (
+            <div className="mt-3 flex flex-col gap-1.5 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
+              <p className="text-sm text-white/70 font-medium text-center">Need some ideas?</p>
+              {searchSuggestions.map((template) => {
+                const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
+                return (
+                  <button
+                    key={template.id}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => handleTemplateSelect(template)}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl active:scale-[0.98] transition-transform overflow-hidden"
+                    style={{ backgroundColor: `${bgColor}cc` }}
+                  >
+                    <FluentEmoji emoji={template.emoji || '📝'} size={22} className="shrink-0" />
+                    <span className="text-sm font-semibold text-black truncate flex-1 min-w-0">{template.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
           {/* "Need some ideas?" tappable text */}
+          {searchSuggestions.length === 0 && (
           <div className="mt-3 flex min-h-5 justify-center">
             <button
               onMouseDown={(e) => e.preventDefault()}
@@ -650,6 +680,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
               Need some ideas?
             </button>
           </div>
+          )}
         </DialogContent>
 
         {/* Suggestions — separate portal layer, grows downward from below the card */}
