@@ -219,6 +219,34 @@ export function RoutineBuilderSheet({
     enabled: !!user && open,
   });
 
+  // Fetch task bank templates for quick-add suggestions
+  const { data: taskBankTemplates = [] } = useQuery({
+    queryKey: ['builder-task-bank'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('admin_task_bank')
+        .select('id, title, emoji, color, category, repeat_pattern, repeat_days, time_period, duration_minutes, goal_enabled, goal_target, goal_type, goal_unit, pro_link_type, pro_link_value, linked_playlist_id, description')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      return data || [];
+    },
+    enabled: open,
+  });
+
+  // Search-based suggestions for quick-add
+  const quickAddSearchSuggestions = useMemo(() => {
+    const q = quickAddTitle.trim().toLowerCase();
+    if (!q || q.length < 2) return [];
+    const words = q.split(/\s+/).filter(w => w.length >= 2);
+    if (words.length === 0) return [];
+    return taskBankTemplates
+      .filter((t: any) => {
+        const tl = t.title.toLowerCase();
+        return words.every((w: string) => tl.includes(w));
+      })
+      .slice(0, 4);
+  }, [taskBankTemplates, quickAddTitle]);
+
   const addedTaskIds = useMemo(() => new Set(tasks.map(t => t.id)), [tasks]);
 
   const addTaskFromSource = (source: any) => {
