@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+const DISMISSED_FEATURED_KEY = 'dismissed-featured-routines';
 import { fetchSmartEstimates, type SmartEstimateInput } from '@/lib/smartEstimate';
 import { cn } from '@/lib/utils';
 import { useNavigate, useSearchParams } from 'react-router-dom';
