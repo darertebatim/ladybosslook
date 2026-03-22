@@ -1178,13 +1178,22 @@ export default function AppRoutinePlayer() {
               ) : null;
             })()}
 
+            {/* Create Routine card */}
+            <button
+              onClick={() => { haptic.light(); setBuilderEditRoutine(null); setShowBuilder(true); }}
+              className="w-full flex items-center justify-center gap-2 h-16 rounded-2xl border-2 border-dashed border-border active:bg-muted/50 transition-colors"
+            >
+              <Plus className="w-5 h-5 text-muted-foreground" />
+              <span className="text-sm font-bold text-muted-foreground">Create Routine</span>
+            </button>
+
             {/* Empty state */}
             {(myRoutines || []).length === 0 && (
-              <div className="text-center py-12">
+              <div className="text-center py-8">
                 <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
                 <h3 className="font-semibold text-foreground mb-1">No routines yet</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Browse and add routines to start your sessions
+                <p className="text-sm text-muted-foreground">
+                  Create your own or browse the library
                 </p>
               </div>
             )}
