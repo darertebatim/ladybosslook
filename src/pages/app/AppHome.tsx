@@ -1158,6 +1158,7 @@ const AppHome = () => {
                     <div className="flex bg-muted rounded-full p-0.5">
                       <button
                         className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-background text-foreground shadow-sm"
+                        onClick={() => setFilterDropdownOpen(true)}
                       >
                         My Tasks
                       </button>
