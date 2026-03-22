@@ -4006,6 +4006,7 @@ export type Database = {
           id: string
           is_active: boolean
           is_focus: boolean | null
+          is_user_created: boolean
           order_index: number | null
           routine_id: string
           schedule_type: string | null
@@ -4023,8 +4024,9 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_focus?: boolean | null
+          is_user_created?: boolean
           order_index?: number | null
-          routine_id: string
+          routine_id?: string
           schedule_type?: string | null
           title?: string | null
           user_id: string
@@ -4040,21 +4042,14 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_focus?: boolean | null
+          is_user_created?: boolean
           order_index?: number | null
           routine_id?: string
           schedule_type?: string | null
           title?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_routines_bank_routine_id_fkey"
-            columns: ["routine_id"]
-            isOneToOne: false
-            referencedRelation: "routines_bank"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_streaks: {
         Row: {
