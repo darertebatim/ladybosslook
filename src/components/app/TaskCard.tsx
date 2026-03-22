@@ -486,7 +486,7 @@ export const TaskCard = memo(function TaskCard({
                 >
                   {isCompleted ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
                     <span className="w-9 h-9 rounded-full border-[2.5px] border-black bg-white flex items-center justify-center">
-                      <ProIcon className={cn("h-4 w-4", proConfig.iconColorClass)} />
+                      {isRoutineLauncher ? <Play className="h-4 w-4 ml-0.5" /> : <ProIcon className={cn("h-4 w-4", proConfig.iconColorClass)} />}
                     </span>
                   )}
                 </button>
