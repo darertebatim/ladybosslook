@@ -651,13 +651,8 @@ export function RoutineBuilderSheet({
         </SheetContent>
       </Sheet>
 
-      {/* Emoji Picker */}
-      <EmojiPicker
-        open={showEmojiPicker}
-        onOpenChange={setShowEmojiPicker}
-        selectedEmoji={routineEmoji}
-        onSelect={(emoji) => { setRoutineEmoji(emoji); setShowEmojiPicker(false); }}
-      />
+
+
 
       {/* Create new task sheet */}
       {showCreateTask && (
