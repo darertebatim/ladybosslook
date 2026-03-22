@@ -171,7 +171,7 @@ export function useProgramEventsForDate(date: Date) {
           programSlug: e.programSlug,
           programTitle: e.programTitle,
           roundId: e.roundId,
-          isCompleted: false,
+          isCompleted: e.isCompleted || false,
         });
       }
 
@@ -218,7 +218,7 @@ export function useCompleteProgramEvent() {
       eventId, 
       date 
     }: { 
-      eventType: 'session' | 'module' | 'track'; 
+      eventType: 'session' | 'module' | 'track' | 'enrollment'; 
       eventId: string; 
       date: Date;
     }) => {
@@ -254,7 +254,7 @@ export function useUncompleteProgramEvent() {
       eventId, 
       date 
     }: { 
-      eventType: 'session' | 'module' | 'track'; 
+      eventType: 'session' | 'module' | 'track' | 'enrollment'; 
       eventId: string; 
       date: Date;
     }) => {
