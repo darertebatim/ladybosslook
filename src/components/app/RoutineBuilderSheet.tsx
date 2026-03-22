@@ -105,6 +105,8 @@ export function RoutineBuilderSheet({
         setPickerSearch('');
         setShowCreateTask(false);
         setShowSuggestions(false);
+        setQuickAddTitle('');
+        setQuickAddOpen(false);
       }, 300);
     } else {
       setRoutineTitle(initialTitle);
