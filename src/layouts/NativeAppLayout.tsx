@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, MessageCircle, Compass, Music, Users, Flame, CalendarPlus } from 'lucide-react';
+import { Home, MessageCircle, Compass, Music, Users, Flame, CalendarPlus, Play } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef, useState } from 'react';
@@ -169,8 +169,9 @@ const NativeAppLayout = () => {
 
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home', tourClass: 'tour-nav-home' },
+    { path: '/app/routineplayer', icon: Play, label: 'MyRoutines', tourClass: 'tour-nav-routines' },
     { path: '/app/tools', icon: Compass, label: 'Tools', tourClass: 'tour-nav-explore' },
-    { path: '/app/routines', icon: CalendarPlus, label: 'Routines', tourClass: 'tour-nav-routines' },
+    { path: '/app/routines', icon: CalendarPlus, label: 'Routines', tourClass: '' },
     { path: '/app/player', icon: Music, label: 'Listen', tourClass: 'tour-nav-listen' },
     { path: '/app/channels', icon: Users, label: 'Chats', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
   ];
@@ -271,17 +272,6 @@ const NativeAppLayout = () => {
                 </Link>
             );
           })}
-
-          {/* Presence - orange streak pill */}
-          <Link
-            to="/app/presence"
-            className="flex items-center justify-center min-h-[44px] tour-nav-presence"
-          >
-            <div className="flex items-center justify-center gap-0.5 w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-orange-500 text-white shadow-sm active:scale-95 transition-transform">
-              <Flame className="h-5 w-5 fill-current shrink-0" />
-              <span className="text-sm font-bold leading-none">{streakCount}</span>
-            </div>
-          </Link>
         </div>
       </nav>
       )}
