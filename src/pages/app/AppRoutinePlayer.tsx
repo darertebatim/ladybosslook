@@ -73,6 +73,20 @@ interface RoutineCardProps {
   onEditRoutine?: (routine: any) => void;
 }
 
+// Secondary (darker) palette for emoji circles in routine cards
+const TASK_COLORS_SECONDARY: Record<string, string> = {
+  pink: '#FFC2EA',
+  peach: '#FFD2A1',
+  yellow: '#FFEA4E',
+  lime: '#C3F1E1',
+  sky: '#B9D6FF',
+  mint: '#C9F588',
+  lavender: '#DEC1FF',
+  purple: '#DEC1FF',
+  blue: '#B9D6FF',
+  red: '#FFC2EA',
+};
+
 function RoutineCardContent({
   routine,
   routineTasksMap,
@@ -93,6 +107,7 @@ function RoutineCardContent({
   const visibleTasks = allTasks.slice(0, MAX_EMOJIS);
   const overflowCount = allTasks.length - MAX_EMOJIS;
   const cardColor = TASK_COLOR_CLASSES[(routine.color as TaskColor) || 'peach'] || TASK_COLOR_CLASSES.peach;
+  const secondaryHex = TASK_COLORS_SECONDARY[(routine.color as string) || 'peach'] || TASK_COLORS_SECONDARY.peach;
 
   return (
     <div
@@ -146,7 +161,10 @@ function RoutineCardContent({
         <div className="flex items-center gap-1">
           {visibleTasks.map((task: any, i: number) => (
             <span key={i} className="flex items-center">
-              <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center">
+              <span
+                className="w-9 h-9 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: secondaryHex }}
+              >
                 <FluentEmoji emoji={task.emoji} size={20} />
               </span>
               {i < visibleTasks.length - 1 && (
@@ -157,7 +175,10 @@ function RoutineCardContent({
           {overflowCount > 0 && (
             <>
               <ChevronRight className="w-3 h-3 text-black mx-0.5" />
-              <span className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center text-xs font-bold text-black">
+              <span
+                className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-black"
+                style={{ backgroundColor: secondaryHex }}
+              >
                 +{overflowCount}
               </span>
             </>
@@ -166,7 +187,8 @@ function RoutineCardContent({
         <button
           onClick={(e) => { e.stopPropagation(); onPlay(routine); }}
           disabled={loadingRoutineId === routine.routine_id}
-          className="flex items-center justify-center gap-2 h-12 min-w-[48px] px-5 rounded-full bg-secondary active:scale-95 transition-transform shrink-0"
+          className="flex items-center justify-center gap-2 h-12 min-w-[48px] px-5 rounded-full active:scale-95 transition-transform shrink-0"
+          style={{ backgroundColor: secondaryHex }}
         >
           {loadingRoutineId === routine.routine_id ? (
             <Loader2 className="w-5 h-5 animate-spin text-black" />
