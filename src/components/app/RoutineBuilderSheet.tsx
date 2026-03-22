@@ -63,7 +63,7 @@ const QUICK_ADD_VARIANTS: { emoji: string; color: string }[] = [
   { emoji: '🌊', color: 'sky' },
 ];
 
-export function RoutineBuilderSheet({
+const QUICK_EMOJIS = ['✨', '🎯', '💪', '🧘', '📚', '🏃', '💼', '🎨', '🌟', '💖', '🔥', '🌿'];
   open,
   onOpenChange,
   onComplete,
