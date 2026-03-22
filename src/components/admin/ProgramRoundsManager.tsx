@@ -1018,7 +1018,7 @@ export const ProgramRoundsManager = () => {
             <Button
               onClick={() => {
                 if (lastSavedRoundRef.current) {
-                  notifyStudentsMutation.mutate(lastSavedRoundRef.current);
+                  notifyStudentsMutation.mutate({ roundId: lastSavedRoundRef.current.id, programSlug: lastSavedRoundRef.current.program_slug });
                 }
               }}
               disabled={notifyStudentsMutation.isPending}
