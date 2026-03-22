@@ -90,6 +90,11 @@ export const TaskCard = memo(function TaskCard({
   const isWater = isWaterTask(task);
   const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
 
+  // For routine launcher tasks, check if all routine tasks are completed
+  const routineId = (proLinkType === 'routine') ? (proLinkValue || task.source_routine_id || '') : '';
+  const { completion: routineCompletion } = useRoutinePreviewData(routineId);
+  const isRoutineComplete = routineCompletion?.isComplete === true;
+
   // Detect if this task was just auto-completed while user was away
   useEffect(() => {
     if (!isCompleted && !goalReached) return;
