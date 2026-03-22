@@ -92,7 +92,10 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
               alt={routine.title}
               loading="lazy"
               decoding="async"
-              className="w-full h-full object-cover"
+              className={cn(
+                "w-full h-full object-cover",
+                routine.cover_aspect === '6x4' && "object-bottom"
+              )}
             />
           ) : (
             <div className={cn(
