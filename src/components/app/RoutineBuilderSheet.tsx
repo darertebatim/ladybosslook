@@ -48,7 +48,22 @@ interface RoutineBuilderSheetProps {
   onEditSave?: (routineTitle: string, routineEmoji: string, routineColor: string, tasks: BuilderTask[]) => void;
 }
 
+const QUICK_ADD_VARIANTS: { emoji: string; color: string }[] = [
+  { emoji: '☀️', color: 'yellow' },
+  { emoji: '🌿', color: 'green' },
+  { emoji: '💜', color: 'purple' },
+  { emoji: '🔥', color: 'red' },
+  { emoji: '💧', color: 'blue' },
+  { emoji: '🧡', color: 'orange' },
+  { emoji: '⭐', color: 'yellow' },
+  { emoji: '🎯', color: 'red' },
+  { emoji: '🌸', color: 'pink' },
+  { emoji: '🍀', color: 'green' },
+  { emoji: '✨', color: 'lavender' },
+  { emoji: '🌊', color: 'sky' },
+];
 const QUICK_EMOJIS = ['✨', '🎯', '💪', '🧘', '📚', '🏃', '💼', '🎨', '🌟', '💖', '🔥', '🌿'];
+
 
 export function RoutineBuilderSheet({
   open,
@@ -73,7 +88,10 @@ export function RoutineBuilderSheet({
   const [pickerSearch, setPickerSearch] = useState('');
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [quickAddTitle, setQuickAddTitle] = useState('');
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const quickAddInputRef = useRef<HTMLInputElement>(null);
 
   // Reset state when sheet opens/closes
   const handleOpenChange = useCallback((open: boolean) => {
@@ -87,6 +105,8 @@ export function RoutineBuilderSheet({
         setPickerSearch('');
         setShowCreateTask(false);
         setShowSuggestions(false);
+        setQuickAddTitle('');
+        setQuickAddOpen(false);
       }, 300);
     } else {
       setRoutineTitle(initialTitle);
@@ -227,6 +247,24 @@ export function RoutineBuilderSheet({
     };
     setTasks(prev => [...prev, newTask]);
     setShowCreateTask(false);
+  };
+
+  const handleQuickAddSubmit = () => {
+    const trimmed = quickAddTitle.trim();
+    if (!trimmed) return;
+    haptic.medium();
+    const variant = QUICK_ADD_VARIANTS[tasks.length % QUICK_ADD_VARIANTS.length];
+    const newTask: BuilderTask = {
+      id: `quick-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      title: trimmed,
+      emoji: variant.emoji,
+      color: variant.color,
+      repeat_pattern: 'daily',
+    };
+    setTasks(prev => [...prev, newTask]);
+    setQuickAddTitle('');
+    // Keep input focused for rapid entry
+    setTimeout(() => quickAddInputRef.current?.focus(), 50);
   };
 
   const handleNext = () => {
@@ -446,14 +484,52 @@ export function RoutineBuilderSheet({
                   )}
                 </div>
 
-                {/* Add task button */}
-                <div className="px-5 py-3 border-t border-border/30">
+                {/* Quick add inline + Browse */}
+                <div className="px-5 py-3 border-t border-border/30 space-y-2">
+                  {/* Quick add input — two-tone card like home planner */}
+                  <div className="rounded-2xl overflow-hidden border border-amber-200/50 dark:border-amber-800/30">
+                    <div className="bg-gradient-to-br from-amber-50/80 to-orange-50/60 dark:from-amber-950/30 dark:to-orange-950/20 px-3.5 py-2.5">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 flex items-center justify-center shrink-0">
+                          <Plus className="h-5 w-5 text-amber-500" strokeWidth={2.5} />
+                        </div>
+                        <input
+                          ref={quickAddInputRef}
+                          value={quickAddTitle}
+                          onChange={(e) => setQuickAddTitle(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleQuickAddSubmit();
+                            if (e.key === 'Escape') { setQuickAddTitle(''); quickAddInputRef.current?.blur(); }
+                          }}
+                          placeholder="Type task name..."
+                          className="flex-1 bg-transparent text-[14px] font-semibold text-foreground placeholder:text-muted-foreground/50 outline-none"
+                          enterKeyHint="done"
+                          autoComplete="off"
+                        />
+                        {quickAddTitle.trim() && (
+                          <button
+                            onClick={handleQuickAddSubmit}
+                            className="shrink-0 h-8 px-3.5 rounded-xl bg-amber-400 dark:bg-amber-500 text-black text-xs font-bold active:scale-95 transition-transform shadow-sm"
+                          >
+                            Add
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="px-4 py-1.5 bg-gradient-to-r from-amber-100/50 to-orange-100/30 dark:from-amber-900/15 dark:to-orange-900/10">
+                      <p className="text-[11px] font-medium text-muted-foreground text-center">
+                        Press enter to add quickly
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Browse existing tasks */}
                   <button
                     onClick={() => { haptic.light(); setShowTaskPicker(true); setPickerSearch(''); }}
-                    className="w-full flex items-center justify-center gap-2 h-12 rounded-2xl border-2 border-dashed border-amber-300/60 dark:border-amber-700/40 bg-amber-50/30 dark:bg-amber-950/10 active:bg-amber-50/60 dark:active:bg-amber-950/20 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 h-10 rounded-xl text-sm font-semibold text-muted-foreground active:bg-muted/50 transition-colors"
                   >
-                    <Plus className="w-4.5 h-4.5 text-amber-600 dark:text-amber-400" />
-                    <span className="text-sm font-bold text-amber-700 dark:text-amber-400">Add Task</span>
+                    <Search className="w-3.5 h-3.5" />
+                    Browse existing tasks
                   </button>
                 </div>
 
