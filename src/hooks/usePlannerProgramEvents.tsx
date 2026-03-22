@@ -171,7 +171,7 @@ export function useProgramEventsForDate(date: Date) {
           programSlug: e.programSlug,
           programTitle: e.programTitle,
           roundId: e.roundId,
-          isCompleted: false,
+          isCompleted: e.isCompleted || false,
         });
       }
 
