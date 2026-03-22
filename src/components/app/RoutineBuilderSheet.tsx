@@ -48,7 +48,20 @@ interface RoutineBuilderSheetProps {
   onEditSave?: (routineTitle: string, routineEmoji: string, routineColor: string, tasks: BuilderTask[]) => void;
 }
 
-const QUICK_EMOJIS = ['✨', '🎯', '💪', '🧘', '📚', '🏃', '💼', '🎨', '🌟', '💖', '🔥', '🌿'];
+const QUICK_ADD_VARIANTS: { emoji: string; color: string }[] = [
+  { emoji: '☀️', color: 'yellow' },
+  { emoji: '🌿', color: 'green' },
+  { emoji: '💜', color: 'purple' },
+  { emoji: '🔥', color: 'red' },
+  { emoji: '💧', color: 'blue' },
+  { emoji: '🧡', color: 'orange' },
+  { emoji: '⭐', color: 'yellow' },
+  { emoji: '🎯', color: 'red' },
+  { emoji: '🌸', color: 'pink' },
+  { emoji: '🍀', color: 'green' },
+  { emoji: '✨', color: 'lavender' },
+  { emoji: '🌊', color: 'sky' },
+];
 
 export function RoutineBuilderSheet({
   open,
