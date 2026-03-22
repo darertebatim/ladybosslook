@@ -400,7 +400,7 @@ export function RoutineBuilderSheet({
               </div>
             ) : (
               /* Step 2 expanded area */
-              <div className="transition-colors duration-200" style={{ backgroundColor: `color-mix(in srgb, ${TASK_COLORS[routineColor as TaskColor] || TASK_COLORS.peach} 75%, #888)` }}>
+              <div className="transition-colors duration-200" style={{ backgroundColor: TASK_COLORS_DARK[routineColor] || TASK_COLORS_DARK.peach }}>
                 {/* Task list */}
                 <div className="max-h-[35vh] overflow-y-auto px-3 pt-2 pb-1">
                   {tasks.length === 0 ? (
