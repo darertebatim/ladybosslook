@@ -84,6 +84,7 @@ function RoutineCardContent({
   onPlay,
   onOpenAddSheet,
   onDeleteRoutine,
+  onEditRoutine,
 }: RoutineCardProps) {
   const completion = getCompletionInfo(routine.routine_id);
   const allTasks = routineTasksMap?.[routine.routine_id] || [];
