@@ -230,6 +230,7 @@ export default function AppRoutinePlayer() {
   const [builderEditRoutine, setBuilderEditRoutine] = useState<any | null>(null);
   const [builderResult, setBuilderResult] = useState<{ title: string; emoji: string; color: string; tasks: any[] } | null>(null);
   const [showBuilderPreview, setShowBuilderPreview] = useState(false);
+  const [builderEditTasks, setBuilderEditTasks] = useState<any[]>([]);
 
   // Check if routine player page is already added as a task
   const { data: isPageAdded } = useExistingProTask('route', '/app/routineplayer');
