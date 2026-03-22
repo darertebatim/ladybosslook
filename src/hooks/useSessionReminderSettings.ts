@@ -43,9 +43,12 @@ export function useSessionReminderSettings(roundId: string | undefined) {
       const stored = localStorage.getItem(sessionStorageKey);
       if (stored) {
         const parsed = JSON.parse(stored);
+        // Backward compat: convert old single number to array
+        const rm = parsed.reminderMinutes;
+        const reminderMinutes = Array.isArray(rm) ? rm : (typeof rm === 'number' ? [rm] : DEFAULT_REMINDER_SETTINGS.reminderMinutes);
         setSessionSettingsState({
           enabled: parsed.enabled ?? DEFAULT_REMINDER_SETTINGS.enabled,
-          reminderMinutes: parsed.reminderMinutes ?? DEFAULT_REMINDER_SETTINGS.reminderMinutes,
+          reminderMinutes,
           isUrgent: parsed.isUrgent ?? DEFAULT_REMINDER_SETTINGS.isUrgent,
         });
       }
