@@ -80,7 +80,7 @@ export function RoutineBuilderSheet({
   const [step, setStep] = useState<1 | 2>(1);
   const [routineTitle, setRoutineTitle] = useState(initialTitle);
   const [routineEmoji, setRoutineEmoji] = useState(initialEmoji);
-  const [routineColor] = useState(initialColor);
+  const [routineColor, setRoutineColor] = useState(initialColor);
 
   const [tasks, setTasks] = useState<BuilderTask[]>(initialTasks);
   const [showSuggestions, setShowSuggestions] = useState(false);
