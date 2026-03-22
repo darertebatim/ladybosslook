@@ -204,7 +204,7 @@ export function RoutineBuilderSheet({
       goal_target: template?.goal_target || null,
       goal_type: template?.goal_type || null,
       goal_unit: template?.goal_unit || null,
-      duration_minutes: template?.duration_minutes || null,
+      duration_minutes: null,
       time_period: template?.time_period || null,
       linked_playlist_id: template?.linked_playlist_id || null,
       category: template?.category || null,
