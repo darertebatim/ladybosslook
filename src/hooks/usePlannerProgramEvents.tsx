@@ -175,6 +175,19 @@ export function useProgramEventsForDate(date: Date) {
         });
       }
 
+      // Process round update notifications
+      for (const u of (data.round_updates || [])) {
+        events.push({
+          id: u.id,
+          type: 'round_update',
+          title: u.programTitle,
+          programSlug: u.programSlug,
+          programTitle: u.programTitle,
+          roundId: u.roundId,
+          isCompleted: false,
+        });
+      }
+
       // Sort: enrollments first, then sessions, then by time
       const typePriority: Record<string, number> = { enrollment: 0, session: 1, module: 2, track: 3 };
       events.sort((a, b) => {
