@@ -26,7 +26,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Delete } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { RoutineTaskPreview, RoutinePlayBadge } from './RoutineTaskPreview';
+import { RoutineTaskPreview, RoutinePlayBadge, useRoutinePreviewData } from './RoutineTaskPreview';
 
 interface TaskCardProps {
   task: UserTask;
@@ -89,6 +89,11 @@ export const TaskCard = memo(function TaskCard({
   const isCountGoal = hasGoal && task.goal_type === 'count';
   const isWater = isWaterTask(task);
   const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
+
+  // For routine launcher tasks, check if all routine tasks are completed
+  const routineId = (proLinkType === 'routine') ? (proLinkValue || task.source_routine_id || '') : '';
+  const { completion: routineCompletion } = useRoutinePreviewData(routineId);
+  const isRoutineComplete = routineCompletion?.isComplete === true;
 
   // Detect if this task was just auto-completed while user was away
   useEffect(() => {
@@ -484,7 +489,7 @@ export const TaskCard = memo(function TaskCard({
                   onClick={handleProCircleClick}
                   className="w-12 h-12 -m-1.5 flex items-center justify-center"
                 >
-                  {isCompleted ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
+                  {(isCompleted || (isRoutineLauncher && isRoutineComplete)) ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
                     <span className="w-9 h-9 rounded-full border-[2.5px] border-black bg-white flex items-center justify-center">
                       {isRoutineLauncher ? <Play className="h-4 w-4 ml-0.5" /> : <ProIcon className={cn("h-4 w-4", proConfig.iconColorClass)} />}
                     </span>
