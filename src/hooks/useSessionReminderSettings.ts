@@ -5,13 +5,13 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
  */
 export interface ReminderSettings {
   enabled: boolean;        // Whether reminders are on for this type
-  reminderMinutes: number; // 15, 30, 60, 120, 1440 (1 day)
+  reminderMinutes: number[]; // Array of selected times: 0, 15, 30, 60, 120, 1440
   isUrgent: boolean;       // Uses calendar alarm to bypass silent mode
 }
 
 export const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
   enabled: true,
-  reminderMinutes: 0, // "At the time" is the default
+  reminderMinutes: [0], // "At the time" is the default
   isUrgent: false,
 };
 
