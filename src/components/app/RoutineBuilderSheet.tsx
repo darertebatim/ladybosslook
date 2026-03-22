@@ -111,7 +111,7 @@ export function RoutineBuilderSheet({
       setRoutineTitle(initialTitle);
       setRoutineEmoji(initialEmoji);
       setTasks(initialTasks);
-      if (editMode && initialTasks.length > 0) {
+      if (editMode) {
         setStep(2);
       } else {
         setStep(1);
