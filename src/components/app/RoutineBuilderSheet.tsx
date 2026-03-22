@@ -392,7 +392,7 @@ export function RoutineBuilderSheet({
                   autoComplete="off"
                 />
               </div>
-              {/* Color picker */}
+              {step === 2 && (
               <div className="flex items-center gap-2 mt-2 pl-12">
                 {(['peach', 'pink', 'yellow', 'mint', 'sky', 'lavender'] as TaskColor[]).map((color) => (
                   <button
@@ -406,6 +406,7 @@ export function RoutineBuilderSheet({
                   />
                 ))}
               </div>
+              )}
             </div>
 
             {/* Bottom section — changes per step */}
