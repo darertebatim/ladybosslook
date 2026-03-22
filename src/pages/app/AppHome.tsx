@@ -22,7 +22,7 @@ import { NotificationBanner } from '@/components/app/NotificationBanner';
 import { HomeCelebrations } from '@/components/app/HomeCelebrations';
 import { HomeTour } from '@/components/app/tour';
 import { useAuth } from '@/hooks/useAuth';
-import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead } from '@/components/SEOHead';
 import { useFeaturedRoutinesBank, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
