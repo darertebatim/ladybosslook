@@ -1101,7 +1101,7 @@ const AppHome = () => {
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex bg-muted rounded-full p-0.5">
                           <button
-                            onClick={() => setFilterDropdownOpen(true)}
+                            onClick={() => taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')}
                             className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-background text-foreground shadow-sm"
                           >
                             Routine Players
