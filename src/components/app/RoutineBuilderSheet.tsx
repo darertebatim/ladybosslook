@@ -3,7 +3,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, Plus, Trash2, ListChecks, MoreHorizontal, Repeat, Clock } from 'lucide-react';
+import { ChevronLeft, Plus, Trash2, ListChecks, MoreHorizontal, Repeat, Clock, Pencil } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { useAuth } from '@/hooks/useAuth';
@@ -90,6 +90,7 @@ export function RoutineBuilderSheet({
   const [quickRepeat, setQuickRepeat] = useState('Daily');
   const [quickTime, setQuickTime] = useState('Anytime');
   const [showCreateTask, setShowCreateTask] = useState(false);
+  const [editingTask, setEditingTask] = useState<BuilderTask | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const quickAddInputRef = useRef<HTMLInputElement>(null);
 
@@ -274,6 +275,30 @@ export function RoutineBuilderSheet({
     setShowCreateTask(false);
   };
 
+  const handleEditTaskSave = (data: TaskFormData) => {
+    if (!editingTask) return;
+    haptic.light();
+    setTasks(prev => prev.map(t => t.id === editingTask.id ? {
+      ...t,
+      title: data.title,
+      emoji: data.icon || t.emoji,
+      color: data.color || t.color,
+      repeat_pattern: data.repeatEnabled ? data.repeatPattern : 'none',
+      repeat_days: data.repeatDays || null,
+      description: data.description || null,
+      pro_link_type: data.proLinkType || null,
+      pro_link_value: data.proLinkValue || null,
+      goal_enabled: data.goalEnabled || false,
+      goal_target: data.goalTarget || null,
+      goal_type: data.goalType || null,
+      goal_unit: data.goalUnit || null,
+      duration_minutes: data.durationMinutes || null,
+      time_period: data.timePeriod || null,
+      linked_playlist_id: data.linkedPlaylistId || null,
+    } : t));
+    setEditingTask(null);
+  };
+
   const handleNext = () => {
     if (!routineTitle.trim()) return;
     haptic.light();
@@ -385,6 +410,12 @@ export function RoutineBuilderSheet({
                                 </div>
                                 <p className="text-black text-[15px] font-semibold leading-tight truncate">{task.title}</p>
                               </div>
+                              <button
+                                onClick={() => { haptic.light(); setEditingTask(task); }}
+                                className="w-12 h-12 -m-1.5 flex items-center justify-center shrink-0 active:scale-95 transition-transform"
+                              >
+                                <Pencil className="w-3.5 h-3.5 text-black/30" />
+                              </button>
                               <button
                                 onClick={() => removeTask(task.id)}
                                 className="w-12 h-12 -m-1.5 flex items-center justify-center shrink-0 active:scale-95 transition-transform"
@@ -680,6 +711,36 @@ export function RoutineBuilderSheet({
             if (!v) setShowCreateTask(false);
           }}
           onSaveSheet={handleCreateNewTask}
+        />
+      )}
+
+      {/* Edit existing task sheet */}
+      {editingTask && (
+        <AppTaskCreate
+          isSheet={true}
+          sheetOpen={!!editingTask}
+          onSheetOpenChange={(v) => {
+            if (!v) setEditingTask(null);
+          }}
+          onSaveSheet={handleEditTaskSave}
+          initialData={{
+            title: editingTask.title,
+            icon: editingTask.emoji,
+            color: (editingTask.color as TaskColor) || 'peach',
+            description: editingTask.description || null,
+            repeatEnabled: editingTask.repeat_pattern !== 'none' && !!editingTask.repeat_pattern,
+            repeatPattern: (editingTask.repeat_pattern === 'daily' || editingTask.repeat_pattern === 'weekly' || editingTask.repeat_pattern === 'monthly') ? editingTask.repeat_pattern : 'daily',
+            repeatDays: editingTask.repeat_days || [],
+            timePeriod: (editingTask.time_period as any) || null,
+            durationMinutes: editingTask.duration_minutes || null,
+            proLinkType: editingTask.pro_link_type as any || null,
+            proLinkValue: editingTask.pro_link_value || null,
+            goalEnabled: editingTask.goal_enabled || false,
+            goalTarget: editingTask.goal_target || 0,
+            goalType: (editingTask.goal_type as any) || 'count',
+            goalUnit: editingTask.goal_unit || '',
+            linkedPlaylistId: editingTask.linked_playlist_id || null,
+          }}
         />
       )}
     </>
