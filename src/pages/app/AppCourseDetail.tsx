@@ -835,7 +835,7 @@ const AppCourseDetail = () => {
           emoji: '🔓',
           scheduledDate: format(unlockDate, 'yyyy-MM-dd'),
           scheduledTime: format(unlockDate, 'HH:mm'),
-          reminderOffset: contentSettings.reminderMinutes,
+          reminderOffset: Math.max(...contentSettings.reminderMinutes),
         });
         
         if (result.success) {
