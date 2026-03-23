@@ -1,5 +1,6 @@
 // AppHome - Main home page component
 import { useState, useMemo, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
