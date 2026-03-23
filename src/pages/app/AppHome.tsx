@@ -868,25 +868,9 @@ const AppHome = () => {
               )}
             </div>
 
-            {/* Right: Mood button + Streak badge */}
+            {/* Right: Streak badge */}
             <div className="flex items-center gap-2 justify-end justify-self-end">
-              {/* Mood check-in button with badge */}
-              <button 
-                onClick={() => {
-                  haptic.light();
-                  navigate('/app/mood');
-                }}
-                className="relative w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center active:scale-95 transition-transform"
-              >
-                <FluentEmoji emoji="🙂" size={26} />
-                {/* Badge indicator */}
-                <div className={cn(
-                  "absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-sm",
-                  todayMood ? "bg-green-500" : "bg-red-500"
-                )}>
-                  {todayMood ? "✓" : "+"}
-                </div>
-              </button>
+              {/* Mood check-in button – hidden for now, re-enable from admin/app */}
               
               {/* Streak badge - navigates to presence page */}
               <button onClick={() => navigate('/app/presence')} className="tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-sm active:scale-95 transition-transform">
