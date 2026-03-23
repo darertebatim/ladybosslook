@@ -403,10 +403,10 @@ export function RoutineBuilderSheet({
   const handleSuggestionSelect = (suggestion: any) => {
     haptic.light();
     if (onNavigateToRoutine) {
-      // Navigate to routine detail page — don't reset builder state
+      // Mark to skip state reset when builder reopens after returning
+      skipNextSyncRef.current = true;
       onNavigateToRoutine(suggestion.id);
     } else {
-      // Fallback: just use the name
       setRoutineTitle(suggestion.title);
       setRoutineEmoji(suggestion.emoji || '✨');
       setShowSuggestions(false);
