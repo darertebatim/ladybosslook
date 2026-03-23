@@ -144,6 +144,34 @@ export default function AppInspire() {
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-hidden w-full">
         <div className="pb-safe w-full max-w-full">
+
+          {/* Favorites View */}
+          {showFavorites ? (
+            <div className="px-4 pt-4 space-y-4">
+              <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+                <Heart className="w-5 h-5 fill-red-500 text-red-500" /> My Favorites
+              </h2>
+              {favoriteIds.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <Heart className="w-12 h-12 text-muted-foreground/30 mb-4" />
+                  <p className="text-muted-foreground font-medium">No favorites yet</p>
+                  <p className="text-sm text-muted-foreground/70 mt-1">Tap the heart icon on any routine to save it here</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  {allRoutines?.filter(r => favoriteIds.includes(r.id)).map(routine => (
+                    <RoutineBankCard
+                      key={routine.id}
+                      routine={routine}
+                      onClick={() => navigateWithScroll(`/app/routines/${routine.id}`)}
+                      isCompleted={completedRoutines?.has(routine.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+          <>
           {/* Promo Banner - Top */}
           <PromoBanner location="routines_top" className="px-4 pt-3" carousel />
 
