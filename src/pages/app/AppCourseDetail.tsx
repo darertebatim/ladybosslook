@@ -237,6 +237,8 @@ const AppCourseDetail = () => {
     isSessionSynced,
     areAllSessionsSynced,
     getUnsyncedCount,
+    getCalendarEventId,
+    getAllCalendarEventIds,
   } = useCalendarSyncTracking(round?.id);
 
   // Program event reminder settings hook - manages reminder settings for program events (sessions & content) as planner tasks
@@ -458,14 +460,21 @@ const AppCourseDetail = () => {
     // Native iOS/Android: Use native calendar integration
     if (isNativeApp() && isCalendarAvailable()) {
       try {
+        const oldCalEventId = getCalendarEventId(nextSession.id);
         const result = await addEventToCalendar({
           ...event,
           reminderMinutes: 60, // 1 hour reminder
         });
         
+        // Delete old calendar event if it existed (session time may have changed)
+        if (oldCalEventId) {
+          const { deleteCalendarEventsById } = await import('@/lib/calendarIntegration');
+          await deleteCalendarEventsById([oldCalEventId]);
+        }
+        
         if (result.success) {
           toast.success('Session added to your calendar!');
-          markSessionSynced(nextSession.id);
+          markSessionSynced(nextSession.id, result.calendarEventId);
         } else if (result.error === 'Calendar permission denied') {
           toast.error('Please allow calendar access in Settings');
         } else {
@@ -561,13 +570,21 @@ const AppCourseDetail = () => {
     if (isNativeApp() && isCalendarAvailable()) {
       setIsSyncingAllSessions(true);
       try {
-        const result = await addMultipleEventsToCalendar(events);
+        // Delete all previously synced calendar events before re-adding
+        const oldCalEventIds = getAllCalendarEventIds();
+        const result = await addMultipleEventsToCalendar(events, oldCalEventIds);
         
         if (result.success) {
           toast.success(`Added ${result.addedCount} sessions to your calendar!`);
-          // Mark all sessions as synced using the tracking hook
+          // Build session→calendarEventId map and mark all synced
           const sessionIds = dbSessions?.map(s => s.id) || [];
-          markAllSessionsSynced(sessionIds);
+          const calEventIdMap: Record<string, string> = {};
+          sessionIds.forEach((sid, i) => {
+            if (result.calendarEventIds[i]) {
+              calEventIdMap[sid] = result.calendarEventIds[i]!;
+            }
+          });
+          markAllSessionsSynced(sessionIds, calEventIdMap);
           setHasNewSessions(false);
         } else if (result.error === 'Calendar permission denied') {
           toast.error('Please allow calendar access in Settings');
@@ -609,9 +626,18 @@ const AppCourseDetail = () => {
     if (events.length === 0) return;
     
     try {
-      const result = await addMultipleEventsToCalendar(events);
+      const oldCalEventIds = getAllCalendarEventIds();
+      const result = await addMultipleEventsToCalendar(events, oldCalEventIds);
       if (result.success) {
         toast.success(`${result.addedCount} sessions added to calendar!`);
+        const sessionIds = dbSessions?.map(s => s.id) || [];
+        const calEventIdMap: Record<string, string> = {};
+        sessionIds.forEach((sid, i) => {
+          if (result.calendarEventIds[i]) {
+            calEventIdMap[sid] = result.calendarEventIds[i]!;
+          }
+        });
+        markAllSessionsSynced(sessionIds, calEventIdMap);
       }
     } catch (error) {
       console.error('Auto-sync calendar error:', error);
@@ -672,11 +698,18 @@ const AppCourseDetail = () => {
 
     if (isNativeApp() && isCalendarAvailable()) {
       try {
+        const oldCalEventId = getCalendarEventId(session.id);
         const result = await addEventToCalendar(event);
+        
+        // Delete old calendar event if it existed (handles session reschedule)
+        if (oldCalEventId) {
+          const { deleteCalendarEventsById } = await import('@/lib/calendarIntegration');
+          await deleteCalendarEventsById([oldCalEventId]);
+        }
         
         if (result.success) {
           toast.success('Session added to calendar!');
-          markSessionSynced(session.id);
+          markSessionSynced(session.id, result.calendarEventId);
         } else if (result.error === 'Calendar permission denied') {
           toast.error('Please allow calendar access in Settings');
         } else {
