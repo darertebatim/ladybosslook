@@ -24,12 +24,12 @@ interface ProgramEventCardProps {
 
 const EVENT_STYLES = {
   session: {
-    bgColor: 'bg-[#FFF492]',
-    borderColor: 'border-[#E8D85C]',
-    settingsBg: 'bg-[#F5E066]',
+    bgColor: 'bg-[#E8D5FF]',
+    borderColor: 'border-transparent',
+    settingsBg: 'bg-[#DEC1FF]',
     emoji: '📡',
     badge: 'Live Session',
-    badgeClass: 'bg-[#E8D85C] text-amber-900',
+    badgeClass: 'bg-[#DEC1FF] text-purple-900',
   },
   module: {
     bgColor: 'bg-[#F0E3FF]',
