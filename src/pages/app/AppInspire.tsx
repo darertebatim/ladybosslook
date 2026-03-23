@@ -44,6 +44,7 @@ export default function AppInspire() {
   const { data: popularRoutines, isLoading: popularLoading } = usePopularRoutinesBank();
   const { data: featuredRoutines = [] } = useFeaturedRoutinesBank();
   const { data: completedRoutines } = useCompletedRoutines();
+  const { favoriteIds } = useRoutineFavorites();
 
   const isLoading = categoriesLoading || routinesLoading || popularLoading;
 
