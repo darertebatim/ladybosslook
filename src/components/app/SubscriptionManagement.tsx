@@ -209,9 +209,9 @@ function ManageSubscriptionSheet({
                       <Sparkles className="h-5 w-5 text-emerald-600" />
                     </div>
                     <div className="flex-1">
-                      <p className="font-bold text-emerald-800 text-sm">Save 40% with Annual</p>
+                      <p className="font-bold text-emerald-800 text-sm">Save 37% with Annual</p>
                       <p className="text-emerald-700/70 text-xs mt-0.5">
-                        Switch to yearly for just $8.33/mo instead of $13.99/mo
+                        Switch to yearly for just $5.00/mo instead of $7.99/mo
                       </p>
                     </div>
                     <ChevronRight className="h-4 w-4 text-emerald-600 flex-shrink-0" />

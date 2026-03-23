@@ -32,13 +32,13 @@ const FEATURES = [
 const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
 
 // Pricing constants
-const ANNUAL_PRICE = 99.99;
-const ANNUAL_ORIGINAL = 240;
+const ANNUAL_PRICE = 59.99;
+const ANNUAL_ORIGINAL = 96;
 const ANNUAL_MONTHLY = (ANNUAL_PRICE / 12).toFixed(2);
 const ANNUAL_DISCOUNT = Math.round((1 - ANNUAL_PRICE / ANNUAL_ORIGINAL) * 100);
 
-const MONTHLY_PRICE = 13.99;
-const MONTHLY_ORIGINAL = 19.99;
+const MONTHLY_PRICE = 7.99;
+const MONTHLY_ORIGINAL = 12.99;
 const MONTHLY_DISCOUNT = Math.round((1 - MONTHLY_PRICE / MONTHLY_ORIGINAL) * 100);
 
 export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }: PaywallVIPProps) {
