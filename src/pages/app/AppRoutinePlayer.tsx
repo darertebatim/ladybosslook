@@ -518,16 +518,27 @@ export default function AppRoutinePlayer() {
     enabled: !!user && allUserTaskIds.length > 0,
   });
 
-  // Progress based on real planner completions — only count tasks scheduled for today
+  // Progress based on planner completions + routine_sessions (dual-source, like RoutinePlayBadge)
   const getCompletionInfo = (routineId: string) => {
     const tasks = userTasksByRoutine?.[routineId];
     if (!tasks || tasks.length === 0) return null;
     const todayTasks = tasks.filter(t => taskAppliesToDate(t, todayStr));
-    if (todayTasks.length === 0) return null;
-    const completed = todayTasks.filter(t => todayCompletions?.has(t.id)).length;
-    if (completed === 0) return null;
-    const pct = Math.round((completed / todayTasks.length) * 100);
-    return { pct, isComplete: pct === 100 };
+    const totalTasks = todayTasks.length || tasks.length;
+
+    // Source 1: manual task_completions
+    const manualCompleted = todayTasks.length > 0
+      ? todayTasks.filter(t => todayCompletions?.has(t.id)).length
+      : 0;
+
+    // Source 2: routine_sessions from the player
+    const session = todaySessions?.find(s => s.routine_id === routineId);
+    const sessionCompleted = session ? Math.min(Math.max(session.tasks_completed, 0), totalTasks) : 0;
+
+    const resolvedCompleted = Math.max(manualCompleted, sessionCompleted);
+    if (resolvedCompleted === 0) return null;
+
+    const pct = Math.round((resolvedCompleted / totalTasks) * 100);
+    return { pct, isComplete: pct >= 100 };
   };
 
   // Pre-start state — now just stores the routine to show planner-style overlay
