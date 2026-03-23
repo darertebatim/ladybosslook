@@ -6,7 +6,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay, subDays } from 'date-fns';
 import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, Headset, ArrowLeft, Heart, Zap, Settings2, Search, Play } from 'lucide-react';
-import { TaskFilterDropdown } from '@/components/app/TaskFilterDropdown';
+
 import AppTaskCreate from '@/pages/app/AppTaskCreate';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { HomeMenu } from '@/components/app/HomeMenu';
@@ -69,8 +69,7 @@ const AppHome = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchParams, setSearchParams] = useSearchParams();
   const taskFilter = searchParams.get('filter') || 'all';
-  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
-  const [homeView, setHomeView] = useState<'tasks' | 'routines'>('tasks');
+  const [homeView, setHomeView] = useState<'tasks' | 'routines' | 'one-time'>('tasks');
   useEffect(() => {
     const handler = () => setHomeView(prev => prev === 'tasks' ? 'routines' : 'tasks');
     window.addEventListener('home-tab-retap', handler);
@@ -1096,44 +1095,47 @@ const AppHome = () => {
                 </div>
               ) : filteredTasks.length > 0 || (!isNewUser && taskFilter !== 'all') ? (
                 <div>
-                  {/* Shared animated switcher */}
+                  {/* Shared animated 3-pill switcher */}
                   <div className="flex items-center justify-between mb-3">
                     <div className="relative flex bg-muted rounded-full p-0.5">
                       <motion.div
-                        className="absolute top-0.5 bottom-0.5 w-[calc(50%-2px)] rounded-full bg-background shadow-sm"
-                        animate={{ x: homeView === 'routines' ? 2 : '100%' }}
+                        className="absolute top-0.5 bottom-0.5 rounded-full bg-background shadow-sm"
+                        style={{ width: 'calc(33.333% - 2px)' }}
+                        animate={{ 
+                          x: homeView === 'routines' ? 2 
+                            : homeView === 'tasks' ? 'calc(100% + 2px)' 
+                            : 'calc(200% + 4px)' 
+                        }}
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                       />
                       <button
-                        onClick={() => { haptic.selection(); homeView === 'routines' ? (taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')) : setHomeView('routines'); }}
+                        onClick={() => { haptic.selection(); setHomeView('routines'); setTaskFilter('all'); }}
                         className={cn(
-                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors",
+                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors whitespace-nowrap",
                           homeView === 'routines' ? 'text-foreground' : 'text-muted-foreground'
                         )}
                       >
                         Routine Players
                       </button>
                       <button
-                        onClick={() => { haptic.selection(); homeView === 'tasks' ? (taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')) : setHomeView('tasks'); }}
+                        onClick={() => { haptic.selection(); setHomeView('tasks'); setTaskFilter('all'); }}
                         className={cn(
-                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-1",
+                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-1 whitespace-nowrap",
                           homeView === 'tasks' ? 'text-foreground' : 'text-muted-foreground'
                         )}
                       >
                         <Zap className="h-3 w-3 fill-amber-400 text-amber-400 shrink-0" /> My Tasks
                       </button>
+                      <button
+                        onClick={() => { haptic.selection(); setHomeView('one-time'); setTaskFilter('one-time'); }}
+                        className={cn(
+                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors whitespace-nowrap",
+                          homeView === 'one-time' ? 'text-foreground' : 'text-muted-foreground'
+                        )}
+                      >
+                        One-Time
+                      </button>
                     </div>
-                    {homeView === 'tasks' && (
-                      <TaskFilterDropdown
-                        value={taskFilter}
-                        onValueChange={setTaskFilter}
-                        routineNames={routineNamesInTasks}
-                        taskTags={taskTags}
-                        categoryNameMap={categoryNameMap}
-                        externalOpen={filterDropdownOpen}
-                        onExternalOpenChange={setFilterDropdownOpen}
-                      />
-                    )}
                   </div>
 
                   {homeView === 'routines' ? (
@@ -1176,32 +1178,18 @@ const AppHome = () => {
 
                   {filteredTasks.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-10 gap-2">
-                      <p className="text-sm text-muted-foreground">Nothing here yet — add your first task!</p>
-                      <button
-                        onClick={() => setTaskFilter('all')}
-                        className="text-xs font-medium text-primary"
-                      >
-                        Show all tasks
-                      </button>
-                      {(taskFilter === 'all-routines' || taskFilter.startsWith('routine:')) ? (
-                        <div className="flex gap-2 mt-3 w-full">
-                          <button
-                            onClick={() => navigate('/app/routineplayer')}
-                            className="flex-1 rounded-3xl py-2.5 px-3 bg-card border-2 border-urgency/30 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
-                          >
-                            <Settings2 className="w-3.5 h-3.5 text-urgency" />
-                            Manage Routines
-                          </button>
-                          <button
-                            onClick={() => navigate('/app/routines')}
-                            className="flex-1 rounded-3xl py-2.5 px-3 bg-card border-2 border-urgency/30 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
-                          >
-                            <Search className="w-3.5 h-3.5 text-urgency" />
-                            Browse Library
-                          </button>
-                        </div>
+                      <p className="text-sm text-muted-foreground">
+                        {homeView === 'one-time' ? 'No one-time tasks yet' : 'Nothing here yet — add your first task!'}
+                      </p>
+                      {homeView === 'one-time' ? (
+                        <button
+                          onClick={() => { setHomeView('tasks'); setTaskFilter('all'); }}
+                          className="text-xs font-medium text-primary"
+                        >
+                          Show all tasks
+                        </button>
                       ) : (
-                        <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} defaultRepeatOverride={taskFilter === 'one-time' ? 'No' : undefined} />
+                        <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                       )}
                     </div>
                   ) : (
