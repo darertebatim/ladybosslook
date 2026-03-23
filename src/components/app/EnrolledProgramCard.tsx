@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, AlertCircle, ChevronRight, Sparkles, Unlock } from 'lucide-react';
 import { format, isToday } from 'date-fns';
+import { haptic } from '@/lib/haptics';
 
 interface EnrolledProgramCardProps {
   enrollment: {
