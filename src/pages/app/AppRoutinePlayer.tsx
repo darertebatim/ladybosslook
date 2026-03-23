@@ -1368,7 +1368,7 @@ export default function AppRoutinePlayer() {
             </div>
           </header>
 
-          <div className="flex-1 overflow-y-auto px-4 pb-32 pt-4">
+          <div className="flex-1 overflow-y-auto px-4 pb-48 pt-4">
             {routineFilteredTasks.length > 0 ? (
               <SortableTaskList
                 tasks={routineFilteredTasks}
