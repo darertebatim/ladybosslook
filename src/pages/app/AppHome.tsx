@@ -69,8 +69,7 @@ const AppHome = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchParams, setSearchParams] = useSearchParams();
   const taskFilter = searchParams.get('filter') || 'all';
-  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
-  const [homeView, setHomeView] = useState<'tasks' | 'routines'>('tasks');
+  const [homeView, setHomeView] = useState<'tasks' | 'routines' | 'one-time'>('tasks');
   useEffect(() => {
     const handler = () => setHomeView(prev => prev === 'tasks' ? 'routines' : 'tasks');
     window.addEventListener('home-tab-retap', handler);
