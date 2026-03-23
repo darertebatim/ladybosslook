@@ -868,25 +868,9 @@ const AppHome = () => {
               )}
             </div>
 
-            {/* Right: Mood button + Streak badge */}
+            {/* Right: Streak badge */}
             <div className="flex items-center gap-2 justify-end justify-self-end">
-              {/* Mood check-in button with badge */}
-              <button 
-                onClick={() => {
-                  haptic.light();
-                  navigate('/app/mood');
-                }}
-                className="relative w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center active:scale-95 transition-transform"
-              >
-                <FluentEmoji emoji="🙂" size={26} />
-                {/* Badge indicator */}
-                <div className={cn(
-                  "absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-sm",
-                  todayMood ? "bg-green-500" : "bg-red-500"
-                )}>
-                  {todayMood ? "✓" : "+"}
-                </div>
-              </button>
+              {/* Mood check-in button – hidden for now, re-enable from admin/app */}
               
               {/* Streak badge - navigates to presence page */}
               <button onClick={() => navigate('/app/presence')} className="tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-sm active:scale-95 transition-transform">
@@ -1017,18 +1001,16 @@ const AppHome = () => {
             {/* Notification Banner - prompts users to enable notifications */}
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
 
-            {/* Mood Check-in Banner - priority over promo banners */}
-            {!showWelcomeCard && <MoodCheckInBanner />}
+            {/* Mood Check-in Banner – hidden for now, re-enable from admin/app */}
+            {/* {!showWelcomeCard && <MoodCheckInBanner />} */}
 
-            {/* Promo Banner - only show after mood check-in is done */}
-            {todayMood && <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />}
+            {/* Promo Banner */}
+            <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
 
-            {/* Home Banners (announcements with videos/CTAs) - only show after mood check-in */}
-            {todayMood && (
-              <div className="tour-banner">
-                <HomeBanner />
-              </div>
-            )}
+            {/* Home Banners (announcements with videos/CTAs) */}
+            <div className="tour-banner">
+              <HomeBanner />
+            </div>
 
             {/* Tag filter chips - temporarily hidden */}
             {/* {taskTags.length > 0 && <div className="py-2 -mx-4 px-4 bg-background overflow-x-auto">
