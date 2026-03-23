@@ -1,5 +1,6 @@
 // AppHome - Main home page component
 import { useState, useMemo, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
+import { motion } from 'framer-motion';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -1095,25 +1096,48 @@ const AppHome = () => {
                 </div>
               ) : filteredTasks.length > 0 || (!isNewUser && taskFilter !== 'all') ? (
                 <div>
+                  {/* Shared animated switcher */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="relative flex bg-muted rounded-full p-0.5">
+                      <motion.div
+                        className="absolute top-0.5 bottom-0.5 w-[calc(50%-2px)] rounded-full bg-background shadow-sm"
+                        animate={{ x: homeView === 'routines' ? 2 : '100%' }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                      />
+                      <button
+                        onClick={() => homeView === 'routines' ? (taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')) : setHomeView('routines')}
+                        className={cn(
+                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors",
+                          homeView === 'routines' ? 'text-foreground' : 'text-muted-foreground'
+                        )}
+                      >
+                        Routine Players
+                      </button>
+                      <button
+                        onClick={() => homeView === 'tasks' ? (taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')) : setHomeView('tasks')}
+                        className={cn(
+                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors",
+                          homeView === 'tasks' ? 'text-foreground' : 'text-muted-foreground'
+                        )}
+                      >
+                        My Tasks
+                      </button>
+                    </div>
+                    {homeView === 'tasks' && (
+                      <TaskFilterDropdown
+                        value={taskFilter}
+                        onValueChange={setTaskFilter}
+                        routineNames={routineNamesInTasks}
+                        taskTags={taskTags}
+                        categoryNameMap={categoryNameMap}
+                        externalOpen={filterDropdownOpen}
+                        onExternalOpenChange={setFilterDropdownOpen}
+                      />
+                    )}
+                  </div>
+
                   {homeView === 'routines' ? (
                     <>
-                      {/* Switcher + no filter in routines mode */}
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex bg-muted rounded-full p-0.5">
-                          <button
-                            onClick={() => taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')}
-                            className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-background text-foreground shadow-sm"
-                          >
-                            Routine Players
-                          </button>
-                          <button
-                            onClick={() => setHomeView('tasks')}
-                            className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all text-muted-foreground"
-                          >
-                            My Tasks
-                          </button>
-                        </div>
-                      </div>
                       {routineProTasks.length > 0 ? (
                         <>
                           <SortableTaskList tasks={routineProTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
@@ -1149,32 +1173,6 @@ const AppHome = () => {
                     </>
                   ) : (
                   <>
-                  {/* Switcher + filter dropdown */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex bg-muted rounded-full p-0.5">
-                      <button
-                        onClick={() => setHomeView('routines')}
-                        className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all text-muted-foreground"
-                      >
-                        Routine Players
-                      </button>
-                      <button
-                        className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-background text-foreground shadow-sm"
-                        onClick={() => taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')}
-                      >
-                        My Tasks
-                      </button>
-                    </div>
-                    <TaskFilterDropdown
-                      value={taskFilter}
-                      onValueChange={setTaskFilter}
-                      routineNames={routineNamesInTasks}
-                      taskTags={taskTags}
-                      categoryNameMap={categoryNameMap}
-                      externalOpen={filterDropdownOpen}
-                      onExternalOpenChange={setFilterDropdownOpen}
-                    />
-                  </div>
 
                   {filteredTasks.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-10 gap-2">
