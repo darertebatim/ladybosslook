@@ -223,7 +223,7 @@ export default function AppInspire() {
                   Featured
                 </h2>
               </div>
-              <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory">
+              <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4" style={{ WebkitOverflowScrolling: 'touch' }}>
                 {featuredRoutines.map((routine) => (
                   <div key={routine.id} className="shrink-0 w-[85%] snap-start">
                     <FeaturedRoutineCard routine={routine} categoryName={categoryNameMap.get(routine.category)} />
