@@ -130,6 +130,7 @@ export function RoutineBuilderSheet({
   const quickAddInputRef = useRef<HTMLInputElement>(null);
   const [quickAddAnchorTop, setQuickAddAnchorTop] = useState<string>('25%');
   const [dialogAnchorTop, setDialogAnchorTop] = useState<string>('12%');
+  const skipNextSyncRef = useRef(false);
 
   // iOS keyboard scroll fixes
   const { handleFocus: handleNameInputFocus } = useKeyboardScroll(nameInputRef, { block: 'center' });
