@@ -255,6 +255,20 @@ export default function AppRoutinePlayer() {
   const [showBuilderPreview, setShowBuilderPreview] = useState(false);
   const [builderEditTasks, setBuilderEditTasks] = useState<any[]>([]);
   const builderPreviewingRef = useRef(false);
+  // Reopen builder when returning from routine preview
+  useEffect(() => {
+    if (builderPreviewingRef.current && !showBuilder) {
+      builderPreviewingRef.current = false;
+      setShowBuilder(true);
+    }
+  });
+
+  const handleBuilderNavigateToRoutine = useCallback((routineId: string) => {
+    builderPreviewingRef.current = true;
+    setShowBuilder(false);
+    navigate(`/app/inspire/${routineId}`);
+  }, [navigate]);
+
   // Dismissed featured routines
   const [dismissedFeatured, setDismissedFeatured] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem(DISMISSED_FEATURED_KEY) || '[]'); } catch { return []; }
