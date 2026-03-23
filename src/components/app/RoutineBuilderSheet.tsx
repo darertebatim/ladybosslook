@@ -176,9 +176,12 @@ export function RoutineBuilderSheet({
     }
   }, [open, editMode, initialTitle, initialEmoji, initialColor, initialTasks]);
 
-  // Auto-focus name input
+  // Capture fixed pixel position and auto-focus when dialog opens
   useEffect(() => {
     if (open && step === 1) {
+      // Capture 12% of current viewport height as fixed pixels before keyboard opens
+      const pixelTop = Math.round(window.innerHeight * 0.12);
+      setDialogAnchorTop(`${pixelTop}px`);
       setTimeout(() => nameInputRef.current?.focus(), 300);
     }
   }, [open, step]);
