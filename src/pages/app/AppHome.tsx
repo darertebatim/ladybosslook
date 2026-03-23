@@ -1001,8 +1001,8 @@ const AppHome = () => {
             {/* Notification Banner - prompts users to enable notifications */}
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
 
-            {/* Mood Check-in Banner - priority over promo banners */}
-            {!showWelcomeCard && <MoodCheckInBanner />}
+            {/* Mood Check-in Banner – hidden for now, re-enable from admin/app */}
+            {/* {!showWelcomeCard && <MoodCheckInBanner />} */}
 
             {/* Promo Banner - only show after mood check-in is done */}
             {todayMood && <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />}
