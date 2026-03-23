@@ -1172,38 +1172,6 @@ const AppHome = () => {
                     </>
                   ) : (
                   <>
-                  {/* Switcher + filter dropdown */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="relative flex bg-muted rounded-full p-0.5">
-                          <motion.div
-                            className="absolute top-0.5 bottom-0.5 rounded-full bg-background shadow-sm"
-                            layoutId="home-view-pill"
-                            style={{ width: '50%', right: '2px' }}
-                            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                          />
-                      <button
-                        onClick={() => setHomeView('routines')}
-                        className="relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors text-muted-foreground"
-                      >
-                        Routine Players
-                      </button>
-                      <button
-                        className="relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors text-foreground"
-                        onClick={() => taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')}
-                      >
-                        My Tasks
-                      </button>
-                    </div>
-                    <TaskFilterDropdown
-                      value={taskFilter}
-                      onValueChange={setTaskFilter}
-                      routineNames={routineNamesInTasks}
-                      taskTags={taskTags}
-                      categoryNameMap={categoryNameMap}
-                      externalOpen={filterDropdownOpen}
-                      onExternalOpenChange={setFilterDropdownOpen}
-                    />
-                  </div>
 
                   {filteredTasks.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-10 gap-2">
