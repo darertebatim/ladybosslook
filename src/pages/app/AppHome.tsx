@@ -1120,7 +1120,7 @@ const AppHome = () => {
                           homeView === 'tasks' ? 'text-foreground' : 'text-muted-foreground'
                         )}
                       >
-                        <Zap className="h-3.5 w-3.5" /> My Tasks
+                        <Zap className="h-3 w-3 fill-amber-400 text-amber-400" /> My Tasks
                       </button>
                     </div>
                     {homeView === 'tasks' && (
