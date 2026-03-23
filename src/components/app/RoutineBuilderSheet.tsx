@@ -403,8 +403,15 @@ export function RoutineBuilderSheet({
   const handleSuggestionSelect = (suggestion: any) => {
     haptic.light();
     if (onNavigateToRoutine) {
-      // Mark to skip state reset when builder reopens after returning
-      skipNextSyncRef.current = true;
+      // Save current builder state so it survives navigation
+      try {
+        sessionStorage.setItem('builder-state', JSON.stringify({
+          title: routineTitle,
+          emoji: routineEmoji,
+          color: routineColor,
+          step,
+        }));
+      } catch {}
       onNavigateToRoutine(suggestion.id);
     } else {
       setRoutineTitle(suggestion.title);
