@@ -82,6 +82,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const hasAdminAccess = isAdmin || adminPages.length > 0;
 
   useEffect(() => {
+    // Safety timeout: if auth takes too long (e.g. no internet), stop loading
+    // so the app doesn't stay stuck on splash screen forever.
+    const offlineTimeout = setTimeout(() => {
+      if (loading) {
+        console.warn('[Auth] Timeout reached – finishing loading (possibly offline)');
+        setRoleCheckComplete(true);
+        setLoading(false);
+      }
+    }, 5000);
+
     // Set up auth state listener FIRST (must be synchronous callback)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -109,14 +119,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (session?.user) {
         checkUserRole(session.user.id).then(() => {
           setLoading(false);
+        }).catch(() => {
+          // Role check failed (offline) – still stop loading
+          setRoleCheckComplete(true);
+          setLoading(false);
         });
       } else {
         setRoleCheckComplete(true);
         setLoading(false);
       }
+    }).catch(() => {
+      // getSession failed (offline) – stop loading
+      console.warn('[Auth] getSession failed – possibly offline');
+      setRoleCheckComplete(true);
+      setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(offlineTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
