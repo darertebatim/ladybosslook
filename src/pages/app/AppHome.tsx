@@ -1095,44 +1095,47 @@ const AppHome = () => {
                 </div>
               ) : filteredTasks.length > 0 || (!isNewUser && taskFilter !== 'all') ? (
                 <div>
-                  {/* Shared animated switcher */}
+                  {/* Shared animated 3-pill switcher */}
                   <div className="flex items-center justify-between mb-3">
                     <div className="relative flex bg-muted rounded-full p-0.5">
                       <motion.div
-                        className="absolute top-0.5 bottom-0.5 w-[calc(50%-2px)] rounded-full bg-background shadow-sm"
-                        animate={{ x: homeView === 'routines' ? 2 : '100%' }}
+                        className="absolute top-0.5 bottom-0.5 rounded-full bg-background shadow-sm"
+                        style={{ width: 'calc(33.333% - 2px)' }}
+                        animate={{ 
+                          x: homeView === 'routines' ? 2 
+                            : homeView === 'tasks' ? 'calc(100% + 2px)' 
+                            : 'calc(200% + 4px)' 
+                        }}
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                       />
                       <button
-                        onClick={() => { haptic.selection(); homeView === 'routines' ? (taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')) : setHomeView('routines'); }}
+                        onClick={() => { haptic.selection(); setHomeView('routines'); setTaskFilter('all'); }}
                         className={cn(
-                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors",
+                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors whitespace-nowrap",
                           homeView === 'routines' ? 'text-foreground' : 'text-muted-foreground'
                         )}
                       >
                         Routine Players
                       </button>
                       <button
-                        onClick={() => { haptic.selection(); homeView === 'tasks' ? (taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')) : setHomeView('tasks'); }}
+                        onClick={() => { haptic.selection(); setHomeView('tasks'); setTaskFilter('all'); }}
                         className={cn(
-                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-1",
+                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-1 whitespace-nowrap",
                           homeView === 'tasks' ? 'text-foreground' : 'text-muted-foreground'
                         )}
                       >
                         <Zap className="h-3 w-3 fill-amber-400 text-amber-400 shrink-0" /> My Tasks
                       </button>
+                      <button
+                        onClick={() => { haptic.selection(); setHomeView('one-time'); setTaskFilter('one-time'); }}
+                        className={cn(
+                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors whitespace-nowrap",
+                          homeView === 'one-time' ? 'text-foreground' : 'text-muted-foreground'
+                        )}
+                      >
+                        One-Time
+                      </button>
                     </div>
-                    {homeView === 'tasks' && (
-                      <TaskFilterDropdown
-                        value={taskFilter}
-                        onValueChange={setTaskFilter}
-                        routineNames={routineNamesInTasks}
-                        taskTags={taskTags}
-                        categoryNameMap={categoryNameMap}
-                        externalOpen={filterDropdownOpen}
-                        onExternalOpenChange={setFilterDropdownOpen}
-                      />
-                    )}
                   </div>
 
                   {homeView === 'routines' ? (
