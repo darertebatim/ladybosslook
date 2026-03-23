@@ -254,7 +254,7 @@ export default function AppRoutinePlayer() {
   const [builderResult, setBuilderResult] = useState<{ title: string; emoji: string; color: string; tasks: any[] } | null>(null);
   const [showBuilderPreview, setShowBuilderPreview] = useState(false);
   const [builderEditTasks, setBuilderEditTasks] = useState<any[]>([]);
-
+  const builderPreviewingRef = useRef(false);
   // Dismissed featured routines
   const [dismissedFeatured, setDismissedFeatured] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem(DISMISSED_FEATURED_KEY) || '[]'); } catch { return []; }
