@@ -288,7 +288,11 @@ const AppHome = () => {
     localStorage.setItem('simora_first_action_celebrated', 'true');
   }, []);
 
-  // Track whether completions changed during this session (not on initial load)
+  // Switcher button refs for pixel-perfect pill animation
+  const btnRoutinesRef = useRef<HTMLButtonElement>(null);
+  const btnTasksRef = useRef<HTMLButtonElement>(null);
+  const btnOneTimeRef = useRef<HTMLButtonElement>(null);
+
   const prevTotalCompletions = useRef(totalCompletions);
   const prevHasCompletionToday = useRef(hasAnyCompletionToday);
   const initialLoadDone = useRef(false);
