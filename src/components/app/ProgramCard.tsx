@@ -1,4 +1,5 @@
 import { CheckCircle2, BookOpen, Users, UserCheck, Headphones, Video, Calendar, Sparkles, Dumbbell, Waves, Heart } from 'lucide-react';
+import { haptic } from '@/lib/haptics';
 import { Badge } from '@/components/ui/badge';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 
