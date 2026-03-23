@@ -1178,32 +1178,18 @@ const AppHome = () => {
 
                   {filteredTasks.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-10 gap-2">
-                      <p className="text-sm text-muted-foreground">Nothing here yet — add your first task!</p>
-                      <button
-                        onClick={() => setTaskFilter('all')}
-                        className="text-xs font-medium text-primary"
-                      >
-                        Show all tasks
-                      </button>
-                      {(taskFilter === 'all-routines' || taskFilter.startsWith('routine:')) ? (
-                        <div className="flex gap-2 mt-3 w-full">
-                          <button
-                            onClick={() => navigate('/app/routineplayer')}
-                            className="flex-1 rounded-3xl py-2.5 px-3 bg-card border-2 border-urgency/30 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
-                          >
-                            <Settings2 className="w-3.5 h-3.5 text-urgency" />
-                            Manage Routines
-                          </button>
-                          <button
-                            onClick={() => navigate('/app/routines')}
-                            className="flex-1 rounded-3xl py-2.5 px-3 bg-card border-2 border-urgency/30 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
-                          >
-                            <Search className="w-3.5 h-3.5 text-urgency" />
-                            Browse Library
-                          </button>
-                        </div>
+                      <p className="text-sm text-muted-foreground">
+                        {homeView === 'one-time' ? 'No one-time tasks yet' : 'Nothing here yet — add your first task!'}
+                      </p>
+                      {homeView === 'one-time' ? (
+                        <button
+                          onClick={() => { setHomeView('tasks'); setTaskFilter('all'); }}
+                          className="text-xs font-medium text-primary"
+                        >
+                          Show all tasks
+                        </button>
                       ) : (
-                        <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} defaultRepeatOverride={taskFilter === 'one-time' ? 'No' : undefined} />
+                        <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                       )}
                     </div>
                   ) : (
