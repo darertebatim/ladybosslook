@@ -334,6 +334,12 @@ const RitualRedirect = () => {
   return <Navigate to={`/app/routines/${planId}`} replace />;
 };
 
+// Redirect component for old /app/inspire/:planId routes (backward compat)
+const InspireRedirect = () => {
+  const { planId } = useParams();
+  return <Navigate to={`/app/routines/${planId}`} replace />;
+};
+
 // Redirect component for old /app/course/:slug routes
 const CourseRedirect = () => {
   const { slug, roundId } = useParams();
