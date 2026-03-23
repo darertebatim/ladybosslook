@@ -109,6 +109,7 @@ export function RoutineBuilderSheet({
   initialColor = 'mint',
   initialTasks = [],
   onEditSave,
+  onNavigateToRoutine,
 }: RoutineBuilderSheetProps) {
   const { user } = useAuth();
   const [step, setStep] = useState<1 | 2>(1);
