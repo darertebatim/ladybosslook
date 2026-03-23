@@ -1099,16 +1099,22 @@ const AppHome = () => {
                     <>
                       {/* Switcher + no filter in routines mode */}
                       <div className="flex items-center justify-between mb-3">
-                        <div className="flex bg-muted rounded-full p-0.5">
+                        <div className="relative flex bg-muted rounded-full p-0.5">
+                          <motion.div
+                            className="absolute top-0.5 bottom-0.5 rounded-full bg-background shadow-sm"
+                            layoutId="home-view-pill"
+                            style={{ width: '50%', left: '2px' }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                          />
                           <button
                             onClick={() => taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')}
-                            className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all bg-background text-foreground shadow-sm"
+                            className="relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors text-foreground"
                           >
                             Routine Players
                           </button>
                           <button
                             onClick={() => setHomeView('tasks')}
-                            className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all text-muted-foreground"
+                            className="relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors text-muted-foreground"
                           >
                             My Tasks
                           </button>
