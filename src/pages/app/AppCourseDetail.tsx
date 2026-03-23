@@ -237,6 +237,8 @@ const AppCourseDetail = () => {
     isSessionSynced,
     areAllSessionsSynced,
     getUnsyncedCount,
+    getCalendarEventId,
+    getAllCalendarEventIds,
   } = useCalendarSyncTracking(round?.id);
 
   // Program event reminder settings hook - manages reminder settings for program events (sessions & content) as planner tasks
