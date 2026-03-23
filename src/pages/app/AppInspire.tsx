@@ -117,8 +117,11 @@ export default function AppInspire() {
             >
               <Search className="w-5 h-5 text-muted-foreground" />
             </button>
-            <button className="p-2 rounded-full active:bg-muted/50 transition-colors">
-              <Heart className="w-5 h-5 text-muted-foreground" />
+            <button 
+              onClick={() => { haptic.light(); setShowFavorites(!showFavorites); }}
+              className={cn("p-2 rounded-full active:bg-muted/50 transition-colors", showFavorites && "bg-primary/10")}
+            >
+              <Heart className={cn("w-5 h-5", showFavorites ? "fill-red-500 text-red-500" : "text-muted-foreground")} />
             </button>
           </div>
         </div>
