@@ -83,7 +83,7 @@ export function SubscriptionCard() {
   const isAnnual = activeSub?.product_id?.toLowerCase().includes('annual') || activeSub?.product_id?.toLowerCase().includes('yearly');
   const isMonthly = !isAnnual;
   const planLabel = isAnnual ? 'SimoraPlus Yearly' : 'SimoraPlus Monthly';
-  const planPrice = isAnnual ? '$99.99/year' : '$13.99/month';
+  const planPrice = isAnnual ? '$59.99/year' : '$7.99/month';
   const expiresAt = activeSub?.expires_at;
   const platform = activeSub?.platform;
 
