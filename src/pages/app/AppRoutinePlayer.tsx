@@ -265,7 +265,7 @@ export default function AppRoutinePlayer() {
   const handleBuilderNavigateToRoutine = useCallback((routineId: string) => {
     sessionStorage.setItem('builder-previewing', 'true');
     setShowBuilder(false);
-    navigate(`/app/inspire/${routineId}`);
+    navigate(`/app/routines/${routineId}`);
   }, [navigate]);
 
   // Dismissed featured routines
