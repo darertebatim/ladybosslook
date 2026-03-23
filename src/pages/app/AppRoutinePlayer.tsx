@@ -254,7 +254,6 @@ export default function AppRoutinePlayer() {
   const [builderResult, setBuilderResult] = useState<{ title: string; emoji: string; color: string; tasks: any[] } | null>(null);
   const [showBuilderPreview, setShowBuilderPreview] = useState(false);
   const [builderEditTasks, setBuilderEditTasks] = useState<any[]>([]);
-  const builderPreviewingRef = useRef(false);
   // Reopen builder when returning from routine preview
   useEffect(() => {
     if (sessionStorage.getItem('builder-previewing') === 'true') {
