@@ -288,7 +288,11 @@ const AppHome = () => {
     localStorage.setItem('simora_first_action_celebrated', 'true');
   }, []);
 
-  // Track whether completions changed during this session (not on initial load)
+  // Switcher button refs for pixel-perfect pill animation
+  const btnRoutinesRef = useRef<HTMLButtonElement>(null);
+  const btnTasksRef = useRef<HTMLButtonElement>(null);
+  const btnOneTimeRef = useRef<HTMLButtonElement>(null);
+
   const prevTotalCompletions = useRef(totalCompletions);
   const prevHasCompletionToday = useRef(hasAnyCompletionToday);
   const initialLoadDone = useRef(false);
@@ -1096,19 +1100,22 @@ const AppHome = () => {
               ) : filteredTasks.length > 0 || (!isNewUser && taskFilter !== 'all') ? (
                 <div>
                   {/* Shared animated 3-pill switcher */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="relative flex bg-muted rounded-full p-0.5">
+                  <div className="flex items-center mb-3">
+                    <div className="relative inline-flex bg-muted rounded-full p-0.5">
                       <motion.div
                         className="absolute top-0.5 bottom-0.5 rounded-full bg-background shadow-sm"
-                        style={{ width: 'calc(33.333% - 2px)' }}
                         animate={{ 
-                          x: homeView === 'routines' ? 2 
-                            : homeView === 'tasks' ? 'calc(100% + 2px)' 
-                            : 'calc(200% + 4px)' 
+                          width: homeView === 'routines' ? btnRoutinesRef.current?.offsetWidth 
+                            : homeView === 'tasks' ? btnTasksRef.current?.offsetWidth 
+                            : btnOneTimeRef.current?.offsetWidth,
+                          x: homeView === 'routines' ? 0 
+                            : homeView === 'tasks' ? (btnRoutinesRef.current?.offsetWidth ?? 0)
+                            : (btnRoutinesRef.current?.offsetWidth ?? 0) + (btnTasksRef.current?.offsetWidth ?? 0)
                         }}
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                       />
                       <button
+                        ref={btnRoutinesRef}
                         onClick={() => { haptic.selection(); setHomeView('routines'); setTaskFilter('all'); }}
                         className={cn(
                           "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors whitespace-nowrap",
@@ -1118,6 +1125,7 @@ const AppHome = () => {
                         Routine Players
                       </button>
                       <button
+                        ref={btnTasksRef}
                         onClick={() => { haptic.selection(); setHomeView('tasks'); setTaskFilter('all'); }}
                         className={cn(
                           "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-1 whitespace-nowrap",
@@ -1127,6 +1135,7 @@ const AppHome = () => {
                         <Zap className="h-3 w-3 fill-amber-400 text-amber-400 shrink-0" /> My Tasks
                       </button>
                       <button
+                        ref={btnOneTimeRef}
                         onClick={() => { haptic.selection(); setHomeView('one-time'); setTaskFilter('one-time'); }}
                         className={cn(
                           "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors whitespace-nowrap",
