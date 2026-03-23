@@ -126,6 +126,7 @@ export function RoutineBuilderSheet({
   const nameInputRef = useRef<HTMLInputElement>(null);
   const quickAddInputRef = useRef<HTMLInputElement>(null);
   const [quickAddAnchorTop, setQuickAddAnchorTop] = useState<string>('25%');
+  const [dialogAnchorTop, setDialogAnchorTop] = useState<string>('12%');
 
   // iOS keyboard scroll fixes
   const { handleFocus: handleNameInputFocus } = useKeyboardScroll(nameInputRef, { block: 'center' });
@@ -175,9 +176,12 @@ export function RoutineBuilderSheet({
     }
   }, [open, editMode, initialTitle, initialEmoji, initialColor, initialTasks]);
 
-  // Auto-focus name input
+  // Capture fixed pixel position and auto-focus when dialog opens
   useEffect(() => {
     if (open && step === 1) {
+      // Capture 12% of current viewport height as fixed pixels before keyboard opens
+      const pixelTop = Math.round(window.innerHeight * 0.12);
+      setDialogAnchorTop(`${pixelTop}px`);
       setTimeout(() => nameInputRef.current?.focus(), 300);
     }
   }, [open, step]);
@@ -402,7 +406,7 @@ export function RoutineBuilderSheet({
         <DialogContent
           hideCloseButton
           className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !translate-y-0 overflow-hidden"
-          style={{ top: '12%' }}
+          style={{ top: dialogAnchorTop }}
         >
           {/* Two-tone name card */}
           <div className="rounded-3xl overflow-hidden transition-all duration-300">
