@@ -20,6 +20,7 @@ import { TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
+import { useRoutineFavorites, useToggleRoutineFavorite } from '@/hooks/useRoutineFavorites';
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400 to-amber-600',
