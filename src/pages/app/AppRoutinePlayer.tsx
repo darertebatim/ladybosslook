@@ -1564,6 +1564,7 @@ export default function AppRoutinePlayer() {
         initialColor={builderEditRoutine?.color || 'mint'}
         initialTasks={builderEditRoutine ? builderEditTasks : []}
         onEditSave={handleBuilderEditSave}
+        onNavigateToRoutine={handleBuilderNavigateToRoutine}
       />
 
       {/* Builder Preview Sheet (shown after builder create) */}
