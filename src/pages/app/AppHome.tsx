@@ -1116,11 +1116,11 @@ const AppHome = () => {
                       <button
                         onClick={() => { haptic.selection(); homeView === 'tasks' ? (taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')) : setHomeView('tasks'); }}
                         className={cn(
-                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors",
+                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-1",
                           homeView === 'tasks' ? 'text-foreground' : 'text-muted-foreground'
                         )}
                       >
-                        <Zap className="h-3 w-3 fill-amber-400 text-amber-400" /> My Tasks
+                        <Zap className="h-3 w-3 fill-amber-400 text-amber-400 shrink-0" /> My Tasks
                       </button>
                     </div>
                     {homeView === 'tasks' && (
