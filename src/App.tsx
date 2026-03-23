@@ -512,7 +512,7 @@ const App = () => (
                       <Route path="rituals" element={<Navigate to="/app/routines" replace />} />
                       <Route path="rituals/:planId" element={<RitualRedirect />} />
                       <Route path="inspire" element={<Navigate to="/app/routines" replace />} />
-                      <Route path="inspire/:planId" element={<Navigate to="/app/routines" replace />} />
+                      <Route path="inspire/:planId" element={<InspireRedirect />} />
                       <Route path="myprofile" element={<AppProfile />} />
                       <Route path="profile" element={<Navigate to="/app/myprofile" replace />} />
                       {/* Legacy routes - redirect to home */}
