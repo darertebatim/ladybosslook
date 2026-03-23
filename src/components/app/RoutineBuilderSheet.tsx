@@ -165,9 +165,13 @@ export function RoutineBuilderSheet({
     onOpenChange(v);
   }, [onOpenChange, initialTitle, initialEmoji, initialColor, initialTasks, editMode]);
 
-  // Sync state when dialog opens via props
+  // Sync state when dialog opens via props (skip if returning from routine preview)
   useEffect(() => {
     if (open) {
+      if (skipNextSyncRef.current) {
+        skipNextSyncRef.current = false;
+        return;
+      }
       setRoutineTitle(initialTitle);
       setRoutineEmoji(initialEmoji);
       setRoutineColor(normalizeRoutineColor(initialColor));
