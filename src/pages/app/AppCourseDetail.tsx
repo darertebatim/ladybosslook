@@ -460,14 +460,21 @@ const AppCourseDetail = () => {
     // Native iOS/Android: Use native calendar integration
     if (isNativeApp() && isCalendarAvailable()) {
       try {
+        const oldCalEventId = getCalendarEventId(nextSession.id);
         const result = await addEventToCalendar({
           ...event,
           reminderMinutes: 60, // 1 hour reminder
         });
         
+        // Delete old calendar event if it existed (session time may have changed)
+        if (oldCalEventId) {
+          const { deleteCalendarEventsById } = await import('@/lib/calendarIntegration');
+          await deleteCalendarEventsById([oldCalEventId]);
+        }
+        
         if (result.success) {
           toast.success('Session added to your calendar!');
-          markSessionSynced(nextSession.id);
+          markSessionSynced(nextSession.id, result.calendarEventId);
         } else if (result.error === 'Calendar permission denied') {
           toast.error('Please allow calendar access in Settings');
         } else {
