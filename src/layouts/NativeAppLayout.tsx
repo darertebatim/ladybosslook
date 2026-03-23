@@ -226,7 +226,10 @@ const NativeAppLayout = () => {
                   onClick={(e) => {
                     if (isActive && item.path === '/app/home') {
                       e.preventDefault();
+                      haptic.medium();
                       window.dispatchEvent(new CustomEvent('home-tab-retap'));
+                    } else {
+                      haptic.light();
                     }
                   }}
                   className={cn(
