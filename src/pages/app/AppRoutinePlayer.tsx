@@ -257,14 +257,14 @@ export default function AppRoutinePlayer() {
   const builderPreviewingRef = useRef(false);
   // Reopen builder when returning from routine preview
   useEffect(() => {
-    if (builderPreviewingRef.current && !showBuilder) {
-      builderPreviewingRef.current = false;
+    if (sessionStorage.getItem('builder-previewing') === 'true') {
+      sessionStorage.removeItem('builder-previewing');
       setShowBuilder(true);
     }
-  });
+  }, []);
 
   const handleBuilderNavigateToRoutine = useCallback((routineId: string) => {
-    builderPreviewingRef.current = true;
+    sessionStorage.setItem('builder-previewing', 'true');
     setShowBuilder(false);
     navigate(`/app/inspire/${routineId}`);
   }, [navigate]);
