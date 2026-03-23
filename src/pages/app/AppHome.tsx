@@ -1105,7 +1105,7 @@ const AppHome = () => {
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                       />
                       <button
-                        onClick={() => homeView === 'routines' ? (taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')) : setHomeView('routines')}
+                        onClick={() => { haptic.selection(); homeView === 'routines' ? (taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')) : setHomeView('routines'); }}
                         className={cn(
                           "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors",
                           homeView === 'routines' ? 'text-foreground' : 'text-muted-foreground'
