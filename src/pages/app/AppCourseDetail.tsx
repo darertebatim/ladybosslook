@@ -570,13 +570,21 @@ const AppCourseDetail = () => {
     if (isNativeApp() && isCalendarAvailable()) {
       setIsSyncingAllSessions(true);
       try {
-        const result = await addMultipleEventsToCalendar(events);
+        // Delete all previously synced calendar events before re-adding
+        const oldCalEventIds = getAllCalendarEventIds();
+        const result = await addMultipleEventsToCalendar(events, oldCalEventIds);
         
         if (result.success) {
           toast.success(`Added ${result.addedCount} sessions to your calendar!`);
-          // Mark all sessions as synced using the tracking hook
+          // Build session→calendarEventId map and mark all synced
           const sessionIds = dbSessions?.map(s => s.id) || [];
-          markAllSessionsSynced(sessionIds);
+          const calEventIdMap: Record<string, string> = {};
+          sessionIds.forEach((sid, i) => {
+            if (result.calendarEventIds[i]) {
+              calEventIdMap[sid] = result.calendarEventIds[i]!;
+            }
+          });
+          markAllSessionsSynced(sessionIds, calEventIdMap);
           setHasNewSessions(false);
         } else if (result.error === 'Calendar permission denied') {
           toast.error('Please allow calendar access in Settings');
