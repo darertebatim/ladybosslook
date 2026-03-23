@@ -1004,13 +1004,12 @@ const AppHome = () => {
             {/* Mood Check-in Banner – hidden for now, re-enable from admin/app */}
             {/* {!showWelcomeCard && <MoodCheckInBanner />} */}
 
-            {/* Promo Banner - only show after mood check-in is done */}
-            {todayMood && <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />}
+            {/* Promo Banner */}
+            <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
 
-            {/* Home Banners (announcements with videos/CTAs) - only show after mood check-in */}
-            {todayMood && (
-              <div className="tour-banner">
-                <HomeBanner />
+            {/* Home Banners (announcements with videos/CTAs) */}
+            <div className="tour-banner">
+              <HomeBanner />
               </div>
             )}
 
