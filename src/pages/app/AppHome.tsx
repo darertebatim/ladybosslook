@@ -1191,12 +1191,15 @@ const AppHome = () => {
                         {homeView === 'one-time' ? 'No one-time tasks yet' : 'Nothing here yet — add your first task!'}
                       </p>
                       {homeView === 'one-time' ? (
-                        <button
-                          onClick={() => { setHomeView('tasks'); setTaskFilter('all'); }}
-                          className="text-xs font-medium text-primary"
-                        >
-                          Show all tasks
-                        </button>
+                        <>
+                          <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} defaultRepeatOverride="No" />
+                          <button
+                            onClick={() => { setHomeView('tasks'); setTaskFilter('all'); }}
+                            className="text-xs font-medium text-primary mt-1"
+                          >
+                            Show all tasks
+                          </button>
+                        </>
                       ) : (
                         <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                       )}
@@ -1335,7 +1338,7 @@ const AppHome = () => {
                           </>
                         ) : (
                           <>
-                            <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenTaskSheet={handleOpenTaskSheet} hideQuickAdd={taskFilter === 'all-routines' || taskFilter.startsWith('routine:')} />
+                            <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenTaskSheet={handleOpenTaskSheet} hideQuickAdd={taskFilter === 'all-routines' || taskFilter.startsWith('routine:')} defaultRepeatOverride={homeView === 'one-time' ? 'No' : undefined} />
                             {(taskFilter === 'all-routines' || taskFilter.startsWith('routine:')) && (
                               <div className="flex gap-2 mt-3">
                                 <button
