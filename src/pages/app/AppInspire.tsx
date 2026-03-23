@@ -462,6 +462,9 @@ export default function AppInspire() {
                 </button>
               </div>
             </div>
+            </div>
+          )}
+          </>
           )}
         </div>
       </div>
