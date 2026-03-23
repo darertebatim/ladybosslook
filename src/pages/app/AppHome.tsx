@@ -1138,6 +1138,7 @@ const AppHome = () => {
 
                   {homeView === 'routines' ? (
                     <>
+                      {routineProTasks.length > 0 ? (
                         <>
                           <SortableTaskList tasks={routineProTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                           <div className="flex gap-2 mt-3">
