@@ -165,11 +165,20 @@ export function RoutineBuilderSheet({
     onOpenChange(v);
   }, [onOpenChange, initialTitle, initialEmoji, initialColor, initialTasks, editMode]);
 
-  // Sync state when dialog opens via props (skip if returning from routine preview)
+  // Sync state when dialog opens via props (restore saved state if returning from routine preview)
   useEffect(() => {
     if (open) {
-      if (skipNextSyncRef.current) {
-        skipNextSyncRef.current = false;
+      const savedState = sessionStorage.getItem('builder-state');
+      if (savedState) {
+        try {
+          const parsed = JSON.parse(savedState);
+          setRoutineTitle(parsed.title || '');
+          setRoutineEmoji(parsed.emoji || '✨');
+          setRoutineColor(normalizeRoutineColor(parsed.color));
+          setStep(parsed.step || 1);
+          setShowSuggestions(true);
+        } catch {}
+        sessionStorage.removeItem('builder-state');
         return;
       }
       setRoutineTitle(initialTitle);
