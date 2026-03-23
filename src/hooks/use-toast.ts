@@ -1,4 +1,5 @@
 import { toast as sonnerToast } from "sonner";
+import { haptic } from "@/lib/haptics";
 
 // Re-export sonner toast with a wrapper that handles the Shadcn toast API
 // This allows existing code to work without changes
@@ -15,6 +16,7 @@ function toast(options: ToastOptions) {
   const { title, description, variant, duration } = options;
   
   if (variant === "destructive") {
+    haptic.error();
     return sonnerToast.error(title as string, {
       description: description as string,
       duration: duration,

@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import { haptic } from '@/lib/haptics';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, Heart, Loader2, CalendarPlus, ChevronRight, Flame, Target, RotateCcw } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -30,6 +31,7 @@ export default function AppInspire() {
   }, []);
 
   const navigateWithScroll = useCallback((path: string) => {
+    haptic.light();
     saveScroll();
     navigate(path, { state: { from: location.pathname } });
   }, [saveScroll, navigate, location.pathname]);

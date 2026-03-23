@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, AlertCircle, ChevronRight, Sparkles, Unlock } from 'lucide-react';
 import { format, isToday } from 'date-fns';
+import { haptic } from '@/lib/haptics';
 
 interface EnrolledProgramCardProps {
   enrollment: {
@@ -67,7 +68,7 @@ export const EnrolledProgramCard = memo(function EnrolledProgramCard({
   return (
     <Link 
       to={`/app/programs/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`}
-      onClick={onMarkViewed}
+      onClick={() => { haptic.light(); onMarkViewed?.(); }}
       className="block"
     >
       <div className={`relative w-full rounded-2xl overflow-hidden shadow-sm border border-border/50 transition-transform active:scale-[0.98] ${

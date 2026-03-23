@@ -1,4 +1,5 @@
 import { CheckCircle2, BookOpen, Users, UserCheck, Headphones, Video, Calendar, Sparkles, Dumbbell, Waves, Heart } from 'lucide-react';
+import { haptic } from '@/lib/haptics';
 import { Badge } from '@/components/ui/badge';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 
@@ -47,7 +48,7 @@ export const ProgramCard = ({
 
   return (
     <button
-      onClick={onClick}
+      onClick={() => { haptic.light(); onClick?.(); }}
       className="relative rounded-2xl overflow-hidden w-full aspect-square active:scale-[0.98] transition-all duration-150 shadow-lg border border-border/50 group"
     >
       {/* Cover Image */}

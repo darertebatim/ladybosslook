@@ -330,6 +330,7 @@ export default function AppPlayer() {
                           haptic.light();
                           setShowPaywall(true);
                         } else {
+                          haptic.selection();
                           setSelectedCategory(cat);
                         }
                       }}

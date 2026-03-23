@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { haptic } from '@/lib/haptics';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -627,7 +628,7 @@ const AppSettings = () => {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDeleteAccount} disabled={deleteConfirmText !== 'DELETE' || isDeletingAccount} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      <AlertDialogAction onClick={() => { haptic.warning(); handleDeleteAccount(); }} disabled={deleteConfirmText !== 'DELETE' || isDeletingAccount} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                         {isDeletingAccount ? 'Deleting...' : 'Delete Forever'}
                       </AlertDialogAction>
                     </AlertDialogFooter>

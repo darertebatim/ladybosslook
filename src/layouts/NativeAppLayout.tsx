@@ -1,4 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { haptic } from '@/lib/haptics';
 import { Home, MessageCircle, Compass, Music, Users, Flame, CalendarPlus, Play } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
@@ -225,7 +226,10 @@ const NativeAppLayout = () => {
                   onClick={(e) => {
                     if (isActive && item.path === '/app/home') {
                       e.preventDefault();
+                      haptic.medium();
                       window.dispatchEvent(new CustomEvent('home-tab-retap'));
+                    } else {
+                      haptic.light();
                     }
                   }}
                   className={cn(
