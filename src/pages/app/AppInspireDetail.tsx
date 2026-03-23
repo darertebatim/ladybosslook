@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Loader2, Share2, Instagram, Play } from 'lucide-react';
+import { Loader2, Share2, Instagram, Play, Heart } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
@@ -20,6 +20,7 @@ import { TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
+import { useRoutineFavorites, useToggleRoutineFavorite } from '@/hooks/useRoutineFavorites';
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400 to-amber-600',
@@ -99,6 +100,9 @@ export default function AppInspireDetail() {
   const { data: categories = [] } = useRoutineBankCategories();
   const { startRoutine } = useRoutinePlayerContext();
   const { user } = useAuth();
+  const { favoriteIds } = useRoutineFavorites();
+  const toggleFavorite = useToggleRoutineFavorite();
+  const isFavorited = planId ? favoriteIds.includes(planId) : false;
   
   // Check if routine was already added
   const isAlreadyAdded = planId ? addedRoutineIds.includes(planId) : false;
@@ -238,6 +242,17 @@ export default function AppInspireDetail() {
       >
         <BackButtonCircle to={(location.state as any)?.from || '/app/routines'} />
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              if (!planId) return;
+              haptic.light();
+              toggleFavorite.mutate({ routineId: planId, isFavorited });
+            }}
+            className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
+            aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+          >
+            <Heart className={cn("h-5 w-5 transition-colors", isFavorited && "fill-red-500 text-red-500")} />
+          </button>
           <button
             onClick={handleShareInstagram}
             className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
