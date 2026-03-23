@@ -626,9 +626,18 @@ const AppCourseDetail = () => {
     if (events.length === 0) return;
     
     try {
-      const result = await addMultipleEventsToCalendar(events);
+      const oldCalEventIds = getAllCalendarEventIds();
+      const result = await addMultipleEventsToCalendar(events, oldCalEventIds);
       if (result.success) {
         toast.success(`${result.addedCount} sessions added to calendar!`);
+        const sessionIds = dbSessions?.map(s => s.id) || [];
+        const calEventIdMap: Record<string, string> = {};
+        sessionIds.forEach((sid, i) => {
+          if (result.calendarEventIds[i]) {
+            calEventIdMap[sid] = result.calendarEventIds[i]!;
+          }
+        });
+        markAllSessionsSynced(sessionIds, calEventIdMap);
       }
     } catch (error) {
       console.error('Auto-sync calendar error:', error);
