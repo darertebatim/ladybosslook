@@ -913,15 +913,33 @@ export default function AppRoutinePlayer() {
     return plannerTasks.filter(t => t.source_routine_id === preStartRoutine.routine_id && t.pro_link_type !== 'routine');
   }, [plannerTasks, preStartRoutine]);
 
-  // Calculate routine duration for header
-  const routineDurationLabel = useMemo(() => {
-    if (!routineFilteredTasks.length) return '';
-    const totalMins = routineFilteredTasks.reduce((s, t) => s + (t.duration_minutes || 0), 0);
-    const hasUntimed = routineFilteredTasks.some(t => !t.duration_minutes);
-    if (totalMins > 0 && hasUntimed) return `${totalMins}m + untimed tasks`;
-    if (totalMins > 0) return `${totalMins}m`;
-    return 'Untimed tasks';
-  }, [routineFilteredTasks]);
+  // Calculate routine duration using smart estimates
+  const { data: routineDurationLabel = '' } = useQuery({
+    queryKey: ['routine-duration-label', preStartRoutine?.routine_id, routineFilteredTasks.map(t => t.id).join(',')],
+    queryFn: async () => {
+      if (!routineFilteredTasks.length || !user) return '';
+      const inputs: SmartEstimateInput[] = routineFilteredTasks.map(t => ({
+        taskTitle: t.title,
+        durationMinutes: t.duration_minutes ?? null,
+        goalType: t.goal_type ?? null,
+        goalTarget: t.goal_target ?? null,
+      }));
+      const estimates = await fetchSmartEstimates(user.id, inputs);
+      const totalSeconds = routineFilteredTasks.reduce((sum, t) => {
+        if (t.goal_type === 'timer' && t.goal_target) return sum + t.goal_target;
+        return sum + (estimates.get(t.title) || 60);
+      }, 0);
+      const totalMins = Math.round(totalSeconds / 60);
+      if (totalMins >= 60) {
+        const h = Math.floor(totalMins / 60);
+        const m = totalMins % 60;
+        return m > 0 ? `${h}h ${m}m` : `${h}h`;
+      }
+      return `${totalMins}m`;
+    },
+    enabled: !!preStartRoutine && routineFilteredTasks.length > 0 && !!user,
+    staleTime: 60_000,
+  });
 
   // Remaining (uncompleted) tasks for start button
   const remainingTasks = useMemo(() => {
