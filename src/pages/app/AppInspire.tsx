@@ -31,6 +31,7 @@ export default function AppInspire() {
   }, []);
 
   const navigateWithScroll = useCallback((path: string) => {
+    haptic.light();
     saveScroll();
     navigate(path, { state: { from: location.pathname } });
   }, [saveScroll, navigate, location.pathname]);
