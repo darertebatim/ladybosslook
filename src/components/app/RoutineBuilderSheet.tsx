@@ -397,9 +397,15 @@ export function RoutineBuilderSheet({
 
   const handleSuggestionSelect = (suggestion: any) => {
     haptic.light();
-    setRoutineTitle(suggestion.title);
-    setRoutineEmoji(suggestion.emoji || '✨');
-    setShowSuggestions(false);
+    if (onNavigateToRoutine) {
+      // Navigate to routine detail page — don't reset builder state
+      onNavigateToRoutine(suggestion.id);
+    } else {
+      // Fallback: just use the name
+      setRoutineTitle(suggestion.title);
+      setRoutineEmoji(suggestion.emoji || '✨');
+      setShowSuggestions(false);
+    }
   };
 
   return (
