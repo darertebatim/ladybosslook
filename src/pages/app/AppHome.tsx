@@ -1191,12 +1191,15 @@ const AppHome = () => {
                         {homeView === 'one-time' ? 'No one-time tasks yet' : 'Nothing here yet — add your first task!'}
                       </p>
                       {homeView === 'one-time' ? (
-                        <button
-                          onClick={() => { setHomeView('tasks'); setTaskFilter('all'); }}
-                          className="text-xs font-medium text-primary"
-                        >
-                          Show all tasks
-                        </button>
+                        <>
+                          <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} defaultRepeatOverride="No" />
+                          <button
+                            onClick={() => { setHomeView('tasks'); setTaskFilter('all'); }}
+                            className="text-xs font-medium text-primary mt-1"
+                          >
+                            Show all tasks
+                          </button>
+                        </>
                       ) : (
                         <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                       )}
