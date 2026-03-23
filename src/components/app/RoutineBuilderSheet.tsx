@@ -3,7 +3,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, Plus, Trash2, ListChecks, MoreHorizontal, Repeat, Clock, Pencil } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2, ListChecks, MoreHorizontal, Repeat, Clock, Pencil } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { useAuth } from '@/hooks/useAuth';
@@ -77,6 +77,8 @@ interface RoutineBuilderSheetProps {
   initialColor?: string;
   initialTasks?: BuilderTask[];
   onEditSave?: (routineTitle: string, routineEmoji: string, routineColor: string, tasks: BuilderTask[]) => void;
+  /** Called when user taps a routine suggestion to preview it */
+  onNavigateToRoutine?: (routineId: string) => void;
 }
 
 const QUICK_ADD_VARIANTS: { emoji: string; color: string }[] = [
@@ -107,6 +109,7 @@ export function RoutineBuilderSheet({
   initialColor = 'mint',
   initialTasks = [],
   onEditSave,
+  onNavigateToRoutine,
 }: RoutineBuilderSheetProps) {
   const { user } = useAuth();
   const [step, setStep] = useState<1 | 2>(1);
@@ -161,9 +164,22 @@ export function RoutineBuilderSheet({
     onOpenChange(v);
   }, [onOpenChange, initialTitle, initialEmoji, initialColor, initialTasks, editMode]);
 
-  // Sync state when dialog opens via props
+  // Sync state when dialog opens via props (restore saved state if returning from routine preview)
   useEffect(() => {
     if (open) {
+      const savedState = sessionStorage.getItem('builder-state');
+      if (savedState) {
+        try {
+          const parsed = JSON.parse(savedState);
+          setRoutineTitle(parsed.title || '');
+          setRoutineEmoji(parsed.emoji || '✨');
+          setRoutineColor(normalizeRoutineColor(parsed.color));
+          setStep(parsed.step || 1);
+          setShowSuggestions(true);
+        } catch {}
+        sessionStorage.removeItem('builder-state');
+        return;
+      }
       setRoutineTitle(initialTitle);
       setRoutineEmoji(initialEmoji);
       setRoutineColor(normalizeRoutineColor(initialColor));
@@ -394,9 +410,22 @@ export function RoutineBuilderSheet({
 
   const handleSuggestionSelect = (suggestion: any) => {
     haptic.light();
-    setRoutineTitle(suggestion.title);
-    setRoutineEmoji(suggestion.emoji || '✨');
-    setShowSuggestions(false);
+    if (onNavigateToRoutine) {
+      // Save current builder state so it survives navigation
+      try {
+        sessionStorage.setItem('builder-state', JSON.stringify({
+          title: routineTitle,
+          emoji: routineEmoji,
+          color: routineColor,
+          step,
+        }));
+      } catch {}
+      onNavigateToRoutine(suggestion.id);
+    } else {
+      setRoutineTitle(suggestion.title);
+      setRoutineEmoji(suggestion.emoji || '✨');
+      setShowSuggestions(false);
+    }
   };
 
   return (
@@ -606,6 +635,7 @@ export function RoutineBuilderSheet({
                   >
                     <FluentEmoji emoji={s.emoji || '✨'} size={22} className="shrink-0" />
                     <span className="text-sm font-medium text-white truncate flex-1 min-w-0">{s.title}</span>
+                    {onNavigateToRoutine && <ChevronRight className="w-4 h-4 text-white/40 shrink-0" />}
                   </button>
                 ))}
               </div>

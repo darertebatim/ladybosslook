@@ -254,6 +254,19 @@ export default function AppRoutinePlayer() {
   const [builderResult, setBuilderResult] = useState<{ title: string; emoji: string; color: string; tasks: any[] } | null>(null);
   const [showBuilderPreview, setShowBuilderPreview] = useState(false);
   const [builderEditTasks, setBuilderEditTasks] = useState<any[]>([]);
+  // Reopen builder when returning from routine preview
+  useEffect(() => {
+    if (sessionStorage.getItem('builder-previewing') === 'true') {
+      sessionStorage.removeItem('builder-previewing');
+      setShowBuilder(true);
+    }
+  }, []);
+
+  const handleBuilderNavigateToRoutine = useCallback((routineId: string) => {
+    sessionStorage.setItem('builder-previewing', 'true');
+    setShowBuilder(false);
+    navigate(`/app/inspire/${routineId}`);
+  }, [navigate]);
 
   // Dismissed featured routines
   const [dismissedFeatured, setDismissedFeatured] = useState<string[]>(() => {
@@ -1551,6 +1564,7 @@ export default function AppRoutinePlayer() {
         initialColor={builderEditRoutine?.color || 'mint'}
         initialTasks={builderEditRoutine ? builderEditTasks : []}
         onEditSave={handleBuilderEditSave}
+        onNavigateToRoutine={handleBuilderNavigateToRoutine}
       />
 
       {/* Builder Preview Sheet (shown after builder create) */}
