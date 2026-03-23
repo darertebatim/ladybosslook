@@ -17,12 +17,15 @@ import { RoutinesTour, TourHelpButton } from '@/components/app/tour';
 import { PromoBanner } from '@/components/app/PromoBanner';
 import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 import { useScrollRestore } from '@/hooks/useScrollRestore';
+import { useRoutineFavorites } from '@/hooks/useRoutineFavorites';
+import { cn } from '@/lib/utils';
 
 export default function AppInspire() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+  const [showFavorites, setShowFavorites] = useState(false);
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
   const { scrollRef, saveScroll } = useScrollRestore('routines_scroll');
 
