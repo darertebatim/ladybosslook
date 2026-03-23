@@ -383,8 +383,8 @@ export const mePlusFlow: OnboardingFlow = {
       subtitle: 'No Payment Now!',
       image: meplusImg32Paywall,
       pricingTiers: [
-        { label: '1 month', perWeek: '$19.99/mo.', total: '$13.99/mo', badge: '7-Day Free Trial', discount: '40% OFF' },
-        { label: '12 months', perWeek: '$8.33/mo.', total: '$99.99/yr', badge: '7-Day Free Trial', discount: '59% OFF' },
+        { label: '1 month', perWeek: '$12.99/mo.', total: '$7.99/mo', badge: '7-Day Free Trial', discount: '38% OFF' },
+        { label: '12 months', perWeek: '$5.00/mo.', total: '$59.99/yr', badge: '7-Day Free Trial', discount: '37% OFF' },
       ],
       buttonLabel: 'Continue',
       description: '',

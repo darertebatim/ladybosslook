@@ -83,7 +83,7 @@ export function SubscriptionCard() {
   const isAnnual = activeSub?.product_id?.toLowerCase().includes('annual') || activeSub?.product_id?.toLowerCase().includes('yearly');
   const isMonthly = !isAnnual;
   const planLabel = isAnnual ? 'SimoraPlus Yearly' : 'SimoraPlus Monthly';
-  const planPrice = isAnnual ? '$99.99/year' : '$13.99/month';
+  const planPrice = isAnnual ? '$59.99/year' : '$7.99/month';
   const expiresAt = activeSub?.expires_at;
   const platform = activeSub?.platform;
 
@@ -209,9 +209,9 @@ function ManageSubscriptionSheet({
                       <Sparkles className="h-5 w-5 text-emerald-600" />
                     </div>
                     <div className="flex-1">
-                      <p className="font-bold text-emerald-800 text-sm">Save 40% with Annual</p>
+                      <p className="font-bold text-emerald-800 text-sm">Save 37% with Annual</p>
                       <p className="text-emerald-700/70 text-xs mt-0.5">
-                        Switch to yearly for just $8.33/mo instead of $13.99/mo
+                        Switch to yearly for just $5.00/mo instead of $7.99/mo
                       </p>
                     </div>
                     <ChevronRight className="h-4 w-4 text-emerald-600 flex-shrink-0" />
