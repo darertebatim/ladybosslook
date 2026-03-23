@@ -48,7 +48,7 @@ export const ProgramCard = ({
 
   return (
     <button
-      onClick={onClick}
+      onClick={() => { haptic.light(); onClick?.(); }}
       className="relative rounded-2xl overflow-hidden w-full aspect-square active:scale-[0.98] transition-all duration-150 shadow-lg border border-border/50 group"
     >
       {/* Cover Image */}

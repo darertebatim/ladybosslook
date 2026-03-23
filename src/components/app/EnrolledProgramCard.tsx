@@ -68,7 +68,7 @@ export const EnrolledProgramCard = memo(function EnrolledProgramCard({
   return (
     <Link 
       to={`/app/programs/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`}
-      onClick={onMarkViewed}
+      onClick={() => { haptic.light(); onMarkViewed?.(); }}
       className="block"
     >
       <div className={`relative w-full rounded-2xl overflow-hidden shadow-sm border border-border/50 transition-transform active:scale-[0.98] ${

@@ -1114,7 +1114,7 @@ const AppHome = () => {
                         Routine Players
                       </button>
                       <button
-                        onClick={() => homeView === 'tasks' ? (taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')) : setHomeView('tasks')}
+                        onClick={() => { haptic.selection(); homeView === 'tasks' ? (taskFilter === 'all' ? setFilterDropdownOpen(true) : setTaskFilter('all')) : setHomeView('tasks'); }}
                         className={cn(
                           "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors",
                           homeView === 'tasks' ? 'text-foreground' : 'text-muted-foreground'

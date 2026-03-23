@@ -268,7 +268,7 @@ export default function AppWatch() {
                     key={cat}
                     name={config.name}
                     isSelected={selectedCategory === cat}
-                    onClick={() => setSelectedCategory(cat)}
+                    onClick={() => { haptic.selection(); setSelectedCategory(cat); }}
                   />
                 );
               })}
