@@ -98,6 +98,7 @@ export function RoutinePreviewSheet({
   onOpenChange,
   tasks,
   routineTitle,
+  routineColor,
   defaultTag,
   scheduleType = 'daily',
   challengeStartDate,
