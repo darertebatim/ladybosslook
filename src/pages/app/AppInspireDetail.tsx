@@ -701,6 +701,7 @@ export default function AppInspireDetail() {
           onOpenChange={setShowPreviewSheet}
           tasks={previewTasks}
           routineTitle={routine.title}
+          routineColor={(routine as any).color || null}
           defaultTag={routine.category}
           scheduleType={(routine as any).schedule_type || 'daily'}
           challengeStartDate={(routine as any).challenge_start_date || null}
