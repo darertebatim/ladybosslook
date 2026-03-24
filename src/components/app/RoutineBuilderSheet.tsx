@@ -126,6 +126,7 @@ export function RoutineBuilderSheet({
   const [quickTime, setQuickTime] = useState('Anytime');
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [editingTask, setEditingTask] = useState<BuilderTask | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const quickAddInputRef = useRef<HTMLInputElement>(null);
   const [quickAddAnchorTop, setQuickAddAnchorTop] = useState<string>('25%');
