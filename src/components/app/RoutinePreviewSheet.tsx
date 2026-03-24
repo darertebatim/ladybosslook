@@ -120,7 +120,7 @@ export function RoutinePreviewSheet({
         plan_id: routineBankId,
         title: routineTitle,
         icon: '🎬',
-        color: 'mint',
+        color: (routineColor as string) || 'mint',
         task_order: -1,
         is_active: true,
         created_at: new Date().toISOString(),
