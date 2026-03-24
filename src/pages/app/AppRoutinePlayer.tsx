@@ -1438,9 +1438,17 @@ export default function AppRoutinePlayer() {
             goalProgress={selectedTask ? (plannerGoalProgressMap.get(selectedTask.id) || 0) : 0}
             onEdit={handleEditTask}
             onDelete={handleDeleteTask}
+            onSkip={handleSkipTask}
             onStreakIncrease={() => {}}
             onOpenGoalInput={handleOpenGoalInput}
             onOpenTimer={handleOpenTimer}
+          />
+
+          <TaskSkipSheet
+            task={skipTask}
+            open={!!skipTask}
+            onClose={() => setSkipTask(null)}
+            date={today}
           />
         </div>
       )}
