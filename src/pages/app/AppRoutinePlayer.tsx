@@ -559,6 +559,7 @@ export default function AppRoutinePlayer() {
   const [preStartRoutine, setPreStartRoutine] = useState<any | null>(null);
   const [loadingRoutineId, setLoadingRoutineId] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
+  const [skipTask, setSkipTask] = useState<UserTask | null>(null);
 
   // Auto-open routine from ?routine= query param (e.g. from pro link)
   const autoOpenedRef = useRef(false);
