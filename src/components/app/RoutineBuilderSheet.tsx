@@ -232,19 +232,26 @@ export function RoutineBuilderSheet({
   }, [routineSuggestions, routineTitle]);
 
   // Fetch user's unlinked tasks (no source_routine_id) for "Add from My Tasks"
+  // Only show recurring tasks or one-time tasks scheduled today or later
   const { data: unlinkedTasks = [] } = useQuery({
     queryKey: ['builder-unlinked-tasks', user?.id],
     queryFn: async () => {
       if (!user) return [];
+      const today = new Date().toISOString().split('T')[0];
       const { data } = await supabase
         .from('user_tasks')
-        .select('id, title, emoji, color, repeat_pattern, category:tag, duration_minutes, pro_link_type, pro_link_value, goal_enabled, goal_target, goal_type, goal_unit, linked_playlist_id, time_period')
+        .select('id, title, emoji, color, repeat_pattern, category:tag, duration_minutes, pro_link_type, pro_link_value, goal_enabled, goal_target, goal_type, goal_unit, linked_playlist_id, time_period, scheduled_date, repeat_end_date')
         .eq('user_id', user.id)
         .eq('is_active', true)
         .is('source_routine_id', null)
         .or('pro_link_type.is.null,pro_link_type.neq.routine')
+        .or(`repeat_end_date.is.null,repeat_end_date.gte.${today}`)
         .order('order_index', { ascending: true });
-      return data || [];
+      // Filter out one-time tasks with a past scheduled date
+      return (data || []).filter((t: any) => {
+        if (t.repeat_pattern === 'none' && t.scheduled_date && t.scheduled_date < today) return false;
+        return true;
+      });
     },
     enabled: !!user && open,
   });
