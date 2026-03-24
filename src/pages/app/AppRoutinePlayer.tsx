@@ -532,7 +532,7 @@ export default function AppRoutinePlayer() {
     enabled: !!user && allUserTaskIds.length > 0,
   });
 
-  // Progress based on planner completions + routine_sessions (dual-source, like RoutinePlayBadge)
+  const { data: skippedTaskIds = new Set<string>() } = useSkipsForDate(new Date());
   const getCompletionInfo = (routineId: string) => {
     const tasks = userTasksByRoutine?.[routineId];
     if (!tasks || tasks.length === 0) return null;
