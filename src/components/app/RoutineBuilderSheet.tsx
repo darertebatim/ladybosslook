@@ -915,6 +915,17 @@ export function RoutineBuilderSheet({
           }}
         />
       )}
+
+      {/* Emoji Picker for routine emoji */}
+      <EmojiPicker
+        open={showEmojiPicker}
+        onOpenChange={setShowEmojiPicker}
+        selectedEmoji={routineEmoji}
+        onSelect={(emoji) => {
+          setRoutineEmoji(emoji);
+          setShowEmojiPicker(false);
+        }}
+      />
     </>
   );
 }
