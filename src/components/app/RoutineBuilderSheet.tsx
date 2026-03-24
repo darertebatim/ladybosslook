@@ -194,11 +194,13 @@ export function RoutineBuilderSheet({
 
   // Capture fixed pixel position and auto-focus when dialog opens
   useEffect(() => {
-    if (open && step === 1) {
+    if (open) {
       // Capture 12% of current viewport height as fixed pixels before keyboard opens
       const pixelTop = Math.round(window.innerHeight * 0.12);
       setDialogAnchorTop(`${pixelTop}px`);
-      setTimeout(() => nameInputRef.current?.focus(), 300);
+      if (step === 1) {
+        setTimeout(() => nameInputRef.current?.focus(), 300);
+      }
     }
   }, [open, step]);
 
