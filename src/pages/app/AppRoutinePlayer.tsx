@@ -1168,6 +1168,11 @@ export default function AppRoutinePlayer() {
     });
   }, [deleteTask]);
 
+  const handleSkipTask = useCallback((task: UserTask) => {
+    setSelectedTask(null);
+    setSkipTask(task);
+  }, []);
+
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
       {/* Header */}
