@@ -78,6 +78,7 @@ interface RoutinePreviewSheetProps {
   onOpenChange: (open: boolean) => void;
   tasks: RoutinePlanTask[];
   routineTitle: string;
+  routineColor?: string | null;
   defaultTag?: string | null;
   scheduleType?: 'daily' | 'weekly' | 'challenge' | 'project';
   challengeStartDate?: string | null;
@@ -97,6 +98,7 @@ export function RoutinePreviewSheet({
   onOpenChange,
   tasks,
   routineTitle,
+  routineColor,
   defaultTag,
   scheduleType = 'daily',
   challengeStartDate,
@@ -118,7 +120,7 @@ export function RoutinePreviewSheet({
         plan_id: routineBankId,
         title: routineTitle,
         icon: '🎬',
-        color: 'mint',
+        color: (routineColor as string) || 'mint',
         task_order: -1,
         is_active: true,
         created_at: new Date().toISOString(),
