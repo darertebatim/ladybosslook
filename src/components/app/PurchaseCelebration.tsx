@@ -70,7 +70,7 @@ export function PurchaseCelebration({ open, onClose, plan }: PurchaseCelebration
   return (
     <div
       className="fixed inset-0 flex items-center justify-center"
-      style={{ zIndex: 9999 }}
+      style={{ zIndex: 10004 }}
     >
       {/* Backdrop */}
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-900/95 via-zinc-900/98 to-black/95 backdrop-blur-sm" />

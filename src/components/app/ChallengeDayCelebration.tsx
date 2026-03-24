@@ -145,7 +145,7 @@ export const ChallengeDayCelebration = ({
   return (
     <OverlayPortal>
       <div
-        className="fixed inset-0 z-[9999] flex flex-col"
+        className="fixed inset-0 z-[10004] flex flex-col"
         onClick={onClose}
       >
         {/* Background */}
