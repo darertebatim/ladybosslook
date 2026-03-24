@@ -22,9 +22,10 @@ import { RoutinePreviewSheet, EditedTask, ROUTINE_COLOR_CYCLE } from '@/componen
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutineBuilderSheet, BuilderTask } from '@/components/app/RoutineBuilderSheet';
 import { SortableTaskList } from '@/components/app/SortableTaskList';
-import { useTasksForDate, useCompletionsForDate, UserTask, useAddGoalProgress, useDeleteTask } from '@/hooks/useTaskPlanner';
+import { useTasksForDate, useCompletionsForDate, UserTask, useAddGoalProgress, useDeleteTask, useSkipsForDate } from '@/hooks/useTaskPlanner';
 import { isWaterTask } from '@/lib/waterTracking';
 import { TaskDetailModal } from '@/components/app/TaskDetailModal';
+import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
 import {
@@ -531,16 +532,18 @@ export default function AppRoutinePlayer() {
     enabled: !!user && allUserTaskIds.length > 0,
   });
 
-  // Progress based on planner completions + routine_sessions (dual-source, like RoutinePlayBadge)
+  const { data: skippedTaskIds = new Set<string>() } = useSkipsForDate(new Date());
   const getCompletionInfo = (routineId: string) => {
     const tasks = userTasksByRoutine?.[routineId];
     if (!tasks || tasks.length === 0) return null;
     const todayTasks = tasks.filter(t => taskAppliesToDate(t, todayStr));
-    const totalTasks = todayTasks.length || tasks.length;
+    // Exclude skipped tasks from total count so skipped tasks don't block 100%
+    const activeTodayTasks = todayTasks.filter(t => !skippedTaskIds.has(t.id));
+    const totalTasks = activeTodayTasks.length || tasks.length;
 
     // Source 1: manual task_completions
-    const manualCompleted = todayTasks.length > 0
-      ? todayTasks.filter(t => todayCompletions?.has(t.id)).length
+    const manualCompleted = activeTodayTasks.length > 0
+      ? activeTodayTasks.filter(t => todayCompletions?.has(t.id)).length
       : 0;
 
     // Source 2: routine_sessions from the player
@@ -558,6 +561,7 @@ export default function AppRoutinePlayer() {
   const [preStartRoutine, setPreStartRoutine] = useState<any | null>(null);
   const [loadingRoutineId, setLoadingRoutineId] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<UserTask | null>(null);
+  const [skipTask, setSkipTask] = useState<UserTask | null>(null);
 
   // Auto-open routine from ?routine= query param (e.g. from pro link)
   const autoOpenedRef = useRef(false);
@@ -931,11 +935,11 @@ export default function AppRoutinePlayer() {
     return map;
   }, [plannerCompletions]);
 
-  // Filter planner tasks to only the selected routine's tasks
+  // Filter planner tasks to only the selected routine's tasks, excluding skipped ones
   const routineFilteredTasks = useMemo(() => {
     if (!preStartRoutine) return [];
-    return plannerTasks.filter(t => t.source_routine_id === preStartRoutine.routine_id && t.pro_link_type !== 'routine');
-  }, [plannerTasks, preStartRoutine]);
+    return plannerTasks.filter(t => t.source_routine_id === preStartRoutine.routine_id && t.pro_link_type !== 'routine' && !skippedTaskIds.has(t.id));
+  }, [plannerTasks, preStartRoutine, skippedTaskIds]);
 
   // Calculate routine duration using smart estimates
   const { data: routineDurationLabel = '' } = useQuery({
@@ -1164,6 +1168,11 @@ export default function AppRoutinePlayer() {
       onSuccess: () => toast.success('Task deleted'),
     });
   }, [deleteTask]);
+
+  const handleSkipTask = useCallback((task: UserTask) => {
+    setSelectedTask(null);
+    setSkipTask(task);
+  }, []);
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
@@ -1430,9 +1439,17 @@ export default function AppRoutinePlayer() {
             goalProgress={selectedTask ? (plannerGoalProgressMap.get(selectedTask.id) || 0) : 0}
             onEdit={handleEditTask}
             onDelete={handleDeleteTask}
+            onSkip={handleSkipTask}
             onStreakIncrease={() => {}}
             onOpenGoalInput={handleOpenGoalInput}
             onOpenTimer={handleOpenTimer}
+          />
+
+          <TaskSkipSheet
+            task={skipTask}
+            open={!!skipTask}
+            onClose={() => setSkipTask(null)}
+            date={today}
           />
         </div>
       )}
