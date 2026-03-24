@@ -915,7 +915,6 @@ export default function AppRoutinePlayer() {
   const today = useMemo(() => new Date(), []);
   const { data: plannerTasks = [] } = useTasksForDate(today);
   const { data: plannerCompletions } = useCompletionsForDate(today);
-  const { data: skippedTaskIds = new Set<string>() } = useSkipsForDate(today);
   const addGoalProgress = useAddGoalProgress();
 
   const plannerCompletedTaskIds = useMemo(() => {
