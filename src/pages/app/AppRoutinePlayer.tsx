@@ -537,11 +537,13 @@ export default function AppRoutinePlayer() {
     const tasks = userTasksByRoutine?.[routineId];
     if (!tasks || tasks.length === 0) return null;
     const todayTasks = tasks.filter(t => taskAppliesToDate(t, todayStr));
-    const totalTasks = todayTasks.length || tasks.length;
+    // Exclude skipped tasks from total count so skipped tasks don't block 100%
+    const activeTodayTasks = todayTasks.filter(t => !skippedTaskIds.has(t.id));
+    const totalTasks = activeTodayTasks.length || tasks.length;
 
     // Source 1: manual task_completions
-    const manualCompleted = todayTasks.length > 0
-      ? todayTasks.filter(t => todayCompletions?.has(t.id)).length
+    const manualCompleted = activeTodayTasks.length > 0
+      ? activeTodayTasks.filter(t => todayCompletions?.has(t.id)).length
       : 0;
 
     // Source 2: routine_sessions from the player
