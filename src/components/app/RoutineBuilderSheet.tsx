@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, Plus, Trash2, ListChecks, MoreHorizontal, Repeat, Clock, Pencil } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { haptic } from '@/lib/haptics';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -126,6 +127,7 @@ export function RoutineBuilderSheet({
   const [quickTime, setQuickTime] = useState('Anytime');
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [editingTask, setEditingTask] = useState<BuilderTask | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const quickAddInputRef = useRef<HTMLInputElement>(null);
   const [quickAddAnchorTop, setQuickAddAnchorTop] = useState<string>('25%');
@@ -451,9 +453,20 @@ export function RoutineBuilderSheet({
             {/* Top: name input */}
             <div className="px-4 pt-4 pb-3 transition-colors duration-200" style={{ backgroundColor: TASK_COLORS[routineColor as TaskColor] || TASK_COLORS.peach }}>
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 flex items-center justify-center shrink-0">
+                <button
+                  onClick={() => { if (step === 2) { haptic.light(); setShowEmojiPicker(true); } }}
+                  className={cn(
+                    'w-10 h-10 flex items-center justify-center shrink-0 relative',
+                    step === 2 && 'active:scale-90 transition-transform'
+                  )}
+                >
                   <FluentEmoji emoji={routineEmoji} size={28} />
-                </div>
+                  {step === 2 && (
+                    <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-black/15 flex items-center justify-center">
+                      <Pencil className="w-2.5 h-2.5 text-black/60" />
+                    </div>
+                  )}
+                </button>
                 <input
                   ref={nameInputRef}
                   value={routineTitle}
@@ -902,6 +915,17 @@ export function RoutineBuilderSheet({
           }}
         />
       )}
+
+      {/* Emoji Picker for routine emoji */}
+      <EmojiPicker
+        open={showEmojiPicker}
+        onOpenChange={setShowEmojiPicker}
+        selectedEmoji={routineEmoji}
+        onSelect={(emoji) => {
+          setRoutineEmoji(emoji);
+          setShowEmojiPicker(false);
+        }}
+      />
     </>
   );
 }
