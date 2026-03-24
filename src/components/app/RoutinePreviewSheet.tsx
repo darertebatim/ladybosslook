@@ -78,6 +78,7 @@ interface RoutinePreviewSheetProps {
   onOpenChange: (open: boolean) => void;
   tasks: RoutinePlanTask[];
   routineTitle: string;
+  routineColor?: string | null;
   defaultTag?: string | null;
   scheduleType?: 'daily' | 'weekly' | 'challenge' | 'project';
   challengeStartDate?: string | null;
