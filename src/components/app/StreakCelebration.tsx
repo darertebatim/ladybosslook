@@ -111,7 +111,7 @@ export const StreakCelebration = ({
   return (
     <OverlayPortal>
     <div
-      className="fixed inset-0 z-[100] flex flex-col justify-end pb-[env(safe-area-inset-bottom)]"
+      className="fixed inset-0 z-[10004] flex flex-col justify-end pb-[env(safe-area-inset-bottom)]"
       onClick={handleClose}
     >
       {/* Dark overlay */}
