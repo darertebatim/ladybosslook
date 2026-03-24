@@ -913,6 +913,7 @@ export default function AppRoutinePlayer() {
   const today = useMemo(() => new Date(), []);
   const { data: plannerTasks = [] } = useTasksForDate(today);
   const { data: plannerCompletions } = useCompletionsForDate(today);
+  const { data: skippedTaskIds = new Set<string>() } = useSkipsForDate(today);
   const addGoalProgress = useAddGoalProgress();
 
   const plannerCompletedTaskIds = useMemo(() => {
@@ -933,11 +934,11 @@ export default function AppRoutinePlayer() {
     return map;
   }, [plannerCompletions]);
 
-  // Filter planner tasks to only the selected routine's tasks
+  // Filter planner tasks to only the selected routine's tasks, excluding skipped ones
   const routineFilteredTasks = useMemo(() => {
     if (!preStartRoutine) return [];
-    return plannerTasks.filter(t => t.source_routine_id === preStartRoutine.routine_id && t.pro_link_type !== 'routine');
-  }, [plannerTasks, preStartRoutine]);
+    return plannerTasks.filter(t => t.source_routine_id === preStartRoutine.routine_id && t.pro_link_type !== 'routine' && !skippedTaskIds.has(t.id));
+  }, [plannerTasks, preStartRoutine, skippedTaskIds]);
 
   // Calculate routine duration using smart estimates
   const { data: routineDurationLabel = '' } = useQuery({
