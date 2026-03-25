@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
 import { supabase } from '@/integrations/supabase/client';
 import confetti from 'canvas-confetti';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -2077,6 +2077,7 @@ type DemoPhase =
   | 'intro'
   | 'revealing'
   | 'viewing'
+  | 'ready-to-play'
   | 'spotlight-app'
   | 'hint-app'
   | 'celebrate-app'
@@ -2299,10 +2300,12 @@ function StarterRoutineScreen({ step, onNext }: Props) {
     return () => clearTimeout(t);
   }, [phase, revealedCount]);
 
-  // Viewing pause → first spotlight
+  // Viewing pause → ready-to-play animation → first spotlight
   useEffect(() => {
     if (phase === 'viewing') {
-      addTimer(() => setPhase('spotlight-app'), 3000);
+      addTimer(() => setPhase('ready-to-play'), 1200);
+    } else if (phase === 'ready-to-play') {
+      addTimer(() => setPhase('spotlight-app'), 2800);
     }
   }, [phase]);
 
@@ -2396,6 +2399,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   };
 
   // Which phases show overlay
+  const showReadyToPlay = phase === 'ready-to-play';
   const showOverlay = phase.startsWith('spotlight') || phase.startsWith('hint') || phase.startsWith('celebrate') || phase === 'feeling-mood' || phase === 'done';
   // Which task is spotlighted
   const spotlightIdx =
@@ -2459,6 +2463,79 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
         {/* Task Cards */}
         <div className="space-y-3 relative">
+          {/* "Ready to play" animated overlay */}
+          <AnimatePresence>
+            {showReadyToPlay && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.3 } }}
+                className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#1a1f3d]/80 backdrop-blur-sm"
+              >
+                {/* Pulsing play circle */}
+                <motion.div
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.15 }}
+                  className="relative mb-6"
+                >
+                  {/* Outer pulse ring */}
+                  <motion.div
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0, 0.4] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                    className="absolute inset-0 rounded-full bg-white/20"
+                    style={{ width: 88, height: 88, top: -4, left: -4 }}
+                  />
+                  <div className="w-20 h-20 rounded-full bg-white/15 border-2 border-white/30 flex items-center justify-center">
+                    <motion.div
+                      animate={{ x: [0, 2, 0] }}
+                      transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut' }}
+                    >
+                      <svg width="28" height="32" viewBox="0 0 28 32" fill="none">
+                        <path d="M26 14.268a2 2 0 010 3.464L4 28.856a2 2 0 01-3-1.732V4.876a2 2 0 013-1.732L26 14.268z" fill="white" fillOpacity="0.9" />
+                      </svg>
+                    </motion.div>
+                  </div>
+                </motion.div>
+
+                {/* Text */}
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.4 }}
+                  className="text-white text-2xl font-bold tracking-wide"
+                >
+                  Let's try it out!
+                </motion.p>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.6 }}
+                  transition={{ delay: 0.6, duration: 0.4 }}
+                  className="text-white text-sm mt-2"
+                >
+                  Complete each task one by one
+                </motion.p>
+
+                {/* Animated dots */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1 }}
+                  className="flex gap-1.5 mt-6"
+                >
+                  {[0, 1, 2].map(i => (
+                    <motion.div
+                      key={i}
+                      animate={{ opacity: [0.3, 1, 0.3] }}
+                      transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
+                      className="w-2 h-2 rounded-full bg-white"
+                    />
+                  ))}
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Dark spotlight overlay */}
           {showOverlay && (
             <motion.div
