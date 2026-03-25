@@ -462,8 +462,8 @@ export function RoutineBuilderSheet({
                 >
                   <FluentEmoji emoji={routineEmoji} size={28} />
                   {step === 2 && (
-                    <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-black/15 flex items-center justify-center">
-                      <Pencil className="w-2.5 h-2.5 text-black/60" />
+                    <div className="absolute -bottom-0.5 -left-0.5 w-4 h-4 rounded-full bg-white shadow-sm flex items-center justify-center">
+                      <Pencil className="w-2.5 h-2.5 text-black/50" />
                     </div>
                   )}
                 </button>
