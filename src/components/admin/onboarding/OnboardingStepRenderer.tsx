@@ -2091,6 +2091,7 @@ type DemoPhase =
   | 'spotlight-complete'
   | 'hint-complete'
   | 'celebrate-complete'
+  | 'victory'
   | 'done';
 
 // ─── Mini inline breathing overlay for onboarding ──────────────
@@ -2320,6 +2321,13 @@ function StarterRoutineScreen({ step, onNext }: Props) {
       addTimer(() => setPhase('hint-breathe'), 800);
     } else if (phase === 'spotlight-complete') {
       addTimer(() => setPhase('hint-complete'), 800);
+    } else if (phase === 'victory') {
+      // Big confetti burst for the victory screen
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.3 }, colors: ['#fbbf24', '#2dd4bf', '#a78bfa', '#f472b6', '#34d399'] });
+      addTimer(() => {
+        confetti({ particleCount: 50, spread: 60, origin: { x: 0.2, y: 0.5 }, colors: ['#fbbf24', '#a78bfa'] });
+        confetti({ particleCount: 50, spread: 60, origin: { x: 0.8, y: 0.5 }, colors: ['#2dd4bf', '#f472b6'] });
+      }, 600);
     }
   }, [phase]);
 
@@ -2404,12 +2412,12 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const handleCheckComplete = () => {
     if (phase !== 'hint-complete' && phase !== 'spotlight-complete') return;
     setPhase('celebrate-complete');
-    triggerCelebration(COMPLETE_IDX, 'done');
+    triggerCelebration(COMPLETE_IDX, 'victory');
   };
 
   // Which phases show overlay
   const showReadyToPlay = phase === 'ready-to-play';
-  const showOverlay = phase.startsWith('spotlight') || phase.startsWith('hint') || phase.startsWith('celebrate') || phase === 'feeling-mood' || phase === 'done';
+  const showOverlay = phase.startsWith('spotlight') || phase.startsWith('hint') || phase.startsWith('celebrate') || phase === 'feeling-mood' || phase === 'victory' || phase === 'done';
   // Which task is spotlighted
   const spotlightIdx =
     phase.includes('app') ? 0 :
@@ -2756,6 +2764,139 @@ function StarterRoutineScreen({ step, onNext }: Props) {
           })}
         </div>
       </div>
+
+      {/* Victory overlay — wow moment */}
+      <AnimatePresence>
+        {phase === 'victory' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.4 } }}
+            className="fixed inset-0 z-[70] flex flex-col items-center justify-center px-8"
+            style={{
+              background: 'radial-gradient(ellipse at center, #1a1f3d 0%, #0f1225 100%)',
+            }}
+          >
+            {/* Floating particles background */}
+            {Array.from({ length: 12 }).map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute rounded-full"
+                style={{
+                  width: 4 + (i % 3) * 3,
+                  height: 4 + (i % 3) * 3,
+                  left: `${10 + (i * 7) % 80}%`,
+                  top: `${10 + (i * 11) % 80}%`,
+                  background: ['#2dd4bf', '#a78bfa', '#fbbf24', '#34d399'][i % 4],
+                  opacity: 0.15,
+                }}
+                animate={{
+                  y: [0, -20, 0],
+                  opacity: [0.1, 0.3, 0.1],
+                }}
+                transition={{
+                  duration: 3 + (i % 3),
+                  repeat: Infinity,
+                  delay: i * 0.3,
+                  ease: 'easeInOut',
+                }}
+              />
+            ))}
+
+            {/* Trophy / celebration emoji */}
+            <motion.div
+              initial={{ scale: 0, rotate: -20 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 12, delay: 0.2 }}
+              className="mb-4"
+            >
+              <FluentEmoji emoji="🏆" size={72} />
+            </motion.div>
+
+            {/* Glow ring behind trophy */}
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.1, 0.3] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute rounded-full"
+              style={{
+                width: 120,
+                height: 120,
+                top: 'calc(50% - 120px)',
+                background: 'radial-gradient(circle, rgba(251,191,36,0.25) 0%, transparent 70%)',
+              }}
+            />
+
+            {/* Title */}
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+              className="text-white text-[28px] font-extrabold tracking-tight text-center"
+            >
+              You crushed it!
+            </motion.h2>
+
+            {/* Subtitle */}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7, duration: 0.4 }}
+              className="text-white/50 text-[15px] text-center mt-2 leading-relaxed"
+            >
+              Your first routine is complete
+            </motion.p>
+
+            {/* Stat cards */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1, duration: 0.5 }}
+              className="flex gap-3 mt-8"
+            >
+              {[
+                { emoji: '✅', value: '5', label: 'Tasks Done' },
+                { emoji: '🫁', value: '3', label: 'Breaths' },
+                { emoji: '🌤️', value: '1', label: 'Check-in' },
+              ].map((stat, i) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.2 + i * 0.15, type: 'spring', stiffness: 200, damping: 15 }}
+                  className="flex flex-col items-center px-5 py-3 rounded-2xl bg-white/[0.07] border border-white/10"
+                >
+                  <FluentEmoji emoji={stat.emoji} size={24} />
+                  <span className="text-white text-lg font-bold mt-1">{stat.value}</span>
+                  <span className="text-white/40 text-[11px] font-medium">{stat.label}</span>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Motivational line */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.8, duration: 0.5 }}
+              className="text-white/35 text-[13px] text-center mt-6 italic"
+            >
+              "Small daily resets lead to big transformations"
+            </motion.p>
+
+            {/* CTA button */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2.2, duration: 0.4 }}
+              className="mt-8 w-full"
+            >
+              <NavyButton onClick={() => setPhase('done')}>
+                Let's Go! →
+              </NavyButton>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* CTA — only in done phase */}
       {phase === 'done' && (
