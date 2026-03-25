@@ -2321,6 +2321,13 @@ function StarterRoutineScreen({ step, onNext }: Props) {
       addTimer(() => setPhase('hint-breathe'), 800);
     } else if (phase === 'spotlight-complete') {
       addTimer(() => setPhase('hint-complete'), 800);
+    } else if (phase === 'victory') {
+      // Big confetti burst for the victory screen
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.3 }, colors: ['#fbbf24', '#2dd4bf', '#a78bfa', '#f472b6', '#34d399'] });
+      addTimer(() => {
+        confetti({ particleCount: 50, spread: 60, origin: { x: 0.2, y: 0.5 }, colors: ['#fbbf24', '#a78bfa'] });
+        confetti({ particleCount: 50, spread: 60, origin: { x: 0.8, y: 0.5 }, colors: ['#2dd4bf', '#f472b6'] });
+      }, 600);
     }
   }, [phase]);
 
