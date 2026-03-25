@@ -1348,7 +1348,7 @@ const AppTaskCreate = ({
 
       {/* Date Picker Sheet - Me+ Full Page Style */}
       <Sheet open={showDatePicker} onOpenChange={setShowDatePicker}>
-        <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl" hideCloseButton>
+        <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl z-[10004]" overlayClassName="z-[10004]" hideCloseButton>
           <div className="flex flex-col h-full">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
