@@ -2103,7 +2103,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
   const [cycleCount, setCycleCount] = useState(0);
   const [isCountingDown, setIsCountingDown] = useState(true);
   const [countdownProgress, setCountdownProgress] = useState(0);
-  const totalCycles = 2;
+  const totalCycles = 3;
 
   // Pattern: 4-4-4 (inhale 4s, hold 4s, exhale 4s, no exhale hold)
   const pattern = { inhale: 4, inhaleHold: 4, exhale: 4, exhaleHold: 0 };
