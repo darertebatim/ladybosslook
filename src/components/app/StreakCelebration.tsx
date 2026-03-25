@@ -69,6 +69,9 @@ export const StreakCelebration = ({
     if (open) {
       setIsAnimating(true);
       haptic.success();
+      // Reset for count-up animation
+      setDisplayedStreak(0);
+      setBarAnimated(false);
       if (!hasTriggeredConfetti) {
         setHasTriggeredConfetti(true);
         confetti({
@@ -84,11 +87,33 @@ export const StreakCelebration = ({
           }, 350);
         }
       }
+      // Animate count-up after card slides in
+      setTimeout(() => {
+        const duration = 600; // ms for full count
+        const steps = currentStreak;
+        const interval = Math.max(Math.floor(duration / steps), 30);
+        let current = 0;
+        countRef.current = setInterval(() => {
+          current++;
+          setDisplayedStreak(current);
+          if (current >= currentStreak) {
+            if (countRef.current) clearInterval(countRef.current);
+            haptic.light();
+          }
+        }, interval);
+      }, 400);
+      // Animate bar after a slight delay
+      setTimeout(() => setBarAnimated(true), 500);
     }
   }, [open, hasTriggeredConfetti, currentStreak]);
 
   useEffect(() => {
-    if (!open) setHasTriggeredConfetti(false);
+    if (!open) {
+      setHasTriggeredConfetti(false);
+      setDisplayedStreak(0);
+      setBarAnimated(false);
+      if (countRef.current) clearInterval(countRef.current);
+    }
   }, [open]);
 
   if (!open) return null;
