@@ -802,13 +802,33 @@ const AppHome = () => {
     setSelectedTask(task);
   }, []);
   
-  // Auto-show tap coach mark for new users after 5 seconds (give them time to look around)
+  // Auto-show first coach mark ("mark off your first task") after 3s for brand new users
+  useEffect(() => {
+    if (
+      localStorage.getItem('simora_first_action_celebrated') !== 'true' &&
+      !tasksLoading &&
+      tasks.length > 0 &&
+      completedTaskIds.size === 0 &&
+      totalCompletions === 0 &&
+      !showFirstCoachMark &&
+      !showStreakModal
+    ) {
+      const t = setTimeout(() => {
+        setShowFirstCoachMark(true);
+      }, 3000);
+      return () => clearTimeout(t);
+    }
+  }, [tasksLoading, tasks.length, completedTaskIds.size, totalCompletions, showFirstCoachMark, showStreakModal]);
+
+  // Auto-show tap coach mark for new users after 5 seconds (only after first coach mark is done)
   useEffect(() => {
     if (
       localStorage.getItem('simora_tap_coach_shown') !== 'true' &&
+      localStorage.getItem('simora_first_action_celebrated') === 'true' &&
       !tasksLoading &&
       tasks.length > 0 &&
       !showTapCoachMark &&
+      !showFirstCoachMark &&
       !showStreakModal
     ) {
       const t = setTimeout(() => {
@@ -817,7 +837,7 @@ const AppHome = () => {
       }, 5000);
       return () => clearTimeout(t);
     }
-  }, [tasksLoading, tasks.length, showTapCoachMark, showStreakModal]);
+  }, [tasksLoading, tasks.length, showTapCoachMark, showFirstCoachMark, showStreakModal]);
 
   // When task detail sheet closes after the tap coach mark, show + button spotlight after 2s
   useEffect(() => {
