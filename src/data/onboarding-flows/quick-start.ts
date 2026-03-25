@@ -64,7 +64,7 @@ export const quickStartFlow: OnboardingFlow = {
     {
       id: 'qs-starter-routine',
       type: 'starter-routine',
-      title: 'Here\'s your first routine',
+      title: 'Here\'s your first Reset',
       subtitle: 'A simple daily reset to start your journey',
       buttonLabel: 'Start your first reset',
     },
