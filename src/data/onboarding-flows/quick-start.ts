@@ -55,7 +55,7 @@ export const quickStartFlow: OnboardingFlow = {
       type: 'before-after-visual',
       title: 'Reset your day in minutes',
       subtitle: '',
-      description: 'Ready to see how a 5-minute reset feels?',
+      description: 'Ready to see how a Just 1-minute reset feels?',
       beforeItems: ['Overwhelmed mind', 'Scattered thoughts', 'Low motivation', 'No clear next step'],
       afterItems: ['Calm mind', 'Clear focus', 'One small step', 'Energy to continue'],
       buttonLabel: 'Begin My First Reset',
