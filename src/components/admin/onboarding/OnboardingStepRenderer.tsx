@@ -2354,7 +2354,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
     addTimer(() => {
       setProLinkTransform(null);
       setShowBreathing(true);
-    }, 1400);
+    }, 2500);
   };
 
   const handleBreathingComplete = useCallback(() => {
@@ -2372,7 +2372,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
     addTimer(() => {
       setProLinkTransform(null);
       setShowMoodPicker(true);
-    }, 1400);
+    }, 2500);
   };
 
   const handleMoodSelect = (moodValue: string) => {
