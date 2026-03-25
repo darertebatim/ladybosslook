@@ -55,10 +55,10 @@ export const quickStartFlow: OnboardingFlow = {
       type: 'before-after-visual',
       title: 'Reset your day in minutes',
       subtitle: 'A few minutes with Simora\ncan reset your mind and your day.',
-      description: 'Think of Simora as a little daily reset button\nin your pocket.',
+      description: 'Ready to see how a 5-minute reset feels?',
       beforeItems: ['Overwhelmed mind', 'Scattered thoughts', 'Low motivation', 'No clear next step'],
       afterItems: ['Calm mind', 'Clear focus', 'One small step', 'Energy to continue'],
-      buttonLabel: 'Try your first reset',
+      buttonLabel: 'Begin My First Reset',
     },
     // 4 — Starter routine preview with real task cards
     {
