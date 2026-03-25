@@ -2493,19 +2493,23 @@ function StarterRoutineScreen({ step, onNext }: Props) {
           <p className="text-[15px] text-gray-500 text-center mt-2 relative z-40">{step.subtitle}</p>
         </motion.div>
 
-        {/* Instruction text — only shows during spotlight/hint/done phases */}
-        {instructionText && (
-          <motion.p
-            key={phase}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="text-center text-[15px] text-white font-semibold mt-3 mb-6 relative z-40 flex items-center justify-center gap-1.5"
-          >
-            {instructionText}
-          </motion.p>
-        )}
-        {!instructionText && <div className="mt-3 mb-6" />}
+        {/* Instruction text — fixed-height container so it never shifts task cards */}
+        <div className="relative mt-3 mb-6 h-6">
+          <AnimatePresence>
+            {instructionText && (
+              <motion.p
+                key={phase}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="absolute inset-0 text-center text-[15px] text-white font-semibold z-40 flex items-center justify-center gap-1.5"
+              >
+                {instructionText}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* Task Cards */}
         <div className="space-y-3 relative">
