@@ -108,7 +108,7 @@ export const TaskTimerScreen = ({
   // Done screen
   if (isDone) {
     return (
-      <div className={cn('fixed inset-0 z-[10004] flex flex-col', colorClass)}>
+      <div className={cn('fixed inset-0 z-[10100] flex flex-col', colorClass)}>
         <div className="flex-1 flex flex-col items-center justify-center px-6">
           {/* Large emoji */}
           <div className="mb-4">
@@ -136,7 +136,7 @@ export const TaskTimerScreen = ({
   }
 
   return (
-    <div className={cn('fixed inset-0 z-[10004] flex flex-col', colorClass)}>
+    <div className={cn('fixed inset-0 z-[10100] flex flex-col', colorClass)}>
       {/* Header with task info - includes safe area */}
       <div 
         className="flex flex-col items-center px-6 pt-8"

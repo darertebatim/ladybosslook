@@ -90,7 +90,7 @@ export function PushNotificationOnboarding({
 
   return (
     <div 
-      className="fixed inset-0 z-[10001] flex flex-col justify-end"
+      className="fixed inset-0 flex flex-col justify-end"
       data-pn-onboarding="true"
     >
       {/* Dimmed overlay */}

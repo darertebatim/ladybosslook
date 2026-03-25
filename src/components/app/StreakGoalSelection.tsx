@@ -59,7 +59,7 @@ export const StreakGoalSelection = ({
 
   return (
     <OverlayPortal>
-    <div className="fixed inset-0 z-[10004] flex flex-col">
+    <div className="fixed inset-0 z-[10100] flex flex-col">
       {/* Purple gradient background */}
       <div 
         className="absolute inset-0"

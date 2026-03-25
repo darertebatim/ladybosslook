@@ -35,8 +35,8 @@ export function ActionLimitSheet({ open, onOpenChange, onTakeChallenge }: Action
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="p-0 border-0 overflow-hidden focus:outline-none [&>button]:hidden z-[10003]"
-        overlayClassName="z-[10003]"
+        className="p-0 border-0 overflow-hidden focus:outline-none [&>button]:hidden"
+       
         style={{ borderRadius: '28px 28px 0 0', height: '82vh' }}
       >
         <div
