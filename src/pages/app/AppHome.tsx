@@ -1146,7 +1146,7 @@ const AppHome = () => {
                     </div>
                     <button
                       onClick={handleFabClick}
-                      className="w-8 h-8 rounded-full bg-urgency text-urgency-foreground shadow-sm flex items-center justify-center active:scale-90 transition-transform mr-2"
+                      className="coach-add-btn w-8 h-8 rounded-full bg-urgency text-urgency-foreground shadow-sm flex items-center justify-center active:scale-90 transition-transform mr-2"
                     >
                       <Plus className="h-4 w-4" />
                     </button>
