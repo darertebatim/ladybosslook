@@ -54,7 +54,7 @@ export const quickStartFlow: OnboardingFlow = {
       id: 'qs-before-after',
       type: 'before-after-visual',
       title: 'Reset your day in minutes',
-      subtitle: 'A few minutes with Simora\ncan reset your mind and your day.',
+      subtitle: '',
       description: 'Ready to see how a 5-minute reset feels?',
       beforeItems: ['Overwhelmed mind', 'Scattered thoughts', 'Low motivation', 'No clear next step'],
       afterItems: ['Calm mind', 'Clear focus', 'One small step', 'Energy to continue'],
