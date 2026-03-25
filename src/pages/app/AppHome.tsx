@@ -127,6 +127,11 @@ const AppHome = () => {
   
   // Second coach mark: "Tap to manage" - shown after first-action celebration closes
   const [showTapCoachMark, setShowTapCoachMark] = useState(false);
+  // Track that tap coach mark was triggered (to chain the + button spotlight)
+  const tapCoachMarkTriggeredRef = useRef(false);
+  
+  // Third coach mark: "Tap + to add" - shown after user closes task detail from tap coach mark
+  const [showAddCoachMark, setShowAddCoachMark] = useState(false);
   
   // Streak goal selection state
   const [showGoalSelection, setShowGoalSelection] = useState(false);
