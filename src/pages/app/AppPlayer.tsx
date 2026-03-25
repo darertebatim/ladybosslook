@@ -165,6 +165,15 @@ export default function AppPlayer() {
     return playlist.language === preferredLanguage;
   };
 
+  // Map profile language codes to playlist language values
+  const PROFILE_TO_PLAYLIST_LANG: Record<string, string> = {
+    fa: 'persian',
+    en: 'american',
+    tr: 'turkish',
+    es: 'spanish',
+  };
+  const mappedUserLanguage = userPreferredLanguage ? PROFILE_TO_PLAYLIST_LANG[userPreferredLanguage] || userPreferredLanguage : null;
+
   // Filter and sort playlists - preferred language first
   const filteredPlaylists = playlists
     ?.filter(p => !p.is_hidden)
@@ -174,9 +183,9 @@ export default function AppPlayer() {
     ?.filter(filterPlaylistBySearch)
     ?.filter(filterPlaylistByProgress)
     ?.sort((a, b) => {
-      if (!userPreferredLanguage || userPreferredLanguage === 'all') return 0;
-      const aMatch = a.language === userPreferredLanguage ? 0 : 1;
-      const bMatch = b.language === userPreferredLanguage ? 0 : 1;
+      if (!mappedUserLanguage) return 0;
+      const aMatch = a.language === mappedUserLanguage ? 0 : 1;
+      const bMatch = b.language === mappedUserLanguage ? 0 : 1;
       return aMatch - bMatch;
     }) || [];
 
