@@ -2111,6 +2111,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
   const [cycleCount, setCycleCount] = useState(0);
   const [isCountingDown, setIsCountingDown] = useState(true);
   const [countdownProgress, setCountdownProgress] = useState(0);
+  const [phaseSecondsLeft, setPhaseSecondsLeft] = useState(0);
   const totalCycles = 3;
 
   // Pattern: 4-4-4 (inhale 4s, hold 4s, exhale 4s, no exhale hold)
@@ -2122,6 +2123,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     if (countdown <= 0) {
       setIsCountingDown(false);
       setBreathPhase('inhale');
+      setPhaseSecondsLeft(pattern.inhale);
       return;
     }
     const t = setTimeout(() => setCountdown(c => c - 1), 1000);
@@ -2131,10 +2133,24 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
   // Animate countdown progress ring
   useEffect(() => {
     if (!isCountingDown) return;
-    // countdown goes 3 -> 2 -> 1 -> 0, progress goes 0 -> 1
     const progress = (3 - countdown) / 3;
     setCountdownProgress(progress);
   }, [countdown, isCountingDown]);
+
+  // Per-phase second countdown (4, 3, 2, 1)
+  useEffect(() => {
+    if (isCountingDown || breathPhase === 'ready' || breathPhase === 'exhale_hold') return;
+    const t = setInterval(() => {
+      setPhaseSecondsLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(t);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, [breathPhase, isCountingDown, cycleCount]);
 
   // Breathing cycle state machine
   useEffect(() => {
@@ -2167,12 +2183,15 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
         return;
       }
       setBreathPhase('inhale');
+      setPhaseSecondsLeft(pattern.inhale);
       return;
     }
 
-    // After exhale, go directly to exhale_hold (which will immediately cycle)
     const t = setTimeout(() => {
-      setBreathPhase(nextPhase[breathPhase]);
+      const np = nextPhase[breathPhase];
+      setBreathPhase(np);
+      const nextDur = durations[np];
+      if (nextDur > 0) setPhaseSecondsLeft(nextDur);
     }, dur);
 
     return () => clearTimeout(t);
