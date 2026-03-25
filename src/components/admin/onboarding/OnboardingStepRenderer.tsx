@@ -223,7 +223,7 @@ function WelcomeScreen({ step, onNext }: Props) {
       )}
 
       {/* Bottom sheet with rounded top */}
-      <div className="absolute inset-x-0 bottom-0 h-[55%] bg-white rounded-t-[28px] flex flex-col items-center px-6 pb-5 pt-7 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-hidden">
+      <div className="absolute inset-x-0 bottom-0 h-[58%] bg-white rounded-t-[28px] flex flex-col items-center px-6 pb-5 pt-7 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 20px)' }}>
         {/* Sparkles scattered in the white space */}
         <div className="absolute top-6 left-8 text-amber-300/60 animate-pulse" style={{ animationDelay: '0s', animationDuration: '2.5s' }}>✦</div>
         <div className="absolute top-10 right-12 text-purple-300/50 animate-pulse text-xs" style={{ animationDelay: '0.8s', animationDuration: '3s' }}>✦</div>
@@ -255,20 +255,25 @@ function WelcomeScreen({ step, onNext }: Props) {
         </FadeUp>
         <FadeUp delay={0.4} className="mt-auto w-full relative z-10">
           {step.description && (
-            <div className="mb-4 w-full rounded-2xl border-2 border-dashed border-amber-400 bg-amber-50/60 px-5 py-4 relative overflow-hidden">
+            <div className="mb-3 w-full rounded-2xl border-2 border-dashed border-amber-400 bg-amber-50/60 px-5 py-4 relative overflow-hidden">
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 text-2xl">🎁</div>
               <p className="text-center text-[16px] text-[#1a1f3d] font-bold whitespace-pre-line leading-snug mt-3">{step.description}</p>
             </div>
           )}
-          <button
-            onClick={onNext}
-            className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-          >
-            {step.buttonLabel}
-            <span className="text-base">→</span>
-          </button>
+          <div className="relative">
+            <div className="absolute -top-3 right-3 z-10 bg-amber-100 text-[#1a1f3d] text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm border border-amber-300 whitespace-nowrap">
+              ⏱ Under 3 min
+            </div>
+            <button
+              onClick={onNext}
+              className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            >
+              {step.buttonLabel}
+              <span className="text-base">→</span>
+            </button>
+          </div>
           {step.secondaryButtonLabel && (
-            <p className="text-center text-sm text-[#1a1f3d]/60 mt-3">
+            <p className="text-center text-sm text-[#1a1f3d]/60 mt-2">
               Already a member?{' '}
               <Link to="/auth?mode=signin&skip_onboarding=true" className="text-[#4CAF50] font-semibold hover:underline">
                 Sign in.
