@@ -362,6 +362,9 @@ export const TaskCard = memo(function TaskCard({
       ['.', '0', 'confirm'],
     ];
 
+    // Pro-task types that are simple navigation links — auto-complete on tap
+    const isSimpleNavProTask = proLinkType && ['route', 'inspire', 'planner', 'channel', 'program'].includes(proLinkType);
+
     const handleProCircleClick = (e: React.MouseEvent) => {
       e.stopPropagation();
       
@@ -383,6 +386,22 @@ export const TaskCard = memo(function TaskCard({
       if (proLinkType === 'weight') {
         setWeightOpen(true);
         return;
+      }
+
+      // Simple navigation pro-tasks: mark complete and navigate
+      if (isSimpleNavProTask && !hasGoal) {
+        playCompletionSound();
+        completeTask.mutate({ taskId: task.id, date }, {
+          onSuccess: (result) => {
+            if (result.streakIncreased && onStreakIncrease) {
+              haptic.medium();
+              onStreakIncrease();
+            }
+            if (result.unlockedStep && onStepUnlocked) {
+              onStepUnlocked(result.unlockedStep);
+            }
+          }
+        });
       }
       
       // Navigate to the tool
