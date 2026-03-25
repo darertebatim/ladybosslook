@@ -873,7 +873,7 @@ const AppHome = () => {
               {/* Mood check-in button – hidden for now, re-enable from admin/app */}
               
               {/* Streak badge - navigates to presence page */}
-              <button onClick={() => navigate('/app/presence')} className="tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-sm active:scale-95 transition-transform">
+              <button onClick={() => navigate('/app/presence')} className={cn("tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full shadow-sm active:scale-95 transition-all", streak?.current_streak ? "bg-gradient-to-r from-orange-400 to-orange-500 text-white" : "bg-muted text-muted-foreground")}>
                 <Flame className="h-4 w-4 fill-current" />
                 <span className="text-sm font-semibold">{streak?.current_streak || 0}</span>
               </button>
