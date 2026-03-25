@@ -128,15 +128,11 @@ export const TaskCard = memo(function TaskCard({
   const getRepeatLabel = (task: UserTask): string => {
     const p = task.repeat_pattern;
     if (!p || p === 'none') {
-      // Carry-forward: show original date if scheduled_date is before the viewing date
       if (task.scheduled_date) {
         const scheduledDate = parseISO(task.scheduled_date);
-        const viewingDate = startOfDay(date);
-        if (isBefore(scheduledDate, viewingDate)) {
-          return fnsFormat(scheduledDate, 'MMM d');
-        }
+        return fnsFormat(scheduledDate, 'MMM d');
       }
-      return 'Today';
+      return fnsFormat(date, 'MMM d');
     }
     if (p === 'daily') return 'Daily';
     if (p === 'weekly') return 'Weekly';
