@@ -2545,7 +2545,70 @@ function StarterRoutineScreen({ step, onNext }: Props) {
             )}
           </AnimatePresence>
 
-          {/* Dark spotlight overlay */}
+          {/* ProLink Transform micro-interaction overlay */}
+          <AnimatePresence>
+            {proLinkTransform && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-[#1a1f3d]/85 backdrop-blur-md"
+              >
+                {/* Morphing icon container */}
+                <div className="relative w-24 h-24 flex items-center justify-center">
+                  {/* Task emoji — shrinks and fades */}
+                  <motion.div
+                    initial={{ scale: 1, opacity: 1 }}
+                    animate={{ scale: 0.3, opacity: 0, rotate: -30 }}
+                    transition={{ duration: 0.5, ease: 'easeIn' }}
+                    className="absolute"
+                  >
+                    <FluentEmoji emoji={proLinkTransform.emoji} size={56} />
+                  </motion.div>
+
+                  {/* Expanding ring */}
+                  <motion.div
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: [0.5, 1.6, 2], opacity: [0, 0.5, 0] }}
+                    transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
+                    className="absolute w-24 h-24 rounded-full border-2 border-white/40"
+                  />
+
+                  {/* Tool emoji — grows in */}
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0, rotate: 30 }}
+                    animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                    transition={{ delay: 0.4, duration: 0.5, type: 'spring', stiffness: 200, damping: 12 }}
+                    className="absolute"
+                  >
+                    <FluentEmoji emoji={proLinkTransform.toolEmoji} size={64} />
+                  </motion.div>
+                </div>
+
+                {/* Label */}
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6, duration: 0.3 }}
+                  className="text-white text-lg font-semibold mt-6 tracking-wide"
+                >
+                  {proLinkTransform.label}
+                </motion.p>
+
+                {/* "Pro Link" badge */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.8, duration: 0.3 }}
+                  className="mt-3 px-3 py-1 rounded-full bg-white/10 border border-white/20"
+                >
+                  <p className="text-white/70 text-xs font-medium tracking-wider">⚡ PRO LINK — One Tap Launch</p>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+
           {showOverlay && (
             <motion.div
               initial={{ opacity: 0 }}
