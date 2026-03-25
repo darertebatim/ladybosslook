@@ -1257,7 +1257,7 @@ const AppHome = () => {
                         return showFirstCoachMark && hintTask ? (
                           <>
                             {/* Dark overlay behind everything */}
-                            <div className="fixed inset-0 bg-black/60 z-[100] pointer-events-none animate-fade-in" />
+                            <div className="fixed inset-0 bg-black/60 z-[100] animate-fade-in" onClick={() => setShowFirstCoachMark(false)} />
                             
                             {/* Spotlighted task card + hint — disable body tap so only checkbox works */}
                             <div className="relative z-[101]">
