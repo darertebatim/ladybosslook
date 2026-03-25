@@ -2097,7 +2097,9 @@ type DemoPhase =
   | 'hint-complete'
   | 'celebrate-complete'
   | 'victory'
-  | 'done';
+  | 'done'
+  | 'transition-mood'
+  | 'transition-breathe';
 
 // ─── Mini inline breathing overlay for onboarding ──────────────
 
@@ -2363,6 +2365,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
   const handleBreatheTap = () => {
     if (phase !== 'hint-breathe' && phase !== 'spotlight-breathe') return;
+    setPhase('transition-breathe' as DemoPhase);
     setProLinkTransform({ emoji: '🫁', toolEmoji: '🌬️', label: 'Opening Breathe...' });
     addTimer(() => {
       setProLinkTransform(null);
@@ -2381,6 +2384,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
   const handleMoodTap = () => {
     if (phase !== 'hint-mood' && phase !== 'spotlight-mood') return;
+    setPhase('transition-mood' as DemoPhase);
     setProLinkTransform({ emoji: '🌤️', toolEmoji: '🎭', label: 'Opening Mood Check-in...' });
     addTimer(() => {
       setProLinkTransform(null);
