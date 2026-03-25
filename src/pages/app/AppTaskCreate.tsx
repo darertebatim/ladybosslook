@@ -2601,7 +2601,7 @@ const AppTaskCreate = ({
           <SheetContent 
             side="bottom" 
             className="h-[90vh] rounded-t-3xl px-0 pt-0 pb-0 border-0 pointer-events-auto"
-            overlayClassName="z-[10003] pointer-events-auto"
+            overlayClassName="pointer-events-auto"
             style={{ backgroundColor: bgColor }}
             hideCloseButton
           >

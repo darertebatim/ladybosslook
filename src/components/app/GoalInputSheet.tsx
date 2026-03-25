@@ -52,8 +52,8 @@ export const GoalInputSheet = ({
     <Sheet open={open} onOpenChange={handleClose}>
       <SheetContent 
         side="bottom" 
-        className="rounded-t-3xl px-4 pt-6 pb-8 bg-gradient-to-b from-white to-[#E8F5F0] z-[10003]"
-        overlayClassName="z-[10003]"
+        className="rounded-t-3xl px-4 pt-6 pb-8 bg-gradient-to-b from-white to-[#E8F5F0]"
+       
         style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}
       >
         {/* Header */}
