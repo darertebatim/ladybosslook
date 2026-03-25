@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
 import { supabase } from '@/integrations/supabase/client';
 import confetti from 'canvas-confetti';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
