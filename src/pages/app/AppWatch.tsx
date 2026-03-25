@@ -127,6 +127,7 @@ export default function AppWatch() {
     },
   });
 
+  const { data: enrollments } = useEnrollments();
   const userLang = useUserPreferredLanguage();
   const isLoading = playlistsLoading;
 
