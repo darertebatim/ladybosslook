@@ -117,7 +117,8 @@ export function ImmersiveBreathingCircle({
         />
 
         {/* Center content */}
-        <div className="absolute flex flex-col items-center justify-center z-10" style={{ width: '35%', height: '35%' }}>
+        {/* Center content — fixed size so text never jumps */}
+        <div className="absolute flex flex-col items-center justify-center z-10" style={{ width: '60%', height: '60%' }}>
           {isCountingDown ? (
             <span
               key={countdownValue}
@@ -129,7 +130,7 @@ export function ImmersiveBreathingCircle({
           ) : (
             <>
               <span
-                className={`${isHolding ? 'text-2xl' : 'text-xl'} font-light ${isHolding ? 'text-white/95' : 'text-white/90'} tracking-wider transition-all duration-300`}
+                className="text-2xl font-light text-white/90 tracking-wider transition-all duration-300 text-center"
                 style={{ textShadow: isHolding ? '0 0 20px rgba(168,85,247,0.5)' : '0 0 15px rgba(139,92,246,0.3)' }}
               >
                 {phaseText}
