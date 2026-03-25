@@ -26,7 +26,7 @@ export function StreakGoalConfirmation({ open, goal, onClose }: StreakGoalConfir
   return (
     <OverlayPortal>
     <div
-      className="fixed inset-0 z-[10004] flex flex-col"
+      className="fixed inset-0 z-[10100] flex flex-col"
       style={{
         background: 'linear-gradient(160deg, hsl(25 95% 60%) 0%, hsl(15 88% 50%) 50%, hsl(5 80% 42%) 100%)',
       }}

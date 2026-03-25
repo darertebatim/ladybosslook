@@ -103,7 +103,7 @@ export const GoldStreakCelebration = ({
   return (
     <OverlayPortal>
     <div 
-      className="fixed inset-0 z-[10004] flex flex-col"
+      className="fixed inset-0 z-[10100] flex flex-col"
       onClick={onClose}
     >
       {/* Elegant dark gradient background */}

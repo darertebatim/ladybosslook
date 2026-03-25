@@ -199,7 +199,7 @@ export function BadgeCelebration({
     if (type === 'action') {
       return (
         <div 
-          className="fixed left-4 right-4 z-[10004] animate-in slide-in-from-bottom-4 duration-300"
+          className="fixed left-4 right-4 z-[10100] animate-in slide-in-from-bottom-4 duration-300"
           style={{ bottom: 'calc(80px + env(safe-area-inset-bottom, 0px) + 16px)' }}
           onClick={onClose}
         >
@@ -225,7 +225,7 @@ export function BadgeCelebration({
 
     return (
       <div 
-        className="fixed left-4 right-4 z-[10004] animate-in slide-in-from-bottom-4 duration-300"
+        className="fixed left-4 right-4 z-[10100] animate-in slide-in-from-bottom-4 duration-300"
         style={{ bottom: 'calc(80px + env(safe-area-inset-bottom, 0px) + 16px)' }}
         onClick={onClose}
       >
@@ -287,7 +287,7 @@ export function BadgeCelebration({
   return (
     <OverlayPortal>
     <div 
-      className="fixed inset-0 z-[10004] flex items-end justify-center"
+      className="fixed inset-0 z-[10100] flex items-end justify-center"
     >
       {/* Dark overlay with rays effect */}
       <div className="absolute inset-0 bg-black/80">
