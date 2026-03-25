@@ -1082,7 +1082,7 @@ const AppHome = () => {
               ) : filteredTasks.length > 0 || (!isNewUser && taskFilter !== 'all') ? (
                 <div>
                   {/* Shared animated 3-pill switcher */}
-                  <div className="flex items-center mb-3">
+                  <div className="flex items-center justify-between mb-3">
                     <div className="relative inline-flex bg-muted rounded-full p-0.5">
                       <motion.div
                         className="absolute top-0.5 bottom-0.5 rounded-full bg-background shadow-sm"
@@ -1127,6 +1127,12 @@ const AppHome = () => {
                         One-Time
                       </button>
                     </div>
+                    <button
+                      onClick={handleFabClick}
+                      className="w-8 h-8 rounded-full bg-urgency text-urgency-foreground shadow-sm flex items-center justify-center active:scale-90 transition-transform"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
                   </div>
 
                   {homeView === 'routines' ? (
