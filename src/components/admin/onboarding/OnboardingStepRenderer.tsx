@@ -2513,7 +2513,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                   transition={{ delay: 0.6, duration: 0.4 }}
                   className="text-white text-sm mt-2"
                 >
-                  Complete each task one by one
+                  Don't just list tasks. Automate them. One tap Plays your Tasks
                 </motion.p>
 
                 {/* Animated dots */}
