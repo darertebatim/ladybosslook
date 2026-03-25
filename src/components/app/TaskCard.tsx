@@ -136,7 +136,9 @@ export const TaskCard = memo(function TaskCard({
           return fnsFormat(scheduledDate, 'MMM d');
         }
       }
-      return 'Today';
+      return fnsFormat(scheduledDate, 'MMM d');
+    }
+    return fnsFormat(date, 'MMM d');
     }
     if (p === 'daily') return 'Daily';
     if (p === 'weekly') return 'Weekly';
