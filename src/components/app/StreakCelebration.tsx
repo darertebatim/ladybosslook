@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { getDay } from 'date-fns';
 import { useAppReview } from '@/hooks/useAppReview';
 import { Button } from '@/components/ui/button';
@@ -41,9 +41,6 @@ export const StreakCelebration = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false);
   const [showReviewPrompt, setShowReviewPrompt] = useState(false);
-  const [displayedStreak, setDisplayedStreak] = useState(0);
-  const [barAnimated, setBarAnimated] = useState(false);
-  const countRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const handleClose = async () => {
     onClose();
@@ -69,9 +66,6 @@ export const StreakCelebration = ({
     if (open) {
       setIsAnimating(true);
       haptic.success();
-      // Reset for count-up animation
-      setDisplayedStreak(0);
-      setBarAnimated(false);
       if (!hasTriggeredConfetti) {
         setHasTriggeredConfetti(true);
         confetti({
@@ -87,33 +81,11 @@ export const StreakCelebration = ({
           }, 350);
         }
       }
-      // Animate count-up after card slides in
-      setTimeout(() => {
-        const duration = 600; // ms for full count
-        const steps = currentStreak;
-        const interval = Math.max(Math.floor(duration / steps), 30);
-        let current = 0;
-        countRef.current = setInterval(() => {
-          current++;
-          setDisplayedStreak(current);
-          if (current >= currentStreak) {
-            if (countRef.current) clearInterval(countRef.current);
-            haptic.light();
-          }
-        }, interval);
-      }, 400);
-      // Animate bar after a slight delay
-      setTimeout(() => setBarAnimated(true), 500);
     }
   }, [open, hasTriggeredConfetti, currentStreak]);
 
   useEffect(() => {
-    if (!open) {
-      setHasTriggeredConfetti(false);
-      setDisplayedStreak(0);
-      setBarAnimated(false);
-      if (countRef.current) clearInterval(countRef.current);
-    }
+    if (!open) setHasTriggeredConfetti(false);
   }, [open]);
 
   if (!open) return null;
@@ -124,7 +96,6 @@ export const StreakCelebration = ({
 
   // How many days this week the user has been active (streak capped to week position)
   const streakDaysThisWeek = Math.min(currentStreak, todayIndex + 1);
-  const animatedDaysThisWeek = Math.min(displayedStreak, todayIndex + 1);
 
   const getMessage = () => {
     if (currentStreak === 1) return "A streak is born! Keep it up\nevery day to help it grow.";
@@ -136,7 +107,6 @@ export const StreakCelebration = ({
 
   // Week progress percentage (out of 7 days)
   const progressPercent = Math.min((streakDaysThisWeek / 7) * 100, 100);
-  const animatedProgress = barAnimated ? progressPercent : 0;
 
   return (
     <OverlayPortal>
@@ -174,8 +144,8 @@ export const StreakCelebration = ({
             'text-center mb-1 transition-all duration-500 delay-150',
             isAnimating ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
           )}>
-            <span className="text-6xl font-bold text-orange-400 tabular-nums">
-              {displayedStreak}
+            <span className="text-6xl font-bold text-orange-400">
+              {currentStreak}
             </span>
           </div>
           <p className="text-center text-white/50 text-sm mb-4">
@@ -191,23 +161,19 @@ export const StreakCelebration = ({
           <div className="mb-2">
             <div className="relative h-3 bg-white/10 rounded-full overflow-hidden">
               <div
-                className="absolute inset-y-0 left-0 rounded-full"
+                className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
                 style={{
-                  width: `${animatedProgress}%`,
+                  width: `${progressPercent}%`,
                   background: 'repeating-linear-gradient(45deg, #fb923c, #fb923c 6px, #fdba74 6px, #fdba74 12px)',
-                  transition: 'width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 }}
               />
             </div>
             {/* Small flame indicator below the bar */}
-            {barAnimated && animatedProgress > 0 && (
+            {progressPercent > 0 && (
               <div className="relative h-0">
                 <div
-                  className="absolute -top-[22px] -translate-x-1/2"
-                  style={{ 
-                    left: `${animatedProgress}%`,
-                    transition: 'left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  }}
+                  className="absolute -top-[22px] -translate-x-1/2 transition-all duration-700"
+                  style={{ left: `${progressPercent}%` }}
                 >
                   <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center shadow-lg">
                     <Flame className="w-3 h-3 text-white" fill="currentColor" />
@@ -220,7 +186,7 @@ export const StreakCelebration = ({
           {/* Weekday labels */}
           <div className="flex justify-between px-1 mb-8">
             {WEEKDAY_LABELS.map((label, i) => {
-              const isActive = i < animatedDaysThisWeek;
+              const isActive = i < streakDaysThisWeek;
               const isToday = i === todayIndex;
               return (
                 <span
