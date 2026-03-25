@@ -1435,6 +1435,53 @@ const AppHome = () => {
           <div style={{ height: isKeyboardOpen ? '24px' : '120px' }} />
         </div>
 
+        {/* + Button Coach Mark Spotlight */}
+        {showAddCoachMark && (
+          <>
+            <div className="fixed inset-0 bg-black/60 z-[100] animate-fade-in" onClick={() => setShowAddCoachMark(false)} />
+            <div className="fixed z-[101] animate-fade-in" style={{ top: (() => { const el = document.querySelector('.coach-add-btn'); if (!el) return '200px'; const rect = el.getBoundingClientRect(); return `${rect.top - 8}px`; })(), right: (() => { const el = document.querySelector('.coach-add-btn'); if (!el) return '16px'; const rect = el.getBoundingClientRect(); return `${window.innerWidth - rect.right + rect.width / 2 - 24}px`; })() }}>
+              <div className="relative">
+                <button
+                  onClick={() => { setShowAddCoachMark(false); handleFabClick(); }}
+                  className="w-12 h-12 rounded-full bg-urgency text-urgency-foreground shadow-lg flex items-center justify-center"
+                  style={{ boxShadow: '0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35)', animation: 'addBtnGlow 1.6s ease-in-out infinite' }}
+                >
+                  <Plus className="h-5 w-5" />
+                </button>
+                {/* Bouncing hand */}
+                <div
+                  className="absolute pointer-events-none"
+                  style={{
+                    top: '-10px',
+                    left: '-30px',
+                    transform: 'rotate(-45deg)',
+                    filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
+                    animation: 'addCoachBounce 1.4s ease-in-out infinite',
+                  }}
+                >
+                  <FluentEmoji emoji="👇" size={64} />
+                </div>
+              </div>
+              <p className="text-center text-sm text-white/90 mt-3 font-medium whitespace-nowrap" style={{ marginLeft: '-60px' }}>
+                Tap + to add a new task
+              </p>
+            </div>
+            <style>{`
+              @keyframes addCoachBounce {
+                0%   { transform: rotate(-45deg) translateY(0px); }
+                40%  { transform: rotate(-45deg) translateY(10px); }
+                55%  { transform: rotate(-45deg) translateY(5px); }
+                70%  { transform: rotate(-45deg) translateY(10px); }
+                100% { transform: rotate(-45deg) translateY(0px); }
+              }
+              @keyframes addBtnGlow {
+                0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
+                50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
+              }
+            `}</style>
+          </>
+        )}
+
         {/* FAB */}
         {!isKeyboardOpen && (
           <button onClick={handleFabClick} className="tour-add-task fixed right-4 w-14 h-14 rounded-full bg-urgency text-urgency-foreground shadow-cta flex items-center justify-center hover:bg-urgency-dark active:scale-95 transition-all z-50" style={{
