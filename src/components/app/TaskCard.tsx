@@ -130,9 +130,13 @@ export const TaskCard = memo(function TaskCard({
     if (!p || p === 'none') {
       if (task.scheduled_date) {
         const scheduledDate = parseISO(task.scheduled_date);
+        const viewingDate = startOfDay(date);
+        if (isSameDay(scheduledDate, viewingDate)) {
+          return 'Today';
+        }
         return fnsFormat(scheduledDate, 'MMM d');
       }
-      return fnsFormat(date, 'MMM d');
+      return 'Today';
     }
     if (p === 'daily') return 'Daily';
     if (p === 'weekly') return 'Weekly';
