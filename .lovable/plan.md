@@ -1,92 +1,69 @@
 
 
-# Haptic Feedback Enhancement Plan
+## Problem
 
-## Current State
-Haptics are already used in **109 files** — primarily on keypads, celebrations, form inputs, and some buttons. However, many core interactions lack haptic feedback, making the app feel flat on silent iPhones.
+The current approach uses hardcoded z-index values (10000-10004) for every sheet, dialog, and overlay. This is fundamentally fragile because:
 
-## Missing Haptic Areas
+1. When a sheet (e.g., Task Builder at z-10003) opens a nested sheet (e.g., Date Picker), they need different z-levels
+2. Every time we fix one layer, we bump it up and break another
+3. The same component (AppTaskCreate) can be opened from different contexts (home page, routine builder), requiring different z-levels each time
 
-### 1. Bottom Navigation Bar (NativeAppLayout.tsx)
-- **No haptics on tab taps** — this is the most-tapped area of the app
-- Add `haptic.light()` on every tab tap, `haptic.medium()` on home re-tap
+Right now, AppTaskCreate's main sheet AND all its nested sheets are ALL at z-[10004] -- same level -- so nested sheets appear behind the parent.
 
-### 2. Tab/Segment Switchers
-Files with animated switchers (home view toggle, filter tabs) that lack haptics on selection change:
-- `AppHome.tsx` — Routine Players / My Tasks switcher
-- `AppInspire.tsx` — category tabs
-- `AppWatch.tsx` — category/filter tabs  
-- `AppPlayer.tsx` — section tabs
-- `AppPrograms.tsx` — tab switches
-- `AppMoodHistory.tsx`, `AppJournal.tsx` — filter tabs
+## Solution: Dynamic Z-Index Stacking Context
 
-### 3. Pull-to-Refresh / Scroll Events
-- Add `haptic.light()` at pull-to-refresh trigger threshold (if implemented)
+Create a React Context (`ZStackProvider`) that automatically assigns incrementing z-index values to nested portals. Each layer that opens gets the next z-index automatically -- no hardcoding needed.
 
-### 4. Task Interactions (TaskCard.tsx)
-- Task completion checkbox tap — already has haptics via checkbox component, but the card's `onTap` handler may not
-- Subtask toggle — verify haptic on toggle
+```text
+ZStackProvider (base: 10000)
+  └─ Dialog (auto: 10000)
+  └─ Sheet / RoutineBuilder (auto: 10000)
+       └─ AppTaskCreate (auto: 10001)  ← automatically +1
+            └─ DatePicker sheet (auto: 10002) ← automatically +1
+  └─ Celebration overlay (auto: 10000, but uses OverlayPortal which resets to top)
+```
 
-### 5. Routine Cards & Action Cards
-- `RoutineBankCard.tsx`, `WelcomeRoutineCard.tsx`, `ChallengeRoutineCard.tsx` — tapping to open
-- `ToolCard.tsx` — tool selection
-- `ProgramCard.tsx`, `EnrolledProgramCard.tsx` — program cards
+## Implementation Steps
 
-### 6. Sheet/Modal Open Triggers
-- Many buttons that open sheets (settings, filters, pickers) lack haptics
-- `BackButton.tsx` — navigation back
+### 1. Create `ZStackContext` (`src/contexts/ZStackContext.tsx`)
+- A React context holding a `level` number (default 10000)
+- A `ZStackProvider` component that reads the parent level and provides `parentLevel + 1`
+- A `useZIndex()` hook that returns the current level
 
-### 7. Destructive Actions
-- Delete confirmations should use `haptic.warning()` before confirm
-- `haptic.error()` on failed actions (network errors, validation failures)
+### 2. Create a wrapper component `ZLayer` (`src/components/ui/z-layer.tsx`)
+- Wraps children in `ZStackProvider`
+- Applies `style={{ zIndex }}` to both overlay and content
+- Used as a drop-in replacement for manual z-index classes
 
-### 8. Long Press / Context Menus
-- Task long-press for reorder already has `haptic.medium()` — good
-- Any other long-press triggers should get `haptic.medium()`
+### 3. Update `SheetContent` in `sheet.tsx`
+- Integrate with `useZIndex()` -- if no explicit z-index class is provided, auto-apply from context
+- Each `SheetContent` renders a `ZStackProvider` around its children so anything nested gets level+1
 
-### 9. Toast/Notification Feedback
-- Success toasts should pair with `haptic.success()`
-- Error toasts should pair with `haptic.error()`
+### 4. Update `DialogContent` in `dialog.tsx`
+- Same pattern as Sheet
 
-## Implementation Approach
+### 5. Remove ALL hardcoded z-index classes
+- Remove every `z-[10000]`, `z-[10001]`, `z-[10002]`, `z-[10003]`, `z-[10004]` from sheet/dialog usage across ~22 files
+- Celebrations/OverlayPortal keep a high base (e.g., start at 10100) so they always float above sheets
 
-### Batch 1: High-Impact Global Components
-1. **Bottom nav tabs** — `haptic.light()` in `NativeAppLayout.tsx` Link onClick
-2. **BackButton** — `haptic.light()` on tap
-3. **UI Switch component** — already has haptics (confirmed)
-4. **UI Checkbox** — already has haptics (confirmed)
+### 6. Keep OverlayPortal celebrations at a fixed high tier
+- Celebrations use `OverlayPortal` which renders to `document.body` outside the React tree, so they escape the context. Give them a fixed high z-index (10100) since they should always be on top of everything.
 
-### Batch 2: View Switchers & Tabs
-Add `haptic.selection()` to all tab/segment switchers across ~8 pages
+## Benefits
+- Never need to manually assign z-index again
+- Nesting automatically works regardless of depth
+- Adding new sheets or moving components between contexts won't break layering
+- Celebrations always on top via separate fixed tier
 
-### Batch 3: Card Taps & Navigation
-Add `haptic.light()` to all tappable cards that navigate:
-- RoutineBankCard, ToolCard, ProgramCard, etc.
-
-### Batch 4: Celebrations & Feedback
-- Ensure all celebration screens fire `haptic.success()`
-- Add `haptic.warning()` to destructive action confirmations
-- Add `haptic.error()` alongside error toasts
-
-### Batch 5: Micro-interactions
-- Star ratings (`haptic.selection()` per star)
-- Slider value changes
-- Countdown timer completion
-- Fasting start/stop
-
-## Estimated Files to Touch
-~25-30 files, mostly adding 1-2 line `haptic.*()` calls to existing handlers.
-
-## Haptic Type Guide (for consistency)
-| Interaction | Haptic |
-|---|---|
-| Tab/nav tap | `haptic.light()` |
-| Segment/filter switch | `haptic.selection()` |
-| Card tap (navigate) | `haptic.light()` |
-| Button (primary action) | `haptic.light()` |
-| Destructive action | `haptic.warning()` |
-| Celebration/completion | `haptic.success()` |
-| Error/failure | `haptic.error()` |
-| Drag start | `haptic.medium()` |
-| Picker/wheel change | `haptic.selection()` |
+## Files to change
+- **New**: `src/contexts/ZStackContext.tsx`
+- **Edit**: `src/components/ui/sheet.tsx` -- auto z-index from context
+- **Edit**: `src/components/ui/dialog.tsx` -- auto z-index from context
+- **Edit**: `src/components/ui/alert-dialog.tsx` -- auto z-index from context
+- **Edit**: `src/components/ui/popover.tsx` -- auto z-index from context
+- **Edit**: `src/components/ui/select.tsx` -- auto z-index from context
+- **Edit**: `src/components/ui/context-menu.tsx` -- auto z-index from context
+- **Edit**: `src/pages/app/AppTaskCreate.tsx` -- remove all hardcoded z-index
+- **Edit**: ~15 other files -- remove hardcoded z-index classes
+- **Edit**: Celebration components -- use fixed 10100 tier
 
