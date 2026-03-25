@@ -1272,7 +1272,7 @@ const AppHome = () => {
                               return (
                               <div className="relative z-[101]">
                                 <div className="relative">
-                                  <SortableTaskList tasks={[spotlightTask]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                                  <SortableTaskList tasks={[spotlightTask]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); tapCoachMarkTriggeredRef.current = true; handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                                   
                                   {/* Glowing highlight around the action name area */}
                                   <div
