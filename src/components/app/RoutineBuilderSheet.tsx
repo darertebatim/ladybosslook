@@ -462,29 +462,36 @@ export function RoutineBuilderSheet({
                 >
                   <FluentEmoji emoji={routineEmoji} size={28} />
                   {step === 2 && (
-                    <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-black/15 flex items-center justify-center">
-                      <Pencil className="w-2.5 h-2.5 text-black/60" />
+                    <div className="absolute -bottom-0.5 -left-0.5 w-4 h-4 rounded-full bg-white shadow-sm flex items-center justify-center">
+                      <Pencil className="w-2.5 h-2.5 text-black/50" />
                     </div>
                   )}
                 </button>
-                <input
-                  ref={nameInputRef}
-                  value={routineTitle}
-                  onChange={(e) => {
-                    setRoutineTitle(e.target.value.slice(0, 40));
-                    if (step === 1) setShowSuggestions(true);
-                  }}
-                  onFocus={() => { handleNameInputFocus(); if (step === 1) setShowSuggestions(true); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && routineTitle.trim()) {
-                      if (step === 1) handleNext();
-                    }
-                  }}
-                  placeholder="Type routine name..."
-                  className="flex-1 bg-transparent text-[15px] font-semibold text-black dark:text-foreground placeholder:text-black/40 dark:placeholder:text-muted-foreground/50 outline-none"
-                  enterKeyHint={step === 1 ? 'next' : 'done'}
-                  autoComplete="off"
-                />
+                <div className="relative flex-1">
+                  <input
+                    ref={nameInputRef}
+                    value={routineTitle}
+                    onChange={(e) => {
+                      setRoutineTitle(e.target.value.slice(0, 40));
+                      if (step === 1) setShowSuggestions(true);
+                    }}
+                    onFocus={() => { handleNameInputFocus(); if (step === 1) setShowSuggestions(true); }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && routineTitle.trim()) {
+                        if (step === 1) handleNext();
+                      }
+                    }}
+                    placeholder="Type routine name..."
+                    className="w-full bg-transparent text-[15px] font-semibold text-black dark:text-foreground placeholder:text-black/40 dark:placeholder:text-muted-foreground/50 outline-none"
+                    enterKeyHint={step === 1 ? 'next' : 'done'}
+                    autoComplete="off"
+                  />
+                  {step === 2 && (
+                    <div className="absolute -bottom-1.5 left-0 w-4 h-4 rounded-full bg-white shadow-sm flex items-center justify-center">
+                      <Pencil className="w-2.5 h-2.5 text-black/50" />
+                    </div>
+                  )}
+                </div>
               </div>
               {step === 2 && (
               <div className="flex items-center gap-2 mt-2 pl-12">
