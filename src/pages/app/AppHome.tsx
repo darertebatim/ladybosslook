@@ -125,7 +125,7 @@ const AppHome = () => {
   // First action celebration - tracks if this is user's first ever completion (uses unified StreakCelebration)
   const [isFirstActionCelebration, setIsFirstActionCelebration] = useState(false);
   
-  // Second coach mark: "Tap to manage" - shown after first-action celebration closes
+  // Second coach mark: "Tap to manage" - shown after 3s for new users OR after first-action celebration
   const [showTapCoachMark, setShowTapCoachMark] = useState(false);
   // Track that tap coach mark was triggered (to chain the + button spotlight)
   const tapCoachMarkTriggeredRef = useRef(false);
