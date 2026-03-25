@@ -76,8 +76,9 @@ const DropdownMenuContent = React.forwardRef<
         style={{ ...style, zIndex: parentZ + 1 }}
         {...props}
       />
-  </DropdownMenuPrimitive.Portal>
-))
+    </DropdownMenuPrimitive.Portal>
+  );
+})
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
 
 const DropdownMenuItem = React.forwardRef<
