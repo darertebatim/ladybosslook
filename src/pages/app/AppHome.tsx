@@ -1251,11 +1251,10 @@ const AppHome = () => {
                     </div>
                   ) : (
                     <>
-                      {/* Coach mark spotlight for first-ever action */}
+                      {/* Coach mark spotlight for first-ever action — delayed via state */}
                       {(() => {
                         const hintTask = filteredTasks.find(t => !t.pro_link_type);
-                        const isFirstActionPending = localStorage.getItem('simora_first_action_celebrated') !== 'true' && completedTaskIds.size === 0 && totalCompletions === 0 && !!hintTask;
-                        return isFirstActionPending ? (
+                        return showFirstCoachMark && hintTask ? (
                           <>
                             {/* Dark overlay behind everything */}
                             <div className="fixed inset-0 bg-black/60 z-[100] pointer-events-none animate-fade-in" />
