@@ -2097,7 +2097,9 @@ type DemoPhase =
   | 'hint-complete'
   | 'celebrate-complete'
   | 'victory'
-  | 'done';
+  | 'done'
+  | 'transition-mood'
+  | 'transition-breathe';
 
 // ─── Mini inline breathing overlay for onboarding ──────────────
 
