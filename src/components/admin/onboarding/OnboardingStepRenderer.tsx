@@ -2422,13 +2422,8 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
   const handleFeelingBreatheTap = () => {
     setShowMoodFeeling(false);
-    // Skip spotlight — go directly to breathing
-    setPhase('transition-breathe');
-    setProLinkTransform({ emoji: '🫁', toolEmoji: '🌬️', label: 'Opening Breathe...' });
-    addTimer(() => {
-      setProLinkTransform(null);
-      setShowBreathing(true);
-    }, 2500);
+    // Show task list with breathe spotlight first, then auto-open breathing
+    addTimer(() => setPhase('spotlight-breathe'), 800);
   };
 
   const handleFeelingDismiss = () => {
