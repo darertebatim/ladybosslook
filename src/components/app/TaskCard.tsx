@@ -17,7 +17,7 @@ import { haptic } from '@/lib/haptics';
 import { playCompletionSound } from '@/lib/completionSound';
 import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
-import { isToday, isBefore, startOfDay, parseISO, format as fnsFormat } from 'date-fns';
+import { isToday, isBefore, isSameDay, startOfDay, parseISO, format as fnsFormat } from 'date-fns';
 import { toast } from 'sonner';
 import { isWaterTask } from '@/lib/waterTracking';
 import { formatTimeLabelWithEmoji } from '@/lib/taskScheduling';
@@ -130,9 +130,13 @@ export const TaskCard = memo(function TaskCard({
     if (!p || p === 'none') {
       if (task.scheduled_date) {
         const scheduledDate = parseISO(task.scheduled_date);
+        const viewingDate = startOfDay(date);
+        if (isSameDay(scheduledDate, viewingDate)) {
+          return 'Today';
+        }
         return fnsFormat(scheduledDate, 'MMM d');
       }
-      return fnsFormat(date, 'MMM d');
+      return 'Today';
     }
     if (p === 'daily') return 'Daily';
     if (p === 'weekly') return 'Weekly';
