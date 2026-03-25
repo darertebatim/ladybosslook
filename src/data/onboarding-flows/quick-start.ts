@@ -14,8 +14,8 @@ export const quickStartFlow: OnboardingFlow = {
     {
       id: 'qs-welcome',
       type: 'welcome',
-      title: 'Welcome to Simora!',
-      subtitle: 'Reset your day and build\nsmall routines that make\nyou stronger.',
+      title: 'Welcome to Ladybosslook!',
+      subtitle: 'Your day, back in your hands.',
       image: meplusWelcomeMascot,
       statHighlight: 'Your **FREE** Routine Planner',
       secondaryButtonLabel: 'Already a member? Sign in.',
