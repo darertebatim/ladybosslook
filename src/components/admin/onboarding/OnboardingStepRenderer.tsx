@@ -2890,7 +2890,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
               transition={{ delay: 2.2, duration: 0.4 }}
               className="mt-8 w-full"
             >
-              <NavyButton onClick={() => setPhase('done')}>
+              <NavyButton onClick={onNext}>
                 Let's Go! →
               </NavyButton>
             </motion.div>
