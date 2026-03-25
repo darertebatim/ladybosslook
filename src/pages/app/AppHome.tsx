@@ -799,6 +799,23 @@ const AppHome = () => {
     setSelectedTask(task);
   }, []);
   
+  // Auto-show tap coach mark for new users after 3 seconds (if tasks exist)
+  useEffect(() => {
+    if (
+      localStorage.getItem('simora_tap_coach_shown') !== 'true' &&
+      !tasksLoading &&
+      tasks.length > 0 &&
+      !showTapCoachMark &&
+      !showStreakModal
+    ) {
+      const t = setTimeout(() => {
+        setShowTapCoachMark(true);
+        localStorage.setItem('simora_tap_coach_shown', 'true');
+      }, 3000);
+      return () => clearTimeout(t);
+    }
+  }, [tasksLoading, tasks.length, showTapCoachMark, showStreakModal]);
+
   // When task detail sheet closes after the tap coach mark, show + button spotlight
   useEffect(() => {
     if (!selectedTask && tapCoachMarkTriggeredRef.current && localStorage.getItem('simora_add_coach_shown') !== 'true') {
