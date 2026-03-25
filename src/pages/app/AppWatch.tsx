@@ -20,6 +20,7 @@ import { haptic } from "@/lib/haptics";
 import { toast } from "sonner";
 import heroStormVideo from "@/assets/watch-hero-storm.mp4";
 import { WatchCategoryPill } from "@/components/video/WatchCategoryPill";
+import { useUserPreferredLanguage, preferredLanguageSorter } from "@/hooks/useUserPreferredLanguage";
 
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
@@ -127,6 +128,7 @@ export default function AppWatch() {
   });
 
   const { data: enrollments } = useEnrollments();
+  const userLang = useUserPreferredLanguage();
   const isLoading = playlistsLoading;
 
   const playlistStats = useMemo(() => {
@@ -183,7 +185,7 @@ export default function AppWatch() {
   const availableCats = new Set(playlists?.filter(p => isVisible(p))?.map(p => p.category).filter(Boolean) || []);
   const categories = catOrder.filter(c => c === 'all' || availableCats.has(c));
 
-  const filtered = playlists?.filter(isVisible)?.filter(filterLang)?.filter(p => selectedCategory === 'all' || p.category === selectedCategory)?.filter(filterSearch)?.filter(filterProgress) || [];
+  const filtered = playlists?.filter(isVisible)?.filter(filterLang)?.filter(p => selectedCategory === 'all' || p.category === selectedCategory)?.filter(filterSearch)?.filter(filterProgress)?.sort(preferredLanguageSorter(userLang)) || [];
 
   const continueWatching = playlists?.filter(p => {
     const s = getStats(p.id);

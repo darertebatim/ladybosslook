@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import heroStormVideo from '@/assets/watch-hero-storm.mp4';
 import { useScrollRestore } from '@/hooks/useScrollRestore';
+import { useUserPreferredLanguage, preferredLanguageSorter } from '@/hooks/useUserPreferredLanguage';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
@@ -239,6 +240,8 @@ const AppBrowsePrograms = () => {
     return [{ value: 'all', label: 'All' }, ...dynamicFilters];
   }, [allPrograms]);
 
+  const userLang = useUserPreferredLanguage();
+
   const filtered = useMemo(() => {
     let result = allPrograms;
     if (selectedType !== 'all') {
@@ -253,8 +256,10 @@ const AppBrowsePrograms = () => {
         p.title.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q)
       );
     }
+    // Sort by user's preferred language
+    result = [...result].sort(preferredLanguageSorter(userLang));
     return result;
-  }, [allPrograms, searchQuery, selectedType, preferredLanguage]);
+  }, [allPrograms, searchQuery, selectedType, preferredLanguage, userLang]);
 
   const enrolledPrograms = useMemo(() => {
     return filtered.filter((p: any) => isEnrolled(p.slug));

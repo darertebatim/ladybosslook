@@ -20,6 +20,7 @@ import { PersianFlag } from "@/components/ui/PersianFlag";
 import { useScrollRestore } from "@/hooks/useScrollRestore";
 import heroStormVideo from "@/assets/watch-hero-storm.mp4";
 import { WatchCategoryPill } from "@/components/video/WatchCategoryPill";
+import { useUserPreferredLanguage, preferredLanguageSorter } from "@/hooks/useUserPreferredLanguage";
 
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
@@ -81,7 +82,8 @@ export default function AppPlayer() {
   }, [searchParams]);
 
   // Use centralized data hook with parallel fetching
-  const { playlists, playlistItems, progressData, enrollments, programs, preferredLanguage: userPreferredLanguage, isLoading } = usePlayerData();
+  const { playlists, playlistItems, progressData, enrollments, programs, isLoading } = usePlayerData();
+  const userLang = useUserPreferredLanguage();
 
   // Memoized playlist stats calculation - O(1) lookups
   const playlistStats = useMemo(() => {
@@ -165,15 +167,6 @@ export default function AppPlayer() {
     return playlist.language === preferredLanguage;
   };
 
-  // Map profile language codes to playlist language values
-  const PROFILE_TO_PLAYLIST_LANG: Record<string, string> = {
-    fa: 'persian',
-    en: 'american',
-    tr: 'turkish',
-    es: 'spanish',
-  };
-  const mappedUserLanguage = userPreferredLanguage ? PROFILE_TO_PLAYLIST_LANG[userPreferredLanguage] || userPreferredLanguage : null;
-
   // Filter and sort playlists - preferred language first
   const filteredPlaylists = playlists
     ?.filter(p => !p.is_hidden)
@@ -182,12 +175,7 @@ export default function AppPlayer() {
     ?.filter(p => selectedCategory === 'all' || p.category === selectedCategory)
     ?.filter(filterPlaylistBySearch)
     ?.filter(filterPlaylistByProgress)
-    ?.sort((a, b) => {
-      if (!mappedUserLanguage) return 0;
-      const aMatch = a.language === mappedUserLanguage ? 0 : 1;
-      const bMatch = b.language === mappedUserLanguage ? 0 : 1;
-      return aMatch - bMatch;
-    }) || [];
+    ?.sort(preferredLanguageSorter(userLang)) || [];
 
   // Continue Learning section
   const continueListening = playlists?.filter(playlist => {
