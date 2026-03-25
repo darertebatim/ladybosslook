@@ -223,7 +223,7 @@ function WelcomeScreen({ step, onNext }: Props) {
       )}
 
       {/* Bottom sheet with rounded top */}
-      <div className="absolute inset-x-0 bottom-0 h-[48%] bg-white rounded-t-[28px] flex flex-col items-center px-6 pb-5 pt-7 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-hidden">
+      <div className="absolute inset-x-0 bottom-0 h-[55%] bg-white rounded-t-[28px] flex flex-col items-center px-6 pb-5 pt-7 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-hidden">
         {/* Sparkles scattered in the white space */}
         <div className="absolute top-6 left-8 text-amber-300/60 animate-pulse" style={{ animationDelay: '0s', animationDuration: '2.5s' }}>✦</div>
         <div className="absolute top-10 right-12 text-purple-300/50 animate-pulse text-xs" style={{ animationDelay: '0.8s', animationDuration: '3s' }}>✦</div>
