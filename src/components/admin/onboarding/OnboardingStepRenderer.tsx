@@ -2705,7 +2705,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                 You feel {selectedMoodLabel.toLowerCase()}
               </h2>
                <p className="text-sm text-[#1a1f3d]">
-                Take a moment to breathe and reset your mind.
+                Tracking your mood helps you spot patterns and understand what lifts you up or drags you down.
               </p>
             </div>
 
