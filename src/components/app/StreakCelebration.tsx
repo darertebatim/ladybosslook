@@ -124,6 +124,7 @@ export const StreakCelebration = ({
 
   // How many days this week the user has been active (streak capped to week position)
   const streakDaysThisWeek = Math.min(currentStreak, todayIndex + 1);
+  const animatedDaysThisWeek = Math.min(displayedStreak, todayIndex + 1);
 
   const getMessage = () => {
     if (currentStreak === 1) return "A streak is born! Keep it up\nevery day to help it grow.";
@@ -135,6 +136,7 @@ export const StreakCelebration = ({
 
   // Week progress percentage (out of 7 days)
   const progressPercent = Math.min((streakDaysThisWeek / 7) * 100, 100);
+  const animatedProgress = barAnimated ? progressPercent : 0;
 
   return (
     <OverlayPortal>
@@ -172,8 +174,8 @@ export const StreakCelebration = ({
             'text-center mb-1 transition-all duration-500 delay-150',
             isAnimating ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
           )}>
-            <span className="text-6xl font-bold text-orange-400">
-              {currentStreak}
+            <span className="text-6xl font-bold text-orange-400 tabular-nums">
+              {displayedStreak}
             </span>
           </div>
           <p className="text-center text-white/50 text-sm mb-4">
@@ -189,19 +191,23 @@ export const StreakCelebration = ({
           <div className="mb-2">
             <div className="relative h-3 bg-white/10 rounded-full overflow-hidden">
               <div
-                className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
+                className="absolute inset-y-0 left-0 rounded-full"
                 style={{
-                  width: `${progressPercent}%`,
+                  width: `${animatedProgress}%`,
                   background: 'repeating-linear-gradient(45deg, #fb923c, #fb923c 6px, #fdba74 6px, #fdba74 12px)',
+                  transition: 'width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 }}
               />
             </div>
             {/* Small flame indicator below the bar */}
-            {progressPercent > 0 && (
+            {barAnimated && animatedProgress > 0 && (
               <div className="relative h-0">
                 <div
-                  className="absolute -top-[22px] -translate-x-1/2 transition-all duration-700"
-                  style={{ left: `${progressPercent}%` }}
+                  className="absolute -top-[22px] -translate-x-1/2"
+                  style={{ 
+                    left: `${animatedProgress}%`,
+                    transition: 'left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  }}
                 >
                   <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center shadow-lg">
                     <Flame className="w-3 h-3 text-white" fill="currentColor" />
@@ -214,7 +220,7 @@ export const StreakCelebration = ({
           {/* Weekday labels */}
           <div className="flex justify-between px-1 mb-8">
             {WEEKDAY_LABELS.map((label, i) => {
-              const isActive = i < streakDaysThisWeek;
+              const isActive = i < animatedDaysThisWeek;
               const isToday = i === todayIndex;
               return (
                 <span
