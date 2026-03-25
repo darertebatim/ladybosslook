@@ -179,7 +179,7 @@ const TimePickerSheet = ({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-auto max-h-[85vh] rounded-t-3xl" overlayClassName="z-[10004]" hideCloseButton>
+      <SheetContent side="bottom" className="h-auto max-h-[85vh] rounded-t-3xl" hideCloseButton>
         <div className="flex flex-col">
           <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
             <button onClick={handleCancel} className="p-2 -ml-2">
@@ -1348,7 +1348,7 @@ const AppTaskCreate = ({
 
       {/* Date Picker Sheet - Me+ Full Page Style */}
       <Sheet open={showDatePicker} onOpenChange={setShowDatePicker}>
-        <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl" overlayClassName="z-[10004]" hideCloseButton>
+        <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl" hideCloseButton>
           <div className="flex flex-col h-full">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
@@ -1446,7 +1446,7 @@ const AppTaskCreate = ({
 
       {/* Duration Picker Sheet */}
       <Sheet open={showDurationPicker} onOpenChange={setShowDurationPicker}>
-        <SheetContent side="bottom" className="h-auto max-h-[65vh] rounded-t-3xl" overlayClassName="z-[10004]" hideCloseButton>
+        <SheetContent side="bottom" className="h-auto max-h-[65vh] rounded-t-3xl" hideCloseButton>
           <div className="flex items-center justify-between px-4 py-3 border-b">
             <button onClick={() => setShowDurationPicker(false)} className="p-2 -ml-2">
               <X className="h-5 w-5" />
@@ -1581,7 +1581,7 @@ const AppTaskCreate = ({
       />
 
       <Sheet open={showRepeatPicker} onOpenChange={setShowRepeatPicker}>
-        <SheetContent side="bottom" className="h-auto rounded-t-3xl" overlayClassName="z-[10004]" hideCloseButton>
+        <SheetContent side="bottom" className="h-auto rounded-t-3xl" hideCloseButton>
           <div className="flex items-center justify-between px-4 py-3 border-b">
             <button onClick={() => setShowRepeatPicker(false)} className="p-2 -ml-2">
               <X className="h-5 w-5" />
@@ -1695,7 +1695,7 @@ const AppTaskCreate = ({
 
       {/* Custom Repeat Sheet - Me+ Full Page Style */}
       <Sheet open={showRepeatCustom} onOpenChange={setShowRepeatCustom}>
-        <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl" overlayClassName="z-[10004]" hideCloseButton>
+        <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl" hideCloseButton>
           <div className="flex flex-col h-full">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
@@ -1797,7 +1797,7 @@ const AppTaskCreate = ({
 
       {/* Reminder Picker Sheet - Me+ Style with dynamic options based on time */}
       <Sheet open={showReminderPicker} onOpenChange={setShowReminderPicker}>
-        <SheetContent side="bottom" className="h-auto rounded-t-3xl" overlayClassName="z-[10004]" hideCloseButton>
+        <SheetContent side="bottom" className="h-auto rounded-t-3xl" hideCloseButton>
           <div className="flex items-center justify-between px-4 py-3 border-b">
             <button onClick={() => setShowReminderPicker(false)} className="p-2 -ml-2">
               <X className="h-5 w-5" />
@@ -1946,7 +1946,7 @@ const AppTaskCreate = ({
 
       {/* Custom Reminder Time Picker - Me+ Style with Wheel */}
       <Sheet open={showReminderCustom} onOpenChange={setShowReminderCustom}>
-        <SheetContent side="bottom" className="h-auto rounded-t-3xl" overlayClassName="z-[10004]" hideCloseButton>
+        <SheetContent side="bottom" className="h-auto rounded-t-3xl" hideCloseButton>
           <div className="flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
@@ -2030,7 +2030,7 @@ const AppTaskCreate = ({
 
       {/* Tag Picker Sheet - Me+ Full Page Style */}
       <Sheet open={showTagPicker} onOpenChange={setShowTagPicker}>
-        <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl" overlayClassName="z-[10004]" hideCloseButton>
+        <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl" hideCloseButton>
           <div className="flex flex-col h-full">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
@@ -2164,7 +2164,7 @@ const AppTaskCreate = ({
 
       {/* Playlist Picker Sheet */}
       <Sheet open={showPlaylistPicker} onOpenChange={setShowPlaylistPicker}>
-        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl" overlayClassName="z-[10004]">
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
           <SheetHeader className="flex-row items-center gap-2">
             <button onClick={() => { setShowPlaylistPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
@@ -2217,7 +2217,7 @@ const AppTaskCreate = ({
 
       {/* Breathing Exercise Picker Sheet */}
       <Sheet open={showBreathingPicker} onOpenChange={setShowBreathingPicker}>
-        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl" overlayClassName="z-[10004]">
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
           <SheetHeader className="flex-row items-center gap-2">
             <button onClick={() => { setShowBreathingPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
@@ -2285,7 +2285,7 @@ const AppTaskCreate = ({
 
       {/* Reflection Picker Sheet */}
       <Sheet open={showReflectionPicker} onOpenChange={setShowReflectionPicker}>
-        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl" overlayClassName="z-[10004]">
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
           <SheetHeader className="flex-row items-center gap-2">
             <button onClick={() => { setShowReflectionPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
@@ -2355,7 +2355,7 @@ const AppTaskCreate = ({
 
       {/* Routine Picker Sheet */}
       <Sheet open={showRoutinePicker} onOpenChange={setShowRoutinePicker}>
-        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl" overlayClassName="z-[10004]">
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
           <SheetHeader className="flex-row items-center gap-2">
             <button onClick={() => { setShowRoutinePicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
@@ -2399,7 +2399,7 @@ const AppTaskCreate = ({
 
       {/* Audio Track Picker Sheet */}
       <Sheet open={showAudioPicker} onOpenChange={setShowAudioPicker}>
-        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl" overlayClassName="z-[10004]">
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
           <SheetHeader className="flex-row items-center gap-2">
             <button onClick={() => { setShowAudioPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
@@ -2453,7 +2453,7 @@ const AppTaskCreate = ({
 
       {/* Community Channel Picker Sheet */}
       <Sheet open={showChannelPicker} onOpenChange={setShowChannelPicker}>
-        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl" overlayClassName="z-[10004]">
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
           <SheetHeader className="flex-row items-center gap-2">
             <button onClick={() => { setShowChannelPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
@@ -2509,7 +2509,7 @@ const AppTaskCreate = ({
 
       {/* Video Picker Sheet */}
       <Sheet open={showVideoPicker} onOpenChange={setShowVideoPicker}>
-        <SheetContent side="bottom" className="h-[60vh] rounded-t-3xl" overlayClassName="z-[10004]">
+        <SheetContent side="bottom" className="h-[60vh] rounded-t-3xl">
           <SheetHeader className="flex-row items-center gap-2">
             <button onClick={() => { setShowVideoPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
@@ -2537,7 +2537,7 @@ const AppTaskCreate = ({
 
       {/* Video Playlist Picker Sheet */}
       <Sheet open={showVideoPlaylistPicker} onOpenChange={setShowVideoPlaylistPicker}>
-        <SheetContent side="bottom" className="h-[60vh] rounded-t-3xl" overlayClassName="z-[10004]">
+        <SheetContent side="bottom" className="h-[60vh] rounded-t-3xl">
           <SheetHeader className="flex-row items-center gap-2">
             <button onClick={() => { setShowVideoPlaylistPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
@@ -2565,7 +2565,7 @@ const AppTaskCreate = ({
 
       {/* Program Picker Sheet */}
       <Sheet open={showProgramPicker} onOpenChange={setShowProgramPicker}>
-        <SheetContent side="bottom" className="h-[60vh] rounded-t-3xl" overlayClassName="z-[10004]">
+        <SheetContent side="bottom" className="h-[60vh] rounded-t-3xl">
           <SheetHeader className="flex-row items-center gap-2">
             <button onClick={() => { setShowProgramPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
