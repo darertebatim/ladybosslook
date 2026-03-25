@@ -820,6 +820,13 @@ const AppHome = () => {
     }
   }, [tasksLoading, tasks.length, completedTaskIds.size, totalCompletions, showFirstCoachMark, showStreakModal]);
 
+  // Dismiss first coach mark when user completes a task
+  useEffect(() => {
+    if (showFirstCoachMark && completedTaskIds.size > 0) {
+      setShowFirstCoachMark(false);
+    }
+  }, [showFirstCoachMark, completedTaskIds.size]);
+
   // Auto-show tap coach mark for new users after 5 seconds (only after first coach mark is done)
   useEffect(() => {
     if (
