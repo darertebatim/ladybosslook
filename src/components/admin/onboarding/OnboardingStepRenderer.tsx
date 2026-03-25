@@ -2402,8 +2402,13 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
   const handleFeelingBreatheTap = () => {
     setShowMoodFeeling(false);
-    // Pause before spotlighting breathe — don't rush
-    addTimer(() => setPhase('spotlight-breathe'), 1200);
+    // Skip spotlight — go directly to breathing
+    setPhase('transition-breathe');
+    setProLinkTransform({ emoji: '🫁', toolEmoji: '🌬️', label: 'Opening Breathe...' });
+    addTimer(() => {
+      setProLinkTransform(null);
+      setShowBreathing(true);
+    }, 2500);
   };
 
   const handleFeelingDismiss = () => {
@@ -3035,14 +3040,6 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                 <span className="text-xs text-[#1a1f3d]/70">3 deep breaths to calm your mind</span>
               </div>
               <span className="text-lg text-gray-400">→</span>
-            </button>
-
-            {/* Skip */}
-            <button
-              onClick={handleFeelingDismiss}
-              className="w-full h-10 rounded-full text-sm bg-orange-200/60 text-orange-900 hover:bg-orange-200/80 transition-colors"
-            >
-              Skip for now
             </button>
           </div>
         </div>
