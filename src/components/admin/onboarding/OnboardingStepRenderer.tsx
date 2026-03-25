@@ -2432,7 +2432,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
           transition={{ duration: 0.4, delay: 0 }}
         >
           <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center leading-tight relative z-40">
-            Here's your first routine
+            Here's your first Reset
           </h1>
         </motion.div>
         <motion.div
