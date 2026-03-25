@@ -798,6 +798,18 @@ const AppHome = () => {
   const handleTaskTap = useCallback((task: UserTask) => {
     setSelectedTask(task);
   }, []);
+  
+  // When task detail sheet closes after the tap coach mark, show + button spotlight
+  useEffect(() => {
+    if (!selectedTask && tapCoachMarkTriggeredRef.current && localStorage.getItem('simora_add_coach_shown') !== 'true') {
+      tapCoachMarkTriggeredRef.current = false;
+      const t = setTimeout(() => {
+        setShowAddCoachMark(true);
+        localStorage.setItem('simora_add_coach_shown', 'true');
+      }, 500);
+      return () => clearTimeout(t);
+    }
+  }, [selectedTask]);
   const handleDateSelect = useCallback((date: Date) => {
     setSelectedDate(date);
     setShowCalendar(false);
