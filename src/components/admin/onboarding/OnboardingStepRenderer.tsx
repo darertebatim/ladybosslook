@@ -2077,6 +2077,7 @@ type DemoPhase =
   | 'intro'
   | 'revealing'
   | 'viewing'
+  | 'ready-to-play'
   | 'spotlight-app'
   | 'hint-app'
   | 'celebrate-app'
@@ -2299,10 +2300,12 @@ function StarterRoutineScreen({ step, onNext }: Props) {
     return () => clearTimeout(t);
   }, [phase, revealedCount]);
 
-  // Viewing pause → first spotlight
+  // Viewing pause → ready-to-play animation → first spotlight
   useEffect(() => {
     if (phase === 'viewing') {
-      addTimer(() => setPhase('spotlight-app'), 3000);
+      addTimer(() => setPhase('ready-to-play'), 1200);
+    } else if (phase === 'ready-to-play') {
+      addTimer(() => setPhase('spotlight-app'), 2800);
     }
   }, [phase]);
 
