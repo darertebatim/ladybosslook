@@ -2259,6 +2259,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const [revealedCount, setRevealedCount] = useState(0);
   const [completedIndices, setCompletedIndices] = useState<Set<number>>(new Set());
   const [showBreathing, setShowBreathing] = useState(false);
+  const [proLinkTransform, setProLinkTransform] = useState<{ emoji: string; toolEmoji: string; label: string } | null>(null);
   const [showMoodPicker, setShowMoodPicker] = useState(false);
   const [showMoodFeeling, setShowMoodFeeling] = useState(false);
   const [selectedMoodLabel, setSelectedMoodLabel] = useState('');
