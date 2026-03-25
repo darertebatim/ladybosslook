@@ -50,6 +50,7 @@ const STEP_TYPE_EMOJI: Record<string, string> = {
   'confetti-message': '🎊',
   'personalized-plan': '📅',
   'single-select-descriptions': '📝',
+  'routine-ready-teaser': '🗓️',
 };
 
 export function OnboardingFlowCard({ flow, onPreview, isDefault, onSetDefault }: Props) {

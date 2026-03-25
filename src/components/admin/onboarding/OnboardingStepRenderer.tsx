@@ -120,6 +120,8 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <BeforeAfterVisualScreen step={step} onNext={onNext} />;
     case 'text-input':
       return <TextInputScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'routine-ready-teaser':
+      return <RoutineReadyTeaserScreen step={step} onNext={onNext} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }
@@ -3502,5 +3504,75 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
         </button>
       </FadeUp>
     </BottomSheetWrapper>
+  );
+}
+
+// ─── Routine Ready Teaser ──────────────────────────────────────
+
+function RoutineReadyTeaserScreen({ step, onNext }: Props) {
+  const previewItems = [
+    { emoji: '🌅', title: 'Morning Check-in', time: '2 min', locked: false },
+    { emoji: '🧘', title: 'Breathing Exercise', time: '3 min', locked: false },
+    { emoji: '📝', title: 'Daily Journal', time: '5 min', locked: true },
+    { emoji: '🎯', title: 'Focus Session', time: '10 min', locked: true },
+    { emoji: '🌙', title: 'Evening Reflection', time: '3 min', locked: true },
+  ];
+
+  return (
+    <ScreenWrapper>
+      <div className="flex-1 flex flex-col items-center justify-center">
+        <FadeUp>
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center mb-5 mx-auto shadow-lg">
+            <span className="text-3xl">🗓️</span>
+          </div>
+        </FadeUp>
+
+        <FadeUp delay={0.1}>
+          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
+        </FadeUp>
+        <FadeUp delay={0.15}>
+          <p className="text-sm text-gray-500 text-center mb-6 max-w-[280px] mx-auto">{step.subtitle}</p>
+        </FadeUp>
+
+        {/* Routine preview cards — last items blurred */}
+        <FadeUp delay={0.25} className="w-full">
+          <div className="relative rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+            {previewItems.map((item, i) => (
+              <div
+                key={i}
+                className={cn(
+                  'flex items-center gap-3 px-4 py-3.5 border-b border-gray-50 last:border-b-0 transition-all',
+                  item.locked && 'blur-[2.5px] opacity-60 select-none'
+                )}
+              >
+                <span className="text-xl">{item.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-[#1a1f3d]">{item.title}</p>
+                  <p className="text-xs text-gray-400">{item.time}</p>
+                </div>
+                {item.locked ? (
+                  <span className="text-gray-300 text-sm">🔒</span>
+                ) : (
+                  <span className="text-emerald-400 text-sm">✓</span>
+                )}
+              </div>
+            ))}
+
+            {/* Gradient overlay on blurred items */}
+            <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+          </div>
+        </FadeUp>
+
+        <FadeUp delay={0.35}>
+          <p className="text-xs text-gray-400 text-center mt-3">
+            Sign up to unlock your full routine
+          </p>
+        </FadeUp>
+      </div>
+
+      <FadeUp delay={0.45} className="mt-auto pt-4">
+        <NavyButton onClick={onNext}>{step.buttonLabel || 'See My Routine'}</NavyButton>
+      </FadeUp>
+    </ScreenWrapper>
   );
 }

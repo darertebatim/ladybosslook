@@ -130,7 +130,15 @@ export const quickStartFlow: OnboardingFlow = {
         { label: '45+' },
       ],
     },
-    // 10 — Gender
+    // 10b — Your Routine is Ready teaser
+    {
+      id: 'qs-routine-ready',
+      type: 'routine-ready-teaser',
+      title: 'Your Routine is Ready ✨',
+      subtitle: 'Based on your answers, we\'ve prepared a personalized routine just for you.',
+      buttonLabel: 'See My Routine',
+    },
+    // 11 — Gender
     {
       id: 'qs-gender',
       type: 'single-select',
