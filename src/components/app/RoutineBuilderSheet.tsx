@@ -487,7 +487,7 @@ export function RoutineBuilderSheet({
                     autoComplete="off"
                   />
                   {step === 2 && (
-                    <div className="absolute -bottom-1.5 left-0 w-4 h-4 rounded-full bg-white shadow-sm flex items-center justify-center">
+                    <div className="absolute -bottom-0.5 left-0 w-4 h-4 rounded-full bg-white shadow-sm flex items-center justify-center">
                       <Pencil className="w-2.5 h-2.5 text-black/50" />
                     </div>
                   )}
