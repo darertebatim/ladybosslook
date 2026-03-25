@@ -200,11 +200,11 @@ export function RoutineBuilderSheet({
       // Capture 12% of current viewport height as fixed pixels before keyboard opens
       const pixelTop = Math.round(window.innerHeight * 0.12);
       setDialogAnchorTop(`${pixelTop}px`);
-      if (step === 1) {
+      if (!editMode && step === 1) {
         setTimeout(() => nameInputRef.current?.focus(), 300);
       }
     }
-  }, [open, step]);
+  }, [open, step, editMode]);
 
   // Auto-focus quick add input
   useEffect(() => {
@@ -467,7 +467,7 @@ export function RoutineBuilderSheet({
                     </div>
                   )}
                 </button>
-                <div className="relative flex-1">
+                <div className="relative flex-1 h-10 flex items-center">
                   <input
                     ref={nameInputRef}
                     value={routineTitle}
@@ -487,7 +487,7 @@ export function RoutineBuilderSheet({
                     autoComplete="off"
                   />
                   {step === 2 && (
-                    <div className="absolute -bottom-0.5 left-0 w-4 h-4 rounded-full bg-white shadow-sm flex items-center justify-center">
+                    <div className="absolute -bottom-0.5 -left-0.5 w-4 h-4 rounded-full bg-white shadow-sm flex items-center justify-center">
                       <Pencil className="w-2.5 h-2.5 text-black/50" />
                     </div>
                   )}
