@@ -2091,6 +2091,7 @@ type DemoPhase =
   | 'spotlight-complete'
   | 'hint-complete'
   | 'celebrate-complete'
+  | 'victory'
   | 'done';
 
 // ─── Mini inline breathing overlay for onboarding ──────────────
