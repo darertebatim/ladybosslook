@@ -29,8 +29,8 @@ export const quickStartFlow: OnboardingFlow = {
     {
       id: 'qs-intent',
       type: 'single-select',
-      title: 'What do you want\nmost right now?',
-      subtitle: 'We\'ll personalise your first routine based on your answer.',
+      title: 'How does your mind feel\nin this moment?',
+      subtitle: 'We\'ll use this to guide your first reset.',
       illustrationLabel: 'Mascot in cozy room',
       options: [
         { label: 'Reduce stress', emoji: '🧘' },
