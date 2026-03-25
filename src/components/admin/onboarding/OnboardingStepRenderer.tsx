@@ -2405,7 +2405,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const handleCheckComplete = () => {
     if (phase !== 'hint-complete' && phase !== 'spotlight-complete') return;
     setPhase('celebrate-complete');
-    triggerCelebration(COMPLETE_IDX, 'done');
+    triggerCelebration(COMPLETE_IDX, 'victory');
   };
 
   // Which phases show overlay
