@@ -13,6 +13,7 @@ interface Props {
   countdown?: number;
   isCountingDown?: boolean;
   countdownValue?: number;
+  phaseSecondsLeft?: number;
 }
 
 export function ImmersiveBreathingCircle({
@@ -23,6 +24,7 @@ export function ImmersiveBreathingCircle({
   countdown,
   isCountingDown,
   countdownValue,
+  phaseSecondsLeft,
 }: Props) {
   const isInhaling = phase === 'inhale';
   const isExhaling = phase === 'exhale';
