@@ -2101,10 +2101,11 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
   const [countdown, setCountdown] = useState(3);
   const [cycleCount, setCycleCount] = useState(0);
   const [isCountingDown, setIsCountingDown] = useState(true);
-  const totalCycles = 3;
+  const [countdownProgress, setCountdownProgress] = useState(0);
+  const totalCycles = 2;
 
-  // Pattern: 3-2-3-2
-  const pattern = { inhale: 3, inhaleHold: 2, exhale: 3, exhaleHold: 2 };
+  // Pattern: 4-4-4 (inhale 4s, hold 4s, exhale 4s, no exhale hold)
+  const pattern = { inhale: 4, inhaleHold: 4, exhale: 4, exhaleHold: 0 };
 
   // Countdown before starting
   useEffect(() => {
@@ -2116,6 +2117,14 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     }
     const t = setTimeout(() => setCountdown(c => c - 1), 1000);
     return () => clearTimeout(t);
+  }, [countdown, isCountingDown]);
+
+  // Animate countdown progress ring
+  useEffect(() => {
+    if (!isCountingDown) return;
+    // countdown goes 3 -> 2 -> 1 -> 0, progress goes 0 -> 1
+    const progress = (3 - countdown) / 3;
+    setCountdownProgress(progress);
   }, [countdown, isCountingDown]);
 
   // Breathing cycle state machine
@@ -2139,15 +2148,21 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     };
 
     const dur = durations[breathPhase] * 1000;
-    const t = setTimeout(() => {
-      if (breathPhase === 'exhale_hold') {
-        const next = cycleCount + 1;
-        setCycleCount(next);
-        if (next >= totalCycles) {
-          onComplete();
-          return;
-        }
+
+    // Skip exhale_hold since it's 0
+    if (breathPhase === 'exhale_hold') {
+      const next = cycleCount + 1;
+      setCycleCount(next);
+      if (next >= totalCycles) {
+        onComplete();
+        return;
       }
+      setBreathPhase('inhale');
+      return;
+    }
+
+    // After exhale, go directly to exhale_hold (which will immediately cycle)
+    const t = setTimeout(() => {
       setBreathPhase(nextPhase[breathPhase]);
     }, dur);
 
@@ -2169,21 +2184,69 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     : breathPhase === 'exhale_hold' ? pattern.exhaleHold
     : 1;
 
+  // SVG progress ring for countdown
+  const ringRadius = 152;
+  const ringCircumference = 2 * Math.PI * ringRadius;
+  const ringOffset = ringCircumference * (1 - countdownProgress);
+
   return (
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center" style={{ background: getImmersiveBgGradient(isCountingDown ? 'ready' : breathPhase, isCountingDown) }}>
       <ImmersiveParticles />
-      <p className="text-white/60 text-sm font-medium mb-8">
-        {cycleCount + 1} / {totalCycles} cycles
-      </p>
-      <ImmersiveBreathingCircle
-        phase={isCountingDown ? 'ready' : breathPhase}
-        phaseDuration={phaseDuration}
-        phaseText={phaseText}
-        countdown={isCountingDown ? countdown : undefined}
-        isCountingDown={isCountingDown}
-        countdownValue={isCountingDown ? countdown : undefined}
-      />
-      <p className="text-white/40 text-xs mt-8">3-2-3-2 pattern</p>
+
+      {/* "Let's Get Ready" title during countdown */}
+      {isCountingDown && (
+        <p className="text-white/70 text-lg font-medium mb-6 tracking-wide animate-fade-in">
+          Let's Get Ready
+        </p>
+      )}
+
+      {!isCountingDown && (
+        <p className="text-white/60 text-sm font-medium mb-8">
+          {cycleCount + 1} / {totalCycles} cycles
+        </p>
+      )}
+
+      {/* Wrapper for circle + progress ring */}
+      <div className="relative flex items-center justify-center" style={{ width: 320, height: 320 }}>
+        {/* SVG progress ring — visible during countdown */}
+        {isCountingDown && (
+          <svg
+            className="absolute inset-0 -rotate-90"
+            width="320" height="320"
+            viewBox="0 0 320 320"
+          >
+            {/* Background ring track */}
+            <circle
+              cx="160" cy="160" r={ringRadius}
+              fill="none"
+              stroke="rgba(167,139,250,0.12)"
+              strokeWidth="4"
+            />
+            {/* Animated progress arc */}
+            <circle
+              cx="160" cy="160" r={ringRadius}
+              fill="none"
+              stroke="rgba(167,139,250,0.7)"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeDasharray={ringCircumference}
+              strokeDashoffset={ringOffset}
+              style={{ transition: 'stroke-dashoffset 1s linear', filter: 'drop-shadow(0 0 6px rgba(139,92,246,0.5))' }}
+            />
+          </svg>
+        )}
+
+        <ImmersiveBreathingCircle
+          phase={isCountingDown ? 'ready' : breathPhase}
+          phaseDuration={phaseDuration}
+          phaseText={phaseText}
+          countdown={isCountingDown ? countdown : undefined}
+          isCountingDown={isCountingDown}
+          countdownValue={isCountingDown ? countdown : undefined}
+        />
+      </div>
+
+      <p className="text-white/40 text-xs mt-8">4-4-4 pattern</p>
     </div>
   );
 }
