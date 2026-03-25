@@ -41,6 +41,9 @@ export const StreakCelebration = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false);
   const [showReviewPrompt, setShowReviewPrompt] = useState(false);
+  const [displayedStreak, setDisplayedStreak] = useState(0);
+  const [barAnimated, setBarAnimated] = useState(false);
+  const countRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const handleClose = async () => {
     onClose();
