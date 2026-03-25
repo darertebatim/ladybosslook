@@ -820,6 +820,13 @@ const AppHome = () => {
     }
   }, [tasksLoading, tasks.length, completedTaskIds.size, totalCompletions, showFirstCoachMark, showStreakModal]);
 
+  // Dismiss first coach mark when user completes a task
+  useEffect(() => {
+    if (showFirstCoachMark && completedTaskIds.size > 0) {
+      setShowFirstCoachMark(false);
+    }
+  }, [showFirstCoachMark, completedTaskIds.size]);
+
   // Auto-show tap coach mark for new users after 5 seconds (only after first coach mark is done)
   useEffect(() => {
     if (
@@ -1257,7 +1264,7 @@ const AppHome = () => {
                         return showFirstCoachMark && hintTask ? (
                           <>
                             {/* Dark overlay behind everything */}
-                            <div className="fixed inset-0 bg-black/60 z-[100] pointer-events-none animate-fade-in" />
+                            <div className="fixed inset-0 bg-black/60 z-[100] animate-fade-in" onClick={() => setShowFirstCoachMark(false)} />
                             
                             {/* Spotlighted task card + hint — disable body tap so only checkbox works */}
                             <div className="relative z-[101]">
