@@ -2271,6 +2271,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
           countdown={isCountingDown ? countdown : undefined}
           isCountingDown={isCountingDown}
           countdownValue={isCountingDown ? countdown : undefined}
+          phaseSecondsLeft={!isCountingDown ? phaseSecondsLeft : undefined}
         />
       </div>
 
