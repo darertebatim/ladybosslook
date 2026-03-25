@@ -134,7 +134,15 @@ export function ImmersiveBreathingCircle({
               >
                 {phaseText}
               </span>
-              {!isHolding && methodText ? (
+              {phaseSecondsLeft != null && phaseSecondsLeft > 0 ? (
+                <span
+                  key={`${phase}-${phaseSecondsLeft}`}
+                  className="text-lg font-light text-white/50 mt-1"
+                  style={{ animation: 'imm-count-pop 0.4s ease-out', textShadow: '0 0 10px rgba(139,92,246,0.3)' }}
+                >
+                  {phaseSecondsLeft}
+                </span>
+              ) : !isHolding && methodText ? (
                 <span className="text-[10px] text-white/35 mt-1.5 px-2.5 py-0.5 rounded-full border border-white/10 tracking-wider uppercase">
                   {methodText}
                 </span>
