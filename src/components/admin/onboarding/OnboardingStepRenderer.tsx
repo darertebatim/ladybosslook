@@ -253,7 +253,7 @@ function WelcomeScreen({ step, onNext }: Props) {
         <FadeUp delay={0.3} className="relative z-10">
           <p className="text-[17px] font-semibold text-[#1a1f3d] text-center mb-4 leading-relaxed max-w-[260px] whitespace-pre-line">{step.subtitle}</p>
         </FadeUp>
-        <FadeUp delay={0.4} className="mt-auto w-full relative z-10">
+        <FadeUp delay={0.4} className="mt-3 w-full relative z-10">
           {step.description && (
             <div className="mb-3 w-full rounded-2xl border-2 border-dashed border-amber-400 bg-amber-50/60 px-5 py-4 relative overflow-hidden">
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 text-2xl">🎁</div>
