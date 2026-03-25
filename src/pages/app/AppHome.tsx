@@ -125,7 +125,7 @@ const AppHome = () => {
   // First action celebration - tracks if this is user's first ever completion (uses unified StreakCelebration)
   const [isFirstActionCelebration, setIsFirstActionCelebration] = useState(false);
   
-  // Second coach mark: "Tap to manage" - shown after first-action celebration closes
+  // Second coach mark: "Tap to manage" - shown after 3s for new users OR after first-action celebration
   const [showTapCoachMark, setShowTapCoachMark] = useState(false);
   // Track that tap coach mark was triggered (to chain the + button spotlight)
   const tapCoachMarkTriggeredRef = useRef(false);
@@ -799,6 +799,23 @@ const AppHome = () => {
     setSelectedTask(task);
   }, []);
   
+  // Auto-show tap coach mark for new users after 3 seconds (if tasks exist)
+  useEffect(() => {
+    if (
+      localStorage.getItem('simora_tap_coach_shown') !== 'true' &&
+      !tasksLoading &&
+      tasks.length > 0 &&
+      !showTapCoachMark &&
+      !showStreakModal
+    ) {
+      const t = setTimeout(() => {
+        setShowTapCoachMark(true);
+        localStorage.setItem('simora_tap_coach_shown', 'true');
+      }, 3000);
+      return () => clearTimeout(t);
+    }
+  }, [tasksLoading, tasks.length, showTapCoachMark, showStreakModal]);
+
   // When task detail sheet closes after the tap coach mark, show + button spotlight
   useEffect(() => {
     if (!selectedTask && tapCoachMarkTriggeredRef.current && localStorage.getItem('simora_add_coach_shown') !== 'true') {
