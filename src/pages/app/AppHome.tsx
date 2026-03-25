@@ -1453,51 +1453,72 @@ const AppHome = () => {
         </div>
 
         {/* + Button Coach Mark Spotlight */}
-        {showAddCoachMark && (
-          <>
-            <div className="fixed inset-0 bg-black/60 z-[100] animate-fade-in" onClick={() => setShowAddCoachMark(false)} />
-            <div className="fixed z-[101] animate-fade-in" style={{ top: (() => { const el = document.querySelector('.coach-add-btn'); if (!el) return '200px'; const rect = el.getBoundingClientRect(); return `${rect.top - 8}px`; })(), right: (() => { const el = document.querySelector('.coach-add-btn'); if (!el) return '16px'; const rect = el.getBoundingClientRect(); return `${window.innerWidth - rect.right + rect.width / 2 - 24}px`; })() }}>
-              <div className="relative">
-                <button
-                  onClick={() => { setShowAddCoachMark(false); handleFabClick(); }}
-                  className="w-12 h-12 rounded-full bg-urgency text-urgency-foreground shadow-lg flex items-center justify-center"
-                  style={{ boxShadow: '0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35)', animation: 'addBtnGlow 1.6s ease-in-out infinite' }}
-                >
-                  <Plus className="h-5 w-5" />
-                </button>
-                {/* Bouncing hand */}
-                <div
-                  className="absolute pointer-events-none"
-                  style={{
-                    top: '-10px',
-                    left: '-30px',
-                    transform: 'rotate(-45deg)',
-                    filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
-                    animation: 'addCoachBounce 1.4s ease-in-out infinite',
-                  }}
-                >
-                  <FluentEmoji emoji="👇" size={64} />
-                </div>
+        {showAddCoachMark && (() => {
+          const el = document.querySelector('.coach-add-btn');
+          const rect = el?.getBoundingClientRect();
+          if (!rect) return null;
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          const r = Math.max(rect.width, rect.height) / 2 + 8;
+          return (
+            <>
+              <svg className="fixed inset-0 w-full h-full z-[100] animate-fade-in" onClick={() => setShowAddCoachMark(false)}>
+                <defs>
+                  <mask id="add-coach-mask">
+                    <rect width="100%" height="100%" fill="white" />
+                    <circle cx={cx} cy={cy} r={r} fill="black" />
+                  </mask>
+                </defs>
+                <rect width="100%" height="100%" fill="rgba(0,0,0,0.6)" mask="url(#add-coach-mask)" />
+              </svg>
+              {/* Make the real button clickable above overlay */}
+              <div
+                className="fixed z-[101]"
+                style={{
+                  left: rect.left - 4,
+                  top: rect.top - 4,
+                  width: rect.width + 8,
+                  height: rect.height + 8,
+                  borderRadius: '50%',
+                  animation: 'addBtnGlow 1.6s ease-in-out infinite',
+                }}
+                onClick={() => { setShowAddCoachMark(false); handleFabClick(); }}
+              />
+              {/* Bouncing hand */}
+              <div
+                className="fixed z-[102] pointer-events-none"
+                style={{
+                  left: cx - 42,
+                  top: cy - 70,
+                  filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
+                  animation: 'addCoachBounce 1.4s ease-in-out infinite',
+                }}
+              >
+                <FluentEmoji emoji="👇" size={56} />
               </div>
-              <p className="text-center text-sm text-white/90 mt-3 font-medium whitespace-nowrap" style={{ marginLeft: '-60px' }}>
+              {/* Label */}
+              <p
+                className="fixed z-[102] text-sm text-white/90 font-medium whitespace-nowrap pointer-events-none"
+                style={{ left: cx - 80, top: rect.bottom + 18 }}
+              >
                 Tap + to add a new task
               </p>
-            </div>
-            <style>{`
-              @keyframes addCoachBounce {
-                0%   { transform: rotate(-45deg) translateY(0px); }
-                40%  { transform: rotate(-45deg) translateY(10px); }
-                55%  { transform: rotate(-45deg) translateY(5px); }
-                70%  { transform: rotate(-45deg) translateY(10px); }
-                100% { transform: rotate(-45deg) translateY(0px); }
-              }
-              @keyframes addBtnGlow {
-                0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
-                50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
-              }
-            `}</style>
-          </>
-        )}
+              <style>{`
+                @keyframes addCoachBounce {
+                  0%   { transform: translateY(0px); }
+                  40%  { transform: translateY(10px); }
+                  55%  { transform: translateY(5px); }
+                  70%  { transform: translateY(10px); }
+                  100% { transform: translateY(0px); }
+                }
+                @keyframes addBtnGlow {
+                  0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
+                  50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
+                }
+              `}</style>
+            </>
+          );
+        })()}
 
         {/* FAB */}
         {!isKeyboardOpen && (
