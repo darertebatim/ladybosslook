@@ -2479,23 +2479,30 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0, transition: { duration: 0.3 } }}
-                className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#1a1f3d]/80 backdrop-blur-sm"
+                className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#1a1f3d]/90 backdrop-blur-md px-8"
               >
                 {/* Pulsing play circle */}
                 <motion.div
-                  initial={{ scale: 0.5, opacity: 0 }}
+                  initial={{ scale: 0.3, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.15 }}
-                  className="relative mb-6"
+                  transition={{ type: 'spring', stiffness: 180, damping: 14, delay: 0.1 }}
+                  className="relative mb-8"
                 >
-                  {/* Outer pulse ring */}
+                  {/* Second outer ring */}
                   <motion.div
-                    animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0, 0.4] }}
+                    animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0, 0.15] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
+                    className="absolute rounded-full border border-white/15"
+                    style={{ width: 104, height: 104, top: -12, left: -12 }}
+                  />
+                  {/* Primary pulse ring */}
+                  <motion.div
+                    animate={{ scale: [1, 1.35, 1], opacity: [0.3, 0, 0.3] }}
                     transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                    className="absolute inset-0 rounded-full bg-white/20"
+                    className="absolute rounded-full bg-white/20"
                     style={{ width: 88, height: 88, top: -4, left: -4 }}
                   />
-                  <div className="w-20 h-20 rounded-full bg-white/15 border-2 border-white/30 flex items-center justify-center">
+                  <div className="w-20 h-20 rounded-full bg-white/10 border-2 border-white/25 flex items-center justify-center shadow-[0_0_40px_rgba(255,255,255,0.1)]">
                     <motion.div
                       animate={{ x: [0, 2, 0] }}
                       transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut' }}
@@ -2507,37 +2514,44 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                   </div>
                 </motion.div>
 
-                {/* Text */}
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
+                {/* Title */}
+                <motion.h2
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3, duration: 0.4 }}
-                  className="text-white text-2xl font-bold tracking-wide"
+                  transition={{ delay: 0.25, duration: 0.45 }}
+                  className="text-white text-[26px] font-extrabold tracking-tight text-center leading-tight"
                 >
                   Let's try it out!
-                </motion.p>
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 0.6 }}
-                  transition={{ delay: 0.6, duration: 0.4 }}
-                  className="text-white text-sm mt-2"
+                </motion.h2>
+
+                {/* Subtitle — structured as two lines */}
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.55, duration: 0.4 }}
+                  className="mt-3 text-center"
                 >
-                  Don't just list tasks. Automate them. One tap Plays your Tasks
-                </motion.p>
+                  <p className="text-white/50 text-[15px] leading-relaxed">
+                    Don't just list tasks. <span className="text-white/80 font-semibold">Automate them.</span>
+                  </p>
+                  <p className="text-white/50 text-[15px] leading-relaxed mt-0.5">
+                    One tap <span className="text-white/90 font-bold">▶ Plays</span> your Tasks
+                  </p>
+                </motion.div>
 
                 {/* Animated dots */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 1 }}
-                  className="flex gap-1.5 mt-6"
+                  transition={{ delay: 1.1 }}
+                  className="flex gap-2 mt-8"
                 >
                   {[0, 1, 2].map(i => (
                     <motion.div
                       key={i}
-                      animate={{ opacity: [0.3, 1, 0.3] }}
+                      animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.3, 1, 0.3] }}
                       transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
-                      className="w-2 h-2 rounded-full bg-white"
+                      className="w-1.5 h-1.5 rounded-full bg-white"
                     />
                   ))}
                 </motion.div>
