@@ -33,10 +33,10 @@ export const quickStartFlow: OnboardingFlow = {
       subtitle: 'We\'ll use this to guide your first reset.',
       illustrationLabel: 'Mascot in cozy room',
       options: [
-        { label: 'Reduce stress', emoji: '🧘' },
-        { label: 'Build discipline', emoji: '💪' },
-        { label: 'Improve focus', emoji: '🎯' },
-        { label: 'Build stronger routines', emoji: '🔄' },
+        { label: 'A bit scattered', emoji: '☁️' },
+        { label: 'Feeling the pressure', emoji: '🌪️' },
+        { label: 'I need a spark', emoji: '✨' },
+        { label: 'Just looking for a rhythm', emoji: '🌿' },
       ],
     },
     // 3 — Daily reset concept
