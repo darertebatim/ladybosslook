@@ -2368,7 +2368,11 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
   const handleMoodTap = () => {
     if (phase !== 'hint-mood' && phase !== 'spotlight-mood') return;
-    setShowMoodPicker(true);
+    setProLinkTransform({ emoji: '🌤️', toolEmoji: '🎭', label: 'Opening Mood Check-in...' });
+    addTimer(() => {
+      setProLinkTransform(null);
+      setShowMoodPicker(true);
+    }, 1400);
   };
 
   const handleMoodSelect = (moodValue: string) => {
