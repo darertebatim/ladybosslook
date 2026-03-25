@@ -2410,7 +2410,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
   // Which phases show overlay
   const showReadyToPlay = phase === 'ready-to-play';
-  const showOverlay = phase.startsWith('spotlight') || phase.startsWith('hint') || phase.startsWith('celebrate') || phase === 'feeling-mood' || phase === 'done';
+  const showOverlay = phase.startsWith('spotlight') || phase.startsWith('hint') || phase.startsWith('celebrate') || phase === 'feeling-mood' || phase === 'victory' || phase === 'done';
   // Which task is spotlighted
   const spotlightIdx =
     phase.includes('app') ? 0 :
