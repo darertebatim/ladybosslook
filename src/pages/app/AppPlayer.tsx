@@ -81,7 +81,7 @@ export default function AppPlayer() {
   }, [searchParams]);
 
   // Use centralized data hook with parallel fetching
-  const { playlists, playlistItems, progressData, enrollments, programs, isLoading } = usePlayerData();
+  const { playlists, playlistItems, progressData, enrollments, programs, preferredLanguage: userPreferredLanguage, isLoading } = usePlayerData();
 
   // Memoized playlist stats calculation - O(1) lookups
   const playlistStats = useMemo(() => {
@@ -165,14 +165,20 @@ export default function AppPlayer() {
     return playlist.language === preferredLanguage;
   };
 
-  // Filter playlists based on selected category
+  // Filter and sort playlists - preferred language first
   const filteredPlaylists = playlists
     ?.filter(p => !p.is_hidden)
     ?.filter(isPlaylistAvailableOnMobile)
     ?.filter(filterByLanguage)
     ?.filter(p => selectedCategory === 'all' || p.category === selectedCategory)
     ?.filter(filterPlaylistBySearch)
-    ?.filter(filterPlaylistByProgress) || [];
+    ?.filter(filterPlaylistByProgress)
+    ?.sort((a, b) => {
+      if (!userPreferredLanguage || userPreferredLanguage === 'all') return 0;
+      const aMatch = a.language === userPreferredLanguage ? 0 : 1;
+      const bMatch = b.language === userPreferredLanguage ? 0 : 1;
+      return aMatch - bMatch;
+    }) || [];
 
   // Continue Learning section
   const continueListening = playlists?.filter(playlist => {
