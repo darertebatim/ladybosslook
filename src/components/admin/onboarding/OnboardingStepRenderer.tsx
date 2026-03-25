@@ -2350,7 +2350,11 @@ function StarterRoutineScreen({ step, onNext }: Props) {
 
   const handleBreatheTap = () => {
     if (phase !== 'hint-breathe' && phase !== 'spotlight-breathe') return;
-    setShowBreathing(true);
+    setProLinkTransform({ emoji: '🫁', toolEmoji: '🌬️', label: 'Opening Breathe...' });
+    addTimer(() => {
+      setProLinkTransform(null);
+      setShowBreathing(true);
+    }, 1400);
   };
 
   const handleBreathingComplete = useCallback(() => {
