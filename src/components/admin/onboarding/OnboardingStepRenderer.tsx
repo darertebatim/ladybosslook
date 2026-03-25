@@ -261,8 +261,8 @@ function WelcomeScreen({ step, onNext }: Props) {
             </div>
           )}
           <div className="relative">
-            <div className="absolute -top-3 right-3 z-10 bg-amber-100 text-[#1a1f3d] text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm border border-amber-300 whitespace-nowrap">
-              ⏱ Under 3 min
+            <div className="absolute -top-3 right-3 z-10 bg-amber-100 text-[#1a1f3d] text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm border border-amber-300 whitespace-nowrap animate-bounce" style={{ animationDuration: '2s' }}>
+              ⚡ Takes only 2 minutes!
             </div>
             <button
               onClick={onNext}
@@ -3262,8 +3262,8 @@ function PersonalizedPlanScreen({ step, onNext, answers }: { step: OnboardingSte
         {/* Fixed button */}
         <div className="shrink-0 px-5 pt-2 pb-6">
           <div className="relative">
-            <div className="absolute -top-3 right-2 z-10 bg-accent text-accent-foreground text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm border border-border whitespace-nowrap">
-              ⏱ Under 3 min
+            <div className="absolute -top-3 right-2 z-10 bg-accent text-accent-foreground text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm border border-border whitespace-nowrap animate-bounce" style={{ animationDuration: '2s' }}>
+              ⚡ Takes only 2 minutes!
             </div>
             <NavyButton onClick={onNext}>{step.buttonLabel || 'Get Started!'}</NavyButton>
           </div>
