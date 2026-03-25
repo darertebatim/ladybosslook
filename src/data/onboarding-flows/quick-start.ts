@@ -149,7 +149,7 @@ export const quickStartFlow: OnboardingFlow = {
       id: 'qs-routine-ready',
       type: 'routine-ready-teaser',
       title: 'Your Routine is Ready ✨',
-      subtitle: 'Based on your answers, we\'ve prepared a personalized routine just for you.',
+      subtitle: 'We shaped this routine around what matters to you — ready when you are.',
       buttonLabel: 'See My Routine',
     },
   ],
