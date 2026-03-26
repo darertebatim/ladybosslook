@@ -77,8 +77,8 @@ export const TaskSkipSheet = ({ task, open, onClose, date }: TaskSkipSheetProps)
           disabled={skipTask.isPending}
         >
           <FastForward className="h-5 w-5 text-muted-foreground" />
-          Skip for Today
-          {task.repeat_pattern !== 'none' && (
+          {isNonRepeating ? 'Move to Tomorrow' : 'Skip for Today'}
+          {!isNonRepeating && task.repeat_pattern !== 'none' && (
             <span className="text-sm text-muted-foreground ml-auto">Returns tomorrow</span>
           )}
         </Button>
