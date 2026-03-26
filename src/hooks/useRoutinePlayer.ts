@@ -466,10 +466,18 @@ export function useRoutinePlayer() {
   }, []);
 
   const adjustTime = useCallback((deltaMinutes: number) => {
-    setTimeLeft(prev => prev + deltaMinutes * 60);
+    const deltaSec = deltaMinutes * 60;
+    originalTargetRef.current += deltaSec;
+    // Re-anchor wall clock so the sync loop uses updated target
+    runningStartWallRef.current = Date.now();
+    elapsedAtRunStartRef.current = elapsedRef.current;
+    setTimeLeft(originalTargetRef.current - elapsedRef.current);
   }, []);
 
   const resetTaskTime = useCallback(() => {
+    elapsedRef.current = 0;
+    runningStartWallRef.current = Date.now();
+    elapsedAtRunStartRef.current = 0;
     setTimeLeft(originalTargetRef.current);
   }, []);
 
