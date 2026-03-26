@@ -215,6 +215,11 @@ export function PromoBanner({
         return false;
       }
       
+      // Check display delay (for player/video_player locations)
+      if ((banner.display_delay_seconds || 0) > 0 && playbackSeconds < banner.display_delay_seconds) {
+        return false;
+      }
+      
       // Location filter - banner's display_location array must include this location
       const bannerLocations = banner.display_location || ['home_top'];
       if (!bannerLocations.includes(location)) {
