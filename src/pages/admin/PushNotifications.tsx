@@ -305,6 +305,19 @@ const localPNs: PNType[] = [
       { title: '{emoji} {taskTitle} — Time\'s up!', body: 'Come back and check off your task ✅', condition: 'Timer reached zero while app in background' },
     ],
   },
+  {
+    name: 'Focus Timer End',
+    function: 'local-focus-timer-end',
+    trigger: 'Timer/Pomodoro countdown reaches zero',
+    description: 'Fires when a focus timer or pomodoro round countdown hits 0 while the app is backgrounded, nudging the user to come back.',
+    icon: <Play className="h-5 w-5" />,
+    codeFile: 'src/lib/routineTaskNotification.ts',
+    deliveryType: 'local',
+    messages: [
+      { title: '⏱️ {theme} Timer — Time\'s up!', body: 'Come back and check off your task ✅', condition: 'Timer mode countdown reached zero' },
+      { title: '🍅 Pomodoro {round}/{total} — Time\'s up!', body: 'Come back and check off your task ✅', condition: 'Pomodoro round countdown reached zero' },
+    ],
+  },
 ];
 
 function DeliveryBadge({ type }: { type: 'server' | 'local' | 'hybrid' }) {
