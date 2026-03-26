@@ -28,12 +28,14 @@ interface PromoBannerData {
   display_location: string[];
   target_playlist_ids: string[];
   target_audio_ids: string[];
+  target_video_ids: string[];
 }
 
 interface PromoBannerProps {
   location?: DisplayLocation;
   currentPlaylistId?: string;
   currentAudioId?: string;
+  currentVideoId?: string;
   className?: string;
   onVisibilityChange?: (visible: boolean) => void;
   /** Show all eligible banners in a carousel instead of one at a time */
@@ -88,6 +90,7 @@ export function PromoBanner({
   location = 'home_top', 
   currentPlaylistId,
   currentAudioId,
+  currentVideoId,
   className,
   onVisibilityChange,
   carousel = false,
