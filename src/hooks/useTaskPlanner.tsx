@@ -1430,6 +1430,28 @@ export const useSkipTask = () => {
 
       const dateStr = getLocalDateStr(date);
 
+      // Check if this is a one-time task
+      const { data: task } = await supabase
+        .from('user_tasks')
+        .select('repeat_pattern')
+        .eq('id', taskId)
+        .single();
+
+      if (task?.repeat_pattern === 'none') {
+        // For one-time tasks, reschedule to tomorrow instead of creating a skip record
+        const tomorrow = new Date(date);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = getLocalDateStr(tomorrow);
+
+        const { error } = await supabase
+          .from('user_tasks')
+          .update({ scheduled_date: tomorrowStr })
+          .eq('id', taskId);
+
+        if (error) throw error;
+        return { task_id: taskId, skipped_date: dateStr, snoozed_to_date: tomorrowStr, user_id: user.id, created_at: new Date().toISOString(), id: '' } as TaskSkip;
+      }
+
       const { data, error } = await supabase
         .from('task_skips')
         .upsert({
@@ -1446,15 +1468,23 @@ export const useSkipTask = () => {
       if (error) throw error;
       return data as TaskSkip;
     },
-    onSuccess: (_, { date }) => {
+    onSuccess: (result, { date }) => {
       const dateStr = getLocalDateStr(date);
       queryClient.invalidateQueries({ queryKey: ['planner-skips', user?.id, dateStr] });
+      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['routine-preview-completion'] });
       queryClient.invalidateQueries({ queryKey: ['weekly-task-completion'] });
       queryClient.invalidateQueries({ queryKey: ['new-home-data', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-challenges'] });
       queryClient.invalidateQueries({ queryKey: ['challenge-routine-infos'] });
-      toast({ title: 'Task skipped for today' });
+      queryClient.invalidateQueries({ queryKey: ['carry-forward-completions'] });
+      
+      // Show appropriate toast based on whether it was rescheduled (one-time) or skipped
+      if (result.snoozed_to_date) {
+        toast({ title: 'Task moved to tomorrow' });
+      } else {
+        toast({ title: 'Task skipped for today' });
+      }
     },
     onError: (error) => {
       console.error('Skip task error:', error);
