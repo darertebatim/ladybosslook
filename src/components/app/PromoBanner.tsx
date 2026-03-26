@@ -29,6 +29,7 @@ interface PromoBannerData {
   target_playlist_ids: string[];
   target_audio_ids: string[];
   target_video_ids: string[];
+  display_delay_seconds: number;
 }
 
 interface PromoBannerProps {
@@ -36,6 +37,8 @@ interface PromoBannerProps {
   currentPlaylistId?: string;
   currentAudioId?: string;
   currentVideoId?: string;
+  /** Current playback time in seconds (for delayed banner display) */
+  playbackSeconds?: number;
   className?: string;
   onVisibilityChange?: (visible: boolean) => void;
   /** Show all eligible banners in a carousel instead of one at a time */
@@ -91,6 +94,7 @@ export function PromoBanner({
   currentPlaylistId,
   currentAudioId,
   currentVideoId,
+  playbackSeconds = 0,
   className,
   onVisibilityChange,
   carousel = false,
@@ -211,6 +215,11 @@ export function PromoBanner({
         return false;
       }
       
+      // Check display delay (for player/video_player locations)
+      if ((banner.display_delay_seconds || 0) > 0 && playbackSeconds < banner.display_delay_seconds) {
+        return false;
+      }
+      
       // Location filter - banner's display_location array must include this location
       const bannerLocations = banner.display_location || ['home_top'];
       if (!bannerLocations.includes(location)) {
@@ -305,7 +314,7 @@ export function PromoBanner({
       
       return true;
     });
-  }, [banners, dismissedIds, location, currentPlaylistId, currentAudioId, currentVideoId, userEnrollments, userPlaylists, userTools]);
+  }, [banners, dismissedIds, location, currentPlaylistId, currentAudioId, currentVideoId, playbackSeconds, userEnrollments, userPlaylists, userTools]);
 
   const handleDismiss = (e: React.MouseEvent, banner: PromoBannerData) => {
     e.stopPropagation();

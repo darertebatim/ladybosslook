@@ -60,6 +60,7 @@ interface PromoBanner {
   target_playlist_ids: string[];
   target_audio_ids: string[];
   target_video_ids: string[];
+  display_delay_seconds: number;
 }
 
 export function PromoBannerManager() {
@@ -90,7 +91,8 @@ export function PromoBannerManager() {
   const [targetPlaylistIds, setTargetPlaylistIds] = useState<string[]>([]);
   const [targetAudioIds, setTargetAudioIds] = useState<string[]>([]);
   const [targetVideoIds, setTargetVideoIds] = useState<string[]>([]);
-  
+  const [displayDelaySeconds, setDisplayDelaySeconds] = useState(0);
+
   // Audience targeting state
   const [targetType, setTargetType] = useState<TargetType>('all');
   const [includePrograms, setIncludePrograms] = useState<string[]>([]);
@@ -336,6 +338,7 @@ export function PromoBannerManager() {
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
         target_video_ids: targetVideoIds,
+        display_delay_seconds: displayDelaySeconds,
       });
       if (error) throw error;
     },
@@ -380,6 +383,7 @@ export function PromoBannerManager() {
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
         target_video_ids: targetVideoIds,
+        display_delay_seconds: displayDelaySeconds,
       }).eq('id', editingBanner.id);
       if (error) throw error;
     },
@@ -450,6 +454,7 @@ export function PromoBannerManager() {
     setTargetPlaylistIds([]);
     setTargetAudioIds([]);
     setTargetVideoIds([]);
+    setDisplayDelaySeconds(0);
   };
 
   const startEditing = (banner: PromoBanner) => {
@@ -477,6 +482,7 @@ export function PromoBannerManager() {
     setTargetPlaylistIds(banner.target_playlist_ids || []);
     setTargetAudioIds(banner.target_audio_ids || []);
     setTargetVideoIds(banner.target_video_ids || []);
+    setDisplayDelaySeconds(banner.display_delay_seconds || 0);
   };
 
   const getDestinationLabel = (banner: PromoBanner) => {
@@ -832,6 +838,24 @@ export function PromoBannerManager() {
                 </div>
               )}
 
+              {/* Display Delay - show when player or video_player location is selected */}
+              {(displayLocations.includes('player') || displayLocations.includes('video_player')) && (
+                <div className="space-y-2">
+                  <Label>Display Delay (seconds)</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Show banner after this many seconds of playback. Set to 0 for immediate display.
+                  </p>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={300}
+                    value={displayDelaySeconds}
+                    onChange={(e) => setDisplayDelaySeconds(parseInt(e.target.value) || 0)}
+                    placeholder="0"
+                  />
+                </div>
+              )}
+
               {/* Destination Type */}
               <div className="space-y-2">
                 <Label>Destination Type</Label>
@@ -1110,6 +1134,7 @@ export function PromoBannerManager() {
                       setTargetPlaylistIds(banner.target_playlist_ids || []);
                       setTargetAudioIds(banner.target_audio_ids || []);
                       setTargetVideoIds(banner.target_video_ids || []);
+                      setDisplayDelaySeconds(banner.display_delay_seconds || 0);
                       setEditingBanner(null);
                       setIsCreating(true);
                       toast.success('Banner duplicated - modify and save as new');
