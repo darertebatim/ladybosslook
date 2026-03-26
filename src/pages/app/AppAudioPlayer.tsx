@@ -752,6 +752,7 @@ export default function AppAudioPlayer() {
             location="player" 
             currentPlaylistId={playlistInfo?.playlist_id || contextPlaylistId || undefined}
             currentAudioId={audio?.id}
+            playbackSeconds={Math.floor(currentTime)}
             className="mt-4 mb-2"
           />
 
