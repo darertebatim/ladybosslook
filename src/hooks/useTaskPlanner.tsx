@@ -1396,7 +1396,7 @@ export interface TaskSkip {
  */
 export const useSkipsForDate = (date: Date) => {
   const { user } = useAuth();
-  const dateStr = format(date, 'yyyy-MM-dd');
+  const dateStr = getLocalDateStr(date);
 
   return useQuery({
     queryKey: ['planner-skips', user?.id, dateStr],
@@ -1428,7 +1428,7 @@ export const useSkipTask = () => {
     mutationFn: async ({ taskId, date }: { taskId: string; date: Date }) => {
       if (!user?.id) throw new Error('Not authenticated');
 
-      const dateStr = format(date, 'yyyy-MM-dd');
+      const dateStr = getLocalDateStr(date);
 
       const { data, error } = await supabase
         .from('task_skips')
@@ -1447,8 +1447,13 @@ export const useSkipTask = () => {
       return data as TaskSkip;
     },
     onSuccess: (_, { date }) => {
-      const dateStr = format(date, 'yyyy-MM-dd');
+      const dateStr = getLocalDateStr(date);
       queryClient.invalidateQueries({ queryKey: ['planner-skips', user?.id, dateStr] });
+      queryClient.invalidateQueries({ queryKey: ['routine-preview-completion'] });
+      queryClient.invalidateQueries({ queryKey: ['weekly-task-completion'] });
+      queryClient.invalidateQueries({ queryKey: ['new-home-data', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['user-challenges'] });
+      queryClient.invalidateQueries({ queryKey: ['challenge-routine-infos'] });
       toast({ title: 'Task skipped for today' });
     },
     onError: (error) => {
@@ -1469,8 +1474,8 @@ export const useSnoozeTask = () => {
     mutationFn: async ({ taskId, fromDate, toDate }: { taskId: string; fromDate: Date; toDate: Date }) => {
       if (!user?.id) throw new Error('Not authenticated');
 
-      const fromDateStr = format(fromDate, 'yyyy-MM-dd');
-      const toDateStr = format(toDate, 'yyyy-MM-dd');
+      const fromDateStr = getLocalDateStr(fromDate);
+      const toDateStr = getLocalDateStr(toDate);
 
       // For non-repeating tasks, update the scheduled_date directly
       const { data: task } = await supabase
@@ -1506,10 +1511,15 @@ export const useSnoozeTask = () => {
       return { taskId, fromDate, toDate };
     },
     onSuccess: (_, { fromDate, toDate }) => {
-      const fromDateStr = format(fromDate, 'yyyy-MM-dd');
+      const fromDateStr = getLocalDateStr(fromDate);
       queryClient.invalidateQueries({ queryKey: ['planner-skips', user?.id, fromDateStr] });
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-      
+      queryClient.invalidateQueries({ queryKey: ['routine-preview-completion'] });
+      queryClient.invalidateQueries({ queryKey: ['weekly-task-completion'] });
+      queryClient.invalidateQueries({ queryKey: ['new-home-data', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['user-challenges'] });
+      queryClient.invalidateQueries({ queryKey: ['challenge-routine-infos'] });
+
       const toDateFormatted = format(toDate, 'MMM d');
       toast({ title: `Rescheduled to ${toDateFormatted}` });
     },
@@ -1531,7 +1541,7 @@ export const useUndoSkip = () => {
     mutationFn: async ({ taskId, date }: { taskId: string; date: Date }) => {
       if (!user?.id) throw new Error('Not authenticated');
 
-      const dateStr = format(date, 'yyyy-MM-dd');
+      const dateStr = getLocalDateStr(date);
 
       const { error } = await supabase
         .from('task_skips')
@@ -1544,8 +1554,13 @@ export const useUndoSkip = () => {
       return { taskId, date };
     },
     onSuccess: (_, { date }) => {
-      const dateStr = format(date, 'yyyy-MM-dd');
+      const dateStr = getLocalDateStr(date);
       queryClient.invalidateQueries({ queryKey: ['planner-skips', user?.id, dateStr] });
+      queryClient.invalidateQueries({ queryKey: ['routine-preview-completion'] });
+      queryClient.invalidateQueries({ queryKey: ['weekly-task-completion'] });
+      queryClient.invalidateQueries({ queryKey: ['new-home-data', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['user-challenges'] });
+      queryClient.invalidateQueries({ queryKey: ['challenge-routine-infos'] });
       toast({ title: 'Skip undone' });
     },
     onError: (error) => {

@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { ChevronRight, Play, RotateCw } from 'lucide-react';
 import { startOfDay, endOfDay } from 'date-fns';
-import { getLocalDateStr } from '@/lib/localDate';
+import { getLocalDateStr, taskAppliesToDate } from '@/lib/localDate';
 
 interface RoutineTaskPreviewProps {
   routineId: string;
@@ -52,32 +52,57 @@ export function useRoutinePreviewData(routineId: string) {
         .limit(1)
         .maybeSingle();
 
-      // 2) Also check manual task_completions for this routine's tasks
+      // 2) Check routine tasks, but only those that apply today
       const { data: routineTasks } = await supabase
         .from('user_tasks')
-        .select('id')
+        .select('id, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date')
         .eq('user_id', user.id)
         .eq('source_routine_id', routineId)
         .eq('is_active', true)
         .or('pro_link_type.is.null,pro_link_type.neq.routine'); // include member pro-tasks, exclude launcher
 
-      const totalTasks = routineTasks?.length || 0;
-      if (totalTasks === 0) return session ? { pct: Math.round((session.tasks_completed / session.tasks_total) * 100), isComplete: session.tasks_completed >= session.tasks_total } : null;
+      const todayTasks = (routineTasks || []).filter((task: any) => taskAppliesToDate(task, todayStr));
 
-      const taskIds = routineTasks!.map(t => t.id);
+      // No applicable tasks today: only show session fallback if a session exists
+      if (todayTasks.length === 0) {
+        if (!session || !session.tasks_total || session.tasks_total <= 0) return null;
+        const sessionTotal = Math.max(session.tasks_total, 1);
+        const sessionCompleted = Math.min(Math.max(session.tasks_completed, 0), sessionTotal);
+        const pct = Math.round((sessionCompleted / sessionTotal) * 100);
+        return { pct, isComplete: pct >= 100 };
+      }
+
+      const todayTaskIds = todayTasks.map(t => t.id);
+      const { data: skippedRows } = await supabase
+        .from('task_skips')
+        .select('task_id')
+        .eq('user_id', user.id)
+        .eq('skipped_date', todayStr)
+        .in('task_id', todayTaskIds);
+
+      const skippedTaskIds = new Set((skippedRows || []).map((row: any) => row.task_id));
+      const activeTodayTasks = todayTasks.filter(t => !skippedTaskIds.has(t.id));
+
+      // All today's tasks skipped = fully done for today
+      if (activeTodayTasks.length === 0) {
+        return { pct: 100, isComplete: true };
+      }
+
+      const activeTaskIds = activeTodayTasks.map(t => t.id);
       const { count: completedCount } = await supabase
         .from('task_completions')
         .select('id', { count: 'exact', head: true })
         .eq('user_id', user.id)
         .eq('completed_date', todayStr)
-        .in('task_id', taskIds);
+        .in('task_id', activeTaskIds);
 
       const manualCompleted = completedCount || 0;
+      const sessionCompleted = session
+        ? Math.min(Math.max(session.tasks_completed, 0), activeTodayTasks.length)
+        : 0;
 
-      // Compare completed counts using the same denominator (current routine tasks)
-      const sessionCompleted = session ? Math.max(session.tasks_completed, 0) : 0;
-      const resolvedCompletedCount = Math.max(manualCompleted, Math.min(sessionCompleted, totalTasks));
-      const pct = totalTasks > 0 ? Math.round((resolvedCompletedCount / totalTasks) * 100) : 0;
+      const resolvedCompletedCount = Math.max(manualCompleted, sessionCompleted);
+      const pct = Math.round((resolvedCompletedCount / activeTodayTasks.length) * 100);
 
       return { pct, isComplete: pct >= 100 };
     },
