@@ -15,7 +15,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { haptic } from '@/lib/haptics';
 import { startOfDay, endOfDay, format } from 'date-fns';
-import { taskAppliesToDate } from '@/lib/localDate';
+import { taskAppliesToDate, getLocalDateStr } from '@/lib/localDate';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { toast } from 'sonner';
 import { RoutinePreviewSheet, EditedTask, ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
@@ -515,7 +515,7 @@ export default function AppRoutinePlayer() {
     return Object.values(userTasksByRoutine).flat().map(t => t.id);
   }, [userTasksByRoutine]);
 
-  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const todayStr = useMemo(() => getLocalDateStr(new Date()), []);
 
   const { data: todayCompletions } = useQuery({
     queryKey: ['focus-today-completions', user?.id, todayStr, allUserTaskIds],
