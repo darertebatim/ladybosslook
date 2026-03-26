@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import heroStormVideo from "@/assets/watch-hero-storm.mp4";
 import { WatchCategoryPill } from "@/components/video/WatchCategoryPill";
 import { useUserPreferredLanguage, preferredLanguageSorter } from "@/hooks/useUserPreferredLanguage";
+import { PromoBanner } from "@/components/app/PromoBanner";
 
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
@@ -326,6 +327,9 @@ export default function AppWatch() {
       {/* Content area */}
       <div className="flex-1 overflow-y-auto overscroll-contain relative z-10" onScroll={handleScroll}>
         <div className="p-4 pb-safe space-y-6">
+          {/* Promo Banner - Watch Page */}
+          <PromoBanner location="watch" className="" />
+
           {/* Continue Watching */}
           {progressFilter === 'all' && selectedCategory === 'all' && !searchQuery && continueWatching.length > 0 && (
             <div className="space-y-3">

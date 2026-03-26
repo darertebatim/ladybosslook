@@ -20,6 +20,7 @@ import { haptic } from "@/lib/haptics";
 import { toast } from "sonner";
 import heroStormVideo from "@/assets/watch-hero-storm.mp4";
 import { useShareContent } from "@/hooks/useShareContent";
+import { PromoBanner } from "@/components/app/PromoBanner";
 
 export default function AppVideoPlaylistDetail() {
   const { playlistId } = useParams();
@@ -233,6 +234,9 @@ export default function AppVideoPlaylistDetail() {
             </div>
             <Progress value={overallProgress} className="h-2 bg-white/10" />
           </div>
+
+          {/* Promo Banner - Video Player */}
+          <PromoBanner location="video_player" className="" />
 
           {/* Video List */}
           <div className="space-y-2 pb-4">
