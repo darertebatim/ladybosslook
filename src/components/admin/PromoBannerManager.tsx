@@ -838,6 +838,24 @@ export function PromoBannerManager() {
                 </div>
               )}
 
+              {/* Display Delay - show when player or video_player location is selected */}
+              {(displayLocations.includes('player') || displayLocations.includes('video_player')) && (
+                <div className="space-y-2">
+                  <Label>Display Delay (seconds)</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Show banner after this many seconds of playback. Set to 0 for immediate display.
+                  </p>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={300}
+                    value={displayDelaySeconds}
+                    onChange={(e) => setDisplayDelaySeconds(parseInt(e.target.value) || 0)}
+                    placeholder="0"
+                  />
+                </div>
+              )}
+
               {/* Destination Type */}
               <div className="space-y-2">
                 <Label>Destination Type</Label>
