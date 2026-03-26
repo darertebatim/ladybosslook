@@ -18,7 +18,7 @@ import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'mood' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist' | 'routine_player';
 type DisplayFrequency = 'once' | 'daily' | 'weekly' | 'forever';
 type AspectRatio = '3:1' | '4:1' | '16:9' | '1:1';
-type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch' | 'routines_top' | 'routines_after_categories' | 'routine_player';
+type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch' | 'video_player' | 'routines_top' | 'routines_after_categories' | 'routine_player';
 
 const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
   { value: 'home_top', label: '🏠 Home - Above Tasks' },
@@ -30,6 +30,7 @@ const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
   { value: 'programs', label: '📚 Programs Page' },
   { value: 'channels', label: '📢 Channels Page' },
   { value: 'watch', label: '📺 Watch Page' },
+  { value: 'video_player', label: '🎥 Video Player' },
   { value: 'routines_top', label: '✨ Routines - Top' },
   { value: 'routines_after_categories', label: '✨ Routines - Under Categories' },
   { value: 'routine_player', label: '🎬 Routine Player' },
