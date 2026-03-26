@@ -151,7 +151,7 @@ export default function AppTimer() {
         audioRef.current.pause();
         audioRef.current = null;
       }
-      cancelTaskEndNotification();
+      cancelFocusTimerNotification();
     };
   }, []);
 
@@ -276,7 +276,7 @@ export default function AppTimer() {
     // Schedule PN for when timer ends
     const themeLabel = customTheme || selectedTheme;
     const isPomodoro = activeTab === 'pomodoro';
-    scheduleTaskEndNotification(
+    scheduleFocusTimerNotification(
       isPomodoro ? `Pomodoro ${pomodoroRound + 1}/${pomodoroCycles}` : `${themeLabel} Timer`,
       isPomodoro ? '🍅' : '⏱️',
       total,
@@ -289,7 +289,7 @@ export default function AppTimer() {
       if (remaining <= 0) {
         clearInterval(intervalRef.current!);
         intervalRef.current = null;
-        cancelTaskEndNotification();
+        cancelFocusTimerNotification();
         onComplete();
       }
     }, 1000);
@@ -305,7 +305,7 @@ export default function AppTimer() {
         if (remaining <= 0) {
           clearInterval(intervalRef.current!);
           intervalRef.current = null;
-          cancelTaskEndNotification();
+          cancelFocusTimerNotification();
           countdownCallbackRef.current?.();
         }
       }
@@ -319,7 +319,7 @@ export default function AppTimer() {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    cancelTaskEndNotification();
+    cancelFocusTimerNotification();
     // Save partial session
     const elapsed = totalSeconds - secondsLeft;
     if (elapsed > 0) {
