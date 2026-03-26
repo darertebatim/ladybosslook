@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { FocusStatsScreen } from '@/components/app/FocusStatsScreen';
 import { useSaveFocusSession } from '@/hooks/useFocusSessions';
-import { scheduleTaskEndNotification, cancelTaskEndNotification } from '@/lib/routineTaskNotification';
+import { scheduleFocusTimerNotification, cancelFocusTimerNotification } from '@/lib/routineTaskNotification';
 
 type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped' | 'pomodoroRoundDone' | 'pomodoroBreak' | 'pomodoroBreakDone' | 'settings' | 'stats';
 
