@@ -140,6 +140,19 @@ export function PromoBannerManager() {
     },
   });
 
+  // Fetch audio content for target audio selector
+  const { data: audioTracks } = useQuery({
+    queryKey: ['audio-tracks-for-promo'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_content')
+        .select('id, title')
+        .order('title');
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Fetch video playlists for destination selector
   const { data: videoPlaylists } = useQuery({
     queryKey: ['video-playlists-for-promo'],
@@ -306,6 +319,7 @@ export function PromoBannerManager() {
         exclude_tools: excludeTools,
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
+        target_audio_ids: targetAudioIds,
       });
       if (error) throw error;
     },
@@ -348,6 +362,7 @@ export function PromoBannerManager() {
         exclude_tools: excludeTools,
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
+        target_audio_ids: targetAudioIds,
       }).eq('id', editingBanner.id);
       if (error) throw error;
     },
@@ -416,6 +431,7 @@ export function PromoBannerManager() {
     // Reset location
     setDisplayLocations(['home_top']);
     setTargetPlaylistIds([]);
+    setTargetAudioIds([]);
   };
 
   const startEditing = (banner: PromoBanner) => {
@@ -441,6 +457,7 @@ export function PromoBannerManager() {
     // Load location
     setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
     setTargetPlaylistIds(banner.target_playlist_ids || []);
+    setTargetAudioIds(banner.target_audio_ids || []);
   };
 
   const getDestinationLabel = (banner: PromoBanner) => {
@@ -974,6 +991,7 @@ export function PromoBannerManager() {
                       setExcludeTools(banner.exclude_tools || []);
                       setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
                       setTargetPlaylistIds(banner.target_playlist_ids || []);
+                      setTargetAudioIds(banner.target_audio_ids || []);
                       setEditingBanner(null);
                       setIsCreating(true);
                       toast.success('Banner duplicated - modify and save as new');
