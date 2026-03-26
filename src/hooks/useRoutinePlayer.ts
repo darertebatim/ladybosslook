@@ -49,6 +49,12 @@ export function useRoutinePlayer() {
   const elapsedRef = useRef(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const originalTargetRef = useRef(0);
+  // Wall-clock anchor: tracks when the current running phase started
+  const runningStartWallRef = useRef<number>(0);
+  // How many seconds had already elapsed when the running phase (re)started
+  const elapsedAtRunStartRef = useRef<number>(0);
+  // Total seconds spent paused during this task
+  const totalPausedSecondsRef = useRef<number>(0);
 
   // Fetch session stats for this routine
   const { data: sessionStats } = useQuery({
@@ -90,20 +96,35 @@ export function useRoutinePlayer() {
   const isOvertime = timeLeft < 0;
   const overtimeSeconds = isOvertime ? Math.abs(timeLeft) : 0;
 
-  // Timer logic - now allows going negative for overtime
+  // Wall-clock timer: survives iOS background suspension
   useEffect(() => {
     if (phase !== 'running') {
       if (intervalRef.current) clearInterval(intervalRef.current);
       return;
     }
 
-    intervalRef.current = setInterval(() => {
-      elapsedRef.current += 1;
-      setTimeLeft(prev => prev - 1); // Allow going negative
-    }, 1000);
+    // Anchor the wall clock when entering running phase
+    runningStartWallRef.current = Date.now();
+    elapsedAtRunStartRef.current = elapsedRef.current;
+
+    const sync = () => {
+      const wallElapsed = Math.round((Date.now() - runningStartWallRef.current) / 1000);
+      const totalElapsed = elapsedAtRunStartRef.current + wallElapsed;
+      elapsedRef.current = totalElapsed;
+      setTimeLeft(originalTargetRef.current - totalElapsed);
+    };
+
+    intervalRef.current = setInterval(sync, 1000);
+
+    // Also sync on visibility change (iOS resume)
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') sync();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
   }, [phase]);
 
@@ -445,10 +466,18 @@ export function useRoutinePlayer() {
   }, []);
 
   const adjustTime = useCallback((deltaMinutes: number) => {
-    setTimeLeft(prev => prev + deltaMinutes * 60);
+    const deltaSec = deltaMinutes * 60;
+    originalTargetRef.current += deltaSec;
+    // Re-anchor wall clock so the sync loop uses updated target
+    runningStartWallRef.current = Date.now();
+    elapsedAtRunStartRef.current = elapsedRef.current;
+    setTimeLeft(originalTargetRef.current - elapsedRef.current);
   }, []);
 
   const resetTaskTime = useCallback(() => {
+    elapsedRef.current = 0;
+    runningStartWallRef.current = Date.now();
+    elapsedAtRunStartRef.current = 0;
     setTimeLeft(originalTargetRef.current);
   }, []);
 
