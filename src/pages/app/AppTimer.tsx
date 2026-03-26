@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { FocusStatsScreen } from '@/components/app/FocusStatsScreen';
 import { useSaveFocusSession } from '@/hooks/useFocusSessions';
+import { scheduleTaskEndNotification, cancelTaskEndNotification } from '@/lib/routineTaskNotification';
 
 type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped' | 'pomodoroRoundDone' | 'pomodoroBreak' | 'pomodoroBreakDone' | 'settings' | 'stats';
 
@@ -150,6 +151,7 @@ export default function AppTimer() {
         audioRef.current.pause();
         audioRef.current = null;
       }
+      cancelTaskEndNotification();
     };
   }, []);
 
@@ -259,26 +261,65 @@ export default function AppTimer() {
     });
   };
 
+  // Wall-clock refs for background resilience
+  const countdownStartWallRef = useRef<number>(0);
+  const countdownTotalRef = useRef<number>(0);
+  const countdownCallbackRef = useRef<(() => void) | null>(null);
+
   const runCountdown = (total: number, onComplete: () => void) => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    let remaining = total;
-    setSecondsLeft(remaining);
+    countdownStartWallRef.current = Date.now();
+    countdownTotalRef.current = total;
+    countdownCallbackRef.current = onComplete;
+    setSecondsLeft(total);
+
+    // Schedule PN for when timer ends
+    const themeLabel = customTheme || selectedTheme;
+    const isPomodoro = activeTab === 'pomodoro';
+    scheduleTaskEndNotification(
+      isPomodoro ? `Pomodoro ${pomodoroRound + 1}/${pomodoroCycles}` : `${themeLabel} Timer`,
+      isPomodoro ? '🍅' : '⏱️',
+      total,
+    );
+
     intervalRef.current = setInterval(() => {
-      remaining -= 1;
+      const wallElapsed = Math.round((Date.now() - countdownStartWallRef.current) / 1000);
+      const remaining = Math.max(0, countdownTotalRef.current - wallElapsed);
       setSecondsLeft(remaining);
       if (remaining <= 0) {
         clearInterval(intervalRef.current!);
         intervalRef.current = null;
+        cancelTaskEndNotification();
         onComplete();
       }
     }, 1000);
   };
+
+  // Sync timer on app resume from background
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible' && intervalRef.current && countdownStartWallRef.current > 0) {
+        const wallElapsed = Math.round((Date.now() - countdownStartWallRef.current) / 1000);
+        const remaining = Math.max(0, countdownTotalRef.current - wallElapsed);
+        setSecondsLeft(remaining);
+        if (remaining <= 0) {
+          clearInterval(intervalRef.current!);
+          intervalRef.current = null;
+          cancelTaskEndNotification();
+          countdownCallbackRef.current?.();
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
 
   const stopTimer = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+    cancelTaskEndNotification();
     // Save partial session
     const elapsed = totalSeconds - secondsLeft;
     if (elapsed > 0) {
