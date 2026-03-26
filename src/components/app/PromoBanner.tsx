@@ -94,6 +94,7 @@ export function PromoBanner({
   currentPlaylistId,
   currentAudioId,
   currentVideoId,
+  playbackSeconds = 0,
   className,
   onVisibilityChange,
   carousel = false,
