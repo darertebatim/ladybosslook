@@ -8,6 +8,7 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { haptic } from '@/lib/haptics';
 import { useAuth } from '@/hooks/useAuth';
+import { getLocalDateStr } from '@/lib/localDate';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TASK_COLOR_CLASSES, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
@@ -239,7 +240,7 @@ export function RoutineBuilderSheet({
     queryKey: ['builder-unlinked-tasks', user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const today = new Date().toISOString().split('T')[0];
+      const today = getLocalDateStr(new Date());
       const { data } = await supabase
         .from('user_tasks')
         .select('id, title, emoji, color, repeat_pattern, category:tag, duration_minutes, pro_link_type, pro_link_value, goal_enabled, goal_target, goal_type, goal_unit, linked_playlist_id, time_period, scheduled_date, repeat_end_date')
