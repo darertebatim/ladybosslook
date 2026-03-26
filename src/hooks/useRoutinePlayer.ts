@@ -6,6 +6,7 @@ import { updatePresence } from '@/hooks/useUserPresence';
 import { updateStreak } from '@/hooks/useTaskPlanner';
 import type { SessionTaskResult } from '@/components/app/RoutinePlayerSummary';
 import { getLocalDateStr, taskAppliesToDate } from '@/lib/localDate';
+import { scheduleTaskEndNotification, cancelTaskEndNotification } from '@/lib/routineTaskNotification';
 
 export interface RoutineTask {
   id: string;
