@@ -314,7 +314,7 @@ export function PromoBanner({
       
       return true;
     });
-  }, [banners, dismissedIds, location, currentPlaylistId, currentAudioId, currentVideoId, userEnrollments, userPlaylists, userTools]);
+  }, [banners, dismissedIds, location, currentPlaylistId, currentAudioId, currentVideoId, playbackSeconds, userEnrollments, userPlaylists, userTools]);
 
   const handleDismiss = (e: React.MouseEvent, banner: PromoBannerData) => {
     e.stopPropagation();

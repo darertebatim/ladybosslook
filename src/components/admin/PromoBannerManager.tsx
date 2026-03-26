@@ -338,6 +338,7 @@ export function PromoBannerManager() {
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
         target_video_ids: targetVideoIds,
+        display_delay_seconds: displayDelaySeconds,
       });
       if (error) throw error;
     },
@@ -382,6 +383,7 @@ export function PromoBannerManager() {
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
         target_video_ids: targetVideoIds,
+        display_delay_seconds: displayDelaySeconds,
       }).eq('id', editingBanner.id);
       if (error) throw error;
     },
@@ -452,6 +454,7 @@ export function PromoBannerManager() {
     setTargetPlaylistIds([]);
     setTargetAudioIds([]);
     setTargetVideoIds([]);
+    setDisplayDelaySeconds(0);
   };
 
   const startEditing = (banner: PromoBanner) => {
@@ -479,6 +482,7 @@ export function PromoBannerManager() {
     setTargetPlaylistIds(banner.target_playlist_ids || []);
     setTargetAudioIds(banner.target_audio_ids || []);
     setTargetVideoIds(banner.target_video_ids || []);
+    setDisplayDelaySeconds(banner.display_delay_seconds || 0);
   };
 
   const getDestinationLabel = (banner: PromoBanner) => {
@@ -1112,6 +1116,7 @@ export function PromoBannerManager() {
                       setTargetPlaylistIds(banner.target_playlist_ids || []);
                       setTargetAudioIds(banner.target_audio_ids || []);
                       setTargetVideoIds(banner.target_video_ids || []);
+                      setDisplayDelaySeconds(banner.display_delay_seconds || 0);
                       setEditingBanner(null);
                       setIsCreating(true);
                       toast.success('Banner duplicated - modify and save as new');
