@@ -58,6 +58,7 @@ interface PromoBanner {
   exclude_tools: string[];
   display_location: string[];
   target_playlist_ids: string[];
+  target_audio_ids: string[];
 }
 
 export function PromoBannerManager() {
@@ -86,6 +87,7 @@ export function PromoBannerManager() {
   // Display location state
   const [displayLocations, setDisplayLocations] = useState<DisplayLocation[]>(['home_top']);
   const [targetPlaylistIds, setTargetPlaylistIds] = useState<string[]>([]);
+  const [targetAudioIds, setTargetAudioIds] = useState<string[]>([]);
   
   // Audience targeting state
   const [targetType, setTargetType] = useState<TargetType>('all');
