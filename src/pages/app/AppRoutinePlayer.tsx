@@ -536,18 +536,33 @@ export default function AppRoutinePlayer() {
   const getCompletionInfo = (routineId: string) => {
     const tasks = userTasksByRoutine?.[routineId];
     if (!tasks || tasks.length === 0) return null;
+
     const todayTasks = tasks.filter(t => taskAppliesToDate(t, todayStr));
-    // Exclude skipped tasks from total count so skipped tasks don't block 100%
+    const session = todaySessions?.find(s => s.routine_id === routineId);
+
+    // No applicable tasks today: only use session fallback if it exists
+    if (todayTasks.length === 0) {
+      if (!session || !session.tasks_total || session.tasks_total <= 0) return null;
+      const sessionTotal = Math.max(session.tasks_total, 1);
+      const sessionCompleted = Math.min(Math.max(session.tasks_completed, 0), sessionTotal);
+      const pct = Math.round((sessionCompleted / sessionTotal) * 100);
+      return { pct, isComplete: pct >= 100 };
+    }
+
+    // Exclude skipped tasks from denominator so skips don't block 100%
     const activeTodayTasks = todayTasks.filter(t => !skippedTaskIds.has(t.id));
-    const totalTasks = activeTodayTasks.length || tasks.length;
+
+    // All today's tasks skipped = fully done for today
+    if (activeTodayTasks.length === 0) {
+      return { pct: 100, isComplete: true };
+    }
+
+    const totalTasks = activeTodayTasks.length;
 
     // Source 1: manual task_completions
-    const manualCompleted = activeTodayTasks.length > 0
-      ? activeTodayTasks.filter(t => todayCompletions?.has(t.id)).length
-      : 0;
+    const manualCompleted = activeTodayTasks.filter(t => todayCompletions?.has(t.id)).length;
 
     // Source 2: routine_sessions from the player
-    const session = todaySessions?.find(s => s.routine_id === routineId);
     const sessionCompleted = session ? Math.min(Math.max(session.tasks_completed, 0), totalTasks) : 0;
 
     const resolvedCompleted = Math.max(manualCompleted, sessionCompleted);
