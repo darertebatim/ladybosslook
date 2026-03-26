@@ -449,6 +449,7 @@ export function PromoBannerManager() {
     setDisplayLocations(['home_top']);
     setTargetPlaylistIds([]);
     setTargetAudioIds([]);
+    setTargetVideoIds([]);
   };
 
   const startEditing = (banner: PromoBanner) => {
@@ -475,6 +476,7 @@ export function PromoBannerManager() {
     setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
     setTargetPlaylistIds(banner.target_playlist_ids || []);
     setTargetAudioIds(banner.target_audio_ids || []);
+    setTargetVideoIds(banner.target_video_ids || []);
   };
 
   const getDestinationLabel = (banner: PromoBanner) => {
@@ -1058,6 +1060,7 @@ export function PromoBannerManager() {
                       setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
                       setTargetPlaylistIds(banner.target_playlist_ids || []);
                       setTargetAudioIds(banner.target_audio_ids || []);
+                      setTargetVideoIds(banner.target_video_ids || []);
                       setEditingBanner(null);
                       setIsCreating(true);
                       toast.success('Banner duplicated - modify and save as new');
