@@ -515,7 +515,7 @@ export default function AppRoutinePlayer() {
     return Object.values(userTasksByRoutine).flat().map(t => t.id);
   }, [userTasksByRoutine]);
 
-  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const todayStr = useMemo(() => getLocalDateStr(new Date()), []);
 
   const { data: todayCompletions } = useQuery({
     queryKey: ['focus-today-completions', user?.id, todayStr, allUserTaskIds],
