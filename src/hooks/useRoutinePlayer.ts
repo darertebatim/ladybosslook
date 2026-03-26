@@ -49,6 +49,12 @@ export function useRoutinePlayer() {
   const elapsedRef = useRef(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const originalTargetRef = useRef(0);
+  // Wall-clock anchor: tracks when the current running phase started
+  const runningStartWallRef = useRef<number>(0);
+  // How many seconds had already elapsed when the running phase (re)started
+  const elapsedAtRunStartRef = useRef<number>(0);
+  // Total seconds spent paused during this task
+  const totalPausedSecondsRef = useRef<number>(0);
 
   // Fetch session stats for this routine
   const { data: sessionStats } = useQuery({
