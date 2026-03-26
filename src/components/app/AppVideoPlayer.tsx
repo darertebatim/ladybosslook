@@ -11,6 +11,7 @@ import { useExistingVideoTask } from '@/hooks/useVideoRoutine';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
+import { PromoBanner } from '@/components/app/PromoBanner';
 
 interface VideoItem {
   url: string;
@@ -277,6 +278,13 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
         <div className="flex-1 flex items-center justify-center px-4 overflow-hidden overscroll-contain">
           {renderPlayer()}
         </div>
+
+        {/* Promo Banner - Video Player overlay above title bar */}
+        <PromoBanner 
+          location="video_player" 
+          currentVideoId={videoId}
+          className="px-4 pb-1"
+        />
 
         {/* Title bar + Next button */}
         <div className="px-4 pb-4 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>

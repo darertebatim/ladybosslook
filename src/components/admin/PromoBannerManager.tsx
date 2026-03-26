@@ -59,6 +59,7 @@ interface PromoBanner {
   display_location: string[];
   target_playlist_ids: string[];
   target_audio_ids: string[];
+  target_video_ids: string[];
 }
 
 export function PromoBannerManager() {
@@ -88,6 +89,7 @@ export function PromoBannerManager() {
   const [displayLocations, setDisplayLocations] = useState<DisplayLocation[]>(['home_top']);
   const [targetPlaylistIds, setTargetPlaylistIds] = useState<string[]>([]);
   const [targetAudioIds, setTargetAudioIds] = useState<string[]>([]);
+  const [targetVideoIds, setTargetVideoIds] = useState<string[]>([]);
   
   // Audience targeting state
   const [targetType, setTargetType] = useState<TargetType>('all');
@@ -146,6 +148,19 @@ export function PromoBannerManager() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('audio_content')
+        .select('id, title')
+        .order('title');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch video content for target video selector
+  const { data: videoTracks } = useQuery({
+    queryKey: ['video-tracks-for-promo'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('video_content')
         .select('id, title')
         .order('title');
       if (error) throw error;
@@ -320,6 +335,7 @@ export function PromoBannerManager() {
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
+        target_video_ids: targetVideoIds,
       });
       if (error) throw error;
     },
@@ -363,6 +379,7 @@ export function PromoBannerManager() {
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
+        target_video_ids: targetVideoIds,
       }).eq('id', editingBanner.id);
       if (error) throw error;
     },
@@ -432,6 +449,7 @@ export function PromoBannerManager() {
     setDisplayLocations(['home_top']);
     setTargetPlaylistIds([]);
     setTargetAudioIds([]);
+    setTargetVideoIds([]);
   };
 
   const startEditing = (banner: PromoBanner) => {
@@ -458,6 +476,7 @@ export function PromoBannerManager() {
     setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
     setTargetPlaylistIds(banner.target_playlist_ids || []);
     setTargetAudioIds(banner.target_audio_ids || []);
+    setTargetVideoIds(banner.target_video_ids || []);
   };
 
   const getDestinationLabel = (banner: PromoBanner) => {
@@ -764,6 +783,55 @@ export function PromoBannerManager() {
                 </div>
               )}
 
+              {/* Target Videos - only show when location is 'video_player' */}
+              {displayLocations.includes('video_player') && (
+                <div className="space-y-2">
+                  <Label>Target Video Tracks (optional)</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Leave empty to show on all video players, or select specific videos to overlay above the progress bar
+                  </p>
+                  <Select 
+                    value={targetVideoIds[0] || ''} 
+                    onValueChange={(v) => {
+                      if (v && !targetVideoIds.includes(v)) {
+                        setTargetVideoIds([...targetVideoIds, v]);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Add a video..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {videoTracks?.filter(v => !targetVideoIds.includes(v.id)).map(v => (
+                        <SelectItem key={v.id} value={v.id}>{v.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {targetVideoIds.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {targetVideoIds.map(id => {
+                        const track = videoTracks?.find(v => v.id === id);
+                        return (
+                          <span 
+                            key={id} 
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
+                          >
+                            🎬 {track?.title || id}
+                            <button 
+                              type="button"
+                              onClick={() => setTargetVideoIds(targetVideoIds.filter(vid => vid !== id))}
+                              className="hover:text-destructive"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Destination Type */}
               <div className="space-y-2">
                 <Label>Destination Type</Label>
@@ -1041,6 +1109,7 @@ export function PromoBannerManager() {
                       setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
                       setTargetPlaylistIds(banner.target_playlist_ids || []);
                       setTargetAudioIds(banner.target_audio_ids || []);
+                      setTargetVideoIds(banner.target_video_ids || []);
                       setEditingBanner(null);
                       setIsCreating(true);
                       toast.success('Banner duplicated - modify and save as new');

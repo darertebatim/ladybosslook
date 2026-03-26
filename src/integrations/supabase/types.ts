@@ -2527,6 +2527,7 @@ export type Database = {
           target_audio_ids: string[] | null
           target_playlist_ids: string[] | null
           target_type: string
+          target_video_ids: string[] | null
           updated_at: string
         }
         Insert: {
@@ -2552,6 +2553,7 @@ export type Database = {
           target_audio_ids?: string[] | null
           target_playlist_ids?: string[] | null
           target_type?: string
+          target_video_ids?: string[] | null
           updated_at?: string
         }
         Update: {
@@ -2577,6 +2579,7 @@ export type Database = {
           target_audio_ids?: string[] | null
           target_playlist_ids?: string[] | null
           target_type?: string
+          target_video_ids?: string[] | null
           updated_at?: string
         }
         Relationships: []
