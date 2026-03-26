@@ -477,18 +477,28 @@ export function useRoutinePlayer() {
   const adjustTime = useCallback((deltaMinutes: number) => {
     const deltaSec = deltaMinutes * 60;
     originalTargetRef.current += deltaSec;
-    // Re-anchor wall clock so the sync loop uses updated target
     runningStartWallRef.current = Date.now();
     elapsedAtRunStartRef.current = elapsedRef.current;
-    setTimeLeft(originalTargetRef.current - elapsedRef.current);
-  }, []);
+    const newRemaining = originalTargetRef.current - elapsedRef.current;
+    setTimeLeft(newRemaining);
+    // Reschedule the end notification with the new remaining time
+    if (newRemaining > 0 && currentTask) {
+      scheduleTaskEndNotification(currentTask.title, currentTask.emoji, newRemaining);
+    } else {
+      cancelTaskEndNotification();
+    }
+  }, [currentTask]);
 
   const resetTaskTime = useCallback(() => {
     elapsedRef.current = 0;
     runningStartWallRef.current = Date.now();
     elapsedAtRunStartRef.current = 0;
     setTimeLeft(originalTargetRef.current);
-  }, []);
+    // Reschedule notification for full duration
+    if (currentTask) {
+      scheduleTaskEndNotification(currentTask.title, currentTask.emoji, originalTargetRef.current);
+    }
+  }, [currentTask]);
 
   const closePlayer = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
