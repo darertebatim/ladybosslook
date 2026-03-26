@@ -101,12 +101,20 @@ export function useRoutinePlayer() {
   useEffect(() => {
     if (phase !== 'running') {
       if (intervalRef.current) clearInterval(intervalRef.current);
+      // Cancel the task-end notification when leaving running phase
+      cancelTaskEndNotification();
       return;
     }
 
     // Anchor the wall clock when entering running phase
     runningStartWallRef.current = Date.now();
     elapsedAtRunStartRef.current = elapsedRef.current;
+
+    // Schedule a local notification for when the task timer ends
+    const remainingSeconds = originalTargetRef.current - elapsedRef.current;
+    if (remainingSeconds > 0 && currentTask) {
+      scheduleTaskEndNotification(currentTask.title, currentTask.emoji, remainingSeconds);
+    }
 
     const sync = () => {
       const wallElapsed = Math.round((Date.now() - runningStartWallRef.current) / 1000);
@@ -127,7 +135,7 @@ export function useRoutinePlayer() {
       if (intervalRef.current) clearInterval(intervalRef.current);
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [phase]);
+  }, [phase, currentTask]);
 
   // Pause duration tracker
   useEffect(() => {
