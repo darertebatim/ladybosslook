@@ -155,6 +155,19 @@ export function PromoBannerManager() {
     },
   });
 
+  // Fetch video content for target video selector
+  const { data: videoTracks } = useQuery({
+    queryKey: ['video-tracks-for-promo'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('video_content')
+        .select('id, title')
+        .order('title');
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Fetch video playlists for destination selector
   const { data: videoPlaylists } = useQuery({
     queryKey: ['video-playlists-for-promo'],
@@ -322,6 +335,7 @@ export function PromoBannerManager() {
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
+        target_video_ids: targetVideoIds,
       });
       if (error) throw error;
     },
@@ -365,6 +379,7 @@ export function PromoBannerManager() {
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
+        target_video_ids: targetVideoIds,
       }).eq('id', editingBanner.id);
       if (error) throw error;
     },
