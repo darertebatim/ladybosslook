@@ -279,6 +279,13 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
           {renderPlayer()}
         </div>
 
+        {/* Promo Banner - Video Player overlay above title bar */}
+        <PromoBanner 
+          location="video_player" 
+          currentVideoId={videoId}
+          className="px-4 pb-1"
+        />
+
         {/* Title bar + Next button */}
         <div className="px-4 pb-4 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
           <div className="flex items-start justify-between gap-3">
