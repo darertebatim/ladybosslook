@@ -1468,15 +1468,23 @@ export const useSkipTask = () => {
       if (error) throw error;
       return data as TaskSkip;
     },
-    onSuccess: (_, { date }) => {
+    onSuccess: (result, { date }) => {
       const dateStr = getLocalDateStr(date);
       queryClient.invalidateQueries({ queryKey: ['planner-skips', user?.id, dateStr] });
+      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['routine-preview-completion'] });
       queryClient.invalidateQueries({ queryKey: ['weekly-task-completion'] });
       queryClient.invalidateQueries({ queryKey: ['new-home-data', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-challenges'] });
       queryClient.invalidateQueries({ queryKey: ['challenge-routine-infos'] });
-      toast({ title: 'Task skipped for today' });
+      queryClient.invalidateQueries({ queryKey: ['carry-forward-completions'] });
+      
+      // Show appropriate toast based on whether it was rescheduled (one-time) or skipped
+      if (result.snoozed_to_date) {
+        toast({ title: 'Task moved to tomorrow' });
+      } else {
+        toast({ title: 'Task skipped for today' });
+      }
     },
     onError: (error) => {
       console.error('Skip task error:', error);
