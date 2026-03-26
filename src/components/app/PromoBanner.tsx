@@ -231,6 +231,13 @@ export function PromoBanner({
         }
       }
       
+      // For video_player location: check video targeting
+      if (location === 'video_player' && bannerLocations.includes('video_player') && banner.target_video_ids?.length > 0) {
+        if (!currentVideoId || !banner.target_video_ids.includes(currentVideoId)) {
+          return false;
+        }
+      }
+      
       // Target type: all - show to everyone
       if (banner.target_type === 'all') {
         return true;
