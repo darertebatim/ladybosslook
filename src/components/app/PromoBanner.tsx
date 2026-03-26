@@ -27,11 +27,13 @@ interface PromoBannerData {
   exclude_tools: string[];
   display_location: string[];
   target_playlist_ids: string[];
+  target_audio_ids: string[];
 }
 
 interface PromoBannerProps {
   location?: DisplayLocation;
   currentPlaylistId?: string;
+  currentAudioId?: string;
   className?: string;
   onVisibilityChange?: (visible: boolean) => void;
   /** Show all eligible banners in a carousel instead of one at a time */
@@ -85,6 +87,7 @@ function shouldShowBanner(banner: PromoBannerData): boolean {
 export function PromoBanner({ 
   location = 'home_top', 
   currentPlaylistId,
+  currentAudioId,
   className,
   onVisibilityChange,
   carousel = false,
@@ -218,6 +221,13 @@ export function PromoBanner({
         }
       }
       
+      // For player location: check audio targeting
+      if (location === 'player' && bannerLocations.includes('player') && banner.target_audio_ids?.length > 0) {
+        if (!currentAudioId || !banner.target_audio_ids.includes(currentAudioId)) {
+          return false;
+        }
+      }
+      
       // Target type: all - show to everyone
       if (banner.target_type === 'all') {
         return true;
@@ -285,7 +295,7 @@ export function PromoBanner({
       
       return true;
     });
-  }, [banners, dismissedIds, location, currentPlaylistId, userEnrollments, userPlaylists, userTools]);
+  }, [banners, dismissedIds, location, currentPlaylistId, currentAudioId, userEnrollments, userPlaylists, userTools]);
 
   const handleDismiss = (e: React.MouseEvent, banner: PromoBannerData) => {
     e.stopPropagation();

@@ -2524,6 +2524,7 @@ export type Database = {
           is_active: boolean
           priority: number
           starts_at: string | null
+          target_audio_ids: string[] | null
           target_playlist_ids: string[] | null
           target_type: string
           updated_at: string
@@ -2548,6 +2549,7 @@ export type Database = {
           is_active?: boolean
           priority?: number
           starts_at?: string | null
+          target_audio_ids?: string[] | null
           target_playlist_ids?: string[] | null
           target_type?: string
           updated_at?: string
@@ -2572,6 +2574,7 @@ export type Database = {
           is_active?: boolean
           priority?: number
           starts_at?: string | null
+          target_audio_ids?: string[] | null
           target_playlist_ids?: string[] | null
           target_type?: string
           updated_at?: string

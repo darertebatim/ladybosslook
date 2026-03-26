@@ -7,6 +7,7 @@ import { AudioControls } from "@/components/audio/AudioControls";
 import { ProgressBar } from "@/components/audio/ProgressBar";
 import { TrackCompletionCelebration } from "@/components/audio/TrackCompletionCelebration";
 import { PromoBanner } from "@/components/app/PromoBanner";
+import { PromoBannerGatedUpNext } from "@/components/app/PromoBannerGatedUpNext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -750,43 +751,49 @@ export default function AppAudioPlayer() {
           <PromoBanner 
             location="player" 
             currentPlaylistId={playlistInfo?.playlist_id || contextPlaylistId || undefined}
+            currentAudioId={audio?.id}
             className="mt-4 mb-2"
           />
 
-          {/* Up Next Preview */}
+          {/* Up Next Preview - hidden when audio-targeted banner is showing */}
           {nextTrack && (
-            <button
-              onClick={() => navigate(`/app/player/${nextTrack.id}`)}
-              className={cn(
-                "w-full mt-2 p-3 rounded-xl",
-                "bg-white/10 hover:bg-white/15 transition-colors",
-                "border border-white/10"
-              )}
+            <PromoBannerGatedUpNext
+              audioId={audio?.id}
+              playlistId={playlistInfo?.playlist_id || contextPlaylistId || undefined}
             >
-              <p className="text-xs text-white/50 mb-2 text-left">Up Next</p>
-              <div className="flex items-center gap-3">
-                {nextTrack.coverImageUrl ? (
-                  <img
-                    src={nextTrack.coverImageUrl}
-                    alt={nextTrack.title}
-                    className="h-10 w-10 rounded-lg object-cover"
-                  />
-                ) : (
-                  <div className="h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center">
-                    <Play className="h-4 w-4 text-white/50" />
-                  </div>
+              <button
+                onClick={() => navigate(`/app/player/${nextTrack.id}`)}
+                className={cn(
+                  "w-full mt-2 p-3 rounded-xl",
+                  "bg-white/10 hover:bg-white/15 transition-colors",
+                  "border border-white/10"
                 )}
-                <div className="flex-1 min-w-0 text-left">
-                  <p className="text-sm font-medium truncate text-white">{nextTrack.title}</p>
-                  {nextTrack.duration && (
-                    <p className="text-xs text-white/50">
-                      {formatDuration(nextTrack.duration)}
-                    </p>
+              >
+                <p className="text-xs text-white/50 mb-2 text-left">Up Next</p>
+                <div className="flex items-center gap-3">
+                  {nextTrack.coverImageUrl ? (
+                    <img
+                      src={nextTrack.coverImageUrl}
+                      alt={nextTrack.title}
+                      className="h-10 w-10 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center">
+                      <Play className="h-4 w-4 text-white/50" />
+                    </div>
                   )}
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className="text-sm font-medium truncate text-white">{nextTrack.title}</p>
+                    {nextTrack.duration && (
+                      <p className="text-xs text-white/50">
+                        {formatDuration(nextTrack.duration)}
+                      </p>
+                    )}
+                  </div>
+                  <Play className="h-4 w-4 text-white/50" />
                 </div>
-                <Play className="h-4 w-4 text-white/50" />
-              </div>
-            </button>
+              </button>
+            </PromoBannerGatedUpNext>
           )}
           
           {/* Bottom safe area padding */}

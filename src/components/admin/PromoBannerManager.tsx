@@ -58,6 +58,7 @@ interface PromoBanner {
   exclude_tools: string[];
   display_location: string[];
   target_playlist_ids: string[];
+  target_audio_ids: string[];
 }
 
 export function PromoBannerManager() {
@@ -86,6 +87,7 @@ export function PromoBannerManager() {
   // Display location state
   const [displayLocations, setDisplayLocations] = useState<DisplayLocation[]>(['home_top']);
   const [targetPlaylistIds, setTargetPlaylistIds] = useState<string[]>([]);
+  const [targetAudioIds, setTargetAudioIds] = useState<string[]>([]);
   
   // Audience targeting state
   const [targetType, setTargetType] = useState<TargetType>('all');
@@ -133,6 +135,19 @@ export function PromoBannerManager() {
         .select('id, name')
         .eq('is_hidden', false)
         .order('name');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch audio content for target audio selector
+  const { data: audioTracks } = useQuery({
+    queryKey: ['audio-tracks-for-promo'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_content')
+        .select('id, title')
+        .order('title');
       if (error) throw error;
       return data;
     },
@@ -304,6 +319,7 @@ export function PromoBannerManager() {
         exclude_tools: excludeTools,
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
+        target_audio_ids: targetAudioIds,
       });
       if (error) throw error;
     },
@@ -346,6 +362,7 @@ export function PromoBannerManager() {
         exclude_tools: excludeTools,
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
+        target_audio_ids: targetAudioIds,
       }).eq('id', editingBanner.id);
       if (error) throw error;
     },
@@ -414,6 +431,7 @@ export function PromoBannerManager() {
     // Reset location
     setDisplayLocations(['home_top']);
     setTargetPlaylistIds([]);
+    setTargetAudioIds([]);
   };
 
   const startEditing = (banner: PromoBanner) => {
@@ -439,6 +457,7 @@ export function PromoBannerManager() {
     // Load location
     setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
     setTargetPlaylistIds(banner.target_playlist_ids || []);
+    setTargetAudioIds(banner.target_audio_ids || []);
   };
 
   const getDestinationLabel = (banner: PromoBanner) => {
@@ -684,6 +703,55 @@ export function PromoBannerManager() {
                             <button 
                               type="button"
                               onClick={() => setTargetPlaylistIds(targetPlaylistIds.filter(pid => pid !== id))}
+                              className="hover:text-destructive"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Target Audios - only show when location is 'player' */}
+              {displayLocations.includes('player') && (
+                <div className="space-y-2">
+                  <Label>Target Audio Tracks (optional)</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Leave empty to show on all audio players, or select specific tracks to overlay the Up Next box
+                  </p>
+                  <Select 
+                    value={targetAudioIds[0] || ''} 
+                    onValueChange={(v) => {
+                      if (v && !targetAudioIds.includes(v)) {
+                        setTargetAudioIds([...targetAudioIds, v]);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Add an audio track..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {audioTracks?.filter(a => !targetAudioIds.includes(a.id)).map(a => (
+                        <SelectItem key={a.id} value={a.id}>{a.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {targetAudioIds.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {targetAudioIds.map(id => {
+                        const track = audioTracks?.find(a => a.id === id);
+                        return (
+                          <span 
+                            key={id} 
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
+                          >
+                            🎵 {track?.title || id}
+                            <button 
+                              type="button"
+                              onClick={() => setTargetAudioIds(targetAudioIds.filter(aid => aid !== id))}
                               className="hover:text-destructive"
                             >
                               ×
@@ -972,6 +1040,7 @@ export function PromoBannerManager() {
                       setExcludeTools(banner.exclude_tools || []);
                       setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
                       setTargetPlaylistIds(banner.target_playlist_ids || []);
+                      setTargetAudioIds(banner.target_audio_ids || []);
                       setEditingBanner(null);
                       setIsCreating(true);
                       toast.success('Banner duplicated - modify and save as new');
