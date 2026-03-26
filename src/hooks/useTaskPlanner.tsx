@@ -1430,6 +1430,28 @@ export const useSkipTask = () => {
 
       const dateStr = getLocalDateStr(date);
 
+      // Check if this is a one-time task
+      const { data: task } = await supabase
+        .from('user_tasks')
+        .select('repeat_pattern')
+        .eq('id', taskId)
+        .single();
+
+      if (task?.repeat_pattern === 'none') {
+        // For one-time tasks, reschedule to tomorrow instead of creating a skip record
+        const tomorrow = new Date(date);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = getLocalDateStr(tomorrow);
+
+        const { error } = await supabase
+          .from('user_tasks')
+          .update({ scheduled_date: tomorrowStr })
+          .eq('id', taskId);
+
+        if (error) throw error;
+        return { task_id: taskId, skipped_date: dateStr, snoozed_to_date: tomorrowStr, user_id: user.id, created_at: new Date().toISOString(), id: '' } as TaskSkip;
+      }
+
       const { data, error } = await supabase
         .from('task_skips')
         .upsert({
