@@ -7,6 +7,7 @@ import { AudioControls } from "@/components/audio/AudioControls";
 import { ProgressBar } from "@/components/audio/ProgressBar";
 import { TrackCompletionCelebration } from "@/components/audio/TrackCompletionCelebration";
 import { PromoBanner } from "@/components/app/PromoBanner";
+import { PromoBannerGatedUpNext } from "@/components/app/PromoBannerGatedUpNext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";

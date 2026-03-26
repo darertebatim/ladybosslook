@@ -715,6 +715,55 @@ export function PromoBannerManager() {
                 </div>
               )}
 
+              {/* Target Audios - only show when location is 'player' */}
+              {displayLocations.includes('player') && (
+                <div className="space-y-2">
+                  <Label>Target Audio Tracks (optional)</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Leave empty to show on all audio players, or select specific tracks to overlay the Up Next box
+                  </p>
+                  <Select 
+                    value={targetAudioIds[0] || ''} 
+                    onValueChange={(v) => {
+                      if (v && !targetAudioIds.includes(v)) {
+                        setTargetAudioIds([...targetAudioIds, v]);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Add an audio track..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {audioTracks?.filter(a => !targetAudioIds.includes(a.id)).map(a => (
+                        <SelectItem key={a.id} value={a.id}>{a.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {targetAudioIds.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {targetAudioIds.map(id => {
+                        const track = audioTracks?.find(a => a.id === id);
+                        return (
+                          <span 
+                            key={id} 
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
+                          >
+                            🎵 {track?.title || id}
+                            <button 
+                              type="button"
+                              onClick={() => setTargetAudioIds(targetAudioIds.filter(aid => aid !== id))}
+                              className="hover:text-destructive"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Destination Type */}
               <div className="space-y-2">
                 <Label>Destination Type</Label>
