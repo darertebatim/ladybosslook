@@ -2511,6 +2511,7 @@ export type Database = {
           custom_url: string | null
           destination_id: string | null
           destination_type: string
+          display_delay_seconds: number | null
           display_frequency: string
           display_location: string[]
           ends_at: string | null
@@ -2537,6 +2538,7 @@ export type Database = {
           custom_url?: string | null
           destination_id?: string | null
           destination_type: string
+          display_delay_seconds?: number | null
           display_frequency?: string
           display_location?: string[]
           ends_at?: string | null
@@ -2563,6 +2565,7 @@ export type Database = {
           custom_url?: string | null
           destination_id?: string | null
           destination_type?: string
+          display_delay_seconds?: number | null
           display_frequency?: string
           display_location?: string[]
           ends_at?: string | null
