@@ -293,6 +293,18 @@ const localPNs: PNType[] = [
       { title: '⏰ Urgent Reminder', body: 'Time-sensitive task reminder' },
     ],
   },
+  {
+    name: 'Routine Player Task End',
+    function: 'local-routine-task-end',
+    trigger: 'Task timer reaches zero',
+    description: 'Fires when a routine player task countdown hits 0 while the app is backgrounded, nudging the user to come back and check off the task.',
+    icon: <Play className="h-5 w-5" />,
+    codeFile: 'src/lib/routineTaskNotification.ts',
+    deliveryType: 'local',
+    messages: [
+      { title: '{emoji} {taskTitle} — Time\'s up!', body: 'Come back and check off your task ✅', condition: 'Timer reached zero while app in background' },
+    ],
+  },
 ];
 
 function DeliveryBadge({ type }: { type: 'server' | 'local' | 'hybrid' }) {
