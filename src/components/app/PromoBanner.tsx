@@ -29,6 +29,7 @@ interface PromoBannerData {
   target_playlist_ids: string[];
   target_audio_ids: string[];
   target_video_ids: string[];
+  display_delay_seconds: number;
 }
 
 interface PromoBannerProps {
@@ -36,6 +37,8 @@ interface PromoBannerProps {
   currentPlaylistId?: string;
   currentAudioId?: string;
   currentVideoId?: string;
+  /** Current playback time in seconds (for delayed banner display) */
+  playbackSeconds?: number;
   className?: string;
   onVisibilityChange?: (visible: boolean) => void;
   /** Show all eligible banners in a carousel instead of one at a time */

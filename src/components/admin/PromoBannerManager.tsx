@@ -60,6 +60,7 @@ interface PromoBanner {
   target_playlist_ids: string[];
   target_audio_ids: string[];
   target_video_ids: string[];
+  display_delay_seconds: number;
 }
 
 export function PromoBannerManager() {
@@ -90,7 +91,8 @@ export function PromoBannerManager() {
   const [targetPlaylistIds, setTargetPlaylistIds] = useState<string[]>([]);
   const [targetAudioIds, setTargetAudioIds] = useState<string[]>([]);
   const [targetVideoIds, setTargetVideoIds] = useState<string[]>([]);
-  
+  const [displayDelaySeconds, setDisplayDelaySeconds] = useState(0);
+
   // Audience targeting state
   const [targetType, setTargetType] = useState<TargetType>('all');
   const [includePrograms, setIncludePrograms] = useState<string[]>([]);
