@@ -6,6 +6,7 @@ import { updatePresence } from '@/hooks/useUserPresence';
 import { updateStreak } from '@/hooks/useTaskPlanner';
 import type { SessionTaskResult } from '@/components/app/RoutinePlayerSummary';
 import { getLocalDateStr, taskAppliesToDate } from '@/lib/localDate';
+import { scheduleTaskEndNotification, cancelTaskEndNotification } from '@/lib/routineTaskNotification';
 
 export interface RoutineTask {
   id: string;
@@ -100,12 +101,20 @@ export function useRoutinePlayer() {
   useEffect(() => {
     if (phase !== 'running') {
       if (intervalRef.current) clearInterval(intervalRef.current);
+      // Cancel the task-end notification when leaving running phase
+      cancelTaskEndNotification();
       return;
     }
 
     // Anchor the wall clock when entering running phase
     runningStartWallRef.current = Date.now();
     elapsedAtRunStartRef.current = elapsedRef.current;
+
+    // Schedule a local notification for when the task timer ends
+    const remainingSeconds = originalTargetRef.current - elapsedRef.current;
+    if (remainingSeconds > 0 && currentTask) {
+      scheduleTaskEndNotification(currentTask.title, currentTask.emoji, remainingSeconds);
+    }
 
     const sync = () => {
       const wallElapsed = Math.round((Date.now() - runningStartWallRef.current) / 1000);
@@ -126,7 +135,7 @@ export function useRoutinePlayer() {
       if (intervalRef.current) clearInterval(intervalRef.current);
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [phase]);
+  }, [phase, currentTask]);
 
   // Pause duration tracker
   useEffect(() => {
@@ -468,25 +477,35 @@ export function useRoutinePlayer() {
   const adjustTime = useCallback((deltaMinutes: number) => {
     const deltaSec = deltaMinutes * 60;
     originalTargetRef.current += deltaSec;
-    // Re-anchor wall clock so the sync loop uses updated target
     runningStartWallRef.current = Date.now();
     elapsedAtRunStartRef.current = elapsedRef.current;
-    setTimeLeft(originalTargetRef.current - elapsedRef.current);
-  }, []);
+    const newRemaining = originalTargetRef.current - elapsedRef.current;
+    setTimeLeft(newRemaining);
+    // Reschedule the end notification with the new remaining time
+    if (newRemaining > 0 && currentTask) {
+      scheduleTaskEndNotification(currentTask.title, currentTask.emoji, newRemaining);
+    } else {
+      cancelTaskEndNotification();
+    }
+  }, [currentTask]);
 
   const resetTaskTime = useCallback(() => {
     elapsedRef.current = 0;
     runningStartWallRef.current = Date.now();
     elapsedAtRunStartRef.current = 0;
     setTimeLeft(originalTargetRef.current);
-  }, []);
+    // Reschedule notification for full duration
+    if (currentTask) {
+      scheduleTaskEndNotification(currentTask.title, currentTask.emoji, originalTargetRef.current);
+    }
+  }, [currentTask]);
 
   const closePlayer = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
+    cancelTaskEndNotification();
     setPhase('idle');
     setConfig(null);
     setSessionId(null);
-    // Refresh progress data on the focus routines page
     queryClient.invalidateQueries({ queryKey: ['focus-today-sessions'] });
   }, [queryClient]);
 
