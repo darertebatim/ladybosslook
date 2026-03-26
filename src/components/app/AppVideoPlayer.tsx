@@ -43,6 +43,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [speedIndex, setSpeedIndex] = useState(0);
+  const [videoPlaybackSeconds, setVideoPlaybackSeconds] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const videoType = detectVideoType(url);
@@ -146,6 +147,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
             onLoadedData={() => setIsLoading(false)}
             onError={() => setHasError(true)}
             onEnded={handleVideoEnded}
+            onTimeUpdate={(e) => setVideoPlaybackSeconds(Math.floor(e.currentTarget.currentTime))}
             className={vertical
               ? "aspect-[9/16] max-h-[75vh] w-auto mx-auto rounded-xl"
               : "aspect-video w-full rounded-xl"
@@ -283,6 +285,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
         <PromoBanner 
           location="video_player" 
           currentVideoId={videoId}
+          playbackSeconds={videoPlaybackSeconds}
           className="px-4 pb-1"
         />
 
