@@ -783,6 +783,55 @@ export function PromoBannerManager() {
                 </div>
               )}
 
+              {/* Target Videos - only show when location is 'video_player' */}
+              {displayLocations.includes('video_player') && (
+                <div className="space-y-2">
+                  <Label>Target Video Tracks (optional)</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Leave empty to show on all video players, or select specific videos to overlay above the progress bar
+                  </p>
+                  <Select 
+                    value={targetVideoIds[0] || ''} 
+                    onValueChange={(v) => {
+                      if (v && !targetVideoIds.includes(v)) {
+                        setTargetVideoIds([...targetVideoIds, v]);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Add a video..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {videoTracks?.filter(v => !targetVideoIds.includes(v.id)).map(v => (
+                        <SelectItem key={v.id} value={v.id}>{v.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {targetVideoIds.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {targetVideoIds.map(id => {
+                        const track = videoTracks?.find(v => v.id === id);
+                        return (
+                          <span 
+                            key={id} 
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
+                          >
+                            🎬 {track?.title || id}
+                            <button 
+                              type="button"
+                              onClick={() => setTargetVideoIds(targetVideoIds.filter(vid => vid !== id))}
+                              className="hover:text-destructive"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Destination Type */}
               <div className="space-y-2">
                 <Label>Destination Type</Label>
