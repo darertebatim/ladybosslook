@@ -1,0 +1,1 @@
+ALTER TABLE public.promo_banners ADD COLUMN IF NOT EXISTS target_audio_ids text[] DEFAULT '{}'::text[];
