@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { ChevronRight, Play, RotateCw } from 'lucide-react';
 import { startOfDay, endOfDay } from 'date-fns';
+import { getLocalDateStr } from '@/lib/localDate';
 
 interface RoutineTaskPreviewProps {
   routineId: string;
@@ -37,7 +38,7 @@ export function useRoutinePreviewData(routineId: string) {
     queryFn: async () => {
       if (!user) return null;
       const today = new Date();
-      const todayStr = today.toISOString().slice(0, 10);
+      const todayStr = getLocalDateStr(today);
 
       // 1) Check routine_sessions first (from Routine Player)
       const { data: session } = await supabase
