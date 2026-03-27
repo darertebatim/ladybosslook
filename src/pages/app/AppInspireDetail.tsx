@@ -367,6 +367,11 @@ export default function AppInspireDetail() {
                   🔥 Challenge
                 </span>
               )}
+              {isProgram && (
+                <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
+                  🎓 Program
+                </span>
+              )}
               {routine.category && (
                 <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-muted text-muted-foreground">
                   {categories.find(c => c.slug === routine.category)?.name || routine.category}
