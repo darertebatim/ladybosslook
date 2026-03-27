@@ -694,16 +694,6 @@ export default function AppAudioPlayer() {
 
       {/* Main Content - Centered vertically */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-3 overflow-hidden" style={{ zIndex: 2 }}>
-        {/* Promo Banner - Overlay on player content */}
-        <div className="absolute bottom-32 left-4 right-4 z-20">
-          <PromoBanner 
-            location="player" 
-            currentPlaylistId={playlistInfo?.playlist_id || contextPlaylistId || undefined}
-            currentAudioId={audio?.id}
-            playbackSeconds={Math.floor(currentTime)}
-            forceShowClose
-          />
-        </div>
         <div className="max-w-md w-full flex flex-col gap-3">
           {/* Cover Art - Constrained size */}
           <div className="w-full max-w-[220px] mx-auto rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] shrink-0">
@@ -758,6 +748,17 @@ export default function AppAudioPlayer() {
           </div>
 
 
+
+          {/* Promo Banner - overlays the Up Next area */}
+          <div className="relative">
+            <PromoBanner 
+              location="player" 
+              currentPlaylistId={playlistInfo?.playlist_id || contextPlaylistId || undefined}
+              currentAudioId={audio?.id}
+              playbackSeconds={Math.floor(currentTime)}
+              forceShowClose
+            />
+          </div>
 
           {/* Up Next Preview */}
           {nextTrack && (
