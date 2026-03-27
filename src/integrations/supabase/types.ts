@@ -2532,7 +2532,9 @@ export type Database = {
           priority: number
           starts_at: string | null
           target_audio_ids: string[] | null
+          target_languages: string[] | null
           target_playlist_ids: string[] | null
+          target_timezones: string[] | null
           target_type: string
           target_video_ids: string[] | null
           updated_at: string
@@ -2559,7 +2561,9 @@ export type Database = {
           priority?: number
           starts_at?: string | null
           target_audio_ids?: string[] | null
+          target_languages?: string[] | null
           target_playlist_ids?: string[] | null
+          target_timezones?: string[] | null
           target_type?: string
           target_video_ids?: string[] | null
           updated_at?: string
@@ -2586,7 +2590,9 @@ export type Database = {
           priority?: number
           starts_at?: string | null
           target_audio_ids?: string[] | null
+          target_languages?: string[] | null
           target_playlist_ids?: string[] | null
+          target_timezones?: string[] | null
           target_type?: string
           target_video_ids?: string[] | null
           updated_at?: string
