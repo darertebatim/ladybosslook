@@ -45,7 +45,7 @@ const AppCourses = () => {
   if (isLoading) {
     return (
       <>
-        <AppHeader title="My Programs" subtitle="Loading..." />
+        <AppHeader title="My Programs" subtitle="Loading..." showBack />
         <AppHeaderSpacer />
         <CoursesSkeleton />
       </>
