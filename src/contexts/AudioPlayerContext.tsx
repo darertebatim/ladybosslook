@@ -2,11 +2,23 @@ import React, { createContext, useContext, useRef, useState, useEffect, useCallb
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-// Music controls removed - was causing iOS build issues with SPM
 import { Capacitor } from "@capacitor/core";
 import { format } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAutoCompleteProTask } from "@/hooks/useAutoCompleteProTask";
+import {
+  isNativeAudioAvailable,
+  setNativeAudioCallbacks,
+  nativeAudioPrepare,
+  nativeAudioPlay,
+  nativeAudioPause,
+  nativeAudioStop,
+  nativeAudioSeek,
+  nativeAudioSetRate,
+  nativeAudioGetCurrentTime,
+  nativeAudioGetDuration,
+  nativeAudioDestroy,
+} from "@/lib/nativeAudioControls";
 
 
 export interface TrackInfo {
@@ -65,6 +77,8 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const lastTimeUpdateRef = useRef<number>(0);
   const onTrackCompleteRef = useRef<(() => void) | null>(null);
   const currentTrackRef = useRef<TrackInfo | null>(null);
+  const useNative = useRef(isNativeAudioAvailable());
+  const nativeTimePollerRef = useRef<NodeJS.Timeout | null>(null);
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -84,7 +98,6 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       const track = tracks[i];
       const dripDays = track.dripDelayDays || 0;
       
-      // Check availability if there's drip content
       if (dripDays > 0 && roundStartDate) {
         const effectiveDripDays = dripDays - (roundDripOffset || 0);
         const startDate = new Date(roundStartDate);
@@ -92,7 +105,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         availableDate.setDate(availableDate.getDate() + effectiveDripDays);
         
         if (new Date() < availableDate) {
-          continue; // Skip locked tracks
+          continue;
         }
       }
       
@@ -104,8 +117,136 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const nextTrack = getNextAvailableTrack();
   const hasNextTrack = !!nextTrack;
 
-  // Initialize audio element
+  // ===== Track completion handler (shared between web & native) =====
+  const handleTrackEnded = useCallback(async () => {
+    setIsPlaying(false);
+    
+    const track = currentTrackRef.current;
+    
+    if (user?.id && track) {
+      await supabase.from("audio_progress").upsert({
+        user_id: user.id,
+        audio_id: track.id,
+        current_position_seconds: Math.floor(duration || 0),
+        completed: true,
+        last_played_at: new Date().toISOString(),
+      }, {
+        onConflict: "user_id,audio_id",
+      });
+      
+      if (track.playlistId) {
+        try {
+          const today = format(new Date(), 'yyyy-MM-dd');
+          const dayOfWeek = new Date().getDay();
+          
+          const { data: tasks } = await supabase
+            .from('user_tasks')
+            .select('id, scheduled_date, repeat_pattern, repeat_days')
+            .eq('user_id', user.id)
+            .eq('is_active', true)
+            .eq('pro_link_type', 'playlist')
+            .eq('pro_link_value', track.playlistId);
+          
+          if (tasks && tasks.length > 0) {
+            const applicableTasks = tasks.filter(task => {
+              if (task.scheduled_date === today) return true;
+              if (task.repeat_pattern === 'daily') return true;
+              if (task.repeat_pattern === 'weekly' && task.repeat_days) {
+                return (task.repeat_days as number[]).includes(dayOfWeek);
+              }
+              if (task.repeat_pattern === 'weekdays') {
+                return dayOfWeek >= 1 && dayOfWeek <= 5;
+              }
+              return false;
+            });
+            
+            if (applicableTasks.length > 0) {
+              const taskIds = applicableTasks.map(t => t.id);
+              
+              const { data: existing } = await supabase
+                .from('task_completions')
+                .select('task_id')
+                .eq('user_id', user.id)
+                .eq('completed_date', today)
+                .in('task_id', taskIds);
+              
+              const completedIds = new Set(existing?.map(c => c.task_id) || []);
+              const toComplete = applicableTasks.filter(t => !completedIds.has(t.id));
+              
+              if (toComplete.length > 0) {
+                await supabase.from('task_completions').insert(
+                  toComplete.map(t => ({
+                    task_id: t.id,
+                    user_id: user.id,
+                    completed_date: today,
+                  }))
+                );
+                
+                queryClient.invalidateQueries({ queryKey: ['planner-completions'] });
+                queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
+                queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
+                
+                console.log(`Auto-completed ${toComplete.length} playlist pro task(s)`);
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error auto-completing playlist task:', error);
+        }
+      }
+    }
+    
+    onTrackCompleteRef.current?.();
+  }, [user?.id, duration, queryClient]);
+
+  // ===== Native audio callbacks =====
   useEffect(() => {
+    if (!useNative.current) return;
+
+    setNativeAudioCallbacks({
+      onStatusChange: (status) => {
+        if (status === 'playing') setIsPlaying(true);
+        else if (status === 'paused') setIsPlaying(false);
+        else if (status === 'stopped') setIsPlaying(false);
+      },
+      onAudioEnd: () => {
+        handleTrackEnded();
+      },
+      onAudioReady: async () => {
+        setIsLoading(false);
+        const dur = await nativeAudioGetDuration();
+        if (dur > 0) setDuration(dur);
+      },
+    });
+  }, [handleTrackEnded]);
+
+  // ===== Native time poller (since native doesn't fire timeupdate events) =====
+  useEffect(() => {
+    if (!useNative.current || !isPlaying) {
+      if (nativeTimePollerRef.current) {
+        clearInterval(nativeTimePollerRef.current);
+        nativeTimePollerRef.current = null;
+      }
+      return;
+    }
+
+    nativeTimePollerRef.current = setInterval(async () => {
+      const t = await nativeAudioGetCurrentTime();
+      setCurrentTime(t);
+    }, 500);
+
+    return () => {
+      if (nativeTimePollerRef.current) {
+        clearInterval(nativeTimePollerRef.current);
+        nativeTimePollerRef.current = null;
+      }
+    };
+  }, [isPlaying]);
+
+  // ===== Web HTML5 Audio setup =====
+  useEffect(() => {
+    if (useNative.current) return; // Skip on native
+
     if (!audioRef.current) {
       audioRef.current = new Audio();
       audioRef.current.preload = "metadata";
@@ -114,7 +255,6 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     const audio = audioRef.current;
     
     const handleTimeUpdate = () => {
-      // Use RAF + throttle for smoother visual updates
       requestAnimationFrame(() => {
         const now = Date.now();
         if (now - lastTimeUpdateRef.current > 500) {
@@ -128,93 +268,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       setDuration(audio.duration || 0);
     };
     
-    const handleEnded = async () => {
-      setIsPlaying(false);
-      
-      const track = currentTrackRef.current;
-      
-      // Save final completion state
-      if (user?.id && track) {
-        await supabase.from("audio_progress").upsert({
-          user_id: user.id,
-          audio_id: track.id,
-          current_position_seconds: Math.floor(audio.duration || 0),
-          completed: true,
-          last_played_at: new Date().toISOString(),
-        }, {
-          onConflict: "user_id,audio_id",
-        });
-        
-        // Auto-complete any playlist pro tasks linked to this playlist
-        if (track.playlistId) {
-          try {
-            const today = format(new Date(), 'yyyy-MM-dd');
-            const dayOfWeek = new Date().getDay();
-            
-            // Find applicable pro tasks for this playlist
-            const { data: tasks } = await supabase
-              .from('user_tasks')
-              .select('id, scheduled_date, repeat_pattern, repeat_days')
-              .eq('user_id', user.id)
-              .eq('is_active', true)
-              .eq('pro_link_type', 'playlist')
-              .eq('pro_link_value', track.playlistId);
-            
-            if (tasks && tasks.length > 0) {
-              const applicableTasks = tasks.filter(task => {
-                if (task.scheduled_date === today) return true;
-                if (task.repeat_pattern === 'daily') return true;
-                if (task.repeat_pattern === 'weekly' && task.repeat_days) {
-                  return (task.repeat_days as number[]).includes(dayOfWeek);
-                }
-                if (task.repeat_pattern === 'weekdays') {
-                  return dayOfWeek >= 1 && dayOfWeek <= 5;
-                }
-                return false;
-              });
-              
-              if (applicableTasks.length > 0) {
-                const taskIds = applicableTasks.map(t => t.id);
-                
-                // Get existing completions
-                const { data: existing } = await supabase
-                  .from('task_completions')
-                  .select('task_id')
-                  .eq('user_id', user.id)
-                  .eq('completed_date', today)
-                  .in('task_id', taskIds);
-                
-                const completedIds = new Set(existing?.map(c => c.task_id) || []);
-                const toComplete = applicableTasks.filter(t => !completedIds.has(t.id));
-                
-                if (toComplete.length > 0) {
-                  await supabase.from('task_completions').insert(
-                    toComplete.map(t => ({
-                      task_id: t.id,
-                      user_id: user.id,
-                      completed_date: today,
-                    }))
-                  );
-                  
-                  // Invalidate queries to update UI
-                  queryClient.invalidateQueries({ queryKey: ['planner-completions'] });
-                  queryClient.invalidateQueries({ queryKey: ['planner-completed-dates'] });
-                  queryClient.invalidateQueries({ queryKey: ['planner-streak'] });
-                  
-                  console.log(`Auto-completed ${toComplete.length} playlist pro task(s)`);
-                }
-              }
-            }
-          } catch (error) {
-            console.error('Error auto-completing playlist task:', error);
-          }
-        }
-      }
-      
-      // Trigger completion callback (for celebration)
-      onTrackCompleteRef.current?.();
-    };
-    
+    const handleEnded = () => handleTrackEnded();
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
     const handleLoadStart = () => setIsLoading(true);
@@ -228,11 +282,6 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     audio.addEventListener("loadstart", handleLoadStart);
     audio.addEventListener("canplay", handleCanPlay);
     
-    // Music controls removed - was causing iOS build issues with SPM
-    if (Capacitor.isNativePlatform()) {
-      // Native music controls disabled
-    }
-    
     return () => {
       audio.removeEventListener("timeupdate", handleTimeUpdate);
       audio.removeEventListener("durationchange", handleDurationChange);
@@ -242,7 +291,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       audio.removeEventListener("loadstart", handleLoadStart);
       audio.removeEventListener("canplay", handleCanPlay);
     };
-  }, [user?.id, currentTrack]);
+  }, [handleTrackEnded]);
 
   // Save progress periodically
   useEffect(() => {
@@ -271,14 +320,55 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     };
   }, [currentTrack, user?.id, isPlaying, currentTime, duration]);
 
-  // Music controls removed - was causing iOS build issues with SPM
-
   const playTrack = useCallback(async (track: TrackInfo, startPosition?: number) => {
+    // ===== NATIVE PATH =====
+    if (useNative.current) {
+      // If same track, just resume
+      if (currentTrack?.id === track.id) {
+        if (startPosition !== undefined) {
+          await nativeAudioSeek(startPosition);
+        }
+        await nativeAudioPlay();
+        return;
+      }
+
+      setCurrentTrack(track);
+      currentTrackRef.current = track;
+      setIsLoading(true);
+
+      const prepared = await nativeAudioPrepare({
+        source: track.fileUrl,
+        title: track.title,
+        artist: track.playlistName || 'Simora',
+        album: track.playlistName || '',
+        artworkUrl: track.coverImageUrl || '',
+      });
+
+      if (prepared) {
+        if (startPosition && startPosition > 0) {
+          await nativeAudioSeek(startPosition);
+        }
+        await nativeAudioPlay();
+        if (playbackRate !== 1) {
+          await nativeAudioSetRate(playbackRate);
+        }
+      } else {
+        setIsLoading(false);
+        console.error('[AudioPlayer] Native prepare failed, no fallback');
+      }
+
+      autoCompleteProTask('audio', track.id);
+      if (track.playlistId) {
+        autoCompletePlaylist(track.playlistId);
+      }
+      return;
+    }
+
+    // ===== WEB PATH =====
     if (!audioRef.current) return;
     
     const audio = audioRef.current;
     
-    // If same track, just resume
     if (currentTrack?.id === track.id && audio.src) {
       if (startPosition !== undefined) {
         audio.currentTime = startPosition;
@@ -291,7 +381,6 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       return;
     }
     
-    // Load new track
     setCurrentTrack(track);
     currentTrackRef.current = track;
     
@@ -325,7 +414,6 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       }
     }
 
-    // Auto-complete pro tasks when playback starts
     autoCompleteProTask('audio', track.id);
     if (track.playlistId) {
       autoCompletePlaylist(track.playlistId);
@@ -333,42 +421,67 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   }, [currentTrack, playbackRate, autoCompleteProTask, autoCompletePlaylist]);
 
   const pause = useCallback(() => {
-    audioRef.current?.pause();
+    if (useNative.current) {
+      nativeAudioPause();
+    } else {
+      audioRef.current?.pause();
+    }
   }, []);
 
   const resume = useCallback(async () => {
-    try {
-      await audioRef.current?.play();
-    } catch (e) {
-      console.warn('[AudioPlayer] Resume failed:', e);
+    if (useNative.current) {
+      await nativeAudioPlay();
+    } else {
+      try {
+        await audioRef.current?.play();
+      } catch (e) {
+        console.warn('[AudioPlayer] Resume failed:', e);
+      }
     }
   }, []);
 
   const seek = useCallback((time: number) => {
-    if (audioRef.current) {
+    if (useNative.current) {
+      nativeAudioSeek(time);
+      setCurrentTime(time);
+    } else if (audioRef.current) {
       audioRef.current.currentTime = time;
       setCurrentTime(time);
     }
   }, []);
 
   const setPlaybackRate = useCallback((rate: number) => {
-    if (audioRef.current) {
+    if (useNative.current) {
+      nativeAudioSetRate(rate);
+    } else if (audioRef.current) {
       audioRef.current.playbackRate = rate;
     }
     setPlaybackRateState(rate);
   }, []);
 
   const skipForward = useCallback((seconds = 15) => {
-    if (audioRef.current) {
+    if (useNative.current) {
+      nativeAudioGetCurrentTime().then(t => {
+        const newTime = Math.min(t + seconds, duration || Infinity);
+        nativeAudioSeek(newTime);
+        setCurrentTime(newTime);
+      });
+    } else if (audioRef.current) {
       audioRef.current.currentTime = Math.min(
         audioRef.current.currentTime + seconds,
         audioRef.current.duration || 0
       );
     }
-  }, []);
+  }, [duration]);
 
   const skipBack = useCallback((seconds = 15) => {
-    if (audioRef.current) {
+    if (useNative.current) {
+      nativeAudioGetCurrentTime().then(t => {
+        const newTime = Math.max(t - seconds, 0);
+        nativeAudioSeek(newTime);
+        setCurrentTime(newTime);
+      });
+    } else if (audioRef.current) {
       audioRef.current.currentTime = Math.max(
         audioRef.current.currentTime - seconds,
         0
@@ -377,7 +490,9 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   }, []);
 
   const stop = useCallback(() => {
-    if (audioRef.current) {
+    if (useNative.current) {
+      nativeAudioDestroy();
+    } else if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.src = "";
     }
@@ -387,7 +502,6 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     setDuration(0);
     setIsPlaying(false);
     setPlaylistContextState(null);
-    // Music controls removed - was causing iOS build issues with SPM
   }, []);
 
   const setPlaylistContext = useCallback((context: PlaylistContext) => {
@@ -402,7 +516,6 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     if (nextTrack) {
       playTrack(nextTrack, 0);
       
-      // Update playlist context index
       if (playlistContext) {
         const newIndex = playlistContext.tracks.findIndex(t => t.id === nextTrack.id);
         if (newIndex >= 0) {
