@@ -106,6 +106,8 @@ const AppHome = () => {
   const [hasPromoBanner, setHasPromoBanner] = useState(false);
   const [hasHomeBanner, setHasHomeBanner] = useState(false);
   const { isKeyboardOpen } = useKeyboard();
+  const { currentTrack } = useAudioPlayer();
+  const hasMiniPlayer = !!currentTrack;
   
   const [goalInputTask, setGoalInputTask] = useState<UserTask | null>(null);
   const addGoalProgress = useAddGoalProgress();
