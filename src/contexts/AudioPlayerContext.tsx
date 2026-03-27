@@ -48,6 +48,7 @@ interface AudioPlayerContextType {
   playbackRate: number;
   currentTrack: TrackInfo | null;
   isLoading: boolean;
+  isBuffering: boolean;
   nextTrack: TrackInfo | null;
   hasNextTrack: boolean;
   
@@ -86,6 +87,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const [playbackRate, setPlaybackRateState] = useState(1);
   const [currentTrack, setCurrentTrack] = useState<TrackInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(false);
   const [playlistContext, setPlaylistContextState] = useState<PlaylistContext | null>(null);
 
   // Calculate next available track
@@ -214,6 +216,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       },
       onAudioReady: async () => {
         setIsLoading(false);
+        setIsBuffering(false);
         const dur = await nativeAudioGetDuration();
         if (dur > 0) setDuration(dur);
       },
@@ -336,6 +339,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       setCurrentTrack(track);
       currentTrackRef.current = track;
       setIsLoading(true);
+      setIsBuffering(true);
 
       const prepared = await nativeAudioPrepare({
         source: track.fileUrl,
@@ -541,6 +545,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         playbackRate,
         currentTrack,
         isLoading,
+        isBuffering,
         nextTrack,
         hasNextTrack,
         playTrack,

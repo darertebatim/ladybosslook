@@ -1,4 +1,4 @@
-import { Play, Pause, Headphones, X } from "lucide-react";
+import { Play, Pause, Headphones, X, Loader2 } from "lucide-react";
 import { CachedImage } from '@/components/ui/CachedImage';
 import { useNavigate } from "react-router-dom";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
@@ -16,6 +16,7 @@ export const MiniPlayer = () => {
   const { 
     currentTrack, 
     isPlaying, 
+    isBuffering,
     duration, 
     pause, 
     resume, 
@@ -96,7 +97,9 @@ export const MiniPlayer = () => {
             "active:scale-95"
           )}
         >
-          {isPlaying ? (
+          {isBuffering ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : isPlaying ? (
             <Pause className="h-4 w-4" />
           ) : (
             <Play className="h-4 w-4 ml-0.5" />

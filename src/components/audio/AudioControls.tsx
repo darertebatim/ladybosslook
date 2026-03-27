@@ -1,10 +1,11 @@
-import { Play, Pause, RotateCcw, RotateCw } from "lucide-react";
+import { Play, Pause, RotateCcw, RotateCw, Loader2 } from "lucide-react";
 import { GlassButton } from "./GlassButton";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
 
 interface AudioControlsProps {
   isPlaying: boolean;
+  isBuffering?: boolean;
   onPlayPause: () => void;
   onSkipBack: () => void;
   onSkipForward: () => void;
@@ -15,6 +16,7 @@ interface AudioControlsProps {
 
 export const AudioControls = ({
   isPlaying,
+  isBuffering = false,
   onPlayPause,
   onSkipBack,
   onSkipForward,
@@ -70,7 +72,9 @@ export const AudioControls = ({
           variant="primary"
           className="h-20 w-20 shadow-[0_0_30px_rgba(255,255,255,0.2)]"
         >
-          {isPlaying ? (
+          {isBuffering ? (
+            <Loader2 className="h-8 w-8 animate-spin" />
+          ) : isPlaying ? (
             <Pause className="h-8 w-8" />
           ) : (
             <Play className="h-8 w-8 ml-1" />
@@ -129,7 +133,9 @@ export const AudioControls = ({
           "active:scale-95 hover:scale-105"
         )}
       >
-        {isPlaying ? (
+        {isBuffering ? (
+          <Loader2 className="h-8 w-8 animate-spin" />
+        ) : isPlaying ? (
           <Pause className="h-8 w-8" />
         ) : (
           <Play className="h-8 w-8 ml-1" />
