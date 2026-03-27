@@ -135,7 +135,7 @@ const AppPeriod = () => {
           <BackButtonCircle />
           <Heart className="h-16 w-16 text-pink-400 mb-4" />
           <h2 className="text-xl font-bold mb-2">Period Tracker is a Plus feature</h2>
-          <p className="text-muted-foreground mb-6">Upgrade to Simora Plus to track your cycle, get predictions, and log symptoms.</p>
+          <p className="text-muted-foreground mb-6">Upgrade to Ladybosslook+ to track your cycle, get predictions, and log symptoms.</p>
           <button
             onClick={() => { haptic.light(); setShowPaywall(true); }}
             className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold"

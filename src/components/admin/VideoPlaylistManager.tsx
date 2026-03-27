@@ -135,7 +135,7 @@ const PlaylistForm = ({ formData, setFormData, onSubmit, onCancel, isSubmitting,
     </div>
     <div className="flex items-center space-x-2">
       <Switch checked={formData.requires_subscription} onCheckedChange={(c) => setFormData({ ...formData, requires_subscription: c })} />
-      <Label>Requires Simora+ (Plus plan)</Label>
+      <Label>Requires Ladybosslook+ (Plus plan)</Label>
     </div>
     <div className="flex items-center space-x-2">
       <Switch checked={formData.available_on_mobile} onCheckedChange={(c) => setFormData({ ...formData, available_on_mobile: c })} />

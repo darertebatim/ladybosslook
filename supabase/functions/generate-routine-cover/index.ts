@@ -350,7 +350,7 @@ function buildSimoraPrompt(
   ];
   const styleVariation = pickRandom(styleVariations);
 
-  return `Square mobile app cover illustration for a wellness app called Simora.
+  return `Square mobile app cover illustration for a wellness app called Ladybosslook.
 Unique seed variation: ${Math.random().toString(36).substring(7)}
 
 ROUTINE: "${title}"${subtitle ? `\nSUBTITLE: "${subtitle}"` : ''}

@@ -7,7 +7,7 @@ export const quickStartFlow: OnboardingFlow = {
   id: 'quick-start-v1',
   name: 'Quick Start Onboarding',
   description: 'Fast 5-screen onboarding focused on getting users into the app quickly',
-  appName: 'Simora',
+  appName: 'Ladybosslook',
   createdAt: '2026-03-14',
   steps: [
     // 1 — Welcome / Promise

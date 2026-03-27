@@ -194,7 +194,7 @@ const AppWater = () => {
           <BackButtonCircle />
           <Droplets className="h-16 w-16 text-sky-400 mb-4" />
           <h2 className="text-xl font-bold mb-2">Water Tracker is a Plus feature</h2>
-          <p className="text-muted-foreground mb-6">Upgrade to Simora Plus to track your hydration with daily goals and reminders.</p>
+          <p className="text-muted-foreground mb-6">Upgrade to Ladybosslook+ to track your hydration with daily goals and reminders.</p>
           <button
             onClick={() => { haptic.light(); setShowPaywall(true); }}
             className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold"

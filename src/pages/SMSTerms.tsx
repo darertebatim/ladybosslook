@@ -3,7 +3,7 @@ import { SEOHead } from "@/components/SEOHead";
 const SMSTerms = () => {
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Terms of Use – Simora" description="Terms of Use, subscription terms, and messaging terms for the Simora app." />
+      <SEOHead title="Terms of Use – Ladybosslook" description="Terms of Use, subscription terms, and messaging terms for the Ladybosslook app." />
 
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <header className="mb-12">
@@ -25,7 +25,7 @@ const SMSTerms = () => {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-foreground mb-4">1. Acceptance of Terms</h2>
             <p className="text-foreground/80 mb-4">
-              By downloading, installing, or using the Simora mobile application ("App"), you agree to be bound by these Terms of Use ("Terms"). If you do not agree, do not use the App.
+              By downloading, installing, or using the Ladybosslook mobile application ("App"), you agree to be bound by these Terms of Use ("Terms"). If you do not agree, do not use the App.
             </p>
             <p className="text-foreground/80 mb-4">
               We reserve the right to update these Terms at any time. Continued use of the App after changes are posted constitutes acceptance of the revised Terms.
@@ -36,22 +36,22 @@ const SMSTerms = () => {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-foreground mb-4">2. Description of Service</h2>
             <p className="text-foreground/80 mb-4">
-              Simora is a wellness and personal-growth app that provides guided audio programs, daily planner tools, breathing exercises, emotion tracking, reflections, and related features. Certain features require a paid subscription ("SimoraPlus").
+              Ladybosslook is a wellness and personal-growth app that provides guided audio programs, daily planner tools, breathing exercises, emotion tracking, reflections, and related features. Certain features require a paid subscription ("Ladybosslook+").
             </p>
           </section>
 
           {/* ── 3. Subscription Terms ── */}
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-foreground mb-4">3. SimoraPlus Subscription</h2>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">3. Ladybosslook+ Subscription</h2>
             
             <h3 className="text-xl font-medium text-foreground mb-3">3.1 Plans & Pricing</h3>
             <p className="text-foreground/80 mb-4">
-              SimoraPlus is offered as an auto-renewable subscription. Current plans include a monthly option and an annual option. Prices are displayed in your local currency on the subscription screen within the App and on the App Store product page before you confirm your purchase.
+              Ladybosslook+ is offered as an auto-renewable subscription. Current plans include a monthly option and an annual option. Prices are displayed in your local currency on the subscription screen within the App and on the App Store product page before you confirm your purchase.
             </p>
 
             <h3 className="text-xl font-medium text-foreground mb-3">3.2 Free Trial</h3>
             <p className="text-foreground/80 mb-4">
-              Eligible new subscribers may receive a free trial period (e.g., 7 days). During the free trial you have full access to all SimoraPlus features. <strong>Your subscription will automatically renew and your payment method will be charged at the end of the free trial period unless you cancel at least 24 hours before the trial ends.</strong> You can cancel at any time in your Apple ID account settings.
+              Eligible new subscribers may receive a free trial period (e.g., 7 days). During the free trial you have full access to all Ladybosslook+ features. <strong>Your subscription will automatically renew and your payment method will be charged at the end of the free trial period unless you cancel at least 24 hours before the trial ends.</strong> You can cancel at any time in your Apple ID account settings.
             </p>
 
             <h3 className="text-xl font-medium text-foreground mb-3">3.3 Auto-Renewal</h3>
@@ -61,7 +61,7 @@ const SMSTerms = () => {
 
             <h3 className="text-xl font-medium text-foreground mb-3">3.4 Cancellation</h3>
             <p className="text-foreground/80 mb-4">
-              You may cancel your subscription at any time through your Apple ID account settings (Settings → Apple ID → Subscriptions). Cancellation takes effect at the end of the current billing period; you will retain access to SimoraPlus features until that date. No partial refunds are provided for unused portions of a subscription period.
+              You may cancel your subscription at any time through your Apple ID account settings (Settings → Apple ID → Subscriptions). Cancellation takes effect at the end of the current billing period; you will retain access to Ladybosslook+ features until that date. No partial refunds are provided for unused portions of a subscription period.
             </p>
 
             <h3 className="text-xl font-medium text-foreground mb-3">3.5 Refunds</h3>

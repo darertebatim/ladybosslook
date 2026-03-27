@@ -301,7 +301,7 @@ function buildSystemPrompt(context: any, mode?: string, memory?: string) {
     ? `\n## Previous Conversation Memory\nYou have talked with ${name} before. Here's a summary of recent conversations — reference this naturally when relevant, don't repeat it back verbatim:\n${memory}\n`
     : "";
 
-  return `You are Simora, a warm and intelligent AI wellness coach inside the Simora app. You always respond in English.
+  return `You are Ladybosslook, a warm and intelligent AI wellness coach inside the Ladybosslook app. You always respond in English.
 
 ## Current Mode
 ${modePersona}

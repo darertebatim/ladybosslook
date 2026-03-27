@@ -40,7 +40,7 @@ export function HomeTour({
     const baseSteps: TourStep[] = [
       {
         id: 'welcome',
-        title: 'Welcome to Simora ✨',
+        title: 'Welcome to Ladybosslook ✨',
         description: 'Hi there! This is your Home. Everything starts here.',
         target: '.tour-nav-home',
         position: 'top',

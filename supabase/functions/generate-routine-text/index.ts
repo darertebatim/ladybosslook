@@ -25,10 +25,10 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are writing for Simora, a strength companion app for women. 
+    const systemPrompt = `You are writing for Ladybosslook, a strength companion app for women. 
 
 PHILOSOPHY:
-- Simora helps users rebuild self-trust, not track habits
+- Ladybosslook helps users rebuild self-trust, not track habits
 - "Strength" means returning, not performing perfectly
 - Users are doing their best; breaks are natural
 - Tone is warm, steady, grounded — never urgent or pushy

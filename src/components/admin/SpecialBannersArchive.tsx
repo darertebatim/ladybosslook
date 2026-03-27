@@ -24,10 +24,10 @@ const specialBanners: SpecialBanner[] = [
     ],
   },
   {
-    name: 'Simora Onboarding',
+    name: 'Ladybosslook Onboarding',
     component: 'OnboardingBanner',
     location: 'Home (above My Tasks)',
-    description: 'Guides new users through the onboarding flow. Features the Simora mascot with a notepad illustration.',
+    description: 'Guides new users through the onboarding flow. Features the Ladybosslook mascot with a notepad illustration.',
     conditions: [
       'Shown only to users who haven\'t completed onboarding',
       'Hidden when Welcome card is active',

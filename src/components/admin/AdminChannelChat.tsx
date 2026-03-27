@@ -273,7 +273,7 @@ export function AdminChannelChat() {
     if (post.post_type === 'discussion') {
       return post.author?.full_name || 'Unknown';
     }
-    return post.display_name || 'Simora';
+    return post.display_name || 'Ladybosslook';
   };
 
   // Helper to get avatar

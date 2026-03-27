@@ -117,7 +117,7 @@ export async function checkAndUnlockNextProjectStep(
     .eq('routine_id', routineId);
 
   // Post to community feed
-  const generalChannel = '40c7c499-ab87-4cc6-9d3e-85d35ed8c83b'; // Simora general channel
+  const generalChannel = '40c7c499-ab87-4cc6-9d3e-85d35ed8c83b'; // Ladybosslook general channel
   await supabase.from('feed_posts').insert({
     channel_id: generalChannel,
     author_id: userId,
