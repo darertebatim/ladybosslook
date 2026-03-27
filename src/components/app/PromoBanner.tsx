@@ -25,6 +25,8 @@ interface PromoBannerData {
   exclude_playlists: string[];
   include_tools: string[];
   exclude_tools: string[];
+  target_languages: string[];
+  target_timezones: string[];
   display_location: string[];
   target_playlist_ids: string[];
   target_audio_ids: string[];
@@ -208,6 +210,23 @@ export function PromoBanner({
     enabled: !!user?.id,
   });
 
+  // Fetch user profile for language/timezone targeting
+  const { data: userProfile } = useQuery({
+    queryKey: ['user-profile-for-promo', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('preferred_language, timezone')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+  });
+
   // Filter banners based on location and targeting
   const eligibleBanners = useMemo(() => {
     if (!banners) return [];
@@ -312,12 +331,28 @@ export function PromoBanner({
           if (hasExcludedTool) shouldShow = false;
         }
         
+        // Language filter (if specified, user must match one)
+        if (banner.target_languages?.length > 0 && shouldShow) {
+          const userLang = userProfile?.preferred_language || '';
+          if (!userLang || !banner.target_languages.includes(userLang)) {
+            shouldShow = false;
+          }
+        }
+        
+        // Timezone filter (if specified, user must match one)
+        if (banner.target_timezones?.length > 0 && shouldShow) {
+          const userTz = userProfile?.timezone || '';
+          if (!userTz || !banner.target_timezones.includes(userTz)) {
+            shouldShow = false;
+          }
+        }
+        
         return shouldShow;
       }
       
       return true;
     });
-  }, [banners, dismissedIds, location, currentPlaylistId, currentAudioId, currentVideoId, playbackSeconds, userEnrollments, userPlaylists, userTools]);
+  }, [banners, dismissedIds, location, currentPlaylistId, currentAudioId, currentVideoId, playbackSeconds, userEnrollments, userPlaylists, userTools, userProfile]);
 
   const handleDismiss = (e: React.MouseEvent, banner: PromoBannerData) => {
     e.stopPropagation();

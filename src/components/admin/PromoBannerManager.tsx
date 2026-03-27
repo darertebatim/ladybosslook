@@ -56,6 +56,8 @@ interface PromoBanner {
   exclude_playlists: string[];
   include_tools: string[];
   exclude_tools: string[];
+  target_languages: string[];
+  target_timezones: string[];
   display_location: string[];
   target_playlist_ids: string[];
   target_audio_ids: string[];
@@ -101,6 +103,8 @@ export function PromoBannerManager() {
   const [excludePlaylists, setExcludePlaylists] = useState<string[]>([]);
   const [includeTools, setIncludeTools] = useState<string[]>([]);
   const [excludeTools, setExcludeTools] = useState<string[]>([]);
+  const [targetLanguages, setTargetLanguages] = useState<string[]>([]);
+  const [targetTimezones, setTargetTimezones] = useState<string[]>([]);
 
   // Fetch banners
   const { data: banners, isLoading } = useQuery({
@@ -334,6 +338,8 @@ export function PromoBannerManager() {
         exclude_playlists: excludePlaylists,
         include_tools: includeTools,
         exclude_tools: excludeTools,
+        target_languages: targetLanguages,
+        target_timezones: targetTimezones,
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
@@ -379,6 +385,8 @@ export function PromoBannerManager() {
         exclude_playlists: excludePlaylists,
         include_tools: includeTools,
         exclude_tools: excludeTools,
+        target_languages: targetLanguages,
+        target_timezones: targetTimezones,
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
@@ -449,6 +457,8 @@ export function PromoBannerManager() {
     setExcludePlaylists([]);
     setIncludeTools([]);
     setExcludeTools([]);
+    setTargetLanguages([]);
+    setTargetTimezones([]);
     // Reset location
     setDisplayLocations(['home_top']);
     setTargetPlaylistIds([]);
@@ -477,6 +487,8 @@ export function PromoBannerManager() {
     setExcludePlaylists(banner.exclude_playlists || []);
     setIncludeTools(banner.include_tools || []);
     setExcludeTools(banner.exclude_tools || []);
+    setTargetLanguages((banner as any).target_languages || []);
+    setTargetTimezones((banner as any).target_timezones || []);
     // Load location
     setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
     setTargetPlaylistIds(banner.target_playlist_ids || []);
@@ -1023,6 +1035,10 @@ export function PromoBannerManager() {
                 setIncludeTools={setIncludeTools}
                 excludeTools={excludeTools}
                 setExcludeTools={setExcludeTools}
+                targetLanguages={targetLanguages}
+                setTargetLanguages={setTargetLanguages}
+                targetTimezones={targetTimezones}
+                setTargetTimezones={setTargetTimezones}
               />
 
               {/* Active Toggle */}
@@ -1130,6 +1146,8 @@ export function PromoBannerManager() {
                       setExcludePlaylists(banner.exclude_playlists || []);
                       setIncludeTools(banner.include_tools || []);
                       setExcludeTools(banner.exclude_tools || []);
+                      setTargetLanguages((banner as any).target_languages || []);
+                      setTargetTimezones((banner as any).target_timezones || []);
                       setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
                       setTargetPlaylistIds(banner.target_playlist_ids || []);
                       setTargetAudioIds(banner.target_audio_ids || []);
