@@ -17,6 +17,33 @@ const TOOLS = [
   { slug: 'planner', label: '📅 Planner', description: 'Users who have tasks' },
 ];
 
+const LANGUAGE_OPTIONS = [
+  { value: 'en', label: '🇺🇸 English' },
+  { value: 'fa', label: '🇮🇷 فارسی (Persian)' },
+  { value: 'ar', label: '🇸🇦 العربية (Arabic)' },
+  { value: 'es', label: '🇪🇸 Español' },
+  { value: 'fr', label: '🇫🇷 Français' },
+  { value: 'de', label: '🇩🇪 Deutsch' },
+  { value: 'tr', label: '🇹🇷 Türkçe' },
+  { value: 'hi', label: '🇮🇳 हिन्दी (Hindi)' },
+  { value: 'zh', label: '🇨🇳 中文 (Chinese)' },
+];
+
+const TIMEZONE_GROUPS = [
+  { label: '🇺🇸 US Pacific', values: ['America/Los_Angeles'] },
+  { label: '🇺🇸 US Mountain', values: ['America/Denver'] },
+  { label: '🇺🇸 US Central', values: ['America/Chicago'] },
+  { label: '🇺🇸 US Eastern', values: ['America/New_York'] },
+  { label: '🇬🇧 UK / GMT', values: ['Europe/London'] },
+  { label: '🇪🇺 Central Europe', values: ['Europe/Berlin', 'Europe/Paris', 'Europe/Rome'] },
+  { label: '🇮🇷 Iran', values: ['Asia/Tehran'] },
+  { label: '🇹🇷 Turkey', values: ['Europe/Istanbul'] },
+  { label: '🇦🇪 UAE / Gulf', values: ['Asia/Dubai'] },
+  { label: '🇮🇳 India', values: ['Asia/Kolkata', 'Asia/Calcutta'] },
+  { label: '🇨🇳 China', values: ['Asia/Shanghai'] },
+  { label: '🇦🇺 Australia', values: ['Australia/Sydney', 'Australia/Melbourne'] },
+];
+
 interface PromoAudienceSelectorProps {
   targetType: TargetType;
   setTargetType: (type: TargetType) => void;
@@ -32,6 +59,10 @@ interface PromoAudienceSelectorProps {
   setIncludeTools: (tools: string[]) => void;
   excludeTools: string[];
   setExcludeTools: (tools: string[]) => void;
+  targetLanguages: string[];
+  setTargetLanguages: (langs: string[]) => void;
+  targetTimezones: string[];
+  setTargetTimezones: (tzs: string[]) => void;
 }
 
 export function PromoAudienceSelector({
@@ -49,6 +80,10 @@ export function PromoAudienceSelector({
   setIncludeTools,
   excludeTools,
   setExcludeTools,
+  targetLanguages,
+  setTargetLanguages,
+  targetTimezones,
+  setTargetTimezones,
 }: PromoAudienceSelectorProps) {
   // Fetch programs
   const { data: programs } = useQuery({
@@ -87,6 +122,16 @@ export function PromoAudienceSelector({
       setList(list.filter((i) => i !== item));
     } else {
       setList([...list, item]);
+    }
+  };
+
+  const toggleTimezoneGroup = (groupValues: string[]) => {
+    const allIncluded = groupValues.every(v => targetTimezones.includes(v));
+    if (allIncluded) {
+      setTargetTimezones(targetTimezones.filter(tz => !groupValues.includes(tz)));
+    } else {
+      const newTzs = [...new Set([...targetTimezones, ...groupValues])];
+      setTargetTimezones(newTzs);
     }
   };
 
@@ -265,10 +310,54 @@ export function PromoAudienceSelector({
             </div>
           </div>
 
+          {/* Language Section */}
+          <div className="space-y-3">
+            <Label className="text-xs text-muted-foreground uppercase tracking-wider">
+              Preferred Language (Second Language)
+            </Label>
+            <p className="text-xs text-muted-foreground">Show only to users whose preferred language matches (empty = all languages)</p>
+            <div className="flex flex-wrap gap-2">
+              {LANGUAGE_OPTIONS.map((lang) => (
+                <Badge
+                  key={lang.value}
+                  variant={targetLanguages.includes(lang.value) ? 'default' : 'outline'}
+                  className="cursor-pointer hover:bg-primary/10"
+                  onClick={() => toggleItem(targetLanguages, setTargetLanguages, lang.value)}
+                >
+                  {lang.label}
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          {/* Timezone Section */}
+          <div className="space-y-3">
+            <Label className="text-xs text-muted-foreground uppercase tracking-wider">
+              Timezone
+            </Label>
+            <p className="text-xs text-muted-foreground">Show only to users in selected timezones (empty = all timezones)</p>
+            <div className="flex flex-wrap gap-2">
+              {TIMEZONE_GROUPS.map((group) => {
+                const allIncluded = group.values.every(v => targetTimezones.includes(v));
+                return (
+                  <Badge
+                    key={group.label}
+                    variant={allIncluded ? 'default' : 'outline'}
+                    className="cursor-pointer hover:bg-primary/10"
+                    onClick={() => toggleTimezoneGroup(group.values)}
+                  >
+                    {group.label}
+                  </Badge>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Summary */}
           {(includePrograms.length > 0 || excludePrograms.length > 0 || 
             includePlaylists.length > 0 || excludePlaylists.length > 0 ||
-            includeTools.length > 0 || excludeTools.length > 0) && (
+            includeTools.length > 0 || excludeTools.length > 0 ||
+            targetLanguages.length > 0 || targetTimezones.length > 0) && (
             <div className="text-xs text-muted-foreground bg-background p-2 rounded border">
               <strong>Summary:</strong>
               {includePrograms.length > 0 && <span className="text-green-600"> +{includePrograms.length} programs</span>}
@@ -277,6 +366,8 @@ export function PromoAudienceSelector({
               {excludePlaylists.length > 0 && <span className="text-red-600"> -{excludePlaylists.length} playlists</span>}
               {includeTools.length > 0 && <span className="text-green-600"> +{includeTools.length} tools</span>}
               {excludeTools.length > 0 && <span className="text-red-600"> -{excludeTools.length} tools</span>}
+              {targetLanguages.length > 0 && <span className="text-blue-600"> 🌐 {targetLanguages.length} languages</span>}
+              {targetTimezones.length > 0 && <span className="text-blue-600"> 🕐 {targetTimezones.length} timezone groups</span>}
             </div>
           )}
         </div>
