@@ -960,12 +960,6 @@ const AppHome = () => {
           }}>
               <div className="min-h-0">
                 <div className={cn("transition-opacity duration-200", showCalendar ? "opacity-100" : "opacity-0")}>
-                  {/* Weekday headers for expanded view */}
-                  <div className="flex mb-1">
-                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => <div key={day} className="flex-1 text-center text-[11px] text-foreground/50 font-medium leading-tight">
-                        {day}
-                      </div>)}
-                  </div>
                   <MonthCalendar selectedDate={selectedDate} currentMonth={currentMonth} onDateSelect={handleDateSelect} completedDates={completedDates} programEventDates={programEventDates} badgeData={monthBadgeData} />
                 </div>
               </div>
