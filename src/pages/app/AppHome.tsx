@@ -5,6 +5,7 @@ import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
+import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay, subDays } from 'date-fns';
 import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, Headset, ArrowLeft, Heart, Zap, Settings2, Search, Play } from 'lucide-react';
 
@@ -108,6 +109,9 @@ const AppHome = () => {
   const { isKeyboardOpen } = useKeyboard();
   const { currentTrack } = useAudioPlayer();
   const hasMiniPlayer = !!currentTrack;
+  let hasRoutineMini = false;
+  try { const rp = useRoutinePlayerContext(); hasRoutineMini = rp.isActive && rp.isMinimized; } catch { /* */ }
+  const activeMiniPlayerCount = (hasMiniPlayer ? 1 : 0) + (hasRoutineMini ? 1 : 0);
   
   const [goalInputTask, setGoalInputTask] = useState<UserTask | null>(null);
   const addGoalProgress = useAddGoalProgress();
@@ -1554,7 +1558,11 @@ const AppHome = () => {
         {/* FAB */}
         {!isKeyboardOpen && (
           <button onClick={handleFabClick} className="tour-add-task fixed right-4 w-14 h-14 rounded-full bg-urgency text-urgency-foreground shadow-cta flex items-center justify-center hover:bg-urgency-dark active:scale-95 transition-all z-50" style={{
-          bottom: hasMiniPlayer ? 'calc(136px + env(safe-area-inset-bottom))' : 'calc(72px + env(safe-area-inset-bottom))'
+          bottom: activeMiniPlayerCount >= 2
+            ? 'calc(196px + env(safe-area-inset-bottom))'
+            : activeMiniPlayerCount === 1
+              ? 'calc(136px + env(safe-area-inset-bottom))'
+              : 'calc(72px + env(safe-area-inset-bottom))'
         }}>
             <Plus className="h-6 w-6" />
           </button>
