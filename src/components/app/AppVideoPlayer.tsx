@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { X, Loader2, ExternalLink, Gauge, SkipForward } from 'lucide-react';
+import { X, Loader2, ExternalLink, Gauge, SkipForward, Play } from 'lucide-react';
 import { detectVideoType, extractYouTubeId, extractVimeoId, getVideoPlatformLabel, isVerticalVideo } from '@/lib/videoUtils';
 import { useNavigate } from 'react-router-dom';
 import { smartOpenUrl } from '@/lib/navigation-utils';
@@ -44,6 +44,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
   const [hasError, setHasError] = useState(false);
   const [speedIndex, setSpeedIndex] = useState(0);
   const [videoPlaybackSeconds, setVideoPlaybackSeconds] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const videoType = detectVideoType(url);
@@ -129,6 +130,12 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
         );
       }
 
+      const togglePlayPause = () => {
+        const v = videoRef.current;
+        if (!v) return;
+        if (v.paused) { v.play(); } else { v.pause(); }
+      };
+
       return (
         <div className="relative w-full flex items-center justify-center">
           {isLoading && (
@@ -147,6 +154,8 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
             onLoadedData={() => setIsLoading(false)}
             onError={() => setHasError(true)}
             onEnded={handleVideoEnded}
+            onPlay={() => setIsPaused(false)}
+            onPause={() => setIsPaused(true)}
             onTimeUpdate={(e) => setVideoPlaybackSeconds(Math.floor(e.currentTarget.currentTime))}
             className={vertical
               ? "aspect-[9/16] max-h-[75vh] w-auto mx-auto rounded-xl"
@@ -154,6 +163,17 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
             }
             style={{ touchAction: 'none' }}
           />
+          {/* Big centered play button when paused */}
+          {isPaused && !isLoading && (
+            <button
+              onClick={togglePlayPause}
+              className="absolute inset-0 flex items-center justify-center z-10"
+            >
+              <div className="w-16 h-16 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform">
+                <Play className="h-8 w-8 text-white fill-white ml-1" />
+              </div>
+            </button>
+          )}
           {/* Speed toggle */}
           {!isLoading && (
             <button
