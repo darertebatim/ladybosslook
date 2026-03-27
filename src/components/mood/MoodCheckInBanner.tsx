@@ -55,7 +55,7 @@ export function MoodCheckInBanner({ onVisibilityChange }: { onVisibilityChange?:
     <button
       onClick={handleTap}
       className={cn(
-        "relative w-full rounded-2xl overflow-hidden active:scale-[0.98] transition-all mb-4",
+        "relative w-full rounded-2xl overflow-hidden active:scale-[0.98] transition-all",
         fading ? "animate-fade-out opacity-0" : "animate-fade-in"
       )}
     >
