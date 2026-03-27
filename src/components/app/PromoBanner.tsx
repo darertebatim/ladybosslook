@@ -242,8 +242,8 @@ export function PromoBanner({
         return false;
       }
       
-      // Check display delay (for player/video_player locations)
-      if ((banner.display_delay_seconds || 0) > 0 && playbackSeconds < banner.display_delay_seconds) {
+      // Check display delay (for player/video_player locations — skip for full-screen overlays, they use page-time delay)
+      if (banner.aspect_ratio !== 'full' && (banner.display_delay_seconds || 0) > 0 && playbackSeconds < banner.display_delay_seconds) {
         return false;
       }
       
