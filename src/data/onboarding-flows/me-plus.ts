@@ -20,7 +20,7 @@ import meplusImg32Paywall from '@/assets/onboarding/meplus-32-beforeafter.png';
 export const mePlusFlow: OnboardingFlow = {
   id: 'me-plus-v1',
   name: 'Ladybosslook Onboarding',
-  description: 'Full 38-screen Simora onboarding with surveys, paywalls, and gamification',
+  description: 'Full 38-screen Ladybosslook onboarding with surveys, paywalls, and gamification',
   appName: 'Ladybosslook',
   createdAt: '2026-02-22',
   steps: [

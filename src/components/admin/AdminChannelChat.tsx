@@ -477,7 +477,7 @@ export function AdminChannelChat() {
               <Input
                 value={editForm.display_name}
                 onChange={(e) => setEditForm({ ...editForm, display_name: e.target.value })}
-                placeholder="e.g., Simora, The Team..."
+                placeholder="e.g., Ladybosslook, The Team..."
               />
             </div>
             <div className="grid grid-cols-2 gap-4">

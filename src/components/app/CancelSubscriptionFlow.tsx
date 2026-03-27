@@ -255,7 +255,7 @@ function HowToCancelStep({ onBack }: { onBack: () => void }) {
         { num: 1, text: 'Open Google Play Store.', image: null },
         { num: 2, text: 'Tap your profile icon → Payments & subscriptions.', image: null },
         { num: 3, text: 'Tap Subscriptions.', image: null },
-        { num: 4, text: 'Select Simora and tap Cancel subscription.', image: null },
+        { num: 4, text: 'Select Ladybosslook and tap Cancel subscription.', image: null },
       ];
 
   return (
