@@ -525,18 +525,45 @@ const AppTaskCreate = ({
   // Determine the current pro link config
   const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
 
-  // Fetch playlists for linking
+  // Fetch playlists for linking (only ones user has access to)
   const { data: playlists = [] } = useQuery({
     queryKey: ['linkable-playlists'],
     queryFn: async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) return [];
+
+      // Get user's enrolled program slugs
+      const { data: enrollments } = await supabase
+        .from('course_enrollments')
+        .select('program_slug')
+        .eq('user_id', authUser.id)
+        .eq('status', 'active');
+      const enrolledSlugs = (enrollments || []).map(e => e.program_slug).filter(Boolean) as string[];
+
+      // Check if user has Simora+ subscription
+      const { data: subs } = await supabase
+        .from('user_subscriptions')
+        .select('id')
+        .eq('user_id', authUser.id)
+        .eq('status', 'active')
+        .limit(1);
+      const hasSubscription = (subs && subs.length > 0);
+
       const { data, error } = await supabase
         .from('audio_playlists')
-        .select('id, name, cover_image_url, category')
+        .select('id, name, cover_image_url, category, is_free, requires_subscription, program_slug')
         .eq('is_hidden', false)
         .order('name', { ascending: true });
       
       if (error) throw error;
-      return data as PlaylistOption[];
+
+      // Filter to accessible playlists
+      return (data || []).filter(p => {
+        if (p.is_free) return true;
+        if (p.requires_subscription && hasSubscription) return true;
+        if (p.program_slug && enrolledSlugs.includes(p.program_slug)) return true;
+        return false;
+      }) as PlaylistOption[];
     },
   });
 
@@ -587,17 +614,43 @@ const AppTaskCreate = ({
     },
   });
 
-  // Fetch audio content for linking
+  // Fetch audio content for linking (only accessible tracks)
   const { data: audioTracks = [] } = useQuery({
     queryKey: ['linkable-audio-tracks'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) return [];
+
+      // Get accessible playlist IDs from the playlists query logic
+      const { data: enrollments } = await supabase
+        .from('course_enrollments')
+        .select('program_slug')
+        .eq('user_id', authUser.id)
+        .eq('status', 'active');
+      const enrolledSlugs = (enrollments || []).map(e => e.program_slug).filter(Boolean) as string[];
+
+      const { data: subs } = await supabase
+        .from('user_subscriptions')
+        .select('id')
+        .eq('user_id', authUser.id)
+        .eq('status', 'active')
+        .limit(1);
+      const hasSubscription = (subs && subs.length > 0);
+
+      // Get free tracks (is_free on audio_content)
+      const { data: allTracks, error } = await supabase
         .from('audio_content')
-        .select('id, title, cover_image_url, category, duration_seconds')
+        .select('id, title, cover_image_url, category, duration_seconds, is_free, program_slug')
         .order('title', { ascending: true });
       
       if (error) throw error;
-      return data as { id: string; title: string; cover_image_url: string | null; category: string; duration_seconds: number }[];
+
+      return (allTracks || []).filter(t => {
+        if (t.is_free) return true;
+        if (hasSubscription) return true;
+        if (t.program_slug && enrolledSlugs.includes(t.program_slug)) return true;
+        return false;
+      }) as { id: string; title: string; cover_image_url: string | null; category: string; duration_seconds: number }[];
     },
   });
 
