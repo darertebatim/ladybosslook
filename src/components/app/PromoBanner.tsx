@@ -438,14 +438,22 @@ export function PromoBanner({
   const fullScreenBanners = eligibleBanners.filter(b => b.aspect_ratio === 'full');
   const inlineBanners = eligibleBanners.filter(b => b.aspect_ratio !== 'full');
 
-  const isVisible = eligibleBanners.length > 0;
+  // Page-time delay for full-screen overlay banners
+  const [pageSeconds, setPageSeconds] = useState(0);
+  const fullBannerCandidate = fullScreenBanners[0];
+  const fullDelay = fullBannerCandidate?.display_delay_seconds || 0;
 
   useEffect(() => {
-    onVisibilityChange?.(isVisible);
-  }, [isVisible, onVisibilityChange]);
+    if (!fullBannerCandidate || fullDelay <= 0) return;
+    const interval = setInterval(() => {
+      setPageSeconds(prev => prev + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [fullBannerCandidate?.id, fullDelay]);
 
-  // Render full-screen overlay banner (first one)
-  const fullBanner = fullScreenBanners[0];
+  const fullBanner = fullBannerCandidate && (fullDelay <= 0 || pageSeconds >= fullDelay)
+    ? fullBannerCandidate
+    : null;
   const fullOverlay = fullBanner ? (
     <OverlayPortal>
       <div
