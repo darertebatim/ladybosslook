@@ -331,12 +331,28 @@ export function PromoBanner({
           if (hasExcludedTool) shouldShow = false;
         }
         
+        // Language filter (if specified, user must match one)
+        if (banner.target_languages?.length > 0 && shouldShow) {
+          const userLang = userProfile?.preferred_language || '';
+          if (!userLang || !banner.target_languages.includes(userLang)) {
+            shouldShow = false;
+          }
+        }
+        
+        // Timezone filter (if specified, user must match one)
+        if (banner.target_timezones?.length > 0 && shouldShow) {
+          const userTz = userProfile?.timezone || '';
+          if (!userTz || !banner.target_timezones.includes(userTz)) {
+            shouldShow = false;
+          }
+        }
+        
         return shouldShow;
       }
       
       return true;
     });
-  }, [banners, dismissedIds, location, currentPlaylistId, currentAudioId, currentVideoId, playbackSeconds, userEnrollments, userPlaylists, userTools]);
+  }, [banners, dismissedIds, location, currentPlaylistId, currentAudioId, currentVideoId, playbackSeconds, userEnrollments, userPlaylists, userTools, userProfile]);
 
   const handleDismiss = (e: React.MouseEvent, banner: PromoBannerData) => {
     e.stopPropagation();
