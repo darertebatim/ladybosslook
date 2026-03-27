@@ -1146,6 +1146,8 @@ export function PromoBannerManager() {
                       setExcludePlaylists(banner.exclude_playlists || []);
                       setIncludeTools(banner.include_tools || []);
                       setExcludeTools(banner.exclude_tools || []);
+                      setTargetLanguages((banner as any).target_languages || []);
+                      setTargetTimezones((banner as any).target_timezones || []);
                       setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
                       setTargetPlaylistIds(banner.target_playlist_ids || []);
                       setTargetAudioIds(banner.target_audio_ids || []);
