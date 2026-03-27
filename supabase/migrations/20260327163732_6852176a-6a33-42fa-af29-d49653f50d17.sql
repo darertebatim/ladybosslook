@@ -1,0 +1,2 @@
+ALTER TABLE public.promo_banners DROP CONSTRAINT promo_banners_destination_type_check;
+ALTER TABLE public.promo_banners ADD CONSTRAINT promo_banners_destination_type_check CHECK (destination_type = ANY (ARRAY['routine','playlist','journal','programs','breathe','water','channels','home','inspire','custom_url','tasks','routines_hub','tasks_bank','breathe_exercise','external_url','emotion','mood','period','chat','profile','planner','rate','onboarding','watch','video_playlist','routine_player','audio_track','video_track']));
