@@ -62,9 +62,18 @@ export const MonthCalendar = ({
 
   return (
     <div className="animate-in slide-in-from-top-2 duration-200">
-      {/* Week rows - same styling as collapsed week strip */}
+      {/* Day-of-week headers */}
+      <div className="flex mb-1">
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+          <div key={d} className="flex-1 text-center text-[10px] font-medium text-muted-foreground/60">
+            {d}
+          </div>
+        ))}
+      </div>
+
+      {/* Week rows - matching collapsed week strip styling */}
       {weeks.map((week, weekIdx) => (
-        <div key={weekIdx} className="flex mt-2">
+        <div key={weekIdx} className="flex mt-1.5">
           {week.map((dateItem) => {
             const isCurrentMonth = isSameMonth(dateItem, currentMonth);
             const isSelected = isSameDay(dateItem, selectedDate);
@@ -85,28 +94,34 @@ export const MonthCalendar = ({
               >
                 <div
                   className={cn(
-                    'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all relative',
-                    !isCurrentMonth && 'text-muted-foreground/30',
-                    isCurrentMonth && !isSelected && !isTodayDate && !hasBadge && 'hover:bg-muted/50',
-                    isSelected && !hasBadge && 'bg-violet-600 text-white shadow-md',
-                    !isSelected && isTodayDate && isCurrentMonth && !hasBadge && 'bg-violet-100 text-violet-700',
-                    hasBadge && isSelected && 'ring-2 ring-violet-600 ring-offset-1'
+                    'w-11 h-11 rounded-xl flex flex-col items-center justify-center transition-all relative',
+                    !isCurrentMonth && 'opacity-30',
+                    isCurrentMonth && !isSelected && !isTodayDate && !hasBadge && 'text-muted-foreground hover:bg-muted/50',
+                    isSelected && !hasBadge && 'bg-chip-lavender text-foreground scale-105',
+                    !isSelected && isTodayDate && isCurrentMonth && !hasBadge && 'border border-background text-muted-foreground',
+                    hasBadge && isSelected && 'ring-2 ring-chip-lavender ring-offset-0'
                   )}
                 >
                   {hasProgramEvents && isCurrentMonth && (
                     <Star className={cn(
-                      "absolute -top-0.5 -right-0.5 h-3 w-3 z-20",
-                      isSelected ? "text-indigo-300 fill-indigo-300" : "text-indigo-500 fill-indigo-500"
+                      "absolute -top-0.5 -right-0.5 h-2.5 w-2.5 z-20",
+                      isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500"
                     )} />
                   )}
                   {hasBadge && isCurrentMonth ? (
                     <img 
                       src={BADGE_IMAGES[badgeLevel]} 
                       alt={`${badgeLevel} badge`}
-                      className="w-[140%] h-[140%] object-cover overflow-hidden rounded-full"
+                      className="absolute inset-0 w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="relative z-10">{format(dateItem, 'd')}</span>
+                    <span className={cn(
+                      'text-sm font-bold leading-none',
+                      isSelected && 'text-foreground',
+                      !isCurrentMonth && 'text-muted-foreground/40'
+                    )}>
+                      {format(dateItem, 'd')}
+                    </span>
                   )}
                 </div>
               </button>
