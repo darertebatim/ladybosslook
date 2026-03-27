@@ -221,6 +221,20 @@ export default function RoutinesBank() {
     },
   });
 
+  // Fetch program catalog for program type routines
+  const { data: programCatalog = [] } = useQuery({
+    queryKey: ['program-catalog-for-routines'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('program_catalog')
+        .select('slug, title')
+        .eq('is_active', true)
+        .order('title', { ascending: true });
+      if (error) throw error;
+      return data as { slug: string; title: string }[];
+    },
+  });
+
   // Fetch routines with task count
   const { data: routines = [], isLoading } = useQuery({
     queryKey: ['routines-bank'],
