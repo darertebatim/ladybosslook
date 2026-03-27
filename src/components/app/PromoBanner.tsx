@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { smartOpenUrl } from '@/lib/navigation-utils';
 import { supabase } from '@/integrations/supabase/client';
 import { X } from 'lucide-react';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 import { useAuth } from '@/hooks/useAuth';
 import useEmblaCarousel from 'embla-carousel-react';
 import { cn } from '@/lib/utils';
