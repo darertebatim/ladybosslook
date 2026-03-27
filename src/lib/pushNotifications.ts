@@ -60,8 +60,8 @@ export function initializePushNotificationHandlers() {
 
   console.log('[Push] 🚀 Initializing notification handlers for ALL states (foreground, background, closed)');
 
-  // Phase 5: Clear badge when app opens
-  clearBadge();
+  // Phase 5: Clear badge when app opens (delayed to ensure registration completes)
+  setTimeout(() => clearBadge(), 3000);
 
   // ========================================
   // FOREGROUND: When app is open and active
