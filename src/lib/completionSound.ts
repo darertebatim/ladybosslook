@@ -1,6 +1,6 @@
 /**
  * Plays an Apple-style "cha-ching" completion sound using Web Audio API.
- * Bright, metallic two-tone ping — like a cash register / payment confirmed.
+ * Warm, satisfying two-tone ping — lower register for a pleasing feel.
  */
 let audioCtx: AudioContext | null = null;
 
@@ -19,75 +19,74 @@ export function playCompletionSound() {
     const ctx = getAudioContext();
     const now = ctx.currentTime;
 
-    // Master gain
     const master = ctx.createGain();
-    master.gain.value = 0.18;
+    master.gain.value = 0.2;
     master.connect(ctx.destination);
 
-    // --- "Cha" — short metallic tap (A6 ~1760 Hz) ---
+    // --- "Cha" — short tap (E5 ~659 Hz) ---
     const cha = ctx.createOscillator();
     cha.type = 'square';
-    cha.frequency.value = 1760;
+    cha.frequency.value = 659;
     const chaGain = ctx.createGain();
     chaGain.gain.setValueAtTime(0, now);
-    chaGain.gain.linearRampToValueAtTime(0.6, now + 0.008);
-    chaGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+    chaGain.gain.linearRampToValueAtTime(0.5, now + 0.01);
+    chaGain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
     cha.connect(chaGain);
     chaGain.connect(master);
     cha.start(now);
-    cha.stop(now + 0.08);
+    cha.stop(now + 0.09);
 
-    // --- Metallic harmonic on "cha" ---
+    // --- Metallic harmonic on "cha" (E6 overtone) ---
     const chaHarm = ctx.createOscillator();
     chaHarm.type = 'sine';
-    chaHarm.frequency.value = 3520; // A7 overtone
+    chaHarm.frequency.value = 1318;
     const chaHarmGain = ctx.createGain();
     chaHarmGain.gain.setValueAtTime(0, now);
-    chaHarmGain.gain.linearRampToValueAtTime(0.2, now + 0.006);
-    chaHarmGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+    chaHarmGain.gain.linearRampToValueAtTime(0.15, now + 0.008);
+    chaHarmGain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
     chaHarm.connect(chaHarmGain);
     chaHarmGain.connect(master);
     chaHarm.start(now);
-    chaHarm.stop(now + 0.06);
+    chaHarm.stop(now + 0.07);
 
-    // --- "Ching" — bright resonant ring (E7 ~2637 Hz), delayed ---
+    // --- "Ching" — resonant ring (A5 ~880 Hz) ---
     const ching = ctx.createOscillator();
     ching.type = 'sine';
-    ching.frequency.value = 2637;
+    ching.frequency.value = 880;
     const chingGain = ctx.createGain();
-    chingGain.gain.setValueAtTime(0, now + 0.09);
-    chingGain.gain.linearRampToValueAtTime(0.7, now + 0.1);
-    chingGain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+    chingGain.gain.setValueAtTime(0, now + 0.1);
+    chingGain.gain.linearRampToValueAtTime(0.65, now + 0.11);
+    chingGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
     ching.connect(chingGain);
     chingGain.connect(master);
-    ching.start(now + 0.09);
-    ching.stop(now + 0.55);
+    ching.start(now + 0.1);
+    ching.stop(now + 0.6);
 
-    // --- "Ching" shimmer overtone (E8 ~5274 Hz) ---
-    const chingShimmer = ctx.createOscillator();
-    chingShimmer.type = 'sine';
-    chingShimmer.frequency.value = 5274;
+    // --- Shimmer overtone (A6 ~1760 Hz) ---
+    const shimmer = ctx.createOscillator();
+    shimmer.type = 'sine';
+    shimmer.frequency.value = 1760;
     const shimmerGain = ctx.createGain();
-    shimmerGain.gain.setValueAtTime(0, now + 0.09);
-    shimmerGain.gain.linearRampToValueAtTime(0.15, now + 0.1);
-    shimmerGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-    chingShimmer.connect(shimmerGain);
+    shimmerGain.gain.setValueAtTime(0, now + 0.1);
+    shimmerGain.gain.linearRampToValueAtTime(0.12, now + 0.11);
+    shimmerGain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+    shimmer.connect(shimmerGain);
     shimmerGain.connect(master);
-    chingShimmer.start(now + 0.09);
-    chingShimmer.stop(now + 0.4);
+    shimmer.start(now + 0.1);
+    shimmer.stop(now + 0.45);
 
-    // --- Sub-bass thud for weight (A4 ~220 Hz) ---
+    // --- Sub-bass thud (A3 ~220 Hz) ---
     const thud = ctx.createOscillator();
     thud.type = 'sine';
     thud.frequency.value = 220;
     const thudGain = ctx.createGain();
     thudGain.gain.setValueAtTime(0, now);
-    thudGain.gain.linearRampToValueAtTime(0.25, now + 0.01);
-    thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    thudGain.gain.linearRampToValueAtTime(0.3, now + 0.01);
+    thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
     thud.connect(thudGain);
     thudGain.connect(master);
     thud.start(now);
-    thud.stop(now + 0.12);
+    thud.stop(now + 0.15);
 
   } catch (e) {
     console.warn('[completionSound] Failed to play:', e);
