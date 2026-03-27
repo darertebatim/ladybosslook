@@ -453,7 +453,7 @@ export function PromoBanner({
         style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => { e.stopPropagation(); handleDismiss(e as any, fullBanner); }}
       >
-        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" />
         {/* Close X button — safe area aware */}
         <button
           onClick={(e) => { e.stopPropagation(); handleDismiss(e as any, fullBanner); }}
