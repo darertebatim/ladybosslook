@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
@@ -19,13 +19,19 @@ function dismissToday() {
   localStorage.setItem(DISMISS_KEY, getLocalDateStr());
 }
 
-export function MoodCheckInBanner() {
+export function MoodCheckInBanner({ onVisibilityChange }: { onVisibilityChange?: (visible: boolean) => void }) {
   const navigate = useNavigate();
   const { data: todayMood } = useTodayMood();
   const [visible, setVisible] = useState(() => !isDismissedToday());
   const [fading, setFading] = useState(false);
 
-  if (!visible || todayMood) return null;
+  const isShowing = visible && !todayMood;
+
+  useEffect(() => {
+    onVisibilityChange?.(isShowing);
+  }, [isShowing, onVisibilityChange]);
+
+  if (!isShowing) return null;
 
   const fadeOut = (cb: () => void) => {
     setFading(true);
