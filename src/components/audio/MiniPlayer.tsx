@@ -2,6 +2,7 @@ import { Play, Pause, Headphones, X } from "lucide-react";
 import { CachedImage } from '@/components/ui/CachedImage';
 import { useNavigate } from "react-router-dom";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import { useRoutinePlayerContext } from "@/components/app/RoutinePlayerProvider";
 import { cn } from "@/lib/utils";
 
 const formatDuration = (seconds: number): string => {
