@@ -530,7 +530,6 @@ export function PromoBanner({
       )}
     </>
   );
-  );
 }
 
 // --- Carousel sub-component ---
