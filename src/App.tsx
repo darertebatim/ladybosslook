@@ -343,7 +343,8 @@ const InspireRedirect = () => {
 // Redirect component for old /app/course/:slug routes
 const CourseRedirect = () => {
   const { slug, roundId } = useParams();
-  return <Navigate to={`/app/myprograms/${slug}${roundId ? `/${roundId}` : ''}`} replace />;
+  const location = useLocation();
+  return <Navigate to={`/app/myprograms/${slug}${roundId ? `/${roundId}` : ''}`} replace state={location.state} />;
 };
 
 // Clear old cache key to prevent crash on app update
