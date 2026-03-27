@@ -43,6 +43,8 @@ interface PromoBannerProps {
   onVisibilityChange?: (visible: boolean) => void;
   /** Show all eligible banners in a carousel instead of one at a time */
   carousel?: boolean;
+  /** Always show the close/dismiss button regardless of display_frequency */
+  forceShowClose?: boolean;
 }
 
 const STORAGE_KEY = 'promo_banner_dismissals';
@@ -98,6 +100,7 @@ export function PromoBanner({
   className,
   onVisibilityChange,
   carousel = false,
+  forceShowClose = false,
 }: PromoBannerProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -420,7 +423,7 @@ export function PromoBanner({
           alt="Promo"
           className={`w-full ${getAspectRatioClass(banner.aspect_ratio)} object-cover`}
         />
-        {banner.display_frequency !== 'forever' && (
+        {(forceShowClose || banner.display_frequency !== 'forever') && (
           <button
             onClick={(e) => handleDismiss(e, banner)}
             className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 flex items-center justify-center active:scale-90 transition-transform"

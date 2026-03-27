@@ -276,18 +276,19 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
           <X className="h-5 w-5 text-white" />
         </button>
 
-        {/* Video area - centered */}
-        <div className="flex-1 flex items-center justify-center px-4 overflow-hidden overscroll-contain">
+        {/* Video area - centered with banner overlay */}
+        <div className="flex-1 flex items-center justify-center px-4 overflow-hidden overscroll-contain relative">
           {renderPlayer()}
+          {/* Promo Banner - overlaid on top of the video */}
+          <div className="absolute bottom-2 left-4 right-4 z-20">
+            <PromoBanner 
+              location="video_player" 
+              currentVideoId={videoId}
+              playbackSeconds={videoPlaybackSeconds}
+              forceShowClose
+            />
+          </div>
         </div>
-
-        {/* Promo Banner - Video Player overlay above title bar */}
-        <PromoBanner 
-          location="video_player" 
-          currentVideoId={videoId}
-          playbackSeconds={videoPlaybackSeconds}
-          className="px-4 pb-1"
-        />
 
         {/* Title bar + Next button */}
         <div className="px-4 pb-4 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}>
