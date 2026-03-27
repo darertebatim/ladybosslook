@@ -33,7 +33,7 @@ interface HomeBannerData {
 
 const DISMISSED_BANNERS_KEY = 'dismissedBannerIds';
 
-export function HomeBanner() {
+export function HomeBanner({ onVisibilityChange }: { onVisibilityChange?: (visible: boolean) => void } = {}) {
   const [banners, setBanners] = useState<HomeBannerData[]>([]);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(() => {
     try {
@@ -97,6 +97,10 @@ export function HomeBanner() {
   };
 
   const visibleBanners = banners.filter(b => !dismissedIds.has(b.id));
+
+  useEffect(() => {
+    onVisibilityChange?.(visibleBanners.length > 0);
+  }, [visibleBanners.length, onVisibilityChange]);
 
   if (visibleBanners.length === 0) return null;
 

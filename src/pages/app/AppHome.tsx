@@ -103,7 +103,7 @@ const AppHome = () => {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showActionLimit, setShowActionLimit] = useState(false);
   const [hasPromoBanner, setHasPromoBanner] = useState(false);
-  const [moodBannerVisible, setMoodBannerVisible] = useState(false);
+  const [hasHomeBanner, setHasHomeBanner] = useState(false);
   const { isKeyboardOpen } = useKeyboard();
   
   const [goalInputTask, setGoalInputTask] = useState<UserTask | null>(null);
@@ -1066,20 +1066,14 @@ const AppHome = () => {
             {/* Notification Banner - prompts users to enable notifications */}
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
 
-            {/* Mood Check-in Banner — shows first; other banners appear only after mood is logged or banner dismissed */}
-            {!showWelcomeCard && <MoodCheckInBanner onVisibilityChange={setMoodBannerVisible} />}
+            {/* Promo & Home Banners — shown first */}
+            <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
+            <div className="tour-banner">
+              <HomeBanner onVisibilityChange={setHasHomeBanner} />
+            </div>
 
-            {/* Promo Banner — only when mood banner is not showing */}
-            {!moodBannerVisible && (
-              <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
-            )}
-
-            {/* Home Banners (announcements with videos/CTAs) — only when mood banner is not showing */}
-            {!moodBannerVisible && (
-              <div className="tour-banner">
-                <HomeBanner />
-              </div>
-            )}
+            {/* Mood Check-in Banner — only after all promo/home banners are dismissed */}
+            {!showWelcomeCard && !hasPromoBanner && !hasHomeBanner && <MoodCheckInBanner />}
 
             {/* Tag filter chips - temporarily hidden */}
             {/* {taskTags.length > 0 && <div className="py-2 -mx-4 px-4 bg-background overflow-x-auto">
