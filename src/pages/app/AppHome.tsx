@@ -1066,15 +1066,15 @@ const AppHome = () => {
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
 
             {/* Mood Check-in Banner — shows first; other banners appear only after mood is logged or banner dismissed */}
-            {!showWelcomeCard && <MoodCheckInBanner />}
+            {!showWelcomeCard && <MoodCheckInBanner onVisibilityChange={setMoodBannerVisible} />}
 
             {/* Promo Banner — only when mood banner is not showing */}
-            {(todayMood || showWelcomeCard) && (
+            {!moodBannerVisible && (
               <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
             )}
 
             {/* Home Banners (announcements with videos/CTAs) — only when mood banner is not showing */}
-            {(todayMood || showWelcomeCard) && (
+            {!moodBannerVisible && (
               <div className="tour-banner">
                 <HomeBanner />
               </div>
