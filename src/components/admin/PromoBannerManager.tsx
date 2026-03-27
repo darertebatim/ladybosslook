@@ -654,9 +654,8 @@ export function PromoBannerManager() {
                 </div>
               </div>
 
-              {/* Image Upload */}
               <div className="space-y-2">
-                <Label>Or Upload Image</Label>
+                <Label>Upload Image</Label>
                 <div className="flex items-center gap-4">
                   <Input
                     type="file"
