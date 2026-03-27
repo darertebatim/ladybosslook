@@ -22,7 +22,11 @@ export const MiniPlayer = () => {
     stop,
   } = useAudioPlayer();
 
-  if (!currentTrack) return null;
+  let routineMinimized = false;
+  try {
+    const rp = useRoutinePlayerContext();
+    routineMinimized = rp.isActive && rp.isMinimized;
+  } catch { /* provider not available */ }
 
   const handlePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation();
