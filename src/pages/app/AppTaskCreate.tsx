@@ -637,7 +637,7 @@ const AppTaskCreate = ({
         .limit(1);
       const hasSubscription = (subs && subs.length > 0);
 
-      // Get free tracks (is_free on audio_content)
+      // Get tracks with their playlist names
       const { data: allTracks, error } = await supabase
         .from('audio_content')
         .select('id, title, cover_image_url, category, duration_seconds, is_free, program_slug')
@@ -645,12 +645,30 @@ const AppTaskCreate = ({
       
       if (error) throw error;
 
+      // Get playlist mappings for all tracks
+      const trackIds = (allTracks || []).map(t => t.id);
+      const { data: playlistItems } = await supabase
+        .from('audio_playlist_items')
+        .select('audio_id, playlist_id, audio_playlists!inner(name)')
+        .in('audio_id', trackIds);
+
+      // Build a map of track ID -> playlist name
+      const trackPlaylistMap: Record<string, string> = {};
+      (playlistItems || []).forEach((item: any) => {
+        if (item.audio_playlists?.name) {
+          trackPlaylistMap[item.audio_id] = item.audio_playlists.name;
+        }
+      });
+
       return (allTracks || []).filter(t => {
         if (t.is_free) return true;
         if (hasSubscription) return true;
         if (t.program_slug && enrolledSlugs.includes(t.program_slug)) return true;
         return false;
-      }) as { id: string; title: string; cover_image_url: string | null; category: string; duration_seconds: number }[];
+      }).map(t => ({
+        ...t,
+        playlist_name: trackPlaylistMap[t.id] || null,
+      })) as { id: string; title: string; cover_image_url: string | null; category: string; duration_seconds: number; playlist_name: string | null }[];
     },
   });
 
@@ -2521,8 +2539,8 @@ const AppTaskCreate = ({
                     )}
                     <div className="flex-1 text-left">
                       <p className="font-medium truncate">{audio.title}</p>
-                      <p className="text-xs text-muted-foreground capitalize">
-                        {audio.category} • {Math.floor(audio.duration_seconds / 60)}min
+                      <p className="text-xs text-muted-foreground">
+                        {audio.playlist_name || audio.category} • {Math.floor(audio.duration_seconds / 60)}min
                       </p>
                     </div>
                   </button>
