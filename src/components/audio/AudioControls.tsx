@@ -72,7 +72,9 @@ export const AudioControls = ({
           variant="primary"
           className="h-20 w-20 shadow-[0_0_30px_rgba(255,255,255,0.2)]"
         >
-          {isPlaying ? (
+          {isBuffering ? (
+            <Loader2 className="h-8 w-8 animate-spin" />
+          ) : isPlaying ? (
             <Pause className="h-8 w-8" />
           ) : (
             <Play className="h-8 w-8 ml-1" />
@@ -131,7 +133,9 @@ export const AudioControls = ({
           "active:scale-95 hover:scale-105"
         )}
       >
-        {isPlaying ? (
+        {isBuffering ? (
+          <Loader2 className="h-8 w-8 animate-spin" />
+        ) : isPlaying ? (
           <Pause className="h-8 w-8" />
         ) : (
           <Play className="h-8 w-8 ml-1" />
