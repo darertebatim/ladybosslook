@@ -61,12 +61,17 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
   const hasNext = playlist && currentIndex !== undefined && currentIndex < playlist.length - 1;
 
   const { pause: pauseAudio } = useAudioPlayer();
+  const { autoCompleteVideo, autoCompleteVideoPlaylist } = useAutoCompleteProTask();
 
   useEffect(() => {
     if (isOpen) {
       pauseAudio();
+      // Auto-complete pro tasks as soon as video starts playing
+      if (videoId) {
+        autoCompleteVideo(videoId);
+      }
     }
-  }, [isOpen, pauseAudio]);
+  }, [isOpen, pauseAudio, videoId, autoCompleteVideo]);
 
   useEffect(() => {
     setIsLoading(true);
