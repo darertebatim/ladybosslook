@@ -45,7 +45,7 @@ const AppCourses = () => {
   if (isLoading) {
     return (
       <>
-        <AppHeader title="My Programs" subtitle="Loading..." />
+        <AppHeader title="My Programs" subtitle="Loading..." showBack />
         <AppHeaderSpacer />
         <CoursesSkeleton />
       </>
@@ -146,6 +146,7 @@ const AppCourses = () => {
       <AppHeader 
         title="My Programs" 
         subtitle={totalPrograms > 0 ? `${totalPrograms} enrolled` : undefined}
+        showBack
         rightAction={startTour ? <TourHelpButton onClick={startTour} /> : undefined}
       />
       <AppHeaderSpacer />
