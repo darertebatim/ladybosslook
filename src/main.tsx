@@ -55,7 +55,8 @@ async function initializeNative() {
   // Push notifications - already has internal safety
   try {
     initializePushNotificationHandlers();
-    clearBadge();
+    // Delay badge clearing to ensure push registration completes first
+    setTimeout(() => clearBadge(), 3000);
     console.log('[Main] ✓ Push handlers initialized');
   } catch (e) {
     console.warn('[Main] Push init failed:', e);

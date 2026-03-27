@@ -323,12 +323,13 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const playTrack = useCallback(async (track: TrackInfo, startPosition?: number) => {
     // ===== NATIVE PATH =====
     if (useNative.current) {
-      // If same track, just resume
+    // If same track, just resume
       if (currentTrack?.id === track.id) {
         if (startPosition !== undefined) {
           await nativeAudioSeek(startPosition);
         }
         await nativeAudioPlay();
+        setIsPlaying(true);
         return;
       }
 
@@ -349,6 +350,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
           await nativeAudioSeek(startPosition);
         }
         await nativeAudioPlay();
+        setIsPlaying(true);
         if (playbackRate !== 1) {
           await nativeAudioSetRate(playbackRate);
         }
@@ -423,6 +425,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const pause = useCallback(() => {
     if (useNative.current) {
       nativeAudioPause();
+      setIsPlaying(false);
     } else {
       audioRef.current?.pause();
     }
@@ -431,6 +434,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const resume = useCallback(async () => {
     if (useNative.current) {
       await nativeAudioPlay();
+      setIsPlaying(true);
     } else {
       try {
         await audioRef.current?.play();
