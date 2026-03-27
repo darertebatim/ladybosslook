@@ -1691,6 +1691,7 @@ export default function RoutinesBank() {
                         )}
                       </div>
                     )}
+                  </div>
 
                   {/* End Mode Selector */}
                   <div className="space-y-2 border-t pt-4">
