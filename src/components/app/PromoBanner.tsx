@@ -71,12 +71,16 @@ function setDismissal(bannerId: string) {
 }
 
 function shouldShowBanner(banner: PromoBannerData): boolean {
-  if (banner.display_frequency === 'forever') return true;
-  
   const dismissals = getDismissals();
   const dismissedAt = dismissals[banner.id];
   
   if (!dismissedAt) return true;
+  
+  // 'forever' banners reappear after 1 hour (session-like behavior)
+  if (banner.display_frequency === 'forever') {
+    const hoursSinceDismissal = (Date.now() - dismissedAt) / (1000 * 60 * 60);
+    return hoursSinceDismissal >= 1;
+  }
   
   const now = Date.now();
   const hoursSinceDismissal = (now - dismissedAt) / (1000 * 60 * 60);
