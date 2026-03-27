@@ -21,8 +21,6 @@ import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider'
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { useRoutineFavorites, useToggleRoutineFavorite } from '@/hooks/useRoutineFavorites';
-import { ProgramEventCard } from '@/components/app/ProgramEventCard';
-import { type ProgramEvent } from '@/hooks/usePlannerProgramEvents';
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400 to-amber-600',
@@ -394,8 +392,7 @@ export default function AppInspireDetail() {
               </div>
             )}
 
-            {/* Start/End + Badge row — hidden for program routines */}
-            {!isProgram && (
+            {/* Start/End + Badge row */}
             <div className={cn("mt-4 flex gap-3", (routine as any).badge_image_url ? "" : "")}>
               {/* Left: Start & End banners */}
               <div className={cn("flex flex-col gap-2", (routine as any).badge_image_url ? "flex-1" : "w-full")}>
@@ -440,28 +437,7 @@ export default function AppInspireDetail() {
                 </div>
               )}
             </div>
-            )}
           </div>
-
-          {/* Program Event Card Preview */}
-          {isProgram && (routine as any).linkedProgram && (
-            <div className="mt-5">
-              <p className="text-xs font-medium text-muted-foreground mb-2">Added to your planner:</p>
-              <div className="pointer-events-none opacity-90">
-                <ProgramEventCard
-                  event={{
-                    id: 'preview',
-                    type: 'enrollment',
-                    title: (routine as any).linkedProgram.title,
-                    programSlug: (routine as any).linked_program_slug || '',
-                    programTitle: (routine as any).linkedProgram.title,
-                    isCompleted: false,
-                  } as ProgramEvent}
-                  date={new Date()}
-                />
-              </div>
-            </div>
-          )}
 
           {/* Description — rendered as rich HTML */}
           {routine.description && (
@@ -754,6 +730,8 @@ export default function AppInspireDetail() {
           isSaving={addRoutineFromBank.isPending}
           isFree={(routine as any).is_free ?? false}
           routineBankId={planId || null}
+          linkedProgramTitle={(routine as any).linkedProgram?.title || null}
+          linkedProgramSlug={(routine as any).linked_program_slug || null}
         />
       )}
     </div>

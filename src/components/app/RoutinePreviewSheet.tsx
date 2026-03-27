@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
+import { ProgramEventCard } from '@/components/app/ProgramEventCard';
+import { type ProgramEvent } from '@/hooks/usePlannerProgramEvents';
 import { SaveRoutineHandHint, useSaveRoutineHint } from '@/components/app/AddToRoutineHandHint';
 import { Check, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
@@ -80,7 +82,7 @@ interface RoutinePreviewSheetProps {
   routineTitle: string;
   routineColor?: string | null;
   defaultTag?: string | null;
-  scheduleType?: 'daily' | 'weekly' | 'challenge' | 'project';
+  scheduleType?: 'daily' | 'weekly' | 'challenge' | 'project' | 'program';
   challengeStartDate?: string | null;
   startDayOfWeek?: number | null;
   endMode?: string | null;
@@ -91,6 +93,8 @@ interface RoutinePreviewSheetProps {
   isSaving?: boolean;
   isFree?: boolean;
   routineBankId?: string | null;
+  linkedProgramTitle?: string | null;
+  linkedProgramSlug?: string | null;
 }
 
 export function RoutinePreviewSheet({
@@ -111,6 +115,8 @@ export function RoutinePreviewSheet({
   isSaving,
   isFree,
   routineBankId,
+  linkedProgramTitle,
+  linkedProgramSlug,
 }: RoutinePreviewSheetProps) {
   // Generate synthetic pro-task for multi-task routines
   const displayTasks = useMemo(() => {
@@ -484,6 +490,25 @@ export function RoutinePreviewSheet({
             </SheetHeader>
 
             <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4 min-h-0">
+            {/* Program Event Card Preview */}
+            {linkedProgramTitle && linkedProgramSlug && (
+              <div className="mb-4">
+                <p className="text-xs font-medium text-muted-foreground mb-2">Added to your planner:</p>
+                <div className="pointer-events-none opacity-90">
+                  <ProgramEventCard
+                    event={{
+                      id: 'preview',
+                      type: 'enrollment',
+                      title: linkedProgramTitle,
+                      programSlug: linkedProgramSlug,
+                      programTitle: linkedProgramTitle,
+                      isCompleted: false,
+                    } as ProgramEvent}
+                    date={new Date()}
+                  />
+                </div>
+              </div>
+            )}
             {scheduleType === 'challenge' ? (
                 <>
                   {/* Pro-task at top for challenges */}
