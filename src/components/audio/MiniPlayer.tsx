@@ -1,4 +1,4 @@
-import { Play, Pause, Headphones, X } from "lucide-react";
+import { Play, Pause, Headphones, X, Loader2 } from "lucide-react";
 import { CachedImage } from '@/components/ui/CachedImage';
 import { useNavigate } from "react-router-dom";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";

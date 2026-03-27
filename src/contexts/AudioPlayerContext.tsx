@@ -216,6 +216,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       },
       onAudioReady: async () => {
         setIsLoading(false);
+        setIsBuffering(false);
         const dur = await nativeAudioGetDuration();
         if (dur > 0) setDuration(dur);
       },
