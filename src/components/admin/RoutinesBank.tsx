@@ -193,7 +193,7 @@ export default function RoutinesBank() {
     category: 'general',
     color: 'yellow',
     emoji: '✨',
-    schedule_type: 'daily' as 'daily' | 'challenge' | 'project',
+    schedule_type: 'daily' as 'daily' | 'challenge' | 'project' | 'program',
     challenge_start_date: null as Date | null,
     start_day_of_week: null as number | null,
     start_mode: 'none' as 'none' | 'date' | 'weekday',
@@ -202,6 +202,7 @@ export default function RoutinesBank() {
     end_after_days: null as number | null,
     badge_image_url: '',
     is_focus: false,
+    linked_program_slug: null as string | null,
   });
   const [localSections, setLocalSections] = useState<LocalSection[]>([]);
   const [localTasks, setLocalTasks] = useState<LocalTask[]>([]);
@@ -217,6 +218,20 @@ export default function RoutinesBank() {
         .order('display_order', { ascending: true });
       if (error) throw error;
       return data as RoutineCategory[];
+    },
+  });
+
+  // Fetch program catalog for program type routines
+  const { data: programCatalog = [] } = useQuery({
+    queryKey: ['program-catalog-for-routines'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('program_catalog')
+        .select('slug, title')
+        .eq('is_active', true)
+        .order('title', { ascending: true });
+      if (error) throw error;
+      return data as { slug: string; title: string }[];
     },
   });
 
@@ -291,7 +306,8 @@ export default function RoutinesBank() {
            end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
            badge_image_url: data.formData.badge_image_url || null,
            is_focus: data.formData.is_focus,
-        })
+           linked_program_slug: data.formData.schedule_type === 'program' ? data.formData.linked_program_slug : null,
+        } as any)
         .select()
         .single();
       if (error) throw error;
@@ -370,7 +386,8 @@ export default function RoutinesBank() {
            end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
            badge_image_url: data.formData.badge_image_url || null,
            is_focus: data.formData.is_focus,
-        })
+           linked_program_slug: data.formData.schedule_type === 'program' ? data.formData.linked_program_slug : null,
+        } as any)
         .eq('id', data.id);
       if (error) throw error;
 
@@ -587,7 +604,7 @@ export default function RoutinesBank() {
       category: 'general',
       color: 'yellow',
       emoji: '✨',
-      schedule_type: 'daily' as 'daily' | 'challenge' | 'project',
+      schedule_type: 'daily' as 'daily' | 'challenge' | 'project' | 'program',
       challenge_start_date: null,
       start_day_of_week: null,
       start_mode: 'none',
@@ -596,6 +613,7 @@ export default function RoutinesBank() {
       end_after_days: null,
       badge_image_url: '',
       is_focus: false,
+      linked_program_slug: null,
     });
     setLocalSections([]);
     setLocalTasks([]);
@@ -615,7 +633,7 @@ export default function RoutinesBank() {
       category: routine.category,
       color: routine.color,
       emoji: routine.emoji,
-      schedule_type: (['challenge', 'project'].includes(routine.schedule_type) ? routine.schedule_type : 'daily') as 'daily' | 'challenge' | 'project',
+      schedule_type: (['challenge', 'project', 'program'].includes(routine.schedule_type) ? routine.schedule_type : 'daily') as 'daily' | 'challenge' | 'project' | 'program',
       challenge_start_date: (routine as any).challenge_start_date ? new Date((routine as any).challenge_start_date) : null,
       start_day_of_week: (routine as any).start_day_of_week ?? null,
       start_mode: (routine as any).start_day_of_week != null ? 'weekday' : ((routine as any).challenge_start_date ? 'date' : 'none'),
@@ -624,6 +642,7 @@ export default function RoutinesBank() {
       end_after_days: (routine as any).end_after_days ?? null,
       badge_image_url: (routine as any).badge_image_url || '',
       is_focus: (routine as any).is_focus ?? false,
+      linked_program_slug: (routine as any).linked_program_slug ?? null,
     });
     const { sections, tasks } = await fetchRoutineData(routine.id);
     setLocalSections(sections);
@@ -1037,6 +1056,8 @@ export default function RoutinesBank() {
     ? routines.filter(r => r.schedule_type === 'challenge')
     : selectedCategory === 'projects'
     ? routines.filter(r => r.schedule_type === 'project')
+    : selectedCategory === 'programs'
+    ? routines.filter(r => r.schedule_type === 'program')
     : routines.filter(r => r.category === selectedCategory);
 
   const filteredTaskBank = taskBank.filter(t => 
@@ -1258,8 +1279,8 @@ export default function RoutinesBank() {
                                 <>
                                   <span>•</span>
                                   <span className="flex items-center gap-1">
-                                    {routine.schedule_type === 'weekly' ? <Calendar className="h-3 w-3" /> : routine.schedule_type === 'project' ? '🎯' : <Flame className="h-3 w-3" />}
-                                    {routine.schedule_type === 'weekly' ? 'Weekly' : routine.schedule_type === 'project' ? 'Project' : 'Challenge'}
+                                    {routine.schedule_type === 'weekly' ? <Calendar className="h-3 w-3" /> : routine.schedule_type === 'project' ? '🎯' : routine.schedule_type === 'program' ? '🎓' : <Flame className="h-3 w-3" />}
+                                    {routine.schedule_type === 'weekly' ? 'Weekly' : routine.schedule_type === 'project' ? 'Project' : routine.schedule_type === 'program' ? 'Program' : 'Challenge'}
                                   </span>
                                 </>
                               )}
@@ -1549,20 +1570,24 @@ export default function RoutinesBank() {
                   {/* Schedule Type */}
                   <div className="space-y-2 border-t pt-4">
                     <Label>Routine Type</Label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-4 gap-2">
                       {[
                         { value: 'daily', label: 'Normal', desc: 'Tasks with their own repeat settings', icon: '☀️' },
                         { value: 'challenge', label: 'Challenge', desc: 'Sequential drip (Day 1, 2...)', icon: '🔥' },
                         { value: 'project', label: 'Project', desc: 'Ordered steps toward a goal', icon: '🎯' },
+                        { value: 'program', label: 'Program', desc: 'Auto-enroll in a program', icon: '🎓' },
                       ].map(opt => (
                         <button
                           key={opt.value}
                           type="button"
                           onClick={() => {
                             const updates: any = { schedule_type: opt.value as any };
-                            if (opt.value === 'project') {
+                            if (opt.value === 'project' || opt.value === 'program') {
                               updates.end_mode = 'never';
                               updates.start_mode = 'none';
+                            }
+                            if (opt.value !== 'program') {
+                              updates.linked_program_slug = null;
                             }
                             setFormData(prev => ({ ...prev, ...updates }));
                           }}
@@ -1580,81 +1605,106 @@ export default function RoutinesBank() {
                       ))}
                     </div>
 
-                    {/* Start Mode Selector */}
-                    <div className="mt-3 space-y-2">
-                      <Label className="text-xs">When does it start?</Label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {[
-                          { value: 'none', label: 'Immediately', desc: 'Starts today' },
-                          { value: 'date', label: 'Specific date', desc: 'Pick a date' },
-                          { value: 'weekday', label: 'Day of week', desc: 'e.g. Next Monday' },
-                        ].map(opt => (
-                          <button
-                            key={opt.value}
-                            type="button"
-                            onClick={() => setFormData({ ...formData, start_mode: opt.value as any })}
-                            className={cn(
-                              "flex flex-col items-center gap-0.5 p-2 rounded-lg border-2 text-center transition-all",
-                              formData.start_mode === opt.value
-                                ? "border-primary bg-primary/5"
-                                : "border-border hover:border-muted-foreground/30"
-                            )}
-                          >
-                            <span className="text-xs font-medium">{opt.label}</span>
-                            <span className="text-[10px] text-muted-foreground leading-tight">{opt.desc}</span>
-                          </button>
-                        ))}
+                    {/* Program Selector (only for program type) */}
+                    {formData.schedule_type === 'program' && (
+                      <div className="mt-3 space-y-2 border rounded-lg p-3 bg-muted/30">
+                        <Label className="text-xs flex items-center gap-1.5">🎓 Linked Program</Label>
+                        <Select
+                          value={formData.linked_program_slug || ''}
+                          onValueChange={(val) => setFormData({ ...formData, linked_program_slug: val || null })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a program..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {programCatalog.map(p => (
+                              <SelectItem key={p.slug} value={p.slug}>
+                                {p.title}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-[10px] text-muted-foreground">Users will be auto-enrolled in this program (and its active round) when they add this routine.</p>
                       </div>
+                    )}
 
-                      {/* Date picker */}
-                      {formData.start_mode === 'date' && (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !formData.challenge_start_date && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {formData.challenge_start_date
-                                ? format(formData.challenge_start_date, 'PPP')
-                                : <span>Pick a start date</span>}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <CalendarComponent
-                              mode="single"
-                              selected={formData.challenge_start_date || undefined}
-                              onSelect={(date) => setFormData({ ...formData, challenge_start_date: date || null })}
-                              className={cn("p-3 pointer-events-auto")}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      )}
-
-                      {/* Weekday picker */}
-                      {formData.start_mode === 'weekday' && (
-                        <div className="flex gap-1.5 justify-center">
-                          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
+                    {/* Start Mode Selector */}
+                    {formData.schedule_type !== 'program' && (
+                      <div className="mt-3 space-y-2">
+                        <Label className="text-xs">When does it start?</Label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            { value: 'none', label: 'Immediately', desc: 'Starts today' },
+                            { value: 'date', label: 'Specific date', desc: 'Pick a date' },
+                            { value: 'weekday', label: 'Day of week', desc: 'e.g. Next Monday' },
+                          ].map(opt => (
                             <button
-                              key={day}
+                              key={opt.value}
                               type="button"
-                              onClick={() => setFormData({ ...formData, start_day_of_week: idx })}
+                              onClick={() => setFormData({ ...formData, start_mode: opt.value as any })}
                               className={cn(
-                                "w-9 h-9 rounded-full text-xs font-medium transition-all",
-                                formData.start_day_of_week === idx
-                                  ? "bg-primary text-primary-foreground"
-                                  : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                                "flex flex-col items-center gap-0.5 p-2 rounded-lg border-2 text-center transition-all",
+                                formData.start_mode === opt.value
+                                  ? "border-primary bg-primary/5"
+                                  : "border-border hover:border-muted-foreground/30"
                               )}
                             >
-                              {day}
+                              <span className="text-xs font-medium">{opt.label}</span>
+                              <span className="text-[10px] text-muted-foreground leading-tight">{opt.desc}</span>
                             </button>
                           ))}
                         </div>
-                      )}
-                    </div>
+
+                        {/* Date picker */}
+                        {formData.start_mode === 'date' && (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !formData.challenge_start_date && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {formData.challenge_start_date
+                                  ? format(formData.challenge_start_date, 'PPP')
+                                  : <span>Pick a start date</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <CalendarComponent
+                                mode="single"
+                                selected={formData.challenge_start_date || undefined}
+                                onSelect={(date) => setFormData({ ...formData, challenge_start_date: date || null })}
+                                className={cn("p-3 pointer-events-auto")}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        )}
+
+                        {/* Weekday picker */}
+                        {formData.start_mode === 'weekday' && (
+                          <div className="flex gap-1.5 justify-center">
+                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
+                              <button
+                                key={day}
+                                type="button"
+                                onClick={() => setFormData({ ...formData, start_day_of_week: idx })}
+                                className={cn(
+                                  "w-9 h-9 rounded-full text-xs font-medium transition-all",
+                                  formData.start_day_of_week === idx
+                                    ? "bg-primary text-primary-foreground"
+                                    : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                                )}
+                              >
+                                {day}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* End Mode Selector */}

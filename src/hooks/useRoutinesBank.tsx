@@ -647,6 +647,53 @@ export function useAddRoutineFromBank() {
         }
       }
 
+      // Auto-enroll user in program if this is a "program" type routine
+      if (scheduleType === 'program' && (routine as any).linked_program_slug) {
+        const programSlug = (routine as any).linked_program_slug as string;
+        
+        // Check if already enrolled
+        const { data: existingEnrollment } = await supabase
+          .from('course_enrollments')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('program_slug', programSlug)
+          .eq('status', 'active')
+          .maybeSingle();
+
+        if (!existingEnrollment) {
+          // Find the active round for this program
+          const { data: activeRound } = await (supabase
+            .from('program_rounds')
+            .select('id, round_name') as any)
+            .eq('program_slug', programSlug)
+            .eq('is_active', true)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          // Get program title from catalog
+          const { data: programInfo } = await supabase
+            .from('program_catalog')
+            .select('title')
+            .eq('slug', programSlug)
+            .single();
+
+          const { error: enrollError } = await supabase
+            .from('course_enrollments')
+            .insert({
+              user_id: user.id,
+              program_slug: programSlug,
+              course_name: programInfo?.title || programSlug,
+              round_id: activeRound?.id || null,
+              status: 'active',
+            });
+
+          if (enrollError) {
+            console.error('Error auto-enrolling in program:', enrollError);
+          }
+        }
+      }
+
       // Track that user added this routine from bank
       const { error: trackError } = await supabase
         .from('user_routines_bank')
