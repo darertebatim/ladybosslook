@@ -434,52 +434,102 @@ export function PromoBanner({
     }
   };
 
+  // Separate full-screen overlay banners from inline banners
+  const fullScreenBanners = eligibleBanners.filter(b => b.aspect_ratio === 'full');
+  const inlineBanners = eligibleBanners.filter(b => b.aspect_ratio !== 'full');
+
   const isVisible = eligibleBanners.length > 0;
 
   useEffect(() => {
     onVisibilityChange?.(isVisible);
   }, [isVisible, onVisibilityChange]);
 
-  // Carousel mode: show all eligible banners with swipe & dots
-  if (carousel && eligibleBanners.length > 1) {
+  // Render full-screen overlay banner (first one)
+  const fullBanner = fullScreenBanners[0];
+  const fullOverlay = fullBanner ? (
+    <OverlayPortal>
+      <div
+        className="fixed inset-0 z-[100] flex items-end justify-center"
+        onClick={(e) => { e.stopPropagation(); handleDismiss(e as any, fullBanner); }}
+      >
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+        <div
+          className="relative w-full max-w-md mx-auto flex flex-col items-center pb-6 px-4 animate-in slide-in-from-bottom-8 duration-500"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Banner Image */}
+          <div
+            className="w-full rounded-3xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform shadow-2xl mb-6"
+            onClick={() => handleTap(fullBanner)}
+          >
+            <img
+              src={fullBanner.cover_image_url}
+              alt="Promo"
+              className="w-full object-cover"
+            />
+          </div>
+
+          {/* Dismiss button */}
+          <button
+            onClick={(e) => handleDismiss(e as any, fullBanner)}
+            className="text-white/50 text-sm font-medium py-2 px-6 active:scale-95 transition-transform"
+          >
+            Maybe later
+          </button>
+        </div>
+      </div>
+    </OverlayPortal>
+  ) : null;
+
+  // Carousel mode for inline banners
+  if (carousel && inlineBanners.length > 1) {
     return (
-      <PromoBannerCarousel
-        banners={eligibleBanners}
-        className={className}
-        getAspectRatioClass={getAspectRatioClass}
-        onTap={handleTap}
-        onDismiss={handleDismiss}
-      />
+      <>
+        {fullOverlay}
+        <PromoBannerCarousel
+          banners={inlineBanners}
+          className={className}
+          getAspectRatioClass={getAspectRatioClass}
+          onTap={handleTap}
+          onDismiss={handleDismiss}
+        />
+      </>
     );
   }
 
-  // Single banner mode (default): show first eligible, next appears on dismiss
-  const banner = eligibleBanners[0];
+  // Single inline banner mode
+  const banner = inlineBanners[0];
 
-  if (!banner) return null;
+  if (!banner && !fullBanner) return null;
 
   return (
-    <div className={className || "px-4 py-2"}>
-      <div
-        key={banner.id}
-        className="relative w-full rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
-        onClick={() => handleTap(banner)}
-      >
-        <img
-          src={banner.cover_image_url}
-          alt="Promo"
-          className={`w-full ${getAspectRatioClass(banner.aspect_ratio)} object-cover`}
-        />
-        {(forceShowClose || banner.display_frequency !== 'forever') && (
-          <button
-            onClick={(e) => handleDismiss(e, banner)}
-            className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 flex items-center justify-center active:scale-90 transition-transform"
+    <>
+      {fullOverlay}
+      {banner && (
+        <div className={className || "px-4 py-2"}>
+          <div
+            key={banner.id}
+            className="relative w-full rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
+            onClick={() => handleTap(banner)}
           >
-            <X className="h-4 w-4 text-white" />
-          </button>
-        )}
-      </div>
-    </div>
+            <img
+              src={banner.cover_image_url}
+              alt="Promo"
+              className={`w-full ${getAspectRatioClass(banner.aspect_ratio)} object-cover`}
+            />
+            {(forceShowClose || banner.display_frequency !== 'forever') && (
+              <button
+                onClick={(e) => handleDismiss(e, banner)}
+                className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 flex items-center justify-center active:scale-90 transition-transform"
+              >
+                <X className="h-4 w-4 text-white" />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
   );
 }
 
