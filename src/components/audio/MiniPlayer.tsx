@@ -53,10 +53,9 @@ export const MiniPlayer = () => {
           : "bottom-[calc(64px+env(safe-area-inset-bottom))]",
         "rounded-xl overflow-hidden cursor-pointer",
         "animate-in slide-in-from-bottom-4 duration-300",
-        "bg-card/95 backdrop-blur-lg",
-        "border border-border/30",
         "shadow-lg"
       )}
+      style={{ backgroundColor: 'rgba(19, 34, 64, 0.95)', backdropFilter: 'blur(16px)' }}
       onClick={() => navigate(`/app/player/${currentTrack.id}`)}
     >
       <div className="flex items-center gap-2.5 p-2">
@@ -71,35 +70,35 @@ export const MiniPlayer = () => {
               className="w-full h-full object-cover" 
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-              <Headphones className="h-5 w-5 text-primary/40" />
+            <div className="w-full h-full bg-white/10 flex items-center justify-center">
+              <Headphones className="h-5 w-5 text-white/40" />
             </div>
           )}
         </div>
         
         {/* Compact Track Info */}
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm truncate">{currentTrack.title}</p>
-          <p className="text-xs text-muted-foreground truncate">
+          <p className="font-medium text-sm truncate text-white">{currentTrack.title}</p>
+          <p className="text-xs text-white/50 truncate">
             {formatDuration(duration)}{currentTrack.playlistName ? ` • ${currentTrack.playlistName}` : ''}
           </p>
         </div>
 
-        {/* Compact Play/Pause Button - outlined style */}
+        {/* Compact Play/Pause Button */}
         <button
           onClick={handlePlayPause}
           className={cn(
             "flex-shrink-0 h-9 w-9 rounded-full",
             "flex items-center justify-center",
-            "border-2 border-foreground/30",
-            "hover:border-foreground/50 transition-colors",
+            "border-2 border-white/30",
+            "transition-colors",
             "active:scale-95"
           )}
         >
           {isPlaying ? (
-            <Pause className="h-4 w-4" />
+            <Pause className="h-4 w-4 text-white" />
           ) : (
-            <Play className="h-4 w-4 ml-0.5" />
+            <Play className="h-4 w-4 ml-0.5 text-white" />
           )}
         </button>
 
@@ -109,8 +108,7 @@ export const MiniPlayer = () => {
           className={cn(
             "flex-shrink-0 h-7 w-7 rounded-full",
             "flex items-center justify-center",
-            "text-muted-foreground hover:text-foreground",
-            "hover:bg-muted/50 transition-colors",
+            "text-white/50",
             "active:scale-95"
           )}
         >
