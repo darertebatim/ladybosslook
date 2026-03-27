@@ -1,132 +1,213 @@
 /**
- * Native lock-screen / notification audio controls via @mediagrid/capacitor-native-audio.
- * Only activates on native platforms (iOS/Android). On web it's a no-op.
+ * Native audio bridge using @mediagrid/capacitor-native-audio.
+ * On native platforms, this plugin handles audio playback natively with
+ * lock-screen / notification controls. On web, we fall back to HTML5 Audio.
  */
 import { Capacitor } from '@capacitor/core';
 
-let nativePlayer: any = null;
-let initialized = false;
+const AUDIO_ID = 'main-player';
 
-// Callbacks from native controls → JS audio player
-type NativeCallbacks = {
-  onPlay: () => void;
-  onPause: () => void;
-  onSeekForward: () => void;
-  onSeekBackward: () => void;
-  onNextTrack: () => void;
-};
+type StatusCallback = (status: 'playing' | 'paused' | 'stopped') => void;
+type VoidCallback = () => void;
 
-let callbacks: NativeCallbacks | null = null;
+let plugin: any = null;
+let isReady = false;
+let currentSource = '';
 
-export function setNativeAudioCallbacks(cbs: NativeCallbacks) {
-  callbacks = cbs;
+// Registered callbacks
+let onStatusChange: StatusCallback | null = null;
+let onAudioEnd: VoidCallback | null = null;
+let onAudioReady: VoidCallback | null = null;
+
+export function isNativeAudioAvailable(): boolean {
+  return Capacitor.isNativePlatform();
 }
 
-export async function initNativeAudioControls(): Promise<void> {
-  if (!Capacitor.isNativePlatform() || initialized) return;
-  
-  try {
-    const { NativeAudio } = await import('@mediagrid/capacitor-native-audio');
-    nativePlayer = NativeAudio;
-    
-    // Create the player instance
-    await nativePlayer.create({
-      id: 'main-player',
-      isMixedAudio: false,
-      useForNotification: true,
-      // Notification media controls
-      notificationControls: {
-        hasPrev: false,
-        hasNext: true,
-        hasClose: true,
-        hasSkipForward: true,
-        hasSkipBackward: true,
-        skipForwardSeconds: 15,
-        skipBackwardSeconds: 15,
-      },
-    });
-
-    // Listen for native control events
-    await nativePlayer.addListener('play', () => {
-      console.log('[NativeAudio] play from lock screen');
-      callbacks?.onPlay();
-    });
-    
-    await nativePlayer.addListener('pause', () => {
-      console.log('[NativeAudio] pause from lock screen');
-      callbacks?.onPause();
-    });
-    
-    await nativePlayer.addListener('seekForward', () => {
-      console.log('[NativeAudio] seekForward from lock screen');
-      callbacks?.onSeekForward();
-    });
-    
-    await nativePlayer.addListener('seekBackward', () => {
-      console.log('[NativeAudio] seekBackward from lock screen');
-      callbacks?.onSeekBackward();
-    });
-
-    await nativePlayer.addListener('next', () => {
-      console.log('[NativeAudio] next from lock screen');
-      callbacks?.onNextTrack();
-    });
-
-    initialized = true;
-    console.log('[NativeAudio] ✓ Lock screen controls initialized');
-  } catch (e) {
-    console.warn('[NativeAudio] Failed to init:', e);
-  }
+export function setNativeAudioCallbacks(cbs: {
+  onStatusChange?: StatusCallback;
+  onAudioEnd?: VoidCallback;
+  onAudioReady?: VoidCallback;
+}) {
+  onStatusChange = cbs.onStatusChange || null;
+  onAudioEnd = cbs.onAudioEnd || null;
+  onAudioReady = cbs.onAudioReady || null;
 }
 
-export async function updateNativeNowPlaying(opts: {
+/**
+ * Prepare a new track for playback. Destroys previous if exists.
+ */
+export async function nativeAudioPrepare(opts: {
+  source: string;
   title: string;
   artist?: string;
   album?: string;
-  imageUrl?: string;
-  duration: number;
-  currentTime: number;
-  isPlaying: boolean;
-}): Promise<void> {
-  if (!nativePlayer) return;
-  
+  artworkUrl?: string;
+}): Promise<boolean> {
+  if (!Capacitor.isNativePlatform()) return false;
+
   try {
-    await nativePlayer.changeMetadata({
-      id: 'main-player',
-      title: opts.title,
-      artist: opts.artist || 'LadyBoss Academy',
-      album: opts.album || '',
-      imageUrl: opts.imageUrl || '',
-      duration: opts.duration,
-      currentTime: opts.currentTime,
-      isPlaying: opts.isPlaying,
+    if (!plugin) {
+      const mod = await import('@mediagrid/capacitor-native-audio');
+      plugin = mod.AudioPlayer;
+    }
+
+    // Destroy previous instance if source changed
+    if (currentSource && currentSource !== opts.source) {
+      try {
+        await plugin.destroy({ audioId: AUDIO_ID });
+      } catch (_) { /* ignore */ }
+      isReady = false;
+    }
+
+    if (currentSource === opts.source && isReady) {
+      // Just update metadata
+      await plugin.changeMetadata({
+        audioId: AUDIO_ID,
+        friendlyTitle: opts.title,
+        artistName: opts.artist || 'Simora',
+        albumTitle: opts.album || '',
+        artworkSource: opts.artworkUrl || '',
+      });
+      return true;
+    }
+
+    currentSource = opts.source;
+    isReady = false;
+
+    await plugin.create({
+      audioId: AUDIO_ID,
+      audioSource: opts.source,
+      friendlyTitle: opts.title,
+      artistName: opts.artist || 'Simora',
+      albumTitle: opts.album || '',
+      artworkSource: opts.artworkUrl || '',
+      useForNotification: true,
+      isBackgroundMusic: false,
+      showSeekForward: true,
+      showSeekBackward: true,
+      seekForwardTime: 15,
+      seekBackwardTime: 15,
     });
+
+    // Register listeners
+    await plugin.onAudioReady({ audioId: AUDIO_ID }, () => {
+      console.log('[NativeAudio] ✓ Audio ready');
+      isReady = true;
+      onAudioReady?.();
+    });
+
+    await plugin.onAudioEnd({ audioId: AUDIO_ID }, () => {
+      console.log('[NativeAudio] Audio ended');
+      onAudioEnd?.();
+    });
+
+    await plugin.onPlaybackStatusChange({ audioId: AUDIO_ID }, (result: { status: 'playing' | 'paused' | 'stopped' }) => {
+      console.log('[NativeAudio] Status:', result.status);
+      onStatusChange?.(result.status);
+    });
+
+    // Initialize (starts buffering)
+    await plugin.initialize({ audioId: AUDIO_ID });
+
+    console.log('[NativeAudio] ✓ Prepared:', opts.title);
+    return true;
   } catch (e) {
-    // Silently ignore metadata update errors
+    console.error('[NativeAudio] Prepare failed:', e);
+    return false;
   }
 }
 
-export async function updateNativePlaybackState(isPlaying: boolean, currentTime: number): Promise<void> {
-  if (!nativePlayer) return;
-  
+export async function nativeAudioPlay(): Promise<void> {
+  if (!plugin) return;
   try {
-    await nativePlayer.updateMetadata({
-      id: 'main-player',
-      isPlaying,
-      currentTime,
-    });
+    await plugin.play({ audioId: AUDIO_ID });
   } catch (e) {
-    // Silently ignore
+    console.warn('[NativeAudio] Play failed:', e);
   }
 }
 
-export async function destroyNativeAudioControls(): Promise<void> {
-  if (!nativePlayer) return;
-  
+export async function nativeAudioPause(): Promise<void> {
+  if (!plugin) return;
   try {
-    await nativePlayer.destroy({ id: 'main-player' });
+    await plugin.pause({ audioId: AUDIO_ID });
+  } catch (e) {
+    console.warn('[NativeAudio] Pause failed:', e);
+  }
+}
+
+export async function nativeAudioStop(): Promise<void> {
+  if (!plugin) return;
+  try {
+    await plugin.stop({ audioId: AUDIO_ID });
+  } catch (e) {
+    console.warn('[NativeAudio] Stop failed:', e);
+  }
+}
+
+export async function nativeAudioSeek(timeInSeconds: number): Promise<void> {
+  if (!plugin) return;
+  try {
+    await plugin.seek({ audioId: AUDIO_ID, timeInSeconds });
+  } catch (e) {
+    console.warn('[NativeAudio] Seek failed:', e);
+  }
+}
+
+export async function nativeAudioSetRate(rate: number): Promise<void> {
+  if (!plugin) return;
+  try {
+    await plugin.setRate({ audioId: AUDIO_ID, rate });
+  } catch (e) {
+    console.warn('[NativeAudio] SetRate failed:', e);
+  }
+}
+
+export async function nativeAudioGetCurrentTime(): Promise<number> {
+  if (!plugin) return 0;
+  try {
+    const result = await plugin.getCurrentTime({ audioId: AUDIO_ID });
+    return result.currentTime;
+  } catch {
+    return 0;
+  }
+}
+
+export async function nativeAudioGetDuration(): Promise<number> {
+  if (!plugin) return 0;
+  try {
+    const result = await plugin.getDuration({ audioId: AUDIO_ID });
+    return result.duration;
+  } catch {
+    return 0;
+  }
+}
+
+export async function nativeAudioDestroy(): Promise<void> {
+  if (!plugin) return;
+  try {
+    await plugin.destroy({ audioId: AUDIO_ID });
+    currentSource = '';
+    isReady = false;
     console.log('[NativeAudio] Destroyed');
   } catch (e) {
     console.warn('[NativeAudio] Destroy failed:', e);
   }
+}
+
+export async function nativeAudioChangeMetadata(opts: {
+  title: string;
+  artist?: string;
+  album?: string;
+  artworkUrl?: string;
+}): Promise<void> {
+  if (!plugin) return;
+  try {
+    await plugin.changeMetadata({
+      audioId: AUDIO_ID,
+      friendlyTitle: opts.title,
+      artistName: opts.artist || 'Simora',
+      albumTitle: opts.album || '',
+      artworkSource: opts.artworkUrl || '',
+    });
+  } catch (_) { /* ignore */ }
 }
