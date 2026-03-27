@@ -103,6 +103,7 @@ const AppHome = () => {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showActionLimit, setShowActionLimit] = useState(false);
   const [hasPromoBanner, setHasPromoBanner] = useState(false);
+  const [moodBannerVisible, setMoodBannerVisible] = useState(false);
   const { isKeyboardOpen } = useKeyboard();
   
   const [goalInputTask, setGoalInputTask] = useState<UserTask | null>(null);
