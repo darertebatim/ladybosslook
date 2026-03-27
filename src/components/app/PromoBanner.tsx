@@ -13,7 +13,7 @@ type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools'
 interface PromoBannerData {
   id: string;
   cover_image_url: string;
-  destination_type: 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'mood' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist' | 'routine_player';
+  destination_type: 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'mood' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist' | 'routine_player' | 'audio_track' | 'video_track';
   destination_id: string | null;
   custom_url: string | null;
   display_frequency: 'once' | 'daily' | 'weekly' | 'forever';
@@ -414,6 +414,12 @@ export function PromoBanner({
         navigate(banner.destination_id ? `/app/watch/playlist/${banner.destination_id}` : '/app/watch');
         break;
       case 'routine_player': navigate('/app/routineplayer'); break;
+      case 'audio_track':
+        if (banner.destination_id) navigate(`/app/player/${banner.destination_id}`);
+        break;
+      case 'video_track':
+        if (banner.destination_id) navigate(`/app/watch/video/${banner.destination_id}`);
+        break;
     }
   };
   
