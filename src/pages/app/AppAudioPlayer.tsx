@@ -518,7 +518,7 @@ export default function AppAudioPlayer() {
             }}
             className="flex items-center gap-0.5 min-h-[44px] min-w-[44px] px-1 -ml-1 text-white hover:bg-transparent active:opacity-70 transition-opacity"
           >
-            <ChevronLeft className="h-7 w-7 shrink-0 text-white" />
+            <ChevronDown className="h-7 w-7 shrink-0 text-white" />
           </button>
           
           <div className="flex-1 min-w-0 flex items-center gap-2">
