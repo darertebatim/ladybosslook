@@ -59,6 +59,14 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
 
   const hasNext = playlist && currentIndex !== undefined && currentIndex < playlist.length - 1;
 
+  const { pause: pauseAudio } = useAudioPlayer();
+
+  useEffect(() => {
+    if (isOpen) {
+      pauseAudio();
+    }
+  }, [isOpen, pauseAudio]);
+
   useEffect(() => {
     setIsLoading(true);
     setHasError(false);

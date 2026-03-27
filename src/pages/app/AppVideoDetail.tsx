@@ -10,6 +10,11 @@ import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 export default function AppVideoDetail() {
   const { videoId } = useParams();
   const navigate = useNavigate();
+  const { pause: pauseAudio } = useAudioPlayer();
+
+  useEffect(() => {
+    pauseAudio();
+  }, [pauseAudio]);
 
   const { data: video, isLoading } = useQuery({
     queryKey: ["app-video-detail", videoId],
