@@ -707,7 +707,7 @@ export default function AppPlaylistDetail() {
             </div>
             <h1 className="text-2xl font-bold text-white">{playlist.name}</h1>
             {playlist.description && (
-              <p className="text-sm text-white/60">{playlist.description}</p>
+              <ExpandableDescription text={playlist.description} />
             )}
           </div>
         </div>
