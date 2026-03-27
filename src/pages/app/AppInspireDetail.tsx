@@ -384,7 +384,18 @@ export default function AppInspireDetail() {
               )}
             </div>
 
-            {/* Start/End + Badge row */}
+            {/* Program enrollment banner */}
+            {isProgram && (routine as any).linkedProgram && (
+              <div className="mt-4 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border bg-[#FFF492]/40 border-[#E8D86A] dark:bg-yellow-950/30 dark:border-yellow-800">
+                <span className="text-lg">🎓</span>
+                <span className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
+                  Enrolls you in: {(routine as any).linkedProgram.title}
+                </span>
+              </div>
+            )}
+
+            {/* Start/End + Badge row — hidden for program routines */}
+            {!isProgram && (
             <div className={cn("mt-4 flex gap-3", (routine as any).badge_image_url ? "" : "")}>
               {/* Left: Start & End banners */}
               <div className={cn("flex flex-col gap-2", (routine as any).badge_image_url ? "flex-1" : "w-full")}>
@@ -429,7 +440,28 @@ export default function AppInspireDetail() {
                 </div>
               )}
             </div>
+            )}
           </div>
+
+          {/* Program Event Card Preview */}
+          {isProgram && (routine as any).linkedProgram && (
+            <div className="mt-5">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Added to your planner:</p>
+              <div className="pointer-events-none opacity-90">
+                <ProgramEventCard
+                  event={{
+                    id: 'preview',
+                    type: 'enrollment',
+                    title: (routine as any).linkedProgram.title,
+                    programSlug: (routine as any).linked_program_slug || '',
+                    programTitle: (routine as any).linkedProgram.title,
+                    isCompleted: false,
+                  } as ProgramEvent}
+                  date={new Date()}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Description — rendered as rich HTML */}
           {routine.description && (
