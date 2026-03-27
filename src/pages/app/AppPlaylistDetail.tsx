@@ -28,6 +28,37 @@ import { cn } from "@/lib/utils";
 import heroStormVideo from "@/assets/watch-hero-storm.mp4";
 import { Share2 } from "lucide-react";
 import { useShareContent } from "@/hooks/useShareContent";
+function ExpandableDescription({ text }: { text: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const MAX_LENGTH = 120;
+  const isLong = text.length > MAX_LENGTH;
+
+  return (
+    <p className="text-sm text-white/60">
+      {isLong && !expanded ? (
+        <>
+          {text.slice(0, MAX_LENGTH).trimEnd()}…{' '}
+          <button onClick={() => setExpanded(true)} className="text-white/80 font-medium">
+            more
+          </button>
+        </>
+      ) : (
+        <>
+          {text}
+          {isLong && (
+            <>
+              {' '}
+              <button onClick={() => setExpanded(false)} className="text-white/80 font-medium">
+                less
+              </button>
+            </>
+          )}
+        </>
+      )}
+    </p>
+  );
+}
+
 export default function AppPlaylistDetail() {
   const { playlistId } = useParams();
   const { user } = useAuth();
