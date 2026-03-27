@@ -324,7 +324,13 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         console.error('[AudioPlayer] Play failed after canplaythrough:', e2);
       }
     }
-  }, [currentTrack, playbackRate]);
+
+    // Auto-complete pro tasks when playback starts
+    autoCompleteProTask('audio', track.id);
+    if (track.playlistId) {
+      autoCompletePlaylist(track.playlistId);
+    }
+  }, [currentTrack, playbackRate, autoCompleteProTask, autoCompletePlaylist]);
 
   const pause = useCallback(() => {
     audioRef.current?.pause();
