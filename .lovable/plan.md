@@ -1,48 +1,59 @@
 
 
-## Plan: Program Routine Detail Page + Event Card Preview
+# Rename "Simora" → "Ladybosslook" Across the App
 
-### What Changes
+## Scope
 
-**1. "Program Guided" badge and indicator on the routine detail page (`AppInspireDetail.tsx`)**
-- Detect `schedule_type === 'program'` (similar to how `isChallenge` and `isProject` are detected)
-- Add a 🎓 "Program" badge in the badges row (like the existing Challenge/Project badges)
-- Replace the "Ready to start today!" banner with a program-specific banner showing the linked program name (e.g., "🎓 Enrolls you in: [Program Title]")
+Found **~1280 occurrences across 94 files**. These fall into several categories:
 
-**2. Fetch linked program info**
-- When the routine has `linked_program_slug`, fetch the program's title and cover image from `program_catalog` inside `useRoutineBankDetail` (or as a separate small query in the detail page)
-- This data powers the banner and the event card preview
+### 1. User-Facing UI Text (High Priority)
+- **Branded splash screen** (`BrandedSplash.tsx`): "Simora" → "Ladybosslook"
+- **SEO titles** (e.g., `AppMood.tsx`): "Mood Check-in | Simora" → "Mood Check-in | Ladybosslook"
+- **Settings page** (`AppSettings.tsx`): "Rate Simora" → "Rate Ladybosslook"
+- **Paywall screens** (`PaywallBold.tsx`, `PaywallVIP.tsx`, `PaywallMascotV2.tsx`, etc.): "Simora Plus" / "simora+" → "Ladybosslook Plus" / "Ladybosslook+"
+- **Admin labels** (`VideoPlaylistManager.tsx`, `BreathingExercisesManager.tsx`): "Requires Simora+" → "Requires Ladybosslook+"
+- **Admin channel chat** default display name: "Simora" → "Ladybosslook"
+- **Rate page** (`AppRate.tsx`): App Store URL slug update
+- **Update checker** (`useAppUpdateChecker.tsx`): App Store URL slug
+- **Subscriptions admin** (`Subscriptions.tsx`): "simora+ Plus V2" label
 
-**3. Show a preview ProgramEventCard on the detail page**
-- Below the description (or in the start info area), render a static/preview version of the enrollment `ProgramEventCard`
-- Build a mock `ProgramEvent` object with `type: 'enrollment'`, the program title, and today's date
-- Render the existing `ProgramEventCard` component in a "preview" wrapper with a label like "What you'll see in your planner:"
-- The card will be non-interactive (wrap in a `pointer-events-none` container so tapping doesn't navigate)
+### 2. AI Coach System Prompt
+- `supabase/functions/ai-coach/index.ts`: "You are Simora" → "You are Ladybosslook"
 
-**4. Hide irrelevant sections for program routines**
-- Hide start/end date banners (program timing comes from the round, not the routine)
-- The tasks list still shows if the routine has tasks (optional for program routines)
+### 3. Internal Keys (localStorage, product IDs)
+- localStorage keys like `simora_daily_reset_enabled`, `simora_tour_*`, `simora_celebrated_*`, `simora_onboarding_completed_*`, etc.
+- Product ID fallbacks like `simora_plus_annual`, `simora_plus_monthly`
+- Program slug `simora-plus`
 
-### Files to Edit
+**Decision needed for internal keys**: Renaming localStorage keys will break state for existing users (they'll re-see onboarding, lose tour progress, etc.). Product IDs and program slugs are tied to App Store Connect and database records.
 
-- **`src/pages/app/AppInspireDetail.tsx`** — Add `isProgram` detection, program badge, program info banner, and ProgramEventCard preview
-- **`src/hooks/useRoutinesBank.tsx`** — Include `linked_program_slug` in the `useRoutineBankDetail` return data; optionally join program title
+### 4. Comments & Documentation
+- Hook comments referencing "Simora" philosophy text
+- Migration SQL comments
 
-### Technical Details
+## Recommended Approach
 
-- The preview event card uses the existing `ProgramEventCard` component with a fabricated event:
-```ts
-const previewEvent: ProgramEvent = {
-  id: 'preview',
-  type: 'enrollment',
-  title: programTitle,
-  programTitle: programTitle,
-  programSlug: routine.linked_program_slug,
-  time: null,
-  isCompleted: false,
-  // ... minimal fields
-};
-```
-- Wrapped in `<div className="pointer-events-none opacity-90">` to prevent interaction
-- Label above: "Added to your planner:" in a muted style
+| Category | Action |
+|----------|--------|
+| UI text, labels, titles | Rename to "Ladybosslook" |
+| AI coach prompt | Rename to "Ladybosslook" |
+| Admin labels | Rename to "Ladybosslook+" |
+| App Store URLs | Update slug if changed, otherwise keep |
+| localStorage keys | **Keep as-is** to avoid breaking existing users |
+| Product IDs / program slugs | **Keep as-is** (tied to App Store / database) |
+| Code comments | Update where trivial |
+| Migration SQL comments | Leave untouched |
+
+## Technical Details
+
+Will do a systematic file-by-file pass across all 94 files, applying the rename rules above. Key files with the most impact:
+
+- `src/components/app/BrandedSplash.tsx`
+- `src/pages/app/AppSettings.tsx`
+- `src/pages/app/AppRate.tsx`
+- `src/components/app/paywalls/*.tsx` (all paywall variants)
+- `supabase/functions/ai-coach/index.ts`
+- `src/components/SEOHead.tsx` default title
+- `src/hooks/useAppUpdateChecker.tsx`
+- All pages using `<SEOHead title="... Simora">`
 
