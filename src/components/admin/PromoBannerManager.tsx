@@ -610,49 +610,7 @@ export function PromoBannerManager() {
                 </Select>
               </div>
 
-              {/* AI Generation Section */}
-              <div className="space-y-3 p-4 bg-gradient-to-br from-violet-50 to-pink-50 dark:from-violet-950/30 dark:to-pink-950/30 rounded-lg border border-violet-200 dark:border-violet-800">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-violet-500" />
-                  <Label className="text-sm font-medium">Generate with AI</Label>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Enter a title and optional subtitle to generate a {getAspectRatioDimensions(aspectRatio)} banner image
-                </p>
-                <div className="grid gap-2">
-                  <Input
-                    placeholder="Banner Title (e.g., 'New Year Sale')"
-                    value={bannerTitle}
-                    onChange={(e) => setBannerTitle(e.target.value)}
-                    disabled={generating}
-                  />
-                  <Input
-                    placeholder="Subtitle (optional)"
-                    value={bannerSubtitle}
-                    onChange={(e) => setBannerSubtitle(e.target.value)}
-                    disabled={generating}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleGenerateBanner}
-                    disabled={generating || !bannerTitle.trim()}
-                    className="gap-2"
-                  >
-                    {generating ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-4 w-4" />
-                        Generate Banner
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
+
 
               <div className="space-y-2">
                 <Label>Upload Image</Label>
