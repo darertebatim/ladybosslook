@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
+import { ProgramEventCard } from '@/components/app/ProgramEventCard';
+import { type ProgramEvent } from '@/hooks/usePlannerProgramEvents';
 import { SaveRoutineHandHint, useSaveRoutineHint } from '@/components/app/AddToRoutineHandHint';
 import { Check, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
@@ -91,6 +93,8 @@ interface RoutinePreviewSheetProps {
   isSaving?: boolean;
   isFree?: boolean;
   routineBankId?: string | null;
+  linkedProgramTitle?: string | null;
+  linkedProgramSlug?: string | null;
 }
 
 export function RoutinePreviewSheet({
@@ -111,6 +115,8 @@ export function RoutinePreviewSheet({
   isSaving,
   isFree,
   routineBankId,
+  linkedProgramTitle,
+  linkedProgramSlug,
 }: RoutinePreviewSheetProps) {
   // Generate synthetic pro-task for multi-task routines
   const displayTasks = useMemo(() => {
