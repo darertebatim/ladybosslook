@@ -649,14 +649,23 @@ const AppTaskCreate = ({
       const trackIds = (allTracks || []).map(t => t.id);
       const { data: playlistItems } = await supabase
         .from('audio_playlist_items')
-        .select('audio_id, playlist_id, audio_playlists!inner(name)')
+        .select('audio_id, playlist_id')
         .in('audio_id', trackIds);
+
+      // Get unique playlist IDs and fetch their names
+      const playlistIds = [...new Set((playlistItems || []).map(i => i.playlist_id))];
+      const { data: playlistNames } = playlistIds.length > 0
+        ? await supabase.from('audio_playlists').select('id, name').in('id', playlistIds)
+        : { data: [] };
+      
+      const playlistNameMap: Record<string, string> = {};
+      (playlistNames || []).forEach(p => { playlistNameMap[p.id] = p.name; });
 
       // Build a map of track ID -> playlist name
       const trackPlaylistMap: Record<string, string> = {};
-      (playlistItems || []).forEach((item: any) => {
-        if (item.audio_playlists?.name) {
-          trackPlaylistMap[item.audio_id] = item.audio_playlists.name;
+      (playlistItems || []).forEach((item) => {
+        if (playlistNameMap[item.playlist_id]) {
+          trackPlaylistMap[item.audio_id] = playlistNameMap[item.playlist_id];
         }
       });
 
