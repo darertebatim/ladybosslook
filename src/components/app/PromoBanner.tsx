@@ -210,6 +210,23 @@ export function PromoBanner({
     enabled: !!user?.id,
   });
 
+  // Fetch user profile for language/timezone targeting
+  const { data: userProfile } = useQuery({
+    queryKey: ['user-profile-for-promo', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('preferred_language, timezone')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+  });
+
   // Filter banners based on location and targeting
   const eligibleBanners = useMemo(() => {
     if (!banners) return [];
