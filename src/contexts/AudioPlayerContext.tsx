@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Capacitor } from "@capacitor/core";
 import { format } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAutoCompleteProTask } from "@/hooks/useAutoCompleteProTask";
 
 
 export interface TrackInfo {
@@ -59,6 +60,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { autoComplete: autoCompleteProTask, autoCompletePlaylist } = useAutoCompleteProTask();
   const saveProgressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastTimeUpdateRef = useRef<number>(0);
   const onTrackCompleteRef = useRef<(() => void) | null>(null);
@@ -322,7 +324,13 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         console.error('[AudioPlayer] Play failed after canplaythrough:', e2);
       }
     }
-  }, [currentTrack, playbackRate]);
+
+    // Auto-complete pro tasks when playback starts
+    autoCompleteProTask('audio', track.id);
+    if (track.playlistId) {
+      autoCompletePlaylist(track.playlistId);
+    }
+  }, [currentTrack, playbackRate, autoCompleteProTask, autoCompletePlaylist]);
 
   const pause = useCallback(() => {
     audioRef.current?.pause();

@@ -13,6 +13,7 @@ import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { PromoBanner } from '@/components/app/PromoBanner';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
+import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 
 interface VideoItem {
   url: string;
@@ -60,12 +61,17 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
   const hasNext = playlist && currentIndex !== undefined && currentIndex < playlist.length - 1;
 
   const { pause: pauseAudio } = useAudioPlayer();
+  const { autoCompleteVideo, autoCompleteVideoPlaylist } = useAutoCompleteProTask();
 
   useEffect(() => {
     if (isOpen) {
       pauseAudio();
+      // Auto-complete pro tasks as soon as video starts playing
+      if (videoId) {
+        autoCompleteVideo(videoId);
+      }
     }
-  }, [isOpen, pauseAudio]);
+  }, [isOpen, pauseAudio, videoId, autoCompleteVideo]);
 
   useEffect(() => {
     setIsLoading(true);
