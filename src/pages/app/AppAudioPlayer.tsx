@@ -695,7 +695,7 @@ export default function AppAudioPlayer() {
       {/* Main Content - Centered vertically */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-3 overflow-hidden" style={{ zIndex: 2 }}>
         {/* Promo Banner - Overlay on player content */}
-        <div className="absolute bottom-32 left-4 right-4 z-20">
+        <div className="absolute bottom-20 left-4 right-4 z-20">
           <PromoBanner 
             location="player" 
             currentPlaylistId={playlistInfo?.playlist_id || contextPlaylistId || undefined}
