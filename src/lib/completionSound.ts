@@ -1,6 +1,6 @@
 /**
- * Plays a warm, satisfying completion chime using Web Audio API.
- * Two-note rising tone with gentle reverb tail — feels rewarding, not rushed.
+ * Plays an Apple-style "cha-ching" completion sound using Web Audio API.
+ * Bright, metallic two-tone ping — like a cash register / payment confirmed.
  */
 let audioCtx: AudioContext | null = null;
 
@@ -21,60 +21,73 @@ export function playCompletionSound() {
 
     // Master gain
     const master = ctx.createGain();
-    master.gain.value = 0.22;
+    master.gain.value = 0.18;
     master.connect(ctx.destination);
 
-    // --- Note 1: warm low tone (C6 ~523 Hz) ---
-    const osc1 = ctx.createOscillator();
-    osc1.type = 'sine';
-    osc1.frequency.value = 523;
-    const gain1 = ctx.createGain();
-    gain1.gain.setValueAtTime(0, now);
-    gain1.gain.linearRampToValueAtTime(0.7, now + 0.04);
-    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-    osc1.connect(gain1);
-    gain1.connect(master);
-    osc1.start(now);
-    osc1.stop(now + 0.5);
+    // --- "Cha" — short metallic tap (A6 ~1760 Hz) ---
+    const cha = ctx.createOscillator();
+    cha.type = 'square';
+    cha.frequency.value = 1760;
+    const chaGain = ctx.createGain();
+    chaGain.gain.setValueAtTime(0, now);
+    chaGain.gain.linearRampToValueAtTime(0.6, now + 0.008);
+    chaGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+    cha.connect(chaGain);
+    chaGain.connect(master);
+    cha.start(now);
+    cha.stop(now + 0.08);
 
-    // --- Note 2: bright high tone (E6 ~659 Hz), slightly delayed ---
-    const osc2 = ctx.createOscillator();
-    osc2.type = 'sine';
-    osc2.frequency.value = 659;
-    const gain2 = ctx.createGain();
-    gain2.gain.setValueAtTime(0, now + 0.12);
-    gain2.gain.linearRampToValueAtTime(0.6, now + 0.16);
-    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
-    osc2.connect(gain2);
-    gain2.connect(master);
-    osc2.start(now + 0.12);
-    osc2.stop(now + 0.7);
+    // --- Metallic harmonic on "cha" ---
+    const chaHarm = ctx.createOscillator();
+    chaHarm.type = 'sine';
+    chaHarm.frequency.value = 3520; // A7 overtone
+    const chaHarmGain = ctx.createGain();
+    chaHarmGain.gain.setValueAtTime(0, now);
+    chaHarmGain.gain.linearRampToValueAtTime(0.2, now + 0.006);
+    chaHarmGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+    chaHarm.connect(chaHarmGain);
+    chaHarmGain.connect(master);
+    chaHarm.start(now);
+    chaHarm.stop(now + 0.06);
 
-    // --- Note 3: sparkle top (G6 ~784 Hz), subtle shimmer ---
-    const osc3 = ctx.createOscillator();
-    osc3.type = 'sine';
-    osc3.frequency.value = 784;
-    const gain3 = ctx.createGain();
-    gain3.gain.setValueAtTime(0, now + 0.22);
-    gain3.gain.linearRampToValueAtTime(0.35, now + 0.26);
-    gain3.gain.exponentialRampToValueAtTime(0.001, now + 0.75);
-    osc3.connect(gain3);
-    gain3.connect(master);
-    osc3.start(now + 0.22);
-    osc3.stop(now + 0.75);
+    // --- "Ching" — bright resonant ring (E7 ~2637 Hz), delayed ---
+    const ching = ctx.createOscillator();
+    ching.type = 'sine';
+    ching.frequency.value = 2637;
+    const chingGain = ctx.createGain();
+    chingGain.gain.setValueAtTime(0, now + 0.09);
+    chingGain.gain.linearRampToValueAtTime(0.7, now + 0.1);
+    chingGain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+    ching.connect(chingGain);
+    chingGain.connect(master);
+    ching.start(now + 0.09);
+    ching.stop(now + 0.55);
 
-    // --- Soft harmonic overtone on note 1 for warmth ---
-    const overtone = ctx.createOscillator();
-    overtone.type = 'triangle';
-    overtone.frequency.value = 1046; // C7 octave above
-    const gainOT = ctx.createGain();
-    gainOT.gain.setValueAtTime(0, now);
-    gainOT.gain.linearRampToValueAtTime(0.12, now + 0.04);
-    gainOT.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-    overtone.connect(gainOT);
-    gainOT.connect(master);
-    overtone.start(now);
-    overtone.stop(now + 0.4);
+    // --- "Ching" shimmer overtone (E8 ~5274 Hz) ---
+    const chingShimmer = ctx.createOscillator();
+    chingShimmer.type = 'sine';
+    chingShimmer.frequency.value = 5274;
+    const shimmerGain = ctx.createGain();
+    shimmerGain.gain.setValueAtTime(0, now + 0.09);
+    shimmerGain.gain.linearRampToValueAtTime(0.15, now + 0.1);
+    shimmerGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+    chingShimmer.connect(shimmerGain);
+    shimmerGain.connect(master);
+    chingShimmer.start(now + 0.09);
+    chingShimmer.stop(now + 0.4);
+
+    // --- Sub-bass thud for weight (A4 ~220 Hz) ---
+    const thud = ctx.createOscillator();
+    thud.type = 'sine';
+    thud.frequency.value = 220;
+    const thudGain = ctx.createGain();
+    thudGain.gain.setValueAtTime(0, now);
+    thudGain.gain.linearRampToValueAtTime(0.25, now + 0.01);
+    thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    thud.connect(thudGain);
+    thudGain.connect(master);
+    thud.start(now);
+    thud.stop(now + 0.12);
 
   } catch (e) {
     console.warn('[completionSound] Failed to play:', e);
