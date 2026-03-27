@@ -1065,16 +1065,20 @@ const AppHome = () => {
             {/* Notification Banner - prompts users to enable notifications */}
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
 
-            {/* Mood Check-in Banner */}
+            {/* Mood Check-in Banner — shows first; other banners appear only after mood is logged or banner dismissed */}
             {!showWelcomeCard && <MoodCheckInBanner />}
 
-            {/* Promo Banner */}
-            <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
+            {/* Promo Banner — only when mood banner is not showing */}
+            {(todayMood || showWelcomeCard) && (
+              <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
+            )}
 
-            {/* Home Banners (announcements with videos/CTAs) */}
-            <div className="tour-banner">
-              <HomeBanner />
-            </div>
+            {/* Home Banners (announcements with videos/CTAs) — only when mood banner is not showing */}
+            {(todayMood || showWelcomeCard) && (
+              <div className="tour-banner">
+                <HomeBanner />
+              </div>
+            )}
 
             {/* Tag filter chips - temporarily hidden */}
             {/* {taskTags.length > 0 && <div className="py-2 -mx-4 px-4 bg-background overflow-x-auto">
