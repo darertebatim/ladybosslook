@@ -479,7 +479,7 @@ export function PromoBanner({
           {/* Dismiss button */}
           <button
             onClick={(e) => handleDismiss(e as any, fullBanner)}
-            className="text-white/50 text-sm font-medium py-2 px-6 active:scale-95 transition-transform"
+            className="text-white text-sm font-medium py-2 px-6 active:scale-95 transition-transform"
           >
             Maybe later
           </button>
