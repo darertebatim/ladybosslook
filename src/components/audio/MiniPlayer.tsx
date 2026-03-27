@@ -28,6 +28,8 @@ export const MiniPlayer = () => {
     routineMinimized = rp.isActive && rp.isMinimized;
   } catch { /* provider not available */ }
 
+  if (!currentTrack) return null;
+
   const handlePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isPlaying) {
@@ -45,7 +47,10 @@ export const MiniPlayer = () => {
   return (
     <div 
       className={cn(
-        "fixed bottom-[calc(64px+env(safe-area-inset-bottom))] left-2 right-2 z-40",
+        "fixed left-2 right-2 z-40",
+        routineMinimized
+          ? "bottom-[calc(64px+env(safe-area-inset-bottom)+60px)]"
+          : "bottom-[calc(64px+env(safe-area-inset-bottom))]",
         "rounded-xl overflow-hidden cursor-pointer",
         "animate-in slide-in-from-bottom-4 duration-300",
         "bg-card/95 backdrop-blur-lg",
