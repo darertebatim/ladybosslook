@@ -450,18 +450,21 @@ export function PromoBanner({
     <OverlayPortal>
       <div
         className="fixed inset-0 z-[100] flex items-end justify-center"
+        style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => { e.stopPropagation(); handleDismiss(e as any, fullBanner); }}
       >
         <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-        {/* Close X button */}
+        {/* Close X button — safe area aware */}
         <button
           onClick={(e) => { e.stopPropagation(); handleDismiss(e as any, fullBanner); }}
-          className="absolute top-12 right-5 z-10 w-8 h-8 rounded-full bg-white/15 flex items-center justify-center active:scale-90 transition-transform"
+          className="absolute right-5 z-10 w-8 h-8 rounded-full bg-white/15 flex items-center justify-center active:scale-90 transition-transform"
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
         >
           <X className="h-5 w-5 text-white/70" />
         </button>
         <div
-          className="relative w-full max-w-md mx-auto flex flex-col items-center pb-6 px-4 animate-in slide-in-from-bottom-8 duration-500"
+          className="relative w-full max-w-md mx-auto flex flex-col items-center px-4 animate-in slide-in-from-bottom-8 duration-500"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Banner Image */}
