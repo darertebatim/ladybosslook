@@ -1067,8 +1067,10 @@ const AppHome = () => {
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
 
             {/* Promo & Home Banners — shown first */}
-            <PromoBanner location="home_top" onVisibilityChange={setHasPromoBanner} />
-            <HomeBanner onVisibilityChange={setHasHomeBanner} />
+            <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
+            <div className="tour-banner">
+              <HomeBanner onVisibilityChange={setHasHomeBanner} />
+            </div>
 
             {/* Mood Check-in Banner — only after all promo/home banners are dismissed */}
             {!showWelcomeCard && !hasPromoBanner && !hasHomeBanner && <MoodCheckInBanner />}
