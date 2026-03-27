@@ -1,54 +1,48 @@
 
 
-## Plan: Add "Program" Routine Type
+## Plan: Program Routine Detail Page + Event Card Preview
 
-### Overview
-Add a new routine type called "Program" in the admin Routines Bank. When selected, the admin can link a program from the `program_catalog` to the routine. When a user adds this routine to their planner, it automatically enrolls them in that program (and its active round).
+### What Changes
 
-### Database Changes
+**1. "Program Guided" badge and indicator on the routine detail page (`AppInspireDetail.tsx`)**
+- Detect `schedule_type === 'program'` (similar to how `isChallenge` and `isProject` are detected)
+- Add a 🎓 "Program" badge in the badges row (like the existing Challenge/Project badges)
+- Replace the "Ready to start today!" banner with a program-specific banner showing the linked program name (e.g., "🎓 Enrolls you in: [Program Title]")
 
-**1. Add `linked_program_slug` column to `routines_bank`:**
-```sql
-ALTER TABLE public.routines_bank 
-  ADD COLUMN linked_program_slug text REFERENCES program_catalog(slug) ON DELETE SET NULL;
-```
+**2. Fetch linked program info**
+- When the routine has `linked_program_slug`, fetch the program's title and cover image from `program_catalog` inside `useRoutineBankDetail` (or as a separate small query in the detail page)
+- This data powers the banner and the event card preview
 
-This stores which program a "program" type routine is linked to.
+**3. Show a preview ProgramEventCard on the detail page**
+- Below the description (or in the start info area), render a static/preview version of the enrollment `ProgramEventCard`
+- Build a mock `ProgramEvent` object with `type: 'enrollment'`, the program title, and today's date
+- Render the existing `ProgramEventCard` component in a "preview" wrapper with a label like "What you'll see in your planner:"
+- The card will be non-interactive (wrap in a `pointer-events-none` container so tapping doesn't navigate)
 
-### Admin UI Changes (RoutinesBank.tsx)
+**4. Hide irrelevant sections for program routines**
+- Hide start/end date banners (program timing comes from the round, not the routine)
+- The tasks list still shows if the routine has tasks (optional for program routines)
 
-**2. Add "Program" as a 4th routine type option:**
-- Add `{ value: 'program', label: 'Program', desc: 'Auto-enroll in a program', icon: '🎓' }` to the type selector
-- Change the grid from `grid-cols-3` to `grid-cols-4`
-- Update the `schedule_type` type to include `'program'`
+### Files to Edit
 
-**3. Show program selector when type is "program":**
-- When `schedule_type === 'program'`, render a dropdown/select fetching from `program_catalog` (active programs)
-- Store selection in `formData.linked_program_slug`
-- Hide start/end mode selectors for program type (not relevant)
-- Tasks section remains available (admin can still add routine tasks alongside enrollment)
-
-**4. Save `linked_program_slug` on create/update:**
-- Include `linked_program_slug` in the insert/update calls to `routines_bank`
-
-### Enrollment Logic (useRoutinesBank.tsx)
-
-**5. Auto-enroll user when adding a "program" routine:**
-- In the `addRoutineToPlanner` mutation, after creating tasks, check if `schedule_type === 'program'` and `linked_program_slug` exists
-- Query `program_rounds` for the latest active round of that program
-- Insert into `course_enrollments` with `user_id`, `program_slug`, `round_id` (if exists), `status: 'active'`
-- Skip enrollment if user is already enrolled (check first)
-
-### App-Side Display
-
-**6. Filter "program" routines in the library:**
-- Add `'program'` to the existing category filters alongside challenges/projects
-- Program routines display with the 🎓 icon
+- **`src/pages/app/AppInspireDetail.tsx`** — Add `isProgram` detection, program badge, program info banner, and ProgramEventCard preview
+- **`src/hooks/useRoutinesBank.tsx`** — Include `linked_program_slug` in the `useRoutineBankDetail` return data; optionally join program title
 
 ### Technical Details
 
-- The `schedule_type` enum in the DB is stored as `text`, so no enum migration needed — just store `'program'`
-- Round assignment: query `program_rounds` for the program where `is_active = true` or the most recent round, matching existing enrollment logic
-- The routine can still have tasks (e.g., "Complete Module 1") that work alongside enrollment
-- If the program has no active round, enroll without a round_id (same as self-paced programs)
+- The preview event card uses the existing `ProgramEventCard` component with a fabricated event:
+```ts
+const previewEvent: ProgramEvent = {
+  id: 'preview',
+  type: 'enrollment',
+  title: programTitle,
+  programTitle: programTitle,
+  programSlug: routine.linked_program_slug,
+  time: null,
+  isCompleted: false,
+  // ... minimal fields
+};
+```
+- Wrapped in `<div className="pointer-events-none opacity-90">` to prevent interaction
+- Label above: "Added to your planner:" in a muted style
 
