@@ -749,6 +749,17 @@ export default function AppAudioPlayer() {
 
 
 
+          {/* Promo Banner - overlays the Up Next area */}
+          <div className="relative">
+            <PromoBanner 
+              location="player" 
+              currentPlaylistId={playlistInfo?.playlist_id || contextPlaylistId || undefined}
+              currentAudioId={audio?.id}
+              playbackSeconds={Math.floor(currentTime)}
+              forceShowClose
+            />
+          </div>
+
           {/* Up Next Preview */}
           {nextTrack && (
               <button
