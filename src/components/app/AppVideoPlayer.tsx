@@ -280,7 +280,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
         <div className="flex-1 flex items-center justify-center px-4 overflow-hidden overscroll-contain relative">
           {renderPlayer()}
           {/* Promo Banner - overlaid on top of the video */}
-          <div className="absolute bottom-2 left-4 right-4 z-20">
+          <div className="absolute bottom-14 left-4 right-4 z-20">
             <PromoBanner 
               location="video_player" 
               currentVideoId={videoId}
