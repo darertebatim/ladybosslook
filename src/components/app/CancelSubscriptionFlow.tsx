@@ -196,7 +196,7 @@ function RetentionStep({
         <div className="rounded-2xl p-6 text-center shadow-lg mb-6"
           style={{ background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.7) 100%)' }}
         >
-          <p className="text-primary-foreground/80 text-sm">🌿 SimoraPlus 🌿</p>
+          <p className="text-primary-foreground/80 text-sm">🌿 Ladybosslook+ 🌿</p>
           <h3 className="text-4xl font-black text-primary-foreground mt-2 mb-1">Free Trial</h3>
           <p className="text-primary-foreground/70 text-xs tracking-[0.3em] uppercase">Super Prize</p>
         </div>
@@ -255,7 +255,7 @@ function HowToCancelStep({ onBack }: { onBack: () => void }) {
         { num: 1, text: 'Open Google Play Store.', image: null },
         { num: 2, text: 'Tap your profile icon → Payments & subscriptions.', image: null },
         { num: 3, text: 'Tap Subscriptions.', image: null },
-        { num: 4, text: 'Select Simora and tap Cancel subscription.', image: null },
+        { num: 4, text: 'Select Ladybosslook and tap Cancel subscription.', image: null },
       ];
 
   return (

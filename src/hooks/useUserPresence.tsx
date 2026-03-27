@@ -8,13 +8,13 @@ import { Capacitor } from '@capacitor/core';
 /**
  * User presence data - replaces streak-based metrics with "depth of return" philosophy
  * 
- * Philosophy: "Simora measures depth of return, not length of absence."
+ * Philosophy: "Ladybosslook measures depth of return, not length of absence."
  * - No "streak broken" anxiety
  * - Returning after a gap is celebrated, not punished
  * - Measures strength through return, not continuity
  * 
  * Returns: Now counts every app open/resume, encouraging healthy habit of
- * coming back to Simora instead of scrolling social media.
+ * coming back to Ladybosslook instead of scrolling social media.
  */
 
 export interface UserPresence {

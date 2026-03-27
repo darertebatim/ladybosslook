@@ -28,7 +28,7 @@ const ACTION_TYPES = [
 ];
 
 const SENDER_OPTIONS = [
-  { value: 'Simora', label: 'Simora' },
+  { value: 'Ladybosslook', label: 'Ladybosslook' },
   { value: 'default', label: 'Use my name' },
   { value: 'Razie', label: 'Razie' },
   { value: 'Team', label: 'The Team' },
@@ -51,7 +51,7 @@ export default function AppChannelPost() {
   const [videoUrl, setVideoUrl] = useState('');
   const [isPinned, setIsPinned] = useState(false);
   const [sendPush, setSendPush] = useState(false);
-  const [displayName, setDisplayName] = useState('Simora');
+  const [displayName, setDisplayName] = useState('Ladybosslook');
   const [customDisplayName, setCustomDisplayName] = useState('');
 
   // Voice recording
@@ -325,7 +325,7 @@ export default function AppChannelPost() {
         action_data: actionData,
         is_pinned: isPinned,
         send_push: sendPush,
-        is_system: displayName === 'Simora',
+        is_system: displayName === 'Ladybosslook',
         display_name: displayName === 'custom' ? customDisplayName : (displayName === 'default' ? null : displayName),
       });
 
@@ -348,7 +348,7 @@ export default function AppChannelPost() {
     setVideoUrl('');
     setIsPinned(false);
     setSendPush(false);
-    setDisplayName('Simora');
+    setDisplayName('Ladybosslook');
     setCustomDisplayName('');
     setActionType('none');
     setActionLabel('');

@@ -6,7 +6,7 @@ export default function AppMood() {
   return (
     <>
       <SEOHead 
-        title="Mood Check-in | Simora"
+        title="Mood Check-in | Ladybosslook"
         description="Track your daily mood and emotional well-being"
       />
       <div 

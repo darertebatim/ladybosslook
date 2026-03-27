@@ -85,7 +85,7 @@ export function SoftReviewPrompt({ isOpen, onClose, onAccept }: SoftReviewPrompt
           </div>
 
           <h2 className="text-xl font-bold text-gray-900 mb-2">
-            Enjoying Simora?
+            Enjoying Ladybosslook?
           </h2>
           
           <p className="text-gray-500 text-sm mb-6 leading-relaxed">

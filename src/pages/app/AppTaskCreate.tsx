@@ -540,7 +540,7 @@ const AppTaskCreate = ({
         .eq('status', 'active');
       const enrolledSlugs = (enrollments || []).map(e => e.program_slug).filter(Boolean) as string[];
 
-      // Check if user has Simora+ subscription
+      // Check if user has Ladybosslook+ subscription
       const { data: subs } = await supabase
         .from('user_subscriptions')
         .select('id')

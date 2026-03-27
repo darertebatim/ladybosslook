@@ -105,7 +105,7 @@ export default function AppAICoach() {
               <Sparkles className="h-4 w-4 text-primary" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-base font-semibold truncate">Simora AI</h1>
+              <h1 className="text-base font-semibold truncate">Ladybosslook AI</h1>
             </div>
           </div>
           <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0" onClick={clearMessages} title="Clear history">

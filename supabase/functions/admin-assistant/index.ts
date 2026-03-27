@@ -844,9 +844,9 @@ async function generateRoutineCover(supabase: any, args: any) {
 
   const taskIcons = (tasks || []).map((t: any) => t.title).join(", ");
 
-  // Build Simora-style prompt using the user's design guide
+  // Build Ladybosslook-style prompt using the user's design guide
   const customDesc = args.description || "";
-  const prompt = `Square mobile app cover illustration for a wellness app called Simora.
+  const prompt = `Square mobile app cover illustration for a wellness app called Ladybosslook.
 
 Style: soft pastel digital illustration, feminine self-care aesthetic,
 calming and uplifting mood, clean modern wellness design,
@@ -945,7 +945,7 @@ Clean cover illustration only.`;
     return {
       success: true,
       action: "generate_routine_cover",
-      message: `Generated and applied Simora-style cover for "${routine.title}"`,
+      message: `Generated and applied Ladybosslook-style cover for "${routine.title}"`,
       created: { title: routine.title, emoji: routine.emoji, coverUrl: publicUrl },
     };
   } catch (e) {
@@ -1036,7 +1036,7 @@ function buildSystemPrompt(context: Record<string, any>, currentPage?: string): 
     weekday: "long", year: "numeric", month: "long", day: "numeric" 
   });
 
-  let prompt = `You are Razie's AI Admin Assistant for the Ladyboss / Simora platform. You're smart, proactive, and action-oriented.
+  let prompt = `You are Razie's AI Admin Assistant for the Ladyboss / Ladybosslook platform. You're smart, proactive, and action-oriented.
 
 Today is ${today}.
 
@@ -1092,7 +1092,7 @@ ${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "�
 - **"Delete breathing exercise X"** → delete_breathing_exercise
 - **"Add tasks to routine X"** → add_tasks_to_routine (adds new tasks to an existing routine)
 - **"Remove task Y from routine"** → delete_routine_task (removes a specific task from a routine)
-- **"Generate a cover for routine X"** → generate_routine_cover (generates a Simora-style pastel cover image using AI and uploads it)
+- **"Generate a cover for routine X"** → generate_routine_cover (generates a Ladybosslook-style pastel cover image using AI and uploads it)
 
 ### SUBTASKS EXPLAINED:
 - **Subtasks** are smaller steps/checklist items that belong to a TASK (admin_task_bank item).
@@ -1517,7 +1517,7 @@ function getToolDefinitions(currentPage?: string) {
       type: "function",
       function: {
         name: "generate_routine_cover",
-        description: "Generate a beautiful Simora-style pastel cover image for a routine using AI. The image is automatically uploaded and applied to the routine. Use when user asks to create/generate a cover for a routine.",
+        description: "Generate a beautiful Ladybosslook-style pastel cover image for a routine using AI. The image is automatically uploaded and applied to the routine. Use when user asks to create/generate a cover for a routine.",
         parameters: {
           type: "object",
           properties: {

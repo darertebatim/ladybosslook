@@ -290,7 +290,7 @@ const AppBrowsePrograms = () => {
 
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
-      <SEOHead title="Academy Programs - Simora" description="Browse all academy programs" />
+      <SEOHead title="Academy Programs - Ladybosslook" description="Browse all academy programs" />
 
       {/* Hero Video Background */}
       <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 h-[420px] overflow-hidden" style={{ transform: `translateY(${-scrollY * 0.4}px)` }}>

@@ -166,7 +166,7 @@ export default function Auth() {
             <div className="w-32 h-32 rounded-3xl overflow-hidden shadow-xl">
               <img 
                 src={appIcon} 
-                alt="Simora" 
+                alt="Ladybosslook" 
                 className="w-full h-full object-cover"
               />
             </div>
@@ -197,7 +197,7 @@ export default function Auth() {
                   ? 'Reset Password' 
                   : showEmailForm 
                     ? (isLogin ? 'Sign in with Email' : 'Sign up with Email')
-                    : (isLogin ? 'Welcome back!' : 'Sign up for Simora')
+                    : (isLogin ? 'Welcome back!' : 'Sign up for Ladybosslook')
                 }
               </h1>
               <p className="text-muted-foreground text-sm">

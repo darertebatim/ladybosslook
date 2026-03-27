@@ -49,7 +49,7 @@ export function PlusGateSheet({
             className="flex items-center gap-1.5 bg-amber-100 text-amber-700 rounded-full px-3 py-1 text-xs font-bold mb-3"
           >
             <Crown className="h-3.5 w-3.5" />
-            Simora+ Feature
+            Ladybosslook+ Feature
           </motion.div>
 
           {/* Premium explainer box */}
@@ -63,7 +63,7 @@ export function PlusGateSheet({
               ✨ Premium tools are designed for professionals who want to level up their daily life.
             </p>
             <p className="text-[12px] text-muted-foreground mt-1 leading-snug">
-              Are you ready to become a Simora+ member?
+              Are you ready to become a Ladybosslook+ member?
             </p>
           </motion.div>
 

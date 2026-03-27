@@ -46,7 +46,7 @@ export function OnboardingBanner() {
       </div>
       <img
         src={onboardingBannerImg}
-        alt="Start your Simora onboarding"
+        alt="Start your Ladybosslook onboarding"
         className="w-full h-auto block"
       />
     </button>
