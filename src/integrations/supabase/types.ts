@@ -1458,6 +1458,8 @@ export type Database = {
           priority: number | null
           starts_at: string | null
           target_below_version: string | null
+          target_languages: string[] | null
+          target_timezones: string[] | null
           title: string
           updated_at: string | null
           video_url: string | null
@@ -1476,6 +1478,8 @@ export type Database = {
           priority?: number | null
           starts_at?: string | null
           target_below_version?: string | null
+          target_languages?: string[] | null
+          target_timezones?: string[] | null
           title: string
           updated_at?: string | null
           video_url?: string | null
@@ -1494,6 +1498,8 @@ export type Database = {
           priority?: number | null
           starts_at?: string | null
           target_below_version?: string | null
+          target_languages?: string[] | null
+          target_timezones?: string[] | null
           title?: string
           updated_at?: string | null
           video_url?: string | null
