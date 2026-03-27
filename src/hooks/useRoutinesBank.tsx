@@ -662,11 +662,11 @@ export function useAddRoutineFromBank() {
 
         if (!existingEnrollment) {
           // Find the active round for this program
-          const { data: activeRound } = await supabase
+          const { data: activeRound } = await (supabase
             .from('program_rounds')
             .select('id, round_name')
             .eq('program_slug', programSlug)
-            .eq('is_active', true)
+            .eq('is_active', true) as any)
             .order('created_at', { ascending: false })
             .limit(1)
             .maybeSingle();
