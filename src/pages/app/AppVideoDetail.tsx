@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppVideoPlayer } from "@/components/app/AppVideoPlayer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 
 export default function AppVideoDetail() {
   const { videoId } = useParams();

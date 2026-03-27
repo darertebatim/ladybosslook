@@ -12,6 +12,7 @@ import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { PromoBanner } from '@/components/app/PromoBanner';
+import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 
 interface VideoItem {
   url: string;
