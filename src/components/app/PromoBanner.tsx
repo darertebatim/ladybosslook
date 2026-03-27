@@ -17,7 +17,7 @@ interface PromoBannerData {
   destination_id: string | null;
   custom_url: string | null;
   display_frequency: 'once' | 'daily' | 'weekly' | 'forever';
-  aspect_ratio: '3:1' | '4:1' | '16:9' | '1:1';
+  aspect_ratio: '3:1' | '4:1' | '16:9' | '1:1' | 'full';
   target_type: 'all' | 'enrolled' | 'custom';
   include_programs: string[];
   exclude_programs: string[];
@@ -428,6 +428,7 @@ export function PromoBanner({
       case '16:9': return 'aspect-video';
       case '1:1': return 'aspect-square';
       case '4:1': return 'aspect-[4/1]';
+      case 'full': return 'aspect-[9/16]';
       default: return 'aspect-[3/1]';
     }
   };

@@ -17,7 +17,7 @@ import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 
 type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'mood' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist' | 'routine_player' | 'audio_track' | 'video_track';
 type DisplayFrequency = 'once' | 'daily' | 'weekly' | 'forever';
-type AspectRatio = '3:1' | '4:1' | '16:9' | '1:1';
+type AspectRatio = '3:1' | '4:1' | '16:9' | '1:1' | 'full';
 type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch' | 'video_player' | 'routines_top' | 'routines_after_categories' | 'routine_player';
 
 const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
@@ -563,6 +563,7 @@ export function PromoBannerManager() {
     switch (ratio) {
       case '16:9': return 'aspect-video';
       case '1:1': return 'aspect-square';
+      case 'full': return 'aspect-[9/16]';
       default: return 'aspect-[3/1]';
     }
   };
@@ -571,6 +572,7 @@ export function PromoBannerManager() {
     switch (ratio) {
       case '16:9': return '1920×1080';
       case '1:1': return '1080×1080';
+      case 'full': return '1080×1920 (mobile full screen)';
       default: return '1200×400';
     }
   };
@@ -606,6 +608,7 @@ export function PromoBannerManager() {
                     <SelectItem value="4:1">4:1 Ultra Wide (1600×400)</SelectItem>
                     <SelectItem value="16:9">16:9 Video Banner (1920×1080)</SelectItem>
                     <SelectItem value="1:1">1:1 Square Banner (1080×1080)</SelectItem>
+                    <SelectItem value="full">📱 Full Screen Overlay (1080×1920)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
