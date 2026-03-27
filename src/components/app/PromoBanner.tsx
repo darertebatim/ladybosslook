@@ -453,6 +453,13 @@ export function PromoBanner({
         onClick={(e) => { e.stopPropagation(); handleDismiss(e as any, fullBanner); }}
       >
         <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+        {/* Close X button */}
+        <button
+          onClick={(e) => { e.stopPropagation(); handleDismiss(e as any, fullBanner); }}
+          className="absolute top-12 right-5 z-10 w-8 h-8 rounded-full bg-white/15 flex items-center justify-center active:scale-90 transition-transform"
+        >
+          <X className="h-5 w-5 text-white/70" />
+        </button>
         <div
           className="relative w-full max-w-md mx-auto flex flex-col items-center pb-6 px-4 animate-in slide-in-from-bottom-8 duration-500"
           onClick={(e) => e.stopPropagation()}
