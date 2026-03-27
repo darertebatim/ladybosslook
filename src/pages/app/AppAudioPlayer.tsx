@@ -693,7 +693,7 @@ export default function AppAudioPlayer() {
       <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
       {/* Main Content - Centered vertically */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-3 overflow-hidden" style={{ zIndex: 2 }}>
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-3 overflow-hidden min-h-0" style={{ zIndex: 2 }}>
         {/* Promo Banner - Overlay on player content */}
         <div className="absolute bottom-20 left-4 right-4 z-20">
           <PromoBanner 
@@ -704,9 +704,9 @@ export default function AppAudioPlayer() {
             forceShowClose
           />
         </div>
-        <div className="max-w-md w-full flex flex-col gap-3">
-          {/* Cover Art - Constrained size */}
-          <div className="w-full max-w-[220px] mx-auto rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] shrink-0">
+        <div className="max-w-md w-full flex flex-col gap-3 min-h-0 max-h-full">
+          {/* Cover Art - Constrained size, can shrink */}
+          <div className="w-full max-w-[220px] mx-auto rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] shrink min-h-0">
             {coverImageUrl ? (
               <CachedImage
                 src={coverImageUrl}
