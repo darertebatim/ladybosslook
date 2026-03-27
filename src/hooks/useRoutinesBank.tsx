@@ -675,15 +675,28 @@ export function useAddRoutineFromBank() {
           .maybeSingle();
 
         if (!existingEnrollment) {
-          // Find the active round for this program
-          const { data: activeRound } = await (supabase
-            .from('program_rounds')
-            .select('id, round_name') as any)
+          // Find the auto-enrollment round for this program (same logic as store/stripe)
+          let roundId: string | null = null;
+          const { data: autoEnroll } = await supabase
+            .from('program_auto_enrollment')
+            .select('round_id')
             .eq('program_slug', programSlug)
-            .eq('is_active', true)
-            .order('created_at', { ascending: false })
-            .limit(1)
             .maybeSingle();
+
+          if (autoEnroll?.round_id) {
+            roundId = autoEnroll.round_id;
+          } else {
+            // Fallback: find active round
+            const { data: activeRound } = await (supabase
+              .from('program_rounds')
+              .select('id') as any)
+              .eq('program_slug', programSlug)
+              .eq('is_active', true)
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .maybeSingle();
+            roundId = activeRound?.id || null;
+          }
 
           // Get program title from catalog
           const { data: programInfo } = await supabase
@@ -698,7 +711,7 @@ export function useAddRoutineFromBank() {
               user_id: user.id,
               program_slug: programSlug,
               course_name: programInfo?.title || programSlug,
-              round_id: activeRound?.id || null,
+              round_id: roundId,
               status: 'active',
             });
 
