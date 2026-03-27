@@ -3328,6 +3328,7 @@ export type Database = {
           is_free: boolean
           is_popular: boolean | null
           is_welcome_popup: boolean
+          linked_program_slug: string | null
           requires_subscription: boolean
           schedule_type: string
           sort_order: number | null
@@ -3357,6 +3358,7 @@ export type Database = {
           is_free?: boolean
           is_popular?: boolean | null
           is_welcome_popup?: boolean
+          linked_program_slug?: string | null
           requires_subscription?: boolean
           schedule_type?: string
           sort_order?: number | null
@@ -3386,6 +3388,7 @@ export type Database = {
           is_free?: boolean
           is_popular?: boolean | null
           is_welcome_popup?: boolean
+          linked_program_slug?: string | null
           requires_subscription?: boolean
           schedule_type?: string
           sort_order?: number | null
@@ -3395,7 +3398,15 @@ export type Database = {
           updated_at?: string | null
           video_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "routines_bank_linked_program_slug_fkey"
+            columns: ["linked_program_slug"]
+            isOneToOne: false
+            referencedRelation: "program_catalog"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
       routines_bank_sections: {
         Row: {
