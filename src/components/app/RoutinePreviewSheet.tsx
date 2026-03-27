@@ -490,6 +490,25 @@ export function RoutinePreviewSheet({
             </SheetHeader>
 
             <div className="flex-1 overflow-y-auto py-4 -mx-4 px-4 min-h-0">
+            {/* Program Event Card Preview */}
+            {linkedProgramTitle && linkedProgramSlug && (
+              <div className="mb-4">
+                <p className="text-xs font-medium text-muted-foreground mb-2">Added to your planner:</p>
+                <div className="pointer-events-none opacity-90">
+                  <ProgramEventCard
+                    event={{
+                      id: 'preview',
+                      type: 'enrollment',
+                      title: linkedProgramTitle,
+                      programSlug: linkedProgramSlug,
+                      programTitle: linkedProgramTitle,
+                      isCompleted: false,
+                    } as ProgramEvent}
+                    date={new Date()}
+                  />
+                </div>
+              </div>
+            )}
             {scheduleType === 'challenge' ? (
                 <>
                   {/* Pro-task at top for challenges */}
