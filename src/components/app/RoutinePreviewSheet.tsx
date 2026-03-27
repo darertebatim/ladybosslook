@@ -82,7 +82,7 @@ interface RoutinePreviewSheetProps {
   routineTitle: string;
   routineColor?: string | null;
   defaultTag?: string | null;
-  scheduleType?: 'daily' | 'weekly' | 'challenge' | 'project';
+  scheduleType?: 'daily' | 'weekly' | 'challenge' | 'project' | 'program';
   challengeStartDate?: string | null;
   startDayOfWeek?: number | null;
   endMode?: string | null;
