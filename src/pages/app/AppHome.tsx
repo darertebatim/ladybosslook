@@ -53,6 +53,7 @@ import { useKeyboard } from '@/hooks/useKeyboard';
 import coinBronze from '@/assets/coin-bronze.png';
 import coinSilver from '@/assets/coin-silver.png';
 import coinGold from '@/assets/coin-gold.png';
+import checklistEmpty from '@/assets/checklist-empty.png';
 import emptyPlannerImg from '@/assets/empty-planner.png';
 
 const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
@@ -1238,10 +1239,20 @@ const AppHome = () => {
                   <>
 
                   {filteredTasks.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-10 gap-2">
-                      <p className="text-sm text-muted-foreground">
-                        {homeView === 'one-time' ? 'No one-time tasks yet' : 'Nothing here yet — add your first task!'}
-                      </p>
+                    <div className="flex flex-col items-center justify-center py-10 gap-3">
+                      {homeView === 'one-time' && (
+                        <img src={checklistEmpty} alt="Checklist" loading="lazy" width={120} height={120} className="opacity-90" />
+                      )}
+                      <div className="text-center px-4">
+                        <p className="text-sm font-medium text-foreground">
+                          {homeView === 'one-time' ? "Your daily checklist" : 'Nothing here yet — add your first task!'}
+                        </p>
+                        {homeView === 'one-time' && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Add things you need to get done today
+                          </p>
+                        )}
+                      </div>
                       {homeView === 'one-time' ? (
                         <>
                           <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} defaultRepeatOverride="No" />
