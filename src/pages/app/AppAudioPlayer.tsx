@@ -759,8 +759,9 @@ export default function AppAudioPlayer() {
 
 
 
-          {/* Up Next Preview */}
-          {nextTrack && (
+          {/* Up Next Preview - fixed height to prevent layout shift */}
+          <div className="min-h-[88px]">
+            {nextTrack && (
               <button
                 onClick={() => navigate(`/app/player/${nextTrack.id}`)}
                 className={cn(
@@ -793,7 +794,8 @@ export default function AppAudioPlayer() {
                   <Play className="h-4 w-4 text-white/50" />
                 </div>
               </button>
-          )}
+            )}
+          </div>
           
           {/* Bottom safe area padding */}
           <div className="pb-safe" />
