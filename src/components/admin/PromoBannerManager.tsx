@@ -338,6 +338,8 @@ export function PromoBannerManager() {
         exclude_playlists: excludePlaylists,
         include_tools: includeTools,
         exclude_tools: excludeTools,
+        target_languages: targetLanguages,
+        target_timezones: targetTimezones,
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
@@ -383,6 +385,8 @@ export function PromoBannerManager() {
         exclude_playlists: excludePlaylists,
         include_tools: includeTools,
         exclude_tools: excludeTools,
+        target_languages: targetLanguages,
+        target_timezones: targetTimezones,
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
@@ -453,6 +457,8 @@ export function PromoBannerManager() {
     setExcludePlaylists([]);
     setIncludeTools([]);
     setExcludeTools([]);
+    setTargetLanguages([]);
+    setTargetTimezones([]);
     // Reset location
     setDisplayLocations(['home_top']);
     setTargetPlaylistIds([]);
@@ -481,6 +487,8 @@ export function PromoBannerManager() {
     setExcludePlaylists(banner.exclude_playlists || []);
     setIncludeTools(banner.include_tools || []);
     setExcludeTools(banner.exclude_tools || []);
+    setTargetLanguages((banner as any).target_languages || []);
+    setTargetTimezones((banner as any).target_timezones || []);
     // Load location
     setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
     setTargetPlaylistIds(banner.target_playlist_ids || []);
@@ -1027,6 +1035,10 @@ export function PromoBannerManager() {
                 setIncludeTools={setIncludeTools}
                 excludeTools={excludeTools}
                 setExcludeTools={setExcludeTools}
+                targetLanguages={targetLanguages}
+                setTargetLanguages={setTargetLanguages}
+                targetTimezones={targetTimezones}
+                setTargetTimezones={setTargetTimezones}
               />
 
               {/* Active Toggle */}
