@@ -493,6 +493,8 @@ const AppTaskCreate = ({
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
   const [audioSearchQuery, setAudioSearchQuery] = useState('');
   const [channelSearchQuery, setChannelSearchQuery] = useState('');
+  const [videoSearchQuery, setVideoSearchQuery] = useState('');
+  const [videoPlaylistSearchQuery, setVideoPlaylistSearchQuery] = useState('');
   
   // Refs for inputs to scroll into view
   const newSubtaskInputRef = useRef<HTMLInputElement>(null);
@@ -611,6 +613,33 @@ const AppTaskCreate = ({
       
       if (error) throw error;
       return data as { id: string; name: string; slug: string; cover_image_url: string | null; type: string }[];
+    },
+  });
+
+  // Fetch video content for linking
+  const { data: videoTracks = [] } = useQuery({
+    queryKey: ['linkable-video-tracks'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('video_content')
+        .select('id, title, thumbnail_url, video_type, duration_seconds')
+        .order('title', { ascending: true });
+      if (error) throw error;
+      return data as { id: string; title: string; thumbnail_url: string | null; video_type: string; duration_seconds: number }[];
+    },
+  });
+
+  // Fetch video playlists for linking
+  const { data: videoPlaylists = [] } = useQuery({
+    queryKey: ['linkable-video-playlists'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('video_playlists')
+        .select('id, name, cover_image_url, category')
+        .eq('is_hidden', false)
+        .order('sort_order', { ascending: true });
+      if (error) throw error;
+      return data as { id: string; name: string; cover_image_url: string | null; category: string | null }[];
     },
   });
 
