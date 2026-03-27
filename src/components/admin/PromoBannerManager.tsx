@@ -315,7 +315,7 @@ export function PromoBannerManager() {
   // Create banner mutation
   const createMutation = useMutation({
     mutationFn: async () => {
-      const needsDestinationId = ['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType);
+      const needsDestinationId = ['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist', 'audio_track', 'video_track'].includes(destinationType);
       const needsCustomUrl = ['custom_url', 'external_url'].includes(destinationType);
       if (needsDestinationId && !destinationId) {
         throw new Error(`Please select a ${destinationType.replace('_', ' ')} before saving`);
@@ -362,7 +362,7 @@ export function PromoBannerManager() {
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!editingBanner) return;
-      const needsDestinationId = ['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType);
+      const needsDestinationId = ['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist', 'audio_track', 'video_track'].includes(destinationType);
       const needsCustomUrl = ['custom_url', 'external_url'].includes(destinationType);
       if (needsDestinationId && !destinationId) {
         throw new Error(`Please select a ${destinationType.replace('_', ' ')} before saving`);
