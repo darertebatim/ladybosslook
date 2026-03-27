@@ -759,12 +759,8 @@ export default function AppAudioPlayer() {
 
 
 
-          {/* Up Next Preview - hidden when audio-targeted banner is showing */}
+          {/* Up Next Preview */}
           {nextTrack && (
-            <PromoBannerGatedUpNext
-              audioId={audio?.id}
-              playlistId={playlistInfo?.playlist_id || contextPlaylistId || undefined}
-            >
               <button
                 onClick={() => navigate(`/app/player/${nextTrack.id}`)}
                 className={cn(
@@ -797,7 +793,6 @@ export default function AppAudioPlayer() {
                   <Play className="h-4 w-4 text-white/50" />
                 </div>
               </button>
-            </PromoBannerGatedUpNext>
           )}
           
           {/* Bottom safe area padding */}
