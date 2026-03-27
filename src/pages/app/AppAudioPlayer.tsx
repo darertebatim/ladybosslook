@@ -704,9 +704,9 @@ export default function AppAudioPlayer() {
             forceShowClose
           />
         </div>
-        <div className="max-w-md w-full flex flex-col gap-3">
-          {/* Cover Art - Constrained size */}
-          <div className="w-full max-w-[220px] mx-auto rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] shrink-0">
+        <div className="max-w-md w-full flex flex-col gap-3 min-h-0 max-h-full">
+          {/* Cover Art - Constrained size, can shrink */}
+          <div className="w-full max-w-[220px] mx-auto rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] shrink min-h-0">
             {coverImageUrl ? (
               <CachedImage
                 src={coverImageUrl}
