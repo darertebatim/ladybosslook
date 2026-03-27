@@ -730,6 +730,8 @@ export default function AppInspireDetail() {
           isSaving={addRoutineFromBank.isPending}
           isFree={(routine as any).is_free ?? false}
           routineBankId={planId || null}
+          linkedProgramTitle={(routine as any).linkedProgram?.title || null}
+          linkedProgramSlug={(routine as any).linked_program_slug || null}
         />
       )}
     </div>
