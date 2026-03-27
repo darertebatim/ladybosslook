@@ -1616,80 +1616,81 @@ export default function RoutinesBank() {
 
                     {/* Start Mode Selector */}
                     {formData.schedule_type !== 'program' && (
-                      <Label className="text-xs">When does it start?</Label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {[
-                          { value: 'none', label: 'Immediately', desc: 'Starts today' },
-                          { value: 'date', label: 'Specific date', desc: 'Pick a date' },
-                          { value: 'weekday', label: 'Day of week', desc: 'e.g. Next Monday' },
-                        ].map(opt => (
-                          <button
-                            key={opt.value}
-                            type="button"
-                            onClick={() => setFormData({ ...formData, start_mode: opt.value as any })}
-                            className={cn(
-                              "flex flex-col items-center gap-0.5 p-2 rounded-lg border-2 text-center transition-all",
-                              formData.start_mode === opt.value
-                                ? "border-primary bg-primary/5"
-                                : "border-border hover:border-muted-foreground/30"
-                            )}
-                          >
-                            <span className="text-xs font-medium">{opt.label}</span>
-                            <span className="text-[10px] text-muted-foreground leading-tight">{opt.desc}</span>
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* Date picker */}
-                      {formData.start_mode === 'date' && (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !formData.challenge_start_date && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {formData.challenge_start_date
-                                ? format(formData.challenge_start_date, 'PPP')
-                                : <span>Pick a start date</span>}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <CalendarComponent
-                              mode="single"
-                              selected={formData.challenge_start_date || undefined}
-                              onSelect={(date) => setFormData({ ...formData, challenge_start_date: date || null })}
-                              className={cn("p-3 pointer-events-auto")}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      )}
-
-                      {/* Weekday picker */}
-                      {formData.start_mode === 'weekday' && (
-                        <div className="flex gap-1.5 justify-center">
-                          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
+                      <div className="mt-3 space-y-2">
+                        <Label className="text-xs">When does it start?</Label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            { value: 'none', label: 'Immediately', desc: 'Starts today' },
+                            { value: 'date', label: 'Specific date', desc: 'Pick a date' },
+                            { value: 'weekday', label: 'Day of week', desc: 'e.g. Next Monday' },
+                          ].map(opt => (
                             <button
-                              key={day}
+                              key={opt.value}
                               type="button"
-                              onClick={() => setFormData({ ...formData, start_day_of_week: idx })}
+                              onClick={() => setFormData({ ...formData, start_mode: opt.value as any })}
                               className={cn(
-                                "w-9 h-9 rounded-full text-xs font-medium transition-all",
-                                formData.start_day_of_week === idx
-                                  ? "bg-primary text-primary-foreground"
-                                  : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                                "flex flex-col items-center gap-0.5 p-2 rounded-lg border-2 text-center transition-all",
+                                formData.start_mode === opt.value
+                                  ? "border-primary bg-primary/5"
+                                  : "border-border hover:border-muted-foreground/30"
                               )}
                             >
-                              {day}
+                              <span className="text-xs font-medium">{opt.label}</span>
+                              <span className="text-[10px] text-muted-foreground leading-tight">{opt.desc}</span>
                             </button>
                           ))}
                         </div>
-                      )}
-                    </div>
-                  </div>
+
+                        {/* Date picker */}
+                        {formData.start_mode === 'date' && (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !formData.challenge_start_date && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {formData.challenge_start_date
+                                  ? format(formData.challenge_start_date, 'PPP')
+                                  : <span>Pick a start date</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <CalendarComponent
+                                mode="single"
+                                selected={formData.challenge_start_date || undefined}
+                                onSelect={(date) => setFormData({ ...formData, challenge_start_date: date || null })}
+                                className={cn("p-3 pointer-events-auto")}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        )}
+
+                        {/* Weekday picker */}
+                        {formData.start_mode === 'weekday' && (
+                          <div className="flex gap-1.5 justify-center">
+                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
+                              <button
+                                key={day}
+                                type="button"
+                                onClick={() => setFormData({ ...formData, start_day_of_week: idx })}
+                                className={cn(
+                                  "w-9 h-9 rounded-full text-xs font-medium transition-all",
+                                  formData.start_day_of_week === idx
+                                    ? "bg-primary text-primary-foreground"
+                                    : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                                )}
+                              >
+                                {day}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                   {/* End Mode Selector */}
                   <div className="space-y-2 border-t pt-4">
