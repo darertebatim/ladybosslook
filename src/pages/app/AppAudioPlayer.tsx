@@ -142,7 +142,11 @@ export default function AppAudioPlayer() {
         .order('sort_order', { ascending: true });
       
       if (error) throw error;
-      return data;
+      // Sort by sort_order, then by title as fallback (matches playlist detail page)
+      return (data || []).sort((a, b) => {
+        if (a.sort_order !== b.sort_order) return a.sort_order - b.sort_order;
+        return (a.audio_content?.title || '').localeCompare(b.audio_content?.title || '');
+      });
     },
     enabled: !!playlistInfo?.playlist_id && !isModuleMode,
   });
