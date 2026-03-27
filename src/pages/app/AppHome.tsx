@@ -109,6 +109,9 @@ const AppHome = () => {
   const { isKeyboardOpen } = useKeyboard();
   const { currentTrack } = useAudioPlayer();
   const hasMiniPlayer = !!currentTrack;
+  let hasRoutineMini = false;
+  try { const rp = useRoutinePlayerContext(); hasRoutineMini = rp.isActive && rp.isMinimized; } catch { /* */ }
+  const activeMiniPlayerCount = (hasMiniPlayer ? 1 : 0) + (hasRoutineMini ? 1 : 0);
   
   const [goalInputTask, setGoalInputTask] = useState<UserTask | null>(null);
   const addGoalProgress = useAddGoalProgress();
