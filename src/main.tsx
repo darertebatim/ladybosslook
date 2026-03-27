@@ -68,6 +68,15 @@ async function initializeNative() {
   } catch (e) {
     console.warn('[Main] AppsFlyer init failed:', e);
   }
+
+  // Pre-warm native audio plugin so first play is instant
+  try {
+    const { nativeAudioWarmUp } = await import('./lib/nativeAudioControls');
+    await nativeAudioWarmUp();
+    console.log('[Main] ✓ Native audio pre-warmed');
+  } catch (e) {
+    console.warn('[Main] Native audio warm-up failed:', e);
+  }
 }
 
 // Initialize native features (non-blocking)

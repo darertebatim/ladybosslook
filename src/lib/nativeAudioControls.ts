@@ -194,6 +194,24 @@ export async function nativeAudioDestroy(): Promise<void> {
   }
 }
 
+/**
+ * Pre-warm the native audio plugin on app start.
+ * Creates and immediately destroys a silent instance so the native
+ * audio session is initialized before the user taps play.
+ */
+export async function nativeAudioWarmUp(): Promise<void> {
+  if (!Capacitor.isNativePlatform()) return;
+  try {
+    if (!plugin) {
+      const mod = await import('@mediagrid/capacitor-native-audio');
+      plugin = mod.AudioPlayer;
+    }
+    console.log('[NativeAudio] ✓ Plugin pre-warmed');
+  } catch (e) {
+    console.warn('[NativeAudio] Warm-up failed:', e);
+  }
+}
+
 export async function nativeAudioChangeMetadata(opts: {
   title: string;
   artist?: string;

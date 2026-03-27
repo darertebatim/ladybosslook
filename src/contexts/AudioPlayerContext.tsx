@@ -48,6 +48,7 @@ interface AudioPlayerContextType {
   playbackRate: number;
   currentTrack: TrackInfo | null;
   isLoading: boolean;
+  isBuffering: boolean;
   nextTrack: TrackInfo | null;
   hasNextTrack: boolean;
   
