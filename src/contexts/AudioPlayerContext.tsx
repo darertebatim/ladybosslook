@@ -544,6 +544,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         playbackRate,
         currentTrack,
         isLoading,
+        isBuffering,
         nextTrack,
         hasNextTrack,
         playTrack,
