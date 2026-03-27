@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Capacitor } from "@capacitor/core";
 import { format } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAutoCompleteProTask } from "@/hooks/useAutoCompleteProTask";
 
 
 export interface TrackInfo {
