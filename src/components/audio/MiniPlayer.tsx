@@ -2,6 +2,7 @@ import { Play, Pause, Headphones, X } from "lucide-react";
 import { CachedImage } from '@/components/ui/CachedImage';
 import { useNavigate } from "react-router-dom";
 import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
+import { useRoutinePlayerContext } from "@/components/app/RoutinePlayerProvider";
 import { cn } from "@/lib/utils";
 
 const formatDuration = (seconds: number): string => {
@@ -20,6 +21,12 @@ export const MiniPlayer = () => {
     resume, 
     stop,
   } = useAudioPlayer();
+
+  let routineMinimized = false;
+  try {
+    const rp = useRoutinePlayerContext();
+    routineMinimized = rp.isActive && rp.isMinimized;
+  } catch { /* provider not available */ }
 
   if (!currentTrack) return null;
 
@@ -40,7 +47,10 @@ export const MiniPlayer = () => {
   return (
     <div 
       className={cn(
-        "fixed bottom-[calc(64px+env(safe-area-inset-bottom))] left-2 right-2 z-40",
+        "fixed left-2 right-2 z-40",
+        routineMinimized
+          ? "bottom-[calc(64px+env(safe-area-inset-bottom)+60px)]"
+          : "bottom-[calc(64px+env(safe-area-inset-bottom))]",
         "rounded-xl overflow-hidden cursor-pointer",
         "animate-in slide-in-from-bottom-4 duration-300",
         "bg-card/95 backdrop-blur-lg",
