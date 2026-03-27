@@ -2538,56 +2538,108 @@ const AppTaskCreate = ({
 
       {/* Video Picker Sheet */}
       <Sheet open={showVideoPicker} onOpenChange={setShowVideoPicker}>
-        <SheetContent side="bottom" className="h-[60vh] rounded-t-3xl">
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
           <SheetHeader className="flex-row items-center gap-2">
-            <button onClick={() => { setShowVideoPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+            <button onClick={() => { setShowVideoPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Link Video</SheetTitle>
+            <SheetTitle>Select Video</SheetTitle>
           </SheetHeader>
-          <div className="p-4 space-y-4">
-            <p className="text-sm text-muted-foreground">Enter the video ID to link to this task.</p>
+          <div className="p-4 space-y-3">
             <Input
-              value={proLinkValue || ''}
-              onChange={(e) => setProLinkValue(e.target.value || null)}
-              placeholder="Video ID"
-              autoFocus
+              value={videoSearchQuery}
+              onChange={(e) => setVideoSearchQuery(e.target.value)}
+              placeholder="Search videos..."
+              className="mb-2"
             />
-            <Button
-              onClick={() => setShowVideoPicker(false)}
-              className="w-full rounded-xl"
-              disabled={!proLinkValue}
-            >
-              Done
-            </Button>
+            <ScrollArea className="h-[45vh]">
+              <div className="space-y-2 pr-4">
+                {videoTracks
+                  .filter(v => v.title.toLowerCase().includes(videoSearchQuery.toLowerCase()))
+                  .map((video) => (
+                  <button
+                    key={video.id}
+                    onClick={() => {
+                      setProLinkType('video');
+                      setProLinkValue(video.id);
+                      setShowVideoPicker(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
+                      proLinkValue === video.id && 'bg-primary/10 ring-1 ring-primary/30'
+                    )}
+                  >
+                    {video.thumbnail_url ? (
+                      <img src={video.thumbnail_url} alt="" className="w-14 h-10 rounded-lg object-cover" />
+                    ) : (
+                      <div className="w-14 h-10 rounded-lg bg-gradient-to-br from-rose-100 to-pink-100 dark:from-rose-900/40 dark:to-pink-900/40 flex items-center justify-center">
+                        <Video className="h-5 w-5 text-rose-600 dark:text-rose-400" />
+                      </div>
+                    )}
+                    <div className="flex-1 text-left">
+                      <p className="font-medium truncate">{video.title}</p>
+                      <p className="text-xs text-muted-foreground capitalize">
+                        {video.video_type} • {Math.floor(video.duration_seconds / 60)}min
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
           </div>
         </SheetContent>
       </Sheet>
 
       {/* Video Playlist Picker Sheet */}
       <Sheet open={showVideoPlaylistPicker} onOpenChange={setShowVideoPlaylistPicker}>
-        <SheetContent side="bottom" className="h-[60vh] rounded-t-3xl">
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
           <SheetHeader className="flex-row items-center gap-2">
-            <button onClick={() => { setShowVideoPlaylistPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+            <button onClick={() => { setShowVideoPlaylistPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Link Video Playlist</SheetTitle>
+            <SheetTitle>Select Video Playlist</SheetTitle>
           </SheetHeader>
-          <div className="p-4 space-y-4">
-            <p className="text-sm text-muted-foreground">Enter the video playlist ID to link to this task.</p>
+          <div className="p-4 space-y-3">
             <Input
-              value={proLinkValue || ''}
-              onChange={(e) => setProLinkValue(e.target.value || null)}
-              placeholder="Video Playlist ID"
-              autoFocus
+              value={videoPlaylistSearchQuery}
+              onChange={(e) => setVideoPlaylistSearchQuery(e.target.value)}
+              placeholder="Search video playlists..."
+              className="mb-2"
             />
-            <Button
-              onClick={() => setShowVideoPlaylistPicker(false)}
-              className="w-full rounded-xl"
-              disabled={!proLinkValue}
-            >
-              Done
-            </Button>
+            <ScrollArea className="h-[45vh]">
+              <div className="space-y-2 pr-4">
+                {videoPlaylists
+                  .filter(vp => vp.name.toLowerCase().includes(videoPlaylistSearchQuery.toLowerCase()))
+                  .map((playlist) => (
+                  <button
+                    key={playlist.id}
+                    onClick={() => {
+                      setProLinkType('video_playlist');
+                      setProLinkValue(playlist.id);
+                      setShowVideoPlaylistPicker(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
+                      proLinkValue === playlist.id && 'bg-primary/10 ring-1 ring-primary/30'
+                    )}
+                  >
+                    {playlist.cover_image_url ? (
+                      <img src={playlist.cover_image_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-rose-100 to-pink-100 dark:from-rose-900/40 dark:to-pink-900/40 flex items-center justify-center">
+                        <Clapperboard className="h-5 w-5 text-rose-600 dark:text-rose-400" />
+                      </div>
+                    )}
+                    <div className="flex-1 text-left">
+                      <p className="font-medium truncate">{playlist.name}</p>
+                      {playlist.category && (
+                        <p className="text-xs text-muted-foreground capitalize">{playlist.category}</p>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
           </div>
         </SheetContent>
       </Sheet>
