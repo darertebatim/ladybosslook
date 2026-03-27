@@ -21,6 +21,8 @@ import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider'
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { useRoutineFavorites, useToggleRoutineFavorite } from '@/hooks/useRoutineFavorites';
+import { ProgramEventCard } from '@/components/app/ProgramEventCard';
+import { type ProgramEvent } from '@/hooks/usePlannerProgramEvents';
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400 to-amber-600',
