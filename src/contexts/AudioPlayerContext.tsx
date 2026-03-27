@@ -60,6 +60,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { autoComplete: autoCompleteProTask, autoCompletePlaylist } = useAutoCompleteProTask();
   const saveProgressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastTimeUpdateRef = useRef<number>(0);
   const onTrackCompleteRef = useRef<(() => void) | null>(null);
