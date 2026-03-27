@@ -1558,7 +1558,11 @@ const AppHome = () => {
         {/* FAB */}
         {!isKeyboardOpen && (
           <button onClick={handleFabClick} className="tour-add-task fixed right-4 w-14 h-14 rounded-full bg-urgency text-urgency-foreground shadow-cta flex items-center justify-center hover:bg-urgency-dark active:scale-95 transition-all z-50" style={{
-          bottom: hasMiniPlayer ? 'calc(136px + env(safe-area-inset-bottom))' : 'calc(72px + env(safe-area-inset-bottom))'
+          bottom: activeMiniPlayerCount >= 2
+            ? 'calc(196px + env(safe-area-inset-bottom))'
+            : activeMiniPlayerCount === 1
+              ? 'calc(136px + env(safe-area-inset-bottom))'
+              : 'calc(72px + env(safe-area-inset-bottom))'
         }}>
             <Plus className="h-6 w-6" />
           </button>
