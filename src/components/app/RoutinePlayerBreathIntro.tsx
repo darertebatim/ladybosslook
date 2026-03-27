@@ -12,7 +12,7 @@ interface RoutinePlayerBreathIntroProps {
 
 const PHASES = ['Inhale', 'Hold', 'Exhale'] as const;
 const PHASE_DURATIONS = [4, 2, 4]; // seconds
-const TOTAL_CYCLES = 3;
+const TOTAL_CYCLES = 1;
 
 export function RoutinePlayerBreathIntro({
   routineTitle,

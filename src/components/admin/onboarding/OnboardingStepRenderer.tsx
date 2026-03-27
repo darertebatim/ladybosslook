@@ -1219,7 +1219,7 @@ function BreathingScreen({ step, onNext }: Props) {
   const [cycles, setCycles] = useState(0);
 
   useEffect(() => {
-    if (cycles >= 3) { onNext(); return; }
+    if (cycles >= 1) { onNext(); return; }
     
     const timer = setInterval(() => {
       setCount(prev => {
@@ -2114,7 +2114,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
   const [isCountingDown, setIsCountingDown] = useState(true);
   const [countdownProgress, setCountdownProgress] = useState(0);
   const [phaseSecondsLeft, setPhaseSecondsLeft] = useState(0);
-  const totalCycles = 3;
+  const totalCycles = 1;
 
   // Pattern: 4-4-4 (inhale 4s, hold 4s, exhale 4s, no exhale hold)
   const pattern = { inhale: 4, inhaleHold: 4, exhale: 4, exhaleHold: 0 };
