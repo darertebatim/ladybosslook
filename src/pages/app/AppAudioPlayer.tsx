@@ -52,6 +52,7 @@ export default function AppAudioPlayer() {
     playbackRate,
     currentTrack,
     isLoading: audioLoading,
+    isBuffering,
     nextTrack,
     hasNextTrack,
     playTrack,
@@ -752,6 +753,7 @@ export default function AppAudioPlayer() {
           <div className="shrink-0">
             <AudioControls
               isPlaying={isPlaying}
+              isBuffering={isBuffering}
               onPlayPause={handlePlayPause}
               onSkipBack={handleSkipBack}
               onSkipForward={handleSkipForward}
