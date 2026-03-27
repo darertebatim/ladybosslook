@@ -693,7 +693,7 @@ export default function AppAudioPlayer() {
       <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
       {/* Main Content - Centered vertically */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-3 overflow-hidden" style={{ zIndex: 2 }}>
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-3 overflow-hidden min-h-0" style={{ zIndex: 2 }}>
         {/* Promo Banner - Overlay on player content */}
         <div className="absolute bottom-20 left-4 right-4 z-20">
           <PromoBanner 
