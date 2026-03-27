@@ -1265,8 +1265,8 @@ export default function RoutinesBank() {
                                 <>
                                   <span>•</span>
                                   <span className="flex items-center gap-1">
-                                    {routine.schedule_type === 'weekly' ? <Calendar className="h-3 w-3" /> : routine.schedule_type === 'project' ? '🎯' : <Flame className="h-3 w-3" />}
-                                    {routine.schedule_type === 'weekly' ? 'Weekly' : routine.schedule_type === 'project' ? 'Project' : 'Challenge'}
+                                    {routine.schedule_type === 'weekly' ? <Calendar className="h-3 w-3" /> : routine.schedule_type === 'project' ? '🎯' : routine.schedule_type === 'program' ? '🎓' : <Flame className="h-3 w-3" />}
+                                    {routine.schedule_type === 'weekly' ? 'Weekly' : routine.schedule_type === 'project' ? 'Project' : routine.schedule_type === 'program' ? 'Program' : 'Challenge'}
                                   </span>
                                 </>
                               )}
@@ -1591,8 +1591,31 @@ export default function RoutinesBank() {
                       ))}
                     </div>
 
+                    {/* Program Selector (only for program type) */}
+                    {formData.schedule_type === 'program' && (
+                      <div className="mt-3 space-y-2 border rounded-lg p-3 bg-muted/30">
+                        <Label className="text-xs flex items-center gap-1.5">🎓 Linked Program</Label>
+                        <Select
+                          value={formData.linked_program_slug || ''}
+                          onValueChange={(val) => setFormData({ ...formData, linked_program_slug: val || null })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a program..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {programCatalog.map(p => (
+                              <SelectItem key={p.slug} value={p.slug}>
+                                {p.title}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-[10px] text-muted-foreground">Users will be auto-enrolled in this program (and its active round) when they add this routine.</p>
+                      </div>
+                    )}
+
                     {/* Start Mode Selector */}
-                    <div className="mt-3 space-y-2">
+                    {formData.schedule_type !== 'program' && (
                       <Label className="text-xs">When does it start?</Label>
                       <div className="grid grid-cols-3 gap-2">
                         {[
