@@ -15,7 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
 import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 
-type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'mood' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist' | 'routine_player';
+type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'mood' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist' | 'routine_player' | 'audio_track' | 'video_track';
 type DisplayFrequency = 'once' | 'daily' | 'weekly' | 'forever';
 type AspectRatio = '3:1' | '4:1' | '16:9' | '1:1';
 type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch' | 'video_player' | 'routines_top' | 'routines_after_categories' | 'routine_player';
@@ -899,12 +899,14 @@ export function PromoBannerManager() {
                     <SelectItem value="watch">📺 Watch Page</SelectItem>
                     <SelectItem value="video_playlist">🎬 Video Playlist (specific)</SelectItem>
                     <SelectItem value="routine_player">🎬 Routine Player</SelectItem>
+                    <SelectItem value="audio_track">🎵 Audio Track (specific)</SelectItem>
+                    <SelectItem value="video_track">📹 Video Track (specific)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Destination ID - for types that need specific selection */}
-              {['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist'].includes(destinationType) && (
+              {['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist', 'audio_track', 'video_track'].includes(destinationType) && (
                 <div className="space-y-2">
                   <Label>
                     {destinationType === 'routines_hub' && 'Select Routine'}
@@ -914,6 +916,8 @@ export function PromoBannerManager() {
                     {destinationType === 'breathe_exercise' && 'Select Breathing Exercise'}
                     {destinationType === 'onboarding' && 'Select Onboarding Flow'}
                     {destinationType === 'video_playlist' && 'Select Video Playlist'}
+                    {destinationType === 'audio_track' && 'Select Audio Track'}
+                    {destinationType === 'video_track' && 'Select Video Track'}
                   </Label>
                   <Select value={destinationId} onValueChange={setDestinationId}>
                     <SelectTrigger>
@@ -940,6 +944,12 @@ export function PromoBannerManager() {
                       ))}
                       {destinationType === 'video_playlist' && videoPlaylists?.map(p => (
                         <SelectItem key={p.id} value={p.id}>🎬 {p.name}</SelectItem>
+                      ))}
+                      {destinationType === 'audio_track' && audioTracks?.map(a => (
+                        <SelectItem key={a.id} value={a.id}>🎵 {a.title}</SelectItem>
+                      ))}
+                      {destinationType === 'video_track' && videoTracks?.map(v => (
+                        <SelectItem key={v.id} value={v.id}>📹 {v.title}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
