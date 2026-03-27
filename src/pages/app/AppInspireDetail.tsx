@@ -21,6 +21,8 @@ import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider'
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { useRoutineFavorites, useToggleRoutineFavorite } from '@/hooks/useRoutineFavorites';
+import { ProgramEventCard } from '@/components/app/ProgramEventCard';
+import { type ProgramEvent } from '@/hooks/usePlannerProgramEvents';
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400 to-amber-600',
@@ -110,6 +112,7 @@ export default function AppInspireDetail() {
   
   const isChallenge = (routine as any)?.schedule_type === 'challenge';
   const isProject = (routine as any)?.schedule_type === 'project';
+  const isProgram = (routine as any)?.schedule_type === 'program';
   const isFocus = (routine as any)?.is_focus === true;
   const userChallenge = useMemo(() => {
     if (!planId || !isChallenge) return null;
@@ -364,6 +367,11 @@ export default function AppInspireDetail() {
                   🔥 Challenge
                 </span>
               )}
+              {isProgram && (
+                <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
+                  🎓 Program
+                </span>
+              )}
               {routine.category && (
                 <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-muted text-muted-foreground">
                   {categories.find(c => c.slug === routine.category)?.name || routine.category}
@@ -376,7 +384,18 @@ export default function AppInspireDetail() {
               )}
             </div>
 
-            {/* Start/End + Badge row */}
+            {/* Program enrollment banner */}
+            {isProgram && (routine as any).linkedProgram && (
+              <div className="mt-4 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border bg-[#FFF492]/40 border-[#E8D86A] dark:bg-yellow-950/30 dark:border-yellow-800">
+                <span className="text-lg">🎓</span>
+                <span className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
+                  Enrolls you in: {(routine as any).linkedProgram.title}
+                </span>
+              </div>
+            )}
+
+            {/* Start/End + Badge row — hidden for program routines */}
+            {!isProgram && (
             <div className={cn("mt-4 flex gap-3", (routine as any).badge_image_url ? "" : "")}>
               {/* Left: Start & End banners */}
               <div className={cn("flex flex-col gap-2", (routine as any).badge_image_url ? "flex-1" : "w-full")}>
@@ -421,7 +440,28 @@ export default function AppInspireDetail() {
                 </div>
               )}
             </div>
+            )}
           </div>
+
+          {/* Program Event Card Preview */}
+          {isProgram && (routine as any).linkedProgram && (
+            <div className="mt-5">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Added to your planner:</p>
+              <div className="pointer-events-none opacity-90">
+                <ProgramEventCard
+                  event={{
+                    id: 'preview',
+                    type: 'enrollment',
+                    title: (routine as any).linkedProgram.title,
+                    programSlug: (routine as any).linked_program_slug || '',
+                    programTitle: (routine as any).linkedProgram.title,
+                    isCompleted: false,
+                  } as ProgramEvent}
+                  date={new Date()}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Description — rendered as rich HTML */}
           {routine.description && (

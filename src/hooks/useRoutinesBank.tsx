@@ -307,11 +307,25 @@ export function useRoutineBankDetail(routineId: string | undefined) {
         goal_unit: task.task_id ? taskDetails[task.task_id]?.goal_unit : null,
       }));
 
+      // Fetch linked program info if this is a program routine
+      let linkedProgram: { title: string; cover_image_url: string | null } | null = null;
+      if ((routine as any).linked_program_slug) {
+        const { data: programData } = await supabase
+          .from('program_catalog')
+          .select('title, cover_image_url')
+          .eq('slug', (routine as any).linked_program_slug)
+          .single();
+        if (programData) {
+          linkedProgram = programData;
+        }
+      }
+
       return {
         ...routine,
         sections: sections || [],
         tasks: enrichedTasks || [],
-      } as RoutineBankWithDetails;
+        linkedProgram,
+      } as RoutineBankWithDetails & { linkedProgram: { title: string; cover_image_url: string | null } | null };
     },
     enabled: !!routineId,
   });
