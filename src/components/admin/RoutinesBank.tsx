@@ -193,7 +193,7 @@ export default function RoutinesBank() {
     category: 'general',
     color: 'yellow',
     emoji: '✨',
-    schedule_type: 'daily' as 'daily' | 'challenge' | 'project',
+    schedule_type: 'daily' as 'daily' | 'challenge' | 'project' | 'program',
     challenge_start_date: null as Date | null,
     start_day_of_week: null as number | null,
     start_mode: 'none' as 'none' | 'date' | 'weekday',
@@ -202,6 +202,7 @@ export default function RoutinesBank() {
     end_after_days: null as number | null,
     badge_image_url: '',
     is_focus: false,
+    linked_program_slug: null as string | null,
   });
   const [localSections, setLocalSections] = useState<LocalSection[]>([]);
   const [localTasks, setLocalTasks] = useState<LocalTask[]>([]);
@@ -291,7 +292,8 @@ export default function RoutinesBank() {
            end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
            badge_image_url: data.formData.badge_image_url || null,
            is_focus: data.formData.is_focus,
-        })
+           linked_program_slug: data.formData.schedule_type === 'program' ? data.formData.linked_program_slug : null,
+        } as any)
         .select()
         .single();
       if (error) throw error;
@@ -370,7 +372,8 @@ export default function RoutinesBank() {
            end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
            badge_image_url: data.formData.badge_image_url || null,
            is_focus: data.formData.is_focus,
-        })
+           linked_program_slug: data.formData.schedule_type === 'program' ? data.formData.linked_program_slug : null,
+        } as any)
         .eq('id', data.id);
       if (error) throw error;
 
@@ -587,7 +590,7 @@ export default function RoutinesBank() {
       category: 'general',
       color: 'yellow',
       emoji: '✨',
-      schedule_type: 'daily' as 'daily' | 'challenge' | 'project',
+      schedule_type: 'daily' as 'daily' | 'challenge' | 'project' | 'program',
       challenge_start_date: null,
       start_day_of_week: null,
       start_mode: 'none',
@@ -596,6 +599,7 @@ export default function RoutinesBank() {
       end_after_days: null,
       badge_image_url: '',
       is_focus: false,
+      linked_program_slug: null,
     });
     setLocalSections([]);
     setLocalTasks([]);
@@ -615,7 +619,7 @@ export default function RoutinesBank() {
       category: routine.category,
       color: routine.color,
       emoji: routine.emoji,
-      schedule_type: (['challenge', 'project'].includes(routine.schedule_type) ? routine.schedule_type : 'daily') as 'daily' | 'challenge' | 'project',
+      schedule_type: (['challenge', 'project', 'program'].includes(routine.schedule_type) ? routine.schedule_type : 'daily') as 'daily' | 'challenge' | 'project' | 'program',
       challenge_start_date: (routine as any).challenge_start_date ? new Date((routine as any).challenge_start_date) : null,
       start_day_of_week: (routine as any).start_day_of_week ?? null,
       start_mode: (routine as any).start_day_of_week != null ? 'weekday' : ((routine as any).challenge_start_date ? 'date' : 'none'),
@@ -624,6 +628,7 @@ export default function RoutinesBank() {
       end_after_days: (routine as any).end_after_days ?? null,
       badge_image_url: (routine as any).badge_image_url || '',
       is_focus: (routine as any).is_focus ?? false,
+      linked_program_slug: (routine as any).linked_program_slug ?? null,
     });
     const { sections, tasks } = await fetchRoutineData(routine.id);
     setLocalSections(sections);
@@ -1037,6 +1042,8 @@ export default function RoutinesBank() {
     ? routines.filter(r => r.schedule_type === 'challenge')
     : selectedCategory === 'projects'
     ? routines.filter(r => r.schedule_type === 'project')
+    : selectedCategory === 'programs'
+    ? routines.filter(r => r.schedule_type === 'program')
     : routines.filter(r => r.category === selectedCategory);
 
   const filteredTaskBank = taskBank.filter(t => 
@@ -1549,20 +1556,24 @@ export default function RoutinesBank() {
                   {/* Schedule Type */}
                   <div className="space-y-2 border-t pt-4">
                     <Label>Routine Type</Label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-4 gap-2">
                       {[
                         { value: 'daily', label: 'Normal', desc: 'Tasks with their own repeat settings', icon: '☀️' },
                         { value: 'challenge', label: 'Challenge', desc: 'Sequential drip (Day 1, 2...)', icon: '🔥' },
                         { value: 'project', label: 'Project', desc: 'Ordered steps toward a goal', icon: '🎯' },
+                        { value: 'program', label: 'Program', desc: 'Auto-enroll in a program', icon: '🎓' },
                       ].map(opt => (
                         <button
                           key={opt.value}
                           type="button"
                           onClick={() => {
                             const updates: any = { schedule_type: opt.value as any };
-                            if (opt.value === 'project') {
+                            if (opt.value === 'project' || opt.value === 'program') {
                               updates.end_mode = 'never';
                               updates.start_mode = 'none';
+                            }
+                            if (opt.value !== 'program') {
+                              updates.linked_program_slug = null;
                             }
                             setFormData(prev => ({ ...prev, ...updates }));
                           }}
