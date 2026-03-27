@@ -454,6 +454,13 @@ export function PromoBanner({
   const fullBanner = fullBannerCandidate && (fullDelay <= 0 || pageSeconds >= fullDelay)
     ? fullBannerCandidate
     : null;
+
+  const isVisible = eligibleBanners.length > 0;
+
+  useEffect(() => {
+    onVisibilityChange?.(isVisible);
+  }, [isVisible, onVisibilityChange]);
+
   const fullOverlay = fullBanner ? (
     <OverlayPortal>
       <div
