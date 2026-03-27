@@ -103,6 +103,8 @@ export function PromoBannerManager() {
   const [excludePlaylists, setExcludePlaylists] = useState<string[]>([]);
   const [includeTools, setIncludeTools] = useState<string[]>([]);
   const [excludeTools, setExcludeTools] = useState<string[]>([]);
+  const [targetLanguages, setTargetLanguages] = useState<string[]>([]);
+  const [targetTimezones, setTargetTimezones] = useState<string[]>([]);
 
   // Fetch banners
   const { data: banners, isLoading } = useQuery({
