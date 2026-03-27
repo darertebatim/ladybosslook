@@ -1,14 +1,20 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppVideoPlayer } from "@/components/app/AppVideoPlayer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { useAudioPlayer } from "@/contexts/AudioPlayerContext";
 
 export default function AppVideoDetail() {
   const { videoId } = useParams();
   const navigate = useNavigate();
+  const { pause: pauseAudio } = useAudioPlayer();
+
+  useEffect(() => {
+    pauseAudio();
+  }, [pauseAudio]);
 
   const { data: video, isLoading } = useQuery({
     queryKey: ["app-video-detail", videoId],

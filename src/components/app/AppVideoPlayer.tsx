@@ -12,6 +12,7 @@ import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { PromoBanner } from '@/components/app/PromoBanner';
+import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 
 interface VideoItem {
   url: string;
@@ -57,6 +58,14 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
   const syntheticTaskId = videoId ? `synthetic-video-${videoId}` : null;
 
   const hasNext = playlist && currentIndex !== undefined && currentIndex < playlist.length - 1;
+
+  const { pause: pauseAudio } = useAudioPlayer();
+
+  useEffect(() => {
+    if (isOpen) {
+      pauseAudio();
+    }
+  }, [isOpen, pauseAudio]);
 
   useEffect(() => {
     setIsLoading(true);
