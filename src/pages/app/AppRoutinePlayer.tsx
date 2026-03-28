@@ -241,6 +241,7 @@ function SortableRoutineCard(props: RoutineCardProps) {
 
 export default function AppRoutinePlayer() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const { startRoutine, isActive } = useRoutinePlayerContext();
