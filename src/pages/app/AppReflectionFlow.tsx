@@ -48,7 +48,31 @@ export default function AppReflectionFlow() {
   const page = pages?.[currentIndex];
   const isLast = currentIndex === totalPages - 1;
   const progress = totalPages > 0 ? ((currentIndex + 1) / totalPages) * 100 : 0;
-  const isSinglePage = totalPages === 1;
+  const isShuffleMode = reflection?.shuffle_mode === true;
+  const isSinglePage = totalPages === 1 || isShuffleMode;
+
+  // For shuffle mode, pick a random page
+  const [shufflePageIndex, setShufflePageIndex] = useState<number>(0);
+  const displayedPage = isShuffleMode ? pages?.[shufflePageIndex] : page;
+
+  // Initialize shuffle with random page
+  useEffect(() => {
+    if (isShuffleMode && pages && pages.length > 0) {
+      setShufflePageIndex(Math.floor(Math.random() * pages.length));
+    }
+  }, [isShuffleMode, pages?.length]);
+
+  const handleShuffle = useCallback(() => {
+    if (!pages || pages.length <= 1) return;
+    let next: number;
+    do {
+      next = Math.floor(Math.random() * pages.length);
+    } while (next === shufflePageIndex && pages.length > 1);
+    setShufflePageIndex(next);
+    // Clear lines when shuffling
+    setLines(['']);
+    setTimeout(() => lineRefs.current[0]?.focus(), 100);
+  }, [pages, shufflePageIndex]);
 
   const reflection = reflections?.find(r => r.id === reflectionId);
 
