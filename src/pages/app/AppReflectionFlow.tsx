@@ -254,10 +254,10 @@ export default function AppReflectionFlow() {
             {isShuffleMode && totalPages > 1 && (
               <button
                 onClick={handleShuffle}
-                className="p-2 rounded-full active:scale-90 transition-transform text-muted-foreground hover:text-foreground"
+                className="p-2.5 rounded-full active:scale-90 transition-transform text-orange-500 hover:text-orange-600"
                 aria-label="Shuffle question"
               >
-                <RefreshCw className="h-5 w-5" />
+                <RefreshCw className="h-6 w-6" />
               </button>
             )}
           </div>
