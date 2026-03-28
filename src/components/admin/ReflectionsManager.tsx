@@ -243,6 +243,16 @@ export function ReflectionsManager() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <EmojiPicker
+        open={showEmojiPicker}
+        onOpenChange={setShowEmojiPicker}
+        selectedEmoji={editing?.emoji || ''}
+        onSelect={(emoji) => {
+          setEditing(editing ? { ...editing, emoji } : null);
+          setShowEmojiPicker(false);
+        }}
+      />
     </div>
   );
 }
