@@ -162,15 +162,17 @@ export default function AppFreeFormReflection() {
               }
             }}
           />
-          <button
-            onClick={() => setShowPrompts(prev => !prev)}
-            className={cn(
-              "mt-2 p-2 rounded-full transition-colors shrink-0",
-              showPrompts ? "bg-amber-100 text-amber-600" : "bg-muted text-muted-foreground"
-            )}
-          >
-            <Lightbulb className="h-5 w-5" />
-          </button>
+          {!title.trim() && (
+            <button
+              onClick={() => setShowPrompts(prev => !prev)}
+              className={cn(
+                "mt-2 p-2 rounded-full transition-colors shrink-0",
+                showPrompts ? "bg-amber-100 text-amber-600" : "bg-muted text-muted-foreground"
+              )}
+            >
+              <Lightbulb className="h-5 w-5" />
+            </button>
+          )}
         </div>
 
         {/* Prompt box */}
