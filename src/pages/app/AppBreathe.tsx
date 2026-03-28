@@ -16,6 +16,7 @@ import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 
 export default function AppBreathe() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { data: exercises, isLoading } = useBreathingExercises();
   
