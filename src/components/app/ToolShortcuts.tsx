@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { wellnessTools, audioTools, type ToolConfig } from '@/lib/toolsConfig';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
+const STORAGE_KEY = 'tool-shortcuts';
 const MAX_SHORTCUTS = 4;
 const DEFAULT_SHORTCUTS: (Shortcut | null)[] = [
   { type: 'routine', value: null },
