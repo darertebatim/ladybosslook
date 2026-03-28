@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Wind } from 'lucide-react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Wind, BarChart3 } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
 import { 
