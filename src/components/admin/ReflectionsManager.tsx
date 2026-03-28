@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   useAllReflections,
   useCreateReflection,
@@ -38,6 +38,17 @@ export function ReflectionsManager() {
 
   const [editing, setEditing] = useState<Partial<Reflection> | null>(null);
   const [isNew, setIsNew] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const availableCategories = useMemo(() => {
+    if (!reflections) return [];
+    const cats = new Set(reflections.map(r => r.category).filter(Boolean));
+    return REFLECTION_CATEGORIES.filter(c => cats.has(c.value));
+  }, [reflections]);
+
+  const filtered = selectedCategory
+    ? reflections?.filter(r => r.category === selectedCategory)
+    : reflections;
 
   const openCreate = () => {
     setIsNew(true);
@@ -73,8 +84,30 @@ export function ReflectionsManager() {
 
       {isLoading && <p className="text-muted-foreground">Loading…</p>}
 
+      <div className="flex items-center gap-2 overflow-x-auto pb-2">
+        <button
+          onClick={() => setSelectedCategory(null)}
+          className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+            !selectedCategory ? 'bg-foreground text-background' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+          }`}
+        >
+          All
+        </button>
+        {availableCategories.map((cat) => (
+          <button
+            key={cat.value}
+            onClick={() => setSelectedCategory(cat.value)}
+            className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+              selectedCategory === cat.value ? 'bg-foreground text-background' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+          >
+            <FluentEmoji emoji={cat.emoji} size={16} /> {cat.label}
+          </button>
+        ))}
+      </div>
+
       <div className="space-y-2">
-        {reflections?.map((r) => (
+        {filtered?.map((r) => (
           <Card key={r.id} className="flex items-center gap-3 p-3">
             {r.cover_image_url ? (
               <img src={r.cover_image_url} alt="" className="h-12 w-12 rounded-lg object-cover shrink-0" />
