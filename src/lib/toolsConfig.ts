@@ -46,7 +46,7 @@ export const wellnessTools: ToolConfig[] = [
     id: 'focus-routine',
     name: 'MyRoutines',
     icon: 'Play',
-    emoji: '▶️',
+    emoji: '🚀',
     bgColor: 'bg-[#DBEAFE]',
     iconColor: 'text-blue-600',
     route: '/app/routineplayer',
