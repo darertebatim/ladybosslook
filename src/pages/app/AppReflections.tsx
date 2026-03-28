@@ -72,12 +72,6 @@ export default function AppReflections() {
               }}
               iconOnly
             />
-            <button
-              onClick={() => navigate('/app/reflections/notes')}
-              className="active:scale-95 transition-transform p-1"
-            >
-              <BookOpen className="h-5 w-5" />
-            </button>
           </div>
         </div>
       </header>
