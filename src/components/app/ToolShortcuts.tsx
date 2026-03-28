@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Plus, Search, Check, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { PRO_LINK_CONFIGS, type ProLinkType, type ProLinkConfig, getProTaskNavigationPath } from '@/lib/proTaskTypes';
 import { useNavigate } from 'react-router-dom';
 import { haptic } from '@/lib/haptics';
 import { Input } from '@/components/ui/input';
@@ -12,48 +11,22 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 const STORAGE_KEY = 'tool-shortcuts';
 const MAX_SHORTCUTS = 4;
-const DEFAULT_SHORTCUTS: (Shortcut | null)[] = [
-  { type: 'routine', value: null },
-  { type: 'reflection', value: null },
-  { type: 'inspire', value: null },
+const DEFAULT_SHORTCUTS: (string | null)[] = [
+  'focus-routine',
+  'reflections',
+  'new-routine',
   null,
 ];
 
-interface Shortcut {
-  type: ProLinkType;
-  value: string | null;
-}
-
-// Map tool config IDs to ProLinkType for shortcut navigation
-const TOOL_TO_PROLINK: Record<string, ProLinkType> = {
-  'self-care': 'tasksbank',
-  'routines': 'inspire',
-  'focus-timer': 'focus_timer',
-  'focus-routine': 'routine',
-  'reflections': 'reflection',
-  'journal': 'journal',
-  'breathe': 'breathe',
-  'mood': 'mood',
-  'emotions': 'emotion',
-  'videos': 'watch',
-  'water': 'water',
-  'period': 'period',
-  'fasting': 'fasting',
-  'programs': 'myprograms',
-  'profile': 'myprofile',
-  'academy': 'program',
-  'listen': 'listen',
-  'presence': 'presence',
-  'weight': 'weight',
-  'meditate': 'audio',
-  'soundscape': 'playlist',
-};
-
-// All tools combined for the picker grid
+// All tools combined for the picker grid (including action buttons)
 const ALL_TOOLS = [
-  ...wellnessTools.filter(t => !t.comingSoon && !t.hidden && t.id !== 'new-task' && t.id !== 'new-routine'),
+  ...wellnessTools.filter(t => !t.comingSoon && !t.hidden),
   ...audioTools.filter(t => t.id === 'meditate' || t.id === 'soundscape'),
 ];
+
+// Build a lookup map
+const TOOL_MAP: Record<string, ToolConfig> = {};
+ALL_TOOLS.forEach(t => { TOOL_MAP[t.id] = t; });
 
 function loadShortcuts(): (Shortcut | null)[] {
   try {
