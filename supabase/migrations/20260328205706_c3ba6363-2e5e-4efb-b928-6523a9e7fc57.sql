@@ -1,0 +1,1 @@
+ALTER TABLE public.promo_banners ADD COLUMN IF NOT EXISTS include_update_status text[] DEFAULT '{}'::text[];
