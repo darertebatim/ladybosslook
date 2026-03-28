@@ -109,6 +109,20 @@ export function ReflectionsManager() {
                 <Label>Subtitle</Label>
                 <Input value={editing.subtitle || ''} onChange={(e) => setEditing({ ...editing, subtitle: e.target.value })} />
               </div>
+              <div>
+                <Label>Category</Label>
+                <Select value={editing.category || 'deep-dives'} onValueChange={(v) => setEditing({ ...editing, category: v })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {REFLECTION_CATEGORIES.map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value}>
+                        {cat.emoji} {cat.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               <ImageUploader
                 value={editing.cover_image_url || ''}
                 onChange={(url) => setEditing({ ...editing, cover_image_url: url })}
