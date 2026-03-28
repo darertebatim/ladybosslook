@@ -38,6 +38,17 @@ export function ReflectionsManager() {
 
   const [editing, setEditing] = useState<Partial<Reflection> | null>(null);
   const [isNew, setIsNew] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const availableCategories = useMemo(() => {
+    if (!reflections) return [];
+    const cats = new Set(reflections.map(r => r.category).filter(Boolean));
+    return REFLECTION_CATEGORIES.filter(c => cats.has(c.value));
+  }, [reflections]);
+
+  const filtered = selectedCategory
+    ? reflections?.filter(r => r.category === selectedCategory)
+    : reflections;
 
   const openCreate = () => {
     setIsNew(true);
