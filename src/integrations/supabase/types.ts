@@ -2793,6 +2793,7 @@ export type Database = {
           is_active: boolean
           is_featured: boolean
           is_free: boolean
+          shuffle_mode: boolean
           sort_order: number
           subtitle: string | null
           title: string
@@ -2807,6 +2808,7 @@ export type Database = {
           is_active?: boolean
           is_featured?: boolean
           is_free?: boolean
+          shuffle_mode?: boolean
           sort_order?: number
           subtitle?: string | null
           title: string
@@ -2821,6 +2823,7 @@ export type Database = {
           is_active?: boolean
           is_featured?: boolean
           is_free?: boolean
+          shuffle_mode?: boolean
           sort_order?: number
           subtitle?: string | null
           title?: string
