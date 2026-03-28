@@ -1,0 +1,1 @@
+ALTER TABLE public.reflections ADD COLUMN shuffle_mode boolean NOT NULL DEFAULT false;

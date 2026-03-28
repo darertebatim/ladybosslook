@@ -24,6 +24,7 @@ export interface Reflection {
   is_free: boolean;
   cover_color: string | null;
   category: string | null;
+  shuffle_mode: boolean;
   sort_order: number;
   created_at: string;
   updated_at: string;

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useReflectionPages, useReflections, useSaveReflectionResponse } from '@/hooks/useReflections';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, RefreshCw } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { useBilingualText } from '@/components/ui/BilingualText';
@@ -44,17 +44,41 @@ export default function AppReflectionFlow() {
   const lineRefs = useRef<(HTMLInputElement | null)[]>([]);
   const justAddedLine = useRef(false);
 
+  const reflection = reflections?.find(r => r.id === reflectionId);
+
   const totalPages = pages?.length || 0;
   const page = pages?.[currentIndex];
   const isLast = currentIndex === totalPages - 1;
   const progress = totalPages > 0 ? ((currentIndex + 1) / totalPages) * 100 : 0;
-  const isSinglePage = totalPages === 1;
+  const isShuffleMode = reflection?.shuffle_mode === true;
+  const isSinglePage = totalPages === 1 || isShuffleMode;
 
-  const reflection = reflections?.find(r => r.id === reflectionId);
+  // For shuffle mode, pick a random page
+  const [shufflePageIndex, setShufflePageIndex] = useState<number>(0);
+  const displayedPage = isShuffleMode ? pages?.[shufflePageIndex] : page;
+
+  // Initialize shuffle with random page
+  useEffect(() => {
+    if (isShuffleMode && pages && pages.length > 0) {
+      setShufflePageIndex(Math.floor(Math.random() * pages.length));
+    }
+  }, [isShuffleMode, pages?.length]);
+
+  const handleShuffle = useCallback(() => {
+    if (!pages || pages.length <= 1) return;
+    let next: number;
+    do {
+      next = Math.floor(Math.random() * pages.length);
+    } while (next === shufflePageIndex && pages.length > 1);
+    setShufflePageIndex(next);
+    setLines(['']);
+    setTimeout(() => lineRefs.current[0]?.focus(), 100);
+  }, [pages, shufflePageIndex]);
 
   const currentAnswer = answers[page?.id || ''] || '';
-  const { className: contentBilingualClassName, direction: contentDirection } = useBilingualText(page?.content || '');
-  const { className: descBilingualClassName, direction: descDirection } = useBilingualText(page?.description || '');
+  const activePage = isSinglePage ? displayedPage : page;
+  const { className: contentBilingualClassName, direction: contentDirection } = useBilingualText(activePage?.content || '');
+  const { className: descBilingualClassName, direction: descDirection } = useBilingualText(activePage?.description || '');
   const { className: answerBilingualClassName, direction: answerDirection } = useBilingualText(currentAnswer);
   const { className: titleBiClass, direction: titleDir } = useBilingualText(reflection?.title || '');
 
@@ -110,12 +134,13 @@ export default function AppReflectionFlow() {
   }, [lines]);
 
   const handleSaveSinglePage = async () => {
-    if (!page || !reflectionId) return;
+    const savePage = displayedPage || page;
+    if (!savePage || !reflectionId) return;
     const content = lines.filter(l => l.trim()).join('\n');
     try {
       await saveResponse.mutateAsync({
         reflectionId,
-        pageId: page.id,
+        pageId: savePage.id,
         responseText: content,
         isCompleted: true,
       });
@@ -224,13 +249,24 @@ export default function AppReflectionFlow() {
         {/* Content */}
         <div className="flex-1 px-5 pt-4 overflow-y-auto overscroll-contain" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}>
           {/* Date */}
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            TODAY, {today.toUpperCase()}
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              TODAY, {today.toUpperCase()}
+            </p>
+            {isShuffleMode && totalPages > 1 && (
+              <button
+                onClick={handleShuffle}
+                className="p-2 rounded-full active:scale-90 transition-transform text-muted-foreground hover:text-foreground"
+                aria-label="Shuffle question"
+              >
+                <RefreshCw className="h-5 w-5" />
+              </button>
+            )}
+          </div>
 
           {/* Title — use page content as the main title */}
           <h1 className={cn("text-2xl font-bold mt-1", contentBilingualClassName)} dir={contentDirection}>
-            {page?.content}
+            {displayedPage?.content}
           </h1>
 
           {/* Bullet entries */}
@@ -250,7 +286,7 @@ export default function AppReflectionFlow() {
                   value={line}
                   onChange={(e) => handleLineChange(idx, e.target.value)}
                   onKeyDown={(e) => handleLineKeyDown(idx, e)}
-                  placeholder={idx === 0 ? (page?.description || 'Write your thoughts…') : ''}
+                  placeholder={idx === 0 ? (displayedPage?.description || 'Write your thoughts…') : ''}
                   className="flex-1 bg-transparent border-0 outline-none text-base placeholder:text-muted-foreground/40"
                 />
               </div>
