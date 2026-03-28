@@ -84,8 +84,30 @@ export function ReflectionsManager() {
 
       {isLoading && <p className="text-muted-foreground">Loading…</p>}
 
+      <div className="flex items-center gap-2 overflow-x-auto pb-2">
+        <button
+          onClick={() => setSelectedCategory(null)}
+          className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+            !selectedCategory ? 'bg-foreground text-background' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+          }`}
+        >
+          All
+        </button>
+        {availableCategories.map((cat) => (
+          <button
+            key={cat.value}
+            onClick={() => setSelectedCategory(cat.value)}
+            className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+              selectedCategory === cat.value ? 'bg-foreground text-background' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+          >
+            <FluentEmoji emoji={cat.emoji} size={16} /> {cat.label}
+          </button>
+        ))}
+      </div>
+
       <div className="space-y-2">
-        {reflections?.map((r) => (
+        {filtered?.map((r) => (
           <Card key={r.id} className="flex items-center gap-3 p-3">
             {r.cover_image_url ? (
               <img src={r.cover_image_url} alt="" className="h-12 w-12 rounded-lg object-cover shrink-0" />
