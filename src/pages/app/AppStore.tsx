@@ -18,6 +18,7 @@ import { useBreathingExercises, type BreathingExercise } from '@/hooks/useBreath
 import { useQuery } from '@tanstack/react-query';
 import { CachedImage } from '@/components/ui/CachedImage';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 
 const AppStore = () => {
   const navigate = useNavigate();
@@ -382,6 +383,11 @@ const AppStore = () => {
               </section>
             )}
 
+            {/* My Shortcuts */}
+            {!searchQuery && (
+              <ToolShortcuts />
+            )}
+
             {/* Reflections Section */}
             {!searchQuery && reflections && reflections.length > 0 && (
               <section>
@@ -461,6 +467,7 @@ const AppStore = () => {
                 </div>
               </section>
             )}
+
 
 
             {/* Meditate Section */}
