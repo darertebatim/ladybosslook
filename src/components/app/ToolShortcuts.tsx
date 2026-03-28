@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PRO_LINK_CONFIGS, type ProLinkType, type ProLinkConfig, getProTaskNavigationPath } from '@/lib/proTaskTypes';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,8 @@ import { haptic } from '@/lib/haptics';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { wellnessTools, audioTools, type ToolConfig } from '@/lib/toolsConfig';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 const STORAGE_KEY = 'tool-shortcuts';
 const MAX_SHORTCUTS = 5;
@@ -16,33 +18,35 @@ interface Shortcut {
   value: string | null;
 }
 
-interface CategoryGroup {
-  id: string;
-  label: string;
-  links: ProLinkType[];
-}
+// Map tool config IDs to ProLinkType for shortcut navigation
+const TOOL_TO_PROLINK: Record<string, ProLinkType> = {
+  'self-care': 'tasksbank',
+  'routines': 'inspire',
+  'focus-timer': 'focus_timer',
+  'focus-routine': 'routine',
+  'reflections': 'reflection',
+  'journal': 'journal',
+  'breathe': 'breathe',
+  'mood': 'mood',
+  'emotions': 'emotion',
+  'videos': 'watch',
+  'water': 'water',
+  'period': 'period',
+  'fasting': 'fasting',
+  'programs': 'myprograms',
+  'profile': 'myprofile',
+  'academy': 'program',
+  'listen': 'listen',
+  'presence': 'presence',
+  'weight': 'weight',
+  'meditate': 'audio',
+  'soundscape': 'playlist',
+};
 
-const CATEGORIES: CategoryGroup[] = [
-  {
-    id: 'wellness',
-    label: 'Wellness Tools',
-    links: ['journal', 'breathe', 'mood', 'emotion', 'reflection', 'presence', 'water', 'period', 'fasting', 'weight', 'focus_timer'],
-  },
-  {
-    id: 'media',
-    label: 'Media',
-    links: ['listen', 'audio', 'playlist', 'watch', 'video', 'video_playlist'],
-  },
-  {
-    id: 'routines',
-    label: 'Routines & Programs',
-    links: ['routine', 'tasksbank', 'inspire', 'program', 'myprograms'],
-  },
-  {
-    id: 'nav',
-    label: 'Navigation',
-    links: ['planner', 'channel', 'myprofile', 'route'],
-  },
+// All tools combined for the picker grid
+const ALL_TOOLS = [
+  ...wellnessTools.filter(t => !t.comingSoon && !t.hidden && t.id !== 'new-task' && t.id !== 'new-routine'),
+  ...audioTools.filter(t => t.id === 'meditate' || t.id === 'soundscape'),
 ];
 
 function loadShortcuts(): (Shortcut | null)[] {
@@ -101,21 +105,24 @@ export function ToolShortcuts() {
     setShortcuts(updated);
   };
 
-  const handleSelect = (type: ProLinkType) => {
-    if (editingIndex !== null) {
+  const handleSelectTool = (tool: ToolConfig) => {
+    const proLinkType = TOOL_TO_PROLINK[tool.id];
+    if (proLinkType && editingIndex !== null) {
       const updated = [...shortcuts];
-      updated[editingIndex] = { type, value: null };
+      updated[editingIndex] = { type: proLinkType, value: null };
       setShortcuts(updated);
       setPickerOpen(false);
       setEditingIndex(null);
     }
   };
 
-  const matchesSearch = (config: ProLinkConfig) => {
+  const matchesToolSearch = (tool: ToolConfig) => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
-    return config.label.toLowerCase().includes(q) || config.description.toLowerCase().includes(q);
+    return tool.name.toLowerCase().includes(q) || tool.description.toLowerCase().includes(q);
   };
+
+  const filteredTools = ALL_TOOLS.filter(matchesToolSearch);
 
   const hasAny = shortcuts.some(s => s !== null);
 
@@ -184,49 +191,36 @@ export function ToolShortcuts() {
             </div>
 
             <ScrollArea className="flex-1 px-5">
-              <div className="pb-6 space-y-5">
-                {CATEGORIES.map((cat) => {
-                  const items = cat.links
-                    .map((type) => PRO_LINK_CONFIGS[type])
-                    .filter(matchesSearch);
-                  if (items.length === 0) return null;
-
+              <div className="grid grid-cols-4 gap-3 pb-6">
+                {filteredTools.map((tool) => {
+                  const proLinkType = TOOL_TO_PROLINK[tool.id];
+                  const isAlreadyUsed = proLinkType && shortcuts.some(s => s?.type === proLinkType);
                   return (
-                    <div key={cat.id}>
-                      <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-2 px-1">
-                        {cat.label}
-                      </h3>
-                      <div className="space-y-1.5">
-                        {items.map((config) => {
-                          const Icon = config.icon;
-                          const isAlreadyUsed = shortcuts.some(s => s?.type === config.value);
-                          return (
-                            <button
-                              key={config.value}
-                              onClick={() => handleSelect(config.value)}
-                              disabled={isAlreadyUsed}
-                              className={cn(
-                                'w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors active:scale-[0.98]',
-                                isAlreadyUsed
-                                  ? 'opacity-40 cursor-not-allowed bg-muted/30'
-                                  : 'bg-card hover:bg-muted/50'
-                              )}
-                            >
-                              <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', config.gradientClass)}>
-                                <Icon className={cn('h-4.5 w-4.5', config.iconColorClass)} />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-medium text-foreground leading-tight">{config.label}</div>
-                                <div className="text-[11px] text-muted-foreground leading-tight mt-0.5 truncate">{config.description}</div>
-                              </div>
-                              {isAlreadyUsed && (
-                                <span className="text-[10px] text-muted-foreground shrink-0">Added</span>
-                              )}
-                            </button>
-                          );
-                        })}
+                    <button
+                      key={tool.id}
+                      onClick={() => handleSelectTool(tool)}
+                      disabled={!!isAlreadyUsed || !proLinkType}
+                      className={cn(
+                        'flex flex-col items-center gap-1 py-2 rounded-xl transition-all active:scale-95',
+                        isAlreadyUsed ? 'opacity-40 cursor-not-allowed' : 'hover:bg-muted/50'
+                      )}
+                    >
+                      <div className={cn('w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm', tool.bgColor)}>
+                        {tool.emoji ? (
+                          <FluentEmoji emoji={tool.emoji} size={32} />
+                        ) : (
+                          <span className="text-2xl">📱</span>
+                        )}
+                        {isAlreadyUsed && (
+                          <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                            <Check className="h-3 w-3 text-primary-foreground" />
+                          </div>
+                        )}
                       </div>
-                    </div>
+                      <span className="text-[10px] font-medium text-foreground text-center leading-tight line-clamp-1 w-full">
+                        {tool.name}
+                      </span>
+                    </button>
                   );
                 })}
               </div>
