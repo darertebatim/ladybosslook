@@ -2,7 +2,7 @@ import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 const DISMISSED_FEATURED_KEY = 'dismissed-featured-routines';
 import { fetchSmartEstimates, type SmartEstimateInput } from '@/lib/smartEstimate';
 import { cn } from '@/lib/utils';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2, CalendarPlus, Bell, Calendar, Check, Plus, Pencil } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
@@ -241,6 +241,7 @@ function SortableRoutineCard(props: RoutineCardProps) {
 
 export default function AppRoutinePlayer() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const { startRoutine, isActive } = useRoutinePlayerContext();
@@ -255,11 +256,17 @@ export default function AppRoutinePlayer() {
   const [builderResult, setBuilderResult] = useState<{ title: string; emoji: string; color: string; tasks: any[] } | null>(null);
   const [showBuilderPreview, setShowBuilderPreview] = useState(false);
   const [builderEditTasks, setBuilderEditTasks] = useState<any[]>([]);
-  // Reopen builder when returning from routine preview
+  // Reopen builder when returning from routine preview or navigating with openBuilder state
   useEffect(() => {
     if (sessionStorage.getItem('builder-previewing') === 'true') {
       sessionStorage.removeItem('builder-previewing');
       setShowBuilder(true);
+    }
+    if (location.state?.openBuilder) {
+      setBuilderEditRoutine(null);
+      setShowBuilder(true);
+      // Clear state to prevent reopening on re-render
+      navigate(location.pathname, { replace: true, state: {} });
     }
   }, []);
 

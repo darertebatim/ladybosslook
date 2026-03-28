@@ -10,13 +10,13 @@ import { Crown } from 'lucide-react';
 import { 
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
-  GraduationCap, User, HeartHandshake, CalendarPlus, Clock, LucideIcon
+  GraduationCap, User, HeartHandshake, CalendarPlus, Clock, Headphones, Plus, Wand2, Play, LucideIcon
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle,
-  GraduationCap, User, HeartHandshake, CalendarPlus, Clock
+  GraduationCap, User, HeartHandshake, CalendarPlus, Clock, Headphones, Plus, Wand2, Play
 };
 
 // Tools that require simora+ subscription
@@ -44,6 +44,15 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
     haptic.light();
     if (isLocked) {
       setShowPaywall(true);
+      return;
+    }
+    // Handle special action routes
+    if (tool.route === '__action:new-task') {
+      window.dispatchEvent(new CustomEvent('quick-add-open', { detail: { defaultRepeat: 'Daily' } }));
+      return;
+    }
+    if (tool.route === '__action:new-routine') {
+      navigate('/app/routineplayer', { state: { openBuilder: true } });
       return;
     }
     navigate(tool.route);
