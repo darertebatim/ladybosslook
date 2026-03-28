@@ -228,22 +228,10 @@ export default function AppReflectionFlow() {
             TODAY, {today.toUpperCase()}
           </p>
 
-          {/* Title */}
-          <h1 className={cn("text-2xl font-bold mt-1", titleBiClass)} dir={titleDir}>
-            {reflection?.title || page?.content}
+          {/* Title — use page content as the main title */}
+          <h1 className={cn("text-2xl font-bold mt-1", contentBilingualClassName)} dir={contentDirection}>
+            {page?.content}
           </h1>
-
-          {/* Question as subtitle */}
-          {page?.content && reflection?.title && (
-            <p className={cn("text-sm text-muted-foreground mt-1", contentBilingualClassName)} dir={contentDirection}>
-              {page.content}
-            </p>
-          )}
-          {page?.description && (
-            <p className={cn("text-xs text-muted-foreground mt-0.5", descBilingualClassName)} dir={descDirection}>
-              {page.description}
-            </p>
-          )}
 
           {/* Bullet entries */}
           <div className="mt-4 space-y-1.5">
@@ -262,7 +250,7 @@ export default function AppReflectionFlow() {
                   value={line}
                   onChange={(e) => handleLineChange(idx, e.target.value)}
                   onKeyDown={(e) => handleLineKeyDown(idx, e)}
-                  placeholder={idx === 0 ? 'Write your thoughts…' : ''}
+                  placeholder={idx === 0 ? (page?.description || 'Write your thoughts…') : ''}
                   className="flex-1 bg-transparent border-0 outline-none text-base placeholder:text-muted-foreground/40"
                 />
               </div>
