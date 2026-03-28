@@ -64,7 +64,7 @@ export function ProLinkPicker({
         <div className="flex flex-col h-[calc(80vh-60px)]">
           {/* Search + subtitle */}
           <div className="px-5 pt-2 pb-3 space-y-2">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-foreground">
               Link this task to an app feature for one-tap access.
             </p>
 
