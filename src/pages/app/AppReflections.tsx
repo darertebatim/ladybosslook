@@ -152,13 +152,13 @@ export default function AppReflections() {
             <button
               key={cat.value}
               onClick={() => setSelectedCategory(cat.value)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === cat.value
                   ? 'bg-foreground text-background'
                   : 'bg-muted text-muted-foreground'
               }`}
             >
-              <FluentEmoji emoji={cat.emoji} size={16} className="mr-1" /> {cat.label}
+              <FluentEmoji emoji={cat.emoji} size={14} /> {cat.label}
             </button>
           ))}
         </div>
@@ -278,7 +278,9 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
                 loading="lazy"
               />
             ) : (
-              <div className="h-24 w-24 rounded-2xl bg-muted flex items-center justify-center text-3xl">📝</div>
+              <div className="h-24 w-24 rounded-2xl bg-muted flex items-center justify-center">
+                <FluentEmoji emoji={reflection.emoji || '📝'} size={48} />
+              </div>
             )}
             {isPremium && (
               <span className="absolute -top-2.5 -left-2 flex items-center gap-0.5 bg-amber-200 text-amber-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
