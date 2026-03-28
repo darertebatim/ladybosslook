@@ -275,18 +275,16 @@ const AppStore = () => {
                 <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
                   Tools
                 </h2>
-                {/* Row 1: Free tools + audio */}
-                <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pt-3 pb-3 scrollbar-hide">
-                  {filteredWellnessTools
-                    .filter(t => !['fasting', 'period', 'focus-routine', 'programs', 'profile'].includes(t.id))
-                    .map((tool) => (
-                      <ToolCard 
-                        key={tool.id} 
-                        tool={tool}
-                        size="compact"
-                        className={`tour-tool-${tool.id}`}
-                      />
-                    ))}
+                {/* All tools in single scrollable row */}
+                <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
+                  {filteredWellnessTools.map((tool) => (
+                    <ToolCard 
+                      key={tool.id} 
+                      tool={tool}
+                      size="compact"
+                      className={`tour-tool-${tool.id}`}
+                    />
+                  ))}
                   {filteredAudioTools
                     .filter(t => t.id === 'meditate' || t.id === 'soundscape')
                     .map((tool) => (
@@ -298,20 +296,12 @@ const AppStore = () => {
                       />
                     ))}
                 </div>
-                {/* Row 2: Plus tools */}
-                <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
-                  {filteredWellnessTools
-                    .filter(t => ['fasting', 'period', 'focus-routine', 'programs', 'profile'].includes(t.id))
-                    .map((tool) => (
-                      <ToolCard 
-                        key={tool.id} 
-                        tool={tool}
-                        size="compact"
-                        className={`tour-tool-${tool.id}`}
-                      />
-                    ))}
-                </div>
               </section>
+            )}
+
+            {/* My Shortcuts - right after tools */}
+            {!searchQuery && (
+              <ToolShortcuts />
             )}
 
             {/* Promo Banner - Under Tools */}
