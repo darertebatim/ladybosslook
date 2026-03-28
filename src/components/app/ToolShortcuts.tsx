@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Search, Check } from 'lucide-react';
+import { Plus, Search, Check, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PRO_LINK_CONFIGS, type ProLinkType, type ProLinkConfig, getProTaskNavigationPath } from '@/lib/proTaskTypes';
 import { useNavigate } from 'react-router-dom';
@@ -197,21 +197,32 @@ export function ToolShortcuts() {
             </div>
 
             <ScrollArea className="flex-1 px-5">
-              <div className="grid grid-cols-4 gap-3 pb-6">
+              <div className="grid grid-cols-4 gap-3 pb-6 pt-2">
                 {filteredTools.map((tool) => {
                   const proLinkType = TOOL_TO_PROLINK[tool.id];
                   const isAlreadyUsed = proLinkType && shortcuts.some(s => s?.type === proLinkType);
+                  const isPremium = ['fasting', 'period'].includes(tool.id);
                   return (
                     <button
                       key={tool.id}
                       onClick={() => handleSelectTool(tool)}
                       disabled={!!isAlreadyUsed || !proLinkType}
                       className={cn(
-                        'flex flex-col items-center gap-1 py-2 rounded-xl transition-all active:scale-95',
+                        'relative flex flex-col items-center gap-1 pt-4 pb-2 rounded-xl transition-all active:scale-95',
                         isAlreadyUsed ? 'opacity-40 cursor-not-allowed' : 'hover:bg-muted/50'
                       )}
                     >
-                      <div className={cn('w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm', tool.bgColor)}>
+                      {/* Badge */}
+                      {isPremium ? (
+                        <div className="absolute top-0.5 left-1/2 -translate-x-1/2 z-10 inline-flex items-center gap-0.5 text-[7px] font-bold text-amber-700 bg-amber-200 px-1.5 py-0.5 rounded-full">
+                          <Crown className="h-2 w-2" /> PLUS
+                        </div>
+                      ) : (
+                        <div className="absolute top-0.5 left-1/2 -translate-x-1/2 z-10 inline-flex items-center gap-0.5 text-[7px] font-bold text-emerald-800 bg-[#E2F9F0] px-1.5 py-0.5 rounded-full">
+                          <FluentEmoji emoji="🔥" size={8} /> FREE
+                        </div>
+                      )}
+                      <div className={cn('w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm relative', tool.bgColor)}>
                         {tool.emoji ? (
                           <FluentEmoji emoji={tool.emoji} size={32} />
                         ) : (
