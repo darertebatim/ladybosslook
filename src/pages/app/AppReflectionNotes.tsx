@@ -6,13 +6,13 @@ import { ArrowLeft } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 
-interface CompletedReflection {
-  reflection_id: string;
-  reflection_title: string;
-  reflection_cover: string | null;
+interface NoteItem {
+  id: string;
+  type: 'guided' | 'free';
+  title: string;
+  cover: string | null;
   completed_at: string;
-  first_question: string | null;
-  first_answer: string | null;
+  preview: string | null;
 }
 
 export default function AppReflectionNotes() {
@@ -23,87 +23,113 @@ export default function AppReflectionNotes() {
     queryKey: ['reflection-notes', user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      // Get all completed responses (those with completed_at)
-      const { data: responses, error } = await supabase
+      const result: NoteItem[] = [];
+
+      // 1. Guided reflections (existing logic)
+      const { data: responses } = await supabase
         .from('user_reflection_responses' as any)
         .select('*')
         .eq('user_id', user!.id)
         .not('completed_at', 'is', null)
         .order('completed_at', { ascending: false });
-      if (error) throw error;
 
       const completedMap = new Map<string, any>();
-      for (const r of responses as any[]) {
+      for (const r of (responses || []) as any[]) {
         if (!completedMap.has(r.reflection_id)) {
           completedMap.set(r.reflection_id, r);
         }
       }
 
-      // Get reflection metadata
       const reflectionIds = Array.from(completedMap.keys());
-      if (reflectionIds.length === 0) return [];
-
-      const { data: reflections } = await supabase
-        .from('reflections' as any)
-        .select('*')
-        .in('id', reflectionIds);
-
-      const reflectionMap = new Map<string, any>();
-      for (const r of (reflections || []) as any[]) {
-        reflectionMap.set(r.id, r);
-      }
-
-      // For each completed reflection, get the first question+answer
-      const result: CompletedReflection[] = [];
-      for (const [refId, response] of completedMap) {
-        const ref = reflectionMap.get(refId);
-        if (!ref) continue;
-
-        // Get first question page
-        const { data: pages } = await supabase
-          .from('reflection_pages' as any)
+      if (reflectionIds.length > 0) {
+        const { data: reflections } = await supabase
+          .from('reflections' as any)
           .select('*')
-          .eq('reflection_id', refId)
-          .eq('type', 'question')
-          .order('page_order', { ascending: true })
-          .limit(1);
+          .in('id', reflectionIds);
 
-        let firstQuestion: string | null = null;
-        let firstAnswer: string | null = null;
-
-        if (pages && (pages as any[]).length > 0) {
-          const page = (pages as any[])[0];
-          firstQuestion = page.content;
-          const { data: ans } = await supabase
-            .from('user_reflection_responses' as any)
-            .select('response_text')
-            .eq('user_id', user!.id)
-            .eq('page_id', page.id)
-            .maybeSingle();
-          firstAnswer = (ans as any)?.response_text || null;
+        const reflectionMap = new Map<string, any>();
+        for (const r of (reflections || []) as any[]) {
+          reflectionMap.set(r.id, r);
         }
 
+        for (const [refId, response] of completedMap) {
+          const ref = reflectionMap.get(refId);
+          if (!ref) continue;
+
+          // Get first question page for preview
+          const { data: pages } = await supabase
+            .from('reflection_pages' as any)
+            .select('*')
+            .eq('reflection_id', refId)
+            .eq('type', 'question')
+            .order('page_order', { ascending: true })
+            .limit(1);
+
+          let preview: string | null = null;
+          if (pages && (pages as any[]).length > 0) {
+            const page = (pages as any[])[0];
+            const { data: ans } = await supabase
+              .from('user_reflection_responses' as any)
+              .select('response_text')
+              .eq('user_id', user!.id)
+              .eq('page_id', page.id)
+              .maybeSingle();
+            preview = [page.content, (ans as any)?.response_text].filter(Boolean).join('  ');
+          }
+
+          result.push({
+            id: refId,
+            type: 'guided',
+            title: ref.title,
+            cover: ref.cover_image_url,
+            completed_at: response.completed_at,
+            preview,
+          });
+        }
+      }
+
+      // 2. Free-form reflections
+      const { data: freeForm } = await supabase
+        .from('free_form_reflections' as any)
+        .select('*')
+        .eq('user_id', user!.id)
+        .order('created_at', { ascending: false });
+
+      for (const ff of (freeForm || []) as any[]) {
         result.push({
-          reflection_id: refId,
-          reflection_title: ref.title,
-          reflection_cover: ref.cover_image_url,
-          completed_at: response.completed_at,
-          first_question: firstQuestion,
-          first_answer: firstAnswer,
+          id: ff.id,
+          type: 'free',
+          title: ff.title,
+          cover: null,
+          completed_at: ff.created_at,
+          preview: ff.content || null,
         });
       }
+
+      // Sort by date descending
+      result.sort((a, b) => new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime());
 
       return result;
     },
   });
 
-  // Group by month
-  const grouped = new Map<string, CompletedReflection[]>();
+  // Group by date
+  const grouped = new Map<string, NoteItem[]>();
   for (const note of notes || []) {
     const key = format(new Date(note.completed_at), 'd MMM');
     if (!grouped.has(key)) grouped.set(key, []);
     grouped.get(key)!.push(note);
   }
+
+  const handleTap = (note: NoteItem) => {
+    if (note.type === 'guided') {
+      navigate(`/app/reflections/notes/${note.id}`, {
+        state: { completedAt: note.completed_at },
+      });
+    } else {
+      navigate(`/app/reflections/notes/free/${note.id}`);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -133,31 +159,29 @@ export default function AppReflectionNotes() {
           <div key={dateLabel}>
             <h2 className="text-base font-bold mb-3">{dateLabel}</h2>
             <div className="space-y-3">
-              {items.map((item, idx) => (
+              {items.map((item) => (
                 <button
-                  key={`${item.reflection_id}-${idx}`}
-                  onClick={() => navigate(`/app/reflections/notes/${item.reflection_id}`, {
-                    state: { completedAt: item.completed_at },
-                  })}
+                  key={`${item.type}-${item.id}`}
+                  onClick={() => handleTap(item)}
                   className="w-full bg-card rounded-xl p-4 text-left active:scale-[0.98] transition-transform"
                 >
                   <div className="flex items-center gap-3 mb-2">
-                    {item.reflection_cover ? (
-                      <img src={item.reflection_cover} alt="" className="h-10 w-10 rounded-lg object-cover" />
+                    {item.cover ? (
+                      <img src={item.cover} alt="" className="h-10 w-10 rounded-lg object-cover" />
                     ) : (
-                      <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center text-lg">📝</div>
+                      <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center text-lg">
+                        {item.type === 'free' ? '✍️' : '📝'}
+                      </div>
                     )}
                     <div>
-                      <p className="font-semibold text-sm">{item.reflection_title}</p>
+                      <p className="font-semibold text-sm">{item.title}</p>
                       <p className="text-xs text-muted-foreground">
                         {format(new Date(item.completed_at), 'MMM d, yyyy • hh:mm a')}
                       </p>
                     </div>
                   </div>
-                  {item.first_question && (
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {item.first_question}  {item.first_answer || ''}
-                    </p>
+                  {item.preview && (
+                    <p className="text-sm text-muted-foreground line-clamp-2">{item.preview}</p>
                   )}
                 </button>
               ))}

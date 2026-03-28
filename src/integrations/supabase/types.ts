@@ -1443,6 +1443,30 @@ export type Database = {
         }
         Relationships: []
       }
+      free_form_reflections: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       home_banners: {
         Row: {
           background_color: string | null

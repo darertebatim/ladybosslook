@@ -88,6 +88,8 @@ const AppReflections = lazy(() => import("@/pages/app/AppReflections"));
 const AppReflectionFlow = lazy(() => import("@/pages/app/AppReflectionFlow"));
 const AppReflectionNotes = lazy(() => import("@/pages/app/AppReflectionNotes"));
 const AppReflectionNoteDetail = lazy(() => import("@/pages/app/AppReflectionNoteDetail"));
+const AppFreeFormReflection = lazy(() => import("@/pages/app/AppFreeFormReflection"));
+const AppFreeFormNoteDetail = lazy(() => import("@/pages/app/AppFreeFormNoteDetail"));
 const AppAICoach = lazy(() => import("@/pages/app/AppAICoach"));
 
 const Users = lazy(() => import("@/pages/admin/Users"));
@@ -470,7 +472,9 @@ const App = () => (
                     <Route path="/app/rate" element={<ProtectedRoute><AppRate /></ProtectedRoute>} />
                     <Route path="/app/settings" element={<ProtectedRoute><AppSettings /></ProtectedRoute>} />
                     <Route path="/app/onboarding/:flowId" element={<AppOnboarding />} />
+                    <Route path="/app/reflections/notes/free/:noteId" element={<ProtectedRoute><AppFreeFormNoteDetail /></ProtectedRoute>} />
                     <Route path="/app/reflections/notes/:reflectionId" element={<ProtectedRoute><AppReflectionNoteDetail /></ProtectedRoute>} />
+                    <Route path="/app/reflections/free-form" element={<ProtectedRoute><AppFreeFormReflection /></ProtectedRoute>} />
                     <Route path="/app/reflections/:reflectionId" element={<ProtectedRoute><AppReflectionFlow /></ProtectedRoute>} />
                     <Route path="/app/ai" element={<ProtectedRoute><AppAICoach /></ProtectedRoute>} />
                     {/* Redirect old feed post route */}
