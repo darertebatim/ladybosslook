@@ -212,7 +212,7 @@ const NativeAppLayout = () => {
           ? "bg-[#132240]/80 backdrop-blur-xl border-t border-white/10"
           : "bg-background border-t"
       )}>
-        <div className="grid grid-cols-6 pt-1.5 pb-1.5">
+        <div className="grid grid-cols-5 pt-1.5 pb-1.5">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path || 
               (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
