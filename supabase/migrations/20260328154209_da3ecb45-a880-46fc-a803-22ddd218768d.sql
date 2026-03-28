@@ -1,0 +1,1 @@
+ALTER TABLE public.reflections ADD COLUMN IF NOT EXISTS category text DEFAULT 'deep-dives';

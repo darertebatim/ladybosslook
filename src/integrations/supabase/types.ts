@@ -2761,6 +2761,7 @@ export type Database = {
       }
       reflections: {
         Row: {
+          category: string | null
           cover_color: string | null
           cover_image_url: string | null
           created_at: string
@@ -2774,6 +2775,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category?: string | null
           cover_color?: string | null
           cover_image_url?: string | null
           created_at?: string
@@ -2787,6 +2789,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category?: string | null
           cover_color?: string | null
           cover_image_url?: string | null
           created_at?: string

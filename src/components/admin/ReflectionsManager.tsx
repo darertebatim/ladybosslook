@@ -7,6 +7,7 @@ import {
   useAdminReflectionPages,
   useSaveReflectionPages,
   Reflection,
+  REFLECTION_CATEGORIES,
 } from '@/hooks/useReflections';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -39,7 +40,7 @@ export function ReflectionsManager() {
 
   const openCreate = () => {
     setIsNew(true);
-    setEditing({ title: '', subtitle: '', cover_image_url: '', is_active: true, is_featured: false, is_free: true, sort_order: 0 });
+    setEditing({ title: '', subtitle: '', cover_image_url: '', is_active: true, is_featured: false, is_free: true, sort_order: 0, category: 'deep-dives' });
   };
 
   const openEdit = (r: Reflection) => {
@@ -81,7 +82,7 @@ export function ReflectionsManager() {
             )}
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm truncate">{r.title}</p>
-              <p className="text-xs text-muted-foreground truncate">{r.subtitle || '—'}</p>
+              <p className="text-xs text-muted-foreground truncate">{r.subtitle || '—'} · {REFLECTION_CATEGORIES.find(c => c.value === r.category)?.label || r.category || '—'}</p>
             </div>
             <span className={`text-xs px-2 py-0.5 rounded-full ${r.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
               {r.is_active ? 'Active' : 'Inactive'}
@@ -107,6 +108,21 @@ export function ReflectionsManager() {
               <div>
                 <Label>Subtitle</Label>
                 <Input value={editing.subtitle || ''} onChange={(e) => setEditing({ ...editing, subtitle: e.target.value })} />
+              </div>
+              <div>
+                <Label>Category</Label>
+                <Select value={editing.category || 'deep-dives'} onValueChange={(v) => setEditing({ ...editing, category: v })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {REFLECTION_CATEGORIES.map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value}>
+                        {cat.emoji} {cat.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <ImageUploader
                 value={editing.cover_image_url || ''}
