@@ -85,7 +85,17 @@ export default function AppBreathe() {
           title="Breathe"
           showBack
           backTo="/app/home"
-          rightAction={startTour ? <TourHelpButton onClick={startTour} /> : undefined}
+          rightAction={
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => navigate('/app/breathe/stats')}
+                className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
+              >
+                <BarChart3 className="h-4 w-4 text-foreground" />
+              </button>
+              {startTour && <TourHelpButton onClick={startTour} />}
+            </div>
+          }
         />
         <AppHeaderSpacer />
 
