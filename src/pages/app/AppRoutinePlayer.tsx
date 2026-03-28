@@ -255,11 +255,17 @@ export default function AppRoutinePlayer() {
   const [builderResult, setBuilderResult] = useState<{ title: string; emoji: string; color: string; tasks: any[] } | null>(null);
   const [showBuilderPreview, setShowBuilderPreview] = useState(false);
   const [builderEditTasks, setBuilderEditTasks] = useState<any[]>([]);
-  // Reopen builder when returning from routine preview
+  // Reopen builder when returning from routine preview or navigating with openBuilder state
   useEffect(() => {
     if (sessionStorage.getItem('builder-previewing') === 'true') {
       sessionStorage.removeItem('builder-previewing');
       setShowBuilder(true);
+    }
+    if (location.state?.openBuilder) {
+      setBuilderEditRoutine(null);
+      setShowBuilder(true);
+      // Clear state to prevent reopening on re-render
+      navigate(location.pathname, { replace: true, state: {} });
     }
   }, []);
 
