@@ -114,6 +114,10 @@ export function ReflectionsManager() {
           <Card key={r.id} className="flex items-center gap-3 p-3">
             {r.cover_image_url ? (
               <img src={r.cover_image_url} alt="" className="h-12 w-12 rounded-lg object-cover shrink-0" />
+            ) : r.emoji ? (
+              <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                <FluentEmoji emoji={r.emoji} size={28} />
+              </div>
             ) : (
               <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center text-lg shrink-0">📝</div>
             )}
