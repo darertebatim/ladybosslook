@@ -40,12 +40,15 @@ export function ToolShortcuts() {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [tempType, setTempType] = useState<ProLinkType | null>(null);
   const [tempValue, setTempValue] = useState<string | null>(null);
+  const suppressTapUntilRef = useRef(0);
 
   useEffect(() => {
     saveShortcuts(shortcuts);
   }, [shortcuts]);
 
   const handleSlotTap = (index: number) => {
+    if (Date.now() < suppressTapUntilRef.current) return;
+
     const existing = shortcuts[index];
     if (existing) {
       // Navigate to the shortcut
@@ -65,6 +68,7 @@ export function ToolShortcuts() {
   const handleLongPress = (index: number) => {
     if (!shortcuts[index]) return;
     haptic.medium();
+    suppressTapUntilRef.current = Date.now() + 700;
     const updated = [...shortcuts];
     updated[index] = null;
     setShortcuts(updated);
@@ -170,8 +174,21 @@ function ShortcutSlot({
   const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPressRef = useRef(false);
 
-  const handleTouchStart = () => {
+  useEffect(() => {
+    return () => {
+      if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
+    };
+  }, []);
+
+  const clearPressTimer = () => {
+    if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
+    pressTimerRef.current = null;
+  };
+
+  const handlePressStart = (pointerType?: string, button?: number) => {
+    if (pointerType === 'mouse' && button !== 0) return;
     didLongPressRef.current = false;
+
     if (onLongPress) {
       pressTimerRef.current = setTimeout(() => {
         didLongPressRef.current = true;
@@ -180,28 +197,32 @@ function ShortcutSlot({
     }
   };
 
-  const handleTouchEnd = () => {
-    if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
-    pressTimerRef.current = null;
-    if (!didLongPressRef.current) {
+  const handlePressEnd = (triggerTap = true, pointerType?: string, button?: number) => {
+    if (pointerType === 'mouse' && button !== 0) return;
+
+    const didLongPress = didLongPressRef.current;
+    clearPressTimer();
+
+    if (triggerTap && !didLongPress) {
       onTap();
     }
-  };
 
-  const handleTouchCancel = () => {
-    if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
-    pressTimerRef.current = null;
+    didLongPressRef.current = false;
   };
 
   return (
     <button
       className="flex flex-col items-center w-[calc((100%-48px)/5)] shrink-0 active:scale-95 transition-transform"
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      onTouchCancel={handleTouchCancel}
+      onPointerDown={(e) => handlePressStart(e.pointerType, e.button)}
+      onPointerUp={(e) => handlePressEnd(true, e.pointerType, e.button)}
+      onPointerCancel={() => handlePressEnd(false)}
+      onPointerLeave={() => handlePressEnd(false)}
+      onContextMenu={(e) => {
+        if (onLongPress) e.preventDefault();
+      }}
       onClick={(e) => {
-        // Desktop fallback
-        if (!('ontouchstart' in window)) onTap();
+        // Keyboard activation fallback
+        if (e.detail === 0) onTap();
       }}
     >
       {children}
