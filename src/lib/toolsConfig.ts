@@ -56,7 +56,7 @@ export const wellnessTools: ToolConfig[] = [
     id: 'reflections',
     name: 'Reflections',
     icon: 'Brain',
-    emoji: '🧠',
+    emoji: '✏️',
     bgColor: 'bg-[#E0FBB8]',
     iconColor: 'text-teal-600',
     route: '/app/reflections',
