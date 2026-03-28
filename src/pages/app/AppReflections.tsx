@@ -72,12 +72,6 @@ export default function AppReflections() {
               }}
               iconOnly
             />
-            <button
-              onClick={() => navigate('/app/reflections/notes')}
-              className="active:scale-95 transition-transform p-1"
-            >
-              <BookOpen className="h-5 w-5" />
-            </button>
           </div>
         </div>
       </header>
@@ -88,15 +82,25 @@ export default function AppReflections() {
       </div>
 
       {/* Free Form */}
-      <div className="px-4 mt-2">
+      <div className="px-4 mt-2 flex gap-3">
         <button
           onClick={() => navigate('/app/reflections/free-form')}
-          className="w-full rounded-2xl bg-accent/60 p-4 flex items-center gap-3 text-left transition-transform active:scale-[0.97]"
+          className="flex-1 rounded-2xl bg-accent/60 p-3 flex items-center gap-2 text-left transition-transform active:scale-[0.97]"
         >
-          <span className="text-2xl">✍️</span>
+          <span className="text-xl">✍️</span>
           <div>
-            <p className="font-semibold text-base">Free Form</p>
-            <p className="text-sm text-muted-foreground">Write freely about anything on your mind</p>
+            <p className="font-semibold text-sm">Free Form</p>
+            <p className="text-xs text-muted-foreground line-clamp-1">Write freely</p>
+          </div>
+        </button>
+        <button
+          onClick={() => navigate('/app/reflections/notes')}
+          className="flex-1 rounded-2xl bg-accent/60 p-3 flex items-center gap-2 text-left transition-transform active:scale-[0.97]"
+        >
+          <BookOpen className="h-5 w-5 text-muted-foreground shrink-0" />
+          <div>
+            <p className="font-semibold text-sm">My Notes</p>
+            <p className="text-xs text-muted-foreground line-clamp-1">Past reflections</p>
           </div>
         </button>
       </div>
