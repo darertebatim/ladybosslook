@@ -70,12 +70,8 @@ export function TaskTemplateCard({ template, onAdd, isSelected, selectable }: Ta
         {selectable ? (
           <button
             onClick={(e) => { e.stopPropagation(); handleAdd(); }}
-            className={cn(
-              "shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-colors",
-              isSelected
-                ? "bg-primary"
-                : "bg-primary/80"
-            )}
+            className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+            style={{ backgroundColor: isSelected ? 'hsl(10, 80%, 55%)' : 'hsl(10, 80%, 65%)' }}
             aria-label={isSelected ? "Deselect task" : "Select task"}
           >
             {isSelected ? (
