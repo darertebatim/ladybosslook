@@ -44,6 +44,8 @@ export default function AppReflectionFlow() {
   const lineRefs = useRef<(HTMLInputElement | null)[]>([]);
   const justAddedLine = useRef(false);
 
+  const reflection = reflections?.find(r => r.id === reflectionId);
+
   const totalPages = pages?.length || 0;
   const page = pages?.[currentIndex];
   const isLast = currentIndex === totalPages - 1;
@@ -69,16 +71,14 @@ export default function AppReflectionFlow() {
       next = Math.floor(Math.random() * pages.length);
     } while (next === shufflePageIndex && pages.length > 1);
     setShufflePageIndex(next);
-    // Clear lines when shuffling
     setLines(['']);
     setTimeout(() => lineRefs.current[0]?.focus(), 100);
   }, [pages, shufflePageIndex]);
 
-  const reflection = reflections?.find(r => r.id === reflectionId);
-
   const currentAnswer = answers[page?.id || ''] || '';
-  const { className: contentBilingualClassName, direction: contentDirection } = useBilingualText(page?.content || '');
-  const { className: descBilingualClassName, direction: descDirection } = useBilingualText(page?.description || '');
+  const activePage = isSinglePage ? displayedPage : page;
+  const { className: contentBilingualClassName, direction: contentDirection } = useBilingualText(activePage?.content || '');
+  const { className: descBilingualClassName, direction: descDirection } = useBilingualText(activePage?.description || '');
   const { className: answerBilingualClassName, direction: answerDirection } = useBilingualText(currentAnswer);
   const { className: titleBiClass, direction: titleDir } = useBilingualText(reflection?.title || '');
 
