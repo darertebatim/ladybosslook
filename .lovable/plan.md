@@ -1,59 +1,42 @@
 
 
-# Rename "Simora" → "Ladybosslook" Across the App
+## Multi-Select & "Build My Routine" Feature for Tasks Bank
 
-## Scope
+### Overview
+Add a multi-select mode to `/app/tasksbank` so users can pick multiple tasks, then tap "Build My Routine" to open the existing Routine Builder pre-loaded with those tasks.
 
-Found **~1280 occurrences across 94 files**. These fall into several categories:
+### How It Works
+1. **Tapping a task card** toggles its selection (checkbox overlay appears on selected cards)
+2. When 1+ tasks are selected, a sticky **"Build My Routine (N)"** button appears at the bottom above the nav bar
+3. Tapping the button opens `RoutineBuilderSheet` at **Step 2** with:
+   - Default routine name: "My Self-Care Routine"
+   - Default emoji: ✨
+   - Pre-populated task list converted from `TaskTemplate[]` → `BuilderTask[]`
+4. User can edit name/emoji on step 1 (go back), reorder/edit tasks on step 2, then save as usual
 
-### 1. User-Facing UI Text (High Priority)
-- **Branded splash screen** (`BrandedSplash.tsx`): "Simora" → "Ladybosslook"
-- **SEO titles** (e.g., `AppMood.tsx`): "Mood Check-in | Simora" → "Mood Check-in | Ladybosslook"
-- **Settings page** (`AppSettings.tsx`): "Rate Simora" → "Rate Ladybosslook"
-- **Paywall screens** (`PaywallBold.tsx`, `PaywallVIP.tsx`, `PaywallMascotV2.tsx`, etc.): "Simora Plus" / "simora+" → "Ladybosslook Plus" / "Ladybosslook+"
-- **Admin labels** (`VideoPlaylistManager.tsx`, `BreathingExercisesManager.tsx`): "Requires Simora+" → "Requires Ladybosslook+"
-- **Admin channel chat** default display name: "Simora" → "Ladybosslook"
-- **Rate page** (`AppRate.tsx`): App Store URL slug update
-- **Update checker** (`useAppUpdateChecker.tsx`): App Store URL slug
-- **Subscriptions admin** (`Subscriptions.tsx`): "simora+ Plus V2" label
+### Technical Changes
 
-### 2. AI Coach System Prompt
-- `supabase/functions/ai-coach/index.ts`: "You are Simora" → "You are Ladybosslook"
+**1. `src/pages/app/AppTasksBank.tsx`**
+- Add `selectedTasks` state (`Set<string>`) to track selected task IDs
+- Add `selectionMode` — activated on first task tap (or always on)
+- Change `TaskTemplateCard` `onAdd` to toggle selection instead of instant-add
+- Add selected visual state (checkmark overlay or border highlight) on cards
+- Add sticky bottom button: "Build My Routine (N)" when selections exist
+- Import and render `RoutineBuilderSheet` with `initialTasks` mapped from selected templates
+- Convert `TaskTemplate` → `BuilderTask` (map fields: id, title, emoji, color, repeat_pattern, description, pro_link_type, pro_link_value, goal fields, time_period, category)
+- Wire `onComplete` to the same routine-saving logic used in `AppRoutinePlayer`
 
-### 3. Internal Keys (localStorage, product IDs)
-- localStorage keys like `simora_daily_reset_enabled`, `simora_tour_*`, `simora_celebrated_*`, `simora_onboarding_completed_*`, etc.
-- Product ID fallbacks like `simora_plus_annual`, `simora_plus_monthly`
-- Program slug `simora-plus`
+**2. `src/components/app/TaskTemplateCard.tsx`**
+- Add optional `isSelected` and `selectable` props
+- When selectable, show a checkbox/checkmark instead of the CalendarPlus button
+- Add selected state styling (e.g., ring/border highlight)
 
-**Decision needed for internal keys**: Renaming localStorage keys will break state for existing users (they'll re-see onboarding, lose tour progress, etc.). Product IDs and program slugs are tied to App Store Connect and database records.
+**3. `src/components/app/RoutineBuilderSheet.tsx`**
+- No changes needed — already accepts `initialTasks`, `initialTitle`, `initialEmoji` props
 
-### 4. Comments & Documentation
-- Hook comments referencing "Simora" philosophy text
-- Migration SQL comments
-
-## Recommended Approach
-
-| Category | Action |
-|----------|--------|
-| UI text, labels, titles | Rename to "Ladybosslook" |
-| AI coach prompt | Rename to "Ladybosslook" |
-| Admin labels | Rename to "Ladybosslook+" |
-| App Store URLs | Update slug if changed, otherwise keep |
-| localStorage keys | **Keep as-is** to avoid breaking existing users |
-| Product IDs / program slugs | **Keep as-is** (tied to App Store / database) |
-| Code comments | Update where trivial |
-| Migration SQL comments | Leave untouched |
-
-## Technical Details
-
-Will do a systematic file-by-file pass across all 94 files, applying the rename rules above. Key files with the most impact:
-
-- `src/components/app/BrandedSplash.tsx`
-- `src/pages/app/AppSettings.tsx`
-- `src/pages/app/AppRate.tsx`
-- `src/components/app/paywalls/*.tsx` (all paywall variants)
-- `supabase/functions/ai-coach/index.ts`
-- `src/components/SEOHead.tsx` default title
-- `src/hooks/useAppUpdateChecker.tsx`
-- All pages using `<SEOHead title="... Simora">`
+### UI Details
+- Selected cards get a colored border/ring + checkmark replacing the add button
+- Bottom button: rounded, primary color, full-width with padding, shows count badge
+- Button positioned with `fixed bottom-20` (above nav bar) with safe area padding
+- Clear selection option in header when in selection mode
 
