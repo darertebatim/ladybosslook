@@ -6,7 +6,7 @@ export interface BreathingExercise {
   id: string;
   name: string;
   description: string | null;
-  category: 'morning' | 'energize' | 'focus' | 'calm' | 'night';
+  category: 'energize' | 'focus' | 'calm' | 'night';
   emoji: string;
   inhale_seconds: number;
   inhale_hold_seconds: number;
@@ -32,7 +32,6 @@ export interface BreathingSession {
 
 export const BREATHING_CATEGORIES = [
   { value: 'all', label: 'All', emoji: '🌬️', icon: 'Wind', color: 'purple' },
-  { value: 'morning', label: 'Morning', emoji: '🌅', icon: 'Sunrise', color: 'orange' },
   { value: 'energize', label: 'Energize', emoji: '⚡', icon: 'Zap', color: 'yellow' },
   { value: 'focus', label: 'Focus', emoji: '🎯', icon: 'Target', color: 'blue' },
   { value: 'calm', label: 'Calm', emoji: '🧘', icon: 'Leaf', color: 'green' },
