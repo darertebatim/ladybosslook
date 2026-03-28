@@ -134,7 +134,8 @@ export default function AppReflectionFlow() {
   }, [lines]);
 
   const handleSaveSinglePage = async () => {
-    if (!page || !reflectionId) return;
+    const savePage = displayedPage || page;
+    if (!savePage || !reflectionId) return;
     const content = lines.filter(l => l.trim()).join('\n');
     try {
       await saveResponse.mutateAsync({
