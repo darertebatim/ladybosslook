@@ -28,17 +28,9 @@ export default function AppTasksBank() {
   // Sort categories by task_display_order (0 goes to end, then ascending)
   const sortedCategories = useMemo(() => {
     if (!categories || !allTasks) return [];
-    // Only show categories that have tasks
     return categories
-      .filter(c => allTasks.some(t => t.category === c.slug))
-      .sort((a, b) => {
-        const aOrder = a.task_display_order ?? 0;
-        const bOrder = b.task_display_order ?? 0;
-        if (aOrder === 0 && bOrder === 0) return 0;
-        if (aOrder === 0) return 1;
-        if (bOrder === 0) return -1;
-        return aOrder - bOrder;
-      });
+      .filter(c => (c.task_display_order ?? 0) !== 0 && allTasks.some(t => t.category === c.slug))
+      .sort((a, b) => (a.task_display_order ?? 0) - (b.task_display_order ?? 0));
   }, [categories, allTasks]);
 
   // Group tasks by category
