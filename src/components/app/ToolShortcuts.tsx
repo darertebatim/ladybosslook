@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PRO_LINK_CONFIGS, type ProLinkType, type ProLinkConfig, getProTaskNavigationPath } from '@/lib/proTaskTypes';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,8 @@ import { haptic } from '@/lib/haptics';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { wellnessTools, audioTools, type ToolConfig } from '@/lib/toolsConfig';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 const STORAGE_KEY = 'tool-shortcuts';
 const MAX_SHORTCUTS = 5;
@@ -16,33 +18,35 @@ interface Shortcut {
   value: string | null;
 }
 
-interface CategoryGroup {
-  id: string;
-  label: string;
-  links: ProLinkType[];
-}
+// Map tool config IDs to ProLinkType for shortcut navigation
+const TOOL_TO_PROLINK: Record<string, ProLinkType> = {
+  'self-care': 'tasksbank',
+  'routines': 'inspire',
+  'focus-timer': 'focus_timer',
+  'focus-routine': 'routine',
+  'reflections': 'reflection',
+  'journal': 'journal',
+  'breathe': 'breathe',
+  'mood': 'mood',
+  'emotions': 'emotion',
+  'videos': 'watch',
+  'water': 'water',
+  'period': 'period',
+  'fasting': 'fasting',
+  'programs': 'myprograms',
+  'profile': 'myprofile',
+  'academy': 'program',
+  'listen': 'listen',
+  'presence': 'presence',
+  'weight': 'weight',
+  'meditate': 'audio',
+  'soundscape': 'playlist',
+};
 
-const CATEGORIES: CategoryGroup[] = [
-  {
-    id: 'wellness',
-    label: 'Wellness Tools',
-    links: ['journal', 'breathe', 'mood', 'emotion', 'reflection', 'presence', 'water', 'period', 'fasting', 'weight', 'focus_timer'],
-  },
-  {
-    id: 'media',
-    label: 'Media',
-    links: ['listen', 'audio', 'playlist', 'watch', 'video', 'video_playlist'],
-  },
-  {
-    id: 'routines',
-    label: 'Routines & Programs',
-    links: ['routine', 'tasksbank', 'inspire', 'program', 'myprograms'],
-  },
-  {
-    id: 'nav',
-    label: 'Navigation',
-    links: ['planner', 'channel', 'myprofile', 'route'],
-  },
+// All tools combined for the picker grid
+const ALL_TOOLS = [
+  ...wellnessTools.filter(t => !t.comingSoon && !t.hidden && t.id !== 'new-task' && t.id !== 'new-routine'),
+  ...audioTools.filter(t => t.id === 'meditate' || t.id === 'soundscape'),
 ];
 
 function loadShortcuts(): (Shortcut | null)[] {
