@@ -23,6 +23,7 @@ type FormData = Omit<BreathingExercise, 'id' | 'created_at' | 'updated_at'>;
 
 const defaultFormData: FormData = {
   name: '',
+  subtitle: null,
   description: '',
   category: 'calm',
   emoji: '🫁',
@@ -61,6 +62,7 @@ export function BreathingExercisesManager() {
     setEditingExercise(exercise);
     setFormData({
       name: exercise.name,
+      subtitle: exercise.subtitle || '',
       description: exercise.description || '',
       category: exercise.category,
       emoji: exercise.emoji,
@@ -218,6 +220,33 @@ export function BreathingExercisesManager() {
                   placeholder="Calm Breathing"
                 />
               </div>
+            </div>
+
+            <div>
+              <Label>Subtitle</Label>
+              <Input
+                value={formData.subtitle || ''}
+                onChange={(e) => updateField('subtitle', e.target.value || null)}
+                placeholder="e.g. 4-7-8 Pattern"
+              />
+            </div>
+
+            <div>
+              <Label>Category</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(v) => updateField('category', v as any)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="energize">⚡ Energize</SelectItem>
+                  <SelectItem value="focus">🎯 Focus</SelectItem>
+                  <SelectItem value="calm">🧘 Calm</SelectItem>
+                  <SelectItem value="night">🌙 Night</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>

@@ -1,0 +1,1 @@
+ALTER TABLE public.breathing_exercises ADD COLUMN IF NOT EXISTS subtitle text;

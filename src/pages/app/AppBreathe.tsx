@@ -6,18 +6,21 @@ import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
 import { 
   useBreathingExercises, 
   BreathingExercise,
+  BREATHING_CATEGORIES,
 } from '@/hooks/useBreathingExercises';
 import { BreathingExerciseCard } from '@/components/breathe/BreathingExerciseCard';
 import { BreathingExerciseScreen } from '@/components/breathe/BreathingExerciseScreen';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BreatheTour, TourHelpButton } from '@/components/app/tour';
 import { haptic } from '@/lib/haptics';
+import { cn } from '@/lib/utils';
 
 export default function AppBreathe() {
   const [searchParams] = useSearchParams();
   const { data: exercises, isLoading } = useBreathingExercises();
   
   const [selectedExercise, setSelectedExercise] = useState<BreathingExercise | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
 
   const handleTourReady = useCallback((tourStart: () => void) => {
@@ -36,11 +39,18 @@ export default function AppBreathe() {
     }
   }, [exerciseId, exercises]);
 
-  // Filter to active exercises only
+  // Filter to active exercises, then by category
   const filteredExercises = useMemo(() => {
     if (!exercises) return [];
-    return exercises.filter(e => e.is_active);
-  }, [exercises]);
+    const active = exercises.filter(e => e.is_active);
+    if (selectedCategory === 'all') return active;
+    return active.filter(e => e.category === selectedCategory);
+  }, [exercises, selectedCategory]);
+
+  const handleCategoryClick = (value: string) => {
+    setSelectedCategory(value);
+    haptic.light();
+  };
 
   const handleExerciseClick = (exercise: BreathingExercise) => {
     setSelectedExercise(exercise);
@@ -77,6 +87,26 @@ export default function AppBreathe() {
           rightAction={startTour ? <TourHelpButton onClick={startTour} /> : undefined}
         />
         <AppHeaderSpacer />
+
+        {/* Category pills */}
+        <div className="px-4 pt-2 pb-3">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar">
+            {BREATHING_CATEGORIES.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => handleCategoryClick(cat.value)}
+                className={cn(
+                  'px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0',
+                  selectedCategory === cat.value
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                )}
+              >
+                {cat.emoji} {cat.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Exercise list */}
         <div className="px-4 pb-safe">
