@@ -11,7 +11,13 @@ import { wellnessTools, audioTools, type ToolConfig } from '@/lib/toolsConfig';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 const STORAGE_KEY = 'tool-shortcuts';
-const MAX_SHORTCUTS = 5;
+const MAX_SHORTCUTS = 4;
+const DEFAULT_SHORTCUTS: (Shortcut | null)[] = [
+  { type: 'routine', value: null },
+  { type: 'reflection', value: null },
+  null,
+  null,
+];
 
 interface Shortcut {
   type: ProLinkType;
@@ -61,7 +67,7 @@ function loadShortcuts(): (Shortcut | null)[] {
       }
     }
   } catch {}
-  return Array(MAX_SHORTCUTS).fill(null);
+  return [...DEFAULT_SHORTCUTS];
 }
 
 function saveShortcuts(shortcuts: (Shortcut | null)[]) {
