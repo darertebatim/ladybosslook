@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Wind } from 'lucide-react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Wind, BarChart3 } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
 import { 
@@ -16,6 +16,7 @@ import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 
 export default function AppBreathe() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { data: exercises, isLoading } = useBreathingExercises();
   
@@ -84,7 +85,17 @@ export default function AppBreathe() {
           title="Breathe"
           showBack
           backTo="/app/home"
-          rightAction={startTour ? <TourHelpButton onClick={startTour} /> : undefined}
+          rightAction={
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => navigate('/app/breathe/stats')}
+                className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
+              >
+                <BarChart3 className="h-4 w-4 text-foreground" />
+              </button>
+              {startTour && <TourHelpButton onClick={startTour} />}
+            </div>
+          }
         />
         <AppHeaderSpacer />
 

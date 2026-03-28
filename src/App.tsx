@@ -69,6 +69,7 @@ const AppRoutineCategory = lazy(() => import("@/pages/app/AppRoutineCategory"));
 const AppActions = lazy(() => import("@/pages/app/AppActions"));
 const AppRoutinePlayerPage = lazy(() => import("@/pages/app/AppRoutinePlayer"));
 const AppBreathe = lazy(() => import("@/pages/app/AppBreathe"));
+const AppBreatheStats = lazy(() => import("@/pages/app/AppBreatheStats"));
 const AppWater = lazy(() => import("@/pages/app/AppWater"));
 const AppPeriod = lazy(() => import("@/pages/app/AppPeriod"));
 const AppEmotion = lazy(() => import("@/pages/app/AppEmotion"));
@@ -458,6 +459,7 @@ const App = () => (
                     <Route path="/app/home/edit/:taskId" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
                     <Route path="/app/channels/post/:postId" element={<ProtectedRoute><AppFeedPost /></ProtectedRoute>} />
                     <Route path="/app/breathe" element={<ProtectedRoute><AppBreathe /></ProtectedRoute>} />
+                    <Route path="/app/breathe/stats" element={<ProtectedRoute><AppBreatheStats /></ProtectedRoute>} />
                     <Route path="/app/water" element={<ProtectedRoute><AppWater /></ProtectedRoute>} />
                     <Route path="/app/period" element={<ProtectedRoute><AppPeriod /></ProtectedRoute>} />
                     <Route path="/app/emotion" element={<ProtectedRoute><AppEmotion /></ProtectedRoute>} />
