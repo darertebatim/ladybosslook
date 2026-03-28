@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useReflections, Reflection, REFLECTION_CATEGORIES } from '@/hooks/useReflections';
 import { ArrowLeft, BookOpen, Crown } from 'lucide-react';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
 import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
@@ -157,7 +158,7 @@ export default function AppReflections() {
                   : 'bg-muted text-muted-foreground'
               }`}
             >
-              {cat.emoji} {cat.label}
+              <FluentEmoji emoji={cat.emoji} size={16} className="mr-1" /> {cat.label}
             </button>
           ))}
         </div>

@@ -20,6 +20,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Pencil, Trash2, GripVertical, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface PageDraft {
   id?: string;
@@ -118,7 +119,7 @@ export function ReflectionsManager() {
                   <SelectContent>
                     {REFLECTION_CATEGORIES.map((cat) => (
                       <SelectItem key={cat.value} value={cat.value}>
-                        {cat.emoji} {cat.label}
+                        <FluentEmoji emoji={cat.emoji} size={16} className="mr-1" /> {cat.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
