@@ -3,7 +3,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, ChevronRight, Plus, Trash2, ListChecks, MoreHorizontal, Repeat, Clock, Pencil } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2, ListChecks, MoreHorizontal, Repeat, Clock, Pencil, Search, Leaf, Check } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { haptic } from '@/lib/haptics';
@@ -11,11 +11,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { getLocalDateStr } from '@/lib/localDate';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { TASK_COLOR_CLASSES, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
+import { TASK_COLOR_CLASSES, TASK_COLORS, TaskColor, TaskTemplate } from '@/hooks/useTaskPlanner';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
 import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 import { Capacitor } from '@capacitor/core';
+import { Input } from '@/components/ui/input';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { Keyboard } from '@capacitor/keyboard';
 
 // Secondary (darker) palette for bottom sections
@@ -123,6 +126,10 @@ export function RoutineBuilderSheet({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showMyTasks, setShowMyTasks] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [showTaskBank, setShowTaskBank] = useState(false);
+  const [taskBankSearch, setTaskBankSearch] = useState('');
+  const [taskBankCategory, setTaskBankCategory] = useState<string | null>(null);
+  const [taskBankSelected, setTaskBankSelected] = useState<Set<string>>(new Set());
   const [quickAddTitle, setQuickAddTitle] = useState('');
   const [quickRepeat, setQuickRepeat] = useState('Daily');
   const [quickTime, setQuickTime] = useState('Anytime');
