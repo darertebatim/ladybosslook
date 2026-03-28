@@ -95,7 +95,7 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-base leading-tight">{exercise.name}</p>
             {exercise.subtitle && (
-              <p className="text-sm text-muted-foreground mt-0.5">{exercise.subtitle}</p>
+              <p className="text-sm text-foreground mt-0.5">{exercise.subtitle}</p>
             )}
           </div>
         </button>
