@@ -8,17 +8,13 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
-// Most-used pro link types shown as featured cards
+// All pro link types shown as featured cards
 const FEATURED_LINKS: ProLinkType[] = [
   'breathe', 'journal', 'routine', 'playlist', 'mood', 'audio',
-];
-
-// Group remaining links by category
-const CATEGORY_ORDER = [
-  { label: 'Media', types: ['video', 'video_playlist'] as ProLinkType[] },
-  { label: 'Wellness', types: ['water', 'period', 'emotion', 'fasting', 'weight'] as ProLinkType[] },
-  { label: 'Productivity', types: ['focus_timer', 'reflection', 'planner'] as ProLinkType[] },
-  { label: 'Navigation', types: ['channel', 'program', 'inspire', 'route'] as ProLinkType[] },
+  'water', 'period', 'emotion', 'fasting', 'weight',
+  'focus_timer', 'reflection', 'planner',
+  'video', 'video_playlist',
+  'channel', 'program', 'inspire', 'route',
 ];
 
 interface ProLinkPickerProps {
