@@ -354,7 +354,7 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
-    "@mediagrid/capacitor-native-audio": ["@mediagrid/capacitor-native-audio@3.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-u3LvuqJn2VLND8KXdkxoD8YobcNylF40d6fA5KirNY5/79rwviY28AksbVZSo41YjkhJSNVnKilPBe6nzpP8kA=="],
+    "@mediagrid/capacitor-native-audio": ["@mediagrid/capacitor-native-audio@3.0.0", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@mediagrid/capacitor-native-audio/-/capacitor-native-audio-3.0.0.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-u3LvuqJn2VLND8KXdkxoD8YobcNylF40d6fA5KirNY5/79rwviY28AksbVZSo41YjkhJSNVnKilPBe6nzpP8kA=="],
 
     "@nodelib/fs.scandir": ["@nodelib/fs.scandir@2.1.5", "", { "dependencies": { "@nodelib/fs.stat": "2.0.5", "run-parallel": "^1.1.9" } }, "sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g=="],
 
