@@ -373,10 +373,7 @@ const AppStore = () => {
               </section>
             )}
 
-            {/* My Shortcuts */}
-            {!searchQuery && (
-              <ToolShortcuts />
-            )}
+            {/* My Shortcuts moved above programs */}
 
             {/* Reflections Section */}
             {!searchQuery && reflections && reflections.length > 0 && (
