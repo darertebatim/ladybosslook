@@ -61,9 +61,13 @@ function loadShortcuts(): (Shortcut | null)[] {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        const padded = [...parsed];
-        while (padded.length < MAX_SHORTCUTS) padded.push(null);
-        return padded.slice(0, MAX_SHORTCUTS);
+        // Migration: if old format (5 slots) or all nulls, reset to defaults
+        const hasAnyShortcut = parsed.some((s: any) => s !== null);
+        if (!hasAnyShortcut || parsed.length !== MAX_SHORTCUTS) {
+          localStorage.removeItem(STORAGE_KEY);
+          return [...DEFAULT_SHORTCUTS];
+        }
+        return parsed.slice(0, MAX_SHORTCUTS);
       }
     }
   } catch {}
