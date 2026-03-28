@@ -10,13 +10,13 @@ import { Crown } from 'lucide-react';
 import { 
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
-  GraduationCap, User, HeartHandshake, CalendarPlus, Clock, Headphones, Plus, Wand2, Play, LucideIcon
+  GraduationCap, User, HeartHandshake, CalendarPlus, Clock, Headphones, Plus, Wand2, Play, Flame, LucideIcon
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle,
-  GraduationCap, User, HeartHandshake, CalendarPlus, Clock, Headphones, Plus, Wand2, Play
+  GraduationCap, User, HeartHandshake, CalendarPlus, Clock, Headphones, Plus, Wand2, Play, Flame
 };
 
 // Tools that require simora+ subscription
@@ -48,7 +48,11 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
     }
     // Handle special action routes
     if (tool.route === '__action:new-task') {
-      window.dispatchEvent(new CustomEvent('quick-add-open', { detail: { defaultRepeat: 'Daily' } }));
+      // Navigate to home first, then open quick-add after mount
+      navigate('/app/home');
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('quick-add-open', { detail: { defaultRepeat: 'Daily' } }));
+      }, 300);
       return;
     }
     if (tool.route === '__action:new-routine') {

@@ -202,6 +202,16 @@ export const wellnessTools: ToolConfig[] = [
     route: '__action:new-routine',
     description: 'Build a routine',
   },
+  {
+    id: 'presence',
+    name: 'Presence',
+    icon: 'Flame',
+    emoji: '🔥',
+    bgColor: 'bg-[#FFE6C9]',
+    iconColor: 'text-orange-600',
+    route: '/app/presence',
+    description: 'Daily streak',
+  },
 ];
 
 export const audioTools: ToolConfig[] = [
