@@ -191,49 +191,36 @@ export function ToolShortcuts() {
             </div>
 
             <ScrollArea className="flex-1 px-5">
-              <div className="pb-6 space-y-5">
-                {CATEGORIES.map((cat) => {
-                  const items = cat.links
-                    .map((type) => PRO_LINK_CONFIGS[type])
-                    .filter(matchesSearch);
-                  if (items.length === 0) return null;
-
+              <div className="grid grid-cols-4 gap-3 pb-6">
+                {filteredTools.map((tool) => {
+                  const proLinkType = TOOL_TO_PROLINK[tool.id];
+                  const isAlreadyUsed = proLinkType && shortcuts.some(s => s?.type === proLinkType);
                   return (
-                    <div key={cat.id}>
-                      <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-2 px-1">
-                        {cat.label}
-                      </h3>
-                      <div className="space-y-1.5">
-                        {items.map((config) => {
-                          const Icon = config.icon;
-                          const isAlreadyUsed = shortcuts.some(s => s?.type === config.value);
-                          return (
-                            <button
-                              key={config.value}
-                              onClick={() => handleSelect(config.value)}
-                              disabled={isAlreadyUsed}
-                              className={cn(
-                                'w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors active:scale-[0.98]',
-                                isAlreadyUsed
-                                  ? 'opacity-40 cursor-not-allowed bg-muted/30'
-                                  : 'bg-card hover:bg-muted/50'
-                              )}
-                            >
-                              <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', config.gradientClass)}>
-                                <Icon className={cn('h-4.5 w-4.5', config.iconColorClass)} />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-medium text-foreground leading-tight">{config.label}</div>
-                                <div className="text-[11px] text-muted-foreground leading-tight mt-0.5 truncate">{config.description}</div>
-                              </div>
-                              {isAlreadyUsed && (
-                                <span className="text-[10px] text-muted-foreground shrink-0">Added</span>
-                              )}
-                            </button>
-                          );
-                        })}
+                    <button
+                      key={tool.id}
+                      onClick={() => handleSelectTool(tool)}
+                      disabled={!!isAlreadyUsed || !proLinkType}
+                      className={cn(
+                        'flex flex-col items-center gap-1 py-2 rounded-xl transition-all active:scale-95',
+                        isAlreadyUsed ? 'opacity-40 cursor-not-allowed' : 'hover:bg-muted/50'
+                      )}
+                    >
+                      <div className={cn('w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm', tool.bgColor)}>
+                        {tool.emoji ? (
+                          <FluentEmoji emoji={tool.emoji} size={32} />
+                        ) : (
+                          <span className="text-2xl">📱</span>
+                        )}
+                        {isAlreadyUsed && (
+                          <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                            <Check className="h-3 w-3 text-primary-foreground" />
+                          </div>
+                        )}
                       </div>
-                    </div>
+                      <span className="text-[10px] font-medium text-foreground text-center leading-tight line-clamp-1 w-full">
+                        {tool.name}
+                      </span>
+                    </button>
                   );
                 })}
               </div>
