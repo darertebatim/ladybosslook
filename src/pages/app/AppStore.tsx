@@ -235,7 +235,7 @@ const AppStore = () => {
             </div>
           ) : (
             <>
-              <h1 className="text-xl font-bold text-foreground">Tools</h1>
+              <h1 className="text-xl font-bold text-foreground">Self-Care Tools</h1>
               <div className="flex items-center">
                 {startTour && (
                   <TourHelpButton onClick={startTour} />
@@ -273,7 +273,7 @@ const AppStore = () => {
             {(!searchQuery || filteredWellnessTools.length > 0 || filteredAudioTools.length > 0) && (
               <section className="tour-tools-section">
                 <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
-                  Tools
+                  All Tools
                 </h2>
                 {/* All tools in single scrollable row */}
                 <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
