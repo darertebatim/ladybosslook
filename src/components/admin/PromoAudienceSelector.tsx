@@ -92,7 +92,14 @@ export function PromoAudienceSelector({
   setTargetLanguages,
   targetTimezones,
   setTargetTimezones,
+  includeUpdateStatus,
+  setIncludeUpdateStatus,
 }: PromoAudienceSelectorProps) {
+  const UPDATE_STATUS_OPTIONS = [
+    { slug: 'latest', label: '🆕 Last Update', description: 'Users on the latest app version' },
+    { slug: 'previous', label: '📦 Previous Updates', description: 'Users on older app versions' },
+  ];
+
   // Fetch programs
   const { data: programs } = useQuery({
     queryKey: ['programs-for-targeting'],
