@@ -277,7 +277,7 @@ const AppStore = () => {
                 {/* Row 1: Free tools + audio */}
                 <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pt-3 pb-3 scrollbar-hide">
                   {filteredWellnessTools
-                    .filter(t => !['fasting', 'water', 'period', 'focus-routine', 'programs', 'profile'].includes(t.id))
+                    .filter(t => !['fasting', 'period', 'focus-routine', 'programs', 'profile'].includes(t.id))
                     .map((tool) => (
                       <ToolCard 
                         key={tool.id} 
@@ -300,7 +300,7 @@ const AppStore = () => {
                 {/* Row 2: Plus tools */}
                 <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
                   {filteredWellnessTools
-                    .filter(t => ['fasting', 'water', 'period', 'focus-routine', 'programs', 'profile'].includes(t.id))
+                    .filter(t => ['fasting', 'period', 'focus-routine', 'programs', 'profile'].includes(t.id))
                     .map((tool) => (
                       <ToolCard 
                         key={tool.id} 
