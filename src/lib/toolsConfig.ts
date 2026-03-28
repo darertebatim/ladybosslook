@@ -182,6 +182,26 @@ export const wellnessTools: ToolConfig[] = [
     route: '/app/player',
     description: 'Audio player',
   },
+  {
+    id: 'new-task',
+    name: 'New Task',
+    icon: 'Plus',
+    emoji: '➕',
+    bgColor: 'bg-[#FFE6C9]',
+    iconColor: 'text-orange-600',
+    route: '__action:new-task',
+    description: 'Quick add a task',
+  },
+  {
+    id: 'new-routine',
+    name: 'New Routine',
+    icon: 'Wand2',
+    emoji: '🪄',
+    bgColor: 'bg-[#E2F9F0]',
+    iconColor: 'text-emerald-600',
+    route: '__action:new-routine',
+    description: 'Build a routine',
+  },
 ];
 
 export const audioTools: ToolConfig[] = [
