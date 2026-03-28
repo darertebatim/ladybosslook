@@ -181,11 +181,7 @@ export default function AppFreeFormReflection() {
             <div key={idx} className="flex items-start gap-3">
               <div
                 className="w-3 h-3 rounded-sm mt-[5px] shrink-0 transition-colors"
-                style={{
-                  backgroundColor: line.trim()
-                    ? getBulletColor(idx)
-                    : 'hsl(var(--muted-foreground) / 0.25)',
-                }}
+                style={{ backgroundColor: BULLET_COLOR }}
               />
               <input
                 ref={(el) => { lineRefs.current[idx] = el; }}
