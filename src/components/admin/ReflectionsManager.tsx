@@ -20,6 +20,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Pencil, Trash2, GripVertical, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface PageDraft {
   id?: string;
