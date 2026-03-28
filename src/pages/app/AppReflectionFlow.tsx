@@ -286,7 +286,7 @@ export default function AppReflectionFlow() {
                   value={line}
                   onChange={(e) => handleLineChange(idx, e.target.value)}
                   onKeyDown={(e) => handleLineKeyDown(idx, e)}
-                  placeholder={idx === 0 ? (page?.description || 'Write your thoughts…') : ''}
+                  placeholder={idx === 0 ? (displayedPage?.description || 'Write your thoughts…') : ''}
                   className="flex-1 bg-transparent border-0 outline-none text-base placeholder:text-muted-foreground/40"
                 />
               </div>
