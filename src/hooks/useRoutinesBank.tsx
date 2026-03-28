@@ -640,7 +640,7 @@ export function useAddRoutineFromBank() {
       // Insert synthetic pro-task (routine launcher) if selected — placed after routine tasks
       if (hasProTask) {
         const proTaskEdited = editedTasks?.find(t => t.id.startsWith(proTaskPrefix));
-        const proTaskOrder = startOrderIndex + selectedRegularTasks.length;
+        const proTaskOrder = startOrderIndex + tasks.length;
         const { error: proError } = await supabase
           .from('user_tasks')
           .insert({
