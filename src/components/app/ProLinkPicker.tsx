@@ -95,47 +95,20 @@ export function ProLinkPicker({
 
           <ScrollArea className="flex-1 px-5">
             <div className="pb-6">
-              {/* Featured cards — 2-column grid */}
+              {/* All tools — 2-column grid */}
               {filteredFeatured.length > 0 && (
-                <div className="mb-4">
-                  <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                    Popular
-                  </p>
-                  <div className="grid grid-cols-2 gap-2.5">
-                    {filteredFeatured.map((config, i) => (
-                      <FeaturedCard
-                        key={config.value}
-                        config={config}
-                        isSelected={proLinkType === config.value}
-                        onSelect={() => onSelect(config.value)}
-                        index={i}
-                      />
-                    ))}
-                  </div>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {filteredFeatured.map((config, i) => (
+                    <FeaturedCard
+                      key={config.value}
+                      config={config}
+                      isSelected={proLinkType === config.value}
+                      onSelect={() => onSelect(config.value)}
+                      index={i}
+                    />
+                  ))}
                 </div>
               )}
-
-              {/* Category sections */}
-              {filteredCategories.map((cat) => (
-                <div key={cat.label} className="mb-3">
-                  <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
-                    {cat.label}
-                  </p>
-                  <div className="space-y-1">
-                    {cat.types.map((type) => {
-                      const config = PRO_LINK_CONFIGS[type];
-                      return (
-                        <CompactRow
-                          key={type}
-                          config={config}
-                          isSelected={proLinkType === type}
-                          onSelect={() => onSelect(type)}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
             </div>
           </ScrollArea>
 
