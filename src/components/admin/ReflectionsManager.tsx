@@ -123,6 +123,7 @@ export function ReflectionsManager() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
               <ImageUploader
                 value={editing.cover_image_url || ''}
                 onChange={(url) => setEditing({ ...editing, cover_image_url: url })}
