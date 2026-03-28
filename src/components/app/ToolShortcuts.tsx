@@ -105,21 +105,24 @@ export function ToolShortcuts() {
     setShortcuts(updated);
   };
 
-  const handleSelect = (type: ProLinkType) => {
-    if (editingIndex !== null) {
+  const handleSelectTool = (tool: ToolConfig) => {
+    const proLinkType = TOOL_TO_PROLINK[tool.id];
+    if (proLinkType && editingIndex !== null) {
       const updated = [...shortcuts];
-      updated[editingIndex] = { type, value: null };
+      updated[editingIndex] = { type: proLinkType, value: null };
       setShortcuts(updated);
       setPickerOpen(false);
       setEditingIndex(null);
     }
   };
 
-  const matchesSearch = (config: ProLinkConfig) => {
+  const matchesToolSearch = (tool: ToolConfig) => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
-    return config.label.toLowerCase().includes(q) || config.description.toLowerCase().includes(q);
+    return tool.name.toLowerCase().includes(q) || tool.description.toLowerCase().includes(q);
   };
+
+  const filteredTools = ALL_TOOLS.filter(matchesToolSearch);
 
   const hasAny = shortcuts.some(s => s !== null);
 
