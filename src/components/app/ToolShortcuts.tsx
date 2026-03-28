@@ -193,14 +193,13 @@ export function ToolShortcuts() {
             <ScrollArea className="flex-1 px-5">
               <div className="grid grid-cols-4 gap-3 pb-6 pt-2">
                 {filteredTools.map((tool) => {
-                  const proLinkType = TOOL_TO_PROLINK[tool.id];
-                  const isAlreadyUsed = proLinkType && shortcuts.some(s => s?.type === proLinkType);
+                  const isAlreadyUsed = shortcuts.some(s => s === tool.id);
                   const isPremium = ['fasting', 'period'].includes(tool.id);
                   return (
                     <button
                       key={tool.id}
                       onClick={() => handleSelectTool(tool)}
-                      disabled={!!isAlreadyUsed || !proLinkType}
+                      disabled={!!isAlreadyUsed}
                       className={cn(
                         'relative flex flex-col items-center gap-1 pt-4 pb-2 rounded-xl transition-all active:scale-95',
                         isAlreadyUsed ? 'opacity-40 cursor-not-allowed' : 'hover:bg-muted/50'
