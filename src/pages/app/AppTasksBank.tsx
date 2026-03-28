@@ -81,7 +81,7 @@ export default function AppTasksBank() {
             <button onClick={() => navigate(-1)} className="p-1 -ml-1 active:scale-95 transition-transform">
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
-            <h1 className="text-xl font-bold text-foreground">Tasks Library</h1>
+            <h1 className="text-xl font-bold text-foreground">Self-Care Habits</h1>
           </div>
           <button
             onClick={() => setShowSearch(!showSearch)}
