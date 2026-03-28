@@ -92,7 +92,7 @@ export function BreathingInfoSheet({
 
         {/* Description */}
         {exercise.description && (
-          <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
+          <p className="text-foreground text-sm mb-6 leading-relaxed">
             {exercise.description}
           </p>
         )}
