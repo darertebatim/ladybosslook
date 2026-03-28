@@ -74,7 +74,7 @@ export function TaskTemplateCard({ template, onAdd, isSelected, selectable }: Ta
               "shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-colors",
               isSelected
                 ? "bg-primary"
-                : "bg-foreground"
+                : "bg-primary/80"
             )}
             aria-label={isSelected ? "Deselect task" : "Select task"}
           >
