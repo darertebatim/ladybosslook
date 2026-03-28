@@ -69,6 +69,8 @@ interface PromoAudienceSelectorProps {
   setTargetLanguages: (langs: string[]) => void;
   targetTimezones: string[];
   setTargetTimezones: (tzs: string[]) => void;
+  includeUpdateStatus: string[];
+  setIncludeUpdateStatus: (statuses: string[]) => void;
 }
 
 export function PromoAudienceSelector({
