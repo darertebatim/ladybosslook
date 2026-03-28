@@ -152,8 +152,8 @@ export function ToolShortcuts() {
                 onTap={() => handleSlotTap(i)}
                 onLongPress={() => handleLongPress(i)}
               >
-                <div className={cn('w-12 h-12 rounded-2xl flex items-center justify-center', config.gradientClass)}>
-                  <Icon className={cn('h-5 w-5', config.iconColorClass)} />
+                <div className={cn('w-16 h-16 rounded-2xl flex items-center justify-center', config.gradientClass)}>
+                  <Icon className={cn('h-6 w-6', config.iconColorClass)} />
                 </div>
                 <span className="text-[10px] font-medium text-foreground leading-tight text-center line-clamp-1 mt-1 w-full">
                   {config.label}
@@ -164,8 +164,8 @@ export function ToolShortcuts() {
 
           return (
             <ShortcutSlot key={i} onTap={() => handleSlotTap(i)}>
-              <div className="w-12 h-12 rounded-2xl bg-muted/60 border-2 border-dashed border-border/50 flex items-center justify-center">
-                <Plus className="h-4 w-4 text-muted-foreground/60" />
+              <div className="w-16 h-16 rounded-2xl bg-muted/60 border-2 border-dashed border-border/50 flex items-center justify-center">
+                <Plus className="h-5 w-5 text-muted-foreground/60" />
               </div>
               <span className="text-[10px] text-muted-foreground/50 mt-1">Add</span>
             </ShortcutSlot>
@@ -300,7 +300,7 @@ function ShortcutSlot({
 
   return (
     <button
-      className="flex flex-col items-center w-[calc((100%-48px)/5)] shrink-0 active:scale-95 transition-transform"
+      className="flex flex-col items-center w-[calc((100%-36px)/4)] shrink-0 active:scale-95 transition-transform"
       onPointerDown={(e) => handlePressStart(e.pointerType, e.button)}
       onPointerUp={(e) => handlePressEnd(true, e.pointerType, e.button)}
       onPointerCancel={() => handlePressEnd(false)}
