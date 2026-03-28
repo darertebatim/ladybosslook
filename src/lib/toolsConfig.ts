@@ -162,6 +162,26 @@ export const wellnessTools: ToolConfig[] = [
     route: '/app/myprofile',
     description: 'Settings & account',
   },
+  {
+    id: 'academy',
+    name: 'Academy',
+    icon: 'GraduationCap',
+    emoji: '🏫',
+    bgColor: 'bg-[#DBEAFE]',
+    iconColor: 'text-blue-600',
+    route: '/app/academy',
+    description: 'Browse programs',
+  },
+  {
+    id: 'listen',
+    name: 'Listen',
+    icon: 'Headphones',
+    emoji: '🎧',
+    bgColor: 'bg-[#F0E3FF]',
+    iconColor: 'text-purple-600',
+    route: '/app/player',
+    description: 'Audio player',
+  },
 ];
 
 export const audioTools: ToolConfig[] = [
