@@ -701,6 +701,21 @@ export function RoutineBuilderSheet({
                     </div>
                     <span className="text-[13px] font-semibold text-black/80 dark:text-foreground">Add from My Tasks</span>
                   </button>
+
+                  {/* Add a Self-Care Habit */}
+                  <button
+                    onClick={() => {
+                      haptic.light();
+                      setTaskBankSelected(new Set());
+                      setShowTaskBank(true);
+                    }}
+                    className="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/60 dark:bg-white/10 active:bg-white/80 dark:active:bg-white/20 transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-emerald-400/20 flex items-center justify-center">
+                      <Leaf className="w-4 h-4 text-emerald-600 dark:text-emerald-400" strokeWidth={2.5} />
+                    </div>
+                    <span className="text-[13px] font-semibold text-black/80 dark:text-foreground">Add a Self-Care Habit</span>
+                  </button>
                 </div>
 
                 {/* Create Routine */}
