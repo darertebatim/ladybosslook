@@ -18,6 +18,7 @@ import { useBreathingExercises, type BreathingExercise } from '@/hooks/useBreath
 import { useQuery } from '@tanstack/react-query';
 import { CachedImage } from '@/components/ui/CachedImage';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 
 const AppStore = () => {
   const navigate = useNavigate();
