@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Pencil, Trash2, GripVertical, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { EmojiPicker } from '@/components/app/EmojiPicker';
 
 interface PageDraft {
   id?: string;
@@ -50,9 +51,11 @@ export function ReflectionsManager() {
     ? reflections?.filter(r => r.category === selectedCategory)
     : reflections;
 
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
   const openCreate = () => {
     setIsNew(true);
-    setEditing({ title: '', subtitle: '', cover_image_url: '', is_active: true, is_featured: false, is_free: true, sort_order: 0, category: 'deep-dives' });
+    setEditing({ title: '', subtitle: '', cover_image_url: '', emoji: '', is_active: true, is_featured: false, is_free: true, sort_order: 0, category: 'deep-dives' });
   };
 
   const openEdit = (r: Reflection) => {
@@ -111,6 +114,10 @@ export function ReflectionsManager() {
           <Card key={r.id} className="flex items-center gap-3 p-3">
             {r.cover_image_url ? (
               <img src={r.cover_image_url} alt="" className="h-12 w-12 rounded-lg object-cover shrink-0" />
+            ) : r.emoji ? (
+              <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                <FluentEmoji emoji={r.emoji} size={28} />
+              </div>
             ) : (
               <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center text-lg shrink-0">📝</div>
             )}
@@ -142,6 +149,27 @@ export function ReflectionsManager() {
               <div>
                 <Label>Subtitle</Label>
                 <Input value={editing.subtitle || ''} onChange={(e) => setEditing({ ...editing, subtitle: e.target.value })} />
+              </div>
+              <div>
+                <Label>Emoji (shown when no cover image)</Label>
+                <div className="flex items-center gap-3 mt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowEmojiPicker(true)}
+                    className="w-14 h-14 rounded-xl border-2 border-dashed border-muted-foreground/30 flex items-center justify-center hover:border-primary transition-colors"
+                  >
+                    {editing.emoji ? (
+                      <FluentEmoji emoji={editing.emoji} size={36} />
+                    ) : (
+                      <Plus className="h-5 w-5 text-muted-foreground" />
+                    )}
+                  </button>
+                  {editing.emoji && (
+                    <Button variant="ghost" size="sm" onClick={() => setEditing({ ...editing, emoji: '' })}>
+                      Clear
+                    </Button>
+                  )}
+                </div>
               </div>
               <div>
                 <Label>Category</Label>
@@ -215,6 +243,16 @@ export function ReflectionsManager() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <EmojiPicker
+        open={showEmojiPicker}
+        onOpenChange={setShowEmojiPicker}
+        selectedEmoji={editing?.emoji || ''}
+        onSelect={(emoji) => {
+          setEditing(editing ? { ...editing, emoji } : null);
+          setShowEmojiPicker(false);
+        }}
+      />
     </div>
   );
 }
