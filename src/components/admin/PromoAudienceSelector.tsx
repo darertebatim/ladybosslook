@@ -409,6 +409,7 @@ export function PromoAudienceSelector({
               {excludePlaylists.length > 0 && <span className="text-red-600"> -{excludePlaylists.length} playlists</span>}
               {includeTools.length > 0 && <span className="text-green-600"> +{includeTools.length} tools</span>}
               {excludeTools.length > 0 && <span className="text-red-600"> -{excludeTools.length} tools</span>}
+              {includeUpdateStatus.length > 0 && <span className="text-green-600"> 📱 {includeUpdateStatus.join(', ')}</span>}
               {targetLanguages.length > 0 && <span className="text-blue-600"> 🌐 {targetLanguages.length} languages</span>}
               {targetTimezones.length > 0 && <span className="text-blue-600"> 🕐 {targetTimezones.length} timezone groups</span>}
             </div>
