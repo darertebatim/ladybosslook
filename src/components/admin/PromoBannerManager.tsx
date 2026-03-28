@@ -58,6 +58,7 @@ interface PromoBanner {
   exclude_tools: string[];
   target_languages: string[];
   target_timezones: string[];
+  include_update_status: string[];
   display_location: string[];
   target_playlist_ids: string[];
   target_audio_ids: string[];
