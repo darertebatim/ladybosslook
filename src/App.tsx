@@ -472,6 +472,7 @@ const App = () => (
                     <Route path="/app/rate" element={<ProtectedRoute><AppRate /></ProtectedRoute>} />
                     <Route path="/app/settings" element={<ProtectedRoute><AppSettings /></ProtectedRoute>} />
                     <Route path="/app/onboarding/:flowId" element={<AppOnboarding />} />
+                    <Route path="/app/reflections/notes/free/:noteId" element={<ProtectedRoute><AppFreeFormNoteDetail /></ProtectedRoute>} />
                     <Route path="/app/reflections/notes/:reflectionId" element={<ProtectedRoute><AppReflectionNoteDetail /></ProtectedRoute>} />
                     <Route path="/app/reflections/free-form" element={<ProtectedRoute><AppFreeFormReflection /></ProtectedRoute>} />
                     <Route path="/app/reflections/:reflectionId" element={<ProtectedRoute><AppReflectionFlow /></ProtectedRoute>} />
