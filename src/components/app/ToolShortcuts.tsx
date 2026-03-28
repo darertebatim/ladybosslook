@@ -28,15 +28,16 @@ const ALL_TOOLS = [
 const TOOL_MAP: Record<string, ToolConfig> = {};
 ALL_TOOLS.forEach(t => { TOOL_MAP[t.id] = t; });
 
-function loadShortcuts(): (Shortcut | null)[] {
+function loadShortcuts(): (string | null)[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        // Migration: if old format (5 slots) or all nulls, reset to defaults
-        const hasAnyShortcut = parsed.some((s: any) => s !== null);
-        if (!hasAnyShortcut || parsed.length !== MAX_SHORTCUTS) {
+        // Migration: if old object format, all nulls, or wrong length, reset
+        const hasAny = parsed.some((s: any) => s !== null);
+        const isStringFormat = parsed.every((s: any) => s === null || typeof s === 'string');
+        if (!hasAny || parsed.length !== MAX_SHORTCUTS || !isStringFormat) {
           localStorage.removeItem(STORAGE_KEY);
           return [...DEFAULT_SHORTCUTS];
         }
@@ -47,13 +48,13 @@ function loadShortcuts(): (Shortcut | null)[] {
   return [...DEFAULT_SHORTCUTS];
 }
 
-function saveShortcuts(shortcuts: (Shortcut | null)[]) {
+function saveShortcuts(shortcuts: (string | null)[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(shortcuts));
 }
 
 export function ToolShortcuts() {
   const navigate = useNavigate();
-  const [shortcuts, setShortcuts] = useState<(Shortcut | null)[]>(loadShortcuts);
+  const [shortcuts, setShortcuts] = useState<(string | null)[]>(loadShortcuts);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -66,11 +67,24 @@ export function ToolShortcuts() {
   const handleSlotTap = (index: number) => {
     if (Date.now() < suppressTapUntilRef.current) return;
 
-    const existing = shortcuts[index];
-    if (existing) {
+    const toolId = shortcuts[index];
+    if (toolId) {
+      const tool = TOOL_MAP[toolId];
+      if (!tool) return;
       haptic.light();
-      const path = getProTaskNavigationPath(existing.type, existing.value);
-      navigate(path);
+      // Handle action routes
+      if (tool.route === '__action:new-task') {
+        navigate('/app/home');
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('quick-add-open', { detail: { defaultRepeat: 'Daily' } }));
+        }, 300);
+        return;
+      }
+      if (tool.route === '__action:new-routine') {
+        navigate('/app/routineplayer', { state: { openBuilder: true } });
+        return;
+      }
+      navigate(tool.route);
     } else {
       haptic.light();
       setEditingIndex(index);
@@ -89,10 +103,9 @@ export function ToolShortcuts() {
   };
 
   const handleSelectTool = (tool: ToolConfig) => {
-    const proLinkType = TOOL_TO_PROLINK[tool.id];
-    if (proLinkType && editingIndex !== null) {
+    if (editingIndex !== null) {
       const updated = [...shortcuts];
-      updated[editingIndex] = { type: proLinkType, value: null };
+      updated[editingIndex] = tool.id;
       setShortcuts(updated);
       setPickerOpen(false);
       setEditingIndex(null);
@@ -119,21 +132,25 @@ export function ToolShortcuts() {
       </div>
 
       <div className="flex gap-3">
-        {shortcuts.map((shortcut, i) => {
-          if (shortcut) {
-            const config = PRO_LINK_CONFIGS[shortcut.type];
-            const Icon = config.icon;
+        {shortcuts.map((toolId, i) => {
+          if (toolId) {
+            const tool = TOOL_MAP[toolId];
+            if (!tool) return null;
             return (
               <ShortcutSlot
                 key={i}
                 onTap={() => handleSlotTap(i)}
                 onLongPress={() => handleLongPress(i)}
               >
-                <div className={cn('w-16 h-16 rounded-2xl flex items-center justify-center', config.gradientClass)}>
-                  <Icon className={cn('h-6 w-6', config.iconColorClass)} />
+                <div className={cn('w-16 h-16 rounded-2xl flex items-center justify-center shadow-sm', tool.bgColor)}>
+                  {tool.emoji ? (
+                    <FluentEmoji emoji={tool.emoji} size={36} />
+                  ) : (
+                    <span className="text-2xl">📱</span>
+                  )}
                 </div>
                 <span className="text-[10px] font-medium text-foreground leading-tight text-center line-clamp-1 mt-1 w-full">
-                  {config.label}
+                  {tool.name}
                 </span>
               </ShortcutSlot>
             );
