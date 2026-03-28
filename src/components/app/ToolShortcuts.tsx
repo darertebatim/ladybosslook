@@ -15,7 +15,7 @@ const MAX_SHORTCUTS = 4;
 const DEFAULT_SHORTCUTS: (Shortcut | null)[] = [
   { type: 'routine', value: null },
   { type: 'reflection', value: null },
-  null,
+  { type: 'inspire', value: null },
   null,
 ];
 
