@@ -399,6 +399,7 @@ export function PromoAudienceSelector({
           {(includePrograms.length > 0 || excludePrograms.length > 0 || 
             includePlaylists.length > 0 || excludePlaylists.length > 0 ||
             includeTools.length > 0 || excludeTools.length > 0 ||
+            includeUpdateStatus.length > 0 ||
             targetLanguages.length > 0 || targetTimezones.length > 0) && (
             <div className="text-xs text-muted-foreground bg-background p-2 rounded border">
               <strong>Summary:</strong>
