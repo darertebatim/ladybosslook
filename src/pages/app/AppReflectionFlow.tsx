@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useReflectionPages, useSaveReflectionResponse } from '@/hooks/useReflections';
+import { useReflectionPages, useReflections, useSaveReflectionResponse } from '@/hooks/useReflections';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -8,11 +8,26 @@ import { toast } from 'sonner';
 import { useBilingualText } from '@/components/ui/BilingualText';
 import { cn } from '@/lib/utils';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
+import { format } from 'date-fns';
+
+const BULLET_COLORS = [
+  'hsl(142, 50%, 78%)',
+  'hsl(20, 70%, 78%)',
+  'hsl(262, 60%, 68%)',
+  'hsl(200, 60%, 72%)',
+  'hsl(45, 70%, 72%)',
+  'hsl(340, 55%, 75%)',
+];
+
+function getBulletColor(index: number) {
+  return BULLET_COLORS[index % BULLET_COLORS.length];
+}
 
 export default function AppReflectionFlow() {
   const { reflectionId } = useParams<{ reflectionId: string }>();
   const navigate = useNavigate();
   const { data: pages, isLoading } = useReflectionPages(reflectionId);
+  const { data: reflections } = useReflections();
   const saveResponse = useSaveReflectionResponse();
   const { autoCompleteReflection } = useAutoCompleteProTask();
 
@@ -24,28 +39,106 @@ export default function AppReflectionFlow() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Free-form style state for single-page reflections
+  const [lines, setLines] = useState<string[]>(['']);
+  const lineRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const justAddedLine = useRef(false);
+
   const totalPages = pages?.length || 0;
   const page = pages?.[currentIndex];
   const isLast = currentIndex === totalPages - 1;
   const progress = totalPages > 0 ? ((currentIndex + 1) / totalPages) * 100 : 0;
+  const isSinglePage = totalPages === 1;
+
+  const reflection = reflections?.find(r => r.id === reflectionId);
 
   const currentAnswer = answers[page?.id || ''] || '';
   const { className: contentBilingualClassName, direction: contentDirection } = useBilingualText(page?.content || '');
   const { className: descBilingualClassName, direction: descDirection } = useBilingualText(page?.description || '');
   const { className: answerBilingualClassName, direction: answerDirection } = useBilingualText(currentAnswer);
+  const { className: titleBiClass, direction: titleDir } = useBilingualText(reflection?.title || '');
 
-  // Auto-focus textarea on question pages
+  // Auto-focus textarea on question pages (multi-page)
   useEffect(() => {
-    if (page?.type === 'question') {
+    if (!isSinglePage && page?.type === 'question') {
       setTimeout(() => textareaRef.current?.focus(), 200);
     }
-  }, [currentIndex, page?.type]);
+  }, [currentIndex, page?.type, isSinglePage]);
+
+  // Focus first line on single-page
+  useEffect(() => {
+    if (isSinglePage) {
+      setTimeout(() => lineRefs.current[0]?.focus(), 200);
+    }
+  }, [isSinglePage]);
+
+  // Focus newly added line
+  useEffect(() => {
+    if (justAddedLine.current) {
+      const lastRef = lineRefs.current[lines.length - 1];
+      lastRef?.focus();
+      justAddedLine.current = false;
+    }
+  }, [lines.length]);
+
+  const handleLineChange = useCallback((index: number, value: string) => {
+    setLines(prev => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
+  }, []);
+
+  const handleLineKeyDown = useCallback((index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      setLines(prev => {
+        const next = [...prev];
+        next.splice(index + 1, 0, '');
+        return next;
+      });
+      justAddedLine.current = true;
+    } else if (e.key === 'Backspace' && lines[index] === '' && index > 0) {
+      e.preventDefault();
+      setLines(prev => {
+        const next = [...prev];
+        next.splice(index, 1);
+        return next;
+      });
+      setTimeout(() => lineRefs.current[index - 1]?.focus(), 0);
+    }
+  }, [lines]);
+
+  const handleSaveSinglePage = async () => {
+    if (!page || !reflectionId) return;
+    const content = lines.filter(l => l.trim()).join('\n');
+    try {
+      await saveResponse.mutateAsync({
+        reflectionId,
+        pageId: page.id,
+        responseText: content,
+        isCompleted: true,
+      });
+      toast.success('Reflection completed ✨');
+      if (reflectionId) {
+        await autoCompleteReflection(reflectionId);
+      }
+      if (hasActivePlayer) {
+        navigate('/app/home');
+        routinePlayer!.maximize();
+      } else {
+        navigate(-1);
+      }
+    } catch (error) {
+      console.error('Failed to save reflection response:', error);
+      toast.error('Failed to save. Please try again.');
+    }
+  };
 
   const handleNext = async () => {
     if (!page || !reflectionId) return;
 
     try {
-      // Save response for question pages
       if (page.type === 'question') {
         await saveResponse.mutateAsync({
           reflectionId,
@@ -54,7 +147,6 @@ export default function AppReflectionFlow() {
           isCompleted: isLast,
         });
       } else if (isLast) {
-        // Save a marker for the last page even if it's a message
         await saveResponse.mutateAsync({
           reflectionId,
           pageId: page.id,
@@ -64,7 +156,6 @@ export default function AppReflectionFlow() {
 
       if (isLast) {
         toast.success('Reflection completed ✨');
-        // Auto-complete any pro-linked tasks for this reflection
         if (reflectionId) {
           await autoCompleteReflection(reflectionId);
         }
@@ -108,6 +199,81 @@ export default function AppReflectionFlow() {
     );
   }
 
+  // Single-page: free-form style UI
+  if (isSinglePage) {
+    const today = format(new Date(), 'EEEE, MMM d');
+    return (
+      <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
+        {/* Top bar */}
+        <div
+          className="px-4 pb-2 flex items-center justify-between shrink-0"
+          style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
+        >
+          <button onClick={() => navigate(-1)} className="text-sm text-muted-foreground active:scale-95 transition-transform">
+            Cancel
+          </button>
+          <button
+            onClick={handleSaveSinglePage}
+            disabled={saveResponse.isPending || lines.every(l => !l.trim())}
+            className="px-5 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold active:scale-95 transition-transform disabled:opacity-40"
+          >
+            Done
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 px-5 pt-4 overflow-y-auto overscroll-contain" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}>
+          {/* Date */}
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            TODAY, {today.toUpperCase()}
+          </p>
+
+          {/* Title */}
+          <h1 className={cn("text-2xl font-bold mt-1", titleBiClass)} dir={titleDir}>
+            {reflection?.title || page?.content}
+          </h1>
+
+          {/* Question as subtitle */}
+          {page?.content && reflection?.title && (
+            <p className={cn("text-sm text-muted-foreground mt-1", contentBilingualClassName)} dir={contentDirection}>
+              {page.content}
+            </p>
+          )}
+          {page?.description && (
+            <p className={cn("text-xs text-muted-foreground mt-0.5", descBilingualClassName)} dir={descDirection}>
+              {page.description}
+            </p>
+          )}
+
+          {/* Bullet entries */}
+          <div className="mt-4 space-y-1.5">
+            {lines.map((line, idx) => (
+              <div key={idx} className="flex items-start gap-3">
+                <div
+                  className="w-3 h-3 rounded-sm mt-[5px] shrink-0 transition-colors"
+                  style={{
+                    backgroundColor: line.trim()
+                      ? getBulletColor(idx)
+                      : 'hsl(var(--muted-foreground) / 0.25)',
+                  }}
+                />
+                <input
+                  ref={(el) => { lineRefs.current[idx] = el; }}
+                  value={line}
+                  onChange={(e) => handleLineChange(idx, e.target.value)}
+                  onKeyDown={(e) => handleLineKeyDown(idx, e)}
+                  placeholder={idx === 0 ? 'Write your thoughts…' : ''}
+                  className="flex-1 bg-transparent border-0 outline-none text-base placeholder:text-muted-foreground/40"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Multi-page: standard flow UI
   return (
     <div
       className="h-[100dvh] bg-background flex flex-col overflow-hidden"
