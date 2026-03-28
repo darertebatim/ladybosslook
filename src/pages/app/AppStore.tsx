@@ -404,7 +404,7 @@ const AppStore = () => {
                             <CachedImage src={r.cover_image_url} alt={r.title} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: r.cover_color || '#f3f4f6' }}>
-                              <FluentEmoji emoji="🪞" size={36} />
+                              <FluentEmoji emoji={r.emoji || '🪞'} size={36} />
                             </div>
                           )}
                         </div>
