@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Plus, Search, Check, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { PRO_LINK_CONFIGS, type ProLinkType, type ProLinkConfig, getProTaskNavigationPath } from '@/lib/proTaskTypes';
 import { useNavigate } from 'react-router-dom';
 import { haptic } from '@/lib/haptics';
 import { Input } from '@/components/ui/input';
@@ -12,58 +11,33 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 const STORAGE_KEY = 'tool-shortcuts';
 const MAX_SHORTCUTS = 4;
-const DEFAULT_SHORTCUTS: (Shortcut | null)[] = [
-  { type: 'routine', value: null },
-  { type: 'reflection', value: null },
-  { type: 'inspire', value: null },
+const DEFAULT_SHORTCUTS: (string | null)[] = [
+  'focus-routine',
+  'reflections',
+  'new-routine',
   null,
 ];
 
-interface Shortcut {
-  type: ProLinkType;
-  value: string | null;
-}
-
-// Map tool config IDs to ProLinkType for shortcut navigation
-const TOOL_TO_PROLINK: Record<string, ProLinkType> = {
-  'self-care': 'tasksbank',
-  'routines': 'inspire',
-  'focus-timer': 'focus_timer',
-  'focus-routine': 'routine',
-  'reflections': 'reflection',
-  'journal': 'journal',
-  'breathe': 'breathe',
-  'mood': 'mood',
-  'emotions': 'emotion',
-  'videos': 'watch',
-  'water': 'water',
-  'period': 'period',
-  'fasting': 'fasting',
-  'programs': 'myprograms',
-  'profile': 'myprofile',
-  'academy': 'program',
-  'listen': 'listen',
-  'presence': 'presence',
-  'weight': 'weight',
-  'meditate': 'audio',
-  'soundscape': 'playlist',
-};
-
-// All tools combined for the picker grid
+// All tools combined for the picker grid (including action buttons)
 const ALL_TOOLS = [
-  ...wellnessTools.filter(t => !t.comingSoon && !t.hidden && t.id !== 'new-task' && t.id !== 'new-routine'),
+  ...wellnessTools.filter(t => !t.comingSoon && !t.hidden),
   ...audioTools.filter(t => t.id === 'meditate' || t.id === 'soundscape'),
 ];
 
-function loadShortcuts(): (Shortcut | null)[] {
+// Build a lookup map
+const TOOL_MAP: Record<string, ToolConfig> = {};
+ALL_TOOLS.forEach(t => { TOOL_MAP[t.id] = t; });
+
+function loadShortcuts(): (string | null)[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        // Migration: if old format (5 slots) or all nulls, reset to defaults
-        const hasAnyShortcut = parsed.some((s: any) => s !== null);
-        if (!hasAnyShortcut || parsed.length !== MAX_SHORTCUTS) {
+        // Migration: if old object format, all nulls, or wrong length, reset
+        const hasAny = parsed.some((s: any) => s !== null);
+        const isStringFormat = parsed.every((s: any) => s === null || typeof s === 'string');
+        if (!hasAny || parsed.length !== MAX_SHORTCUTS || !isStringFormat) {
           localStorage.removeItem(STORAGE_KEY);
           return [...DEFAULT_SHORTCUTS];
         }
@@ -74,13 +48,13 @@ function loadShortcuts(): (Shortcut | null)[] {
   return [...DEFAULT_SHORTCUTS];
 }
 
-function saveShortcuts(shortcuts: (Shortcut | null)[]) {
+function saveShortcuts(shortcuts: (string | null)[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(shortcuts));
 }
 
 export function ToolShortcuts() {
   const navigate = useNavigate();
-  const [shortcuts, setShortcuts] = useState<(Shortcut | null)[]>(loadShortcuts);
+  const [shortcuts, setShortcuts] = useState<(string | null)[]>(loadShortcuts);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -93,11 +67,24 @@ export function ToolShortcuts() {
   const handleSlotTap = (index: number) => {
     if (Date.now() < suppressTapUntilRef.current) return;
 
-    const existing = shortcuts[index];
-    if (existing) {
+    const toolId = shortcuts[index];
+    if (toolId) {
+      const tool = TOOL_MAP[toolId];
+      if (!tool) return;
       haptic.light();
-      const path = getProTaskNavigationPath(existing.type, existing.value);
-      navigate(path);
+      // Handle action routes
+      if (tool.route === '__action:new-task') {
+        navigate('/app/home');
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('quick-add-open', { detail: { defaultRepeat: 'Daily' } }));
+        }, 300);
+        return;
+      }
+      if (tool.route === '__action:new-routine') {
+        navigate('/app/routineplayer', { state: { openBuilder: true } });
+        return;
+      }
+      navigate(tool.route);
     } else {
       haptic.light();
       setEditingIndex(index);
@@ -116,10 +103,9 @@ export function ToolShortcuts() {
   };
 
   const handleSelectTool = (tool: ToolConfig) => {
-    const proLinkType = TOOL_TO_PROLINK[tool.id];
-    if (proLinkType && editingIndex !== null) {
+    if (editingIndex !== null) {
       const updated = [...shortcuts];
-      updated[editingIndex] = { type: proLinkType, value: null };
+      updated[editingIndex] = tool.id;
       setShortcuts(updated);
       setPickerOpen(false);
       setEditingIndex(null);
@@ -146,21 +132,25 @@ export function ToolShortcuts() {
       </div>
 
       <div className="flex gap-3">
-        {shortcuts.map((shortcut, i) => {
-          if (shortcut) {
-            const config = PRO_LINK_CONFIGS[shortcut.type];
-            const Icon = config.icon;
+        {shortcuts.map((toolId, i) => {
+          if (toolId) {
+            const tool = TOOL_MAP[toolId];
+            if (!tool) return null;
             return (
               <ShortcutSlot
                 key={i}
                 onTap={() => handleSlotTap(i)}
                 onLongPress={() => handleLongPress(i)}
               >
-                <div className={cn('w-16 h-16 rounded-2xl flex items-center justify-center', config.gradientClass)}>
-                  <Icon className={cn('h-6 w-6', config.iconColorClass)} />
+                <div className={cn('w-16 h-16 rounded-2xl flex items-center justify-center shadow-sm', tool.bgColor)}>
+                  {tool.emoji ? (
+                    <FluentEmoji emoji={tool.emoji} size={36} />
+                  ) : (
+                    <span className="text-2xl">📱</span>
+                  )}
                 </div>
                 <span className="text-[10px] font-medium text-foreground leading-tight text-center line-clamp-1 mt-1 w-full">
-                  {config.label}
+                  {tool.name}
                 </span>
               </ShortcutSlot>
             );
@@ -203,14 +193,13 @@ export function ToolShortcuts() {
             <ScrollArea className="flex-1 px-5">
               <div className="grid grid-cols-4 gap-3 pb-6 pt-2">
                 {filteredTools.map((tool) => {
-                  const proLinkType = TOOL_TO_PROLINK[tool.id];
-                  const isAlreadyUsed = proLinkType && shortcuts.some(s => s?.type === proLinkType);
+                  const isAlreadyUsed = shortcuts.some(s => s === tool.id);
                   const isPremium = ['fasting', 'period'].includes(tool.id);
                   return (
                     <button
                       key={tool.id}
                       onClick={() => handleSelectTool(tool)}
-                      disabled={!!isAlreadyUsed || !proLinkType}
+                      disabled={!!isAlreadyUsed}
                       className={cn(
                         'relative flex flex-col items-center gap-1 pt-4 pb-2 rounded-xl transition-all active:scale-95',
                         isAlreadyUsed ? 'opacity-40 cursor-not-allowed' : 'hover:bg-muted/50'
