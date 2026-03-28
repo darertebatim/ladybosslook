@@ -78,6 +78,20 @@ export default function AppReflections() {
         <p className="text-muted-foreground text-sm">Find ways to be happier & healthier</p>
       </div>
 
+      {/* Free Form */}
+      <div className="px-4 mt-2">
+        <button
+          onClick={() => navigate('/app/journal/new')}
+          className="w-full rounded-2xl bg-accent/60 p-4 flex items-center gap-3 text-left transition-transform active:scale-[0.97]"
+        >
+          <span className="text-2xl">✍️</span>
+          <div>
+            <p className="font-semibold text-base">Free Form</p>
+            <p className="text-sm text-muted-foreground">Write freely about anything on your mind</p>
+          </div>
+        </button>
+      </div>
+
       {/* Featured */}
       {featured.length > 0 && (
         <div className="px-4 mt-4">
