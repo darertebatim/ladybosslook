@@ -1,0 +1,1 @@
+ALTER TABLE public.reflections ADD COLUMN emoji text DEFAULT NULL;

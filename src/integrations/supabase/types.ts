@@ -2789,6 +2789,7 @@ export type Database = {
           cover_color: string | null
           cover_image_url: string | null
           created_at: string
+          emoji: string | null
           id: string
           is_active: boolean
           is_featured: boolean
@@ -2804,6 +2805,7 @@ export type Database = {
           cover_color?: string | null
           cover_image_url?: string | null
           created_at?: string
+          emoji?: string | null
           id?: string
           is_active?: boolean
           is_featured?: boolean
@@ -2819,6 +2821,7 @@ export type Database = {
           cover_color?: string | null
           cover_image_url?: string | null
           created_at?: string
+          emoji?: string | null
           id?: string
           is_active?: boolean
           is_featured?: boolean
