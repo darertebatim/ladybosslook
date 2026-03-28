@@ -463,6 +463,11 @@ const AppStore = () => {
               </section>
             )}
 
+            {/* My Shortcuts */}
+            {!searchQuery && (
+              <ToolShortcuts />
+            )}
+
 
             {/* Meditate Section */}
             {!searchQuery && meditatePlaylists.length > 0 && (
