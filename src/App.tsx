@@ -91,6 +91,7 @@ const AppReflectionNoteDetail = lazy(() => import("@/pages/app/AppReflectionNote
 const AppFreeFormReflection = lazy(() => import("@/pages/app/AppFreeFormReflection"));
 const AppFreeFormNoteDetail = lazy(() => import("@/pages/app/AppFreeFormNoteDetail"));
 const AppAICoach = lazy(() => import("@/pages/app/AppAICoach"));
+const AppTasksBank = lazy(() => import("@/pages/app/AppTasksBank"));
 
 const Users = lazy(() => import("@/pages/admin/Users"));
 const Enrollment = lazy(() => import("@/pages/admin/Enrollment"));
@@ -518,6 +519,7 @@ const App = () => (
                       <Route path="routines/category/:categorySlug" element={<AppRoutineCategory />} />
                       <Route path="routines/:planId" element={<AppInspireDetail />} />
                       <Route path="actions" element={<AppActions />} />
+                      <Route path="tasksbank" element={<AppTasksBank />} />
                       <Route path="routineplayer" element={<AppRoutinePlayerPage />} />
                       {/* Redirects for backward compatibility with older app versions */}
                       <Route path="rituals" element={<Navigate to="/app/routines" replace />} />
