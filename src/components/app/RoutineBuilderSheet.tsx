@@ -157,6 +157,10 @@ export function RoutineBuilderSheet({
         setShowSuggestions(false);
         setShowMyTasks(false);
         setShowQuickAdd(false);
+        setShowTaskBank(false);
+        setTaskBankSearch('');
+        setTaskBankCategory(null);
+        setTaskBankSelected(new Set());
         setQuickAddTitle('');
         setShowCreateTask(false);
       }, 300);
