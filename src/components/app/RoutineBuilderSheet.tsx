@@ -894,6 +894,7 @@ export function RoutineBuilderSheet({
                       <CategoryCircle
                         key={cat.slug}
                         name={cat.name}
+                        icon={cat.emoji || 'Sparkles'}
                         emoji={cat.emoji}
                         color={cat.color}
                         isSelected={taskBankCategory === cat.slug}
