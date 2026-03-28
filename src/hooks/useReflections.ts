@@ -4,6 +4,16 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
 // Types (since tables are new and not yet in generated types)
+export const REFLECTION_CATEGORIES = [
+  { value: 'micro-wins', label: 'Micro-wins', emoji: '🏆' },
+  { value: 'deep-dives', label: 'Deep Dives', emoji: '🌊' },
+  { value: 'morning', label: 'Morning', emoji: '🌅' },
+  { value: 'energize', label: 'Energize', emoji: '⚡' },
+  { value: 'calm', label: 'Calm', emoji: '🧘' },
+  { value: 'night', label: 'Night', emoji: '🌙' },
+  { value: 'big-picture', label: 'Big picture', emoji: '🔭' },
+] as const;
+
 export interface Reflection {
   id: string;
   title: string;
@@ -13,6 +23,7 @@ export interface Reflection {
   is_featured: boolean;
   is_free: boolean;
   cover_color: string | null;
+  category: string | null;
   sort_order: number;
   created_at: string;
   updated_at: string;

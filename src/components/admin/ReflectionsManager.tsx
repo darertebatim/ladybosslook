@@ -7,6 +7,7 @@ import {
   useAdminReflectionPages,
   useSaveReflectionPages,
   Reflection,
+  REFLECTION_CATEGORIES,
 } from '@/hooks/useReflections';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
