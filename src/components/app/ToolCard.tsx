@@ -48,7 +48,11 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
     }
     // Handle special action routes
     if (tool.route === '__action:new-task') {
-      window.dispatchEvent(new CustomEvent('quick-add-open', { detail: { defaultRepeat: 'Daily' } }));
+      // Navigate to home first, then open quick-add after mount
+      navigate('/app/home');
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('quick-add-open', { detail: { defaultRepeat: 'Daily' } }));
+      }, 300);
       return;
     }
     if (tool.route === '__action:new-routine') {
