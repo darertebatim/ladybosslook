@@ -78,7 +78,7 @@ export default function AppReflections() {
       <div style={{ height: 'calc(56px + env(safe-area-inset-top, 0px))' }} />
 
       <div className="px-4 pt-2 pb-2">
-        <p className="text-muted-foreground text-sm">Find ways to be happier & healthier</p>
+        <p className="text-foreground text-sm">Find ways to be happier & healthier</p>
       </div>
 
       {/* Free Form */}
@@ -90,17 +90,17 @@ export default function AppReflections() {
           <span className="text-xl">✍️</span>
           <div>
             <p className="font-semibold text-sm">Free Form</p>
-            <p className="text-xs text-muted-foreground line-clamp-1">Write freely</p>
+            <p className="text-xs text-foreground/70 line-clamp-1">Write freely</p>
           </div>
         </button>
         <button
           onClick={() => navigate('/app/reflections/notes')}
           className="flex-1 rounded-2xl bg-accent/60 p-3 flex items-center gap-2 text-left transition-transform active:scale-[0.97]"
         >
-          <BookOpen className="h-5 w-5 text-muted-foreground shrink-0" />
+          <BookOpen className="h-5 w-5 text-foreground/70 shrink-0" />
           <div>
             <p className="font-semibold text-sm">My Notes</p>
-            <p className="text-xs text-muted-foreground line-clamp-1">Past reflections</p>
+            <p className="text-xs text-foreground/70 line-clamp-1">Past reflections</p>
           </div>
         </button>
       </div>
@@ -108,7 +108,7 @@ export default function AppReflections() {
       {/* Featured */}
       {featured.length > 0 && (
         <div className="px-4 mt-4">
-          <h2 className="text-sm font-semibold text-muted-foreground mb-2">For you</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-2">For you</h2>
           <div className="flex flex-col gap-3">
             {featured.map((r) => (
               <button
