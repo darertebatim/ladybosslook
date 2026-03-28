@@ -3,7 +3,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, ChevronRight, Plus, Trash2, ListChecks, MoreHorizontal, Repeat, Clock, Pencil } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2, ListChecks, MoreHorizontal, Repeat, Clock, Pencil, Search, Leaf, Check } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { haptic } from '@/lib/haptics';
@@ -11,11 +11,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { getLocalDateStr } from '@/lib/localDate';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { TASK_COLOR_CLASSES, TASK_COLORS, TaskColor } from '@/hooks/useTaskPlanner';
+import { TASK_COLOR_CLASSES, TASK_COLORS, TaskColor, TaskTemplate } from '@/hooks/useTaskPlanner';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
 import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 import { Capacitor } from '@capacitor/core';
+import { Input } from '@/components/ui/input';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { Keyboard } from '@capacitor/keyboard';
 
 // Secondary (darker) palette for bottom sections
@@ -123,6 +126,10 @@ export function RoutineBuilderSheet({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showMyTasks, setShowMyTasks] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [showTaskBank, setShowTaskBank] = useState(false);
+  const [taskBankSearch, setTaskBankSearch] = useState('');
+  const [taskBankCategory, setTaskBankCategory] = useState<string | null>(null);
+  const [taskBankSelected, setTaskBankSelected] = useState<Set<string>>(new Set());
   const [quickAddTitle, setQuickAddTitle] = useState('');
   const [quickRepeat, setQuickRepeat] = useState('Daily');
   const [quickTime, setQuickTime] = useState('Anytime');
@@ -150,6 +157,10 @@ export function RoutineBuilderSheet({
         setShowSuggestions(false);
         setShowMyTasks(false);
         setShowQuickAdd(false);
+        setShowTaskBank(false);
+        setTaskBankSearch('');
+        setTaskBankCategory(null);
+        setTaskBankSelected(new Set());
         setQuickAddTitle('');
         setShowCreateTask(false);
       }, 300);
@@ -273,6 +284,87 @@ export function RoutineBuilderSheet({
     enabled: open,
   });
 
+  const addedTaskIds = useMemo(() => new Set(tasks.map(t => t.id)), [tasks]);
+
+  // Fetch task bank categories for the habit picker
+  const { data: taskBankCategories = [] } = useQuery({
+    queryKey: ['routine-categories-builder'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('routine_categories')
+        .select('slug, name, icon, color, task_display_order')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+      return (data || [])
+        .filter((c: any) => (c.task_display_order ?? 0) !== 0)
+        .sort((a: any, b: any) => (a.task_display_order ?? 0) - (b.task_display_order ?? 0))
+        .map((c: any) => ({ slug: c.slug, name: c.name, emoji: c.icon, color: c.color }));
+    },
+    enabled: open,
+  });
+
+  // Group task bank templates by category for habit picker
+  const taskBankByCategory = useMemo(() => {
+    const grouped: Record<string, any[]> = {};
+    for (const task of taskBankTemplates) {
+      if (!grouped[task.category]) grouped[task.category] = [];
+      grouped[task.category].push(task);
+    }
+    return grouped;
+  }, [taskBankTemplates]);
+
+  // Filter task bank by search & category
+  const filteredTaskBankCategories = useMemo(() => {
+    const cats = taskBankCategory
+      ? taskBankCategories.filter((c: any) => c.slug === taskBankCategory)
+      : taskBankCategories;
+    return cats.filter((c: any) => {
+      const catTasks = taskBankByCategory[c.slug] || [];
+      if (!taskBankSearch) return catTasks.length > 0;
+      const q = taskBankSearch.toLowerCase();
+      return catTasks.some((t: any) => t.title.toLowerCase().includes(q));
+    });
+  }, [taskBankCategories, taskBankCategory, taskBankByCategory, taskBankSearch]);
+
+  const handleTaskBankToggle = useCallback((taskId: string) => {
+    haptic.light();
+    setTaskBankSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(taskId)) next.delete(taskId);
+      else next.add(taskId);
+      return next;
+    });
+  }, []);
+
+  const handleTaskBankAddSelected = useCallback(() => {
+    haptic.medium();
+    const toAdd = taskBankTemplates.filter((t: any) => taskBankSelected.has(t.id) && !addedTaskIds.has(t.id));
+    const newTasks: BuilderTask[] = toAdd.map((t: any, i: number) => ({
+      id: t.id,
+      title: t.title,
+      emoji: t.emoji || '📝',
+      color: t.color || ROUTINE_COLOR_CYCLE[(tasks.length + i) % ROUTINE_COLOR_CYCLE.length],
+      repeat_pattern: t.repeat_pattern || 'daily',
+      repeat_days: t.repeat_days || null,
+      description: t.description || null,
+      pro_link_type: t.pro_link_type || null,
+      pro_link_value: t.pro_link_value || null,
+      goal_enabled: t.goal_enabled || false,
+      goal_target: t.goal_target || null,
+      goal_type: t.goal_type || null,
+      goal_unit: t.goal_unit || null,
+      duration_minutes: t.duration_minutes || null,
+      time_period: t.time_period || null,
+      linked_playlist_id: t.linked_playlist_id || null,
+      category: t.category || null,
+    }));
+    setTasks(prev => [...prev, ...newTasks]);
+    setTaskBankSelected(new Set());
+    setShowTaskBank(false);
+    setTaskBankSearch('');
+    setTaskBankCategory(null);
+  }, [taskBankTemplates, taskBankSelected, addedTaskIds, tasks.length]);
+
   // Search-based suggestions for quick-add
   const quickAddSearchSuggestions = useMemo(() => {
     const q = quickAddTitle.trim().toLowerCase();
@@ -286,8 +378,6 @@ export function RoutineBuilderSheet({
       })
       .slice(0, 4);
   }, [taskBankTemplates, quickAddTitle]);
-
-  const addedTaskIds = useMemo(() => new Set(tasks.map(t => t.id)), [tasks]);
 
   const addTaskFromSource = (source: any) => {
     if (addedTaskIds.has(source.id)) return;
@@ -443,7 +533,7 @@ export function RoutineBuilderSheet({
   return (
     <>
       {/* Main Dialog — both steps live here */}
-      <Dialog open={open && !showMyTasks && !showQuickAdd} onOpenChange={(v) => { if (!v) handleOpenChange(false); }}>
+      <Dialog open={open && !showMyTasks && !showQuickAdd && !showTaskBank} onOpenChange={(v) => { if (!v) handleOpenChange(false); }}>
         <DialogContent
           hideCloseButton
           className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none !translate-y-0 overflow-hidden"
@@ -611,6 +701,21 @@ export function RoutineBuilderSheet({
                     </div>
                     <span className="text-[13px] font-semibold text-black/80 dark:text-foreground">Add from My Tasks</span>
                   </button>
+
+                  {/* Add a Self-Care Habit */}
+                  <button
+                    onClick={() => {
+                      haptic.light();
+                      setTaskBankSelected(new Set());
+                      setShowTaskBank(true);
+                    }}
+                    className="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/60 dark:bg-white/10 active:bg-white/80 dark:active:bg-white/20 transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-emerald-400/20 flex items-center justify-center">
+                      <Leaf className="w-4 h-4 text-emerald-600 dark:text-emerald-400" strokeWidth={2.5} />
+                    </div>
+                    <span className="text-[13px] font-semibold text-black/80 dark:text-foreground">Add a Self-Care Habit</span>
+                  </button>
                 </div>
 
                 {/* Create Routine */}
@@ -746,7 +851,157 @@ export function RoutineBuilderSheet({
         </SheetContent>
       </Sheet>
 
-      {/* Quick Add Dialog — identical to home page quick-add */}
+      {/* Self-Care Habit Picker — Sheet overlay */}
+      <Sheet open={showTaskBank} onOpenChange={(v) => { if (!v) { setShowTaskBank(false); setTaskBankSearch(''); setTaskBankCategory(null); } }}>
+        <SheetContent
+          side="bottom"
+          className="h-[85vh] rounded-t-3xl px-0 pb-0"
+          hideCloseButton
+        >
+          <div className="flex flex-col h-full">
+            <div className="flex items-center gap-3 px-5 pb-3 border-b border-border/30">
+              <button onClick={() => { setShowTaskBank(false); setTaskBankSearch(''); setTaskBankCategory(null); }} className="p-1 active:opacity-70">
+                <ChevronLeft className="w-5 h-5 text-foreground" />
+              </button>
+              <h3 className="text-base font-bold text-foreground flex-1">Self-Care Habits</h3>
+              {taskBankSelected.size > 0 && (
+                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-100/60 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
+                  {taskBankSelected.size} selected
+                </span>
+              )}
+            </div>
+
+            {/* Search */}
+            <div className="px-4 py-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search habits..."
+                  value={taskBankSearch}
+                  onChange={(e) => setTaskBankSearch(e.target.value)}
+                  className="pl-9 bg-muted/50 h-9 text-sm"
+                />
+              </div>
+            </div>
+
+            {/* Category pills */}
+            {taskBankCategories.length > 0 && (
+              <div className="px-1">
+                <ScrollArea className="w-full">
+                  <div className="flex gap-2.5 px-3 pb-2">
+                    {taskBankCategories.map((cat: any) => (
+                      <CategoryCircle
+                        key={cat.slug}
+                        name={cat.name}
+                        icon={cat.emoji || 'Sparkles'}
+                        emoji={cat.emoji}
+                        color={cat.color}
+                        isSelected={taskBankCategory === cat.slug}
+                        onClick={() => {
+                          haptic.light();
+                          setTaskBankCategory(prev => prev === cat.slug ? null : cat.slug);
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <ScrollBar orientation="horizontal" className="invisible" />
+                </ScrollArea>
+              </div>
+            )}
+
+            {/* Task lists grouped by category */}
+            <div className="flex-1 overflow-y-auto px-4 py-2">
+              {filteredTaskBankCategories.map((cat: any) => {
+                const catTasks = (taskBankByCategory[cat.slug] || []).filter((t: any) => {
+                  if (!taskBankSearch) return true;
+                  return t.title.toLowerCase().includes(taskBankSearch.toLowerCase());
+                });
+                if (catTasks.length === 0) return null;
+
+                return (
+                  <div key={cat.slug} className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h4 className="text-sm font-bold text-foreground">{cat.name}</h4>
+                      <span className="text-[10px] text-muted-foreground font-medium bg-muted/60 px-1.5 py-0.5 rounded-full">{catTasks.length}</span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {catTasks.map((task: any) => {
+                        const isSelected = taskBankSelected.has(task.id);
+                        const isAlreadyAdded = addedTaskIds.has(task.id);
+                        const bgColor = TASK_COLORS[task.color as TaskColor] || TASK_COLORS.blue;
+                        return (
+                          <button
+                            key={task.id}
+                            onClick={() => {
+                              if (isAlreadyAdded) return;
+                              handleTaskBankToggle(task.id);
+                            }}
+                            disabled={isAlreadyAdded}
+                            className={cn(
+                              'w-full flex items-center gap-3 rounded-xl p-3 text-left transition-all',
+                              isAlreadyAdded
+                                ? 'opacity-40'
+                                : isSelected
+                                  ? 'ring-2 ring-primary/50'
+                                  : 'active:scale-[0.99]'
+                            )}
+                            style={{ backgroundColor: bgColor }}
+                          >
+                            <FluentEmoji emoji={task.emoji || '📝'} size={26} className="shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-black truncate">{task.title}</p>
+                              <p className="text-[11px] text-black/60 truncate">
+                                {task.repeat_pattern === 'daily' ? 'Daily' : task.repeat_pattern === 'weekly' ? 'Weekly' : 'Once'}
+                                {task.time_period && ` • ${task.time_period}`}
+                              </p>
+                            </div>
+                            {isAlreadyAdded ? (
+                              <span className="text-[10px] text-black/40 font-semibold bg-white/60 px-2 py-0.5 rounded-full shrink-0">Added</span>
+                            ) : (
+                              <div className={cn(
+                                'w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-colors',
+                                isSelected ? 'bg-primary' : 'bg-black/10'
+                              )}>
+                                {isSelected ? (
+                                  <Check className="w-4 h-4 text-primary-foreground" />
+                                ) : (
+                                  <Plus className="w-3.5 h-3.5 text-black/50" />
+                                )}
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {filteredTaskBankCategories.length === 0 && taskBankSearch && (
+                <div className="text-center py-10">
+                  <Search className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">No habits found</p>
+                </div>
+              )}
+            </div>
+
+            {/* Bottom action */}
+            <div
+              className="px-5 pt-2 border-t border-border/30"
+              style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
+            >
+              <Button
+                onClick={taskBankSelected.size > 0 ? handleTaskBankAddSelected : () => setShowTaskBank(false)}
+                className="w-full h-12 rounded-2xl text-base font-bold bg-foreground text-background"
+              >
+                {taskBankSelected.size > 0 ? `Add ${taskBankSelected.size} Habit${taskBankSelected.size > 1 ? 's' : ''}` : 'Done'}
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       <Dialog open={showQuickAdd} onOpenChange={(v) => { if (!v) handleQuickAddClose(); }}>
         <DialogContent
           hideCloseButton
