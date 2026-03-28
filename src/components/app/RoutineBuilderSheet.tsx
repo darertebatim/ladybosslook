@@ -274,12 +274,23 @@ export function RoutineBuilderSheet({
   const { data: taskBankTemplates = [] } = useQuery({
     queryKey: ['builder-task-bank'],
     queryFn: async () => {
-      const { data } = await supabase
-        .from('admin_task_bank')
-        .select('id, title, emoji, color, category, repeat_pattern, repeat_days, time_period, duration_minutes, goal_enabled, goal_target, goal_type, goal_unit, pro_link_type, pro_link_value, linked_playlist_id, description')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
-      return data || [];
+      const pageSize = 1000;
+      let from = 0;
+      const all: any[] = [];
+      while (true) {
+        const { data } = await supabase
+          .from('admin_task_bank')
+          .select('id, title, emoji, color, category, repeat_pattern, repeat_days, time_period, duration_minutes, goal_enabled, goal_target, goal_type, goal_unit, pro_link_type, pro_link_value, linked_playlist_id, description')
+          .eq('is_active', true)
+          .order('sort_order', { ascending: true })
+          .order('id', { ascending: true })
+          .range(from, from + pageSize - 1);
+        const batch = data || [];
+        all.push(...batch);
+        if (batch.length < pageSize) break;
+        from += pageSize;
+      }
+      return all;
     },
     enabled: open,
   });
