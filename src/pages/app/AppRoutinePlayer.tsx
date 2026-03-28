@@ -2,7 +2,7 @@ import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 const DISMISSED_FEATURED_KEY = 'dismissed-featured-routines';
 import { fetchSmartEstimates, type SmartEstimateInput } from '@/lib/smartEstimate';
 import { cn } from '@/lib/utils';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Play, Loader2, ChevronRight, RotateCw, ChevronLeft, Trash2, CalendarPlus, Bell, Calendar, Check, Plus, Pencil } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { PRO_LINK_CONFIGS, type ProLinkType } from '@/lib/proTaskTypes';
