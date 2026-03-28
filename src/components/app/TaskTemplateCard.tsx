@@ -74,14 +74,14 @@ export function TaskTemplateCard({ template, onAdd, isSelected, selectable }: Ta
               "shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-colors",
               isSelected
                 ? "bg-primary"
-                : "bg-foreground"
+                : "bg-primary/80"
             )}
             aria-label={isSelected ? "Deselect task" : "Select task"}
           >
             {isSelected ? (
-              <Check className="h-5 w-5 text-primary-foreground" />
+              <Check className="h-5 w-5 text-white" />
             ) : (
-              <CalendarPlus className="h-5 w-5 text-background" />
+              <CalendarPlus className="h-5 w-5 text-white" />
             )}
           </button>
         ) : (
