@@ -79,9 +79,9 @@ export function TaskTemplateCard({ template, onAdd, isSelected, selectable }: Ta
             aria-label={isSelected ? "Deselect task" : "Select task"}
           >
             {isSelected ? (
-              <Check className="h-5 w-5 text-primary-foreground" />
+              <Check className="h-5 w-5 text-white" />
             ) : (
-              <CalendarPlus className="h-5 w-5 text-background" />
+              <CalendarPlus className="h-5 w-5 text-white" />
             )}
           </button>
         ) : (
