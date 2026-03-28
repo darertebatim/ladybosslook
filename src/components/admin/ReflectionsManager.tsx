@@ -159,6 +159,10 @@ export function ReflectionsManager() {
                   <Switch checked={editing.is_free ?? true} onCheckedChange={(v) => setEditing({ ...editing, is_free: v })} />
                   <Label>Free</Label>
                 </div>
+                <div className="flex items-center gap-2">
+                  <Switch checked={editing.shuffle_mode ?? false} onCheckedChange={(v) => setEditing({ ...editing, shuffle_mode: v })} />
+                  <Label>Shuffle Mode</Label>
+                </div>
               </div>
               <div>
                 <Label>Sort Order</Label>
