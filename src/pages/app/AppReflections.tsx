@@ -81,7 +81,7 @@ export default function AppReflections() {
       {/* Free Form */}
       <div className="px-4 mt-2">
         <button
-          onClick={() => navigate('/app/journal/new')}
+          onClick={() => navigate('/app/reflections/free-form')}
           className="w-full rounded-2xl bg-accent/60 p-4 flex items-center gap-3 text-left transition-transform active:scale-[0.97]"
         >
           <span className="text-2xl">✍️</span>
