@@ -114,24 +114,16 @@ export default function AppReflections() {
               <button
                 key={r.id}
                 onClick={() => navigate(`/app/reflections/${r.id}`)}
-                className="w-full rounded-2xl overflow-hidden text-left transition-transform active:scale-[0.97] relative"
-                style={{ backgroundColor: r.cover_color || '#ffffff' }}
+                className="w-full rounded-2xl overflow-hidden text-left transition-transform active:scale-[0.97] relative bg-accent/60 border border-border/40"
               >
-                <div className="flex items-center">
-                  <div className="flex-1 p-4">
-                    <p className="font-bold text-base leading-tight text-foreground">{r.title}</p>
-                    {r.subtitle && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{r.subtitle}</p>}
+                <div className="flex items-center gap-3 p-4">
+                  <div className="h-14 w-14 rounded-xl bg-background/60 flex items-center justify-center shrink-0">
+                    <FluentEmoji emoji={r.emoji || '🪞'} size={36} />
                   </div>
-                  {r.cover_image_url && (
-                    <div className="w-28 h-28 shrink-0">
-                      <img
-                        src={r.cover_image_url}
-                        alt=""
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                      />
-                    </div>
-                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-base leading-tight text-foreground">{r.title}</p>
+                    {r.subtitle && <p className="text-sm text-foreground/80 mt-1 line-clamp-2">{r.subtitle}</p>}
+                  </div>
                 </div>
               </button>
             ))}
@@ -296,7 +288,7 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-base leading-tight">{reflection.title}</p>
             {reflection.subtitle && (
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{reflection.subtitle}</p>
+              <p className="text-sm text-foreground/80 mt-1 line-clamp-2">{reflection.subtitle}</p>
             )}
           </div>
         </button>
