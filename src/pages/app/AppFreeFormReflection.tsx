@@ -8,6 +8,8 @@ import { cn } from '@/lib/utils';
 import { useBilingualText } from '@/components/ui/BilingualText';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { format } from 'date-fns';
+import { Lightbulb } from 'lucide-react';
+import { JournalPromptMarquee } from '@/components/app/JournalPromptMarquee';
 
 const BULLET_COLORS = [
   'hsl(142, 50%, 78%)',  // sage green
@@ -33,6 +35,7 @@ export default function AppFreeFormReflection() {
 
   const [title, setTitle] = useState('');
   const [lines, setLines] = useState<string[]>(['']);
+  const [showPrompts, setShowPrompts] = useState(false);
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const lineRefs = useRef<(HTMLInputElement | null)[]>([]);
   const justAddedLine = useRef(false);
@@ -133,31 +136,53 @@ export default function AppFreeFormReflection() {
           TODAY, {today.toUpperCase()}
         </p>
 
-        {/* Title */}
-        <textarea
-          ref={titleRef}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Reflections"
-          rows={1}
-          className={cn(
-            "w-full bg-transparent border-0 outline-none resize-none text-2xl font-bold mt-1 placeholder:text-foreground/30",
-            titleBiClass
-          )}
-          dir={titleDir}
-          style={{ minHeight: '40px' }}
-          onInput={(e) => {
-            const t = e.currentTarget;
-            t.style.height = 'auto';
-            t.style.height = t.scrollHeight + 'px';
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              lineRefs.current[0]?.focus();
-            }
-          }}
-        />
+        {/* Title row with lamp button */}
+        <div className="flex items-start gap-2">
+          <textarea
+            ref={titleRef}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Reflections"
+            rows={1}
+            className={cn(
+              "flex-1 bg-transparent border-0 outline-none resize-none text-2xl font-bold mt-1 placeholder:text-foreground/30",
+              titleBiClass
+            )}
+            dir={titleDir}
+            style={{ minHeight: '40px' }}
+            onInput={(e) => {
+              const t = e.currentTarget;
+              t.style.height = 'auto';
+              t.style.height = t.scrollHeight + 'px';
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                lineRefs.current[0]?.focus();
+              }
+            }}
+          />
+          <button
+            onClick={() => setShowPrompts(prev => !prev)}
+            className={cn(
+              "mt-2 p-2 rounded-full transition-colors shrink-0",
+              showPrompts ? "bg-amber-100 text-amber-600" : "bg-muted text-muted-foreground"
+            )}
+          >
+            <Lightbulb className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Prompt box */}
+        {showPrompts && (
+          <div className="mt-2">
+            <JournalPromptMarquee onSelect={(prompt) => {
+              setTitle(prompt);
+              setShowPrompts(false);
+              titleRef.current?.focus();
+            }} />
+          </div>
+        )}
 
         {/* Bullet entries */}
         <div className="mt-3 space-y-1.5">
