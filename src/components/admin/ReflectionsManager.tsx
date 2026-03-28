@@ -118,7 +118,7 @@ export function ReflectionsManager() {
                   <SelectContent>
                     {REFLECTION_CATEGORIES.map((cat) => (
                       <SelectItem key={cat.value} value={cat.value}>
-                        {cat.emoji} {cat.label}
+                        <FluentEmoji emoji={cat.emoji} size={16} className="mr-1" /> {cat.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
