@@ -383,6 +383,11 @@ const AppStore = () => {
               </section>
             )}
 
+            {/* My Shortcuts */}
+            {!searchQuery && (
+              <ToolShortcuts />
+            )}
+
             {/* Reflections Section */}
             {!searchQuery && reflections && reflections.length > 0 && (
               <section>
@@ -463,10 +468,6 @@ const AppStore = () => {
               </section>
             )}
 
-            {/* My Shortcuts */}
-            {!searchQuery && (
-              <ToolShortcuts />
-            )}
 
 
             {/* Meditate Section */}
