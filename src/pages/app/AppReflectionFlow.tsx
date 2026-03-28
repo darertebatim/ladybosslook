@@ -140,7 +140,7 @@ export default function AppReflectionFlow() {
     try {
       await saveResponse.mutateAsync({
         reflectionId,
-        pageId: page.id,
+        pageId: savePage.id,
         responseText: content,
         isCompleted: true,
       });
