@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XCircle, ChevronRight, Search } from 'lucide-react';
+import { XCircle, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PRO_LINK_CONFIGS, PRO_LINK_TYPES, type ProLinkType } from '@/lib/proTaskTypes';
 import { Input } from '@/components/ui/input';
@@ -192,37 +192,3 @@ function FeaturedCard({
 }
 
 // --- Compact Row (category lists) ---
-
-function CompactRow({
-  config,
-  isSelected,
-  onSelect,
-}: {
-  config: (typeof PRO_LINK_TYPES)[number];
-  isSelected: boolean;
-  onSelect: () => void;
-}) {
-  const Icon = config.icon;
-
-  return (
-    <button
-      onClick={onSelect}
-      className={cn(
-        'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl active:bg-muted/60 text-left transition-colors',
-        isSelected && 'bg-primary/10 ring-1 ring-primary/30'
-      )}
-    >
-      <div className={cn(
-        'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0',
-        config.gradientClass
-      )}>
-        <Icon className={cn('h-4 w-4', config.iconColorClass)} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium leading-tight">{config.label}</p>
-        <p className="text-[11px] text-muted-foreground truncate">{config.description}</p>
-      </div>
-      <ChevronRight className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
-    </button>
-  );
-}
