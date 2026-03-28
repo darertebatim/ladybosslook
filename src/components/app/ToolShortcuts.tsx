@@ -167,31 +167,30 @@ function ShortcutSlot({
   onTap: () => void;
   onLongPress?: () => void;
 }) {
-  const [pressTimer, setPressTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
-  const [didLongPress, setDidLongPress] = useState(false);
+  const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const didLongPressRef = useRef(false);
 
   const handleTouchStart = () => {
-    setDidLongPress(false);
+    didLongPressRef.current = false;
     if (onLongPress) {
-      const timer = setTimeout(() => {
-        setDidLongPress(true);
+      pressTimerRef.current = setTimeout(() => {
+        didLongPressRef.current = true;
         onLongPress();
       }, 600);
-      setPressTimer(timer);
     }
   };
 
   const handleTouchEnd = () => {
-    if (pressTimer) clearTimeout(pressTimer);
-    setPressTimer(null);
-    if (!didLongPress) {
+    if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
+    pressTimerRef.current = null;
+    if (!didLongPressRef.current) {
       onTap();
     }
   };
 
   const handleTouchCancel = () => {
-    if (pressTimer) clearTimeout(pressTimer);
-    setPressTimer(null);
+    if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
+    pressTimerRef.current = null;
   };
 
   return (
