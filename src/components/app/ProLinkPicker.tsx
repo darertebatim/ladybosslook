@@ -54,13 +54,6 @@ export function ProLinkPicker({
     .map(type => PRO_LINK_CONFIGS[type])
     .filter(matchesSearch);
 
-  const filteredCategories = CATEGORY_ORDER
-    .map(cat => ({
-      ...cat,
-      types: cat.types.filter(type => matchesSearch(PRO_LINK_CONFIGS[type])),
-    }))
-    .filter(cat => cat.types.length > 0);
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl px-0">
