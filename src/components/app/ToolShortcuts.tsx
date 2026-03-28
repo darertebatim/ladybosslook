@@ -162,12 +162,12 @@ export function ToolShortcuts() {
 
       {/* Shortcut Picker Sheet */}
       <Sheet open={pickerOpen} onOpenChange={setPickerOpen}>
-        <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl px-0">
+        <SheetContent side="bottom" className="h-auto max-h-[60vh] rounded-t-3xl px-0">
           <SheetHeader className="px-5 pb-0">
             <SheetTitle className="text-lg font-bold">Add Shortcut</SheetTitle>
           </SheetHeader>
 
-          <div className="flex flex-col h-[calc(80vh-60px)]">
+          <div className="flex flex-col">
             <div className="px-5 pt-2 pb-3 space-y-2">
               <p className="text-xs text-foreground font-medium">
                 Choose a tool to add to your shortcuts.
@@ -184,7 +184,7 @@ export function ToolShortcuts() {
             </div>
 
             <ScrollArea className="flex-1 px-5">
-              <div className="pb-6 space-y-5">
+              <div className="pb-6 space-y-4">
                 {CATEGORIES.map((cat) => {
                   const items = cat.links
                     .map((type) => PRO_LINK_CONFIGS[type])
@@ -196,32 +196,26 @@ export function ToolShortcuts() {
                       <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-2 px-1">
                         {cat.label}
                       </h3>
-                      <div className="space-y-1.5">
+                      <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-1">
                         {items.map((config) => {
                           const Icon = config.icon;
                           const isAlreadyUsed = shortcuts.some(s => s?.type === config.value);
                           return (
                             <button
                               key={config.value}
-                              onClick={() => handleSelect(config.value)}
+                              onClick={() => !isAlreadyUsed && handleSelect(config.value)}
                               disabled={isAlreadyUsed}
                               className={cn(
-                                'w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors active:scale-[0.98]',
-                                isAlreadyUsed
-                                  ? 'opacity-40 cursor-not-allowed bg-muted/30'
-                                  : 'bg-card hover:bg-muted/50'
+                                'flex flex-col items-center gap-1 shrink-0 w-16 active:scale-95 transition-transform',
+                                isAlreadyUsed && 'opacity-35 cursor-not-allowed'
                               )}
                             >
-                              <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', config.gradientClass)}>
-                                <Icon className={cn('h-4.5 w-4.5', config.iconColorClass)} />
+                              <div className={cn('w-12 h-12 rounded-2xl flex items-center justify-center', config.gradientClass)}>
+                                <Icon className={cn('h-5 w-5', config.iconColorClass)} />
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-medium text-foreground leading-tight">{config.label}</div>
-                                <div className="text-[11px] text-muted-foreground leading-tight mt-0.5 truncate">{config.description}</div>
-                              </div>
-                              {isAlreadyUsed && (
-                                <span className="text-[10px] text-muted-foreground shrink-0">Added</span>
-                              )}
+                              <span className="text-[10px] font-medium text-foreground leading-tight text-center line-clamp-2 w-full">
+                                {config.label}
+                              </span>
                             </button>
                           );
                         })}
