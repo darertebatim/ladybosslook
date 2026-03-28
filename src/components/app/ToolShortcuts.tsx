@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { PRO_LINK_CONFIGS, type ProLinkType, getProTaskNavigationPath } from '@/lib/proTaskTypes';
-import { ProLinkPicker } from '@/components/app/ProLinkPicker';
+import { PRO_LINK_CONFIGS, type ProLinkType, type ProLinkConfig, getProTaskNavigationPath } from '@/lib/proTaskTypes';
 import { useNavigate } from 'react-router-dom';
 import { haptic } from '@/lib/haptics';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 const STORAGE_KEY = 'tool-shortcuts';
 const MAX_SHORTCUTS = 5;
@@ -13,6 +15,35 @@ interface Shortcut {
   type: ProLinkType;
   value: string | null;
 }
+
+interface CategoryGroup {
+  id: string;
+  label: string;
+  links: ProLinkType[];
+}
+
+const CATEGORIES: CategoryGroup[] = [
+  {
+    id: 'wellness',
+    label: 'Wellness Tools',
+    links: ['journal', 'breathe', 'mood', 'emotion', 'reflection', 'presence', 'water', 'period', 'fasting', 'weight', 'focus_timer'],
+  },
+  {
+    id: 'media',
+    label: 'Media',
+    links: ['listen', 'audio', 'playlist', 'watch', 'video', 'video_playlist'],
+  },
+  {
+    id: 'routines',
+    label: 'Routines & Programs',
+    links: ['routine', 'tasksbank', 'inspire', 'program', 'myprograms'],
+  },
+  {
+    id: 'nav',
+    label: 'Navigation',
+    links: ['planner', 'channel', 'myprofile', 'route'],
+  },
+];
 
 function loadShortcuts(): (Shortcut | null)[] {
   try {
@@ -38,8 +69,7 @@ export function ToolShortcuts() {
   const [shortcuts, setShortcuts] = useState<(Shortcut | null)[]>(loadShortcuts);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [tempType, setTempType] = useState<ProLinkType | null>(null);
-  const [tempValue, setTempValue] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const suppressTapUntilRef = useRef(0);
 
   useEffect(() => {
@@ -51,16 +81,13 @@ export function ToolShortcuts() {
 
     const existing = shortcuts[index];
     if (existing) {
-      // Navigate to the shortcut
       haptic.light();
       const path = getProTaskNavigationPath(existing.type, existing.value);
       navigate(path);
     } else {
-      // Open picker to add
       haptic.light();
       setEditingIndex(index);
-      setTempType(null);
-      setTempValue(null);
+      setSearchQuery('');
       setPickerOpen(true);
     }
   };
@@ -75,33 +102,19 @@ export function ToolShortcuts() {
   };
 
   const handleSelect = (type: ProLinkType) => {
-    const config = PRO_LINK_CONFIGS[type];
-    setTempType(type);
-    if (!config.requiresValue || type !== 'route') {
-      // Auto-save for types that don't need manual value input
-      if (editingIndex !== null) {
-        const updated = [...shortcuts];
-        updated[editingIndex] = { type, value: null };
-        setShortcuts(updated);
-        setPickerOpen(false);
-        setEditingIndex(null);
-      }
-    }
-  };
-
-  const handleDone = () => {
-    if (editingIndex !== null && tempType) {
+    if (editingIndex !== null) {
       const updated = [...shortcuts];
-      updated[editingIndex] = { type: tempType, value: tempValue };
+      updated[editingIndex] = { type, value: null };
       setShortcuts(updated);
+      setPickerOpen(false);
+      setEditingIndex(null);
     }
-    setPickerOpen(false);
-    setEditingIndex(null);
   };
 
-  const handleClear = () => {
-    setTempType(null);
-    setTempValue(null);
+  const matchesSearch = (config: ProLinkConfig) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return config.label.toLowerCase().includes(q) || config.description.toLowerCase().includes(q);
   };
 
   const hasAny = shortcuts.some(s => s !== null);
@@ -147,16 +160,80 @@ export function ToolShortcuts() {
         })}
       </div>
 
-      <ProLinkPicker
-        open={pickerOpen}
-        onOpenChange={setPickerOpen}
-        proLinkType={tempType}
-        onSelect={handleSelect}
-        onClear={handleClear}
-        proLinkValue={tempValue}
-        onValueChange={setTempValue}
-        onDone={handleDone}
-      />
+      {/* Shortcut Picker Sheet */}
+      <Sheet open={pickerOpen} onOpenChange={setPickerOpen}>
+        <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl px-0">
+          <SheetHeader className="px-5 pb-0">
+            <SheetTitle className="text-lg font-bold">Add Shortcut</SheetTitle>
+          </SheetHeader>
+
+          <div className="flex flex-col h-[calc(80vh-60px)]">
+            <div className="px-5 pt-2 pb-3 space-y-2">
+              <p className="text-xs text-foreground font-medium">
+                Choose a tool to add to your shortcuts.
+              </p>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search tools..."
+                  className="pl-9 h-9 rounded-xl bg-muted/50 border-0 text-sm"
+                />
+              </div>
+            </div>
+
+            <ScrollArea className="flex-1 px-5">
+              <div className="pb-6 space-y-5">
+                {CATEGORIES.map((cat) => {
+                  const items = cat.links
+                    .map((type) => PRO_LINK_CONFIGS[type])
+                    .filter(matchesSearch);
+                  if (items.length === 0) return null;
+
+                  return (
+                    <div key={cat.id}>
+                      <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-2 px-1">
+                        {cat.label}
+                      </h3>
+                      <div className="space-y-1.5">
+                        {items.map((config) => {
+                          const Icon = config.icon;
+                          const isAlreadyUsed = shortcuts.some(s => s?.type === config.value);
+                          return (
+                            <button
+                              key={config.value}
+                              onClick={() => handleSelect(config.value)}
+                              disabled={isAlreadyUsed}
+                              className={cn(
+                                'w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors active:scale-[0.98]',
+                                isAlreadyUsed
+                                  ? 'opacity-40 cursor-not-allowed bg-muted/30'
+                                  : 'bg-card hover:bg-muted/50'
+                              )}
+                            >
+                              <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', config.gradientClass)}>
+                                <Icon className={cn('h-4.5 w-4.5', config.iconColorClass)} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-medium text-foreground leading-tight">{config.label}</div>
+                                <div className="text-[11px] text-muted-foreground leading-tight mt-0.5 truncate">{config.description}</div>
+                              </div>
+                              {isAlreadyUsed && (
+                                <span className="text-[10px] text-muted-foreground shrink-0">Added</span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollArea>
+          </div>
+        </SheetContent>
+      </Sheet>
     </section>
   );
 }
@@ -221,7 +298,6 @@ function ShortcutSlot({
         if (onLongPress) e.preventDefault();
       }}
       onClick={(e) => {
-        // Keyboard activation fallback
         if (e.detail === 0) onTap();
       }}
     >
