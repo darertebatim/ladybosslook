@@ -341,6 +341,7 @@ export function PromoBannerManager() {
         exclude_tools: excludeTools,
         target_languages: targetLanguages,
         target_timezones: targetTimezones,
+        include_update_status: includeUpdateStatus,
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
@@ -388,7 +389,7 @@ export function PromoBannerManager() {
         exclude_tools: excludeTools,
         target_languages: targetLanguages,
         target_timezones: targetTimezones,
-        display_location: displayLocations,
+        include_update_status: includeUpdateStatus,
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
         target_video_ids: targetVideoIds,
@@ -1012,6 +1013,8 @@ export function PromoBannerManager() {
                 setTargetLanguages={setTargetLanguages}
                 targetTimezones={targetTimezones}
                 setTargetTimezones={setTargetTimezones}
+                includeUpdateStatus={includeUpdateStatus}
+                setIncludeUpdateStatus={setIncludeUpdateStatus}
               />
 
               {/* Active Toggle */}
