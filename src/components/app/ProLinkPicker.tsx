@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XCircle, ChevronRight, Search } from 'lucide-react';
+import { XCircle, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PRO_LINK_CONFIGS, PRO_LINK_TYPES, type ProLinkType } from '@/lib/proTaskTypes';
 import { Input } from '@/components/ui/input';
@@ -8,17 +8,13 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
-// Most-used pro link types shown as featured cards
+// All pro link types shown as featured cards
 const FEATURED_LINKS: ProLinkType[] = [
   'breathe', 'journal', 'routine', 'playlist', 'mood', 'audio',
-];
-
-// Group remaining links by category
-const CATEGORY_ORDER = [
-  { label: 'Media', types: ['video', 'video_playlist'] as ProLinkType[] },
-  { label: 'Wellness', types: ['water', 'period', 'emotion', 'fasting', 'weight'] as ProLinkType[] },
-  { label: 'Productivity', types: ['focus_timer', 'reflection', 'planner'] as ProLinkType[] },
-  { label: 'Navigation', types: ['channel', 'program', 'inspire', 'route'] as ProLinkType[] },
+  'water', 'period', 'emotion', 'fasting', 'weight',
+  'focus_timer', 'reflection', 'planner',
+  'video', 'video_playlist',
+  'channel', 'program', 'inspire', 'route',
 ];
 
 interface ProLinkPickerProps {
@@ -58,24 +54,17 @@ export function ProLinkPicker({
     .map(type => PRO_LINK_CONFIGS[type])
     .filter(matchesSearch);
 
-  const filteredCategories = CATEGORY_ORDER
-    .map(cat => ({
-      ...cat,
-      types: cat.types.filter(type => matchesSearch(PRO_LINK_CONFIGS[type])),
-    }))
-    .filter(cat => cat.types.length > 0);
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl px-0">
         <SheetHeader className="px-5 pb-0">
-          <SheetTitle className="text-lg font-bold">Pro Action Link</SheetTitle>
+          <SheetTitle className="text-lg font-bold">Pro Task Link</SheetTitle>
         </SheetHeader>
 
         <div className="flex flex-col h-[calc(80vh-60px)]">
           {/* Search + subtitle */}
           <div className="px-5 pt-2 pb-3 space-y-2">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-foreground">
               Link this task to an app feature for one-tap access.
             </p>
 
@@ -106,47 +95,20 @@ export function ProLinkPicker({
 
           <ScrollArea className="flex-1 px-5">
             <div className="pb-6">
-              {/* Featured cards — 2-column grid */}
+              {/* All tools — 2-column grid */}
               {filteredFeatured.length > 0 && (
-                <div className="mb-4">
-                  <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                    Popular
-                  </p>
-                  <div className="grid grid-cols-2 gap-2.5">
-                    {filteredFeatured.map((config, i) => (
-                      <FeaturedCard
-                        key={config.value}
-                        config={config}
-                        isSelected={proLinkType === config.value}
-                        onSelect={() => onSelect(config.value)}
-                        index={i}
-                      />
-                    ))}
-                  </div>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {filteredFeatured.map((config, i) => (
+                    <FeaturedCard
+                      key={config.value}
+                      config={config}
+                      isSelected={proLinkType === config.value}
+                      onSelect={() => onSelect(config.value)}
+                      index={i}
+                    />
+                  ))}
                 </div>
               )}
-
-              {/* Category sections */}
-              {filteredCategories.map((cat) => (
-                <div key={cat.label} className="mb-3">
-                  <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
-                    {cat.label}
-                  </p>
-                  <div className="space-y-1">
-                    {cat.types.map((type) => {
-                      const config = PRO_LINK_CONFIGS[type];
-                      return (
-                        <CompactRow
-                          key={type}
-                          config={config}
-                          isSelected={proLinkType === type}
-                          onSelect={() => onSelect(type)}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
             </div>
           </ScrollArea>
 
@@ -230,37 +192,3 @@ function FeaturedCard({
 }
 
 // --- Compact Row (category lists) ---
-
-function CompactRow({
-  config,
-  isSelected,
-  onSelect,
-}: {
-  config: (typeof PRO_LINK_TYPES)[number];
-  isSelected: boolean;
-  onSelect: () => void;
-}) {
-  const Icon = config.icon;
-
-  return (
-    <button
-      onClick={onSelect}
-      className={cn(
-        'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl active:bg-muted/60 text-left transition-colors',
-        isSelected && 'bg-primary/10 ring-1 ring-primary/30'
-      )}
-    >
-      <div className={cn(
-        'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0',
-        config.gradientClass
-      )}>
-        <Icon className={cn('h-4 w-4', config.iconColorClass)} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium leading-tight">{config.label}</p>
-        <p className="text-[11px] text-muted-foreground truncate">{config.description}</p>
-      </div>
-      <ChevronRight className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
-    </button>
-  );
-}
