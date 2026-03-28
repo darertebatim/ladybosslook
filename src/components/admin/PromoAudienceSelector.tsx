@@ -10,11 +10,17 @@ export type TargetType = 'all' | 'enrolled' | 'custom';
 
 const TOOLS = [
   { slug: 'journal', label: '📔 Journal', description: 'Users who have journal entries' },
-  { slug: 'breathe', label: '🫁 Breathe', description: 'Users who have breathing sessions' },
+  { slug: 'breathe', label: '🌬️ Breathe', description: 'Users who have breathing sessions' },
   { slug: 'water', label: '💧 Water', description: 'Users who tracked water' },
-  { slug: 'emotion', label: '😊 Emotion', description: 'Users who logged emotions' },
-  { slug: 'period', label: '🌸 Period', description: 'Users who use period tracker' },
+  { slug: 'emotion', label: '💜 Emotion', description: 'Users who logged emotions' },
+  { slug: 'period', label: '❤️ Period', description: 'Users who use period tracker' },
   { slug: 'planner', label: '📅 Planner', description: 'Users who have tasks' },
+  { slug: 'mood', label: '🫧 Mood', description: 'Users who tracked mood' },
+  { slug: 'fasting', label: '⏳ Fasting', description: 'Users who use fasting tracker' },
+  { slug: 'reflections', label: '✏️ Reflections', description: 'Users who wrote reflections' },
+  { slug: 'routines', label: '🚀 Routines', description: 'Users who use routine player' },
+  { slug: 'timer', label: '⏱️ Timer', description: 'Users who use focus timer' },
+  { slug: 'presence', label: '🔥 Presence', description: 'Users who track presence streak' },
 ];
 
 const LANGUAGE_OPTIONS = [
