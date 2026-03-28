@@ -90,17 +90,17 @@ export default function AppReflections() {
           <span className="text-xl">✍️</span>
           <div>
             <p className="font-semibold text-sm">Free Form</p>
-            <p className="text-xs text-foreground/70 line-clamp-1">Write freely</p>
+            <p className="text-xs text-foreground line-clamp-1">Write freely</p>
           </div>
         </button>
         <button
           onClick={() => navigate('/app/reflections/notes')}
           className="flex-1 rounded-2xl bg-accent/60 p-3 flex items-center gap-2 text-left transition-transform active:scale-[0.97]"
         >
-          <BookOpen className="h-5 w-5 text-foreground/70 shrink-0" />
+          <FluentEmoji emoji="📓" size={24} />
           <div>
             <p className="font-semibold text-sm">My Notes</p>
-            <p className="text-xs text-foreground/70 line-clamp-1">Past reflections</p>
+            <p className="text-xs text-foreground line-clamp-1">Past reflections</p>
           </div>
         </button>
       </div>
