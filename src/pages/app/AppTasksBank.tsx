@@ -362,7 +362,8 @@ export default function AppTasksBank() {
         >
           <Button
             onClick={handleOpenBuilder}
-            className="w-full h-14 rounded-2xl text-base font-bold gap-2 shadow-lg bg-primary text-primary-foreground hover:bg-primary/90"
+            className="w-full h-14 rounded-2xl text-base font-bold gap-2 shadow-lg text-white hover:opacity-90"
+            style={{ backgroundColor: 'hsl(10, 80%, 55%)' }}
             size="lg"
           >
             <FluentEmoji emoji="✨" size={20} />
