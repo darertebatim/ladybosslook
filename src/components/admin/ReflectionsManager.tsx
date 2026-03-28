@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Pencil, Trash2, GripVertical, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { EmojiPicker } from '@/components/app/EmojiPicker';
 
 interface PageDraft {
   id?: string;

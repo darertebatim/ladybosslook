@@ -19,6 +19,7 @@ export interface Reflection {
   title: string;
   subtitle: string | null;
   cover_image_url: string | null;
+  emoji: string | null;
   is_active: boolean;
   is_featured: boolean;
   is_free: boolean;
