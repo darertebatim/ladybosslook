@@ -462,6 +462,7 @@ export function PromoBannerManager() {
     setExcludeTools([]);
     setTargetLanguages([]);
     setTargetTimezones([]);
+    setIncludeUpdateStatus([]);
     // Reset location
     setDisplayLocations(['home_top']);
     setTargetPlaylistIds([]);
@@ -492,6 +493,7 @@ export function PromoBannerManager() {
     setExcludeTools(banner.exclude_tools || []);
     setTargetLanguages((banner as any).target_languages || []);
     setTargetTimezones((banner as any).target_timezones || []);
+    setIncludeUpdateStatus((banner as any).include_update_status || []);
     // Load location
     setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
     setTargetPlaylistIds(banner.target_playlist_ids || []);
@@ -1125,6 +1127,7 @@ export function PromoBannerManager() {
                       setExcludeTools(banner.exclude_tools || []);
                       setTargetLanguages((banner as any).target_languages || []);
                       setTargetTimezones((banner as any).target_timezones || []);
+                      setIncludeUpdateStatus((banner as any).include_update_status || []);
                       setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
                       setTargetPlaylistIds(banner.target_playlist_ids || []);
                       setTargetAudioIds(banner.target_audio_ids || []);
