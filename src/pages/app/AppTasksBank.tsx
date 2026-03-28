@@ -199,7 +199,7 @@ export default function AppTasksBank() {
           pro_link_type: 'routine',
           pro_link_value: routineId,
           is_active: true,
-          order_index: -1,
+          order_index: startOrder + regularTasks.length,
           source_routine_id: null,
         });
       }

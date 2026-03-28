@@ -637,10 +637,10 @@ export function useAddRoutineFromBank() {
         if (insertError) throw insertError;
       }
 
-      // Insert synthetic pro-task (routine launcher) if selected — placed at top of planner
+      // Insert synthetic pro-task (routine launcher) if selected — placed after routine tasks
       if (hasProTask) {
         const proTaskEdited = editedTasks?.find(t => t.id.startsWith(proTaskPrefix));
-        // Use order_index = -1 to sort above all existing tasks (which start at 0+)
+        const proTaskOrder = startOrderIndex + tasks.length;
         const { error: proError } = await supabase
           .from('user_tasks')
           .insert({
@@ -653,7 +653,7 @@ export function useAddRoutineFromBank() {
             pro_link_type: 'routine',
             pro_link_value: routineId,
             is_active: true,
-            order_index: -1,
+            order_index: proTaskOrder,
             source_routine_id: null,
           });
         if (proError) {
