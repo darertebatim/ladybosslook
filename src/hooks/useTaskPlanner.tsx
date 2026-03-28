@@ -484,19 +484,34 @@ export const useTaskTemplates = (category?: string) => {
   return useQuery({
     queryKey: ['planner-templates', category],
     queryFn: async () => {
-      let query = supabase
-        .from('admin_task_bank')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
+      const pageSize = 1000;
+      let from = 0;
+      const allTemplates: TaskTemplate[] = [];
 
-      if (category) {
-        query = query.eq('category', category);
+      while (true) {
+        let query = supabase
+          .from('admin_task_bank')
+          .select('*')
+          .eq('is_active', true)
+          .order('sort_order', { ascending: true })
+          .order('id', { ascending: true })
+          .range(from, from + pageSize - 1);
+
+        if (category) {
+          query = query.eq('category', category);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        const batch = (data || []) as TaskTemplate[];
+        allTemplates.push(...batch);
+
+        if (batch.length < pageSize) break;
+        from += pageSize;
       }
 
-      const { data, error } = await query;
-      if (error) throw error;
-      return data as TaskTemplate[];
+      return allTemplates;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes - refresh on app reopen
     refetchOnMount: 'always', // Always refetch when component mounts
