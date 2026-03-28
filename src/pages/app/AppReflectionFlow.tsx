@@ -249,13 +249,24 @@ export default function AppReflectionFlow() {
         {/* Content */}
         <div className="flex-1 px-5 pt-4 overflow-y-auto overscroll-contain" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}>
           {/* Date */}
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            TODAY, {today.toUpperCase()}
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              TODAY, {today.toUpperCase()}
+            </p>
+            {isShuffleMode && totalPages > 1 && (
+              <button
+                onClick={handleShuffle}
+                className="p-2 rounded-full active:scale-90 transition-transform text-muted-foreground hover:text-foreground"
+                aria-label="Shuffle question"
+              >
+                <RefreshCw className="h-5 w-5" />
+              </button>
+            )}
+          </div>
 
           {/* Title — use page content as the main title */}
           <h1 className={cn("text-2xl font-bold mt-1", contentBilingualClassName)} dir={contentDirection}>
-            {page?.content}
+            {displayedPage?.content}
           </h1>
 
           {/* Bullet entries */}
