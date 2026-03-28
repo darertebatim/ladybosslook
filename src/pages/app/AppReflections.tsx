@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useReflections, Reflection } from '@/hooks/useReflections';
+import { useReflections, Reflection, REFLECTION_CATEGORIES } from '@/hooks/useReflections';
 import { ArrowLeft, BookOpen, Crown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
@@ -38,9 +38,17 @@ export default function AppReflections() {
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const isPageAdded = !!existingPageTask || justAdded;
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const featured = reflections?.filter((r) => r.is_featured) || [];
   const all = reflections || [];
+  const filtered = selectedCategory ? all.filter(r => r.category === selectedCategory) : all;
+
+  const availableCategories = useMemo(() => {
+    if (!reflections) return [];
+    const cats = new Set(reflections.map(r => r.category).filter(Boolean));
+    return REFLECTION_CATEGORIES.filter(c => cats.has(c.value));
+  }, [reflections]);
 
   return (
     <div className="min-h-screen bg-background pb-24">
