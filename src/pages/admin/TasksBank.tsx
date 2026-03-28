@@ -129,15 +129,29 @@ export default function TasksBank() {
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ['admin-task-bank'],
     queryFn: async () => {
-      // Fetch all tasks (Supabase default limit is 1000, we need all)
-      const { data, error } = await supabase
-        .from('admin_task_bank')
-        .select('*')
-        .order('sort_order', { ascending: true })
-        .limit(5000);
-      
-      if (error) throw error;
-      return data as TaskBankItem[];
+      // Fetch all tasks with pagination (project API max rows is often 1000/request)
+      const pageSize = 1000;
+      let from = 0;
+      const allTasks: TaskBankItem[] = [];
+
+      while (true) {
+        const { data, error } = await supabase
+          .from('admin_task_bank')
+          .select('*')
+          .order('sort_order', { ascending: true })
+          .order('id', { ascending: true })
+          .range(from, from + pageSize - 1);
+
+        if (error) throw error;
+
+        const batch = (data || []) as TaskBankItem[];
+        allTasks.push(...batch);
+
+        if (batch.length < pageSize) break;
+        from += pageSize;
+      }
+
+      return allTasks;
     },
   });
 
