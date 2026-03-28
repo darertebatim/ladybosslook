@@ -11,18 +11,7 @@ import { format } from 'date-fns';
 import { Lightbulb } from 'lucide-react';
 import { JournalPromptMarquee } from '@/components/app/JournalPromptMarquee';
 
-const BULLET_COLORS = [
-  'hsl(142, 50%, 78%)',  // sage green
-  'hsl(20, 70%, 78%)',   // peach
-  'hsl(262, 60%, 68%)',  // purple
-  'hsl(200, 60%, 72%)',  // sky blue
-  'hsl(45, 70%, 72%)',   // warm yellow
-  'hsl(340, 55%, 75%)',  // pink
-];
-
-function getBulletColor(index: number) {
-  return BULLET_COLORS[index % BULLET_COLORS.length];
-}
+const BULLET_COLOR = 'hsl(var(--muted-foreground) / 0.4)';
 
 export default function AppFreeFormReflection() {
   const navigate = useNavigate();
@@ -192,11 +181,7 @@ export default function AppFreeFormReflection() {
             <div key={idx} className="flex items-start gap-3">
               <div
                 className="w-3 h-3 rounded-sm mt-[5px] shrink-0 transition-colors"
-                style={{
-                  backgroundColor: line.trim()
-                    ? getBulletColor(idx)
-                    : 'hsl(var(--muted-foreground) / 0.25)',
-                }}
+                style={{ backgroundColor: BULLET_COLOR }}
               />
               <input
                 ref={(el) => { lineRefs.current[idx] = el; }}
