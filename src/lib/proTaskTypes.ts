@@ -18,11 +18,17 @@ import {
   Video,
   Clapperboard,
   ListChecks,
-  Clock
+  Clock,
+  User,
+  Library,
+  Eye,
+  Leaf,
+  MonitorPlay,
+  PlayCircle
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
-export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | 'video' | 'video_playlist' | 'focus_timer' | 'routine';
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | 'video' | 'video_playlist' | 'focus_timer' | 'routine' | 'myprograms' | 'myprofile' | 'presence' | 'tasksbank' | 'listen' | 'watch';
 
 export interface ProLinkConfig {
   value: ProLinkType;
