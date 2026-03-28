@@ -851,7 +851,156 @@ export function RoutineBuilderSheet({
         </SheetContent>
       </Sheet>
 
-      {/* Quick Add Dialog — identical to home page quick-add */}
+      {/* Self-Care Habit Picker — Sheet overlay */}
+      <Sheet open={showTaskBank} onOpenChange={(v) => { if (!v) { setShowTaskBank(false); setTaskBankSearch(''); setTaskBankCategory(null); } }}>
+        <SheetContent
+          side="bottom"
+          className="h-[85vh] rounded-t-3xl px-0 pb-0"
+          hideCloseButton
+        >
+          <div className="flex flex-col h-full">
+            <div className="flex items-center gap-3 px-5 pb-3 border-b border-border/30">
+              <button onClick={() => { setShowTaskBank(false); setTaskBankSearch(''); setTaskBankCategory(null); }} className="p-1 active:opacity-70">
+                <ChevronLeft className="w-5 h-5 text-foreground" />
+              </button>
+              <h3 className="text-base font-bold text-foreground flex-1">Self-Care Habits</h3>
+              {taskBankSelected.size > 0 && (
+                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-100/60 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
+                  {taskBankSelected.size} selected
+                </span>
+              )}
+            </div>
+
+            {/* Search */}
+            <div className="px-4 py-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search habits..."
+                  value={taskBankSearch}
+                  onChange={(e) => setTaskBankSearch(e.target.value)}
+                  className="pl-9 bg-muted/50 h-9 text-sm"
+                />
+              </div>
+            </div>
+
+            {/* Category pills */}
+            {taskBankCategories.length > 0 && (
+              <div className="px-1">
+                <ScrollArea className="w-full">
+                  <div className="flex gap-2.5 px-3 pb-2">
+                    {taskBankCategories.map((cat: any) => (
+                      <CategoryCircle
+                        key={cat.slug}
+                        name={cat.name}
+                        emoji={cat.emoji}
+                        color={cat.color}
+                        isSelected={taskBankCategory === cat.slug}
+                        onClick={() => {
+                          haptic.light();
+                          setTaskBankCategory(prev => prev === cat.slug ? null : cat.slug);
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <ScrollBar orientation="horizontal" className="invisible" />
+                </ScrollArea>
+              </div>
+            )}
+
+            {/* Task lists grouped by category */}
+            <div className="flex-1 overflow-y-auto px-4 py-2">
+              {filteredTaskBankCategories.map((cat: any) => {
+                const catTasks = (taskBankByCategory[cat.slug] || []).filter((t: any) => {
+                  if (!taskBankSearch) return true;
+                  return t.title.toLowerCase().includes(taskBankSearch.toLowerCase());
+                });
+                if (catTasks.length === 0) return null;
+
+                return (
+                  <div key={cat.slug} className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h4 className="text-sm font-bold text-foreground">{cat.name}</h4>
+                      <span className="text-[10px] text-muted-foreground font-medium bg-muted/60 px-1.5 py-0.5 rounded-full">{catTasks.length}</span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {catTasks.map((task: any) => {
+                        const isSelected = taskBankSelected.has(task.id);
+                        const isAlreadyAdded = addedTaskIds.has(task.id);
+                        const bgColor = TASK_COLORS[task.color as TaskColor] || TASK_COLORS.blue;
+                        return (
+                          <button
+                            key={task.id}
+                            onClick={() => {
+                              if (isAlreadyAdded) return;
+                              handleTaskBankToggle(task.id);
+                            }}
+                            disabled={isAlreadyAdded}
+                            className={cn(
+                              'w-full flex items-center gap-3 rounded-xl p-3 text-left transition-all',
+                              isAlreadyAdded
+                                ? 'opacity-40'
+                                : isSelected
+                                  ? 'ring-2 ring-primary/50'
+                                  : 'active:scale-[0.99]'
+                            )}
+                            style={{ backgroundColor: bgColor }}
+                          >
+                            <FluentEmoji emoji={task.emoji || '📝'} size={26} className="shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-black truncate">{task.title}</p>
+                              <p className="text-[11px] text-black/60 truncate">
+                                {task.repeat_pattern === 'daily' ? 'Daily' : task.repeat_pattern === 'weekly' ? 'Weekly' : 'Once'}
+                                {task.time_period && ` • ${task.time_period}`}
+                              </p>
+                            </div>
+                            {isAlreadyAdded ? (
+                              <span className="text-[10px] text-black/40 font-semibold bg-white/60 px-2 py-0.5 rounded-full shrink-0">Added</span>
+                            ) : (
+                              <div className={cn(
+                                'w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-colors',
+                                isSelected ? 'bg-primary' : 'bg-black/10'
+                              )}>
+                                {isSelected ? (
+                                  <Check className="w-4 h-4 text-primary-foreground" />
+                                ) : (
+                                  <Plus className="w-3.5 h-3.5 text-black/50" />
+                                )}
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {filteredTaskBankCategories.length === 0 && taskBankSearch && (
+                <div className="text-center py-10">
+                  <Search className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">No habits found</p>
+                </div>
+              )}
+            </div>
+
+            {/* Bottom action */}
+            <div
+              className="px-5 pt-2 border-t border-border/30"
+              style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
+            >
+              <Button
+                onClick={taskBankSelected.size > 0 ? handleTaskBankAddSelected : () => setShowTaskBank(false)}
+                className="w-full h-12 rounded-2xl text-base font-bold bg-foreground text-background"
+              >
+                {taskBankSelected.size > 0 ? `Add ${taskBankSelected.size} Habit${taskBankSelected.size > 1 ? 's' : ''}` : 'Done'}
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       <Dialog open={showQuickAdd} onOpenChange={(v) => { if (!v) handleQuickAddClose(); }}>
         <DialogContent
           hideCloseButton
