@@ -18,11 +18,17 @@ import {
   Video,
   Clapperboard,
   ListChecks,
-  Clock
+  Clock,
+  User,
+  Library,
+  Eye,
+  Leaf,
+  MonitorPlay,
+  PlayCircle
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
-export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | 'video' | 'video_playlist' | 'focus_timer' | 'routine';
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | 'video' | 'video_playlist' | 'focus_timer' | 'routine' | 'myprograms' | 'myprofile' | 'presence' | 'tasksbank' | 'listen' | 'watch';
 
 export interface ProLinkConfig {
   value: ProLinkType;
@@ -299,6 +305,84 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Open a routine in the player',
     requiresValue: true,
   },
+  myprograms: {
+    value: 'myprograms',
+    label: 'My Programs',
+    icon: Library,
+    badgeText: 'View',
+    color: 'orange',
+    gradientClass: 'bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/40 dark:to-amber-900/40',
+    iconColorClass: 'text-orange-600 dark:text-orange-400',
+    badgeColorClass: 'bg-orange-500/20 text-orange-700 dark:text-orange-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open My Programs page',
+    requiresValue: false,
+  },
+  myprofile: {
+    value: 'myprofile',
+    label: 'My Profile',
+    icon: User,
+    badgeText: 'View',
+    color: 'slate',
+    gradientClass: 'bg-gradient-to-br from-slate-100 to-gray-100 dark:from-slate-900/40 dark:to-gray-900/40',
+    iconColorClass: 'text-slate-600 dark:text-slate-400',
+    badgeColorClass: 'bg-slate-500/20 text-slate-700 dark:text-slate-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open your profile',
+    requiresValue: false,
+  },
+  presence: {
+    value: 'presence',
+    label: 'Presence',
+    icon: Eye,
+    badgeText: 'Start',
+    color: 'cyan',
+    gradientClass: 'bg-gradient-to-br from-cyan-100 to-teal-100 dark:from-cyan-900/40 dark:to-teal-900/40',
+    iconColorClass: 'text-cyan-600 dark:text-cyan-400',
+    badgeColorClass: 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open the presence exercise',
+    requiresValue: false,
+  },
+  tasksbank: {
+    value: 'tasksbank',
+    label: 'Self-Care Habits',
+    icon: Leaf,
+    badgeText: 'Browse',
+    color: 'green',
+    gradientClass: 'bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/40 dark:to-emerald-900/40',
+    iconColorClass: 'text-green-600 dark:text-green-400',
+    badgeColorClass: 'bg-green-500/20 text-green-700 dark:text-green-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Browse self-care habit library',
+    requiresValue: false,
+  },
+  listen: {
+    value: 'listen',
+    label: 'Audio Player',
+    icon: PlayCircle,
+    badgeText: 'Listen',
+    color: 'emerald',
+    gradientClass: 'bg-gradient-to-br from-emerald-100 to-green-100 dark:from-emerald-900/40 dark:to-green-900/40',
+    iconColorClass: 'text-emerald-600 dark:text-emerald-400',
+    badgeColorClass: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open the audio player',
+    requiresValue: false,
+  },
+  watch: {
+    value: 'watch',
+    label: 'Video Player',
+    icon: MonitorPlay,
+    badgeText: 'Watch',
+    color: 'sky',
+    gradientClass: 'bg-gradient-to-br from-sky-100 to-blue-100 dark:from-sky-900/40 dark:to-blue-900/40',
+    iconColorClass: 'text-sky-600 dark:text-sky-400',
+    badgeColorClass: 'bg-sky-500/20 text-sky-700 dark:text-sky-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open the video player',
+    requiresValue: false,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
@@ -346,6 +430,18 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return '/app/timer';
     case 'routine':
       return linkValue ? `/app/routineplayer?routine=${linkValue}` : '/app/routineplayer';
+    case 'myprograms':
+      return '/app/myprograms';
+    case 'myprofile':
+      return '/app/myprofile';
+    case 'presence':
+      return '/app/presence';
+    case 'tasksbank':
+      return '/app/tasksbank';
+    case 'listen':
+      return '/app/player';
+    case 'watch':
+      return '/app/watch';
     default:
       return '/app/home';
   }

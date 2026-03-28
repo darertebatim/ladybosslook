@@ -18,22 +18,22 @@ const CATEGORIES: CategoryGroup[] = [
   {
     id: 'wellness',
     label: 'Wellness Tools',
-    links: ['journal', 'breathe', 'mood', 'emotion', 'reflection', 'water', 'period', 'fasting', 'weight', 'focus_timer'],
+    links: ['journal', 'breathe', 'mood', 'emotion', 'reflection', 'presence', 'water', 'period', 'fasting', 'weight', 'focus_timer'],
   },
   {
     id: 'media',
     label: 'Media',
-    links: ['audio', 'playlist', 'video', 'video_playlist'],
+    links: ['listen', 'audio', 'playlist', 'watch', 'video', 'video_playlist'],
   },
   {
     id: 'routines',
     label: 'Routines & Programs',
-    links: ['routine', 'inspire', 'program'],
+    links: ['routine', 'tasksbank', 'inspire', 'program', 'myprograms'],
   },
   {
     id: 'nav',
     label: 'Navigation',
-    links: ['planner', 'channel', 'route'],
+    links: ['planner', 'channel', 'myprofile', 'route'],
   },
 ];
 
