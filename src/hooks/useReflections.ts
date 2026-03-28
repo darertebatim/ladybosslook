@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 // Types (since tables are new and not yet in generated types)
 export const REFLECTION_CATEGORIES = [
+  { value: 'reset', label: 'Reset', emoji: '🔄' },
   { value: 'micro-wins', label: 'Micro-wins', emoji: '🏆' },
   { value: 'deep-dives', label: 'Deep Dives', emoji: '🌊' },
   { value: 'morning', label: 'Morning', emoji: '🌅' },
