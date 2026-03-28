@@ -134,9 +134,34 @@ export default function AppReflections() {
         </div>
       )}
 
-      {/* All */}
+      {/* Category pills */}
       <div className="px-4 mt-6">
-        <h2 className="text-sm font-semibold text-muted-foreground mb-3">All</h2>
+        <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+              selectedCategory === null
+                ? 'bg-foreground text-background'
+                : 'bg-muted text-muted-foreground'
+            }`}
+          >
+            All
+          </button>
+          {availableCategories.map((cat) => (
+            <button
+              key={cat.value}
+              onClick={() => setSelectedCategory(cat.value)}
+              className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                selectedCategory === cat.value
+                  ? 'bg-foreground text-background'
+                  : 'bg-muted text-muted-foreground'
+              }`}
+            >
+              {cat.emoji} {cat.label}
+            </button>
+          ))}
+        </div>
+
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
@@ -151,13 +176,13 @@ export default function AppReflections() {
           </div>
         ) : (
           <div className="divide-y divide-border">
-            {all.map((r) => (
+            {filtered.map((r) => (
               <ReflectionRow key={r.id} reflection={r} isSubscribed={isSubscribed} />
             ))}
           </div>
         )}
-        {!isLoading && all.length === 0 && (
-          <p className="text-center text-muted-foreground py-12">No reflections available yet.</p>
+        {!isLoading && filtered.length === 0 && (
+          <p className="text-center text-muted-foreground py-12">No reflections in this category.</p>
         )}
       </div>
 
