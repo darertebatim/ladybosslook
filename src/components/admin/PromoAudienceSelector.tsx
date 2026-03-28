@@ -325,7 +325,34 @@ export function PromoAudienceSelector({
             </div>
           </div>
 
-          {/* Language Section */}
+          {/* App Update Status Section */}
+          <div className="space-y-3">
+            <Label className="text-xs text-muted-foreground uppercase tracking-wider">
+              App Update Status
+            </Label>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-xs font-medium text-green-600">
+                <Plus className="h-3 w-3" />
+                Include users on:
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {UPDATE_STATUS_OPTIONS.map((opt) => (
+                  <Badge
+                    key={opt.slug}
+                    variant={includeUpdateStatus.includes(opt.slug) ? 'default' : 'outline'}
+                    className="cursor-pointer hover:bg-primary/10"
+                    onClick={() => toggleItem(includeUpdateStatus, setIncludeUpdateStatus, opt.slug)}
+                  >
+                    {opt.label}
+                  </Badge>
+                ))}
+              </div>
+              <p className="text-[10px] text-muted-foreground">
+                "Last Update" = users on the latest app version. "Previous Updates" = users on older versions.
+              </p>
+            </div>
+          </div>
+
           <div className="space-y-3">
             <Label className="text-xs text-muted-foreground uppercase tracking-wider">
               Preferred Language (Second Language)
