@@ -2555,6 +2555,7 @@ export type Database = {
           include_playlists: string[] | null
           include_programs: string[] | null
           include_tools: string[] | null
+          include_update_status: string[] | null
           is_active: boolean
           priority: number
           starts_at: string | null
@@ -2584,6 +2585,7 @@ export type Database = {
           include_playlists?: string[] | null
           include_programs?: string[] | null
           include_tools?: string[] | null
+          include_update_status?: string[] | null
           is_active?: boolean
           priority?: number
           starts_at?: string | null
@@ -2613,6 +2615,7 @@ export type Database = {
           include_playlists?: string[] | null
           include_programs?: string[] | null
           include_tools?: string[] | null
+          include_update_status?: string[] | null
           is_active?: boolean
           priority?: number
           starts_at?: string | null

@@ -58,6 +58,7 @@ interface PromoBanner {
   exclude_tools: string[];
   target_languages: string[];
   target_timezones: string[];
+  include_update_status: string[];
   display_location: string[];
   target_playlist_ids: string[];
   target_audio_ids: string[];
@@ -105,6 +106,7 @@ export function PromoBannerManager() {
   const [excludeTools, setExcludeTools] = useState<string[]>([]);
   const [targetLanguages, setTargetLanguages] = useState<string[]>([]);
   const [targetTimezones, setTargetTimezones] = useState<string[]>([]);
+  const [includeUpdateStatus, setIncludeUpdateStatus] = useState<string[]>([]);
 
   // Fetch banners
   const { data: banners, isLoading } = useQuery({
@@ -340,6 +342,7 @@ export function PromoBannerManager() {
         exclude_tools: excludeTools,
         target_languages: targetLanguages,
         target_timezones: targetTimezones,
+        include_update_status: includeUpdateStatus,
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
@@ -387,6 +390,7 @@ export function PromoBannerManager() {
         exclude_tools: excludeTools,
         target_languages: targetLanguages,
         target_timezones: targetTimezones,
+        include_update_status: includeUpdateStatus,
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
@@ -459,6 +463,7 @@ export function PromoBannerManager() {
     setExcludeTools([]);
     setTargetLanguages([]);
     setTargetTimezones([]);
+    setIncludeUpdateStatus([]);
     // Reset location
     setDisplayLocations(['home_top']);
     setTargetPlaylistIds([]);
@@ -489,6 +494,7 @@ export function PromoBannerManager() {
     setExcludeTools(banner.exclude_tools || []);
     setTargetLanguages((banner as any).target_languages || []);
     setTargetTimezones((banner as any).target_timezones || []);
+    setIncludeUpdateStatus((banner as any).include_update_status || []);
     // Load location
     setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
     setTargetPlaylistIds(banner.target_playlist_ids || []);
@@ -1011,6 +1017,8 @@ export function PromoBannerManager() {
                 setTargetLanguages={setTargetLanguages}
                 targetTimezones={targetTimezones}
                 setTargetTimezones={setTargetTimezones}
+                includeUpdateStatus={includeUpdateStatus}
+                setIncludeUpdateStatus={setIncludeUpdateStatus}
               />
 
               {/* Active Toggle */}
@@ -1120,6 +1128,7 @@ export function PromoBannerManager() {
                       setExcludeTools(banner.exclude_tools || []);
                       setTargetLanguages((banner as any).target_languages || []);
                       setTargetTimezones((banner as any).target_timezones || []);
+                      setIncludeUpdateStatus((banner as any).include_update_status || []);
                       setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
                       setTargetPlaylistIds(banner.target_playlist_ids || []);
                       setTargetAudioIds(banner.target_audio_ids || []);

@@ -10,11 +10,17 @@ export type TargetType = 'all' | 'enrolled' | 'custom';
 
 const TOOLS = [
   { slug: 'journal', label: '📔 Journal', description: 'Users who have journal entries' },
-  { slug: 'breathe', label: '🫁 Breathe', description: 'Users who have breathing sessions' },
+  { slug: 'breathe', label: '🌬️ Breathe', description: 'Users who have breathing sessions' },
   { slug: 'water', label: '💧 Water', description: 'Users who tracked water' },
-  { slug: 'emotion', label: '😊 Emotion', description: 'Users who logged emotions' },
-  { slug: 'period', label: '🌸 Period', description: 'Users who use period tracker' },
+  { slug: 'emotion', label: '💜 Emotion', description: 'Users who logged emotions' },
+  { slug: 'period', label: '❤️ Period', description: 'Users who use period tracker' },
   { slug: 'planner', label: '📅 Planner', description: 'Users who have tasks' },
+  { slug: 'mood', label: '🫧 Mood', description: 'Users who tracked mood' },
+  { slug: 'fasting', label: '⏳ Fasting', description: 'Users who use fasting tracker' },
+  { slug: 'reflections', label: '✏️ Reflections', description: 'Users who wrote reflections' },
+  { slug: 'routines', label: '🚀 Routines', description: 'Users who use routine player' },
+  { slug: 'timer', label: '⏱️ Timer', description: 'Users who use focus timer' },
+  { slug: 'presence', label: '🔥 Presence', description: 'Users who track presence streak' },
 ];
 
 const LANGUAGE_OPTIONS = [
@@ -63,6 +69,8 @@ interface PromoAudienceSelectorProps {
   setTargetLanguages: (langs: string[]) => void;
   targetTimezones: string[];
   setTargetTimezones: (tzs: string[]) => void;
+  includeUpdateStatus: string[];
+  setIncludeUpdateStatus: (statuses: string[]) => void;
 }
 
 export function PromoAudienceSelector({
@@ -84,7 +92,14 @@ export function PromoAudienceSelector({
   setTargetLanguages,
   targetTimezones,
   setTargetTimezones,
+  includeUpdateStatus,
+  setIncludeUpdateStatus,
 }: PromoAudienceSelectorProps) {
+  const UPDATE_STATUS_OPTIONS = [
+    { slug: 'latest', label: '🆕 Last Update', description: 'Users on the latest app version' },
+    { slug: 'previous', label: '📦 Previous Updates', description: 'Users on older app versions' },
+  ];
+
   // Fetch programs
   const { data: programs } = useQuery({
     queryKey: ['programs-for-targeting'],
@@ -310,7 +325,34 @@ export function PromoAudienceSelector({
             </div>
           </div>
 
-          {/* Language Section */}
+          {/* App Update Status Section */}
+          <div className="space-y-3">
+            <Label className="text-xs text-muted-foreground uppercase tracking-wider">
+              App Update Status
+            </Label>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-xs font-medium text-green-600">
+                <Plus className="h-3 w-3" />
+                Include users on:
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {UPDATE_STATUS_OPTIONS.map((opt) => (
+                  <Badge
+                    key={opt.slug}
+                    variant={includeUpdateStatus.includes(opt.slug) ? 'default' : 'outline'}
+                    className="cursor-pointer hover:bg-primary/10"
+                    onClick={() => toggleItem(includeUpdateStatus, setIncludeUpdateStatus, opt.slug)}
+                  >
+                    {opt.label}
+                  </Badge>
+                ))}
+              </div>
+              <p className="text-[10px] text-muted-foreground">
+                "Last Update" = users on the latest app version. "Previous Updates" = users on older versions.
+              </p>
+            </div>
+          </div>
+
           <div className="space-y-3">
             <Label className="text-xs text-muted-foreground uppercase tracking-wider">
               Preferred Language (Second Language)
@@ -357,6 +399,7 @@ export function PromoAudienceSelector({
           {(includePrograms.length > 0 || excludePrograms.length > 0 || 
             includePlaylists.length > 0 || excludePlaylists.length > 0 ||
             includeTools.length > 0 || excludeTools.length > 0 ||
+            includeUpdateStatus.length > 0 ||
             targetLanguages.length > 0 || targetTimezones.length > 0) && (
             <div className="text-xs text-muted-foreground bg-background p-2 rounded border">
               <strong>Summary:</strong>
@@ -366,6 +409,7 @@ export function PromoAudienceSelector({
               {excludePlaylists.length > 0 && <span className="text-red-600"> -{excludePlaylists.length} playlists</span>}
               {includeTools.length > 0 && <span className="text-green-600"> +{includeTools.length} tools</span>}
               {excludeTools.length > 0 && <span className="text-red-600"> -{excludeTools.length} tools</span>}
+              {includeUpdateStatus.length > 0 && <span className="text-green-600"> 📱 {includeUpdateStatus.join(', ')}</span>}
               {targetLanguages.length > 0 && <span className="text-blue-600"> 🌐 {targetLanguages.length} languages</span>}
               {targetTimezones.length > 0 && <span className="text-blue-600"> 🕐 {targetTimezones.length} timezone groups</span>}
             </div>
