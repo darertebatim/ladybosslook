@@ -1,14 +1,26 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useBilingualText } from '@/components/ui/BilingualText';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { format } from 'date-fns';
+
+const BULLET_COLORS = [
+  'hsl(142, 50%, 78%)',  // sage green
+  'hsl(20, 70%, 78%)',   // peach
+  'hsl(262, 60%, 68%)',  // purple
+  'hsl(200, 60%, 72%)',  // sky blue
+  'hsl(45, 70%, 72%)',   // warm yellow
+  'hsl(340, 55%, 75%)',  // pink
+];
+
+function getBulletColor(index: number) {
+  return BULLET_COLORS[index % BULLET_COLORS.length];
+}
 
 export default function AppFreeFormReflection() {
   const navigate = useNavigate();
@@ -20,15 +32,27 @@ export default function AppFreeFormReflection() {
   const hasActivePlayer = routinePlayer?.isActive && routinePlayer?.isMinimized;
 
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [lines, setLines] = useState<string[]>(['']);
   const titleRef = useRef<HTMLTextAreaElement>(null);
+  const lineRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const justAddedLine = useRef(false);
 
   const { className: titleBiClass, direction: titleDir } = useBilingualText(title);
-  const { className: contentBiClass, direction: contentDir } = useBilingualText(content);
 
   useEffect(() => {
     setTimeout(() => titleRef.current?.focus(), 200);
   }, []);
+
+  // Focus newly added line
+  useEffect(() => {
+    if (justAddedLine.current) {
+      const lastRef = lineRefs.current[lines.length - 1];
+      lastRef?.focus();
+      justAddedLine.current = false;
+    }
+  }, [lines.length]);
+
+  const contentForSave = lines.filter(l => l.trim()).join('\n');
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -36,7 +60,7 @@ export default function AppFreeFormReflection() {
       if (!title.trim()) throw new Error('Please write a title');
       const { error } = await supabase
         .from('free_form_reflections' as any)
-        .insert({ user_id: user.id, title: title.trim(), content: content.trim() } as any);
+        .insert({ user_id: user.id, title: title.trim(), content: contentForSave } as any);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -51,6 +75,35 @@ export default function AppFreeFormReflection() {
     },
     onError: (e: any) => toast.error(e.message || 'Failed to save'),
   });
+
+  const handleLineChange = useCallback((index: number, value: string) => {
+    setLines(prev => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
+  }, []);
+
+  const handleLineKeyDown = useCallback((index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      setLines(prev => {
+        const next = [...prev];
+        next.splice(index + 1, 0, '');
+        return next;
+      });
+      justAddedLine.current = true;
+    } else if (e.key === 'Backspace' && lines[index] === '' && index > 0) {
+      e.preventDefault();
+      setLines(prev => {
+        const next = [...prev];
+        next.splice(index, 1);
+        return next;
+      });
+      // Focus previous line
+      setTimeout(() => lineRefs.current[index - 1]?.focus(), 0);
+    }
+  }, [lines]);
 
   const today = format(new Date(), 'EEEE, MMM d');
 
@@ -77,7 +130,7 @@ export default function AppFreeFormReflection() {
       <div className="flex-1 px-5 pt-4 overflow-y-auto overscroll-contain" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}>
         {/* Date */}
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-          {today}
+          TODAY, {today.toUpperCase()}
         </p>
 
         {/* Title */}
@@ -98,20 +151,37 @@ export default function AppFreeFormReflection() {
             t.style.height = 'auto';
             t.style.height = t.scrollHeight + 'px';
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              lineRefs.current[0]?.focus();
+            }
+          }}
         />
 
-        {/* Content entries */}
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Write your thoughts…"
-          className={cn(
-            "w-full bg-transparent border-0 outline-none resize-none text-base mt-2 placeholder:text-muted-foreground/50 leading-relaxed",
-            contentBiClass
-          )}
-          dir={contentDir}
-          style={{ minHeight: '300px' }}
-        />
+        {/* Bullet entries */}
+        <div className="mt-3 space-y-1.5">
+          {lines.map((line, idx) => (
+            <div key={idx} className="flex items-start gap-3">
+              <div
+                className="w-3 h-3 rounded-sm mt-[5px] shrink-0 transition-colors"
+                style={{
+                  backgroundColor: line.trim()
+                    ? getBulletColor(idx)
+                    : 'hsl(var(--muted-foreground) / 0.25)',
+                }}
+              />
+              <input
+                ref={(el) => { lineRefs.current[idx] = el; }}
+                value={line}
+                onChange={(e) => handleLineChange(idx, e.target.value)}
+                onKeyDown={(e) => handleLineKeyDown(idx, e)}
+                placeholder={idx === 0 ? 'Write your thoughts…' : ''}
+                className="flex-1 bg-transparent border-0 outline-none text-base placeholder:text-muted-foreground/40"
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
