@@ -147,6 +147,27 @@ export function ReflectionsManager() {
                 <Input value={editing.subtitle || ''} onChange={(e) => setEditing({ ...editing, subtitle: e.target.value })} />
               </div>
               <div>
+                <Label>Emoji (shown when no cover image)</Label>
+                <div className="flex items-center gap-3 mt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowEmojiPicker(true)}
+                    className="w-14 h-14 rounded-xl border-2 border-dashed border-muted-foreground/30 flex items-center justify-center hover:border-primary transition-colors"
+                  >
+                    {editing.emoji ? (
+                      <FluentEmoji emoji={editing.emoji} size={36} />
+                    ) : (
+                      <Plus className="h-5 w-5 text-muted-foreground" />
+                    )}
+                  </button>
+                  {editing.emoji && (
+                    <Button variant="ghost" size="sm" onClick={() => setEditing({ ...editing, emoji: '' })}>
+                      Clear
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <div>
                 <Label>Category</Label>
                 <Select value={editing.category || 'deep-dives'} onValueChange={(v) => setEditing({ ...editing, category: v })}>
                   <SelectTrigger>
