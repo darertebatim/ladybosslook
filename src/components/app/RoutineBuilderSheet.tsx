@@ -284,6 +284,87 @@ export function RoutineBuilderSheet({
     enabled: open,
   });
 
+  const addedTaskIds = useMemo(() => new Set(tasks.map(t => t.id)), [tasks]);
+
+  // Fetch task bank categories for the habit picker
+  const { data: taskBankCategories = [] } = useQuery({
+    queryKey: ['routine-categories-builder'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('routine_categories')
+        .select('slug, name, icon, color, task_display_order')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+      return (data || [])
+        .filter((c: any) => (c.task_display_order ?? 0) !== 0)
+        .sort((a: any, b: any) => (a.task_display_order ?? 0) - (b.task_display_order ?? 0))
+        .map((c: any) => ({ slug: c.slug, name: c.name, emoji: c.icon, color: c.color }));
+    },
+    enabled: open,
+  });
+
+  // Group task bank templates by category for habit picker
+  const taskBankByCategory = useMemo(() => {
+    const grouped: Record<string, any[]> = {};
+    for (const task of taskBankTemplates) {
+      if (!grouped[task.category]) grouped[task.category] = [];
+      grouped[task.category].push(task);
+    }
+    return grouped;
+  }, [taskBankTemplates]);
+
+  // Filter task bank by search & category
+  const filteredTaskBankCategories = useMemo(() => {
+    const cats = taskBankCategory
+      ? taskBankCategories.filter((c: any) => c.slug === taskBankCategory)
+      : taskBankCategories;
+    return cats.filter((c: any) => {
+      const catTasks = taskBankByCategory[c.slug] || [];
+      if (!taskBankSearch) return catTasks.length > 0;
+      const q = taskBankSearch.toLowerCase();
+      return catTasks.some((t: any) => t.title.toLowerCase().includes(q));
+    });
+  }, [taskBankCategories, taskBankCategory, taskBankByCategory, taskBankSearch]);
+
+  const handleTaskBankToggle = useCallback((taskId: string) => {
+    haptic.light();
+    setTaskBankSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(taskId)) next.delete(taskId);
+      else next.add(taskId);
+      return next;
+    });
+  }, []);
+
+  const handleTaskBankAddSelected = useCallback(() => {
+    haptic.medium();
+    const toAdd = taskBankTemplates.filter((t: any) => taskBankSelected.has(t.id) && !addedTaskIds.has(t.id));
+    const newTasks: BuilderTask[] = toAdd.map((t: any, i: number) => ({
+      id: t.id,
+      title: t.title,
+      emoji: t.emoji || '📝',
+      color: t.color || ROUTINE_COLOR_CYCLE[(tasks.length + i) % ROUTINE_COLOR_CYCLE.length],
+      repeat_pattern: t.repeat_pattern || 'daily',
+      repeat_days: t.repeat_days || null,
+      description: t.description || null,
+      pro_link_type: t.pro_link_type || null,
+      pro_link_value: t.pro_link_value || null,
+      goal_enabled: t.goal_enabled || false,
+      goal_target: t.goal_target || null,
+      goal_type: t.goal_type || null,
+      goal_unit: t.goal_unit || null,
+      duration_minutes: t.duration_minutes || null,
+      time_period: t.time_period || null,
+      linked_playlist_id: t.linked_playlist_id || null,
+      category: t.category || null,
+    }));
+    setTasks(prev => [...prev, ...newTasks]);
+    setTaskBankSelected(new Set());
+    setShowTaskBank(false);
+    setTaskBankSearch('');
+    setTaskBankCategory(null);
+  }, [taskBankTemplates, taskBankSelected, addedTaskIds, tasks.length]);
+
   // Search-based suggestions for quick-add
   const quickAddSearchSuggestions = useMemo(() => {
     const q = quickAddTitle.trim().toLowerCase();
@@ -297,8 +378,6 @@ export function RoutineBuilderSheet({
       })
       .slice(0, 4);
   }, [taskBankTemplates, quickAddTitle]);
-
-  const addedTaskIds = useMemo(() => new Set(tasks.map(t => t.id)), [tasks]);
 
   const addTaskFromSource = (source: any) => {
     if (addedTaskIds.has(source.id)) return;
