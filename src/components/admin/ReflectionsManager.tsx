@@ -51,9 +51,11 @@ export function ReflectionsManager() {
     ? reflections?.filter(r => r.category === selectedCategory)
     : reflections;
 
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
   const openCreate = () => {
     setIsNew(true);
-    setEditing({ title: '', subtitle: '', cover_image_url: '', is_active: true, is_featured: false, is_free: true, sort_order: 0, category: 'deep-dives' });
+    setEditing({ title: '', subtitle: '', cover_image_url: '', emoji: '', is_active: true, is_featured: false, is_free: true, sort_order: 0, category: 'deep-dives' });
   };
 
   const openEdit = (r: Reflection) => {
