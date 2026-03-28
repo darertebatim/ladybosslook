@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus, Pencil, Trash2, GripVertical, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +15,7 @@ import {
   useUpdateBreathingExercise,
   useDeleteBreathingExercise,
   BreathingExercise,
+  BREATHING_CATEGORIES,
 } from '@/hooks/useBreathingExercises';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -48,6 +49,13 @@ export function BreathingExercisesManager() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExercise, setEditingExercise] = useState<BreathingExercise | null>(null);
   const [formData, setFormData] = useState<FormData>(defaultFormData);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
+  const filteredExercises = useMemo(() => {
+    if (!exercises) return [];
+    if (selectedCategory === 'all') return exercises;
+    return exercises.filter(e => e.category === selectedCategory);
+  }, [exercises, selectedCategory]);
 
   const handleOpenCreate = () => {
     setEditingExercise(null);
@@ -138,9 +146,26 @@ export function BreathingExercisesManager() {
         </Button>
       </div>
 
+      {/* Category pills */}
+      <div className="flex gap-2 flex-wrap">
+        {BREATHING_CATEGORIES.map((cat) => (
+          <button
+            key={cat.value}
+            onClick={() => setSelectedCategory(cat.value)}
+            className={`px-3 py-1 rounded-full text-sm font-medium transition-all ${
+              selectedCategory === cat.value
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+          >
+            {cat.emoji} {cat.label}
+          </button>
+        ))}
+      </div>
+
       {/* Exercise list */}
       <div className="space-y-2">
-        {exercises?.map((exercise) => (
+        {filteredExercises.map((exercise) => (
           <Card key={exercise.id} className={!exercise.is_active ? 'opacity-50' : ''}>
             <CardContent className="py-3 px-4">
               <div className="flex items-center gap-3">
