@@ -129,10 +129,12 @@ export default function TasksBank() {
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ['admin-task-bank'],
     queryFn: async () => {
+      // Fetch all tasks (Supabase default limit is 1000, we need all)
       const { data, error } = await supabase
         .from('admin_task_bank')
         .select('*')
-        .order('sort_order', { ascending: true });
+        .order('sort_order', { ascending: true })
+        .limit(5000);
       
       if (error) throw error;
       return data as TaskBankItem[];
