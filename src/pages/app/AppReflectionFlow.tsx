@@ -71,8 +71,6 @@ export default function AppReflectionFlow() {
       next = Math.floor(Math.random() * pages.length);
     } while (next === shufflePageIndex && pages.length > 1);
     setShufflePageIndex(next);
-    setLines(['']);
-    setTimeout(() => lineRefs.current[0]?.focus(), 100);
   }, [pages, shufflePageIndex]);
 
   const currentAnswer = answers[page?.id || ''] || '';
