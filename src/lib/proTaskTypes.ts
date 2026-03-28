@@ -119,15 +119,15 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
   },
   inspire: {
     value: 'inspire',
-    label: 'Explore',
+    label: 'Routines Templates',
     icon: Sparkles,
-    badgeText: 'Explore',
+    badgeText: 'Browse',
     color: 'pink',
     gradientClass: 'bg-gradient-to-br from-pink-100 to-rose-100 dark:from-pink-900/40 dark:to-rose-900/40',
     iconColorClass: 'text-pink-600 dark:text-pink-400',
     badgeColorClass: 'bg-pink-500/20 text-pink-700 dark:text-pink-300',
     buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
-    description: 'Open the Explore page',
+    description: 'Browse routines templates',
     requiresValue: false,
   },
   route: {
