@@ -142,13 +142,13 @@ export function ToolShortcuts() {
                 onTap={() => handleSlotTap(i)}
                 onLongPress={() => handleLongPress(i)}
               >
-                <div className={cn('w-16 h-16 rounded-2xl flex flex-col items-center justify-center shadow-sm gap-0.5', tool.bgColor)}>
+                <div className={cn('w-16 h-16 rounded-2xl flex flex-col items-center justify-center shadow-sm', tool.bgColor)}>
                   {tool.emoji ? (
-                    <FluentEmoji emoji={tool.emoji} size={28} />
+                    <FluentEmoji emoji={tool.emoji} size={40} />
                   ) : (
-                    <span className="text-xl">📱</span>
+                    <span className="text-2xl">📱</span>
                   )}
-                  <span className="text-[8px] font-semibold text-foreground/80 leading-none text-center line-clamp-1 w-full px-0.5">
+                  <span className="text-[7px] font-semibold text-foreground/80 leading-none text-center line-clamp-1 w-full px-0.5">
                     {tool.name}
                   </span>
                 </div>
