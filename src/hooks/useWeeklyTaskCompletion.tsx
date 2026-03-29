@@ -15,6 +15,7 @@ export interface DailyTaskCompletion {
 
 type PlannerTaskRow = {
   id: string;
+  source_routine_id: string | null;
   scheduled_date: string | null;
   repeat_pattern: string;
   repeat_days: number[] | null;
@@ -75,6 +76,52 @@ function buildCompletedRoutineSetByDate(
   return map;
 }
 
+function buildRoutineTasksByRoutine(tasks: PlannerTaskRow[]): Record<string, PlannerTaskRow[]> {
+  const map: Record<string, PlannerTaskRow[]> = {};
+
+  tasks.forEach((task) => {
+    if (!task.source_routine_id) return;
+
+    if (!map[task.source_routine_id]) {
+      map[task.source_routine_id] = [];
+    }
+
+    map[task.source_routine_id].push(task);
+  });
+
+  return map;
+}
+
+function buildCompletedRoutineSetFromTaskCompletions(
+  routineTasksByRoutine: Record<string, PlannerTaskRow[]>,
+  dateStr: string,
+  dayCompletions: Set<string>,
+  skippedTaskIds: Set<string>
+): Set<string> {
+  const completedRoutineIds = new Set<string>();
+
+  Object.entries(routineTasksByRoutine).forEach(([routineId, routineTasks]) => {
+    const applicableTasks = routineTasks.filter((task) =>
+      !skippedTaskIds.has(task.id) && taskAppliesToDate(task, dateStr)
+    );
+
+    if (applicableTasks.length === 0) return;
+
+    const fullyCompleted = applicableTasks.every((task) => dayCompletions.has(task.id));
+    if (fullyCompleted) {
+      completedRoutineIds.add(routineId);
+    }
+  });
+
+  return completedRoutineIds;
+}
+
+function mergeStringSets(...sets: Set<string>[]): Set<string> {
+  const merged = new Set<string>();
+  sets.forEach((set) => set.forEach((value) => merged.add(value)));
+  return merged;
+}
+
 function countCompletedTasksForDate(
   dayTasks: PlannerTaskRow[],
   dayCompletions: Set<string>,
@@ -109,7 +156,7 @@ export function useWeeklyTaskCompletion() {
       const [tasksResult, completionsResult, skipsResult, sessionsResult] = await Promise.all([
         supabase
           .from('user_tasks')
-          .select('id, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date, pro_link_type, pro_link_value')
+          .select('id, source_routine_id, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date, pro_link_type, pro_link_value')
           .eq('user_id', user.id)
           .eq('is_active', true),
         supabase
@@ -139,13 +186,22 @@ export function useWeeklyTaskCompletion() {
       const completionsByDate = buildTaskIdSetByDate(completionsResult.data || [], 'completed_date');
       const skipsByDate = buildTaskIdSetByDate(skipsResult.data || [], 'skipped_date');
       const completedRoutinesByDate = buildCompletedRoutineSetByDate(sessionsResult.data || []);
+      const routineTasksByRoutine = buildRoutineTasksByRoutine(tasks);
 
       const result: Record<string, DailyTaskCompletion> = {};
 
       weekDates.forEach((dateStr) => {
         const dayCompletions = completionsByDate[dateStr] || new Set<string>();
         const skippedTaskIds = skipsByDate[dateStr] || new Set<string>();
-        const completedRoutineIds = completedRoutinesByDate[dateStr] || new Set<string>();
+        const completedRoutineIds = mergeStringSets(
+          completedRoutinesByDate[dateStr] || new Set<string>(),
+          buildCompletedRoutineSetFromTaskCompletions(
+            routineTasksByRoutine,
+            dateStr,
+            dayCompletions,
+            skippedTaskIds
+          )
+        );
 
         const dayTasks = tasks.filter((task) =>
           !skippedTaskIds.has(task.id) && taskAppliesToDate(task, dateStr)
@@ -196,7 +252,7 @@ export function useDateRangeTaskCompletion(startDate: Date, endDate: Date) {
       const [tasksResult, completionsResult, skipsResult, sessionsResult] = await Promise.all([
         supabase
           .from('user_tasks')
-          .select('id, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date, pro_link_type, pro_link_value')
+          .select('id, source_routine_id, scheduled_date, repeat_pattern, repeat_days, created_at, repeat_end_date, pro_link_type, pro_link_value')
           .eq('user_id', user.id)
           .eq('is_active', true),
         supabase
@@ -228,13 +284,22 @@ export function useDateRangeTaskCompletion(startDate: Date, endDate: Date) {
       const completionsByDate = buildTaskIdSetByDate(completionsResult.data || [], 'completed_date');
       const skipsByDate = buildTaskIdSetByDate(skipsResult.data || [], 'skipped_date');
       const completedRoutinesByDate = buildCompletedRoutineSetByDate(sessionsResult.data || []);
+      const routineTasksByRoutine = buildRoutineTasksByRoutine(tasks);
 
       const result: Record<string, DailyTaskCompletion> = {};
 
       dates.forEach((dateStr) => {
         const dayCompletions = completionsByDate[dateStr] || new Set<string>();
         const skippedTaskIds = skipsByDate[dateStr] || new Set<string>();
-        const completedRoutineIds = completedRoutinesByDate[dateStr] || new Set<string>();
+        const completedRoutineIds = mergeStringSets(
+          completedRoutinesByDate[dateStr] || new Set<string>(),
+          buildCompletedRoutineSetFromTaskCompletions(
+            routineTasksByRoutine,
+            dateStr,
+            dayCompletions,
+            skippedTaskIds
+          )
+        );
 
         const dayTasks = tasks.filter((task) =>
           !skippedTaskIds.has(task.id) && taskAppliesToDate(task, dateStr)
