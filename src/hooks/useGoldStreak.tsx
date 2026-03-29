@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { format, subDays, parseISO, startOfWeek, endOfWeek } from 'date-fns';
+import { format, subDays, parseISO, startOfWeek, endOfWeek, addDays } from 'date-fns';
 import { taskAppliesToDate } from '@/lib/localDate';
 
 export interface GoldStreakData {
