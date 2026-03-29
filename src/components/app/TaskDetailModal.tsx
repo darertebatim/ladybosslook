@@ -22,6 +22,7 @@ import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/p
 import { isWaterTask } from '@/lib/waterTracking';
 import { formatTimeLabelWithEmoji } from '@/lib/taskScheduling';
 import { CircleProgressButton } from './CircleProgressButton';
+import { useRoutinePreviewData } from './RoutineTaskPreview';
 
 // Secondary (darker) palette for card footer strips
 const TASK_COLOR_DARK_CLASSES: Record<string, string> = {
@@ -93,6 +94,11 @@ export const TaskDetailModal = ({
   const isCountGoal = hasGoal && task.goal_type === 'count';
   const isWater = isWaterTask(task);
   const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
+  const routineId = proLinkType === 'routine' ? (proLinkValue || task.source_routine_id || '') : '';
+  const { completion: routineCompletion } = useRoutinePreviewData(routineId);
+  const isRoutineLauncher = proLinkType === 'routine' && !!(proLinkValue || task.source_routine_id);
+  const isRoutineComplete = routineCompletion?.isComplete === true;
+  const isCompletedState = isCompleted || (isRoutineLauncher && isRoutineComplete);
 
   const getRepeatLabel = (): string => {
     const p = task.repeat_pattern;
@@ -141,6 +147,10 @@ export const TaskDetailModal = ({
 
   const handleToggleComplete = async () => {
     haptic.light();
+
+    // Routine launchers can be auto-complete via Routine Player sessions
+    if (isRoutineLauncher && isRoutineComplete && !isCompleted) return;
+
     if (isCompleted) {
       uncompleteTask.mutate({ taskId: task.id, date });
     } else {
@@ -197,7 +207,7 @@ export const TaskDetailModal = ({
                 
                 <p className={cn(
                   'text-black text-[15px] font-semibold transition-all',
-                  (hasGoal ? goalReached : isCompleted) && 'line-through'
+                  (hasGoal ? goalReached : isCompletedState) && 'line-through'
                 )}>
                   {task.title}
                 </p>
@@ -246,7 +256,7 @@ export const TaskDetailModal = ({
                   onClick={handleToggleComplete}
                   className="w-9 h-9 flex items-center justify-center shrink-0"
                 >
-                  {isCompleted ? (
+                  {isCompletedState ? (
                     <SealCheck className="w-9 h-9 text-teal-400" />
                   ) : (
                     <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
@@ -350,7 +360,7 @@ export const TaskDetailModal = ({
             Edit Task
           </Button>
           
-          {!isCompleted && !goalReached && onSkip && (
+          {!isCompletedState && !goalReached && onSkip && (
             <Button
               onClick={() => {
                 onClose();
