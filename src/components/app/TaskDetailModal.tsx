@@ -82,11 +82,13 @@ export const TaskDetailModal = ({
   const completeTask = useCompleteTask();
   const uncompleteTask = useUncompleteTask();
 
-  if (!task) return null;
+  const isProTask = !!task?.pro_link_type || !!task?.linked_playlist_id;
+  const proLinkType: ProLinkType | null = (task?.pro_link_type as ProLinkType | null) || (task?.linked_playlist_id ? 'playlist' : null);
+  const proLinkValue = task?.pro_link_value || task?.linked_playlist_id || null;
+  const routineId = proLinkType === 'routine' ? (proLinkValue || task?.source_routine_id || '') : '';
+  const { completion: routineCompletion } = useRoutinePreviewData(routineId);
 
-  const isProTask = !!task.pro_link_type || !!task.linked_playlist_id;
-  const proLinkType: ProLinkType | null = task.pro_link_type as ProLinkType || (task.linked_playlist_id ? 'playlist' : null);
-  const proLinkValue = task.pro_link_value || task.linked_playlist_id;
+  if (!task) return null;
   const proConfig = proLinkType ? PRO_LINK_CONFIGS[proLinkType] : null;
 
   const hasGoal = task.goal_enabled && task.goal_target && task.goal_target > 0;
@@ -94,8 +96,6 @@ export const TaskDetailModal = ({
   const isCountGoal = hasGoal && task.goal_type === 'count';
   const isWater = isWaterTask(task);
   const goalReached = hasGoal && goalProgress >= (task.goal_target || 0);
-  const routineId = proLinkType === 'routine' ? (proLinkValue || task.source_routine_id || '') : '';
-  const { completion: routineCompletion } = useRoutinePreviewData(routineId);
   const isRoutineLauncher = proLinkType === 'routine' && !!(proLinkValue || task.source_routine_id);
   const isRoutineComplete = routineCompletion?.isComplete === true;
   const isCompletedState = isCompleted || (isRoutineLauncher && isRoutineComplete);
