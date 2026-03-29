@@ -48,6 +48,7 @@ import { hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/ap
 import { MoodCheckInBanner } from '@/components/mood/MoodCheckInBanner';
 import { OnboardingBanner } from '@/components/app/OnboardingBanner';
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { useAutoAssignDefaultRoutine } from '@/hooks/useAutoAssignDefaultRoutine';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
