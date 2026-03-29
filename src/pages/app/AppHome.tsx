@@ -66,6 +66,7 @@ const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
 const AppHome = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  useAutoAssignDefaultRoutine();
   const { scrollRef: homeScrollRef } = useScrollRestore('home_scroll', { autoSave: true });
   const {
     user
