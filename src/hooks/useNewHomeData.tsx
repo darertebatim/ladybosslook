@@ -42,37 +42,22 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
   // 2. Remaining queries that need joins/complex logic (run in parallel)
   const tasksQuery = supabase
     .from('user_tasks')
-    .select('id, repeat_pattern, scheduled_date, repeat_days')
+    .select('id, repeat_pattern, scheduled_date, repeat_days, pro_link_type, pro_link_value, source_routine_id, created_at, repeat_end_date')
     .eq('user_id', userId)
     .eq('is_active', true);
 
-  const routineQuery = (supabase
-    .from('routines_bank')
-    .select('*')
-    .eq('is_active', true) as any)
-    .eq('is_featured', true)
-    .limit(10);
-
-  const addedBankQuery = supabase
-    .from('user_routines_bank')
-    .select('routine_id')
+  const routineSessionsQuery = supabase
+    .from('routine_sessions')
+    .select('routine_id, started_at, tasks_completed, tasks_total')
     .eq('user_id', userId)
-    .eq('is_active', true);
+    .gte('started_at', new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString())
+    .lte('started_at', new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59).toISOString());
 
-  const [tasksRes, routineRes, addedBankRoutinesRes] = await Promise.all([
-    tasksQuery,
-    routineQuery,
-    addedBankQuery,
-  ]);
-
-  // Filter tasks for today
-  const allTasks = tasksRes.data || [];
-  const todayTasks = allTasks.filter(task => taskAppliesToDate(task, dateStr));
-
-  const completedTaskIds = new Set(
-    (d.today_completions || []).map((c: any) => c.task_id)
-  );
-  const todayCompletedCount = todayTasks.filter(t => completedTaskIds.has(t.id)).length;
+  const skipsQuery = supabase
+    .from('task_skips')
+    .select('task_id, skipped_date')
+    .eq('user_id', userId)
+    .eq('skipped_date', dateStr);
 
   // Process enrollments from RPC (exclude simora-plus subscription)
   const enrollments = (d.active_enrollments || []).filter((e: any) => e.program_slug !== 'simora-plus');
