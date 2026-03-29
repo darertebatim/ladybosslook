@@ -57,21 +57,22 @@ export const useGoldDatesThisWeek = () => {
       const weekStartStr = format(weekStart, 'yyyy-MM-dd');
       const weekEndStr = format(weekEnd, 'yyyy-MM-dd');
 
-      // Get all task completions for the week
-      const { data: completions, error } = await supabase
-        .from('task_completions')
-        .select('completed_date, task_id')
-        .eq('user_id', user.id)
-        .gte('completed_date', weekStartStr)
-        .lte('completed_date', weekEndStr);
-
-      if (error) throw error;
-
-      // Get active tasks + skipped tasks for the week
-      const [{ data: tasks }, { data: skips }] = await Promise.all([
+      // Get all task completions, skips, and routine sessions for the week
+      const [
+        { data: completions, error },
+        { data: tasks },
+        { data: skips },
+        { data: routineSessions },
+      ] = await Promise.all([
+        supabase
+          .from('task_completions')
+          .select('completed_date, task_id')
+          .eq('user_id', user.id)
+          .gte('completed_date', weekStartStr)
+          .lte('completed_date', weekEndStr),
         supabase
           .from('user_tasks')
-          .select('id, repeat_pattern, repeat_days, scheduled_date, created_at, repeat_end_date')
+          .select('id, repeat_pattern, repeat_days, scheduled_date, created_at, repeat_end_date, pro_link_type, pro_link_value, source_routine_id')
           .eq('user_id', user.id)
           .eq('is_active', true),
         supabase
@@ -80,12 +81,16 @@ export const useGoldDatesThisWeek = () => {
           .eq('user_id', user.id)
           .gte('skipped_date', weekStartStr)
           .lte('skipped_date', weekEndStr),
+        supabase
+          .from('routine_sessions')
+          .select('routine_id, started_at, tasks_completed, tasks_total')
+          .eq('user_id', user.id)
+          .gte('started_at', weekStart.toISOString())
+          .lte('started_at', weekEnd.toISOString()),
       ]);
 
+      if (error) throw error;
       if (!tasks) return [];
-
-      // For each day, calculate if it was a gold day (100% completion)
-      const goldDates: Date[] = [];
 
       // Group completions by date
       const completionsByDate = new Map<string, Set<string>>();
@@ -105,20 +110,67 @@ export const useGoldDatesThisWeek = () => {
         skippedByDate.get(s.skipped_date)!.add(s.task_id);
       });
 
-      // Check each day where user has completions
-      completionsByDate.forEach((taskIds, dateStr) => {
-        const date = parseISO(dateStr);
+      // Build completed routine IDs by date from sessions
+      const completedRoutinesByDate = new Map<string, Set<string>>();
+      routineSessions?.forEach((session: any) => {
+        const total = session.tasks_total || 0;
+        const completed = session.tasks_completed || 0;
+        if (session.routine_id && total > 0 && completed >= total) {
+          const sessionDate = format(new Date(session.started_at), 'yyyy-MM-dd');
+          if (!completedRoutinesByDate.has(sessionDate)) {
+            completedRoutinesByDate.set(sessionDate, new Set());
+          }
+          completedRoutinesByDate.get(sessionDate)!.add(session.routine_id);
+        }
+      });
+
+      // Group routine sub-tasks by routine
+      const routineTasksByRoutine: Record<string, any[]> = {};
+      tasks.forEach((task: any) => {
+        if (!task.source_routine_id) return;
+        if (!routineTasksByRoutine[task.source_routine_id]) {
+          routineTasksByRoutine[task.source_routine_id] = [];
+        }
+        routineTasksByRoutine[task.source_routine_id].push(task);
+      });
+
+      // Check each day in the week for gold status
+      const goldDates: Date[] = [];
+      for (let i = 0; i < 7; i++) {
+        const date = addDays(weekStart, i);
+        const dateStr = format(date, 'yyyy-MM-dd');
+        const dayCompletions = completionsByDate.get(dateStr) || new Set<string>();
         const skippedTaskIds = skippedByDate.get(dateStr) || new Set<string>();
 
-        const tasksForDay = tasks.filter((task) =>
+        // Build completed routine IDs: from sessions + from sub-task completions
+        const completedRoutineIds = new Set(completedRoutinesByDate.get(dateStr) || []);
+        Object.entries(routineTasksByRoutine).forEach(([routineId, routineTasks]) => {
+          const applicable = routineTasks.filter((t: any) =>
+            !skippedTaskIds.has(t.id) && taskAppliesToDate(t, dateStr)
+          );
+          if (applicable.length > 0 && applicable.every((t: any) => dayCompletions.has(t.id))) {
+            completedRoutineIds.add(routineId);
+          }
+        });
+
+        const tasksForDay = tasks.filter((task: any) =>
           !skippedTaskIds.has(task.id) && taskAppliesToDate(task, dateStr)
         );
 
-        // Gold = completed all applicable non-skipped tasks for that day
-        if (tasksForDay.length > 0 && taskIds.size >= tasksForDay.length) {
+        if (tasksForDay.length === 0) continue;
+
+        // Count completed: explicit + routine launcher via completed routines
+        const completedCount = tasksForDay.filter((task: any) => {
+          if (dayCompletions.has(task.id)) return true;
+          const isRoutineLauncher = task.pro_link_type === 'routine' && !!task.pro_link_value;
+          if (isRoutineLauncher) return completedRoutineIds.has(task.pro_link_value);
+          return false;
+        }).length;
+
+        if (completedCount >= tasksForDay.length) {
           goldDates.push(date);
         }
-      });
+      }
 
       return goldDates;
     },

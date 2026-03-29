@@ -59,6 +59,75 @@ async function fetchNewHomeData(userId: string): Promise<NewHomeData> {
     .eq('user_id', userId)
     .eq('skipped_date', dateStr);
 
+  const routineQuery = (supabase
+    .from('routines_bank')
+    .select('*')
+    .eq('is_active', true) as any)
+    .eq('is_featured', true)
+    .limit(10);
+
+  const addedBankQuery = supabase
+    .from('user_routines_bank')
+    .select('routine_id')
+    .eq('user_id', userId)
+    .eq('is_active', true);
+
+  const [tasksRes, routineSessionsRes, skipsRes, routineRes, addedBankRoutinesRes] = await Promise.all([
+    tasksQuery,
+    routineSessionsQuery,
+    skipsQuery,
+    routineQuery,
+    addedBankQuery,
+  ]);
+
+  // Filter tasks for today, excluding skipped
+  const allTasks = tasksRes.data || [];
+  const skippedTaskIds = new Set((skipsRes.data || []).map((s: any) => s.task_id));
+  const todayTasks = allTasks.filter(task =>
+    !skippedTaskIds.has(task.id) && taskAppliesToDate(task, dateStr)
+  );
+
+  // Build completed task IDs from explicit completions
+  const completedTaskIds = new Set(
+    (d.today_completions || []).map((c: any) => c.task_id)
+  );
+
+  // Build completed routine IDs from routine sessions
+  const completedRoutineIds = new Set<string>();
+  (routineSessionsRes.data || []).forEach((session: any) => {
+    const total = session.tasks_total || 0;
+    const completed = session.tasks_completed || 0;
+    if (session.routine_id && total > 0 && completed >= total) {
+      completedRoutineIds.add(session.routine_id);
+    }
+  });
+
+  // Also detect completed routines from individual sub-task completions
+  const routineTasksByRoutine: Record<string, any[]> = {};
+  allTasks.forEach((task: any) => {
+    if (!task.source_routine_id) return;
+    if (!routineTasksByRoutine[task.source_routine_id]) {
+      routineTasksByRoutine[task.source_routine_id] = [];
+    }
+    routineTasksByRoutine[task.source_routine_id].push(task);
+  });
+  Object.entries(routineTasksByRoutine).forEach(([routineId, routineTasks]) => {
+    const applicable = routineTasks.filter((t: any) =>
+      !skippedTaskIds.has(t.id) && taskAppliesToDate(t, dateStr)
+    );
+    if (applicable.length > 0 && applicable.every((t: any) => completedTaskIds.has(t.id))) {
+      completedRoutineIds.add(routineId);
+    }
+  });
+
+  // Count completed: explicit completions + routine launcher tasks with completed routines
+  const todayCompletedCount = todayTasks.filter((task: any) => {
+    if (completedTaskIds.has(task.id)) return true;
+    const isRoutineLauncher = task.pro_link_type === 'routine' && !!task.pro_link_value;
+    if (isRoutineLauncher) return completedRoutineIds.has(task.pro_link_value);
+    return false;
+  }).length;
+
   // Process enrollments from RPC (exclude simora-plus subscription)
   const enrollments = (d.active_enrollments || []).filter((e: any) => e.program_slug !== 'simora-plus');
   const activeRounds = enrollments.filter((e: any) => e.program_rounds?.status !== 'completed');
