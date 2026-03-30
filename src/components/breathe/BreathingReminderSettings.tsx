@@ -36,7 +36,7 @@ export const BreathingReminderSettings = ({ className }: BreathingReminderSettin
   const [justAdded, setJustAdded] = useState(false);
   
   const { data: routinePlan, isLoading } = useRoutinePlan(BREATHE_ROUTINE_ID || undefined);
-  const { data: existingTask } = useExistingProTask('breathe');
+  const { data: existingTask } = useExistingProTask('breathe', null, true);
   const addRoutinePlan = useAddRoutinePlan();
 
   const isAdded = existingTask || justAdded;
