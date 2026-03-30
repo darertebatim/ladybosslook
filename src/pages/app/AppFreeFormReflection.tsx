@@ -49,10 +49,11 @@ export default function AppFreeFormReflection() {
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error('Not authenticated');
-      if (!title.trim()) throw new Error('Please write a title');
+      if (!title.trim() && !contentForSave) throw new Error('Please write something');
+      const finalTitle = title.trim() || `Reflection`;
       const { error } = await supabase
         .from('free_form_reflections' as any)
-        .insert({ user_id: user.id, title: title.trim(), content: contentForSave } as any);
+        .insert({ user_id: user.id, title: finalTitle, content: contentForSave } as any);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -111,7 +112,7 @@ export default function AppFreeFormReflection() {
         </button>
         <button
           onClick={() => saveMutation.mutate()}
-          disabled={saveMutation.isPending || !title.trim()}
+          disabled={saveMutation.isPending || (!title.trim() && !contentForSave)}
           className="px-5 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold active:scale-95 transition-transform disabled:opacity-40"
         >
           Done
