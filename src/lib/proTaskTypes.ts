@@ -383,6 +383,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Open the video player',
     requiresValue: false,
   },
+  myroutines: {
+    value: 'myroutines',
+    label: 'My Routines',
+    icon: ListChecks,
+    badgeText: 'Play',
+    color: 'emerald',
+    gradientClass: 'bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/40 dark:to-teal-900/40',
+    iconColorClass: 'text-emerald-600 dark:text-emerald-400',
+    badgeColorClass: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open your routines player',
+    requiresValue: false,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
