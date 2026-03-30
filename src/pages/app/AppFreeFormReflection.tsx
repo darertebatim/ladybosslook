@@ -19,6 +19,8 @@ export default function AppFreeFormReflection() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { autoCompleteJournal } = useAutoCompleteProTask();
+  const [searchParams] = useSearchParams();
 
   let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
   try { routinePlayer = useRoutinePlayerContext(); } catch { /* not available */ }
