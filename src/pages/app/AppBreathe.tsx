@@ -72,6 +72,12 @@ export default function AppBreathe() {
     );
   }
 
+  // If deep-linking to a specific exercise but data hasn't loaded yet, show blank screen
+  // to avoid flashing the exercise list
+  if (exerciseId && (!exercises || exercises.length === 0)) {
+    return <div className="min-h-0 bg-background" />;
+  }
+
   return (
     <>
       <SEOHead 
