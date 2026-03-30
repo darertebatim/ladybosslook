@@ -384,34 +384,35 @@ const AppStore = () => {
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
-                  {reflections.slice(0, 8).map((r) => (
+                <div className="divide-y divide-border">
+                  {reflections.slice(0, 5).map((r) => (
                     <button
                       key={r.id}
                       onClick={() => navigate(`/app/reflections/${r.id}`, { state: { from: location.pathname } })}
-                      className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
+                      className="w-full flex items-center gap-3 py-2.5 text-left transition-transform active:scale-[0.98]"
                     >
-                      <div className="relative h-32 w-32 rounded-2xl overflow-visible mb-1.5">
-                        <div className="h-full w-full rounded-2xl overflow-hidden bg-muted shadow-lg">
-                          {r.cover_image_url ? (
-                            <CachedImage src={r.cover_image_url} alt={r.title} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: r.cover_color || '#f3f4f6' }}>
-                              <FluentEmoji emoji={r.emoji || '🪞'} size={36} />
-                            </div>
-                          )}
-                        </div>
-                        {r.is_free ? (
-                          <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
-                            <FluentEmoji emoji="🔥" size={10} /> FREE
-                          </div>
+                      <div className="relative shrink-0">
+                        {r.cover_image_url ? (
+                          <CachedImage src={r.cover_image_url} alt={r.title} className="h-14 w-14 rounded-xl object-cover" />
                         ) : (
-                          <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
-                            <Crown className="h-2.5 w-2.5" /> PLUS
+                          <div className="h-14 w-14 rounded-xl flex items-center justify-center" style={{ backgroundColor: r.cover_color || '#f3f4f6' }}>
+                            <FluentEmoji emoji={r.emoji || '🪞'} size={28} />
                           </div>
                         )}
+                        {r.is_free ? (
+                          <span className="absolute -top-2 -left-1.5 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                            <FluentEmoji emoji="🔥" size={10} /> FREE
+                          </span>
+                        ) : (
+                          <span className="absolute -top-2 -left-1.5 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                            <Crown className="h-2.5 w-2.5" /> PLUS
+                          </span>
+                        )}
                       </div>
-                      <p className="text-xs font-medium line-clamp-2 leading-tight">{r.title}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm leading-tight">{r.title}</p>
+                        {r.subtitle && <p className="text-xs text-foreground/80 mt-0.5 line-clamp-1">{r.subtitle}</p>}
+                      </div>
                     </button>
                   ))}
                 </div>
