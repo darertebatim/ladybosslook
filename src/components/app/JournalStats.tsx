@@ -115,7 +115,7 @@ export const JournalStats = ({ className }: JournalStatsProps) => {
           <div className="text-center py-4">
             <NotebookPen className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
             <p className="text-sm text-muted-foreground mb-3">Start journaling today</p>
-            <Button size="sm" onClick={() => navigate('/app/journal/new')}>
+            <Button size="sm" onClick={() => navigate('/app/reflections/free-form')}>
               Write First Entry
             </Button>
           </div>
