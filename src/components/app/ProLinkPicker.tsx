@@ -121,7 +121,7 @@ export function ProLinkPicker({
                     const mapping: Record<string, ProLinkType> = {
                       '/app/tasksbank': 'tasksbank',
                       '/app/routines': 'inspire',
-                      '/app/reflections': 'journal',
+                      '/app/reflections': 'reflection',
                       '/app/breathe': 'breathe',
                       '/app/timer': 'focus_timer',
                       '/app/routineplayer': 'myroutines',
