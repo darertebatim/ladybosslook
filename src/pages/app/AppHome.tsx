@@ -47,6 +47,7 @@ import { useAppReview } from '@/hooks/useAppReview';
 import { hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 import { MoodCheckInBanner } from '@/components/mood/MoodCheckInBanner';
 import { OnboardingBanner } from '@/components/app/OnboardingBanner';
+import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { useAutoAssignDefaultRoutine } from '@/hooks/useAutoAssignDefaultRoutine';
 
