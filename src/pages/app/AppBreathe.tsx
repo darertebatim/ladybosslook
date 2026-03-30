@@ -79,7 +79,7 @@ export default function AppBreathe() {
         description="Breathing exercises for relaxation and focus" 
       />
       
-      <div className="min-h-screen bg-background">
+      <div className="min-h-0 bg-background">
         {/* Header */}
         <AppHeader
           title="Breathe"
