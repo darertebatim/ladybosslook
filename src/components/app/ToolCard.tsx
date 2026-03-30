@@ -141,12 +141,12 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
             {isMoodTool && !isLocked && (
               <div className={cn(
                 "absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-sm",
-                todayMood ? "bg-emerald-500" : "bg-muted border border-border"
+                todayMood ? "bg-emerald-500" : "bg-destructive/80"
               )}>
                 {todayMood ? (
                   <Check className="h-3 w-3 text-white" strokeWidth={3} />
                 ) : (
-                  <X className="h-3 w-3 text-muted-foreground" strokeWidth={2.5} />
+                  <X className="h-3 w-3 text-white" strokeWidth={2.5} />
                 )}
               </div>
             )}
