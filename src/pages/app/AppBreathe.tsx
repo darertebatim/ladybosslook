@@ -32,7 +32,7 @@ export default function AppBreathe() {
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
 
-  const { data: existingTask } = useExistingProTask('breathe');
+  const { data: existingTask } = useExistingProTask('breathe', null, true);
   const addRoutinePlan = useAddRoutinePlan();
   const isAdded = !!(existingTask || justAdded);
 
