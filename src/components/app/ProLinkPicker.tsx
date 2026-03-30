@@ -109,6 +109,52 @@ export function ProLinkPicker({
                 className="pl-9 h-9 rounded-xl bg-muted/50 border-0 text-sm"
               />
             </div>
+
+            {/* Quick Tools horizontal scroll */}
+            {!searchQuery && (
+              <div className="flex gap-3 overflow-x-auto px-5 pb-3 scrollbar-hide">
+                {QUICK_TOOLS.map((tool) => (
+                  <button
+                    key={tool.id}
+                    onClick={() => {
+                      // Map tool route to closest pro link type
+                      const mapping: Record<string, ProLinkType> = {
+                        '/app/tasksbank': 'tasksbank',
+                        '/app/routines': 'inspire',
+                        '/app/reflections': 'journal',
+                        '/app/breathe': 'breathe',
+                        '/app/timer': 'focus_timer',
+                        '/app/routineplayer': 'routine',
+                        '/app/mood': 'mood',
+                        '/app/emotion': 'emotion',
+                        '/app/water': 'water',
+                        '/app/fasting': 'fasting',
+                        '/app/period': 'period',
+                        '/app/presence': 'presence',
+                        '/app/player': 'listen',
+                        '/app/watch': 'watch',
+                        '/app/meditate': 'listen',
+                        '/app/soundscape': 'listen',
+                      };
+                      const proType = mapping[tool.route];
+                      if (proType) onSelect(proType);
+                    }}
+                    className="flex flex-col items-center gap-1 shrink-0 active:scale-95 transition-transform"
+                  >
+                    <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center', tool.bgColor)}>
+                      {tool.emoji ? (
+                        <FluentEmoji emoji={tool.emoji} size={28} />
+                      ) : (
+                        <span className="text-lg">📱</span>
+                      )}
+                    </div>
+                    <span className="text-[9px] font-medium text-foreground max-w-[52px] text-center leading-tight line-clamp-1">
+                      {tool.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <ScrollArea className="flex-1 px-5">
