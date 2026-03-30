@@ -24,7 +24,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'routines',
-    name: 'Routines',
+    name: 'Routines Templates',
     icon: 'CalendarPlus',
     emoji: '📋',
     bgColor: 'bg-[#E2F9F0]',
