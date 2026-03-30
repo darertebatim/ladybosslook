@@ -105,7 +105,7 @@ export const JournalStats = ({ className }: JournalStatsProps) => {
           </CardTitle>
           <CardDescription>Your personal reflections</CardDescription>
         </div>
-        <Button variant="ghost" size="sm" onClick={() => navigate('/app/journal')}>
+        <Button variant="ghost" size="sm" onClick={() => navigate('/app/reflections')}>
           View All
           <ChevronRight className="h-4 w-4 ml-1" />
         </Button>
