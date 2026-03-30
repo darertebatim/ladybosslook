@@ -242,7 +242,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
   },
   reflection: {
     value: 'reflection',
-    label: 'Reflection',
+    label: 'Reflections Journal',
     icon: Brain,
     badgeText: 'Reflect',
     color: 'teal',
@@ -250,8 +250,8 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     iconColorClass: 'text-teal-600 dark:text-teal-400',
     badgeColorClass: 'bg-teal-500/20 text-teal-700 dark:text-teal-300',
     buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
-    description: 'Link to a reflection exercise',
-    requiresValue: true,
+    description: 'Open the reflections tool',
+    requiresValue: false,
   },
   video: {
     value: 'video',
