@@ -1684,6 +1684,12 @@ function WelcomeAboardScreen({ step, onNext }: Props) {
       </div>
       <FadeUp delay={0.3} className="mt-auto">
         <NavyButton onClick={handleEnable}>Turn on notifications</NavyButton>
+        <button
+          onClick={onNext}
+          className="w-full py-3 text-sm text-[#1a1f3d]/50 font-medium active:opacity-60 mt-2"
+        >
+          Maybe later
+        </button>
       </FadeUp>
     </ScreenWrapper>
   );
