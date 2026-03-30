@@ -52,7 +52,7 @@ function saveShortcuts(shortcuts: (ShortcutData | null)[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(shortcuts));
 }
 
-export function ToolShortcuts() {
+export function ToolShortcuts({ hideWhenEmpty = false }: { hideWhenEmpty?: boolean } = {}) {
   const navigate = useNavigate();
   const { data: todayMood } = useTodayMood();
   const { data: proLinkCompletions } = useTodayProLinkCompletions();
@@ -357,6 +357,8 @@ export function ToolShortcuts() {
 
   const hasAny = shortcuts.some(s => s !== null);
   const filteredPlaylists = playlists.filter(p => p.name.toLowerCase().includes(playlistSearchQuery.toLowerCase()));
+
+  if (hideWhenEmpty && !hasAny) return null;
 
   return (
     <section>
