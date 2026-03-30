@@ -175,9 +175,9 @@ export function PromoBanner({
       if (!user?.id) return [];
       const tools: string[] = [];
       
-      // Check journal entries
+      // Check reflections (merged from journal)
       const { count: journalCount } = await supabase
-        .from('journal_entries')
+        .from('free_form_reflections' as any)
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id);
       if (journalCount && journalCount > 0) tools.push('journal');
