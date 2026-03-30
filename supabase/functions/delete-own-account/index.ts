@@ -59,8 +59,9 @@ Deno.serve(async (req) => {
       // Audio data
       { table: 'audio_bookmarks', column: 'user_id' },
       { table: 'audio_progress', column: 'user_id' },
-      // Journal data
+      // Journal / Reflections data
       { table: 'journal_entries', column: 'user_id' },
+      { table: 'free_form_reflections', column: 'user_id' },
       { table: 'journal_reminder_settings', column: 'user_id' },
       // Course data
       { table: 'course_enrollments', column: 'user_id' },

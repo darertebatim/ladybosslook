@@ -145,6 +145,7 @@ Deno.serve(async (req) => {
       'audio_bookmarks',
       'audio_progress',
       'journal_entries',
+      'free_form_reflections',
       'journal_reminder_settings',
       'course_enrollments',
       'module_progress',
