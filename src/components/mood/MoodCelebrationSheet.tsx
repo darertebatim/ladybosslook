@@ -61,7 +61,7 @@ const MOOD_CONFIG: Record<string, MoodData> = {
 };
 
 // Calm Breathing exercise ID
-const CALM_BREATHING_ID = 'd5f63835-1fe7-4ae3-b4e2-543b64855a6b';
+const CALM_BREATHING_ID = '00218ce1-be10-4670-8644-cfdb7fe94c20';
 
 const ACTIONS = [
   {
