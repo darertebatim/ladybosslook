@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,9 +7,11 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useBilingualText } from '@/components/ui/BilingualText';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
+import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { format } from 'date-fns';
 import { Lightbulb } from 'lucide-react';
 import { JournalPromptMarquee } from '@/components/app/JournalPromptMarquee';
+import { MoodSelector } from '@/components/app/MoodSelector';
 
 const BULLET_COLOR = 'hsl(var(--muted-foreground) / 0.4)';
 
