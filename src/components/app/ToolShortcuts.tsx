@@ -1,63 +1,53 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Search, Check, Crown } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { haptic } from '@/lib/haptics';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { wellnessTools, audioTools, type ToolConfig } from '@/lib/toolsConfig';
-import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { PRO_LINK_CONFIGS, type ProLinkType, getProTaskNavigationPath } from '@/lib/proTaskTypes';
+import { ProLinkPicker } from '@/components/app/ProLinkPicker';
 
-const STORAGE_KEY = 'tool-shortcuts';
+interface ShortcutData {
+  type: ProLinkType;
+  value: string | null;
+}
+
+const STORAGE_KEY = 'tool-shortcuts-v2';
 const MAX_SHORTCUTS = 4;
-const DEFAULT_SHORTCUTS: (string | null)[] = [
-  'focus-routine',
-  'reflections',
-  'new-routine',
+const DEFAULT_SHORTCUTS: (ShortcutData | null)[] = [
+  { type: 'journal', value: null },
+  { type: 'breathe', value: null },
+  { type: 'mood', value: null },
   null,
 ];
 
-// All tools combined for the picker grid (including action buttons)
-const ALL_TOOLS = [
-  ...wellnessTools.filter(t => !t.comingSoon && !t.hidden),
-  ...audioTools.filter(t => t.id === 'meditate' || t.id === 'soundscape'),
-];
-
-// Build a lookup map
-const TOOL_MAP: Record<string, ToolConfig> = {};
-ALL_TOOLS.forEach(t => { TOOL_MAP[t.id] = t; });
-
-function loadShortcuts(): (string | null)[] {
+function loadShortcuts(): (ShortcutData | null)[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        // Migration: if old object format, all nulls, or wrong length, reset
-        const hasAny = parsed.some((s: any) => s !== null);
-        const isStringFormat = parsed.every((s: any) => s === null || typeof s === 'string');
-        if (!hasAny || parsed.length !== MAX_SHORTCUTS || !isStringFormat) {
-          localStorage.removeItem(STORAGE_KEY);
-          return [...DEFAULT_SHORTCUTS];
-        }
-        return parsed.slice(0, MAX_SHORTCUTS);
+      if (Array.isArray(parsed) && parsed.length === MAX_SHORTCUTS) {
+        // Validate format
+        const valid = parsed.every((s: any) =>
+          s === null || (typeof s === 'object' && s.type && typeof s.type === 'string')
+        );
+        if (valid) return parsed;
       }
     }
   } catch {}
   return [...DEFAULT_SHORTCUTS];
 }
 
-function saveShortcuts(shortcuts: (string | null)[]) {
+function saveShortcuts(shortcuts: (ShortcutData | null)[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(shortcuts));
 }
 
 export function ToolShortcuts() {
   const navigate = useNavigate();
-  const [shortcuts, setShortcuts] = useState<(string | null)[]>(loadShortcuts);
+  const [shortcuts, setShortcuts] = useState<(ShortcutData | null)[]>(loadShortcuts);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [pendingType, setPendingType] = useState<ProLinkType | null>(null);
+  const [pendingValue, setPendingValue] = useState<string | null>(null);
   const suppressTapUntilRef = useRef(0);
 
   useEffect(() => {
@@ -67,28 +57,16 @@ export function ToolShortcuts() {
   const handleSlotTap = (index: number) => {
     if (Date.now() < suppressTapUntilRef.current) return;
 
-    const toolId = shortcuts[index];
-    if (toolId) {
-      const tool = TOOL_MAP[toolId];
-      if (!tool) return;
+    const shortcut = shortcuts[index];
+    if (shortcut) {
       haptic.light();
-      // Handle action routes
-      if (tool.route === '__action:new-task') {
-        navigate('/app/home');
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('quick-add-open', { detail: { defaultRepeat: 'Daily' } }));
-        }, 300);
-        return;
-      }
-      if (tool.route === '__action:new-routine') {
-        navigate('/app/routineplayer', { state: { openBuilder: true } });
-        return;
-      }
-      navigate(tool.route);
+      const path = getProTaskNavigationPath(shortcut.type, shortcut.value);
+      navigate(path);
     } else {
       haptic.light();
       setEditingIndex(index);
-      setSearchQuery('');
+      setPendingType(null);
+      setPendingValue(null);
       setPickerOpen(true);
     }
   };
@@ -102,23 +80,41 @@ export function ToolShortcuts() {
     setShortcuts(updated);
   };
 
-  const handleSelectTool = (tool: ToolConfig) => {
-    if (editingIndex !== null) {
+  const handleSelectProLink = (type: ProLinkType) => {
+    const config = PRO_LINK_CONFIGS[type];
+    setPendingType(type);
+    setPendingValue(null);
+
+    // If it doesn't require a value, save immediately
+    if (!config.requiresValue) {
+      if (editingIndex !== null) {
+        const updated = [...shortcuts];
+        updated[editingIndex] = { type, value: null };
+        setShortcuts(updated);
+        setPickerOpen(false);
+        setEditingIndex(null);
+        setPendingType(null);
+      }
+    }
+    // If it requires a value, the ProLinkPicker route input will handle it
+  };
+
+  const handleClearProLink = () => {
+    setPendingType(null);
+    setPendingValue(null);
+  };
+
+  const handleProLinkDone = () => {
+    if (editingIndex !== null && pendingType) {
       const updated = [...shortcuts];
-      updated[editingIndex] = tool.id;
+      updated[editingIndex] = { type: pendingType, value: pendingValue };
       setShortcuts(updated);
       setPickerOpen(false);
       setEditingIndex(null);
+      setPendingType(null);
+      setPendingValue(null);
     }
   };
-
-  const matchesToolSearch = (tool: ToolConfig) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return tool.name.toLowerCase().includes(q) || tool.description.toLowerCase().includes(q);
-  };
-
-  const filteredTools = ALL_TOOLS.filter(matchesToolSearch);
 
   const hasAny = shortcuts.some(s => s !== null);
 
@@ -132,24 +128,24 @@ export function ToolShortcuts() {
       </div>
 
       <div className="grid grid-cols-4 gap-3">
-        {shortcuts.map((toolId, i) => {
-          if (toolId) {
-            const tool = TOOL_MAP[toolId];
-            if (!tool) return null;
+        {shortcuts.map((shortcut, i) => {
+          if (shortcut) {
+            const config = PRO_LINK_CONFIGS[shortcut.type];
+            if (!config) return null;
+            const Icon = config.icon;
             return (
               <ShortcutSlot
                 key={i}
                 onTap={() => handleSlotTap(i)}
                 onLongPress={() => handleLongPress(i)}
               >
-                <div className={cn('w-full aspect-square rounded-2xl flex flex-col items-center justify-center shadow-sm', tool.bgColor)}>
-                  {tool.emoji ? (
-                    <FluentEmoji emoji={tool.emoji} size={48} />
-                  ) : (
-                    <span className="text-3xl">📱</span>
-                  )}
-                  <span className="text-[11px] font-semibold text-foreground/80 leading-none text-center line-clamp-1 w-full px-1 mt-0.5">
-                    {tool.name}
+                <div className={cn(
+                  'w-full aspect-square rounded-2xl flex flex-col items-center justify-center',
+                  config.gradientClass
+                )}>
+                  <Icon className={cn('h-7 w-7', config.iconColorClass)} />
+                  <span className="text-[9px] font-semibold text-foreground/80 leading-none text-center line-clamp-1 w-full px-1 mt-1">
+                    {config.label}
                   </span>
                 </div>
               </ShortcutSlot>
@@ -167,77 +163,16 @@ export function ToolShortcuts() {
         })}
       </div>
 
-      {/* Shortcut Picker Sheet */}
-      <Sheet open={pickerOpen} onOpenChange={setPickerOpen}>
-        <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl px-0">
-          <SheetHeader className="px-5 pb-0">
-            <SheetTitle className="text-lg font-bold">Add Shortcut</SheetTitle>
-          </SheetHeader>
-
-          <div className="flex flex-col h-[calc(80vh-60px)]">
-            <div className="px-5 pt-2 pb-3 space-y-2">
-              <p className="text-xs text-foreground font-medium">
-                Choose a tool to add to your shortcuts.
-              </p>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search tools..."
-                  className="pl-9 h-9 rounded-xl bg-muted/50 border-0 text-sm"
-                />
-              </div>
-            </div>
-
-            <ScrollArea className="flex-1 px-5">
-              <div className="grid grid-cols-4 gap-3 pb-6 pt-2">
-                {filteredTools.map((tool) => {
-                  const isAlreadyUsed = shortcuts.some(s => s === tool.id);
-                  const isPremium = ['fasting', 'period'].includes(tool.id);
-                  return (
-                    <button
-                      key={tool.id}
-                      onClick={() => handleSelectTool(tool)}
-                      disabled={!!isAlreadyUsed}
-                      className={cn(
-                        'relative flex flex-col items-center gap-1 pt-4 pb-2 rounded-xl transition-all active:scale-95',
-                        isAlreadyUsed ? 'opacity-40 cursor-not-allowed' : 'hover:bg-muted/50'
-                      )}
-                    >
-                      {/* Badge */}
-                      {isPremium ? (
-                        <div className="absolute top-0.5 left-1/2 -translate-x-1/2 z-10 inline-flex items-center gap-0.5 text-[7px] font-bold text-amber-700 bg-amber-200 px-1.5 py-0.5 rounded-full">
-                          <Crown className="h-2 w-2" /> PLUS
-                        </div>
-                      ) : (
-                        <div className="absolute top-0.5 left-1/2 -translate-x-1/2 z-10 inline-flex items-center gap-0.5 text-[7px] font-bold text-emerald-800 bg-[#E2F9F0] px-1.5 py-0.5 rounded-full">
-                          <FluentEmoji emoji="🔥" size={8} /> FREE
-                        </div>
-                      )}
-                      <div className={cn('w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm relative', tool.bgColor)}>
-                        {tool.emoji ? (
-                          <FluentEmoji emoji={tool.emoji} size={32} />
-                        ) : (
-                          <span className="text-2xl">📱</span>
-                        )}
-                        {isAlreadyUsed && (
-                          <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                            <Check className="h-3 w-3 text-primary-foreground" />
-                          </div>
-                        )}
-                      </div>
-                      <span className="text-[10px] font-medium text-foreground text-center leading-tight line-clamp-1 w-full">
-                        {tool.name}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </ScrollArea>
-          </div>
-        </SheetContent>
-      </Sheet>
+      <ProLinkPicker
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        proLinkType={pendingType}
+        onSelect={handleSelectProLink}
+        onClear={handleClearProLink}
+        proLinkValue={pendingValue}
+        onValueChange={setPendingValue}
+        onDone={handleProLinkDone}
+      />
     </section>
   );
 }
