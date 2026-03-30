@@ -6,7 +6,8 @@ import type { ToolConfig } from '@/lib/toolsConfig';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { Crown } from 'lucide-react';
+import { Crown, Check, X } from 'lucide-react';
+import { useTodayMood } from '@/hooks/useMoodLogs';
 import { 
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
