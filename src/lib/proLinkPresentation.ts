@@ -23,7 +23,7 @@ export const PRO_LINK_EMOJIS: Record<ProLinkType, string> = {
   routine: '🚀',
   myprograms: '🎓',
   myprofile: '👤',
-  presence: '👁️',
+  presence: '🔥',
   tasksbank: '🌿',
   listen: '🎧',
   watch: '📺',
