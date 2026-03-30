@@ -418,28 +418,19 @@ const AppStore = () => {
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
+                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
                   {breathingExercises.filter(e => e.is_active).slice(0, 8).map((exercise) => (
                     <button
                       key={exercise.id}
                       onClick={() => navigate(`/app/breathe?exercise=${exercise.id}`, { state: { from: location.pathname } })}
-                      className="shrink-0 w-24 text-center transition-transform active:scale-[0.97]"
+                      className="shrink-0 w-44 flex items-center gap-2.5 py-2 text-left transition-transform active:scale-[0.97] bg-accent/60 rounded-xl px-2.5 border border-border/40"
                     >
-                      <div className="relative h-24 w-24 overflow-visible mb-1.5">
-                        <div className="h-full w-full rounded-2xl bg-muted flex items-center justify-center shadow-lg">
-                          <FluentEmoji emoji={exercise.emoji || '🌬️'} size={36} />
-                        </div>
-                        {exercise.is_premium ? (
-                          <div className="absolute -top-2.5 left-0 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
-                            <Crown className="h-2.5 w-2.5" /> PLUS
-                          </div>
-                        ) : (
-                          <div className="absolute -top-2.5 left-0 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
-                            <FluentEmoji emoji="🔥" size={10} /> FREE
-                          </div>
-                        )}
+                      <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                        <FluentEmoji emoji={exercise.emoji || '🌬️'} size={22} />
                       </div>
-                      <p className="text-xs font-medium line-clamp-2 leading-tight">{exercise.name}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-xs leading-tight line-clamp-2">{exercise.name}</p>
+                      </div>
                     </button>
                   ))}
                 </div>
