@@ -47,6 +47,7 @@ import { useAppReview } from '@/hooks/useAppReview';
 import { hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 import { MoodCheckInBanner } from '@/components/mood/MoodCheckInBanner';
 import { OnboardingBanner } from '@/components/app/OnboardingBanner';
+import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { useAutoAssignDefaultRoutine } from '@/hooks/useAutoAssignDefaultRoutine';
 
@@ -109,6 +110,7 @@ const AppHome = () => {
   const [showActionLimit, setShowActionLimit] = useState(false);
   const [hasPromoBanner, setHasPromoBanner] = useState(false);
   const [hasHomeBanner, setHasHomeBanner] = useState(false);
+  const [hasMoodBanner, setHasMoodBanner] = useState(false);
   const { isKeyboardOpen } = useKeyboard();
   const { currentTrack } = useAudioPlayer();
   const hasMiniPlayer = !!currentTrack;
@@ -1077,7 +1079,14 @@ const AppHome = () => {
             </div>
 
             {/* Mood Check-in Banner — only after all promo/home banners are dismissed */}
-            {!showWelcomeCard && !hasPromoBanner && !hasHomeBanner && <MoodCheckInBanner />}
+            {!showWelcomeCard && !hasPromoBanner && !hasHomeBanner && <MoodCheckInBanner onVisibilityChange={setHasMoodBanner} />}
+
+            {/* My Shortcuts — only when no banners are visible */}
+            {!showWelcomeCard && !hasPromoBanner && !hasHomeBanner && !hasMoodBanner && (
+              <div className="mb-3">
+                <ToolShortcuts />
+              </div>
+            )}
 
             {/* Tag filter chips - temporarily hidden */}
             {/* {taskTags.length > 0 && <div className="py-2 -mx-4 px-4 bg-background overflow-x-auto">
