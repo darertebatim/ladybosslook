@@ -101,7 +101,7 @@ export default function AppBreathe() {
 
         {/* Category pills */}
         <div className="px-4 pt-2 pb-3">
-          <div className="flex gap-2 overflow-x-auto no-scrollbar">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar" style={{ touchAction: 'pan-x pan-y' }}>
             {BREATHING_CATEGORIES.map((cat) => (
               <button
                 key={cat.value}
