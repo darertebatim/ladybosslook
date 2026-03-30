@@ -14,7 +14,7 @@ export interface ToolConfig {
 export const wellnessTools: ToolConfig[] = [
   {
     id: 'self-care',
-    name: 'Self-Care',
+    name: 'Self-Care Habits',
     icon: 'Heart',
     emoji: '🌿',
     bgColor: 'bg-[#E2F9F0]',
@@ -24,13 +24,23 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'routines',
-    name: 'Routines',
+    name: 'Routines Templates',
     icon: 'CalendarPlus',
     emoji: '📋',
     bgColor: 'bg-[#E2F9F0]',
     iconColor: 'text-emerald-600',
     route: '/app/routines',
     description: 'Daily routines',
+  },
+  {
+    id: 'reflections',
+    name: 'Reflections Journal',
+    icon: 'Brain',
+    emoji: '✏️',
+    bgColor: 'bg-[#E0FBB8]',
+    iconColor: 'text-teal-600',
+    route: '/app/reflections',
+    description: 'Journal & guided prompts',
   },
   {
     id: 'focus-timer',
@@ -51,16 +61,6 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-blue-600',
     route: '/app/routineplayer',
     description: 'Routine player',
-  },
-  {
-    id: 'reflections',
-    name: 'Reflections',
-    icon: 'Brain',
-    emoji: '✏️',
-    bgColor: 'bg-[#E0FBB8]',
-    iconColor: 'text-teal-600',
-    route: '/app/reflections',
-    description: 'Journal & guided prompts',
   },
   {
     id: 'breathe',
