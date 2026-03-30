@@ -36,7 +36,7 @@ const CATEGORIES: CategoryGroup[] = [
   {
     id: 'routines',
     label: 'Routines & Programs',
-    links: ['routine', 'tasksbank', 'inspire', 'program', 'myprograms'],
+    links: ['myroutines', 'routine', 'tasksbank', 'inspire', 'program', 'myprograms'],
   },
   {
     id: 'nav',
@@ -124,7 +124,7 @@ export function ProLinkPicker({
                       '/app/reflections': 'journal',
                       '/app/breathe': 'breathe',
                       '/app/timer': 'focus_timer',
-                      '/app/routineplayer': 'routine',
+                      '/app/routineplayer': 'myroutines',
                       '/app/mood': 'mood',
                       '/app/emotion': 'emotion',
                       '/app/water': 'water',
