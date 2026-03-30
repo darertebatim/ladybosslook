@@ -55,6 +55,7 @@ function saveShortcuts(shortcuts: (ShortcutData | null)[]) {
 export function ToolShortcuts() {
   const navigate = useNavigate();
   const { data: todayMood } = useTodayMood();
+  const { data: proLinkCompletions } = useTodayProLinkCompletions();
   const [shortcuts, setShortcuts] = useState<(ShortcutData | null)[]>(loadShortcuts);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
