@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { getProLinkEmoji } from '@/lib/proLinkPresentation';
 import { useTodayMood } from '@/hooks/useMoodLogs';
+import { useTodayProLinkCompletions, isShortcutCompletedToday } from '@/hooks/useTodayProLinkCompletions';
 
 interface ShortcutData {
   type: ProLinkType;
