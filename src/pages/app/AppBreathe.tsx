@@ -79,7 +79,7 @@ export default function AppBreathe() {
         description="Breathing exercises for relaxation and focus" 
       />
       
-      <div className="min-h-screen bg-background overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+      <div className="min-h-screen bg-background">
         {/* Header */}
         <AppHeader
           title="Breathe"
