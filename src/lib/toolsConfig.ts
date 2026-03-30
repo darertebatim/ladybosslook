@@ -54,7 +54,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'reflections',
-    name: 'Reflections',
+    name: 'Reflections Journal',
     icon: 'Brain',
     emoji: '✏️',
     bgColor: 'bg-[#E0FBB8]',
