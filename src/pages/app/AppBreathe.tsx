@@ -139,6 +139,12 @@ export default function AppBreathe() {
           backTo="/app/home"
           rightAction={
             <div className="flex items-center gap-1">
+              <AddedToRoutineButton
+                isAdded={isAdded}
+                onAddClick={() => setShowRoutineSheet(true)}
+                isLoading={addRoutinePlan.isPending}
+                iconOnly
+              />
               <button
                 onClick={() => navigate('/app/breathe/stats')}
                 className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
