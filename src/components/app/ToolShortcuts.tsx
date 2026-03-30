@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { getProLinkEmoji } from '@/lib/proLinkPresentation';
+import { useTodayMood } from '@/hooks/useMoodLogs';
 
 interface ShortcutData {
   type: ProLinkType;
