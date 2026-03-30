@@ -14,6 +14,7 @@ interface NoteItem {
   cover: string | null;
   completed_at: string;
   preview: string | null;
+  mood?: string | null;
 }
 
 export default function AppReflectionNotes() {
