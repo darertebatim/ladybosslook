@@ -75,6 +75,7 @@ export const quickStartFlow: OnboardingFlow = {
       title: 'Enable Daily Reset?',
       subtitle: 'Your routine resets every morning so you can start each day fresh.',
       buttonLabel: 'Yes, enable it',
+      secondaryButtonLabel: 'Maybe later',
     },
     // 6 — Push notification permission
     {
