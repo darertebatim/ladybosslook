@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { getProLinkEmoji } from '@/lib/proLinkPresentation';
 import { useTodayMood } from '@/hooks/useMoodLogs';
+import { useTodayProLinkCompletions, isShortcutCompletedToday } from '@/hooks/useTodayProLinkCompletions';
 
 interface ShortcutData {
   type: ProLinkType;
@@ -54,6 +55,7 @@ function saveShortcuts(shortcuts: (ShortcutData | null)[]) {
 export function ToolShortcuts() {
   const navigate = useNavigate();
   const { data: todayMood } = useTodayMood();
+  const { data: proLinkCompletions } = useTodayProLinkCompletions();
   const [shortcuts, setShortcuts] = useState<(ShortcutData | null)[]>(loadShortcuts);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -373,18 +375,23 @@ export function ToolShortcuts() {
                   <span className="text-[9px] font-semibold text-foreground leading-none text-center line-clamp-2 w-full px-1 mt-1">
                     {shortcut.label}
                   </span>
-                  {shortcut.type === 'mood' && (
-                    <div className={cn(
-                      "absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-sm",
-                      todayMood ? "bg-emerald-500" : "bg-muted border border-border"
-                    )}>
-                      {todayMood ? (
-                        <Check className="h-3 w-3 text-white" strokeWidth={3} />
-                      ) : (
-                        <X className="h-3 w-3 text-muted-foreground" strokeWidth={2.5} />
-                      )}
-                    </div>
-                  )}
+                  {(() => {
+                    const isDone = shortcut.type === 'mood'
+                      ? !!todayMood
+                      : isShortcutCompletedToday(proLinkCompletions, shortcut.type, shortcut.value);
+                    return (
+                      <div className={cn(
+                        "absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-sm",
+                        isDone ? "bg-emerald-500" : "bg-muted border border-border"
+                      )}>
+                        {isDone ? (
+                          <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                        ) : (
+                          <X className="h-3 w-3 text-muted-foreground" strokeWidth={2.5} />
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               </ShortcutSlot>
             );
