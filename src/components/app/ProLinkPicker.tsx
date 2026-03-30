@@ -36,7 +36,7 @@ const CATEGORIES: CategoryGroup[] = [
   {
     id: 'routines',
     label: 'Routines & Programs',
-    links: ['routine', 'tasksbank', 'inspire', 'program', 'myprograms'],
+    links: ['myroutines', 'routine', 'tasksbank', 'inspire', 'program', 'myprograms'],
   },
   {
     id: 'nav',
