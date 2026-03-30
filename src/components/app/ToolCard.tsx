@@ -122,7 +122,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
             </div>
           )}
           <div className={cn(
-            'w-14 h-14 rounded-2xl flex items-center justify-center relative shadow-lg',
+            'w-14 h-14 rounded-2xl flex items-center justify-center relative',
             tool.bgColor
           )}>
             {tool.emoji ? (
@@ -136,7 +136,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
               </div>
             )}
           </div>
-          <span className="text-[11px] font-medium text-muted-foreground max-w-[64px] text-center leading-tight line-clamp-2">
+          <span className="text-[11px] font-medium text-foreground max-w-[64px] text-center leading-tight line-clamp-2">
             {tool.name}
           </span>
         </button>
