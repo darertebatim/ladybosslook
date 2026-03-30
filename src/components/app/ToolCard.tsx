@@ -6,7 +6,8 @@ import type { ToolConfig } from '@/lib/toolsConfig';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { Crown } from 'lucide-react';
+import { Crown, Check, X } from 'lucide-react';
+import { useTodayMood } from '@/hooks/useMoodLogs';
 import { 
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
@@ -31,10 +32,12 @@ interface ToolCardProps {
 export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
   const navigate = useNavigate();
   const { isSubscribed } = useSubscription();
+  const { data: todayMood } = useTodayMood();
   const [showPaywall, setShowPaywall] = useState(false);
   const IconComponent = iconMap[tool.icon] || Circle;
   const isPremiumTool = LOCKED_TOOLS.includes(tool.id);
   const isLocked = isPremiumTool && !isSubscribed;
+  const isMoodTool = tool.id === 'mood';
 
   const handleClick = () => {
     if (tool.comingSoon) {
@@ -133,6 +136,18 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
             {isLocked && (
               <div className="absolute -bottom-1 -right-1 p-1 rounded-full bg-amber-100">
                 <FluentEmoji emoji="🔒" size={14} />
+              </div>
+            )}
+            {isMoodTool && !isLocked && (
+              <div className={cn(
+                "absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-sm",
+                todayMood ? "bg-emerald-500" : "bg-muted border border-border"
+              )}>
+                {todayMood ? (
+                  <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                ) : (
+                  <X className="h-3 w-3 text-muted-foreground" strokeWidth={2.5} />
+                )}
               </div>
             )}
           </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, ArrowLeft, Music, Wind, Brain, Headphones, MessageCircle, Video, Clapperboard, GraduationCap } from 'lucide-react';
+import { Plus, ArrowLeft, Music, Wind, Brain, Headphones, MessageCircle, Video, Clapperboard, GraduationCap, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { getProLinkEmoji } from '@/lib/proLinkPresentation';
+import { useTodayMood } from '@/hooks/useMoodLogs';
 
 interface ShortcutData {
   type: ProLinkType;
@@ -52,6 +53,7 @@ function saveShortcuts(shortcuts: (ShortcutData | null)[]) {
 
 export function ToolShortcuts() {
   const navigate = useNavigate();
+  const { data: todayMood } = useTodayMood();
   const [shortcuts, setShortcuts] = useState<(ShortcutData | null)[]>(loadShortcuts);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -366,11 +368,23 @@ export function ToolShortcuts() {
           if (shortcut) {
             return (
               <ShortcutSlot key={i} onTap={() => handleSlotTap(i)} onLongPress={() => handleLongPress(i)}>
-                <div className="w-full aspect-square rounded-2xl flex flex-col items-center justify-center bg-accent/60">
+                <div className="relative w-full aspect-square rounded-2xl flex flex-col items-center justify-center bg-accent/60">
                   <FluentEmoji emoji={shortcut.emoji} size={42} />
                   <span className="text-[9px] font-semibold text-foreground leading-none text-center line-clamp-2 w-full px-1 mt-1">
                     {shortcut.label}
                   </span>
+                  {shortcut.type === 'mood' && (
+                    <div className={cn(
+                      "absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-sm",
+                      todayMood ? "bg-emerald-500" : "bg-muted border border-border"
+                    )}>
+                      {todayMood ? (
+                        <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                      ) : (
+                        <X className="h-3 w-3 text-muted-foreground" strokeWidth={2.5} />
+                      )}
+                    </div>
+                  )}
                 </div>
               </ShortcutSlot>
             );
