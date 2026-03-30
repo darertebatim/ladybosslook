@@ -384,34 +384,24 @@ const AppStore = () => {
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <div className="divide-y divide-border">
-                  {reflections.slice(0, 5).map((r) => (
+                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                  {reflections.slice(0, 8).map((r) => (
                     <button
                       key={r.id}
                       onClick={() => navigate(`/app/reflections/${r.id}`, { state: { from: location.pathname } })}
-                      className="w-full flex items-center gap-3 py-2.5 text-left transition-transform active:scale-[0.98]"
+                      className="shrink-0 w-44 flex items-center gap-2.5 py-2 text-left transition-transform active:scale-[0.97] bg-accent/60 rounded-xl px-2.5 border border-border/40"
                     >
                       <div className="relative shrink-0">
                         {r.cover_image_url ? (
-                          <CachedImage src={r.cover_image_url} alt={r.title} className="h-14 w-14 rounded-xl object-cover" />
+                          <CachedImage src={r.cover_image_url} alt={r.title} className="h-10 w-10 rounded-lg object-cover" />
                         ) : (
-                          <div className="h-14 w-14 rounded-xl flex items-center justify-center" style={{ backgroundColor: r.cover_color || '#f3f4f6' }}>
-                            <FluentEmoji emoji={r.emoji || '🪞'} size={28} />
+                          <div className="h-10 w-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: r.cover_color || '#f3f4f6' }}>
+                            <FluentEmoji emoji={r.emoji || '🪞'} size={22} />
                           </div>
-                        )}
-                        {r.is_free ? (
-                          <span className="absolute -top-2 -left-1.5 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
-                            <FluentEmoji emoji="🔥" size={10} /> FREE
-                          </span>
-                        ) : (
-                          <span className="absolute -top-2 -left-1.5 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
-                            <Crown className="h-2.5 w-2.5" /> PLUS
-                          </span>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm leading-tight">{r.title}</p>
-                        {r.subtitle && <p className="text-xs text-foreground/80 mt-0.5 line-clamp-1">{r.subtitle}</p>}
+                        <p className="font-semibold text-xs leading-tight line-clamp-2">{r.title}</p>
                       </div>
                     </button>
                   ))}
