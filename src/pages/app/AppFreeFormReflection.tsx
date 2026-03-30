@@ -28,6 +28,7 @@ export default function AppFreeFormReflection() {
 
   const [title, setTitle] = useState('');
   const [lines, setLines] = useState<string[]>(['']);
+  const [mood, setMood] = useState<string | null>(searchParams.get('mood') || null);
   const [showPrompts, setShowPrompts] = useState(false);
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const lineRefs = useRef<(HTMLInputElement | null)[]>([]);
