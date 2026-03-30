@@ -75,27 +75,27 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
 
   return (
     <>
-      <div className={cn("w-full flex items-center gap-4 py-4", className)}>
+      <div className={cn("w-full flex items-center gap-3 py-2.5", className)}>
         <button
           onClick={handleExerciseClick}
-          className="flex-1 flex items-center gap-4 text-left transition-transform active:scale-[0.98] min-w-0"
+          className="flex-1 flex items-center gap-3 text-left transition-transform active:scale-[0.98] min-w-0"
         >
           {/* Emoji avatar */}
           <div className="relative shrink-0">
-            <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center">
-              <FluentEmoji emoji={exercise.emoji || '🌬️'} size={40} />
+            <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center">
+              <FluentEmoji emoji={exercise.emoji || '🌬️'} size={28} />
             </div>
             {isPremium && (
-              <span className="absolute -top-2.5 -left-2 flex items-center gap-0.5 bg-amber-200 text-amber-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
-                <Crown className="h-2.5 w-2.5" />
+              <span className="absolute -top-2 -left-1.5 flex items-center gap-0.5 bg-amber-200 text-amber-900 text-[8px] font-bold px-1 py-0.5 rounded-full shadow-sm">
+                <Crown className="h-2 w-2" />
                 PLUS
               </span>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-base leading-tight">{exercise.name}</p>
+            <p className="font-semibold text-sm leading-tight">{exercise.name}</p>
             {exercise.subtitle && (
-              <p className="text-sm text-foreground mt-0.5">{exercise.subtitle}</p>
+              <p className="text-xs text-foreground/70 mt-0.5 line-clamp-1">{exercise.subtitle}</p>
             )}
           </div>
         </button>
