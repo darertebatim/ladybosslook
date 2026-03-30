@@ -139,13 +139,13 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
               </div>
             )}
             {isMoodTool && !isLocked && (
-              {todayMood ? (
+              todayMood ? (
                 <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-sm bg-emerald-500">
                   <Check className="h-3 w-3 text-white" strokeWidth={3} />
                 </div>
               ) : (
                 <span className="absolute -bottom-1.5 -right-1.5 text-[14px] leading-none">⭕️</span>
-              )}
+              )
             )}
           </div>
           <span className="text-[11px] font-medium text-foreground max-w-[64px] text-center leading-tight line-clamp-2">
