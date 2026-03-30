@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft } from 'lucide-react';
+import { getMoodEmoji } from '@/components/app/MoodSelector';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 
