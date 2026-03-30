@@ -153,7 +153,7 @@ export function useMoodLogsForMonth(month: Date) {
           .lte('created_at', monthEnd.toISOString())
           .order('created_at', { ascending: false }),
         supabase
-          .from('journal_entries')
+          .from('free_form_reflections')
           .select('id, mood, created_at')
           .eq('user_id', user.id)
           .not('mood', 'is', null)
