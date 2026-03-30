@@ -14,6 +14,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { BreatheTour, TourHelpButton } from '@/components/app/tour';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
+import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
+import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
+import { useRoutinePlan, useAddRoutinePlan } from '@/hooks/useRoutinePlans';
+import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
+import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
+import { toast } from 'sonner';
 
 export default function AppBreathe() {
   const navigate = useNavigate();
@@ -23,6 +29,46 @@ export default function AppBreathe() {
   const [selectedExercise, setSelectedExercise] = useState<BreathingExercise | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [startTour, setStartTour] = useState<(() => void) | null>(null);
+  const [showRoutineSheet, setShowRoutineSheet] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
+
+  const { data: existingTask } = useExistingProTask('breathe');
+  const addRoutinePlan = useAddRoutinePlan();
+  const isAdded = !!(existingTask || justAdded);
+
+  const FALLBACK_BREATHING_TASKS: RoutinePlanTask[] = useMemo(() => [{
+    id: 'breathe-task-1',
+    plan_id: 'synthetic-breathe',
+    title: 'Morning Breathing Exercise',
+    icon: '🌬️',
+    task_order: 0,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    linked_playlist_id: null,
+    pro_link_type: 'breathe',
+    pro_link_value: null,
+    tag: 'pro',
+  }], []);
+
+  const handleSaveRoutine = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
+    try {
+      const editedTask = editedTasks[0];
+      if (editedTask || selectedTaskIds.length > 0) {
+        await addRoutinePlan.mutateAsync({
+          planId: 'synthetic-breathe',
+          selectedTaskIds,
+          editedTasks,
+          syntheticTasks: FALLBACK_BREATHING_TASKS,
+        });
+      }
+      toast.success('Breathing routine added to your planner!');
+      setShowRoutineSheet(false);
+      setJustAdded(true);
+    } catch (error) {
+      console.error('Failed to add routine:', error);
+      toast.error('Failed to add routine');
+    }
+  };
 
   const handleTourReady = useCallback((tourStart: () => void) => {
     setStartTour(() => tourStart);
@@ -93,6 +139,12 @@ export default function AppBreathe() {
           backTo="/app/home"
           rightAction={
             <div className="flex items-center gap-1">
+              <AddedToRoutineButton
+                isAdded={isAdded}
+                onAddClick={() => setShowRoutineSheet(true)}
+                isLoading={addRoutinePlan.isPending}
+                iconOnly
+              />
               <button
                 onClick={() => navigate('/app/breathe/stats')}
                 className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
@@ -163,6 +215,16 @@ export default function AppBreathe() {
       
       {/* Feature Tour */}
       <BreatheTour isFirstVisit={true} onTourReady={handleTourReady} />
+
+      {/* Routine Preview Sheet */}
+      <RoutinePreviewSheet
+        open={showRoutineSheet}
+        onOpenChange={setShowRoutineSheet}
+        tasks={FALLBACK_BREATHING_TASKS}
+        routineTitle="Breathing Routine"
+        onSave={handleSaveRoutine}
+        isSaving={addRoutinePlan.isPending}
+      />
     </>
   );
 }
