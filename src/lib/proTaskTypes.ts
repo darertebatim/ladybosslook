@@ -455,6 +455,8 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return '/app/player';
     case 'watch':
       return '/app/watch';
+    case 'myroutines':
+      return '/app/routineplayer';
     default:
       return '/app/home';
   }
