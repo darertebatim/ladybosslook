@@ -43,6 +43,16 @@ export const wellnessTools: ToolConfig[] = [
     description: 'Journal & guided prompts',
   },
   {
+    id: 'breathe',
+    name: 'Breathe Exercises',
+    icon: 'Wind',
+    emoji: '🌬️',
+    bgColor: 'bg-[#D7E9FF]',
+    iconColor: 'text-teal-600',
+    route: '/app/breathe',
+    description: 'Breathing exercises',
+  },
+  {
     id: 'focus-timer',
     name: 'Timer',
     icon: 'Clock',
@@ -61,16 +71,6 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-blue-600',
     route: '/app/routineplayer',
     description: 'Routine player',
-  },
-  {
-    id: 'breathe',
-    name: 'Breathe',
-    icon: 'Wind',
-    emoji: '🌬️',
-    bgColor: 'bg-[#D7E9FF]',
-    iconColor: 'text-teal-600',
-    route: '/app/breathe',
-    description: 'Breathing exercises',
   },
   {
     id: 'mood',
