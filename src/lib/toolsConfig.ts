@@ -74,9 +74,9 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'mood',
-    name: 'Mood',
+    name: 'Mood Check-in',
     icon: 'Smile',
-    emoji: '🫧',
+    emoji: '😊',
     bgColor: 'bg-[#FFF492]',
     iconColor: 'text-yellow-600',
     route: '/app/mood',
