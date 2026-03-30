@@ -276,7 +276,7 @@ const AppStore = () => {
                   All Tools
                 </h2>
                 {/* All tools in single scrollable row */}
-                <div className="flex gap-4 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
+                <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
                   {filteredWellnessTools.map((tool) => (
                     <ToolCard 
                       key={tool.id} 
