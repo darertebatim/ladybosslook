@@ -1,77 +1,88 @@
 
 
-## Problem
+# Merge Journal into Reflections
 
-The ProLinkPicker sheet currently shows all tools as flat 2-column grid cards with no sub-selection capability. Previously, tools like Breathing, Reflection, Audio, Playlist, Video, Routine, etc. had drill-down sub-pickers — but the current UI gives no indication of this. Also, "Explore" should be renamed to match actual pages (Routines Templates, Self-Care Habits).
+## What we're merging
 
-## Plan
+**Journal** (`journal_entries` table): title, content, mood, shared_with_admin, shared_at, created_at
+**Free-form Reflections** (`free_form_reflections` table): title, content, created_at
 
-### 1. Reorganize ProLinkPicker into categorized list rows
+They're essentially the same thing. Journal has two extra fields: `mood` and `shared_with_admin/shared_at`.
 
-Replace the 2-column grid with a **single-column list** layout, grouped into logical categories:
+## Full scope of work
 
-**Wellness Tools**
-- Journal Writing — direct (no sub)
-- Breathing Exercise — has sub-picker (chevron indicator)
-- Mood Check-in — direct
-- Emotion Naming — direct
-- Reflection — has sub-picker (chevron)
-- Water Tracking — direct
-- Period Tracker — direct
-- Fasting Timer — direct
-- Weight Logging — direct
-- Focus Timer — direct
+### 1. Database Migration — Add missing columns to `free_form_reflections`
+- Add `mood` (text, nullable) column
+- Add `shared_with_admin` (boolean, nullable) column  
+- Add `shared_at` (timestamptz, nullable) column
+- Add `updated_at` (timestamptz) column
 
-**Media**
-- Audio Track — has sub-picker (chevron)
-- Audio Playlist — has sub-picker (chevron)
-- Video — has sub-picker (chevron)
-- Video Playlist — has sub-picker (chevron)
+### 2. Data Migration — Copy all journal entries into free_form_reflections
+- SQL script to INSERT all `journal_entries` rows into `free_form_reflections` with matching fields (preserving original `id`, `created_at`, mood, etc.)
+- This ensures no user data is lost
 
-**Routines & Programs**
-- Routine Player — has sub-picker (chevron)
-- Self-Care Habits — new link type or rename "inspire" → routes to `/app/tasksbank`
-- Routines Templates — rename "inspire" (no value) → routes to `/app/routines`
-- Program Page — has sub-picker (chevron)
+### 3. Redirect all `/app/journal` routes
+- `/app/journal` → `/app/reflections`
+- `/app/journal/new` → `/app/reflections` (open free-form)
+- `/app/journal/:entryId` → `/app/reflections/notes/free/:entryId`
 
-**Navigation**
-- Planner — direct
-- Community Channel — has sub-picker (chevron)
-- Custom Route — has value input
+### 4. Update the Journal Entry editor (`AppJournalEntry.tsx`)
+- Repoint it to read/write from `free_form_reflections` instead of `journal_entries`
+- OR retire it entirely and enhance `AppFreeFormReflection.tsx` to support mood selection + editing existing entries (currently it only creates new ones)
 
-### 2. Update list item design
+### 5. Update `AppFreeFormNoteDetail.tsx`
+- Add mood display and editing support
+- Add shared_with_admin support
 
-Each row:
-- Left: colored icon in a small rounded container
-- Center: label + subtle description
-- Right: chevron `>` for items with sub-pickers, checkmark for selected item
+### 6. Update hooks
+- Retire `useJournal.tsx` (or repoint it to `free_form_reflections`)
+- Update `useAutoCompleteProTask` — the `autoCompleteJournal` function should now trigger when a free-form reflection is saved
 
-### 3. Fix "Explore" / "inspire" naming
+### 7. Update stats & achievements
+- `usePresenceStats.tsx` — count `free_form_reflections` instead of `journal_entries`
+- `useAppData.tsx` — same: query `free_form_reflections` for monthly presence
+- `JournalStats.tsx` — repoint to free_form_reflections, or merge into reflections stats
+- `achievements.ts` — journal achievement thresholds should count free_form_reflections
+- `get_home_data` DB function — update the journal days query to use `free_form_reflections`
 
-- Rename `inspire` label from "Explore" to "Routines Templates" in `proTaskTypes.ts`
-- Update its navigation path (already goes to `/app/routines`)
-- Consider whether to keep `requiresValue: false` (just opens the page) — yes, keep it simple
+### 8. Remove the Journal tool from tools config
+- In `toolsConfig.ts`, remove the `journal` entry (id: 'journal') since it's now part of Reflections
+- Update the Reflections tool description from "Guided prompts" to something like "Journal & guided prompts"
 
-### 4. Add visual cue for sub-picker items
+### 9. Update Reflection Notes page
+- Already merges both — will now show journal entries too (migrated data)
+- Mood emoji should display on cards for entries that have mood
 
-Items whose `requiresValue: true` will show a `ChevronRight` icon on the right, signaling the user will drill into a specific selection sheet.
+### 10. Update admin panel
+- `SharedJournalsManager` — repoint queries to `free_form_reflections` where `shared_with_admin = true`
+- Keep the "Journals" tab in admin Community page
 
-### Technical Details
+### 11. Cleanup references
+- `JournalPromptMarquee` — keep it, it's used in free-form reflections already
+- `JournalCalendar`, `JournalHeaderStats` — either retire or integrate into reflections page
+- `JournalReminderSettings` / `journal_reminder_settings` table — keep working, just redirect to reflections context
+- Update nav hiding logic in `NativeAppLayout.tsx`
+- Update `BreathingCompleteSheet.tsx` "Write in Journal" link
+- Update `AnnouncementCreator.tsx` journal link
+- Update `CompactStatsPills.tsx` journal link
+- Update `AppProfile.tsx` journal stats section
+- Update `PromoBanner.tsx` journal usage check
 
-**Files to modify:**
-- `src/components/app/ProLinkPicker.tsx` — Complete rewrite of layout from 2-col grid to categorized list
-- `src/lib/proTaskTypes.ts` — Rename "Explore" label to "Routines Templates"
+### 12. Edge functions
+- `send-weekly-summary` — update journal stats query
+- `local-smart-nudges` — update journal proaction references
 
-**List item component** replaces `FeaturedCard`:
-```text
-┌──────────────────────────────────────┐
-│ [🎵]  Audio Track          [>]      │
-│        Pick a specific track         │
-├──────────────────────────────────────┤
-│ [📖]  Journal Writing      [✓]      │
-│        Open the journal editor       │
-└──────────────────────────────────────┘
-```
+## What stays the same
+- Guided reflections (multi-page) — untouched
+- Reflection Notes page — already unified, just gains mood display
+- The ✏️ emoji for the Reflections tool
 
-Categories rendered as section headers (`text-xs font-semibold text-muted-foreground uppercase tracking-wide`).
+## Order of execution
+1. DB migration (add columns) → data migration (copy entries)
+2. Repoint all code from `journal_entries` to `free_form_reflections`
+3. Add redirects for old routes
+4. Remove journal tool entry, update descriptions
+5. Clean up unused components
+
+This is a large change touching ~20 files. Shall I proceed?
 
