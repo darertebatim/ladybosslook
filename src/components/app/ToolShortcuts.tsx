@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, ArrowLeft, Music, Wind, Brain, Headphones, MessageCircle, Video, Clapperboard, GraduationCap } from 'lucide-react';
+import { Plus, ArrowLeft, Music, Wind, Brain, Headphones, MessageCircle, Video, Clapperboard, GraduationCap, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
