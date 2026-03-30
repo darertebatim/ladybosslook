@@ -49,7 +49,7 @@ export default function AppFreeFormReflection() {
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error('Not authenticated');
-      if (!title.trim()) throw new Error('Please write a title');
+      if (!title.trim() && !contentForSave) throw new Error('Please write something');
       const { error } = await supabase
         .from('free_form_reflections' as any)
         .insert({ user_id: user.id, title: title.trim(), content: contentForSave } as any);
