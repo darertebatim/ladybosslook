@@ -26,7 +26,7 @@ interface ShortcutData {
 const STORAGE_KEY = 'tool-shortcuts-v4';
 const MAX_SHORTCUTS = 4;
 const DEFAULT_SHORTCUTS: (ShortcutData | null)[] = [
-  { type: 'mood', value: null, label: 'Mood Check-in', emoji: '😊' },
+  { type: 'mood', value: null, label: 'My Mood Check-in', emoji: '😊' },
   { type: 'reflection', value: null, label: 'Reflections Journal', emoji: '✏️' },
   { type: 'myroutines', value: null, label: 'My Routines', emoji: '🚀' },
   null,

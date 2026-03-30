@@ -203,7 +203,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
   },
   mood: {
     value: 'mood',
-    label: 'Mood Check-in',
+    label: 'My Mood Check-in',
     icon: Smile,
     badgeText: 'Check',
     color: 'yellow',
