@@ -224,9 +224,9 @@ Deno.serve(async (req) => {
       .eq('completed', true)
       .gte('updated_at', weekStart);
     
-    // Get journal entries for users to notify this week
+    // Get reflection entries for users to notify this week
     const { data: journalEntries } = await supabase
-      .from('journal_entries')
+      .from('free_form_reflections')
       .select('user_id, id')
       .in('user_id', usersToNotify)
       .gte('created_at', weekStart);

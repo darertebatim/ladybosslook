@@ -218,7 +218,7 @@ async function fetchUserContext(supabase: any, userId: string) {
     supabase.from("user_tasks").select("id, title, emoji, scheduled_date, is_active, repeat_pattern, pro_link_type").eq("user_id", userId).eq("is_active", true).limit(30),
     supabase.from("task_completions").select("task_id, completed_date").eq("user_id", userId).eq("completed_date", today),
     supabase.from("emotion_logs").select("emotion, valence, category, created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(10),
-    supabase.from("journal_entries").select("title, mood, created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(5),
+    supabase.from("free_form_reflections").select("title, mood, created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(5),
     supabase.from("user_streaks").select("current_streak, longest_streak").eq("user_id", userId).single(),
     supabase.from("routines_bank").select("id, title, emoji, category, subtitle").eq("is_active", true).order("sort_order").limit(50),
     supabase.from("breathing_exercises").select("id, name, emoji, category, description").eq("is_active", true).limit(20),

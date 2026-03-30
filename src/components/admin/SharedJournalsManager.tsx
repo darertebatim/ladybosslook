@@ -63,7 +63,7 @@ export function SharedJournalsManager() {
 
       // Fetch profiles for each entry
       const entriesWithProfiles = await Promise.all(
-        (data || []).map(async (entry) => {
+        (data as any[] || []).map(async (entry: any) => {
           const { data: profile } = await supabase
             .from('profiles')
             .select('full_name, email')
