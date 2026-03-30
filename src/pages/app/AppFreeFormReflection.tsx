@@ -58,11 +58,13 @@ export default function AppFreeFormReflection() {
       const finalTitle = title.trim() || `Reflection`;
       const { error } = await supabase
         .from('free_form_reflections' as any)
-        .insert({ user_id: user.id, title: finalTitle, content: contentForSave } as any);
+        .insert({ user_id: user.id, title: finalTitle, content: contentForSave, mood: mood || null } as any);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['reflection-notes'] });
+      queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
+      await autoCompleteJournal();
       toast.success('Reflection saved ✨');
       if (hasActivePlayer) {
         navigate('/app/home');
