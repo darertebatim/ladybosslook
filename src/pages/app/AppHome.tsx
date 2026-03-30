@@ -110,6 +110,7 @@ const AppHome = () => {
   const [showActionLimit, setShowActionLimit] = useState(false);
   const [hasPromoBanner, setHasPromoBanner] = useState(false);
   const [hasHomeBanner, setHasHomeBanner] = useState(false);
+  const [hasMoodBanner, setHasMoodBanner] = useState(false);
   const { isKeyboardOpen } = useKeyboard();
   const { currentTrack } = useAudioPlayer();
   const hasMiniPlayer = !!currentTrack;
