@@ -215,6 +215,16 @@ export default function AppBreathe() {
       
       {/* Feature Tour */}
       <BreatheTour isFirstVisit={true} onTourReady={handleTourReady} />
+
+      {/* Routine Preview Sheet */}
+      <RoutinePreviewSheet
+        open={showRoutineSheet}
+        onOpenChange={setShowRoutineSheet}
+        tasks={FALLBACK_BREATHING_TASKS}
+        routineTitle="Breathing Routine"
+        onSave={handleSaveRoutine}
+        isSaving={addRoutinePlan.isPending}
+      />
     </>
   );
 }
