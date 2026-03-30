@@ -27,6 +27,7 @@ export const PRO_LINK_EMOJIS: Record<ProLinkType, string> = {
   tasksbank: '🌿',
   listen: '🎧',
   watch: '📺',
+  myroutines: '🔄',
 };
 
 export function getProLinkEmoji(type: ProLinkType) {
