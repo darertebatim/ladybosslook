@@ -104,9 +104,9 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
         {isLocked ? (
           <button
             onClick={() => { haptic.light(); setShowPaywall(true); }}
-            className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0"
+            className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0"
           >
-            <span className="text-lg">🔒</span>
+            <span className="text-sm">🔒</span>
           </button>
         ) : (
           <AddedToRoutineButton
