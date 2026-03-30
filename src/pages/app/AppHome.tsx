@@ -1079,7 +1079,14 @@ const AppHome = () => {
             </div>
 
             {/* Mood Check-in Banner — only after all promo/home banners are dismissed */}
-            {!showWelcomeCard && !hasPromoBanner && !hasHomeBanner && <MoodCheckInBanner />}
+            {!showWelcomeCard && !hasPromoBanner && !hasHomeBanner && <MoodCheckInBanner onVisibilityChange={setHasMoodBanner} />}
+
+            {/* My Shortcuts — only when no banners are visible */}
+            {!showWelcomeCard && !hasPromoBanner && !hasHomeBanner && !hasMoodBanner && (
+              <div className="mb-3">
+                <ToolShortcuts />
+              </div>
+            )}
 
             {/* Tag filter chips - temporarily hidden */}
             {/* {taskTags.length > 0 && <div className="py-2 -mx-4 px-4 bg-background overflow-x-auto">
