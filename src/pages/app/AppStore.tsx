@@ -423,7 +423,7 @@ const AppStore = () => {
                     <button
                       key={exercise.id}
                       onClick={() => navigate(`/app/breathe?exercise=${exercise.id}`, { state: { from: location.pathname } })}
-                      className="shrink-0 w-44 flex items-center gap-2.5 py-2 text-left transition-transform active:scale-[0.97] bg-accent/60 rounded-xl px-2.5 border border-border/40"
+                      className="shrink-0 w-[140px] flex items-center gap-2 py-2 text-left transition-transform active:scale-[0.97] bg-accent/60 rounded-xl px-2 border border-border/40"
                     >
                       <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
                         <FluentEmoji emoji={exercise.emoji || '🌬️'} size={22} />
