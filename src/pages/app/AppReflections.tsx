@@ -62,7 +62,7 @@ export default function AppReflections() {
           <button onClick={() => navigate(-1)} className="active:scale-95 transition-transform">
             <ArrowLeft className="h-6 w-6" />
           </button>
-          <h1 className="text-lg font-semibold">Reflection</h1>
+          <h1 className="text-lg font-semibold">Reflections Journal</h1>
           <div className="flex items-center gap-1">
             <AddedToRoutineButton
               isAdded={isPageAdded}
