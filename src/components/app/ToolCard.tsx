@@ -32,10 +32,12 @@ interface ToolCardProps {
 export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
   const navigate = useNavigate();
   const { isSubscribed } = useSubscription();
+  const { data: todayMood } = useTodayMood();
   const [showPaywall, setShowPaywall] = useState(false);
   const IconComponent = iconMap[tool.icon] || Circle;
   const isPremiumTool = LOCKED_TOOLS.includes(tool.id);
   const isLocked = isPremiumTool && !isSubscribed;
+  const isMoodTool = tool.id === 'mood';
 
   const handleClick = () => {
     if (tool.comingSoon) {
