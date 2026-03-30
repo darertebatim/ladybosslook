@@ -259,10 +259,10 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
 
   return (
     <>
-      <div className="w-full flex items-center gap-4 py-4">
+      <div className="w-full flex items-center gap-3 py-2.5">
         <button
           onClick={handleReflectionClick}
-          className="flex-1 flex items-center gap-4 text-left transition-transform active:scale-[0.98] min-w-0"
+          className="flex-1 flex items-center gap-3 text-left transition-transform active:scale-[0.98] min-w-0"
         >
           {/* Cover with PLUS badge */}
           <div className="relative shrink-0">
@@ -270,25 +270,25 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
               <img
                 src={reflection.cover_image_url}
                 alt={reflection.title}
-                className="h-24 w-24 rounded-2xl object-cover"
+                className="h-14 w-14 rounded-xl object-cover"
                 loading="lazy"
               />
             ) : (
-              <div className="h-24 w-24 rounded-2xl bg-muted flex items-center justify-center">
-                <FluentEmoji emoji={reflection.emoji || '📝'} size={48} />
+              <div className="h-14 w-14 rounded-xl bg-muted flex items-center justify-center">
+                <FluentEmoji emoji={reflection.emoji || '📝'} size={28} />
               </div>
             )}
             {isPremium && (
-              <span className="absolute -top-2.5 -left-2 flex items-center gap-0.5 bg-amber-200 text-amber-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+              <span className="absolute -top-2 -left-1.5 flex items-center gap-0.5 bg-amber-200 text-amber-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
                 <Crown className="h-2.5 w-2.5" />
                 PLUS
               </span>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-base leading-tight">{reflection.title}</p>
+            <p className="font-semibold text-sm leading-tight">{reflection.title}</p>
             {reflection.subtitle && (
-              <p className="text-sm text-foreground/80 mt-1 line-clamp-2">{reflection.subtitle}</p>
+              <p className="text-xs text-foreground/80 mt-0.5 line-clamp-1">{reflection.subtitle}</p>
             )}
           </div>
         </button>
