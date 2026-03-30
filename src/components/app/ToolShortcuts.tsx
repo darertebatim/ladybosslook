@@ -82,21 +82,23 @@ export function ToolShortcuts() {
 
   const handleSelectProLink = (type: ProLinkType) => {
     const config = PRO_LINK_CONFIGS[type];
-    setPendingType(type);
-    setPendingValue(null);
-
-    // If it doesn't require a value, save immediately
-    if (!config.requiresValue) {
-      if (editingIndex !== null) {
-        const updated = [...shortcuts];
-        updated[editingIndex] = { type, value: null };
-        setShortcuts(updated);
-        setPickerOpen(false);
-        setEditingIndex(null);
-        setPendingType(null);
-      }
+    
+    // For shortcuts, always save immediately (navigate to base route if no value)
+    // Only exception: 'route' type which needs a custom path
+    if (type === 'route') {
+      setPendingType(type);
+      setPendingValue(null);
+      return;
     }
-    // If it requires a value, the ProLinkPicker route input will handle it
+
+    if (editingIndex !== null) {
+      const updated = [...shortcuts];
+      updated[editingIndex] = { type, value: null };
+      setShortcuts(updated);
+      setPickerOpen(false);
+      setEditingIndex(null);
+      setPendingType(null);
+    }
   };
 
   const handleClearProLink = () => {
