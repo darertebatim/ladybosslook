@@ -60,17 +60,7 @@ export const wellnessTools: ToolConfig[] = [
     bgColor: 'bg-[#E0FBB8]',
     iconColor: 'text-teal-600',
     route: '/app/reflections',
-    description: 'Guided prompts',
-  },
-  {
-    id: 'journal',
-    name: 'Journal',
-    icon: 'BookOpen',
-    emoji: '📖',
-    bgColor: 'bg-[#FFE6C9]',
-    iconColor: 'text-orange-600',
-    route: '/app/journal',
-    description: 'Daily reflections',
+    description: 'Journal & guided prompts',
   },
   {
     id: 'breathe',

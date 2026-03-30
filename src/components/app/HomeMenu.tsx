@@ -24,7 +24,7 @@ const navPages: NavItem[] = [
 ];
 
 const toolItems: NavItem[] = [
-  { id: 'journal', name: 'Journal', icon: <BookOpen className="h-4 w-4" />, route: '/app/journal', color: 'text-orange-600 bg-orange-100' },
+  { id: 'reflections', name: 'Reflections', icon: <BookOpen className="h-4 w-4" />, route: '/app/reflections', color: 'text-orange-600 bg-orange-100' },
   { id: 'mood', name: 'Mood', icon: <Heart className="h-4 w-4" />, route: '/app/mood', color: 'text-yellow-600 bg-yellow-100' },
   { id: 'breathe', name: 'Breathe', icon: <Wind className="h-4 w-4" />, route: '/app/breathe', color: 'text-teal-600 bg-teal-100' },
   { id: 'water', name: 'Water', icon: <Droplets className="h-4 w-4" />, route: '/app/water', color: 'text-blue-600 bg-blue-100' },

@@ -15,9 +15,9 @@ import talkImg from '@/assets/mood-card-talk.png';
 
 const ACTIONS = [
   {
-    label: 'Write in Journal',
+    label: 'Write Reflection',
     image: journalImg,
-    route: '/app/journal/new',
+    route: '/app/reflections/free-form',
   },
   {
     label: 'Self Reflection',

@@ -89,7 +89,7 @@ export function StatsCards({
       {/* Journal - Days This Month (not streak) */}
       <Card 
         className="overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors"
-        onClick={() => navigate('/app/journal')}
+        onClick={() => navigate('/app/reflections')}
       >
         <CardContent className="p-3 lg:pt-6">
           <div className="flex items-center justify-between">

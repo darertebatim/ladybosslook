@@ -30,25 +30,6 @@ export interface UpdateJournalEntry {
   shared_with_admin?: boolean;
 }
 
-const LEGACY_MOOD_CHECKIN_CONTENTS = new Set([
-  'feeling great today.',
-  'feeling good today.',
-  'feeling okay today.',
-  'feeling not great today.',
-  'feeling bad today.',
-]);
-
-const isHiddenMoodCheckin = (entry: JournalEntry): boolean => {
-  if (entry.title === '__mood_checkin__') return true;
-
-  if (!entry.title && entry.mood) {
-    const normalizedContent = entry.content.trim().replace(/\s+/g, ' ').toLowerCase();
-    return LEGACY_MOOD_CHECKIN_CONTENTS.has(normalizedContent);
-  }
-
-  return false;
-};
-
 export const useJournalEntries = (searchQuery?: string) => {
   const { user, loading } = useAuth();
 
@@ -60,7 +41,7 @@ export const useJournalEntries = (searchQuery?: string) => {
       if (!userId) return [];
 
       let query = supabase
-        .from('journal_entries')
+        .from('free_form_reflections' as any)
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
@@ -72,7 +53,7 @@ export const useJournalEntries = (searchQuery?: string) => {
       const { data, error } = await query;
 
       if (error) throw error;
-      return (data as JournalEntry[]).filter((entry) => !isHiddenMoodCheckin(entry));
+      return (data as any as JournalEntry[]);
     },
     enabled: !loading && !!user?.id,
   });
@@ -87,14 +68,14 @@ export const useJournalEntry = (entryId: string | undefined) => {
       if (!entryId || !user?.id) return null;
 
       const { data, error } = await supabase
-        .from('journal_entries')
+        .from('free_form_reflections' as any)
         .select('*')
         .eq('id', entryId)
         .eq('user_id', user.id)
         .single();
 
       if (error) throw error;
-      return data as JournalEntry;
+      return data as any as JournalEntry;
     },
     enabled: !!entryId && !!user?.id,
   });
@@ -110,22 +91,22 @@ export const useCreateJournalEntry = () => {
       if (!user?.id) throw new Error('Not authenticated');
 
       const { data, error } = await supabase
-        .from('journal_entries')
+        .from('free_form_reflections' as any)
         .insert({
           user_id: user.id,
-          title: entry.title || null,
+          title: entry.title || 'Reflection',
           content: entry.content,
           mood: entry.mood || null,
-        })
+        } as any)
         .select()
         .single();
 
       if (error) throw error;
-      return data as JournalEntry;
+      return data as any as JournalEntry;
     },
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
-      // Auto-complete any journal pro tasks for today
+      queryClient.invalidateQueries({ queryKey: ['reflection-notes'] });
       await autoCompleteJournal();
     },
     onError: (error) => {
@@ -152,18 +133,19 @@ export const useUpdateJournalEntry = () => {
       }
 
       const { data, error } = await supabase
-        .from('journal_entries')
-        .update(updateData)
+        .from('free_form_reflections' as any)
+        .update(updateData as any)
         .eq('id', entry.id)
         .select()
         .single();
 
       if (error) throw error;
-      return data as JournalEntry;
+      return data as any as JournalEntry;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
       queryClient.invalidateQueries({ queryKey: ['journal-entry', data.id] });
+      queryClient.invalidateQueries({ queryKey: ['reflection-notes'] });
     },
     onError: (error) => {
       console.error('Failed to update journal entry:', error);
@@ -178,7 +160,7 @@ export const useDeleteJournalEntry = () => {
   return useMutation({
     mutationFn: async (entryId: string) => {
       const { error } = await supabase
-        .from('journal_entries')
+        .from('free_form_reflections' as any)
         .delete()
         .eq('id', entryId);
 
@@ -187,6 +169,7 @@ export const useDeleteJournalEntry = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
+      queryClient.invalidateQueries({ queryKey: ['reflection-notes'] });
       toast.success('Entry deleted');
     },
     onError: (error) => {

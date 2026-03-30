@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft } from 'lucide-react';
+import { getMoodEmoji } from '@/components/app/MoodSelector';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 
@@ -13,6 +14,7 @@ interface NoteItem {
   cover: string | null;
   completed_at: string;
   preview: string | null;
+  mood?: string | null;
 }
 
 export default function AppReflectionNotes() {
@@ -103,6 +105,7 @@ export default function AppReflectionNotes() {
           cover: null,
           completed_at: ff.created_at,
           preview: ff.content || null,
+          mood: ff.mood || null,
         });
       }
 
@@ -170,7 +173,7 @@ export default function AppReflectionNotes() {
                       <img src={item.cover} alt="" className="h-10 w-10 rounded-lg object-cover" />
                     ) : (
                       <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center text-lg">
-                        {item.type === 'free' ? '✍️' : '📝'}
+                        {item.mood ? getMoodEmoji(item.mood) || '✍️' : (item.type === 'free' ? '✍️' : '📝')}
                       </div>
                     )}
                     <div>

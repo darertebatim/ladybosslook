@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, MoreHorizontal, Pencil, Trash2, Share2 } from 'lucide-react';
+import { getMoodEmoji } from '@/components/app/MoodSelector';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -130,7 +131,9 @@ export default function AppFreeFormNoteDetail() {
       ) : data ? (
         <div className="px-5 py-5 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center text-xl">✍️</div>
+            <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center text-xl">
+              {data.mood ? getMoodEmoji(data.mood) || '✍️' : '✍️'}
+            </div>
             <div>
               <h1 className="text-xl font-bold">{data.title}</h1>
               <p className="text-sm text-muted-foreground">

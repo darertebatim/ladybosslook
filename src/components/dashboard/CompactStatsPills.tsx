@@ -52,7 +52,7 @@ export function CompactStatsPills({
       icon: Calendar,
       value: daysThisMonth > 0 ? `${daysThisMonth}d` : '0d',
       label: 'this month',
-      to: '/app/journal',
+      to: '/app/reflections',
       color: 'bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300',
     },
   ];

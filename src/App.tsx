@@ -62,6 +62,10 @@ const AppChannelDetail = lazy(() => import("@/pages/app/AppChannelDetail"));
 const AppFeedPost = lazy(() => import("@/pages/app/AppFeedPost"));
 const AppJournal = lazy(() => import("@/pages/app/AppJournal"));
 const AppJournalEntry = lazy(() => import("@/pages/app/AppJournalEntry"));
+// Journal redirect components
+const JournalRedirect = () => { const navigate = useNavigate(); React.useEffect(() => { navigate('/app/reflections', { replace: true }); }, []); return null; };
+const JournalNewRedirect = () => { const navigate = useNavigate(); React.useEffect(() => { navigate('/app/reflections/free-form', { replace: true }); }, []); return null; };
+const JournalEntryRedirect = () => { const { entryId } = useParams(); const navigate = useNavigate(); React.useEffect(() => { navigate(`/app/reflections/notes/free/${entryId}`, { replace: true }); }, []); return null; };
 const AppTaskCreate = lazy(() => import("@/pages/app/AppTaskCreate"));
 // AppInspire eagerly imported above
 const AppInspireDetail = lazy(() => import("@/pages/app/AppInspireDetail"));
@@ -453,8 +457,8 @@ const App = () => (
                   {/* All /app/* routes wrapped with Audio + Focus player providers */}
                   <Route element={<AppProvidersLayout />}>
                     {/* Full-screen pages - Outside of AppLayout so no tab bar */}
-                    <Route path="/app/journal/new" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
-                    <Route path="/app/journal/:entryId" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
+                    <Route path="/app/journal/new" element={<JournalNewRedirect />} />
+                    <Route path="/app/journal/:entryId" element={<JournalEntryRedirect />} />
                     <Route path="/app/home/new" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
                     <Route path="/app/home/edit/:taskId" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
                     <Route path="/app/channels/post/:postId" element={<ProtectedRoute><AppFeedPost /></ProtectedRoute>} />
@@ -514,7 +518,7 @@ const App = () => (
                       <Route path="channels/:slug" element={<AppChannelDetail />} />
                       {/* Redirect old feed route */}
                       <Route path="feed" element={<Navigate to="/app/channels" replace />} />
-                      <Route path="journal" element={<AppJournal />} />
+                      <Route path="journal" element={<JournalRedirect />} />
                       <Route path="reflections" element={<AppReflections />} />
                       <Route path="reflections/notes" element={<AppReflectionNotes />} />
                       <Route path="routines" element={<AppInspire />} />

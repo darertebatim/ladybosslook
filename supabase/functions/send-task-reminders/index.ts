@@ -405,7 +405,7 @@ Deno.serve(async (req) => {
             notificationUrl = '/app/feed';
             break;
           case 'journal':
-            notificationUrl = '/app/journal';
+            notificationUrl = '/app/reflections';
             break;
           case 'planner':
           default:

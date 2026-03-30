@@ -72,7 +72,7 @@ export function QuickMoodCheckIn({ open, onOpenChange }: QuickMoodCheckInProps) 
       toast.success('Mood logged!', {
         action: {
           label: 'Write more',
-          onClick: () => navigate(`/app/journal/new?mood=${moodValue}`),
+          onClick: () => navigate(`/app/reflections/free-form?mood=${moodValue}`),
         },
       });
       onOpenChange(false);

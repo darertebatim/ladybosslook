@@ -44,10 +44,9 @@ export function usePresenceStats() {
           .select('audio_id, current_position_seconds, completed')
           .eq('user_id', user.id),
         supabase
-          .from('journal_entries')
+          .from('free_form_reflections')
           .select('id', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .or('title.is.null,title.neq.__mood_checkin__'),
+          .eq('user_id', user.id),
         supabase
           .from('breathing_sessions')
           .select('id', { count: 'exact', head: true })

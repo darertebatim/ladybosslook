@@ -105,7 +105,7 @@ export const JournalStats = ({ className }: JournalStatsProps) => {
           </CardTitle>
           <CardDescription>Your personal reflections</CardDescription>
         </div>
-        <Button variant="ghost" size="sm" onClick={() => navigate('/app/journal')}>
+        <Button variant="ghost" size="sm" onClick={() => navigate('/app/reflections')}>
           View All
           <ChevronRight className="h-4 w-4 ml-1" />
         </Button>
@@ -115,7 +115,7 @@ export const JournalStats = ({ className }: JournalStatsProps) => {
           <div className="text-center py-4">
             <NotebookPen className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
             <p className="text-sm text-muted-foreground mb-3">Start journaling today</p>
-            <Button size="sm" onClick={() => navigate('/app/journal/new')}>
+            <Button size="sm" onClick={() => navigate('/app/reflections/free-form')}>
               Write First Entry
             </Button>
           </div>
@@ -165,7 +165,7 @@ export const JournalStats = ({ className }: JournalStatsProps) => {
             <Button 
               className="w-full" 
               variant="outline"
-              onClick={() => navigate('/app/journal/new')}
+              onClick={() => navigate('/app/reflections/free-form')}
             >
               <NotebookPen className="h-4 w-4 mr-2" />
               Write Today's Entry

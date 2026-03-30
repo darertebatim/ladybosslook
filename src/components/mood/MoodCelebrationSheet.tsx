@@ -111,7 +111,7 @@ export function MoodCelebrationSheet({
   const handleAction = (action: typeof ACTIONS[number]) => {
     haptic.medium();
     const route = action.routeKey === 'journal' 
-      ? `/app/journal/new?mood=${mood}` 
+      ? `/app/reflections/free-form?mood=${mood}` 
       : action.route || '/app/home';
     
     // If interceptor returns true, don't navigate yet

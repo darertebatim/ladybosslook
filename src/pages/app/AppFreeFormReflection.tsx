@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,9 +7,11 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useBilingualText } from '@/components/ui/BilingualText';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
+import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { format } from 'date-fns';
 import { Lightbulb } from 'lucide-react';
 import { JournalPromptMarquee } from '@/components/app/JournalPromptMarquee';
+import { MoodSelector } from '@/components/app/MoodSelector';
 
 const BULLET_COLOR = 'hsl(var(--muted-foreground) / 0.4)';
 
@@ -17,6 +19,8 @@ export default function AppFreeFormReflection() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { autoCompleteJournal } = useAutoCompleteProTask();
+  const [searchParams] = useSearchParams();
 
   let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
   try { routinePlayer = useRoutinePlayerContext(); } catch { /* not available */ }
@@ -24,6 +28,7 @@ export default function AppFreeFormReflection() {
 
   const [title, setTitle] = useState('');
   const [lines, setLines] = useState<string[]>(['']);
+  const [mood, setMood] = useState<string | null>(searchParams.get('mood') || null);
   const [showPrompts, setShowPrompts] = useState(false);
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const lineRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -53,11 +58,13 @@ export default function AppFreeFormReflection() {
       const finalTitle = title.trim() || `Reflection`;
       const { error } = await supabase
         .from('free_form_reflections' as any)
-        .insert({ user_id: user.id, title: finalTitle, content: contentForSave } as any);
+        .insert({ user_id: user.id, title: finalTitle, content: contentForSave, mood: mood || null } as any);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['reflection-notes'] });
+      queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
+      await autoCompleteJournal();
       toast.success('Reflection saved ✨');
       if (hasActivePlayer) {
         navigate('/app/home');
@@ -194,6 +201,12 @@ export default function AppFreeFormReflection() {
               />
             </div>
           ))}
+        </div>
+
+        {/* Mood selector */}
+        <div className="mt-6">
+          <p className="text-xs font-medium text-muted-foreground mb-2">How are you feeling?</p>
+          <MoodSelector value={mood} onChange={(m) => setMood(m)} showHeader={false} />
         </div>
       </div>
     </div>
