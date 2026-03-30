@@ -148,7 +148,7 @@ export function ToolShortcuts() {
                   ) : (
                     <span className="text-3xl">📱</span>
                   )}
-                  <span className="text-[8px] font-semibold text-foreground/80 leading-none text-center line-clamp-1 w-full px-1 mt-0.5">
+                  <span className="text-[11px] font-semibold text-foreground/80 leading-none text-center line-clamp-1 w-full px-1 mt-0.5">
                     {tool.name}
                   </span>
                 </div>
