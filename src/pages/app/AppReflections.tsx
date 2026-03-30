@@ -109,20 +109,20 @@ export default function AppReflections() {
       {featured.length > 0 && (
         <div className="px-4 mt-4">
           <h2 className="text-sm font-semibold text-foreground mb-2">For you</h2>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
             {featured.map((r) => (
               <button
                 key={r.id}
                 onClick={() => navigate(`/app/reflections/${r.id}`)}
                 className="w-full rounded-2xl overflow-hidden text-left transition-transform active:scale-[0.97] relative bg-accent/60 border border-border/40"
               >
-                <div className="flex items-center gap-3 p-4">
-                  <div className="h-14 w-14 rounded-xl bg-background/60 flex items-center justify-center shrink-0">
-                    <FluentEmoji emoji={r.emoji || '🪞'} size={36} />
+                <div className="flex items-center gap-3 p-3">
+                  <div className="h-10 w-10 rounded-xl bg-background/60 flex items-center justify-center shrink-0">
+                    <FluentEmoji emoji={r.emoji || '🪞'} size={24} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-base leading-tight text-foreground">{r.title}</p>
-                    {r.subtitle && <p className="text-sm text-foreground/80 mt-1 line-clamp-2">{r.subtitle}</p>}
+                    <p className="font-bold text-sm leading-tight text-foreground">{r.title}</p>
+                    {r.subtitle && <p className="text-xs text-foreground/80 mt-0.5 line-clamp-1">{r.subtitle}</p>}
                   </div>
                 </div>
               </button>
