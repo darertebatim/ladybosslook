@@ -27,7 +27,8 @@ export function useTodayProLinkCompletions() {
         reflectionResult,
         freeFormResult,
         fastingResult,
-        routineResult,
+        presenceResult,
+        returnEventsResult,
         taskCompletionResult,
       ] = await Promise.all([
         // Breathe: check breathing_sessions for today
@@ -66,9 +67,16 @@ export function useTodayProLinkCompletions() {
           .lte('ended_at', todayEnd)
           .limit(1),
 
-        // Routines: check routine_sessions completed today
+        // Presence: check if last_active_date is today
         supabase
-          .from('routine_sessions' as any)
+          .from('profiles')
+          .select('last_active_date')
+          .eq('id', user.id)
+          .maybeSingle(),
+
+        // App return events for today
+        supabase
+          .from('app_return_events')
           .select('id')
           .eq('user_id', user.id)
           .gte('created_at', todayStart)
@@ -99,19 +107,21 @@ export function useTodayProLinkCompletions() {
         completedKeys.add('fasting');
       }
 
-      if (routineResult.data && (routineResult.data as any[]).length > 0) {
-        completedKeys.add('myroutines');
-        completedKeys.add('routine');
+      // Presence: user showed up today (last_active_date matches or return event exists)
+      if (
+        (presenceResult.data && (presenceResult.data as any)?.last_active_date === todayStr) ||
+        (returnEventsResult.data && returnEventsResult.data.length > 0)
+      ) {
+        completedKeys.add('presence');
       }
 
-      // Also check task_completions for pro-link types
+      // Check task_completions for pro-link types AND routine completions
       if (taskCompletionResult.data && taskCompletionResult.data.length > 0) {
         const taskIds = taskCompletionResult.data.map(c => c.task_id);
         const { data: tasks } = await supabase
           .from('user_tasks')
-          .select('pro_link_type, pro_link_value')
+          .select('pro_link_type, pro_link_value, source_routine_id')
           .eq('user_id', user.id)
-          .not('pro_link_type', 'is', null)
           .in('id', taskIds);
 
         if (tasks) {
@@ -121,6 +131,12 @@ export function useTodayProLinkCompletions() {
               if (task.pro_link_value) {
                 completedKeys.add(`${task.pro_link_type}:${task.pro_link_value}`);
               }
+            }
+            // If any routine-linked task was completed, mark routines as done
+            if (task.source_routine_id) {
+              completedKeys.add('myroutines');
+              completedKeys.add('routine');
+              completedKeys.add(`routine:${task.source_routine_id}`);
             }
           }
         }
