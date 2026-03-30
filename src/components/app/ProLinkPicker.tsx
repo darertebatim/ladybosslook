@@ -7,6 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { wellnessTools, audioTools } from '@/lib/toolsConfig';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
+
+const QUICK_TOOLS = [
+  ...wellnessTools.filter(t => !t.comingSoon && !t.hidden),
+  ...audioTools.filter(t => t.id === 'meditate' || t.id === 'soundscape'),
+];
 
 interface CategoryGroup {
   id: string;
