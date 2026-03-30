@@ -79,7 +79,7 @@ export default function AppBreathe() {
         description="Breathing exercises for relaxation and focus" 
       />
       
-      <div className="min-h-screen bg-background">
+      <div className="min-h-0 bg-background">
         {/* Header */}
         <AppHeader
           title="Breathe"
@@ -101,7 +101,7 @@ export default function AppBreathe() {
 
         {/* Category pills */}
         <div className="px-4 pt-2 pb-3">
-          <div className="flex gap-2 overflow-x-auto no-scrollbar">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar" style={{ touchAction: 'pan-x pan-y' }}>
             {BREATHING_CATEGORIES.map((cat) => (
               <button
                 key={cat.value}
