@@ -14,7 +14,7 @@ export interface ToolConfig {
 export const wellnessTools: ToolConfig[] = [
   {
     id: 'self-care',
-    name: 'Self-Care',
+    name: 'Self-Care Habits',
     icon: 'Heart',
     emoji: '🌿',
     bgColor: 'bg-[#E2F9F0]',
