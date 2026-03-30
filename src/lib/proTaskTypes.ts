@@ -60,7 +60,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
   },
   journal: {
     value: 'journal',
-    label: 'Reflections Journal',
+    label: 'Write Reflection',
     icon: BookOpen,
     badgeText: 'Write',
     color: 'purple',
@@ -68,7 +68,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     iconColorClass: 'text-purple-600 dark:text-purple-400',
     badgeColorClass: 'bg-purple-500/20 text-purple-700 dark:text-purple-300',
     buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
-    description: 'Open the reflection editor',
+    description: 'Open the free-form reflection editor',
     requiresValue: false,
   },
   breathe: {
