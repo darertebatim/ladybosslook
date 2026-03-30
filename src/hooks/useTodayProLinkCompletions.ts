@@ -1,53 +1,127 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { format } from 'date-fns';
+import { format, startOfDay, endOfDay } from 'date-fns';
 
 /**
- * Returns a Set of pro_link_type values (optionally with pro_link_value)
- * that the user has completed today.
- * Key format: "type" or "type:value"
+ * Checks actual activity completion for today across different pro-link types.
+ * Returns a Set of pro_link_type strings that were completed today.
+ * This checks the activity tables directly, independent of planner tasks.
  */
 export function useTodayProLinkCompletions() {
   const { user } = useAuth();
-  const today = format(new Date(), 'yyyy-MM-dd');
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const todayStart = startOfDay(new Date()).toISOString();
+  const todayEnd = endOfDay(new Date()).toISOString();
 
   return useQuery({
-    queryKey: ['today-prolink-completions', user?.id, today],
+    queryKey: ['today-prolink-completions', user?.id, todayStr],
     queryFn: async () => {
       if (!user) return new Set<string>();
 
-      // Get all active user tasks that have a pro_link_type
-      const { data: tasks } = await supabase
-        .from('user_tasks')
-        .select('id, pro_link_type, pro_link_value')
-        .eq('user_id', user.id)
-        .eq('is_active', true)
-        .not('pro_link_type', 'is', null);
-
-      if (!tasks || tasks.length === 0) return new Set<string>();
-
-      const taskIds = tasks.map(t => t.id);
-
-      // Check which of these tasks have completions for today
-      const { data: completions } = await supabase
-        .from('task_completions')
-        .select('task_id')
-        .eq('user_id', user.id)
-        .eq('completed_date', today)
-        .in('task_id', taskIds);
-
-      const completedTaskIds = new Set((completions || []).map(c => c.task_id));
-
-      // Build a set of completed pro-link keys
       const completedKeys = new Set<string>();
-      for (const task of tasks) {
-        if (completedTaskIds.has(task.id) && task.pro_link_type) {
-          // Add generic key (type only)
-          completedKeys.add(task.pro_link_type);
-          // Add specific key (type:value)
-          if (task.pro_link_value) {
-            completedKeys.add(`${task.pro_link_type}:${task.pro_link_value}`);
+
+      // Run all checks in parallel
+      const [
+        breatheResult,
+        reflectionResult,
+        freeFormResult,
+        fastingResult,
+        routineResult,
+        taskCompletionResult,
+      ] = await Promise.all([
+        // Breathe: check breathing_sessions for today
+        supabase
+          .from('breathing_sessions')
+          .select('id')
+          .eq('user_id', user.id)
+          .gte('completed_at', todayStart)
+          .lte('completed_at', todayEnd)
+          .limit(1),
+
+        // Reflection (guided): check user_reflection_responses for today
+        supabase
+          .from('user_reflection_responses' as any)
+          .select('id')
+          .eq('user_id', user.id)
+          .gte('completed_at', todayStart)
+          .lte('completed_at', todayEnd)
+          .limit(1),
+
+        // Free-form reflection/journal: check free_form_reflections for today
+        supabase
+          .from('free_form_reflections')
+          .select('id')
+          .eq('user_id', user.id)
+          .gte('created_at', todayStart)
+          .lte('created_at', todayEnd)
+          .limit(1),
+
+        // Fasting: check fasting_sessions that ended today
+        supabase
+          .from('fasting_sessions' as any)
+          .select('id')
+          .eq('user_id', user.id)
+          .gte('ended_at', todayStart)
+          .lte('ended_at', todayEnd)
+          .limit(1),
+
+        // Routines: check routine_sessions completed today
+        supabase
+          .from('routine_sessions' as any)
+          .select('id')
+          .eq('user_id', user.id)
+          .gte('created_at', todayStart)
+          .lte('created_at', todayEnd)
+          .limit(1),
+
+        // Pro-link task completions for today (covers all types)
+        supabase
+          .from('task_completions')
+          .select('task_id')
+          .eq('user_id', user.id)
+          .eq('completed_date', todayStr),
+      ]);
+
+      if (breatheResult.data && breatheResult.data.length > 0) {
+        completedKeys.add('breathe');
+      }
+
+      if (
+        (reflectionResult.data && (reflectionResult.data as any[]).length > 0) ||
+        (freeFormResult.data && freeFormResult.data.length > 0)
+      ) {
+        completedKeys.add('reflection');
+        completedKeys.add('journal');
+      }
+
+      if (fastingResult.data && (fastingResult.data as any[]).length > 0) {
+        completedKeys.add('fasting');
+      }
+
+      if (routineResult.data && (routineResult.data as any[]).length > 0) {
+        completedKeys.add('myroutines');
+        completedKeys.add('routine');
+      }
+
+      // Also check task_completions for pro-link types
+      if (taskCompletionResult.data && taskCompletionResult.data.length > 0) {
+        const taskIds = taskCompletionResult.data.map(c => c.task_id);
+        const { data: tasks } = await supabase
+          .from('user_tasks')
+          .select('pro_link_type, pro_link_value')
+          .eq('user_id', user.id)
+          .not('pro_link_type', 'is', null)
+          .in('id', taskIds);
+
+        if (tasks) {
+          for (const task of tasks) {
+            if (task.pro_link_type) {
+              completedKeys.add(task.pro_link_type);
+              if (task.pro_link_value) {
+                completedKeys.add(`${task.pro_link_type}:${task.pro_link_value}`);
+              }
+            }
           }
         }
       }
@@ -68,7 +142,6 @@ export function isShortcutCompletedToday(
   value: string | null
 ): boolean {
   if (!completedKeys) return false;
-  // Check specific match first (type:value), then generic (type)
   if (value && completedKeys.has(`${type}:${value}`)) return true;
   return completedKeys.has(type);
 }
