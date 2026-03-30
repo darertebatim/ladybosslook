@@ -112,7 +112,7 @@ export default function AppFreeFormReflection() {
         </button>
         <button
           onClick={() => saveMutation.mutate()}
-          disabled={saveMutation.isPending || !title.trim()}
+          disabled={saveMutation.isPending || (!title.trim() && !contentForSave)}
           className="px-5 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold active:scale-95 transition-transform disabled:opacity-40"
         >
           Done
