@@ -293,7 +293,7 @@ function ShortcutSlot({
 
   return (
     <button
-      className="flex flex-col items-center w-[calc((100%-36px)/4)] shrink-0 active:scale-95 transition-transform"
+      className="flex flex-col items-center active:scale-95 transition-transform"
       onPointerDown={(e) => handlePressStart(e.pointerType, e.button)}
       onPointerUp={(e) => handlePressEnd(true, e.pointerType, e.button)}
       onPointerCancel={() => handlePressEnd(false)}
