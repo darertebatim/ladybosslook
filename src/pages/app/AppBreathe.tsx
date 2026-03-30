@@ -14,6 +14,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { BreatheTour, TourHelpButton } from '@/components/app/tour';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
+import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
+import { useExistingProTask } from '@/hooks/usePlaylistRoutine';
+import { useRoutinePlan, useAddRoutinePlan } from '@/hooks/useRoutinePlans';
+import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
+import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
+import { toast } from 'sonner';
 
 export default function AppBreathe() {
   const navigate = useNavigate();
