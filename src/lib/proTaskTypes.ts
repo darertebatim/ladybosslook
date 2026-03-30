@@ -60,7 +60,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
   },
   journal: {
     value: 'journal',
-    label: 'Journal Writing',
+    label: 'Reflections Journal',
     icon: BookOpen,
     badgeText: 'Write',
     color: 'purple',
