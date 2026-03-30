@@ -358,6 +358,8 @@ export function ToolShortcuts({ hideWhenEmpty = false }: { hideWhenEmpty?: boole
   const hasAny = shortcuts.some(s => s !== null);
   const filteredPlaylists = playlists.filter(p => p.name.toLowerCase().includes(playlistSearchQuery.toLowerCase()));
 
+  if (hideWhenEmpty && !hasAny) return null;
+
   return (
     <section>
       <div className="flex items-center justify-between mb-2 px-1">
