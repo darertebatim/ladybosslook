@@ -105,6 +105,7 @@ export default function AppReflectionNotes() {
           cover: null,
           completed_at: ff.created_at,
           preview: ff.content || null,
+          mood: ff.mood || null,
         });
       }
 
