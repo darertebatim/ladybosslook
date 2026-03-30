@@ -53,7 +53,7 @@ export default function AppFreeFormReflection() {
       const finalTitle = title.trim() || `Reflection`;
       const { error } = await supabase
         .from('free_form_reflections' as any)
-        .insert({ user_id: user.id, title: title.trim(), content: contentForSave } as any);
+        .insert({ user_id: user.id, title: finalTitle, content: contentForSave } as any);
       if (error) throw error;
     },
     onSuccess: () => {
