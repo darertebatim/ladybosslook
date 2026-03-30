@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { wellnessTools, audioTools } from '@/lib/toolsConfig';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { getProLinkEmoji } from '@/lib/proLinkPresentation';
 
 const QUICK_TOOLS = [
   ...wellnessTools.filter(t => !t.comingSoon && !t.hidden),
@@ -109,53 +110,51 @@ export function ProLinkPicker({
                 className="pl-9 h-9 rounded-xl bg-muted/50 border-0 text-sm"
               />
             </div>
-
-            {/* Quick Tools horizontal scroll */}
-            {!searchQuery && (
-              <div className="flex gap-3 overflow-x-auto px-5 pb-3 scrollbar-hide">
-                {QUICK_TOOLS.map((tool) => (
-                  <button
-                    key={tool.id}
-                    onClick={() => {
-                      // Map tool route to closest pro link type
-                      const mapping: Record<string, ProLinkType> = {
-                        '/app/tasksbank': 'tasksbank',
-                        '/app/routines': 'inspire',
-                        '/app/reflections': 'journal',
-                        '/app/breathe': 'breathe',
-                        '/app/timer': 'focus_timer',
-                        '/app/routineplayer': 'routine',
-                        '/app/mood': 'mood',
-                        '/app/emotion': 'emotion',
-                        '/app/water': 'water',
-                        '/app/fasting': 'fasting',
-                        '/app/period': 'period',
-                        '/app/presence': 'presence',
-                        '/app/player': 'listen',
-                        '/app/watch': 'watch',
-                        '/app/meditate': 'listen',
-                        '/app/soundscape': 'listen',
-                      };
-                      const proType = mapping[tool.route];
-                      if (proType) onSelect(proType);
-                    }}
-                    className="flex flex-col items-center gap-1 shrink-0 active:scale-95 transition-transform"
-                  >
-                    <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center', tool.bgColor)}>
-                      {tool.emoji ? (
-                        <FluentEmoji emoji={tool.emoji} size={28} />
-                      ) : (
-                        <span className="text-lg">📱</span>
-                      )}
-                    </div>
-                    <span className="text-[9px] font-medium text-foreground max-w-[52px] text-center leading-tight line-clamp-1">
-                      {tool.name}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
+
+          {!searchQuery && (
+            <div className="flex gap-3 overflow-x-auto px-5 pb-3 scrollbar-hide">
+              {QUICK_TOOLS.map((tool) => (
+                <button
+                  key={tool.id}
+                  onClick={() => {
+                    const mapping: Record<string, ProLinkType> = {
+                      '/app/tasksbank': 'tasksbank',
+                      '/app/routines': 'inspire',
+                      '/app/reflections': 'journal',
+                      '/app/breathe': 'breathe',
+                      '/app/timer': 'focus_timer',
+                      '/app/routineplayer': 'routine',
+                      '/app/mood': 'mood',
+                      '/app/emotion': 'emotion',
+                      '/app/water': 'water',
+                      '/app/fasting': 'fasting',
+                      '/app/period': 'period',
+                      '/app/presence': 'presence',
+                      '/app/player': 'listen',
+                      '/app/watch': 'watch',
+                      '/app/meditate': 'listen',
+                      '/app/soundscape': 'listen',
+                    };
+                    const proType = mapping[tool.route];
+                    if (proType) onSelect(proType);
+                  }}
+                  className="flex flex-col items-center gap-1 shrink-0 active:scale-95 transition-transform"
+                >
+                  <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center', tool.bgColor)}>
+                    {tool.emoji ? (
+                      <FluentEmoji emoji={tool.emoji} size={28} />
+                    ) : (
+                      <span className="text-lg">📱</span>
+                    )}
+                  </div>
+                  <span className="text-[9px] font-medium text-foreground max-w-[60px] text-center leading-tight line-clamp-2">
+                    {tool.name}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
 
           <ScrollArea className="flex-1 px-5">
             <div className="pb-6 space-y-5">
@@ -228,8 +227,8 @@ function LinkRow({
   isSelected: boolean;
   onSelect: () => void;
 }) {
-  const Icon = config.icon;
   const hasSub = config.requiresValue;
+  const emoji = getProLinkEmoji(config.value);
 
   return (
     <button
@@ -242,7 +241,7 @@ function LinkRow({
       )}
     >
       <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', config.gradientClass)}>
-        <Icon className={cn('h-4.5 w-4.5', config.iconColorClass)} />
+        <FluentEmoji emoji={emoji} size={22} />
       </div>
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium text-foreground leading-tight">{config.label}</div>
