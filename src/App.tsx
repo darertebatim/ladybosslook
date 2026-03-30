@@ -457,8 +457,8 @@ const App = () => (
                   {/* All /app/* routes wrapped with Audio + Focus player providers */}
                   <Route element={<AppProvidersLayout />}>
                     {/* Full-screen pages - Outside of AppLayout so no tab bar */}
-                    <Route path="/app/journal/new" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
-                    <Route path="/app/journal/:entryId" element={<ProtectedRoute><AppJournalEntry /></ProtectedRoute>} />
+                    <Route path="/app/journal/new" element={<JournalNewRedirect />} />
+                    <Route path="/app/journal/:entryId" element={<JournalEntryRedirect />} />
                     <Route path="/app/home/new" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
                     <Route path="/app/home/edit/:taskId" element={<ProtectedRoute><AppTaskCreate /></ProtectedRoute>} />
                     <Route path="/app/channels/post/:postId" element={<ProtectedRoute><AppFeedPost /></ProtectedRoute>} />
