@@ -173,7 +173,7 @@ export default function AppReflectionNotes() {
                       <img src={item.cover} alt="" className="h-10 w-10 rounded-lg object-cover" />
                     ) : (
                       <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center text-lg">
-                        {item.type === 'free' ? '✍️' : '📝'}
+                        {item.mood ? getMoodEmoji(item.mood) || '✍️' : (item.type === 'free' ? '✍️' : '📝')}
                       </div>
                     )}
                     <div>
