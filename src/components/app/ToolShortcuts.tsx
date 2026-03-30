@@ -373,7 +373,7 @@ export function ToolShortcuts() {
                 <div className="relative w-full aspect-square rounded-2xl flex flex-col items-center justify-center bg-accent/60">
                   <FluentEmoji emoji={getProLinkEmoji(shortcut.type) || shortcut.emoji} size={42} />
                   <span className="text-[9px] font-semibold text-foreground leading-none text-center line-clamp-2 w-full px-1 mt-1">
-                    {shortcut.label}
+                    {PRO_LINK_CONFIGS[shortcut.type]?.label || shortcut.label}
                   </span>
                   {(() => {
                     const isDone = shortcut.type === 'mood'
