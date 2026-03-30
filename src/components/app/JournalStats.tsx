@@ -165,7 +165,7 @@ export const JournalStats = ({ className }: JournalStatsProps) => {
             <Button 
               className="w-full" 
               variant="outline"
-              onClick={() => navigate('/app/journal/new')}
+              onClick={() => navigate('/app/reflections/free-form')}
             >
               <NotebookPen className="h-4 w-4 mr-2" />
               Write Today's Entry

@@ -51,7 +51,7 @@ function getNotificationUrl(proLinkType?: string | null, proLinkValue?: string |
     case 'channel':
       return '/app/channels';
     case 'journal':
-      return '/app/journal';
+      return '/app/reflections';
     case 'inspire':
     case 'routine':
       return '/app/routines';

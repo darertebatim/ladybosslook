@@ -12,8 +12,8 @@ export function QuickActionsGrid() {
     },
     {
       icon: BookOpen,
-      label: 'Journal',
-      to: '/app/journal',
+      label: 'Reflections',
+      to: '/app/reflections',
       bgColor: 'bg-[#FAE5C5]', // peach
       iconColor: 'text-orange-600',
     },

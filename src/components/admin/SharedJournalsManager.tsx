@@ -49,7 +49,7 @@ export function SharedJournalsManager() {
     queryKey: ['shared-journals', searchQuery],
     queryFn: async () => {
       let query = supabase
-        .from('journal_entries')
+        .from('free_form_reflections' as any)
         .select('*')
         .eq('shared_with_admin', true)
         .order('shared_at', { ascending: false });

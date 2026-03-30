@@ -120,9 +120,9 @@ async function fetchHomeData(userId: string): Promise<HomeData> {
       .from('feed_post_reads')
       .select('post_id')
       .eq('user_id', userId),
-    // Journal entries for streak calculation (last 30 days)
+    // Reflections for monthly presence calculation (last 30 days)
     supabase
-      .from('journal_entries')
+      .from('free_form_reflections')
       .select('created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })

@@ -227,7 +227,7 @@ export function useTodayMood() {
           .limit(1)
           .maybeSingle(),
         supabase
-          .from('journal_entries')
+          .from('free_form_reflections')
           .select('id, mood, content, created_at')
           .eq('user_id', user.id)
           .not('mood', 'is', null)

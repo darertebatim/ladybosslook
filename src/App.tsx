@@ -518,7 +518,7 @@ const App = () => (
                       <Route path="channels/:slug" element={<AppChannelDetail />} />
                       {/* Redirect old feed route */}
                       <Route path="feed" element={<Navigate to="/app/channels" replace />} />
-                      <Route path="journal" element={<AppJournal />} />
+                      <Route path="journal" element={<JournalRedirect />} />
                       <Route path="reflections" element={<AppReflections />} />
                       <Route path="reflections/notes" element={<AppReflectionNotes />} />
                       <Route path="routines" element={<AppInspire />} />

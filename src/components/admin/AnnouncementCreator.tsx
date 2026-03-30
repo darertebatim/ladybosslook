@@ -30,7 +30,7 @@ const IN_APP_LINKS = [
   { value: '/app/chat', label: '💬 Support Chat' },
   { value: '/app/myprofile', label: '👤 Profile' },
   { value: '/app/rate', label: '⭐ Rate the App' },
-  { value: '/app/journal', label: '📓 Journal' },
+  { value: '/app/reflections', label: '📓 Reflections' },
   { value: '/app/breathing', label: '🌬️ Breathing' },
   { value: '/app/focus', label: '🎯 Focus Timer' },
   { value: '/app/fasting', label: '⏰ Fasting Tracker' },

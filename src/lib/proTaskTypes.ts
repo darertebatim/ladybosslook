@@ -399,7 +399,7 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
     case 'video_playlist':
       return linkValue ? `/app/watch/playlist/${linkValue}` : '/app/watch';
     case 'journal':
-      return '/app/journal/new';
+      return '/app/reflections/free-form';
     case 'breathe':
       return linkValue ? `/app/breathe?exercise=${linkValue}` : '/app/breathe';
     case 'water':
