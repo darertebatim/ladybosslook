@@ -202,6 +202,12 @@ export default function AppFreeFormReflection() {
             </div>
           ))}
         </div>
+
+        {/* Mood selector */}
+        <div className="mt-6">
+          <p className="text-xs font-medium text-muted-foreground mb-2">How are you feeling?</p>
+          <MoodSelector selectedMood={mood} onMoodSelect={(m) => setMood(m === mood ? null : m)} />
+        </div>
       </div>
     </div>
   );
