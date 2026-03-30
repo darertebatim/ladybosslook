@@ -22,12 +22,12 @@ interface ShortcutData {
   emoji: string;
 }
 
-const STORAGE_KEY = 'tool-shortcuts-v3';
+const STORAGE_KEY = 'tool-shortcuts-v4';
 const MAX_SHORTCUTS = 4;
 const DEFAULT_SHORTCUTS: (ShortcutData | null)[] = [
-  { type: 'journal', value: null, label: 'Reflections', emoji: '📝' },
-  { type: 'breathe', value: null, label: 'Breathe', emoji: '🌬️' },
-  { type: 'mood', value: null, label: 'Mood', emoji: '😊' },
+  { type: 'mood', value: null, label: 'Mood Check-in', emoji: '😊' },
+  { type: 'reflection', value: null, label: 'Reflections Journal', emoji: '✏️' },
+  { type: 'myroutines', value: null, label: 'My Routines', emoji: '🚀' },
   null,
 ];
 
