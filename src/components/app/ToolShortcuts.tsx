@@ -131,7 +131,7 @@ export function ToolShortcuts() {
         )}
       </div>
 
-      <div className="flex gap-3">
+      <div className="grid grid-cols-4 gap-3">
         {shortcuts.map((toolId, i) => {
           if (toolId) {
             const tool = TOOL_MAP[toolId];
@@ -142,13 +142,13 @@ export function ToolShortcuts() {
                 onTap={() => handleSlotTap(i)}
                 onLongPress={() => handleLongPress(i)}
               >
-                <div className={cn('w-16 h-16 rounded-2xl flex flex-col items-center justify-center shadow-sm', tool.bgColor)}>
+                <div className={cn('w-full aspect-square rounded-2xl flex flex-col items-center justify-center shadow-sm', tool.bgColor)}>
                   {tool.emoji ? (
-                    <FluentEmoji emoji={tool.emoji} size={40} />
+                    <FluentEmoji emoji={tool.emoji} size={48} />
                   ) : (
-                    <span className="text-2xl">📱</span>
+                    <span className="text-3xl">📱</span>
                   )}
-                  <span className="text-[7px] font-semibold text-foreground/80 leading-none text-center line-clamp-1 w-full px-0.5">
+                  <span className="text-[8px] font-semibold text-foreground/80 leading-none text-center line-clamp-1 w-full px-1 mt-0.5">
                     {tool.name}
                   </span>
                 </div>
@@ -158,8 +158,8 @@ export function ToolShortcuts() {
 
           return (
             <ShortcutSlot key={i} onTap={() => handleSlotTap(i)}>
-              <div className="w-16 h-16 rounded-2xl bg-muted/60 border-2 border-dashed border-border/50 flex items-center justify-center">
-                <Plus className="h-5 w-5 text-muted-foreground/60" />
+              <div className="w-full aspect-square rounded-2xl bg-muted/60 border-2 border-dashed border-border/50 flex items-center justify-center">
+                <Plus className="h-6 w-6 text-muted-foreground/60" />
               </div>
               <span className="text-[10px] text-muted-foreground/50 mt-1">Add</span>
             </ShortcutSlot>
