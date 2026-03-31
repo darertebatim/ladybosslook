@@ -125,10 +125,14 @@ const AppStore = () => {
   const { data: routinesBankData } = useRoutinesBank();
   const { data: taskTemplatesData } = useTaskTemplates();
 
-  const popularRoutines = useMemo(() => {
-    if (!routinesBankData) return [];
-    return routinesBankData.filter(r => r.is_popular).slice(0, 8);
-  }, [routinesBankData]);
+  const { data: featuredRoutines = [] } = useFeaturedRoutinesBank();
+
+  const displayRoutines = useMemo(() => {
+    if (!routinesBankData) return featuredRoutines;
+    const featuredIds = new Set(featuredRoutines.map(r => r.id));
+    const popular = routinesBankData.filter(r => r.is_popular && !featuredIds.has(r.id));
+    return [...featuredRoutines, ...popular].slice(0, 10);
+  }, [routinesBankData, featuredRoutines]);
 
   const popularTasks = useMemo(() => {
     if (!taskTemplatesData) return [];
