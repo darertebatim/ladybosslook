@@ -19,6 +19,8 @@ import { useQuery } from '@tanstack/react-query';
 import { CachedImage } from '@/components/ui/CachedImage';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
+import { useRoutinesBank } from '@/hooks/useRoutinesBank';
+import { useTaskTemplates } from '@/hooks/useTaskPlanner';
 
 const AppStore = () => {
   const navigate = useNavigate();
@@ -117,6 +119,20 @@ const AppStore = () => {
 
   const meditatePlaylists = useMemo(() => audioPlaylists?.filter(p => p.category === 'meditate') || [], [audioPlaylists]);
   const soundscapePlaylists = useMemo(() => audioPlaylists?.filter(p => p.category === 'soundscape') || [], [audioPlaylists]);
+
+  // Fetch routines bank and task templates for explore sections
+  const { data: routinesBankData } = useRoutinesBank();
+  const { data: taskTemplatesData } = useTaskTemplates();
+
+  const popularRoutines = useMemo(() => {
+    if (!routinesBankData) return [];
+    return routinesBankData.filter(r => r.is_popular).slice(0, 8);
+  }, [routinesBankData]);
+
+  const popularTasks = useMemo(() => {
+    if (!taskTemplatesData) return [];
+    return taskTemplatesData.filter(t => t.is_popular).slice(0, 8);
+  }, [taskTemplatesData]);
 
   // Filter tools by search
   const filteredWellnessTools = useMemo(() => {
@@ -438,8 +454,67 @@ const AppStore = () => {
             )}
 
 
+            {/* Routines Templates Section */}
+            {!searchQuery && popularRoutines.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h2 className="text-sm font-semibold text-foreground">Routines Templates</h2>
+                  <Link to="/app/routines" className="text-xs text-primary font-medium flex items-center gap-0.5">
+                    All <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                  {popularRoutines.map((r) => (
+                    <button
+                      key={r.id}
+                      onClick={() => navigate(`/app/routines/${r.id}`, { state: { from: location.pathname } })}
+                      className="shrink-0 w-[140px] flex items-center gap-2 py-2 text-left transition-transform active:scale-[0.97] bg-accent/60 rounded-xl px-2 border border-border/40"
+                    >
+                      {r.cover_image_url ? (
+                        <CachedImage src={r.cover_image_url} alt={r.title} className="h-10 w-10 rounded-lg object-cover shrink-0" />
+                      ) : (
+                        <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                          <FluentEmoji emoji={r.emoji || '🚀'} size={22} />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-xs leading-tight line-clamp-2">{r.title}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
 
-            {/* Meditate Section */}
+            {/* Self-Care Habits Section */}
+            {!searchQuery && popularTasks.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h2 className="text-sm font-semibold text-foreground">Self-Care Habits</h2>
+                  <Link to="/app/tasksbank" className="text-xs text-primary font-medium flex items-center gap-0.5">
+                    All <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                  {popularTasks.map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => navigate(`/app/tasksbank`, { state: { from: location.pathname } })}
+                      className="shrink-0 w-[140px] flex items-center gap-2 py-2 text-left transition-transform active:scale-[0.97] bg-accent/60 rounded-xl px-2 border border-border/40"
+                    >
+                      <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                        <FluentEmoji emoji={t.emoji || '🌿'} size={22} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-xs leading-tight line-clamp-2">{t.title}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
+
+
             {!searchQuery && meditatePlaylists.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
