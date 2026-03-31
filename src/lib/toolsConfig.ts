@@ -23,16 +23,6 @@ export const wellnessTools: ToolConfig[] = [
     description: 'Self-care habits',
   },
   {
-    id: 'projects',
-    name: 'Projects',
-    icon: 'FolderKanban',
-    emoji: '📁',
-    bgColor: 'bg-[#FFF3D6]',
-    iconColor: 'text-amber-600',
-    route: '/app/projects',
-    description: 'Organize task projects',
-  },
-  {
     id: 'routines',
     name: 'Routines Templates',
     icon: 'CalendarPlus',
@@ -61,6 +51,16 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-teal-600',
     route: '/app/breathe',
     description: 'Breathing exercises',
+  },
+  {
+    id: 'projects',
+    name: 'Projects',
+    icon: 'FolderKanban',
+    emoji: '📁',
+    bgColor: 'bg-[#FFF3D6]',
+    iconColor: 'text-amber-600',
+    route: '/app/projects',
+    description: 'Organize task projects',
   },
   {
     id: 'focus-timer',
