@@ -135,6 +135,7 @@ export function ProLinkPicker({
                       '/app/watch': 'watch',
                       '/app/meditate': 'listen',
                       '/app/soundscape': 'listen',
+                      '/app/projects': 'projects',
                     };
                     const proType = mapping[tool.route];
                     if (proType) onSelect(proType);
