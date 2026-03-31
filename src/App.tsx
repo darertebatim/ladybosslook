@@ -120,6 +120,7 @@ const BrandDesign = lazy(() => import("@/pages/admin/BrandDesign"));
 const BrandMock = lazy(() => import("@/pages/admin/BrandMock"));
 const Onboarding = lazy(() => import("@/pages/admin/Onboarding"));
 const Banners = lazy(() => import("@/pages/admin/Banners"));
+const Documents = lazy(() => import("@/pages/admin/Documents"));
 
 
 // Lazy load marketing/landing pages
