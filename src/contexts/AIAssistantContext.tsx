@@ -1,5 +1,7 @@
-import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Message {
   id: string;
@@ -21,39 +23,71 @@ interface AIAssistantContextType {
 
 const AIAssistantContext = createContext<AIAssistantContextType | null>(null);
 
-const STORAGE_KEY = 'ai-assistant-messages';
-
-function loadMessages(): Message[] {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveMessages(messages: Message[]) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-  } catch {
-    // Storage full or unavailable
-  }
-}
-
 export function AIAssistantProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>(loadMessages);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
+  const { user } = useAuth();
+  const saveQueue = useRef<Array<{ id: string; role: string; content: string }>>([]);
+  const isSaving = useRef(false);
 
   const currentPage = location.pathname.split('/').pop() || 'overview';
 
-  // Persist messages to localStorage whenever they change
+  // Load messages from Supabase on mount / user change
   useEffect(() => {
-    saveMessages(messages);
-  }, [messages]);
+    if (!user?.id) {
+      setMessages([]);
+      return;
+    }
 
-  // Cmd+J / Ctrl+J keyboard shortcut to toggle panel
+    const load = async () => {
+      const { data, error } = await (supabase as any)
+        .from('admin_ai_chat_messages')
+        .select('id, role, content')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true });
+
+      if (!error && data) {
+        setMessages(data as Message[]);
+      }
+    };
+
+    load();
+  }, [user?.id]);
+
+  // Flush save queue sequentially
+  const flushQueue = useCallback(async () => {
+    if (isSaving.current || saveQueue.current.length === 0 || !user?.id) return;
+    isSaving.current = true;
+
+    while (saveQueue.current.length > 0) {
+      const item = saveQueue.current[0];
+      const { error } = await (supabase as any)
+        .from('admin_ai_chat_messages')
+        .upsert({ id: item.id, user_id: user.id, role: item.role, content: item.content }, { onConflict: 'id' });
+
+      if (error) {
+        console.error('[AIAssistant] save error:', error.message);
+      }
+      saveQueue.current.shift();
+    }
+
+    isSaving.current = false;
+  }, [user?.id]);
+
+  const enqueueSave = useCallback((msg: { id: string; role: string; content: string }) => {
+    // Replace existing entry for same id (streaming updates)
+    const idx = saveQueue.current.findIndex(q => q.id === msg.id);
+    if (idx >= 0) {
+      saveQueue.current[idx] = msg;
+    } else {
+      saveQueue.current.push(msg);
+    }
+    flushQueue();
+  }, [flushQueue]);
+
+  // Cmd+J / Ctrl+J keyboard shortcut
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'j') {
@@ -67,20 +101,33 @@ export function AIAssistantProvider({ children }: { children: ReactNode }) {
 
   const addMessage = useCallback((message: Omit<Message, 'id'>): string => {
     const id = crypto.randomUUID();
-    setMessages(prev => [...prev, { ...message, id }]);
+    const newMsg = { ...message, id };
+    setMessages(prev => [...prev, newMsg]);
+    enqueueSave({ id, role: message.role, content: message.content });
     return id;
-  }, []);
+  }, [enqueueSave]);
 
   const updateMessage = useCallback((id: string, updates: Partial<Omit<Message, 'id'>>) => {
-    setMessages(prev => prev.map(msg => 
-      msg.id === id ? { ...msg, ...updates } : msg
-    ));
-  }, []);
+    setMessages(prev => {
+      const updated = prev.map(msg => msg.id === id ? { ...msg, ...updates } : msg);
+      const msg = updated.find(m => m.id === id);
+      if (msg) {
+        enqueueSave({ id: msg.id, role: msg.role, content: msg.content });
+      }
+      return updated;
+    });
+  }, [enqueueSave]);
 
-  const clearMessages = useCallback(() => {
+  const clearMessages = useCallback(async () => {
     setMessages([]);
-    localStorage.removeItem(STORAGE_KEY);
-  }, []);
+    saveQueue.current = [];
+    if (user?.id) {
+      await (supabase as any)
+        .from('admin_ai_chat_messages')
+        .delete()
+        .eq('user_id', user.id);
+    }
+  }, [user?.id]);
 
   return (
     <AIAssistantContext.Provider
