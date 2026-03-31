@@ -251,7 +251,7 @@ export default function AppTasksBank() {
               </button>
             )}
             <button
-              onClick={() => navigate('/app/tasksbank/drafts')}
+              onClick={() => navigate('/app/projects')}
               className="p-2 rounded-full active:bg-muted/50 transition-colors"
               aria-label="Task Drafts"
             >
