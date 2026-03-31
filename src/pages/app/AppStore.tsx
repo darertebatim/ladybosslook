@@ -471,26 +471,11 @@ const AppStore = () => {
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
+                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4" style={{ WebkitOverflowScrolling: 'touch' }}>
                   {popularRoutines.map((r) => (
-                    <button
-                      key={r.id}
-                      onClick={() => navigate(`/app/routines/${r.id}`, { state: { from: location.pathname } })}
-                      className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
-                    >
-                      <div className="relative h-32 w-32 overflow-visible mb-1.5">
-                        <div className="h-full w-full rounded-2xl overflow-hidden bg-muted shadow-lg">
-                          {r.cover_image_url ? (
-                            <CachedImage src={r.cover_image_url} alt={r.title} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-primary/10">
-                              <FluentEmoji emoji={r.emoji || '🚀'} size={36} />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-xs font-medium line-clamp-2 leading-tight">{r.title}</p>
-                    </button>
+                    <div key={r.id} className="shrink-0 w-[85%] snap-start">
+                      <FeaturedRoutineCard routine={r} categoryName={categoryNameMap.get(r.category)} />
+                    </div>
                   ))}
                 </div>
               </section>
