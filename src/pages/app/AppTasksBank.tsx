@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, X } from 'lucide-react';
+import { ArrowLeft, Search, X, StickyNote } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
@@ -250,6 +250,13 @@ export default function AppTasksBank() {
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
             )}
+            <button
+              onClick={() => navigate('/app/tasksbank/drafts')}
+              className="p-2 rounded-full active:bg-muted/50 transition-colors"
+              aria-label="Task Drafts"
+            >
+              <StickyNote className="w-5 h-5 text-muted-foreground" />
+            </button>
             <button
               onClick={() => setShowSearch(!showSearch)}
               className="p-2 rounded-full active:bg-muted/50 transition-colors"
