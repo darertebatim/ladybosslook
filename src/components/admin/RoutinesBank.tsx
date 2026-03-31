@@ -202,6 +202,7 @@ export default function RoutinesBank() {
     end_after_days: null as number | null,
     badge_image_url: '',
     is_focus: false,
+    is_moment: false,
     linked_program_slug: null as string | null,
   });
   const [localSections, setLocalSections] = useState<LocalSection[]>([]);
@@ -305,11 +306,12 @@ export default function RoutinesBank() {
           end_date: data.formData.end_mode === 'date' && data.formData.end_date ? data.formData.end_date.toISOString().split('T')[0] : null,
            end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
            badge_image_url: data.formData.badge_image_url || null,
-           is_focus: data.formData.is_focus,
-           linked_program_slug: data.formData.schedule_type === 'program' ? data.formData.linked_program_slug : null,
-        } as any)
-        .select()
-        .single();
+            is_focus: data.formData.is_focus,
+            is_moment: data.formData.is_moment,
+            linked_program_slug: data.formData.schedule_type === 'program' ? data.formData.linked_program_slug : null,
+         } as any)
+         .select()
+         .single();
       if (error) throw error;
 
       // Create sections and build id mapping
@@ -385,10 +387,11 @@ export default function RoutinesBank() {
           end_date: data.formData.end_mode === 'date' && data.formData.end_date ? data.formData.end_date.toISOString().split('T')[0] : null,
            end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
            badge_image_url: data.formData.badge_image_url || null,
-           is_focus: data.formData.is_focus,
-           linked_program_slug: data.formData.schedule_type === 'program' ? data.formData.linked_program_slug : null,
-        } as any)
-        .eq('id', data.id);
+            is_focus: data.formData.is_focus,
+            is_moment: data.formData.is_moment,
+            linked_program_slug: data.formData.schedule_type === 'program' ? data.formData.linked_program_slug : null,
+         } as any)
+         .eq('id', data.id);
       if (error) throw error;
 
       // Delete old sections and tasks
@@ -613,6 +616,7 @@ export default function RoutinesBank() {
       end_after_days: null,
       badge_image_url: '',
       is_focus: false,
+      is_moment: false,
       linked_program_slug: null,
     });
     setLocalSections([]);
@@ -642,6 +646,7 @@ export default function RoutinesBank() {
       end_after_days: (routine as any).end_after_days ?? null,
       badge_image_url: (routine as any).badge_image_url || '',
       is_focus: (routine as any).is_focus ?? false,
+      is_moment: (routine as any).is_moment ?? false,
       linked_program_slug: (routine as any).linked_program_slug ?? null,
     });
     const { sections, tasks } = await fetchRoutineData(routine.id);
@@ -1814,6 +1819,18 @@ export default function RoutinesBank() {
                     <Switch
                       checked={formData.is_focus}
                       onCheckedChange={(checked) => setFormData({ ...formData, is_focus: checked })}
+                    />
+                  </div>
+
+                  {/* Moment Toggle */}
+                  <div className="flex items-center justify-between border-t pt-4">
+                    <div>
+                      <Label className="text-xs font-medium">✨ Moment</Label>
+                      <p className="text-xs text-muted-foreground">User can play once without adding to planner</p>
+                    </div>
+                    <Switch
+                      checked={formData.is_moment}
+                      onCheckedChange={(checked) => setFormData({ ...formData, is_moment: checked })}
                     />
                   </div>
 

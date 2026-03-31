@@ -112,6 +112,7 @@ export default function AppInspireDetail() {
   const isProject = (routine as any)?.schedule_type === 'project';
   const isProgram = (routine as any)?.schedule_type === 'program';
   const isFocus = (routine as any)?.is_focus === true;
+  const isMoment = (routine as any)?.is_moment === true;
   const userChallenge = useMemo(() => {
     if (!planId || !isChallenge) return null;
     return userChallenges.find(c => c.routineId === planId) || null;
@@ -634,12 +635,41 @@ export default function AppInspireDetail() {
       {/* Animated hand hint for new users — outside footer so fixed positioning works */}
       <AddToRoutineHandHint show={showHint && !isAdded} />
 
-      {/* Sticky Footer: Play button (for focus routines already added) OR Add button */}
+      {/* Sticky Footer: Play button (for focus routines already added), Moment play-once, OR Add button */}
       <div 
         className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}
       >
-        {isFocus && isAdded && routine?.tasks?.length ? (
+        {isMoment && routine?.tasks?.length ? (
+          <div className="flex gap-3">
+            <Button
+              onClick={() => {
+                haptic.medium();
+                const bankTasks = routine.tasks || [];
+                startRoutine({
+                  routineId: planId || `moment-${routine.title}`,
+                  routineTitle: routine.title,
+                  routineEmoji: routine.emoji || '✨',
+                  tasks: bankTasks.map((t: RoutineBankTask) => ({
+                    id: t.id,
+                    title: t.title,
+                    emoji: t.emoji || '📝',
+                    targetSeconds: t.duration_minutes ? t.duration_minutes * 60 : 60,
+                    color: t.color || undefined,
+                    proLinkType: t.pro_link_type || undefined,
+                    proLinkValue: t.pro_link_value || undefined,
+                    hasTimerGoal: true,
+                    isEstimate: !t.duration_minutes,
+                  })),
+                });
+              }}
+              className="flex-1 h-12 rounded-xl text-base font-semibold gap-2"
+            >
+              <Play className="w-5 h-5" />
+              Moment
+            </Button>
+          </div>
+        ) : isFocus && isAdded && routine?.tasks?.length ? (
           <div className="flex gap-3">
             <Button
               onClick={async () => {
