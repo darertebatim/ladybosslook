@@ -19,7 +19,8 @@ import { useQuery } from '@tanstack/react-query';
 import { CachedImage } from '@/components/ui/CachedImage';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
-import { useRoutinesBank } from '@/hooks/useRoutinesBank';
+import { useRoutinesBank, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
+import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 import { useTaskTemplates } from '@/hooks/useTaskPlanner';
 
 const AppStore = () => {
