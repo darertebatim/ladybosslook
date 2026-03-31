@@ -114,8 +114,9 @@ export default function Documents() {
     const { data: urlData } = supabase.storage.from('admin-documents').getPublicUrl(filePath);
 
     let extractedText: string | null = null;
-    if (file.type === 'text/plain') extractedText = await file.text();
-    if (file.type === 'application/pdf' && session) {
+    if (file.type === 'text/plain') {
+      extractedText = await file.text();
+    } else if (session) {
       try {
         const formData = new FormData();
         formData.append('file', file);
