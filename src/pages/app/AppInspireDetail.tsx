@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Loader2, Share2, Instagram, Play, Heart } from 'lucide-react';
+import { Loader2, Share2, Instagram, Play, Heart, CalendarPlus } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
@@ -667,6 +667,16 @@ export default function AppInspireDetail() {
             >
               <Play className="w-5 h-5" />
               Moment
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                dismissHint();
+                handleAddClick();
+              }}
+              className="h-12 w-12 rounded-xl p-0 shrink-0"
+            >
+              <CalendarPlus className="w-5 h-5" />
             </Button>
           </div>
         ) : isFocus && isAdded && routine?.tasks?.length ? (
