@@ -668,6 +668,16 @@ export default function AppInspireDetail() {
               <Play className="w-5 h-5" />
               Moment
             </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                dismissHint();
+                handleAddClick();
+              }}
+              className="h-12 w-12 rounded-xl p-0 shrink-0"
+            >
+              <CalendarPlus className="w-5 h-5" />
+            </Button>
           </div>
         ) : isFocus && isAdded && routine?.tasks?.length ? (
           <div className="flex gap-3">
