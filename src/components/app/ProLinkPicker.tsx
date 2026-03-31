@@ -36,7 +36,7 @@ const CATEGORIES: CategoryGroup[] = [
   {
     id: 'routines',
     label: 'Routines & Programs',
-    links: ['myroutines', 'routine', 'tasksbank', 'inspire', 'program', 'myprograms'],
+    links: ['myroutines', 'routine', 'tasksbank', 'projects', 'inspire', 'program', 'myprograms'],
   },
   {
     id: 'nav',
@@ -135,6 +135,7 @@ export function ProLinkPicker({
                       '/app/watch': 'watch',
                       '/app/meditate': 'listen',
                       '/app/soundscape': 'listen',
+                      '/app/projects': 'projects',
                     };
                     const proType = mapping[tool.route];
                     if (proType) onSelect(proType);
