@@ -168,7 +168,8 @@ export function useSendDraftToPlanner() {
           emoji: '📝',
           color: 'sky',
           scheduled_date: format(date, 'yyyy-MM-dd'),
-          repeat_pattern: 'once',
+          repeat_pattern: 'none',
+          is_active: true,
         });
       if (taskError) throw taskError;
       // Mark draft item as sent
