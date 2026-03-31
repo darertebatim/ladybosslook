@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { FileText, Upload, Trash2, Download, Loader2, Search, Eye, FolderInput } from 'lucide-react';
+import { FileText, Upload, Trash2, Download, Loader2, Search, Eye, FolderInput, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -44,6 +44,61 @@ export default function Documents() {
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [moveDialogDoc, setMoveDialogDoc] = useState<AdminDocument | null>(null);
   const [moveFolderId, setMoveFolderId] = useState<string>('none');
+  const [reExtractingId, setReExtractingId] = useState<string | null>(null);
+  const [bulkExtracting, setBulkExtracting] = useState(false);
+
+  const reExtractDocument = async (docId: string) => {
+    setReExtractingId(docId);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { toast.error('Please log in'); return; }
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-document-text`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ document_id: docId }),
+        }
+      );
+      if (!response.ok) throw new Error('Extraction failed');
+      const result = await response.json();
+      if (result.text) {
+        toast.success('Text extracted successfully');
+        queryClient.invalidateQueries({ queryKey: ['admin-documents'] });
+      } else {
+        toast.error(result.error || 'No text could be extracted');
+      }
+    } catch { toast.error('Failed to extract text'); }
+    finally { setReExtractingId(null); }
+  };
+
+  const bulkReExtract = async () => {
+    const unindexed = documents.filter(d => !d.extracted_text);
+    if (unindexed.length === 0) { toast.info('All documents are already indexed'); return; }
+    setBulkExtracting(true);
+    let success = 0, failed = 0;
+    for (const doc of unindexed) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) break;
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-document-text`,
+          {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ document_id: doc.id }),
+          }
+        );
+        if (response.ok) {
+          const result = await response.json();
+          if (result.text) success++; else failed++;
+        } else failed++;
+      } catch { failed++; }
+    }
+    queryClient.invalidateQueries({ queryKey: ['admin-documents'] });
+    toast.success(`Indexed ${success} documents${failed > 0 ? `, ${failed} failed` : ''}`);
+    setBulkExtracting(false);
+  };
 
   const { data: documents = [], isLoading } = useQuery({
     queryKey: ['admin-documents'],
@@ -114,8 +169,9 @@ export default function Documents() {
     const { data: urlData } = supabase.storage.from('admin-documents').getPublicUrl(filePath);
 
     let extractedText: string | null = null;
-    if (file.type === 'text/plain') extractedText = await file.text();
-    if (file.type === 'application/pdf' && session) {
+    if (file.type === 'text/plain') {
+      extractedText = await file.text();
+    } else if (session) {
       try {
         const formData = new FormData();
         formData.append('file', file);
@@ -241,9 +297,16 @@ export default function Documents() {
         />
 
         <div className="flex-1 space-y-4">
-          <div className="relative max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search documents..." className="pl-9" />
+          <div className="flex items-center gap-2">
+            <div className="relative max-w-sm flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search documents..." className="pl-9" />
+            </div>
+            {documents.some(d => !d.extracted_text) && (
+              <Button variant="outline" size="sm" onClick={bulkReExtract} disabled={bulkExtracting}>
+                {bulkExtracting ? <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Indexing...</> : <><RefreshCw className="h-4 w-4 mr-1" /> Index All for AI</>}
+              </Button>
+            )}
           </div>
 
           {isLoading ? (
@@ -271,7 +334,13 @@ export default function Documents() {
                       {doc.description && <p className="text-xs text-muted-foreground mt-1 truncate">{doc.description}</p>}
                     </div>
                     <div className="flex items-center gap-1">
-                      {doc.extracted_text && <Badge variant="secondary" className="text-xs">AI indexed</Badge>}
+                      {doc.extracted_text ? (
+                        <Badge variant="secondary" className="text-xs">AI indexed</Badge>
+                      ) : (
+                        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => reExtractDocument(doc.id)} disabled={reExtractingId === doc.id}>
+                          {reExtractingId === doc.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <><RefreshCw className="h-3 w-3 mr-1" /> Index</>}
+                        </Button>
+                      )}
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setMoveDialogDoc(doc)} title="Move to folder">
                         <FolderInput className="h-4 w-4" />
                       </Button>
