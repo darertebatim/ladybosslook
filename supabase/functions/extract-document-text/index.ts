@@ -1,10 +1,38 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import JSZip from "https://esm.sh/jszip@3.10.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+async function extractDocxText(file: File): Promise<string | null> {
+  try {
+    const zip = await JSZip.loadAsync(await file.arrayBuffer());
+    const documentXmlFile = zip.file("word/document.xml");
+    if (!documentXmlFile) return null;
+
+    const documentXml = await documentXmlFile.async("text");
+    const xml = new DOMParser().parseFromString(documentXml, "application/xml");
+    if (xml.querySelector("parsererror")) return null;
+
+    const paragraphs = Array.from(xml.getElementsByTagName("w:p"));
+    const lines = paragraphs
+      .map((paragraph) =>
+        Array.from(paragraph.getElementsByTagName("w:t"))
+          .map((node) => node.textContent || "")
+          .join("")
+          .trim(),
+      )
+      .filter(Boolean);
+
+    return lines.length > 0 ? lines.join("\n") : null;
+  } catch (error) {
+    console.error("DOCX extraction error:", error);
+    return null;
+  }
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -121,24 +149,13 @@ serve(async (req) => {
       });
     }
 
-    // Determine MIME type for the AI request
     const mimeType = file.type || "application/octet-stream";
-    const isSupported = 
-      mimeType === "application/pdf" ||
+    const lowerName = file.name.toLowerCase();
+    const isDocx =
       mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-      mimeType === "application/msword" ||
-      mimeType === "text/plain" ||
-      mimeType.startsWith("image/") ||
-      mimeType === "application/vnd.apple.pages";
+      lowerName.endsWith(".docx");
 
-    if (!isSupported) {
-      return new Response(JSON.stringify({ text: null, error: `Unsupported file type: ${mimeType}` }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // For plain text, just read directly
+    // Fast local extract paths
     if (mimeType === "text/plain") {
       const text = await file.text();
       if (documentId) {
@@ -149,7 +166,25 @@ serve(async (req) => {
       });
     }
 
-    // Read file as base64 for the AI to process
+    if (isDocx) {
+      const text = await extractDocxText(file);
+      if (documentId && text) {
+        await supabase.from("admin_documents").update({ extracted_text: text }).eq("id", documentId);
+      }
+      return new Response(JSON.stringify({ text, error: text ? null : "DOCX extraction failed" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // AI fallback for PDF and image-based docs
+    const canUseAi = mimeType === "application/pdf" || mimeType.startsWith("image/") || mimeType === "application/vnd.apple.pages";
+    if (!canUseAi) {
+      return new Response(JSON.stringify({ text: null, error: `Unsupported file type: ${mimeType}` }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const arrayBuffer = await file.arrayBuffer();
     const uint8Array = new Uint8Array(arrayBuffer);
     let base64 = "";
@@ -159,7 +194,6 @@ serve(async (req) => {
     }
     base64 = btoa(base64);
 
-    // Use Gemini to extract text from the document
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -171,23 +205,23 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are a document text extractor. Extract ALL text content from the provided document. Return ONLY the extracted text, preserving structure and formatting. Do not add commentary or explanations. If the text is in Farsi/Persian, preserve it exactly as-is."
+            content: "You are a document text extractor. Extract ALL text content from the provided document. Return ONLY the extracted text, preserving structure and formatting. Do not add commentary or explanations. If the text is in Farsi/Persian, preserve it exactly as-is.",
           },
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: `Extract all text from this ${file.name} document:`
+                text: `Extract all text from this ${file.name} document:`,
               },
               {
                 type: "image_url",
                 image_url: {
-                  url: `data:${mimeType};base64,${base64}`
-                }
-              }
-            ]
-          }
+                  url: `data:${mimeType};base64,${base64}`,
+                },
+              },
+            ],
+          },
         ],
       }),
     });
@@ -204,7 +238,6 @@ serve(async (req) => {
     const aiData = await aiResponse.json();
     const extractedText = aiData.choices?.[0]?.message?.content || null;
 
-    // If re-extracting, update the document record
     if (documentId && extractedText) {
       await supabase.from("admin_documents").update({ extracted_text: extractedText }).eq("id", documentId);
     }
