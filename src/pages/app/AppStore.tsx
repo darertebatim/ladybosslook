@@ -463,23 +463,25 @@ const AppStore = () => {
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
                   {popularRoutines.map((r) => (
                     <button
                       key={r.id}
                       onClick={() => navigate(`/app/routines/${r.id}`, { state: { from: location.pathname } })}
-                      className="shrink-0 w-[140px] flex items-center gap-2 py-2 text-left transition-transform active:scale-[0.97] bg-accent/60 rounded-xl px-2 border border-border/40"
+                      className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
                     >
-                      {r.cover_image_url ? (
-                        <CachedImage src={r.cover_image_url} alt={r.title} className="h-10 w-10 rounded-lg object-cover shrink-0" />
-                      ) : (
-                        <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                          <FluentEmoji emoji={r.emoji || '🚀'} size={22} />
+                      <div className="relative h-32 w-32 overflow-visible mb-1.5">
+                        <div className="h-full w-full rounded-2xl overflow-hidden bg-muted shadow-lg">
+                          {r.cover_image_url ? (
+                            <CachedImage src={r.cover_image_url} alt={r.title} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-primary/10">
+                              <FluentEmoji emoji={r.emoji || '🚀'} size={36} />
+                            </div>
+                          )}
                         </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-xs leading-tight line-clamp-2">{r.title}</p>
                       </div>
+                      <p className="text-xs font-medium line-clamp-2 leading-tight">{r.title}</p>
                     </button>
                   ))}
                 </div>
