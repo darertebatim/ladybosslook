@@ -63,6 +63,50 @@ function BilingualInput({
   );
 }
 
+// ─── Auto-growing bilingual textarea ───
+function BilingualTextarea({
+  value,
+  onChange,
+  onFocus,
+  placeholder,
+  className,
+  textareaRef,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onFocus?: () => void;
+  placeholder?: string;
+  className?: string;
+  textareaRef?: React.Ref<HTMLTextAreaElement>;
+}) {
+  const { className: biClass, direction: dir } = useBilingualText(value);
+  const internalRef = useRef<HTMLTextAreaElement>(null);
+
+  const autoResize = useCallback(() => {
+    const el = typeof textareaRef === 'object' && textareaRef?.current
+      ? textareaRef.current
+      : internalRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  }, [textareaRef]);
+
+  useEffect(() => { autoResize(); }, [value, autoResize]);
+
+  return (
+    <textarea
+      ref={textareaRef || internalRef}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      onFocus={onFocus}
+      placeholder={placeholder}
+      dir={dir}
+      rows={1}
+      className={cn('bg-transparent border-0 outline-none w-full resize-none', biClass, className)}
+    />
+  );
+}
+
 // ─── Section component ───
 function DraftSectionBlock({
   section,
