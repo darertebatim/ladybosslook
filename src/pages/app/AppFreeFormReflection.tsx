@@ -15,6 +15,27 @@ import { MoodSelector } from '@/components/app/MoodSelector';
 
 const BULLET_COLOR = 'hsl(var(--muted-foreground) / 0.4)';
 
+function BulletLineInput({ inputRef, value, onChange, onKeyDown, placeholder }: {
+  inputRef: (el: HTMLInputElement | null) => void;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  placeholder: string;
+}) {
+  const { className: biClass, direction: dir } = useBilingualText(value);
+  return (
+    <input
+      ref={inputRef}
+      value={value}
+      onChange={onChange}
+      onKeyDown={onKeyDown}
+      placeholder={placeholder}
+      dir={dir}
+      className={cn("flex-1 bg-transparent border-0 outline-none text-base placeholder:text-muted-foreground/40", biClass)}
+    />
+  );
+}
+
 export default function AppFreeFormReflection() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -191,13 +212,12 @@ export default function AppFreeFormReflection() {
                 className="w-3 h-3 rounded-sm mt-[5px] shrink-0 transition-colors"
                 style={{ backgroundColor: BULLET_COLOR }}
               />
-              <input
-                ref={(el) => { lineRefs.current[idx] = el; }}
+              <BulletLineInput
+                inputRef={(el) => { lineRefs.current[idx] = el; }}
                 value={line}
                 onChange={(e) => handleLineChange(idx, e.target.value)}
                 onKeyDown={(e) => handleLineKeyDown(idx, e)}
                 placeholder={idx === 0 ? 'Write your thoughts…' : ''}
-                className="flex-1 bg-transparent border-0 outline-none text-base placeholder:text-muted-foreground/40"
               />
             </div>
           ))}
