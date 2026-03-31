@@ -97,6 +97,7 @@ const AppFreeFormReflection = lazy(() => import("@/pages/app/AppFreeFormReflecti
 const AppFreeFormNoteDetail = lazy(() => import("@/pages/app/AppFreeFormNoteDetail"));
 const AppAICoach = lazy(() => import("@/pages/app/AppAICoach"));
 const AppTasksBank = lazy(() => import("@/pages/app/AppTasksBank"));
+const AppTaskDrafts = lazy(() => import("@/pages/app/AppTaskDrafts"));
 
 const Users = lazy(() => import("@/pages/admin/Users"));
 const Enrollment = lazy(() => import("@/pages/admin/Enrollment"));
