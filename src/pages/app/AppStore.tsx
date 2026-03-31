@@ -120,6 +120,20 @@ const AppStore = () => {
   const meditatePlaylists = useMemo(() => audioPlaylists?.filter(p => p.category === 'meditate') || [], [audioPlaylists]);
   const soundscapePlaylists = useMemo(() => audioPlaylists?.filter(p => p.category === 'soundscape') || [], [audioPlaylists]);
 
+  // Fetch routines bank and task templates for explore sections
+  const { data: routinesBankData } = useRoutinesBank();
+  const { data: taskTemplatesData } = useTaskTemplates();
+
+  const popularRoutines = useMemo(() => {
+    if (!routinesBankData) return [];
+    return routinesBankData.filter(r => r.is_popular).slice(0, 8);
+  }, [routinesBankData]);
+
+  const popularTasks = useMemo(() => {
+    if (!taskTemplatesData) return [];
+    return taskTemplatesData.filter(t => t.is_popular).slice(0, 8);
+  }, [taskTemplatesData]);
+
   // Filter tools by search
   const filteredWellnessTools = useMemo(() => {
     if (!searchQuery.trim()) return wellnessTools;
