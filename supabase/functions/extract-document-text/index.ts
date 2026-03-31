@@ -49,52 +49,68 @@ serve(async (req) => {
       });
     }
 
-    // Support both FormData (file upload) and JSON (re-extract by document ID)
-    const contentType = req.headers.get("content-type") || "";
-    
+    // Support both FormData and JSON (for re-extract by document ID)
+    const contentType = (req.headers.get("content-type") || "").toLowerCase();
+
     let file: File | null = null;
     let documentId: string | null = null;
 
-    if (contentType.includes("multipart/form-data")) {
-      const formData = await req.formData();
-      file = formData.get("file") as File;
-      documentId = formData.get("document_id") as string | null;
-    } else if (contentType.includes("application/json")) {
+    const loadFileByDocumentId = async (id: string): Promise<File | Response> => {
+      const { data: doc } = await supabase
+        .from("admin_documents")
+        .select("file_name, file_url, mime_type")
+        .eq("id", id)
+        .single();
+
+      if (!doc) {
+        return new Response(JSON.stringify({ error: "Document not found" }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const urlParts = doc.file_url.split("/admin-documents/");
+      const storagePath = urlParts[urlParts.length - 1];
+
+      const { data: fileData, error: dlError } = await supabase.storage
+        .from("admin-documents")
+        .download(storagePath);
+
+      if (dlError || !fileData) {
+        console.error("Download error:", dlError);
+        return new Response(JSON.stringify({ error: "Failed to download file" }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      return new File([fileData], doc.file_name, { type: doc.mime_type || "application/octet-stream" });
+    };
+
+    if (contentType.includes("application/json")) {
       const body = await req.json();
-      documentId = body.document_id;
-      
-      // If re-extracting, download file from storage
+      documentId = typeof body?.document_id === "string" ? body.document_id : null;
       if (documentId) {
-        const { data: doc } = await supabase
-          .from("admin_documents")
-          .select("file_name, file_url, mime_type")
-          .eq("id", documentId)
-          .single();
-        
-        if (!doc) {
-          return new Response(JSON.stringify({ error: "Document not found" }), {
-            status: 404,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
+        const loaded = await loadFileByDocumentId(documentId);
+        if (loaded instanceof Response) return loaded;
+        file = loaded;
+      }
+    } else {
+      const formData = await req.formData();
+      const maybeFile = formData.get("file");
+      const maybeDocumentId = formData.get("document_id");
 
-        // Extract storage path from URL
-        const urlParts = doc.file_url.split("/admin-documents/");
-        const storagePath = urlParts[urlParts.length - 1];
-        
-        const { data: fileData, error: dlError } = await supabase.storage
-          .from("admin-documents")
-          .download(storagePath);
-        
-        if (dlError || !fileData) {
-          console.error("Download error:", dlError);
-          return new Response(JSON.stringify({ error: "Failed to download file" }), {
-            status: 500,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
+      if (maybeFile instanceof File) {
+        file = maybeFile;
+      }
 
-        file = new File([fileData], doc.file_name, { type: doc.mime_type || "application/octet-stream" });
+      documentId = typeof maybeDocumentId === "string" ? maybeDocumentId : null;
+
+      // Re-extract path: multipart request with document_id but no raw file
+      if (!file && documentId) {
+        const loaded = await loadFileByDocumentId(documentId);
+        if (loaded instanceof Response) return loaded;
+        file = loaded;
       }
     }
 

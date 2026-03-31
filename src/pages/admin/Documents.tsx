@@ -52,14 +52,19 @@ export default function Documents() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { toast.error('Please log in'); return; }
+
+      const formData = new FormData();
+      formData.append('document_id', docId);
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-document-text`,
         {
           method: 'POST',
-          headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ document_id: docId }),
+          headers: { Authorization: `Bearer ${session.access_token}` },
+          body: formData,
         }
       );
+
       if (!response.ok) throw new Error('Extraction failed');
       const result = await response.json();
       if (result.text) {
@@ -68,33 +73,52 @@ export default function Documents() {
       } else {
         toast.error(result.error || 'No text could be extracted');
       }
-    } catch { toast.error('Failed to extract text'); }
-    finally { setReExtractingId(null); }
+    } catch {
+      toast.error('Failed to extract text');
+    } finally {
+      setReExtractingId(null);
+    }
   };
 
   const bulkReExtract = async () => {
     const unindexed = documents.filter(d => !d.extracted_text);
     if (unindexed.length === 0) { toast.info('All documents are already indexed'); return; }
+
     setBulkExtracting(true);
     let success = 0, failed = 0;
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast.error('Please log in');
+      setBulkExtracting(false);
+      return;
+    }
+
     for (const doc of unindexed) {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) break;
+        const formData = new FormData();
+        formData.append('document_id', doc.id);
+
         const response = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-document-text`,
           {
             method: 'POST',
-            headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ document_id: doc.id }),
+            headers: { Authorization: `Bearer ${session.access_token}` },
+            body: formData,
           }
         );
+
         if (response.ok) {
           const result = await response.json();
           if (result.text) success++; else failed++;
-        } else failed++;
-      } catch { failed++; }
+        } else {
+          failed++;
+        }
+      } catch {
+        failed++;
+      }
     }
+
     queryClient.invalidateQueries({ queryKey: ['admin-documents'] });
     toast.success(`Indexed ${success} documents${failed > 0 ? `, ${failed} failed` : ''}`);
     setBulkExtracting(false);
