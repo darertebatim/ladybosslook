@@ -1,29 +1,34 @@
 
 
-## Why `/app/breathe` doesn't scroll on iOS
+# Redesign Task Drafts → "Projects" (Mobile-Native Style)
 
-**Root cause**: The category pills container uses `overflow-x-auto` (line 104 in `AppBreathe.tsx`), which creates a nested horizontal scroll area inside the layout's vertical scroll container (`<main>` in `NativeAppLayout.tsx`). On iOS WebKit, nested scroll containers compete for touch events — when you touch within the horizontal scroll area or its vicinity, iOS can lock onto the horizontal axis and block vertical scrolling entirely.
+## What's Changing
 
-Additionally, the outer `<div className="min-h-screen">` may contribute by making the content area appear to be exactly one viewport tall before the exercise list renders, giving iOS no initial scroll momentum.
+1. **Rename & reroute**: "Task Drafts" → "Projects", `/app/tasksbank/drafts` → `/app/projects`
+2. **Remove all hover effects** (violates project rules for mobile-first Capacitor app)
+3. **Redesign to match app's native card-based style** — larger touch targets, rounded cards, proper spacing
 
-## Fix
+## Technical Changes
 
-**File: `src/pages/app/AppBreathe.tsx`**
+### 1. Route & Navigation Updates
+- **`src/App.tsx`**: Change route from `tasksbank/drafts` to `projects`
+- **`src/pages/app/AppTasksBank.tsx`**: Update navigate path to `/app/projects`
 
-1. Change `min-h-screen` to `min-h-0` on the outer div (line 82) — the layout already handles full-height via flexbox, so `min-h-screen` is redundant and can confuse iOS scroll calculations.
+### 2. Full Redesign of `src/pages/app/AppTaskDrafts.tsx`
+- **Header**: Rename title to "Projects"
+- **Section cards**: Each project section gets a `rounded-2xl bg-muted/30 p-4` card container (like other app cards) instead of bare dividers
+- **Section title**: Larger font (`text-xl font-bold`), delete button with larger touch target (`w-10 h-10`), no hover — use `active:scale-95 active:text-destructive`
+- **Task items**: Taller rows with `py-2.5` padding, circle button enlarged to `w-6 h-6`, text `text-base` instead of `text-sm`, delete uses `active:text-destructive` instead of `opacity-0 group-hover:opacity-100`
+- **Add task input**: Larger, matching sizing
+- **Send-to-planner sheet**: Date buttons get `py-4` with larger icons (`w-5 h-5`), use `active:scale-95` instead of `hover:bg-primary/10`
+- **Sent items section**: Slightly larger text
+- **Empty state**: Keep emoji-centered pattern but larger text
 
-2. Add `touch-action: pan-y` to the category pills horizontal scroll container to tell iOS that vertical scrolling should always be allowed to propagate, even within the horizontal scroll area.
+### 3. Remove All Hover Classes
+Replace every instance of `hover:` with appropriate `active:` alternatives throughout the file.
 
-```tsx
-// Line 82: change min-h-screen
-<div className="min-h-0 bg-background">
-
-// Line 104: add touch-action style
-<div 
-  className="flex gap-2 overflow-x-auto no-scrollbar"
-  style={{ touchAction: 'pan-x pan-y' }}
->
-```
-
-These two changes ensure iOS doesn't block vertical scroll propagation through the horizontal pill area, and the content sizing cooperates with the layout's flex scroll container.
+### Files Modified
+- `src/pages/app/AppTaskDrafts.tsx` — full redesign + rename
+- `src/App.tsx` — route path change
+- `src/pages/app/AppTasksBank.tsx` — navigation path change
 
