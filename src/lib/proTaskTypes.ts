@@ -24,7 +24,8 @@ import {
   Eye,
   Leaf,
   MonitorPlay,
-  PlayCircle
+  PlayCircle,
+  FolderKanban
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
