@@ -297,9 +297,16 @@ export default function Documents() {
         />
 
         <div className="flex-1 space-y-4">
-          <div className="relative max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search documents..." className="pl-9" />
+          <div className="flex items-center gap-2">
+            <div className="relative max-w-sm flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search documents..." className="pl-9" />
+            </div>
+            {documents.some(d => !d.extracted_text) && (
+              <Button variant="outline" size="sm" onClick={bulkReExtract} disabled={bulkExtracting}>
+                {bulkExtracting ? <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Indexing...</> : <><RefreshCw className="h-4 w-4 mr-1" /> Index All for AI</>}
+              </Button>
+            )}
           </div>
 
           {isLoading ? (
