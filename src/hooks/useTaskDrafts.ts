@@ -115,6 +115,7 @@ export function useReorderDraftSections() {
   });
 }
 
+export function useDeleteDraftSection() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
