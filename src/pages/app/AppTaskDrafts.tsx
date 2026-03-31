@@ -123,6 +123,14 @@ function DraftSectionBlock({
         </button>
       </div>
 
+      {/* Description */}
+      <BilingualInput
+        value={desc}
+        onChange={handleDescChange}
+        placeholder="Add a description..."
+        className="text-sm text-muted-foreground mb-3 placeholder:text-muted-foreground/30"
+      />
+
       {/* Pending items */}
       <div className="space-y-0.5">
         {pendingItems.map((item) => (
