@@ -397,6 +397,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Open your routines player',
     requiresValue: false,
   },
+  projects: {
+    value: 'projects',
+    label: 'Projects',
+    icon: FolderKanban,
+    badgeText: 'Open',
+    color: 'amber',
+    gradientClass: 'bg-gradient-to-br from-amber-100 to-yellow-100 dark:from-amber-900/40 dark:to-yellow-900/40',
+    iconColorClass: 'text-amber-600 dark:text-amber-400',
+    badgeColorClass: 'bg-amber-500/20 text-amber-700 dark:text-amber-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open your projects board',
+    requiresValue: false,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
