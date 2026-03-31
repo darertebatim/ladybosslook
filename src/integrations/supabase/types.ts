@@ -3475,6 +3475,7 @@ export type Database = {
           is_featured: boolean
           is_focus: boolean
           is_free: boolean
+          is_moment: boolean
           is_popular: boolean | null
           is_welcome_popup: boolean
           linked_program_slug: string | null
@@ -3505,6 +3506,7 @@ export type Database = {
           is_featured?: boolean
           is_focus?: boolean
           is_free?: boolean
+          is_moment?: boolean
           is_popular?: boolean | null
           is_welcome_popup?: boolean
           linked_program_slug?: string | null
@@ -3535,6 +3537,7 @@ export type Database = {
           is_featured?: boolean
           is_focus?: boolean
           is_free?: boolean
+          is_moment?: boolean
           is_popular?: boolean | null
           is_welcome_popup?: boolean
           linked_program_slug?: string | null

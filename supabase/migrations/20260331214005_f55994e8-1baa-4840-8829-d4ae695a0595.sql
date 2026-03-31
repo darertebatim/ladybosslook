@@ -1,0 +1,1 @@
+ALTER TABLE public.routines_bank ADD COLUMN is_moment boolean NOT NULL DEFAULT false;
