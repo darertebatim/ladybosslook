@@ -23,16 +23,23 @@ function BulletLineInput({ inputRef, value, onChange, onKeyDown, placeholder }: 
   placeholder: string;
 }) {
   const { className: biClass, direction: dir } = useBilingualText(value);
+  const isRtl = dir === 'rtl';
   return (
-    <input
-      ref={inputRef}
-      value={value}
-      onChange={onChange}
-      onKeyDown={onKeyDown}
-      placeholder={placeholder}
-      dir={dir}
-      className={cn("flex-1 bg-transparent border-0 outline-none text-base placeholder:text-muted-foreground/40", biClass)}
-    />
+    <div className={cn("flex items-start gap-3 w-full", isRtl && "flex-row-reverse")}>
+      <div
+        className="w-3 h-3 rounded-sm mt-[5px] shrink-0 transition-colors"
+        style={{ backgroundColor: BULLET_COLOR }}
+      />
+      <input
+        ref={inputRef}
+        value={value}
+        onChange={onChange}
+        onKeyDown={onKeyDown}
+        placeholder={placeholder}
+        dir={dir}
+        className={cn("flex-1 bg-transparent border-0 outline-none text-base placeholder:text-muted-foreground/40", biClass)}
+      />
+    </div>
   );
 }
 
