@@ -387,10 +387,11 @@ export default function RoutinesBank() {
           end_date: data.formData.end_mode === 'date' && data.formData.end_date ? data.formData.end_date.toISOString().split('T')[0] : null,
            end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
            badge_image_url: data.formData.badge_image_url || null,
-           is_focus: data.formData.is_focus,
-           linked_program_slug: data.formData.schedule_type === 'program' ? data.formData.linked_program_slug : null,
-        } as any)
-        .eq('id', data.id);
+            is_focus: data.formData.is_focus,
+            is_moment: data.formData.is_moment,
+            linked_program_slug: data.formData.schedule_type === 'program' ? data.formData.linked_program_slug : null,
+         } as any)
+         .eq('id', data.id);
       if (error) throw error;
 
       // Delete old sections and tasks
