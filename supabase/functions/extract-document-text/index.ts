@@ -41,16 +41,6 @@ serve(async (req) => {
       });
     }
 
-    // Use Lovable AI to extract text from the PDF
-    const formData = await req.formData();
-    const file = formData.get("file") as File;
-    if (!file) {
-      return new Response(JSON.stringify({ error: "No file provided" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       return new Response(JSON.stringify({ error: "AI not configured" }), {
@@ -59,11 +49,101 @@ serve(async (req) => {
       });
     }
 
+    // Support both FormData (file upload) and JSON (re-extract by document ID)
+    const contentType = req.headers.get("content-type") || "";
+    
+    let file: File | null = null;
+    let documentId: string | null = null;
+
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await req.formData();
+      file = formData.get("file") as File;
+      documentId = formData.get("document_id") as string | null;
+    } else if (contentType.includes("application/json")) {
+      const body = await req.json();
+      documentId = body.document_id;
+      
+      // If re-extracting, download file from storage
+      if (documentId) {
+        const { data: doc } = await supabase
+          .from("admin_documents")
+          .select("file_name, file_url, mime_type")
+          .eq("id", documentId)
+          .single();
+        
+        if (!doc) {
+          return new Response(JSON.stringify({ error: "Document not found" }), {
+            status: 404,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        // Extract storage path from URL
+        const urlParts = doc.file_url.split("/admin-documents/");
+        const storagePath = urlParts[urlParts.length - 1];
+        
+        const { data: fileData, error: dlError } = await supabase.storage
+          .from("admin-documents")
+          .download(storagePath);
+        
+        if (dlError || !fileData) {
+          console.error("Download error:", dlError);
+          return new Response(JSON.stringify({ error: "Failed to download file" }), {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        file = new File([fileData], doc.file_name, { type: doc.mime_type || "application/octet-stream" });
+      }
+    }
+
+    if (!file) {
+      return new Response(JSON.stringify({ error: "No file provided" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Determine MIME type for the AI request
+    const mimeType = file.type || "application/octet-stream";
+    const isSupported = 
+      mimeType === "application/pdf" ||
+      mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+      mimeType === "application/msword" ||
+      mimeType === "text/plain" ||
+      mimeType.startsWith("image/") ||
+      mimeType === "application/vnd.apple.pages";
+
+    if (!isSupported) {
+      return new Response(JSON.stringify({ text: null, error: `Unsupported file type: ${mimeType}` }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // For plain text, just read directly
+    if (mimeType === "text/plain") {
+      const text = await file.text();
+      if (documentId) {
+        await supabase.from("admin_documents").update({ extracted_text: text }).eq("id", documentId);
+      }
+      return new Response(JSON.stringify({ text }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Read file as base64 for the AI to process
     const arrayBuffer = await file.arrayBuffer();
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+    const uint8Array = new Uint8Array(arrayBuffer);
+    let base64 = "";
+    const chunkSize = 8192;
+    for (let i = 0; i < uint8Array.length; i += chunkSize) {
+      base64 += String.fromCharCode(...uint8Array.slice(i, i + chunkSize));
+    }
+    base64 = btoa(base64);
 
-    // Use Gemini to extract text from the PDF
+    // Use Gemini to extract text from the document
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -75,19 +155,19 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are a document text extractor. Extract ALL text content from the provided document. Return ONLY the extracted text, preserving structure and formatting. Do not add commentary."
+            content: "You are a document text extractor. Extract ALL text content from the provided document. Return ONLY the extracted text, preserving structure and formatting. Do not add commentary or explanations. If the text is in Farsi/Persian, preserve it exactly as-is."
           },
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: "Extract all text from this PDF document:"
+                text: `Extract all text from this ${file.name} document:`
               },
               {
                 type: "image_url",
                 image_url: {
-                  url: `data:application/pdf;base64,${base64}`
+                  url: `data:${mimeType};base64,${base64}`
                 }
               }
             ]
@@ -107,6 +187,11 @@ serve(async (req) => {
 
     const aiData = await aiResponse.json();
     const extractedText = aiData.choices?.[0]?.message?.content || null;
+
+    // If re-extracting, update the document record
+    if (documentId && extractedText) {
+      await supabase.from("admin_documents").update({ extracted_text: extractedText }).eq("id", documentId);
+    }
 
     return new Response(JSON.stringify({ text: extractedText }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
