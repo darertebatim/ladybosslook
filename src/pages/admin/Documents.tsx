@@ -44,6 +44,61 @@ export default function Documents() {
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [moveDialogDoc, setMoveDialogDoc] = useState<AdminDocument | null>(null);
   const [moveFolderId, setMoveFolderId] = useState<string>('none');
+  const [reExtractingId, setReExtractingId] = useState<string | null>(null);
+  const [bulkExtracting, setBulkExtracting] = useState(false);
+
+  const reExtractDocument = async (docId: string) => {
+    setReExtractingId(docId);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { toast.error('Please log in'); return; }
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-document-text`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ document_id: docId }),
+        }
+      );
+      if (!response.ok) throw new Error('Extraction failed');
+      const result = await response.json();
+      if (result.text) {
+        toast.success('Text extracted successfully');
+        queryClient.invalidateQueries({ queryKey: ['admin-documents'] });
+      } else {
+        toast.error(result.error || 'No text could be extracted');
+      }
+    } catch { toast.error('Failed to extract text'); }
+    finally { setReExtractingId(null); }
+  };
+
+  const bulkReExtract = async () => {
+    const unindexed = documents.filter(d => !d.extracted_text);
+    if (unindexed.length === 0) { toast.info('All documents are already indexed'); return; }
+    setBulkExtracting(true);
+    let success = 0, failed = 0;
+    for (const doc of unindexed) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) break;
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-document-text`,
+          {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ document_id: doc.id }),
+          }
+        );
+        if (response.ok) {
+          const result = await response.json();
+          if (result.text) success++; else failed++;
+        } else failed++;
+      } catch { failed++; }
+    }
+    queryClient.invalidateQueries({ queryKey: ['admin-documents'] });
+    toast.success(`Indexed ${success} documents${failed > 0 ? `, ${failed} failed` : ''}`);
+    setBulkExtracting(false);
+  };
 
   const { data: documents = [], isLoading } = useQuery({
     queryKey: ['admin-documents'],
