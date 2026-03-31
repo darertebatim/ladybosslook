@@ -1822,6 +1822,18 @@ export default function RoutinesBank() {
                     />
                   </div>
 
+                  {/* Moment Toggle */}
+                  <div className="flex items-center justify-between border-t pt-4">
+                    <div>
+                      <Label className="text-xs font-medium">✨ Moment</Label>
+                      <p className="text-xs text-muted-foreground">User can play once without adding to planner</p>
+                    </div>
+                    <Switch
+                      checked={formData.is_moment}
+                      onCheckedChange={(checked) => setFormData({ ...formData, is_moment: checked })}
+                    />
+                  </div>
+
                   {/* Summary stats */}
                   <div className="flex items-center gap-4 text-sm text-muted-foreground border-t pt-4">
                     <span className="flex items-center gap-1">
