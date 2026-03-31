@@ -646,6 +646,7 @@ export default function RoutinesBank() {
       end_after_days: (routine as any).end_after_days ?? null,
       badge_image_url: (routine as any).badge_image_url || '',
       is_focus: (routine as any).is_focus ?? false,
+      is_moment: (routine as any).is_moment ?? false,
       linked_program_slug: (routine as any).linked_program_slug ?? null,
     });
     const { sections, tasks } = await fetchRoutineData(routine.id);
