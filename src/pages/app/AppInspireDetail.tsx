@@ -666,7 +666,7 @@ export default function AppInspireDetail() {
               className="flex-1 h-12 rounded-xl text-base font-semibold gap-2"
             >
               <Play className="w-5 h-5" />
-              Moment
+              Reset
             </Button>
             <Button
               variant="outline"
@@ -674,7 +674,7 @@ export default function AppInspireDetail() {
                 dismissHint();
                 handleAddClick();
               }}
-              className="h-12 w-12 rounded-xl p-0 shrink-0"
+              className="h-12 w-12 rounded-xl p-0 shrink-0 bg-orange-500 hover:bg-orange-600 text-white border-0"
             >
               <CalendarPlus className="w-5 h-5" />
             </Button>
