@@ -527,6 +527,7 @@ const App = () => (
                       <Route path="routines/:planId" element={<AppInspireDetail />} />
                       <Route path="actions" element={<AppActions />} />
                       <Route path="tasksbank" element={<AppTasksBank />} />
+                      <Route path="tasksbank/drafts" element={<AppTaskDrafts />} />
                       <Route path="routineplayer" element={<AppRoutinePlayerPage />} />
                       {/* Redirects for backward compatibility with older app versions */}
                       <Route path="rituals" element={<Navigate to="/app/routines" replace />} />
