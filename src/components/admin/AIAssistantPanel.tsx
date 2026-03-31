@@ -1,46 +1,23 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Trash2, Copy, Check, Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { X, Send, Trash2, Copy, Check, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Card } from '@/components/ui/card';
 import { useAIAssistant } from '@/contexts/AIAssistantContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 const QUICK_ACTIONS: Record<string, Array<{ label: string; prompt: string }>> = {
-  tools: [
-    { label: 'Create 5 tasks', prompt: 'Create 5 wellness tasks for the Tasks Bank (morning routine, meditation, gratitude, hydration, stretching)' },
-    { label: 'Create routine', prompt: 'Create a "Morning Glow" routine with sections and tasks for a calm morning start' },
-    { label: 'Breathing exercise', prompt: 'Create a 4-7-8 relaxation breathing exercise' },
-    { label: 'Self-care bundle', prompt: 'Create a complete self-care routine with 6 tasks covering body, mind, and soul' },
-    { label: '🎨 Generate covers', prompt: 'Generate Ladybosslook-style cover images for all routines that don\'t have covers yet' },
-  ],
   default: [
+    { label: 'Content ideas', prompt: 'What are some engaging content ideas for our community this week?' },
     { label: 'Draft announcement', prompt: 'Help me write an announcement for my community' },
     { label: 'Session reminder', prompt: 'Write a session reminder for tomorrow\'s class' },
-    { label: 'Create routine', prompt: 'Create a morning wellness routine with 5 tasks' },
-    { label: 'Push notification', prompt: 'Write a short push notification to engage users' },
+    { label: 'Engagement tips', prompt: 'How can I increase user engagement this month?' },
+    { label: 'Push notification', prompt: 'Write a short push notification to encourage users to check in today' },
   ],
 };
-
-const TOOL_TO_FORM_TYPE: Record<string, string> = {
-  create_broadcast_content: 'broadcast',
-  create_feed_post_content: 'feed_post',
-  create_push_notification_content: 'push_notification',
-  create_routine_plan: 'routine_plan',
-  suggest_task_templates: 'task_templates',
-};
-
-interface ActionResult {
-  success: boolean;
-  action: string;
-  message: string;
-  created?: Record<string, any>;
-  error?: string;
-}
 
 export function AIAssistantPanel() {
   const { 
@@ -53,8 +30,6 @@ export function AIAssistantPanel() {
     isLoading, 
     setIsLoading,
     currentPage,
-    applyToForm,
-    hasFormHandler,
   } = useAIAssistant();
   
   const [input, setInput] = useState('');
@@ -129,10 +104,7 @@ export function AIAssistantPanel() {
 
       const decoder = new TextDecoder();
       let assistantContent = '';
-      let toolCall: { name: string; data: Record<string, any> } | undefined;
-      let toolCallBuffer = '';
       let assistantMessageId: string | null = null;
-      let actionResults: ActionResult[] = [];
 
       const processLine = (line: string) => {
         if (!line.startsWith('data: ')) return;
@@ -141,12 +113,6 @@ export function AIAssistantPanel() {
 
         try {
           const parsed = JSON.parse(jsonStr);
-          
-          if (parsed.action_results) {
-            actionResults = parsed.action_results;
-            return;
-          }
-
           const delta = parsed.choices?.[0]?.delta;
           
           if (delta?.content) {
@@ -156,33 +122,9 @@ export function AIAssistantPanel() {
               assistantMessageId = addMessage({ 
                 role: 'assistant', 
                 content: assistantContent,
-                actionResults: actionResults.length > 0 ? actionResults : undefined,
               });
             } else {
               updateMessage(assistantMessageId, { content: assistantContent });
-            }
-          }
-          
-          if (delta?.tool_calls) {
-            for (const tc of delta.tool_calls) {
-              if (tc.function?.name) {
-                toolCallBuffer = '';
-                toolCall = { name: tc.function.name, data: {} };
-              }
-              if (tc.function?.arguments) {
-                toolCallBuffer += tc.function.arguments;
-              }
-            }
-          }
-
-          if (parsed.choices?.[0]?.finish_reason === 'tool_calls' && toolCall && toolCallBuffer) {
-            try {
-              toolCall.data = JSON.parse(toolCallBuffer);
-              if (assistantMessageId) {
-                updateMessage(assistantMessageId, { toolCall });
-              }
-            } catch {
-              console.error('Failed to parse tool call arguments');
             }
           }
         } catch {
@@ -210,23 +152,6 @@ export function AIAssistantPanel() {
         }
       }
 
-      if (assistantMessageId) {
-        const updates: any = {};
-        if (toolCall && toolCallBuffer) {
-          try {
-            toolCall.data = JSON.parse(toolCallBuffer);
-            updates.toolCall = toolCall;
-          } catch { /* Already handled */ }
-        }
-        if (actionResults.length > 0) {
-          updates.actionResults = actionResults;
-        }
-        if (Object.keys(updates).length > 0) {
-          updates.content = assistantContent;
-          updateMessage(assistantMessageId, updates);
-        }
-      }
-
     } catch (error) {
       console.error('AI Assistant error:', error);
       toast.error('Failed to get AI response');
@@ -240,26 +165,6 @@ export function AIAssistantPanel() {
     setCopiedId(id);
     toast.success('Copied to clipboard');
     setTimeout(() => setCopiedId(null), 2000);
-  };
-
-  const handleApplyToForm = (toolCall: { name: string; data: Record<string, any> }) => {
-    const formType = TOOL_TO_FORM_TYPE[toolCall.name];
-    if (!formType) {
-      toast.error('Unknown form type');
-      return;
-    }
-
-    if (!hasFormHandler(formType)) {
-      toast.error(`No ${formType} form found on this page. Navigate to the correct page first.`);
-      return;
-    }
-
-    const success = applyToForm(formType, toolCall.data);
-    if (success) {
-      toast.success('Applied to form!');
-    } else {
-      toast.error('Failed to apply to form');
-    }
   };
 
   return (
@@ -347,69 +252,8 @@ export function AIAssistantPanel() {
                       <p className="text-sm break-words whitespace-pre-wrap">{message.content}</p>
                     )}
 
-                    {/* Tool call card */}
-                    {message.toolCall && (
-                      <Card className="mt-3 p-3 bg-background">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-medium text-muted-foreground capitalize">
-                            {message.toolCall.name.replace(/_/g, ' ')}
-                          </span>
-                        </div>
-                        <pre className="text-xs bg-muted p-2 rounded overflow-x-auto max-h-40 whitespace-pre-wrap break-words">
-                          {JSON.stringify(message.toolCall.data, null, 2)}
-                        </pre>
-                        <div className="flex gap-2 mt-2">
-                          <Button
-                            size="sm"
-                            variant="default"
-                            className="flex-1"
-                            onClick={() => handleApplyToForm(message.toolCall!)}
-                          >
-                            Apply to Form
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleCopy(JSON.stringify(message.toolCall!.data, null, 2), message.id)}
-                          >
-                            {copiedId === message.id ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                          </Button>
-                        </div>
-                      </Card>
-                    )}
-
-                    {/* Action results cards */}
-                    {message.actionResults && message.actionResults.length > 0 && (
-                      <div className="mt-3 space-y-2">
-                        {message.actionResults.map((result, idx) => (
-                          <Card key={idx} className={cn(
-                            "p-3",
-                            result.success ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800" : "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800"
-                          )}>
-                            <div className="flex items-center gap-2">
-                              {result.success ? (
-                                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
-                              ) : (
-                                <XCircle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0" />
-                              )}
-                              <span className="text-sm font-medium">
-                                {result.message || result.error}
-                              </span>
-                            </div>
-                            {result.created && (
-                              <p className="text-xs text-muted-foreground mt-1 ml-6">
-                                {result.created.emoji || '✨'} {result.created.title || result.created.name} 
-                                {result.created.category ? ` • ${result.created.category}` : ''}
-                                {result.created.taskCount != null ? ` • ${result.created.taskCount} tasks` : ''}
-                              </p>
-                            )}
-                          </Card>
-                        ))}
-                      </div>
-                    )}
-
                     {/* Copy button for assistant messages */}
-                    {message.role === 'assistant' && !message.toolCall && (
+                    {message.role === 'assistant' && (
                       <Button
                         variant="ghost"
                         size="sm"

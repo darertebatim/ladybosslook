@@ -1,26 +1,10 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 
-interface FormFillHandler {
-  formType: string;
-  handler: (data: Record<string, any>) => void;
-}
-
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
-  toolCall?: {
-    name: string;
-    data: Record<string, any>;
-  };
-  actionResults?: Array<{
-    success: boolean;
-    action: string;
-    message: string;
-    created?: Record<string, any>;
-    error?: string;
-  }>;
 }
 
 interface AIAssistantContextType {
@@ -33,10 +17,6 @@ interface AIAssistantContextType {
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
   currentPage: string;
-  registerFormHandler: (formType: string, handler: (data: Record<string, any>) => void) => void;
-  unregisterFormHandler: (formType: string) => void;
-  applyToForm: (formType: string, data: Record<string, any>) => boolean;
-  hasFormHandler: (formType: string) => boolean;
 }
 
 const AIAssistantContext = createContext<AIAssistantContextType | null>(null);
@@ -64,7 +44,6 @@ export function AIAssistantProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(loadMessages);
   const [isLoading, setIsLoading] = useState(false);
-  const [formHandlers, setFormHandlers] = useState<Map<string, FormFillHandler['handler']>>(new Map());
   const location = useLocation();
 
   const currentPage = location.pathname.split('/').pop() || 'overview';
@@ -103,35 +82,6 @@ export function AIAssistantProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(STORAGE_KEY);
   }, []);
 
-  const registerFormHandler = useCallback((formType: string, handler: (data: Record<string, any>) => void) => {
-    setFormHandlers(prev => {
-      const next = new Map(prev);
-      next.set(formType, handler);
-      return next;
-    });
-  }, []);
-
-  const unregisterFormHandler = useCallback((formType: string) => {
-    setFormHandlers(prev => {
-      const next = new Map(prev);
-      next.delete(formType);
-      return next;
-    });
-  }, []);
-
-  const applyToForm = useCallback((formType: string, data: Record<string, any>): boolean => {
-    const handler = formHandlers.get(formType);
-    if (handler) {
-      handler(data);
-      return true;
-    }
-    return false;
-  }, [formHandlers]);
-
-  const hasFormHandler = useCallback((formType: string): boolean => {
-    return formHandlers.has(formType);
-  }, [formHandlers]);
-
   return (
     <AIAssistantContext.Provider
       value={{
@@ -144,10 +94,6 @@ export function AIAssistantProvider({ children }: { children: ReactNode }) {
         isLoading,
         setIsLoading,
         currentPage,
-        registerFormHandler,
-        unregisterFormHandler,
-        applyToForm,
-        hasFormHandler,
       }}
     >
       {children}
