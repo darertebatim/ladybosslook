@@ -62,7 +62,7 @@ function BilingualInput({
 function DraftSectionBlock({
   section,
   items,
-  onUpdateTitle,
+  onUpdateSection,
   onDeleteSection,
   onCreateItem,
   onUpdateItem,
