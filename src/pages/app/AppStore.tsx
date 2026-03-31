@@ -19,7 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import { CachedImage } from '@/components/ui/CachedImage';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
-import { useRoutinesBank, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
+import { useRoutinesBank, useRoutineBankCategories, useFeaturedRoutinesBank } from '@/hooks/useRoutinesBank';
 import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 import { useTaskTemplates } from '@/hooks/useTaskPlanner';
 
@@ -125,10 +125,14 @@ const AppStore = () => {
   const { data: routinesBankData } = useRoutinesBank();
   const { data: taskTemplatesData } = useTaskTemplates();
 
-  const popularRoutines = useMemo(() => {
-    if (!routinesBankData) return [];
-    return routinesBankData.filter(r => r.is_popular).slice(0, 8);
-  }, [routinesBankData]);
+  const { data: featuredRoutines = [] } = useFeaturedRoutinesBank();
+
+  const displayRoutines = useMemo(() => {
+    if (!routinesBankData) return featuredRoutines;
+    const featuredIds = new Set(featuredRoutines.map(r => r.id));
+    const popular = routinesBankData.filter(r => r.is_popular && !featuredIds.has(r.id));
+    return [...featuredRoutines, ...popular].slice(0, 10);
+  }, [routinesBankData, featuredRoutines]);
 
   const popularTasks = useMemo(() => {
     if (!taskTemplatesData) return [];
@@ -324,7 +328,7 @@ const AppStore = () => {
             )}
 
             {/* Routines Templates Section */}
-            {!searchQuery && popularRoutines.length > 0 && (
+            {!searchQuery && displayRoutines.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
                   <h2 className="text-sm font-semibold text-foreground">Routines Templates</h2>
@@ -333,7 +337,7 @@ const AppStore = () => {
                   </Link>
                 </div>
                 <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4" style={{ WebkitOverflowScrolling: 'touch' }}>
-                  {popularRoutines.map((r) => (
+                  {displayRoutines.map((r) => (
                     <div key={r.id} className="shrink-0 w-[85%] snap-start">
                       <FeaturedRoutineCard routine={r} categoryName={categoryNameMap.get(r.category)} />
                     </div>
