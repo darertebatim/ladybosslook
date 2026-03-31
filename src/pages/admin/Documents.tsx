@@ -334,7 +334,13 @@ export default function Documents() {
                       {doc.description && <p className="text-xs text-muted-foreground mt-1 truncate">{doc.description}</p>}
                     </div>
                     <div className="flex items-center gap-1">
-                      {doc.extracted_text && <Badge variant="secondary" className="text-xs">AI indexed</Badge>}
+                      {doc.extracted_text ? (
+                        <Badge variant="secondary" className="text-xs">AI indexed</Badge>
+                      ) : (
+                        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => reExtractDocument(doc.id)} disabled={reExtractingId === doc.id}>
+                          {reExtractingId === doc.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <><RefreshCw className="h-3 w-3 mr-1" /> Index</>}
+                        </Button>
+                      )}
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setMoveDialogDoc(doc)} title="Move to folder">
                         <FolderInput className="h-4 w-4" />
                       </Button>
