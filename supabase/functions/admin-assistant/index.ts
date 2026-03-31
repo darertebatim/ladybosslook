@@ -153,6 +153,7 @@ async function fetchContext(supabase: any, currentPage?: string) {
     { data: breathingExercises },
     { data: recentActions },
     { data: recentRoutines },
+    { data: adminDocuments },
   ] = await Promise.all([
     supabase.from("routine_categories").select("name, slug, icon").eq("is_active", true).order("display_order"),
     supabase.from("admin_task_bank").select("*", { count: "exact", head: true }).eq("is_active", true),
@@ -160,6 +161,7 @@ async function fetchContext(supabase: any, currentPage?: string) {
     supabase.from("breathing_exercises").select("name, category, emoji").eq("is_active", true).order("sort_order"),
     supabase.from("admin_task_bank").select("title, emoji, category").eq("is_active", true).order("sort_order").limit(30),
     supabase.from("routines_bank").select("title, emoji, category").eq("is_active", true).order("sort_order").limit(30),
+    supabase.from("admin_documents").select("title, description, extracted_text").not("extracted_text", "is", null).order("created_at", { ascending: false }).limit(20),
   ]);
 
   context.categories = categories || [];
