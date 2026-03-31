@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_documents: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          extracted_text: string | null
+          file_name: string
+          file_size_bytes: number | null
+          file_url: string
+          id: string
+          mime_type: string | null
+          title: string
+          updated_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          extracted_text?: string | null
+          file_name: string
+          file_size_bytes?: number | null
+          file_url: string
+          id?: string
+          mime_type?: string | null
+          title: string
+          updated_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          extracted_text?: string | null
+          file_name?: string
+          file_size_bytes?: number | null
+          file_url?: string
+          id?: string
+          mime_type?: string | null
+          title?: string
+          updated_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       admin_task_bank: {
         Row: {
           category: string
