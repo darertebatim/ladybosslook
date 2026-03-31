@@ -191,11 +191,11 @@ function DraftSectionBlock({
       </div>
 
       {/* Description */}
-      <BilingualInput
+      <BilingualTextarea
         value={desc}
         onChange={handleDescChange}
         onFocus={handleDescFocus}
-        inputRef={descRef}
+        textareaRef={descRef as any}
         placeholder="Add a description..."
         className="text-sm text-muted-foreground mb-3 placeholder:text-muted-foreground/30"
       />
