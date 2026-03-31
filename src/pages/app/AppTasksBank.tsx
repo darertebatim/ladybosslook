@@ -251,6 +251,13 @@ export default function AppTasksBank() {
               </button>
             )}
             <button
+              onClick={() => navigate('/app/tasksbank/drafts')}
+              className="p-2 rounded-full active:bg-muted/50 transition-colors"
+              aria-label="Task Drafts"
+            >
+              <StickyNote className="w-5 h-5 text-muted-foreground" />
+            </button>
+            <button
               onClick={() => setShowSearch(!showSearch)}
               className="p-2 rounded-full active:bg-muted/50 transition-colors"
             >
