@@ -79,13 +79,21 @@ function DraftSectionBlock({
   onSendItem: (item: DraftItem) => void;
 }) {
   const [sectionTitle, setSectionTitle] = useState(section.title);
+  const [desc, setDesc] = useState(section.description || '');
   const [newItemText, setNewItemText] = useState('');
   const titleTimeout = useRef<NodeJS.Timeout>();
+  const descTimeout = useRef<NodeJS.Timeout>();
 
   const handleTitleChange = (v: string) => {
     setSectionTitle(v);
     clearTimeout(titleTimeout.current);
-    titleTimeout.current = setTimeout(() => onUpdateTitle(section.id, v), 600);
+    titleTimeout.current = setTimeout(() => onUpdateSection(section.id, { title: v }), 600);
+  };
+
+  const handleDescChange = (v: string) => {
+    setDesc(v);
+    clearTimeout(descTimeout.current);
+    descTimeout.current = setTimeout(() => onUpdateSection(section.id, { description: v }), 600);
   };
 
   const handleAddItem = () => {
