@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Megaphone, Bell, Mail, MessageCircle, Link as LinkIcon, X, UserMinus, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useAIAssistant } from '@/contexts/AIAssistantContext';
+
 import { Badge } from '@/components/ui/badge';
 
 interface Program {

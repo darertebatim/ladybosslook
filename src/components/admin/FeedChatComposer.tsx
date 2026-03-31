@@ -17,7 +17,7 @@ import {
 import { cn } from '@/lib/utils';
 import { FeedMessage } from '@/components/feed/FeedMessage';
 import { detectVideoType, getVideoPlatformLabel, getVideoEmbedUrl, extractYouTubeId } from '@/lib/videoUtils';
-import { useAIAssistant } from '@/contexts/AIAssistantContext';
+
 
 const ACTION_TYPES = [
   { value: 'none', label: 'No Action', icon: null },
