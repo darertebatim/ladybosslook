@@ -202,6 +202,7 @@ export default function RoutinesBank() {
     end_after_days: null as number | null,
     badge_image_url: '',
     is_focus: false,
+    is_moment: false,
     linked_program_slug: null as string | null,
   });
   const [localSections, setLocalSections] = useState<LocalSection[]>([]);
