@@ -170,6 +170,7 @@ async function fetchContext(supabase: any, currentPage?: string) {
   context.breathingExercises = breathingExercises || [];
   context.sampleTasks = recentActions || [];
   context.sampleRoutines = recentRoutines || [];
+  context.adminDocuments = adminDocuments || [];
 
   return context;
 }
