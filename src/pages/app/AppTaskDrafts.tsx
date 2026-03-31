@@ -71,7 +71,7 @@ function DraftSectionBlock({
 }: {
   section: DraftSection;
   items: DraftItem[];
-  onUpdateTitle: (id: string, title: string) => void;
+  onUpdateSection: (id: string, updates: { title?: string; description?: string }) => void;
   onDeleteSection: (id: string) => void;
   onCreateItem: (sectionId: string, title: string) => void;
   onUpdateItem: (id: string, title: string) => void;
