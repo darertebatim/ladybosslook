@@ -319,7 +319,7 @@ export default function AppTaskDrafts() {
   };
 
   return (
-    <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
+    <div className="min-h-[100dvh] bg-background flex flex-col">
       {/* Header */}
       <header
         className="px-4 pb-3 flex items-center justify-between shrink-0"
@@ -341,8 +341,8 @@ export default function AppTaskDrafts() {
 
       {/* Content */}
       <div
-        className="flex-1 px-4 pt-2 overflow-y-auto overscroll-contain"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}
+        className="flex-1 px-4 pt-2 overflow-y-auto overscroll-contain -webkit-overflow-scrolling-touch"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)' }}
       >
         {sectionsLoading ? (
           <div className="space-y-4">
