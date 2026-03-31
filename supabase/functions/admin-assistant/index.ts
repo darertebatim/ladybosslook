@@ -7,10 +7,8 @@ const corsHeaders = {
 };
 
 interface Message {
-  role: "user" | "assistant" | "system" | "tool";
+  role: "user" | "assistant" | "system";
   content: string;
-  tool_calls?: any[];
-  tool_call_id?: string;
 }
 
 interface RequestBody {
@@ -19,40 +17,6 @@ interface RequestBody {
 }
 
 const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
-
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-function isValidUUID(value: string): boolean {
-  return UUID_REGEX.test(value);
-}
-
-async function resolveRoutineId(supabase: any, idOrTitle: string): Promise<{ id: string; title: string } | null> {
-  if (isValidUUID(idOrTitle)) {
-    const { data } = await supabase.from("routines_bank").select("id, title").eq("id", idOrTitle).single();
-    return data;
-  }
-  // Fallback: search by title (case-insensitive)
-  const { data } = await supabase.from("routines_bank").select("id, title").ilike("title", idOrTitle).limit(1).single();
-  return data;
-}
-
-async function resolveActionId(supabase: any, idOrTitle: string): Promise<{ id: string; title: string } | null> {
-  if (isValidUUID(idOrTitle)) {
-    const { data } = await supabase.from("admin_task_bank").select("id, title").eq("id", idOrTitle).single();
-    return data;
-  }
-  const { data } = await supabase.from("admin_task_bank").select("id, title").ilike("title", idOrTitle).limit(1).single();
-  return data;
-}
-
-async function resolveBreathingId(supabase: any, idOrName: string): Promise<{ id: string; name: string } | null> {
-  if (isValidUUID(idOrName)) {
-    const { data } = await supabase.from("breathing_exercises").select("id, name").eq("id", idOrName).single();
-    return data;
-  }
-  const { data } = await supabase.from("breathing_exercises").select("id, name").ilike("name", idOrName).limit(1).single();
-  return data;
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -103,141 +67,11 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Determine which tools can execute directly vs which are form-fill only
-    const directExecutionTools = [
-      "create_action_in_bank",
-      "create_ritual_in_bank",
-      "create_breathing_exercise",
-      "update_action_in_bank",
-      "update_ritual_in_bank",
-      "update_breathing_exercise",
-      "add_subtasks_to_action",
-      "delete_subtask",
-      "delete_action_from_bank",
-      "delete_ritual_from_bank",
-      "delete_breathing_exercise",
-      "add_tasks_to_routine",
-      "delete_routine_task",
-      "generate_routine_cover",
-    ];
-
-    const allTools = getToolDefinitions(currentPage);
-
-    // First AI call
     const aiMessages: Message[] = [
       { role: "system", content: systemPrompt },
       ...messages,
     ];
 
-    const firstResponse = await fetch(AI_GATEWAY, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: aiMessages,
-        tools: allTools,
-        tool_choice: "auto",
-      }),
-    });
-
-    if (!firstResponse.ok) {
-      return handleAIError(firstResponse);
-    }
-
-    const firstResult = await firstResponse.json();
-    const choice = firstResult.choices?.[0];
-
-    // If the AI wants to call a direct-execution tool, execute it and get a follow-up response
-    if (choice?.finish_reason === "tool_calls" && choice?.message?.tool_calls?.length) {
-      const toolCalls = choice.message.tool_calls;
-      const hasDirectTool = toolCalls.some((tc: any) => directExecutionTools.includes(tc.function?.name));
-
-      if (hasDirectTool) {
-        // Execute tools and collect results
-        const toolResults: { tool_call_id: string; result: any }[] = [];
-        
-        for (const tc of toolCalls) {
-          const fnName = tc.function?.name;
-          let args: any;
-          try {
-            args = JSON.parse(tc.function?.arguments || "{}");
-          } catch {
-            args = {};
-          }
-
-          if (directExecutionTools.includes(fnName)) {
-            const result = await executeToolAction(supabase, fnName, args);
-            toolResults.push({ tool_call_id: tc.id, result });
-          } else {
-            toolResults.push({ tool_call_id: tc.id, result: { success: true, message: "Form content generated" } });
-          }
-        }
-
-        // Build messages for follow-up including tool results
-        const followUpMessages: Message[] = [
-          ...aiMessages,
-          choice.message,
-          ...toolResults.map(tr => ({
-            role: "tool" as const,
-            content: JSON.stringify(tr.result),
-            tool_call_id: tr.tool_call_id,
-          })),
-        ];
-
-        // Second AI call to get natural language confirmation (streaming)
-        const secondResponse = await fetch(AI_GATEWAY, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-3-flash-preview",
-            messages: followUpMessages,
-            stream: true,
-          }),
-        });
-
-        if (!secondResponse.ok) {
-          return handleAIError(secondResponse);
-        }
-
-        // Prepend a custom SSE event with action results before streaming the AI response
-        const actionData = toolResults.map(tr => tr.result);
-        const actionEvent = `data: ${JSON.stringify({ action_results: actionData })}\n\n`;
-        const actionEncoder = new TextEncoder();
-        const actionChunk = actionEncoder.encode(actionEvent);
-
-        // Create a combined stream
-        const combinedStream = new ReadableStream({
-          async start(controller) {
-            // Send action results first
-            controller.enqueue(actionChunk);
-
-            // Then pipe the AI stream
-            const reader = secondResponse.body!.getReader();
-            try {
-              while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                controller.enqueue(value);
-              }
-            } finally {
-              controller.close();
-            }
-          }
-        });
-
-        return new Response(combinedStream, {
-          headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
-        });
-      }
-    }
-
-    // No direct-execution tools called — stream normally
     const streamResponse = await fetch(AI_GATEWAY, {
       method: "POST",
       headers: {
@@ -248,13 +82,28 @@ serve(async (req) => {
         model: "google/gemini-3-flash-preview",
         messages: aiMessages,
         stream: true,
-        tools: allTools,
-        tool_choice: "auto",
       }),
     });
 
     if (!streamResponse.ok) {
-      return handleAIError(streamResponse);
+      if (streamResponse.status === 429) {
+        return new Response(JSON.stringify({ error: "Rate limits exceeded, please try again later." }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (streamResponse.status === 402) {
+        return new Response(JSON.stringify({ error: "AI credits exhausted. Please add funds to continue." }), {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const text = await streamResponse.text();
+      console.error("AI gateway error:", streamResponse.status, text);
+      return new Response(JSON.stringify({ error: "AI gateway error" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     return new Response(streamResponse.body, {
@@ -269,691 +118,6 @@ serve(async (req) => {
   }
 });
 
-async function handleAIError(response: Response) {
-  if (response.status === 429) {
-    return new Response(JSON.stringify({ error: "Rate limits exceeded, please try again later." }), {
-      status: 429,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-  if (response.status === 402) {
-    return new Response(JSON.stringify({ error: "AI credits exhausted. Please add funds to continue." }), {
-      status: 402,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-  const text = await response.text();
-  console.error("AI gateway error:", response.status, text);
-  return new Response(JSON.stringify({ error: "AI gateway error" }), {
-    status: 500,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
-
-// ============= TOOL EXECUTION =============
-
-async function executeToolAction(supabase: any, fnName: string, args: any): Promise<any> {
-  try {
-    switch (fnName) {
-      case "create_action_in_bank":
-        return await createActionInBank(supabase, args);
-      case "create_ritual_in_bank":
-        return await createRoutineInBank(supabase, args);
-      case "create_breathing_exercise":
-        return await createBreathingExercise(supabase, args);
-      case "update_action_in_bank":
-        return await updateActionInBank(supabase, args);
-      case "update_ritual_in_bank":
-        return await updateRoutineInBank(supabase, args);
-      case "update_breathing_exercise":
-        return await updateBreathingExercise(supabase, args);
-      case "add_subtasks_to_action":
-        return await addSubtasksToAction(supabase, args);
-      case "delete_subtask":
-        return await deleteSubtask(supabase, args);
-      case "delete_action_from_bank":
-        return await deleteActionFromBank(supabase, args);
-      case "delete_ritual_from_bank":
-        return await deleteRoutineFromBank(supabase, args);
-      case "delete_breathing_exercise":
-        return await deleteBreathingExerciseAction(supabase, args);
-      case "add_tasks_to_routine":
-        return await addTasksToRoutine(supabase, args);
-      case "delete_routine_task":
-        return await deleteRoutineTask(supabase, args);
-      case "generate_routine_cover":
-        return await generateRoutineCover(supabase, args);
-      default:
-        return { success: false, error: `Unknown tool: ${fnName}` };
-    }
-  } catch (e) {
-    console.error(`Tool execution error (${fnName}):`, e);
-    return { success: false, error: e instanceof Error ? e.message : "Unknown error" };
-  }
-}
-
-async function createActionInBank(supabase: any, args: any) {
-  const { data, error } = await supabase.from("admin_task_bank").insert({
-    title: args.title,
-    emoji: args.emoji || "✨",
-    category: args.category || "general",
-    color: args.color || "#8B5CF6",
-    description: args.description || null,
-    duration_minutes: args.duration_minutes || null,
-    time_period: args.time_period || null,
-    repeat_pattern: args.repeat_pattern || "daily",
-    is_active: true,
-    is_popular: args.is_popular || false,
-    tag: args.tag || null,
-  }).select("id, title, emoji, category").single();
-
-  if (error) {
-    console.error("Insert task error:", error);
-    return { success: false, error: error.message, action: "create_action_in_bank" };
-  }
-
-  return {
-    success: true,
-    action: "create_action_in_bank",
-    message: `Created task "${data.title}" in ${data.category} category`,
-    created: data,
-  };
-}
-
-async function createRoutineInBank(supabase: any, args: any) {
-  const { data: routine, error: routineError } = await supabase.from("routines_bank").insert({
-    title: args.title,
-    subtitle: args.subtitle || null,
-    description: args.description || null,
-    category: args.category || "general",
-    emoji: args.emoji || "🌟",
-    color: args.color || "#8B5CF6",
-    schedule_type: args.schedule_type || "daily",
-    is_active: true,
-    is_popular: args.is_popular || false,
-  }).select("id, title, emoji, category").single();
-
-  if (routineError) {
-    console.error("Insert routine error:", routineError);
-    return { success: false, error: routineError.message, action: "create_ritual_in_bank" };
-  }
-
-  const sectionMap: Record<string, string> = {};
-  if (args.sections?.length) {
-    for (let i = 0; i < args.sections.length; i++) {
-      const sec = args.sections[i];
-      const { data: sectionData, error: secError } = await supabase.from("routines_bank_sections").insert({
-        routine_id: routine.id,
-        title: sec.title,
-        section_order: i,
-        is_active: true,
-      }).select("id").single();
-
-      if (!secError && sectionData) {
-        sectionMap[sec.title] = sectionData.id;
-      }
-    }
-  }
-
-  let taskCount = 0;
-  if (args.tasks?.length) {
-    for (let i = 0; i < args.tasks.length; i++) {
-      const task = args.tasks[i];
-      const sectionId = task.section_title ? sectionMap[task.section_title] : null;
-      
-      const { error: taskError } = await supabase.from("routines_bank_tasks").insert({
-        routine_id: routine.id,
-        section_id: sectionId || null,
-        section_title: task.section_title || null,
-        title: task.title,
-        emoji: task.emoji || "✅",
-        duration_minutes: task.duration_minutes || null,
-        task_order: i,
-        drip_day: task.drip_day || null,
-        schedule_days: task.schedule_days || null,
-      });
-
-      if (!taskError) taskCount++;
-    }
-  }
-
-  return {
-    success: true,
-    action: "create_ritual_in_bank",
-    message: `Created routine "${routine.title}" with ${Object.keys(sectionMap).length} sections and ${taskCount} tasks`,
-    created: { ...routine, sectionCount: Object.keys(sectionMap).length, taskCount },
-  };
-}
-
-async function createBreathingExercise(supabase: any, args: any) {
-  const { data, error } = await supabase.from("breathing_exercises").insert({
-    name: args.name,
-    description: args.description || null,
-    category: args.category || "relaxation",
-    emoji: args.emoji || "🌬️",
-    inhale_seconds: args.inhale_seconds || 4,
-    inhale_hold_seconds: args.inhale_hold_seconds || 0,
-    exhale_seconds: args.exhale_seconds || 4,
-    exhale_hold_seconds: args.exhale_hold_seconds || 0,
-    inhale_method: args.inhale_method || "nose",
-    exhale_method: args.exhale_method || "mouth",
-    is_active: true,
-    is_premium: args.is_premium || false,
-  }).select("id, name, emoji, category").single();
-
-  if (error) {
-    console.error("Insert breathing error:", error);
-    return { success: false, error: error.message, action: "create_breathing_exercise" };
-  }
-
-  return {
-    success: true,
-    action: "create_breathing_exercise",
-    message: `Created breathing exercise "${data.name}"`,
-    created: data,
-  };
-}
-
-// ============= UPDATE FUNCTIONS =============
-
-async function updateActionInBank(supabase: any, args: any) {
-  if (!args.id) {
-    return { success: false, error: "Missing task ID", action: "update_action_in_bank" };
-  }
-
-  const resolved = await resolveActionId(supabase, args.id);
-  if (!resolved) {
-    return { success: false, error: `Task not found: "${args.id}". Use the exact UUID from context.`, action: "update_action_in_bank" };
-  }
-
-  const updates: Record<string, any> = {};
-  if (args.title !== undefined) updates.title = args.title;
-  if (args.emoji !== undefined) updates.emoji = args.emoji;
-  if (args.category !== undefined) updates.category = args.category;
-  if (args.color !== undefined) updates.color = args.color;
-  if (args.description !== undefined) updates.description = args.description;
-  if (args.duration_minutes !== undefined) updates.duration_minutes = args.duration_minutes;
-  if (args.time_period !== undefined) updates.time_period = args.time_period;
-  if (args.repeat_pattern !== undefined) updates.repeat_pattern = args.repeat_pattern;
-  if (args.tag !== undefined) updates.tag = args.tag;
-  if (args.is_popular !== undefined) updates.is_popular = args.is_popular;
-  if (args.is_active !== undefined) updates.is_active = args.is_active;
-
-  const { data, error } = await supabase.from("admin_task_bank")
-    .update(updates)
-    .eq("id", resolved.id)
-    .select("id, title, emoji, category")
-    .single();
-
-  if (error) {
-    console.error("Update task error:", error);
-    return { success: false, error: error.message, action: "update_action_in_bank" };
-  }
-
-  return {
-    success: true,
-    action: "update_action_in_bank",
-    message: `Updated task "${data.title}"`,
-    created: data,
-  };
-}
-
-async function updateRoutineInBank(supabase: any, args: any) {
-  if (!args.id) {
-    return { success: false, error: "Missing routine ID", action: "update_ritual_in_bank" };
-  }
-
-  const resolved = await resolveRoutineId(supabase, args.id);
-  if (!resolved) {
-    return { success: false, error: `Routine not found: "${args.id}". Use the exact UUID from context.`, action: "update_ritual_in_bank" };
-  }
-
-  const updates: Record<string, any> = {};
-  if (args.title !== undefined) updates.title = args.title;
-  if (args.subtitle !== undefined) updates.subtitle = args.subtitle;
-  if (args.description !== undefined) updates.description = args.description;
-  if (args.category !== undefined) updates.category = args.category;
-  if (args.emoji !== undefined) updates.emoji = args.emoji;
-  if (args.color !== undefined) updates.color = args.color;
-  if (args.schedule_type !== undefined) updates.schedule_type = args.schedule_type;
-  if (args.is_popular !== undefined) updates.is_popular = args.is_popular;
-  if (args.is_active !== undefined) updates.is_active = args.is_active;
-
-  const { data, error } = await supabase.from("routines_bank")
-    .update(updates)
-    .eq("id", resolved.id)
-    .select("id, title, emoji, category, color")
-    .single();
-
-  if (error) {
-    console.error("Update routine error:", error);
-    return { success: false, error: error.message, action: "update_ritual_in_bank" };
-  }
-
-  return {
-    success: true,
-    action: "update_ritual_in_bank",
-    message: `Updated routine "${data.title}" — color is now ${data.color}`,
-    created: data,
-  };
-}
-
-async function updateBreathingExercise(supabase: any, args: any) {
-  if (!args.id) {
-    return { success: false, error: "Missing exercise ID", action: "update_breathing_exercise" };
-  }
-
-  const resolved = await resolveBreathingId(supabase, args.id);
-  if (!resolved) {
-    return { success: false, error: `Breathing exercise not found: "${args.id}". Use the exact UUID from context.`, action: "update_breathing_exercise" };
-  }
-
-  const updates: Record<string, any> = {};
-  if (args.name !== undefined) updates.name = args.name;
-  if (args.description !== undefined) updates.description = args.description;
-  if (args.category !== undefined) updates.category = args.category;
-  if (args.emoji !== undefined) updates.emoji = args.emoji;
-  if (args.inhale_seconds !== undefined) updates.inhale_seconds = args.inhale_seconds;
-  if (args.inhale_hold_seconds !== undefined) updates.inhale_hold_seconds = args.inhale_hold_seconds;
-  if (args.exhale_seconds !== undefined) updates.exhale_seconds = args.exhale_seconds;
-  if (args.exhale_hold_seconds !== undefined) updates.exhale_hold_seconds = args.exhale_hold_seconds;
-  if (args.inhale_method !== undefined) updates.inhale_method = args.inhale_method;
-  if (args.exhale_method !== undefined) updates.exhale_method = args.exhale_method;
-  if (args.is_premium !== undefined) updates.is_premium = args.is_premium;
-  if (args.is_active !== undefined) updates.is_active = args.is_active;
-
-  const { data, error } = await supabase.from("breathing_exercises")
-    .update(updates)
-    .eq("id", resolved.id)
-    .select("id, name, emoji, category")
-    .single();
-
-  if (error) {
-    console.error("Update breathing error:", error);
-    return { success: false, error: error.message, action: "update_breathing_exercise" };
-  }
-
-  return {
-    success: true,
-    action: "update_breathing_exercise",
-    message: `Updated breathing exercise "${data.name}"`,
-    created: data,
-  };
-}
-
-// ============= SUBTASK FUNCTIONS =============
-
-async function addSubtasksToAction(supabase: any, args: any) {
-  if (!args.task_id) {
-    return { success: false, error: "Missing task_id (task ID)", action: "add_subtasks_to_action" };
-  }
-  if (!args.subtasks?.length) {
-    return { success: false, error: "No subtasks provided", action: "add_subtasks_to_action" };
-  }
-
-  const { data: existing } = await supabase.from("admin_task_bank_subtasks")
-    .select("order_index")
-    .eq("task_id", args.task_id)
-    .order("order_index", { ascending: false })
-    .limit(1);
-
-  let nextOrder = (existing?.[0]?.order_index ?? -1) + 1;
-
-  const inserted = [];
-  for (const sub of args.subtasks) {
-    const { data, error } = await supabase.from("admin_task_bank_subtasks").insert({
-      task_id: args.task_id,
-      title: sub.title,
-      order_index: nextOrder++,
-    }).select("id, title, order_index").single();
-
-    if (!error && data) inserted.push(data);
-  }
-
-  return {
-    success: true,
-    action: "add_subtasks_to_action",
-    message: `Added ${inserted.length} subtask(s) to task`,
-    created: inserted,
-  };
-}
-
-async function deleteSubtask(supabase: any, args: any) {
-  if (!args.id) {
-    return { success: false, error: "Missing subtask ID", action: "delete_subtask" };
-  }
-
-  const { error } = await supabase.from("admin_task_bank_subtasks")
-    .delete()
-    .eq("id", args.id);
-
-  if (error) {
-    return { success: false, error: error.message, action: "delete_subtask" };
-  }
-
-  return {
-    success: true,
-    action: "delete_subtask",
-    message: `Deleted subtask`,
-  };
-}
-
-// ============= DELETE FUNCTIONS =============
-
-async function deleteActionFromBank(supabase: any, args: any) {
-  if (!args.id) {
-    return { success: false, error: "Missing task ID", action: "delete_action_from_bank" };
-  }
-
-  const resolved = await resolveActionId(supabase, args.id);
-  if (!resolved) {
-    return { success: false, error: `Task not found: "${args.id}". Make sure to use the exact UUID from context.`, action: "delete_action_from_bank" };
-  }
-
-  // Delete subtasks first
-  await supabase.from("admin_task_bank_subtasks")
-    .delete()
-    .eq("task_id", resolved.id);
-
-  // Delete the task
-  const { error } = await supabase.from("admin_task_bank")
-    .delete()
-    .eq("id", resolved.id);
-
-  if (error) {
-    console.error("Delete task error:", error);
-    return { success: false, error: error.message, action: "delete_action_from_bank" };
-  }
-
-  return {
-    success: true,
-    action: "delete_action_from_bank",
-    message: `Deleted task "${resolved.title}"`,
-  };
-}
-
-async function deleteRoutineFromBank(supabase: any, args: any) {
-  if (!args.id) {
-    return { success: false, error: "Missing routine ID", action: "delete_ritual_from_bank" };
-  }
-
-  const resolved = await resolveRoutineId(supabase, args.id);
-  if (!resolved) {
-    return { success: false, error: `Routine not found: "${args.id}". Make sure to use the exact UUID from context.`, action: "delete_ritual_from_bank" };
-  }
-
-  // Delete tasks, sections, then the routine
-  await supabase.from("routines_bank_tasks")
-    .delete()
-    .eq("routine_id", resolved.id);
-
-  await supabase.from("routines_bank_sections")
-    .delete()
-    .eq("routine_id", resolved.id);
-
-  const { error } = await supabase.from("routines_bank")
-    .delete()
-    .eq("id", resolved.id);
-
-  if (error) {
-    console.error("Delete routine error:", error);
-    return { success: false, error: error.message, action: "delete_ritual_from_bank" };
-  }
-
-  return {
-    success: true,
-    action: "delete_ritual_from_bank",
-    message: `Deleted routine "${resolved.title}" and all its tasks/sections`,
-  };
-}
-
-async function deleteBreathingExerciseAction(supabase: any, args: any) {
-  if (!args.id) {
-    return { success: false, error: "Missing exercise ID", action: "delete_breathing_exercise" };
-  }
-
-  const resolved = await resolveBreathingId(supabase, args.id);
-  if (!resolved) {
-    return { success: false, error: `Breathing exercise not found: "${args.id}". Make sure to use the exact UUID from context.`, action: "delete_breathing_exercise" };
-  }
-
-  const { error } = await supabase.from("breathing_exercises")
-    .delete()
-    .eq("id", resolved.id);
-
-  if (error) {
-    console.error("Delete breathing error:", error);
-    return { success: false, error: error.message, action: "delete_breathing_exercise" };
-  }
-
-  return {
-    success: true,
-    action: "delete_breathing_exercise",
-    message: `Deleted breathing exercise "${resolved.name}"`,
-  };
-}
-
-// ============= ROUTINE TASK MANAGEMENT =============
-
-async function addTasksToRoutine(supabase: any, args: any) {
-  if (!args.ritual_id) {
-    return { success: false, error: "Missing ritual_id", action: "add_tasks_to_routine" };
-  }
-  if (!args.tasks?.length) {
-    return { success: false, error: "No tasks provided", action: "add_tasks_to_routine" };
-  }
-
-  const resolved = await resolveRoutineId(supabase, args.ritual_id);
-  if (!resolved) {
-    return { success: false, error: `Routine not found: "${args.ritual_id}". Use the exact UUID from context.`, action: "add_tasks_to_routine" };
-  }
-  const routineId = resolved.id;
-
-  // Get current max task_order
-  const { data: existing } = await supabase.from("routines_bank_tasks")
-    .select("task_order")
-    .eq("routine_id", routineId)
-    .order("task_order", { ascending: false })
-    .limit(1);
-
-  let nextOrder = (existing?.[0]?.task_order ?? -1) + 1;
-
-  const inserted = [];
-  for (const task of args.tasks) {
-    const { data, error } = await supabase.from("routines_bank_tasks").insert({
-      routine_id: routineId,
-      section_id: task.section_id || null,
-      section_title: task.section_title || null,
-      title: task.title,
-      emoji: task.emoji || "✅",
-      duration_minutes: task.duration_minutes || null,
-      task_order: nextOrder++,
-      drip_day: task.drip_day || null,
-      schedule_days: task.schedule_days || null,
-    }).select("id, title, emoji, task_order").single();
-
-    if (!error && data) inserted.push(data);
-  }
-
-  return {
-    success: true,
-    action: "add_tasks_to_routine",
-    message: `Added ${inserted.length} task(s) to routine`,
-    created: inserted,
-  };
-}
-
-async function deleteRoutineTask(supabase: any, args: any) {
-  if (!args.id) {
-    return { success: false, error: "Missing task ID", action: "delete_routine_task" };
-  }
-
-  const { data: task } = await supabase.from("routines_bank_tasks")
-    .select("title")
-    .eq("id", args.id)
-    .single();
-
-  const { error } = await supabase.from("routines_bank_tasks")
-    .delete()
-    .eq("id", args.id);
-
-  if (error) {
-    return { success: false, error: error.message, action: "delete_routine_task" };
-  }
-
-  return {
-    success: true,
-    action: "delete_routine_task",
-    message: `Deleted task "${task?.title || args.id}" from routine`,
-  };
-}
-
-// ============= COVER GENERATION =============
-
-async function generateRoutineCover(supabase: any, args: any) {
-  if (!args.ritual_id) {
-    return { success: false, error: "Missing ritual_id", action: "generate_routine_cover" };
-  }
-
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!LOVABLE_API_KEY) {
-    return { success: false, error: "LOVABLE_API_KEY not configured", action: "generate_routine_cover" };
-  }
-
-  const resolved = await resolveRoutineId(supabase, args.ritual_id);
-  if (!resolved) {
-    return { success: false, error: `Routine not found: "${args.ritual_id}". Use the exact UUID from context.`, action: "generate_routine_cover" };
-  }
-
-  // Fetch the routine details
-  const { data: routine, error: fetchError } = await supabase.from("routines_bank")
-    .select("id, title, subtitle, description, category, emoji")
-    .eq("id", resolved.id)
-    .single();
-
-  if (fetchError || !routine) {
-    return { success: false, error: "Routine not found", action: "generate_routine_cover" };
-  }
-
-  // Fetch routine tasks for icon context
-  const { data: tasks } = await supabase.from("routines_bank_tasks")
-    .select("title, emoji")
-    .eq("routine_id", resolved.id)
-    .order("task_order")
-    .limit(6);
-
-  const taskIcons = (tasks || []).map((t: any) => t.title).join(", ");
-
-  // Build Ladybosslook-style prompt using the user's design guide
-  const customDesc = args.description || "";
-  const prompt = `Square mobile app cover illustration for a wellness app called Ladybosslook.
-
-Style: soft pastel digital illustration, feminine self-care aesthetic,
-calming and uplifting mood, clean modern wellness design,
-gentle feminine wellness style, friendly digital illustration,
-soft glow and sparkles, modern wellness illustration, minimal but expressive objects.
-
-Main scene:
-${customDesc || `A cover representing "${routine.title}"${routine.description ? ` — ${routine.description}` : ""}`}
-
-Floating around:
-${taskIcons ? `Soft illustrated icons representing: ${taskIcons}` : "Small floating hearts, stars, and gentle sparkle elements"}
-
-Character direction (if applicable):
-gentle confident woman, positive energy, soft athletic outfit,
-calm confidence, empowering feminine energy, warm expression.
-
-Background:
-dreamy pastel gradient sky (lavender, pastel pink, soft blue, warm sunrise gradients),
-soft sparkles, light nature elements, minimal but warm environment,
-gentle purple accents, soft glow lighting.
-
-Composition:
-centered hero element, balanced clean layout,
-designed as a mobile app routine cover.
-The background gradient MUST extend to all edges — NO white borders or padding.
-
-ABSOLUTELY NO text, words, letters, or typography of any kind.
-Clean cover illustration only.`;
-
-  console.log(`[generate_routine_cover] Generating for routine: ${routine.title}`);
-
-  try {
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-pro-image-preview",
-        messages: [{ role: "user", content: prompt }],
-        modalities: ["image", "text"],
-      }),
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error("AI image generation error:", response.status, errText);
-      if (response.status === 429) {
-        return { success: false, error: "Rate limit exceeded. Try again in a moment.", action: "generate_routine_cover" };
-      }
-      if (response.status === 402) {
-        return { success: false, error: "AI credits exhausted.", action: "generate_routine_cover" };
-      }
-      return { success: false, error: `AI error: ${response.status}`, action: "generate_routine_cover" };
-    }
-
-    const data = await response.json();
-    const imageData = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
-    if (!imageData) {
-      console.error("No image in AI response");
-      return { success: false, error: "No image was generated", action: "generate_routine_cover" };
-    }
-
-    // Upload to storage
-    const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
-    const imageBuffer = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
-    const fileName = `routine-${resolved.id}-${Date.now()}.png`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("routine-covers")
-      .upload(fileName, imageBuffer, { contentType: "image/png", upsert: true });
-
-    if (uploadError) {
-      console.error("Upload error:", uploadError);
-      return { success: false, error: `Upload failed: ${uploadError.message}`, action: "generate_routine_cover" };
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from("routine-covers")
-      .getPublicUrl(fileName);
-
-    // Update the routine with the cover URL
-    const { error: updateError } = await supabase.from("routines_bank")
-      .update({ cover_image_url: publicUrl })
-      .eq("id", resolved.id);
-
-    if (updateError) {
-      console.error("Update routine cover error:", updateError);
-      return { success: false, error: `Cover uploaded but failed to update routine: ${updateError.message}`, action: "generate_routine_cover" };
-    }
-
-    console.log(`[generate_routine_cover] Cover generated and saved: ${publicUrl}`);
-
-    return {
-      success: true,
-      action: "generate_routine_cover",
-      message: `Generated and applied Ladybosslook-style cover for "${routine.title}"`,
-      created: { title: routine.title, emoji: routine.emoji, coverUrl: publicUrl },
-    };
-  } catch (e) {
-    console.error("Cover generation error:", e);
-    return { success: false, error: e instanceof Error ? e.message : "Unknown error", action: "generate_routine_cover" };
-  }
-}
-
 // ============= CONTEXT =============
 
 async function fetchContext(supabase: any, currentPage?: string) {
@@ -964,11 +128,13 @@ async function fetchContext(supabase: any, currentPage?: string) {
     { count: activeEnrollments },
     { data: recentRounds },
     { data: feedChannels },
+    { data: programs },
   ] = await Promise.all([
     supabase.from("profiles").select("*", { count: "exact", head: true }),
     supabase.from("course_enrollments").select("*", { count: "exact", head: true }).eq("status", "active"),
     supabase.from("program_rounds").select("id, round_name, program_slug, status, start_date").in("status", ["active", "upcoming"]).order("start_date").limit(10),
     supabase.from("feed_channels").select("id, name, slug, type, program_slug").eq("is_archived", false).order("sort_order").limit(20),
+    supabase.from("program_catalog").select("slug, title, type").eq("is_active", true).limit(30),
   ]);
 
   context.stats = {
@@ -977,54 +143,31 @@ async function fetchContext(supabase: any, currentPage?: string) {
   };
   context.activeRounds = recentRounds || [];
   context.feedChannels = feedChannels || [];
+  context.programs = programs || [];
 
-  // Fetch tools-page-specific context
-  if (currentPage === "tools") {
-    const [
-      { data: categories },
-      { data: recentActions },
-      { data: recentRoutines },
-      { data: breathingExercises },
-      { data: actionSubtasks },
-      { data: routineTasks },
-    ] = await Promise.all([
-      supabase.from("routine_categories").select("id, name, slug, icon").eq("is_active", true).order("display_order"),
-      supabase.from("admin_task_bank").select("id, title, emoji, category, color, description, time_period").eq("is_active", true).order("sort_order").limit(20),
-      supabase.from("routines_bank").select("id, title, emoji, category, color, description").eq("is_active", true).order("sort_order").limit(50),
-      supabase.from("breathing_exercises").select("id, name, emoji, category, description").eq("is_active", true).order("sort_order").limit(10),
-      supabase.from("admin_task_bank_subtasks").select("id, task_id, title, order_index").order("order_index").limit(200),
-      supabase.from("routines_bank_tasks").select("id, routine_id, title, emoji, duration_minutes, task_order, section_id, section_title").order("task_order").limit(200),
-    ]);
+  // Fetch tools context for deeper knowledge
+  const [
+    { data: categories },
+    { data: taskCount },
+    { data: routineCount },
+    { data: breathingExercises },
+    { data: recentActions },
+    { data: recentRoutines },
+  ] = await Promise.all([
+    supabase.from("routine_categories").select("name, slug, icon").eq("is_active", true).order("display_order"),
+    supabase.from("admin_task_bank").select("*", { count: "exact", head: true }).eq("is_active", true),
+    supabase.from("routines_bank").select("*", { count: "exact", head: true }).eq("is_active", true),
+    supabase.from("breathing_exercises").select("name, category, emoji").eq("is_active", true).order("sort_order"),
+    supabase.from("admin_task_bank").select("title, emoji, category").eq("is_active", true).order("sort_order").limit(30),
+    supabase.from("routines_bank").select("title, emoji, category").eq("is_active", true).order("sort_order").limit(30),
+  ]);
 
-    context.categories = categories || [];
-    context.existingActions = recentActions || [];
-    context.existingRoutines = recentRoutines || [];
-    context.breathingExercises = breathingExercises || [];
-    context.actionSubtasks = actionSubtasks || [];
-    context.routineTasks = routineTasks || [];
-  }
-
-  if (currentPage === "routines") {
-    const { data: routineCategories } = await supabase
-      .from("routine_categories").select("id, name, slug, emoji: icon").eq("is_active", true).order("display_order");
-    context.routineCategories = routineCategories || [];
-
-    const { data: routinePlans } = await supabase
-      .from("routine_plans").select("id, name, description, category_id").eq("is_published", true).limit(10);
-    context.recentRoutines = routinePlans || [];
-  }
-
-  if (currentPage === "communications" || currentPage === "community") {
-    const { data: recentPosts } = await supabase
-      .from("feed_posts").select("id, title, content, post_type, created_at").order("created_at", { ascending: false }).limit(5);
-    context.recentPosts = recentPosts || [];
-  }
-
-  if (currentPage === "programs") {
-    const { data: programs } = await supabase
-      .from("program_catalog").select("slug, title, type").eq("is_active", true).limit(20);
-    context.programs = programs || [];
-  }
+  context.categories = categories || [];
+  context.taskCount = taskCount || 0;
+  context.routineCount = routineCount || 0;
+  context.breathingExercises = breathingExercises || [];
+  context.sampleTasks = recentActions || [];
+  context.sampleRoutines = recentRoutines || [];
 
   return context;
 }
@@ -1036,625 +179,80 @@ function buildSystemPrompt(context: Record<string, any>, currentPage?: string): 
     weekday: "long", year: "numeric", month: "long", day: "numeric" 
   });
 
-  let prompt = `You are Razie's AI Admin Assistant for the Ladyboss / Ladybosslook platform. You're smart, proactive, and action-oriented.
+  return `You are Razie's knowledgeable AI assistant for the Ladyboss / Ladybosslook platform. You know every detail about this app and can have deep, helpful conversations about the platform, its features, strategy, content ideas, and more.
 
-Today is ${today}.
+Today is ${today}. Current admin page: ${currentPage || "overview"}.
 
-## Platform Stats
+## Your Role
+You are a conversational partner who deeply understands the Ladybosslook platform. You can:
+- Discuss strategy, content ideas, and feature planning
+- Help brainstorm announcements, push notifications, social posts
+- Advise on routine/task design and wellness content
+- Answer questions about the platform's data and structure
+- Help draft text content (announcements, descriptions, emails)
+- Provide insights based on platform stats and data
+- Discuss user engagement strategies
+
+You do NOT execute database actions or create/modify content directly. You provide ideas, drafts, and advice that the admin can then implement manually.
+
+## Platform Knowledge
+
+### Stats
 - Total Users: ${context.stats?.totalUsers || 0}
 - Active Enrollments: ${context.stats?.activeEnrollments || 0}
+- Active Tasks in Bank: ${context.taskCount || 0}
+- Active Routines in Bank: ${context.routineCount || 0}
 
-## Active Program Rounds
-${context.activeRounds?.map((r: any) => `- ${r.round_name} (${r.program_slug}) - Status: ${r.status}, Starts: ${r.start_date}`).join("\n") || "None"}
+### Active Program Rounds
+${context.activeRounds?.map((r: any) => `- ${r.round_name} (${r.program_slug}) — ${r.status}, starts ${r.start_date}`).join("\n") || "None"}
 
-## Feed Channels Available
-${context.feedChannels?.map((c: any) => `- "${c.name}" (ID: ${c.id}, slug: ${c.slug})`).join("\n") || "None"}
-`;
+### Programs
+${context.programs?.map((p: any) => `- ${p.title} (${p.slug}) — ${p.type}`).join("\n") || "None"}
 
-  if (currentPage === "tools") {
-    prompt += `
-## Current Page: TOOLS (Tasks Bank, Routines Bank, Breathing Exercises)
+### Feed Channels
+${context.feedChannels?.map((c: any) => `- "${c.name}" (${c.slug}, type: ${c.type})`).join("\n") || "None"}
 
-You can DIRECTLY CREATE, UPDATE, and DELETE items in the database. When the user asks you to do something, USE THE TOOLS to do it immediately.
+### Task Categories
+${context.categories?.map((c: any) => `- ${c.icon || "📌"} ${c.name} (${c.slug})`).join("\n") || "None"}
 
-### Available Categories
-${context.categories?.map((c: any) => `- ${c.icon || "📌"} ${c.name} (slug: "${c.slug}")`).join("\n") || "None"}
+### Sample Tasks (${context.taskCount} total)
+${context.sampleTasks?.slice(0, 15).map((a: any) => `- ${a.emoji} ${a.title} [${a.category}]`).join("\n") || "None"}
 
-### Existing Tasks (${context.existingActions?.length || 0} active)
-${context.existingActions?.slice(0, 20).map((a: any) => {
-  const subs = (context.actionSubtasks || []).filter((s: any) => s.task_id === a.id);
-  const subText = subs.length ? ` | Subtasks: ${subs.map((s: any) => `"${s.title}" (ID:${s.id})`).join(', ')}` : '';
-  return `- ID: "${a.id}" | ${a.emoji} ${a.title} [${a.category}] color:${a.color || 'none'} ${a.time_period ? `time:${a.time_period}` : ''}${subText}`;
-}).join("\n") || "None"}
+### Sample Routines (${context.routineCount} total)
+${context.sampleRoutines?.slice(0, 15).map((r: any) => `- ${r.emoji || "🌟"} ${r.title} [${r.category}]`).join("\n") || "None"}
 
-### Existing Routines (${context.existingRoutines?.length || 0} active)
-${context.existingRoutines?.map((r: any) => {
-  const tasks = (context.routineTasks || []).filter((t: any) => t.routine_id === r.id);
-  const taskText = tasks.length ? `\n    Tasks: ${tasks.map((t: any) => `"${t.emoji || '✅'} ${t.title}" (ID:${t.id})`).join(', ')}` : '';
-  return `- ID: "${r.id}" | ${r.emoji || "🌟"} ${r.title} [${r.category}] color:${r.color || 'none'} desc:${r.description ? `"${r.description.substring(0, 100)}..."` : 'none'}${taskText}`;
-}).join("\n") || "None"}
+### Breathing Exercises
+${context.breathingExercises?.map((b: any) => `- ${b.emoji || "🌬️"} ${b.name} [${b.category}]`).join("\n") || "None"}
 
-### Existing Breathing Exercises (${context.breathingExercises?.length || 0} active)
-${context.breathingExercises?.map((b: any) => `- ID: "${b.id}" | ${b.emoji || "🌬️"} ${b.name} [${b.category}]`).join("\n") || "None"}
+## App Features You Know About
+- **Home/Planner**: Daily task planner with customizable tasks, goals, subtasks, pro-links
+- **Tools Hub**: Self-Care Habits (task bank), Routines, Reflections Journal, Breathe, Timer, Mood, Emotions, Projects, Water, Period, Fasting
+- **My Shortcuts**: Up to 4 pinnable quick-access buttons on the dashboard
+- **Routines**: Template-based routines users can adopt and play through
+- **Projects**: Scratchpad for organizing tasks into project-based sections with drag-and-drop reordering
+- **Audio Player**: Course-supplement audios, playlists with drip scheduling
+- **Video Player**: Workout and educational videos
+- **Feed/Channels**: Community chat channels per program/round
+- **Support Chat**: Private messaging with admin ("Mary")
+- **AI Coach**: Context-aware AI chat with planning and emotional support
+- **Programs**: Academy courses with rounds, enrollments, and progress tracking
+- **Breathing Exercises**: Guided breathing with customizable patterns
+- **Mood & Emotions**: Daily mood logging and emotion tracking
+- **Period Tracker**: Cycle tracking with predictions
+- **Fasting Timer**: Intermittent fasting protocols
+- **Water Tracker**: Daily hydration goals
+- **Reflections**: Guided prompts and free-form journaling
+- **Push Notifications**: Scheduled and event-driven notifications
+- **Banners**: Promotional and informational banners on home/explore pages
 
-### What You Can Do (DIRECT DATABASE ACTIONS):
-- "Create a morning meditation task" → create_action_in_bank
-- "Add 5 self-care tasks" → call create_action_in_bank multiple times
-- "Create a morning routine with tasks" → create_ritual_in_bank
-- "Add a 4-7-8 breathing exercise" → create_breathing_exercise
-- "Change the category of X" → update_action_in_bank / update_ritual_in_bank
-- "Rename X to Y" → use the update tool with the item's ID
-- "Deactivate X" → update tool with is_active: false
-- "Add subtasks to task X" → add_subtasks_to_action
-- "Remove subtask Y" → delete_subtask
-- **"Delete task X"** → delete_action_from_bank (deletes the task and its subtasks)
-- **"Delete routine X"** → delete_ritual_from_bank (deletes the routine, its tasks)
-- **"Delete breathing exercise X"** → delete_breathing_exercise
-- **"Add tasks to routine X"** → add_tasks_to_routine (adds new tasks to an existing routine)
-- **"Remove task Y from routine"** → delete_routine_task (removes a specific task from a routine)
-- **"Generate a cover for routine X"** → generate_routine_cover (generates a Ladybosslook-style pastel cover image using AI and uploads it)
+## Brand Voice
+Ladybosslook is warm, empowering, and wellness-focused. Content should feel personal, encouraging, and feminine. Use emojis naturally. Support both English and Farsi/bilingual content when relevant.
 
-### SUBTASKS EXPLAINED:
-- **Subtasks** are smaller steps/checklist items that belong to a TASK (admin_task_bank item).
-- Each task can have multiple subtasks (e.g., "Workout" → subtasks: "20 leg rises", "10 heel touches", "1 min plank").
-- Use add_subtasks_to_action to add them, delete_subtask to remove one.
-
-### ROUTINE DESCRIPTION (BLOG-STYLE RICH TEXT):
-- The routine "description" field supports **rich HTML content** (like a blog post).
-- When the user provides a long description, multiple paragraphs, or detailed content → put ALL of it into the "description" field.
-- Use HTML formatting: <h2>, <h3> for headings, <p> for paragraphs, <ul>/<ol> for lists, <strong>, <em> for emphasis.
-- Structure the content like a blog article with headings and paragraphs (e.g., "Why This Routine?", "What You'll Need", "How It Works").
-- Do NOT truncate or shorten the user's content. Put the FULL text into description.
-- Do NOT use sections (routines_bank_sections). All content goes in the description field.
-
-### ROUTINE TASKS EXPLAINED:
-- **Routine tasks** are the individual activities within a ROUTINE (routines_bank item).
-- Each routine can have multiple tasks grouped by sections.
-- The existing tasks for each routine are listed above in the "Existing Routines" section.
-- Use add_tasks_to_routine to add new tasks, delete_routine_task to remove one.
-
-### IMPORTANT RULES:
-1. When user says "create", "add", "make" → USE the create tool to create it directly in the database
-2. When user says "change", "update", "edit", "move", "rename", "modify" → USE the update tool with the existing item's ID from the context above. NEVER create a duplicate.
-3. Don't just describe what you'd create — ACTUALLY create/update it
-4. Pick appropriate emojis, categories, and colors
-5. Use existing categories from the list above (use the slug)
-6. For routines, include tasks with relevant emojis and durations
-7. After creating/updating/deleting, confirm what was done with details
-8. To find the correct item ID for updates, match by title from the existing items lists above
-9. When asked to CHANGE a COLOR: you MUST pick a DIFFERENT hex color than the current one shown in context. Do NOT re-use the same color. Choose a visually distinct new color.
-10. If the user says "change color" without specifying which color, pick a beautiful new color that fits the item's theme.
-11. When user mentions "subtasks", "steps", "checklist items" for a TASK → use add_subtasks_to_action tool. Match the task by title to find its ID.
-12. When user asks to remove/delete a subtask → use delete_subtask with the subtask's ID from context.
-13. When user says "delete", "remove" a task/ritual/exercise → use the appropriate delete tool. Always confirm what was deleted.
-14. When user asks to add tasks to an existing routine → use add_tasks_to_routine. Match the routine by title to find its ID.
-15. When user asks to remove a task from a routine → use delete_routine_task with the task's ID from context.
-16. When user says "generate cover", "create cover image", "make a cover" for a routine → use generate_routine_cover.
-17. **DESCRIPTION IS RICH TEXT (BLOG POST)**: When the user provides a long description, multiple paragraphs, or detailed content for a routine:
-    - Put ALL content into the routine's "description" field using HTML formatting.
-    - Use <h2>/<h3> for section headings, <p> for paragraphs, <ul>/<ol> for lists, <strong>/<em> for emphasis.
-    - NEVER truncate or summarize — include the FULL user-provided text.
-    - Structure it like a blog post with clear headings and paragraphs.
-    - Do NOT create sections in routines_bank_sections. Everything goes in description.
-`;
-  } else if (currentPage === "routines") {
-    prompt += `
-## Current Page: ROUTINES
-You're on the Routines management page. Here you can:
-1. Create routine plans with sections and tasks
-2. Suggest task templates for users
-
-### Available Routine Categories
-${context.routineCategories?.map((c: any) => `- ${c.emoji || "📌"} ${c.name} (slug: "${c.slug}")`).join("\n") || "None"}
-
-### Recent Routine Plans
-${context.recentRoutines?.map((r: any) => `- "${r.name}": ${r.description || "No description"}`).join("\n") || "None"}
-`;
-  } else if (currentPage === "communications") {
-    prompt += `
-## Current Page: COMMUNICATIONS
-You're on the Communications page. Use create_broadcast_content and create_push_notification_content tools.
-
-### What You Can Do Here
-- "Write a broadcast about tomorrow's session" → Use create_broadcast_content tool
-- "Push notification for new audio" → Use create_push_notification_content tool
-`;
-  } else if (currentPage === "community") {
-    prompt += `
-## Current Page: COMMUNITY
-You're on the Community/Feed page. Use create_feed_post_content tool.
-
-### Recent Posts
-${context.recentPosts?.map((p: any) => `- [${p.post_type}] ${p.title || p.content?.substring(0, 50)}...`).join("\n") || "None"}
-`;
-  } else if (currentPage === "programs") {
-    prompt += `
-## Current Page: PROGRAMS
-### Active Programs
-${context.programs?.map((p: any) => `- ${p.title} (${p.slug}) - ${p.type}`).join("\n") || "None"}
-`;
-  }
-
-  prompt += `
-## CRITICAL INSTRUCTIONS
-- When on the Tools page and user asks to CREATE something, ALWAYS use the direct-action create tools
-- When user asks to CHANGE, EDIT, UPDATE, MOVE, or RENAME something, ALWAYS use the UPDATE tools with the item's ID from the context. NEVER create a duplicate.
-- When user asks to DELETE or REMOVE something, use the appropriate DELETE tool with the item's ID from context.
-- The IDs listed in "Existing Tasks/Routines/Exercises" above are real database IDs — use them for updates and deletes
-- Use appropriate emojis for each item
-- Match Ladyboss brand: warm, empowering, wellness-focused
-- For bilingual: English first, then Farsi if requested
-- After creating/updating/deleting items, summarize what was done clearly
-- If creating multiple items, call the tool multiple times
-`;
-
-  return prompt;
-}
-
-// ============= TOOL DEFINITIONS =============
-
-function getToolDefinitions(currentPage?: string) {
-  const tools: any[] = [];
-
-  // Tools page: direct-execution tools
-  if (currentPage === "tools") {
-    tools.push(
-      {
-        type: "function",
-        function: {
-          name: "create_action_in_bank",
-          description: "Create a new task directly in the Tasks Bank database. This IMMEDIATELY creates the task.",
-          parameters: {
-            type: "object",
-            properties: {
-              title: { type: "string", description: "Task title (e.g., '10-min meditation')" },
-              emoji: { type: "string", description: "Single emoji for the task (e.g., '🧘')" },
-              category: { type: "string", description: "Category slug from available categories (e.g., 'morning', 'wellness')" },
-              color: { type: "string", description: "Hex color (e.g., '#8B5CF6')" },
-              description: { type: "string", description: "Brief description of the task" },
-              duration_minutes: { type: "number", description: "Duration in minutes" },
-              time_period: { type: "string", enum: ["morning", "afternoon", "evening", "anytime"], description: "Best time of day" },
-              repeat_pattern: { type: "string", enum: ["daily", "weekly", "custom"], description: "Repeat schedule" },
-              tag: { type: "string", description: "Optional tag like 'wellness', 'fitness'" },
-              is_popular: { type: "boolean", description: "Mark as popular/featured" },
-            },
-            required: ["title", "emoji", "category"],
-          },
-        },
-      },
-      {
-        type: "function",
-        function: {
-          name: "create_ritual_in_bank",
-          description: "Create a complete routine in the Routines Bank with optional sections and tasks. This IMMEDIATELY creates it in the database.",
-          parameters: {
-            type: "object",
-            properties: {
-              title: { type: "string", description: "Routine title" },
-              subtitle: { type: "string", description: "Short subtitle" },
-              description: { type: "string", description: "Rich HTML description of the routine (blog-post style). Use HTML tags: <h2>, <h3>, <p>, <ul>, <ol>, <strong>, <em>. Put ALL content here, structured with headings and paragraphs. Do NOT truncate." },
-              category: { type: "string", description: "Category slug" },
-              emoji: { type: "string", description: "Single emoji" },
-              color: { type: "string", description: "Hex color" },
-              schedule_type: { type: "string", enum: ["daily", "weekly", "custom"], description: "Schedule type" },
-              is_popular: { type: "boolean", description: "Mark as popular" },
-              sections: {
-                type: "array",
-                description: "Routine sections (optional groupings)",
-                items: {
-                  type: "object",
-                  properties: {
-                    title: { type: "string" },
-                  },
-                  required: ["title"],
-                },
-              },
-              tasks: {
-                type: "array",
-                description: "Tasks within the routine",
-                items: {
-                  type: "object",
-                  properties: {
-                    title: { type: "string", description: "Task title" },
-                    emoji: { type: "string", description: "Task emoji" },
-                    duration_minutes: { type: "number", description: "Duration in minutes" },
-                    section_title: { type: "string", description: "Which section this task belongs to (must match a section title)" },
-                    drip_day: { type: "number", description: "Day number for drip scheduling" },
-                    schedule_days: { type: "array", items: { type: "number" }, description: "Days of week (0=Sun)" },
-                  },
-                  required: ["title"],
-                },
-              },
-            },
-            required: ["title", "emoji", "category"],
-          },
-        },
-      },
-      {
-        type: "function",
-        function: {
-          name: "create_breathing_exercise",
-          description: "Create a new breathing exercise. This IMMEDIATELY creates it in the database.",
-          parameters: {
-            type: "object",
-            properties: {
-              name: { type: "string", description: "Exercise name (e.g., '4-7-8 Calm Breath')" },
-              description: { type: "string", description: "Brief description" },
-              category: { type: "string", enum: ["relaxation", "energy", "focus", "sleep"], description: "Exercise category" },
-              emoji: { type: "string", description: "Single emoji" },
-              inhale_seconds: { type: "number", description: "Inhale duration in seconds" },
-              inhale_hold_seconds: { type: "number", description: "Hold after inhale in seconds" },
-              exhale_seconds: { type: "number", description: "Exhale duration in seconds" },
-              exhale_hold_seconds: { type: "number", description: "Hold after exhale in seconds" },
-              inhale_method: { type: "string", enum: ["nose", "mouth"], description: "Inhale through nose or mouth" },
-              exhale_method: { type: "string", enum: ["nose", "mouth"], description: "Exhale through nose or mouth" },
-              is_premium: { type: "boolean", description: "Whether this is a premium exercise" },
-            },
-            required: ["name"],
-          },
-        },
-      },
-    );
-
-    // Update tools
-    tools.push(
-      {
-        type: "function",
-        function: {
-          name: "update_action_in_bank",
-          description: "Update an EXISTING task in the Tasks Bank. Use this when the user wants to change, edit, move category, rename, or modify a task. Do NOT create a new one.",
-          parameters: {
-            type: "object",
-            properties: {
-              id: { type: "string", description: "The ID of the existing task to update (from context)" },
-              title: { type: "string", description: "New title" },
-              emoji: { type: "string", description: "New emoji" },
-              category: { type: "string", description: "New category slug" },
-              color: { type: "string", description: "New hex color" },
-              description: { type: "string", description: "New description" },
-              duration_minutes: { type: "number", description: "New duration" },
-              time_period: { type: "string", enum: ["morning", "afternoon", "evening", "anytime"] },
-              repeat_pattern: { type: "string", enum: ["daily", "weekly", "custom"] },
-              tag: { type: "string", description: "New tag" },
-              is_popular: { type: "boolean" },
-              is_active: { type: "boolean", description: "Set false to deactivate" },
-            },
-            required: ["id"],
-          },
-        },
-      },
-      {
-        type: "function",
-        function: {
-          name: "update_ritual_in_bank",
-          description: "Update an EXISTING routine in the Routines Bank. Use this when the user wants to change, edit, move category, rename, or modify a routine. Do NOT create a new one.",
-          parameters: {
-            type: "object",
-            properties: {
-              id: { type: "string", description: "The ID of the existing routine to update (from context)" },
-              title: { type: "string", description: "New title" },
-              subtitle: { type: "string" },
-              description: { type: "string" },
-              category: { type: "string", description: "New category slug" },
-              emoji: { type: "string" },
-              color: { type: "string" },
-              schedule_type: { type: "string", enum: ["daily", "weekly", "custom"] },
-              is_popular: { type: "boolean" },
-              is_active: { type: "boolean", description: "Set false to deactivate" },
-            },
-            required: ["id"],
-          },
-        },
-      },
-      {
-        type: "function",
-        function: {
-          name: "update_breathing_exercise",
-          description: "Update an EXISTING breathing exercise. Use this when the user wants to change, edit, or modify an exercise. Do NOT create a new one.",
-          parameters: {
-            type: "object",
-            properties: {
-              id: { type: "string", description: "The ID of the existing exercise to update (from context)" },
-              name: { type: "string" },
-              description: { type: "string" },
-              category: { type: "string", enum: ["relaxation", "energy", "focus", "sleep"] },
-              emoji: { type: "string" },
-              inhale_seconds: { type: "number" },
-              inhale_hold_seconds: { type: "number" },
-              exhale_seconds: { type: "number" },
-              exhale_hold_seconds: { type: "number" },
-              inhale_method: { type: "string", enum: ["nose", "mouth"] },
-              exhale_method: { type: "string", enum: ["nose", "mouth"] },
-              is_premium: { type: "boolean" },
-              is_active: { type: "boolean" },
-            },
-            required: ["id"],
-          },
-        },
-      },
-    );
-
-    // Subtask tools
-    tools.push(
-      {
-        type: "function",
-        function: {
-          name: "add_subtasks_to_action",
-          description: "Add subtasks (checklist steps) to an existing task in the Tasks Bank.",
-          parameters: {
-            type: "object",
-            properties: {
-              task_id: { type: "string", description: "The ID of the task to add subtasks to" },
-              subtasks: {
-                type: "array",
-                description: "Array of subtasks to add",
-                items: {
-                  type: "object",
-                  properties: {
-                    title: { type: "string", description: "Subtask title" },
-                  },
-                  required: ["title"],
-                },
-              },
-            },
-            required: ["task_id", "subtasks"],
-          },
-        },
-      },
-      {
-        type: "function",
-        function: {
-          name: "delete_subtask",
-          description: "Delete a specific subtask from a task. Use the subtask's ID from context.",
-          parameters: {
-            type: "object",
-            properties: {
-              id: { type: "string", description: "The subtask ID to delete" },
-            },
-            required: ["id"],
-          },
-        },
-      },
-    );
-
-    // Delete tools
-    tools.push(
-      {
-        type: "function",
-        function: {
-          name: "delete_action_from_bank",
-          description: "Permanently DELETE a task from the Tasks Bank and all its subtasks. Use when user says 'delete', 'remove' a task.",
-          parameters: {
-            type: "object",
-            properties: {
-              id: { type: "string", description: "The ID of the task to delete (from context)" },
-            },
-            required: ["id"],
-          },
-        },
-      },
-      {
-        type: "function",
-        function: {
-          name: "delete_ritual_from_bank",
-          description: "Permanently DELETE a routine from the Routines Bank including all its tasks and sections. Use when user says 'delete', 'remove' a routine.",
-          parameters: {
-            type: "object",
-            properties: {
-              id: { type: "string", description: "The ID of the routine to delete (from context)" },
-            },
-            required: ["id"],
-          },
-        },
-      },
-      {
-        type: "function",
-        function: {
-          name: "delete_breathing_exercise",
-          description: "Permanently DELETE a breathing exercise. Use when user says 'delete', 'remove' a breathing exercise.",
-          parameters: {
-            type: "object",
-            properties: {
-              id: { type: "string", description: "The ID of the exercise to delete (from context)" },
-            },
-            required: ["id"],
-          },
-        },
-      },
-    );
-
-    // Routine task management tools
-    tools.push(
-      {
-        type: "function",
-        function: {
-          name: "add_tasks_to_routine",
-          description: "Add new tasks to an EXISTING routine in the Routines Bank. Use when user wants to add more tasks/activities to a routine that already exists.",
-          parameters: {
-            type: "object",
-            properties: {
-              ritual_id: { type: "string", description: "The ID of the routine to add tasks to (from context)" },
-              tasks: {
-                type: "array",
-                description: "Tasks to add to the ritual",
-                items: {
-                  type: "object",
-                  properties: {
-                    title: { type: "string", description: "Task title" },
-                    emoji: { type: "string", description: "Task emoji" },
-                    duration_minutes: { type: "number", description: "Duration in minutes" },
-                    section_id: { type: "string", description: "Section ID if adding to a specific section" },
-                    section_title: { type: "string", description: "Section title for reference" },
-                    drip_day: { type: "number", description: "Day number for drip scheduling" },
-                    schedule_days: { type: "array", items: { type: "number" }, description: "Days of week (0=Sun)" },
-                  },
-                  required: ["title"],
-                },
-              },
-            },
-            required: ["ritual_id", "tasks"],
-          },
-        },
-      },
-      {
-        type: "function",
-        function: {
-          name: "delete_routine_task",
-          description: "Delete a specific task from a routine. Use the task's ID from context.",
-          parameters: {
-            type: "object",
-            properties: {
-              id: { type: "string", description: "The task ID to delete (from context)" },
-            },
-            required: ["id"],
-          },
-        },
-      },
-    );
-
-    // Cover generation tool
-    tools.push({
-      type: "function",
-      function: {
-        name: "generate_routine_cover",
-        description: "Generate a beautiful Ladybosslook-style pastel cover image for a routine using AI. The image is automatically uploaded and applied to the routine. Use when user asks to create/generate a cover for a routine.",
-        parameters: {
-          type: "object",
-          properties: {
-            ritual_id: { type: "string", description: "The ID of the routine to generate a cover for (from context)" },
-            description: { type: "string", description: "Optional custom description to guide the image generation (e.g., 'woman meditating at sunrise with floating hearts')" },
-          },
-          required: ["ritual_id"],
-        },
-      },
-    });
-
-  }
-
-  // Existing form-fill tools for other pages
-  tools.push(
-    {
-      type: "function",
-      function: {
-        name: "create_broadcast_content",
-        description: "Generate structured content for a broadcast message",
-        parameters: {
-          type: "object",
-          properties: {
-            title: { type: "string" },
-            content: { type: "string" },
-            targetType: { type: "string", enum: ["all", "course", "round"] },
-            targetCourse: { type: "string" },
-            sendEmail: { type: "boolean" },
-            sendPush: { type: "boolean" },
-          },
-          required: ["title", "content"],
-        },
-      },
-    },
-    {
-      type: "function",
-      function: {
-        name: "create_feed_post_content",
-        description: "Generate structured content for a feed post",
-        parameters: {
-          type: "object",
-          properties: {
-            channelId: { type: "string" },
-            postType: { type: "string", enum: ["announcement", "drip_unlock", "session_reminder", "media", "discussion"] },
-            title: { type: "string" },
-            content: { type: "string" },
-            isPinned: { type: "boolean" },
-            sendPush: { type: "boolean" },
-          },
-          required: ["content", "postType"],
-        },
-      },
-    },
-    {
-      type: "function",
-      function: {
-        name: "create_push_notification_content",
-        description: "Generate structured content for a push notification",
-        parameters: {
-          type: "object",
-          properties: {
-            title: { type: "string" },
-            body: { type: "string" },
-            targetType: { type: "string", enum: ["all", "course", "round"] },
-            targetCourse: { type: "string" },
-          },
-          required: ["title", "body"],
-        },
-      },
-    },
-    {
-      type: "function",
-      function: {
-        name: "create_routine_plan",
-        description: "Generate a structured routine plan with sections and tasks",
-        parameters: {
-          type: "object",
-          properties: {
-            name: { type: "string" },
-            description: { type: "string" },
-            categorySlug: { type: "string" },
-            sections: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  title: { type: "string" },
-                  tasks: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        title: { type: "string" },
-                        duration: { type: "number" },
-                        icon: { type: "string" },
-                        linkType: { type: "string", enum: ["none", "water", "breathing", "journal", "audio"] },
-                      },
-                      required: ["title"],
-                    },
-                  },
-                },
-                required: ["title", "tasks"],
-              },
-            },
-          },
-          required: ["name", "sections"],
-        },
-      },
-    },
-    {
-      type: "function",
-      function: {
-        name: "suggest_task_templates",
-        description: "Suggest task templates for routines",
-        parameters: {
-          type: "object",
-          properties: {
-            suggestions: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  title: { type: "string" },
-                  description: { type: "string" },
-                  defaultDuration: { type: "number" },
-                  icon: { type: "string" },
-                  category: { type: "string" },
-                },
-                required: ["title", "defaultDuration"],
-              },
-            },
-          },
-          required: ["suggestions"],
-        },
-      },
-    },
-  );
-
-  return tools;
+## Guidelines
+- Be conversational and helpful, like a knowledgeable team member
+- Provide concrete suggestions with examples
+- When drafting content, format it ready to copy-paste
+- Use markdown formatting for clarity
+- If asked about data you don't have, say so honestly
+- Be proactive with ideas and improvements`;
 }
