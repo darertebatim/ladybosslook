@@ -133,7 +133,7 @@ function DraftSectionBlock({
   const titleTimeout = useRef<NodeJS.Timeout>();
   const descTimeout = useRef<NodeJS.Timeout>();
   const titleRef = useRef<HTMLInputElement>(null);
-  const descRef = useRef<HTMLInputElement>(null);
+  const descRef = useRef<HTMLTextAreaElement>(null);
   const newItemRef = useRef<HTMLInputElement>(null);
 
   const { handleFocus: handleTitleFocus } = useKeyboardScroll(titleRef, {
