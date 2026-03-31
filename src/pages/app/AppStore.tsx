@@ -135,6 +135,13 @@ const AppStore = () => {
     return taskTemplatesData.filter(t => t.is_popular).slice(0, 8);
   }, [taskTemplatesData]);
 
+  const { data: routineCategories } = useRoutineBankCategories();
+  const categoryNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    routineCategories?.forEach(c => map.set(c.slug, c.name));
+    return map;
+  }, [routineCategories]);
+
   // Filter tools by search
   const filteredWellnessTools = useMemo(() => {
     if (!searchQuery.trim()) return wellnessTools;
