@@ -22,6 +22,7 @@ export type Database = {
           file_name: string
           file_size_bytes: number | null
           file_url: string
+          folder_id: string | null
           id: string
           mime_type: string | null
           title: string
@@ -35,6 +36,7 @@ export type Database = {
           file_name: string
           file_size_bytes?: number | null
           file_url: string
+          folder_id?: string | null
           id?: string
           mime_type?: string | null
           title: string
@@ -48,13 +50,22 @@ export type Database = {
           file_name?: string
           file_size_bytes?: number | null
           file_url?: string
+          folder_id?: string | null
           id?: string
           mime_type?: string | null
           title?: string
           updated_at?: string | null
           uploaded_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "admin_documents_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "document_folders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       admin_task_bank: {
         Row: {
@@ -977,6 +988,27 @@ export type Database = {
           id?: string
           transaction_type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      document_folders: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
         }
         Relationships: []
       }
