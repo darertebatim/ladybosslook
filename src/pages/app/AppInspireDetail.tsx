@@ -666,7 +666,7 @@ export default function AppInspireDetail() {
               className="flex-1 h-12 rounded-xl text-base font-semibold gap-2"
             >
               <Play className="w-5 h-5" />
-              Moment
+              Reset
             </Button>
             <Button
               variant="outline"
