@@ -7,6 +7,17 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+function decodeXmlEntities(input: string): string {
+  return input
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(parseInt(dec, 10)));
+}
+
 async function extractDocxText(file: File): Promise<string | null> {
   try {
     const zip = await JSZip.loadAsync(await file.arrayBuffer());
@@ -14,20 +25,24 @@ async function extractDocxText(file: File): Promise<string | null> {
     if (!documentXmlFile) return null;
 
     const documentXml = await documentXmlFile.async("text");
-    const xml = new DOMParser().parseFromString(documentXml, "application/xml");
-    if (xml.querySelector("parsererror")) return null;
+    const normalizedXml = documentXml
+      .replace(/<w:tab(?:\s+[^>]*)?\/>/g, "\t")
+      .replace(/<w:(?:br|cr)(?:\s+[^>]*)?\/>/g, "\n");
 
-    const paragraphs = Array.from(xml.getElementsByTagName("w:p"));
+    const paragraphs = normalizedXml.match(/<w:p[\s\S]*?<\/w:p>/g) ?? [];
     const lines = paragraphs
-      .map((paragraph) =>
-        Array.from(paragraph.getElementsByTagName("w:t"))
-          .map((node) => node.textContent || "")
-          .join("")
-          .trim(),
-      )
+      .map((paragraph) => {
+        const parts = Array.from(paragraph.matchAll(/<w:t(?:\s+[^>]*)?>([\s\S]*?)<\/w:t>/g)).map((m) => decodeXmlEntities(m[1]));
+        return parts.join("").replace(/\r/g, "").trim();
+      })
       .filter(Boolean);
 
-    return lines.length > 0 ? lines.join("\n") : null;
+    if (lines.length > 0) {
+      return lines.join("\n");
+    }
+
+    const fallbackParts = Array.from(normalizedXml.matchAll(/<w:t(?:\s+[^>]*)?>([\s\S]*?)<\/w:t>/g)).map((m) => decodeXmlEntities(m[1]).trim()).filter(Boolean);
+    return fallbackParts.length > 0 ? fallbackParts.join("\n") : null;
   } catch (error) {
     console.error("DOCX extraction error:", error);
     return null;
