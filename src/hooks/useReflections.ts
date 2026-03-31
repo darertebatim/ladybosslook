@@ -13,6 +13,7 @@ export const REFLECTION_CATEGORIES = [
   { value: 'calm', label: 'Calm', emoji: '🧘' },
   { value: 'night', label: 'Night', emoji: '🌙' },
   { value: 'big-picture', label: 'Big picture', emoji: '🔭' },
+  { value: 'business-finance', label: 'Business & Finance', emoji: '💼' },
 ] as const;
 
 export interface Reflection {
