@@ -3706,6 +3706,74 @@ export type Database = {
           },
         ]
       }
+      task_draft_items: {
+        Row: {
+          created_at: string
+          id: string
+          is_sent: boolean
+          section_id: string
+          sent_at: string | null
+          sort_order: number
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_sent?: boolean
+          section_id: string
+          sent_at?: string | null
+          sort_order?: number
+          title?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_sent?: boolean
+          section_id?: string
+          sent_at?: string | null
+          sort_order?: number
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_draft_items_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "task_draft_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_draft_sections: {
+        Row: {
+          created_at: string
+          id: string
+          sort_order: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       task_reminder_logs: {
         Row: {
           id: string
