@@ -8,6 +8,7 @@ export interface DraftSection {
   id: string;
   user_id: string;
   title: string;
+  description: string;
   sort_order: number;
   created_at: string;
   updated_at: string;
@@ -82,10 +83,13 @@ export function useCreateDraftSection() {
 export function useUpdateDraftSection() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, title }: { id: string; title: string }) => {
+    mutationFn: async ({ id, title, description }: { id: string; title?: string; description?: string }) => {
+      const updates: any = {};
+      if (title !== undefined) updates.title = title;
+      if (description !== undefined) updates.description = description;
       const { error } = await supabase
         .from('task_draft_sections' as any)
-        .update({ title } as any)
+        .update(updates)
         .eq('id', id);
       if (error) throw error;
     },

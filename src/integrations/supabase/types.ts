@@ -3750,6 +3750,7 @@ export type Database = {
       task_draft_sections: {
         Row: {
           created_at: string
+          description: string
           id: string
           sort_order: number
           title: string
@@ -3758,6 +3759,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          description?: string
           id?: string
           sort_order?: number
           title?: string
@@ -3766,6 +3768,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          description?: string
           id?: string
           sort_order?: number
           title?: string

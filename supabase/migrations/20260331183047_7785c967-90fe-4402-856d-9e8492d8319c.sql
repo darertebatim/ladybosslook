@@ -1,0 +1,1 @@
+ALTER TABLE task_draft_sections ADD COLUMN description text DEFAULT '' NOT NULL;

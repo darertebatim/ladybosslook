@@ -62,7 +62,7 @@ function BilingualInput({
 function DraftSectionBlock({
   section,
   items,
-  onUpdateTitle,
+  onUpdateSection,
   onDeleteSection,
   onCreateItem,
   onUpdateItem,
@@ -71,7 +71,7 @@ function DraftSectionBlock({
 }: {
   section: DraftSection;
   items: DraftItem[];
-  onUpdateTitle: (id: string, title: string) => void;
+  onUpdateSection: (id: string, updates: { title?: string; description?: string }) => void;
   onDeleteSection: (id: string) => void;
   onCreateItem: (sectionId: string, title: string) => void;
   onUpdateItem: (id: string, title: string) => void;
@@ -79,13 +79,21 @@ function DraftSectionBlock({
   onSendItem: (item: DraftItem) => void;
 }) {
   const [sectionTitle, setSectionTitle] = useState(section.title);
+  const [desc, setDesc] = useState(section.description || '');
   const [newItemText, setNewItemText] = useState('');
   const titleTimeout = useRef<NodeJS.Timeout>();
+  const descTimeout = useRef<NodeJS.Timeout>();
 
   const handleTitleChange = (v: string) => {
     setSectionTitle(v);
     clearTimeout(titleTimeout.current);
-    titleTimeout.current = setTimeout(() => onUpdateTitle(section.id, v), 600);
+    titleTimeout.current = setTimeout(() => onUpdateSection(section.id, { title: v }), 600);
+  };
+
+  const handleDescChange = (v: string) => {
+    setDesc(v);
+    clearTimeout(descTimeout.current);
+    descTimeout.current = setTimeout(() => onUpdateSection(section.id, { description: v }), 600);
   };
 
   const handleAddItem = () => {
@@ -114,6 +122,14 @@ function DraftSectionBlock({
           <Trash2 className="w-5 h-5" />
         </button>
       </div>
+
+      {/* Description */}
+      <BilingualInput
+        value={desc}
+        onChange={handleDescChange}
+        placeholder="Add a description..."
+        className="text-sm text-muted-foreground mb-3 placeholder:text-muted-foreground/30"
+      />
 
       {/* Pending items */}
       <div className="space-y-0.5">
@@ -352,7 +368,7 @@ export default function AppTaskDrafts() {
                 key={section.id}
                 section={section}
                 items={itemsBySection[section.id] || []}
-                onUpdateTitle={(id, title) => updateSection.mutate({ id, title })}
+                onUpdateSection={(id, updates) => updateSection.mutate({ id, ...updates })}
                 onDeleteSection={(id) => {
                   haptic.medium();
                   deleteSection.mutate(id);
