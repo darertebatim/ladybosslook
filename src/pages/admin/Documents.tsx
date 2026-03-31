@@ -10,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 import { formatDistanceToNow } from 'date-fns';
 
 interface AdminDocument {
@@ -24,14 +25,17 @@ interface AdminDocument {
   created_at: string;
 }
 
+const ACCEPTED_TYPES = '.pdf,.doc,.docx,.txt,.md,.pages,.key,.keynote';
+const ACCEPTED_LABEL = 'PDF, DOC, DOCX, TXT, MD, Pages, Keynote — max 20MB each';
+
 export default function Documents() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
-  const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [viewingDoc, setViewingDoc] = useState<AdminDocument | null>(null);
 
   const { data: documents = [], isLoading } = useQuery({
@@ -62,78 +66,102 @@ export default function Documents() {
     onError: () => toast.error('Failed to delete document'),
   });
 
+  const uploadSingleFile = async (file: File, session: any) => {
+    const ext = file.name.split('.').pop();
+    const filePath = `${crypto.randomUUID()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('admin-documents')
+      .upload(filePath, file);
+    if (uploadError) throw uploadError;
+
+    const { data: urlData } = supabase.storage
+      .from('admin-documents')
+      .getPublicUrl(filePath);
+
+    let extractedText: string | null = null;
+    if (file.type === 'text/plain') {
+      extractedText = await file.text();
+    }
+
+    if (file.type === 'application/pdf' && session) {
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-document-text`,
+          {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${session.access_token}` },
+            body: formData,
+          }
+        );
+        if (response.ok) {
+          const result = await response.json();
+          extractedText = result.text || null;
+        }
+      } catch {
+        // Text extraction failed, continue without it
+      }
+    }
+
+    // Use file name (without extension) as title
+    const title = file.name.replace(/\.[^/.]+$/, '');
+
+    const { error: dbError } = await supabase.from('admin_documents').insert({
+      title,
+      description: description.trim() || null,
+      file_name: file.name,
+      file_url: urlData.publicUrl,
+      file_size_bytes: file.size,
+      mime_type: file.type || `application/${ext}`,
+      extracted_text: extractedText,
+      uploaded_by: session?.user?.id,
+    });
+    if (dbError) throw dbError;
+  };
+
   const handleUpload = async () => {
-    if (!file || !title.trim()) {
-      toast.error('Please provide a title and file');
+    if (files.length === 0) {
+      toast.error('Please select at least one file');
       return;
     }
 
     setUploading(true);
+    setUploadProgress({ current: 0, total: files.length });
+
     try {
-      const ext = file.name.split('.').pop();
-      const filePath = `${crypto.randomUUID()}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('admin-documents')
-        .upload(filePath, file);
-      if (uploadError) throw uploadError;
-
-      const { data: urlData } = supabase.storage
-        .from('admin-documents')
-        .getPublicUrl(filePath);
-
-      // Extract text from the file on the client side for txt files
-      let extractedText: string | null = null;
-      if (file.type === 'text/plain') {
-        extractedText = await file.text();
-      }
-
       const { data: { session } } = await supabase.auth.getSession();
+      let successCount = 0;
+      let failCount = 0;
 
-      // Try to extract text via edge function for PDFs
-      if (file.type === 'application/pdf' && session) {
+      for (let i = 0; i < files.length; i++) {
+        setUploadProgress({ current: i + 1, total: files.length });
         try {
-          const formData = new FormData();
-          formData.append('file', file);
-          const response = await fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-document-text`,
-            {
-              method: 'POST',
-              headers: { Authorization: `Bearer ${session.access_token}` },
-              body: formData,
-            }
-          );
-          if (response.ok) {
-            const result = await response.json();
-            extractedText = result.text || null;
-          }
-        } catch {
-          // Text extraction failed, continue without it
+          await uploadSingleFile(files[i], session);
+          successCount++;
+        } catch (err: any) {
+          failCount++;
+          console.error(`Failed to upload ${files[i].name}:`, err);
         }
       }
 
-      const { error: dbError } = await supabase.from('admin_documents').insert({
-        title: title.trim(),
-        description: description.trim() || null,
-        file_name: file.name,
-        file_url: urlData.publicUrl,
-        file_size_bytes: file.size,
-        mime_type: file.type,
-        extracted_text: extractedText,
-        uploaded_by: session?.user?.id,
-      });
-      if (dbError) throw dbError;
-
       queryClient.invalidateQueries({ queryKey: ['admin-documents'] });
-      toast.success('Document uploaded');
-      setTitle('');
+
+      if (failCount === 0) {
+        toast.success(`${successCount} document${successCount > 1 ? 's' : ''} uploaded`);
+      } else {
+        toast.warning(`${successCount} uploaded, ${failCount} failed`);
+      }
+
       setDescription('');
-      setFile(null);
+      setFiles([]);
       setUploadDialogOpen(false);
     } catch (err: any) {
       toast.error(err.message || 'Upload failed');
     } finally {
       setUploading(false);
+      setUploadProgress({ current: 0, total: 0 });
     }
   };
 
@@ -162,33 +190,53 @@ export default function Documents() {
         <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
           <DialogTrigger asChild>
             <Button>
-              <Upload className="h-4 w-4 mr-2" /> Upload Document
+              <Upload className="h-4 w-4 mr-2" /> Upload Documents
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Upload Document</DialogTitle>
+              <DialogTitle>Upload Documents</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label>Title *</Label>
-                <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Brand Guidelines" />
+                <Label>Description (optional, applies to all)</Label>
+                <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="What are these documents about?" rows={2} />
               </div>
               <div>
-                <Label>Description</Label>
-                <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="What is this document about?" rows={2} />
-              </div>
-              <div>
-                <Label>File *</Label>
+                <Label>Files *</Label>
                 <Input
                   type="file"
-                  accept=".pdf,.doc,.docx,.txt,.md"
-                  onChange={e => setFile(e.target.files?.[0] || null)}
+                  multiple
+                  accept={ACCEPTED_TYPES}
+                  onChange={e => setFiles(Array.from(e.target.files || []))}
                 />
-                <p className="text-xs text-muted-foreground mt-1">PDF, DOC, DOCX, TXT, MD — max 20MB</p>
+                <p className="text-xs text-muted-foreground mt-1">{ACCEPTED_LABEL}</p>
+                {files.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {files.map((f, i) => (
+                      <div key={i} className="text-xs text-muted-foreground flex items-center gap-2">
+                        <FileText className="h-3 w-3" />
+                        <span className="truncate">{f.name}</span>
+                        <span className="shrink-0">({formatSize(f.size)})</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-              <Button onClick={handleUpload} disabled={uploading || !file || !title.trim()} className="w-full">
-                {uploading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Uploading...</> : 'Upload'}
+              {uploading && uploadProgress.total > 1 && (
+                <div className="space-y-1">
+                  <Progress value={(uploadProgress.current / uploadProgress.total) * 100} className="h-2" />
+                  <p className="text-xs text-muted-foreground text-center">
+                    Uploading {uploadProgress.current} of {uploadProgress.total}...
+                  </p>
+                </div>
+              )}
+              <Button onClick={handleUpload} disabled={uploading || files.length === 0} className="w-full">
+                {uploading ? (
+                  <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Uploading {files.length > 1 ? `${uploadProgress.current}/${uploadProgress.total}` : '...'}</>
+                ) : (
+                  `Upload ${files.length > 0 ? files.length : ''} File${files.length !== 1 ? 's' : ''}`
+                )}
               </Button>
             </div>
           </DialogContent>
