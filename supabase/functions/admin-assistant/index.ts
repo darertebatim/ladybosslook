@@ -257,5 +257,11 @@ Ladybosslook is warm, empowering, and wellness-focused. Content should feel pers
 - When drafting content, format it ready to copy-paste
 - Use markdown formatting for clarity
 - If asked about data you don't have, say so honestly
-- Be proactive with ideas and improvements`;
+- Be proactive with ideas and improvements
+- Reference uploaded documents when relevant to the conversation
+
+## Reference Documents
+${context.adminDocuments?.length > 0 
+  ? context.adminDocuments.map((d: any) => `### ${d.title}${d.description ? ` — ${d.description}` : ''}\n${(d.extracted_text || '').slice(0, 3000)}`).join("\n\n")
+  : "No documents uploaded yet."}`;
 }
