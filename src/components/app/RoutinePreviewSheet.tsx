@@ -159,13 +159,20 @@ export function RoutinePreviewSheet({
   const { showHint: showSaveHint, dismissHint: dismissSaveHint } = useSaveRoutineHint(open);
   const MAX_FREE_ACTIONS = 6;
 
-  // Sync selectedTaskIds when displayTasks change (e.g., when data loads async or pro-task is added)
+  // Sync selectedTaskIds when displayTasks change (e.g., when data loads async)
+  // Pro-tasks (routine player launchers) are excluded from default selection
   useEffect(() => {
-    const allIds = new Set(displayTasks.map(t => t.id));
-    // If any displayTask id is missing from selection, re-sync to select all
-    const missingIds = displayTasks.filter(t => !selectedTaskIds.has(t.id));
-    if (displayTasks.length > 0 && (selectedTaskIds.size === 0 || missingIds.length > 0)) {
-      setSelectedTaskIds(allIds);
+    const nonProTasks = displayTasks.filter(t => !t.id.startsWith('__pro_task_routine_'));
+    const missingIds = nonProTasks.filter(t => !selectedTaskIds.has(t.id));
+    if (nonProTasks.length > 0 && (selectedTaskIds.size === 0 || missingIds.length > 0)) {
+      const newIds = new Set(nonProTasks.map(t => t.id));
+      // Preserve pro-task selection if user manually selected it
+      displayTasks.forEach(t => {
+        if (t.id.startsWith('__pro_task_routine_') && selectedTaskIds.has(t.id)) {
+          newIds.add(t.id);
+        }
+      });
+      setSelectedTaskIds(newIds);
     }
   }, [displayTasks.length]);
 
