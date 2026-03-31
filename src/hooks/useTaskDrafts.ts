@@ -97,6 +97,24 @@ export function useUpdateDraftSection() {
   });
 }
 
+export function useReorderDraftSections() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (orderedIds: string[]) => {
+      const updates = orderedIds.map((id, i) =>
+        supabase
+          .from('task_draft_sections' as any)
+          .update({ sort_order: i } as any)
+          .eq('id', id)
+      );
+      const results = await Promise.all(updates);
+      const err = results.find((r) => r.error);
+      if (err?.error) throw err.error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEY }),
+  });
+}
+
 export function useDeleteDraftSection() {
   const qc = useQueryClient();
   return useMutation({

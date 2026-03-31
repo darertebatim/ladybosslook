@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2, Send, Check } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Send, Check, ChevronDown, GripVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useBilingualText } from '@/components/ui/BilingualText';
 import {
@@ -9,6 +9,7 @@ import {
   useCreateDraftSection,
   useUpdateDraftSection,
   useDeleteDraftSection,
+  useReorderDraftSections,
   useCreateDraftItem,
   useUpdateDraftItem,
   useDeleteDraftItem,
@@ -26,6 +27,22 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
+import {
+  DndContext,
+  closestCenter,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 // ─── Inline bilingual input ───
 function BilingualInput({
@@ -107,8 +124,8 @@ function BilingualTextarea({
   );
 }
 
-// ─── Section component ───
-function DraftSectionBlock({
+// ─── Sortable Section wrapper ───
+function SortableSectionCard({
   section,
   items,
   onUpdateSection,
@@ -127,9 +144,65 @@ function DraftSectionBlock({
   onDeleteItem: (id: string) => void;
   onSendItem: (item: DraftItem) => void;
 }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: section.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+    opacity: isDragging ? 0.85 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <DraftSectionBlock
+        section={section}
+        items={items}
+        onUpdateSection={onUpdateSection}
+        onDeleteSection={onDeleteSection}
+        onCreateItem={onCreateItem}
+        onUpdateItem={onUpdateItem}
+        onDeleteItem={onDeleteItem}
+        onSendItem={onSendItem}
+        dragHandleProps={{ ...attributes, ...listeners }}
+      />
+    </div>
+  );
+}
+
+// ─── Section component ───
+function DraftSectionBlock({
+  section,
+  items,
+  onUpdateSection,
+  onDeleteSection,
+  onCreateItem,
+  onUpdateItem,
+  onDeleteItem,
+  onSendItem,
+  dragHandleProps,
+}: {
+  section: DraftSection;
+  items: DraftItem[];
+  onUpdateSection: (id: string, updates: { title?: string; description?: string }) => void;
+  onDeleteSection: (id: string) => void;
+  onCreateItem: (sectionId: string, title: string) => void;
+  onUpdateItem: (id: string, title: string) => void;
+  onDeleteItem: (id: string) => void;
+  onSendItem: (item: DraftItem) => void;
+  dragHandleProps?: Record<string, any>;
+}) {
   const [sectionTitle, setSectionTitle] = useState(section.title);
   const [desc, setDesc] = useState(section.description || '');
   const [newItemText, setNewItemText] = useState('');
+  const [collapsed, setCollapsed] = useState(false);
   const titleTimeout = useRef<NodeJS.Timeout>();
   const descTimeout = useRef<NodeJS.Timeout>();
   const titleRef = useRef<HTMLInputElement>(null);
@@ -169,11 +242,32 @@ function DraftSectionBlock({
 
   const pendingItems = items.filter((i) => !i.is_sent);
   const sentItems = items.filter((i) => i.is_sent);
+  const taskCount = pendingItems.length;
 
   return (
     <div className="rounded-2xl bg-muted/30 p-4">
       {/* Section header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center gap-1">
+        {/* Drag handle */}
+        <button
+          {...dragHandleProps}
+          className="w-8 h-10 flex items-center justify-center text-muted-foreground/40 shrink-0 touch-none"
+          aria-label="Drag to reorder"
+        >
+          <GripVertical className="w-4 h-4" />
+        </button>
+
+        {/* Collapse toggle */}
+        <button
+          onClick={() => {
+            haptic.light();
+            setCollapsed(!collapsed);
+          }}
+          className="w-8 h-10 flex items-center justify-center text-muted-foreground shrink-0 active:scale-90 transition-transform"
+        >
+          <ChevronDown className={cn('w-4 h-4 transition-transform duration-200', collapsed && '-rotate-90')} />
+        </button>
+
         <BilingualInput
           value={sectionTitle}
           onChange={handleTitleChange}
@@ -182,6 +276,13 @@ function DraftSectionBlock({
           placeholder="Project name..."
           className="text-xl font-bold flex-1 placeholder:text-muted-foreground/40"
         />
+
+        {collapsed && taskCount > 0 && (
+          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full shrink-0">
+            {taskCount}
+          </span>
+        )}
+
         <button
           onClick={() => onDeleteSection(section.id)}
           className="w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground active:scale-95 active:text-destructive transition-all shrink-0"
@@ -190,58 +291,65 @@ function DraftSectionBlock({
         </button>
       </div>
 
-      {/* Description */}
-      <BilingualTextarea
-        value={desc}
-        onChange={handleDescChange}
-        onFocus={handleDescFocus}
-        textareaRef={descRef as any}
-        placeholder="Add a description..."
-        className="text-sm text-muted-foreground mb-3 placeholder:text-muted-foreground/30"
-      />
+      {/* Collapsible content */}
+      {!collapsed && (
+        <>
+          {/* Description */}
+          <div className="pl-[4.5rem]">
+            <BilingualTextarea
+              value={desc}
+              onChange={handleDescChange}
+              onFocus={handleDescFocus}
+              textareaRef={descRef as any}
+              placeholder="Add a description..."
+              className="text-sm text-muted-foreground mb-3 placeholder:text-muted-foreground/30"
+            />
+          </div>
 
-      {/* Pending items */}
-      <div className="space-y-0.5">
-        {pendingItems.map((item) => (
-          <DraftItemRow key={item.id} item={item} onUpdate={onUpdateItem} onDelete={onDeleteItem} onSend={onSendItem} />
-        ))}
-      </div>
+          {/* Pending items */}
+          <div className="space-y-0.5">
+            {pendingItems.map((item) => (
+              <DraftItemRow key={item.id} item={item} onUpdate={onUpdateItem} onDelete={onDeleteItem} onSend={onSendItem} />
+            ))}
+          </div>
 
-      {/* Add new item */}
-      <div className="flex items-center gap-3 mt-2 py-2.5">
-        <div className="w-6 h-6 rounded-full border-2 border-dashed border-muted-foreground/30 shrink-0" />
-        <BilingualInput
-          value={newItemText}
-          onChange={setNewItemText}
-          onFocus={handleNewItemFocus}
-          inputRef={newItemRef}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              handleAddItem();
-            }
-          }}
-          placeholder="Add a task..."
-          className="text-base flex-1 placeholder:text-muted-foreground/30"
-        />
-        {newItemText.trim() && (
-          <button onClick={handleAddItem} className="w-10 h-10 flex items-center justify-center text-primary active:scale-95 transition-transform">
-            <Plus className="w-5 h-5" />
-          </button>
-        )}
-      </div>
+          {/* Add new item */}
+          <div className="flex items-center gap-3 mt-2 py-2.5">
+            <div className="w-6 h-6 rounded-full border-2 border-dashed border-muted-foreground/30 shrink-0" />
+            <BilingualInput
+              value={newItemText}
+              onChange={setNewItemText}
+              onFocus={handleNewItemFocus}
+              inputRef={newItemRef}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddItem();
+                }
+              }}
+              placeholder="Add a task..."
+              className="text-base flex-1 placeholder:text-muted-foreground/30"
+            />
+            {newItemText.trim() && (
+              <button onClick={handleAddItem} className="w-10 h-10 flex items-center justify-center text-primary active:scale-95 transition-transform">
+                <Plus className="w-5 h-5" />
+              </button>
+            )}
+          </div>
 
-      {/* Sent items */}
-      {sentItems.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-border/50 space-y-1.5">
-          <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Sent</p>
-          {sentItems.map((item) => (
-            <div key={item.id} className="flex items-center gap-3 py-1">
-              <Check className="w-5 h-5 text-primary shrink-0" />
-              <span className="text-base line-through text-muted-foreground">{item.title}</span>
+          {/* Sent items */}
+          {sentItems.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-border/50 space-y-1.5">
+              <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Sent</p>
+              {sentItems.map((item) => (
+                <div key={item.id} className="flex items-center gap-3 py-1">
+                  <Check className="w-5 h-5 text-primary shrink-0" />
+                  <span className="text-base line-through text-muted-foreground">{item.title}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -368,12 +476,31 @@ export default function AppTaskDrafts() {
   const createSection = useCreateDraftSection();
   const updateSection = useUpdateDraftSection();
   const deleteSection = useDeleteDraftSection();
+  const reorderSections = useReorderDraftSections();
   const createItem = useCreateDraftItem();
   const updateItem = useUpdateDraftItem();
   const deleteItem = useDeleteDraftItem();
   const sendToPlanner = useSendDraftToPlanner();
 
   const [sendingItem, setSendingItem] = useState<DraftItem | null>(null);
+
+  // Optimistic local order to prevent snap-back
+  const [localOrder, setLocalOrder] = useState<DraftSection[] | null>(null);
+  const skipSyncRef = useRef(false);
+  const skipSyncTimeout = useRef<NodeJS.Timeout>();
+
+  // Sync from server unless we just reordered
+  const displaySections = useMemo(() => {
+    if (skipSyncRef.current && localOrder) return localOrder;
+    return sections || [];
+  }, [sections, localOrder]);
+
+  // Reset localOrder when server data arrives and skipSync is off
+  useEffect(() => {
+    if (!skipSyncRef.current) {
+      setLocalOrder(null);
+    }
+  }, [sections]);
 
   const itemsBySection = useMemo(() => {
     const map: Record<string, DraftItem[]> = {};
@@ -383,6 +510,36 @@ export default function AppTaskDrafts() {
     });
     return map;
   }, [allItems]);
+
+  // DnD sensors
+  const mouseSensor = useSensor(MouseSensor, { activationConstraint: { distance: 6 } });
+  const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } });
+  const sensors = useSensors(mouseSensor, touchSensor);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !displaySections.length) return;
+
+    const oldIndex = displaySections.findIndex((s) => s.id === active.id);
+    const newIndex = displaySections.findIndex((s) => s.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    haptic.medium();
+
+    // Optimistic reorder
+    const newOrder = [...displaySections];
+    const [moved] = newOrder.splice(oldIndex, 1);
+    newOrder.splice(newIndex, 0, moved);
+
+    setLocalOrder(newOrder);
+    skipSyncRef.current = true;
+    clearTimeout(skipSyncTimeout.current);
+    skipSyncTimeout.current = setTimeout(() => {
+      skipSyncRef.current = false;
+    }, 2000);
+
+    reorderSections.mutate(newOrder.map((s) => s.id));
+  };
 
   const handleAddSection = () => {
     haptic.medium();
@@ -396,6 +553,8 @@ export default function AppTaskDrafts() {
       { onSuccess: () => setSendingItem(null) }
     );
   };
+
+  const sectionIdList = useMemo(() => displaySections.map((s) => s.id), [displaySections]);
 
   return (
     <div className="h-full min-h-0 bg-background flex flex-col overflow-hidden">
@@ -437,7 +596,7 @@ export default function AppTaskDrafts() {
               </div>
             ))}
           </div>
-        ) : !sections?.length ? (
+        ) : !displaySections.length ? (
           <div className="flex flex-col items-center justify-center h-full text-center gap-4 opacity-60">
             <p className="text-5xl">📋</p>
             <p className="text-base text-muted-foreground leading-relaxed">
@@ -445,33 +604,42 @@ export default function AppTaskDrafts() {
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {sections.map((section) => (
-              <DraftSectionBlock
-                key={section.id}
-                section={section}
-                items={itemsBySection[section.id] || []}
-                onUpdateSection={(id, updates) => updateSection.mutate({ id, ...updates })}
-                onDeleteSection={(id) => {
-                  haptic.medium();
-                  deleteSection.mutate(id);
-                }}
-                onCreateItem={(sectionId, title) => {
-                  haptic.light();
-                  createItem.mutate({ sectionId, title });
-                }}
-                onUpdateItem={(id, title) => updateItem.mutate({ id, title })}
-                onDeleteItem={(id) => {
-                  haptic.light();
-                  deleteItem.mutate(id);
-                }}
-                onSendItem={(item) => {
-                  haptic.light();
-                  setSendingItem(item);
-                }}
-              />
-            ))}
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis]}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={sectionIdList} strategy={verticalListSortingStrategy}>
+              <div className="space-y-4">
+                {displaySections.map((section) => (
+                  <SortableSectionCard
+                    key={section.id}
+                    section={section}
+                    items={itemsBySection[section.id] || []}
+                    onUpdateSection={(id, updates) => updateSection.mutate({ id, ...updates })}
+                    onDeleteSection={(id) => {
+                      haptic.medium();
+                      deleteSection.mutate(id);
+                    }}
+                    onCreateItem={(sectionId, title) => {
+                      haptic.light();
+                      createItem.mutate({ sectionId, title });
+                    }}
+                    onUpdateItem={(id, title) => updateItem.mutate({ id, title })}
+                    onDeleteItem={(id) => {
+                      haptic.light();
+                      deleteItem.mutate(id);
+                    }}
+                    onSendItem={(item) => {
+                      haptic.light();
+                      setSendingItem(item);
+                    }}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
 
