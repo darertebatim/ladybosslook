@@ -168,7 +168,8 @@ export function useSendDraftToPlanner() {
           emoji: '📝',
           color: 'sky',
           scheduled_date: format(date, 'yyyy-MM-dd'),
-          repeat_pattern: 'once',
+          repeat_pattern: 'none',
+          is_active: true,
         });
       if (taskError) throw taskError;
       // Mark draft item as sent
@@ -181,6 +182,7 @@ export function useSendDraftToPlanner() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: QUERY_KEY });
       qc.invalidateQueries({ queryKey: ['planner-all-tasks'] });
+      qc.invalidateQueries({ queryKey: ['new-home-data'] });
       toast.success('Task added to planner ✨');
     },
     onError: (e: any) => toast.error(e.message || 'Failed to send'),
