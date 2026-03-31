@@ -146,7 +146,7 @@ export function RoutinePreviewSheet({
   }, [tasks, routineBankId, routineTitle]);
 
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(
-    new Set(tasks.map(t => t.id))
+    new Set(tasks.filter(t => !t.id.startsWith('__pro_task_routine_')).map(t => t.id))
   );
   const [editedTasks, setEditedTasks] = useState<Record<string, EditedTask>>({});
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
