@@ -120,6 +120,7 @@ const BrandDesign = lazy(() => import("@/pages/admin/BrandDesign"));
 const BrandMock = lazy(() => import("@/pages/admin/BrandMock"));
 const Onboarding = lazy(() => import("@/pages/admin/Onboarding"));
 const Banners = lazy(() => import("@/pages/admin/Banners"));
+const Documents = lazy(() => import("@/pages/admin/Documents"));
 
 
 // Lazy load marketing/landing pages
@@ -421,6 +422,7 @@ const App = () => (
                       
                       <Route path="banners" element={<ProtectedRoute requiredPage="communications"><Banners /></ProtectedRoute>} />
                       <Route path="app" element={<ProtectedRoute requiredPage="system"><AppTest /></ProtectedRoute>} />
+                      <Route path="documents" element={<ProtectedRoute requiredPage="system"><Documents /></ProtectedRoute>} />
                     </Route>
                   )}
                   

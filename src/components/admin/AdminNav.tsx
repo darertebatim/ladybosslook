@@ -24,6 +24,7 @@ const menuItems = [
   { title: 'Support', url: '/admin/support', icon: MessageCircle, pageSlug: 'support' },
   { title: 'Tools', url: '/admin/tools', icon: Wrench, pageSlug: 'tools' },
   { title: 'Onboarding', url: '/admin/onboarding', icon: FlaskConical, pageSlug: 'tools' },
+  { title: 'Documents', url: '/admin/documents', icon: FileText, pageSlug: 'system' },
   
   { title: 'Brand', url: '/admin/brand', icon: Palette, pageSlug: 'system' },
   { title: 'App Test', url: '/admin/app', icon: Smartphone, pageSlug: 'system' },

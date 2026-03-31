@@ -153,6 +153,7 @@ async function fetchContext(supabase: any, currentPage?: string) {
     { data: breathingExercises },
     { data: recentActions },
     { data: recentRoutines },
+    { data: adminDocuments },
   ] = await Promise.all([
     supabase.from("routine_categories").select("name, slug, icon").eq("is_active", true).order("display_order"),
     supabase.from("admin_task_bank").select("*", { count: "exact", head: true }).eq("is_active", true),
@@ -160,6 +161,7 @@ async function fetchContext(supabase: any, currentPage?: string) {
     supabase.from("breathing_exercises").select("name, category, emoji").eq("is_active", true).order("sort_order"),
     supabase.from("admin_task_bank").select("title, emoji, category").eq("is_active", true).order("sort_order").limit(30),
     supabase.from("routines_bank").select("title, emoji, category").eq("is_active", true).order("sort_order").limit(30),
+    supabase.from("admin_documents").select("title, description, extracted_text").not("extracted_text", "is", null).order("created_at", { ascending: false }).limit(20),
   ]);
 
   context.categories = categories || [];
@@ -168,6 +170,7 @@ async function fetchContext(supabase: any, currentPage?: string) {
   context.breathingExercises = breathingExercises || [];
   context.sampleTasks = recentActions || [];
   context.sampleRoutines = recentRoutines || [];
+  context.adminDocuments = adminDocuments || [];
 
   return context;
 }
@@ -254,5 +257,11 @@ Ladybosslook is warm, empowering, and wellness-focused. Content should feel pers
 - When drafting content, format it ready to copy-paste
 - Use markdown formatting for clarity
 - If asked about data you don't have, say so honestly
-- Be proactive with ideas and improvements`;
+- Be proactive with ideas and improvements
+- Reference uploaded documents when relevant to the conversation
+
+## Reference Documents
+${context.adminDocuments?.length > 0 
+  ? context.adminDocuments.map((d: any) => `### ${d.title}${d.description ? ` — ${d.description}` : ''}\n${(d.extracted_text || '').slice(0, 3000)}`).join("\n\n")
+  : "No documents uploaded yet."}`;
 }
