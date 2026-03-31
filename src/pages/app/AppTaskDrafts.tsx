@@ -360,7 +360,7 @@ export default function AppTaskDrafts() {
                 key={section.id}
                 section={section}
                 items={itemsBySection[section.id] || []}
-                onUpdateTitle={(id, title) => updateSection.mutate({ id, title })}
+                onUpdateSection={(id, updates) => updateSection.mutate({ id, ...updates })}
                 onDeleteSection={(id) => {
                   haptic.medium();
                   deleteSection.mutate(id);
