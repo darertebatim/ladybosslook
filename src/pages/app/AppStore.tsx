@@ -328,7 +328,7 @@ const AppStore = () => {
             )}
 
             {/* Routines Templates Section */}
-            {!searchQuery && popularRoutines.length > 0 && (
+            {!searchQuery && displayRoutines.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
                   <h2 className="text-sm font-semibold text-foreground">Routines Templates</h2>
@@ -337,7 +337,7 @@ const AppStore = () => {
                   </Link>
                 </div>
                 <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4" style={{ WebkitOverflowScrolling: 'touch' }}>
-                  {popularRoutines.map((r) => (
+                  {displayRoutines.map((r) => (
                     <div key={r.id} className="shrink-0 w-[85%] snap-start">
                       <FeaturedRoutineCard routine={r} categoryName={categoryNameMap.get(r.category)} />
                     </div>
