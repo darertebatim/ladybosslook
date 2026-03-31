@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, Send, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -63,6 +63,50 @@ function BilingualInput({
   );
 }
 
+// ─── Auto-growing bilingual textarea ───
+function BilingualTextarea({
+  value,
+  onChange,
+  onFocus,
+  placeholder,
+  className,
+  textareaRef,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onFocus?: () => void;
+  placeholder?: string;
+  className?: string;
+  textareaRef?: React.Ref<HTMLTextAreaElement>;
+}) {
+  const { className: biClass, direction: dir } = useBilingualText(value);
+  const internalRef = useRef<HTMLTextAreaElement>(null);
+
+  const autoResize = useCallback(() => {
+    const el = typeof textareaRef === 'object' && textareaRef?.current
+      ? textareaRef.current
+      : internalRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  }, [textareaRef]);
+
+  useEffect(() => { autoResize(); }, [value, autoResize]);
+
+  return (
+    <textarea
+      ref={textareaRef || internalRef}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      onFocus={onFocus}
+      placeholder={placeholder}
+      dir={dir}
+      rows={1}
+      className={cn('bg-transparent border-0 outline-none w-full resize-none', biClass, className)}
+    />
+  );
+}
+
 // ─── Section component ───
 function DraftSectionBlock({
   section,
@@ -89,7 +133,7 @@ function DraftSectionBlock({
   const titleTimeout = useRef<NodeJS.Timeout>();
   const descTimeout = useRef<NodeJS.Timeout>();
   const titleRef = useRef<HTMLInputElement>(null);
-  const descRef = useRef<HTMLInputElement>(null);
+  const descRef = useRef<HTMLTextAreaElement>(null);
   const newItemRef = useRef<HTMLInputElement>(null);
 
   const { handleFocus: handleTitleFocus } = useKeyboardScroll(titleRef, {
@@ -147,11 +191,11 @@ function DraftSectionBlock({
       </div>
 
       {/* Description */}
-      <BilingualInput
+      <BilingualTextarea
         value={desc}
         onChange={handleDescChange}
         onFocus={handleDescFocus}
-        inputRef={descRef}
+        textareaRef={descRef as any}
         placeholder="Add a description..."
         className="text-sm text-muted-foreground mb-3 placeholder:text-muted-foreground/30"
       />
