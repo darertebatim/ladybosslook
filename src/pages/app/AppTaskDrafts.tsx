@@ -21,15 +21,18 @@ import { haptic } from '@/lib/haptics';
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 
 // ─── Inline bilingual input ───
 function BilingualInput({
   value,
   onChange,
   onKeyDown,
+  onFocus,
   placeholder,
   className,
   inputRef,
@@ -38,9 +41,10 @@ function BilingualInput({
   value: string;
   onChange: (v: string) => void;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onFocus?: () => void;
   placeholder?: string;
   className?: string;
-  inputRef?: (el: HTMLInputElement | null) => void;
+  inputRef?: React.Ref<HTMLInputElement>;
   autoFocus?: boolean;
 }) {
   const { className: biClass, direction: dir } = useBilingualText(value);
@@ -50,6 +54,7 @@ function BilingualInput({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       onKeyDown={onKeyDown}
+      onFocus={onFocus}
       placeholder={placeholder}
       dir={dir}
       autoFocus={autoFocus}
@@ -83,6 +88,22 @@ function DraftSectionBlock({
   const [newItemText, setNewItemText] = useState('');
   const titleTimeout = useRef<NodeJS.Timeout>();
   const descTimeout = useRef<NodeJS.Timeout>();
+  const titleRef = useRef<HTMLInputElement>(null);
+  const descRef = useRef<HTMLInputElement>(null);
+  const newItemRef = useRef<HTMLInputElement>(null);
+
+  const { handleFocus: handleTitleFocus } = useKeyboardScroll(titleRef, {
+    block: 'center',
+    scrollContainerSelector: '#projects-scroll-container',
+  });
+  const { handleFocus: handleDescFocus } = useKeyboardScroll(descRef, {
+    block: 'center',
+    scrollContainerSelector: '#projects-scroll-container',
+  });
+  const { handleFocus: handleNewItemFocus } = useKeyboardScroll(newItemRef, {
+    block: 'center',
+    scrollContainerSelector: '#projects-scroll-container',
+  });
 
   const handleTitleChange = (v: string) => {
     setSectionTitle(v);
@@ -112,6 +133,8 @@ function DraftSectionBlock({
         <BilingualInput
           value={sectionTitle}
           onChange={handleTitleChange}
+          onFocus={handleTitleFocus}
+          inputRef={titleRef}
           placeholder="Project name..."
           className="text-xl font-bold flex-1 placeholder:text-muted-foreground/40"
         />
@@ -127,6 +150,8 @@ function DraftSectionBlock({
       <BilingualInput
         value={desc}
         onChange={handleDescChange}
+        onFocus={handleDescFocus}
+        inputRef={descRef}
         placeholder="Add a description..."
         className="text-sm text-muted-foreground mb-3 placeholder:text-muted-foreground/30"
       />
@@ -144,6 +169,8 @@ function DraftSectionBlock({
         <BilingualInput
           value={newItemText}
           onChange={setNewItemText}
+          onFocus={handleNewItemFocus}
+          inputRef={newItemRef}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
@@ -166,7 +193,7 @@ function DraftSectionBlock({
           <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Sent</p>
           {sentItems.map((item) => (
             <div key={item.id} className="flex items-center gap-3 py-1">
-              <Check className="w-5 h-5 text-green-500 shrink-0" />
+              <Check className="w-5 h-5 text-primary shrink-0" />
               <span className="text-base line-through text-muted-foreground">{item.title}</span>
             </div>
           ))}
@@ -190,8 +217,13 @@ function DraftItemRow({
 }) {
   const [text, setText] = useState(item.title);
   const timeout = useRef<NodeJS.Timeout>();
+  const taskRef = useRef<HTMLInputElement>(null);
   const { className: biClass, direction: dir } = useBilingualText(text);
   const isRtl = dir === 'rtl';
+  const { handleFocus: handleTaskFocus } = useKeyboardScroll(taskRef, {
+    block: 'center',
+    scrollContainerSelector: '#projects-scroll-container',
+  });
 
   const handleChange = (v: string) => {
     setText(v);
@@ -209,8 +241,10 @@ function DraftItemRow({
         className="w-6 h-6 rounded-full border-2 border-muted-foreground/40 shrink-0 active:border-primary active:bg-primary/10 transition-colors"
       />
       <input
+        ref={taskRef}
         value={text}
         onChange={(e) => handleChange(e.target.value)}
+        onFocus={handleTaskFocus}
         dir={dir}
         className={cn('flex-1 bg-transparent border-0 outline-none text-base', biClass)}
       />
@@ -251,6 +285,7 @@ function SendToPlannerSheet({
       <SheetContent side="bottom" className="rounded-t-2xl pb-safe">
         <SheetHeader>
           <SheetTitle className="text-base font-semibold">Send to Planner</SheetTitle>
+          <SheetDescription className="sr-only">Choose a date to send this task to planner.</SheetDescription>
         </SheetHeader>
         {item && (
           <div className="mt-3">
@@ -319,7 +354,7 @@ export default function AppTaskDrafts() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-background flex flex-col">
+    <div className="h-full min-h-0 bg-background flex flex-col overflow-hidden">
       {/* Header */}
       <header
         className="px-4 pb-3 flex items-center justify-between shrink-0"
@@ -341,8 +376,12 @@ export default function AppTaskDrafts() {
 
       {/* Content */}
       <div
-        className="flex-1 px-4 pt-2 overflow-y-auto overscroll-contain -webkit-overflow-scrolling-touch"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)' }}
+        id="projects-scroll-container"
+        className="flex-1 min-h-0 px-4 pt-2 overflow-y-auto overscroll-contain touch-pan-y"
+        style={{
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)',
+          WebkitOverflowScrolling: 'touch',
+        }}
       >
         {sectionsLoading ? (
           <div className="space-y-4">
