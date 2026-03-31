@@ -60,21 +60,7 @@ export function AnnouncementCreator() {
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { registerFormHandler, unregisterFormHandler } = useAIAssistant();
 
-  // Register AI form handler
-  const handleAIFill = useCallback((data: Record<string, any>) => {
-    if (data.title) setTitle(data.title);
-    if (data.content) setMessage(data.content);
-    if (data.targetCourse) setTargetCourse(data.targetCourse);
-    if (data.sendEmail !== undefined) setSendEmail(data.sendEmail);
-    if (data.sendPush !== undefined) setSendPush(data.sendPush);
-  }, []);
-
-  useEffect(() => {
-    registerFormHandler('broadcast', handleAIFill);
-    return () => unregisterFormHandler('broadcast');
-  }, [registerFormHandler, unregisterFormHandler, handleAIFill]);
 
   // Compute actual link URL
   const linkUrl = linkType === 'none' ? '' : (linkType === 'custom' ? customLinkUrl : linkType);

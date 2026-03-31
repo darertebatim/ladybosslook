@@ -35,7 +35,6 @@ interface FeedChatComposerProps {
 export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const { registerFormHandler, unregisterFormHandler } = useAIAssistant();
   
   const [channelId, setChannelId] = useState('');
   const [content, setContent] = useState('');
@@ -73,20 +72,6 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
   const [showAttachments, setShowAttachments] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
-
-  // Register AI form handler
-  const handleAIFill = useCallback((data: Record<string, any>) => {
-    if (data.channelId) setChannelId(data.channelId);
-    if (data.content) setContent(data.content);
-    if (data.title) setTitle(data.title);
-    if (data.isPinned !== undefined) setIsPinned(data.isPinned);
-    if (data.sendPush !== undefined) setSendPush(data.sendPush);
-  }, []);
-
-  useEffect(() => {
-    registerFormHandler('feed_post', handleAIFill);
-    return () => unregisterFormHandler('feed_post');
-  }, [registerFormHandler, unregisterFormHandler, handleAIFill]);
 
   // Detect video type when URL changes
   const detectedVideoType = videoUrl ? detectVideoType(videoUrl) : null;
