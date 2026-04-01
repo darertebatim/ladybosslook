@@ -449,6 +449,9 @@ const AppStore = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-xs leading-tight line-clamp-2">{r.title}</p>
+                        {r.subtitle && (
+                          <p className="text-[10px] text-muted-foreground leading-tight mt-0.5 line-clamp-1">{r.subtitle}</p>
+                        )}
                       </div>
                     </button>
                   ))}
