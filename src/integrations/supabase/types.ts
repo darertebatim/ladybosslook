@@ -2861,6 +2861,141 @@ export type Database = {
         }
         Relationships: []
       }
+      reading_cards: {
+        Row: {
+          bg_color: string | null
+          content: string
+          created_at: string | null
+          id: string
+          image_url: string | null
+          key_point: string | null
+          lesson_id: string
+          sort_order: number | null
+          title: string
+        }
+        Insert: {
+          bg_color?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          key_point?: string | null
+          lesson_id: string
+          sort_order?: number | null
+          title: string
+        }
+        Update: {
+          bg_color?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          key_point?: string | null
+          lesson_id?: string
+          sort_order?: number | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_cards_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "reading_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reading_lessons: {
+        Row: {
+          category: string | null
+          cover_image_url: string | null
+          created_at: string | null
+          description: string | null
+          emoji: string | null
+          id: string
+          is_published: boolean | null
+          sort_order: number | null
+          source_document_id: string | null
+          subtitle: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          emoji?: string | null
+          id?: string
+          is_published?: boolean | null
+          sort_order?: number | null
+          source_document_id?: string | null
+          subtitle?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          emoji?: string | null
+          id?: string
+          is_published?: boolean | null
+          sort_order?: number | null
+          source_document_id?: string | null
+          subtitle?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_lessons_source_document_id_fkey"
+            columns: ["source_document_id"]
+            isOneToOne: false
+            referencedRelation: "admin_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reading_progress: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          last_card_index: number | null
+          lesson_id: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          last_card_index?: number | null
+          lesson_id: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          last_card_index?: number | null
+          lesson_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "reading_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reflection_pages: {
         Row: {
           content: string
