@@ -31,6 +31,22 @@ export function ReadingCardEditor({ lesson }: Props) {
   const [generating, setGenerating] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
+  const [showDocPicker, setShowDocPicker] = useState(false);
+
+  // Fetch available admin documents for the picker
+  const { data: adminDocs = [] } = useQuery({
+    queryKey: ['admin-documents-for-reading'],
+    enabled: showDocPicker,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('admin_documents')
+        .select('id, title, file_name, extracted_text')
+        .not('extracted_text', 'is', null)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+  });
 
   const [form, setForm] = useState({
     title: '',
@@ -65,15 +81,12 @@ export function ReadingCardEditor({ lesson }: Props) {
     setShowForm(false);
   };
 
-  const handleGenerateAI = async () => {
-    if (!lesson.source_document_id) {
-      toast({ title: 'No source document', description: 'Link a document to this lesson first, or create cards manually.', variant: 'destructive' });
-      return;
-    }
+  const handleGenerateAI = async (documentId: string) => {
+    setShowDocPicker(false);
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-reading-cards', {
-        body: { document_id: lesson.source_document_id, lesson_id: lesson.id },
+        body: { document_id: documentId, lesson_id: lesson.id },
       });
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ['admin-reading-cards', lesson.id] });
