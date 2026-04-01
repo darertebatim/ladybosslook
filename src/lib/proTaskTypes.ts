@@ -410,6 +410,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Open your projects board',
     requiresValue: false,
   },
+  reading: {
+    value: 'reading',
+    label: 'Read & Learn',
+    icon: BookOpen,
+    badgeText: 'Read',
+    color: 'purple',
+    gradientClass: 'bg-gradient-to-br from-purple-100 to-violet-100 dark:from-purple-900/40 dark:to-violet-900/40',
+    iconColorClass: 'text-purple-600 dark:text-purple-400',
+    badgeColorClass: 'bg-purple-500/20 text-purple-700 dark:text-purple-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open reading lessons',
+    requiresValue: false,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
