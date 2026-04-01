@@ -480,6 +480,9 @@ const AppStore = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-xs leading-tight line-clamp-2">{exercise.name}</p>
+                        {exercise.subtitle && (
+                          <p className="text-[10px] text-muted-foreground leading-tight mt-0.5 line-clamp-1">{exercise.subtitle}</p>
+                        )}
                       </div>
                     </button>
                   ))}
