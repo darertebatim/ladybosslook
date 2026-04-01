@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,11 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Trash2, Pencil, Sparkles, GripVertical, Eye } from 'lucide-react';
+import { Plus, Trash2, Pencil, Sparkles, GripVertical, Eye, FileText } from 'lucide-react';
 import { useAdminReadingCards, useCreateCard, useUpdateCard, useDeleteCard, type ReadingCard, type ReadingLesson } from '@/hooks/useReadingLessons';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 
 const BG_COLORS = ['#F0E3FF', '#D7E9FF', '#E2F9F0', '#FFF3D6', '#FFE0F5', '#FFF492', '#FFE6C9', '#DBEAFE', '#FEE2E2', '#E0FBB8'];
 
@@ -31,6 +31,22 @@ export function ReadingCardEditor({ lesson }: Props) {
   const [generating, setGenerating] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
+  const [showDocPicker, setShowDocPicker] = useState(false);
+
+  // Fetch available admin documents for the picker
+  const { data: adminDocs = [] } = useQuery({
+    queryKey: ['admin-documents-for-reading'],
+    enabled: showDocPicker,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('admin_documents')
+        .select('id, title, file_name, extracted_text')
+        .not('extracted_text', 'is', null)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+  });
 
   const [form, setForm] = useState({
     title: '',
@@ -65,15 +81,12 @@ export function ReadingCardEditor({ lesson }: Props) {
     setShowForm(false);
   };
 
-  const handleGenerateAI = async () => {
-    if (!lesson.source_document_id) {
-      toast({ title: 'No source document', description: 'Link a document to this lesson first, or create cards manually.', variant: 'destructive' });
-      return;
-    }
+  const handleGenerateAI = async (documentId: string) => {
+    setShowDocPicker(false);
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-reading-cards', {
-        body: { document_id: lesson.source_document_id, lesson_id: lesson.id },
+        body: { document_id: documentId, lesson_id: lesson.id },
       });
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ['admin-reading-cards', lesson.id] });
@@ -100,7 +113,7 @@ export function ReadingCardEditor({ lesson }: Props) {
               <Eye className="h-4 w-4 mr-1" /> Preview
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={generating}>
+          <Button variant="outline" size="sm" onClick={() => setShowDocPicker(true)} disabled={generating}>
             <Sparkles className="h-4 w-4 mr-1" /> {generating ? 'Generating...' : 'AI Generate'}
           </Button>
           <Button size="sm" onClick={openCreate}>
@@ -211,6 +224,37 @@ export function ReadingCardEditor({ lesson }: Props) {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+      {/* Document picker dialog */}
+      <Dialog open={showDocPicker} onOpenChange={setShowDocPicker}>
+        <DialogContent className="max-w-lg max-h-[70vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Select Source Document</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">Pick a document to generate cards from. Only documents with extracted text are shown.</p>
+          <div className="flex-1 overflow-y-auto space-y-2 mt-2">
+            {adminDocs.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">No documents with extracted text found. Upload documents in the Documents section first.</p>
+            ) : (
+              adminDocs.map((doc: any) => (
+                <button
+                  key={doc.id}
+                  onClick={() => handleGenerateAI(doc.id)}
+                  className="w-full text-left p-3 rounded-lg border hover:bg-accent transition-colors flex items-start gap-3"
+                >
+                  <FileText className="h-5 w-5 mt-0.5 text-muted-foreground shrink-0" />
+                  <div className="min-w-0">
+                    <div className="font-medium truncate">{doc.title}</div>
+                    <div className="text-xs text-muted-foreground truncate">{doc.file_name}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {doc.extracted_text ? `${doc.extracted_text.length.toLocaleString()} chars extracted` : 'No text'}
+                    </div>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
