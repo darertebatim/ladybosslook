@@ -307,8 +307,8 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
             {
               user_id: userId,
               endpoint: `native:${token.value}`,
-              p256dh_key: 'native-ios',
-              auth_key: 'native-ios',
+              p256dh_key: getNativePlatformMarker(),
+              auth_key: getNativePlatformMarker(),
               app_version: appVersion,
             },
             {
