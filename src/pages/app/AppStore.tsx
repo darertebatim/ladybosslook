@@ -431,27 +431,43 @@ const AppStore = () => {
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
-                  {reflections.slice(0, 8).map((r) => (
-                    <button
-                      key={r.id}
-                      onClick={() => navigate(`/app/reflections/${r.id}`, { state: { from: location.pathname } })}
-                      className="shrink-0 w-[140px] flex items-center gap-2 py-2 text-left transition-transform active:scale-[0.97] bg-accent/60 rounded-xl px-2 border border-border/40"
-                    >
-                      <div className="relative shrink-0">
-                        {r.cover_image_url ? (
-                          <CachedImage src={r.cover_image_url} alt={r.title} className="h-10 w-10 rounded-lg object-cover" />
-                        ) : (
-                          <div className="h-10 w-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: r.cover_color || '#f3f4f6' }}>
-                            <FluentEmoji emoji={r.emoji || '🪞'} size={22} />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-xs leading-tight line-clamp-2">{r.title}</p>
-                      </div>
-                    </button>
-                  ))}
+                <div className="flex gap-2.5 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+                  <div className="flex flex-col gap-2 shrink-0" style={{ display: 'contents' }}>
+                    {(() => {
+                      const items = reflections.slice(0, 12);
+                      const columns: [typeof items[0], typeof items[0] | undefined][] = [];
+                      for (let i = 0; i < items.length; i += 2) {
+                        columns.push([items[i], items[i + 1]]);
+                      }
+                      return columns.map((pair, colIdx) => (
+                        <div key={colIdx} className="flex flex-col gap-2 shrink-0 w-[160px]">
+                          {pair.map((r) => r && (
+                            <button
+                              key={r.id}
+                              onClick={() => navigate(`/app/reflections/${r.id}`, { state: { from: location.pathname } })}
+                              className="flex items-center gap-2.5 p-2 text-left transition-transform active:scale-[0.97] bg-accent/60 rounded-xl border border-border/40"
+                            >
+                              <div className="relative shrink-0">
+                                {r.cover_image_url ? (
+                                  <CachedImage src={r.cover_image_url} alt={r.title} className="h-11 w-11 rounded-lg object-cover" />
+                                ) : (
+                                  <div className="h-11 w-11 rounded-lg flex items-center justify-center" style={{ backgroundColor: r.cover_color || '#f3f4f6' }}>
+                                    <FluentEmoji emoji={r.emoji || '🪞'} size={24} />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-xs leading-tight line-clamp-1">{r.title}</p>
+                                {r.subtitle && (
+                                  <p className="text-[10px] text-muted-foreground leading-tight line-clamp-1 mt-0.5">{r.subtitle}</p>
+                                )}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      ));
+                    })()}
+                  </div>
                 </div>
               </section>
             )}
