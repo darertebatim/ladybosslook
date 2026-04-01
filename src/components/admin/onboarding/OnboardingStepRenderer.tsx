@@ -3434,7 +3434,7 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
       origin: { y: 0.6 },
       colors: ['#2dd4bf', '#34d399', '#a78bfa', '#fbbf24', '#ec4899'],
     });
-    try { localStorage.setItem('simora_daily_reset_enabled', 'true'); } catch {}
+    
     setTimeout(onNext, 1200);
   };
 

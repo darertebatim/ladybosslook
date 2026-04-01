@@ -23,7 +23,7 @@ import { useNotificationCleanup } from '@/hooks/useNotificationCleanup';
 import { DeferredLayoutHooks } from '@/components/app/DeferredLayoutHooks';
 import { AppUpdatePopup } from '@/components/app/AppUpdatePopup';
 import { useKeyboard } from '@/hooks/useKeyboard';
-import { useDailyResetProvisioning } from '@/hooks/useDailyResetProvisioning';
+
 import { useOnboardingProfileSync } from '@/hooks/useOnboardingProfileSync';
 import { useRoutePreloader } from '@/hooks/useRoutePreloader';
 
@@ -61,8 +61,6 @@ const NativeAppLayout = () => {
   // Comprehensive cleanup of stale/legacy local notifications (runs first, before schedulers)
   useNotificationCleanup();
   
-  // Provision Daily Reset routine if user opted in during onboarding
-  useDailyResetProvisioning(user?.id);
   
   // Sync onboarding answers (nickname, gender) to user profile
   useOnboardingProfileSync(user?.id);
