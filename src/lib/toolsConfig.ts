@@ -53,6 +53,16 @@ export const wellnessTools: ToolConfig[] = [
     description: 'Breathing exercises',
   },
   {
+    id: 'focus-routine',
+    name: 'MyRoutines',
+    icon: 'Play',
+    emoji: '🚀',
+    bgColor: 'bg-[#DBEAFE]',
+    iconColor: 'text-blue-600',
+    route: '/app/routineplayer',
+    description: 'Routine player',
+  },
+  {
     id: 'projects',
     name: 'Projects',
     icon: 'FolderKanban',
@@ -71,16 +81,6 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-purple-600',
     route: '/app/timer',
     description: 'Stay focused',
-  },
-  {
-    id: 'focus-routine',
-    name: 'MyRoutines',
-    icon: 'Play',
-    emoji: '🚀',
-    bgColor: 'bg-[#DBEAFE]',
-    iconColor: 'text-blue-600',
-    route: '/app/routineplayer',
-    description: 'Routine player',
   },
   {
     id: 'mood',
