@@ -491,6 +491,8 @@ const App = () => (
                     <Route path="/app/reflections/free-form" element={<ProtectedRoute><AppFreeFormReflection /></ProtectedRoute>} />
                     <Route path="/app/reflections/:reflectionId" element={<ProtectedRoute><AppReflectionFlow /></ProtectedRoute>} />
                     <Route path="/app/ai" element={<ProtectedRoute><AppAICoach /></ProtectedRoute>} />
+                    <Route path="/app/read" element={<ProtectedRoute><AppRead /></ProtectedRoute>} />
+                    <Route path="/app/read/:lessonId" element={<ProtectedRoute><AppReadLesson /></ProtectedRoute>} />
                     {/* Redirect old feed post route */}
                     <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
                     
