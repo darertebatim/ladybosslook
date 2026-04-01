@@ -113,7 +113,7 @@ export function ReadingCardEditor({ lesson }: Props) {
               <Eye className="h-4 w-4 mr-1" /> Preview
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={generating}>
+          <Button variant="outline" size="sm" onClick={() => setShowDocPicker(true)} disabled={generating}>
             <Sparkles className="h-4 w-4 mr-1" /> {generating ? 'Generating...' : 'AI Generate'}
           </Button>
           <Button size="sm" onClick={openCreate}>
