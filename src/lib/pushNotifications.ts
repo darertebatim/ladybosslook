@@ -5,6 +5,12 @@ import { App } from '@capacitor/app';
 import { toast as shadcnToast } from '@/hooks/use-toast';
 import { toast } from 'sonner';
 
+// Helper to get platform marker for push subscriptions
+function getNativePlatformMarker(): string {
+  const platform = Capacitor.getPlatform();
+  return platform === 'android' ? 'native-android' : 'native-ios';
+}
+
 export type NotificationPermission = 'granted' | 'denied' | 'default';
 
 // Helper to get current app version
