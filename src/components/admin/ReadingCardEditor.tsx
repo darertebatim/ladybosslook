@@ -226,6 +226,37 @@ export function ReadingCardEditor({ lesson }: Props) {
           )}
         </DialogContent>
       </Dialog>
+      {/* Document picker dialog */}
+      <Dialog open={showDocPicker} onOpenChange={setShowDocPicker}>
+        <DialogContent className="max-w-lg max-h-[70vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Select Source Document</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">Pick a document to generate cards from. Only documents with extracted text are shown.</p>
+          <div className="flex-1 overflow-y-auto space-y-2 mt-2">
+            {adminDocs.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">No documents with extracted text found. Upload documents in the Documents section first.</p>
+            ) : (
+              adminDocs.map((doc: any) => (
+                <button
+                  key={doc.id}
+                  onClick={() => handleGenerateAI(doc.id)}
+                  className="w-full text-left p-3 rounded-lg border hover:bg-accent transition-colors flex items-start gap-3"
+                >
+                  <FileText className="h-5 w-5 mt-0.5 text-muted-foreground shrink-0" />
+                  <div className="min-w-0">
+                    <div className="font-medium truncate">{doc.title}</div>
+                    <div className="text-xs text-muted-foreground truncate">{doc.file_name}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {doc.extracted_text ? `${doc.extracted_text.length.toLocaleString()} chars extracted` : 'No text'}
+                    </div>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
