@@ -13,25 +13,23 @@ interface PushNotificationRequest {
   targetRoundId?: string;
   targetUserEmail?: string;
   title: string;
-  message?: string; // Alias for body
+  message?: string;
   body?: string;
   icon?: string;
   url?: string;
-  destinationUrl?: string; // Alias for url
+  destinationUrl?: string;
   badge?: number;
   environment?: 'development' | 'production';
-  isUrgent?: boolean; // For time-sensitive notifications that bypass Focus/DND
+  isUrgent?: boolean;
 }
 
-// Helper function to convert PEM format to ArrayBuffer
+// ─── APNs (iOS) helpers ───
+
 function pemToArrayBuffer(pem: string): ArrayBuffer {
-  // Remove PEM header/footer and newlines
   const pemContents = pem
     .replace(/-----BEGIN PRIVATE KEY-----/, '')
     .replace(/-----END PRIVATE KEY-----/, '')
     .replace(/\s/g, '');
-  
-  // Convert base64 to binary
   const binaryString = atob(pemContents);
   const bytes = new Uint8Array(binaryString.length);
   for (let i = 0; i < binaryString.length; i++) {
@@ -40,72 +38,47 @@ function pemToArrayBuffer(pem: string): ArrayBuffer {
   return bytes.buffer;
 }
 
-// Generate JWT token for APNs authentication
 async function generateApnsJwt(authKey: string, keyId: string, teamId: string): Promise<string> {
-  try {
-    // Parse the .p8 file content to get the private key
-    const keyData = pemToArrayBuffer(authKey);
-    
-    const key = await crypto.subtle.importKey(
-      'pkcs8',
-      keyData,
-      { name: 'ECDSA', namedCurve: 'P-256' },
-      false,
-      ['sign']
-    );
-    
-    const jwt = await create(
-      { alg: 'ES256', kid: keyId },
-      { iss: teamId, iat: Math.floor(Date.now() / 1000) },
-      key
-    );
-    
-    return jwt;
-  } catch (error: any) {
-    console.error('Error generating APNs JWT:', error);
-    throw new Error(`Failed to generate APNs JWT: ${error.message}`);
-  }
+  const keyData = pemToArrayBuffer(authKey);
+  const key = await crypto.subtle.importKey(
+    'pkcs8', keyData, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']
+  );
+  return await create(
+    { alg: 'ES256', kid: keyId },
+    { iss: teamId, iat: Math.floor(Date.now() / 1000) },
+    key
+  );
 }
 
-// Send push notification to iOS via APNs (JWT passed in to avoid rate limits)
 async function sendToApns(
-  deviceToken: string, 
-  payload: { title: string; body: string; url: string; badge?: number; isUrgent?: boolean }, 
-  jwt: string,
-  topic: string,
-  environment: string
+  deviceToken: string,
+  payload: { title: string; body: string; url: string; badge?: number; isUrgent?: boolean },
+  jwt: string, topic: string, environment: string
 ): Promise<Response> {
-  // Use production APNs unless explicitly set to development/sandbox
   const isProduction = environment === 'production';
   const apnsHost = isProduction ? 'api.push.apple.com' : 'api.sandbox.push.apple.com';
   const apnsUrl = `https://${apnsHost}/3/device/${deviceToken}`;
-  
-  console.log(`📱 Sending to APNs (${isProduction ? 'production' : 'sandbox'}):`, deviceToken.substring(0, 20) + '...', payload.isUrgent ? '⚠️ URGENT' : '');
-  
-  // Build APNs payload
+
+  console.log(`📱 [APNs] Sending (${isProduction ? 'prod' : 'sandbox'}):`, deviceToken.substring(0, 20) + '...', payload.isUrgent ? '⚠️ URGENT' : '');
+
   const apsPayload: Record<string, unknown> = {
-    alert: {
-      title: payload.title,
-      body: payload.body,
-    },
+    alert: { title: payload.title, body: payload.body },
     sound: payload.isUrgent ? 'alarm.wav' : 'default',
     badge: payload.badge || 1,
   };
-  
-  // Add interruption-level for iOS 15+ time-sensitive notifications
-  // This allows the notification to bypass Focus/DND modes
+
   if (payload.isUrgent) {
     apsPayload['interruption-level'] = 'time-sensitive';
-    apsPayload['relevance-score'] = 1.0; // Highest relevance
+    apsPayload['relevance-score'] = 1.0;
   }
-  
-  const response = await fetch(apnsUrl, {
+
+  return await fetch(apnsUrl, {
     method: 'POST',
     headers: {
       'authorization': `bearer ${jwt}`,
       'apns-topic': topic,
       'apns-push-type': 'alert',
-      'apns-priority': '10', // High priority for immediate delivery
+      'apns-priority': '10',
       'content-type': 'application/json',
     },
     body: JSON.stringify({
@@ -114,9 +87,108 @@ async function sendToApns(
       isUrgent: payload.isUrgent || false,
     }),
   });
-  
-  return response;
 }
+
+// ─── FCM (Android) helpers ───
+
+// Cache for FCM access token (valid ~1 hour)
+let fcmAccessToken: string | null = null;
+let fcmTokenExpiry = 0;
+
+async function getFcmAccessToken(serviceAccountJson: string): Promise<string> {
+  // Return cached token if still valid (with 5 min buffer)
+  if (fcmAccessToken && Date.now() < fcmTokenExpiry - 300000) {
+    return fcmAccessToken;
+  }
+
+  const sa = JSON.parse(serviceAccountJson);
+
+  // Import the RSA private key
+  const keyData = pemToArrayBuffer(sa.private_key);
+  const key = await crypto.subtle.importKey(
+    'pkcs8', keyData,
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+    false, ['sign']
+  );
+
+  const now = Math.floor(Date.now() / 1000);
+  const header = btoa(JSON.stringify({ alg: 'RS256', typ: 'JWT' }))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const payload = btoa(JSON.stringify({
+    iss: sa.client_email,
+    scope: 'https://www.googleapis.com/auth/firebase.messaging',
+    aud: sa.token_uri,
+    iat: now,
+    exp: now + 3600,
+  })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+  const signingInput = new TextEncoder().encode(`${header}.${payload}`);
+  const signatureBuffer = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, signingInput);
+  const signature = btoa(String.fromCharCode(...new Uint8Array(signatureBuffer)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+  const jwt = `${header}.${payload}.${signature}`;
+
+  // Exchange JWT for access token
+  const tokenResponse = await fetch(sa.token_uri, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`,
+  });
+
+  if (!tokenResponse.ok) {
+    const err = await tokenResponse.text();
+    throw new Error(`FCM token exchange failed: ${err}`);
+  }
+
+  const tokenData = await tokenResponse.json();
+  fcmAccessToken = tokenData.access_token;
+  fcmTokenExpiry = Date.now() + (tokenData.expires_in * 1000);
+
+  return fcmAccessToken!;
+}
+
+async function sendToFcm(
+  fcmToken: string,
+  payload: { title: string; body: string; url: string; isUrgent?: boolean },
+  accessToken: string,
+  projectId: string
+): Promise<Response> {
+  const fcmUrl = `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`;
+
+  console.log(`🤖 [FCM] Sending to Android:`, fcmToken.substring(0, 20) + '...', payload.isUrgent ? '⚠️ URGENT' : '');
+
+  const message: Record<string, unknown> = {
+    token: fcmToken,
+    notification: {
+      title: payload.title,
+      body: payload.body,
+    },
+    data: {
+      url: payload.url,
+      isUrgent: String(payload.isUrgent || false),
+    },
+    android: {
+      priority: payload.isUrgent ? 'HIGH' : 'NORMAL',
+      notification: {
+        channel_id: payload.isUrgent ? 'urgent' : 'default',
+        sound: payload.isUrgent ? 'alarm' : 'default',
+        click_action: 'FLUTTER_NOTIFICATION_CLICK',
+      },
+    },
+  };
+
+  return await fetch(fcmUrl, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ message }),
+  });
+}
+
+// ─── Main handler ───
 
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') {
@@ -129,17 +201,11 @@ const handler = async (req: Request): Promise<Response> => {
     const body = requestBody.body || requestBody.message || '';
     const url = requestBody.url || requestBody.destinationUrl || '';
 
-    // Debug logging
     console.log('🔔 Received push notification request:', {
       hasUserIds: !!userIds,
       userIdsLength: userIds?.length,
-      targetCourse,
-      targetRoundId,
-      targetUserEmail,
-      targetUserEmailTrimmed: targetUserEmail?.trim(),
-      title,
-      bodyLength: body?.length,
-      url,
+      targetCourse, targetRoundId, targetUserEmail: targetUserEmail?.trim(),
+      title, bodyLength: body?.length, url,
     });
 
     if (!title || !body) {
@@ -173,7 +239,6 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Verify admin role
     const { data: roleData } = await supabase
       .from('user_roles')
       .select('role')
@@ -194,67 +259,37 @@ const handler = async (req: Request): Promise<Response> => {
     let query = supabase.from('push_subscriptions').select('*');
 
     if (userIds && userIds.length > 0) {
-      console.log('📧 Filtering by userIds:', userIds);
       query = query.in('user_id', userIds);
     } else if (targetUserEmail) {
       const trimmedEmail = targetUserEmail.trim().toLowerCase();
-      console.log('📧 Looking up user by email:', trimmedEmail);
-      
-      // Get user by email from profiles table
       const { data: profiles, error: profileError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', trimmedEmail)
-        .single();
-
-      console.log('📧 Profile lookup result:', { 
-        found: !!profiles, 
-        userId: profiles?.id,
-        error: profileError?.message 
-      });
+        .from('profiles').select('id').eq('email', trimmedEmail).single();
 
       if (profiles) {
         query = query.eq('user_id', profiles.id);
-        console.log('📧 Filtering subscriptions for user:', profiles.id);
       } else {
-        console.error('❌ User not found with email:', trimmedEmail);
         return new Response(
           JSON.stringify({ message: 'User not found with that email', sent: 0, failed: 0 }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 404 }
         );
       }
     } else if (targetRoundId) {
-      // Get users enrolled in the specific round
-      console.log('📧 Looking up users enrolled in round:', targetRoundId);
       const { data: enrollments } = await supabase
-        .from('course_enrollments')
-        .select('user_id')
-        .eq('round_id', targetRoundId);
-
+        .from('course_enrollments').select('user_id').eq('round_id', targetRoundId);
       if (enrollments && enrollments.length > 0) {
-        const enrolledUserIds = enrollments.map(e => e.user_id);
-        console.log('📧 Found enrolled users:', enrolledUserIds.length);
-        query = query.in('user_id', enrolledUserIds);
-      } else {
-        console.log('📧 No enrolled users found for round');
+        query = query.in('user_id', enrollments.map(e => e.user_id));
       }
     } else if (targetCourse) {
-      // Get users enrolled in the target course
       const { data: enrollments } = await supabase
-        .from('course_enrollments')
-        .select('user_id')
-        .eq('course_name', targetCourse);
-
+        .from('course_enrollments').select('user_id').eq('course_name', targetCourse);
       if (enrollments && enrollments.length > 0) {
-        const enrolledUserIds = enrollments.map(e => e.user_id);
-        query = query.in('user_id', enrolledUserIds);
+        query = query.in('user_id', enrollments.map(e => e.user_id));
       }
     }
 
     const { data: subscriptions, error: fetchError } = await query;
 
     if (fetchError) {
-      console.error('Error fetching subscriptions:', fetchError);
       return new Response(
         JSON.stringify({ error: fetchError.message }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
@@ -262,132 +297,138 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (!subscriptions || subscriptions.length === 0) {
-      console.log('No subscriptions found for target users');
       return new Response(
         JSON.stringify({ message: 'No subscriptions found', sent: 0, failed: 0 }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
     }
 
-    console.log(`📊 Found ${subscriptions.length} native iOS subscriptions to notify`);
-
-    // Generate APNs JWT once before the loop to avoid rate limits
-    const authKey = Deno.env.get('APNS_AUTH_KEY');
-    const keyId = Deno.env.get('APNS_KEY_ID');
-    const teamId = Deno.env.get('APNS_TEAM_ID');
-    const topic = Deno.env.get('APNS_TOPIC') || 'com.ladybosslook.academy';
-    const apnsEnvironment = environment || Deno.env.get('APNS_ENVIRONMENT') || 'production';
-
-    if (!authKey || !keyId || !teamId) {
-      return new Response(
-        JSON.stringify({ error: 'APNs credentials not configured' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-      );
-    }
-
-    console.log('🔑 Generating APNs JWT token (once for all notifications)...');
-    const apnsJwt = await generateApnsJwt(authKey, keyId, teamId);
-    console.log('✅ APNs JWT generated successfully');
+    // Split subscriptions by platform
+    const iosSubs = subscriptions.filter(s => s.p256dh_key === 'native-ios');
+    const androidSubs = subscriptions.filter(s => s.p256dh_key === 'native-android');
+    
+    console.log(`📊 Found ${iosSubs.length} iOS + ${androidSubs.length} Android subscriptions`);
 
     let successCount = 0;
     let failedCount = 0;
     const failedSubscriptions: string[] = [];
 
-    // Send push notifications to native iOS devices only
-    for (const subscription of subscriptions) {
-      try {
-        // Extract native iOS token
-        const deviceToken = subscription.endpoint.replace('native:', '');
-        console.log(`📱 Sending to native iOS device for user ${subscription.user_id}`);
-        
-        const response = await sendToApns(
-          deviceToken,
-          {
-            title,
-            body,
-            url: url || '/app/home',
-            badge,
-            isUrgent: isUrgent || false,
-          },
-          apnsJwt,
-          topic,
-          apnsEnvironment as 'development' | 'production'
-        );
-        
-        if (response.ok) {
-          successCount++;
-          console.log(`✅ Push notification sent successfully to user ${subscription.user_id}`);
-        } else {
-          const errorBody = await response.text();
-          console.error(`❌ APNs error (${response.status}):`, errorBody);
-          
-          // Mark invalid tokens for deletion (410 = Unregistered, 400 = BadDeviceToken)
-          if (response.status === 410 || response.status === 400) {
+    const notificationPayload = {
+      title,
+      body,
+      url: url || '/app/home',
+      badge,
+      isUrgent: isUrgent || false,
+    };
+
+    // ─── Send to iOS via APNs ───
+    if (iosSubs.length > 0) {
+      const authKey = Deno.env.get('APNS_AUTH_KEY');
+      const keyId = Deno.env.get('APNS_KEY_ID');
+      const teamId = Deno.env.get('APNS_TEAM_ID');
+      const topic = Deno.env.get('APNS_TOPIC') || 'com.ladybosslook.academy';
+      const apnsEnvironment = environment || Deno.env.get('APNS_ENVIRONMENT') || 'production';
+
+      if (!authKey || !keyId || !teamId) {
+        console.error('❌ APNs credentials not configured, skipping iOS');
+      } else {
+        console.log('🔑 Generating APNs JWT token...');
+        const apnsJwt = await generateApnsJwt(authKey, keyId, teamId);
+
+        for (const subscription of iosSubs) {
+          try {
+            const deviceToken = subscription.endpoint.replace('native:', '');
+            const response = await sendToApns(deviceToken, notificationPayload, apnsJwt, topic, apnsEnvironment);
+            
+            if (response.ok) {
+              successCount++;
+            } else {
+              const errorBody = await response.text();
+              console.error(`❌ APNs error (${response.status}):`, errorBody);
+              if (response.status === 410 || response.status === 400) {
+                failedSubscriptions.push(subscription.id);
+              }
+              failedCount++;
+            }
+          } catch (error: any) {
+            failedCount++;
             failedSubscriptions.push(subscription.id);
-            console.log(`Marking subscription ${subscription.id} for deletion (invalid token)`);
+            console.error(`Error sending to iOS user ${subscription.user_id}:`, error.message);
           }
-          
-          failedCount++;
         }
-      } catch (error: any) {
-        failedCount++;
-        
-        if (!failedSubscriptions.includes(subscription.id)) {
-          failedSubscriptions.push(subscription.id);
-        }
-        
-        console.error(`Error sending push notification to user ${subscription.user_id}:`, error.message);
       }
     }
 
-    // Remove failed subscriptions from database
+    // ─── Send to Android via FCM ───
+    if (androidSubs.length > 0) {
+      const fcmServiceAccountJson = Deno.env.get('FCM_SERVICE_ACCOUNT_KEY');
+
+      if (!fcmServiceAccountJson) {
+        console.error('❌ FCM_SERVICE_ACCOUNT_KEY not configured, skipping Android');
+      } else {
+        try {
+          const sa = JSON.parse(fcmServiceAccountJson);
+          const accessToken = await getFcmAccessToken(fcmServiceAccountJson);
+          console.log('🔑 FCM access token obtained');
+
+          for (const subscription of androidSubs) {
+            try {
+              const fcmToken = subscription.endpoint.replace('native:', '');
+              const response = await sendToFcm(fcmToken, notificationPayload, accessToken, sa.project_id);
+
+              if (response.ok) {
+                successCount++;
+                console.log(`✅ FCM sent to user ${subscription.user_id}`);
+              } else {
+                const errorBody = await response.text();
+                console.error(`❌ FCM error (${response.status}):`, errorBody);
+                // 404 = unregistered token, INVALID_ARGUMENT = bad token
+                if (response.status === 404 || response.status === 400) {
+                  failedSubscriptions.push(subscription.id);
+                }
+                failedCount++;
+              }
+            } catch (error: any) {
+              failedCount++;
+              failedSubscriptions.push(subscription.id);
+              console.error(`Error sending to Android user ${subscription.user_id}:`, error.message);
+            }
+          }
+        } catch (error: any) {
+          console.error('❌ FCM initialization error:', error.message);
+          failedCount += androidSubs.length;
+        }
+      }
+    }
+
+    // Remove failed subscriptions
     if (failedSubscriptions.length > 0) {
       console.log(`🗑️ Removing ${failedSubscriptions.length} invalid subscriptions`);
-      await supabase
-        .from('push_subscriptions')
-        .delete()
-        .in('id', failedSubscriptions);
-      console.log(`✅ Removed ${failedSubscriptions.length} invalid subscriptions`);
+      await supabase.from('push_subscriptions').delete().in('id', failedSubscriptions);
     }
 
     // Log the push notification
     const targetType = userIds?.length ? 'specific' : targetUserEmail ? 'user' : targetCourse ? 'course' : 'all';
-    const { error: logError } = await supabase
-      .from('push_notification_logs')
-      .insert({
-        title,
-        message: body,
-        destination_url: url || '/app/home',
-        target_type: targetType,
-        target_course: targetCourse || null,
-        sent_count: successCount,
-        failed_count: failedCount,
-        created_by: adminUserId,
-      });
-
-    if (logError) {
-      console.error('Error logging notification:', logError);
-    }
+    await supabase.from('push_notification_logs').insert({
+      title,
+      message: body,
+      destination_url: url || '/app/home',
+      target_type: targetType,
+      target_course: targetCourse || null,
+      sent_count: successCount,
+      failed_count: failedCount,
+      created_by: adminUserId,
+    });
 
     return new Response(
-      JSON.stringify({
-        message: 'Push notifications sent',
-        sent: successCount,
-        failed: failedCount,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
+      JSON.stringify({ message: 'Push notifications sent', sent: successCount, failed: failedCount }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );
   } catch (error: any) {
     console.error('Error in send-push-notification:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }
 };
