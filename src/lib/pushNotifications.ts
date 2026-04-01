@@ -443,8 +443,8 @@ export async function refreshDeviceToken(userId: string): Promise<void> {
           {
             user_id: userId,
             endpoint: `native:${result.token}`,
-            p256dh_key: 'native-ios',
-            auth_key: 'native-ios',
+            p256dh_key: getNativePlatformMarker(),
+            auth_key: getNativePlatformMarker(),
             app_version: appVersion,
           },
           { onConflict: 'user_id,endpoint' }
