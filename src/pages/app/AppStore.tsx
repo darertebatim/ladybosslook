@@ -425,42 +425,33 @@ const AppStore = () => {
             {/* Reflections Section */}
             {!searchQuery && reflections && reflections.length > 0 && (
               <section>
-                <div className="flex items-center justify-between mb-3 px-1">
+                <div className="flex items-center justify-between mb-2 px-1">
                   <h2 className="text-sm font-semibold text-foreground">Guided Reflections</h2>
                   <Link to="/app/reflections" className="text-xs text-primary font-medium flex items-center gap-0.5">
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
                 <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
-                  {reflections.slice(0, 8).map((r, i) => {
-                    const palettes = [
-                      { bg: 'bg-gradient-to-br from-amber-50 to-orange-50', ring: 'ring-amber-200/60' },
-                      { bg: 'bg-gradient-to-br from-rose-50 to-pink-50', ring: 'ring-rose-200/60' },
-                      { bg: 'bg-gradient-to-br from-violet-50 to-purple-50', ring: 'ring-violet-200/60' },
-                      { bg: 'bg-gradient-to-br from-emerald-50 to-teal-50', ring: 'ring-emerald-200/60' },
-                      { bg: 'bg-gradient-to-br from-sky-50 to-blue-50', ring: 'ring-sky-200/60' },
-                    ];
-                    const palette = palettes[i % palettes.length];
-                    return (
-                      <button
-                        key={r.id}
-                        onClick={() => navigate(`/app/reflections/${r.id}`, { state: { from: location.pathname } })}
-                        className={`shrink-0 w-[150px] flex flex-col items-center text-center p-3 rounded-2xl transition-all active:scale-[0.96] ring-1 ${palette.bg} ${palette.ring}`}
-                      >
-                        <div className="h-14 w-14 rounded-2xl flex items-center justify-center mb-2 bg-white/70 shadow-sm">
-                          {r.cover_image_url ? (
-                            <CachedImage src={r.cover_image_url} alt={r.title} className="h-10 w-10 rounded-xl object-cover" />
-                          ) : (
-                            <FluentEmoji emoji={r.emoji || '🪞'} size={30} />
-                          )}
-                        </div>
-                        <p className="font-semibold text-[11px] leading-tight line-clamp-2 text-foreground">{r.title}</p>
-                        {r.subtitle && (
-                          <p className="text-[10px] text-muted-foreground leading-tight mt-1 line-clamp-2">{r.subtitle}</p>
+                  {reflections.slice(0, 8).map((r) => (
+                    <button
+                      key={r.id}
+                      onClick={() => navigate(`/app/reflections/${r.id}`, { state: { from: location.pathname } })}
+                      className="shrink-0 w-[140px] flex items-center gap-2 py-2 text-left transition-transform active:scale-[0.97] bg-accent/60 rounded-xl px-2 border border-border/40"
+                    >
+                      <div className="relative shrink-0">
+                        {r.cover_image_url ? (
+                          <CachedImage src={r.cover_image_url} alt={r.title} className="h-10 w-10 rounded-lg object-cover" />
+                        ) : (
+                          <div className="h-10 w-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: r.cover_color || '#f3f4f6' }}>
+                            <FluentEmoji emoji={r.emoji || '🪞'} size={22} />
+                          </div>
                         )}
-                      </button>
-                    );
-                  })}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-xs leading-tight line-clamp-2">{r.title}</p>
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </section>
             )}
@@ -468,38 +459,27 @@ const AppStore = () => {
             {/* Breathe Section */}
             {!searchQuery && breathingExercises && breathingExercises.length > 0 && (
               <section>
-                <div className="flex items-center justify-between mb-3 px-1">
+                <div className="flex items-center justify-between mb-2 px-1">
                   <h2 className="text-sm font-semibold text-foreground">Breathe Practice</h2>
                   <Link to="/app/breathe" className="text-xs text-primary font-medium flex items-center gap-0.5">
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
                 <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
-                  {breathingExercises.filter(e => e.is_active).slice(0, 8).map((exercise, i) => {
-                    const palettes = [
-                      { bg: 'bg-gradient-to-br from-sky-50 to-cyan-50', ring: 'ring-sky-200/60' },
-                      { bg: 'bg-gradient-to-br from-indigo-50 to-blue-50', ring: 'ring-indigo-200/60' },
-                      { bg: 'bg-gradient-to-br from-teal-50 to-emerald-50', ring: 'ring-teal-200/60' },
-                      { bg: 'bg-gradient-to-br from-purple-50 to-violet-50', ring: 'ring-purple-200/60' },
-                      { bg: 'bg-gradient-to-br from-cyan-50 to-sky-50', ring: 'ring-cyan-200/60' },
-                    ];
-                    const palette = palettes[i % palettes.length];
-                    return (
-                      <button
-                        key={exercise.id}
-                        onClick={() => navigate(`/app/breathe?exercise=${exercise.id}`, { state: { from: location.pathname } })}
-                        className={`shrink-0 w-[150px] flex flex-col items-center text-center p-3 rounded-2xl transition-all active:scale-[0.96] ring-1 ${palette.bg} ${palette.ring}`}
-                      >
-                        <div className="h-14 w-14 rounded-2xl flex items-center justify-center mb-2 bg-white/70 shadow-sm">
-                          <FluentEmoji emoji={exercise.emoji || '🌬️'} size={30} />
-                        </div>
-                        <p className="font-semibold text-[11px] leading-tight line-clamp-2 text-foreground">{exercise.name}</p>
-                        {exercise.subtitle && (
-                          <p className="text-[10px] text-muted-foreground leading-tight mt-1 line-clamp-2">{exercise.subtitle}</p>
-                        )}
-                      </button>
-                    );
-                  })}
+                  {breathingExercises.filter(e => e.is_active).slice(0, 8).map((exercise) => (
+                    <button
+                      key={exercise.id}
+                      onClick={() => navigate(`/app/breathe?exercise=${exercise.id}`, { state: { from: location.pathname } })}
+                      className="shrink-0 w-[140px] flex items-center gap-2 py-2 text-left transition-transform active:scale-[0.97] bg-accent/60 rounded-xl px-2 border border-border/40"
+                    >
+                      <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                        <FluentEmoji emoji={exercise.emoji || '🌬️'} size={22} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-xs leading-tight line-clamp-2">{exercise.name}</p>
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </section>
             )}
