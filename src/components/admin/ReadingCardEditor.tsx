@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,11 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Trash2, Pencil, Sparkles, GripVertical, Eye } from 'lucide-react';
+import { Plus, Trash2, Pencil, Sparkles, GripVertical, Eye, FileText } from 'lucide-react';
 import { useAdminReadingCards, useCreateCard, useUpdateCard, useDeleteCard, type ReadingCard, type ReadingLesson } from '@/hooks/useReadingLessons';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 
 const BG_COLORS = ['#F0E3FF', '#D7E9FF', '#E2F9F0', '#FFF3D6', '#FFE0F5', '#FFF492', '#FFE6C9', '#DBEAFE', '#FEE2E2', '#E0FBB8'];
 
