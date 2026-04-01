@@ -5,6 +5,12 @@ import { App } from '@capacitor/app';
 import { toast as shadcnToast } from '@/hooks/use-toast';
 import { toast } from 'sonner';
 
+// Helper to get platform marker for push subscriptions
+function getNativePlatformMarker(): string {
+  const platform = Capacitor.getPlatform();
+  return platform === 'android' ? 'native-android' : 'native-ios';
+}
+
 export type NotificationPermission = 'granted' | 'denied' | 'default';
 
 // Helper to get current app version
@@ -301,8 +307,8 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
             {
               user_id: userId,
               endpoint: `native:${token.value}`,
-              p256dh_key: 'native-ios',
-              auth_key: 'native-ios',
+              p256dh_key: getNativePlatformMarker(),
+              auth_key: getNativePlatformMarker(),
               app_version: appVersion,
             },
             {
@@ -437,8 +443,8 @@ export async function refreshDeviceToken(userId: string): Promise<void> {
           {
             user_id: userId,
             endpoint: `native:${result.token}`,
-            p256dh_key: 'native-ios',
-            auth_key: 'native-ios',
+            p256dh_key: getNativePlatformMarker(),
+            auth_key: getNativePlatformMarker(),
             app_version: appVersion,
           },
           { onConflict: 'user_id,endpoint' }
