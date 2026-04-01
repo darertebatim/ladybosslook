@@ -203,6 +203,16 @@ export const wellnessTools: ToolConfig[] = [
     description: 'Build a routine',
   },
   {
+    id: 'read',
+    name: 'Read & Learn',
+    icon: 'BookOpen',
+    emoji: '📖',
+    bgColor: 'bg-[#F0E3FF]',
+    iconColor: 'text-purple-600',
+    route: '/app/read',
+    description: 'Micro-learning lessons',
+  },
+  {
     id: 'presence',
     name: 'Presence',
     icon: 'Flame',

@@ -121,6 +121,9 @@ const BrandMock = lazy(() => import("@/pages/admin/BrandMock"));
 const Onboarding = lazy(() => import("@/pages/admin/Onboarding"));
 const Banners = lazy(() => import("@/pages/admin/Banners"));
 const Documents = lazy(() => import("@/pages/admin/Documents"));
+const ReadingManager = lazy(() => import("@/pages/admin/ReadingManager"));
+const AppRead = lazy(() => import("@/pages/app/AppRead"));
+const AppReadLesson = lazy(() => import("@/pages/app/AppReadLesson"));
 
 
 // Lazy load marketing/landing pages
@@ -423,6 +426,7 @@ const App = () => (
                       <Route path="banners" element={<ProtectedRoute requiredPage="communications"><Banners /></ProtectedRoute>} />
                       <Route path="app" element={<ProtectedRoute requiredPage="system"><AppTest /></ProtectedRoute>} />
                       <Route path="documents" element={<ProtectedRoute requiredPage="system"><Documents /></ProtectedRoute>} />
+                      <Route path="read" element={<ProtectedRoute requiredPage="tools"><ReadingManager /></ProtectedRoute>} />
                     </Route>
                   )}
                   
@@ -487,6 +491,8 @@ const App = () => (
                     <Route path="/app/reflections/free-form" element={<ProtectedRoute><AppFreeFormReflection /></ProtectedRoute>} />
                     <Route path="/app/reflections/:reflectionId" element={<ProtectedRoute><AppReflectionFlow /></ProtectedRoute>} />
                     <Route path="/app/ai" element={<ProtectedRoute><AppAICoach /></ProtectedRoute>} />
+                    <Route path="/app/read" element={<ProtectedRoute><AppRead /></ProtectedRoute>} />
+                    <Route path="/app/read/:lessonId" element={<ProtectedRoute><AppReadLesson /></ProtectedRoute>} />
                     {/* Redirect old feed post route */}
                     <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
                     

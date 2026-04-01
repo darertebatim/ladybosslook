@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
-export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | 'video' | 'video_playlist' | 'focus_timer' | 'routine' | 'myprograms' | 'myprofile' | 'presence' | 'tasksbank' | 'listen' | 'watch' | 'myroutines' | 'projects';
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | 'video' | 'video_playlist' | 'focus_timer' | 'routine' | 'myprograms' | 'myprofile' | 'presence' | 'tasksbank' | 'listen' | 'watch' | 'myroutines' | 'projects' | 'reading';
 
 export interface ProLinkConfig {
   value: ProLinkType;
@@ -410,6 +410,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     description: 'Open your projects board',
     requiresValue: false,
   },
+  reading: {
+    value: 'reading',
+    label: 'Read & Learn',
+    icon: BookOpen,
+    badgeText: 'Read',
+    color: 'purple',
+    gradientClass: 'bg-gradient-to-br from-purple-100 to-violet-100 dark:from-purple-900/40 dark:to-violet-900/40',
+    iconColorClass: 'text-purple-600 dark:text-purple-400',
+    badgeColorClass: 'bg-purple-500/20 text-purple-700 dark:text-purple-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open reading lessons',
+    requiresValue: false,
+  },
 };
 
 export const PRO_LINK_TYPES = Object.values(PRO_LINK_CONFIGS);
@@ -473,6 +486,8 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return '/app/routineplayer';
     case 'projects':
       return '/app/projects';
+    case 'reading':
+      return '/app/read';
     default:
       return '/app/home';
   }
