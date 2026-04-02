@@ -35,6 +35,7 @@ export function setNativeAudioCallbacks(cbs: {
 
 /**
  * Prepare a new track for playback. Destroys previous if exists.
+ * Resolves once the audio is buffered and ready to play.
  */
 export async function nativeAudioPrepare(opts: {
   source: string;
@@ -89,11 +90,20 @@ export async function nativeAudioPrepare(opts: {
       seekBackwardTime: 15,
     });
 
-    // Register listeners
-    await plugin.onAudioReady({ audioId: AUDIO_ID }, () => {
-      console.log('[NativeAudio] ✓ Audio ready');
-      isReady = true;
-      onAudioReady?.();
+    // Create a promise that resolves when audio is ready
+    const readyPromise = new Promise<void>((resolve) => {
+      const timeout = setTimeout(() => {
+        console.warn('[NativeAudio] Ready timeout after 15s, proceeding anyway');
+        resolve();
+      }, 15000);
+
+      plugin.onAudioReady({ audioId: AUDIO_ID }, () => {
+        console.log('[NativeAudio] ✓ Audio ready');
+        clearTimeout(timeout);
+        isReady = true;
+        onAudioReady?.();
+        resolve();
+      });
     });
 
     await plugin.onAudioEnd({ audioId: AUDIO_ID }, () => {
@@ -108,6 +118,9 @@ export async function nativeAudioPrepare(opts: {
 
     // Initialize (starts buffering)
     await plugin.initialize({ audioId: AUDIO_ID });
+
+    // Wait for audio to actually be ready before returning
+    await readyPromise;
 
     console.log('[NativeAudio] ✓ Prepared:', opts.title);
     return true;
