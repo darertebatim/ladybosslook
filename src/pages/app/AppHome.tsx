@@ -1098,16 +1098,6 @@ const AppHome = () => {
                 </div>
               )}
 
-              {/* Welcome Routine Card for New Users - stays until dismissed */}
-              {showWelcomeCard && (
-                <div className="py-4 tour-welcome-card">
-                  <WelcomeRoutineCard onDismiss={() => {
-                    setWelcomeCardDismissed(true);
-                    setStartedAsNewUser(false);
-                    localStorage.setItem('simora_welcome_card_dismissed', 'true');
-                  }} />
-                </div>
-              )}
 
               {/* Personal Actions Section - hide empty state when welcome card is shown */}
               {!isNewUser && filteredTasks.length === 0 && taskFilter === 'all' && programEvents.length === 0 ? (
