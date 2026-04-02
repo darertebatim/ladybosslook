@@ -29,7 +29,7 @@ export async function initializeRevenueCat(userId: string) {
     const { Purchases } = await import('@revenuecat/purchases-capacitor');
     
     await Purchases.configure({
-      apiKey: RC_IOS_API_KEY,
+      apiKey: getRevenueCatApiKey(),
       appUserID: userId,
     });
 
