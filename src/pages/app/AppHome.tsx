@@ -1631,7 +1631,7 @@ const AppHome = () => {
           forceShow={serverIndicatesNewUser}
           hasEnrolledPrograms={false}
           hasSuggestedRoutines={suggestedRoutines.length > 0}
-          hasWelcomeCard={showWelcomeCard}
+          hasWelcomeCard={false}
           onTourReady={handleHomeTourReady}
         />
 
