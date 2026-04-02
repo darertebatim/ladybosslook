@@ -172,13 +172,6 @@ const AppHome = () => {
   const updateGoldStreak = useUpdateGoldStreak();
   const { data: todayMood } = useTodayMood();
   
-  // Welcome card dismissed state - persisted in localStorage
-  // Also hide if user has ever added an action from the welcome card
-  const [welcomeCardDismissed, setWelcomeCardDismissed] = useState(() => 
-    localStorage.getItem('simora_welcome_card_dismissed') === 'true' ||
-    localStorage.getItem('simora_welcome_card_action_added') === 'true'
-  );
-  
   // Dismissed individual routine card IDs
   const [dismissedRoutineIds, setDismissedRoutineIds] = useState<Set<string>>(() => {
     try {
@@ -187,9 +180,6 @@ const AppHome = () => {
       return new Set(JSON.parse(newKey || oldKey || '[]'));
     } catch { return new Set(); }
   });
-  
-  // Track if user started this session as a new user (so card stays visible after adding tasks)
-  const [startedAsNewUser, setStartedAsNewUser] = useState<boolean | null>(null);
 
   // Handle quick start continue
   const handleQuickStartContinue = useCallback((taskName: string, template?: TaskTemplate) => {
