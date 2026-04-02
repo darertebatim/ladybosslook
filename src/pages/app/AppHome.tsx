@@ -35,7 +35,7 @@ import { useScrollRestore } from '@/hooks/useScrollRestore';
 import { isWaterTask } from '@/lib/waterTracking';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { FastingStatusCard } from '@/components/app/FastingStatusCard';
-import { WelcomeRoutineCard } from '@/components/app/WelcomeRoutineCard';
+
 import { toast } from 'sonner';
 import { useWeeklyTaskCompletion, useDateRangeTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 import { useBadgeCelebration } from '@/hooks/useBadgeCelebration';
@@ -172,13 +172,6 @@ const AppHome = () => {
   const updateGoldStreak = useUpdateGoldStreak();
   const { data: todayMood } = useTodayMood();
   
-  // Welcome card dismissed state - persisted in localStorage
-  // Also hide if user has ever added an action from the welcome card
-  const [welcomeCardDismissed, setWelcomeCardDismissed] = useState(() => 
-    localStorage.getItem('simora_welcome_card_dismissed') === 'true' ||
-    localStorage.getItem('simora_welcome_card_action_added') === 'true'
-  );
-  
   // Dismissed individual routine card IDs
   const [dismissedRoutineIds, setDismissedRoutineIds] = useState<Set<string>>(() => {
     try {
@@ -187,9 +180,6 @@ const AppHome = () => {
       return new Set(JSON.parse(newKey || oldKey || '[]'));
     } catch { return new Set(); }
   });
-  
-  // Track if user started this session as a new user (so card stays visible after adding tasks)
-  const [startedAsNewUser, setStartedAsNewUser] = useState<boolean | null>(null);
 
   // Handle quick start continue
   const handleQuickStartContinue = useCallback((taskName: string, template?: TaskTemplate) => {
@@ -274,28 +264,6 @@ const AppHome = () => {
   const serverIndicatesNewUser = totalCompletions === 0;
   const isFirstOpen = !homeDataLoading && serverIndicatesNewUser;
   
-  // Track if user started this session as a new user (only set once when data loads)
-  useEffect(() => {
-    if (startedAsNewUser === null && !homeDataLoading) {
-      // Only set this once when home data first loads
-      setStartedAsNewUser(isNewUser);
-    }
-  }, [isNewUser, startedAsNewUser, homeDataLoading]);
-  
-  // Auto-reset welcome card dismissal if user truly has no tasks
-  // This handles the case when admin resets user data - the welcome card should reappear
-  useEffect(() => {
-    if (dataIsNewUser && welcomeCardDismissed) {
-      // User has 0 tasks but card was dismissed - likely an admin reset
-      // Clear the dismissal so the card shows again
-      setWelcomeCardDismissed(false);
-      localStorage.removeItem('simora_welcome_card_dismissed');
-      localStorage.removeItem('simora_welcome_card_action_added');
-    }
-  }, [dataIsNewUser, welcomeCardDismissed]);
-  
-  // Show welcome card if user started as new user this session (even after adding tasks)
-  const showWelcomeCard = (startedAsNewUser ?? isNewUser) && !welcomeCardDismissed;
   
   // Track first action celebration
   const hasAnyCompletionToday = (completions?.tasks?.length ?? 0) > 0;
@@ -1079,10 +1047,10 @@ const AppHome = () => {
             </div>
 
             {/* Mood Check-in Banner — only after all promo/home banners are dismissed */}
-            {!showWelcomeCard && !hasPromoBanner && !hasHomeBanner && <MoodCheckInBanner onVisibilityChange={setHasMoodBanner} />}
+            {!hasPromoBanner && !hasHomeBanner && <MoodCheckInBanner onVisibilityChange={setHasMoodBanner} />}
 
             {/* My Shortcuts — only when no banners are visible */}
-            {!showWelcomeCard && !hasPromoBanner && !hasHomeBanner && !hasMoodBanner && (
+            {!hasPromoBanner && !hasHomeBanner && !hasMoodBanner && (
               <div className="mb-3">
                 <ToolShortcuts hideWhenEmpty />
               </div>
@@ -1130,16 +1098,6 @@ const AppHome = () => {
                 </div>
               )}
 
-              {/* Welcome Routine Card for New Users - stays until dismissed */}
-              {showWelcomeCard && (
-                <div className="py-4 tour-welcome-card">
-                  <WelcomeRoutineCard onDismiss={() => {
-                    setWelcomeCardDismissed(true);
-                    setStartedAsNewUser(false);
-                    localStorage.setItem('simora_welcome_card_dismissed', 'true');
-                  }} />
-                </div>
-              )}
 
               {/* Personal Actions Section - hide empty state when welcome card is shown */}
               {!isNewUser && filteredTasks.length === 0 && taskFilter === 'all' && programEvents.length === 0 ? (
@@ -1456,7 +1414,7 @@ const AppHome = () => {
               )}
 
               {/* Popular Routine Suggestions - only show routines user hasn't added */}
-              {suggestedRoutines.length > 0 && taskFilter === 'all' && !showWelcomeCard && <div className="tour-suggested-routine mt-6">
+              {suggestedRoutines.length > 0 && taskFilter === 'all' && <div className="tour-suggested-routine mt-6">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <CalendarPlus className="h-4 w-4 text-violet-500" />
@@ -1491,7 +1449,7 @@ const AppHome = () => {
 
               {/* Tour Banner & Promo - always visible regardless of routine cards */}
               {taskFilter === 'all' && <>
-                {!showWelcomeCard && <OnboardingBanner />}
+                <OnboardingBanner />
                 <div id="tour-banner-slot" className="mt-4" />
                 <PromoBanner location="home_rituals" className="mt-4" />
               </>}
@@ -1673,7 +1631,7 @@ const AppHome = () => {
           forceShow={serverIndicatesNewUser}
           hasEnrolledPrograms={false}
           hasSuggestedRoutines={suggestedRoutines.length > 0}
-          hasWelcomeCard={showWelcomeCard}
+          hasWelcomeCard={false}
           onTourReady={handleHomeTourReady}
         />
 
