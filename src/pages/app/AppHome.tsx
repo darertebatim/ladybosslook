@@ -35,7 +35,7 @@ import { useScrollRestore } from '@/hooks/useScrollRestore';
 import { isWaterTask } from '@/lib/waterTracking';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { FastingStatusCard } from '@/components/app/FastingStatusCard';
-import { WelcomeRoutineCard } from '@/components/app/WelcomeRoutineCard';
+
 import { toast } from 'sonner';
 import { useWeeklyTaskCompletion, useDateRangeTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 import { useBadgeCelebration } from '@/hooks/useBadgeCelebration';
