@@ -10,9 +10,10 @@ export const initializeSocialLogin = async () => {
       const module = await import('@capgo/capacitor-social-login');
       SocialLogin = module.SocialLogin;
       
-      // Initialize Google provider with iOS client ID
+      // Initialize Google provider for all platforms
       await SocialLogin.initialize({
         google: {
+          webClientId: '945736365946-79h9fsgo6uedji5tq5qsmpa55m88rg7e.apps.googleusercontent.com',
           iOSClientId: '945736365946-auuab5v8310rvlpol3uh226p088nj1n5.apps.googleusercontent.com',
         },
       });
