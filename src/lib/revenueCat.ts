@@ -145,7 +145,7 @@ async function syncSubscriptionToSupabase(customerInfo: any) {
           user_id: user.id,
           program_slug: programSlug,
           status: 'active',
-          platform: 'ios',
+          platform: Capacitor.getPlatform() === 'android' ? 'android' : 'ios',
           product_id: entitlement.productIdentifier || null,
           revenuecat_id: customerInfo.originalAppUserId || null,
           expires_at: entitlement.expirationDate || null,
