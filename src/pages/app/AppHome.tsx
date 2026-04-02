@@ -264,28 +264,6 @@ const AppHome = () => {
   const serverIndicatesNewUser = totalCompletions === 0;
   const isFirstOpen = !homeDataLoading && serverIndicatesNewUser;
   
-  // Track if user started this session as a new user (only set once when data loads)
-  useEffect(() => {
-    if (startedAsNewUser === null && !homeDataLoading) {
-      // Only set this once when home data first loads
-      setStartedAsNewUser(isNewUser);
-    }
-  }, [isNewUser, startedAsNewUser, homeDataLoading]);
-  
-  // Auto-reset welcome card dismissal if user truly has no tasks
-  // This handles the case when admin resets user data - the welcome card should reappear
-  useEffect(() => {
-    if (dataIsNewUser && welcomeCardDismissed) {
-      // User has 0 tasks but card was dismissed - likely an admin reset
-      // Clear the dismissal so the card shows again
-      setWelcomeCardDismissed(false);
-      localStorage.removeItem('simora_welcome_card_dismissed');
-      localStorage.removeItem('simora_welcome_card_action_added');
-    }
-  }, [dataIsNewUser, welcomeCardDismissed]);
-  
-  // Show welcome card if user started as new user this session (even after adding tasks)
-  const showWelcomeCard = (startedAsNewUser ?? isNewUser) && !welcomeCardDismissed;
   
   // Track first action celebration
   const hasAnyCompletionToday = (completions?.tasks?.length ?? 0) > 0;
