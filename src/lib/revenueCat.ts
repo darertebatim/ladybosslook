@@ -2,6 +2,12 @@ import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
 
 const RC_IOS_API_KEY = 'appl_FfoHuonnYUncpGWZBaIfXkvurVW';
+const RC_ANDROID_API_KEY = 'goog_iYeGtIOKPgFpziIEHlWtXLnBzWu';
+
+function getRevenueCatApiKey(): string {
+  const platform = Capacitor.getPlatform();
+  return platform === 'android' ? RC_ANDROID_API_KEY : RC_IOS_API_KEY;
+}
 
 let rcInitialized = false;
 
@@ -23,7 +29,7 @@ export async function initializeRevenueCat(userId: string) {
     const { Purchases } = await import('@revenuecat/purchases-capacitor');
     
     await Purchases.configure({
-      apiKey: RC_IOS_API_KEY,
+      apiKey: getRevenueCatApiKey(),
       appUserID: userId,
     });
 
@@ -139,7 +145,7 @@ async function syncSubscriptionToSupabase(customerInfo: any) {
           user_id: user.id,
           program_slug: programSlug,
           status: 'active',
-          platform: 'ios',
+          platform: Capacitor.getPlatform() === 'android' ? 'android' : 'ios',
           product_id: entitlement.productIdentifier || null,
           revenuecat_id: customerInfo.originalAppUserId || null,
           expires_at: entitlement.expirationDate || null,
