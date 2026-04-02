@@ -2,6 +2,12 @@ import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
 
 const RC_IOS_API_KEY = 'appl_FfoHuonnYUncpGWZBaIfXkvurVW';
+const RC_ANDROID_API_KEY = 'goog_iYeGtIOKPgFpziIEHlWtXLnBzWu';
+
+function getRevenueCatApiKey(): string {
+  const platform = Capacitor.getPlatform();
+  return platform === 'android' ? RC_ANDROID_API_KEY : RC_IOS_API_KEY;
+}
 
 let rcInitialized = false;
 
