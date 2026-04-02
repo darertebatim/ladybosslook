@@ -77,6 +77,7 @@ export async function nativeAudioPrepare(opts: {
     currentSource = opts.source;
     isReady = false;
 
+    console.log('[NativeAudio] Creating player with source:', opts.source?.substring(0, 80));
     await plugin.create({
       audioId: AUDIO_ID,
       audioSource: opts.source,
@@ -91,6 +92,7 @@ export async function nativeAudioPrepare(opts: {
       seekForwardTime: 15,
       seekBackwardTime: 15,
     });
+    console.log('[NativeAudio] Player created successfully');
 
     // Create a promise that resolves when audio is ready
     const readyPromise = new Promise<void>((resolve) => {
