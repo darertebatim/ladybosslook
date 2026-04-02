@@ -44,6 +44,8 @@ export async function nativeAudioPrepare(opts: {
   album?: string;
   artworkUrl?: string;
 }): Promise<boolean> {
+  const platform = Capacitor.getPlatform();
+  console.log('[NativeAudio] Platform:', platform, 'isNative:', Capacitor.isNativePlatform());
   if (!Capacitor.isNativePlatform()) return false;
 
   try {
