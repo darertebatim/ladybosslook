@@ -156,7 +156,21 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
     },
   });
 
-  const { data: audioTracks = [] } = useQuery({
+  // Fetch routines bank templates for inspire linking
+  const { data: routineTemplates = [] } = useQuery({
+    queryKey: ['shortcut-linkable-routine-templates'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routines_bank')
+        .select('id, title, emoji, category, subtitle, cover_image_url')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      if (error) throw error;
+      return data as { id: string; title: string; emoji: string | null; category: string; subtitle: string | null; cover_image_url: string | null }[];
+    },
+  });
+
+
     queryKey: ['shortcut-linkable-audio-tracks'],
     queryFn: async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
