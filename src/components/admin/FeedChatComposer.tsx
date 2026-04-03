@@ -662,28 +662,162 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
           <Popover>
             <PopoverTrigger asChild>
               <Button type="button" variant="outline" size="sm" className="h-8">
-                {actionType === 'none' ? 'Add Action' : ACTION_TYPES.find(t => t.value === actionType)?.label}
+                {actionType === 'none' 
+                  ? 'Add Action' 
+                  : actionType === 'pro_link' && actionProLinkType
+                    ? `${PRO_LINK_EMOJIS[actionProLinkType]} ${PRO_LINK_CONFIGS[actionProLinkType]?.label}`
+                    : actionType === 'external_link' ? '🔗 External Link'
+                    : actionType === 'rate_app' ? '⭐ Rate the App'
+                    : 'Add Action'
+                }
+                {actionType !== 'none' && (
+                  <button
+                    type="button"
+                    className="ml-1.5 h-4 w-4 rounded-full hover:bg-muted inline-flex items-center justify-center"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActionType('none');
+                      setActionProLinkType('');
+                      setActionProLinkValue('');
+                      setActionLabel('');
+                      setActionUrl('');
+                    }}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="start" className="w-72 p-3 space-y-3">
-              <div>
-                <Label className="text-xs">Action Type</Label>
-                <Select value={actionType} onValueChange={setActionType}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ACTION_TYPES.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <PopoverContent align="start" className="w-80 p-0" sideOffset={8}>
+              {/* Search */}
+              <div className="p-3 border-b">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    value={actionSearch}
+                    onChange={(e) => setActionSearch(e.target.value)}
+                    placeholder="Search destinations..."
+                    className="pl-9 h-9"
+                  />
+                </div>
               </div>
 
-              {actionType !== 'none' && (
-                <>
+              <div className="max-h-[320px] overflow-y-auto p-2">
+                {/* No action option */}
+                <button
+                  type="button"
+                  className={cn(
+                    "w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-muted/80 transition-colors",
+                    actionType === 'none' && "bg-muted"
+                  )}
+                  onClick={() => {
+                    setActionType('none');
+                    setActionProLinkType('');
+                    setActionProLinkValue('');
+                  }}
+                >
+                  No Action
+                </button>
+
+                {/* Pro Link destinations by category */}
+                {DESTINATION_CATEGORIES.map((category) => {
+                  const filteredItems = category.items.filter(item => {
+                    const config = PRO_LINK_CONFIGS[item];
+                    if (!actionSearch) return true;
+                    return config.label.toLowerCase().includes(actionSearch.toLowerCase()) ||
+                           config.description.toLowerCase().includes(actionSearch.toLowerCase());
+                  });
+                  if (filteredItems.length === 0) return null;
+
+                  return (
+                    <div key={category.label} className="mt-2">
+                      <p className="px-3 py-1 text-xs font-medium text-muted-foreground">{category.label}</p>
+                      {filteredItems.map((linkType) => {
+                        const config = PRO_LINK_CONFIGS[linkType];
+                        const emoji = PRO_LINK_EMOJIS[linkType];
+                        const isSelected = actionType === 'pro_link' && actionProLinkType === linkType;
+
+                        return (
+                          <button
+                            key={linkType}
+                            type="button"
+                            className={cn(
+                              "w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-muted/80 transition-colors flex items-center gap-2.5",
+                              isSelected && "bg-primary/10 text-primary"
+                            )}
+                            onClick={() => {
+                              setActionType('pro_link');
+                              setActionProLinkType(linkType);
+                              setActionLabel(config.badgeText);
+                              if (!config.requiresValue) {
+                                setActionProLinkValue('');
+                              }
+                            }}
+                          >
+                            <span className="text-base">{emoji}</span>
+                            <span className="flex-1">{config.label}</span>
+                            {config.requiresValue && <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+
+                {/* Special actions */}
+                {(!actionSearch || SPECIAL_ACTIONS.some(a => a.label.toLowerCase().includes(actionSearch.toLowerCase()))) && (
+                  <div className="mt-2">
+                    <p className="px-3 py-1 text-xs font-medium text-muted-foreground">⚡ Special</p>
+                    {SPECIAL_ACTIONS.filter(a => !actionSearch || a.label.toLowerCase().includes(actionSearch.toLowerCase())).map((action) => (
+                      <button
+                        key={action.value}
+                        type="button"
+                        className={cn(
+                          "w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-muted/80 transition-colors flex items-center gap-2.5",
+                          actionType === action.value && "bg-primary/10 text-primary"
+                        )}
+                        onClick={() => {
+                          setActionType(action.value);
+                          setActionProLinkType('');
+                          setActionLabel('');
+                        }}
+                      >
+                        <span className="text-base">{action.emoji}</span>
+                        <span className="flex-1">{action.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Value input for selected action */}
+              {((actionType === 'pro_link' && actionProLinkType && PRO_LINK_CONFIGS[actionProLinkType]?.requiresValue) || actionType === 'external_link') && (
+                <div className="p-3 border-t space-y-2">
+                  {actionType === 'pro_link' && actionProLinkType === 'playlist' ? (
+                    <div>
+                      <Label className="text-xs">Playlist</Label>
+                      <Select value={actionProLinkValue} onValueChange={setActionProLinkValue}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Select playlist..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {playlists?.map((p) => (
+                            <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ) : (
+                    <div>
+                      <Label className="text-xs">{actionType === 'external_link' ? 'URL' : 'Value (ID or path)'}</Label>
+                      <Input
+                        value={actionType === 'external_link' ? actionUrl : actionProLinkValue}
+                        onChange={(e) => actionType === 'external_link' ? setActionUrl(e.target.value) : setActionProLinkValue(e.target.value)}
+                        placeholder={actionType === 'external_link' ? 'https://...' : 'Enter ID or value...'}
+                        className="mt-1"
+                      />
+                    </div>
+                  )}
                   <div>
                     <Label className="text-xs">Button Label</Label>
                     <Input
@@ -693,35 +827,21 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
                       className="mt-1"
                     />
                   </div>
+                </div>
+              )}
 
-                  {actionType === 'play_audio' && (
-                    <div>
-                      <Label className="text-xs">Playlist</Label>
-                      <Select value={actionPlaylistId} onValueChange={setActionPlaylistId}>
-                        <SelectTrigger className="mt-1">
-                          <SelectValue placeholder="Select..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {playlists?.map((p) => (
-                            <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {['join_session', 'view_materials', 'external_link'].includes(actionType) && (
-                    <div>
-                      <Label className="text-xs">URL</Label>
-                      <Input
-                        value={actionUrl}
-                        onChange={(e) => setActionUrl(e.target.value)}
-                        placeholder="https://..."
-                        className="mt-1"
-                      />
-                    </div>
-                  )}
-                </>
+              {/* Label for non-requiresValue actions */}
+              {actionType !== 'none' && actionType !== 'external_link' && 
+               !(actionType === 'pro_link' && actionProLinkType && PRO_LINK_CONFIGS[actionProLinkType]?.requiresValue) && (
+                <div className="p-3 border-t">
+                  <Label className="text-xs">Button Label</Label>
+                  <Input
+                    value={actionLabel}
+                    onChange={(e) => setActionLabel(e.target.value)}
+                    placeholder="e.g., Start Now"
+                    className="mt-1"
+                  />
+                </div>
               )}
             </PopoverContent>
           </Popover>
