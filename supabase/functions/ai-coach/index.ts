@@ -132,9 +132,9 @@ serve(async (req) => {
         toolResults.push({ tool_call_id: tc.id, result });
       }
 
-      // Collect mutation results for action cards
-      const mutationTools = ["add_task_to_planner", "log_mood", "adopt_routine"];
-      allMutationResults.push(...toolResults.filter(tr => mutationTools.includes(tr.result.action)).map(tr => tr.result));
+      // Collect ALL tool results for action cards (not just mutations)
+      allMutationResults.push(...toolResults.map(tr => tr.result));
+      console.log(`[ai-coach] Round ${round}: executed ${toolResults.length} tools:`, toolResults.map(tr => tr.result.action));
 
       // Add tool call + results to conversation for next round
       currentMessages = [
