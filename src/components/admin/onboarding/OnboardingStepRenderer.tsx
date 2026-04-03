@@ -2904,10 +2904,22 @@ function StarterRoutineScreen({ step, onNext }: Props) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7, duration: 0.4 }}
-              className="text-white/50 text-[15px] text-center mt-2 leading-relaxed"
+              className="text-white text-[15px] text-center mt-2 leading-relaxed"
             >
               Your first Reset is complete
             </motion.p>
+
+            {/* Star rating */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.9, duration: 0.4 }}
+              className="flex gap-1 mt-3"
+            >
+              {[...Array(5)].map((_, i) => (
+                <span key={i} className="text-yellow-400 text-2xl">⭐</span>
+              ))}
+            </motion.div>
 
             {/* Stat cards */}
             <motion.div
@@ -2930,7 +2942,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                 >
                   <FluentEmoji emoji={stat.emoji} size={24} />
                   <span className="text-white text-lg font-bold mt-1">{stat.value}</span>
-                  <span className="text-white/40 text-[11px] font-medium">{stat.label}</span>
+                  <span className="text-white text-[11px] font-medium">{stat.label}</span>
                 </motion.div>
               ))}
             </motion.div>
@@ -2940,7 +2952,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.8, duration: 0.5 }}
-              className="text-white/35 text-[13px] text-center mt-6 italic"
+              className="text-white text-[15px] text-center mt-6 font-bold leading-relaxed"
             >
               "80% of users report less stress and more happiness in their first 7 days of daily resets"
             </motion.p>
