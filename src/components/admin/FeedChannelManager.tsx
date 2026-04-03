@@ -52,9 +52,6 @@ export function FeedChannelManager() {
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
-    type: 'general' as 'general' | 'program' | 'round' | 'all_enrolled' | 'all_paid',
-    program_slug: '',
-    round_id: '',
     allow_reactions: true,
     allow_comments: true,
     cover_type: 'none' as 'none' | 'emoji' | 'image',
