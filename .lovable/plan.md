@@ -1,115 +1,87 @@
 
 
-# Educational Reading System — Full Plan
+## AI Coach Overhaul Plan
 
-## Overview
+The current AI Coach has a solid backend (tool-calling, context-fetching, streaming) but the frontend is basic and the tools don't surface results well. Here's the plan to make it great.
 
-Build a Headway/Imprint-style micro-learning feature where admin documents are converted into swipeable visual card lessons. Admin manages content at `/admin/read`, users consume it at `/app/read`.
+### What's Actually Working (Backend)
+- Edge function has 7 tools: add_task, log_mood, adopt_routine, suggest_breathing, journal_prompt, get_routines, get_tasks
+- Multi-turn tool chaining (up to 3 rounds)
+- User context fetching (profile, tasks, emotions, streaks, routines)
+- Conversation memory from previous sessions
+- Mode-specific system prompts (coach/assistant/companion)
 
-## Database
+### What's Broken or Weak
 
-### New table: `reading_lessons`
-| Column | Type | Notes |
-|--------|------|-------|
-| id | uuid PK | |
-| title | text | Lesson title |
-| subtitle | text | Short tagline |
-| description | text | Brief summary |
-| cover_image_url | text | Cover for the library |
-| emoji | text | Fallback if no cover |
-| source_document_id | uuid FK → admin_documents | Optional link to source doc |
-| category | text | e.g. "Money", "Mindset" |
-| is_published | boolean | default false |
-| sort_order | int | default 0 |
-| created_at / updated_at | timestamptz | |
+1. **Tool results are invisible** — action results render as tiny cards with no interactivity (can't tap to open breathing, can't navigate to planner)
+2. **Modes are cosmetic** — switching modes only changes quick chips and system prompt phrasing, no real behavioral difference in UI
+3. **UI is a plain chatbox** — no visual identity, no animations, no personality
+4. **No deep links from results** — when AI suggests breathing or a routine, there's no button to actually go do it
 
-### New table: `reading_cards`
-| Column | Type | Notes |
-|--------|------|-------|
-| id | uuid PK | |
-| lesson_id | uuid FK → reading_lessons | |
-| sort_order | int | Card position |
-| title | text | Card headline |
-| content | text | Main text (2-4 sentences) |
-| key_point | text | Bold takeaway line |
-| image_url | text | Optional visual |
-| bg_color | text | Card background color |
-| created_at | timestamptz | |
+---
 
-### New table: `reading_progress`
-| Column | Type | Notes |
-|--------|------|-------|
-| id | uuid PK | |
-| user_id | uuid FK → auth.users | |
-| lesson_id | uuid FK → reading_lessons | |
-| last_card_index | int | Where user left off |
-| completed | boolean | default false |
-| completed_at | timestamptz | |
-| unique(user_id, lesson_id) | | |
+### Phase 1: Redesign the UI (Visual Identity)
 
-### RLS
-- `reading_lessons` / `reading_cards`: SELECT for authenticated (published only), full CRUD for admins
-- `reading_progress`: Users can SELECT/INSERT/UPDATE their own rows
+**File: `src/pages/app/AppAICoach.tsx`** — Full rewrite
 
-## Admin: `/admin/read`
+- **Animated header** with gradient background (purple-to-pink mesh), pulsing AI orb instead of plain Sparkles icon
+- **Mode selector** redesigned as pill tabs with colored accents per mode (Coach = purple, Assistant = blue, Companion = pink)
+- **Empty state** with large animated AI avatar, greeting that uses the user's name (fetched from profile), and floating quick-action cards instead of flat chips
+- **Message bubbles** with glassmorphism for AI responses, subtle fade-in animation
+- **Typing indicator** with animated gradient dots instead of plain bouncing circles
+- **Input area** with frosted glass effect, expandable textarea instead of single-line input
 
-### Features
-1. **Lesson list** — table of all lessons with title, category, card count, published status
-2. **Lesson editor** — form to create/edit a lesson (title, subtitle, description, cover image, category, published toggle)
-3. **Card editor** — drag-reorderable list of cards within a lesson. Each card has: title, content, key_point, bg_color picker, optional image upload
-4. **AI Generate from Document** — button to select an admin document → calls an edge function that chunks extracted_text into cards using AI (Gemini Flash via Lovable AI Gateway)
-5. **Preview** — renders the swipeable card UX inline so admin can preview before publishing
+### Phase 2: Interactive Action Cards
 
-### New edge function: `generate-reading-cards`
-- Receives: `document_id` (to fetch `extracted_text` from `admin_documents`) + `lesson_id`
-- Uses Gemini Flash to chunk text into 8-15 cards with title, content, key_point, and suggested bg_color
-- Inserts cards into `reading_cards` table
-- Returns the created cards
+**File: `src/pages/app/AppAICoach.tsx`** — New `ActionResultCard` component
 
-## App: `/app/read`
+Replace the current tiny action cards with rich, tappable cards:
 
-### Library page (`AppRead.tsx`)
-- Grid of published lessons with cover image/emoji, title, subtitle
-- Progress indicator (e.g. "3/12 cards read", or checkmark if completed)
-- Tap opens the reader
+- **Task added** → Card with task emoji, title, date, and "Open Planner" button (navigates to `/app/planner`)
+- **Routine adopted** → Card with routine info and "Start Routine" button (navigates to `/app/myroutines`)
+- **Breathing suggested** → Card with exercise name and "Start Breathing" deep link (`/app/breathe?exercise={id}`)
+- **Mood logged** → Card with emotion emoji and valence badge
+- **Routine/Task suggestions** → Carousel of selectable cards the user can tap to adopt/add directly from chat
 
-### Reader page (`AppReadLesson.tsx`)
-- Full-screen swipeable card experience (horizontal swipe using Embla carousel)
-- Each card: colored background, title at top, content in center, key_point highlighted at bottom
-- Progress dots at top
-- Auto-saves progress to `reading_progress` on each swipe
-- Final card shows "Lesson Complete" with confetti/celebration
-- Back button returns to library
+### Phase 3: Make Modes Real
 
-### Integration
-- Add route `/app/read` to App.tsx inside the app layout routes
-- Add route `/app/read/:lessonId` for the reader
-- Add `read` as a tool type in `toolsConfig.ts` with 📖 emoji
-- Add to the Tools/Explore page as a section or tool card
-- Add `reading` to `proLinkPresentation.ts` for deep linking
+Each mode gets distinct UI behavior, not just prompt differences:
 
-### Admin route
-- Add `/admin/read` route in App.tsx under admin routes
-- Add nav item to admin sidebar
+- **Coach mode** (purple accent): Shows a "Daily Progress" mini-widget at top (streak, tasks done today). Quick actions surface routine suggestions proactively.
+- **Assistant mode** (blue accent): Shows today's task summary as a collapsible card above chat. Quick actions focus on planning.
+- **Companion mode** (pink accent): Warmer color palette, larger text, breathing shortcut always visible in input area.
 
-## File Structure
+### Phase 4: Smart Suggestion Chips (Context-Aware)
 
-```text
-src/pages/admin/ReadingManager.tsx        — Admin lesson list + CRUD
-src/components/admin/ReadingCardEditor.tsx — Card editor with drag-reorder
-src/pages/app/AppRead.tsx                 — Library grid
-src/pages/app/AppReadLesson.tsx           — Swipeable reader
-src/hooks/useReadingLessons.ts            — Data hooks
-supabase/functions/generate-reading-cards/ — AI chunking edge function
-```
+**File: `src/pages/app/AppAICoach.tsx`** + **`supabase/functions/ai-coach/index.ts`**
 
-## Implementation Order
-1. Database migration (3 tables + RLS)
-2. Hooks for CRUD operations
-3. Admin lesson manager page + routing
-4. Admin card editor with reorder
-5. AI generation edge function
-6. App library page + routing
-7. App swipeable reader
-8. Integration into tools page and navigation
+- After each AI response, show 2-3 contextual follow-up chips based on what was discussed (not static chips)
+- Backend: Add a `suggested_followups` field to the streaming response — the AI generates these naturally
+- Frontend: Render as floating pills below the last message
+
+### Phase 5: Conversation Persistence Fix
+
+**File: `src/hooks/useAICoachStream.ts`**
+
+- Currently saves only to `ai_coach_conversations` as a single blob — loses action results on reload
+- Store action results alongside messages so they render correctly on history load
+
+---
+
+### Technical Summary
+
+| Area | Files Changed |
+|------|--------------|
+| UI Redesign | `src/pages/app/AppAICoach.tsx` (rewrite) |
+| Action Cards | `src/pages/app/AppAICoach.tsx` (new components) |
+| Mode Widgets | `src/pages/app/AppAICoach.tsx` + new `src/components/app/ai/` folder |
+| Follow-up Chips | `supabase/functions/ai-coach/index.ts` + frontend |
+| History Fix | `src/hooks/useAICoachStream.ts` |
+
+### Execution Order
+1. UI redesign (header, bubbles, input, empty state)
+2. Interactive action cards with navigation
+3. Mode-specific UI widgets
+4. Context-aware follow-up suggestions
+5. History persistence improvements
 
