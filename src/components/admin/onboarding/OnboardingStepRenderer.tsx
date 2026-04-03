@@ -2186,7 +2186,12 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
       if (next >= totalCycles) {
         if (!completedRef.current) {
           completedRef.current = true;
-          onComplete();
+          setShowCompletion(true);
+          // Import confetti dynamically
+          import('canvas-confetti').then(({ default: confetti }) => {
+            confetti({ particleCount: 80, spread: 70, origin: { y: 0.5 }, colors: ['#a78bfa', '#34d399', '#60a5fa', '#fbbf24'] });
+          });
+          setTimeout(() => onComplete(), 2500);
         }
         return;
       }
