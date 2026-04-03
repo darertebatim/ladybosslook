@@ -66,14 +66,27 @@ export default function AppFreeFormReflection() {
   const { className: titleBiClass, direction: titleDir } = useBilingualText(title);
 
   useEffect(() => {
-    setTimeout(() => titleRef.current?.focus(), 200);
+    setTimeout(() => {
+      if (titleRef.current) {
+        titleRef.current.focus();
+        titleRef.current.style.height = 'auto';
+        titleRef.current.style.height = titleRef.current.scrollHeight + 'px';
+      }
+    }, 200);
   }, []);
 
   useEffect(() => {
     if (promptPrefill && !title.trim()) {
       setTitle(promptPrefill);
     }
-  }, [promptPrefill, title]);
+    // Auto-resize title when prefilled
+    setTimeout(() => {
+      if (titleRef.current) {
+        titleRef.current.style.height = 'auto';
+        titleRef.current.style.height = titleRef.current.scrollHeight + 'px';
+      }
+    }, 50);
+  }, [promptPrefill]);
 
   // Focus newly added line
   useEffect(() => {
