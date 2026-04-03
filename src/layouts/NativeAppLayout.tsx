@@ -186,7 +186,7 @@ const NativeAppLayout = () => {
         data-scroll-container="true"
         className={cn(
           "flex-1 min-h-0 overflow-x-hidden overscroll-contain",
-          isOnPlayerPage ? "overflow-hidden" : "overflow-y-auto"
+          (isOnPlayerPage || isOwnScrollPage) ? "overflow-hidden" : "overflow-y-auto"
         )}
         style={{
           paddingBottom: (isOnChatPage || isFullScreenTool || isKeyboardOpen || isOnPlayerPage) ? 0 : TAB_BAR_CONTENT_HEIGHT + 8,
