@@ -141,9 +141,15 @@ export default function AppFreeFormReflection() {
   const handleLineKeyDown = useCallback((index: number, e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
+      const target = e.currentTarget;
+      const cursorPos = target.selectionStart || 0;
+      const currentValue = lines[index];
+      const before = currentValue.slice(0, cursorPos);
+      const after = currentValue.slice(cursorPos);
       setLines(prev => {
         const next = [...prev];
-        next.splice(index + 1, 0, '');
+        next[index] = before;
+        next.splice(index + 1, 0, after);
         return next;
       });
       justAddedLine.current = true;
