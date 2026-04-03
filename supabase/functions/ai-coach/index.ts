@@ -44,7 +44,17 @@ serve(async (req) => {
       });
     }
 
-    const { messages, mode, conversationSummary } = await req.json();
+    const body = await req.json();
+    
+    // Direct tool execution mode (user confirmed proposal via button)
+    if (body.action === "execute_tool") {
+      const result = await executeToolAction(supabase, user.id, body.tool, body.args, false);
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { messages, mode, conversationSummary } = body;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
