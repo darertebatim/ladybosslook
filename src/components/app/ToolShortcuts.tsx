@@ -52,7 +52,7 @@ function saveShortcuts(shortcuts: (ShortcutData | null)[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(shortcuts));
 }
 
-export function ToolShortcuts({ hideWhenEmpty = false }: { hideWhenEmpty?: boolean } = {}) {
+export function ToolShortcuts({ hideWhenEmpty = false, compact = false }: { hideWhenEmpty?: boolean; compact?: boolean } = {}) {
   const navigate = useNavigate();
   const { data: todayMood } = useTodayMood();
   const { data: proLinkCompletions } = useTodayProLinkCompletions();
@@ -362,37 +362,46 @@ export function ToolShortcuts({ hideWhenEmpty = false }: { hideWhenEmpty?: boole
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-2 px-1">
-        <h2 className="text-sm font-semibold text-foreground">My Shortcuts</h2>
-        {hasAny && <p className="text-[10px] text-muted-foreground">Long press to remove</p>}
-      </div>
+      {!compact && (
+        <div className="flex items-center justify-between mb-2 px-1">
+          <h2 className="text-sm font-semibold text-foreground">My Shortcuts</h2>
+          {hasAny && <p className="text-[10px] text-muted-foreground">Long press to remove</p>}
+        </div>
+      )}
 
-      <div className="grid grid-cols-4 gap-3">
+      <div className={cn("grid gap-3", compact ? "grid-cols-4" : "grid-cols-4")}>
         {shortcuts.map((shortcut, i) => {
           if (shortcut) {
             return (
               <ShortcutSlot key={i} onTap={() => handleSlotTap(i)} onLongPress={() => handleLongPress(i)}>
-                <div className="relative w-full aspect-square rounded-2xl flex flex-col items-center justify-center bg-accent/60">
-                  <FluentEmoji emoji={getProLinkEmoji(shortcut.type) || shortcut.emoji} size={42} />
-                  <span className="text-[11px] font-semibold text-foreground leading-tight text-center line-clamp-2 w-full px-0.5 mt-1 whitespace-pre-line">
-                    {(PRO_LINK_CONFIGS[shortcut.type]?.label || shortcut.label).replace('Mood Check-in', 'Mood\nCheck-in')}
-                  </span>
+                <div className={cn(
+                  "relative rounded-2xl flex flex-col items-center justify-center bg-accent/60",
+                  compact ? "w-14 h-14 mx-auto" : "w-full aspect-square"
+                )}>
+                  <FluentEmoji emoji={getProLinkEmoji(shortcut.type) || shortcut.emoji} size={compact ? 30 : 42} />
+                  {!compact && (
+                    <span className="text-[11px] font-semibold text-foreground leading-tight text-center line-clamp-2 w-full px-0.5 mt-1 whitespace-pre-line">
+                      {(PRO_LINK_CONFIGS[shortcut.type]?.label || shortcut.label).replace('Mood Check-in', 'Mood\nCheck-in')}
+                    </span>
+                  )}
                   {(() => {
                     const isDone = shortcut.type === 'mood'
                       ? !!todayMood
                       : isShortcutCompletedToday(proLinkCompletions, shortcut.type, shortcut.value);
                     return isDone ? (
-                        <div className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-sm bg-emerald-500">
-                          <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                        <div className={cn("absolute w-4 h-4 rounded-full flex items-center justify-center shadow-sm bg-emerald-500", compact ? "top-0 right-0" : "top-1 right-1 w-5 h-5")}>
+                          <Check className={cn(compact ? "h-2.5 w-2.5" : "h-3 w-3", "text-white")} strokeWidth={3} />
                         </div>
                       ) : (
-                        <span className="absolute top-0.5 right-0.5 text-[14px] leading-none">⭕️</span>
+                        <span className={cn("absolute leading-none", compact ? "top-0 right-0 text-[10px]" : "top-0.5 right-0.5 text-[14px]")}>⭕️</span>
                       );
                   })()}
                 </div>
               </ShortcutSlot>
             );
           }
+
+          if (compact) return null;
 
           return (
             <ShortcutSlot key={i} onTap={() => handleSlotTap(i)}>
