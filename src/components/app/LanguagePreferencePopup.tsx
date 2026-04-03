@@ -26,7 +26,7 @@ export function LanguagePreferencePopup({ open, onClose }: LanguagePreferencePop
   const [saving, setSaving] = useState(false);
 
   const handleSelect = (code: string) => {
-    haptic('light');
+    haptic.light();
     setSelected(code);
   };
 
