@@ -2180,11 +2180,14 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     // Skip exhale_hold since it's 0
     if (breathPhase === 'exhale_hold') {
       const next = cycleCount + 1;
-      setCycleCount(next);
       if (next >= totalCycles) {
-        onComplete();
+        if (!completedRef.current) {
+          completedRef.current = true;
+          onComplete();
+        }
         return;
       }
+      setCycleCount(next);
       setBreathPhase('inhale');
       setPhaseSecondsLeft(pattern.inhale);
       return;
