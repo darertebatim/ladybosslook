@@ -374,7 +374,7 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
           if (shortcut) {
             return (
               <ShortcutSlot key={i} onTap={() => handleSlotTap(i)} onLongPress={() => handleLongPress(i)}>
-                <div className="relative w-full aspect-square rounded-2xl flex flex-col items-center justify-center bg-accent/60">
+                <div className={cn("relative w-full rounded-2xl flex flex-col items-center justify-center bg-accent/60", hideLabels ? "aspect-square" : "aspect-[3/4]")}>
                   <FluentEmoji emoji={getProLinkEmoji(shortcut.type) || shortcut.emoji} size={42} />
                   {!hideLabels && (
                     <span className="text-[11px] font-semibold text-foreground leading-tight text-center line-clamp-2 w-full px-0.5 mt-1 whitespace-pre-line">
@@ -400,7 +400,7 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
 
           return (
             <ShortcutSlot key={i} onTap={() => handleSlotTap(i)}>
-              <div className="w-full aspect-square rounded-2xl bg-muted/60 border-2 border-dashed border-border/50 flex flex-col items-center justify-center gap-1">
+              <div className={cn("w-full rounded-2xl bg-muted/60 border-2 border-dashed border-border/50 flex flex-col items-center justify-center gap-1", hideLabels ? "aspect-square" : "aspect-[3/4]")}>
                 <Plus className="h-5 w-5 text-muted-foreground/60" />
                 <span className="text-[10px] text-muted-foreground/50">Add</span>
               </div>
