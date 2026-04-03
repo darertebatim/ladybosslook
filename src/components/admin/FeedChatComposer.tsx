@@ -320,6 +320,9 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
     setActionLabel('');
     setActionUrl('');
     setActionPlaylistId('');
+    setActionProLinkType('');
+    setActionProLinkValue('');
+    setActionSearch('');
     clearRecording();
     setShowAttachments(false);
   };
