@@ -13,11 +13,13 @@ const STORAGE_KEY = 'simora_default_routine_assigned';
 export function useAutoAssignDefaultRoutine() {
   const { user } = useAuth();
   const addRoutine = useAddRoutineFromBank();
+  const addRoutineRef = useRef(addRoutine);
+  addRoutineRef.current = addRoutine;
   const attempted = useRef(false);
 
   useEffect(() => {
-    if (!user || attempted.current) return;
-    if (addRoutine.isPending) return;
+    if (!user) return;
+    if (attempted.current) return;
 
     // Already assigned for this user
     if (localStorage.getItem(`${STORAGE_KEY}_${user.id}`) === 'true') return;
@@ -32,8 +34,13 @@ export function useAutoAssignDefaultRoutine() {
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id);
 
-        if (error || (count ?? 0) > 0) {
-          // Has tasks or error — mark as done so we don't retry
+        if (error) {
+          console.error('[AutoAssign] Error checking tasks:', error);
+          attempted.current = false;
+          return;
+        }
+
+        if ((count ?? 0) > 0) {
           localStorage.setItem(`${STORAGE_KEY}_${user.id}`, 'true');
           return;
         }
@@ -53,7 +60,7 @@ export function useAutoAssignDefaultRoutine() {
 
         // No tasks, no routine — auto-assign Daily Reset
         console.log('[AutoAssign] Assigning default "Daily Reset" routine');
-        await addRoutine.mutateAsync({ routineId: DEFAULT_ROUTINE_ID });
+        await addRoutineRef.current.mutateAsync({ routineId: DEFAULT_ROUTINE_ID });
         localStorage.setItem(`${STORAGE_KEY}_${user.id}`, 'true');
       } catch (err) {
         console.error('[AutoAssign] Failed to assign default routine:', err);
@@ -62,8 +69,9 @@ export function useAutoAssignDefaultRoutine() {
       }
     };
 
-    // Delay slightly to let auth settle
-    const timer = setTimeout(checkAndAssign, 1500);
+    // Delay to let auth & queries settle
+    const timer = setTimeout(checkAndAssign, 2500);
     return () => clearTimeout(timer);
-  }, [user, addRoutine]);
+    // Only depend on user — mutation ref is stable via ref
+  }, [user]);
 }
