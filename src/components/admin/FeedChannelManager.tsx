@@ -13,6 +13,7 @@ import { Plus, Pencil, Trash2, Archive, ArchiveRestore, Loader2, Image as ImageI
 import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { ImageUploader } from '@/components/admin/ImageUploader';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 
 interface Channel {
   id: string;
@@ -26,6 +27,16 @@ interface Channel {
   is_archived: boolean;
   sort_order: number;
   cover_image_url: string | null;
+  target_type: string;
+  include_programs: string[];
+  exclude_programs: string[];
+  include_playlists: string[];
+  exclude_playlists: string[];
+  include_tools: string[];
+  exclude_tools: string[];
+  target_languages: string[];
+  target_timezones: string[];
+  include_update_status: string[];
 }
 
 // Helper functions for cover storage
@@ -50,6 +61,18 @@ export function FeedChannelManager() {
     cover_emoji: '📢',
     cover_image_url: '',
   });
+
+  // Audience targeting state
+  const [targetType, setTargetType] = useState<TargetType>('all');
+  const [includePrograms, setIncludePrograms] = useState<string[]>([]);
+  const [excludePrograms, setExcludePrograms] = useState<string[]>([]);
+  const [includePlaylists, setIncludePlaylists] = useState<string[]>([]);
+  const [excludePlaylists, setExcludePlaylists] = useState<string[]>([]);
+  const [includeTools, setIncludeTools] = useState<string[]>([]);
+  const [excludeTools, setExcludeTools] = useState<string[]>([]);
+  const [targetLanguages, setTargetLanguages] = useState<string[]>([]);
+  const [targetTimezones, setTargetTimezones] = useState<string[]>([]);
+  const [includeUpdateStatus, setIncludeUpdateStatus] = useState<string[]>([]);
 
   const { data: channels, isLoading } = useQuery({
     queryKey: ['admin-feed-channels'],
@@ -107,6 +130,16 @@ export function FeedChannelManager() {
         allow_reactions: channelData.allow_reactions,
         allow_comments: channelData.allow_comments,
         cover_image_url,
+        target_type: targetType,
+        include_programs: includePrograms,
+        exclude_programs: excludePrograms,
+        include_playlists: includePlaylists,
+        exclude_playlists: excludePlaylists,
+        include_tools: includeTools,
+        exclude_tools: excludeTools,
+        target_languages: targetLanguages,
+        target_timezones: targetTimezones,
+        include_update_status: includeUpdateStatus,
       });
       if (error) throw error;
     },
@@ -171,6 +204,16 @@ export function FeedChannelManager() {
       cover_emoji: '📢',
       cover_image_url: '',
     });
+    setTargetType('all');
+    setIncludePrograms([]);
+    setExcludePrograms([]);
+    setIncludePlaylists([]);
+    setExcludePlaylists([]);
+    setIncludeTools([]);
+    setExcludeTools([]);
+    setTargetLanguages([]);
+    setTargetTimezones([]);
+    setIncludeUpdateStatus([]);
   };
 
   const openEditDialog = (channel: Channel) => {
@@ -203,6 +246,17 @@ export function FeedChannelManager() {
       cover_emoji,
       cover_image_url,
     });
+    // Load audience targeting
+    setTargetType((channel.target_type as TargetType) || 'all');
+    setIncludePrograms(channel.include_programs || []);
+    setExcludePrograms(channel.exclude_programs || []);
+    setIncludePlaylists(channel.include_playlists || []);
+    setExcludePlaylists(channel.exclude_playlists || []);
+    setIncludeTools(channel.include_tools || []);
+    setExcludeTools(channel.exclude_tools || []);
+    setTargetLanguages(channel.target_languages || []);
+    setTargetTimezones(channel.target_timezones || []);
+    setIncludeUpdateStatus(channel.include_update_status || []);
     setIsDialogOpen(true);
   };
 
@@ -215,6 +269,19 @@ export function FeedChannelManager() {
       cover_image_url = formData.cover_image_url;
     }
 
+    const audienceData = {
+      target_type: targetType,
+      include_programs: includePrograms,
+      exclude_programs: excludePrograms,
+      include_playlists: includePlaylists,
+      exclude_playlists: excludePlaylists,
+      include_tools: includeTools,
+      exclude_tools: excludeTools,
+      target_languages: targetLanguages,
+      target_timezones: targetTimezones,
+      include_update_status: includeUpdateStatus,
+    };
+
     if (editingChannel) {
       updateChannel.mutate({
         id: editingChannel.id,
@@ -226,6 +293,7 @@ export function FeedChannelManager() {
         allow_reactions: formData.allow_reactions,
         allow_comments: formData.allow_comments,
         cover_image_url,
+        ...audienceData,
       });
     } else {
       createChannel.mutate(formData);
@@ -250,7 +318,7 @@ export function FeedChannelManager() {
           <DialogTrigger asChild>
             <Button><Plus className="h-4 w-4 mr-2" /> Add Channel</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingChannel ? 'Edit Channel' : 'Create Channel'}</DialogTitle>
             </DialogHeader>
@@ -404,8 +472,31 @@ export function FeedChannelManager() {
                 />
               </div>
 
+              {/* Audience Targeting */}
+              <PromoAudienceSelector
+                targetType={targetType}
+                setTargetType={setTargetType}
+                includePrograms={includePrograms}
+                setIncludePrograms={setIncludePrograms}
+                excludePrograms={excludePrograms}
+                setExcludePrograms={setExcludePrograms}
+                includePlaylists={includePlaylists}
+                setIncludePlaylists={setIncludePlaylists}
+                excludePlaylists={excludePlaylists}
+                setExcludePlaylists={setExcludePlaylists}
+                includeTools={includeTools}
+                setIncludeTools={setIncludeTools}
+                excludeTools={excludeTools}
+                setExcludeTools={setExcludeTools}
+                targetLanguages={targetLanguages}
+                setTargetLanguages={setTargetLanguages}
+                targetTimezones={targetTimezones}
+                setTargetTimezones={setTargetTimezones}
+                includeUpdateStatus={includeUpdateStatus}
+                setIncludeUpdateStatus={setIncludeUpdateStatus}
+              />
+
               <Button
-                onClick={handleSubmit}
                 disabled={createChannel.isPending || updateChannel.isPending}
                 className="w-full"
               >

@@ -1214,13 +1214,23 @@ export type Database = {
           allow_reactions: boolean
           cover_image_url: string | null
           created_at: string
+          exclude_playlists: string[]
+          exclude_programs: string[]
+          exclude_tools: string[]
           id: string
+          include_playlists: string[]
+          include_programs: string[]
+          include_tools: string[]
+          include_update_status: string[]
           is_archived: boolean
           name: string
           program_slug: string | null
           round_id: string | null
           slug: string
           sort_order: number
+          target_languages: string[]
+          target_timezones: string[]
+          target_type: string
           type: string
         }
         Insert: {
@@ -1228,13 +1238,23 @@ export type Database = {
           allow_reactions?: boolean
           cover_image_url?: string | null
           created_at?: string
+          exclude_playlists?: string[]
+          exclude_programs?: string[]
+          exclude_tools?: string[]
           id?: string
+          include_playlists?: string[]
+          include_programs?: string[]
+          include_tools?: string[]
+          include_update_status?: string[]
           is_archived?: boolean
           name: string
           program_slug?: string | null
           round_id?: string | null
           slug: string
           sort_order?: number
+          target_languages?: string[]
+          target_timezones?: string[]
+          target_type?: string
           type?: string
         }
         Update: {
@@ -1242,13 +1262,23 @@ export type Database = {
           allow_reactions?: boolean
           cover_image_url?: string | null
           created_at?: string
+          exclude_playlists?: string[]
+          exclude_programs?: string[]
+          exclude_tools?: string[]
           id?: string
+          include_playlists?: string[]
+          include_programs?: string[]
+          include_tools?: string[]
+          include_update_status?: string[]
           is_archived?: boolean
           name?: string
           program_slug?: string | null
           round_id?: string | null
           slug?: string
           sort_order?: number
+          target_languages?: string[]
+          target_timezones?: string[]
+          target_type?: string
           type?: string
         }
         Relationships: [
