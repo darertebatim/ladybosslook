@@ -293,7 +293,7 @@ export default function AppChannelsList() {
               );
             })}
 
-            {/* No feedback message here anymore */}
+            
 
             {/* Support Chat - Last in the list */}
             <button
