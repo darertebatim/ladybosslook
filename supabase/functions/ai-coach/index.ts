@@ -843,9 +843,9 @@ async function getTaskSuggestions(supabase: any, args: any) {
 
 async function generateFollowUps(apiKey: string, messages: Message[], mode?: string): Promise<string[]> {
   try {
-    const followUpPrompt = `Based on this conversation, suggest 2-3 short follow-up questions or actions the user might want to take next. 
-Return ONLY a JSON array of strings, each 3-8 words. Examples: ["How's my streak going?", "Add a morning task", "Suggest breathing exercise"]
-Consider the current mode: ${mode || 'coach'}. Make suggestions contextually relevant.`;
+    const followUpPrompt = `Based on this conversation, suggest 1-2 short follow-up actions the user might want to take next. 
+Return ONLY a JSON array of 1-2 strings, each 3-6 words. Do NOT repeat anything already discussed. Make them feel like natural next steps.
+Consider the current mode: ${mode || 'coach'}. Keep suggestions focused and contextually relevant.`;
 
     const resp = await fetch(AI_GATEWAY, {
       method: "POST",
