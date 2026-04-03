@@ -170,7 +170,7 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
     },
   });
 
-
+  const { data: audioTracks = [] } = useQuery({
     queryKey: ['shortcut-linkable-audio-tracks'],
     queryFn: async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
