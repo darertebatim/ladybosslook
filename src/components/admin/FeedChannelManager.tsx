@@ -13,6 +13,7 @@ import { Plus, Pencil, Trash2, Archive, ArchiveRestore, Loader2, Image as ImageI
 import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { ImageUploader } from '@/components/admin/ImageUploader';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 
 interface Channel {
   id: string;
