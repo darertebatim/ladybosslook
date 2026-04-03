@@ -80,10 +80,28 @@ serve(async (req) => {
       "get_task_suggestions",
     ];
 
-    // Build AI messages
+    // Build AI messages — convert image messages to multimodal format
     const aiMessages: Message[] = [
       { role: "system", content: systemPrompt },
-      ...messages,
+      ...messages.map((m: any) => {
+        if (m.image && m.role === "user") {
+          // Convert to multimodal content array for Gemini
+          const parts: any[] = [];
+          if (m.content) {
+            parts.push({ type: "text", text: m.content });
+          }
+          // Extract mime type and base64 from data URL
+          const match = m.image.match(/^data:(image\/[^;]+);base64,(.+)$/);
+          if (match) {
+            parts.push({
+              type: "image_url",
+              image_url: { url: m.image },
+            });
+          }
+          return { role: "user", content: parts };
+        }
+        return { role: m.role, content: m.content };
+      }),
     ];
 
     // Multi-turn tool chaining loop (up to 3 rounds)
