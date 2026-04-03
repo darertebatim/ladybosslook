@@ -292,13 +292,7 @@ export default function AppChannelsList() {
               );
             })}
 
-            {/* Feedback encouragement */}
-            <div className="px-4 py-3 flex items-start gap-2.5 bg-muted/40">
-              <span className="text-base mt-0.5">💬</span>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Have ideas, feedback, or suggestions? We'd love to hear from you — tap <span className="font-semibold text-foreground">Support</span> below and share your thoughts!
-              </p>
-            </div>
+            {/* No feedback message here anymore */}
 
             {/* Support Chat - Last in the list */}
             <button
