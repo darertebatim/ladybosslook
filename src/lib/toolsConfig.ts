@@ -259,16 +259,6 @@ export const audioTools: ToolConfig[] = [
 
 export const comingSoonTools: ToolConfig[] = [
   {
-    id: 'ai',
-    name: 'AI Coach',
-    icon: 'Bot',
-    bgColor: 'bg-[#D4F1F4]',
-    iconColor: 'text-cyan-600',
-    route: '/app/ai',
-    description: 'Personal assistant',
-    comingSoon: true,
-  },
-  {
     id: 'challenges',
     name: 'Challenges',
     icon: 'Trophy',
