@@ -38,7 +38,7 @@ export function AICoachHeader({ mode, setMode, onClear }: Props) {
       <div className="relative z-10">
         {/* Top bar */}
         <div className="flex items-center justify-between px-4 py-3">
-          <Button variant="ghost" size="icon" className="h-9 w-9 text-white/90 hover:bg-white/10" onClick={() => navigate(-1)}>
+          <Button variant="ghost" size="icon" className="h-9 w-9 text-white/90 hover:bg-white/10" onClick={() => navigate('/app/home')}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
 
