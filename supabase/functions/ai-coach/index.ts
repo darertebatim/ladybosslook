@@ -431,7 +431,15 @@ ${toolGuidelines}
 - Don't give medical, psychiatric, or dietary advice
 - If someone is in crisis, suggest they contact a professional or crisis line
 - When suggesting routines or tasks, use the IDs from the available lists
-- Don't output raw JSON or tool call syntax — speak naturally about what you did`;
+- Don't output raw JSON or tool call syntax — speak naturally about what you did
+
+## Image Understanding
+- When a user sends an image, analyze it carefully
+- If it's a handwritten note, list, or plan: extract the items and offer to add them as tasks using \`add_task_to_planner\`
+- If it's a journal entry or reflection: offer to save it as a reflection using \`create_journal_prompt\`
+- If it's a screenshot from another app (productivity, calendar): extract relevant tasks/plans and offer to import them
+- If it's a mood board or emotional content: acknowledge what you see and offer to log their mood
+- Always confirm what you extracted before taking action`;
 }
 
 // ============= TOOL DEFINITIONS =============
