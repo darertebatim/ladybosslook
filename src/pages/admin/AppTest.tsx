@@ -560,6 +560,25 @@ export default function AppTest() {
         </CardContent>
       </Card>
 
+      {/* Language Preference Popup */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Globe className="h-5 w-5" />
+            Language Preference Popup
+          </CardTitle>
+          <CardDescription>
+            Shown on first /app/player visit if user hasn't set their preferred language
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={() => setShowLanguagePopup(true)} variant="outline">
+            <Globe className="h-4 w-4 mr-2" />
+            Preview Language Popup
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Streak Lost Banners */}
       <Card>
         <CardHeader>
