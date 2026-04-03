@@ -400,7 +400,7 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
 
           return (
             <ShortcutSlot key={i} onTap={() => handleSlotTap(i)}>
-              <div className="w-full aspect-square rounded-2xl bg-muted/60 border-2 border-dashed border-border/50 flex flex-col items-center justify-center gap-1">
+              <div className={cn("w-full rounded-2xl bg-muted/60 border-2 border-dashed border-border/50 flex flex-col items-center justify-center gap-1", hideLabels ? "aspect-square" : "aspect-[3/4]")}>
                 <Plus className="h-5 w-5 text-muted-foreground/60" />
                 <span className="text-[10px] text-muted-foreground/50">Add</span>
               </div>
