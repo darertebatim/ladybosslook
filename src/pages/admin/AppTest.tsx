@@ -25,6 +25,7 @@ import {
   Shield,
   RefreshCw,
   MessageCircle,
+  Globe,
 } from 'lucide-react';
 import {
   AlertDialog,
