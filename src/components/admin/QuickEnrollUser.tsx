@@ -47,10 +47,10 @@ export const QuickEnrollUser = () => {
   });
 
   const handleEnroll = async () => {
-    if (!email || !selectedCourse) {
+    if (!email) {
       toast({
         title: 'Missing Information',
-        description: 'Please provide email and select a course',
+        description: 'Please provide an email address',
         variant: 'destructive',
       });
       return;
