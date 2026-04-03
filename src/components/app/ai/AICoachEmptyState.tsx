@@ -44,7 +44,7 @@ export function AICoachEmptyState({ mode, userName, onSend }: Props) {
       {/* Animated AI avatar */}
       <div className="relative">
         <div className="h-20 w-20 rounded-full bg-gradient-to-br from-primary/20 via-accent/20 to-secondary/20 flex items-center justify-center backdrop-blur-sm border border-primary/10">
-          <span className="text-4xl">✨</span>
+          <FluentEmoji emoji="✨" size={48} />
         </div>
         <div className="absolute -inset-2 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 animate-pulse blur-xl -z-10" />
       </div>

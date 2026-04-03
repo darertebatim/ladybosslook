@@ -97,7 +97,7 @@ export function AICoachActionCard({ result }: Props) {
             <div className="mt-2 space-y-1">
               {(result.created.tasks as any[]).slice(0, 5).map((t: any) => (
                 <div key={t.id} className="text-xs flex items-center gap-1.5 text-muted-foreground">
-                  <span>{t.emoji}</span> {t.title}
+                  <FluentEmoji emoji={t.emoji} size={14} /> {t.title}
                 </div>
               ))}
             </div>
