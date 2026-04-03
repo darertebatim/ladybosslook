@@ -359,7 +359,7 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
     audio_url: audioUrl,
     audio_duration: recordingDuration,
     action_type: actionType as any,
-    action_data: actionType !== 'none' ? { label: actionLabel, url: actionUrl, playlistId: actionPlaylistId } : {},
+    action_data: actionType !== 'none' ? { label: actionLabel, url: actionUrl, playlistId: actionPlaylistId, proLinkType: actionProLinkType || undefined, proLinkValue: actionProLinkValue || undefined } : {},
     is_pinned: isPinned,
     is_system: false,
     send_push: sendPush,
