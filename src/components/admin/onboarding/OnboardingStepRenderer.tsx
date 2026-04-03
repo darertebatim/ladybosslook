@@ -2297,6 +2297,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const [showMoodPicker, setShowMoodPicker] = useState(false);
   const [showMoodFeeling, setShowMoodFeeling] = useState(false);
   const [selectedMoodLabel, setSelectedMoodLabel] = useState('');
+  const [selectedMoodValue, setSelectedMoodValue] = useState<string | null>(null);
   const [celebratingIdx, setCelebratingIdx] = useState<number | null>(null);
   const timersRef = useRef<NodeJS.Timeout[]>([]);
 
