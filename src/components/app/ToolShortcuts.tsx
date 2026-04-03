@@ -70,6 +70,8 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
   const [showVideoPicker, setShowVideoPicker] = useState(false);
   const [showVideoPlaylistPicker, setShowVideoPlaylistPicker] = useState(false);
   const [showProgramPicker, setShowProgramPicker] = useState(false);
+  const [showRoutineTemplatePicker, setShowRoutineTemplatePicker] = useState(false);
+  const [routineTemplateSearchQuery, setRoutineTemplateSearchQuery] = useState('');
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
   const [audioSearchQuery, setAudioSearchQuery] = useState('');
   const [channelSearchQuery, setChannelSearchQuery] = useState('');
