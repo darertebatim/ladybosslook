@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertTriangle, CheckCircle2, Shield, Mail } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
+import appIcon from '@/assets/app-icon.png';
 
 export default function DeleteAccount() {
   const [step, setStep] = useState<'method' | 'email-form' | 'confirm' | 'success' | 'error'>('method');
