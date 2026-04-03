@@ -79,7 +79,7 @@ export function AICoachActionCard({ result }: Props) {
           </p>
           {result.created && (
             <p className="text-xs text-muted-foreground mt-0.5">
-              {result.created.emoji || ''} {result.created.title || result.created.name || result.created.emotion || ''}
+              {result.created.emoji && <FluentEmoji emoji={result.created.emoji} size={14} />} {result.created.title || result.created.name || result.created.emotion || ''}
               {result.created.scheduled_date && ` · ${result.created.scheduled_date}`}
             </p>
           )}
