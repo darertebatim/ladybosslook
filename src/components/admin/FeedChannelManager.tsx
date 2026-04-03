@@ -83,30 +83,7 @@ export function FeedChannelManager() {
     },
   });
 
-  const { data: programs } = useQuery({
-    queryKey: ['programs-list'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('program_catalog')
-        .select('slug, title')
-        .order('title');
-      if (error) throw error;
-      return data;
-    },
-  });
 
-  const { data: rounds } = useQuery({
-    queryKey: ['rounds-list'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('program_rounds')
-        .select('id, round_name, program_slug')
-        .order('program_slug')
-        .order('round_number', { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
 
   const createChannel = useMutation({
     mutationFn: async (channelData: typeof formData) => {
