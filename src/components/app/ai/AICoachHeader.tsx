@@ -45,10 +45,10 @@ export function AICoachHeader({ mode, setMode, onClear }: Props) {
           <div className="flex items-center gap-2.5">
             {/* Pulsing AI orb */}
             <div className="relative">
-              <div className="h-9 w-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-                <span className="text-lg">✨</span>
-              </div>
-              <div className="absolute inset-0 rounded-full bg-white/20 animate-ping" style={{ animationDuration: '3s' }} />
+            <div className="h-9 w-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+              <FluentEmoji emoji="✨" size={20} />
+            </div>
+            <div className="absolute inset-0 rounded-full bg-white/20 animate-ping" style={{ animationDuration: '3s' }} />
             </div>
             <div>
               <h1 className="text-base font-bold text-white tracking-tight">Ladybosslook AI</h1>
