@@ -52,7 +52,7 @@ function saveShortcuts(shortcuts: (ShortcutData | null)[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(shortcuts));
 }
 
-export function ToolShortcuts({ hideWhenEmpty = false }: { hideWhenEmpty?: boolean } = {}) {
+export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { hideWhenEmpty?: boolean; hideLabels?: boolean } = {}) {
   const navigate = useNavigate();
   const { data: todayMood } = useTodayMood();
   const { data: proLinkCompletions } = useTodayProLinkCompletions();
