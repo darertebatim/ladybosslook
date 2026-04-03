@@ -25,6 +25,7 @@ import {
   Shield,
   RefreshCw,
   MessageCircle,
+  Globe,
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -60,6 +61,7 @@ import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebratio
 import { PlusGateSheet } from '@/components/app/PlusGateSheet';
 import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebration';
 import { ProjectCompletionCelebration } from '@/components/app/ProjectCompletionCelebration';
+import { LanguagePreferencePopup } from '@/components/app/LanguagePreferencePopup';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
@@ -108,6 +110,7 @@ export default function AppTest() {
   const [showNewMessagePopup, setShowNewMessagePopup] = useState(false);
   const [testUnreadCount, setTestUnreadCount] = useState(1);
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
+  const [showLanguagePopup, setShowLanguagePopup] = useState(false);
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
     return (
@@ -554,6 +557,25 @@ export default function AppTest() {
           <Button onClick={() => setShowPlusGate(true)} variant="outline">
             <Crown className="h-4 w-4 mr-2" />
             Preview Gate Sheet
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Language Preference Popup */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Globe className="h-5 w-5" />
+            Language Preference Popup
+          </CardTitle>
+          <CardDescription>
+            Shown on first /app/player visit if user hasn't set their preferred language
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={() => setShowLanguagePopup(true)} variant="outline">
+            <Globe className="h-4 w-4 mr-2" />
+            Preview Language Popup
           </Button>
         </CardContent>
       </Card>
@@ -1187,6 +1209,9 @@ export default function AppTest() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Language Preference Popup */}
+      <LanguagePreferencePopup open={showLanguagePopup} onClose={() => setShowLanguagePopup(false)} />
     </div>
   );
 }

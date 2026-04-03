@@ -21,6 +21,7 @@ import { useScrollRestore } from "@/hooks/useScrollRestore";
 import heroStormVideo from "@/assets/watch-hero-storm.mp4";
 import { WatchCategoryPill } from "@/components/video/WatchCategoryPill";
 import { useUserPreferredLanguage, preferredLanguageSorter } from "@/hooks/useUserPreferredLanguage";
+import { LanguagePreferencePopup, shouldShowLanguagePopup } from "@/components/app/LanguagePreferencePopup";
 
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
@@ -84,6 +85,15 @@ export default function AppPlayer() {
   // Use centralized data hook with parallel fetching
   const { playlists, playlistItems, progressData, enrollments, programs, isLoading } = usePlayerData();
   const userLang = useUserPreferredLanguage();
+  const [showLangPopup, setShowLangPopup] = useState(false);
+
+  // Show language preference popup on first visit if not set
+  useEffect(() => {
+    if (!isLoading && shouldShowLanguagePopup(userLang)) {
+      const timer = setTimeout(() => setShowLangPopup(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, userLang]);
 
   // Memoized playlist stats calculation - O(1) lookups
   const playlistStats = useMemo(() => {
@@ -473,6 +483,9 @@ export default function AppPlayer() {
 
       {/* Paywall for locked categories */}
       <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
+
+      {/* Language preference popup */}
+      <LanguagePreferencePopup open={showLangPopup} onClose={() => setShowLangPopup(false)} />
     </div>
   );
 }
