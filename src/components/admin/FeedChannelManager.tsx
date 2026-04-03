@@ -269,6 +269,19 @@ export function FeedChannelManager() {
       cover_image_url = formData.cover_image_url;
     }
 
+    const audienceData = {
+      target_type: targetType,
+      include_programs: includePrograms,
+      exclude_programs: excludePrograms,
+      include_playlists: includePlaylists,
+      exclude_playlists: excludePlaylists,
+      include_tools: includeTools,
+      exclude_tools: excludeTools,
+      target_languages: targetLanguages,
+      target_timezones: targetTimezones,
+      include_update_status: includeUpdateStatus,
+    };
+
     if (editingChannel) {
       updateChannel.mutate({
         id: editingChannel.id,
@@ -280,6 +293,7 @@ export function FeedChannelManager() {
         allow_reactions: formData.allow_reactions,
         allow_comments: formData.allow_comments,
         cover_image_url,
+        ...audienceData,
       });
     } else {
       createChannel.mutate(formData);
