@@ -66,7 +66,7 @@ serve(async (req) => {
     }
     
     const systemPrompt = buildSystemPrompt(context, mode, memory);
-    const tools = getToolDefinitions();
+    const tools = getToolsForMode(mode);
 
     // ALL tools are direct-execution
     const directExecutionTools = [
