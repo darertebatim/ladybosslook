@@ -871,7 +871,7 @@ Consider the current mode: ${mode || 'coach'}. Keep suggestions focused and cont
     if (!match) return [];
     
     const parsed = JSON.parse(match[0]);
-    if (Array.isArray(parsed)) return parsed.slice(0, 3).map((s: any) => String(s));
+    if (Array.isArray(parsed)) return parsed.slice(0, 2).map((s: any) => String(s));
     return [];
   } catch {
     return [];
