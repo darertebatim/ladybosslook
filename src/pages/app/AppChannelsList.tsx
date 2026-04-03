@@ -333,7 +333,6 @@ export default function AppChannelsList() {
               <ChevronRight className="h-4 w-4 text-muted-foreground/50 shrink-0" />
             </button>
           </div>
-
           {/* Feedback encouragement in white space */}
           <button
             onClick={handleSupportClick}
@@ -354,7 +353,7 @@ export default function AppChannelsList() {
               Share your ideas, feedback, or suggestions with us in the Support chat
             </p>
           </button>
-        ) : (
+        </>) : (
           <div className="text-center py-12 px-4">
             <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
               <Users className="h-8 w-8 text-muted-foreground" />
