@@ -33,7 +33,7 @@ export function LanguagePreferencePopup({ open, onClose }: LanguagePreferencePop
   const handleConfirm = async () => {
     if (!selected || !user) return;
     setSaving(true);
-    haptic('medium');
+    haptic.medium();
 
     try {
       const { error } = await supabase
