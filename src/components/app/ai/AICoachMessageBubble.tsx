@@ -20,6 +20,17 @@ export function AICoachMessageBubble({ message }: Props) {
             : "bg-card/80 backdrop-blur-sm border border-border/50 shadow-sm rounded-tl-md"
         )}
       >
+        {/* Attached image */}
+        {message.imageUrl && (
+          <div className="mb-2">
+            <img
+              src={message.imageUrl}
+              alt="Attached"
+              className="max-w-full max-h-48 rounded-lg object-contain"
+            />
+          </div>
+        )}
+
         {isUser ? (
           <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
         ) : (
