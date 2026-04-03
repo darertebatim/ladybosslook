@@ -208,9 +208,6 @@ export function FeedChannelManager() {
     setFormData({
       name: channel.name,
       slug: channel.slug,
-      type: channel.type,
-      program_slug: channel.program_slug || '',
-      round_id: channel.round_id || '',
       allow_reactions: channel.allow_reactions,
       allow_comments: channel.allow_comments,
       cover_type,
