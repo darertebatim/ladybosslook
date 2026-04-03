@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import type { CoachMode } from './AICoachHeader';
 
 const QUICK_CHIPS: Record<CoachMode, { label: string; prompt: string }[]> = {
