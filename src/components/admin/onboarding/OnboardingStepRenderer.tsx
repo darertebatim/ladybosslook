@@ -275,7 +275,7 @@ function WelcomeScreen({ step, onNext }: Props) {
             </button>
           </div>
           {step.secondaryButtonLabel && (
-            <p className="text-center text-sm text-[#1a1f3d]/60 mt-2">
+            <p className="text-center text-base text-[#1a1f3d]/60 mt-5">
               Already a member?{' '}
               <Link to="/auth?mode=signin&skip_onboarding=true" className="text-[#4CAF50] font-semibold hover:underline">
                 Sign in.
