@@ -286,5 +286,5 @@ export function useAICoachStream() {
     }
   }, []);
 
-  return { messages, isLoading, sendMessage, clearMessages, stopGeneration, loadHistory, followUps, insertDivider };
+  return { messages, isLoading, sendMessage, clearMessages, stopGeneration, loadHistory, followUps, insertDivider, executeProposal };
 }
