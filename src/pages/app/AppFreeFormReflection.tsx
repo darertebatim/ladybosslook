@@ -16,10 +16,10 @@ import { MoodSelector } from '@/components/app/MoodSelector';
 const BULLET_COLOR = 'hsl(var(--muted-foreground) / 0.4)';
 
 function BulletLineInput({ inputRef, value, onChange, onKeyDown, placeholder }: {
-  inputRef: (el: HTMLInputElement | null) => void;
+  inputRef: (el: HTMLTextAreaElement | null) => void;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   placeholder: string;
 }) {
   const { className: biClass, direction: dir } = useBilingualText(value);
@@ -30,14 +30,20 @@ function BulletLineInput({ inputRef, value, onChange, onKeyDown, placeholder }: 
         className="w-3 h-3 rounded-sm mt-[5px] shrink-0 transition-colors"
         style={{ backgroundColor: BULLET_COLOR }}
       />
-      <input
+      <textarea
         ref={inputRef}
         value={value}
         onChange={onChange}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
         dir={dir}
-        className={cn("flex-1 bg-transparent border-0 outline-none text-base placeholder:text-muted-foreground/40", biClass)}
+        rows={1}
+        className={cn("flex-1 bg-transparent border-0 outline-none text-base placeholder:text-muted-foreground/40 resize-none overflow-hidden", biClass)}
+        onInput={(e) => {
+          const t = e.currentTarget;
+          t.style.height = 'auto';
+          t.style.height = t.scrollHeight + 'px';
+        }}
       />
     </div>
   );
