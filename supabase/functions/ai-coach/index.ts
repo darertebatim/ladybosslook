@@ -605,8 +605,15 @@ function getToolsForMode(mode?: string) {
   return allTools.filter((t: any) => allowed.includes(t.function.name));
 }
 
-async function executeToolAction(supabase: any, userId: string, fnName: string, args: any) {
+const WRITE_TOOLS = ["add_task_to_planner", "log_mood", "adopt_routine"];
+
+async function executeToolAction(supabase: any, userId: string, fnName: string, args: any, proposeOnly = true) {
   try {
+    // For write tools in propose mode, return proposal without executing
+    if (proposeOnly && WRITE_TOOLS.includes(fnName)) {
+      return await buildProposal(supabase, fnName, args);
+    }
+
     switch (fnName) {
       case "add_task_to_planner":
         return await addTaskToPlanner(supabase, userId, args);
@@ -638,6 +645,53 @@ async function executeToolAction(supabase: any, userId: string, fnName: string, 
   } catch (e) {
     console.error(`Tool error (${fnName}):`, e);
     return { success: false, error: e instanceof Error ? e.message : "Unknown error" };
+  }
+}
+
+async function buildProposal(supabase: any, fnName: string, args: any) {
+  const today = new Date().toISOString().split("T")[0];
+  switch (fnName) {
+    case "add_task_to_planner": {
+      // If task_bank_id, look up title/emoji for better display
+      let title = args.title;
+      let emoji = args.emoji || "✅";
+      if (args.task_bank_id) {
+        const { data: bankTask } = await supabase
+          .from("admin_task_bank")
+          .select("title, emoji")
+          .eq("id", args.task_bank_id)
+          .single();
+        if (bankTask) { title = bankTask.title; emoji = bankTask.emoji; }
+      }
+      return {
+        success: true, action: fnName, proposed: true,
+        message: `Add "${title}" to your planner for ${args.scheduled_date || today}?`,
+        toolArgs: args,
+        created: { title, emoji, scheduled_date: args.scheduled_date || today },
+      };
+    }
+    case "log_mood":
+      return {
+        success: true, action: fnName, proposed: true,
+        message: `Log your mood as "${args.emotion}"?`,
+        toolArgs: args,
+        created: { emotion: args.emotion, valence: args.valence, category: args.category },
+      };
+    case "adopt_routine": {
+      const { data: routine } = await supabase
+        .from("routines_bank")
+        .select("id, title, emoji")
+        .eq("id", args.routine_id)
+        .single();
+      return {
+        success: true, action: fnName, proposed: true,
+        message: `Adopt "${routine?.title || 'this routine'}"?`,
+        toolArgs: args,
+        created: { title: routine?.title, emoji: routine?.emoji, routine_id: args.routine_id },
+      };
+    }
+    default:
+      return { success: false, action: fnName, error: "Unknown proposal" };
   }
 }
 
