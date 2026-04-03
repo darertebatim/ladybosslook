@@ -138,7 +138,7 @@ export default function AppFreeFormReflection() {
     });
   }, []);
 
-  const handleLineKeyDown = useCallback((index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleLineKeyDown = useCallback((index: number, e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       setLines(prev => {
