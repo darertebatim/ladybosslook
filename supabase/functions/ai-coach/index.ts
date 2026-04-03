@@ -157,7 +157,7 @@ serve(async (req) => {
         const fnName = tc.function?.name;
         let args: any;
         try { args = JSON.parse(tc.function?.arguments || "{}"); } catch { args = {}; }
-        const result = await executeToolAction(supabase, user.id, fnName, args);
+        const result = await executeToolAction(supabase, user.id, fnName, args, true);
         toolResults.push({ tool_call_id: tc.id, result });
       }
 
