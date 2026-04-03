@@ -413,7 +413,7 @@ ${modePersona}
 - Streak: ${context.streak?.current_streak || 0} days (longest: ${context.streak?.longest_streak || 0})
 - Recent moods: ${recentMoods || "none logged recently"}
 - Recent journals: ${context.recentJournals.length} entries in the last week
-${memorySection}
+
 ## Available Routines to Suggest
 ${routinesList || "No routines available"}
 
