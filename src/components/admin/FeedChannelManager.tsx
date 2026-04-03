@@ -62,6 +62,18 @@ export function FeedChannelManager() {
     cover_image_url: '',
   });
 
+  // Audience targeting state
+  const [targetType, setTargetType] = useState<TargetType>('all');
+  const [includePrograms, setIncludePrograms] = useState<string[]>([]);
+  const [excludePrograms, setExcludePrograms] = useState<string[]>([]);
+  const [includePlaylists, setIncludePlaylists] = useState<string[]>([]);
+  const [excludePlaylists, setExcludePlaylists] = useState<string[]>([]);
+  const [includeTools, setIncludeTools] = useState<string[]>([]);
+  const [excludeTools, setExcludeTools] = useState<string[]>([]);
+  const [targetLanguages, setTargetLanguages] = useState<string[]>([]);
+  const [targetTimezones, setTargetTimezones] = useState<string[]>([]);
+  const [includeUpdateStatus, setIncludeUpdateStatus] = useState<string[]>([]);
+
   const { data: channels, isLoading } = useQuery({
     queryKey: ['admin-feed-channels'],
     queryFn: async () => {
