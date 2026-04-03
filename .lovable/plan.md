@@ -1,87 +1,77 @@
 
 
-## AI Coach Overhaul Plan
+## AI Coach: Mode Separation + Conversation Reset on Switch
 
-The current AI Coach has a solid backend (tool-calling, context-fetching, streaming) but the frontend is basic and the tools don't surface results well. Here's the plan to make it great.
+### Problem
+1. Switching between Coach/Assistant/Companion doesn't reset the conversation — old messages stay, making it feel like the same AI
+2. All three modes behave identically — same tone, same tool usage, same follow-ups
+3. No visual indication that a mode switch happened
 
-### What's Actually Working (Backend)
-- Edge function has 7 tools: add_task, log_mood, adopt_routine, suggest_breathing, journal_prompt, get_routines, get_tasks
-- Multi-turn tool chaining (up to 3 rounds)
-- User context fetching (profile, tasks, emotions, streaks, routines)
-- Conversation memory from previous sessions
-- Mode-specific system prompts (coach/assistant/companion)
+### Changes
 
-### What's Broken or Weak
+#### 1. Mode Switch = End Conversation Section (Frontend)
 
-1. **Tool results are invisible** — action results render as tiny cards with no interactivity (can't tap to open breathing, can't navigate to planner)
-2. **Modes are cosmetic** — switching modes only changes quick chips and system prompt phrasing, no real behavioral difference in UI
-3. **UI is a plain chatbox** — no visual identity, no animations, no personality
-4. **No deep links from results** — when AI suggests breathing or a routine, there's no button to actually go do it
+**`src/pages/app/AppAICoach.tsx`** and **`src/hooks/useAICoachStream.ts`**
 
----
+When the user switches modes:
+- Insert a visual **divider message** (a separator line with the mode name, e.g. "— Switched to Companion —") into the messages array
+- Show the **empty state greeting + quick chips** for the new mode below the divider (inline, not replacing the whole view)
+- Only send messages **after the divider** as conversation history to the AI — previous mode's messages are "sealed"
+- Clear follow-up chips on switch
 
-### Phase 1: Redesign the UI (Visual Identity)
+New message type added to `CoachMessage`: `role: 'divider'` with a `mode` field. The hook tracks `activeMode` and filters messages sent to the backend.
 
-**File: `src/pages/app/AppAICoach.tsx`** — Full rewrite
+#### 2. Make Each Mode Genuinely Different (Backend)
 
-- **Animated header** with gradient background (purple-to-pink mesh), pulsing AI orb instead of plain Sparkles icon
-- **Mode selector** redesigned as pill tabs with colored accents per mode (Coach = purple, Assistant = blue, Companion = pink)
-- **Empty state** with large animated AI avatar, greeting that uses the user's name (fetched from profile), and floating quick-action cards instead of flat chips
-- **Message bubbles** with glassmorphism for AI responses, subtle fade-in animation
-- **Typing indicator** with animated gradient dots instead of plain bouncing circles
-- **Input area** with frosted glass effect, expandable textarea instead of single-line input
+**`supabase/functions/ai-coach/index.ts`** — Rewrite `buildSystemPrompt` mode sections:
 
-### Phase 2: Interactive Action Cards
+**Coach Mode:**
+- Personality: Direct, motivating, structured. Like a personal trainer for life habits
+- Proactive tool usage: Always suggests routines and tasks. Uses `get_routine_suggestions` and `add_task_to_planner` frequently
+- Tone: "Let's do this!" energy. Uses accountability language
+- Restricted from: lengthy emotional exploration (redirects to Companion)
+- Follow-ups biased toward action: "Want me to add that?", "Ready for your routine?"
 
-**File: `src/pages/app/AppAICoach.tsx`** — New `ActionResultCard` component
+**Assistant Mode:**
+- Personality: Efficient, organized, no-nonsense. Like a smart secretary
+- Proactive tool usage: Immediately uses `get_task_suggestions`, `add_task_to_planner`. Opens with today's task summary
+- Tone: Brief, bullet-pointed, structured. Minimal small talk
+- Focus: Planning, scheduling, prioritizing, reviewing progress
+- Restricted from: emotional coaching (redirects to Companion)
+- Follow-ups biased toward planning: "What else for today?", "Prioritize your list?"
 
-Replace the current tiny action cards with rich, tappable cards:
+**Companion Mode:**
+- Personality: Warm, empathetic, gentle. Like a caring close friend
+- Proactive tool usage: `log_mood` when emotions are detected, `suggest_breathing` for stress, `create_journal_prompt` for reflection
+- Tone: Soft, validating, uses more emojis. Asks "how does that make you feel?"
+- Restricted from: task management (redirects to Assistant). Does NOT add tasks or adopt routines
+- Available tools limited to: `log_mood`, `suggest_breathing`, `create_journal_prompt` only
+- Follow-ups biased toward feelings: "Want to talk more?", "How about journaling?"
 
-- **Task added** → Card with task emoji, title, date, and "Open Planner" button (navigates to `/app/planner`)
-- **Routine adopted** → Card with routine info and "Start Routine" button (navigates to `/app/myroutines`)
-- **Breathing suggested** → Card with exercise name and "Start Breathing" deep link (`/app/breathe?exercise={id}`)
-- **Mood logged** → Card with emotion emoji and valence badge
-- **Routine/Task suggestions** → Carousel of selectable cards the user can tap to adopt/add directly from chat
+#### 3. Tool Availability Per Mode (Backend)
 
-### Phase 3: Make Modes Real
+**`supabase/functions/ai-coach/index.ts`**
 
-Each mode gets distinct UI behavior, not just prompt differences:
+Filter the `tools` array based on mode before sending to the AI:
+- **Coach**: All tools
+- **Assistant**: `add_task_to_planner`, `get_task_suggestions`, `get_routine_suggestions`, `adopt_routine`
+- **Companion**: `log_mood`, `suggest_breathing`, `create_journal_prompt`
 
-- **Coach mode** (purple accent): Shows a "Daily Progress" mini-widget at top (streak, tasks done today). Quick actions surface routine suggestions proactively.
-- **Assistant mode** (blue accent): Shows today's task summary as a collapsible card above chat. Quick actions focus on planning.
-- **Companion mode** (pink accent): Warmer color palette, larger text, breathing shortcut always visible in input area.
+This physically prevents the wrong mode from using wrong tools.
 
-### Phase 4: Smart Suggestion Chips (Context-Aware)
+#### 4. Divider UI Component
 
-**File: `src/pages/app/AppAICoach.tsx`** + **`supabase/functions/ai-coach/index.ts`**
+**New: `src/components/app/ai/AICoachDivider.tsx`**
 
-- After each AI response, show 2-3 contextual follow-up chips based on what was discussed (not static chips)
-- Backend: Add a `suggested_followups` field to the streaming response — the AI generates these naturally
-- Frontend: Render as floating pills below the last message
+A styled horizontal line with the mode name and icon centered, using the mode's accent color. Renders between conversation sections.
 
-### Phase 5: Conversation Persistence Fix
+### Files Changed
 
-**File: `src/hooks/useAICoachStream.ts`**
-
-- Currently saves only to `ai_coach_conversations` as a single blob — loses action results on reload
-- Store action results alongside messages so they render correctly on history load
-
----
-
-### Technical Summary
-
-| Area | Files Changed |
-|------|--------------|
-| UI Redesign | `src/pages/app/AppAICoach.tsx` (rewrite) |
-| Action Cards | `src/pages/app/AppAICoach.tsx` (new components) |
-| Mode Widgets | `src/pages/app/AppAICoach.tsx` + new `src/components/app/ai/` folder |
-| Follow-up Chips | `supabase/functions/ai-coach/index.ts` + frontend |
-| History Fix | `src/hooks/useAICoachStream.ts` |
-
-### Execution Order
-1. UI redesign (header, bubbles, input, empty state)
-2. Interactive action cards with navigation
-3. Mode-specific UI widgets
-4. Context-aware follow-up suggestions
-5. History persistence improvements
+| File | Change |
+|------|--------|
+| `src/hooks/useAICoachStream.ts` | Add `divider` message type, track active mode, filter history on send |
+| `src/pages/app/AppAICoach.tsx` | Handle mode switch: insert divider, show inline empty state for new mode |
+| `src/components/app/ai/AICoachDivider.tsx` | New divider component |
+| `src/components/app/ai/AICoachEmptyState.tsx` | Support inline variant (smaller, no avatar) |
+| `supabase/functions/ai-coach/index.ts` | Rewrite mode personas, filter tools per mode |
 
