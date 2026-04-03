@@ -441,6 +441,7 @@ const App = () => (
                   {!isNativeApp() && <Route path="/cc" element={<CourageousCharacter />} />}
                   {!isNativeApp() && <Route path="/payment-success" element={<PaymentSuccess />} />}
                   <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/delete-account" element={<DeleteAccount />} />
                   <Route path="/refund-policy" element={<RefundPolicy />} />
                   <Route path="/sms-terms" element={<SMSTerms />} />
                   <Route path="/appsupport" element={<AppSupport />} />
