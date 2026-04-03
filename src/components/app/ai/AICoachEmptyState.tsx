@@ -32,11 +32,38 @@ interface Props {
   mode: CoachMode;
   userName?: string;
   onSend: (text: string) => void;
+  inline?: boolean;
 }
 
-export function AICoachEmptyState({ mode, userName, onSend }: Props) {
+export function AICoachEmptyState({ mode, userName, onSend, inline }: Props) {
   const greeting = MODE_GREETINGS[mode];
   const chips = QUICK_CHIPS[mode];
+
+  if (inline) {
+    return (
+      <div className="flex flex-col items-center gap-3 py-4 animate-fade-in">
+        <div className="text-center space-y-1">
+          <h3 className="flex items-center justify-center gap-1.5 text-sm font-semibold">
+            <span>{greeting.title}</span>
+            <FluentEmoji emoji={greeting.emoji} size={18} />
+          </h3>
+          <p className="text-xs text-muted-foreground">{greeting.subtitle}</p>
+        </div>
+        <div className="grid grid-cols-2 gap-1.5 w-full max-w-sm">
+          {chips.map(chip => (
+            <button
+              key={chip.label}
+              onClick={() => onSend(chip.prompt)}
+              className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-card border border-border/50 text-left text-xs font-medium shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200 active:scale-[0.98]"
+            >
+              <FluentEmoji emoji={chip.emoji} size={16} className="shrink-0" />
+              <span>{chip.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center h-full gap-6 pb-8 px-4 animate-fade-in">
