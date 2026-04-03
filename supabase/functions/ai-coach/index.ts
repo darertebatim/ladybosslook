@@ -507,7 +507,17 @@ async function executeToolAction(supabase: any, userId: string, fnName: string, 
       case "suggest_breathing":
         return await suggestBreathing(supabase, args);
       case "create_journal_prompt":
-        return { success: true, action: "create_journal_prompt", message: `Journal prompt: "${args.prompt}"`, created: { title: args.prompt, mood: args.mood } };
+        return {
+          success: true,
+          action: "create_journal_prompt",
+          message: `Journal prompt: "${args.prompt}"`,
+          created: {
+            title: args.prompt,
+            mood: args.mood,
+            cta: "Start Writing",
+            deepLink: `/app/reflections/free-form?prompt=${encodeURIComponent(args.prompt || "")}${args.mood ? `&mood=${encodeURIComponent(args.mood)}` : ""}`,
+          },
+        };
       case "get_routine_suggestions":
         return await getRoutineSuggestions(supabase, args);
       case "get_task_suggestions":
@@ -539,7 +549,7 @@ async function addTaskToPlanner(supabase: any, userId: string, args: any) {
   if (args.task_bank_id) {
     const { data: bankTask } = await supabase
       .from("admin_task_bank")
-      .select("title, emoji, category, color, duration_minutes, time_period, repeat_pattern, description, goal_enabled, goal_type, goal_target, goal_unit")
+      .select("title, emoji, color, duration_minutes, time_period, repeat_pattern, description, goal_enabled, goal_type, goal_target, goal_unit")
       .eq("id", args.task_bank_id)
       .single();
 
@@ -548,7 +558,6 @@ async function addTaskToPlanner(supabase: any, userId: string, args: any) {
         ...taskData,
         title: bankTask.title,
         emoji: bankTask.emoji,
-        category: bankTask.category,
         color: bankTask.color,
         duration_minutes: bankTask.duration_minutes,
         time_period: bankTask.time_period,
@@ -577,7 +586,11 @@ async function addTaskToPlanner(supabase: any, userId: string, args: any) {
     success: true,
     action: "add_task_to_planner",
     message: `Added "${data.title}" to your planner for ${data.scheduled_date}`,
-    created: data,
+    created: {
+      ...data,
+      cta: "Open Task",
+      deepLink: `/app/home/edit/${data.id}`,
+    },
   };
 }
 
@@ -601,7 +614,11 @@ async function logMood(supabase: any, userId: string, args: any) {
     success: true,
     action: "log_mood",
     message: `Logged your mood: ${args.emotion}`,
-    created: data,
+    created: {
+      ...data,
+      cta: "Open Mood History",
+      deepLink: "/app/emotion/history",
+    },
   };
 }
 
@@ -626,7 +643,16 @@ async function adoptRoutine(supabase: any, userId: string, args: any) {
     .limit(1);
 
   if (existing?.length) {
-    return { success: true, action: "adopt_routine", message: `You already have "${routine.title}" in your routines!`, created: routine };
+    return {
+      success: true,
+      action: "adopt_routine",
+      message: `You already have "${routine.title}" in your routines!`,
+      created: {
+        ...routine,
+        cta: "Open Routine",
+        deepLink: `/app/routines/${routine.id}`,
+      },
+    };
   }
 
   const { error } = await supabase
@@ -641,7 +667,11 @@ async function adoptRoutine(supabase: any, userId: string, args: any) {
     success: true,
     action: "adopt_routine",
     message: `Added "${routine.title}" to your routines!`,
-    created: routine,
+    created: {
+      ...routine,
+      cta: "Open Routine",
+      deepLink: `/app/routines/${routine.id}`,
+    },
   };
 }
 

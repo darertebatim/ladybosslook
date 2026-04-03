@@ -49,12 +49,13 @@ export default function AppFreeFormReflection() {
   const queryClient = useQueryClient();
   const { autoCompleteJournal } = useAutoCompleteProTask();
   const [searchParams] = useSearchParams();
+  const promptPrefill = searchParams.get('prompt') || '';
 
   let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
   try { routinePlayer = useRoutinePlayerContext(); } catch { /* not available */ }
   const hasActivePlayer = routinePlayer?.isActive && routinePlayer?.isMinimized;
 
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState(promptPrefill);
   const [lines, setLines] = useState<string[]>(['']);
   const [mood, setMood] = useState<string | null>(searchParams.get('mood') || null);
   const [showPrompts, setShowPrompts] = useState(false);
@@ -67,6 +68,12 @@ export default function AppFreeFormReflection() {
   useEffect(() => {
     setTimeout(() => titleRef.current?.focus(), 200);
   }, []);
+
+  useEffect(() => {
+    if (promptPrefill && !title.trim()) {
+      setTitle(promptPrefill);
+    }
+  }, [promptPrefill, title]);
 
   // Focus newly added line
   useEffect(() => {
