@@ -167,7 +167,7 @@ export default function AppChannelsList() {
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
-        ) : channels && channels.length > 0 ? (
+        ) : channels && channels.length > 0 ? (<>
           <div className="divide-y divide-border/50">
             {/* Coach Chat - only shown when user has access */}
             {hasCoachAccess && (
