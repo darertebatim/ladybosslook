@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import type { ActionResult } from '@/hooks/useAICoachStream';
 import { cn } from '@/lib/utils';
 
@@ -71,14 +72,14 @@ export function AICoachActionCard({ result }: Props) {
       result.success ? config.gradient : "from-destructive/5 to-destructive/10 border-destructive/20"
     )}>
       <div className="flex items-start gap-2.5">
-        <span className="text-xl mt-0.5">{config.icon}</span>
+        <FluentEmoji emoji={config.icon} size={24} className="mt-0.5" />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-foreground leading-tight">
             {result.message || result.error}
           </p>
           {result.created && (
             <p className="text-xs text-muted-foreground mt-0.5">
-              {result.created.emoji || ''} {result.created.title || result.created.name || result.created.emotion || ''}
+              {result.created.emoji && <FluentEmoji emoji={result.created.emoji} size={14} />} {result.created.title || result.created.name || result.created.emotion || ''}
               {result.created.scheduled_date && ` · ${result.created.scheduled_date}`}
             </p>
           )}
@@ -87,7 +88,7 @@ export function AICoachActionCard({ result }: Props) {
             <div className="mt-2 space-y-1">
               {(result.created.routines as any[]).slice(0, 5).map((r: any) => (
                 <div key={r.id} className="text-xs flex items-center gap-1.5 text-muted-foreground">
-                  <span>{r.emoji}</span> {r.title}
+                  <FluentEmoji emoji={r.emoji} size={14} /> {r.title}
                 </div>
               ))}
             </div>
@@ -96,7 +97,7 @@ export function AICoachActionCard({ result }: Props) {
             <div className="mt-2 space-y-1">
               {(result.created.tasks as any[]).slice(0, 5).map((t: any) => (
                 <div key={t.id} className="text-xs flex items-center gap-1.5 text-muted-foreground">
-                  <span>{t.emoji}</span> {t.title}
+                  <FluentEmoji emoji={t.emoji} size={14} /> {t.title}
                 </div>
               ))}
             </div>

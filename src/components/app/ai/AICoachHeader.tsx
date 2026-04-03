@@ -1,12 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { cn } from '@/lib/utils';
 
 export type CoachMode = 'coach' | 'assistant' | 'companion';
 
 const MODES: { id: CoachMode; label: string; emoji: string; color: string }[] = [
-  { id: 'coach', label: 'Coach', emoji: '🏋️', color: 'from-purple-500 to-violet-600' },
+  { id: 'coach', label: 'Coach', emoji: '💪', color: 'from-purple-500 to-violet-600' },
   { id: 'assistant', label: 'Assistant', emoji: '📋', color: 'from-blue-500 to-cyan-600' },
   { id: 'companion', label: 'Companion', emoji: '💜', color: 'from-pink-500 to-rose-600' },
 ];
@@ -44,10 +45,10 @@ export function AICoachHeader({ mode, setMode, onClear }: Props) {
           <div className="flex items-center gap-2.5">
             {/* Pulsing AI orb */}
             <div className="relative">
-              <div className="h-9 w-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-                <span className="text-lg">✨</span>
-              </div>
-              <div className="absolute inset-0 rounded-full bg-white/20 animate-ping" style={{ animationDuration: '3s' }} />
+            <div className="h-9 w-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+              <FluentEmoji emoji="✨" size={20} />
+            </div>
+            <div className="absolute inset-0 rounded-full bg-white/20 animate-ping" style={{ animationDuration: '3s' }} />
             </div>
             <div>
               <h1 className="text-base font-bold text-white tracking-tight">Ladybosslook AI</h1>
@@ -73,7 +74,7 @@ export function AICoachHeader({ mode, setMode, onClear }: Props) {
                   : "bg-white/15 text-white/90 hover:bg-white/25 backdrop-blur-sm"
               )}
             >
-              <span className="text-sm">{m.emoji}</span>
+              <FluentEmoji emoji={m.emoji} size={18} />
               {m.label}
             </button>
           ))}
