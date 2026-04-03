@@ -167,15 +167,6 @@ export function AICoachInput({ mode, isLoading, onSend, onStop }: Props) {
           onChange={handleImageSelect}
         />
 
-        <Button
-          type="button"
-          variant={isListening ? "default" : "ghost"}
-          size="icon"
-          className={cn("h-10 w-10 shrink-0 rounded-full", isListening && "animate-pulse")}
-          onClick={toggleVoice}
-        >
-          {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-        </Button>
 
         <div className="flex-1 relative">
           <Textarea
