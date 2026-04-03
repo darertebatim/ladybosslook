@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useGoBack } from '@/hooks/useGoBack';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,6 +19,7 @@ import { useShareContent } from '@/hooks/useShareContent';
 export default function AppFreeFormNoteDetail() {
   const { noteId } = useParams<{ noteId: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack('/app/reflections/notes');
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -73,7 +75,7 @@ export default function AppFreeFormNoteDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reflection-notes'] });
       toast.success('Deleted');
-      navigate(-1);
+      goBack();
     },
     onError: () => toast.error('Failed to delete'),
   });
@@ -97,7 +99,7 @@ export default function AppFreeFormNoteDetail() {
         className="px-4 pb-3 flex items-center justify-between border-b"
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
       >
-        <button onClick={() => navigate(-1)} className="active:scale-95 transition-transform p-1">
+        <button onClick={() => goBack()} className="active:scale-95 transition-transform p-1">
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex items-center gap-1">

@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '@/hooks/useGoBack';
 import { useReflections, Reflection, REFLECTION_CATEGORIES } from '@/hooks/useReflections';
 import { ArrowLeft, BookOpen, Crown } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -30,6 +31,7 @@ const SYNTHETIC_REFLECTION_TASK: RoutinePlanTask = {
 
 export default function AppReflections() {
   const navigate = useNavigate();
+  const goBack = useGoBack('/app/home');
   const { data: reflections, isLoading } = useReflections();
   const { isSubscribed } = useSubscription();
 
@@ -59,7 +61,7 @@ export default function AppReflections() {
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center justify-between pt-1 pb-2 px-4">
-          <button onClick={() => navigate(-1)} className="active:scale-95 transition-transform">
+          <button onClick={() => goBack()} className="active:scale-95 transition-transform">
             <ArrowLeft className="h-6 w-6" />
           </button>
           <h1 className="text-lg font-semibold">Reflections Journal</h1>

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useGoBack } from '@/hooks/useGoBack';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -51,6 +52,7 @@ function BulletLineInput({ inputRef, value, onChange, onKeyDown, placeholder }: 
 
 export default function AppFreeFormReflection() {
   const navigate = useNavigate();
+  const goBack = useGoBack('/app/reflections');
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { autoCompleteJournal } = useAutoCompleteProTask();
@@ -124,7 +126,7 @@ export default function AppFreeFormReflection() {
         navigate('/app/home');
         routinePlayer!.maximize();
       } else {
-        navigate(-1);
+        goBack();
       }
     },
     onError: (e: any) => toast.error(e.message || 'Failed to save'),
@@ -174,7 +176,7 @@ export default function AppFreeFormReflection() {
         className="px-4 pb-2 flex items-center justify-between shrink-0"
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
       >
-        <button onClick={() => navigate(-1)} className="text-sm text-muted-foreground active:scale-95 transition-transform">
+        <button onClick={() => goBack()} className="text-sm text-muted-foreground active:scale-95 transition-transform">
           Cancel
         </button>
         <button
