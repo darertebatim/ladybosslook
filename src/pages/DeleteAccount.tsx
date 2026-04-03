@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertTriangle, CheckCircle2, Shield, Mail } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
+import appIcon from '@/assets/app-icon.png';
 
 export default function DeleteAccount() {
   const [step, setStep] = useState<'method' | 'email-form' | 'confirm' | 'success' | 'error'>('method');
@@ -156,8 +157,9 @@ export default function DeleteAccount() {
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="text-center mb-8">
-            <img src="/simora-icon.png" alt="Ladybosslook" className="h-12 w-12 mx-auto mb-3 rounded-xl" />
+            <img src={appIcon} alt="Ladybosslook" className="h-16 w-16 mx-auto mb-3 rounded-2xl shadow-md" />
             <h1 className="text-xl font-bold">Ladybosslook</h1>
+            <p className="text-sm text-muted-foreground">Account Management</p>
           </div>
 
           {step === 'success' ? (
