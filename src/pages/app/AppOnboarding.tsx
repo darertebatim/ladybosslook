@@ -116,6 +116,8 @@ export default function AppOnboarding() {
       localStorage.setItem('simora_onboarding_gender', typeof answer === 'string' ? answer : answer[0] || '');
     } else if (stepId === 'qs-age-group') {
       localStorage.setItem('simora_onboarding_age_group', typeof answer === 'string' ? answer : answer[0] || '');
+    } else if (stepId === 'qs-second-language') {
+      localStorage.setItem('simora_onboarding_language', typeof answer === 'string' ? answer : answer[0] || '');
     }
 
     // Persist answer to Supabase
