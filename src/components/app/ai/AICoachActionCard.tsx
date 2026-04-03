@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import type { ActionResult } from '@/hooks/useAICoachStream';
 import { cn } from '@/lib/utils';
 
