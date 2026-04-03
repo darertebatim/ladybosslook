@@ -66,7 +66,7 @@ export default function AppFreeFormReflection() {
   const [mood, setMood] = useState<string | null>(searchParams.get('mood') || null);
   const [showPrompts, setShowPrompts] = useState(false);
   const titleRef = useRef<HTMLTextAreaElement>(null);
-  const lineRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const lineRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
   const justAddedLine = useRef(false);
 
   const { className: titleBiClass, direction: titleDir } = useBilingualText(title);
