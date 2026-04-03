@@ -110,8 +110,13 @@ serve(async (req) => {
       const callResult = await callResponse.json();
       const choice = callResult.choices?.[0];
 
+      console.log(`[ai-coach] Round ${round}: finish_reason=${choice?.finish_reason}, tool_calls=${JSON.stringify(choice?.message?.tool_calls?.length || 0)}`);
+
       // If no tool calls, we're done — stream the final response
-      if (choice?.finish_reason !== "tool_calls" || !choice?.message?.tool_calls?.length) {
+      // Check both finish_reason variants AND presence of tool_calls array
+      const hasToolCalls = choice?.message?.tool_calls && choice.message.tool_calls.length > 0;
+      if (!hasToolCalls) {
+        console.log("[ai-coach] No tool calls detected, proceeding to stream");
         break;
       }
 
@@ -127,9 +132,9 @@ serve(async (req) => {
         toolResults.push({ tool_call_id: tc.id, result });
       }
 
-      // Collect mutation results for action cards
-      const mutationTools = ["add_task_to_planner", "log_mood", "adopt_routine"];
-      allMutationResults.push(...toolResults.filter(tr => mutationTools.includes(tr.result.action)).map(tr => tr.result));
+      // Collect ALL tool results for action cards (not just mutations)
+      allMutationResults.push(...toolResults.map(tr => tr.result));
+      console.log(`[ai-coach] Round ${round}: executed ${toolResults.length} tools:`, toolResults.map(tr => tr.result.action));
 
       // Add tool call + results to conversation for next round
       currentMessages = [
