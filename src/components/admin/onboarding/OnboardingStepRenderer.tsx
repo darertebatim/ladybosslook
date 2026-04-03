@@ -2942,7 +2942,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
               transition={{ delay: 1.8, duration: 0.5 }}
               className="text-white/35 text-[13px] text-center mt-6 italic"
             >
-              "Small daily resets lead to big transformations"
+              "80% of users report less stress and more happiness in their first 7 days of daily resets"
             </motion.p>
 
             {/* CTA button */}
