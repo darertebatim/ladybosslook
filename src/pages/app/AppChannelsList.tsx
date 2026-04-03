@@ -21,6 +21,7 @@ import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
+import feedbackIllustration from '@/assets/feedback-illustration.png';
 
 const SYNTHETIC_CHANNEL_TASK: RoutinePlanTask = {
   id: 'synthetic-channel-task',
