@@ -231,7 +231,7 @@ export const QuickEnrollUser = () => {
           className="w-full"
         >
           <UserPlus className="w-4 h-4 mr-2" />
-          {isLoading ? 'Creating...' : 'Create Account & Enroll'}
+          {isLoading ? 'Creating...' : selectedCourse ? 'Create Account & Enroll' : 'Create Account Only'}
         </Button>
 
         <p className="text-xs text-muted-foreground">
