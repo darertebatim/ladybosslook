@@ -386,7 +386,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
   },
   myroutines: {
     value: 'myroutines',
-    label: 'My Routines',
+    label: 'MyRoutine Player',
     icon: ListChecks,
     badgeText: 'Play',
     color: 'emerald',
