@@ -496,7 +496,7 @@ export function FeedChannelManager() {
                 setIncludeUpdateStatus={setIncludeUpdateStatus}
               />
 
-                onClick={handleSubmit}
+              <Button
                 disabled={createChannel.isPending || updateChannel.isPending}
                 className="w-full"
               >
