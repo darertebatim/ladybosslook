@@ -1,32 +1,31 @@
-import { Button } from '@/components/ui/button';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import type { CoachMode } from './AICoachHeader';
 
-const QUICK_CHIPS: Record<CoachMode, { label: string; prompt: string }[]> = {
+const QUICK_CHIPS: Record<CoachMode, { emoji: string; label: string; prompt: string }[]> = {
   coach: [
-    { label: '✨ Suggest a routine', prompt: 'Suggest a routine that would be good for me based on my goals.' },
-    { label: '🔄 Review my habits', prompt: 'How are my current routines going? What should I improve?' },
-    { label: '🌅 Morning routine', prompt: 'Help me build a solid morning routine.' },
-    { label: '📈 What\'s working?', prompt: 'Based on my activity, what habits are sticking and what needs work?' },
+    { emoji: '✨', label: 'Suggest a routine', prompt: 'Suggest a routine that would be good for me based on my goals.' },
+    { emoji: '🔄', label: 'Review my habits', prompt: 'How are my current routines going? What should I improve?' },
+    { emoji: '🌅', label: 'Morning routine', prompt: 'Help me build a solid morning routine.' },
+    { emoji: '📈', label: 'What\'s working?', prompt: 'Based on my activity, what habits are sticking and what needs work?' },
   ],
   assistant: [
-    { label: '📋 Plan my day', prompt: 'Help me plan my day — what should I focus on?' },
-    { label: '🎯 Add a task', prompt: 'Help me add a wellness task to my planner for today.' },
-    { label: '⏰ Time-block', prompt: 'Create a time-blocked schedule for today based on my tasks.' },
-    { label: '✅ What\'s left?', prompt: 'What do I still need to do today? Help me prioritize.' },
+    { emoji: '📋', label: 'Plan my day', prompt: 'Help me plan my day — what should I focus on?' },
+    { emoji: '🎯', label: 'Add a task', prompt: 'Help me add a wellness task to my planner for today.' },
+    { emoji: '⏰', label: 'Time-block', prompt: 'Create a time-blocked schedule for today based on my tasks.' },
+    { emoji: '✅', label: 'What\'s left?', prompt: 'What do I still need to do today? Help me prioritize.' },
   ],
   companion: [
-    { label: '💭 How am I doing?', prompt: 'How am I doing based on my recent mood and activity?' },
-    { label: '😮‍💨 I\'m stressed', prompt: 'I\'m feeling stressed right now. Can you help me reset?' },
-    { label: '📝 Journal prompt', prompt: 'Give me a thoughtful journaling prompt for today.' },
-    { label: '🫁 Need to breathe', prompt: 'I need a calming breathing exercise right now.' },
+    { emoji: '💭', label: 'How am I doing?', prompt: 'How am I doing based on my recent mood and activity?' },
+    { emoji: '😮‍💨', label: 'I\'m stressed', prompt: 'I\'m feeling stressed right now. Can you help me reset?' },
+    { emoji: '📝', label: 'Journal prompt', prompt: 'Give me a thoughtful journaling prompt for today.' },
+    { emoji: '🫁', label: 'Need to breathe', prompt: 'I need a calming breathing exercise right now.' },
   ],
 };
 
-const MODE_GREETINGS: Record<CoachMode, { title: string; subtitle: string }> = {
-  coach: { title: 'Ready to level up? 💪', subtitle: 'I\'ll help you build routines that stick' },
-  assistant: { title: 'Let\'s get organized 📋', subtitle: 'Plan, prioritize, and conquer your day' },
-  companion: { title: 'I\'m here for you 💜', subtitle: 'Let\'s talk about how you\'re feeling' },
+const MODE_GREETINGS: Record<CoachMode, { title: string; subtitle: string; emoji: string }> = {
+  coach: { title: 'Ready to level up?', subtitle: 'I\'ll help you build routines that stick', emoji: '💪' },
+  assistant: { title: 'Let\'s get organized', subtitle: 'Plan, prioritize, and conquer your day', emoji: '📋' },
+  companion: { title: 'I\'m here for you', subtitle: 'Let\'s talk about how you\'re feeling', emoji: '💜' },
 };
 
 interface Props {
@@ -50,8 +49,9 @@ export function AICoachEmptyState({ mode, userName, onSend }: Props) {
       </div>
 
       <div className="text-center space-y-1.5">
-        <h2 className="text-lg font-bold">
-          {userName ? `Hey ${userName}! ` : ''}{greeting.title}
+        <h2 className="flex items-center justify-center gap-2 text-lg font-bold">
+          <span>{userName ? `Hey ${userName}! ` : ''}{greeting.title}</span>
+          <FluentEmoji emoji={greeting.emoji} size={24} />
         </h2>
         <p className="text-sm text-muted-foreground">
           {greeting.subtitle}
@@ -66,6 +66,7 @@ export function AICoachEmptyState({ mode, userName, onSend }: Props) {
             onClick={() => onSend(chip.prompt)}
             className="flex items-center gap-2 px-3 py-3 rounded-2xl bg-card border border-border/50 text-left text-xs font-medium shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200 active:scale-[0.98]"
           >
+            <FluentEmoji emoji={chip.emoji} size={18} className="shrink-0" />
             <span>{chip.label}</span>
           </button>
         ))}
