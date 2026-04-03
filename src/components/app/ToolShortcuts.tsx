@@ -577,7 +577,7 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
         </SheetContent>
       </Sheet>
 
-
+      <Sheet open={showAudioPicker} onOpenChange={setShowAudioPicker}>
         <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
           <SheetHeader className="flex-row items-center gap-2">
             <button onClick={() => { setShowAudioPicker(false); setPickerOpen(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
