@@ -84,7 +84,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log(`Admin ${user.id} creating enrollment for ${email} in ${courseName}`);
+    console.log(`Admin ${user.id} ${createUserOnly ? 'creating user' : 'creating enrollment'} for ${email}${courseName ? ` in ${courseName}` : ''}`);
 
     let userId: string;
 
