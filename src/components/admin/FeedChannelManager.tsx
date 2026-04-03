@@ -98,9 +98,9 @@ export function FeedChannelManager() {
       const { error } = await supabase.from('feed_channels').insert({
         name: channelData.name,
         slug: channelData.slug,
-        type: channelData.type,
-        program_slug: channelData.type === 'program' ? channelData.program_slug : null,
-        round_id: channelData.type === 'round' ? channelData.round_id : null,
+        type: 'general',
+        allow_reactions: channelData.allow_reactions,
+        allow_comments: channelData.allow_comments,
         allow_reactions: channelData.allow_reactions,
         allow_comments: channelData.allow_comments,
         cover_image_url,
