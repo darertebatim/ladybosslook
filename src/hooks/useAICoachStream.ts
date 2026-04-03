@@ -10,7 +10,8 @@ export interface CoachMessage {
   content: string;
   timestamp: number;
   actionResults?: ActionResult[];
-  mode?: CoachMode; // used for divider messages
+  mode?: CoachMode;
+  imageUrl?: string; // for displaying attached images
 }
 
 export interface ActionResult {
@@ -34,15 +35,12 @@ export function useAICoachStream() {
     setFollowUps([]);
   }, []);
 
-  // Insert a divider when switching modes
   const insertDivider = useCallback((newMode: CoachMode) => {
     setFollowUps([]);
     setMessages(prev => {
-      // Don't add divider if there are no messages or last message is already a divider
       if (prev.length === 0) return prev;
       const last = prev[prev.length - 1];
       if (last.role === 'divider') return prev;
-
       return [...prev, {
         id: `divider-${Date.now()}`,
         role: 'divider',
@@ -53,15 +51,14 @@ export function useAICoachStream() {
     });
   }, []);
 
-  // Get only messages after the last divider for sending to the backend
   const getActiveMessages = useCallback((allMessages: CoachMessage[]) => {
     const lastDividerIdx = allMessages.map(m => m.role).lastIndexOf('divider');
     const active = lastDividerIdx >= 0 ? allMessages.slice(lastDividerIdx + 1) : allMessages;
     return active.filter(m => m.role === 'user' || m.role === 'assistant');
   }, []);
 
-  const sendMessage = useCallback(async (text: string, mode?: string) => {
-    if (!text.trim() || isLoading) return;
+  const sendMessage = useCallback(async (text: string, mode?: string, imageBase64?: string) => {
+    if ((!text.trim() && !imageBase64) || isLoading) return;
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
@@ -74,6 +71,7 @@ export function useAICoachStream() {
       role: 'user',
       content: text,
       timestamp: Date.now(),
+      imageUrl: imageBase64 || undefined,
     };
 
     setMessages(prev => [...prev, userMsg]);
@@ -84,9 +82,21 @@ export function useAICoachStream() {
     abortRef.current = controller;
 
     try {
-      // Only send messages after the last divider
       const allMessages = [...messages, userMsg];
       const activeMessages = getActiveMessages(allMessages);
+
+      // Build messages payload - include image for the latest message if present
+      const messagesPayload = activeMessages.map((m, i) => {
+        const isLast = i === activeMessages.length - 1;
+        if (isLast && m.imageUrl && m.role === 'user') {
+          return {
+            role: m.role,
+            content: m.content,
+            image: m.imageUrl,
+          };
+        }
+        return { role: m.role, content: m.content };
+      });
 
       const response = await fetch(`${SUPABASE_URL}/functions/v1/ai-coach`, {
         method: 'POST',
@@ -95,7 +105,7 @@ export function useAICoachStream() {
           Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-          messages: activeMessages.map(m => ({ role: m.role, content: m.content })),
+          messages: messagesPayload,
           mode,
         }),
         signal: controller.signal,
@@ -178,7 +188,7 @@ export function useAICoachStream() {
         ));
       }
 
-      // Persist to DB
+      // Persist to DB (don't persist base64 images - too large)
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const finalMessages = [...allMessages, { id: assistantId, role: 'assistant' as const, content: assistantContent, timestamp: Date.now(), actionResults: actionResults.length > 0 ? actionResults : undefined }];
@@ -188,6 +198,7 @@ export function useAICoachStream() {
           timestamp: m.timestamp,
           mode: (m as any).mode || undefined,
           actionResults: (m as any).actionResults || undefined,
+          // Don't persist imageUrl (base64) - too large for DB
         }));
         await supabase.from('ai_coach_conversations').upsert({
           user_id: user.id,
