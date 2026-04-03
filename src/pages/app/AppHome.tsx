@@ -1052,7 +1052,7 @@ const AppHome = () => {
             {/* My Shortcuts — only when no banners are visible */}
             {!hasPromoBanner && !hasHomeBanner && !hasMoodBanner && (
               <div className="mb-3">
-                <ToolShortcuts hideWhenEmpty compact />
+                <ToolShortcuts hideWhenEmpty />
               </div>
             )}
 
