@@ -7,7 +7,6 @@ import { TourBanner } from './TourBanner';
 interface HomeTourProps {
   hasEnrolledPrograms?: boolean;
   hasSuggestedRoutines?: boolean;
-  hasWelcomeCard?: boolean;
   isFirstOpen?: boolean;
   /** Server indicates 0 completions - bypass localStorage flags */
   forceShow?: boolean;
@@ -20,7 +19,6 @@ interface HomeTourProps {
 export function HomeTour({
   hasEnrolledPrograms = false,
   hasSuggestedRoutines = false,
-  hasWelcomeCard = false,
   isFirstOpen = false,
   forceShow = false,
   bannerPortalId = 'tour-banner-slot',
@@ -126,29 +124,17 @@ export function HomeTour({
       action: 'tap',
     });
 
-    // ===== FINAL STEP - Dynamic based on Welcome Card =====
-    if (hasWelcomeCard) {
-      baseSteps.push({
-        id: 'welcome-card',
-         title: 'Your First Task 🎯',
-         target: '.tour-welcome-card',
-         description: 'Ready? Flip the card below to pick your first task.',
-         position: 'top',
-         action: 'tap',
-        condition: () => !!document.querySelector('.tour-welcome-card'),
-      });
-    } else {
-      baseSteps.push({
-        id: 'done',
-         title: 'Ready to Start! 👋',
-         description: "Ready? Tap + to add your first task.",
-        position: 'center',
-        action: 'look',
-      });
-    }
+    // ===== FINAL STEP =====
+    baseSteps.push({
+      id: 'done',
+       title: 'Ready to Start! 👋',
+       description: "Ready? Tap + to add your first task.",
+      position: 'center',
+      action: 'look',
+    });
 
     return baseSteps;
-  }, [hasEnrolledPrograms, hasSuggestedRoutines, hasWelcomeCard]);
+  }, [hasEnrolledPrograms, hasSuggestedRoutines]);
 
   const tour = useFeatureTour({
     feature: 'home',
