@@ -443,7 +443,7 @@ export function FeedChannelManager() {
                     <div>
                       <CardTitle className="text-base">{channel.name}</CardTitle>
                       <p className="text-sm text-muted-foreground">
-                        /{channel.slug} • {channel.type}
+                        /{channel.slug} • {channel.target_type === 'custom' ? '⚙️ Custom' : channel.target_type === 'enrolled' ? '🎓 Enrolled' : '🌍 All Users'}
                         {channel.is_archived && ' • Archived'}
                       </p>
                     </div>
