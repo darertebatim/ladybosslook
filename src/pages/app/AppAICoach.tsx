@@ -10,7 +10,7 @@ import { AICoachDivider } from '@/components/app/ai/AICoachDivider';
 import { Button } from '@/components/ui/button';
 
 export default function AppAICoach() {
-  const { messages, isLoading, sendMessage, clearMessages, stopGeneration, loadHistory, followUps, insertDivider } = useAICoachStream();
+  const { messages, isLoading, sendMessage, clearMessages, stopGeneration, loadHistory, followUps, insertDivider, executeProposal } = useAICoachStream();
   const [mode, setMode] = useState<CoachMode>('coach');
   const [userName, setUserName] = useState<string>();
   const scrollRef = useRef<HTMLDivElement>(null);
