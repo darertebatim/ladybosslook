@@ -74,7 +74,7 @@ export function AICoachHeader({ mode, setMode, onClear }: Props) {
                   : "bg-white/15 text-white/90 hover:bg-white/25 backdrop-blur-sm"
               )}
             >
-              <span className="text-sm">{m.emoji}</span>
+              <FluentEmoji emoji={m.emoji} size={18} />
               {m.label}
             </button>
           ))}
