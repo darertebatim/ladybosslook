@@ -101,8 +101,6 @@ export function FeedChannelManager() {
         type: 'general',
         allow_reactions: channelData.allow_reactions,
         allow_comments: channelData.allow_comments,
-        allow_reactions: channelData.allow_reactions,
-        allow_comments: channelData.allow_comments,
         cover_image_url,
         target_type: targetType,
         include_programs: includePrograms,
