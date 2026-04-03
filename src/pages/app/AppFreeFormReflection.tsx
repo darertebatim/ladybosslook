@@ -126,7 +126,7 @@ export default function AppFreeFormReflection() {
         navigate('/app/home');
         routinePlayer!.maximize();
       } else {
-        navigate(-1);
+        goBack();
       }
     },
     onError: (e: any) => toast.error(e.message || 'Failed to save'),
@@ -176,7 +176,7 @@ export default function AppFreeFormReflection() {
         className="px-4 pb-2 flex items-center justify-between shrink-0"
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
       >
-        <button onClick={() => navigate(-1)} className="text-sm text-muted-foreground active:scale-95 transition-transform">
+        <button onClick={() => goBack()} className="text-sm text-muted-foreground active:scale-95 transition-transform">
           Cancel
         </button>
         <button

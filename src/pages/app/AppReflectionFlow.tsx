@@ -151,7 +151,7 @@ export default function AppReflectionFlow() {
         navigate('/app/home');
         routinePlayer!.maximize();
       } else {
-        navigate(-1);
+        goBack();
       }
     } catch (error) {
       console.error('Failed to save reflection response:', error);
@@ -187,7 +187,7 @@ export default function AppReflectionFlow() {
           navigate('/app/home');
           routinePlayer!.maximize();
         } else {
-          navigate(-1);
+          goBack();
         }
       } else {
         setCurrentIndex((i) => i + 1);
@@ -202,7 +202,7 @@ export default function AppReflectionFlow() {
     if (currentIndex > 0) {
       setCurrentIndex((i) => i - 1);
     } else {
-      navigate(-1);
+      goBack();
     }
   };
 
@@ -218,7 +218,7 @@ export default function AppReflectionFlow() {
     return (
       <div className="h-full bg-background flex flex-col items-center justify-center p-6">
         <p className="text-muted-foreground">This reflection has no pages yet.</p>
-        <button onClick={() => navigate(-1)} className="mt-4 text-primary underline">Go back</button>
+        <button onClick={() => goBack()} className="mt-4 text-primary underline">Go back</button>
       </div>
     );
   }
@@ -233,7 +233,7 @@ export default function AppReflectionFlow() {
           className="px-4 pb-2 flex items-center justify-between shrink-0"
           style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
         >
-          <button onClick={() => navigate(-1)} className="text-sm text-muted-foreground active:scale-95 transition-transform">
+          <button onClick={() => goBack()} className="text-sm text-muted-foreground active:scale-95 transition-transform">
             Cancel
           </button>
           <button

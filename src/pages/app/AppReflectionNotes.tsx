@@ -142,7 +142,7 @@ export default function AppReflectionNotes() {
         className="px-4 pb-3 flex items-center gap-3 border-b"
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
       >
-        <button onClick={() => navigate(-1)} className="active:scale-95 transition-transform p-1">
+        <button onClick={() => goBack()} className="active:scale-95 transition-transform p-1">
           <ArrowLeft className="h-5 w-5" />
         </button>
         <h1 className="text-lg font-semibold flex-1 text-center pr-6">Reflection Notes</h1>
