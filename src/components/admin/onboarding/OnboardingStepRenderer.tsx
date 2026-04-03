@@ -3081,19 +3081,12 @@ function StarterRoutineScreen({ step, onNext }: Props) {
               </p>
             </div>
 
-            {/* Single breathing card */}
+            {/* Continue button */}
             <button
-              onClick={handleFeelingBreatheTap}
-              className="w-full flex items-center gap-4 rounded-2xl p-4 bg-white/90 backdrop-blur-sm active:scale-[0.97] transition-all mb-5 shadow-sm"
+              onClick={handleFeelingDismiss}
+              className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-base active:scale-[0.97] transition-all shadow-sm"
             >
-              <div className="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
-                <FluentEmoji emoji="🫁" size={32} />
-              </div>
-              <div className="text-left flex-1">
-                <span className="text-base font-semibold text-[#1a1f3d] block">Try a Breathing Exercise</span>
-                <span className="text-xs text-[#1a1f3d]/70">3 deep breaths to calm your mind</span>
-              </div>
-              <span className="text-lg text-gray-400">→</span>
+              Continue
             </button>
           </div>
         </div>
