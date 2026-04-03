@@ -10,9 +10,10 @@ const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
 interface Message {
   role: "user" | "assistant" | "system" | "tool";
-  content: string;
+  content: string | any[];
   tool_calls?: any[];
   tool_call_id?: string;
+  image?: string; // base64 data URL from client
 }
 
 serve(async (req) => {
