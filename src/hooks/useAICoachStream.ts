@@ -20,6 +20,8 @@ export interface ActionResult {
   message: string;
   created?: Record<string, any>;
   error?: string;
+  proposed?: boolean;
+  toolArgs?: Record<string, any>;
 }
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
