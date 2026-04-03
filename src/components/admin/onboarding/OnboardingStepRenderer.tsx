@@ -2437,9 +2437,14 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const handleMoodSelect = (moodValue: string) => {
     const moodLabel = MOODS.find(m => m.value === moodValue)?.label || moodValue;
     setSelectedMoodLabel(moodLabel);
-    setShowMoodPicker(false);
-    setPhase('celebrate-mood');
-    triggerCelebration(MOOD_IDX, 'feeling-mood');
+    setSelectedMoodValue(moodValue);
+    // Brief delay so user sees their selection highlighted before picker closes
+    addTimer(() => {
+      setShowMoodPicker(false);
+      setSelectedMoodValue(null);
+      setPhase('celebrate-mood');
+      triggerCelebration(MOOD_IDX, 'feeling-mood');
+    }, 600);
   };
 
   const handleFeelingBreatheTap = () => {
