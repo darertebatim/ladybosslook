@@ -155,6 +155,7 @@ const Landing = lazy(() => import("@/pages/Landing"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const PaymentSuccess = lazy(() => import("@/pages/PaymentSuccess"));
 const Privacy = lazy(() => import("@/pages/Privacy"));
+const DeleteAccount = lazy(() => import("@/pages/DeleteAccount"));
 const RefundPolicy = lazy(() => import("@/pages/RefundPolicy"));
 const SMSTerms = lazy(() => import("@/pages/SMSTerms"));
 const ThankFreeLive = lazy(() => import("@/pages/ThankFreeLive"));
