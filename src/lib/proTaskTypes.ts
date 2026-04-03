@@ -134,8 +134,8 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     iconColorClass: 'text-pink-600 dark:text-pink-400',
     badgeColorClass: 'bg-pink-500/20 text-pink-700 dark:text-pink-300',
     buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
-    description: 'Browse routines templates',
-    requiresValue: false,
+    description: 'Link to a routine template',
+    requiresValue: true,
   },
   route: {
     value: 'route',

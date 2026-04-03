@@ -488,6 +488,8 @@ const AppTaskCreate = ({
   const [showVideoPicker, setShowVideoPicker] = useState(false);
   const [showVideoPlaylistPicker, setShowVideoPlaylistPicker] = useState(false);
   const [showProgramPicker, setShowProgramPicker] = useState(false);
+  const [showRoutineTemplatePicker, setShowRoutineTemplatePicker] = useState(false);
+  const [routineTemplateSearchQuery, setRoutineTemplateSearchQuery] = useState('');
   const [showSubtaskEditor, setShowSubtaskEditor] = useState(false);
   const [showGoalSettings, setShowGoalSettings] = useState(false);
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
@@ -614,7 +616,21 @@ const AppTaskCreate = ({
     },
   });
 
-  // Fetch audio content for linking (only accessible tracks)
+  // Fetch routines bank templates for inspire linking
+  const { data: routineTemplates = [] } = useQuery({
+    queryKey: ['linkable-routine-templates'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routines_bank')
+        .select('id, title, emoji, category, subtitle, cover_image_url')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      if (error) throw error;
+      return data as { id: string; title: string; emoji: string | null; category: string; subtitle: string | null; cover_image_url: string | null }[];
+    },
+  });
+
+
   const { data: audioTracks = [] } = useQuery({
     queryKey: ['linkable-audio-tracks'],
     queryFn: async () => {
@@ -2257,6 +2273,9 @@ const AppTaskCreate = ({
           } else if (type === 'program') {
             setShowProLinkPicker(false);
             setShowProgramPicker(true);
+          } else if (type === 'inspire') {
+            setShowProLinkPicker(false);
+            setShowRoutineTemplatePicker(true);
           }
           // route handled by the picker's built-in value input
         }}
@@ -2497,6 +2516,48 @@ const AppTaskCreate = ({
                     <div className="flex-1 text-left">
                       <p className="font-medium truncate">{routine.title}</p>
                       <p className="text-xs text-muted-foreground capitalize">{routine.category}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+
+      {/* Routine Template Picker Sheet */}
+      <Sheet open={showRoutineTemplatePicker} onOpenChange={setShowRoutineTemplatePicker}>
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
+          <SheetHeader className="flex-row items-center gap-2">
+            <button onClick={() => { setShowRoutineTemplatePicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <SheetTitle>Select Routine Template</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-3">
+            <Input value={routineTemplateSearchQuery} onChange={(e) => setRoutineTemplateSearchQuery(e.target.value)} placeholder="Search templates..." className="mb-2" />
+            <ScrollArea className="h-[45vh]">
+              <div className="space-y-2 pr-4">
+                {routineTemplates.filter(r => !routineTemplateSearchQuery || r.title.toLowerCase().includes(routineTemplateSearchQuery.toLowerCase())).map((routine) => (
+                  <button
+                    key={routine.id}
+                    onClick={() => {
+                      setProLinkType('inspire');
+                      setProLinkValue(routine.id);
+                      setShowRoutineTemplatePicker(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
+                      proLinkValue === routine.id && proLinkType === 'inspire' && 'bg-primary/10 ring-1 ring-primary/30'
+                    )}
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-100 to-rose-100 dark:from-pink-900/40 dark:to-rose-900/40 flex items-center justify-center">
+                      <span className="text-xl">{routine.emoji || '📋'}</span>
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="font-medium truncate">{routine.title}</p>
+                      {routine.subtitle && <p className="text-xs text-muted-foreground line-clamp-1">{routine.subtitle}</p>}
                     </div>
                   </button>
                 ))}

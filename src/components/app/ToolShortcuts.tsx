@@ -70,6 +70,8 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
   const [showVideoPicker, setShowVideoPicker] = useState(false);
   const [showVideoPlaylistPicker, setShowVideoPlaylistPicker] = useState(false);
   const [showProgramPicker, setShowProgramPicker] = useState(false);
+  const [showRoutineTemplatePicker, setShowRoutineTemplatePicker] = useState(false);
+  const [routineTemplateSearchQuery, setRoutineTemplateSearchQuery] = useState('');
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
   const [audioSearchQuery, setAudioSearchQuery] = useState('');
   const [channelSearchQuery, setChannelSearchQuery] = useState('');
@@ -151,6 +153,20 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
         .eq('is_active', true);
       if (error) throw error;
       return (data || []).map((r: any) => ({ id: r.routine_id, title: r.title, emoji: r.emoji, category: r.category })) as { id: string; title: string; emoji: string | null; category: string }[];
+    },
+  });
+
+  // Fetch routines bank templates for inspire linking
+  const { data: routineTemplates = [] } = useQuery({
+    queryKey: ['shortcut-linkable-routine-templates'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routines_bank')
+        .select('id, title, emoji, category, subtitle, cover_image_url')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      if (error) throw error;
+      return data as { id: string; title: string; emoji: string | null; category: string; subtitle: string | null; cover_image_url: string | null }[];
     },
   });
 
@@ -329,6 +345,11 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
     if (type === 'program') {
       setPickerOpen(false);
       setShowProgramPicker(true);
+      return;
+    }
+    if (type === 'inspire') {
+      setPickerOpen(false);
+      setShowRoutineTemplatePicker(true);
       return;
     }
 
@@ -515,6 +536,43 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
                 <div className="flex-1 text-left"><p className="font-medium truncate">{routine.title}</p><p className="text-xs text-muted-foreground capitalize">{routine.category}</p></div>
               </button>
             ))}</div></ScrollArea>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Routine Template Picker Sheet */}
+      <Sheet open={showRoutineTemplatePicker} onOpenChange={setShowRoutineTemplatePicker}>
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
+          <SheetHeader className="flex-row items-center gap-2">
+            <button onClick={() => { setShowRoutineTemplatePicker(false); setPickerOpen(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <SheetTitle>Select Routine Template</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-3">
+            <Input value={routineTemplateSearchQuery} onChange={(e) => setRoutineTemplateSearchQuery(e.target.value)} placeholder="Search templates..." className="mb-2" />
+            <ScrollArea className="h-[45vh]">
+              <div className="space-y-2 pr-4">
+                {routineTemplates.filter(r => !routineTemplateSearchQuery || r.title.toLowerCase().includes(routineTemplateSearchQuery.toLowerCase())).map((routine) => (
+                  <button
+                    key={routine.id}
+                    onClick={() => {
+                      setShortcutAtIndex({ type: 'inspire', value: routine.id, label: routine.title, emoji: routine.emoji || '📋' });
+                      setShowRoutineTemplatePicker(false);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-100 to-rose-100 dark:from-pink-900/40 dark:to-rose-900/40 flex items-center justify-center">
+                      <FluentEmoji emoji={routine.emoji || '📋'} size={22} />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="font-medium truncate">{routine.title}</p>
+                      {routine.subtitle && <p className="text-xs text-muted-foreground line-clamp-1">{routine.subtitle}</p>}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
           </div>
         </SheetContent>
       </Sheet>
