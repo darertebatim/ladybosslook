@@ -52,6 +52,7 @@ function BulletLineInput({ inputRef, value, onChange, onKeyDown, placeholder }: 
 
 export default function AppFreeFormReflection() {
   const navigate = useNavigate();
+  const goBack = useGoBack('/app/reflections');
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { autoCompleteJournal } = useAutoCompleteProTask();

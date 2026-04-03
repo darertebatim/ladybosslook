@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useGoBack } from '@/hooks/useGoBack';
 import { useReflectionPages, useReflections, useSaveReflectionResponse } from '@/hooks/useReflections';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { ArrowLeft, ArrowRight, Check, RefreshCw } from 'lucide-react';

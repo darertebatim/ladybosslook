@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '@/hooks/useGoBack';
 import { useReflections, Reflection, REFLECTION_CATEGORIES } from '@/hooks/useReflections';
 import { ArrowLeft, BookOpen, Crown } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
