@@ -21,6 +21,7 @@ import { useScrollRestore } from "@/hooks/useScrollRestore";
 import heroStormVideo from "@/assets/watch-hero-storm.mp4";
 import { WatchCategoryPill } from "@/components/video/WatchCategoryPill";
 import { useUserPreferredLanguage, preferredLanguageSorter } from "@/hooks/useUserPreferredLanguage";
+import { LanguagePreferencePopup, shouldShowLanguagePopup } from "@/components/app/LanguagePreferencePopup";
 
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
