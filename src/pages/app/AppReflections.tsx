@@ -31,6 +31,7 @@ const SYNTHETIC_REFLECTION_TASK: RoutinePlanTask = {
 
 export default function AppReflections() {
   const navigate = useNavigate();
+  const goBack = useGoBack('/app/home');
   const { data: reflections, isLoading } = useReflections();
   const { isSubscribed } = useSubscription();
 

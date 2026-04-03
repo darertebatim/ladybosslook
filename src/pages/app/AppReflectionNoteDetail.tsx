@@ -17,6 +17,7 @@ import { useShareContent } from '@/hooks/useShareContent';
 export default function AppReflectionNoteDetail() {
   const { reflectionId } = useParams<{ reflectionId: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack('/app/reflections/notes');
   const { user } = useAuth();
   const queryClient = useQueryClient();
 

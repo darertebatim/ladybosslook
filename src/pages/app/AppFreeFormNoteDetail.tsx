@@ -19,6 +19,7 @@ import { useShareContent } from '@/hooks/useShareContent';
 export default function AppFreeFormNoteDetail() {
   const { noteId } = useParams<{ noteId: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack('/app/reflections/notes');
   const { user } = useAuth();
   const queryClient = useQueryClient();
 

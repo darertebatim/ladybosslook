@@ -20,6 +20,7 @@ interface NoteItem {
 
 export default function AppReflectionNotes() {
   const navigate = useNavigate();
+  const goBack = useGoBack('/app/reflections');
   const { user } = useAuth();
 
   const { data: notes, isLoading } = useQuery({
