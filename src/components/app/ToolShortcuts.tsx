@@ -540,7 +540,44 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
         </SheetContent>
       </Sheet>
 
-      <Sheet open={showAudioPicker} onOpenChange={setShowAudioPicker}>
+      {/* Routine Template Picker Sheet */}
+      <Sheet open={showRoutineTemplatePicker} onOpenChange={setShowRoutineTemplatePicker}>
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
+          <SheetHeader className="flex-row items-center gap-2">
+            <button onClick={() => { setShowRoutineTemplatePicker(false); setPickerOpen(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <SheetTitle>Select Routine Template</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-3">
+            <Input value={routineTemplateSearchQuery} onChange={(e) => setRoutineTemplateSearchQuery(e.target.value)} placeholder="Search templates..." className="mb-2" />
+            <ScrollArea className="h-[45vh]">
+              <div className="space-y-2 pr-4">
+                {routineTemplates.filter(r => !routineTemplateSearchQuery || r.title.toLowerCase().includes(routineTemplateSearchQuery.toLowerCase())).map((routine) => (
+                  <button
+                    key={routine.id}
+                    onClick={() => {
+                      setShortcutAtIndex({ type: 'inspire', value: routine.id, label: routine.title, emoji: routine.emoji || '📋' });
+                      setShowRoutineTemplatePicker(false);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-100 to-rose-100 dark:from-pink-900/40 dark:to-rose-900/40 flex items-center justify-center">
+                      <FluentEmoji emoji={routine.emoji || '📋'} size={22} />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="font-medium truncate">{routine.title}</p>
+                      {routine.subtitle && <p className="text-xs text-muted-foreground line-clamp-1">{routine.subtitle}</p>}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+
         <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
           <SheetHeader className="flex-row items-center gap-2">
             <button onClick={() => { setShowAudioPicker(false); setPickerOpen(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
