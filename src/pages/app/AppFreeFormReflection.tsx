@@ -66,7 +66,13 @@ export default function AppFreeFormReflection() {
   const { className: titleBiClass, direction: titleDir } = useBilingualText(title);
 
   useEffect(() => {
-    setTimeout(() => titleRef.current?.focus(), 200);
+    setTimeout(() => {
+      if (titleRef.current) {
+        titleRef.current.focus();
+        titleRef.current.style.height = 'auto';
+        titleRef.current.style.height = titleRef.current.scrollHeight + 'px';
+      }
+    }, 200);
   }, []);
 
   useEffect(() => {
