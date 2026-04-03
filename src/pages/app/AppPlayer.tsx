@@ -85,6 +85,15 @@ export default function AppPlayer() {
   // Use centralized data hook with parallel fetching
   const { playlists, playlistItems, progressData, enrollments, programs, isLoading } = usePlayerData();
   const userLang = useUserPreferredLanguage();
+  const [showLangPopup, setShowLangPopup] = useState(false);
+
+  // Show language preference popup on first visit if not set
+  useEffect(() => {
+    if (!isLoading && shouldShowLanguagePopup(userLang)) {
+      const timer = setTimeout(() => setShowLangPopup(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, userLang]);
 
   // Memoized playlist stats calculation - O(1) lookups
   const playlistStats = useMemo(() => {
