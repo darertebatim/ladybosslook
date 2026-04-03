@@ -8,11 +8,12 @@ const corsHeaders = {
 
 interface EnrollmentRequest {
   email: string;
-  courseName: string;
+  courseName?: string;
   programSlug?: string;
   roundId?: string;
   fullName?: string;
-  expiresAt?: string; // ISO date string for custom expiration
+  expiresAt?: string;
+  createUserOnly?: boolean;
 }
 
 // Generate cryptographically secure random password
@@ -28,11 +29,18 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, courseName, programSlug, roundId, fullName, expiresAt }: EnrollmentRequest = await req.json();
+    const { email, courseName, programSlug, roundId, fullName, expiresAt, createUserOnly }: EnrollmentRequest = await req.json();
 
-    if (!email || !courseName) {
+    if (!email) {
       return new Response(
-        JSON.stringify({ error: 'Email and course name are required' }),
+        JSON.stringify({ error: 'Email is required' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
+    if (!createUserOnly && !courseName) {
+      return new Response(
+        JSON.stringify({ error: 'Course name is required unless creating user only' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
       );
     }
@@ -76,7 +84,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log(`Admin ${user.id} creating enrollment for ${email} in ${courseName}`);
+    console.log(`Admin ${user.id} ${createUserOnly ? 'creating user' : 'creating enrollment'} for ${email}${courseName ? ` in ${courseName}` : ''}`);
 
     let userId: string;
 
@@ -214,6 +222,18 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
+    // If createUserOnly, skip enrollment and return early
+    if (createUserOnly || !courseName) {
+      return new Response(
+        JSON.stringify({
+          message: 'User account created successfully (no enrollment)',
+          userId,
+          email,
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      );
+    }
+
     // Check if enrollment already exists
     const { data: existingEnrollment } = await supabase
       .from('course_enrollments')
@@ -273,7 +293,6 @@ const handler = async (req: Request): Promise<Response> => {
         .single();
 
       if (programInfo?.requires_subscription || programInfo?.type === 'subscription') {
-        // Use custom expiration if provided, otherwise default to 1 year
         const subscriptionExpiresAt = expiresAt 
           ? new Date(expiresAt).toISOString()
           : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
@@ -308,7 +327,6 @@ const handler = async (req: Request): Promise<Response> => {
     
     if (programSlug) {
       try {
-        // Fetch program details to determine if paid or free
         const { data: program } = await supabase
           .from('program_catalog')
           .select('price_amount, is_free_on_ios, mailchimp_tags')
@@ -318,20 +336,16 @@ const handler = async (req: Request): Promise<Response> => {
         if (program) {
           const isPaid = program.price_amount > 0 && !program.is_free_on_ios;
           const baseTag = isPaid ? 'paid_customer' : 'free_customer';
-          
-          // Combine base tag with program-specific tags
           const programTags = Array.isArray(program.mailchimp_tags) ? program.mailchimp_tags : [];
           const allTags = [baseTag, ...programTags.filter((t: string) => t !== baseTag)];
           
           console.log(`Applying Mailchimp tags for ${email}: ${allTags.join(', ')}`);
           
-          // Call Mailchimp API to add tags
           const MAILCHIMP_API_KEY = Deno.env.get('MAILCHIMP_API_KEY');
           const MAILCHIMP_SERVER_PREFIX = Deno.env.get('MAILCHIMP_SERVER_PREFIX') || 'us8';
           const MAILCHIMP_LIST_ID = Deno.env.get('MAILCHIMP_LIST_ID');
           
           if (MAILCHIMP_API_KEY && MAILCHIMP_LIST_ID) {
-            // Create MD5 hash of lowercase email for Mailchimp subscriber ID
             const encoder = new TextEncoder();
             const data = encoder.encode(email.toLowerCase());
             const hashBuffer = await crypto.subtle.digest('MD5', data);
@@ -355,15 +369,11 @@ const handler = async (req: Request): Promise<Response> => {
             
             if (mailchimpResponse.ok) {
               mailchimpTagged = true;
-              console.log(`Mailchimp tags applied successfully for ${email}`);
             } else {
               const errorText = await mailchimpResponse.text();
               mailchimpError = `Mailchimp error: ${mailchimpResponse.status} - ${errorText}`;
               console.error(mailchimpError);
             }
-          } else {
-            mailchimpError = 'Mailchimp credentials not configured';
-            console.warn(mailchimpError);
           }
         }
       } catch (tagError: any) {

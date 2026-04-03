@@ -47,10 +47,10 @@ export const QuickEnrollUser = () => {
   });
 
   const handleEnroll = async () => {
-    if (!email || !selectedCourse) {
+    if (!email) {
       toast({
         title: 'Missing Information',
-        description: 'Please provide email and select a course',
+        description: 'Please provide an email address',
         variant: 'destructive',
       });
       return;
@@ -58,16 +58,17 @@ export const QuickEnrollUser = () => {
 
     setIsLoading(true);
     try {
-      const selectedProgram = programs.find(p => p.title === selectedCourse);
+      const selectedProgram = selectedCourse ? programs.find(p => p.title === selectedCourse) : null;
       
       const { data, error } = await supabase.functions.invoke('admin-create-enrollment', {
         body: {
           email: email.trim(),
-          courseName: selectedCourse,
-          programSlug: selectedProgram?.slug,
+          courseName: selectedCourse || null,
+          programSlug: selectedProgram?.slug || null,
           roundId: selectedRound || null,
           fullName: fullName.trim() || null,
           expiresAt: expiresAt ? expiresAt.toISOString() : null,
+          createUserOnly: !selectedCourse,
         },
       });
 
@@ -226,11 +227,11 @@ export const QuickEnrollUser = () => {
 
         <Button
           onClick={handleEnroll} 
-          disabled={isLoading || !email || !selectedCourse}
+          disabled={isLoading || !email}
           className="w-full"
         >
           <UserPlus className="w-4 h-4 mr-2" />
-          {isLoading ? 'Creating...' : 'Create Account & Enroll'}
+          {isLoading ? 'Creating...' : selectedCourse ? 'Create Account & Enroll' : 'Create Account Only'}
         </Button>
 
         <p className="text-xs text-muted-foreground">
