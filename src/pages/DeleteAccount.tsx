@@ -157,8 +157,9 @@ export default function DeleteAccount() {
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="text-center mb-8">
-            <img src="/simora-icon.png" alt="Ladybosslook" className="h-12 w-12 mx-auto mb-3 rounded-xl" />
+            <img src={appIcon} alt="Ladybosslook" className="h-16 w-16 mx-auto mb-3 rounded-2xl shadow-md" />
             <h1 className="text-xl font-bold">Ladybosslook</h1>
+            <p className="text-sm text-muted-foreground">Account Management</p>
           </div>
 
           {step === 'success' ? (
