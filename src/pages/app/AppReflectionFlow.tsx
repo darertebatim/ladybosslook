@@ -27,6 +27,7 @@ function getBulletColor(index: number) {
 export default function AppReflectionFlow() {
   const { reflectionId } = useParams<{ reflectionId: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack('/app/reflections');
   const { data: pages, isLoading } = useReflectionPages(reflectionId);
   const { data: reflections } = useReflections();
   const saveResponse = useSaveReflectionResponse();
