@@ -472,7 +472,30 @@ export function FeedChannelManager() {
                 />
               </div>
 
-              <Button
+              {/* Audience Targeting */}
+              <PromoAudienceSelector
+                targetType={targetType}
+                setTargetType={setTargetType}
+                includePrograms={includePrograms}
+                setIncludePrograms={setIncludePrograms}
+                excludePrograms={excludePrograms}
+                setExcludePrograms={setExcludePrograms}
+                includePlaylists={includePlaylists}
+                setIncludePlaylists={setIncludePlaylists}
+                excludePlaylists={excludePlaylists}
+                setExcludePlaylists={setExcludePlaylists}
+                includeTools={includeTools}
+                setIncludeTools={setIncludeTools}
+                excludeTools={excludeTools}
+                setExcludeTools={setExcludeTools}
+                targetLanguages={targetLanguages}
+                setTargetLanguages={setTargetLanguages}
+                targetTimezones={targetTimezones}
+                setTargetTimezones={setTargetTimezones}
+                includeUpdateStatus={includeUpdateStatus}
+                setIncludeUpdateStatus={setIncludeUpdateStatus}
+              />
+
                 onClick={handleSubmit}
                 disabled={createChannel.isPending || updateChannel.isPending}
                 className="w-full"
