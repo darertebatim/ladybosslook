@@ -223,6 +223,47 @@ export function useAICoachStream() {
     abortRef.current?.abort();
   }, []);
 
+  const executeProposal = useCallback(async (messageId: string, resultIndex: number, action: string, toolArgs: Record<string, any>) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast.error('Please log in first');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/ai-coach`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ action: 'execute_tool', tool: action, args: toolArgs }),
+      });
+
+      if (!response.ok) {
+        toast.error('Failed to execute action');
+        return;
+      }
+
+      const result = await response.json();
+
+      setMessages(prev => prev.map(m => {
+        if (m.id !== messageId) return m;
+        const newResults = [...(m.actionResults || [])];
+        newResults[resultIndex] = { ...result, proposed: false };
+        return { ...m, actionResults: newResults };
+      }));
+
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.error || 'Action failed');
+      }
+    } catch {
+      toast.error('Failed to execute action');
+    }
+  }, []);
+
   const loadHistory = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
