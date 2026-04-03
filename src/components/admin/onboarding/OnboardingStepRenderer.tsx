@@ -2133,11 +2133,13 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     return () => clearTimeout(t);
   }, [countdown, isCountingDown]);
 
-  // Animate countdown progress ring
+  // Animate countdown progress ring — each tick advances by 1/3
   useEffect(() => {
     if (!isCountingDown) return;
-    const progress = (3 - countdown) / 3;
-    setCountdownProgress(progress);
+    // When countdown=3, progress should already be 1/3 (first second ticking)
+    // countdown=2 → 2/3, countdown=1 → 3/3
+    const progress = (3 - countdown + 1) / 3;
+    setCountdownProgress(Math.min(progress, 1));
   }, [countdown, isCountingDown]);
 
   // Per-phase second countdown (4, 3, 2, 1)
