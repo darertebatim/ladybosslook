@@ -347,6 +347,11 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
       setShowProgramPicker(true);
       return;
     }
+    if (type === 'inspire') {
+      setPickerOpen(false);
+      setShowRoutineTemplatePicker(true);
+      return;
+    }
 
     setShortcutAtIndex({
       type,
