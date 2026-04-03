@@ -1209,6 +1209,9 @@ export default function AppTest() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Language Preference Popup */}
+      <LanguagePreferencePopup open={showLanguagePopup} onClose={() => setShowLanguagePopup(false)} />
     </div>
   );
 }
