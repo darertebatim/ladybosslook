@@ -8,11 +8,12 @@ const corsHeaders = {
 
 interface EnrollmentRequest {
   email: string;
-  courseName: string;
+  courseName?: string;
   programSlug?: string;
   roundId?: string;
   fullName?: string;
-  expiresAt?: string; // ISO date string for custom expiration
+  expiresAt?: string;
+  createUserOnly?: boolean;
 }
 
 // Generate cryptographically secure random password
