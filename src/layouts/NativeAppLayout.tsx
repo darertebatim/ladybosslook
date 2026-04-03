@@ -190,7 +190,7 @@ const NativeAppLayout = () => {
         )}
         style={{
           paddingBottom: (isOnChatPage || isFullScreenTool || isKeyboardOpen || isOnPlayerPage) ? 0 : TAB_BAR_CONTENT_HEIGHT + 8,
-          WebkitOverflowScrolling: isOnPlayerPage ? 'auto' : 'touch',
+          WebkitOverflowScrolling: (isOnPlayerPage || isOwnScrollPage) ? 'auto' : 'touch',
           touchAction: 'pan-y',
         }}
       >
