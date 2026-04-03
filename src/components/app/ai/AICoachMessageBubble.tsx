@@ -5,9 +5,10 @@ import { cn } from '@/lib/utils';
 
 interface Props {
   message: CoachMessage;
+  onExecuteProposal?: (messageId: string, resultIndex: number, action: string, toolArgs: Record<string, any>) => Promise<void>;
 }
 
-export function AICoachMessageBubble({ message }: Props) {
+export function AICoachMessageBubble({ message, onExecuteProposal }: Props) {
   const isUser = message.role === 'user';
 
   return (
@@ -42,7 +43,13 @@ export function AICoachMessageBubble({ message }: Props) {
         {message.actionResults && message.actionResults.length > 0 && (
           <div className="mt-3 space-y-2">
             {message.actionResults.map((result, idx) => (
-              <AICoachActionCard key={idx} result={result} />
+              <AICoachActionCard
+                key={idx}
+                result={result}
+                messageId={message.id}
+                resultIndex={idx}
+                onExecute={onExecuteProposal}
+              />
             ))}
           </div>
         )}
