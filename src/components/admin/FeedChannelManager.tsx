@@ -130,6 +130,16 @@ export function FeedChannelManager() {
         allow_reactions: channelData.allow_reactions,
         allow_comments: channelData.allow_comments,
         cover_image_url,
+        target_type: targetType,
+        include_programs: includePrograms,
+        exclude_programs: excludePrograms,
+        include_playlists: includePlaylists,
+        exclude_playlists: excludePlaylists,
+        include_tools: includeTools,
+        exclude_tools: excludeTools,
+        target_languages: targetLanguages,
+        target_timezones: targetTimezones,
+        include_update_status: includeUpdateStatus,
       });
       if (error) throw error;
     },
