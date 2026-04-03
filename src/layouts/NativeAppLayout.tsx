@@ -165,6 +165,8 @@ const NativeAppLayout = () => {
   const isOnChatPage = location.pathname === '/app/chat';
   // Hide nav on full-screen tool pages (journal, timer, etc.)
   const isFullScreenTool = location.pathname.startsWith('/app/journal');
+  // Pages that manage their own scroll container (need overflow-hidden on main)
+  const isOwnScrollPage = location.pathname === '/app/projects';
 
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home', tourClass: 'tour-nav-home' },
