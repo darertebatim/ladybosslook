@@ -52,9 +52,6 @@ export function FeedChannelManager() {
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
-    type: 'general' as 'general' | 'program' | 'round' | 'all_enrolled' | 'all_paid',
-    program_slug: '',
-    round_id: '',
     allow_reactions: true,
     allow_comments: true,
     cover_type: 'none' as 'none' | 'emoji' | 'image',
@@ -86,30 +83,7 @@ export function FeedChannelManager() {
     },
   });
 
-  const { data: programs } = useQuery({
-    queryKey: ['programs-list'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('program_catalog')
-        .select('slug, title')
-        .order('title');
-      if (error) throw error;
-      return data;
-    },
-  });
 
-  const { data: rounds } = useQuery({
-    queryKey: ['rounds-list'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('program_rounds')
-        .select('id, round_name, program_slug')
-        .order('program_slug')
-        .order('round_number', { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
 
   const createChannel = useMutation({
     mutationFn: async (channelData: typeof formData) => {
@@ -124,9 +98,7 @@ export function FeedChannelManager() {
       const { error } = await supabase.from('feed_channels').insert({
         name: channelData.name,
         slug: channelData.slug,
-        type: channelData.type,
-        program_slug: channelData.type === 'program' ? channelData.program_slug : null,
-        round_id: channelData.type === 'round' ? channelData.round_id : null,
+        type: 'general',
         allow_reactions: channelData.allow_reactions,
         allow_comments: channelData.allow_comments,
         cover_image_url,
@@ -195,9 +167,6 @@ export function FeedChannelManager() {
     setFormData({
       name: '',
       slug: '',
-      type: 'general',
-      program_slug: '',
-      round_id: '',
       allow_reactions: true,
       allow_comments: true,
       cover_type: 'none',
@@ -237,9 +206,6 @@ export function FeedChannelManager() {
     setFormData({
       name: channel.name,
       slug: channel.slug,
-      type: channel.type,
-      program_slug: channel.program_slug || '',
-      round_id: channel.round_id || '',
       allow_reactions: channel.allow_reactions,
       allow_comments: channel.allow_comments,
       cover_type,
@@ -287,9 +253,6 @@ export function FeedChannelManager() {
         id: editingChannel.id,
         name: formData.name,
         slug: formData.slug,
-        type: formData.type,
-        program_slug: formData.type === 'program' ? formData.program_slug : null,
-        round_id: formData.type === 'round' ? formData.round_id : null,
         allow_reactions: formData.allow_reactions,
         allow_comments: formData.allow_comments,
         cover_image_url,
@@ -339,66 +302,8 @@ export function FeedChannelManager() {
                   placeholder="channel-slug"
                 />
               </div>
-              <div>
-                <Label>Type</Label>
-                <Select
-                  value={formData.type}
-                  onValueChange={(value: 'general' | 'program' | 'round' | 'all_enrolled' | 'all_paid') => 
-                    setFormData({ ...formData, type: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="general">General (All Users)</SelectItem>
-                    <SelectItem value="all_enrolled">All Enrolled (Any Program)</SelectItem>
-                    <SelectItem value="all_paid">All Paid Users</SelectItem>
-                    <SelectItem value="program">Specific Program</SelectItem>
-                    <SelectItem value="round">Specific Round</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              {formData.type === 'program' && (
-                <div>
-                  <Label>Program</Label>
-                  <Select
-                    value={formData.program_slug}
-                    onValueChange={(value) => setFormData({ ...formData, program_slug: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select program" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {programs?.filter(p => p.slug).map((p) => (
-                        <SelectItem key={p.slug} value={p.slug}>{p.title}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
 
-              {formData.type === 'round' && (
-                <div>
-                  <Label>Round</Label>
-                  <Select
-                    value={formData.round_id}
-                    onValueChange={(value) => setFormData({ ...formData, round_id: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select round" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {rounds?.filter(r => r.id).map((r) => (
-                        <SelectItem key={r.id} value={r.id}>
-                          {r.round_name} ({r.program_slug})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+
 
               {/* Cover selector */}
               <div>
@@ -538,7 +443,7 @@ export function FeedChannelManager() {
                     <div>
                       <CardTitle className="text-base">{channel.name}</CardTitle>
                       <p className="text-sm text-muted-foreground">
-                        /{channel.slug} • {channel.type}
+                        /{channel.slug} • {channel.target_type === 'custom' ? '⚙️ Custom' : channel.target_type === 'enrolled' ? '🎓 Enrolled' : '🌍 All Users'}
                         {channel.is_archived && ' • Archived'}
                       </p>
                     </div>
