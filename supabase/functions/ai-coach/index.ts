@@ -646,7 +646,7 @@ async function addTaskToPlanner(supabase: any, userId: string, args: any) {
         time_period: bankTask.time_period,
         repeat_pattern: bankTask.repeat_pattern || "none",
         description: bankTask.description,
-        task_bank_id: args.task_bank_id,
+        // task_bank_id column doesn't exist in user_tasks, skip it
         goal_enabled: bankTask.goal_enabled,
         goal_type: bankTask.goal_type,
         goal_target: bankTask.goal_target,
