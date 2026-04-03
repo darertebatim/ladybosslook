@@ -2114,6 +2114,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
   const [isCountingDown, setIsCountingDown] = useState(true);
   const [countdownProgress, setCountdownProgress] = useState(0);
   const [phaseSecondsLeft, setPhaseSecondsLeft] = useState(0);
+  const [showCompletion, setShowCompletion] = useState(false);
   const completedRef = useRef(false);
   const totalCycles = 1;
 
