@@ -2232,7 +2232,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
       {/* "Let's Get Ready" title during countdown */}
       {isCountingDown && (
         <p className="text-white/70 text-lg font-medium mb-6 tracking-wide animate-fade-in">
-          Let's Get Ready
+          Let's try 1 breath together
         </p>
       )}
 
