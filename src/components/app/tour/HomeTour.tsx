@@ -7,7 +7,6 @@ import { TourBanner } from './TourBanner';
 interface HomeTourProps {
   hasEnrolledPrograms?: boolean;
   hasSuggestedRoutines?: boolean;
-  hasWelcomeCard?: boolean;
   isFirstOpen?: boolean;
   /** Server indicates 0 completions - bypass localStorage flags */
   forceShow?: boolean;
@@ -20,7 +19,6 @@ interface HomeTourProps {
 export function HomeTour({
   hasEnrolledPrograms = false,
   hasSuggestedRoutines = false,
-  hasWelcomeCard = false,
   isFirstOpen = false,
   forceShow = false,
   bannerPortalId = 'tour-banner-slot',
