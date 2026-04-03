@@ -2114,6 +2114,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
   const [isCountingDown, setIsCountingDown] = useState(true);
   const [countdownProgress, setCountdownProgress] = useState(0);
   const [phaseSecondsLeft, setPhaseSecondsLeft] = useState(0);
+  const [showCompletion, setShowCompletion] = useState(false);
   const completedRef = useRef(false);
   const totalCycles = 1;
 
@@ -2185,7 +2186,12 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
       if (next >= totalCycles) {
         if (!completedRef.current) {
           completedRef.current = true;
-          onComplete();
+          setShowCompletion(true);
+          // Import confetti dynamically
+          import('canvas-confetti').then(({ default: confetti }) => {
+            confetti({ particleCount: 80, spread: 70, origin: { y: 0.5 }, colors: ['#a78bfa', '#34d399', '#60a5fa', '#fbbf24'] });
+          });
+          setTimeout(() => onComplete(), 2500);
         }
         return;
       }
@@ -2232,7 +2238,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
       {/* "Let's Get Ready" title during countdown */}
       {isCountingDown && (
         <p className="text-white/70 text-lg font-medium mb-6 tracking-wide animate-fade-in">
-          Let's Get Ready
+          Let's try 1 breath together
         </p>
       )}
 
@@ -2283,7 +2289,18 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
         />
       </div>
 
-      <p className="text-white/40 text-xs mt-8">4-4-4 pattern</p>
+      {/* Completion celebration overlay */}
+      {showCompletion && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-20 animate-fade-in">
+          <div className="w-24 h-24 rounded-full bg-emerald-400/20 flex items-center justify-center mb-4 animate-scale-in">
+            <span className="text-5xl">✨</span>
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">Well done!</h2>
+          <p className="text-white/70 text-sm">You completed your first breath</p>
+        </div>
+      )}
+
+      {!showCompletion && <p className="text-white/40 text-xs mt-8">4-4-4 pattern</p>}
     </div>
   );
 }
