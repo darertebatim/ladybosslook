@@ -72,7 +72,7 @@ export function AICoachActionCard({ result }: Props) {
       result.success ? config.gradient : "from-destructive/5 to-destructive/10 border-destructive/20"
     )}>
       <div className="flex items-start gap-2.5">
-        <span className="text-xl mt-0.5">{config.icon}</span>
+        <FluentEmoji emoji={config.icon} size={24} className="mt-0.5" />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-foreground leading-tight">
             {result.message || result.error}
