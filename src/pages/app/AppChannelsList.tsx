@@ -333,6 +333,27 @@ export default function AppChannelsList() {
               <ChevronRight className="h-4 w-4 text-muted-foreground/50 shrink-0" />
             </button>
           </div>
+
+          {/* Feedback encouragement in white space */}
+          <button
+            onClick={handleSupportClick}
+            className="w-full flex flex-col items-center py-8 px-6 active:bg-muted/30 transition-colors"
+          >
+            <img
+              src={feedbackIllustration}
+              alt="Share your feedback"
+              width={100}
+              height={100}
+              loading="lazy"
+              className="mb-3"
+            />
+            <p className="text-sm font-medium text-foreground text-center">
+              We'd love to hear from you! 💛
+            </p>
+            <p className="text-xs text-muted-foreground text-center mt-1 max-w-[260px]">
+              Share your ideas, feedback, or suggestions with us in the Support chat
+            </p>
+          </button>
         ) : (
           <div className="text-center py-12 px-4">
             <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
