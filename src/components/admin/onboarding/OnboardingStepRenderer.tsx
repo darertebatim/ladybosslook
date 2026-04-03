@@ -3024,30 +3024,38 @@ function StarterRoutineScreen({ step, onNext }: Props) {
             <h2 className="text-xl font-bold text-center text-[#1a1f3d] mb-2">How are you feeling?</h2>
             <p className="text-sm text-gray-400 text-center mb-6">Tap the one that fits best</p>
             <div className="flex justify-center gap-4 mb-5">
-              {MOODS.slice(0, 3).map((mood) => (
-                <button
-                  key={mood.value}
-                  onClick={() => handleMoodSelect(mood.value)}
-                  className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
-                >
-                  <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center" style={{ background: mood.bg }}>
-                    <FluentEmoji emoji={mood.emoji} size={42} />
-                  </div>
-                  <span className="text-xs font-medium text-gray-700">{mood.label}</span>
-                </button>
-              ))}
+              {MOODS.slice(0, 3).map((mood) => {
+                const isSelected = selectedMoodValue === mood.value;
+                return (
+                  <button
+                    key={mood.value}
+                    onClick={() => !selectedMoodValue && handleMoodSelect(mood.value)}
+                    className={`flex flex-col items-center gap-2 transition-all duration-300 ${isSelected ? 'scale-110' : selectedMoodValue ? 'opacity-40 scale-90' : 'active:scale-95'}`}
+                  >
+                    <div className={`w-[72px] h-[72px] rounded-full flex items-center justify-center transition-shadow duration-300 ${isSelected ? 'ring-4 ring-emerald-400 shadow-lg' : ''}`} style={{ background: mood.bg }}>
+                      <FluentEmoji emoji={mood.emoji} size={42} />
+                    </div>
+                    <span className="text-xs font-medium text-gray-700">{mood.label}</span>
+                  </button>
+                );
+              })}
             </div>
             <div className="flex justify-center gap-4">
-              {MOODS.slice(3).map((mood) => (
-                <button
-                  key={mood.value}
-                  onClick={() => handleMoodSelect(mood.value)}
-                  className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
-                >
-                  <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center" style={{ background: mood.bg }}>
-                    <FluentEmoji emoji={mood.emoji} size={42} />
-                  </div>
-                  <span className="text-xs font-medium text-gray-700">{mood.label}</span>
+              {MOODS.slice(3).map((mood) => {
+                const isSelected = selectedMoodValue === mood.value;
+                return (
+                  <button
+                    key={mood.value}
+                    onClick={() => !selectedMoodValue && handleMoodSelect(mood.value)}
+                    className={`flex flex-col items-center gap-2 transition-all duration-300 ${isSelected ? 'scale-110' : selectedMoodValue ? 'opacity-40 scale-90' : 'active:scale-95'}`}
+                  >
+                    <div className={`w-[72px] h-[72px] rounded-full flex items-center justify-center transition-shadow duration-300 ${isSelected ? 'ring-4 ring-emerald-400 shadow-lg' : ''}`} style={{ background: mood.bg }}>
+                      <FluentEmoji emoji={mood.emoji} size={42} />
+                    </div>
+                    <span className="text-xs font-medium text-gray-700">{mood.label}</span>
+                  </button>
+                );
+              })}
                 </button>
               ))}
             </div>
