@@ -302,66 +302,8 @@ export function FeedChannelManager() {
                   placeholder="channel-slug"
                 />
               </div>
-              <div>
-                <Label>Type</Label>
-                <Select
-                  value={formData.type}
-                  onValueChange={(value: 'general' | 'program' | 'round' | 'all_enrolled' | 'all_paid') => 
-                    setFormData({ ...formData, type: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="general">General (All Users)</SelectItem>
-                    <SelectItem value="all_enrolled">All Enrolled (Any Program)</SelectItem>
-                    <SelectItem value="all_paid">All Paid Users</SelectItem>
-                    <SelectItem value="program">Specific Program</SelectItem>
-                    <SelectItem value="round">Specific Round</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              {formData.type === 'program' && (
-                <div>
-                  <Label>Program</Label>
-                  <Select
-                    value={formData.program_slug}
-                    onValueChange={(value) => setFormData({ ...formData, program_slug: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select program" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {programs?.filter(p => p.slug).map((p) => (
-                        <SelectItem key={p.slug} value={p.slug}>{p.title}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
 
-              {formData.type === 'round' && (
-                <div>
-                  <Label>Round</Label>
-                  <Select
-                    value={formData.round_id}
-                    onValueChange={(value) => setFormData({ ...formData, round_id: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select round" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {rounds?.filter(r => r.id).map((r) => (
-                        <SelectItem key={r.id} value={r.id}>
-                          {r.round_name} ({r.program_slug})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+
 
               {/* Cover selector */}
               <div>
