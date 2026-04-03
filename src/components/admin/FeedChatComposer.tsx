@@ -88,6 +88,9 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
   const [actionLabel, setActionLabel] = useState('');
   const [actionUrl, setActionUrl] = useState('');
   const [actionPlaylistId, setActionPlaylistId] = useState('');
+  const [actionProLinkType, setActionProLinkType] = useState<ProLinkType | ''>('');
+  const [actionProLinkValue, setActionProLinkValue] = useState('');
+  const [actionSearch, setActionSearch] = useState('');
   
   // Attachments panel
   const [showAttachments, setShowAttachments] = useState(false);
