@@ -204,6 +204,16 @@ export function FeedChannelManager() {
       cover_emoji: '📢',
       cover_image_url: '',
     });
+    setTargetType('all');
+    setIncludePrograms([]);
+    setExcludePrograms([]);
+    setIncludePlaylists([]);
+    setExcludePlaylists([]);
+    setIncludeTools([]);
+    setExcludeTools([]);
+    setTargetLanguages([]);
+    setTargetTimezones([]);
+    setIncludeUpdateStatus([]);
   };
 
   const openEditDialog = (channel: Channel) => {
