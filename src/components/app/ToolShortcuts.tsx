@@ -390,7 +390,7 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
                           <Check className="h-3 w-3 text-white" strokeWidth={3} />
                         </div>
                       ) : (
-                        <span className="absolute top-0.5 right-0.5 text-[14px] leading-none">⭕️</span>
+                        <span className="absolute top-1 right-1 text-[14px] leading-none">⭕️</span>
                       );
                   })()}
                 </div>
