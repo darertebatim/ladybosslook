@@ -10,9 +10,10 @@ const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
 interface Message {
   role: "user" | "assistant" | "system" | "tool";
-  content: string;
+  content: string | any[];
   tool_calls?: any[];
   tool_call_id?: string;
+  image?: string; // base64 data URL from client
 }
 
 serve(async (req) => {
@@ -79,10 +80,28 @@ serve(async (req) => {
       "get_task_suggestions",
     ];
 
-    // Build AI messages
+    // Build AI messages — convert image messages to multimodal format
     const aiMessages: Message[] = [
       { role: "system", content: systemPrompt },
-      ...messages,
+      ...messages.map((m: any) => {
+        if (m.image && m.role === "user") {
+          // Convert to multimodal content array for Gemini
+          const parts: any[] = [];
+          if (m.content) {
+            parts.push({ type: "text", text: m.content });
+          }
+          // Extract mime type and base64 from data URL
+          const match = m.image.match(/^data:(image\/[^;]+);base64,(.+)$/);
+          if (match) {
+            parts.push({
+              type: "image_url",
+              image_url: { url: m.image },
+            });
+          }
+          return { role: "user", content: parts };
+        }
+        return { role: m.role, content: m.content };
+      }),
     ];
 
     // Multi-turn tool chaining loop (up to 3 rounds)
@@ -412,7 +431,15 @@ ${toolGuidelines}
 - Don't give medical, psychiatric, or dietary advice
 - If someone is in crisis, suggest they contact a professional or crisis line
 - When suggesting routines or tasks, use the IDs from the available lists
-- Don't output raw JSON or tool call syntax — speak naturally about what you did`;
+- Don't output raw JSON or tool call syntax — speak naturally about what you did
+
+## Image Understanding
+- When a user sends an image, analyze it carefully
+- If it's a handwritten note, list, or plan: extract the items and offer to add them as tasks using \`add_task_to_planner\`
+- If it's a journal entry or reflection: offer to save it as a reflection using \`create_journal_prompt\`
+- If it's a screenshot from another app (productivity, calendar): extract relevant tasks/plans and offer to import them
+- If it's a mood board or emotional content: acknowledge what you see and offer to log their mood
+- Always confirm what you extracted before taking action`;
 }
 
 // ============= TOOL DEFINITIONS =============

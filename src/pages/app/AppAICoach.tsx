@@ -40,9 +40,9 @@ export default function AppAICoach() {
     setMode(newMode);
   }, [mode, insertDivider]);
 
-  const handleSend = useCallback((text: string) => {
-    if (!text.trim()) return;
-    sendMessage(text, mode);
+  const handleSend = useCallback((text: string, imageBase64?: string) => {
+    if (!text.trim() && !imageBase64) return;
+    sendMessage(text, mode, imageBase64);
   }, [sendMessage, mode]);
 
   const showTyping = isLoading && messages[messages.length - 1]?.role !== 'assistant';
