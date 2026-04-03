@@ -21,6 +21,7 @@ import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
+import feedbackIllustration from '@/assets/feedback-illustration.png';
 
 const SYNTHETIC_CHANNEL_TASK: RoutinePlanTask = {
   id: 'synthetic-channel-task',
@@ -166,7 +167,7 @@ export default function AppChannelsList() {
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
-        ) : channels && channels.length > 0 ? (
+        ) : channels && channels.length > 0 ? (<>
           <div className="divide-y divide-border/50">
             {/* Coach Chat - only shown when user has access */}
             {hasCoachAccess && (
@@ -292,13 +293,7 @@ export default function AppChannelsList() {
               );
             })}
 
-            {/* Feedback encouragement */}
-            <div className="px-4 py-3 flex items-start gap-2.5 bg-muted/40">
-              <span className="text-base mt-0.5">💬</span>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Have ideas, feedback, or suggestions? We'd love to hear from you — tap <span className="font-semibold text-foreground">Support</span> below and share your thoughts!
-              </p>
-            </div>
+            
 
             {/* Support Chat - Last in the list */}
             <button
@@ -338,7 +333,27 @@ export default function AppChannelsList() {
               <ChevronRight className="h-4 w-4 text-muted-foreground/50 shrink-0" />
             </button>
           </div>
-        ) : (
+          {/* Feedback encouragement in white space */}
+          <button
+            onClick={handleSupportClick}
+            className="w-full flex flex-col items-center py-8 px-6 active:bg-muted/30 transition-colors"
+          >
+            <img
+              src={feedbackIllustration}
+              alt="Share your feedback"
+              width={100}
+              height={100}
+              loading="lazy"
+              className="mb-3"
+            />
+            <p className="text-sm font-medium text-foreground text-center">
+              We'd love to hear from you! 💛
+            </p>
+            <p className="text-xs text-muted-foreground text-center mt-1 max-w-[260px]">
+              Share your ideas, feedback, or suggestions with us in the Support chat
+            </p>
+          </button>
+        </>) : (
           <div className="text-center py-12 px-4">
             <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
               <Users className="h-8 w-8 text-muted-foreground" />
