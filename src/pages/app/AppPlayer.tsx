@@ -483,6 +483,9 @@ export default function AppPlayer() {
 
       {/* Paywall for locked categories */}
       <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
+
+      {/* Language preference popup */}
+      <LanguagePreferencePopup open={showLangPopup} onClose={() => setShowLangPopup(false)} />
     </div>
   );
 }
