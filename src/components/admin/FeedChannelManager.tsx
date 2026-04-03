@@ -246,6 +246,17 @@ export function FeedChannelManager() {
       cover_emoji,
       cover_image_url,
     });
+    // Load audience targeting
+    setTargetType((channel.target_type as TargetType) || 'all');
+    setIncludePrograms(channel.include_programs || []);
+    setExcludePrograms(channel.exclude_programs || []);
+    setIncludePlaylists(channel.include_playlists || []);
+    setExcludePlaylists(channel.exclude_playlists || []);
+    setIncludeTools(channel.include_tools || []);
+    setExcludeTools(channel.exclude_tools || []);
+    setTargetLanguages(channel.target_languages || []);
+    setTargetTimezones(channel.target_timezones || []);
+    setIncludeUpdateStatus(channel.include_update_status || []);
     setIsDialogOpen(true);
   };
 
