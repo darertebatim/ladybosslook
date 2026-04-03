@@ -2273,6 +2273,9 @@ const AppTaskCreate = ({
           } else if (type === 'program') {
             setShowProLinkPicker(false);
             setShowProgramPicker(true);
+          } else if (type === 'inspire') {
+            setShowProLinkPicker(false);
+            setShowRoutineTemplatePicker(true);
           }
           // route handled by the picker's built-in value input
         }}
