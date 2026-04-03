@@ -58,16 +58,17 @@ export const QuickEnrollUser = () => {
 
     setIsLoading(true);
     try {
-      const selectedProgram = programs.find(p => p.title === selectedCourse);
+      const selectedProgram = selectedCourse ? programs.find(p => p.title === selectedCourse) : null;
       
       const { data, error } = await supabase.functions.invoke('admin-create-enrollment', {
         body: {
           email: email.trim(),
-          courseName: selectedCourse,
-          programSlug: selectedProgram?.slug,
+          courseName: selectedCourse || null,
+          programSlug: selectedProgram?.slug || null,
           roundId: selectedRound || null,
           fullName: fullName.trim() || null,
           expiresAt: expiresAt ? expiresAt.toISOString() : null,
+          createUserOnly: !selectedCourse,
         },
       });
 
