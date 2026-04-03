@@ -2906,7 +2906,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
               transition={{ delay: 0.7, duration: 0.4 }}
               className="text-white/50 text-[15px] text-center mt-2 leading-relaxed"
             >
-              Your first routine is complete
+              Your first Reset is complete
             </motion.p>
 
             {/* Stat cards */}
