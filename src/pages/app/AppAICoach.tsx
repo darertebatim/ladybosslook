@@ -64,7 +64,7 @@ export default function AppAICoach() {
               message.role === 'divider' ? (
                 <AICoachDivider key={message.id} mode={message.mode || mode} />
               ) : (
-                <AICoachMessageBubble key={message.id} message={message} />
+                <AICoachMessageBubble key={message.id} message={message} onExecuteProposal={executeProposal} />
               )
             ))}
 
