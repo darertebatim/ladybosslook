@@ -52,7 +52,7 @@ function saveShortcuts(shortcuts: (ShortcutData | null)[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(shortcuts));
 }
 
-export function ToolShortcuts({ hideWhenEmpty = false }: { hideWhenEmpty?: boolean } = {}) {
+export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { hideWhenEmpty?: boolean; hideLabels?: boolean } = {}) {
   const navigate = useNavigate();
   const { data: todayMood } = useTodayMood();
   const { data: proLinkCompletions } = useTodayProLinkCompletions();
@@ -362,10 +362,12 @@ export function ToolShortcuts({ hideWhenEmpty = false }: { hideWhenEmpty?: boole
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-2 px-1">
-        <h2 className="text-sm font-semibold text-foreground">My Shortcuts</h2>
-        {hasAny && <p className="text-[10px] text-muted-foreground">Long press to remove</p>}
-      </div>
+      {!hideLabels && (
+        <div className="flex items-center justify-between mb-2 px-1">
+          <h2 className="text-sm font-semibold text-foreground">My Shortcuts</h2>
+          {hasAny && <p className="text-[10px] text-muted-foreground">Long press to remove</p>}
+        </div>
+      )}
 
       <div className="grid grid-cols-4 gap-3">
         {shortcuts.map((shortcut, i) => {
@@ -374,9 +376,11 @@ export function ToolShortcuts({ hideWhenEmpty = false }: { hideWhenEmpty?: boole
               <ShortcutSlot key={i} onTap={() => handleSlotTap(i)} onLongPress={() => handleLongPress(i)}>
                 <div className="relative w-full aspect-square rounded-2xl flex flex-col items-center justify-center bg-accent/60">
                   <FluentEmoji emoji={getProLinkEmoji(shortcut.type) || shortcut.emoji} size={42} />
-                  <span className="text-[11px] font-semibold text-foreground leading-tight text-center line-clamp-2 w-full px-0.5 mt-1 whitespace-pre-line">
-                    {(PRO_LINK_CONFIGS[shortcut.type]?.label || shortcut.label).replace('Mood Check-in', 'Mood\nCheck-in')}
-                  </span>
+                  {!hideLabels && (
+                    <span className="text-[11px] font-semibold text-foreground leading-tight text-center line-clamp-2 w-full px-0.5 mt-1 whitespace-pre-line">
+                      {(PRO_LINK_CONFIGS[shortcut.type]?.label || shortcut.label).replace('Mood Check-in', 'Mood\nCheck-in')}
+                    </span>
+                  )}
                   {(() => {
                     const isDone = shortcut.type === 'mood'
                       ? !!todayMood
