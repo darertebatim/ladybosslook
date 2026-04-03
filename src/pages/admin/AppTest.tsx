@@ -60,6 +60,7 @@ import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebratio
 import { PlusGateSheet } from '@/components/app/PlusGateSheet';
 import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebration';
 import { ProjectCompletionCelebration } from '@/components/app/ProjectCompletionCelebration';
+import { LanguagePreferencePopup } from '@/components/app/LanguagePreferencePopup';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
