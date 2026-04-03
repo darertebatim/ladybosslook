@@ -2235,72 +2235,55 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center" style={{ background: getImmersiveBgGradient(isCountingDown ? 'ready' : breathPhase, isCountingDown) }}>
       <ImmersiveParticles />
 
-      {/* "Let's Get Ready" title during countdown */}
-      {isCountingDown && (
-        <p className="text-white/70 text-lg font-medium mb-6 tracking-wide animate-fade-in">
-          Let's try 1 breath together
-        </p>
-      )}
-
-      {!isCountingDown && (
-        <p className="text-white/60 text-sm font-medium mb-8">
-          {cycleCount + 1} / {totalCycles} cycles
-        </p>
-      )}
-
-      {/* Wrapper for circle + progress ring */}
-      <div className="relative flex items-center justify-center" style={{ width: 320, height: 320 }}>
-        {/* SVG progress ring — visible during countdown */}
-        {isCountingDown && (
-          <svg
-            className="absolute inset-0 -rotate-90"
-            width="320" height="320"
-            viewBox="0 0 320 320"
-          >
-            {/* Background ring track */}
-            <circle
-              cx="160" cy="160" r={ringRadius}
-              fill="none"
-              stroke="rgba(167,139,250,0.12)"
-              strokeWidth="4"
-            />
-            {/* Animated progress arc */}
-            <circle
-              cx="160" cy="160" r={ringRadius}
-              fill="none"
-              stroke="rgba(167,139,250,0.7)"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeDasharray={ringCircumference}
-              strokeDashoffset={ringOffset}
-              style={{ transition: 'stroke-dashoffset 1s linear', filter: 'drop-shadow(0 0 6px rgba(139,92,246,0.5))' }}
-            />
-          </svg>
-        )}
-
-        <ImmersiveBreathingCircle
-          phase={isCountingDown ? 'ready' : breathPhase}
-          phaseDuration={phaseDuration}
-          phaseText={phaseText}
-          countdown={isCountingDown ? countdown : undefined}
-          isCountingDown={isCountingDown}
-          countdownValue={isCountingDown ? countdown : undefined}
-          phaseSecondsLeft={!isCountingDown ? phaseSecondsLeft : undefined}
-        />
-      </div>
-
-      {/* Completion celebration overlay */}
-      {showCompletion && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-20 animate-fade-in">
+      {showCompletion ? (
+        <div className="flex flex-col items-center justify-center animate-fade-in">
           <div className="w-24 h-24 rounded-full bg-emerald-400/20 flex items-center justify-center mb-4 animate-scale-in">
             <span className="text-5xl">✨</span>
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">Well done!</h2>
           <p className="text-white/70 text-sm">You completed your first breath</p>
         </div>
-      )}
+      ) : (
+        <>
+          {/* "Let's try" title during countdown */}
+          {isCountingDown && (
+            <p className="text-white/70 text-lg font-medium mb-6 tracking-wide animate-fade-in">
+              Let's try 1 breath together
+            </p>
+          )}
 
-      {!showCompletion && <p className="text-white/40 text-xs mt-8">4-4-4 pattern</p>}
+          {!isCountingDown && (
+            <p className="text-white/60 text-sm font-medium mb-8">
+              {cycleCount + 1} / {totalCycles} cycles
+            </p>
+          )}
+
+          {/* Wrapper for circle + progress ring */}
+          <div className="relative flex items-center justify-center" style={{ width: 320, height: 320 }}>
+            {isCountingDown && (
+              <svg
+                className="absolute inset-0 -rotate-90"
+                width="320" height="320"
+                viewBox="0 0 320 320"
+              >
+                <circle cx="160" cy="160" r={ringRadius} fill="none" stroke="rgba(167,139,250,0.12)" strokeWidth="4" />
+                <circle cx="160" cy="160" r={ringRadius} fill="none" stroke="rgba(167,139,250,0.7)" strokeWidth="4" strokeLinecap="round" strokeDasharray={ringCircumference} strokeDashoffset={ringOffset} style={{ transition: 'stroke-dashoffset 1s linear', filter: 'drop-shadow(0 0 6px rgba(139,92,246,0.5))' }} />
+              </svg>
+            )}
+            <ImmersiveBreathingCircle
+              phase={isCountingDown ? 'ready' : breathPhase}
+              phaseDuration={phaseDuration}
+              phaseText={phaseText}
+              countdown={isCountingDown ? countdown : undefined}
+              isCountingDown={isCountingDown}
+              countdownValue={isCountingDown ? countdown : undefined}
+              phaseSecondsLeft={!isCountingDown ? phaseSecondsLeft : undefined}
+            />
+          </div>
+
+          <p className="text-white/40 text-xs mt-8">4-4-4 pattern</p>
+        </>
+      )}
     </div>
   );
 }
