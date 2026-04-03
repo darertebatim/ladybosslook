@@ -29,11 +29,18 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, courseName, programSlug, roundId, fullName, expiresAt }: EnrollmentRequest = await req.json();
+    const { email, courseName, programSlug, roundId, fullName, expiresAt, createUserOnly }: EnrollmentRequest = await req.json();
 
-    if (!email || !courseName) {
+    if (!email) {
       return new Response(
-        JSON.stringify({ error: 'Email and course name are required' }),
+        JSON.stringify({ error: 'Email is required' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
+    if (!createUserOnly && !courseName) {
+      return new Response(
+        JSON.stringify({ error: 'Course name is required unless creating user only' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
       );
     }
