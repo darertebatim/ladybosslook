@@ -27,6 +27,16 @@ interface Channel {
   is_archived: boolean;
   sort_order: number;
   cover_image_url: string | null;
+  target_type: string;
+  include_programs: string[];
+  exclude_programs: string[];
+  include_playlists: string[];
+  exclude_playlists: string[];
+  include_tools: string[];
+  exclude_tools: string[];
+  target_languages: string[];
+  target_timezones: string[];
+  include_update_status: string[];
 }
 
 // Helper functions for cover storage
