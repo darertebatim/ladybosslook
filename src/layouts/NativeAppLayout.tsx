@@ -165,6 +165,8 @@ const NativeAppLayout = () => {
   const isOnChatPage = location.pathname === '/app/chat';
   // Hide nav on full-screen tool pages (journal, timer, etc.)
   const isFullScreenTool = location.pathname.startsWith('/app/journal');
+  // Pages that manage their own scroll container (need overflow-hidden on main)
+  const isOwnScrollPage = location.pathname === '/app/projects';
 
   const navItems = [
     { path: '/app/home', icon: Home, label: 'Home', tourClass: 'tour-nav-home' },
@@ -184,11 +186,11 @@ const NativeAppLayout = () => {
         data-scroll-container="true"
         className={cn(
           "flex-1 min-h-0 overflow-x-hidden overscroll-contain",
-          isOnPlayerPage ? "overflow-hidden" : "overflow-y-auto"
+          (isOnPlayerPage || isOwnScrollPage) ? "overflow-hidden" : "overflow-y-auto"
         )}
         style={{
           paddingBottom: (isOnChatPage || isFullScreenTool || isKeyboardOpen || isOnPlayerPage) ? 0 : TAB_BAR_CONTENT_HEIGHT + 8,
-          WebkitOverflowScrolling: isOnPlayerPage ? 'auto' : 'touch',
+          WebkitOverflowScrolling: (isOnPlayerPage || isOwnScrollPage) ? 'auto' : 'touch',
           touchAction: 'pan-y',
         }}
       >
