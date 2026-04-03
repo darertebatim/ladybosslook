@@ -8,14 +8,14 @@ import { cn } from '@/lib/utils';
 const ACTION_CONFIG: Record<string, { icon: string; cta: string; route: string; gradient: string }> = {
   add_task_to_planner: {
     icon: '📋',
-    cta: 'Open Planner',
+    cta: 'Open Task',
     route: '/app/home',
     gradient: 'from-blue-500/10 to-cyan-500/10 border-blue-200',
   },
   adopt_routine: {
     icon: '🔄',
-    cta: 'My Routines',
-    route: '/app/myroutines',
+    cta: 'Open Routine',
+    route: '/app/routines',
     gradient: 'from-purple-500/10 to-violet-500/10 border-purple-200',
   },
   suggest_breathing: {
@@ -26,14 +26,14 @@ const ACTION_CONFIG: Record<string, { icon: string; cta: string; route: string; 
   },
   log_mood: {
     icon: '🎭',
-    cta: 'Mood Log',
-    route: '/app/tools',
+    cta: 'Open Mood History',
+    route: '/app/emotion/history',
     gradient: 'from-pink-500/10 to-rose-500/10 border-pink-200',
   },
   create_journal_prompt: {
     icon: '📝',
-    cta: 'Open Journal',
-    route: '/app/journal',
+    cta: 'Open Reflection',
+    route: '/app/reflections/free-form',
     gradient: 'from-amber-500/10 to-yellow-500/10 border-amber-200',
   },
   get_routine_suggestions: {
@@ -45,7 +45,7 @@ const ACTION_CONFIG: Record<string, { icon: string; cta: string; route: string; 
   get_task_suggestions: {
     icon: '🎯',
     cta: 'Browse Tasks',
-    route: '/app/home',
+    route: '/app/tasksbank',
     gradient: 'from-orange-500/10 to-amber-500/10 border-orange-200',
   },
 };
@@ -65,6 +65,7 @@ export function AICoachActionCard({ result }: Props) {
 
   const deepLink = result.created?.deepLink;
   const route = deepLink || config.route;
+  const cta = result.created?.cta || config.cta;
 
   return (
     <div className={cn(
@@ -112,7 +113,7 @@ export function AICoachActionCard({ result }: Props) {
           className="mt-2 w-full h-8 text-xs font-semibold rounded-xl bg-white/60 hover:bg-white/80 gap-1"
           onClick={() => navigate(route)}
         >
-          {config.cta} <ArrowRight className="h-3 w-3" />
+          {cta} <ArrowRight className="h-3 w-3" />
         </Button>
       )}
     </div>
