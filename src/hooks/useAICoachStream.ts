@@ -23,9 +23,13 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 export function useAICoachStream() {
   const [messages, setMessages] = useState<CoachMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [followUps, setFollowUps] = useState<string[]>([]);
   const abortRef = useRef<AbortController | null>(null);
 
-  const clearMessages = useCallback(() => setMessages([]), []);
+  const clearMessages = useCallback(() => {
+    setMessages([]);
+    setFollowUps([]);
+  }, []);
 
   const sendMessage = useCallback(async (text: string, mode?: string) => {
     if (!text.trim() || isLoading) return;
@@ -45,6 +49,7 @@ export function useAICoachStream() {
 
     setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
+    setFollowUps([]);
 
     const controller = new AbortController();
     abortRef.current = controller;
@@ -90,8 +95,15 @@ export function useAICoachStream() {
         try {
           const parsed = JSON.parse(jsonStr);
 
+          // Action results from tool execution
           if (parsed.action_results) {
             actionResults = parsed.action_results;
+            return;
+          }
+
+          // Follow-up suggestions
+          if (parsed.suggested_followups) {
+            setFollowUps(parsed.suggested_followups);
             return;
           }
 
@@ -137,11 +149,16 @@ export function useAICoachStream() {
         ));
       }
 
-      // Persist to DB
+      // Persist to DB — include action results
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const finalMessages = [...allMessages, { id: assistantId, role: 'assistant' as const, content: assistantContent, timestamp: Date.now() }];
-        const msgPayload = finalMessages.map(m => ({ role: m.role, content: m.content, timestamp: m.timestamp }));
+        const finalMessages = [...allMessages, { id: assistantId, role: 'assistant' as const, content: assistantContent, timestamp: Date.now(), actionResults: actionResults.length > 0 ? actionResults : undefined }];
+        const msgPayload = finalMessages.map(m => ({
+          role: m.role,
+          content: m.content,
+          timestamp: m.timestamp,
+          actionResults: (m as any).actionResults || undefined,
+        }));
         await supabase.from('ai_coach_conversations').upsert({
           user_id: user.id,
           messages: msgPayload,
@@ -179,9 +196,10 @@ export function useAICoachStream() {
         role: m.role,
         content: m.content,
         timestamp: m.timestamp || Date.now(),
+        actionResults: m.actionResults || undefined,
       })));
     }
   }, []);
 
-  return { messages, isLoading, sendMessage, clearMessages, stopGeneration, loadHistory };
+  return { messages, isLoading, sendMessage, clearMessages, stopGeneration, loadHistory, followUps };
 }
