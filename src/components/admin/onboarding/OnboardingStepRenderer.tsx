@@ -3055,9 +3055,6 @@ function StarterRoutineScreen({ step, onNext }: Props) {
                     <span className="text-xs font-medium text-gray-700">{mood.label}</span>
                   </button>
                 );
-              })}
-                </button>
-              ))}
             </div>
           </div>
         </div>
