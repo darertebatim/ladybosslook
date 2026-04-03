@@ -169,9 +169,6 @@ export function FeedChannelManager() {
     setFormData({
       name: '',
       slug: '',
-      type: 'general',
-      program_slug: '',
-      round_id: '',
       allow_reactions: true,
       allow_comments: true,
       cover_type: 'none',
