@@ -616,7 +616,21 @@ const AppTaskCreate = ({
     },
   });
 
-  // Fetch audio content for linking (only accessible tracks)
+  // Fetch routines bank templates for inspire linking
+  const { data: routineTemplates = [] } = useQuery({
+    queryKey: ['linkable-routine-templates'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('routines_bank')
+        .select('id, title, emoji, category, subtitle, cover_image_url')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      if (error) throw error;
+      return data as { id: string; title: string; emoji: string | null; category: string; subtitle: string | null; cover_image_url: string | null }[];
+    },
+  });
+
+
   const { data: audioTracks = [] } = useQuery({
     queryKey: ['linkable-audio-tracks'],
     queryFn: async () => {
