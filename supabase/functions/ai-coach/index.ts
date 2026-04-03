@@ -535,7 +535,21 @@ function getToolDefinitions() {
   ];
 }
 
-// ============= TOOL EXECUTION =============
+
+// ============= MODE-FILTERED TOOLS =============
+
+const MODE_TOOLS: Record<string, string[]> = {
+  coach: ["add_task_to_planner", "log_mood", "adopt_routine", "suggest_breathing", "create_journal_prompt", "get_routine_suggestions", "get_task_suggestions"],
+  assistant: ["add_task_to_planner", "get_task_suggestions", "get_routine_suggestions", "adopt_routine"],
+  companion: ["log_mood", "suggest_breathing", "create_journal_prompt"],
+};
+
+function getToolsForMode(mode?: string) {
+  const allTools = getToolDefinitions();
+  const allowed = MODE_TOOLS[mode || "coach"];
+  if (!allowed) return allTools;
+  return allTools.filter((t: any) => allowed.includes(t.function.name));
+}
 
 async function executeToolAction(supabase: any, userId: string, fnName: string, args: any) {
   try {
