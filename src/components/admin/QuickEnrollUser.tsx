@@ -227,7 +227,7 @@ export const QuickEnrollUser = () => {
 
         <Button
           onClick={handleEnroll} 
-          disabled={isLoading || !email || !selectedCourse}
+          disabled={isLoading || !email}
           className="w-full"
         >
           <UserPlus className="w-4 h-4 mr-2" />
