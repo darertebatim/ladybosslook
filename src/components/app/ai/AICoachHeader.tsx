@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 export type CoachMode = 'coach' | 'assistant' | 'companion';
 
 const MODES: { id: CoachMode; label: string; emoji: string; color: string }[] = [
-  { id: 'coach', label: 'Coach', emoji: '🏋️', color: 'from-purple-500 to-violet-600' },
+  { id: 'coach', label: 'Coach', emoji: '💪', color: 'from-purple-500 to-violet-600' },
   { id: 'assistant', label: 'Assistant', emoji: '📋', color: 'from-blue-500 to-cyan-600' },
   { id: 'companion', label: 'Companion', emoji: '💜', color: 'from-pink-500 to-rose-600' },
 ];
