@@ -159,6 +159,9 @@ serve(async (req) => {
 
     if (!finalResponse.ok) return handleAIError(finalResponse);
 
+    // Generate follow-up suggestions (non-blocking)
+    const followUpPromise = generateFollowUps(LOVABLE_API_KEY, currentMessages, mode);
+
     const combinedStream = new ReadableStream({
       async start(controller) {
         if (allMutationResults.length > 0) {
@@ -172,9 +175,22 @@ serve(async (req) => {
             if (done) break;
             controller.enqueue(value);
           }
-        } finally {
-          controller.close();
+        } catch (e) {
+          console.error("Stream read error:", e);
         }
+
+        // Append follow-up suggestions after stream ends
+        try {
+          const followUps = await followUpPromise;
+          if (followUps.length > 0) {
+            const followUpEvent = `data: ${JSON.stringify({ suggested_followups: followUps })}\n\n`;
+            controller.enqueue(new TextEncoder().encode(followUpEvent));
+          }
+        } catch (e) {
+          console.error("Follow-up generation error:", e);
+        }
+
+        controller.close();
       },
     });
 
@@ -686,4 +702,43 @@ async function getTaskSuggestions(supabase: any, args: any) {
     message: `Found ${data?.length || 0} task suggestions`,
     created: { tasks: data },
   };
+}
+
+// ============= FOLLOW-UP SUGGESTIONS =============
+
+async function generateFollowUps(apiKey: string, messages: Message[], mode?: string): Promise<string[]> {
+  try {
+    const followUpPrompt = `Based on this conversation, suggest 2-3 short follow-up questions or actions the user might want to take next. 
+Return ONLY a JSON array of strings, each 3-8 words. Examples: ["How's my streak going?", "Add a morning task", "Suggest breathing exercise"]
+Consider the current mode: ${mode || 'coach'}. Make suggestions contextually relevant.`;
+
+    const resp = await fetch(AI_GATEWAY, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-lite",
+        messages: [
+          ...messages.slice(-6),
+          { role: "user", content: followUpPrompt },
+        ],
+      }),
+    });
+
+    if (!resp.ok) return [];
+    const result = await resp.json();
+    const content = result.choices?.[0]?.message?.content || "";
+    
+    // Extract JSON array from response
+    const match = content.match(/\[[\s\S]*?\]/);
+    if (!match) return [];
+    
+    const parsed = JSON.parse(match[0]);
+    if (Array.isArray(parsed)) return parsed.slice(0, 3).map((s: any) => String(s));
+    return [];
+  } catch {
+    return [];
+  }
 }
