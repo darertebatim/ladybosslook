@@ -2402,10 +2402,25 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const handleBreathingComplete = useCallback(() => {
     setShowBreathing(false);
     // Pause after breathing before celebration — let it breathe
-    addTimer(() => {
+    const t1 = setTimeout(() => {
       setPhase('celebrate-breathe');
-      triggerCelebration(BREATHE_IDX, 'spotlight-complete');
+      setCompletedIndices(prev => new Set(prev).add(BREATHE_IDX));
+      setCelebratingIdx(BREATHE_IDX);
+      playCompletionSound();
+      haptic.success();
+      confetti({
+        particleCount: 60,
+        spread: 55,
+        origin: { y: 0.5 },
+        colors: ['#2dd4bf', '#34d399', '#a78bfa', '#fbbf24'],
+      });
+      const t2 = setTimeout(() => {
+        setCelebratingIdx(null);
+        setPhase('spotlight-complete');
+      }, 2500);
+      timersRef.current.push(t2);
     }, 1200);
+    timersRef.current.push(t1);
   }, []);
 
   const handleMoodTap = () => {
