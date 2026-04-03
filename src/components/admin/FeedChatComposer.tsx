@@ -12,20 +12,41 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { 
   Loader2, Image, Video, Link, Play, FileText, ExternalLink, 
-  Mic, Square, Send, Pin, Bell, X, Trash2, Upload 
+  Mic, Square, Send, Pin, Bell, X, Trash2, Upload, Search, Star, ChevronRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FeedMessage } from '@/components/feed/FeedMessage';
 import { detectVideoType, getVideoPlatformLabel, getVideoEmbedUrl, extractYouTubeId } from '@/lib/videoUtils';
+import { PRO_LINK_CONFIGS, PRO_LINK_TYPES, type ProLinkType } from '@/lib/proTaskTypes';
+import { PRO_LINK_EMOJIS } from '@/lib/proLinkPresentation';
 
+// Categorized destination links for the action picker
+const DESTINATION_CATEGORIES = [
+  {
+    label: '🎯 Wellness Tools',
+    items: ['breathe', 'water', 'period', 'emotion', 'mood', 'fasting', 'weight', 'presence', 'focus_timer'] as ProLinkType[],
+  },
+  {
+    label: '🎵 Media',
+    items: ['playlist', 'audio', 'listen', 'video', 'video_playlist', 'watch'] as ProLinkType[],
+  },
+  {
+    label: '📝 Journaling & Reflection',
+    items: ['journal', 'reflection', 'reading'] as ProLinkType[],
+  },
+  {
+    label: '🚀 Routines & Programs',
+    items: ['routine', 'myroutines', 'inspire', 'program', 'myprograms'] as ProLinkType[],
+  },
+  {
+    label: '📌 Navigation',
+    items: ['planner', 'channel', 'tasksbank', 'projects', 'myprofile', 'route'] as ProLinkType[],
+  },
+];
 
-const ACTION_TYPES = [
-  { value: 'none', label: 'No Action', icon: null },
-  { value: 'play_audio', label: 'Play Audio', icon: Play },
-  { value: 'join_session', label: 'Join Session', icon: Video },
-  { value: 'view_materials', label: 'View Materials', icon: FileText },
-  { value: 'external_link', label: 'External Link', icon: ExternalLink },
-  { value: 'rate_app', label: '⭐ Rate the App', icon: null },
+const SPECIAL_ACTIONS = [
+  { value: 'external_link', label: 'External Link', emoji: '🔗' },
+  { value: 'rate_app', label: 'Rate the App', emoji: '⭐' },
 ];
 
 interface FeedChatComposerProps {
