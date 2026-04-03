@@ -267,15 +267,13 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
       if (actionType !== 'none') {
         actionData.label = actionLabel || undefined;
         
-        if (actionType === 'play_audio' && actionPlaylistId) {
-          actionData.playlistId = actionPlaylistId;
+        if (actionType === 'pro_link') {
+          actionData.proLinkType = actionProLinkType;
+          actionData.proLinkValue = actionProLinkValue || undefined;
+        } else if (actionType === 'external_link') {
+          actionData.url = actionUrl;
         } else if (actionType === 'rate_app') {
           actionData.url = '/app/rate';
-        } else if (['join_session', 'view_materials', 'external_link'].includes(actionType)) {
-          actionData.url = actionUrl;
-          if (actionType === 'join_session') {
-            actionData.meetingUrl = actionUrl;
-          }
         }
       }
 
