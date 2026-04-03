@@ -2114,6 +2114,7 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
   const [isCountingDown, setIsCountingDown] = useState(true);
   const [countdownProgress, setCountdownProgress] = useState(0);
   const [phaseSecondsLeft, setPhaseSecondsLeft] = useState(0);
+  const completedRef = useRef(false);
   const totalCycles = 1;
 
   // Pattern: 4-4-4 (inhale 4s, hold 4s, exhale 4s, no exhale hold)
@@ -2179,11 +2180,14 @@ function OnboardingBreathingOverlay({ onComplete }: { onComplete: () => void }) 
     // Skip exhale_hold since it's 0
     if (breathPhase === 'exhale_hold') {
       const next = cycleCount + 1;
-      setCycleCount(next);
       if (next >= totalCycles) {
-        onComplete();
+        if (!completedRef.current) {
+          completedRef.current = true;
+          onComplete();
+        }
         return;
       }
+      setCycleCount(next);
       setBreathPhase('inhale');
       setPhaseSecondsLeft(pattern.inhale);
       return;
@@ -2398,10 +2402,25 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const handleBreathingComplete = useCallback(() => {
     setShowBreathing(false);
     // Pause after breathing before celebration — let it breathe
-    addTimer(() => {
+    const t1 = setTimeout(() => {
       setPhase('celebrate-breathe');
-      triggerCelebration(BREATHE_IDX, 'spotlight-complete');
+      setCompletedIndices(prev => new Set(prev).add(BREATHE_IDX));
+      setCelebratingIdx(BREATHE_IDX);
+      playCompletionSound();
+      haptic.success();
+      confetti({
+        particleCount: 60,
+        spread: 55,
+        origin: { y: 0.5 },
+        colors: ['#2dd4bf', '#34d399', '#a78bfa', '#fbbf24'],
+      });
+      const t2 = setTimeout(() => {
+        setCelebratingIdx(null);
+        setPhase('spotlight-complete');
+      }, 2500);
+      timersRef.current.push(t2);
     }, 1200);
+    timersRef.current.push(t1);
   }, []);
 
   const handleMoodTap = () => {
