@@ -318,7 +318,7 @@ export function FeedChannelManager() {
           <DialogTrigger asChild>
             <Button><Plus className="h-4 w-4 mr-2" /> Add Channel</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingChannel ? 'Edit Channel' : 'Create Channel'}</DialogTitle>
             </DialogHeader>
