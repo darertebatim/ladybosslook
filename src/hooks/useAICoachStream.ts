@@ -2,12 +2,15 @@ import { useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+export type CoachMode = 'coach' | 'assistant' | 'companion';
+
 export interface CoachMessage {
   id: string;
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'divider';
   content: string;
   timestamp: number;
   actionResults?: ActionResult[];
+  mode?: CoachMode; // used for divider messages
 }
 
 export interface ActionResult {
@@ -29,6 +32,32 @@ export function useAICoachStream() {
   const clearMessages = useCallback(() => {
     setMessages([]);
     setFollowUps([]);
+  }, []);
+
+  // Insert a divider when switching modes
+  const insertDivider = useCallback((newMode: CoachMode) => {
+    setFollowUps([]);
+    setMessages(prev => {
+      // Don't add divider if there are no messages or last message is already a divider
+      if (prev.length === 0) return prev;
+      const last = prev[prev.length - 1];
+      if (last.role === 'divider') return prev;
+
+      return [...prev, {
+        id: `divider-${Date.now()}`,
+        role: 'divider',
+        content: `Switched to ${newMode}`,
+        timestamp: Date.now(),
+        mode: newMode,
+      }];
+    });
+  }, []);
+
+  // Get only messages after the last divider for sending to the backend
+  const getActiveMessages = useCallback((allMessages: CoachMessage[]) => {
+    const lastDividerIdx = allMessages.map(m => m.role).lastIndexOf('divider');
+    const active = lastDividerIdx >= 0 ? allMessages.slice(lastDividerIdx + 1) : allMessages;
+    return active.filter(m => m.role === 'user' || m.role === 'assistant');
   }, []);
 
   const sendMessage = useCallback(async (text: string, mode?: string) => {
@@ -55,7 +84,10 @@ export function useAICoachStream() {
     abortRef.current = controller;
 
     try {
+      // Only send messages after the last divider
       const allMessages = [...messages, userMsg];
+      const activeMessages = getActiveMessages(allMessages);
+
       const response = await fetch(`${SUPABASE_URL}/functions/v1/ai-coach`, {
         method: 'POST',
         headers: {
@@ -63,7 +95,7 @@ export function useAICoachStream() {
           Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-          messages: allMessages.map(m => ({ role: m.role, content: m.content })),
+          messages: activeMessages.map(m => ({ role: m.role, content: m.content })),
           mode,
         }),
         signal: controller.signal,
@@ -95,13 +127,11 @@ export function useAICoachStream() {
         try {
           const parsed = JSON.parse(jsonStr);
 
-          // Action results from tool execution
           if (parsed.action_results) {
             actionResults = parsed.action_results;
             return;
           }
 
-          // Follow-up suggestions
           if (parsed.suggested_followups) {
             setFollowUps(parsed.suggested_followups);
             return;
@@ -142,14 +172,13 @@ export function useAICoachStream() {
         for (const line of buffer.split('\n')) processLine(line);
       }
 
-      // Ensure final message has action results
       if (actionResults.length > 0) {
         setMessages(prev => prev.map(m =>
           m.id === assistantId ? { ...m, actionResults } : m
         ));
       }
 
-      // Persist to DB — include action results
+      // Persist to DB
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const finalMessages = [...allMessages, { id: assistantId, role: 'assistant' as const, content: assistantContent, timestamp: Date.now(), actionResults: actionResults.length > 0 ? actionResults : undefined }];
@@ -157,6 +186,7 @@ export function useAICoachStream() {
           role: m.role,
           content: m.content,
           timestamp: m.timestamp,
+          mode: (m as any).mode || undefined,
           actionResults: (m as any).actionResults || undefined,
         }));
         await supabase.from('ai_coach_conversations').upsert({
@@ -174,7 +204,7 @@ export function useAICoachStream() {
       setIsLoading(false);
       abortRef.current = null;
     }
-  }, [messages, isLoading]);
+  }, [messages, isLoading, getActiveMessages]);
 
   const stopGeneration = useCallback(() => {
     abortRef.current?.abort();
@@ -196,10 +226,11 @@ export function useAICoachStream() {
         role: m.role,
         content: m.content,
         timestamp: m.timestamp || Date.now(),
+        mode: m.mode || undefined,
         actionResults: m.actionResults || undefined,
       })));
     }
   }, []);
 
-  return { messages, isLoading, sendMessage, clearMessages, stopGeneration, loadHistory, followUps };
+  return { messages, isLoading, sendMessage, clearMessages, stopGeneration, loadHistory, followUps, insertDivider };
 }
