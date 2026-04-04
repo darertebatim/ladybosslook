@@ -63,6 +63,27 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
   const { user } = useAuth();
   const addRoutinePlan = useAddRoutinePlan();
   const [showPreview, setShowPreview] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loadingText, setLoadingText] = useState('Analyzing your answers...');
+
+  useEffect(() => {
+    const texts = [
+      'Analyzing your answers...',
+      'Finding the best goals for you...',
+      'Personalizing your suggestions...',
+    ];
+    let i = 0;
+    const interval = setInterval(() => {
+      i++;
+      if (i < texts.length) {
+        setLoadingText(texts[i]);
+      } else {
+        clearInterval(interval);
+        setLoading(false);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const suggestions = useMemo(() => {
     const tasks: TaskSuggestion[] = [];
