@@ -5,7 +5,10 @@ import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { useAuth } from '@/hooks/useAuth';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import type { ProLinkType } from '@/lib/proTaskTypes';
 
 interface Props {
   step: OnboardingStep;
@@ -14,53 +17,26 @@ interface Props {
 }
 
 interface TaskSuggestion {
+  id: string;
   emoji: string;
   title: string;
   color: string;
   difficulty?: string;
   timeEstimate?: string;
   reason?: string;
+  linked_playlist_id?: string | null;
+  pro_link_type?: string | null;
+  pro_link_value?: string | null;
 }
 
-const feltGoodMapping: Record<string, TaskSuggestion> = {
-  'Sleep': { emoji: '😴', title: 'Wind-down routine at 10pm', color: 'lavender', difficulty: 'Easy', timeEstimate: '10 min', reason: 'You felt good about Sleep' },
-  'Nutrition': { emoji: '🥗', title: 'Eat a home-cooked meal', color: 'mint', difficulty: 'Medium', timeEstimate: '30 min', reason: 'You felt good about Nutrition' },
-  'Learning': { emoji: '📚', title: 'Read for 15 minutes', color: 'yellow', difficulty: 'Easy', timeEstimate: '15 min', reason: 'You felt good about Learning' },
-  'Physical activities': { emoji: '🏃', title: '30-min workout', color: 'peach', difficulty: 'Medium', timeEstimate: '30 min', reason: 'You felt good about Physical activities' },
-  'Mindfulness': { emoji: '🧘', title: '5-min morning meditation', color: 'lavender', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You felt good about Mindfulness' },
-  'Relaxation': { emoji: '🛀', title: 'Take a relaxing bath', color: 'sky', difficulty: 'Easy', timeEstimate: '20 min', reason: 'You felt good about Relaxation' },
-  'Nature': { emoji: '🌿', title: '20-min nature walk', color: 'mint', difficulty: 'Easy', timeEstimate: '20 min', reason: 'You felt good about Nature' },
-  'School': { emoji: '🎓', title: 'Review notes for 20 min', color: 'sky', difficulty: 'Medium', timeEstimate: '20 min', reason: 'You felt good about School' },
-  'Work': { emoji: '💼', title: 'Plan top 3 priorities', color: 'sky', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You felt good about Work' },
-  'Family': { emoji: '👨‍👩‍👧', title: 'Quality family time', color: 'pink', difficulty: 'Easy', timeEstimate: '30 min', reason: 'You felt good about Family' },
-  'Friends': { emoji: '🤝', title: 'Reach out to a friend', color: 'peach', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You felt good about Friends' },
-  'Partner': { emoji: '💑', title: 'Plan a date night', color: 'pink', difficulty: 'Easy', timeEstimate: '10 min', reason: 'You felt good about Partner' },
-  'Pet': { emoji: '🐾', title: 'Extra playtime with pet', color: 'yellow', difficulty: 'Easy', timeEstimate: '15 min', reason: 'You felt good about Pet' },
-  'Community': { emoji: '🏘️', title: 'Join a local event', color: 'mint', difficulty: 'Medium', timeEstimate: '1 hr', reason: 'You felt good about Community' },
-  'Productivity': { emoji: '⚡', title: 'Time-block your day', color: 'peach', difficulty: 'Easy', timeEstimate: '10 min', reason: 'You felt good about Productivity' },
-  'Achievement': { emoji: '🏆', title: 'Celebrate a small win', color: 'yellow', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You felt good about Achievement' },
-  'Hobbies': { emoji: '🎨', title: 'Spend 30 min on a hobby', color: 'lavender', difficulty: 'Easy', timeEstimate: '30 min', reason: 'You felt good about Hobbies' },
-  'Creativity': { emoji: '✏️', title: 'Try something creative', color: 'pink', difficulty: 'Easy', timeEstimate: '20 min', reason: 'You felt good about Creativity' },
-};
-
-const focusMapping: Record<string, TaskSuggestion> = {
-  'Sleep better': { emoji: '🌙', title: 'No screens after 9pm', color: 'lavender', difficulty: 'Medium', timeEstimate: 'Daily', reason: 'You want to Sleep better' },
-  'Eat healthier': { emoji: '🥑', title: 'Meal prep Sunday', color: 'mint', difficulty: 'Medium', timeEstimate: '1 hr', reason: 'You want to Eat healthier' },
-  'Be more active': { emoji: '💪', title: 'Walk 10,000 steps', color: 'peach', difficulty: 'Medium', timeEstimate: 'Daily', reason: 'You want to Be more active' },
-  'Be present': { emoji: '🧠', title: 'Practice mindful breathing', color: 'lavender', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You want to Be present' },
-  'Stay calm': { emoji: '🕊️', title: 'Breathing exercise 2x daily', color: 'sky', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You want to Stay calm' },
-  'Be kind to self': { emoji: '💚', title: "Write 3 things I'm proud of", color: 'mint', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You want to Be kind to self' },
-  'Be organized': { emoji: '📋', title: 'Plan tomorrow before bed', color: 'yellow', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You want to Be organized' },
-  'Get things done': { emoji: '🎯', title: 'Complete top priority first', color: 'peach', difficulty: 'Medium', timeEstimate: 'Daily', reason: 'You want to Get things done' },
-  'Find joy': { emoji: '🌈', title: 'Do something fun for 30 min', color: 'pink', difficulty: 'Easy', timeEstimate: '30 min', reason: 'You want to Find joy' },
-  'Feel more connected': { emoji: '💕', title: 'Send a kind message', color: 'pink', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You want to Feel more connected' },
-};
-
-const defaultTasks: TaskSuggestion[] = [
-  { emoji: '🌅', title: 'Morning stretch routine', color: 'yellow', difficulty: 'Easy', timeEstimate: '10 min' },
-  { emoji: '💧', title: 'Drink 8 glasses of water', color: 'sky', difficulty: 'Easy', timeEstimate: 'Daily' },
-  { emoji: '📖', title: 'Read for 15 minutes', color: 'lavender', difficulty: 'Easy', timeEstimate: '15 min' },
-];
+function parseDifficulty(desc: string | null): { difficulty?: string; timeEstimate?: string } {
+  if (!desc) return {};
+  const parts = desc.split('·').map(s => s.trim());
+  return {
+    difficulty: parts[0] || undefined,
+    timeEstimate: parts[1] || undefined,
+  };
+}
 
 const difficultyColors: Record<string, string> = {
   Easy: 'bg-green-100 text-green-700',
@@ -75,6 +51,20 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
   const [loadingText, setLoadingText] = useState('Analyzing your answers...');
   const [revealedCount, setRevealedCount] = useState(0);
   const [showWhyIdx, setShowWhyIdx] = useState<number | null>(null);
+
+  // Fetch weekly review tasks from the task bank
+  const { data: wrTasks } = useQuery({
+    queryKey: ['wr-task-bank'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('admin_task_bank')
+        .select('id, title, emoji, color, tag, description, duration_minutes, linked_playlist_id, pro_link_type, pro_link_value')
+        .like('tag', 'wr-%')
+        .eq('is_active', true);
+      return data || [];
+    },
+    staleTime: 1000 * 60 * 30,
+  });
 
   useEffect(() => {
     const texts = [
@@ -96,16 +86,29 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
   }, []);
 
   const suggestions = useMemo(() => {
+    if (!wrTasks) return [];
     const tasks: TaskSuggestion[] = [];
     const seen = new Set<string>();
 
     const feltGood = answers?.['wr-felt-good'];
     if (Array.isArray(feltGood)) {
       feltGood.forEach(answer => {
-        const task = feltGoodMapping[answer];
-        if (task && !seen.has(task.title)) {
-          tasks.push(task);
-          seen.add(task.title);
+        const match = wrTasks.find(t => t.tag === `wr-felt-good:${answer}`);
+        if (match && !seen.has(match.title)) {
+          const { difficulty, timeEstimate } = parseDifficulty(match.description);
+          tasks.push({
+            id: match.id,
+            emoji: match.emoji,
+            title: match.title,
+            color: match.color,
+            difficulty,
+            timeEstimate,
+            reason: `You felt good about ${answer}`,
+            linked_playlist_id: match.linked_playlist_id,
+            pro_link_type: match.pro_link_type,
+            pro_link_value: match.pro_link_value,
+          });
+          seen.add(match.title);
         }
       });
     }
@@ -113,17 +116,47 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
     const focusNext = answers?.['wr-focus-next'];
     if (Array.isArray(focusNext)) {
       focusNext.forEach(answer => {
-        const task = focusMapping[answer];
-        if (task && !seen.has(task.title)) {
-          tasks.push(task);
-          seen.add(task.title);
+        const match = wrTasks.find(t => t.tag === `wr-focus:${answer}`);
+        if (match && !seen.has(match.title)) {
+          const { difficulty, timeEstimate } = parseDifficulty(match.description);
+          tasks.push({
+            id: match.id,
+            emoji: match.emoji,
+            title: match.title,
+            color: match.color,
+            difficulty,
+            timeEstimate,
+            reason: `You want to ${answer}`,
+            linked_playlist_id: match.linked_playlist_id,
+            pro_link_type: match.pro_link_type,
+            pro_link_value: match.pro_link_value,
+          });
+          seen.add(match.title);
         }
       });
     }
 
-    if (tasks.length === 0) return defaultTasks;
+    if (tasks.length === 0) {
+      // Use default tasks from bank
+      const defaults = wrTasks.filter(t => t.tag === 'wr-default');
+      defaults.forEach(match => {
+        const { difficulty, timeEstimate } = parseDifficulty(match.description);
+        tasks.push({
+          id: match.id,
+          emoji: match.emoji,
+          title: match.title,
+          color: match.color,
+          difficulty,
+          timeEstimate,
+          linked_playlist_id: match.linked_playlist_id,
+          pro_link_type: match.pro_link_type,
+          pro_link_value: match.pro_link_value,
+        });
+      });
+    }
+
     return tasks.slice(0, 4);
-  }, [answers]);
+  }, [answers, wrTasks]);
 
   useEffect(() => {
     if (loading) return;
@@ -138,7 +171,7 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
 
   const routineTasks: RoutinePlanTask[] = useMemo(() => {
     return suggestions.map((task, i) => ({
-      id: `wr-suggestion-${i}`,
+      id: task.id,
       plan_id: 'synthetic-weekly-review',
       title: task.title,
       icon: task.emoji,
@@ -146,9 +179,9 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
       task_order: i,
       is_active: true,
       created_at: new Date().toISOString(),
-      linked_playlist_id: null,
-      pro_link_type: null,
-      pro_link_value: null,
+      linked_playlist_id: task.linked_playlist_id || null,
+      pro_link_type: (task.pro_link_type as ProLinkType) || null,
+      pro_link_value: task.pro_link_value || null,
     }));
   }, [suggestions]);
 
