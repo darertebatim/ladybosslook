@@ -362,26 +362,26 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
   // Group options by category if descriptions are used as categories
   const hasCategories = isWeeklyFeltGood && step.options?.some(o => o.description);
 
-  const renderOption = (opt: { label: string; emoji?: string; description?: string }, i: number) => {
+  const renderChip = (opt: { label: string; emoji?: string; description?: string }, i: number) => {
     const isPopular = popularIndices.includes(i);
     return (
       <button
         key={i}
         onClick={() => toggle(i)}
-        className={`relative flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+        className={`relative flex items-center gap-1.5 px-3 py-2 rounded-full border text-left transition-all active:scale-[0.96] ${
           selected.has(i)
-            ? 'border-purple-400 bg-purple-50 shadow-sm'
+            ? 'border-primary bg-primary/10 shadow-sm'
             : selected.size >= maxSelections
-              ? 'border-gray-100 bg-gray-50 opacity-50'
-              : 'border-gray-200 bg-white'
+              ? 'border-border bg-muted opacity-50'
+              : 'border-border bg-card'
         }`}
       >
-        {opt.emoji && <OptionEmoji emoji={opt.emoji} size={24} />}
-        <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
+        {opt.emoji && <OptionEmoji emoji={opt.emoji} size={18} />}
+        <span className="text-xs font-medium text-foreground whitespace-nowrap">{opt.label}</span>
         {isPopular && !selected.has(i) && (
-          <span className="text-[9px] font-bold text-purple-500 bg-purple-50 px-1.5 py-0.5 rounded-full">Popular</span>
+          <span className="text-[8px] font-bold text-primary bg-primary/10 px-1 py-0.5 rounded-full">Popular</span>
         )}
-        {selected.has(i) && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
+        {selected.has(i) && <SealCheck showParticles className="w-4 h-4 text-primary animate-seal-pop" />}
       </button>
     );
   };
@@ -424,21 +424,21 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
               const catOptions = step.options?.map((o, i) => ({ ...o, idx: i })).filter(o => o.description === cat) || [];
               if (catOptions.length === 0) return null;
               return (
-                <div key={cat} className="mb-4">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{catLabel}</p>
-                  <div className="space-y-2">
-                    {catOptions.map(opt => renderOption(opt, opt.idx))}
+                <div key={cat} className="mb-3">
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">{catLabel}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {catOptions.map(opt => renderChip(opt, opt.idx))}
                   </div>
                 </div>
               );
             })}
           </FadeUp>
         ) : (
-          <StaggerContainer className="space-y-3 mb-6">
-            {step.options?.map((opt, i) => (
-              <StaggerItem key={i}>{renderOption(opt, i)}</StaggerItem>
-            ))}
-          </StaggerContainer>
+          <FadeUp delay={0.1}>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {step.options?.map((opt, i) => renderChip(opt, i))}
+            </div>
+          </FadeUp>
         )}
 
         {isWeeklyFocus && (
@@ -462,11 +462,11 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
   return (
     <ScreenWrapper>
       <FadeUp><h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1></FadeUp>
-      <StaggerContainer className="space-y-3 mb-6">
-        {step.options?.map((opt, i) => (
-          <StaggerItem key={i}>{renderOption(opt, i)}</StaggerItem>
-        ))}
-      </StaggerContainer>
+      <FadeUp delay={0.1}>
+        <div className="flex flex-wrap gap-2 mb-6">
+          {step.options?.map((opt, i) => renderChip(opt, i))}
+        </div>
+      </FadeUp>
       <FadeUp delay={0.3} className="mt-auto">
         <NavyButton onClick={onNext} disabled={selected.size === 0}>{step.buttonLabel}</NavyButton>
       </FadeUp>
