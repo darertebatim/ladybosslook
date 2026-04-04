@@ -58,7 +58,7 @@ export default function AppReadDetail() {
       <div className="px-4 -mt-3 relative z-10">
         <div className="bg-card rounded-2xl p-5 shadow-sm border">
           {content.description && (
-            <p className="text-sm text-black/80 mb-4 leading-relaxed">{content.description}</p>
+            <p className="text-sm text-black mb-4 leading-relaxed">{content.description}</p>
           )}
 
           <div className="flex items-center gap-3 mb-5">
