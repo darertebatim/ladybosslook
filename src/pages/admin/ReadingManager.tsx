@@ -15,7 +15,7 @@ import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { ImageUploader } from '@/components/admin/ImageUploader';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import type { ReadingContent } from '@/hooks/useReading';
-import { TASK_COLORS } from '@/hooks/useTaskPlanner';
+
 
 const CATEGORIES = ['general', 'money', 'mindset', 'business', 'wellness', 'relationships', 'productivity', 'story'];
 
