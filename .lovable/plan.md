@@ -1,117 +1,71 @@
 
 
-## Rebuild Read: Visual Stories + Lessons with TTS
+## Redesign Read: Unified List, Color Palette, Emoji Covers
 
-### What We're Building
-A Blinkist-inspired reading experience with two content types -- **Stories** (narrative, entertaining, 5-30 min) and **Lessons** (educational, from uploaded documents). Both share the same visual reader UI with swipeable screens, cover images, and text-to-speech narration.
+### What Changes
 
-### Database Changes
+**1. Remove Stories/Lessons tabs** -- merge into one unified list in both admin and app, differentiated by category instead of type.
 
-**Replace existing tables** with a unified content model:
+**2. Add `emoji` column to `reading_content`** -- for 3D Fluent emoji covers (like feed channels and routines).
 
-**`reading_content`** -- replaces `reading_lessons`
-- `id` (uuid PK), `title`, `subtitle`, `description` (text)
-- `cover_url` (text) -- 6:4 cover image
-- `type` (text: 'story' or 'lesson')
-- `category` (text), `author` (text)
-- `reading_time_minutes` (int) -- estimated read time
-- `theme_color` (text, default '#F0E3FF')
-- `is_published` (boolean), `is_premium` (boolean)
-- `sort_order` (int), `created_at`, `updated_at`
+**3. Use task color palette for theme colors** -- replace the free-form color picker with the same pastel palette used in tasks/routines:
+```
+pink: #FFD6E8, peach: #FFE4C4, yellow: #FFF59D, lime: #E8F5A3,
+sky: #C5E8FA, mint: #B8F5E4, lavender: #E8D4F8
+```
 
-**`reading_sections`** -- replaces `reading_cards` (now full article sections, not micro-cards)
-- `id` (uuid PK), `content_id` (FK -> reading_content)
-- `sort_order` (int)
-- `heading` (text) -- section heading
-- `body` (text) -- rich text / markdown body
-- `quote` (text, nullable) -- highlighted pull-quote
-- `image_url` (text, nullable) -- section illustration
-- `created_at`
+**4. Cover system: emoji OR image upload** -- same pattern as FeedChannelManager (None/Emoji/Image toggle), using existing `EmojiPicker` and `ImageUploader` components.
 
-**`reading_user_progress`** -- replaces `reading_progress`
-- `id` (uuid PK), `user_id` (FK -> auth.users)
-- `content_id` (FK -> reading_content)
-- `last_section_index` (int)
-- `completed` (boolean), `completed_at` (timestamptz)
-- unique on (user_id, content_id)
+**5. Redesign all UI** -- make it visually rich and consistent with the rest of the app.
 
-**New storage bucket**: `reading-covers` (public)
+### Database Migration
 
-### Text-to-Speech (ElevenLabs)
+```sql
+ALTER TABLE reading_content ADD COLUMN emoji text DEFAULT '📖';
+```
 
-**Edge function**: `supabase/functions/elevenlabs-tts/index.ts`
-- Accepts `{ text, voiceId? }`, returns audio/mpeg binary
-- Uses ElevenLabs TTS API with `eleven_multilingual_v2` model
+### Admin (`ReadingManager.tsx`) -- Redesign
 
-**Requires**: User needs to add `ELEVENLABS_API_KEY` secret in Supabase dashboard.
+- Remove Stories/Lessons tabs -- show all content in one list
+- Replace plain `<Table>` with styled cards showing color + emoji/cover preview
+- Content form gets:
+  - Color palette swatches (clickable circles, same as task colors)
+  - Cover type toggle: Emoji (with `EmojiPicker` sheet) or Image (with `ImageUploader` to `reading-covers` bucket)
+  - Type dropdown stays (story/lesson) but just as metadata, not a filter tab
+- "New Content" button instead of "New Story" / "New Lesson"
 
-**Client integration**: A play/pause button in the reader that streams the current section's text as narrated audio. Fetches from the edge function using `fetch()` + `.blob()`.
+### App Library (`AppRead.tsx`) -- Redesign
 
-### Admin: Reading Manager (rebuilt)
+- Remove Stories/Lessons pill tabs
+- Single vertical list of all published content
+- Each card: full-width rounded card with `theme_color` background, large 3D `FluentEmoji` (or cover image), title, subtitle, reading time badge, category chip, completion checkmark
+- Visually similar to routine/tool cards in the app
 
-**Route**: `/admin/read` (same URL, rebuilt component)
+### App Detail (`AppReadDetail.tsx`) -- Redesign
 
-Two tabs: **Stories** | **Lessons**
+- Hero area uses theme_color background with large centered FluentEmoji or cover image
+- Gradient overlay with title and author
+- Polished info card below with description, reading time, category badge
+- Prominent CTA button
 
-Each tab shows a table of content items with:
-- Cover thumbnail, title, type badge, status badge, reading time
-- Actions: Edit, Manage Sections, Delete
+### App Reader (`AppReadReader.tsx`) -- Minor Polish
 
-**Content Editor** (dialog):
-- Title, subtitle, description, author, category, reading time
-- Cover image upload (6:4 aspect ratio)
-- Theme color picker
-- Published/Premium toggles
+- Keep current layout (already clean)
+- Use `theme_color` in progress bar accent
 
-**Section Editor** (inline, below content):
-- Ordered list of sections with heading, body (textarea), quote, image upload
-- Add/reorder/delete sections
-- Preview button
+### Files Modified
 
-### User-Facing Pages
-
-**1. Read Library (`/app/read`)** -- rebuilt
-- Two horizontal pill tabs at top: "Stories" | "Lessons"
-- Vertical list of cards (Blinkist-style): 6:4 cover image on left, title + subtitle + reading time + category on right
-- Completed items show a checkmark
-
-**2. Content Detail (`/app/read/:id`)** -- rebuilt
-- Hero: full-width 6:4 cover with gradient overlay, title + author
-- White card below: description, reading time, category
-- "Start Reading" / "Continue" CTA button
-- If completed: "Read Again" button
-
-**3. Reader (`/app/read/:id/reader`)** -- new
-- Clean, distraction-free reading screen
-- Top bar: back button + progress bar + section counter
-- Scrollable single-section view with heading, body text, pull-quote highlight, section image
-- Bottom: prev/next navigation buttons
-- Floating TTS play/pause button (bottom-right corner)
-- On last section complete: celebration screen with "Back to Library"
-
-### Sample Content (1 test story)
-
-Insert a sample story: "The Jar of Stones" -- a classic parable about priorities (approx 5 min read), split into 5 sections with headings and quotes. No cover image (placeholder color).
-
-### Files to Create/Modify
-
-| File | Action |
+| File | Change |
 |------|--------|
-| Migration SQL | Drop old tables, create new schema + RLS + storage bucket |
-| `supabase/functions/elevenlabs-tts/index.ts` | TTS edge function |
-| `src/hooks/useReading.ts` | New hooks for reading_content, sections, progress |
-| `src/pages/admin/ReadingManager.tsx` | Rebuild with Stories/Lessons tabs |
-| `src/components/admin/ReadingSectionEditor.tsx` | Section editor component |
-| `src/pages/app/AppRead.tsx` | Rebuild as Blinkist-style library |
-| `src/pages/app/AppReadDetail.tsx` | New content detail page |
-| `src/pages/app/AppReadReader.tsx` | New reader with TTS |
-| `src/App.tsx` | Add new routes |
-| `src/hooks/useReadingLessons.ts` | Remove (replaced by useReading.ts) |
-| `src/components/admin/ReadingCardEditor.tsx` | Remove (replaced) |
+| Migration SQL | Add `emoji` column |
+| `src/hooks/useReading.ts` | Add `emoji` to `ReadingContent` interface |
+| `src/pages/admin/ReadingManager.tsx` | Remove tabs, add color palette + emoji/image cover picker, card-based list |
+| `src/pages/app/AppRead.tsx` | Remove tabs, unified list with FluentEmoji covers + pastel cards |
+| `src/pages/app/AppReadDetail.tsx` | Redesign hero with emoji/color, polish layout |
+| `src/pages/app/AppReadReader.tsx` | Minor: theme color accent on progress bar |
 
-### Technical Notes
-- TTS requires `ELEVENLABS_API_KEY` -- will prompt user to add it
-- Cover images uploaded to `reading-covers` bucket
-- Reader uses simple prev/next navigation (not carousel) for long-form content
-- Old `reading_lessons`, `reading_cards`, `reading_progress` tables will be dropped and replaced
+### Reused Components
+- `EmojiPicker` (3D emoji selection sheet)
+- `FluentEmoji` (3D emoji rendering)
+- `ImageUploader` (file upload to Supabase Storage)
 
