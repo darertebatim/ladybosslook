@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useReadingContentById, useContentSections, useReadingUserProgress } from '@/hooks/useReading';
-import { ArrowLeft, Clock, BookOpen } from 'lucide-react';
+import { ArrowLeft, Clock, BookOpen, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { Badge } from '@/components/ui/badge';
 
 export default function AppReadDetail() {
   const { id } = useParams<{ id: string }>();
@@ -23,50 +24,64 @@ export default function AppReadDetail() {
     );
   }
 
+  const hasCoverImage = !!content.cover_url;
+
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Hero */}
-      <div className="relative" style={{ backgroundColor: content.theme_color || '#F0E3FF' }}>
-        <button onClick={() => navigate('/app/read')} className="absolute top-4 left-4 z-10 bg-background/80 rounded-full p-2">
-          <ArrowLeft className="h-5 w-5" />
+      <div className="relative overflow-hidden" style={{ backgroundColor: content.theme_color || '#F0E3FF' }}>
+        <button onClick={() => navigate('/app/read')} className="absolute top-4 left-4 z-10 bg-white/70 backdrop-blur-sm rounded-full p-2">
+          <ArrowLeft className="h-5 w-5 text-gray-800" />
         </button>
-        <AspectRatio ratio={6 / 4}>
-          {content.cover_url ? (
-            <img src={content.cover_url} alt={content.title} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="text-6xl">{content.type === 'story' ? '📖' : '📚'}</span>
+
+        {hasCoverImage ? (
+          <div className="relative w-full" style={{ aspectRatio: '6/4' }}>
+            <img src={content.cover_url!} alt={content.title} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <h1 className="text-2xl font-bold leading-tight">{content.title}</h1>
+              {content.author && <p className="text-sm opacity-80 mt-1">by {content.author}</p>}
             </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-          <div className="absolute bottom-4 left-4 right-4 text-white">
-            <h1 className="text-2xl font-bold leading-tight">{content.title}</h1>
-            {content.author && <p className="text-sm opacity-80 mt-1">by {content.author}</p>}
           </div>
-        </AspectRatio>
+        ) : (
+          <div className="flex flex-col items-center justify-center pt-16 pb-10 px-6">
+            <div className="w-24 h-24 rounded-3xl bg-white/40 flex items-center justify-center mb-5">
+              <FluentEmoji emoji={content.emoji || '📖'} size={56} />
+            </div>
+            <h1 className="text-2xl font-bold leading-tight text-center text-gray-900">{content.title}</h1>
+            {content.author && <p className="text-sm text-gray-600 mt-1.5">by {content.author}</p>}
+          </div>
+        )}
       </div>
 
       {/* Info Card */}
-      <div className="px-4 -mt-2 relative z-10">
+      <div className="px-4 -mt-3 relative z-10">
         <div className="bg-card rounded-2xl p-5 shadow-sm border">
           {content.description && (
-            <p className="text-sm text-muted-foreground mb-4">{content.description}</p>
+            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{content.description}</p>
           )}
-          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-5">
-            <span className="flex items-center gap-1">
-              <Clock className="h-4 w-4" /> {content.reading_time_minutes} min read
+
+          <div className="flex items-center gap-3 mb-5">
+            <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Clock className="h-4 w-4" /> {content.reading_time_minutes} min
             </span>
-            <span className="capitalize">{content.category}</span>
-            <span>{sections.length} sections</span>
+            <Badge variant="secondary" className="capitalize text-xs">{content.category}</Badge>
+            <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Layers className="h-4 w-4" /> {sections.length} sections
+            </span>
           </div>
 
           <Button
-            className="w-full"
+            className="w-full h-12 text-base font-semibold rounded-xl"
             size="lg"
             onClick={() => navigate(`/app/read/${id}/reader`)}
             disabled={sections.length === 0}
+            style={{
+              backgroundColor: content.theme_color || undefined,
+              color: '#1a1a1a',
+            }}
           >
-            <BookOpen className="h-4 w-4 mr-2" />
+            <BookOpen className="h-5 w-5 mr-2" />
             {isCompleted ? 'Read Again' : hasProgress ? 'Continue Reading' : 'Start Reading'}
           </Button>
         </div>

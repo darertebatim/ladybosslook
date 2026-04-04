@@ -8,6 +8,7 @@ export interface ReadingContent {
   subtitle: string | null;
   description: string | null;
   cover_url: string | null;
+  emoji: string | null;
   type: 'story' | 'lesson';
   category: string;
   author: string | null;

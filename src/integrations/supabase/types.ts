@@ -3084,6 +3084,7 @@ export type Database = {
           cover_url: string | null
           created_at: string | null
           description: string | null
+          emoji: string | null
           id: string
           is_premium: boolean | null
           is_published: boolean | null
@@ -3101,6 +3102,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string | null
           description?: string | null
+          emoji?: string | null
           id?: string
           is_premium?: boolean | null
           is_published?: boolean | null
@@ -3118,6 +3120,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string | null
           description?: string | null
+          emoji?: string | null
           id?: string
           is_premium?: boolean | null
           is_published?: boolean | null
