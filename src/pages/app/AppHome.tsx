@@ -112,6 +112,7 @@ const AppHome = () => {
   const [hasPromoBanner, setHasPromoBanner] = useState(false);
   const [hasHomeBanner, setHasHomeBanner] = useState(false);
   const [hasMoodBanner, setHasMoodBanner] = useState(false);
+  const [hasWeeklyBanner, setHasWeeklyBanner] = useState(false);
   const { isKeyboardOpen } = useKeyboard();
   const { currentTrack } = useAudioPlayer();
   const hasMiniPlayer = !!currentTrack;
@@ -1050,8 +1051,11 @@ const AppHome = () => {
             {/* Mood Check-in Banner — only after all promo/home banners are dismissed */}
             {!hasPromoBanner && !hasHomeBanner && <MoodCheckInBanner onVisibilityChange={setHasMoodBanner} />}
 
+            {/* Weekly Review Banner — shows when mood banner is dismissed, on weekends */}
+            {!hasPromoBanner && !hasHomeBanner && !hasMoodBanner && <WeeklyReviewBanner onVisibilityChange={setHasWeeklyBanner} />}
+
             {/* My Shortcuts — only when no banners are visible */}
-            {!hasPromoBanner && !hasHomeBanner && !hasMoodBanner && (
+            {!hasPromoBanner && !hasHomeBanner && !hasMoodBanner && !hasWeeklyBanner && (
               <div className="mb-3">
                 <ToolShortcuts hideWhenEmpty hideLabels />
               </div>
@@ -1451,7 +1455,6 @@ const AppHome = () => {
               {/* Tour Banner & Promo - always visible regardless of routine cards */}
               {taskFilter === 'all' && <>
                 <OnboardingBanner />
-                <WeeklyReviewBanner />
                 <div id="tour-banner-slot" className="mt-4" />
                 <PromoBanner location="home_rituals" className="mt-4" />
               </>}
