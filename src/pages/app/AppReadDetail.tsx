@@ -48,8 +48,8 @@ export default function AppReadDetail() {
             <div className="w-24 h-24 rounded-3xl bg-white/40 flex items-center justify-center mb-5">
               <FluentEmoji emoji={content.emoji || '📖'} size={56} />
             </div>
-            <h1 className="text-2xl font-bold leading-tight text-center text-gray-900">{content.title}</h1>
-            {content.author && <p className="text-sm text-gray-600 mt-1.5">by {content.author}</p>}
+            <h1 className="text-2xl font-bold leading-tight text-center text-black">{content.title}</h1>
+            {content.author && <p className="text-sm text-black/70 mt-1.5">by {content.author}</p>}
           </div>
         )}
       </div>
