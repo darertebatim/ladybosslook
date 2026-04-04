@@ -26,6 +26,7 @@ const menuItems = [
   { title: 'Onboarding', url: '/admin/onboarding', icon: FlaskConical, pageSlug: 'tools' },
   { title: 'Documents', url: '/admin/documents', icon: FileText, pageSlug: 'system' },
   { title: 'Reading', url: '/admin/read', icon: BookOpen, pageSlug: 'tools' },
+  { title: 'Quizzes', url: '/admin/quizzes', icon: Brain, pageSlug: 'tools' },
   
   { title: 'Brand', url: '/admin/brand', icon: Palette, pageSlug: 'system' },
   { title: 'App Test', url: '/admin/app', icon: Smartphone, pageSlug: 'system' },
