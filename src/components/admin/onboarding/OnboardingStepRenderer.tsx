@@ -328,6 +328,7 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
   };
 
   const hasBg = !!step.illustrationLabel;
+  const usePills = hasBg && !step.options?.some(o => o.emoji);
 
   if (hasBg) {
     return (
@@ -337,22 +338,42 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
             <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center leading-snug">{step.title}</h1>
           </div>
         </FadeUp>
-        <StaggerContainer className="space-y-3 mb-6">
-          {step.options?.map((opt, i) => (
-            <StaggerItem key={i}>
-              <button
-                onClick={() => toggle(i)}
-                className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
-                  selected.has(i) ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
-                }`}
-              >
-                {opt.emoji && <OptionEmoji emoji={opt.emoji} size={24} />}
-                <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
-                {selected.has(i) && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
-              </button>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
+        {usePills ? (
+          <FadeUp delay={0.1}>
+            <div className="flex flex-wrap gap-2.5 mb-6">
+              {step.options?.map((opt, i) => (
+                <button
+                  key={i}
+                  onClick={() => toggle(i)}
+                  className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all active:scale-[0.96] ${
+                    selected.has(i)
+                      ? 'bg-purple-100 text-purple-700 ring-2 ring-purple-400'
+                      : 'bg-gray-100 text-[#1a1f3d]'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </FadeUp>
+        ) : (
+          <StaggerContainer className="space-y-3 mb-6">
+            {step.options?.map((opt, i) => (
+              <StaggerItem key={i}>
+                <button
+                  onClick={() => toggle(i)}
+                  className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+                    selected.has(i) ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
+                  }`}
+                >
+                  {opt.emoji && <OptionEmoji emoji={opt.emoji} size={24} />}
+                  <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
+                  {selected.has(i) && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
+                </button>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        )}
         <FadeUp delay={0.3} className="mt-auto">
           <NavyButton onClick={onNext} disabled={selected.size === 0}>{step.buttonLabel}</NavyButton>
         </FadeUp>
