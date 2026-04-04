@@ -22,7 +22,7 @@ function ReadingCard({ item, isCompleted, onClick }: { item: ReadingContent; isC
         className="overflow-hidden cursor-pointer transition-all active:scale-[0.98] w-full text-left rounded-2xl shadow-lg border border-border/50"
         onClick={() => { haptic.light(); onClick(); }}
       >
-        {/* Title Header - only for square covers */}
+        {/* Title Header - only for square/emoji covers (not 6x4) */}
         {!isTall && (
           <div
             className="px-3 py-3 rounded-t-2xl h-[5rem] flex items-start"
