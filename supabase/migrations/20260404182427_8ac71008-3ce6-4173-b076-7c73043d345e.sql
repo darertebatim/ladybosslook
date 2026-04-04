@@ -1,0 +1,1 @@
+UPDATE reading_content SET cover_aspect = '6x4' WHERE cover_url IS NOT NULL AND cover_url != '';
