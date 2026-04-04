@@ -424,21 +424,21 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
               const catOptions = step.options?.map((o, i) => ({ ...o, idx: i })).filter(o => o.description === cat) || [];
               if (catOptions.length === 0) return null;
               return (
-                <div key={cat} className="mb-4">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{catLabel}</p>
-                  <div className="space-y-2">
-                    {catOptions.map(opt => renderOption(opt, opt.idx))}
+                <div key={cat} className="mb-3">
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">{catLabel}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {catOptions.map(opt => renderChip(opt, opt.idx))}
                   </div>
                 </div>
               );
             })}
           </FadeUp>
         ) : (
-          <StaggerContainer className="space-y-3 mb-6">
-            {step.options?.map((opt, i) => (
-              <StaggerItem key={i}>{renderOption(opt, i)}</StaggerItem>
-            ))}
-          </StaggerContainer>
+          <FadeUp delay={0.1}>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {step.options?.map((opt, i) => renderChip(opt, i))}
+            </div>
+          </FadeUp>
         )}
 
         {isWeeklyFocus && (
