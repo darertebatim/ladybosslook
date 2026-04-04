@@ -1,0 +1,1 @@
+ALTER TABLE public.reading_content ADD COLUMN IF NOT EXISTS cover_aspect text NOT NULL DEFAULT 'square';
