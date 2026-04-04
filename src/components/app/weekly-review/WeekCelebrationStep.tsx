@@ -44,7 +44,7 @@ export function WeekCelebrationStep({ step, onNext, answers }: Props) {
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
       {/* Hero — 38% */}
-      <div className="shrink-0 relative" style={{ height: '38%' }}>
+      <div className="shrink-0 relative" style={{ height: '50%' }}>
         <img
           src={celebrationImg}
           alt=""
@@ -63,7 +63,7 @@ export function WeekCelebrationStep({ step, onNext, answers }: Props) {
             className="text-center"
           >
             <h1 className="text-2xl font-extrabold text-foreground mb-2">{step.title}</h1>
-            <p className="text-muted-foreground text-sm leading-relaxed max-w-[280px] mx-auto">{step.subtitle}</p>
+            <p className="text-foreground text-sm leading-relaxed max-w-[280px] mx-auto">{step.subtitle}</p>
           </motion.div>
 
           {summary && (
