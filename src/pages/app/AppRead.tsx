@@ -59,17 +59,17 @@ export default function AppRead() {
 
                 {/* Text */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-gray-900 text-[15px] leading-tight line-clamp-1">
+                  <h3 className="font-bold text-black text-[15px] leading-tight line-clamp-1">
                     {item.title}
                   </h3>
                   {item.subtitle && (
-                    <p className="text-xs text-gray-600 mt-0.5 line-clamp-1">{item.subtitle}</p>
+                    <p className="text-xs text-black/70 mt-0.5 line-clamp-1">{item.subtitle}</p>
                   )}
                   <div className="flex items-center gap-2.5 mt-1.5">
-                    <span className="text-[11px] text-gray-500 flex items-center gap-1 font-medium">
+                    <span className="text-[11px] text-black/70 flex items-center gap-1 font-medium">
                       <Clock className="h-3 w-3" /> {item.reading_time_minutes} min
                     </span>
-                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/50 text-gray-600 capitalize font-medium">
+                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/50 text-black/70 capitalize font-medium">
                       {item.category}
                     </span>
                     {isCompleted && (

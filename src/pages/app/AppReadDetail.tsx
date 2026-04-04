@@ -31,7 +31,7 @@ export default function AppReadDetail() {
       {/* Hero */}
       <div className="relative overflow-hidden" style={{ backgroundColor: content.theme_color || '#F0E3FF' }}>
         <button onClick={() => navigate('/app/read')} className="absolute top-4 left-4 z-10 bg-white/70 backdrop-blur-sm rounded-full p-2">
-          <ArrowLeft className="h-5 w-5 text-gray-800" />
+          <ArrowLeft className="h-5 w-5 text-black" />
         </button>
 
         {hasCoverImage ? (
@@ -48,8 +48,8 @@ export default function AppReadDetail() {
             <div className="w-24 h-24 rounded-3xl bg-white/40 flex items-center justify-center mb-5">
               <FluentEmoji emoji={content.emoji || '📖'} size={56} />
             </div>
-            <h1 className="text-2xl font-bold leading-tight text-center text-gray-900">{content.title}</h1>
-            {content.author && <p className="text-sm text-gray-600 mt-1.5">by {content.author}</p>}
+            <h1 className="text-2xl font-bold leading-tight text-center text-black">{content.title}</h1>
+            {content.author && <p className="text-sm text-black/70 mt-1.5">by {content.author}</p>}
           </div>
         )}
       </div>
@@ -58,15 +58,15 @@ export default function AppReadDetail() {
       <div className="px-4 -mt-3 relative z-10">
         <div className="bg-card rounded-2xl p-5 shadow-sm border">
           {content.description && (
-            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{content.description}</p>
+            <p className="text-sm text-black/80 mb-4 leading-relaxed">{content.description}</p>
           )}
 
           <div className="flex items-center gap-3 mb-5">
-            <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1.5 text-sm text-black/70">
               <Clock className="h-4 w-4" /> {content.reading_time_minutes} min
             </span>
             <Badge variant="secondary" className="capitalize text-xs">{content.category}</Badge>
-            <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1.5 text-sm text-black/70">
               <Layers className="h-4 w-4" /> {sections.length} sections
             </span>
           </div>
