@@ -102,10 +102,10 @@ export default function Quizzes() {
       setEditing(quiz);
       const { data: qs } = await supabase.from('admin_quiz_questions')
         .select('*').eq('quiz_id', quiz.id).order('sort_order');
-      setQuestions((qs as QuizQuestion[]) || []);
+      setQuestions((qs as unknown as QuizQuestion[]) || []);
       const { data: rs } = await supabase.from('admin_quiz_results')
         .select('*').eq('quiz_id', quiz.id).order('score_min');
-      setResults((rs as QuizResult[]) || []);
+      setResults((rs as unknown as QuizResult[]) || []);
     } else {
       setEditing({ ...emptyQuiz });
       setQuestions([]);

@@ -35,7 +35,7 @@ export default function QuizPlay() {
       if (!q) { setLoading(false); return; }
       setQuiz(q);
       const { data: qs } = await supabase.from('admin_quiz_questions').select('*').eq('quiz_id', q.id).eq('is_active', true).order('sort_order');
-      setQuestions((qs || []) as Question[]);
+      setQuestions((qs || []) as unknown as Question[]);
       const { data: rs } = await supabase.from('admin_quiz_results').select('*').eq('quiz_id', q.id).order('score_min');
       setQuizResults((rs || []) as QuizResult[]);
       setLoading(false);
