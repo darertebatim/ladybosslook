@@ -49,7 +49,7 @@ export default function AppReadDetail() {
               <FluentEmoji emoji={content.emoji || '📖'} size={56} />
             </div>
             <h1 className="text-2xl font-bold leading-tight text-center text-black">{content.title}</h1>
-            {content.author && <p className="text-sm text-black/70 mt-1.5">by {content.author}</p>}
+            {content.author && <p className="text-sm text-black mt-1.5">by {content.author}</p>}
           </div>
         )}
       </div>
@@ -58,15 +58,15 @@ export default function AppReadDetail() {
       <div className="px-4 -mt-3 relative z-10">
         <div className="bg-card rounded-2xl p-5 shadow-sm border">
           {content.description && (
-            <p className="text-sm text-black/80 mb-4 leading-relaxed">{content.description}</p>
+            <p className="text-sm text-black mb-4 leading-relaxed">{content.description}</p>
           )}
 
           <div className="flex items-center gap-3 mb-5">
-            <span className="flex items-center gap-1.5 text-sm text-black/70">
+            <span className="flex items-center gap-1.5 text-sm text-black">
               <Clock className="h-4 w-4" /> {content.reading_time_minutes} min
             </span>
             <Badge variant="secondary" className="capitalize text-xs">{content.category}</Badge>
-            <span className="flex items-center gap-1.5 text-sm text-black/70">
+            <span className="flex items-center gap-1.5 text-sm text-black">
               <Layers className="h-4 w-4" /> {sections.length} sections
             </span>
           </div>

@@ -123,7 +123,7 @@ export default function AppReadReader() {
           <FluentEmoji emoji="🎉" size={48} />
         </div>
         <h1 className="text-2xl font-bold mb-2">Well Done!</h1>
-        <p className="text-muted-foreground mb-8">You've finished "{content.title}"</p>
+        <p className="text-black mb-8">You've finished "{content.title}"</p>
         <Button size="lg" className="rounded-xl h-12 px-8" onClick={() => navigate('/app/read')}>
           Back to Library
         </Button>
@@ -144,7 +144,7 @@ export default function AppReadReader() {
             style={{ width: `${progressPercent}%`, backgroundColor: themeColor }}
           />
         </div>
-        <span className="text-xs text-muted-foreground whitespace-nowrap">
+        <span className="text-xs text-black whitespace-nowrap">
           {currentIndex + 1} / {sections.length}
         </span>
       </div>
@@ -157,7 +157,7 @@ export default function AppReadReader() {
         {currentSection.heading && (
           <h2 className="text-xl font-bold mb-4 text-foreground">{currentSection.heading}</h2>
         )}
-        <div className="text-base leading-relaxed text-foreground/90 whitespace-pre-line">
+        <div className="text-base leading-relaxed text-black whitespace-pre-line">
           {currentSection.body}
         </div>
         {currentSection.quote && (

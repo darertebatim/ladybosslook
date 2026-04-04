@@ -16,7 +16,7 @@ export default function AppRead() {
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <BookOpen className="h-6 w-6 text-primary" /> Read
         </h1>
-        <p className="text-muted-foreground text-sm mt-1">Stories & lessons for your mind</p>
+        <p className="text-black text-sm mt-1">Stories & lessons for your mind</p>
       </div>
 
       {/* Content List */}
@@ -63,13 +63,13 @@ export default function AppRead() {
                     {item.title}
                   </h3>
                   {item.subtitle && (
-                    <p className="text-xs text-black/70 mt-0.5 line-clamp-1">{item.subtitle}</p>
+                    <p className="text-xs text-black mt-0.5 line-clamp-1">{item.subtitle}</p>
                   )}
                   <div className="flex items-center gap-2.5 mt-1.5">
-                    <span className="text-[11px] text-black/70 flex items-center gap-1 font-medium">
+                    <span className="text-[11px] text-black flex items-center gap-1 font-medium">
                       <Clock className="h-3 w-3" /> {item.reading_time_minutes} min
                     </span>
-                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/50 text-black/70 capitalize font-medium">
+                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/50 text-black capitalize font-medium">
                       {item.category}
                     </span>
                     {isCompleted && (
