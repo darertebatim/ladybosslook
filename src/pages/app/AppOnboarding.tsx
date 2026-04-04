@@ -142,7 +142,12 @@ export default function AppOnboarding() {
     } else {
       localStorage.setItem(completedKey, 'true');
       localStorage.removeItem(progressKey);
-      navigate('/auth?mode=signup');
+      // Weekly review goes back to home; onboarding flows go to signup
+      if (flowId === 'weekly-review') {
+        navigate('/app/home');
+      } else {
+        navigate('/auth?mode=signup');
+      }
     }
   }, [currentStep, flow, completedKey, progressKey, navigate]);
 
