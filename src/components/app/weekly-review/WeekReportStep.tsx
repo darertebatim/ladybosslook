@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { subDays, format } from 'date-fns';
 import { OnboardingStep } from '@/types/onboarding';
-import weeklyReviewMascot from '@/assets/weekly-review-mascot.png';
+import weeklyReviewMascot from '@/assets/weekly-review-mascot-new.png';
 
 interface Props {
   step: OnboardingStep;
@@ -103,7 +103,7 @@ export function WeekReportStep({ step, onNext }: Props) {
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
       {/* Hero image area */}
-      <div className="shrink-0 relative" style={{ height: 260 }}>
+      <div className="shrink-0 relative" style={{ height: '50%' }}>
         <img
           src={weeklyReviewMascot}
           alt=""
