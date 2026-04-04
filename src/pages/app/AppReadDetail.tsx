@@ -16,6 +16,13 @@ export default function AppReadDetail() {
   const isCompleted = prog?.completed;
   const hasProgress = prog && prog.last_section_index > 0;
 
+  // Calculate reading time from actual section content (~200 words/min)
+  const totalWords = sections.reduce((sum, s) => {
+    const text = [s.heading, s.body, s.quote].filter(Boolean).join(' ');
+    return sum + text.split(/\s+/).filter(Boolean).length;
+  }, 0);
+  const calculatedMinutes = Math.max(1, Math.round(totalWords / 200));
+
   if (isLoading || !content) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -63,7 +70,7 @@ export default function AppReadDetail() {
 
           <div className="flex items-center gap-3 mb-5">
             <span className="flex items-center gap-1.5 text-sm text-black">
-              <Clock className="h-4 w-4" /> {content.reading_time_minutes} min
+              <Clock className="h-4 w-4" /> {calculatedMinutes} min
             </span>
             <Badge variant="secondary" className="capitalize text-xs">{content.category}</Badge>
             <span className="flex items-center gap-1.5 text-sm text-black">
