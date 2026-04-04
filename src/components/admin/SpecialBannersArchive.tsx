@@ -1,6 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Info } from 'lucide-react';
+import moodBannerImg from '@/assets/mood-banner.png';
+import onboardingBannerImg from '@/assets/onboarding-banner.png';
+import weeklyReviewBannerImg from '@/assets/weekly-review-banner.png';
 
 interface SpecialBanner {
   name: string;
@@ -8,17 +11,19 @@ interface SpecialBanner {
   location: string;
   description: string;
   conditions: string[];
+  coverImage?: string;
 }
 
 const specialBanners: SpecialBanner[] = [
   {
     name: 'Mood Check-In',
     component: 'MoodCheckInBanner',
-    location: 'Home (above My Tasks)',
-    description: 'Daily prompt encouraging users to log their mood. Uses a static 3:1 image banner.',
+    location: 'Home (after Promo & Home banners)',
+    description: 'Daily prompt encouraging users to log their mood. Uses a static 3:1 image banner. Tapping opens the mood logging screen.',
+    coverImage: moodBannerImg,
     conditions: [
-      'Hidden when Welcome card is active',
-      'Auto-dismisses after mood is logged',
+      'Hidden when Promo or Home banners are active',
+      'Auto-hides after today\'s mood is logged',
       'Dismissible via X button (resets daily)',
       'Tapping navigates to /app/mood',
     ],
@@ -27,21 +32,24 @@ const specialBanners: SpecialBanner[] = [
     name: 'Ladybosslook Onboarding',
     component: 'OnboardingBanner',
     location: 'Home (above My Tasks)',
-    description: 'Guides new users through the onboarding flow. Features the Ladybosslook mascot with a notepad illustration.',
+    description: 'Guides new users through the 12-step onboarding flow. Uses a static 3:1 image banner with the Ladybosslook mascot.',
+    coverImage: onboardingBannerImg,
     conditions: [
       'Shown only to users who haven\'t completed onboarding',
-      'Hidden when Welcome card is active',
+      'Dismissible via X button (stays hidden for session)',
       'Tapping navigates to /app/onboarding',
-      'Auto-dismisses after onboarding is completed',
+      'Auto-hides after onboarding is completed',
     ],
   },
   {
     name: 'Weekly Review',
     component: 'WeeklyReviewBanner',
-    location: 'Home (below OnboardingBanner)',
-    description: 'Weekend banner encouraging users to review their week and plan the next one. Purple gradient with clipboard emoji.',
+    location: 'Home (after Mood Check-In banner)',
+    description: 'Weekend banner encouraging users to review their week and plan the next one. Uses a 3:1 cover image with mascot, "Plan your next week in 1 min!" text, and a "Let\'s go!" CTA.',
+    coverImage: weeklyReviewBannerImg,
     conditions: [
       'Shown only on weekends (Saturday & Sunday)',
+      'Appears after Mood Check-In banner is dismissed',
       'Hidden once the weekly review flow is completed for that week',
       'Dismissible via X button (resets each week)',
       'Tapping navigates to /app/onboarding/weekly-review',
@@ -62,6 +70,16 @@ export function SpecialBannersArchive() {
 
       {specialBanners.map((banner) => (
         <Card key={banner.component}>
+          {banner.coverImage && (
+            <div className="px-4 pt-4">
+              <img
+                src={banner.coverImage}
+                alt={`${banner.name} banner preview`}
+                className="w-full h-auto rounded-lg border"
+                style={{ aspectRatio: '3/1', objectFit: 'cover' }}
+              />
+            </div>
+          )}
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base">{banner.name}</CardTitle>
