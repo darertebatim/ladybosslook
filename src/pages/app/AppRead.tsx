@@ -63,7 +63,7 @@ export default function AppRead() {
                     {item.title}
                   </h3>
                   {item.subtitle && (
-                    <p className="text-xs text-gray-600 mt-0.5 line-clamp-1">{item.subtitle}</p>
+                    <p className="text-xs text-black/70 mt-0.5 line-clamp-1">{item.subtitle}</p>
                   )}
                   <div className="flex items-center gap-2.5 mt-1.5">
                     <span className="text-[11px] text-gray-500 flex items-center gap-1 font-medium">
