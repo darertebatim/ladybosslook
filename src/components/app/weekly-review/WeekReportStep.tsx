@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { subDays, format } from 'date-fns';
 import { OnboardingStep } from '@/types/onboarding';
+import weeklyReviewMascot from '@/assets/weekly-review-mascot.png';
 
 interface Props {
   step: OnboardingStep;
@@ -37,7 +38,6 @@ export function WeekReportStep({ step, onNext }: Props) {
       const weekAgo = subDays(today, 7);
       const weekAgoStr = format(weekAgo, 'yyyy-MM-dd');
 
-      // Get completions for last 7 days
       const { data: completions } = await supabase
         .from('task_completions')
         .select('task_id, completed_date')
@@ -46,7 +46,6 @@ export function WeekReportStep({ step, onNext }: Props) {
 
       const tasksCompleted = completions?.length || 0;
 
-      // Calculate best streak (consecutive days with completions)
       const datesSet = new Set(completions?.map(c => c.completed_date) || []);
       let bestStreak = 0;
       let currentStreak = 0;
@@ -60,7 +59,6 @@ export function WeekReportStep({ step, onNext }: Props) {
         }
       }
 
-      // Find top habit (most completed task)
       const taskCounts: Record<string, number> = {};
       completions?.forEach(c => {
         taskCounts[c.task_id] = (taskCounts[c.task_id] || 0) + 1;
@@ -81,7 +79,6 @@ export function WeekReportStep({ step, onNext }: Props) {
         }
       }
 
-      // Weeks since signup
       const { data: profile } = await supabase
         .from('profiles')
         .select('created_at')
@@ -98,65 +95,68 @@ export function WeekReportStep({ step, onNext }: Props) {
   }, [user]);
 
   const statCards = [
-    { label: 'Tasks Done', value: String(stats.tasksCompleted), emoji: '✅' },
-    { label: 'Best Streak', value: `${stats.bestStreak} days`, emoji: '🔥' },
-    { label: 'Top Habit', value: stats.topHabit, emoji: stats.topHabitEmoji },
+    { label: 'Tasks Done', value: String(stats.tasksCompleted), emoji: '✅', borderColor: 'border-blue-300', bgColor: 'bg-blue-50' },
+    { label: 'Best Streak', value: `${stats.bestStreak} days`, emoji: '🔥', borderColor: 'border-orange-300', bgColor: 'bg-orange-50' },
+    { label: 'Top Habit', value: stats.topHabit, emoji: stats.topHabitEmoji, borderColor: 'border-purple-300', bgColor: 'bg-purple-50' },
   ];
 
   return (
-    <div className="h-full flex flex-col overflow-y-auto overscroll-contain">
-      {/* Purple gradient hero */}
-      <div className="shrink-0 bg-gradient-to-b from-purple-500 to-purple-400 px-6 pt-10 pb-8 text-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="absolute rounded-full bg-white" style={{
-              width: 60 + i * 20, height: 60 + i * 20,
-              top: `${10 + i * 15}%`, left: `${10 + i * 18}%`,
-              opacity: 0.1 + i * 0.05,
-            }} />
-          ))}
-        </div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="relative z-10"
-        >
-          <FluentEmoji emoji="🎉" size={56} />
-          <h1 className="text-2xl font-extrabold text-white mt-3">
-            Hooray! It's been {stats.weeksCount} week{stats.weeksCount !== 1 ? 's' : ''}!
-          </h1>
-          <p className="text-white/80 text-sm mt-1">Here's how your last 7 days went</p>
-        </motion.div>
+    <div className="h-full flex flex-col relative overflow-hidden">
+      {/* Hero image area */}
+      <div className="shrink-0 relative" style={{ height: 260 }}>
+        <img
+          src={weeklyReviewMascot}
+          alt=""
+          className="w-full h-full object-cover"
+          style={{ objectPosition: 'center 40%' }}
+        />
       </div>
 
-      {/* Stat cards */}
-      <div className="flex-1 px-5 pt-6 pb-6 flex flex-col">
-        <div className="space-y-3 mb-8">
-          {statCards.map((card, i) => (
-            <motion.div
-              key={card.label}
-              initial={{ opacity: 0, x: -20 }}
-              animate={loaded ? { opacity: 1, x: 0 } : {}}
-              transition={{ delay: 0.2 + i * 0.1, duration: 0.35 }}
-              className="flex items-center gap-4 p-4 rounded-2xl bg-purple-50 border border-purple-100"
-            >
-              <FluentEmoji emoji={card.emoji} size={32} />
-              <div className="flex-1">
-                <p className="text-xs text-purple-400 font-medium">{card.label}</p>
-                <p className="text-base font-bold text-[#1a1f3d] truncate">{card.value}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="mt-auto">
-          <button
-            onClick={onNext}
-            className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base active:scale-[0.98] transition-all"
+      {/* White bottom sheet */}
+      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 overflow-y-auto">
+        <div className="px-5 pt-7 pb-6 flex flex-col min-h-full">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="text-center mb-6"
           >
-            {step.buttonLabel || 'Continue'}
-          </button>
+            <h1 className="text-2xl font-extrabold text-[#1a1f3d] leading-snug">
+              Hooray!{'\n'}It's been {stats.weeksCount} week{stats.weeksCount !== 1 ? 's' : ''}!
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">Here's how your last 7 days went</p>
+          </motion.div>
+
+          {/* Stat cards in a row like me+ */}
+          <div className="grid grid-cols-3 gap-3 mb-8">
+            {statCards.map((card, i) => (
+              <motion.div
+                key={card.label}
+                initial={{ opacity: 0, y: 16 }}
+                animate={loaded ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: 0.2 + i * 0.1, duration: 0.35 }}
+                className={`flex flex-col items-center p-3 rounded-2xl border-2 ${card.borderColor} ${card.bgColor}`}
+              >
+                <p className="text-[10px] font-bold text-[#1a1f3d] mb-1.5">{card.label}</p>
+                <FluentEmoji emoji={card.emoji} size={28} />
+                <p className="text-lg font-extrabold text-[#1a1f3d] mt-1 truncate max-w-full text-center leading-tight">
+                  {card.value}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-auto">
+            <button
+              onClick={onNext}
+              className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base flex items-center justify-center gap-3 active:scale-[0.98] transition-all"
+            >
+              {step.buttonLabel || 'Continue'}
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
