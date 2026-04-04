@@ -363,7 +363,6 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
   const hasCategories = isWeeklyFeltGood && step.options?.some(o => o.description);
 
   const renderChip = (opt: { label: string; emoji?: string; description?: string }, i: number) => {
-    const isPopular = popularIndices.includes(i);
     return (
       <button
         key={i}
@@ -378,9 +377,6 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
       >
         {opt.emoji && <OptionEmoji emoji={opt.emoji} size={18} />}
         <span className="text-xs font-medium text-foreground whitespace-nowrap">{opt.label}</span>
-        {isPopular && !selected.has(i) && (
-          <span className="text-[8px] font-bold text-primary bg-primary/10 px-1 py-0.5 rounded-full">Popular</span>
-        )}
         {selected.has(i) && <SealCheck showParticles className="w-4 h-4 text-primary animate-seal-pop" />}
       </button>
     );
@@ -390,48 +386,33 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
     return (
       <BottomSheetWrapper bgImage={meplusMascotBg}>
         <FadeUp>
-          <div className="min-h-[4.5em] flex items-start justify-center mb-3">
-            <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center leading-snug">{step.title}</h1>
+          <div className="min-h-[3em] flex items-start justify-center mb-3">
+            <h1 className="text-xl font-extrabold text-foreground text-center leading-snug">{step.title}</h1>
           </div>
           {isWeeklyFocus && (
-            <p className="text-xs text-gray-400 text-center mb-4">Pick up to 3 — focus works best with fewer goals</p>
+            <p className="text-xs text-muted-foreground text-center mb-3">Pick up to 3 — focus works best with fewer goals</p>
           )}
         </FadeUp>
 
         {usePills ? (
           <FadeUp delay={0.1}>
-            <div className="flex flex-wrap gap-2.5 mb-6">
+            <div className="flex flex-wrap gap-2 mb-4">
               {step.options?.map((opt, i) => (
                 <button
                   key={i}
                   onClick={() => toggle(i)}
-                  className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all active:scale-[0.96] ${
+                  className={`px-3 py-2 rounded-full text-xs font-medium transition-all active:scale-[0.96] ${
                     selected.has(i)
-                      ? 'bg-purple-100 text-purple-700 ring-2 ring-purple-400'
+                      ? 'bg-primary/15 text-primary ring-2 ring-primary'
                       : selected.size >= maxSelections
-                        ? 'bg-gray-50 text-gray-300'
-                        : 'bg-gray-100 text-[#1a1f3d]'
+                        ? 'bg-muted text-muted-foreground'
+                        : 'bg-muted text-foreground'
                   }`}
                 >
                   {opt.label}
                 </button>
               ))}
             </div>
-          </FadeUp>
-        ) : hasCategories ? (
-          <FadeUp delay={0.1}>
-            {Object.entries(categoryLabels).map(([cat, catLabel]) => {
-              const catOptions = step.options?.map((o, i) => ({ ...o, idx: i })).filter(o => o.description === cat) || [];
-              if (catOptions.length === 0) return null;
-              return (
-                <div key={cat} className="mb-3">
-                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5">{catLabel}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {catOptions.map(opt => renderChip(opt, opt.idx))}
-                  </div>
-                </div>
-              );
-            })}
           </FadeUp>
         ) : (
           <FadeUp delay={0.1}>
