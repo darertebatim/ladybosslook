@@ -16,7 +16,7 @@ export default function AppRead() {
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <BookOpen className="h-6 w-6 text-primary" /> Read
         </h1>
-        <p className="text-muted-foreground text-sm mt-1">Stories & lessons for your mind</p>
+        <p className="text-black text-sm mt-1">Stories & lessons for your mind</p>
       </div>
 
       {/* Content List */}
