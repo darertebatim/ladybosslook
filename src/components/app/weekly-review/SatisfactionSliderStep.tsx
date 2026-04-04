@@ -11,10 +11,10 @@ interface Props {
 }
 
 const levels = [
-  { emoji: '😞', label: 'Not at all', color: 'bg-red-100 border-red-200' },
-  { emoji: '😐', label: 'A little', color: 'bg-orange-100 border-orange-200' },
-  { emoji: '😊', label: 'Satisfied', color: 'bg-green-100 border-green-200' },
-  { emoji: '🤩', label: 'Really satisfied!', color: 'bg-purple-100 border-purple-200' },
+  { emoji: '😞', label: 'Unsatisfied' },
+  { emoji: '😐', label: 'A little' },
+  { emoji: '😊', label: 'Satisfied' },
+  { emoji: '🤩', label: 'Really satisfied' },
 ];
 
 export function SatisfactionSliderStep({ step, onNext, onAnswer }: Props) {
@@ -27,12 +27,10 @@ export function SatisfactionSliderStep({ step, onNext, onAnswer }: Props) {
 
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
-      {/* Purple gradient header with mascot */}
       <div className="shrink-0 relative" style={{ height: 200 }}>
         <img src={meplusMascotBg} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
       </div>
 
-      {/* White bottom sheet */}
       <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 overflow-y-auto">
         <div className="px-5 pt-6 pb-6 flex flex-col min-h-full">
           <motion.div
@@ -43,7 +41,6 @@ export function SatisfactionSliderStep({ step, onNext, onAnswer }: Props) {
             <div className="min-h-[4.5em] flex items-start justify-center mb-4">
               <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center leading-snug">{step.title}</h1>
             </div>
-            {step.subtitle && <p className="text-sm text-gray-500 text-center mb-6">{step.subtitle}</p>}
           </motion.div>
 
           {/* Big emoji display */}
@@ -52,36 +49,40 @@ export function SatisfactionSliderStep({ step, onNext, onAnswer }: Props) {
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.3 }}
-            className="flex justify-center mb-4"
+            className="flex justify-center mb-8"
           >
-            <FluentEmoji emoji={selected !== null ? levels[selected].emoji : '🤔'} size={72} />
+            <FluentEmoji emoji={selected !== null ? levels[selected].emoji : '🤔'} size={80} />
           </motion.div>
 
-          {selected !== null && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center text-base font-semibold text-[#1a1f3d] mb-5"
-            >
-              {levels[selected].label}
-            </motion.p>
-          )}
+          {/* Slider track with dots */}
+          <div className="relative px-2 mb-2">
+            {/* Background track */}
+            <div className="absolute top-1/2 left-2 right-2 h-2 -translate-y-1/2 bg-purple-100 rounded-full" />
 
-          {/* Selection buttons */}
-          <div className="flex justify-center gap-3 mb-6">
-            {levels.map((level, i) => (
-              <button
-                key={i}
-                onClick={() => handleSelect(i)}
-                className={`w-16 h-16 rounded-2xl border-2 flex items-center justify-center transition-all active:scale-95 ${
-                  selected === i
-                    ? `${level.color} scale-110 shadow-md`
-                    : 'bg-gray-50 border-gray-200'
-                }`}
-              >
-                <FluentEmoji emoji={level.emoji} size={32} />
-              </button>
-            ))}
+            {/* Dots on track */}
+            <div className="relative flex justify-between items-center">
+              {levels.map((level, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSelect(i)}
+                  className="relative z-10 flex items-center justify-center transition-all active:scale-95"
+                >
+                  <div
+                    className={`rounded-full transition-all duration-200 ${
+                      selected === i
+                        ? 'w-12 h-12 bg-purple-500 shadow-lg shadow-purple-200'
+                        : 'w-6 h-6 bg-purple-200'
+                    }`}
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Labels under the bar */}
+          <div className="flex justify-between px-1 mb-6">
+            <span className="text-xs font-medium text-[#1a1f3d]">Unsatisfied</span>
+            <span className="text-xs font-medium text-[#1a1f3d]">Really satisfied</span>
           </div>
 
           <div className="mt-auto">
