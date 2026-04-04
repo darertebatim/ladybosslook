@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
-import weeklyReviewMascot from '@/assets/weekly-review-mascot.png';
+import weeklyReviewBanner from '@/assets/weekly-review-banner.png';
 
 function getWeekNumber(d: Date): number {
   const oneJan = new Date(d.getFullYear(), 0, 1);
@@ -59,25 +59,12 @@ export function WeeklyReviewBanner({ onVisibilityChange }: { onVisibilityChange?
         fading ? "animate-fade-out opacity-0" : "animate-fade-in"
       )}
     >
-      {/* Banner image with overlay */}
-      <div className="relative h-[100px]">
-        <img
-          src={weeklyReviewMascot}
-          alt=""
-          className="w-full h-full object-cover"
-          style={{ objectPosition: 'center 30%' }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/80 to-purple-500/60" />
-        <div className="absolute inset-0 flex items-center px-4 gap-3">
-          <div className="flex-1 min-w-0">
-            <p className="text-white font-bold text-sm">Plan your next week in 1 min!</p>
-            <p className="text-white/80 text-xs mt-0.5">Review & set your goals 📋</p>
-          </div>
-          <span className="shrink-0 bg-white text-purple-600 text-xs font-bold px-4 py-2 rounded-full">
-            Let's go!
-          </span>
-        </div>
-      </div>
+      <img
+        src={weeklyReviewBanner}
+        alt="Plan your next week in 1 min"
+        className="w-full object-cover rounded-2xl"
+        style={{ aspectRatio: '3/1' }}
+      />
       <button
         onClick={handleDismiss}
         className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center"
