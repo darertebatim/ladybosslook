@@ -15,6 +15,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { WeekReportStep } from '@/components/app/weekly-review/WeekReportStep';
+import { SatisfactionSliderStep } from '@/components/app/weekly-review/SatisfactionSliderStep';
+import { WeekTaskSuggestionsStep } from '@/components/app/weekly-review/WeekTaskSuggestionsStep';
+import { WeekCelebrationStep } from '@/components/app/weekly-review/WeekCelebrationStep';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 
 function OptionEmoji({ emoji, size }: { emoji: string; size: number }) {
