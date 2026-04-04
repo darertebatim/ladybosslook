@@ -1051,8 +1051,11 @@ const AppHome = () => {
             {/* Mood Check-in Banner — only after all promo/home banners are dismissed */}
             {!hasPromoBanner && !hasHomeBanner && <MoodCheckInBanner onVisibilityChange={setHasMoodBanner} />}
 
+            {/* Weekly Review Banner — shows when mood banner is dismissed, on weekends */}
+            {!hasPromoBanner && !hasHomeBanner && !hasMoodBanner && <WeeklyReviewBanner onVisibilityChange={setHasWeeklyBanner} />}
+
             {/* My Shortcuts — only when no banners are visible */}
-            {!hasPromoBanner && !hasHomeBanner && !hasMoodBanner && (
+            {!hasPromoBanner && !hasHomeBanner && !hasMoodBanner && !hasWeeklyBanner && (
               <div className="mb-3">
                 <ToolShortcuts hideWhenEmpty hideLabels />
               </div>
