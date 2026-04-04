@@ -27,9 +27,17 @@ const feltGoodMapping: Record<string, TaskSuggestion> = {
   'Mindfulness': { emoji: '🧘', title: '5-min morning meditation', color: 'lavender' },
   'Relaxation': { emoji: '🛀', title: 'Take a relaxing bath', color: 'sky' },
   'Nature': { emoji: '🌿', title: '20-min nature walk', color: 'mint' },
+  'School': { emoji: '🎓', title: 'Review notes for 20 min', color: 'sky' },
   'Work': { emoji: '💼', title: 'Plan top 3 priorities', color: 'sky' },
   'Family': { emoji: '👨‍👩‍👧', title: 'Quality family time', color: 'pink' },
   'Friends': { emoji: '🤝', title: 'Reach out to a friend', color: 'peach' },
+  'Partner': { emoji: '💑', title: 'Plan a date night', color: 'pink' },
+  'Pet': { emoji: '🐾', title: 'Extra playtime with pet', color: 'yellow' },
+  'Community': { emoji: '🏘️', title: 'Join a local event', color: 'mint' },
+  'Productivity': { emoji: '⚡', title: 'Time-block your day', color: 'peach' },
+  'Achievement': { emoji: '🏆', title: 'Celebrate a small win', color: 'yellow' },
+  'Hobbies': { emoji: '🎨', title: 'Spend 30 min on a hobby', color: 'lavender' },
+  'Creativity': { emoji: '✏️', title: 'Try something creative', color: 'pink' },
 };
 
 const focusMapping: Record<string, TaskSuggestion> = {
