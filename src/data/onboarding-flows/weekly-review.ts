@@ -64,7 +64,7 @@ export const weeklyReviewFlow: OnboardingFlow = {
       type: 'week-task-suggestions',
       title: 'Great! How about trying some new goals this week?',
       subtitle: 'We picked these based on your answers',
-      buttonLabel: 'Add to My Planner',
+      buttonLabel: 'Add to My Routines',
       secondaryButtonLabel: 'Skip',
     },
     {
