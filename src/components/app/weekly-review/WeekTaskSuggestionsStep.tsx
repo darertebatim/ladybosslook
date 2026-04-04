@@ -3,10 +3,9 @@ import { motion } from 'framer-motion';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { useAuth } from '@/hooks/useAuth';
-import { RoutinePreviewSheet, EditedTask, ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
+import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
-import { TaskColor } from '@/hooks/useTaskPlanner';
 
 interface Props {
   step: OnboardingStep;
@@ -20,7 +19,6 @@ interface TaskSuggestion {
   color: string;
 }
 
-// Mapping from "felt good about" (Step 3) → reinforcement tasks
 const feltGoodMapping: Record<string, TaskSuggestion> = {
   'Sleep': { emoji: '😴', title: 'Wind-down routine at 10pm', color: 'lavender' },
   'Nutrition': { emoji: '🥗', title: 'Eat a home-cooked meal', color: 'mint' },
@@ -34,7 +32,6 @@ const feltGoodMapping: Record<string, TaskSuggestion> = {
   'Friends': { emoji: '🤝', title: 'Reach out to a friend', color: 'peach' },
 };
 
-// Mapping from "focus on next week" (Step 4) → growth tasks
 const focusMapping: Record<string, TaskSuggestion> = {
   'Sleep better': { emoji: '🌙', title: 'No screens after 9pm', color: 'lavender' },
   'Eat healthier': { emoji: '🥑', title: 'Meal prep Sunday', color: 'mint' },
@@ -89,17 +86,20 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
     return tasks.slice(0, 4);
   }, [answers]);
 
-  // Convert suggestions to RoutinePlanTask format for RoutinePreviewSheet
+  // Convert to RoutinePlanTask for RoutinePreviewSheet
   const routineTasks: RoutinePlanTask[] = useMemo(() => {
     return suggestions.map((task, i) => ({
       id: `wr-suggestion-${i}`,
-      plan_id: 'weekly-review',
+      plan_id: 'synthetic-weekly-review',
       title: task.title,
       icon: task.emoji,
-      color: task.color as TaskColor,
+      color: task.color,
       task_order: i,
-      repeat_pattern: 'daily' as const,
-      is_enabled: true,
+      is_active: true,
+      created_at: new Date().toISOString(),
+      linked_playlist_id: null,
+      pro_link_type: null,
+      pro_link_value: null,
     }));
   }, [suggestions]);
 
@@ -107,21 +107,21 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
     if (!user) return;
     try {
       await addRoutinePlan.mutateAsync({
-        title: 'Weekly Goals',
-        emoji: '🎯',
-        color: 'lavender',
-        tasks: selectedTaskIds.map((id, idx) => {
-          const edited = editedTasks.find(t => t.id === id);
-          const original = routineTasks.find(t => t.id === id);
-          return {
-            title: edited?.title || original?.title || '',
-            icon: edited?.icon || original?.icon || '✨',
-            color: (edited?.color || original?.color || ROUTINE_COLOR_CYCLE[idx % ROUTINE_COLOR_CYCLE.length]) as TaskColor,
-            task_order: idx,
-            repeat_pattern: edited?.repeatPattern || 'daily',
-            is_enabled: true,
-          };
-        }),
+        planId: 'synthetic-weekly-review',
+        selectedTaskIds,
+        editedTasks: editedTasks.map(t => ({
+          id: t.id,
+          title: t.title,
+          icon: t.icon,
+          color: t.color,
+          repeatPattern: t.repeatPattern,
+          scheduledTime: t.scheduledTime,
+          tag: t.tag,
+          linked_playlist_id: t.linked_playlist_id,
+          pro_link_type: t.pro_link_type,
+          pro_link_value: t.pro_link_value,
+        })),
+        syntheticTasks: routineTasks,
       });
       toast.success('Routine added to your planner!');
       setShowPreview(false);
