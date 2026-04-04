@@ -17,7 +17,7 @@ import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
 import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
 import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
 
-const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow];
+const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow, weeklyReviewFlow];
 
 function preloadImages(srcs: string[]) {
   srcs.forEach(src => {

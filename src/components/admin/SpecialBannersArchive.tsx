@@ -35,6 +35,18 @@ const specialBanners: SpecialBanner[] = [
       'Auto-dismisses after onboarding is completed',
     ],
   },
+  {
+    name: 'Weekly Review',
+    component: 'WeeklyReviewBanner',
+    location: 'Home (below OnboardingBanner)',
+    description: 'Weekend banner encouraging users to review their week and plan the next one. Purple gradient with clipboard emoji.',
+    conditions: [
+      'Shown only on weekends (Saturday & Sunday)',
+      'Hidden once the weekly review flow is completed for that week',
+      'Dismissible via X button (resets each week)',
+      'Tapping navigates to /app/onboarding/weekly-review',
+    ],
+  },
 ];
 
 export function SpecialBannersArchive() {

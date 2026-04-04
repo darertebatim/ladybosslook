@@ -126,6 +126,14 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <TextInputScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'routine-ready-teaser':
       return <RoutineReadyTeaserScreen step={step} onNext={onNext} />;
+    case 'week-report':
+      return <WeekReportStep step={step} onNext={onNext} />;
+    case 'satisfaction-slider':
+      return <SatisfactionSliderStep step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'week-task-suggestions':
+      return <WeekTaskSuggestionsStep step={step} onNext={onNext} answers={answers} />;
+    case 'week-celebration':
+      return <WeekCelebrationStep step={step} onNext={onNext} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }
