@@ -98,23 +98,6 @@ export function SatisfactionSliderStep({ step, onNext, onAnswer }: Props) {
             )}
           </motion.div>
 
-          {/* Note for low scores — compact */}
-          {selected !== null && selected <= 1 && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              transition={{ duration: 0.3 }}
-              className="mb-2"
-            >
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder="What would've made it better? (optional)"
-                className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground"
-                rows={2}
-              />
-            </motion.div>
-          )}
 
           <div className="mt-auto">
             <button
