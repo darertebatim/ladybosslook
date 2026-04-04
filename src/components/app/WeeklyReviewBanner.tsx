@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
-import weeklyReviewMascot from '@/assets/weekly-review-mascot.png';
+import weeklyReviewBanner from '@/assets/weekly-review-banner.png';
 
 function getWeekNumber(d: Date): number {
   const oneJan = new Date(d.getFullYear(), 0, 1);
