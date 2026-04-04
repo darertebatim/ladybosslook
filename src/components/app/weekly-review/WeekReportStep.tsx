@@ -103,7 +103,7 @@ export function WeekReportStep({ step, onNext }: Props) {
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
       {/* Hero image area */}
-      <div className="shrink-0 relative" style={{ height: 260 }}>
+      <div className="shrink-0 relative" style={{ height: '50%' }}>
         <img
           src={weeklyReviewMascot}
           alt=""
