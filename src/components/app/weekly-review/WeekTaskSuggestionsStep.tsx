@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { useAuth } from '@/hooks/useAuth';
@@ -17,47 +17,55 @@ interface TaskSuggestion {
   emoji: string;
   title: string;
   color: string;
+  difficulty?: string;
+  timeEstimate?: string;
+  reason?: string;
 }
 
 const feltGoodMapping: Record<string, TaskSuggestion> = {
-  'Sleep': { emoji: '😴', title: 'Wind-down routine at 10pm', color: 'lavender' },
-  'Nutrition': { emoji: '🥗', title: 'Eat a home-cooked meal', color: 'mint' },
-  'Learning': { emoji: '📚', title: 'Read for 15 minutes', color: 'yellow' },
-  'Physical activities': { emoji: '🏃', title: '30-min workout', color: 'peach' },
-  'Mindfulness': { emoji: '🧘', title: '5-min morning meditation', color: 'lavender' },
-  'Relaxation': { emoji: '🛀', title: 'Take a relaxing bath', color: 'sky' },
-  'Nature': { emoji: '🌿', title: '20-min nature walk', color: 'mint' },
-  'School': { emoji: '🎓', title: 'Review notes for 20 min', color: 'sky' },
-  'Work': { emoji: '💼', title: 'Plan top 3 priorities', color: 'sky' },
-  'Family': { emoji: '👨‍👩‍👧', title: 'Quality family time', color: 'pink' },
-  'Friends': { emoji: '🤝', title: 'Reach out to a friend', color: 'peach' },
-  'Partner': { emoji: '💑', title: 'Plan a date night', color: 'pink' },
-  'Pet': { emoji: '🐾', title: 'Extra playtime with pet', color: 'yellow' },
-  'Community': { emoji: '🏘️', title: 'Join a local event', color: 'mint' },
-  'Productivity': { emoji: '⚡', title: 'Time-block your day', color: 'peach' },
-  'Achievement': { emoji: '🏆', title: 'Celebrate a small win', color: 'yellow' },
-  'Hobbies': { emoji: '🎨', title: 'Spend 30 min on a hobby', color: 'lavender' },
-  'Creativity': { emoji: '✏️', title: 'Try something creative', color: 'pink' },
+  'Sleep': { emoji: '😴', title: 'Wind-down routine at 10pm', color: 'lavender', difficulty: 'Easy', timeEstimate: '10 min', reason: 'You felt good about Sleep' },
+  'Nutrition': { emoji: '🥗', title: 'Eat a home-cooked meal', color: 'mint', difficulty: 'Medium', timeEstimate: '30 min', reason: 'You felt good about Nutrition' },
+  'Learning': { emoji: '📚', title: 'Read for 15 minutes', color: 'yellow', difficulty: 'Easy', timeEstimate: '15 min', reason: 'You felt good about Learning' },
+  'Physical activities': { emoji: '🏃', title: '30-min workout', color: 'peach', difficulty: 'Medium', timeEstimate: '30 min', reason: 'You felt good about Physical activities' },
+  'Mindfulness': { emoji: '🧘', title: '5-min morning meditation', color: 'lavender', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You felt good about Mindfulness' },
+  'Relaxation': { emoji: '🛀', title: 'Take a relaxing bath', color: 'sky', difficulty: 'Easy', timeEstimate: '20 min', reason: 'You felt good about Relaxation' },
+  'Nature': { emoji: '🌿', title: '20-min nature walk', color: 'mint', difficulty: 'Easy', timeEstimate: '20 min', reason: 'You felt good about Nature' },
+  'School': { emoji: '🎓', title: 'Review notes for 20 min', color: 'sky', difficulty: 'Medium', timeEstimate: '20 min', reason: 'You felt good about School' },
+  'Work': { emoji: '💼', title: 'Plan top 3 priorities', color: 'sky', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You felt good about Work' },
+  'Family': { emoji: '👨‍👩‍👧', title: 'Quality family time', color: 'pink', difficulty: 'Easy', timeEstimate: '30 min', reason: 'You felt good about Family' },
+  'Friends': { emoji: '🤝', title: 'Reach out to a friend', color: 'peach', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You felt good about Friends' },
+  'Partner': { emoji: '💑', title: 'Plan a date night', color: 'pink', difficulty: 'Easy', timeEstimate: '10 min', reason: 'You felt good about Partner' },
+  'Pet': { emoji: '🐾', title: 'Extra playtime with pet', color: 'yellow', difficulty: 'Easy', timeEstimate: '15 min', reason: 'You felt good about Pet' },
+  'Community': { emoji: '🏘️', title: 'Join a local event', color: 'mint', difficulty: 'Medium', timeEstimate: '1 hr', reason: 'You felt good about Community' },
+  'Productivity': { emoji: '⚡', title: 'Time-block your day', color: 'peach', difficulty: 'Easy', timeEstimate: '10 min', reason: 'You felt good about Productivity' },
+  'Achievement': { emoji: '🏆', title: 'Celebrate a small win', color: 'yellow', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You felt good about Achievement' },
+  'Hobbies': { emoji: '🎨', title: 'Spend 30 min on a hobby', color: 'lavender', difficulty: 'Easy', timeEstimate: '30 min', reason: 'You felt good about Hobbies' },
+  'Creativity': { emoji: '✏️', title: 'Try something creative', color: 'pink', difficulty: 'Easy', timeEstimate: '20 min', reason: 'You felt good about Creativity' },
 };
 
 const focusMapping: Record<string, TaskSuggestion> = {
-  'Sleep better': { emoji: '🌙', title: 'No screens after 9pm', color: 'lavender' },
-  'Eat healthier': { emoji: '🥑', title: 'Meal prep Sunday', color: 'mint' },
-  'Be more active': { emoji: '💪', title: 'Walk 10,000 steps', color: 'peach' },
-  'Be present': { emoji: '🧠', title: 'Practice mindful breathing', color: 'lavender' },
-  'Stay calm': { emoji: '🕊️', title: 'Breathing exercise 2x daily', color: 'sky' },
-  'Be kind to self': { emoji: '💚', title: "Write 3 things I'm proud of", color: 'mint' },
-  'Be organized': { emoji: '📋', title: 'Plan tomorrow before bed', color: 'yellow' },
-  'Get things done': { emoji: '🎯', title: 'Complete top priority first', color: 'peach' },
-  'Find joy': { emoji: '🌈', title: 'Do something fun for 30 min', color: 'pink' },
-  'Feel more connected': { emoji: '💕', title: 'Send a kind message', color: 'pink' },
+  'Sleep better': { emoji: '🌙', title: 'No screens after 9pm', color: 'lavender', difficulty: 'Medium', timeEstimate: 'Daily', reason: 'You want to Sleep better' },
+  'Eat healthier': { emoji: '🥑', title: 'Meal prep Sunday', color: 'mint', difficulty: 'Medium', timeEstimate: '1 hr', reason: 'You want to Eat healthier' },
+  'Be more active': { emoji: '💪', title: 'Walk 10,000 steps', color: 'peach', difficulty: 'Medium', timeEstimate: 'Daily', reason: 'You want to Be more active' },
+  'Be present': { emoji: '🧠', title: 'Practice mindful breathing', color: 'lavender', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You want to Be present' },
+  'Stay calm': { emoji: '🕊️', title: 'Breathing exercise 2x daily', color: 'sky', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You want to Stay calm' },
+  'Be kind to self': { emoji: '💚', title: "Write 3 things I'm proud of", color: 'mint', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You want to Be kind to self' },
+  'Be organized': { emoji: '📋', title: 'Plan tomorrow before bed', color: 'yellow', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You want to Be organized' },
+  'Get things done': { emoji: '🎯', title: 'Complete top priority first', color: 'peach', difficulty: 'Medium', timeEstimate: 'Daily', reason: 'You want to Get things done' },
+  'Find joy': { emoji: '🌈', title: 'Do something fun for 30 min', color: 'pink', difficulty: 'Easy', timeEstimate: '30 min', reason: 'You want to Find joy' },
+  'Feel more connected': { emoji: '💕', title: 'Send a kind message', color: 'pink', difficulty: 'Easy', timeEstimate: '5 min', reason: 'You want to Feel more connected' },
 };
 
 const defaultTasks: TaskSuggestion[] = [
-  { emoji: '🌅', title: 'Morning stretch routine', color: 'yellow' },
-  { emoji: '💧', title: 'Drink 8 glasses of water', color: 'sky' },
-  { emoji: '📖', title: 'Read for 15 minutes', color: 'lavender' },
+  { emoji: '🌅', title: 'Morning stretch routine', color: 'yellow', difficulty: 'Easy', timeEstimate: '10 min' },
+  { emoji: '💧', title: 'Drink 8 glasses of water', color: 'sky', difficulty: 'Easy', timeEstimate: 'Daily' },
+  { emoji: '📖', title: 'Read for 15 minutes', color: 'lavender', difficulty: 'Easy', timeEstimate: '15 min' },
 ];
+
+const difficultyColors: Record<string, string> = {
+  Easy: 'bg-green-100 text-green-700',
+  Medium: 'bg-orange-100 text-orange-700',
+};
 
 export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
   const { user } = useAuth();
@@ -65,6 +73,8 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
   const [showPreview, setShowPreview] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingText, setLoadingText] = useState('Analyzing your answers...');
+  const [revealedCount, setRevealedCount] = useState(0);
+  const [showWhyIdx, setShowWhyIdx] = useState<number | null>(null);
 
   useEffect(() => {
     const texts = [
@@ -115,7 +125,18 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
     return tasks.slice(0, 4);
   }, [answers]);
 
-  // Convert to RoutinePlanTask for RoutinePreviewSheet
+  // Staggered reveal after loading finishes
+  useEffect(() => {
+    if (loading) return;
+    let count = 0;
+    const interval = setInterval(() => {
+      count++;
+      setRevealedCount(count);
+      if (count >= suggestions.length) clearInterval(interval);
+    }, 200);
+    return () => clearInterval(interval);
+  }, [loading, suggestions.length]);
+
   const routineTasks: RoutinePlanTask[] = useMemo(() => {
     return suggestions.map((task, i) => ({
       id: `wr-suggestion-${i}`,
@@ -199,18 +220,58 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
         </motion.div>
 
         <div className="space-y-3 mb-8">
-          {suggestions.map((task, i) => (
-            <motion.div
-              key={task.title}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + i * 0.08, duration: 0.3 }}
-              className={`flex items-center gap-3 p-4 rounded-2xl border-2 border-purple-200 ${pastelColors[i % pastelColors.length]}`}
-            >
-              <FluentEmoji emoji={task.emoji} size={28} />
-              <span className="flex-1 text-sm font-semibold text-[#1a1f3d]">{task.title}</span>
-            </motion.div>
-          ))}
+          <AnimatePresence>
+            {suggestions.map((task, i) => (
+              i < revealedCount && (
+                <motion.div
+                  key={task.title}
+                  initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  transition={{ duration: 0.35, ease: 'easeOut' }}
+                  className={`p-4 rounded-2xl border-2 border-purple-200 ${pastelColors[i % pastelColors.length]}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <FluentEmoji emoji={task.emoji} size={28} />
+                    <span className="flex-1 text-sm font-semibold text-[#1a1f3d]">{task.title}</span>
+                  </div>
+                  {/* Badges row */}
+                  <div className="flex items-center gap-2 mt-2 ml-10">
+                    {task.timeEstimate && (
+                      <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                        ⏱ {task.timeEstimate}
+                      </span>
+                    )}
+                    {task.difficulty && (
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${difficultyColors[task.difficulty] || ''}`}>
+                        {task.difficulty}
+                      </span>
+                    )}
+                    {task.reason && (
+                      <button
+                        onClick={() => setShowWhyIdx(showWhyIdx === i ? null : i)}
+                        className="text-[10px] font-bold text-purple-500 bg-purple-50 px-2 py-0.5 rounded-full active:opacity-60"
+                      >
+                        Why this?
+                      </button>
+                    )}
+                  </div>
+                  {/* "Why this?" tooltip */}
+                  <AnimatePresence>
+                    {showWhyIdx === i && task.reason && (
+                      <motion.p
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="text-xs text-purple-600 mt-2 ml-10"
+                      >
+                        💡 {task.reason}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )
+            ))}
+          </AnimatePresence>
         </div>
 
         <div className="mt-auto space-y-2">

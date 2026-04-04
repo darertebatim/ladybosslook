@@ -133,7 +133,7 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
     case 'week-task-suggestions':
       return <WeekTaskSuggestionsStep step={step} onNext={onNext} answers={answers} />;
     case 'week-celebration':
-      return <WeekCelebrationStep step={step} onNext={onNext} />;
+      return <WeekCelebrationStep step={step} onNext={onNext} answers={answers} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }
@@ -316,28 +316,88 @@ function GreetingScreen({ step, onNext }: Props) {
 function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
   const [selected, setSelected] = useState<Set<number>>(new Set());
 
+  const isWeeklyFocus = step.illustrationLabel === 'weekly-review-focus';
+  const isWeeklyFeltGood = step.illustrationLabel === 'weekly-review';
+  const maxSelections = isWeeklyFocus ? 3 : Infinity;
+
+  // Popular options indices for "Most picked" badge
+  const popularIndices = isWeeklyFeltGood ? [0, 4, 5] : isWeeklyFocus ? [0, 2, 7] : [];
+
+  // Group options by category for weekly-review felt-good
+  const categoryLabels: Record<string, string> = {
+    mind: '🧠 Mind',
+    body: '💪 Body',
+    social: '💕 Social',
+    productivity: '⚡ Productivity',
+  };
+
   const toggle = (i: number) => {
     setSelected(prev => {
       const next = new Set(prev);
-      next.has(i) ? next.delete(i) : next.add(i);
-      // Report selected labels
+      if (next.has(i)) {
+        next.delete(i);
+      } else {
+        if (next.size >= maxSelections) return prev;
+        next.add(i);
+      }
       const labels = Array.from(next).map(idx => step.options?.[idx]?.label || '');
       onAnswer?.(step.id, labels);
       return next;
     });
   };
 
+  const surpriseMe = () => {
+    if (!step.options) return;
+    const indices = Array.from({ length: step.options.length }, (_, i) => i);
+    const shuffled = indices.sort(() => Math.random() - 0.5).slice(0, Math.min(maxSelections, 3));
+    const next = new Set(shuffled);
+    setSelected(next);
+    const labels = Array.from(next).map(idx => step.options?.[idx]?.label || '');
+    onAnswer?.(step.id, labels);
+  };
+
   const hasBg = !!step.illustrationLabel;
   const usePills = hasBg && !step.options?.some(o => o.emoji);
+
+  // Group options by category if descriptions are used as categories
+  const hasCategories = isWeeklyFeltGood && step.options?.some(o => o.description);
+
+  const renderOption = (opt: { label: string; emoji?: string; description?: string }, i: number) => {
+    const isPopular = popularIndices.includes(i);
+    return (
+      <button
+        key={i}
+        onClick={() => toggle(i)}
+        className={`relative flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+          selected.has(i)
+            ? 'border-purple-400 bg-purple-50 shadow-sm'
+            : selected.size >= maxSelections
+              ? 'border-gray-100 bg-gray-50 opacity-50'
+              : 'border-gray-200 bg-white'
+        }`}
+      >
+        {opt.emoji && <OptionEmoji emoji={opt.emoji} size={24} />}
+        <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
+        {isPopular && !selected.has(i) && (
+          <span className="text-[9px] font-bold text-purple-500 bg-purple-50 px-1.5 py-0.5 rounded-full">Popular</span>
+        )}
+        {selected.has(i) && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
+      </button>
+    );
+  };
 
   if (hasBg) {
     return (
       <BottomSheetWrapper bgImage={meplusMascotBg}>
         <FadeUp>
-          <div className="min-h-[4.5em] flex items-start justify-center mb-5">
+          <div className="min-h-[4.5em] flex items-start justify-center mb-3">
             <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center leading-snug">{step.title}</h1>
           </div>
+          {isWeeklyFocus && (
+            <p className="text-xs text-gray-400 text-center mb-4">Pick up to 3 — focus works best with fewer goals</p>
+          )}
         </FadeUp>
+
         {usePills ? (
           <FadeUp delay={0.1}>
             <div className="flex flex-wrap gap-2.5 mb-6">
@@ -348,7 +408,9 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
                   className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all active:scale-[0.96] ${
                     selected.has(i)
                       ? 'bg-purple-100 text-purple-700 ring-2 ring-purple-400'
-                      : 'bg-gray-100 text-[#1a1f3d]'
+                      : selected.size >= maxSelections
+                        ? 'bg-gray-50 text-gray-300'
+                        : 'bg-gray-100 text-[#1a1f3d]'
                   }`}
                 >
                   {opt.label}
@@ -356,24 +418,40 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
               ))}
             </div>
           </FadeUp>
+        ) : hasCategories ? (
+          <FadeUp delay={0.1}>
+            {Object.entries(categoryLabels).map(([cat, catLabel]) => {
+              const catOptions = step.options?.map((o, i) => ({ ...o, idx: i })).filter(o => o.description === cat) || [];
+              if (catOptions.length === 0) return null;
+              return (
+                <div key={cat} className="mb-4">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{catLabel}</p>
+                  <div className="space-y-2">
+                    {catOptions.map(opt => renderOption(opt, opt.idx))}
+                  </div>
+                </div>
+              );
+            })}
+          </FadeUp>
         ) : (
           <StaggerContainer className="space-y-3 mb-6">
             {step.options?.map((opt, i) => (
-              <StaggerItem key={i}>
-                <button
-                  onClick={() => toggle(i)}
-                  className={`w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98] ${
-                    selected.has(i) ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
-                  }`}
-                >
-                  {opt.emoji && <OptionEmoji emoji={opt.emoji} size={24} />}
-                  <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
-                  {selected.has(i) && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
-                </button>
-              </StaggerItem>
+              <StaggerItem key={i}>{renderOption(opt, i)}</StaggerItem>
             ))}
           </StaggerContainer>
         )}
+
+        {isWeeklyFocus && (
+          <FadeUp delay={0.15}>
+            <button
+              onClick={surpriseMe}
+              className="w-full mb-4 py-2.5 text-sm font-semibold text-purple-500 active:opacity-60 transition-all"
+            >
+              🎲 Surprise me!
+            </button>
+          </FadeUp>
+        )}
+
         <FadeUp delay={0.3} className="mt-auto">
           <NavyButton onClick={onNext} disabled={selected.size === 0}>{step.buttonLabel}</NavyButton>
         </FadeUp>
@@ -386,18 +464,7 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
       <FadeUp><h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1></FadeUp>
       <StaggerContainer className="space-y-3 mb-6">
         {step.options?.map((opt, i) => (
-          <StaggerItem key={i}>
-            <button
-              onClick={() => toggle(i)}
-              className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 text-left transition-all active:scale-[0.98] ${
-                selected.has(i) ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
-              }`}
-            >
-              {opt.emoji && <OptionEmoji emoji={opt.emoji} size={24} />}
-              <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
-              {selected.has(i) && <SealCheck showParticles className="w-7 h-7 text-purple-500 animate-seal-pop" />}
-            </button>
-          </StaggerItem>
+          <StaggerItem key={i}>{renderOption(opt, i)}</StaggerItem>
         ))}
       </StaggerContainer>
       <FadeUp delay={0.3} className="mt-auto">
