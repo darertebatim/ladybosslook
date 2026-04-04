@@ -85,7 +85,15 @@ export function WeekCelebrationStep({ step, onNext, answers }: Props) {
             className="mt-3"
           >
             <button
-              onClick={() => setShowReminder(!showReminder)}
+              onClick={() => {
+                const next = !showReminder;
+                setShowReminder(next);
+                if (next) {
+                  scheduleMidWeekReminder();
+                } else {
+                  cancelMidWeekReminder();
+                }
+              }}
               className={`w-full flex items-center justify-between p-3 rounded-2xl border transition-all ${
                 showReminder ? 'border-primary/40 bg-primary/5' : 'border-border bg-muted'
               }`}
