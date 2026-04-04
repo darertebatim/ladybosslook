@@ -462,11 +462,11 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
   return (
     <ScreenWrapper>
       <FadeUp><h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-5">{step.title}</h1></FadeUp>
-      <StaggerContainer className="space-y-3 mb-6">
-        {step.options?.map((opt, i) => (
-          <StaggerItem key={i}>{renderOption(opt, i)}</StaggerItem>
-        ))}
-      </StaggerContainer>
+      <FadeUp delay={0.1}>
+        <div className="flex flex-wrap gap-2 mb-6">
+          {step.options?.map((opt, i) => renderChip(opt, i))}
+        </div>
+      </FadeUp>
       <FadeUp delay={0.3} className="mt-auto">
         <NavyButton onClick={onNext} disabled={selected.size === 0}>{step.buttonLabel}</NavyButton>
       </FadeUp>
