@@ -31,7 +31,7 @@ export default function AppReadDetail() {
       {/* Hero */}
       <div className="relative overflow-hidden" style={{ backgroundColor: content.theme_color || '#F0E3FF' }}>
         <button onClick={() => navigate('/app/read')} className="absolute top-4 left-4 z-10 bg-white/70 backdrop-blur-sm rounded-full p-2">
-          <ArrowLeft className="h-5 w-5 text-gray-800" />
+          <ArrowLeft className="h-5 w-5 text-black" />
         </button>
 
         {hasCoverImage ? (
