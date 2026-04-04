@@ -62,11 +62,11 @@ export default function AppReadDetail() {
           )}
 
           <div className="flex items-center gap-3 mb-5">
-            <span className="flex items-center gap-1.5 text-sm text-black/70">
+            <span className="flex items-center gap-1.5 text-sm text-black">
               <Clock className="h-4 w-4" /> {content.reading_time_minutes} min
             </span>
             <Badge variant="secondary" className="capitalize text-xs">{content.category}</Badge>
-            <span className="flex items-center gap-1.5 text-sm text-black/70">
+            <span className="flex items-center gap-1.5 text-sm text-black">
               <Layers className="h-4 w-4" /> {sections.length} sections
             </span>
           </div>

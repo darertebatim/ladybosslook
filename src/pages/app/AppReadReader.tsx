@@ -157,7 +157,7 @@ export default function AppReadReader() {
         {currentSection.heading && (
           <h2 className="text-xl font-bold mb-4 text-foreground">{currentSection.heading}</h2>
         )}
-        <div className="text-base leading-relaxed text-foreground/90 whitespace-pre-line">
+        <div className="text-base leading-relaxed text-black whitespace-pre-line">
           {currentSection.body}
         </div>
         {currentSection.quote && (
