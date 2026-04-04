@@ -47,6 +47,7 @@ import { useAppReview } from '@/hooks/useAppReview';
 import { hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 import { MoodCheckInBanner } from '@/components/mood/MoodCheckInBanner';
 import { OnboardingBanner } from '@/components/app/OnboardingBanner';
+import { WeeklyReviewBanner } from '@/components/app/WeeklyReviewBanner';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { useAutoAssignDefaultRoutine } from '@/hooks/useAutoAssignDefaultRoutine';
@@ -1450,6 +1451,7 @@ const AppHome = () => {
               {/* Tour Banner & Promo - always visible regardless of routine cards */}
               {taskFilter === 'all' && <>
                 <OnboardingBanner />
+                <WeeklyReviewBanner />
                 <div id="tour-banner-slot" className="mt-4" />
                 <PromoBanner location="home_rituals" className="mt-4" />
               </>}

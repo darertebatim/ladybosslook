@@ -6,6 +6,7 @@ import { ChevronLeft } from 'lucide-react';
 import { dearMeFlow } from '@/data/onboarding-flows/dear-me';
 import { mePlusFlow } from '@/data/onboarding-flows/me-plus';
 import { quickStartFlow } from '@/data/onboarding-flows/quick-start';
+import { weeklyReviewFlow } from '@/data/onboarding-flows/weekly-review';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,7 +17,7 @@ import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
 import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
 import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
 
-const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow];
+const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow, weeklyReviewFlow];
 
 function preloadImages(srcs: string[]) {
   srcs.forEach(src => {
@@ -141,7 +142,12 @@ export default function AppOnboarding() {
     } else {
       localStorage.setItem(completedKey, 'true');
       localStorage.removeItem(progressKey);
-      navigate('/auth?mode=signup');
+      // Weekly review goes back to home; onboarding flows go to signup
+      if (flowId === 'weekly-review') {
+        navigate('/app/home');
+      } else {
+        navigate('/auth?mode=signup');
+      }
     }
   }, [currentStep, flow, completedKey, progressKey, navigate]);
 

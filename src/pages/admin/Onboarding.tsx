@@ -5,13 +5,14 @@ import { Plus } from 'lucide-react';
 import { dearMeFlow } from '@/data/onboarding-flows/dear-me';
 import { mePlusFlow } from '@/data/onboarding-flows/me-plus';
 import { quickStartFlow } from '@/data/onboarding-flows/quick-start';
+import { weeklyReviewFlow } from '@/data/onboarding-flows/weekly-review';
 import { OnboardingFlowCard } from '@/components/admin/onboarding/OnboardingFlowCard';
 import { useDefaultOnboarding, useSetDefaultOnboarding } from '@/hooks/useDefaultOnboarding';
 import { toast } from 'sonner';
 import OnboardingAnswers from './OnboardingAnswers';
 
 export default function Onboarding() {
-  const flows = [dearMeFlow, mePlusFlow, quickStartFlow];
+  const flows = [dearMeFlow, mePlusFlow, quickStartFlow, weeklyReviewFlow];
   const { flowId: defaultFlowId } = useDefaultOnboarding();
   const setDefaultMutation = useSetDefaultOnboarding();
 

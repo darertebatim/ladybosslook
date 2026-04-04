@@ -15,6 +15,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { WeekReportStep } from '@/components/app/weekly-review/WeekReportStep';
+import { SatisfactionSliderStep } from '@/components/app/weekly-review/SatisfactionSliderStep';
+import { WeekTaskSuggestionsStep } from '@/components/app/weekly-review/WeekTaskSuggestionsStep';
+import { WeekCelebrationStep } from '@/components/app/weekly-review/WeekCelebrationStep';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 
 function OptionEmoji({ emoji, size }: { emoji: string; size: number }) {
@@ -122,6 +126,14 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <TextInputScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'routine-ready-teaser':
       return <RoutineReadyTeaserScreen step={step} onNext={onNext} />;
+    case 'week-report':
+      return <WeekReportStep step={step} onNext={onNext} />;
+    case 'satisfaction-slider':
+      return <SatisfactionSliderStep step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'week-task-suggestions':
+      return <WeekTaskSuggestionsStep step={step} onNext={onNext} answers={answers} />;
+    case 'week-celebration':
+      return <WeekCelebrationStep step={step} onNext={onNext} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }

@@ -38,7 +38,11 @@ export type OnboardingStepType =
   | 'daily-reset-prompt'
   | 'before-after-visual'
   | 'text-input'
-  | 'routine-ready-teaser';
+  | 'routine-ready-teaser'
+  | 'week-report'
+  | 'satisfaction-slider'
+  | 'week-task-suggestions'
+  | 'week-celebration';
 export interface OnboardingOption {
   label: string;
   emoji?: string;
