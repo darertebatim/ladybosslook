@@ -6,6 +6,7 @@ import { ChevronLeft } from 'lucide-react';
 import { dearMeFlow } from '@/data/onboarding-flows/dear-me';
 import { mePlusFlow } from '@/data/onboarding-flows/me-plus';
 import { quickStartFlow } from '@/data/onboarding-flows/quick-start';
+import { weeklyReviewFlow } from '@/data/onboarding-flows/weekly-review';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
