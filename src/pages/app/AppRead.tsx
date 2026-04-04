@@ -59,7 +59,7 @@ export default function AppRead() {
 
                 {/* Text */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-gray-900 text-[15px] leading-tight line-clamp-1">
+                  <h3 className="font-bold text-black text-[15px] leading-tight line-clamp-1">
                     {item.title}
                   </h3>
                   {item.subtitle && (
