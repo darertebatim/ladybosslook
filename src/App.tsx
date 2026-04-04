@@ -122,8 +122,12 @@ const Onboarding = lazy(() => import("@/pages/admin/Onboarding"));
 const Banners = lazy(() => import("@/pages/admin/Banners"));
 const Documents = lazy(() => import("@/pages/admin/Documents"));
 const ReadingManager = lazy(() => import("@/pages/admin/ReadingManager"));
+const QuizzesAdmin = lazy(() => import("@/pages/admin/Quizzes"));
 const AppRead = lazy(() => import("@/pages/app/AppRead"));
 const AppReadLesson = lazy(() => import("@/pages/app/AppReadLesson"));
+const QuizLibrary = lazy(() => import("@/pages/app/QuizLibrary"));
+const QuizDetail = lazy(() => import("@/pages/app/QuizDetail"));
+const QuizPlay = lazy(() => import("@/pages/app/QuizPlay"));
 
 
 // Lazy load marketing/landing pages
