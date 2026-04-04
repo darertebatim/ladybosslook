@@ -1,120 +1,117 @@
 
 
-## Quiz Center - Plan
+## Rebuild Read: Visual Stories + Lessons with TTS
 
-### Overview
-Build a full Quiz Center system with an admin management page and a user-facing quiz experience. Quizzes reuse the existing onboarding questionnaire UI (single-select, multi-select, etc.) and add analysis/results screens inspired by the Dear Me app screenshots.
+### What We're Building
+A Blinkist-inspired reading experience with two content types -- **Stories** (narrative, entertaining, 5-30 min) and **Lessons** (educational, from uploaded documents). Both share the same visual reader UI with swipeable screens, cover images, and text-to-speech narration.
 
-### Database Schema
+### Database Changes
 
-**`admin_quizzes` table** -- quiz metadata
-- `id` (uuid, PK)
-- `title` (text) -- e.g. "Discover Your Social Style"
-- `slug` (text, unique) -- URL-friendly identifier
-- `overview` (text) -- short description shown on detail page
-- `description` (text) -- "What you'll get" section
-- `cover_url` (text) -- 6:4 cover image URL
-- `theme_color` (text) -- background color for header area
-- `is_active` (boolean, default true)
-- `is_premium` (boolean, default false)
-- `sort_order` (int, default 0)
-- `created_at`, `updated_at`
+**Replace existing tables** with a unified content model:
 
-**`admin_quiz_questions` table** -- ordered questions per quiz
-- `id` (uuid, PK)
-- `quiz_id` (uuid, FK -> admin_quizzes)
+**`reading_content`** -- replaces `reading_lessons`
+- `id` (uuid PK), `title`, `subtitle`, `description` (text)
+- `cover_url` (text) -- 6:4 cover image
+- `type` (text: 'story' or 'lesson')
+- `category` (text), `author` (text)
+- `reading_time_minutes` (int) -- estimated read time
+- `theme_color` (text, default '#F0E3FF')
+- `is_published` (boolean), `is_premium` (boolean)
+- `sort_order` (int), `created_at`, `updated_at`
+
+**`reading_sections`** -- replaces `reading_cards` (now full article sections, not micro-cards)
+- `id` (uuid PK), `content_id` (FK -> reading_content)
 - `sort_order` (int)
-- `question_text` (text)
-- `type` (text) -- 'single-select', 'multi-select', 'yes-no', 'slider'
-- `options` (jsonb) -- array of `{ label, emoji?, score? }`
-- `is_active` (boolean, default true)
-
-**`admin_quiz_results` table** -- possible result outcomes per quiz
-- `id` (uuid, PK)
-- `quiz_id` (uuid, FK -> admin_quizzes)
-- `result_key` (text) -- e.g. "introvert", "extrovert", "ambivert"
-- `title` (text) -- "Introvert"
-- `subtitle` (text) -- short label
-- `description` (text) -- detailed result text
-- `image_url` (text) -- result illustration
-- `characteristics` (jsonb) -- string array
-- `strengths` (jsonb) -- string array
-- `weaknesses` (jsonb) -- string array
-- `suggestions` (jsonb) -- string array of recommended actions
-- `score_min` (int) -- score range lower bound
-- `score_max` (int) -- score range upper bound
-
-**`quiz_submissions` table** -- user answers and results
-- `id` (uuid, PK)
-- `user_id` (uuid, FK -> auth.users)
-- `quiz_id` (uuid, FK -> admin_quizzes)
-- `answers` (jsonb) -- full answer map
-- `total_score` (int)
-- `result_key` (text) -- matched result
-- `completed_at` (timestamptz)
+- `heading` (text) -- section heading
+- `body` (text) -- rich text / markdown body
+- `quote` (text, nullable) -- highlighted pull-quote
+- `image_url` (text, nullable) -- section illustration
 - `created_at`
 
-### Admin Pages
+**`reading_user_progress`** -- replaces `reading_progress`
+- `id` (uuid PK), `user_id` (FK -> auth.users)
+- `content_id` (FK -> reading_content)
+- `last_section_index` (int)
+- `completed` (boolean), `completed_at` (timestamptz)
+- unique on (user_id, content_id)
 
-**1. Quiz Center page (`/admin/quizzes`)**
-- Grid of quiz cards showing cover, title, question count, status badge
-- "New Quiz" button
-- Each card has Edit, Preview, toggle active actions
+**New storage bucket**: `reading-covers` (public)
 
-**2. Quiz Editor (inline or separate route)**
-- Form for title, slug, overview, description, cover upload, theme color
-- Sortable question list with inline editing
-- Result outcomes editor (key, title, description, score range, characteristics/strengths/weaknesses arrays)
-- Preview button opens the user-facing quiz flow
+### Text-to-Speech (ElevenLabs)
+
+**Edge function**: `supabase/functions/elevenlabs-tts/index.ts`
+- Accepts `{ text, voiceId? }`, returns audio/mpeg binary
+- Uses ElevenLabs TTS API with `eleven_multilingual_v2` model
+
+**Requires**: User needs to add `ELEVENLABS_API_KEY` secret in Supabase dashboard.
+
+**Client integration**: A play/pause button in the reader that streams the current section's text as narrated audio. Fetches from the edge function using `fetch()` + `.blob()`.
+
+### Admin: Reading Manager (rebuilt)
+
+**Route**: `/admin/read` (same URL, rebuilt component)
+
+Two tabs: **Stories** | **Lessons**
+
+Each tab shows a table of content items with:
+- Cover thumbnail, title, type badge, status badge, reading time
+- Actions: Edit, Manage Sections, Delete
+
+**Content Editor** (dialog):
+- Title, subtitle, description, author, category, reading time
+- Cover image upload (6:4 aspect ratio)
+- Theme color picker
+- Published/Premium toggles
+
+**Section Editor** (inline, below content):
+- Ordered list of sections with heading, body (textarea), quote, image upload
+- Add/reorder/delete sections
+- Preview button
 
 ### User-Facing Pages
 
-**3. Quiz Library page (`/app/quizzes`)**
-- 2-column grid of quiz cards (6:4 cover, title, "Take the test" CTA) -- matches the Dear Me screenshot layout
+**1. Read Library (`/app/read`)** -- rebuilt
+- Two horizontal pill tabs at top: "Stories" | "Lessons"
+- Vertical list of cards (Blinkist-style): 6:4 cover image on left, title + subtitle + reading time + category on right
+- Completed items show a checkmark
 
-**4. Quiz Detail page (`/app/quiz/:slug`)**
-- Hero image with colored background + title overlay
-- White cards for "Overview" and "What you'll get" sections
-- "Start test" button at bottom
+**2. Content Detail (`/app/read/:id`)** -- rebuilt
+- Hero: full-width 6:4 cover with gradient overlay, title + author
+- White card below: description, reading time, category
+- "Start Reading" / "Continue" CTA button
+- If completed: "Read Again" button
 
-**5. Quiz Flow (`/app/quiz/:slug/play`)**
-- Reuses existing `OnboardingStepRenderer` question UI components (single-select, multi-select, yes-no)
-- Compact header: quiz title + illustration peek, progress bar with "QUESTION N/M"
-- Each answer selection records a score value
+**3. Reader (`/app/read/:id/reader`)** -- new
+- Clean, distraction-free reading screen
+- Top bar: back button + progress bar + section counter
+- Scrollable single-section view with heading, body text, pull-quote highlight, section image
+- Bottom: prev/next navigation buttons
+- Floating TTS play/pause button (bottom-right corner)
+- On last section complete: celebration screen with "Back to Library"
 
-**6. Analyzing screen**
-- Animated progress circle with percentage
-- "Analyzing your answers" text
-- Mascot illustration
-- Auto-advances after ~3 seconds
+### Sample Content (1 test story)
 
-**7. Results page**
-- Header with quiz title + illustration
-- Colored result card: "My Result" label + result title + illustration
-- White cards for: Details, Characteristics, Strengths, Weaknesses
-- "Share my result" button (native share API)
-- Bottom bar: "Retake" + "Get suggested routine" buttons
-- Result saved to `quiz_submissions`
+Insert a sample story: "The Jar of Stones" -- a classic parable about priorities (approx 5 min read), split into 5 sections with headings and quotes. No cover image (placeholder color).
 
 ### Files to Create/Modify
 
 | File | Action |
 |------|--------|
-| `supabase/migrations/...quiz_tables.sql` | Create 4 tables + RLS |
-| `src/pages/admin/Quizzes.tsx` | Admin quiz list + editor |
-| `src/pages/app/QuizLibrary.tsx` | User quiz grid |
-| `src/pages/app/QuizDetail.tsx` | Quiz overview + start |
-| `src/pages/app/QuizPlay.tsx` | Question flow + analysis + results |
-| `src/components/admin/AdminNav.tsx` | Add "Quizzes" nav item |
-| `src/App.tsx` | Add routes for admin + app quiz pages |
-
-### Scoring Logic
-Each option in a question carries a `score` value (integer). After all questions are answered, scores are summed. The result whose `score_min <= total <= score_max` is matched. This allows flexible personality-type mappings.
+| Migration SQL | Drop old tables, create new schema + RLS + storage bucket |
+| `supabase/functions/elevenlabs-tts/index.ts` | TTS edge function |
+| `src/hooks/useReading.ts` | New hooks for reading_content, sections, progress |
+| `src/pages/admin/ReadingManager.tsx` | Rebuild with Stories/Lessons tabs |
+| `src/components/admin/ReadingSectionEditor.tsx` | Section editor component |
+| `src/pages/app/AppRead.tsx` | Rebuild as Blinkist-style library |
+| `src/pages/app/AppReadDetail.tsx` | New content detail page |
+| `src/pages/app/AppReadReader.tsx` | New reader with TTS |
+| `src/App.tsx` | Add new routes |
+| `src/hooks/useReadingLessons.ts` | Remove (replaced by useReading.ts) |
+| `src/components/admin/ReadingCardEditor.tsx` | Remove (replaced) |
 
 ### Technical Notes
-- Cover images uploaded via existing Supabase Storage bucket
-- Quiz question UI components are reused directly from `OnboardingStepRenderer` (single-select, multi-select chips)
-- The analyzing animation uses a circular SVG progress with framer-motion
-- Share uses the Web Share API / Capacitor Share plugin
-- Admin quiz editor follows the same patterns as existing admin managers (e.g., RoutineManagement, TasksBank)
+- TTS requires `ELEVENLABS_API_KEY` -- will prompt user to add it
+- Cover images uploaded to `reading-covers` bucket
+- Reader uses simple prev/next navigation (not carousel) for long-form content
+- Old `reading_lessons`, `reading_cards`, `reading_progress` tables will be dropped and replaced
 
