@@ -60,13 +60,10 @@ function ReadingCard({ item, isCompleted, onClick }: { item: ReadingContent; isC
             </div>
           )}
 
-          {/* Completed overlay */}
+          {/* Completed badge */}
           {isCompleted && (
-            <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
-              <div className="flex items-center gap-1.5 bg-emerald-500 rounded-full px-3 py-1.5 shadow-lg">
-                <CheckCircle2 className="h-4 w-4 text-white" />
-                <span className="text-white text-xs font-bold">Completed</span>
-              </div>
+            <div className="absolute top-2 right-2 z-10 bg-emerald-500 rounded-full p-1 shadow-lg">
+              <CheckCircle2 className="h-4 w-4 text-white" />
             </div>
           )}
         </div>
