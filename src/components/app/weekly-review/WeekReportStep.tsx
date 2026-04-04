@@ -121,9 +121,12 @@ export function WeekReportStep({ step, onNext }: Props) {
             transition={{ duration: 0.4 }}
             className="text-center mb-6"
           >
-            <h1 className="text-2xl font-extrabold text-[#1a1f3d] leading-snug">
-              Hooray!{'\n'}It's been {stats.weeksCount} week{stats.weeksCount !== 1 ? 's' : ''}!
+            <h1 className="text-5xl font-extrabold text-[#1a1f3d] leading-tight">
+              Hooray!
             </h1>
+            <p className="text-lg font-bold text-[#1a1f3d] mt-1">
+              It's been {stats.weeksCount} week{stats.weeksCount !== 1 ? 's' : ''}!
+            </p>
             <p className="text-sm text-gray-500 mt-1">Here's how your last 7 days went</p>
           </motion.div>
 
