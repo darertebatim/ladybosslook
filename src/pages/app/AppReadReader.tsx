@@ -144,7 +144,7 @@ export default function AppReadReader() {
             style={{ width: `${progressPercent}%`, backgroundColor: themeColor }}
           />
         </div>
-        <span className="text-xs text-muted-foreground whitespace-nowrap">
+        <span className="text-xs text-black whitespace-nowrap">
           {currentIndex + 1} / {sections.length}
         </span>
       </div>
