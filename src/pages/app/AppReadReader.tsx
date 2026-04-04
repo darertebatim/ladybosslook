@@ -123,7 +123,7 @@ export default function AppReadReader() {
           <FluentEmoji emoji="🎉" size={48} />
         </div>
         <h1 className="text-2xl font-bold mb-2">Well Done!</h1>
-        <p className="text-muted-foreground mb-8">You've finished "{content.title}"</p>
+        <p className="text-black mb-8">You've finished "{content.title}"</p>
         <Button size="lg" className="rounded-xl h-12 px-8" onClick={() => navigate('/app/read')}>
           Back to Library
         </Button>
