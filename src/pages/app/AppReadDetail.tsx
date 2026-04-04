@@ -49,7 +49,7 @@ export default function AppReadDetail() {
               <FluentEmoji emoji={content.emoji || '📖'} size={56} />
             </div>
             <h1 className="text-2xl font-bold leading-tight text-center text-black">{content.title}</h1>
-            {content.author && <p className="text-sm text-black/70 mt-1.5">by {content.author}</p>}
+            {content.author && <p className="text-sm text-black mt-1.5">by {content.author}</p>}
           </div>
         )}
       </div>
