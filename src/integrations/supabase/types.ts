@@ -91,6 +91,151 @@ export type Database = {
           },
         ]
       }
+      admin_quiz_questions: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          options: Json
+          question_text: string
+          quiz_id: string
+          sort_order: number
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          options?: Json
+          question_text: string
+          quiz_id: string
+          sort_order?: number
+          type?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          options?: Json
+          question_text?: string
+          quiz_id?: string
+          sort_order?: number
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_quiz_questions_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "admin_quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_quiz_results: {
+        Row: {
+          characteristics: Json | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          quiz_id: string
+          result_key: string
+          score_max: number
+          score_min: number
+          strengths: Json | null
+          subtitle: string | null
+          suggestions: Json | null
+          title: string
+          weaknesses: Json | null
+        }
+        Insert: {
+          characteristics?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          quiz_id: string
+          result_key: string
+          score_max?: number
+          score_min?: number
+          strengths?: Json | null
+          subtitle?: string | null
+          suggestions?: Json | null
+          title: string
+          weaknesses?: Json | null
+        }
+        Update: {
+          characteristics?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          quiz_id?: string
+          result_key?: string
+          score_max?: number
+          score_min?: number
+          strengths?: Json | null
+          subtitle?: string | null
+          suggestions?: Json | null
+          title?: string
+          weaknesses?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_quiz_results_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "admin_quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_quizzes: {
+        Row: {
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          is_premium: boolean
+          overview: string | null
+          slug: string
+          sort_order: number
+          theme_color: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_premium?: boolean
+          overview?: string | null
+          slug: string
+          sort_order?: number
+          theme_color?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_premium?: boolean
+          overview?: string | null
+          slug?: string
+          sort_order?: number
+          theme_color?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_task_bank: {
         Row: {
           category: string
@@ -2890,6 +3035,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      quiz_submissions: {
+        Row: {
+          answers: Json
+          completed_at: string | null
+          created_at: string
+          id: string
+          quiz_id: string
+          result_key: string | null
+          total_score: number
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          quiz_id: string
+          result_key?: string | null
+          total_score?: number
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          quiz_id?: string
+          result_key?: string | null
+          total_score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_submissions_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "admin_quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reading_cards: {
         Row: {

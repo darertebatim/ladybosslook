@@ -122,8 +122,12 @@ const Onboarding = lazy(() => import("@/pages/admin/Onboarding"));
 const Banners = lazy(() => import("@/pages/admin/Banners"));
 const Documents = lazy(() => import("@/pages/admin/Documents"));
 const ReadingManager = lazy(() => import("@/pages/admin/ReadingManager"));
+const QuizzesAdmin = lazy(() => import("@/pages/admin/Quizzes"));
 const AppRead = lazy(() => import("@/pages/app/AppRead"));
 const AppReadLesson = lazy(() => import("@/pages/app/AppReadLesson"));
+const QuizLibrary = lazy(() => import("@/pages/app/QuizLibrary"));
+const QuizDetail = lazy(() => import("@/pages/app/QuizDetail"));
+const QuizPlay = lazy(() => import("@/pages/app/QuizPlay"));
 
 
 // Lazy load marketing/landing pages
@@ -428,6 +432,7 @@ const App = () => (
                       <Route path="app" element={<ProtectedRoute requiredPage="system"><AppTest /></ProtectedRoute>} />
                       <Route path="documents" element={<ProtectedRoute requiredPage="system"><Documents /></ProtectedRoute>} />
                       <Route path="read" element={<ProtectedRoute requiredPage="tools"><ReadingManager /></ProtectedRoute>} />
+                      <Route path="quizzes" element={<ProtectedRoute requiredPage="tools"><QuizzesAdmin /></ProtectedRoute>} />
                     </Route>
                   )}
                   
@@ -495,6 +500,8 @@ const App = () => (
                     <Route path="/app/ai" element={<ProtectedRoute><AppAICoach /></ProtectedRoute>} />
                     <Route path="/app/read" element={<ProtectedRoute><AppRead /></ProtectedRoute>} />
                     <Route path="/app/read/:lessonId" element={<ProtectedRoute><AppReadLesson /></ProtectedRoute>} />
+                    <Route path="/app/quiz/:slug" element={<ProtectedRoute><QuizDetail /></ProtectedRoute>} />
+                    <Route path="/app/quiz/:slug/play" element={<ProtectedRoute><QuizPlay /></ProtectedRoute>} />
                     {/* Redirect old feed post route */}
                     <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
                     
@@ -538,6 +545,7 @@ const App = () => (
                       <Route path="actions" element={<AppActions />} />
                       <Route path="tasksbank" element={<AppTasksBank />} />
                       <Route path="projects" element={<AppTaskDrafts />} />
+                      <Route path="quizzes" element={<QuizLibrary />} />
                       <Route path="routineplayer" element={<AppRoutinePlayerPage />} />
                       {/* Redirects for backward compatibility with older app versions */}
                       <Route path="rituals" element={<Navigate to="/app/routines" replace />} />
