@@ -1455,7 +1455,6 @@ const AppHome = () => {
               {/* Tour Banner & Promo - always visible regardless of routine cards */}
               {taskFilter === 'all' && <>
                 <OnboardingBanner />
-                <WeeklyReviewBanner />
                 <div id="tour-banner-slot" className="mt-4" />
                 <PromoBanner location="home_rituals" className="mt-4" />
               </>}
