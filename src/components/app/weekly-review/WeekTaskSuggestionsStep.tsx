@@ -180,7 +180,7 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
       is_active: true,
       created_at: new Date().toISOString(),
       linked_playlist_id: task.linked_playlist_id || null,
-      pro_link_type: task.pro_link_type || null,
+      pro_link_type: (task.pro_link_type as ProLinkType) || null,
       pro_link_value: task.pro_link_value || null,
     }));
   }, [suggestions]);
