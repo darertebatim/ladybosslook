@@ -133,7 +133,7 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
     case 'week-task-suggestions':
       return <WeekTaskSuggestionsStep step={step} onNext={onNext} answers={answers} />;
     case 'week-celebration':
-      return <WeekCelebrationStep step={step} onNext={onNext} />;
+      return <WeekCelebrationStep step={step} onNext={onNext} answers={answers} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }
