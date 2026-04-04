@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { subDays, format } from 'date-fns';
 import { OnboardingStep } from '@/types/onboarding';
-import weeklyReviewMascot from '@/assets/weekly-review-mascot.png';
+import weeklyReviewMascot from '@/assets/weekly-review-mascot-new.png';
 
 interface Props {
   step: OnboardingStep;
