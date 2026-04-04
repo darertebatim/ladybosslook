@@ -3077,137 +3077,132 @@ export type Database = {
           },
         ]
       }
-      reading_cards: {
+      reading_content: {
         Row: {
-          bg_color: string | null
-          content: string
-          created_at: string | null
-          id: string
-          image_url: string | null
-          key_point: string | null
-          lesson_id: string
-          sort_order: number | null
-          title: string
-        }
-        Insert: {
-          bg_color?: string | null
-          content: string
-          created_at?: string | null
-          id?: string
-          image_url?: string | null
-          key_point?: string | null
-          lesson_id: string
-          sort_order?: number | null
-          title: string
-        }
-        Update: {
-          bg_color?: string | null
-          content?: string
-          created_at?: string | null
-          id?: string
-          image_url?: string | null
-          key_point?: string | null
-          lesson_id?: string
-          sort_order?: number | null
-          title?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reading_cards_lesson_id_fkey"
-            columns: ["lesson_id"]
-            isOneToOne: false
-            referencedRelation: "reading_lessons"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      reading_lessons: {
-        Row: {
-          category: string | null
-          cover_image_url: string | null
+          author: string | null
+          category: string
+          cover_url: string | null
           created_at: string | null
           description: string | null
-          emoji: string | null
           id: string
+          is_premium: boolean | null
           is_published: boolean | null
+          reading_time_minutes: number | null
           sort_order: number | null
-          source_document_id: string | null
           subtitle: string | null
+          theme_color: string | null
           title: string
+          type: string
           updated_at: string | null
         }
         Insert: {
-          category?: string | null
-          cover_image_url?: string | null
+          author?: string | null
+          category?: string
+          cover_url?: string | null
           created_at?: string | null
           description?: string | null
-          emoji?: string | null
           id?: string
+          is_premium?: boolean | null
           is_published?: boolean | null
+          reading_time_minutes?: number | null
           sort_order?: number | null
-          source_document_id?: string | null
           subtitle?: string | null
+          theme_color?: string | null
           title: string
+          type?: string
           updated_at?: string | null
         }
         Update: {
-          category?: string | null
-          cover_image_url?: string | null
+          author?: string | null
+          category?: string
+          cover_url?: string | null
           created_at?: string | null
           description?: string | null
-          emoji?: string | null
           id?: string
+          is_premium?: boolean | null
           is_published?: boolean | null
+          reading_time_minutes?: number | null
           sort_order?: number | null
-          source_document_id?: string | null
           subtitle?: string | null
+          theme_color?: string | null
           title?: string
+          type?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      reading_sections: {
+        Row: {
+          body: string
+          content_id: string
+          created_at: string | null
+          heading: string | null
+          id: string
+          image_url: string | null
+          quote: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          body?: string
+          content_id: string
+          created_at?: string | null
+          heading?: string | null
+          id?: string
+          image_url?: string | null
+          quote?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          body?: string
+          content_id?: string
+          created_at?: string | null
+          heading?: string | null
+          id?: string
+          image_url?: string | null
+          quote?: string | null
+          sort_order?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "reading_lessons_source_document_id_fkey"
-            columns: ["source_document_id"]
+            foreignKeyName: "reading_sections_content_id_fkey"
+            columns: ["content_id"]
             isOneToOne: false
-            referencedRelation: "admin_documents"
+            referencedRelation: "reading_content"
             referencedColumns: ["id"]
           },
         ]
       }
-      reading_progress: {
+      reading_user_progress: {
         Row: {
           completed: boolean | null
           completed_at: string | null
-          created_at: string | null
+          content_id: string
           id: string
-          last_card_index: number | null
-          lesson_id: string
+          last_section_index: number | null
           user_id: string
         }
         Insert: {
           completed?: boolean | null
           completed_at?: string | null
-          created_at?: string | null
+          content_id: string
           id?: string
-          last_card_index?: number | null
-          lesson_id: string
+          last_section_index?: number | null
           user_id: string
         }
         Update: {
           completed?: boolean | null
           completed_at?: string | null
-          created_at?: string | null
+          content_id?: string
           id?: string
-          last_card_index?: number | null
-          lesson_id?: string
+          last_section_index?: number | null
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "reading_progress_lesson_id_fkey"
-            columns: ["lesson_id"]
+            foreignKeyName: "reading_user_progress_content_id_fkey"
+            columns: ["content_id"]
             isOneToOne: false
-            referencedRelation: "reading_lessons"
+            referencedRelation: "reading_content"
             referencedColumns: ["id"]
           },
         ]

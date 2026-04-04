@@ -124,7 +124,8 @@ const Documents = lazy(() => import("@/pages/admin/Documents"));
 const ReadingManager = lazy(() => import("@/pages/admin/ReadingManager"));
 const QuizzesAdmin = lazy(() => import("@/pages/admin/Quizzes"));
 const AppRead = lazy(() => import("@/pages/app/AppRead"));
-const AppReadLesson = lazy(() => import("@/pages/app/AppReadLesson"));
+const AppReadDetail = lazy(() => import("@/pages/app/AppReadDetail"));
+const AppReadReader = lazy(() => import("@/pages/app/AppReadReader"));
 const QuizLibrary = lazy(() => import("@/pages/app/QuizLibrary"));
 const QuizDetail = lazy(() => import("@/pages/app/QuizDetail"));
 const QuizPlay = lazy(() => import("@/pages/app/QuizPlay"));
@@ -499,7 +500,8 @@ const App = () => (
                     <Route path="/app/reflections/:reflectionId" element={<ProtectedRoute><AppReflectionFlow /></ProtectedRoute>} />
                     <Route path="/app/ai" element={<ProtectedRoute><AppAICoach /></ProtectedRoute>} />
                     <Route path="/app/read" element={<ProtectedRoute><AppRead /></ProtectedRoute>} />
-                    <Route path="/app/read/:lessonId" element={<ProtectedRoute><AppReadLesson /></ProtectedRoute>} />
+                    <Route path="/app/read/:id" element={<ProtectedRoute><AppReadDetail /></ProtectedRoute>} />
+                    <Route path="/app/read/:id/reader" element={<ProtectedRoute><AppReadReader /></ProtectedRoute>} />
                     <Route path="/app/quiz/:slug" element={<ProtectedRoute><QuizDetail /></ProtectedRoute>} />
                     <Route path="/app/quiz/:slug/play" element={<ProtectedRoute><QuizPlay /></ProtectedRoute>} />
                     {/* Redirect old feed post route */}
