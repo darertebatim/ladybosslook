@@ -178,11 +178,7 @@ export default function ReadingManager() {
               </div>
             </div>
 
-            {/* Reading Time */}
-            <div>
-              <Label>Reading Time (min)</Label>
-              <Input type="number" value={form.reading_time_minutes} onChange={e => setForm(f => ({ ...f, reading_time_minutes: parseInt(e.target.value) || 5 }))} />
-            </div>
+            {/* Reading time is auto-calculated from section content */}
 
             {/* Theme Color Palette */}
             <div>
