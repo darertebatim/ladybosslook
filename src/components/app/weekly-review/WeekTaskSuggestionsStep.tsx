@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
@@ -63,6 +63,27 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
   const { user } = useAuth();
   const addRoutinePlan = useAddRoutinePlan();
   const [showPreview, setShowPreview] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loadingText, setLoadingText] = useState('Analyzing your answers...');
+
+  useEffect(() => {
+    const texts = [
+      'Analyzing your answers...',
+      'Finding the best goals for you...',
+      'Personalizing your suggestions...',
+    ];
+    let i = 0;
+    const interval = setInterval(() => {
+      i++;
+      if (i < texts.length) {
+        setLoadingText(texts[i]);
+      } else {
+        clearInterval(interval);
+        setLoading(false);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const suggestions = useMemo(() => {
     const tasks: TaskSuggestion[] = [];
@@ -141,6 +162,29 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
   };
 
   const pastelColors = ['bg-purple-50', 'bg-green-50', 'bg-orange-50', 'bg-blue-50'];
+
+  if (loading) {
+    return (
+      <div className="h-full bg-white flex flex-col items-center justify-center px-5">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center"
+        >
+          <div className="w-14 h-14 rounded-full border-4 border-purple-200 border-t-purple-500 animate-spin mb-6" />
+          <motion.p
+            key={loadingText}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-base font-semibold text-[#1a1f3d] text-center"
+          >
+            {loadingText}
+          </motion.p>
+          <p className="text-sm text-gray-400 mt-2">✨ Based on your weekly review</p>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full bg-white overflow-y-auto overscroll-contain">
