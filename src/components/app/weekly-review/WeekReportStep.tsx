@@ -18,7 +18,6 @@ interface WeekStats {
   topHabit: string;
   topHabitEmoji: string;
   weeksCount: number;
-  dailyCounts: number[];
   prevWeekTasks: number;
 }
 
@@ -44,27 +43,6 @@ function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: strin
   return <>{display}{suffix}</>;
 }
 
-function MiniBarChart({ dailyCounts }: { dailyCounts: number[] }) {
-  const max = Math.max(...dailyCounts, 1);
-  const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-
-  return (
-    <div className="flex items-end justify-between gap-1.5 h-12 px-1">
-      {dailyCounts.map((count, i) => (
-        <div key={i} className="flex flex-col items-center gap-0.5 flex-1">
-          <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: `${Math.max((count / max) * 32, 2)}px` }}
-            transition={{ delay: 0.4 + i * 0.06, duration: 0.4, ease: 'easeOut' }}
-            className={`w-full rounded-full ${count > 0 ? 'bg-purple-400' : 'bg-gray-200'}`}
-          />
-          <span className="text-[9px] font-medium text-gray-400">{days[i]}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function ComparedBadge({ current, previous }: { current: number; previous: number }) {
   if (previous === 0 && current === 0) return null;
   const diff = previous > 0
@@ -88,7 +66,6 @@ export function WeekReportStep({ step, onNext }: Props) {
     topHabit: 'Getting started',
     topHabitEmoji: '🌟',
     weeksCount: 1,
-    dailyCounts: [0, 0, 0, 0, 0, 0, 0],
     prevWeekTasks: 0,
   });
   const [loaded, setLoaded] = useState(false);
@@ -102,7 +79,6 @@ export function WeekReportStep({ step, onNext }: Props) {
       const weekAgoStr = format(weekAgo, 'yyyy-MM-dd');
       const twoWeeksAgoStr = format(twoWeeksAgo, 'yyyy-MM-dd');
 
-      // Fetch this week + last week completions
       const { data: allCompletions } = await supabase
         .from('task_completions')
         .select('task_id, completed_date')
@@ -114,13 +90,6 @@ export function WeekReportStep({ step, onNext }: Props) {
 
       const tasksCompleted = completions.length;
       const prevWeekTasks = prevCompletions.length;
-
-      // Daily counts (Mon-Sun)
-      const dailyCounts = Array(7).fill(0);
-      for (let i = 0; i < 7; i++) {
-        const d = format(subDays(today, 6 - i), 'yyyy-MM-dd');
-        dailyCounts[i] = completions.filter(c => c.completed_date === d).length;
-      }
 
       const datesSet = new Set(completions.map(c => c.completed_date));
       let bestStreak = 0;
@@ -164,21 +133,22 @@ export function WeekReportStep({ step, onNext }: Props) {
         ? Math.max(1, Math.floor((today.getTime() - new Date(profile.created_at).getTime()) / (7 * 24 * 60 * 60 * 1000)))
         : 1;
 
-      setStats({ tasksCompleted, bestStreak, topHabit, topHabitEmoji, weeksCount, dailyCounts, prevWeekTasks });
+      setStats({ tasksCompleted, bestStreak, topHabit, topHabitEmoji, weeksCount, prevWeekTasks });
       setLoaded(true);
     };
     fetchStats();
   }, [user]);
 
   const statCards = [
-    { label: 'Tasks Done', value: stats.tasksCompleted, displayValue: <AnimatedCounter value={stats.tasksCompleted} />, emoji: '✅', borderColor: 'border-blue-300', bgColor: 'bg-blue-50' },
-    { label: 'Best Streak', value: stats.bestStreak, displayValue: <><AnimatedCounter value={stats.bestStreak} /> days</>, emoji: '🔥', borderColor: 'border-orange-300', bgColor: 'bg-orange-50' },
-    { label: 'Top Habit', value: 0, displayValue: stats.topHabit, emoji: stats.topHabitEmoji, borderColor: 'border-purple-300', bgColor: 'bg-purple-50' },
+    { label: 'Tasks Done', displayValue: <AnimatedCounter value={stats.tasksCompleted} />, emoji: '✅', borderColor: 'border-primary/30', bgColor: 'bg-primary/5' },
+    { label: 'Best Streak', displayValue: <><AnimatedCounter value={stats.bestStreak} /> days</>, emoji: '🔥', borderColor: 'border-secondary/40', bgColor: 'bg-secondary/10' },
+    { label: 'Top Habit', displayValue: stats.topHabit, emoji: stats.topHabitEmoji, borderColor: 'border-accent/40', bgColor: 'bg-accent/10' },
   ];
 
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
-      <div className="shrink-0 relative" style={{ height: '50%' }}>
+      {/* Hero image — 40% height */}
+      <div className="shrink-0 relative" style={{ height: '40%' }}>
         <img
           src={weeklyReviewMascot}
           alt=""
@@ -187,24 +157,25 @@ export function WeekReportStep({ step, onNext }: Props) {
         />
       </div>
 
-      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 overflow-y-auto">
-        <div className="px-5 pt-7 pb-6 flex flex-col min-h-full">
+      {/* Bottom sheet — 60% */}
+      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col">
+        <div className="px-5 pt-6 pb-5 flex flex-col flex-1">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="text-center mb-4"
+            className="text-center mb-3"
           >
-            <h1 className="text-5xl font-extrabold text-[#1a1f3d] leading-tight">
+            <h1 className="text-5xl font-extrabold text-foreground leading-tight">
               Hooray!
             </h1>
-            <p className="text-lg font-bold text-[#1a1f3d] mt-1">
+            <p className="text-lg font-bold text-foreground mt-1">
               It's been {stats.weeksCount} week{stats.weeksCount !== 1 ? 's' : ''}!
             </p>
-            <p className="text-sm text-gray-500 mt-1">Here's how your last 7 days went</p>
+            <p className="text-xs text-muted-foreground mt-1">Here's how your last 7 days went</p>
           </motion.div>
 
-          {/* Compared to last week */}
+          {/* Compared badge */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={loaded ? { opacity: 1 } : {}}
@@ -215,39 +186,29 @@ export function WeekReportStep({ step, onNext }: Props) {
           </motion.div>
 
           {/* Stat cards */}
-          <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="grid grid-cols-3 gap-2 mb-3">
             {statCards.map((card, i) => (
               <motion.div
                 key={card.label}
                 initial={{ opacity: 0, y: 16 }}
                 animate={loaded ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: 0.2 + i * 0.1, duration: 0.35 }}
-                className={`flex flex-col items-center p-3 rounded-2xl border-2 ${card.borderColor} ${card.bgColor}`}
+                className={`flex flex-col items-center p-2.5 rounded-2xl border-2 ${card.borderColor} ${card.bgColor}`}
               >
-                <p className="text-[10px] font-bold text-[#1a1f3d] mb-1.5">{card.label}</p>
-                <FluentEmoji emoji={card.emoji} size={28} />
-                <p className="text-lg font-extrabold text-[#1a1f3d] mt-1 truncate max-w-full text-center leading-tight">
+                <p className="text-[9px] font-bold text-foreground mb-1">{card.label}</p>
+                <FluentEmoji emoji={card.emoji} size={24} />
+                <p className="text-sm font-extrabold text-foreground mt-1 truncate max-w-full text-center leading-tight">
                   {card.displayValue}
                 </p>
               </motion.div>
             ))}
           </div>
 
-          {/* Mini bar chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={loaded ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.5, duration: 0.4 }}
-            className="mb-6 bg-gray-50 rounded-2xl p-3"
-          >
-            <p className="text-[10px] font-bold text-gray-400 mb-2 text-center uppercase tracking-wide">Daily Activity</p>
-            <MiniBarChart dailyCounts={stats.dailyCounts} />
-          </motion.div>
-
+          {/* Button pinned at bottom */}
           <div className="mt-auto">
             <button
               onClick={onNext}
-              className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base flex items-center justify-center gap-3 active:scale-[0.98] transition-all"
+              className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-3 active:scale-[0.98] transition-all"
             >
               {step.buttonLabel || 'Continue'}
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

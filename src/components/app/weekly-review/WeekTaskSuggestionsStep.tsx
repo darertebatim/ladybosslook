@@ -125,7 +125,6 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
     return tasks.slice(0, 4);
   }, [answers]);
 
-  // Staggered reveal after loading finishes
   useEffect(() => {
     if (loading) return;
     let count = 0;
@@ -182,7 +181,7 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
     }
   };
 
-  const pastelColors = ['bg-purple-50', 'bg-green-50', 'bg-orange-50', 'bg-blue-50'];
+  const pastelColors = ['bg-primary/5', 'bg-accent/10', 'bg-secondary/10', 'bg-primary/8'];
 
   if (loading) {
     return (
@@ -192,34 +191,34 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
           animate={{ opacity: 1, scale: 1 }}
           className="flex flex-col items-center"
         >
-          <div className="w-14 h-14 rounded-full border-4 border-purple-200 border-t-purple-500 animate-spin mb-6" />
+          <div className="w-14 h-14 rounded-full border-4 border-primary/20 border-t-primary animate-spin mb-6" />
           <motion.p
             key={loadingText}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-base font-semibold text-[#1a1f3d] text-center"
+            className="text-base font-semibold text-foreground text-center"
           >
             {loadingText}
           </motion.p>
-          <p className="text-sm text-gray-400 mt-2">✨ Based on your weekly review</p>
+          <p className="text-sm text-muted-foreground mt-2">✨ Based on your weekly review</p>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="h-full bg-white overflow-y-auto overscroll-contain">
-      <div className="flex flex-col h-full px-5 pt-8 pb-6">
+    <div className="h-full bg-white flex flex-col">
+      <div className="flex flex-col flex-1 px-5 pt-8 pb-5">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
         >
-          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-1">{step.title}</h1>
-          {step.subtitle && <p className="text-sm text-gray-500 text-center mb-6">{step.subtitle}</p>}
+          <h1 className="text-xl font-extrabold text-foreground text-center mb-1">{step.title}</h1>
+          {step.subtitle && <p className="text-xs text-muted-foreground text-center mb-4">{step.subtitle}</p>}
         </motion.div>
 
-        <div className="space-y-3 mb-8">
+        <div className="space-y-2 flex-1 min-h-0">
           <AnimatePresence>
             {suggestions.map((task, i) => (
               i < revealedCount && (
@@ -228,16 +227,15 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
                   initial={{ opacity: 0, x: -20, scale: 0.95 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   transition={{ duration: 0.35, ease: 'easeOut' }}
-                  className={`p-4 rounded-2xl border-2 border-purple-200 ${pastelColors[i % pastelColors.length]}`}
+                  className={`p-3 rounded-2xl border-2 border-primary/20 ${pastelColors[i % pastelColors.length]}`}
                 >
                   <div className="flex items-center gap-3">
-                    <FluentEmoji emoji={task.emoji} size={28} />
-                    <span className="flex-1 text-sm font-semibold text-[#1a1f3d]">{task.title}</span>
+                    <FluentEmoji emoji={task.emoji} size={24} />
+                    <span className="flex-1 text-sm font-semibold text-foreground">{task.title}</span>
                   </div>
-                  {/* Badges row */}
-                  <div className="flex items-center gap-2 mt-2 ml-10">
+                  <div className="flex items-center gap-2 mt-1.5 ml-9">
                     {task.timeEstimate && (
-                      <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                         ⏱ {task.timeEstimate}
                       </span>
                     )}
@@ -249,20 +247,19 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
                     {task.reason && (
                       <button
                         onClick={() => setShowWhyIdx(showWhyIdx === i ? null : i)}
-                        className="text-[10px] font-bold text-purple-500 bg-purple-50 px-2 py-0.5 rounded-full active:opacity-60"
+                        className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full active:opacity-60"
                       >
                         Why this?
                       </button>
                     )}
                   </div>
-                  {/* "Why this?" tooltip */}
                   <AnimatePresence>
                     {showWhyIdx === i && task.reason && (
                       <motion.p
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="text-xs text-purple-600 mt-2 ml-10"
+                        className="text-xs text-primary mt-1.5 ml-9"
                       >
                         💡 {task.reason}
                       </motion.p>
@@ -274,16 +271,16 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
           </AnimatePresence>
         </div>
 
-        <div className="mt-auto space-y-2">
+        <div className="mt-auto space-y-2 pt-2">
           <button
             onClick={() => setShowPreview(true)}
-            className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base active:scale-[0.98] transition-all"
+            className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base active:scale-[0.98] transition-all"
           >
             {step.buttonLabel || 'Add to My Routines'}
           </button>
           <button
             onClick={onNext}
-            className="w-full py-3 text-sm text-gray-500 font-medium active:opacity-60"
+            className="w-full py-2 text-sm text-muted-foreground font-medium active:opacity-60"
           >
             {step.secondaryButtonLabel || 'Skip'}
           </button>
