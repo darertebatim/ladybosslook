@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import confetti from 'canvas-confetti';
 import celebrationImg from '@/assets/weekly-review-celebration.png';
+import { scheduleMidWeekReminder, cancelMidWeekReminder, isMidWeekReminderEnabled } from '@/lib/midWeekReminder';
 
 interface Props {
   step: OnboardingStep;
@@ -12,7 +13,7 @@ interface Props {
 
 export function WeekCelebrationStep({ step, onNext, answers }: Props) {
   const firedRef = useRef(false);
-  const [showReminder, setShowReminder] = useState(false);
+  const [showReminder, setShowReminder] = useState(() => isMidWeekReminderEnabled());
 
   const summary = useMemo(() => {
     const focusItems = answers?.['wr-focus-next'];
@@ -84,7 +85,15 @@ export function WeekCelebrationStep({ step, onNext, answers }: Props) {
             className="mt-3"
           >
             <button
-              onClick={() => setShowReminder(!showReminder)}
+              onClick={() => {
+                const next = !showReminder;
+                setShowReminder(next);
+                if (next) {
+                  scheduleMidWeekReminder();
+                } else {
+                  cancelMidWeekReminder();
+                }
+              }}
               className={`w-full flex items-center justify-between p-3 rounded-2xl border transition-all ${
                 showReminder ? 'border-primary/40 bg-primary/5' : 'border-border bg-muted'
               }`}
