@@ -3588,10 +3588,13 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
         </div>
       </FadeUp>
 
-      {/* Description */}
+      {/* Testimony */}
       <FadeUp delay={0.1}>
-        <p className="text-[16px] text-[#1a1f3d] leading-relaxed text-center mb-3">
-          A simple daily routine to help you<br />take control of your life.
+        <p className="text-[15px] text-[#1a1f3d]/80 italic leading-relaxed text-center mb-1">
+          "It feels like having a little daily reset button in my pocket."
+        </p>
+        <p className="text-[13px] text-[#1a1f3d]/60 text-center mb-3">
+          — Yalda-M ⭐⭐⭐⭐⭐
         </p>
       </FadeUp>
 
