@@ -6,7 +6,7 @@ import mascotPlanner from '@/assets/onboarding/mascot-planner.png';
 export const quickStartV2Flow: OnboardingFlow = {
   id: 'quick-start-v2',
   name: 'Quick Start Onboarding V2',
-  description: 'Copy of Quick Start — Fast 5-screen onboarding focused on getting users into the app quickly',
+  description: 'Copy of Quick Start — Fast onboarding focused on getting users into the app quickly',
   appName: 'Ladybosslook',
   createdAt: '2026-04-05',
   steps: [
@@ -49,26 +49,7 @@ export const quickStartV2Flow: OnboardingFlow = {
       description: '"It feels like having a little daily reset button in my pocket." — Yalda-M ⭐⭐⭐⭐⭐',
       buttonLabel: 'Continue',
     },
-    // 3b — Before/After visual comparison
-    {
-      id: 'qs2-before-after',
-      type: 'before-after-visual',
-      title: 'Reset your day in minutes',
-      subtitle: '',
-      description: 'Ready to see how a Just 1-minute reset feels?',
-      beforeItems: ['Overwhelmed mind', 'Scattered thoughts', 'Low motivation', 'No clear next step'],
-      afterItems: ['Calm mind', 'Clear focus', 'One small step', 'Energy to continue'],
-      buttonLabel: 'Begin My First Reset',
-    },
-    // 4 — Starter routine preview with real task cards
-    {
-      id: 'qs2-starter-routine',
-      type: 'starter-routine',
-      title: 'Here\'s your first Reset',
-      subtitle: 'A simple daily reset to start your journey',
-      buttonLabel: 'Start your first reset',
-    },
-    // 5 — Daily reset prompt
+    // 4 — Daily reset prompt
     {
       id: 'qs2-daily-reset-prompt',
       type: 'daily-reset-prompt',
@@ -77,16 +58,7 @@ export const quickStartV2Flow: OnboardingFlow = {
       buttonLabel: 'Yes, enable it',
       secondaryButtonLabel: 'Maybe later',
     },
-    // 6 — Push notification permission
-    {
-      id: 'qs2-push-permission',
-      type: 'welcome-aboard',
-      title: 'With reminders, routines feel 80% easier.',
-      subtitle: 'Get gentle nudges to keep your daily reset on track.',
-      buttonLabel: 'Turn on notifications',
-      secondaryButtonLabel: 'Maybe later',
-    },
-    // 8 — Nickname
+    // 5 — Nickname
     {
       id: 'qs2-nickname',
       type: 'text-input',
@@ -96,7 +68,7 @@ export const quickStartV2Flow: OnboardingFlow = {
       illustrationLabel: 'Mascot greeting',
       buttonLabel: 'Continue',
     },
-    // 9 — Preferred second language
+    // 6 — Preferred second language
     {
       id: 'qs2-second-language',
       type: 'single-select',
@@ -111,7 +83,7 @@ export const quickStartV2Flow: OnboardingFlow = {
         { label: 'Spanish', emoji: '🇪🇸' },
       ],
     },
-    // 10 — Age group
+    // 7 — Age group
     {
       id: 'qs2-age-group',
       type: 'single-select',
@@ -130,7 +102,7 @@ export const quickStartV2Flow: OnboardingFlow = {
         { label: '45+' },
       ],
     },
-    // 11 — Gender
+    // 8 — Gender
     {
       id: 'qs2-gender',
       type: 'single-select',
@@ -144,7 +116,16 @@ export const quickStartV2Flow: OnboardingFlow = {
         { label: 'Neither' },
       ],
     },
-    // 12 — Your Routine is Ready teaser (last page)
+    // 9 — Push notification permission (moved from earlier)
+    {
+      id: 'qs2-push-permission',
+      type: 'welcome-aboard',
+      title: 'With reminders, routines feel 80% easier.',
+      subtitle: 'Get gentle nudges to keep your daily reset on track.',
+      buttonLabel: 'Turn on notifications',
+      secondaryButtonLabel: 'Maybe later',
+    },
+    // 10 — Your Routine is Ready teaser (last page)
     {
       id: 'qs2-routine-ready',
       type: 'routine-ready-teaser',
