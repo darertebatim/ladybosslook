@@ -6,6 +6,7 @@ import { useTodayMood } from '@/hooks/useMoodLogs';
 import { cn } from '@/lib/utils';
 import { getLocalDateStr } from '@/lib/localDate';
 import moodBannerImg from '@/assets/mood-banner.png';
+import { isSpecialBannerDisabled } from '@/components/admin/SpecialBannersArchive';
 
 const DISMISS_KEY = 'mood-banner-dismissed';
 
@@ -25,7 +26,7 @@ export function MoodCheckInBanner({ onVisibilityChange }: { onVisibilityChange?:
   const [visible, setVisible] = useState(() => !isDismissedToday());
   const [fading, setFading] = useState(false);
 
-  const isShowing = visible && !todayMood;
+  const isShowing = visible && !todayMood && !isSpecialBannerDisabled('MoodCheckInBanner');
 
   useEffect(() => {
     onVisibilityChange?.(isShowing);
