@@ -3600,6 +3600,13 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
         <LoopWheel />
       </FadeUp>
 
+      {/* Testimony */}
+      <FadeUp delay={0.25}>
+        <p className="text-[13px] text-[#1a1f3d]/60 text-center italic mt-2 mb-1 px-4">
+          "It feels like having a little daily reset button in my pocket." — Yalda-M ⭐⭐⭐⭐⭐
+        </p>
+      </FadeUp>
+
       {/* Bottom button */}
       <FadeUp delay={0.5} className="mt-auto pt-2">
         {!added ? (
