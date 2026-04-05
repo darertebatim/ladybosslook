@@ -386,10 +386,11 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
 
   if (hasBg) {
     return (
-      <BottomSheetWrapper bgImage={meplusMascotBg}>
+      <BottomSheetWrapper bgImage={step.image || meplusMascotBg}>
         <FadeUp>
-          <div className="min-h-[3em] flex items-start justify-center mb-3">
-            <h1 className="text-xl font-extrabold text-foreground text-center leading-snug">{step.title}</h1>
+          <div className="min-h-[3em] flex flex-col items-center justify-center mb-3">
+            <h1 className="text-xl font-extrabold text-foreground text-center leading-snug whitespace-pre-line">{step.title}</h1>
+            {step.subtitle && <p className="text-sm text-muted-foreground mt-1 text-center">{step.subtitle}</p>}
           </div>
           {isWeeklyFocus && (
             <p className="text-xs text-muted-foreground text-center mb-3">Pick up to 3 — focus works best with fewer goals</p>
@@ -418,8 +419,20 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
           </FadeUp>
         ) : (
           <FadeUp delay={0.1}>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {step.options?.map((opt, i) => renderChip(opt, i))}
+            <div className="space-y-2 mb-4">
+              {step.options?.map((opt, i) => (
+                <button
+                  key={i}
+                  onClick={() => toggle(i)}
+                  className={`w-full flex items-center gap-3 p-3.5 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+                    selected.has(i) ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
+                  }`}
+                >
+                  {opt.emoji && <OptionEmoji emoji={opt.emoji} size={24} />}
+                  <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
+                  {selected.has(i) && <SealCheck showParticles className="w-6 h-6 text-purple-500 animate-seal-pop" />}
+                </button>
+              ))}
             </div>
           </FadeUp>
         )}
@@ -436,7 +449,7 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
         )}
 
         <FadeUp delay={0.3} className="mt-auto">
-          <NavyButton onClick={onNext} disabled={selected.size === 0}>{step.buttonLabel}</NavyButton>
+          <NavyButton onClick={onNext} disabled={selected.size === 0}>{step.buttonLabel || 'Continue'}</NavyButton>
         </FadeUp>
       </BottomSheetWrapper>
     );
