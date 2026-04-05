@@ -39,7 +39,6 @@ export const quickStartV2Flow: OnboardingFlow = {
         { label: 'No daily structure or routine', emoji: '🌀' },
         { label: 'ADHD / scattered focus', emoji: '🧠' },
         { label: 'Emotional ups & downs', emoji: '💔' },
-        { label: 'All of the above', emoji: '😅' },
       ],
       buttonLabel: 'Continue',
     },
