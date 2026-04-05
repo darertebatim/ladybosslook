@@ -172,7 +172,7 @@ function IllustrationPlaceholder({ label, className = '' }: { label: string; cla
 function ScreenWrapper({ children, bg = 'bg-white', center = false }: { children: React.ReactNode; bg?: string; center?: boolean }) {
   return (
     <div className={`h-full ${bg} overflow-y-auto overscroll-contain`}>
-      <div className={`flex flex-col min-h-full px-5 pt-4 pb-6 ${center ? 'justify-center' : ''}`}>
+      <div className={`flex flex-col h-full px-5 pt-4 pb-6 ${center ? 'justify-center' : ''}`}>
         {children}
       </div>
     </div>
@@ -467,8 +467,8 @@ function BottomSheetWrapper({ children, bgImage, headerHeight = 200 }: { childre
         )}
       </div>
       {/* White bottom sheet */}
-      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-y-auto overscroll-contain min-h-0">
-        <div className="px-5 pt-5 pb-5 flex flex-col flex-1">
+      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col">
+        <div className="px-5 pt-5 pb-5 flex flex-col flex-1 min-h-0">
           {children}
         </div>
       </div>
