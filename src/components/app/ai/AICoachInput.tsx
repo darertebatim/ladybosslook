@@ -176,6 +176,7 @@ export function AICoachInput({ mode, isLoading, onSend, onStop }: Props) {
             value={input}
             onChange={handleInput}
             onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
             placeholder={imagePreview ? 'Describe what to do with this image...' : PLACEHOLDERS[mode]}
             disabled={isLoading}
             rows={1}
