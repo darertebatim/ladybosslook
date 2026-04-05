@@ -3584,9 +3584,9 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
           <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-2">
             <FluentEmoji emoji="🎉" size={32} />
           </div>
-          <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center leading-tight">
-            You completed your first<br />Daily Reset!
-          </h1>
+           <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center leading-tight">
+             Your first<br />Daily Reset!
+           </h1>
         </div>
       </FadeUp>
 
