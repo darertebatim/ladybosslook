@@ -3610,7 +3610,7 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
       </FadeUp>
 
       {/* Bottom button */}
-      <FadeUp delay={0.5} className="mt-auto pt-2">
+      <FadeUp delay={0.5} className="mt-auto pt-2 sticky bottom-0 bg-white pb-1">
         {!added ? (
           <NavyButton onClick={handleAdd}>
             Add to my daily routine
