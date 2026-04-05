@@ -274,16 +274,6 @@ function WelcomeScreen({ step, onNext }: Props) {
               <p className="text-center text-[16px] text-[#1a1f3d] font-bold whitespace-pre-line leading-snug mt-3">{step.description}</p>
             </div>
           )}
-          {step.secondaryButtonLabel && (
-            <div className="bg-[#f5f5f0] rounded-2xl px-5 py-3 mb-3 text-center">
-              <p className="text-base text-[#1a1f3d]/60">
-                Already a member?{' '}
-                <Link to="/auth?mode=signin&skip_onboarding=true" className="text-[#4CAF50] font-semibold hover:underline">
-                  Sign in.
-                </Link>
-              </p>
-            </div>
-          )}
           <div className="relative">
             <div className="absolute -top-3 right-3 z-10 bg-amber-100 text-[#1a1f3d] text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm border border-amber-300 whitespace-nowrap animate-bounce" style={{ animationDuration: '2s' }}>
               ⚡ Takes only 2 minutes!
@@ -296,6 +286,16 @@ function WelcomeScreen({ step, onNext }: Props) {
               <span className="text-base">→</span>
             </button>
           </div>
+          {step.secondaryButtonLabel && (
+            <div className="bg-[#f5f5f0] rounded-2xl px-5 py-3 mt-3 text-center">
+              <p className="text-base text-[#1a1f3d]/60">
+                Already a member?{' '}
+                <Link to="/auth?mode=signin&skip_onboarding=true" className="text-[#4CAF50] font-semibold hover:underline">
+                  Sign in.
+                </Link>
+              </p>
+            </div>
+          )}
         </FadeUp>
       </div>
     </div>
