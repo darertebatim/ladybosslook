@@ -31,6 +31,8 @@ export const quickStartV2Flow: OnboardingFlow = {
       type: 'multi-select',
       title: 'What do you struggle\nwith most?',
       subtitle: 'Pick all that apply — no judgment here.',
+      image: mascotPlanner,
+      illustrationLabel: 'Mascot asking',
       options: [
         { label: 'Stress & overthinking', emoji: '😮‍💨' },
         { label: 'Procrastination & low motivation', emoji: '🫠' },
@@ -39,6 +41,7 @@ export const quickStartV2Flow: OnboardingFlow = {
         { label: 'Emotional ups & downs', emoji: '💔' },
         { label: 'All of the above', emoji: '😅' },
       ],
+      buttonLabel: 'Continue',
     },
     // 3 — Feature interest question
     {
