@@ -2452,7 +2452,6 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const triggerCelebration = (taskIdx: number, nextPhase: DemoPhase) => {
     setCompletedIndices(prev => new Set(prev).add(taskIdx));
     setCelebratingIdx(taskIdx);
-    playCompletionSound();
     haptic.success();
     confetti({
       particleCount: 60,
