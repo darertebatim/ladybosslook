@@ -2489,7 +2489,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
       setPhase('celebrate-breathe');
       setCompletedIndices(prev => new Set(prev).add(BREATHE_IDX));
       setCelebratingIdx(BREATHE_IDX);
-      playCompletionSound();
+      
       haptic.success();
       confetti({
         particleCount: 60,
