@@ -3692,7 +3692,7 @@ function RoutineReadyTeaserScreen({ step, onNext }: Props) {
         </FadeUp>
       </div>
 
-      <FadeUp delay={0.55} className="mt-auto pt-4">
+      <FadeUp delay={0.55} className="mt-auto pt-4 sticky bottom-0 bg-white pb-1">
         <NavyButton onClick={onNext}>{step.buttonLabel || 'See My Routine'}</NavyButton>
       </FadeUp>
     </ScreenWrapper>
