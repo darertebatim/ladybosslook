@@ -46,7 +46,7 @@ export const quickStartV2Flow: OnboardingFlow = {
       title: 'Your daily reset button',
       subtitle: '',
       image: resetBeforeAfter,
-      description: '',
+      description: '"It feels like having a little daily reset button in my pocket." — Yalda-M ⭐⭐⭐⭐⭐',
       buttonLabel: 'Continue',
     },
     // 4 — Daily reset prompt
