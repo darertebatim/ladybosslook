@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import type { CoachMode } from './AICoachHeader';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 
 const PLACEHOLDERS: Record<CoachMode, string> = {
   coach: 'Ask your coach...',
@@ -29,6 +30,7 @@ export function AICoachInput({ mode, isLoading, onSend, onStop }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
+  const { handleFocus } = useKeyboardScroll(textareaRef);
 
   const handleSubmit = useCallback(() => {
     const text = input.trim();
@@ -174,6 +176,7 @@ export function AICoachInput({ mode, isLoading, onSend, onStop }: Props) {
             value={input}
             onChange={handleInput}
             onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
             placeholder={imagePreview ? 'Describe what to do with this image...' : PLACEHOLDERS[mode]}
             disabled={isLoading}
             rows={1}
