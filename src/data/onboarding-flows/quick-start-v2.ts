@@ -25,18 +25,34 @@ export const quickStartV2Flow: OnboardingFlow = {
       ],
       buttonLabel: 'Get Started',
     },
-    // 2 — Intent question
+    // 2 — Pain points question
     {
-      id: 'qs2-intent',
-      type: 'single-select',
-      title: 'How does your mind feel\nin this moment?',
-      subtitle: 'We\'ll use this to guide your first reset.',
-      illustrationLabel: 'Mascot in cozy room',
+      id: 'qs2-pain-points',
+      type: 'multi-select',
+      title: 'What do you struggle\nwith most?',
+      subtitle: 'Pick all that apply — no judgment here.',
       options: [
-        { label: 'A bit scattered (Focus)', emoji: '☁️' },
-        { label: 'Feeling the pressure (Stress)', emoji: '🌪️' },
-        { label: 'I need a spark (Motivation)', emoji: '✨' },
-        { label: 'Just looking for a rhythm (Routines)', emoji: '🌿' },
+        { label: 'Stress & overthinking', emoji: '😮‍💨' },
+        { label: 'Procrastination & low motivation', emoji: '🫠' },
+        { label: 'No daily structure or routine', emoji: '🌀' },
+        { label: 'ADHD / scattered focus', emoji: '🧠' },
+        { label: 'Emotional ups & downs', emoji: '💔' },
+        { label: 'All of the above', emoji: '😅' },
+      ],
+    },
+    // 3 — Feature interest question
+    {
+      id: 'qs2-feature-interest',
+      type: 'multi-select',
+      title: 'What sounds most\nhelpful to you?',
+      subtitle: 'We\'ll personalize your experience.',
+      options: [
+        { label: 'Daily routines & habits', emoji: '📋' },
+        { label: 'Guided audio & meditation', emoji: '🎧' },
+        { label: 'Self-care task planner', emoji: '✅' },
+        { label: 'Breathing & stress relief', emoji: '🌬️' },
+        { label: 'Journaling & reflections', emoji: '✏️' },
+        { label: 'Learning & personal growth', emoji: '🎓' },
       ],
     },
     // 3 — Daily reset prompt
