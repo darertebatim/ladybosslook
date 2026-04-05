@@ -28,7 +28,7 @@ export function AICoachHeader({ mode, setMode, onClear }: Props) {
   const navigate = useNavigate();
 
   return (
-    <div className={cn("safe-area-top relative overflow-hidden bg-gradient-to-br", MODE_BG[mode])}>
+    <div className={cn("safe-area-inset-top relative overflow-hidden bg-gradient-to-br", MODE_BG[mode])}>
       {/* Animated mesh overlay */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-0 right-0 w-40 h-40 bg-white/20 rounded-full blur-3xl animate-pulse" />
