@@ -1763,7 +1763,7 @@ function WelcomeAboardScreen({ step, onNext }: Props) {
           </p>
         </FadeUp>
       </div>
-      <FadeUp delay={0.3} className="mt-auto">
+      <FadeUp delay={0.3} className="mt-auto sticky bottom-0 bg-white pb-1">
         <NavyButton onClick={handleEnable}>Turn on notifications</NavyButton>
         <button
           onClick={onNext}
