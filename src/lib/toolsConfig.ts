@@ -224,7 +224,7 @@ export const wellnessTools: ToolConfig[] = [
   },
   {
     id: 'ai',
-    name: 'AI Coach',
+    name: 'AI Agents',
     icon: 'Bot',
     emoji: '🤖',
     bgColor: 'bg-[#D4F1F4]',
