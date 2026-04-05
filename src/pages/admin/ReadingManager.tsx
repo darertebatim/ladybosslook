@@ -87,6 +87,7 @@ export default function ReadingManager() {
       theme_color: content.theme_color || '#F0E3FF',
       emoji: content.emoji || '📖',
       cover_url: content.cover_url || '',
+      cover_aspect: (content as any).cover_aspect || 'square',
       is_published: content.is_published,
       is_premium: content.is_premium,
     });
