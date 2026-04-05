@@ -16,7 +16,7 @@ export const quickStartV2Flow: OnboardingFlow = {
       type: 'welcome',
       title: 'Welcome to Ladybosslook!',
       subtitle: 'Your day, back in your hands.',
-      image: meplusWelcomeMascot,
+      image: cheerfulBird,
       statHighlight: 'Your **FREE** Routine Planner',
       secondaryButtonLabel: 'Already a member? Sign in.',
       statBadges: [
