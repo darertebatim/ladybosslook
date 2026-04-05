@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import type { CoachMode } from './AICoachHeader';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 
 const PLACEHOLDERS: Record<CoachMode, string> = {
   coach: 'Ask your coach...',
