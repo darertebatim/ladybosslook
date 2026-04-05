@@ -98,6 +98,7 @@ export default function ReadingManager() {
     const payload = {
       ...form,
       cover_url: coverType === 'image' ? form.cover_url : null,
+      cover_aspect: form.cover_aspect,
       emoji: coverType === 'emoji' ? form.emoji : null,
     };
     if (editingContent) {
