@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '@/hooks/useGoBack';
 import { usePublishedContent, useReadingUserProgress, ReadingContent } from '@/hooks/useReading';
-import { BookOpen, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, CheckCircle2 } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { CachedImage } from '@/components/ui/CachedImage';
 import { cn } from '@/lib/utils';
@@ -74,6 +75,7 @@ function ReadingCard({ item, isCompleted, onClick }: { item: ReadingContent; isC
 
 export default function AppRead() {
   const navigate = useNavigate();
+  const goBack = useGoBack('/app/tools');
   const { data: content = [], isLoading } = usePublishedContent();
   const { data: progress = [] } = useReadingUserProgress();
 
@@ -81,12 +83,18 @@ export default function AppRead() {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <div className="px-4 pt-6 pb-2">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <BookOpen className="h-6 w-6 text-primary" /> Read
-        </h1>
-        <p className="text-black text-sm mt-1">Stories & lessons for your mind</p>
+      {/* Header */}
+      <div
+        className="px-4 pb-3 flex items-center gap-3 border-b"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
+      >
+        <button onClick={() => goBack()} className="active:scale-95 transition-transform p-1">
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+        <h1 className="text-lg font-semibold flex-1">Read</h1>
       </div>
+
+      <p className="text-foreground text-sm px-4 pt-3">Stories & lessons for your mind</p>
 
       {/* Content Grid */}
       <div className="px-4 pt-3">

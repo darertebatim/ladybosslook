@@ -499,7 +499,6 @@ const App = () => (
                     <Route path="/app/reflections/free-form" element={<ProtectedRoute><AppFreeFormReflection /></ProtectedRoute>} />
                     <Route path="/app/reflections/:reflectionId" element={<ProtectedRoute><AppReflectionFlow /></ProtectedRoute>} />
                     <Route path="/app/ai" element={<ProtectedRoute><AppAICoach /></ProtectedRoute>} />
-                    <Route path="/app/read" element={<ProtectedRoute><AppRead /></ProtectedRoute>} />
                     <Route path="/app/read/:id" element={<ProtectedRoute><AppReadDetail /></ProtectedRoute>} />
                     <Route path="/app/read/:id/reader" element={<ProtectedRoute><AppReadReader /></ProtectedRoute>} />
                     <Route path="/app/quiz/:slug" element={<ProtectedRoute><QuizDetail /></ProtectedRoute>} />
@@ -548,6 +547,7 @@ const App = () => (
                       <Route path="tasksbank" element={<AppTasksBank />} />
                       <Route path="projects" element={<AppTaskDrafts />} />
                       <Route path="quizzes" element={<QuizLibrary />} />
+                      <Route path="read" element={<AppRead />} />
                       <Route path="routineplayer" element={<AppRoutinePlayerPage />} />
                       {/* Redirects for backward compatibility with older app versions */}
                       <Route path="rituals" element={<Navigate to="/app/routines" replace />} />
