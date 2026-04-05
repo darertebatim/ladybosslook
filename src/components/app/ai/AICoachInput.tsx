@@ -30,6 +30,7 @@ export function AICoachInput({ mode, isLoading, onSend, onStop }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
+  const { handleFocus } = useKeyboardScroll(textareaRef);
 
   const handleSubmit = useCallback(() => {
     const text = input.trim();
