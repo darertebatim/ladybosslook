@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import OnboardingAnswers from './OnboardingAnswers';
 
 export default function Onboarding() {
-  const flows = [dearMeFlow, mePlusFlow, quickStartFlow, weeklyReviewFlow];
+  const flows = [dearMeFlow, mePlusFlow, quickStartFlow, quickStartV2Flow, weeklyReviewFlow];
   const { flowId: defaultFlowId } = useDefaultOnboarding();
   const setDefaultMutation = useSetDefaultOnboarding();
 
