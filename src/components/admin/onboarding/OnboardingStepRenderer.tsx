@@ -172,7 +172,7 @@ function IllustrationPlaceholder({ label, className = '' }: { label: string; cla
 function ScreenWrapper({ children, bg = 'bg-white', center = false }: { children: React.ReactNode; bg?: string; center?: boolean }) {
   return (
     <div className={`h-full ${bg} overflow-y-auto overscroll-contain`}>
-      <div className={`flex flex-col h-full px-5 pt-4 pb-6 ${center ? 'justify-center' : ''}`}>
+      <div className={`flex flex-col min-h-full px-5 pt-4 pb-6 ${center ? 'justify-center' : ''}`} style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
         {children}
       </div>
     </div>
