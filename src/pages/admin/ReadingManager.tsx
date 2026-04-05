@@ -67,7 +67,7 @@ export default function ReadingManager() {
       title: '', subtitle: '', description: '', author: '',
       category: 'general', type: 'story',
       reading_time_minutes: 5, theme_color: '#F0E3FF',
-      emoji: '📖', cover_url: '',
+      emoji: '📖', cover_url: '', cover_aspect: 'square',
       is_published: false, is_premium: false,
     });
     setShowForm(true);
