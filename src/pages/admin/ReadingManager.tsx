@@ -55,6 +55,7 @@ export default function ReadingManager() {
     theme_color: '#F0E3FF',
     emoji: '📖',
     cover_url: '',
+    cover_aspect: 'square' as string,
     is_published: false,
     is_premium: false,
   });
@@ -66,7 +67,7 @@ export default function ReadingManager() {
       title: '', subtitle: '', description: '', author: '',
       category: 'general', type: 'story',
       reading_time_minutes: 5, theme_color: '#F0E3FF',
-      emoji: '📖', cover_url: '',
+      emoji: '📖', cover_url: '', cover_aspect: 'square',
       is_published: false, is_premium: false,
     });
     setShowForm(true);
@@ -86,6 +87,7 @@ export default function ReadingManager() {
       theme_color: content.theme_color || '#F0E3FF',
       emoji: content.emoji || '📖',
       cover_url: content.cover_url || '',
+      cover_aspect: (content as any).cover_aspect || 'square',
       is_published: content.is_published,
       is_premium: content.is_premium,
     });
@@ -96,6 +98,7 @@ export default function ReadingManager() {
     const payload = {
       ...form,
       cover_url: coverType === 'image' ? form.cover_url : null,
+      cover_aspect: form.cover_aspect,
       emoji: coverType === 'emoji' ? form.emoji : null,
     };
     if (editingContent) {
@@ -234,6 +237,30 @@ export default function ReadingManager() {
               )}
 
               {coverType === 'image' && (
+                <>
+                <div className="mb-3">
+                  <Label className="text-xs text-muted-foreground mb-1.5 block">Aspect Ratio</Label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, cover_aspect: 'square' }))}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                        form.cover_aspect === 'square' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      4:4 Square
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, cover_aspect: '6x4' }))}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                        form.cover_aspect === '6x4' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      6:4 Tall
+                    </button>
+                  </div>
+                </div>
                 <ImageUploader
                   value={form.cover_url}
                   onChange={(url) => setForm(f => ({ ...f, cover_url: url }))}
@@ -241,6 +268,7 @@ export default function ReadingManager() {
                   folder="covers"
                   label=""
                 />
+                </>
               )}
             </div>
 
