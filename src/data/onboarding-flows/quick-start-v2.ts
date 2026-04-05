@@ -39,17 +39,7 @@ export const quickStartV2Flow: OnboardingFlow = {
         { label: 'Just looking for a rhythm (Routines)', emoji: '🌿' },
       ],
     },
-    // 3 — Daily reset concept
-    {
-      id: 'qs2-reset-concept',
-      type: 'motivational',
-      title: 'Your daily reset button',
-      subtitle: '',
-      image: resetBeforeAfter,
-      description: '',
-      buttonLabel: 'Continue',
-    },
-    // 4 — Daily reset prompt
+    // 3 — Daily reset prompt
     {
       id: 'qs2-daily-reset-prompt',
       type: 'daily-reset-prompt',
