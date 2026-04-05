@@ -467,8 +467,8 @@ function BottomSheetWrapper({ children, bgImage, headerHeight = 200 }: { childre
         )}
       </div>
       {/* White bottom sheet */}
-      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col">
-        <div className="px-5 pt-5 pb-5 flex flex-col flex-1 min-h-0">
+      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-y-auto overscroll-contain">
+        <div className="px-5 pt-5 flex flex-col flex-1 min-h-0" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}>
           {children}
         </div>
       </div>
