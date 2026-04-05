@@ -37,7 +37,11 @@ export default function AppReadDetail() {
     <div className="min-h-screen bg-background pb-24">
       {/* Hero */}
       <div className="relative overflow-hidden" style={{ backgroundColor: content.theme_color || '#F0E3FF' }}>
-        <button onClick={() => navigate('/app/read')} className="absolute top-4 left-4 z-10 bg-white/70 backdrop-blur-sm rounded-full p-2">
+        <button
+          onClick={() => navigate('/app/read')}
+          className="absolute left-4 z-10 bg-white/70 backdrop-blur-sm rounded-full p-2 active:scale-95 transition-transform"
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
+        >
           <ArrowLeft className="h-5 w-5 text-black" />
         </button>
 

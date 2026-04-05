@@ -134,8 +134,11 @@ export default function AppReadReader() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top Bar */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b bg-background sticky top-0 z-10">
-        <button onClick={() => navigate(`/app/read/${id}`)} className="p-1">
+      <div
+        className="flex items-center gap-3 px-4 py-3 border-b bg-background sticky top-0 z-10"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
+      >
+        <button onClick={() => navigate(`/app/read/${id}`)} className="p-1 active:scale-95 transition-transform">
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
