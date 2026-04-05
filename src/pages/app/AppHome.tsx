@@ -1163,7 +1163,7 @@ const AppHome = () => {
                           homeView === 'one-time' ? 'text-foreground' : 'text-muted-foreground'
                         )}
                       >
-                        One-Time
+                        To-Dos
                       </button>
                     </div>
                     <button
