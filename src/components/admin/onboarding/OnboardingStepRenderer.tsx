@@ -3602,9 +3602,11 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
 
       {/* Testimony */}
       <FadeUp delay={0.25}>
-        <p className="text-[13px] text-[#1a1f3d]/60 text-center italic mt-2 mb-1 px-4">
-          "It feels like having a little daily reset button in my pocket." — Yalda-M ⭐⭐⭐⭐⭐
-        </p>
+        <div className="bg-[#f5f3ff] rounded-2xl px-4 py-3 mt-2 mb-1">
+          <p className="text-[13px] text-[#1a1f3d]/70 text-center italic">
+            "It feels like having a little daily reset button in my pocket." — Yalda-M ⭐⭐⭐⭐⭐
+          </p>
+        </div>
       </FadeUp>
 
       {/* Bottom button */}
@@ -3623,9 +3625,6 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
             Added to your routine!
           </motion.div>
         )}
-        <button onClick={onNext} className="w-full py-3 text-sm text-[#1a1f3d]/40 font-medium mt-1 active:opacity-60">
-          Maybe later
-        </button>
       </FadeUp>
     </BottomSheetWrapper>
   );
