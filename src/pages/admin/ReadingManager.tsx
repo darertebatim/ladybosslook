@@ -55,6 +55,7 @@ export default function ReadingManager() {
     theme_color: '#F0E3FF',
     emoji: '📖',
     cover_url: '',
+    cover_aspect: 'square' as string,
     is_published: false,
     is_premium: false,
   });
