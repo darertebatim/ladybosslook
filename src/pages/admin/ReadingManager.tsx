@@ -268,6 +268,7 @@ export default function ReadingManager() {
                   folder="covers"
                   label=""
                 />
+                </>
               )}
             </div>
 
