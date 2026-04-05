@@ -1,5 +1,5 @@
 import { OnboardingFlow } from '@/types/onboarding';
-import meplusWelcomeMascot from '@/assets/onboarding/meplus-welcome-mascot.png';
+import cheerfulBird from '@/assets/onboarding/cheerful-bird.png';
 import resetBeforeAfter from '@/assets/onboarding/reset-before-after.png';
 import mascotPlanner from '@/assets/onboarding/mascot-planner.png';
 
@@ -16,7 +16,7 @@ export const quickStartV2Flow: OnboardingFlow = {
       type: 'welcome',
       title: 'Welcome to Ladybosslook!',
       subtitle: 'Your day, back in your hands.',
-      image: meplusWelcomeMascot,
+      image: cheerfulBird,
       statHighlight: 'Your **FREE** Routine Planner',
       secondaryButtonLabel: 'Already a member? Sign in.',
       statBadges: [
