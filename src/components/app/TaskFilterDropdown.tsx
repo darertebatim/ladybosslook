@@ -40,7 +40,7 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
   const baseOptions: FilterOption[] = [
     { value: 'all', label: 'All Tasks' },
     ...(routineNames.size > 0 ? [{ value: 'all-routines', label: 'Routine Players' }] : []),
-    { value: 'one-time', label: 'One-time Tasks' },
+    { value: 'one-time', label: 'To-Dos' },
   ];
 
   const endOptions: FilterOption[] = [
