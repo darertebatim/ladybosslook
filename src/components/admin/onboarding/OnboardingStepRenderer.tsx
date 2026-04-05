@@ -2452,7 +2452,6 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const triggerCelebration = (taskIdx: number, nextPhase: DemoPhase) => {
     setCompletedIndices(prev => new Set(prev).add(taskIdx));
     setCelebratingIdx(taskIdx);
-    playCompletionSound();
     haptic.success();
     confetti({
       particleCount: 60,
@@ -2490,7 +2489,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
       setPhase('celebrate-breathe');
       setCompletedIndices(prev => new Set(prev).add(BREATHE_IDX));
       setCelebratingIdx(BREATHE_IDX);
-      playCompletionSound();
+      
       haptic.success();
       confetti({
         particleCount: 60,
@@ -3546,7 +3545,6 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
   const handleAdd = () => {
     setAdded(true);
     haptic.success();
-    playCompletionSound();
     confetti({
       particleCount: 80,
       spread: 70,
@@ -3560,7 +3558,6 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
   // Fire celebration effects on mount
   useEffect(() => {
     haptic.success();
-    playCompletionSound();
     // Initial burst
     confetti({
       particleCount: 70,
@@ -3584,16 +3581,19 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
           <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-2">
             <FluentEmoji emoji="🎉" size={32} />
           </div>
-          <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center leading-tight">
-            You completed your first<br />Daily Reset!
-          </h1>
+           <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center leading-tight">
+             Your first<br />Daily Reset!
+           </h1>
         </div>
       </FadeUp>
 
-      {/* Description */}
+      {/* Testimony */}
       <FadeUp delay={0.1}>
-        <p className="text-[16px] text-[#1a1f3d] leading-relaxed text-center mb-3">
-          A simple daily routine to help you<br />take control of your life.
+        <p className="text-[15px] text-[#1a1f3d]/80 italic leading-relaxed text-center mb-1">
+          "It feels like having a little daily reset button in my pocket."
+        </p>
+        <p className="text-[13px] text-[#1a1f3d]/60 text-center mb-3">
+          — Yalda-M ⭐⭐⭐⭐⭐
         </p>
       </FadeUp>
 
