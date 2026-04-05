@@ -587,7 +587,7 @@ function TextInputScreen({ step, onNext, onAnswer }: Props) {
           autoFocus
         />
       </FadeUp>
-      <div className="mt-auto pt-8 space-y-2">
+      <div className="mt-auto pt-8 space-y-2 sticky bottom-0 bg-white pb-1">
         <button
           onClick={handleSubmit}
           disabled={!value.trim()}
