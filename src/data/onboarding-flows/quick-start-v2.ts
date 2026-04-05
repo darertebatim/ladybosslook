@@ -49,6 +49,8 @@ export const quickStartV2Flow: OnboardingFlow = {
       type: 'multi-select',
       title: 'What sounds most\nhelpful to you?',
       subtitle: 'We\'ll personalize your experience.',
+      image: mascotPlanner,
+      illustrationLabel: 'Mascot features',
       options: [
         { label: 'Daily routines & habits', emoji: '📋' },
         { label: 'Guided audio & meditation', emoji: '🎧' },
@@ -57,6 +59,7 @@ export const quickStartV2Flow: OnboardingFlow = {
         { label: 'Journaling & reflections', emoji: '✏️' },
         { label: 'Learning & personal growth', emoji: '🎓' },
       ],
+      buttonLabel: 'Continue',
     },
     // 3 — Daily reset prompt
     {
