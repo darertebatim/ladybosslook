@@ -141,7 +141,7 @@ export function ProLinkPicker({
                       '/app/meditate': 'listen',
                       '/app/soundscape': 'listen',
                       '/app/projects': 'projects',
-                    };
+                      '/app/read': 'reading',
                     const proType = mapping[tool.route];
                     if (proType) onSelect(proType);
                   }}
