@@ -172,7 +172,7 @@ function IllustrationPlaceholder({ label, className = '' }: { label: string; cla
 function ScreenWrapper({ children, bg = 'bg-white', center = false }: { children: React.ReactNode; bg?: string; center?: boolean }) {
   return (
     <div className={`h-full ${bg} overflow-y-auto overscroll-contain`}>
-      <div className={`flex flex-col h-full px-5 pt-4 pb-6 ${center ? 'justify-center' : ''}`}>
+      <div className={`flex flex-col min-h-full px-5 pt-4 pb-6 ${center ? 'justify-center' : ''}`} style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
         {children}
       </div>
     </div>
@@ -467,8 +467,8 @@ function BottomSheetWrapper({ children, bgImage, headerHeight = 200 }: { childre
         )}
       </div>
       {/* White bottom sheet */}
-      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col">
-        <div className="px-5 pt-5 pb-5 flex flex-col flex-1 min-h-0">
+      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-y-auto overscroll-contain">
+        <div className="px-5 pt-5 flex flex-col flex-1 min-h-0" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}>
           {children}
         </div>
       </div>
@@ -587,7 +587,7 @@ function TextInputScreen({ step, onNext, onAnswer }: Props) {
           autoFocus
         />
       </FadeUp>
-      <div className="mt-auto pt-8 space-y-2">
+      <div className="mt-auto pt-8 space-y-2 sticky bottom-0 bg-white pb-1">
         <button
           onClick={handleSubmit}
           disabled={!value.trim()}
@@ -1763,7 +1763,7 @@ function WelcomeAboardScreen({ step, onNext }: Props) {
           </p>
         </FadeUp>
       </div>
-      <FadeUp delay={0.3} className="mt-auto">
+      <FadeUp delay={0.3} className="mt-auto sticky bottom-0 bg-white pb-1">
         <NavyButton onClick={handleEnable}>Turn on notifications</NavyButton>
         <button
           onClick={onNext}
@@ -3610,7 +3610,7 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
       </FadeUp>
 
       {/* Bottom button */}
-      <FadeUp delay={0.5} className="mt-auto pt-2">
+      <FadeUp delay={0.5} className="mt-auto pt-2 sticky bottom-0 bg-white pb-1">
         {!added ? (
           <NavyButton onClick={handleAdd}>
             Add to my daily routine
@@ -3692,7 +3692,7 @@ function RoutineReadyTeaserScreen({ step, onNext }: Props) {
         </FadeUp>
       </div>
 
-      <FadeUp delay={0.55} className="mt-auto pt-4">
+      <FadeUp delay={0.55} className="mt-auto pt-4 sticky bottom-0 bg-white pb-1">
         <NavyButton onClick={onNext}>{step.buttonLabel || 'See My Routine'}</NavyButton>
       </FadeUp>
     </ScreenWrapper>
