@@ -83,9 +83,9 @@ export default function AppRead() {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
+      {/* Fixed Header */}
       <div
-        className="px-4 pb-3 flex items-center gap-3 border-b"
+        className="fixed top-0 left-0 right-0 z-50 px-4 pb-3 flex items-center gap-3 border-b bg-background"
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
       >
         <button onClick={() => goBack()} className="active:scale-95 transition-transform p-1">
@@ -93,6 +93,9 @@ export default function AppRead() {
         </button>
         <h1 className="text-lg font-semibold flex-1">Read</h1>
       </div>
+
+      {/* Spacer for fixed header */}
+      <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 56px)' }} />
 
       <p className="text-foreground text-sm px-4 pt-3">Stories & lessons for your mind</p>
 
