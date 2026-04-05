@@ -547,6 +547,7 @@ const App = () => (
                       <Route path="tasksbank" element={<AppTasksBank />} />
                       <Route path="projects" element={<AppTaskDrafts />} />
                       <Route path="quizzes" element={<QuizLibrary />} />
+                      <Route path="read" element={<AppRead />} />
                       <Route path="routineplayer" element={<AppRoutinePlayerPage />} />
                       {/* Redirects for backward compatibility with older app versions */}
                       <Route path="rituals" element={<Navigate to="/app/routines" replace />} />
