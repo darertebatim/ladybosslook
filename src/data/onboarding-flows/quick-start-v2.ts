@@ -1,5 +1,5 @@
 import { OnboardingFlow } from '@/types/onboarding';
-import meplusWelcomeMascot from '@/assets/onboarding/meplus-welcome-mascot.png';
+import cheerfulBird from '@/assets/onboarding/cheerful-bird.png';
 import resetBeforeAfter from '@/assets/onboarding/reset-before-after.png';
 import mascotPlanner from '@/assets/onboarding/mascot-planner.png';
 
