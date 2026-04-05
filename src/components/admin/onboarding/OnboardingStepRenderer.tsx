@@ -3546,7 +3546,6 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
   const handleAdd = () => {
     setAdded(true);
     haptic.success();
-    playCompletionSound();
     confetti({
       particleCount: 80,
       spread: 70,
