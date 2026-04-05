@@ -56,10 +56,10 @@ export default function Auth() {
       navigate(redirectPath);
     } else if (!authLoading) {
       // First-time users should see onboarding before auth
-      const hasSeenOnboarding = localStorage.getItem('simora_onboarding_completed_quick-start-v1') === 'true';
+      const hasSeenOnboarding = localStorage.getItem('simora_onboarding_completed_quick-start-v2') === 'true';
       const skipOnboarding = searchParams.get('skip_onboarding') === 'true';
       if (!hasSeenOnboarding && !hasCustomRedirect && !skipOnboarding) {
-        navigate('/app/onboarding/quick-start-v1', { replace: true });
+        navigate('/app/onboarding/quick-start-v2', { replace: true });
       }
     }
   }, [user, authLoading, navigate, redirectPath, hasCustomRedirect]);
