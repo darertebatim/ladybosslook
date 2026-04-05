@@ -3559,7 +3559,6 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
   // Fire celebration effects on mount
   useEffect(() => {
     haptic.success();
-    playCompletionSound();
     // Initial burst
     confetti({
       particleCount: 70,
