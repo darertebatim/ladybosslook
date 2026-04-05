@@ -2452,7 +2452,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
   const triggerCelebration = (taskIdx: number, nextPhase: DemoPhase) => {
     setCompletedIndices(prev => new Set(prev).add(taskIdx));
     setCelebratingIdx(taskIdx);
-    playCompletionSound();
+    // sound removed from onboarding
     haptic.success();
     confetti({
       particleCount: 60,
@@ -2490,7 +2490,7 @@ function StarterRoutineScreen({ step, onNext }: Props) {
       setPhase('celebrate-breathe');
       setCompletedIndices(prev => new Set(prev).add(BREATHE_IDX));
       setCelebratingIdx(BREATHE_IDX);
-      playCompletionSound();
+      // sound removed from onboarding
       haptic.success();
       confetti({
         particleCount: 60,
@@ -3546,7 +3546,6 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
   const handleAdd = () => {
     setAdded(true);
     haptic.success();
-    playCompletionSound();
     confetti({
       particleCount: 80,
       spread: 70,
@@ -3560,7 +3559,6 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
   // Fire celebration effects on mount
   useEffect(() => {
     haptic.success();
-    playCompletionSound();
     // Initial burst
     confetti({
       particleCount: 70,
@@ -3585,7 +3583,7 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
             <FluentEmoji emoji="🎉" size={32} />
           </div>
           <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center leading-tight">
-            You completed your first<br />Daily Reset!
+            Your first<br />Daily Reset!
           </h1>
         </div>
       </FadeUp>
@@ -3600,6 +3598,13 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
       {/* Loop Wheel */}
       <FadeUp delay={0.15}>
         <LoopWheel />
+      </FadeUp>
+
+      {/* Testimony */}
+      <FadeUp delay={0.25}>
+        <p className="text-[13px] text-[#1a1f3d]/60 text-center italic mt-2 mb-1 px-4">
+          "It feels like having a little daily reset button in my pocket." — Yalda-M ⭐⭐⭐⭐⭐
+        </p>
       </FadeUp>
 
       {/* Bottom button */}
