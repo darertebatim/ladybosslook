@@ -237,6 +237,30 @@ export default function ReadingManager() {
               )}
 
               {coverType === 'image' && (
+                <>
+                <div className="mb-3">
+                  <Label className="text-xs text-muted-foreground mb-1.5 block">Aspect Ratio</Label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, cover_aspect: 'square' }))}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                        form.cover_aspect === 'square' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      4:4 Square
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, cover_aspect: '6x4' }))}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                        form.cover_aspect === '6x4' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      6:4 Tall
+                    </button>
+                  </div>
+                </div>
                 <ImageUploader
                   value={form.cover_url}
                   onChange={(url) => setForm(f => ({ ...f, cover_url: url }))}
