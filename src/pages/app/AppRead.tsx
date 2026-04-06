@@ -6,7 +6,7 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { CachedImage } from '@/components/ui/CachedImage';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
-import { getOptimizedImageUrl, IMAGE_SIZES } from '@/lib/imageUtils';
+
 
 // Map theme_color hex to tailwind-friendly bg classes (fallback to inline style)
 function themeColorToBg(color: string) {
@@ -44,7 +44,7 @@ function ReadingCard({ item, isCompleted, onClick }: { item: ReadingContent; isC
         )}>
           {item.cover_url ? (
             <CachedImage
-              src={getOptimizedImageUrl(item.cover_url, IMAGE_SIZES.thumbnail)}
+              src={item.cover_url}
               alt={item.title}
               loading="lazy"
               decoding="async"
