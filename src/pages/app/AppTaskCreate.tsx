@@ -591,12 +591,12 @@ const AppTaskCreate = ({
     queryFn: async () => {
       const { data, error } = await supabase
         .from('reflections' as any)
-        .select('id, title, subtitle, cover_image_url')
+        .select('id, title, subtitle, cover_image_url, emoji')
         .eq('is_active', true)
         .order('sort_order', { ascending: true });
       
       if (error) throw error;
-      return data as unknown as { id: string; title: string; subtitle: string | null; cover_image_url: string | null }[];
+      return data as unknown as { id: string; title: string; subtitle: string | null; cover_image_url: string | null; emoji: string | null }[];
     },
   });
 
