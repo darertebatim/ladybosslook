@@ -4,7 +4,7 @@ import { ArrowLeft, Clock, BookOpen, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { Badge } from '@/components/ui/badge';
-import { getOptimizedImageUrl, IMAGE_SIZES } from '@/lib/imageUtils';
+
 
 export default function AppReadDetail() {
   const { id } = useParams<{ id: string }>();
