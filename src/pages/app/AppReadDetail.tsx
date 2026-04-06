@@ -4,6 +4,7 @@ import { ArrowLeft, Clock, BookOpen, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { Badge } from '@/components/ui/badge';
+import { getOptimizedImageUrl, IMAGE_SIZES } from '@/lib/imageUtils';
 
 export default function AppReadDetail() {
   const { id } = useParams<{ id: string }>();
@@ -47,7 +48,7 @@ export default function AppReadDetail() {
 
         {hasCoverImage ? (
           <div className="relative w-full" style={{ aspectRatio: '6/4' }}>
-            <img src={content.cover_url!} alt={content.title} className="w-full h-full object-cover" />
+            <img src={getOptimizedImageUrl(content.cover_url!, IMAGE_SIZES.cover)} alt={content.title} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4 right-4 text-white">
               <h1 className="text-2xl font-bold leading-tight">{content.title}</h1>

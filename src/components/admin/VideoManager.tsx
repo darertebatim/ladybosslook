@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { compressImage } from "@/lib/imageUtils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,9 +58,10 @@ export const VideoManager = () => {
   });
 
   const uploadThumbnail = async (file: File, videoId?: string): Promise<string> => {
-    const ext = file.name.split('.').pop();
+    const compressed = await compressImage(file, { maxSizeMB: 0.3, maxWidthOrHeight: 800 });
+    const ext = compressed.type === 'image/webp' ? 'webp' : file.name.split('.').pop();
     const name = `thumb-${videoId || 'new'}-${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from('video_files').upload(name, file, { upsert: true });
+    const { error } = await supabase.storage.from('video_files').upload(name, compressed, { upsert: true });
     if (error) throw error;
     return supabase.storage.from('video_files').getPublicUrl(name).data.publicUrl;
   };

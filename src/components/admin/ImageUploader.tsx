@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { compressImage } from '@/lib/imageUtils';
 
 interface ImageUploaderProps {
   value: string;
@@ -49,14 +50,17 @@ export function ImageUploader({
 
     setIsUploading(true);
     try {
-      // Generate unique filename
-      const ext = file.name.split('.').pop();
+      // Compress image before upload
+      const compressed = await compressImage(file);
+      
+      // Use .webp extension if compressed to WebP, otherwise keep original
+      const ext = compressed.type === 'image/webp' ? 'webp' : file.name.split('.').pop();
       const filename = `${folder}/${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
 
       // Upload to Supabase Storage
       const { data, error } = await supabase.storage
         .from(bucket)
-        .upload(filename, file, {
+        .upload(filename, compressed, {
           cacheControl: '3600',
           upsert: false,
         });
