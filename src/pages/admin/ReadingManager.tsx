@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,13 +8,16 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Pencil, Trash2, BookOpen, Layers, ArrowLeft, Clock, Image as ImageIcon, Smile } from 'lucide-react';
+import { Plus, Pencil, Trash2, BookOpen, Layers, ArrowLeft, Clock, Image as ImageIcon, Smile, Loader2, Zap } from 'lucide-react';
 import { useAdminReadingContent, useCreateContent, useUpdateContent, useDeleteContent } from '@/hooks/useReading';
 import { ReadingSectionEditor } from '@/components/admin/ReadingSectionEditor';
 import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { ImageUploader } from '@/components/admin/ImageUploader';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import type { ReadingContent } from '@/hooks/useReading';
+import { compressImage } from '@/lib/imageUtils';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 
 const CATEGORIES = ['general', 'money', 'mindset', 'business', 'wellness', 'relationships', 'productivity', 'story'];
@@ -43,6 +46,54 @@ export default function ReadingManager() {
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
 
   const [coverType, setCoverType] = useState<CoverType>('emoji');
+  const [isOptimizing, setIsOptimizing] = useState(false);
+
+  const optimizeCovers = useCallback(async () => {
+    const coversToOptimize = allContent.filter(
+      c => c.cover_url && !c.cover_url.endsWith('.webp')
+    );
+    if (coversToOptimize.length === 0) {
+      toast.info('All covers are already optimized!');
+      return;
+    }
+    setIsOptimizing(true);
+    let done = 0;
+    let failed = 0;
+    for (const item of coversToOptimize) {
+      try {
+        // Download the image
+        const resp = await fetch(item.cover_url!);
+        const blob = await resp.blob();
+        const file = new File([blob], 'cover.jpg', { type: blob.type });
+
+        // Compress to WebP
+        const compressed = await compressImage(file, { maxSizeMB: 0.8, maxWidthOrHeight: 1200 });
+
+        // Extract storage path and upload compressed version
+        const match = item.cover_url!.match(/\/storage\/v1\/object\/public\/([^/]+)\/(.+)$/);
+        if (!match) { failed++; continue; }
+        const [, bucket, oldPath] = match;
+        const newPath = oldPath.replace(/\.[^.]+$/, '.webp');
+
+        const { error: upErr } = await supabase.storage
+          .from(bucket)
+          .upload(newPath, compressed, { contentType: 'image/webp', upsert: true });
+        if (upErr) throw upErr;
+
+        // Get new public URL and update DB
+        const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(newPath);
+        await supabase.from('reading_content').update({ cover_url: urlData.publicUrl }).eq('id', item.id);
+        done++;
+      } catch (e) {
+        console.error(`Failed to optimize ${item.title}:`, e);
+        failed++;
+      }
+    }
+    setIsOptimizing(false);
+    toast.success(`Optimized ${done} covers${failed ? `, ${failed} failed` : ''}`);
+    // Refresh data
+    window.location.reload();
+  }, [allContent]);
 
   const [form, setForm] = useState({
     title: '',
@@ -129,9 +180,17 @@ export default function ReadingManager() {
           </h1>
           <p className="text-muted-foreground">Manage stories and lessons</p>
         </div>
-        <Button onClick={openCreate}>
-          <Plus className="h-4 w-4 mr-2" /> New Content
-        </Button>
+        <div className="flex gap-2">
+          {allContent.some(c => c.cover_url && !c.cover_url.endsWith('.webp')) && (
+            <Button variant="outline" onClick={optimizeCovers} disabled={isOptimizing}>
+              {isOptimizing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+              Optimize Covers
+            </Button>
+          )}
+          <Button onClick={openCreate}>
+            <Plus className="h-4 w-4 mr-2" /> New Content
+          </Button>
+        </div>
       </div>
 
       {/* Content Form Dialog */}
