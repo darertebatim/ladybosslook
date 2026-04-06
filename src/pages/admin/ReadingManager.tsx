@@ -180,9 +180,17 @@ export default function ReadingManager() {
           </h1>
           <p className="text-muted-foreground">Manage stories and lessons</p>
         </div>
-        <Button onClick={openCreate}>
-          <Plus className="h-4 w-4 mr-2" /> New Content
-        </Button>
+        <div className="flex gap-2">
+          {allContent.some(c => c.cover_url && !c.cover_url.endsWith('.webp')) && (
+            <Button variant="outline" onClick={optimizeCovers} disabled={isOptimizing}>
+              {isOptimizing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+              Optimize Covers
+            </Button>
+          )}
+          <Button onClick={openCreate}>
+            <Plus className="h-4 w-4 mr-2" /> New Content
+          </Button>
+        </div>
       </div>
 
       {/* Content Form Dialog */}
