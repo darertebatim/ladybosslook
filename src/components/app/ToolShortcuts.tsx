@@ -396,10 +396,10 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
             return (
               <ShortcutSlot key={i} onTap={() => handleSlotTap(i)} onLongPress={() => handleLongPress(i)}>
                 <div className={cn("relative w-full rounded-2xl flex flex-col items-center justify-center bg-accent/60", hideLabels ? "aspect-square" : "aspect-[3/4]")}>
-                  <FluentEmoji emoji={getProLinkEmoji(shortcut.type) || shortcut.emoji} size={42} />
+                  <FluentEmoji emoji={shortcut.emoji || getProLinkEmoji(shortcut.type)} size={42} />
                   {!hideLabels && (
                     <span className="text-[11px] font-semibold text-foreground leading-tight text-center line-clamp-2 w-full px-0.5 mt-1 whitespace-pre-line">
-                      {(PRO_LINK_CONFIGS[shortcut.type]?.label || shortcut.label).replace('Mood Check-in', 'Mood\nCheck-in')}
+                      {(shortcut.value ? shortcut.label : (PRO_LINK_CONFIGS[shortcut.type]?.label || shortcut.label)).replace('Mood Check-in', 'Mood\nCheck-in')}
                     </span>
                   )}
                   {(() => {
