@@ -15,6 +15,9 @@ import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { ImageUploader } from '@/components/admin/ImageUploader';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import type { ReadingContent } from '@/hooks/useReading';
+import { compressImage } from '@/lib/imageUtils';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 
 const CATEGORIES = ['general', 'money', 'mindset', 'business', 'wellness', 'relationships', 'productivity', 'story'];
