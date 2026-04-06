@@ -252,7 +252,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     badgeColorClass: 'bg-teal-500/20 text-teal-700 dark:text-teal-300',
     buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
     description: 'Open the reflections tool',
-    requiresValue: false,
+    requiresValue: true,
   },
   video: {
     value: 'video',
