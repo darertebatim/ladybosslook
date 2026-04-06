@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Pencil, Trash2, BookOpen, Layers, ArrowLeft, Clock, Image as ImageIcon, Smile } from 'lucide-react';
+import { Plus, Pencil, Trash2, BookOpen, Layers, ArrowLeft, Clock, Image as ImageIcon, Smile, Loader2, Zap } from 'lucide-react';
 import { useAdminReadingContent, useCreateContent, useUpdateContent, useDeleteContent } from '@/hooks/useReading';
 import { ReadingSectionEditor } from '@/components/admin/ReadingSectionEditor';
 import { EmojiPicker } from '@/components/app/EmojiPicker';
