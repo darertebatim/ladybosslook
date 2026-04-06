@@ -2465,7 +2465,7 @@ const AppTaskCreate = ({
                       <img src={reflection.cover_image_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
                     ) : (
                       <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-100 to-cyan-100 dark:from-teal-900/40 dark:to-cyan-900/40 flex items-center justify-center">
-                        <Brain className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                        <FluentEmoji emoji={reflection.emoji || '✏️'} size={22} />
                       </div>
                     )}
                     <div className="flex-1 text-left">
