@@ -44,7 +44,7 @@ function ReadingCard({ item, isCompleted, onClick }: { item: ReadingContent; isC
         )}>
           {item.cover_url ? (
             <CachedImage
-              src={item.cover_url}
+              src={getOptimizedImageUrl(item.cover_url, IMAGE_SIZES.thumbnail)}
               alt={item.title}
               loading="lazy"
               decoding="async"
