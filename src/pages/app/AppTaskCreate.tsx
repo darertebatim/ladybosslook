@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format, addDays, nextMonday, startOfDay } from 'date-fns';
 import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag, AlarmClock, Target, Wind, Pencil, Brain, GripVertical, Headphones, MessageCircle, Clapperboard, Video, GraduationCap, Timer } from 'lucide-react';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { cn } from '@/lib/utils';
 import {
   DndContext,
@@ -590,12 +591,12 @@ const AppTaskCreate = ({
     queryFn: async () => {
       const { data, error } = await supabase
         .from('reflections' as any)
-        .select('id, title, subtitle, cover_image_url')
+        .select('id, title, subtitle, cover_image_url, emoji')
         .eq('is_active', true)
         .order('sort_order', { ascending: true });
       
       if (error) throw error;
-      return data as unknown as { id: string; title: string; subtitle: string | null; cover_image_url: string | null }[];
+      return data as unknown as { id: string; title: string; subtitle: string | null; cover_image_url: string | null; emoji: string | null }[];
     },
   });
 
@@ -2464,7 +2465,7 @@ const AppTaskCreate = ({
                       <img src={reflection.cover_image_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
                     ) : (
                       <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-100 to-cyan-100 dark:from-teal-900/40 dark:to-cyan-900/40 flex items-center justify-center">
-                        <Brain className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                        <FluentEmoji emoji={reflection.emoji || '✏️'} size={22} />
                       </div>
                     )}
                     <div className="flex-1 text-left">

@@ -133,11 +133,11 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
     queryFn: async () => {
       const { data, error } = await supabase
         .from('reflections' as any)
-        .select('id, title, subtitle, cover_image_url')
+        .select('id, title, subtitle, cover_image_url, emoji')
         .eq('is_active', true)
         .order('sort_order', { ascending: true });
       if (error) throw error;
-      return data as unknown as { id: string; title: string; subtitle: string | null; cover_image_url: string | null }[];
+      return data as unknown as { id: string; title: string; subtitle: string | null; cover_image_url: string | null; emoji: string | null }[];
     },
   });
 
@@ -512,8 +512,8 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
               <div className="flex-1 text-left"><p className="font-medium">Any Reflection</p><p className="text-xs text-muted-foreground">Open the Reflections page to choose</p></div>
             </button>
             <ScrollArea className="h-[40vh]"><div className="space-y-2 pr-4">{reflections.map((reflection) => (
-              <button key={reflection.id} onClick={() => { setShortcutAtIndex({ type: 'reflection', value: reflection.id, label: reflection.title, emoji: '✏️' }); setShowReflectionPicker(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80">
-                {reflection.cover_image_url ? <img src={reflection.cover_image_url} alt="" className="w-10 h-10 rounded-lg object-cover" /> : <div className="w-10 h-10 rounded-lg bg-accent/60 flex items-center justify-center"><FluentEmoji emoji="✏️" size={22} /></div>}
+              <button key={reflection.id} onClick={() => { setShortcutAtIndex({ type: 'reflection', value: reflection.id, label: reflection.title, emoji: reflection.emoji || '✏️' }); setShowReflectionPicker(false); }} className="w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80">
+                {reflection.cover_image_url ? <img src={reflection.cover_image_url} alt="" className="w-10 h-10 rounded-lg object-cover" /> : <div className="w-10 h-10 rounded-lg bg-accent/60 flex items-center justify-center"><FluentEmoji emoji={reflection.emoji || '✏️'} size={22} /></div>}
                 <div className="flex-1 text-left"><p className="font-medium truncate">{reflection.title}</p>{reflection.subtitle && <p className="text-xs text-muted-foreground truncate">{reflection.subtitle}</p>}</div>
               </button>
             ))}</div></ScrollArea>
