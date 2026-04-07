@@ -1937,6 +1937,7 @@ export type Database = {
           label: string
           slug: string
           sort_order: number
+          tags: string[]
           type: string
         }
         Insert: {
@@ -1947,6 +1948,7 @@ export type Database = {
           label: string
           slug: string
           sort_order?: number
+          tags?: string[]
           type: string
         }
         Update: {
@@ -1957,6 +1959,7 @@ export type Database = {
           label?: string
           slug?: string
           sort_order?: number
+          tags?: string[]
           type?: string
         }
         Relationships: []

@@ -26,10 +26,11 @@ interface CategoryForm {
   emoji: string;
   sort_order: number;
   is_active: boolean;
+  tags: string[];
 }
 
 const defaultForm: CategoryForm = {
-  slug: "", label: "", emoji: "📁", sort_order: 0, is_active: true,
+  slug: "", label: "", emoji: "📁", sort_order: 0, is_active: true, tags: [],
 };
 
 export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
@@ -59,7 +60,7 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
       const slug = form.slug || form.label.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
       const { error } = await supabase.from('media_categories').insert({
         type, slug, label: form.label, emoji: form.emoji,
-        sort_order: form.sort_order, is_active: form.is_active,
+        sort_order: form.sort_order, is_active: form.is_active, tags: form.tags,
       });
       if (error) throw error;
     },
@@ -77,7 +78,7 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
       if (!editingId) return;
       const { error } = await supabase.from('media_categories').update({
         label: form.label, emoji: form.emoji,
-        sort_order: form.sort_order, is_active: form.is_active,
+        sort_order: form.sort_order, is_active: form.is_active, tags: form.tags,
       }).eq('id', editingId);
       if (error) throw error;
     },
@@ -106,7 +107,7 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
     setEditingId(cat.id);
     setForm({
       slug: cat.slug, label: cat.label, emoji: cat.emoji,
-      sort_order: cat.sort_order, is_active: cat.is_active,
+      sort_order: cat.sort_order, is_active: cat.is_active, tags: cat.tags || [],
     });
     setIsEditOpen(true);
   };
@@ -139,7 +140,16 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
         <div className="flex items-center gap-2 pt-6">
           <Switch checked={form.is_active} onCheckedChange={(c) => setForm({ ...form, is_active: c })} />
           <Label>Active</Label>
-        </div>
+      </div>
+
+      <div>
+        <Label>Tags (comma-separated)</Label>
+        <Input
+          value={form.tags.join(', ')}
+          onChange={(e) => setForm({ ...form, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
+          placeholder="e.g. self-care, wellness"
+        />
+      </div>
       </div>
 
       <div className="flex justify-end gap-2">
@@ -172,6 +182,7 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
                 <TableHead>Label</TableHead>
                 <TableHead>Slug</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Tags</TableHead>
                 <TableHead className="w-24">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -188,6 +199,13 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
                     ) : (
                       <Badge variant="outline">Inactive</Badge>
                     )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-1 flex-wrap">
+                      {((cat.tags as string[]) || []).map((tag, i) => (
+                        <Badge key={i} variant="outline" className="text-xs">{tag}</Badge>
+                      ))}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
