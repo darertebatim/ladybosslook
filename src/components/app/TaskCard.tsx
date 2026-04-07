@@ -357,7 +357,7 @@ export const TaskCard = memo(function TaskCard({
     ];
 
     // Pro-task types that are simple navigation links — auto-complete on tap
-    const isSimpleNavProTask = proLinkType && ['route', 'inspire', 'planner', 'channel', 'program'].includes(proLinkType);
+    const isSimpleNavProTask = proLinkType && ['route', 'inspire', 'planner', 'channel', 'program', 'reading', 'reading_item'].includes(proLinkType);
 
     const handleProCircleClick = (e: React.MouseEvent) => {
       e.stopPropagation();
