@@ -177,6 +177,16 @@ export function RoutineBankCard({
             </div>
           )}
 
+          {/* Reset badge */}
+          {(routine as any).is_moment && (
+            <div className={cn("absolute z-10", (routine as any).is_focus && !hideFocusBadge ? "top-9 left-2" : "top-2 left-2")}>
+              <Badge className="bg-teal-500 hover:bg-teal-500 text-white rounded-full text-[10px] px-2 py-0.5 gap-1 shadow-md">
+                <RotateCcw className="h-3 w-3" />
+                Reset
+              </Badge>
+            </div>
+          )}
+
           {/* Completed overlay */}
           {isCompleted && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
