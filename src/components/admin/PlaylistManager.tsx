@@ -14,7 +14,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Trash2, Plus, Pencil, List, Layers, Eye, EyeOff, Upload, X, Sparkles, RefreshCw, Wand2 } from "lucide-react";
+import { Loader2, Trash2, Plus, Pencil, List, Layers, Eye, EyeOff, Upload, X, Sparkles, RefreshCw, Wand2, Zap } from "lucide-react";
+import { optimizeCoversForTable } from '@/lib/imageUtils';
 import { PlaylistTracksManager } from "./PlaylistTracksManager";
 import { PlaylistModulesManager } from "./PlaylistModulesManager";
 import { usePrograms } from "@/hooks/usePrograms";
