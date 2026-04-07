@@ -50,22 +50,24 @@ export function TaskTemplateCard({ template, onAdd, isSelected, selectable, comp
         
         <div className="flex-1 min-w-0">
           <p className={cn("font-medium text-black", compact ? "text-sm leading-tight" : "truncate")}>{template.title}</p>
-          <p className="text-xs text-black truncate">
-            {template.category}
-            {template.repeat_pattern && template.repeat_pattern !== 'none' && (
-              <span>
-                {' • '}
-                {template.repeat_pattern === 'daily' ? 'Daily' : 
-                 template.repeat_pattern === 'weekly' ? 'Weekly' : 
-                 template.repeat_pattern === 'monthly' ? 'Monthly' :
-                 template.repeat_pattern === 'weekend' ? 'Weekends' : ''}
-              </span>
-            )}
-            {(!template.repeat_pattern || template.repeat_pattern === 'none') && (
-              <span>{' • '}Once</span>
-            )}
-            <span>{' • '}{timePeriodLabel}</span>
-          </p>
+          {!compact && (
+            <p className="text-xs text-black truncate">
+              {template.category}
+              {template.repeat_pattern && template.repeat_pattern !== 'none' && (
+                <span>
+                  {' • '}
+                  {template.repeat_pattern === 'daily' ? 'Daily' : 
+                   template.repeat_pattern === 'weekly' ? 'Weekly' : 
+                   template.repeat_pattern === 'monthly' ? 'Monthly' :
+                   template.repeat_pattern === 'weekend' ? 'Weekends' : ''}
+                </span>
+              )}
+              {(!template.repeat_pattern || template.repeat_pattern === 'none') && (
+                <span>{' • '}Once</span>
+              )}
+              <span>{' • '}{timePeriodLabel}</span>
+            </p>
+          )}
         </div>
 
         {selectable ? (
