@@ -18,6 +18,8 @@ interface RoutineBankCardProps {
   className?: string;
   /** Show a completed badge overlay */
   isCompleted?: boolean;
+  /** Hide the Focus badge */
+  hideFocusBadge?: boolean;
 }
 
 const colorGradients: Record<string, string> = {
@@ -58,6 +60,7 @@ export function RoutineBankCard({
   coverOnly = false,
   className,
   isCompleted = false,
+  hideFocusBadge = false,
 }: RoutineBankCardProps) {
   const color = routine.color || 'purple';
   const gradient = colorGradients[color] || colorGradients.purple;
@@ -165,7 +168,7 @@ export function RoutineBankCard({
           )}
 
           {/* Focus badge */}
-          {(routine as any).is_focus && (
+          {!hideFocusBadge && (routine as any).is_focus && (
             <div className="absolute top-2 left-2 z-10">
               <Badge className="bg-orange-500 hover:bg-orange-500 text-white rounded-full text-[10px] px-2 py-0.5 gap-1 shadow-md">
                 <Target className="h-3 w-3" />
