@@ -11,7 +11,7 @@ import { haptic } from '@/lib/haptics';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCreateTaskFromTemplate } from '@/hooks/useTaskPlanner';
 
-const PREVIEW_COUNT = 4;
+const PREVIEW_COUNT = 8;
 
 export default function AppTasksBank() {
   const navigate = useNavigate();
@@ -192,22 +192,32 @@ export default function AppTasksBank() {
                   </div>
                 </button>
 
-                {/* Horizontal scroll of task cards */}
+                {/* Horizontal scroll of task cards - 2 rows */}
                 <ScrollArea className="w-full">
                   <div className="flex gap-2.5 px-4 pb-2">
-                    {tasks.slice(0, PREVIEW_COUNT).map(task => (
-                      <div key={task.id} className="min-w-[280px] max-w-[280px]">
-                        <TaskTemplateCard
-                          template={task}
-                          onAdd={() => handleAddTask(task)}
-                        />
-                      </div>
-                    ))}
+                    {(() => {
+                      const preview = tasks.slice(0, PREVIEW_COUNT);
+                      const columns: TaskTemplate[][] = [];
+                      for (let i = 0; i < preview.length; i += 2) {
+                        columns.push(preview.slice(i, i + 2));
+                      }
+                      return columns.map((col, ci) => (
+                        <div key={ci} className="flex flex-col gap-2 min-w-[260px] max-w-[260px]">
+                          {col.map(task => (
+                            <TaskTemplateCard
+                              key={task.id}
+                              template={task}
+                              onAdd={() => handleAddTask(task)}
+                            />
+                          ))}
+                        </div>
+                      ));
+                    })()}
                     {/* "See more" card */}
                     {tasks.length > PREVIEW_COUNT && (
                       <button
                         onClick={() => handleCategoryTap(cat.slug)}
-                        className="min-w-[120px] max-w-[120px] rounded-xl border border-border/50 bg-muted/30 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform"
+                        className="min-w-[100px] max-w-[100px] rounded-xl border border-border/50 bg-muted/30 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform self-stretch"
                       >
                         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                           <ChevronRight className="w-5 h-5 text-primary" />
