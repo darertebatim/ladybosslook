@@ -16,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { useTaskBankSelection } from '@/hooks/useTaskBankSelection';
 
 export default function AppTasksBankCategory() {
   const { categorySlug } = useParams<{ categorySlug: string }>();
@@ -24,10 +25,11 @@ export default function AppTasksBankCategory() {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
-  const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [showBuilder, setShowBuilder] = useState(false);
   const [showBuilderPreview, setShowBuilderPreview] = useState(false);
   const [builderResult, setBuilderResult] = useState<{ title: string; emoji: string; color: string; tasks: BuilderTask[] } | null>(null);
+
+  const { selectedTasks, setSelectedTasks, handleToggleTask, handleClearSelection } = useTaskBankSelection();
 
   const { data: categories } = useRoutineBankCategories();
   const { data: allTasks, isLoading: tasksLoading } = useTaskTemplates();
@@ -47,21 +49,6 @@ export default function AppTasksBankCategory() {
   };
 
   const filteredTasks = useMemo(() => tasks.filter(matchesSearch), [tasks, searchQuery]);
-
-  const handleToggleTask = useCallback((taskId: string) => {
-    haptic.light();
-    setSelectedTasks(prev => {
-      const next = new Set(prev);
-      if (next.has(taskId)) next.delete(taskId);
-      else next.add(taskId);
-      return next;
-    });
-  }, []);
-
-  const handleClearSelection = () => {
-    haptic.light();
-    setSelectedTasks(new Set());
-  };
 
   const getBuilderTasks = useCallback((): BuilderTask[] => {
     if (!allTasks) return [];
