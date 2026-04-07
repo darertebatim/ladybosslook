@@ -147,6 +147,7 @@ function CategoriesManager() {
     display_order: 0,
     task_display_order: 0,
     is_active: true,
+    tags: [] as string[],
   });
 
   const { data: categories, isLoading } = useQuery({
