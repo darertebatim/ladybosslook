@@ -382,6 +382,14 @@ function CategoriesManager() {
                 />
               </div>
             </div>
+            <div>
+              <Label>Tags (comma-separated)</Label>
+              <Input
+                value={formData.tags.join(', ')}
+                onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) }))}
+                placeholder="e.g. self-care, wellness"
+              />
+            </div>
             <div className="flex items-center gap-2">
               <Switch
                 checked={formData.is_active}
