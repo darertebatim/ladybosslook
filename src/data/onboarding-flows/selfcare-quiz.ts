@@ -10,6 +10,13 @@ export const selfcareQuizFlow: OnboardingFlow = {
     {
       id: 'sc-hook',
       type: 'motivational',
+      title: "Your problem isn't\nproductivity.",
+      subtitle: "It's that one part of your life is quietly falling apart.",
+      buttonLabel: "Tell me more →",
+    },
+    {
+      id: 'sc-intro',
+      type: 'motivational',
       title: "What's Missing?",
       subtitle: "Our AI analyzes your lifestyle to find the perfect self-care habits just for you — in under a minute.",
       buttonLabel: "Let's find out →",
