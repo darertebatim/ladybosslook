@@ -327,6 +327,7 @@ export const PlaylistManager = () => {
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
   const [isGeneratingPrograms, setIsGeneratingPrograms] = useState(false);
   const [isImprovingDescription, setIsImprovingDescription] = useState(false);
+  const [isOptimizingCovers, setIsOptimizingCovers] = useState(false);
   const createFileInputRef = useRef<HTMLInputElement>(null);
   const editFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -924,6 +925,21 @@ export const PlaylistManager = () => {
             )}
             AI: Free Programs
           </Button>
+          {(playlists || []).some((p: any) => p.cover_image_url && !p.cover_image_url.endsWith('.webp')) && (
+            <Button variant="outline" size="sm" onClick={async () => {
+              const items = (playlists || [])
+                .filter((p: any) => p.cover_image_url && !p.cover_image_url.endsWith('.webp'))
+                .map((p: any) => ({ id: p.id, coverUrl: p.cover_image_url }));
+              setIsOptimizingCovers(true);
+              const { done, failed } = await optimizeCoversForTable(items, 'audio_playlists', 'cover_image_url');
+              setIsOptimizingCovers(false);
+              toast.success(`Optimized ${done} covers${failed ? `, ${failed} failed` : ''}`);
+              queryClient.invalidateQueries({ queryKey: ['audio-playlists-with-count'] });
+            }} disabled={isOptimizingCovers}>
+              {isOptimizingCovers ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+              Optimize Covers
+            </Button>
+          )}
           <Button onClick={handleOpenCreate} size="sm">
             <Plus className="mr-2 h-4 w-4" />
             New Playlist
