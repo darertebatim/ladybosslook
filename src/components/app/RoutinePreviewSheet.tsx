@@ -146,7 +146,7 @@ export function RoutinePreviewSheet({
   }, [tasks, routineBankId, routineTitle]);
 
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(
-    new Set(tasks.filter(t => !t.id.startsWith('__pro_task_routine_')).map(t => t.id))
+    new Set(tasks.map(t => t.id))
   );
   const [editedTasks, setEditedTasks] = useState<Record<string, EditedTask>>({});
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -160,18 +160,11 @@ export function RoutinePreviewSheet({
   const MAX_FREE_ACTIONS = 6;
 
   // Sync selectedTaskIds when displayTasks change (e.g., when data loads async)
-  // Pro-tasks (routine player launchers) are excluded from default selection
+  // All tasks including pro-tasks are selected by default
   useEffect(() => {
-    const nonProTasks = displayTasks.filter(t => !t.id.startsWith('__pro_task_routine_'));
-    const missingIds = nonProTasks.filter(t => !selectedTaskIds.has(t.id));
-    if (nonProTasks.length > 0 && (selectedTaskIds.size === 0 || missingIds.length > 0)) {
-      const newIds = new Set(nonProTasks.map(t => t.id));
-      // Preserve pro-task selection if user manually selected it
-      displayTasks.forEach(t => {
-        if (t.id.startsWith('__pro_task_routine_') && selectedTaskIds.has(t.id)) {
-          newIds.add(t.id);
-        }
-      });
+    const missingIds = displayTasks.filter(t => !selectedTaskIds.has(t.id));
+    if (displayTasks.length > 0 && (selectedTaskIds.size === 0 || missingIds.length > 0)) {
+      const newIds = new Set(displayTasks.map(t => t.id));
       setSelectedTaskIds(newIds);
     }
   }, [displayTasks.length]);
