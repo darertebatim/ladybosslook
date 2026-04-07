@@ -164,6 +164,16 @@ export function RoutineBankCard({
             </button>
           )}
 
+          {/* Focus badge */}
+          {(routine as any).is_focus && (
+            <div className="absolute top-2 left-2 z-10">
+              <Badge className="bg-orange-500 hover:bg-orange-500 text-white rounded-full text-[10px] px-2 py-0.5 gap-1 shadow-md">
+                <Target className="h-3 w-3" />
+                Focus
+              </Badge>
+            </div>
+          )}
+
           {/* Completed overlay */}
           {isCompleted && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
