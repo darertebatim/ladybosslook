@@ -691,6 +691,49 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Reading Content Picker Sheet */}
+      <Sheet open={showReadingPicker} onOpenChange={setShowReadingPicker}>
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
+          <SheetHeader className="flex-row items-center gap-2">
+            <button onClick={() => { setShowReadingPicker(false); setPickerOpen(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <SheetTitle>Select Reading</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-3">
+            <ScrollArea className="h-[50vh]">
+              <div className="space-y-2 pr-4">
+                {readingContent.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setShortcutAtIndex({ type: 'reading_item', value: item.id, label: item.title, emoji: item.emoji || '📖' });
+                      setShowReadingPicker(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
+                      pendingValue === item.id && 'bg-primary/10 ring-1 ring-primary/30'
+                    )}
+                  >
+                    {item.cover_url ? (
+                      <img src={item.cover_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-100 to-violet-100 dark:from-purple-900/40 dark:to-violet-900/40 flex items-center justify-center">
+                        <FluentEmoji emoji={item.emoji || '📖'} size={22} />
+                      </div>
+                    )}
+                    <div className="flex-1 text-left">
+                      <p className="font-medium truncate">{item.title}</p>
+                      <p className="text-xs text-muted-foreground capitalize">{item.type} · {item.category}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </SheetContent>
+      </Sheet>
     </section>
   );
 }
