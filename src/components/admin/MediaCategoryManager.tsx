@@ -183,6 +183,7 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
                 <TableHead>Slug</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Tags</TableHead>
+                <TableHead className="w-24">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -193,17 +194,18 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
                   <TableCell className="font-medium">{cat.label}</TableCell>
                   <TableCell><Badge variant="outline" className="font-mono text-xs">{cat.slug}</Badge></TableCell>
                   <TableCell>
-                    <div className="flex gap-1 flex-wrap">
-                      {(cat.tags as string[] || []).map((tag, i) => (
-                        <Badge key={i} variant="outline" className="text-xs">{tag}</Badge>
-                      ))}
-                    </div>
-                  </TableCell>
                     {cat.is_active ? (
                       <Badge variant="secondary">Active</Badge>
                     ) : (
                       <Badge variant="outline">Inactive</Badge>
                     )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-1 flex-wrap">
+                      {((cat.tags as string[]) || []).map((tag, i) => (
+                        <Badge key={i} variant="outline" className="text-xs">{tag}</Badge>
+                      ))}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
