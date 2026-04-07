@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, X, StickyNote } from 'lucide-react';
+import { ArrowLeft, Search, X, StickyNote, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
