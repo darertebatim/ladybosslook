@@ -71,6 +71,7 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
   const [showVideoPlaylistPicker, setShowVideoPlaylistPicker] = useState(false);
   const [showProgramPicker, setShowProgramPicker] = useState(false);
   const [showRoutineTemplatePicker, setShowRoutineTemplatePicker] = useState(false);
+  const [showReadingPicker, setShowReadingPicker] = useState(false);
   const [routineTemplateSearchQuery, setRoutineTemplateSearchQuery] = useState('');
   const [playlistSearchQuery, setPlaylistSearchQuery] = useState('');
   const [audioSearchQuery, setAudioSearchQuery] = useState('');
@@ -350,6 +351,11 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
     if (type === 'inspire') {
       setPickerOpen(false);
       setShowRoutineTemplatePicker(true);
+      return;
+    }
+    if (type === 'reading_item') {
+      setPickerOpen(false);
+      setShowReadingPicker(true);
       return;
     }
 
