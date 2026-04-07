@@ -97,6 +97,7 @@ const AppFreeFormReflection = lazy(() => import("@/pages/app/AppFreeFormReflecti
 const AppFreeFormNoteDetail = lazy(() => import("@/pages/app/AppFreeFormNoteDetail"));
 const AppAICoach = lazy(() => import("@/pages/app/AppAICoach"));
 const AppTasksBank = lazy(() => import("@/pages/app/AppTasksBank"));
+const AppTasksBankCategory = lazy(() => import("@/pages/app/AppTasksBankCategory"));
 const AppTaskDrafts = lazy(() => import("@/pages/app/AppTaskDrafts"));
 
 const Users = lazy(() => import("@/pages/admin/Users"));
@@ -545,6 +546,7 @@ const App = () => (
                       <Route path="routines/:planId" element={<AppInspireDetail />} />
                       <Route path="actions" element={<AppActions />} />
                       <Route path="tasksbank" element={<AppTasksBank />} />
+                      <Route path="tasksbank/:categorySlug" element={<AppTasksBankCategory />} />
                       <Route path="projects" element={<AppTaskDrafts />} />
                       <Route path="quizzes" element={<QuizLibrary />} />
                       <Route path="read" element={<AppRead />} />
