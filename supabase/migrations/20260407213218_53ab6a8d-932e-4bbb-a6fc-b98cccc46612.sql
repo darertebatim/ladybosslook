@@ -1,0 +1,1 @@
+ALTER TABLE public.media_categories ADD COLUMN tags text[] NOT NULL DEFAULT '{}';
