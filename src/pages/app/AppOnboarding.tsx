@@ -8,6 +8,7 @@ import { mePlusFlow } from '@/data/onboarding-flows/me-plus';
 import { quickStartFlow } from '@/data/onboarding-flows/quick-start';
 import { quickStartV2Flow } from '@/data/onboarding-flows/quick-start-v2';
 import { weeklyReviewFlow } from '@/data/onboarding-flows/weekly-review';
+import { selfcareQuizFlow } from '@/data/onboarding-flows/selfcare-quiz';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,7 +19,7 @@ import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
 import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
 import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
 
-const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow, quickStartV2Flow, weeklyReviewFlow];
+const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow, quickStartV2Flow, weeklyReviewFlow, selfcareQuizFlow];
 
 function preloadImages(srcs: string[]) {
   srcs.forEach(src => {
