@@ -60,7 +60,7 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
       const slug = form.slug || form.label.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
       const { error } = await supabase.from('media_categories').insert({
         type, slug, label: form.label, emoji: form.emoji,
-        sort_order: form.sort_order, is_active: form.is_active,
+        sort_order: form.sort_order, is_active: form.is_active, tags: form.tags,
       });
       if (error) throw error;
     },
