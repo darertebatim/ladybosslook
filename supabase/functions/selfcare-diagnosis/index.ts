@@ -57,6 +57,13 @@ serve(async (req) => {
       "Doing something kind for yourself": ["self-kindness", "gratitude"],
     };
 
+    const PROUD_MAP: Record<string, string[]> = {
+      "A real morning routine": ["movement", "hygiene"],
+      "Taking care of my mind": ["calm", "gratitude"],
+      "Taking care of my body": ["Exercise", "nutrition", "sleep"],
+      "Reconnecting with people": ["connection"],
+    };
+
     // Score categories
     const scores: Record<string, number> = {};
     const addScore = (cats: string[], weight: number) => {
@@ -73,6 +80,9 @@ serve(async (req) => {
     for (const s of skippingAnswers) {
       if (SKIP_MAP[s]) addScore(SKIP_MAP[s], 3);
     }
+
+    const proudAnswer = answers?.["sc-proud"];
+    if (proudAnswer && PROUD_MAP[proudAnswer]) addScore(PROUD_MAP[proudAnswer], 2);
 
     // Top gap categories
     const sortedGaps = Object.entries(scores)
