@@ -295,7 +295,13 @@ function CategoriesManager() {
                   <TableCell>{cat.display_order}</TableCell>
                   <TableCell>{cat.task_display_order ?? 0}</TableCell>
                   <TableCell>{cat.is_active ? 'Yes' : 'No'}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell>
+                    <div className="flex gap-1 flex-wrap">
+                      {(cat.tags || []).map((tag, i) => (
+                        <Badge key={i} variant="outline" className="text-xs">{tag}</Badge>
+                      ))}
+                    </div>
+                  </TableCell>
                     <div className="flex justify-end gap-1">
                       <Button variant="ghost" size="icon" onClick={() => handleOpenEdit(cat)}>
                         <Pencil className="h-4 w-4" />
