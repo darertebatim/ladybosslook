@@ -371,6 +371,11 @@ export default function AppInspireDetail() {
                   🎓 Program
                 </span>
               )}
+              {isMoment && (
+                 <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300">
+                   🫧 Reset
+                </span>
+              )}
               {routine.category && (
                 <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-muted text-muted-foreground">
                   {categories.find(c => c.slug === routine.category)?.name || routine.category}

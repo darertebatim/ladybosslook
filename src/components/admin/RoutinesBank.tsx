@@ -1815,10 +1815,10 @@ export default function RoutinesBank() {
                     />
                   </div>
 
-                  {/* Moment Toggle */}
+                  {/* Reset Routine Toggle */}
                   <div className="flex items-center justify-between border-t pt-4">
                     <div>
-                      <Label className="text-xs font-medium">✨ Moment</Label>
+                      <Label className="text-xs font-medium">🫧 Reset Routine</Label>
                       <p className="text-xs text-muted-foreground">User can play once without adding to planner</p>
                     </div>
                     <Switch

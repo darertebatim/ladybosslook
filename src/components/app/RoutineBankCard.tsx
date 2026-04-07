@@ -5,7 +5,7 @@ import { haptic } from '@/lib/haptics';
 import { RoutineBankItem } from '@/hooks/useRoutinesBank';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { isEmoji } from '@/lib/fluentEmoji';
-import { X, Crown, CheckCircle, Target } from 'lucide-react';
+import { X, Crown, CheckCircle, Target, RotateCcw } from 'lucide-react';
 import { CachedImage } from '@/components/ui/CachedImage';
 
 interface RoutineBankCardProps {
@@ -173,6 +173,16 @@ export function RoutineBankCard({
               <Badge className="bg-orange-500 hover:bg-orange-500 text-white rounded-full text-[10px] px-2 py-0.5 gap-1 shadow-md">
                 <Target className="h-3 w-3" />
                 Focus
+              </Badge>
+            </div>
+          )}
+
+          {/* Reset badge */}
+          {(routine as any).is_moment && (
+            <div className={cn("absolute z-10", (routine as any).is_focus && !hideFocusBadge ? "top-9 left-2" : "top-2 left-2")}>
+              <Badge className="bg-teal-500 hover:bg-teal-500 text-white rounded-full text-[10px] px-2 py-0.5 gap-1 shadow-md">
+                <RotateCcw className="h-3 w-3" />
+                Reset
               </Badge>
             </div>
           )}
