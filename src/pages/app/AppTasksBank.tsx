@@ -219,10 +219,8 @@ export default function AppTasksBank() {
     }
   };
 
-  // Categories to display in content
-  const displayCategories = selectedCategory 
-    ? sortedCategories.filter(c => c.slug === selectedCategory)
-    : sortedCategories;
+  // In default view show all categories; when one is selected show only that one
+  const displayCategories = sortedCategories;
 
   const selectionCount = selectedTasks.size;
 
