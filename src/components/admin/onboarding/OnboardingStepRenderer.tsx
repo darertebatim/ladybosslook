@@ -19,6 +19,7 @@ import { WeekReportStep } from '@/components/app/weekly-review/WeekReportStep';
 import { SatisfactionSliderStep } from '@/components/app/weekly-review/SatisfactionSliderStep';
 import { WeekTaskSuggestionsStep } from '@/components/app/weekly-review/WeekTaskSuggestionsStep';
 import { WeekCelebrationStep } from '@/components/app/weekly-review/WeekCelebrationStep';
+import { SelfCareDiagnosisStep } from '@/components/app/selfcare-quiz/SelfCareDiagnosisStep';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 
 function OptionEmoji({ emoji, size }: { emoji: string; size: number }) {
@@ -134,6 +135,8 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <WeekTaskSuggestionsStep step={step} onNext={onNext} answers={answers} />;
     case 'week-celebration':
       return <WeekCelebrationStep step={step} onNext={onNext} answers={answers} />;
+    case 'selfcare-diagnosis':
+      return <SelfCareDiagnosisStep step={step} onNext={onNext} answers={answers} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }

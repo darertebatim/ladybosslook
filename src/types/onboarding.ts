@@ -42,7 +42,8 @@ export type OnboardingStepType =
   | 'week-report'
   | 'satisfaction-slider'
   | 'week-task-suggestions'
-  | 'week-celebration';
+  | 'week-celebration'
+  | 'selfcare-diagnosis';
 export interface OnboardingOption {
   label: string;
   emoji?: string;
