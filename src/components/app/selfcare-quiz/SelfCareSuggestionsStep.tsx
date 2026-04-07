@@ -24,7 +24,6 @@ interface Props {
 }
 
 export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
-  const navigate = useNavigate();
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [showBuilder, setShowBuilder] = useState(false);
 
