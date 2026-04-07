@@ -261,6 +261,19 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
     },
   });
 
+  const { data: readingContent = [] } = useQuery({
+    queryKey: ['shortcut-reading-content'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('reading_content' as any)
+        .select('id, title, emoji, cover_url, type, category')
+        .eq('is_published', true)
+        .order('sort_order', { ascending: true });
+      if (error) throw error;
+      return data as unknown as { id: string; title: string; emoji: string | null; cover_url: string | null; type: string; category: string }[];
+    },
+  });
+
   const setShortcutAtIndex = (shortcut: ShortcutData) => {
     if (editingIndex === null) return;
     const updated = [...shortcuts];
