@@ -205,3 +205,6 @@ verify_jwt = false
 
 [functions.temp-extract-text]
 verify_jwt = false
+
+[functions.selfcare-diagnosis]
+verify_jwt = false
