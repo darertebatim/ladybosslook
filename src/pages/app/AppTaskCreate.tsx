@@ -490,6 +490,7 @@ const AppTaskCreate = ({
   const [showVideoPlaylistPicker, setShowVideoPlaylistPicker] = useState(false);
   const [showProgramPicker, setShowProgramPicker] = useState(false);
   const [showRoutineTemplatePicker, setShowRoutineTemplatePicker] = useState(false);
+  const [showReadingPicker, setShowReadingPicker] = useState(false);
   const [routineTemplateSearchQuery, setRoutineTemplateSearchQuery] = useState('');
   const [showSubtaskEditor, setShowSubtaskEditor] = useState(false);
   const [showGoalSettings, setShowGoalSettings] = useState(false);
@@ -737,6 +738,20 @@ const AppTaskCreate = ({
         .order('sort_order', { ascending: true });
       if (error) throw error;
       return data as { id: string; name: string; cover_image_url: string | null; category: string | null }[];
+    },
+  });
+
+  // Fetch reading content for linking
+  const { data: readingContent = [] } = useQuery({
+    queryKey: ['linkable-reading-content'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('reading_content' as any)
+        .select('id, title, emoji, cover_url, type, category')
+        .eq('is_published', true)
+        .order('sort_order', { ascending: true });
+      if (error) throw error;
+      return data as unknown as { id: string; title: string; emoji: string | null; cover_url: string | null; type: string; category: string }[];
     },
   });
 
@@ -2277,6 +2292,9 @@ const AppTaskCreate = ({
           } else if (type === 'inspire') {
             setShowProLinkPicker(false);
             setShowRoutineTemplatePicker(true);
+          } else if (type === 'reading_item') {
+            setShowProLinkPicker(false);
+            setShowReadingPicker(true);
           }
           // route handled by the picker's built-in value input
         }}
@@ -2810,6 +2828,50 @@ const AppTaskCreate = ({
             >
               Done
             </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Reading Content Picker Sheet */}
+      <Sheet open={showReadingPicker} onOpenChange={setShowReadingPicker}>
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
+          <SheetHeader className="flex-row items-center gap-2">
+            <button onClick={() => { setShowReadingPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <SheetTitle>Select Reading</SheetTitle>
+          </SheetHeader>
+          <div className="p-4 space-y-3">
+            <ScrollArea className="h-[50vh]">
+              <div className="space-y-2 pr-4">
+                {readingContent.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setProLinkType('reading_item');
+                      setProLinkValue(item.id);
+                      setShowReadingPicker(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 p-3 rounded-xl active:bg-muted/80',
+                      proLinkValue === item.id && 'bg-primary/10 ring-1 ring-primary/30'
+                    )}
+                  >
+                    {item.cover_url ? (
+                      <img src={item.cover_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-100 to-violet-100 dark:from-purple-900/40 dark:to-violet-900/40 flex items-center justify-center">
+                        <FluentEmoji emoji={item.emoji || '📖'} size={22} />
+                      </div>
+                    )}
+                    <div className="flex-1 text-left">
+                      <p className="font-medium truncate">{item.title}</p>
+                      <p className="text-xs text-muted-foreground capitalize">{item.type} · {item.category}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
           </div>
         </SheetContent>
       </Sheet>

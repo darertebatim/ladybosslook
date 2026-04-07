@@ -30,6 +30,7 @@ export const PRO_LINK_EMOJIS: Record<ProLinkType, string> = {
   myroutines: '📅',
   projects: '📁',
   reading: '📖',
+  reading_item: '📖',
 };
 
 export function getProLinkEmoji(type: ProLinkType) {

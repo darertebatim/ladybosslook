@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
-export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | 'video' | 'video_playlist' | 'focus_timer' | 'routine' | 'myprograms' | 'myprofile' | 'presence' | 'tasksbank' | 'listen' | 'watch' | 'myroutines' | 'projects' | 'reading';
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | 'video' | 'video_playlist' | 'focus_timer' | 'routine' | 'myprograms' | 'myprofile' | 'presence' | 'tasksbank' | 'listen' | 'watch' | 'myroutines' | 'projects' | 'reading' | 'reading_item';
 
 export interface ProLinkConfig {
   value: ProLinkType;
@@ -420,8 +420,21 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     iconColorClass: 'text-purple-600 dark:text-purple-400',
     badgeColorClass: 'bg-purple-500/20 text-purple-700 dark:text-purple-300',
     buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
-    description: 'Open reading lessons',
+    description: 'Open reading library',
     requiresValue: false,
+  },
+  reading_item: {
+    value: 'reading_item',
+    label: 'Specific Reading',
+    icon: BookOpen,
+    badgeText: 'Read',
+    color: 'purple',
+    gradientClass: 'bg-gradient-to-br from-purple-100 to-violet-100 dark:from-purple-900/40 dark:to-violet-900/40',
+    iconColorClass: 'text-purple-600 dark:text-purple-400',
+    badgeColorClass: 'bg-purple-500/20 text-purple-700 dark:text-purple-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Link to a specific lesson or story',
+    requiresValue: true,
   },
 };
 
@@ -488,6 +501,8 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return '/app/projects';
     case 'reading':
       return '/app/read';
+    case 'reading_item':
+      return linkValue ? `/app/read/${linkValue}` : '/app/read';
     default:
       return '/app/home';
   }
