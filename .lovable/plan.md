@@ -1,30 +1,33 @@
 
 
-## Plan: Redesign Tasks Bank — Show Category Sections with Preview + "All" Button
+## Plan: Add "Optimize Covers" Button to Routines and Audio Playlists Admin Pages
 
-### Problem
-Currently, all tasks display in one long flat list. Users only see the first category (Easy Wins) and don't realize there are more categories unless they tap the category pills.
+### What We're Doing
+Adding the same batch cover optimization feature (compress existing covers to WebP) that exists in the Reading Manager to two more admin sections: **Routines Bank** and **Audio Playlist Manager**.
 
-### Design
-Adopt the same section pattern used in AppInspire (routine templates page):
-- Each category gets its own section with a **header row** (category name + task count + "All >" button)
-- Show only the **first 6 tasks** per category (roughly 2 screen-rows of cards)
-- Tapping **"All >"** sets `selectedCategory` to that category, which scrolls to top and shows only that category's full task list with a back/clear option
-- Category pills at the top remain for quick jumping
-- Search still works across all tasks
+### Technical Approach
 
-### Changes
+**1. Extract a reusable `optimizeCoversForTable` utility** (in `src/lib/imageUtils.ts`)
+- A generic async function that takes a list of items with cover URLs, a Supabase table name, and a column name
+- Downloads each non-WebP cover, compresses it via `compressImage`, re-uploads as `.webp`, and updates the DB record
+- Returns a `{ done, failed }` count
+- This avoids duplicating the same logic in three places
 
-**File: `src/pages/app/AppTasksBank.tsx`**
+**2. Add "Optimize Covers" button to `RoutinesBank.tsx`**
+- Query `routines_bank` for entries where `cover_image_url` exists and doesn't end with `.webp`
+- Show the ⚡ Optimize Covers button in the header when unoptimized covers exist
+- Uses the shared utility to process them
 
-1. **Default view (no category selected):** Show each sorted category as a section with:
-   - Section header: category name + count badge + "All >" button (ChevronRight icon, `text-primary`)
-   - Only first 6 tasks rendered per section
-   - Tapping "All >" sets `selectedCategory` to that slug
+**3. Add "Optimize Covers" button to `PlaylistManager.tsx`**
+- Same pattern for `audio_playlists` table, checking `cover_image_url`
+- Button appears in the playlist list header area
 
-2. **Filtered view (category selected):** Show full list for that single category (current behavior), with the category pills highlighting the active one. Tapping the same category pill again clears the filter back to the overview.
+**4. Refactor `ReadingManager.tsx`**
+- Replace its inline optimization logic with a call to the shared utility
 
-3. Import `ChevronRight` from lucide-react (already used in AppInspire pattern).
-
-### No new files or routes needed — this is a layout change within the existing page.
+### Files Changed
+- `src/lib/imageUtils.ts` — add `optimizeCoversForTable()` helper
+- `src/pages/admin/ReadingManager.tsx` — refactor to use shared helper
+- `src/components/admin/RoutinesBank.tsx` — add optimize button
+- `src/components/admin/PlaylistManager.tsx` — add optimize button
 

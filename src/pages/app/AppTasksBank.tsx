@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, X, StickyNote, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Search, X, StickyNote } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
@@ -219,8 +219,10 @@ export default function AppTasksBank() {
     }
   };
 
-  // In default view show all categories; when one is selected show only that one
-  const displayCategories = sortedCategories;
+  // Categories to display in content
+  const displayCategories = selectedCategory 
+    ? sortedCategories.filter(c => c.slug === selectedCategory)
+    : sortedCategories;
 
   const selectionCount = selectedTasks.size;
 
@@ -320,33 +322,16 @@ export default function AppTasksBank() {
             const tasks = (tasksByCategory[cat.slug] || []).filter(matchesSearch);
             if (tasks.length === 0) return null;
 
-            const isExpanded = selectedCategory === cat.slug;
-            const previewCount = 6;
-            const visibleTasks = isExpanded || searchQuery ? tasks : tasks.slice(0, previewCount);
-            const hasMore = tasks.length > previewCount;
-
             return (
               <div key={cat.slug} className="mt-6 first:mt-4">
-                <div className="px-4 mb-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {cat.emoji && <FluentEmoji emoji={cat.emoji} size={20} />}
-                    <h2 className="text-lg font-bold text-foreground">{cat.name}</h2>
-                    <span className="text-xs text-muted-foreground font-medium bg-muted/60 px-2 py-0.5 rounded-full">
-                      {tasks.length}
-                    </span>
-                  </div>
-                  {hasMore && !searchQuery && (
-                    <button
-                      onClick={() => handleCategoryTap(cat.slug)}
-                      className="flex items-center gap-0.5 text-sm font-semibold text-primary active:opacity-70 transition-opacity"
-                    >
-                      {isExpanded ? 'Less' : 'All'}
-                      <ChevronRight className={cn("w-4 h-4 transition-transform", isExpanded && "rotate-90")} />
-                    </button>
-                  )}
+                <div className="px-4 mb-3 flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-foreground">{cat.name}</h2>
+                  <span className="text-xs text-muted-foreground font-medium bg-muted/60 px-2 py-0.5 rounded-full">
+                    {tasks.length}
+                  </span>
                 </div>
                 <div className="px-4 space-y-2.5">
-                  {visibleTasks.map(task => (
+                  {tasks.map(task => (
                     <TaskTemplateCard
                       key={task.id}
                       template={task}
