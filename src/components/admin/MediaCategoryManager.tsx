@@ -140,7 +140,16 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
         <div className="flex items-center gap-2 pt-6">
           <Switch checked={form.is_active} onCheckedChange={(c) => setForm({ ...form, is_active: c })} />
           <Label>Active</Label>
-        </div>
+      </div>
+
+      <div>
+        <Label>Tags (comma-separated)</Label>
+        <Input
+          value={form.tags.join(', ')}
+          onChange={(e) => setForm({ ...form, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
+          placeholder="e.g. self-care, wellness"
+        />
+      </div>
       </div>
 
       <div className="flex justify-end gap-2">
