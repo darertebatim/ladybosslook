@@ -41,6 +41,7 @@ import {
 } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, FolderOpen, Star } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
 import { RoutineStatisticsManager } from './RoutineStatisticsManager';
@@ -59,6 +60,7 @@ interface RoutineCategory {
   display_order: number;
   task_display_order: number;
   is_active: boolean;
+  tags: string[];
 }
 
 // =====================================
@@ -146,6 +148,7 @@ function CategoriesManager() {
     display_order: 0,
     task_display_order: 0,
     is_active: true,
+    tags: [] as string[],
   });
 
   const { data: categories, isLoading } = useQuery({
@@ -209,6 +212,7 @@ function CategoriesManager() {
       display_order: (categories?.length || 0) + 1,
       task_display_order: (categories?.length || 0) + 1,
       is_active: true,
+      tags: [],
     });
     setIsDialogOpen(true);
   };
@@ -223,6 +227,7 @@ function CategoriesManager() {
       display_order: cat.display_order,
       task_display_order: cat.task_display_order ?? 0,
       is_active: cat.is_active,
+      tags: cat.tags || [],
     });
     setIsDialogOpen(true);
   };
@@ -275,6 +280,7 @@ function CategoriesManager() {
                 <TableHead>Routine Order</TableHead>
                 <TableHead>Task Order</TableHead>
                 <TableHead>Active</TableHead>
+                <TableHead>Tags</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -290,6 +296,13 @@ function CategoriesManager() {
                   <TableCell>{cat.display_order}</TableCell>
                   <TableCell>{cat.task_display_order ?? 0}</TableCell>
                   <TableCell>{cat.is_active ? 'Yes' : 'No'}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-1 flex-wrap">
+                      {(cat.tags || []).map((tag, i) => (
+                        <Badge key={i} variant="outline" className="text-xs">{tag}</Badge>
+                      ))}
+                    </div>
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
                       <Button variant="ghost" size="icon" onClick={() => handleOpenEdit(cat)}>
@@ -377,6 +390,14 @@ function CategoriesManager() {
                   onChange={(e) => setFormData(prev => ({ ...prev, task_display_order: parseInt(e.target.value) || 0 }))}
                 />
               </div>
+            </div>
+            <div>
+              <Label>Tags (comma-separated)</Label>
+              <Input
+                value={formData.tags.join(', ')}
+                onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) }))}
+                placeholder="e.g. self-care, wellness"
+              />
             </div>
             <div className="flex items-center gap-2">
               <Switch

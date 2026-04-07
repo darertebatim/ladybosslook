@@ -3376,6 +3376,7 @@ export type Database = {
           is_active: boolean
           name: string
           slug: string
+          tags: string[]
           task_display_order: number
         }
         Insert: {
@@ -3387,6 +3388,7 @@ export type Database = {
           is_active?: boolean
           name: string
           slug: string
+          tags?: string[]
           task_display_order?: number
         }
         Update: {
@@ -3398,6 +3400,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           slug?: string
+          tags?: string[]
           task_display_order?: number
         }
         Relationships: []
