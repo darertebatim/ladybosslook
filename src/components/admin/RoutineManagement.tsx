@@ -41,6 +41,7 @@ import {
 } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, FolderOpen, Star } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { EmojiPicker } from '@/components/app/EmojiPicker';
 import { TASK_COLOR_CLASSES, TaskColor } from '@/hooks/useTaskPlanner';
 import { RoutineStatisticsManager } from './RoutineStatisticsManager';
