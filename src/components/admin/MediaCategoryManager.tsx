@@ -182,7 +182,7 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
                 <TableHead>Label</TableHead>
                 <TableHead>Slug</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-24">Actions</TableHead>
+                <TableHead>Tags</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
