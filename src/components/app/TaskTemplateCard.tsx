@@ -20,7 +20,7 @@ const TIME_PERIOD_LABELS: Record<string, string> = {
   night: 'Bedtime',
 };
 
-export function TaskTemplateCard({ template, onAdd, isSelected, selectable }: TaskTemplateCardProps) {
+export function TaskTemplateCard({ template, onAdd, isSelected, selectable, compact }: TaskTemplateCardProps) {
   const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
 
   const handleAdd = () => {
@@ -49,7 +49,7 @@ export function TaskTemplateCard({ template, onAdd, isSelected, selectable }: Ta
         <FluentEmoji emoji={template.emoji || '📝'} size={32} className="shrink-0" />
         
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-black truncate">{template.title}</p>
+          <p className={cn("font-medium text-black", compact ? "text-sm leading-tight" : "truncate")}>{template.title}</p>
           <p className="text-xs text-black truncate">
             {template.category}
             {template.repeat_pattern && template.repeat_pattern !== 'none' && (
@@ -97,7 +97,7 @@ export function TaskTemplateCard({ template, onAdd, isSelected, selectable }: Ta
       </div>
 
       {/* Description box */}
-      {template.description && (
+      {!compact && template.description && (
         <div className="mx-2 mb-2 p-2.5 bg-white/90 rounded-lg">
           <p className="text-xs text-black/80 leading-relaxed">
             {template.description}

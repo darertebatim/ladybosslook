@@ -208,6 +208,7 @@ export default function AppTasksBank() {
                               key={task.id}
                               template={task}
                               onAdd={() => handleAddTask(task)}
+                              compact
                             />
                           ))}
                         </div>
