@@ -57,6 +57,7 @@ export function SelfCareDiagnosisStep({ step, onNext, answers }: Props) {
         });
 
         if (fnError) throw fnError;
+        if (data?.error) throw new Error(data.error);
 
         setInsight(data.ai_insight || '');
         setGapCategories(data.gap_categories || []);
