@@ -740,6 +740,20 @@ const AppTaskCreate = ({
     },
   });
 
+  // Fetch reading content for linking
+  const { data: readingContent = [] } = useQuery({
+    queryKey: ['linkable-reading-content'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('reading_content' as any)
+        .select('id, title, emoji, cover_url, type, category')
+        .eq('is_published', true)
+        .order('sort_order', { ascending: true });
+      if (error) throw error;
+      return data as { id: string; title: string; emoji: string | null; cover_url: string | null; type: string; category: string }[];
+    },
+  });
+
   // Fetch routine categories for tags (dynamic instead of hardcoded)
   const { data: routineCategories = [] } = useQuery({
     queryKey: ['routine-categories-for-tags'],
