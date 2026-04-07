@@ -78,7 +78,7 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
       if (!editingId) return;
       const { error } = await supabase.from('media_categories').update({
         label: form.label, emoji: form.emoji,
-        sort_order: form.sort_order, is_active: form.is_active,
+        sort_order: form.sort_order, is_active: form.is_active, tags: form.tags,
       }).eq('id', editingId);
       if (error) throw error;
     },
