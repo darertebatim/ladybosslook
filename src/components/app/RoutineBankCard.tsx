@@ -5,7 +5,7 @@ import { haptic } from '@/lib/haptics';
 import { RoutineBankItem } from '@/hooks/useRoutinesBank';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { isEmoji } from '@/lib/fluentEmoji';
-import { X, Crown, CheckCircle } from 'lucide-react';
+import { X, Crown, CheckCircle, Target } from 'lucide-react';
 import { CachedImage } from '@/components/ui/CachedImage';
 
 interface RoutineBankCardProps {
@@ -162,6 +162,16 @@ export function RoutineBankCard({
             >
               <X className="h-3.5 w-3.5 text-white" />
             </button>
+          )}
+
+          {/* Focus badge */}
+          {(routine as any).is_focus && (
+            <div className="absolute top-2 left-2 z-10">
+              <Badge className="bg-orange-500 hover:bg-orange-500 text-white rounded-full text-[10px] px-2 py-0.5 gap-1 shadow-md">
+                <Target className="h-3 w-3" />
+                Focus
+              </Badge>
+            </div>
           )}
 
           {/* Completed overlay */}

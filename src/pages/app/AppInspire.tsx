@@ -182,7 +182,7 @@ export default function AppInspire() {
                 <div className="flex gap-2 px-4 pb-2">
                   {resetRoutines.length > 0 && (
                     <CategoryCircle
-                      name="Reset"
+                      name="Focus"
                       icon="RotateCcw"
                       emoji="🫧"
                       color="violet"
@@ -372,7 +372,7 @@ export default function AppInspire() {
                   <div className="flex items-center justify-between mb-2 px-4">
                     <h2 className="text-xl font-bold text-foreground flex items-center gap-1.5">
                       <RotateCcw className="h-5 w-5 text-violet-500" />
-                      Reset
+                      Focus
                     </h2>
                     <button
                       onClick={() => navigateWithScroll(`/app/routines/category/reset`)}
