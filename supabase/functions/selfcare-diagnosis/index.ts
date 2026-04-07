@@ -18,16 +18,15 @@ serve(async (req) => {
 
     if (!lovableApiKey) throw new Error("LOVABLE_API_KEY not configured");
 
-    // Auth: get user from token
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const userClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader || "" } },
-    });
-    const { data: { user }, error: authError } = await userClient.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    // Auth: get user from token (optional — quiz works without login too)
+    let userId: string | null = null;
+    if (authHeader) {
+      const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+      const userClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: authHeader } },
       });
+      const { data: { user } } = await userClient.auth.getUser();
+      userId = user?.id || null;
     }
 
     const { answers } = await req.json();
@@ -118,27 +117,31 @@ serve(async (req) => {
     }
 
     // Fetch previous quiz results for returning users
-    const { data: prevResults } = await adminClient
-      .from("selfcare_quiz_results")
-      .select("gap_categories, ai_insight, created_at")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(1);
-
-    // Fetch task completion stats per gap category (last 30 days)
+    let prevResults: any[] | null = null;
     let completionContext = "";
-    try {
-      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-      const { data: completions } = await adminClient.rpc("get_selfcare_completion_stats" as any, {
-        p_user_id: user.id,
-        p_categories: sortedGaps,
-        p_since: thirtyDaysAgo,
-      });
-      if (completions) {
-        completionContext = `\nTask completion stats (last 30 days): ${JSON.stringify(completions)}`;
+    if (userId) {
+      const { data } = await adminClient
+        .from("selfcare_quiz_results")
+        .select("gap_categories, ai_insight, created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      prevResults = data;
+
+      // Fetch task completion stats per gap category (last 30 days)
+      try {
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+        const { data: completions } = await adminClient.rpc("get_selfcare_completion_stats" as any, {
+          p_user_id: userId,
+          p_categories: sortedGaps,
+          p_since: thirtyDaysAgo,
+        });
+        if (completions) {
+          completionContext = `\nTask completion stats (last 30 days): ${JSON.stringify(completions)}`;
+        }
+      } catch {
+        // RPC may not exist yet, skip
       }
-    } catch {
-      // RPC may not exist yet, skip
     }
 
     // Build AI prompt
@@ -193,15 +196,17 @@ Write a personalized 2-3 sentence insight about what area of their life needs at
     const aiData = await aiResponse.json();
     const aiInsight = aiData.choices?.[0]?.message?.content || "Take a moment to check in with yourself today. Small steps lead to big changes.";
 
-    // Save result
+    // Save result (only if logged in)
     const suggestedTaskIds = suggestedTasks.map(t => t.id);
-    await adminClient.from("selfcare_quiz_results").insert({
-      user_id: user.id,
-      answers,
-      gap_categories: sortedGaps,
-      ai_insight: aiInsight,
-      suggested_task_ids: suggestedTaskIds,
-    });
+    if (userId) {
+      await adminClient.from("selfcare_quiz_results").insert({
+        user_id: userId,
+        answers,
+        gap_categories: sortedGaps,
+        ai_insight: aiInsight,
+        suggested_task_ids: suggestedTaskIds,
+      });
+    }
 
     return new Response(JSON.stringify({
       gap_categories: sortedGaps,
