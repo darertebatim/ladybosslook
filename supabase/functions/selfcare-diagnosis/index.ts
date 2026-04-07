@@ -18,16 +18,15 @@ serve(async (req) => {
 
     if (!lovableApiKey) throw new Error("LOVABLE_API_KEY not configured");
 
-    // Auth: get user from token
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const userClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader || "" } },
-    });
-    const { data: { user }, error: authError } = await userClient.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    // Auth: get user from token (optional — quiz works without login too)
+    let userId: string | null = null;
+    if (authHeader) {
+      const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+      const userClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: authHeader } },
       });
+      const { data: { user } } = await userClient.auth.getUser();
+      userId = user?.id || null;
     }
 
     const { answers } = await req.json();
