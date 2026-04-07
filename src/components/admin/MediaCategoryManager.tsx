@@ -107,7 +107,7 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
     setEditingId(cat.id);
     setForm({
       slug: cat.slug, label: cat.label, emoji: cat.emoji,
-      sort_order: cat.sort_order, is_active: cat.is_active,
+      sort_order: cat.sort_order, is_active: cat.is_active, tags: cat.tags || [],
     });
     setIsEditOpen(true);
   };
