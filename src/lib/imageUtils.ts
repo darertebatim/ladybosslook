@@ -73,3 +73,48 @@ export const IMAGE_SIZES = {
   /** Small icons / avatars */
   avatar: { width: 128, quality: 70 },
 } as const;
+
+/**
+ * Batch-optimize cover images for a given Supabase table.
+ * Downloads each non-WebP cover, compresses to WebP, re-uploads, and updates the DB row.
+ *
+ * @returns `{ done, failed }` counts
+ */
+export async function optimizeCoversForTable(
+  items: { id: string; coverUrl: string }[],
+  tableName: string,
+  columnName: string
+): Promise<{ done: number; failed: number }> {
+  const { supabase } = await import('@/integrations/supabase/client');
+  let done = 0;
+  let failed = 0;
+
+  for (const item of items) {
+    try {
+      const resp = await fetch(item.coverUrl);
+      const blob = await resp.blob();
+      const file = new File([blob], 'cover.jpg', { type: blob.type });
+
+      const compressed = await compressImage(file, { maxSizeMB: 0.8, maxWidthOrHeight: 1200 });
+
+      const match = item.coverUrl.match(/\/storage\/v1\/object\/public\/([^/]+)\/(.+)$/);
+      if (!match) { failed++; continue; }
+      const [, bucket, oldPath] = match;
+      const newPath = oldPath.replace(/\.[^.]+$/, '.webp');
+
+      const { error: upErr } = await supabase.storage
+        .from(bucket)
+        .upload(newPath, compressed, { contentType: 'image/webp', upsert: true });
+      if (upErr) throw upErr;
+
+      const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(newPath);
+      await supabase.from(tableName as any).update({ [columnName]: urlData.publicUrl }).eq('id', item.id);
+      done++;
+    } catch (e) {
+      console.error(`Failed to optimize cover for ${item.id}:`, e);
+      failed++;
+    }
+  }
+
+  return { done, failed };
+}
