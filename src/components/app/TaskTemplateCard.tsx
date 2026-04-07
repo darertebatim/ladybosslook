@@ -9,6 +9,7 @@ interface TaskTemplateCardProps {
   onAdd: () => void;
   isSelected?: boolean;
   selectable?: boolean;
+  compact?: boolean;
 }
 
 // Map time_period values to display labels
