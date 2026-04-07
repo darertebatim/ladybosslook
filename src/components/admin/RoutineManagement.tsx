@@ -280,6 +280,7 @@ function CategoriesManager() {
                 <TableHead>Routine Order</TableHead>
                 <TableHead>Task Order</TableHead>
                 <TableHead>Active</TableHead>
+                <TableHead>Tags</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -302,6 +303,7 @@ function CategoriesManager() {
                       ))}
                     </div>
                   </TableCell>
+                  <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
                       <Button variant="ghost" size="icon" onClick={() => handleOpenEdit(cat)}>
                         <Pencil className="h-4 w-4" />
