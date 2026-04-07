@@ -26,10 +26,11 @@ interface CategoryForm {
   emoji: string;
   sort_order: number;
   is_active: boolean;
+  tags: string[];
 }
 
 const defaultForm: CategoryForm = {
-  slug: "", label: "", emoji: "📁", sort_order: 0, is_active: true,
+  slug: "", label: "", emoji: "📁", sort_order: 0, is_active: true, tags: [],
 };
 
 export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
