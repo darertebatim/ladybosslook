@@ -77,15 +77,14 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
 
   const selectionCount = selectedTasks.size;
 
-  const getBuilderTasks = () => {
+  const getBuilderTasks = (): BuilderTask[] => {
     return taskTemplates
       .filter(t => selectedTasks.has(t.id))
-      .map((t, i) => ({
+      .map((t) => ({
         id: t.id,
         title: t.title,
         emoji: t.emoji,
         color: t.color,
-        order: i,
         repeat_pattern: t.repeat_pattern,
         repeat_days: t.repeat_days,
         goal_enabled: t.goal_enabled,
@@ -105,7 +104,7 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
     setShowBuilder(true);
   };
 
-  const handleBuilderComplete = () => {
+  const handleBuilderComplete = (_title: string, _emoji: string, _color: string, _tasks: BuilderTask[]) => {
     setShowBuilder(false);
     onNext();
   };
