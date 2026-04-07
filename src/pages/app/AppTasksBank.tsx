@@ -262,6 +262,23 @@ export default function AppTasksBank() {
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full">
         <div className="pb-safe w-full max-w-full">
 
+          {/* Self-Care Quiz Banner */}
+          {!isSearching && (
+            <button
+              onClick={() => navigate('/app/onboarding/selfcare-quiz')}
+              className="mx-4 mt-4 p-4 rounded-2xl bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100 flex items-center gap-3 active:scale-[0.98] transition-all"
+            >
+              <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                <FluentEmoji emoji="✨" size={22} />
+              </div>
+              <div className="text-left flex-1">
+                <p className="text-sm font-bold text-foreground">Not sure where to start?</p>
+                <p className="text-xs text-muted-foreground">Take a 1-min quiz to find your gaps</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+            </button>
+          )}
+
           {!isSearching && sortedCategories.length > 0 && (
             <div className="mt-4">
               <ScrollArea className="w-full">
