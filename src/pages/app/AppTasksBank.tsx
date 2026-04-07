@@ -63,7 +63,7 @@ export default function AppTasksBank() {
 
   const handleAddTask = (task: TaskTemplate) => {
     haptic.light();
-    createTask.mutate(task);
+    createTask.mutate({ template: task, date: new Date() });
   };
 
   return (
