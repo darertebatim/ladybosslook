@@ -53,6 +53,18 @@ export const selfcareQuizFlow: OnboardingFlow = {
       ],
     },
     {
+      id: 'sc-proud',
+      type: 'single-select',
+      title: 'What would make you proud this week?',
+      options: [
+        { label: 'A real morning routine', emoji: '🌅' },
+        { label: 'Taking care of my mind', emoji: '🧠' },
+        { label: 'Taking care of my body', emoji: '💪' },
+        { label: 'Reconnecting with people', emoji: '🤝' },
+      ],
+    },
+    },
+    {
       id: 'sc-diagnosis',
       type: 'selfcare-diagnosis',
       title: 'Your Self-Care Diagnosis',
