@@ -121,7 +121,7 @@ export function MoodCelebrationSheet({
     }
     
     onOpenChange(false);
-    navigate(route);
+    navigate(route, { replace: true });
   };
 
   const handleDone = () => {
