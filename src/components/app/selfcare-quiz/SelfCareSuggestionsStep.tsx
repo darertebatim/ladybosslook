@@ -4,8 +4,7 @@ import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
 import { TaskTemplate, TaskColor } from '@/hooks/useTaskPlanner';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { useNavigate } from 'react-router-dom';
-import { RoutineBuilderSheet } from '@/components/app/RoutineBuilderSheet';
+import { RoutineBuilderSheet, BuilderTask } from '@/components/app/RoutineBuilderSheet';
 
 interface SuggestedTask {
   id: string;
