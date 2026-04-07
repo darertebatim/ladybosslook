@@ -1806,7 +1806,7 @@ export default function RoutinesBank() {
                   {/* Focus Routine Toggle */}
                   <div className="flex items-center justify-between border-t pt-4">
                     <div>
-                      <Label className="text-xs font-medium">🎯 Reset Routine</Label>
+                      <Label className="text-xs font-medium">🎯 Focus Routine</Label>
                       <p className="text-xs text-muted-foreground">Tasks have timer goals based on duration</p>
                     </div>
                     <Switch
