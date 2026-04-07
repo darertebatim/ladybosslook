@@ -5,7 +5,7 @@ import { haptic } from '@/lib/haptics';
 import { RoutineBankItem } from '@/hooks/useRoutinesBank';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { isEmoji } from '@/lib/fluentEmoji';
-import { X, Crown, CheckCircle, Target } from 'lucide-react';
+import { X, Crown, CheckCircle, Target, RotateCcw } from 'lucide-react';
 import { CachedImage } from '@/components/ui/CachedImage';
 
 interface RoutineBankCardProps {
