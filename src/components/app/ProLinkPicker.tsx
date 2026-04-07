@@ -41,7 +41,7 @@ const CATEGORIES: CategoryGroup[] = [
   {
     id: 'content',
     label: 'Content',
-    links: ['reading'],
+    links: ['reading', 'reading_item'],
   },
   {
     id: 'nav',
