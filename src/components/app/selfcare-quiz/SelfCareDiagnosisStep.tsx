@@ -33,8 +33,12 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
   const [insight, setInsight] = useState('');
   const [gapCategories, setGapCategories] = useState<string[]>([]);
   const [error, setError] = useState('');
+  const hasFetched = useRef(false);
 
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     const fetchDiagnosis = async () => {
       try {
         const { data, error: fnError } = await supabase.functions.invoke('selfcare-diagnosis', {
@@ -66,7 +70,7 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
 
     const timer = setTimeout(fetchDiagnosis, 1500);
     return () => clearTimeout(timer);
-  }, [answers]);
+  }, []);
 
   return (
     <div className="h-full bg-white overflow-y-auto overscroll-contain">
