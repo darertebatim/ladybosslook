@@ -160,7 +160,7 @@ export default function AppInspire() {
               ) : (
                 <div className="grid grid-cols-2 gap-3">
                   {allRoutines?.filter(r => favoriteIds.includes(r.id)).map(routine => (
-                    <RoutineBankCard hideFocusBadge hideFocusBadge
+                    <RoutineBankCard hideFocusBadge
                       key={routine.id}
                       routine={routine}
                       onClick={() => navigateWithScroll(`/app/routines/${routine.id}`)}
@@ -294,7 +294,7 @@ export default function AppInspire() {
                   <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
                     {filteredPopular.map((routine, index) => (
                       <div key={routine.id} className="shrink-0 w-40">
-                        <RoutineBankCard hideFocusBadge hideFocusBadge
+                        <RoutineBankCard hideFocusBadge
                           routine={routine}
                           onClick={() => navigateWithScroll(`/app/routines/${routine.id}`)}
                           className={index === 0 ? 'tour-routine-card' : undefined}
@@ -324,7 +324,7 @@ export default function AppInspire() {
                     <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
                       {catRoutines.slice(0, 8).map((routine) => (
                         <div key={routine.id} className="shrink-0 w-40">
-                          <RoutineBankCard hideFocusBadge hideFocusBadge
+                          <RoutineBankCard hideFocusBadge
                             routine={routine}
                             onClick={() => navigateWithScroll(`/app/routines/${routine.id}`)}
                           />
@@ -355,7 +355,7 @@ export default function AppInspire() {
                     <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
                       {proRoutines.slice(0, 8).map((routine) => (
                         <div key={routine.id} className="shrink-0 w-40">
-                          <RoutineBankCard hideFocusBadge hideFocusBadge
+                          <RoutineBankCard hideFocusBadge
                             routine={routine}
                             onClick={() => navigateWithScroll(`/app/routines/${routine.id}`)}
                           />
@@ -384,7 +384,7 @@ export default function AppInspire() {
                   <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
                     {resetRoutines.slice(0, 8).map((routine) => (
                       <div key={routine.id} className="shrink-0 w-40">
-                        <RoutineBankCard hideFocusBadge hideFocusBadge
+                        <RoutineBankCard hideFocusBadge
                           routine={routine}
                           onClick={() => navigateWithScroll(`/app/routines/${routine.id}`)}
                         />
@@ -412,7 +412,7 @@ export default function AppInspire() {
                   <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
                     {challengeRoutines.map((routine) => (
                       <div key={routine.id} className="shrink-0 w-40">
-                        <RoutineBankCard hideFocusBadge hideFocusBadge
+                        <RoutineBankCard hideFocusBadge
                           routine={routine}
                           onClick={() => navigateWithScroll(`/app/routines/${routine.id}`)}
                         />
@@ -440,7 +440,7 @@ export default function AppInspire() {
                   <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
                     {projectRoutines.map((routine) => (
                       <div key={routine.id} className="shrink-0 w-40">
-                        <RoutineBankCard hideFocusBadge hideFocusBadge
+                        <RoutineBankCard hideFocusBadge
                           routine={routine}
                           onClick={() => navigateWithScroll(`/app/routines/${routine.id}`)}
                           isCompleted={completedRoutines?.has(routine.id)}
