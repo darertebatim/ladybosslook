@@ -1,6 +1,6 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, X, StickyNote } from 'lucide-react';
+import { ArrowLeft, Search, StickyNote, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
@@ -9,34 +9,21 @@ import { useTaskTemplates, TaskTemplate } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { haptic } from '@/lib/haptics';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { RoutineBuilderSheet, BuilderTask } from '@/components/app/RoutineBuilderSheet';
-import { RoutinePreviewSheet, EditedTask, ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
-import { useQueryClient } from '@tanstack/react-query';
-import { toast } from '@/hooks/use-toast';
-import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { useCreateTaskFromTemplate } from '@/hooks/useTaskPlanner';
+
+const PREVIEW_COUNT = 4;
 
 export default function AppTasksBank() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
-  const [showBuilder, setShowBuilder] = useState(false);
-  const [showBuilderPreview, setShowBuilderPreview] = useState(false);
-  const [builderResult, setBuilderResult] = useState<{ title: string; emoji: string; color: string; tasks: BuilderTask[] } | null>(null);
 
   const { data: categories, isLoading: categoriesLoading } = useRoutineBankCategories();
   const { data: allTasks, isLoading: tasksLoading } = useTaskTemplates();
+  const createTask = useCreateTaskFromTemplate();
 
   const isLoading = categoriesLoading || tasksLoading;
 
-  // Sort categories by task_display_order (0 goes to end, then ascending)
   const sortedCategories = useMemo(() => {
     if (!categories || !allTasks) return [];
     return categories
@@ -44,7 +31,6 @@ export default function AppTasksBank() {
       .sort((a, b) => (a.task_display_order ?? 0) - (b.task_display_order ?? 0));
   }, [categories, allTasks]);
 
-  // Group tasks by category
   const tasksByCategory = useMemo(() => {
     if (!allTasks) return {};
     const grouped: Record<string, TaskTemplate[]> = {};
@@ -55,176 +41,30 @@ export default function AppTasksBank() {
     return grouped;
   }, [allTasks]);
 
-  // Filter by search
   const matchesSearch = (task: TaskTemplate) => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
-    return task.title.toLowerCase().includes(q) || 
+    return task.title.toLowerCase().includes(q) ||
            task.description?.toLowerCase().includes(q) ||
            task.category.toLowerCase().includes(q);
   };
 
-  const handleToggleTask = useCallback((taskId: string) => {
-    haptic.light();
-    setSelectedTasks(prev => {
-      const next = new Set(prev);
-      if (next.has(taskId)) {
-        next.delete(taskId);
-      } else {
-        next.add(taskId);
-      }
-      return next;
-    });
-  }, []);
+  // If searching, show flat filtered results
+  const isSearching = searchQuery.length > 0;
+  const searchResults = useMemo(() => {
+    if (!isSearching || !allTasks) return [];
+    return allTasks.filter(matchesSearch);
+  }, [allTasks, searchQuery, isSearching]);
 
   const handleCategoryTap = (slug: string) => {
     haptic.light();
-    setSelectedCategory(prev => prev === slug ? null : slug);
+    navigate(`/app/tasksbank/${slug}`);
   };
 
-  const handleClearSelection = () => {
+  const handleAddTask = (task: TaskTemplate) => {
     haptic.light();
-    setSelectedTasks(new Set());
+    createTask.mutate(task);
   };
-
-  // Convert selected TaskTemplates to BuilderTasks
-  const getBuilderTasks = useCallback((): BuilderTask[] => {
-    if (!allTasks) return [];
-    return Array.from(selectedTasks)
-      .map(id => allTasks.find(t => t.id === id))
-      .filter(Boolean)
-      .map((t, i) => ({
-        id: t!.id,
-        title: t!.title,
-        emoji: t!.emoji || '📝',
-        color: t!.color || ROUTINE_COLOR_CYCLE[i % ROUTINE_COLOR_CYCLE.length],
-        repeat_pattern: t!.repeat_pattern || 'daily',
-        repeat_days: t!.repeat_days || null,
-        description: t!.description,
-        pro_link_type: t!.pro_link_type,
-        pro_link_value: t!.pro_link_value,
-        goal_enabled: t!.goal_enabled,
-        goal_target: t!.goal_target,
-        goal_type: t!.goal_type,
-        goal_unit: t!.goal_unit,
-        time_period: t!.time_period,
-        linked_playlist_id: t!.linked_playlist_id,
-        category: t!.category,
-      }));
-  }, [allTasks, selectedTasks]);
-
-  const handleOpenBuilder = () => {
-    haptic.medium();
-    setShowBuilder(true);
-  };
-
-  const handleBuilderComplete = (title: string, emoji: string, color: string, tasks: BuilderTask[]) => {
-    setShowBuilder(false);
-    setBuilderResult({ title, emoji, color, tasks });
-    setShowBuilderPreview(true);
-  };
-
-  const handleBuilderPreviewSave = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
-    if (!user || !builderResult) return;
-    try {
-      const { data: newRoutine, error: routineError } = await supabase
-        .from('user_routines_bank')
-        .insert({
-          user_id: user.id,
-          title: builderResult.title,
-          emoji: builderResult.emoji,
-          color: builderResult.color,
-          is_active: true,
-          is_user_created: true,
-          category: null,
-        } as any)
-        .select('id, routine_id')
-        .single();
-
-      if (routineError) throw routineError;
-      const routineId = (newRoutine as any).routine_id;
-
-      const selectedBuilderTasks = builderResult.tasks.filter(t => selectedTaskIds.includes(t.id));
-      const editedMap = new Map(editedTasks.map(e => [e.id, e]));
-
-      const { data: existingTasks } = await supabase
-        .from('user_tasks')
-        .select('order_index')
-        .eq('user_id', user.id)
-        .order('order_index', { ascending: false })
-        .limit(1);
-      const startOrder = (existingTasks?.[0]?.order_index ?? -1) + 1;
-
-      const hasProTask = selectedTaskIds.some(id => id.startsWith('__pro_task_routine_'));
-      const regularTasks = selectedBuilderTasks.filter(t => !t.id.startsWith('__pro_task_routine_'));
-
-      if (regularTasks.length > 0) {
-        const userTasks = regularTasks.map((task: any, index: number) => {
-          const edited = editedMap.get(task.id);
-          return {
-            user_id: user.id,
-            title: edited?.title || task.title,
-            emoji: edited?.icon || task.emoji || '📝',
-            color: edited?.color || task.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
-            repeat_pattern: edited?.repeatPattern || task.repeat_pattern || 'daily',
-            repeat_days: task.repeat_days || null,
-            scheduled_time: edited?.scheduledTime || null,
-            tag: edited?.tag ?? builderResult.title,
-            time_period: task.time_period || null,
-            linked_playlist_id: (edited?.pro_link_type || task.pro_link_type) === 'playlist' ? (edited?.pro_link_value || task.pro_link_value) : null,
-            pro_link_type: edited?.pro_link_type || task.pro_link_type || null,
-            pro_link_value: edited?.pro_link_value || task.pro_link_value || null,
-            is_active: true,
-            order_index: startOrder + index,
-            goal_enabled: task.goal_enabled || false,
-            goal_target: task.goal_target || null,
-            goal_type: task.goal_type || null,
-            goal_unit: task.goal_unit || null,
-            duration_minutes: task.duration_minutes || null,
-            source_routine_id: routineId,
-          };
-        });
-        await supabase.from('user_tasks').insert(userTasks);
-      }
-
-      if (hasProTask) {
-        const proEdited = editedTasks.find(e => e.id.startsWith('__pro_task_routine_'));
-        await supabase.from('user_tasks').insert({
-          user_id: user.id,
-          title: proEdited?.title || builderResult.title,
-          emoji: proEdited?.icon || '🎬',
-          color: proEdited?.color || 'mint',
-          repeat_pattern: 'daily',
-          tag: builderResult.title,
-          pro_link_type: 'routine',
-          pro_link_value: routineId,
-          is_active: true,
-          order_index: startOrder + regularTasks.length,
-          source_routine_id: null,
-        });
-      }
-
-      toast({ title: 'Routine created! 🎉' });
-      setShowBuilderPreview(false);
-      setBuilderResult(null);
-      setSelectedTasks(new Set());
-      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
-      queryClient.invalidateQueries({ queryKey: ['routine-user-tasks-emojis'] });
-      queryClient.invalidateQueries({ queryKey: ['routine-user-task-ids'] });
-      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
-    } catch (err) {
-      console.error('Failed to create routine:', err);
-      toast({ title: 'Failed to create routine', variant: 'destructive' });
-    }
-  };
-
-  // Categories to display in content
-  const displayCategories = selectedCategory 
-    ? sortedCategories.filter(c => c.slug === selectedCategory)
-    : sortedCategories;
-
-  const selectionCount = selectedTasks.size;
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
@@ -241,15 +81,6 @@ export default function AppTasksBank() {
             <h1 className="text-xl font-bold text-foreground">Self-Care Habits</h1>
           </div>
           <div className="flex items-center gap-1">
-            {selectionCount > 0 && (
-              <button
-                onClick={handleClearSelection}
-                className="p-2 rounded-full active:bg-muted/50 transition-colors"
-                aria-label="Clear selection"
-              >
-                <X className="w-5 h-5 text-muted-foreground" />
-              </button>
-            )}
             <button
               onClick={() => navigate('/app/projects')}
               className="p-2 rounded-full active:bg-muted/50 transition-colors"
@@ -287,7 +118,7 @@ export default function AppTasksBank() {
         <div className="pb-safe w-full max-w-full">
 
           {/* Category pills - horizontal scroll */}
-          {sortedCategories.length > 0 && (
+          {!isSearching && sortedCategories.length > 0 && (
             <div className="mt-4">
               <ScrollArea className="w-full">
                 <div className="flex gap-3 px-4 pb-2">
@@ -298,7 +129,6 @@ export default function AppTasksBank() {
                       icon={cat.icon}
                       emoji={cat.emoji}
                       color={cat.color}
-                      isSelected={selectedCategory === cat.slug}
                       onClick={() => handleCategoryTap(cat.slug)}
                     />
                   ))}
@@ -317,114 +147,86 @@ export default function AppTasksBank() {
             </div>
           )}
 
-          {/* Task lists grouped by category */}
-          {!isLoading && displayCategories.map(cat => {
-            const tasks = (tasksByCategory[cat.slug] || []).filter(matchesSearch);
+          {/* Search results - flat list */}
+          {!isLoading && isSearching && (
+            <div className="px-4 pt-4 space-y-2.5">
+              {searchResults.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 text-center">
+                  <Search className="w-12 h-12 text-muted-foreground/30 mb-4" />
+                  <p className="text-muted-foreground font-medium">No tasks found</p>
+                  <p className="text-sm text-muted-foreground/70 mt-1">Try a different search term</p>
+                </div>
+              ) : (
+                searchResults.map(task => (
+                  <TaskTemplateCard
+                    key={task.id}
+                    template={task}
+                    onAdd={() => handleAddTask(task)}
+                  />
+                ))
+              )}
+            </div>
+          )}
+
+          {/* Category sections with horizontal scroll previews */}
+          {!isLoading && !isSearching && sortedCategories.map(cat => {
+            const tasks = tasksByCategory[cat.slug] || [];
             if (tasks.length === 0) return null;
 
             return (
               <div key={cat.slug} className="mt-6 first:mt-4">
-                <div className="px-4 mb-3 flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-foreground">{cat.name}</h2>
-                  <span className="text-xs text-muted-foreground font-medium bg-muted/60 px-2 py-0.5 rounded-full">
-                    {tasks.length}
-                  </span>
-                </div>
-                <div className="px-4 space-y-2.5">
-                  {tasks.map(task => (
-                    <TaskTemplateCard
-                      key={task.id}
-                      template={task}
-                      onAdd={() => handleToggleTask(task.id)}
-                      isSelected={selectedTasks.has(task.id)}
-                      selectable
-                    />
-                  ))}
-                </div>
+                {/* Section header */}
+                <button
+                  onClick={() => handleCategoryTap(cat.slug)}
+                  className="w-full flex items-center justify-between px-4 mb-3 active:opacity-70 transition-opacity"
+                >
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-bold text-foreground">{cat.name}</h2>
+                    <span className="text-xs text-muted-foreground font-medium bg-muted/60 px-2 py-0.5 rounded-full">
+                      {tasks.length}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 text-sm font-medium text-primary">
+                    All
+                    <ChevronRight className="w-4 h-4" />
+                  </div>
+                </button>
+
+                {/* Horizontal scroll of task cards */}
+                <ScrollArea className="w-full">
+                  <div className="flex gap-2.5 px-4 pb-2">
+                    {tasks.slice(0, PREVIEW_COUNT).map(task => (
+                      <div key={task.id} className="min-w-[280px] max-w-[280px]">
+                        <TaskTemplateCard
+                          template={task}
+                          onAdd={() => handleAddTask(task)}
+                        />
+                      </div>
+                    ))}
+                    {/* "See more" card */}
+                    {tasks.length > PREVIEW_COUNT && (
+                      <button
+                        onClick={() => handleCategoryTap(cat.slug)}
+                        className="min-w-[120px] max-w-[120px] rounded-xl border border-border/50 bg-muted/30 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform"
+                      >
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <ChevronRight className="w-5 h-5 text-primary" />
+                        </div>
+                        <span className="text-xs font-semibold text-primary">
+                          +{tasks.length - PREVIEW_COUNT} more
+                        </span>
+                      </button>
+                    )}
+                  </div>
+                  <ScrollBar orientation="horizontal" className="invisible" />
+                </ScrollArea>
               </div>
             );
           })}
 
-          {/* Empty search state */}
-          {!isLoading && searchQuery && displayCategories.every(cat => 
-            (tasksByCategory[cat.slug] || []).filter(matchesSearch).length === 0
-          ) && (
-            <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-              <Search className="w-12 h-12 text-muted-foreground/30 mb-4" />
-              <p className="text-muted-foreground font-medium">No tasks found</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">Try a different search term</p>
-            </div>
-          )}
-
-          {/* Bottom padding for sticky button */}
-          <div className={cn(selectionCount > 0 ? "h-40" : "h-24")} />
+          <div className="h-24" />
         </div>
       </div>
-
-      {/* Sticky bottom button */}
-      {selectionCount > 0 && (
-        <div 
-          className="fixed left-0 right-0 bottom-20 z-40 px-4 pb-2 animate-in slide-in-from-bottom duration-300"
-          style={{ paddingBottom: 'env(safe-area-inset-bottom, 8px)' }}
-        >
-          <Button
-            onClick={handleOpenBuilder}
-            className="w-full h-14 rounded-2xl text-base font-bold gap-2 shadow-lg"
-            size="lg"
-          >
-            <FluentEmoji emoji="✨" size={20} />
-            Build My Routine ({selectionCount})
-          </Button>
-        </div>
-      )}
-
-      {/* Routine Builder Sheet */}
-      <RoutineBuilderSheet
-        open={showBuilder}
-        onOpenChange={setShowBuilder}
-        onComplete={handleBuilderComplete}
-        initialTitle="My Self-Care Routine"
-        initialEmoji="✨"
-        initialColor="mint"
-        initialTasks={getBuilderTasks()}
-      />
-
-      {/* Builder Preview Sheet */}
-      {builderResult && (
-        <RoutinePreviewSheet
-          open={showBuilderPreview}
-          onOpenChange={(open) => {
-            setShowBuilderPreview(open);
-            if (!open) setBuilderResult(null);
-          }}
-          tasks={builderResult.tasks.map((t, i) => ({
-            id: t.id,
-            plan_id: 'user-created',
-            title: t.title,
-            icon: t.emoji || '📝',
-            color: t.color,
-            task_order: i,
-            is_active: true,
-            created_at: new Date().toISOString(),
-            linked_playlist_id: t.linked_playlist_id || null,
-            pro_link_type: t.pro_link_type as any,
-            pro_link_value: t.pro_link_value || null,
-            tag: builderResult.title,
-            linked_playlist: null,
-            repeat_pattern: t.repeat_pattern,
-            repeat_days: t.repeat_days,
-            goal_enabled: t.goal_enabled,
-            goal_target: t.goal_target,
-            goal_type: t.goal_type,
-            goal_unit: t.goal_unit,
-            description: t.description,
-            time_period: t.time_period,
-          } as any))}
-          routineTitle={builderResult.title}
-          routineBankId="user-created"
-          onSave={handleBuilderPreviewSave}
-        />
-      )}
     </div>
   );
 }
