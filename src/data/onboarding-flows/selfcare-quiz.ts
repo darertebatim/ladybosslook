@@ -63,7 +63,6 @@ export const selfcareQuizFlow: OnboardingFlow = {
         { label: 'Reconnecting with people', emoji: '🤝' },
       ],
     },
-    },
     {
       id: 'sc-diagnosis',
       type: 'selfcare-diagnosis',
