@@ -16,7 +16,7 @@ export default function AppRoutineCategory() {
   const { data: routines, isLoading } = useRoutinesBank(isChallenges || isProjects || isReset || isPopular ? undefined : categorySlug);
 
   const category = categories?.find(c => c.slug === categorySlug);
-  const title = isChallenges ? 'Challenges' : isProjects ? 'Projects' : isReset ? 'Reset' : isPopular ? 'Popular' : (category?.name || 'Routines');
+  const title = isChallenges ? 'Challenges' : isProjects ? 'Projects' : isReset ? 'Focus' : isPopular ? 'Popular' : (category?.name || 'Routines');
 
   const displayedRoutines = useMemo(() => {
     if (!routines) return [];
