@@ -490,6 +490,7 @@ const AppTaskCreate = ({
   const [showVideoPlaylistPicker, setShowVideoPlaylistPicker] = useState(false);
   const [showProgramPicker, setShowProgramPicker] = useState(false);
   const [showRoutineTemplatePicker, setShowRoutineTemplatePicker] = useState(false);
+  const [showReadingPicker, setShowReadingPicker] = useState(false);
   const [routineTemplateSearchQuery, setRoutineTemplateSearchQuery] = useState('');
   const [showSubtaskEditor, setShowSubtaskEditor] = useState(false);
   const [showGoalSettings, setShowGoalSettings] = useState(false);
