@@ -97,23 +97,23 @@ serve(async (req) => {
     // Fetch matching tasks from admin_task_bank
     const { data: tasks } = await adminClient
       .from("admin_task_bank")
-      .select("id, title, emoji, category, description, color")
+      .select("id, title, emoji, category, description, color, repeat_pattern, time_period")
       .in("category", sortedGaps)
       .eq("is_active", true)
       .order("is_popular", { ascending: false })
-      .limit(20);
+      .limit(30);
 
     // Pick top 5 unique tasks spread across gap categories
     const suggestedTasks: typeof tasks = [];
     const usedIds = new Set<string>();
     for (const gap of sortedGaps) {
       const catTasks = (tasks || []).filter(t => t.category === gap && !usedIds.has(t.id));
-      for (const t of catTasks.slice(0, 2)) {
+      for (const t of catTasks.slice(0, 3)) {
         suggestedTasks.push(t);
         usedIds.add(t.id);
-        if (suggestedTasks.length >= 5) break;
+        if (suggestedTasks.length >= 8) break;
       }
-      if (suggestedTasks.length >= 5) break;
+      if (suggestedTasks.length >= 8) break;
     }
 
     // Fetch previous quiz results for returning users
