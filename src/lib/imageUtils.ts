@@ -86,18 +86,24 @@ export async function optimizeCoversForTable(
   columnName: string
 ): Promise<{ done: number; failed: number }> {
   const { supabase } = await import('@/integrations/supabase/client');
+  const SUPABASE_URL = 'https://mnukhzjcvbwpvktxqlej.supabase.co';
   let done = 0;
   let failed = 0;
 
   for (const item of items) {
     try {
-      const resp = await fetch(item.coverUrl);
+      // Normalise relative paths (e.g. "/playlist-covers/file.jpg") to full URLs
+      const fullUrl = item.coverUrl.startsWith('http')
+        ? item.coverUrl
+        : `${SUPABASE_URL}/storage/v1/object/public${item.coverUrl.startsWith('/') ? '' : '/'}${item.coverUrl}`;
+
+      const resp = await fetch(fullUrl);
       const blob = await resp.blob();
       const file = new File([blob], 'cover.jpg', { type: blob.type });
 
       const compressed = await compressImage(file, { maxSizeMB: 0.8, maxWidthOrHeight: 1200 });
 
-      const match = item.coverUrl.match(/\/storage\/v1\/object\/public\/([^/]+)\/(.+)$/);
+      const match = fullUrl.match(/\/storage\/v1\/object\/public\/([^/]+)\/(.+)$/);
       if (!match) { failed++; continue; }
       const [, bucket, oldPath] = match;
       const newPath = oldPath.replace(/\.[^.]+$/, '.webp');
