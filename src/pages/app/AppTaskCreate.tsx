@@ -750,7 +750,7 @@ const AppTaskCreate = ({
         .eq('is_published', true)
         .order('sort_order', { ascending: true });
       if (error) throw error;
-      return data as { id: string; title: string; emoji: string | null; cover_url: string | null; type: string; category: string }[];
+      return data as unknown as { id: string; title: string; emoji: string | null; cover_url: string | null; type: string; category: string }[];
     },
   });
 
