@@ -4062,6 +4062,44 @@ export type Database = {
         }
         Relationships: []
       }
+      selfcare_quiz_results: {
+        Row: {
+          ai_insight: string | null
+          answers: Json
+          created_at: string
+          gap_categories: string[]
+          id: string
+          suggested_task_ids: string[]
+          user_id: string
+        }
+        Insert: {
+          ai_insight?: string | null
+          answers?: Json
+          created_at?: string
+          gap_categories?: string[]
+          id?: string
+          suggested_task_ids?: string[]
+          user_id: string
+        }
+        Update: {
+          ai_insight?: string | null
+          answers?: Json
+          created_at?: string
+          gap_categories?: string[]
+          id?: string
+          suggested_task_ids?: string[]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "selfcare_quiz_results_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_products: {
         Row: {
           created_at: string
