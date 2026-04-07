@@ -17,7 +17,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
-import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles, Calendar, Flame, CalendarIcon, Upload, GripVertical } from 'lucide-react';
+import { Plus, Layers, Star, Trash2, Eye, EyeOff, Pencil, X, Search, Clock, FileText, ChevronUp, ChevronDown, FolderPlus, Edit2, Image, Sparkles, Calendar, Flame, CalendarIcon, Upload, GripVertical, Zap, Loader2 } from 'lucide-react';
+import { optimizeCoversForTable } from '@/lib/imageUtils';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/lib/utils';
 import { TaskIcon } from '@/components/app/IconPicker';
@@ -167,6 +168,7 @@ export default function RoutinesBank() {
   const [taskSearch, setTaskSearch] = useState('');
   const [addingTaskToSection, setAddingTaskToSection] = useState<string | null>(null); // section_id or 'uncategorized'
   const [dialogTab, setDialogTab] = useState<'basic' | 'sections'>('basic');
+  const [isOptimizingCovers, setIsOptimizingCovers] = useState(false);
 
   // Create action sheet state
   const [createActionSheetOpen, setCreateActionSheetOpen] = useState(false);
@@ -1178,10 +1180,27 @@ export default function RoutinesBank() {
             Create and manage routine templates with rich sections
           </CardDescription>
         </div>
-        <Button onClick={openNewDialog} className="gap-2">
-          <Plus className="h-4 w-4" />
-          New Routine
-        </Button>
+        <div className="flex gap-2">
+          {routines.some(r => r.cover_image_url && !r.cover_image_url.endsWith('.webp')) && (
+            <Button variant="outline" onClick={async () => {
+              const items = routines
+                .filter(r => r.cover_image_url && !r.cover_image_url.endsWith('.webp'))
+                .map(r => ({ id: r.id, coverUrl: r.cover_image_url! }));
+              setIsOptimizingCovers(true);
+              const { done, failed } = await optimizeCoversForTable(items, 'routines_bank', 'cover_image_url');
+              setIsOptimizingCovers(false);
+              toast.success(`Optimized ${done} covers${failed ? `, ${failed} failed` : ''}`);
+              queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
+            }} disabled={isOptimizingCovers}>
+              {isOptimizingCovers ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+              Optimize Covers
+            </Button>
+          )}
+          <Button onClick={openNewDialog} className="gap-2">
+            <Plus className="h-4 w-4" />
+            New Routine
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="flex flex-wrap gap-1 mb-4">
