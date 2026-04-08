@@ -356,6 +356,7 @@ export function PromoBannerManager() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['promo-banners'] });
+      queryClient.invalidateQueries({ queryKey: ['active-promo-banners'] });
       toast.success('Banner created');
       resetForm();
     },
@@ -405,6 +406,7 @@ export function PromoBannerManager() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['promo-banners'] });
+      queryClient.invalidateQueries({ queryKey: ['active-promo-banners'] });
       toast.success('Banner updated');
       resetForm();
     },
@@ -421,6 +423,7 @@ export function PromoBannerManager() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['promo-banners'] });
+      queryClient.invalidateQueries({ queryKey: ['active-promo-banners'] });
       toast.success('Banner deleted');
     },
     onError: (error: any) => {
@@ -439,6 +442,7 @@ export function PromoBannerManager() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['promo-banners'] });
+      queryClient.invalidateQueries({ queryKey: ['active-promo-banners'] });
     },
   });
 
