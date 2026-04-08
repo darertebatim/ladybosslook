@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,20 +13,39 @@ interface Props {
 }
 
 const CATEGORY_EMOJI: Record<string, string> = {
-  calm: '🧘', sleep: '😴', nutrition: '🥗', movement: '🏃',
-  Exercise: '💪', hygiene: '🧴', Presence: '🧠', connection: '💬',
-  'self-kindness': '💚', gratitude: '🙏', productivity: '📋',
-  TidyUp: '🧹', Night: '🌙',
+  calm: '🧘',
+  sleep: '😴',
+  nutrition: '🥗',
+  movement: '🏃',
+  Exercise: '💪',
+  hygiene: '🧴',
+  Presence: '🧠',
+  connection: '💬',
+  'self-kindness': '💚',
+  gratitude: '🙏',
+  productivity: '📋',
+  TidyUp: '🧹',
+  Night: '🌙',
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
-  calm: 'Calm', sleep: 'Sleep', nutrition: 'Nutrition', movement: 'Movement',
-  Exercise: 'Exercise', hygiene: 'Hygiene', Presence: 'Presence', connection: 'Connection',
-  'self-kindness': 'Self-Kindness', gratitude: 'Gratitude', productivity: 'Productivity',
-  TidyUp: 'Tidy Up', Night: 'Night Routine',
+  calm: 'Calm',
+  sleep: 'Sleep',
+  nutrition: 'Nutrition',
+  movement: 'Movement',
+  Exercise: 'Exercise',
+  hygiene: 'Hygiene',
+  Presence: 'Presence',
+  connection: 'Connection',
+  'self-kindness': 'Self-Kindness',
+  gratitude: 'Gratitude',
+  productivity: 'Productivity',
+  TidyUp: 'Tidy Up',
+  Night: 'Night Routine',
 };
 
 const ALL_CATEGORIES = Object.keys(CATEGORY_EMOJI);
+const DEFAULT_GAPS = ['calm', 'sleep', 'movement'];
 
 const STATUS_MESSAGES = [
   { title: 'Scanning your habits...', sub: 'Looking at your daily patterns' },
@@ -37,58 +56,163 @@ const STATUS_MESSAGES = [
   { title: 'Almost there...', sub: 'Preparing your diagnosis' },
 ];
 
+const buildFallbackDiagnosis = (answers?: OnboardingAnswers) => {
+  const scores: Record<string, number> = {};
+  const addScore = (categories: string[], weight: number) => {
+    categories.forEach((category) => {
+      scores[category] = (scores[category] || 0) + weight;
+    });
+  };
+
+  const DRAIN_MAP: Record<string, string[]> = {
+    'Stress & anxiety': ['calm', 'sleep', 'Night'],
+    'Constant tiredness': ['sleep', 'nutrition', 'movement'],
+    'Screen overload': ['Presence', 'calm', 'productivity'],
+    'Feeling disconnected': ['connection', 'self-kindness'],
+  };
+
+  const MORNING_MAP: Record<string, string[]> = {
+    'Peaceful & slow': ['calm', 'gratitude'],
+    'Active & energized': ['Exercise', 'movement'],
+    'Fresh & put-together': ['hygiene', 'self-kindness'],
+    'Organized & productive': ['productivity', 'TidyUp'],
+  };
+
+  const SKIP_MAP: Record<string, string[]> = {
+    'Getting enough sleep': ['sleep', 'Night'],
+    'Drinking water': ['nutrition'],
+    'Moving your body': ['movement', 'Exercise'],
+    'Skincare / grooming': ['hygiene'],
+    'A moment of silence': ['calm', 'Presence'],
+    'Connecting with someone': ['connection'],
+    'Tidying your space': ['TidyUp', 'productivity'],
+    'Doing something kind for yourself': ['self-kindness', 'gratitude'],
+  };
+
+  const PROUD_MAP: Record<string, string[]> = {
+    'A real morning routine': ['movement', 'hygiene', 'Night'],
+    'Taking care of my mind': ['calm', 'gratitude', 'Presence'],
+    'Taking care of my body': ['Exercise', 'nutrition', 'sleep'],
+    'Reconnecting with people': ['connection', 'TidyUp'],
+  };
+
+  const drainAnswer = typeof answers?.['sc-drain'] === 'string' ? answers['sc-drain'] : null;
+  const morningAnswer = typeof answers?.['sc-morning'] === 'string' ? answers['sc-morning'] : null;
+  const proudAnswer = typeof answers?.['sc-proud'] === 'string' ? answers['sc-proud'] : null;
+  const skippingAnswers = Array.isArray(answers?.['sc-skipping']) ? answers['sc-skipping'] : [];
+  const neglectingAnswers = Array.isArray(answers?.['sc-neglecting']) ? answers['sc-neglecting'] : [];
+
+  if (drainAnswer && DRAIN_MAP[drainAnswer]) addScore(DRAIN_MAP[drainAnswer], 2);
+  if (morningAnswer && MORNING_MAP[morningAnswer]) addScore(MORNING_MAP[morningAnswer], 1);
+  if (proudAnswer && PROUD_MAP[proudAnswer]) addScore(PROUD_MAP[proudAnswer], 2);
+  skippingAnswers.forEach((answer) => {
+    if (SKIP_MAP[answer]) addScore(SKIP_MAP[answer], 3);
+  });
+  neglectingAnswers.forEach((answer) => {
+    if (SKIP_MAP[answer]) addScore(SKIP_MAP[answer], 3);
+  });
+
+  const gapCategories = Object.entries(scores)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([category]) => category);
+
+  return {
+    gap_categories: gapCategories.length > 0 ? gapCategories : DEFAULT_GAPS,
+    suggested_tasks: [],
+    ai_insight:
+      'You may be carrying more than you realize, and a few self-care areas are asking for your attention right now. Start small and steady — the right habits can help you feel more grounded, energized, and back in sync with yourself.',
+  };
+};
+
 export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props) {
   const [phase, setPhase] = useState<'loading' | 'results'>('loading');
   const [insight, setInsight] = useState('');
   const [gapCategories, setGapCategories] = useState<string[]>([]);
   const [error, setError] = useState('');
   const hasFetched = useRef(false);
+  const hasResolved = useRef(false);
 
-  // Loading animation state
   const [statusIdx, setStatusIdx] = useState(0);
   const [scanIdx, setScanIdx] = useState(-1);
   const [progress, setProgress] = useState(0);
   const [scannedResults, setScannedResults] = useState<Record<string, 'good' | 'gap' | null>>({});
 
-  // Cycle status messages
   useEffect(() => {
     if (phase !== 'loading') return;
-    const t = setInterval(() => setStatusIdx(i => (i + 1) % STATUS_MESSAGES.length), 2200);
-    return () => clearInterval(t);
+    const timer = window.setInterval(() => {
+      setStatusIdx((i) => (i + 1) % STATUS_MESSAGES.length);
+    }, 2200);
+    return () => window.clearInterval(timer);
   }, [phase]);
 
-  // Animate progress bar
   useEffect(() => {
     if (phase !== 'loading') return;
-    const t = setInterval(() => setProgress(p => Math.min(p + 0.8, 95)), 100);
-    return () => clearInterval(t);
+    const timer = window.setInterval(() => {
+      setProgress((p) => Math.min(p + 0.8, 95));
+    }, 100);
+    return () => window.clearInterval(timer);
   }, [phase]);
 
-  // Scan through categories one by one
   useEffect(() => {
     if (phase !== 'loading') return;
     let idx = 0;
-    const t = setInterval(() => {
+    const timer = window.setInterval(() => {
       if (idx < ALL_CATEGORIES.length) {
         setScanIdx(idx);
-        // Randomly mark as good or neutral during scan
-        setScannedResults(prev => ({
+        setScannedResults((prev) => ({
           ...prev,
           [ALL_CATEGORIES[idx]]: Math.random() > 0.5 ? 'good' : null,
         }));
-        idx++;
+        idx += 1;
       } else {
-        // Reset and scan again
         idx = 0;
         setScanIdx(0);
       }
     }, 350);
-    return () => clearInterval(t);
+    return () => window.clearInterval(timer);
   }, [phase]);
 
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
+
+    const applyDiagnosis = (
+      diagnosis: { gap_categories?: string[]; suggested_tasks?: unknown[]; ai_insight?: string },
+      nextError = ''
+    ) => {
+      if (hasResolved.current) return;
+      hasResolved.current = true;
+
+      const nextGaps = diagnosis.gap_categories || DEFAULT_GAPS;
+      const nextInsight = diagnosis.ai_insight || buildFallbackDiagnosis(answers).ai_insight;
+
+      setGapCategories(nextGaps);
+      setInsight(nextInsight);
+      setError(nextError);
+      setProgress(100);
+
+      const results: Record<string, 'good' | 'gap' | null> = {};
+      ALL_CATEGORIES.forEach((cat) => {
+        results[cat] = nextGaps.includes(cat) ? 'gap' : 'good';
+      });
+      setScannedResults(results);
+
+      onAnswer?.(
+        'sc-diagnosis-data',
+        JSON.stringify({
+          gap_categories: nextGaps,
+          suggested_tasks: diagnosis.suggested_tasks || [],
+          ai_insight: nextInsight,
+        })
+      );
+
+      window.setTimeout(() => setPhase('results'), 500);
+    };
+
+    const fallbackTimer = window.setTimeout(() => {
+      applyDiagnosis(buildFallbackDiagnosis(answers), 'Live analysis took too long, so we prepared your diagnosis locally.');
+    }, 9000);
 
     const fetchDiagnosis = async () => {
       try {
@@ -96,50 +220,34 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
           body: { answers },
         });
 
+        if (hasResolved.current) return;
         if (fnError) throw fnError;
         if (data?.error) throw new Error(data.error);
 
-        setInsight(data.ai_insight || '');
-        setGapCategories(data.gap_categories || []);
-
-        if (onAnswer) {
-          onAnswer('sc-diagnosis-data', JSON.stringify({
-            gap_categories: data.gap_categories || [],
-            suggested_tasks: data.suggested_tasks || [],
-            ai_insight: data.ai_insight || '',
-          }));
-        }
-
-        // Mark gap categories in scan results
-        const results: Record<string, 'good' | 'gap' | null> = {};
-        ALL_CATEGORIES.forEach(cat => {
-          results[cat] = (data.gap_categories || []).includes(cat) ? 'gap' : 'good';
-        });
-        setScannedResults(results);
-        setProgress(100);
-        
-        setTimeout(() => setPhase('results'), 800);
-      } catch (err: any) {
+        window.clearTimeout(fallbackTimer);
+        applyDiagnosis(data || buildFallbackDiagnosis(answers));
+      } catch (err) {
         console.error('Diagnosis error:', err);
-        setError('Something went wrong. Please try again.');
-        setPhase('results');
+        window.clearTimeout(fallbackTimer);
+        applyDiagnosis(buildFallbackDiagnosis(answers), 'We could not finish the live analysis, so we used a quick backup diagnosis.');
       }
     };
 
-    const timer = setTimeout(fetchDiagnosis, 1200);
-    return () => clearTimeout(timer);
-  }, []);
+    const startTimer = window.setTimeout(fetchDiagnosis, 1200);
+    return () => {
+      window.clearTimeout(startTimer);
+      window.clearTimeout(fallbackTimer);
+    };
+  }, [answers, onAnswer]);
 
   const currentStatus = STATUS_MESSAGES[statusIdx];
 
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
-      {/* Hero mascot header */}
       <div className="shrink-0 relative" style={{ height: 200 }}>
         <img src={meplusMascotBg} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
       </div>
 
-      {/* White bottom sheet */}
       <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-y-auto overscroll-contain">
         <div className="px-5 pt-5 flex flex-col flex-1 min-h-0" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}>
           <AnimatePresence mode="wait">
@@ -151,7 +259,6 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
                 exit={{ opacity: 0, y: -10 }}
                 className="flex-1 flex flex-col gap-4"
               >
-                {/* Status text with animation */}
                 <div className="text-center pt-2">
                   <AnimatePresence mode="wait">
                     <motion.div
@@ -167,64 +274,45 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
                   </AnimatePresence>
                 </div>
 
-                {/* Progress bar */}
                 <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                   <motion.div
-                    className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full"
+                    className="h-full rounded-full bg-gradient-to-r from-primary via-primary to-accent"
                     style={{ width: `${progress}%` }}
                     transition={{ duration: 0.1 }}
                   />
                 </div>
 
-                {/* Category scan grid */}
                 <div className="grid grid-cols-3 gap-2 mt-2">
                   {ALL_CATEGORIES.map((cat, i) => {
                     const isActive = i === scanIdx;
                     const result = scannedResults[cat];
+
                     return (
                       <motion.div
                         key={cat}
                         className={`
-                          flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-xs font-medium
-                          transition-all duration-200 border
-                          ${isActive 
-                            ? 'border-indigo-400 bg-indigo-50 shadow-sm shadow-indigo-100 scale-[1.03]' 
+                          flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-xs font-medium border transition-all duration-200
+                          ${isActive
+                            ? 'border-primary bg-primary/10 shadow-sm scale-[1.03]'
                             : result === 'gap'
-                              ? 'border-amber-300 bg-amber-50'
+                              ? 'border-accent/40 bg-accent/10'
                               : result === 'good'
-                                ? 'border-green-200 bg-green-50'
-                                : 'border-muted bg-muted/30'
+                                ? 'border-primary/20 bg-primary/5'
+                                : 'border-border bg-muted/30'
                           }
                         `}
-                        animate={isActive ? { scale: [1, 1.03, 1] } : {}}
+                        animate={isActive ? { scale: [1, 1.03, 1] } : undefined}
                         transition={{ duration: 0.3 }}
                       >
                         <span className="text-sm">{CATEGORY_EMOJI[cat]}</span>
-                        <span className={`truncate ${
-                          isActive ? 'text-indigo-700' 
-                          : result === 'gap' ? 'text-amber-700'
-                          : result === 'good' ? 'text-green-700'
-                          : 'text-muted-foreground'
-                        }`}>
+                        <span className={`truncate ${result ? 'text-foreground' : 'text-muted-foreground'}`}>
                           {CATEGORY_LABELS[cat]}
                         </span>
-                        {result === 'good' && !isActive && (
-                          <motion.span 
-                            initial={{ scale: 0 }} 
-                            animate={{ scale: 1 }}
-                            className="ml-auto text-green-500 text-[10px]"
-                          >✓</motion.span>
-                        )}
-                        {result === 'gap' && !isActive && (
-                          <motion.span 
-                            initial={{ scale: 0 }} 
-                            animate={{ scale: 1 }}
-                            className="ml-auto text-amber-500 text-[10px]"
-                          >!</motion.span>
-                        )}
+                        {result === 'good' && !isActive && <span className="ml-auto text-primary text-[10px]">✓</span>}
+                        {result === 'gap' && !isActive && <span className="ml-auto text-accent text-[10px]">!</span>}
                         {isActive && (
                           <motion.div
-                            className="ml-auto w-3 h-3 border-2 border-indigo-400 border-t-transparent rounded-full"
+                            className="ml-auto h-3 w-3 rounded-full border-2 border-primary border-t-transparent"
                             animate={{ rotate: 360 }}
                             transition={{ duration: 0.6, repeat: Infinity, ease: 'linear' }}
                           />
@@ -234,8 +322,7 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
                   })}
                 </div>
 
-                {/* Scanning indicator */}
-                <p className="text-[11px] text-center text-muted-foreground mt-1">
+                <p className="mt-1 text-center text-[11px] text-muted-foreground">
                   Checking {Math.min(scanIdx + 1, ALL_CATEGORIES.length)} of {ALL_CATEGORIES.length} categories
                 </p>
               </motion.div>
@@ -249,53 +336,48 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
                 transition={{ duration: 0.4 }}
                 className="flex-1 flex flex-col"
               >
-                {error ? (
-                  <div className="flex-1 flex items-center justify-center">
-                    <p className="text-muted-foreground">{error}</p>
+                <h2 className="mb-4 text-[22px] font-extrabold text-foreground">{step.title}</h2>
+
+                {error && (
+                  <div className="mb-4 rounded-2xl border border-accent/20 bg-accent/10 p-3">
+                    <p className="text-sm text-foreground">{error}</p>
                   </div>
-                ) : (
-                  <>
-                    <h2 className="text-[22px] font-extrabold text-foreground mb-4">{step.title}</h2>
-
-                    {/* AI Insight */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-4 mb-5 border border-purple-100"
-                    >
-                      <p className="text-[15px] text-foreground leading-relaxed">{insight}</p>
-                    </motion.div>
-
-                    {/* Gap Categories */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.35 }}
-                      className="flex flex-wrap gap-2 mb-6"
-                    >
-                      {gapCategories.map((cat) => (
-                        <div
-                          key={cat}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-sm font-medium text-foreground"
-                        >
-                          <FluentEmoji emoji={CATEGORY_EMOJI[cat] || '📌'} size={16} />
-                          {CATEGORY_LABELS[cat] || cat}
-                        </div>
-                      ))}
-                    </motion.div>
-
-                    {/* Next button */}
-                    <div className="mt-auto pt-6">
-                      <button
-                        onClick={onNext}
-                        className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base active:scale-[0.98] transition-all"
-                      >
-                        {step.buttonLabel || 'Next'}
-                      </button>
-                    </div>
-                  </>
                 )}
+
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="mb-5 rounded-2xl border border-border bg-gradient-to-br from-primary/5 to-accent/10 p-4"
+                >
+                  <p className="text-[15px] leading-relaxed text-foreground">{insight}</p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.35 }}
+                  className="mb-6 flex flex-wrap gap-2"
+                >
+                  {gapCategories.map((cat) => (
+                    <div
+                      key={cat}
+                      className="flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/10 px-3 py-1.5 text-sm font-medium text-foreground"
+                    >
+                      <FluentEmoji emoji={CATEGORY_EMOJI[cat] || '📌'} size={16} />
+                      {CATEGORY_LABELS[cat] || cat}
+                    </div>
+                  ))}
+                </motion.div>
+
+                <div className="mt-auto pt-6">
+                  <button
+                    onClick={onNext}
+                    className="w-full rounded-2xl bg-primary py-4 text-base font-bold text-primary-foreground transition-all active:scale-[0.98]"
+                  >
+                    {step.buttonLabel || 'Next'}
+                  </button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
