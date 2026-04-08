@@ -44,7 +44,15 @@ export type OnboardingStepType =
   | 'week-task-suggestions'
   | 'week-celebration'
   | 'selfcare-diagnosis'
-  | 'selfcare-suggestions';
+  | 'selfcare-suggestions'
+  | 'dynamic-single-select';
+
+export interface OnboardingOptionVariant {
+  cluster: string;
+  title: string;
+  options: OnboardingOption[];
+}
+
 export interface OnboardingOption {
   label: string;
   emoji?: string;
