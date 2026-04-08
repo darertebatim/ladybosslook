@@ -874,7 +874,7 @@ export function RoutineBuilderSheet({
               <button onClick={() => { setShowTaskBank(false); setTaskBankSearch(''); setTaskBankCategory(null); }} className="p-1 active:opacity-70">
                 <ChevronLeft className="w-5 h-5 text-foreground" />
               </button>
-              <h3 className="text-base font-bold text-foreground flex-1">Self-Care Habits</h3>
+              <h3 className="text-base font-bold text-foreground flex-1">Self-Care Goals</h3>
               {taskBankSelected.size > 0 && (
                 <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-100/60 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
                   {taskBankSelected.size} selected
