@@ -12,8 +12,8 @@ export const selfcareQuizFlow: OnboardingFlow = {
       type: 'motivational',
       illustrationLabel: 'selfcare-quiz',
       title: "What's Missing?",
-      subtitle: "Our AI analyzes your lifestyle to find the perfect **self-care goals** just for you — in under a minute.\n\n**Discover your Self-care Gaps in 1 min**",
-      buttonLabel: "AI powered Analyze",
+      subtitle: "Our AI analyzes your lifestyle to find the perfect **self-care goals** just for you — in under a minute.",
+      buttonLabel: "Let's find out →",
     },
     {
       id: 'sc-hook',
