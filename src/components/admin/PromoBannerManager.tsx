@@ -15,7 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
 import { PromoAudienceSelector, TargetType } from './PromoAudienceSelector';
 
-type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'mood' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist' | 'routine_player' | 'audio_track' | 'video_track' | 'selfcare_quiz';
+type DestinationType = 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'mood' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist' | 'routine_player' | 'audio_track' | 'video_track';
 type DisplayFrequency = 'once' | 'daily' | 'weekly' | 'forever';
 type AspectRatio = '3:1' | '4:1' | '16:9' | '1:1' | 'full';
 type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch' | 'video_player' | 'routines_top' | 'routines_after_categories' | 'routine_player';
@@ -555,6 +555,7 @@ export function PromoBannerManager() {
       case 'onboarding':
         const onboardingFlows = [dearMeFlow, mePlusFlow];
         const obFlow = onboardingFlows.find(f => f.id === banner.destination_id);
+        if (banner.destination_id === 'selfcare-quiz') return '🩺 Self-Care Quiz';
         return obFlow ? `🎯 ${obFlow.name}` : 'Unknown Flow';
       case 'watch':
         return 'Watch Page';
@@ -869,7 +870,6 @@ export function PromoBannerManager() {
                     <SelectItem value="routine_player">🎬 Routine Player</SelectItem>
                     <SelectItem value="audio_track">🎵 Audio Track (specific)</SelectItem>
                     <SelectItem value="video_track">📹 Video Track (specific)</SelectItem>
-                    <SelectItem value="selfcare_quiz">🩺 Self-Care Quiz</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -911,6 +911,9 @@ export function PromoBannerManager() {
                       {destinationType === 'onboarding' && [dearMeFlow, mePlusFlow].map(f => (
                         <SelectItem key={f.id} value={f.id}>🎯 {f.name}</SelectItem>
                       ))}
+                      {destinationType === 'onboarding' && (
+                        <SelectItem value="selfcare-quiz">🩺 Self-Care Quiz</SelectItem>
+                      )}
                       {destinationType === 'video_playlist' && videoPlaylists?.map(p => (
                         <SelectItem key={p.id} value={p.id}>🎬 {p.name}</SelectItem>
                       ))}
