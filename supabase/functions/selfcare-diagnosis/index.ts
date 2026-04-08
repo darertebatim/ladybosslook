@@ -80,6 +80,11 @@ serve(async (req) => {
       if (SKIP_MAP[s]) addScore(SKIP_MAP[s], 3);
     }
 
+    const neglectingAnswers: string[] = answers?.["sc-neglecting"] || [];
+    for (const s of neglectingAnswers) {
+      if (SKIP_MAP[s]) addScore(SKIP_MAP[s], 3);
+    }
+
     const proudAnswer = answers?.["sc-proud"];
     if (proudAnswer && PROUD_MAP[proudAnswer]) addScore(PROUD_MAP[proudAnswer], 2);
 
@@ -158,6 +163,7 @@ Keep it to 2-3 sentences max.${prevContext ? "\nThis is a RETURNING user. Acknow
 - Main drain: ${drainAnswer || "not specified"}
 - Ideal morning: ${morningAnswer || "not specified"}  
 - Skipping: ${skippingAnswers.join(", ") || "none selected"}
+- Haven't done in a while: ${neglectingAnswers.join(", ") || "none selected"}
 - Top gap categories: ${sortedGaps.join(", ")}${prevContext}${completionContext}
 
 Write a personalized 2-3 sentence insight about what area of their life needs attention and why these specific habits matter. Don't list the categories — weave them naturally into the message.`;
