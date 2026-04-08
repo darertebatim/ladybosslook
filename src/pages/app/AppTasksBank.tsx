@@ -272,8 +272,8 @@ export default function AppTasksBank() {
                 <FluentEmoji emoji="✨" size={22} />
               </div>
               <div className="text-left flex-1">
-                <p className="text-sm font-bold text-foreground">Not sure where to start?</p>
-                <p className="text-xs text-muted-foreground">Take a 1-min quiz to find your gaps</p>
+                <p className="text-sm font-bold text-foreground">Discover your self-care gaps</p>
+                <p className="text-xs text-muted-foreground">Your personalized plan is one quiz away</p>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
             </button>
