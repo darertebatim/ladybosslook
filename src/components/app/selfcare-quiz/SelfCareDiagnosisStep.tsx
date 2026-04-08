@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { supabase } from '@/integrations/supabase/client';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { computeGapCategories } from '@/utils/selfcare-scoring';
+import { computeGapCategories, computeTopCluster, ClusterType } from '@/utils/selfcare-scoring';
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 
 interface Props {
@@ -14,39 +14,49 @@ interface Props {
 }
 
 const CATEGORY_EMOJI: Record<string, string> = {
-  calm: '🧘',
-  sleep: '😴',
-  nutrition: '🥗',
-  movement: '🏃',
-  Exercise: '💪',
-  hygiene: '🧴',
-  Presence: '🧠',
-  connection: '💬',
-  'self-kindness': '💚',
-  gratitude: '🙏',
-  productivity: '📋',
-  TidyUp: '🧹',
-  Evening: '🌙',
-  LovedOnes: '🥰',
-  'easy-win': '✨',
+  calm: '🧘', sleep: '😴', nutrition: '🥗', movement: '🏃',
+  Exercise: '💪', hygiene: '🧴', Presence: '🧠', connection: '💬',
+  'self-kindness': '💚', gratitude: '🙏', productivity: '📋',
+  TidyUp: '🧹', Evening: '🌙', LovedOnes: '🥰', 'easy-win': '✨',
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
-  calm: 'Calm',
-  sleep: 'Sleep',
-  nutrition: 'Nutrition',
-  movement: 'Movement',
-  Exercise: 'Exercise',
-  hygiene: 'Hygiene',
-  Presence: 'Presence',
-  connection: 'Connection',
-  'self-kindness': 'Self-Kindness',
-  gratitude: 'Gratitude',
-  productivity: 'Productivity',
-  TidyUp: 'Tidy Up',
-  Evening: 'Evening',
-  LovedOnes: 'Loved Ones',
-  'easy-win': 'Easy Win',
+  calm: 'Calm', sleep: 'Sleep', nutrition: 'Nutrition', movement: 'Movement',
+  Exercise: 'Exercise', hygiene: 'Hygiene', Presence: 'Presence', connection: 'Connection',
+  'self-kindness': 'Self-Kindness', gratitude: 'Gratitude', productivity: 'Productivity',
+  TidyUp: 'Tidy Up', Evening: 'Evening', LovedOnes: 'Loved Ones', 'easy-win': 'Easy Win',
+};
+
+const CATEGORY_DESCRIPTIONS: Record<string, string> = {
+  calm: "Your mind is running non-stop — you need moments of stillness.",
+  sleep: "Your body isn't getting the rest it needs to recharge.",
+  nutrition: "You've been skipping meals or not fueling yourself well.",
+  movement: "Your body is craving more gentle, everyday movement.",
+  Exercise: "You haven't been making time for real physical activity.",
+  hygiene: "Basic self-care routines have been slipping lately.",
+  Presence: "You're on autopilot — you need to slow down and be present.",
+  connection: "You've been isolating — reaching out would help.",
+  'self-kindness': "You're being too hard on yourself right now.",
+  gratitude: "You've lost sight of the good things around you.",
+  productivity: "Your days feel unstructured and scattered.",
+  TidyUp: "Your space is cluttered, and it's draining your energy.",
+  Evening: "Your nights are chaotic — a wind-down routine would help.",
+  LovedOnes: "The people you love need more of your time and care.",
+  'easy-win': "You just need a quick win to build momentum.",
+};
+
+const CLUSTER_HEADLINES: Record<ClusterType, string> = {
+  body: "Your body is asking for attention",
+  mind: "Your mind needs a reset",
+  environment: "Your daily life needs more structure",
+  people: "Your relationships need nurturing",
+};
+
+const CLUSTER_SUBTEXT: Record<ClusterType, string> = {
+  body: "Rest, movement, and nourishment are the foundation. Let's start there.",
+  mind: "When your mind is overwhelmed, everything else suffers. Let's create some calm.",
+  environment: "Small changes to your space and routines can shift everything.",
+  people: "Connection is self-care too. Let's make space for the people who matter.",
 };
 
 const ALL_CATEGORIES = Object.keys(CATEGORY_EMOJI);
@@ -63,18 +73,14 @@ const STATUS_MESSAGES = [
 
 const buildFallbackDiagnosis = (answers?: OnboardingAnswers) => {
   const gapCategories = computeGapCategories(answers || {});
-  return {
-    gap_categories: gapCategories,
-    suggested_tasks: [],
-    ai_insight:
-      'You may be carrying more than you realize, and a few self-care areas are asking for your attention right now. Start small and steady — the right habits can help you feel more grounded, energized, and back in sync with yourself.',
-  };
+  const topCluster = computeTopCluster(answers || {});
+  return { gap_categories: gapCategories, suggested_tasks: [], top_cluster: topCluster };
 };
 
 export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props) {
   const [phase, setPhase] = useState<'loading' | 'results'>('loading');
-  const [insight, setInsight] = useState('');
   const [gapCategories, setGapCategories] = useState<string[]>([]);
+  const [topCluster, setTopCluster] = useState<ClusterType>('mind');
   const [error, setError] = useState('');
   const hasResolved = useRef(false);
 
@@ -101,7 +107,7 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
   useEffect(() => {
     if (phase !== 'loading') return;
     const timer = window.setInterval(() => {
-      setProgress((p) => Math.min(p + 0.8, 95));
+      setProgress((p) => Math.min(p + 1.5, 95));
     }, 100);
     return () => window.clearInterval(timer);
   }, [phase]);
@@ -130,17 +136,17 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
     hasResolved.current = false;
 
     const applyDiagnosis = (
-      diagnosis: { gap_categories?: string[]; suggested_tasks?: unknown[]; ai_insight?: string },
+      diagnosis: { gap_categories?: string[]; suggested_tasks?: unknown[]; top_cluster?: string },
       nextError = ''
     ) => {
       if (cancelled || hasResolved.current) return;
       hasResolved.current = true;
 
       const nextGaps = diagnosis.gap_categories || DEFAULT_GAPS;
-      const nextInsight = diagnosis.ai_insight || buildFallbackDiagnosis(answers).ai_insight;
+      const cluster = (diagnosis.top_cluster || computeTopCluster(answers || {})) as ClusterType;
 
       setGapCategories(nextGaps);
-      setInsight(nextInsight);
+      setTopCluster(cluster);
       setError(nextError);
       setProgress(100);
 
@@ -155,7 +161,7 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
         JSON.stringify({
           gap_categories: nextGaps,
           suggested_tasks: diagnosis.suggested_tasks || [],
-          ai_insight: nextInsight,
+          top_cluster: cluster,
         })
       );
 
@@ -163,7 +169,7 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
     };
 
     const fallbackTimer = window.setTimeout(() => {
-      applyDiagnosis(buildFallbackDiagnosis(answers), 'Live analysis took too long, so we prepared your diagnosis locally.');
+      applyDiagnosis(buildFallbackDiagnosis(answers));
     }, 9000);
 
     const fetchDiagnosis = async () => {
@@ -181,7 +187,7 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
       } catch (err) {
         console.error('Diagnosis error:', err);
         window.clearTimeout(fallbackTimer);
-        applyDiagnosis(buildFallbackDiagnosis(answers), 'We could not finish the live analysis, so we used a quick backup diagnosis.');
+        applyDiagnosis(buildFallbackDiagnosis(answers));
       }
     };
 
@@ -239,7 +245,6 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
                   {ALL_CATEGORIES.map((cat, i) => {
                     const isActive = i === scanIdx;
                     const result = scannedResults[cat];
-
                     return (
                       <motion.div
                         key={cat}
@@ -289,39 +294,61 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
                 transition={{ duration: 0.4 }}
                 className="flex-1 flex flex-col"
               >
-                <h2 className="mb-4 text-[22px] font-extrabold text-foreground">{step.title}</h2>
+                {/* Cluster headline */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="mb-1"
+                >
+                  <h2 className="text-[22px] font-extrabold text-foreground">
+                    {CLUSTER_HEADLINES[topCluster]}
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {CLUSTER_SUBTEXT[topCluster]}
+                  </p>
+                </motion.div>
 
                 {error && (
-                  <div className="mb-4 rounded-2xl border border-accent/20 bg-accent/10 p-3">
+                  <div className="mt-3 rounded-2xl border border-accent/20 bg-accent/10 p-3">
                     <p className="text-sm text-foreground">{error}</p>
                   </div>
                 )}
 
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="mb-5 rounded-2xl border border-border bg-gradient-to-br from-primary/5 to-accent/10 p-4"
-                >
-                  <p className="text-[15px] leading-relaxed text-foreground">{insight}</p>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.35 }}
-                  className="mb-6 flex flex-wrap gap-2"
-                >
-                  {gapCategories.map((cat) => (
-                    <div
+                {/* Category gap cards */}
+                <div className="mt-5 space-y-3">
+                  {gapCategories.map((cat, i) => (
+                    <motion.div
                       key={cat}
-                      className="flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/10 px-3 py-1.5 text-sm font-medium text-foreground"
+                      initial={{ opacity: 0, x: -15 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.2 + i * 0.12 }}
+                      className="flex items-start gap-3 rounded-2xl border border-accent/20 bg-gradient-to-r from-accent/5 to-accent/10 p-4"
                     >
-                      <FluentEmoji emoji={CATEGORY_EMOJI[cat] || '📌'} size={16} />
-                      {CATEGORY_LABELS[cat] || cat}
-                    </div>
+                      <div className="w-10 h-10 rounded-xl bg-accent/15 flex items-center justify-center shrink-0">
+                        <FluentEmoji emoji={CATEGORY_EMOJI[cat] || '📌'} size={22} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-[15px] text-foreground">
+                          {CATEGORY_LABELS[cat] || cat}
+                        </p>
+                        <p className="text-[13px] text-muted-foreground mt-0.5 leading-snug">
+                          {CATEGORY_DESCRIPTIONS[cat] || "This area needs your attention."}
+                        </p>
+                      </div>
+                    </motion.div>
                   ))}
-                </motion.div>
+                </div>
+
+                {/* Motivational closer */}
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="mt-5 text-center text-sm text-muted-foreground"
+                >
+                  Small changes here will make the biggest difference ✨
+                </motion.p>
 
                 <div className="mt-auto pt-6">
                   <button

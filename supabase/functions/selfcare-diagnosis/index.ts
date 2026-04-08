@@ -38,27 +38,43 @@ const WIN_MAP: Record<string, string[]> = {
 };
 
 const DEEPER_MAP: Record<string, string[]> = {
-  // Body
   "Can't fall asleep / stay asleep": ["sleep", "Evening"],
   "No energy to exercise": ["Exercise", "movement"],
   "Eating poorly or skipping meals": ["nutrition"],
   "Just feeling physically run down": ["sleep", "movement", "nutrition"],
-  // Mind
   "A way to quiet racing thoughts": ["calm", "Presence"],
   "Permission to rest without guilt": ["self-kindness", "calm"],
   "More moments of gratitude": ["gratitude", "Presence"],
   "Reconnecting with myself": ["self-kindness", "gratitude"],
-  // Environment
   "My space is a mess": ["TidyUp"],
   "I have no real routine": ["productivity", "Evening"],
   "I keep skipping basic self-care": ["hygiene", "self-kindness"],
   "My evenings are chaotic": ["Evening", "calm"],
-  // People
   "Quality time with loved ones": ["LovedOnes", "connection"],
   "Feeling seen and supported": ["connection", "self-kindness"],
   "Making effort to stay in touch": ["connection"],
   "Taking care of someone I love": ["LovedOnes"],
 };
+
+// ─── Cluster mapping ──────────────────────────────────────────
+
+const CLUSTER_MAP: Record<string, string> = {
+  sleep: "body", nutrition: "body", movement: "body", Exercise: "body",
+  calm: "mind", Presence: "mind", gratitude: "mind", "self-kindness": "mind",
+  TidyUp: "environment", productivity: "environment", hygiene: "environment", Evening: "environment",
+  connection: "people", LovedOnes: "people",
+  "easy-win": "environment",
+};
+
+function getTopCluster(gaps: string[]): string {
+  const clusterScores: Record<string, number> = { body: 0, mind: 0, environment: 0, people: 0 };
+  for (const gap of gaps) {
+    const cluster = CLUSTER_MAP[gap] || "mind";
+    clusterScores[cluster] += 1;
+  }
+  const sorted = Object.entries(clusterScores).sort((a, b) => b[1] - a[1]);
+  return sorted[0]?.[0] || "mind";
+}
 
 // ─── Handler ───────────────────────────────────────────────────
 
@@ -69,9 +85,6 @@ serve(async (req) => {
     const authHeader = req.headers.get("Authorization");
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
-
-    if (!lovableApiKey) throw new Error("LOVABLE_API_KEY not configured");
 
     let userId: string | null = null;
     if (authHeader) {
@@ -113,6 +126,8 @@ serve(async (req) => {
 
     if (sortedGaps.length === 0) sortedGaps.push("calm", "sleep");
 
+    const topCluster = getTopCluster(sortedGaps);
+
     // ─── Fetch suggested tasks ─────────────────────────────────
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -136,86 +151,6 @@ serve(async (req) => {
       if (suggestedTasks.length >= 8) break;
     }
 
-    // ─── Previous results for returning users ──────────────────
-    let prevResults: any[] | null = null;
-    let completionContext = "";
-    if (userId) {
-      const { data } = await adminClient
-        .from("selfcare_quiz_results")
-        .select("gap_categories, ai_insight, created_at")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
-        .limit(1);
-      prevResults = data;
-
-      try {
-        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-        const { data: completions } = await adminClient.rpc("get_selfcare_completion_stats" as any, {
-          p_user_id: userId,
-          p_categories: sortedGaps,
-          p_since: thirtyDaysAgo,
-        });
-        if (completions) {
-          completionContext = `\nTask completion stats (last 30 days): ${JSON.stringify(completions)}`;
-        }
-      } catch {
-        // RPC may not exist yet
-      }
-    }
-
-    // ─── AI prompt ─────────────────────────────────────────────
-    const prevContext = prevResults?.[0]
-      ? `\nPrevious quiz result (${prevResults[0].created_at}): gaps were [${prevResults[0].gap_categories?.join(", ")}]. Previous insight: "${prevResults[0].ai_insight}"`
-      : "";
-
-    const systemPrompt = `You are a warm, insightful self-care coach for the Ladybosslook app. 
-You speak in a supportive, friendly tone — like a caring friend who gets it.
-Write in the user's perspective. Be specific, not generic.
-Keep it to 2-3 sentences max.${prevContext ? "\nThis is a RETURNING user. Acknowledge their progress or patterns compared to last time." : ""}`;
-
-    const userPrompt = `Based on this self-care diagnostic quiz:
-- What's weighing on them: ${weighingAnswer || "not specified"}
-- Neglecting: ${neglectingAnswers.join(", ") || "none selected"}
-- What would feel like a win: ${winAnswer || "not specified"}
-- Deeper struggle: ${deeperAnswer || "not specified"}
-- Top gap categories: ${sortedGaps.join(", ")}${prevContext}${completionContext}
-
-Write a personalized 2-3 sentence insight about what area of their life needs attention and why these specific habits matter. Don't list the categories — weave them naturally into the message.`;
-
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${lovableApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-      }),
-    });
-
-    if (!aiResponse.ok) {
-      const status = aiResponse.status;
-      if (status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limited, please try again later." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      console.error("AI error:", status, await aiResponse.text());
-      throw new Error("AI generation failed");
-    }
-
-    const aiData = await aiResponse.json();
-    const aiInsight = aiData.choices?.[0]?.message?.content || "Take a moment to check in with yourself today. Small steps lead to big changes.";
-
     // ─── Save result ───────────────────────────────────────────
     const suggestedTaskIds = suggestedTasks.map(t => t.id);
     if (userId) {
@@ -223,14 +158,14 @@ Write a personalized 2-3 sentence insight about what area of their life needs at
         user_id: userId,
         answers,
         gap_categories: sortedGaps,
-        ai_insight: aiInsight,
+        ai_insight: null,
         suggested_task_ids: suggestedTaskIds,
       });
     }
 
     return new Response(JSON.stringify({
       gap_categories: sortedGaps,
-      ai_insight: aiInsight,
+      top_cluster: topCluster,
       suggested_tasks: suggestedTasks,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
