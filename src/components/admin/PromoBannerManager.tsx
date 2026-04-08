@@ -480,7 +480,7 @@ export function PromoBannerManager() {
     setEditingBanner(banner);
     setCoverImageUrl(banner.cover_image_url);
     setDestinationType(banner.destination_type);
-    setDestinationId(banner.destination_id || '');
+    setDestinationId(banner.destination_type === 'onboarding' && banner.custom_url === 'selfcare-quiz' ? 'selfcare-quiz' : (banner.destination_id || ''));
     setCustomUrl(banner.custom_url || '');
     setDisplayFrequency(banner.display_frequency);
     setAspectRatio(banner.aspect_ratio || '3:1');
