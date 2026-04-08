@@ -56,6 +56,7 @@ const STEP_TYPE_EMOJI: Record<string, string> = {
 
 export function OnboardingFlowCard({ flow, onPreview, isDefault, onSetDefault }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const navigate = useNavigate();
 
   const handlePreviewStep = (stepIndex: number) => {
     window.open(`/app/onboarding/${flow.id}?step=${stepIndex}`, '_blank');
@@ -100,7 +101,7 @@ export function OnboardingFlowCard({ flow, onPreview, isDefault, onSetDefault }:
             <Button
               variant="outline"
               size="sm"
-              onClick={(e) => { e.stopPropagation(); window.open(`/app/onboarding/${flow.id}`, '_blank'); }}
+              onClick={(e) => { e.stopPropagation(); navigate(`/app/onboarding/${flow.id}`); }}
               className="text-xs"
             >
               Open in App
