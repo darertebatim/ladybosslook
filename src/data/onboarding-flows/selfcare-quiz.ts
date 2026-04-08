@@ -1,4 +1,5 @@
 import type { OnboardingFlow } from '@/types/onboarding';
+import selfcareQuizHero from '@/assets/selfcare-quiz-hero.png';
 
 export const selfcareQuizFlow: OnboardingFlow = {
   id: 'selfcare-quiz',
