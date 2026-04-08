@@ -22,7 +22,17 @@ export const selfcareQuizFlow: OnboardingFlow = {
       title: "Your problem isn't\nproductivity.",
       subtitle: "It's that one part of your life is quietly falling apart.",
       buttonLabel: "Tell me more →",
-    },
+      badges: [
+        { emoji: '😴', label: 'Sleep' },
+        { emoji: '🧘', label: 'Calm' },
+        { emoji: '💪', label: 'Movement' },
+        { emoji: '🧴', label: 'Hygiene' },
+        { emoji: '🥗', label: 'Nutrition' },
+        { emoji: '💬', label: 'Connection' },
+        { emoji: '🧹', label: 'Tidy Up' },
+        { emoji: '💚', label: 'Self-Kindness' },
+      ],
+    } as any,
     {
       id: 'sc-drain',
       type: 'single-select',
