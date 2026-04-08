@@ -34,6 +34,8 @@ const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
   { value: 'routines_top', label: '✨ Routines - Top' },
   { value: 'routines_after_categories', label: '✨ Routines - Under Categories' },
   { value: 'routine_player', label: '🎬 Routine Player' },
+  { value: 'tasks_bank_top', label: '☑️ Tasks Bank - Top' },
+  { value: 'tasks_bank_after_categories', label: '☑️ Tasks Bank - Under Categories' },
 ];
 
 interface PromoBanner {
