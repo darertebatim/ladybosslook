@@ -141,6 +141,8 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <SelfCareDiagnosisStep step={step} onNext={onNext} onAnswer={onAnswer} answers={answers} />;
     case 'selfcare-suggestions':
       return <SelfCareSuggestionsStep step={step} onNext={onNext} answers={answers} />;
+    case 'dynamic-single-select':
+      return <DynamicSingleSelectScreen step={step} onNext={onNext} onAnswer={onAnswer} answers={answers} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }
