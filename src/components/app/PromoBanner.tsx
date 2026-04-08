@@ -14,7 +14,7 @@ type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools'
 interface PromoBannerData {
   id: string;
   cover_image_url: string;
-  destination_type: 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'mood' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist' | 'routine_player' | 'audio_track' | 'video_track' | 'selfcare_quiz';
+  destination_type: 'routine' | 'playlist' | 'journal' | 'programs' | 'breathe' | 'water' | 'channels' | 'home' | 'inspire' | 'custom_url' | 'tasks' | 'routines_hub' | 'tasks_bank' | 'breathe_exercise' | 'external_url' | 'emotion' | 'mood' | 'period' | 'chat' | 'profile' | 'planner' | 'rate' | 'onboarding' | 'watch' | 'video_playlist' | 'routine_player' | 'audio_track' | 'video_track';
   destination_id: string | null;
   custom_url: string | null;
   display_frequency: 'once' | 'daily' | 'weekly' | 'forever';
@@ -409,7 +409,11 @@ export function PromoBanner({
         break;
       case 'rate': navigate('/app/rate'); break;
       case 'onboarding':
-        if (banner.destination_id) navigate(`/app/onboarding/${banner.destination_id}`);
+        if (banner.destination_id === 'selfcare-quiz') {
+          navigate('/app/onboarding/selfcare-quiz');
+        } else if (banner.destination_id) {
+          navigate(`/app/onboarding/${banner.destination_id}`);
+        }
         break;
       case 'watch': navigate('/app/watch'); break;
       case 'video_playlist':

@@ -555,6 +555,7 @@ export function PromoBannerManager() {
       case 'onboarding':
         const onboardingFlows = [dearMeFlow, mePlusFlow];
         const obFlow = onboardingFlows.find(f => f.id === banner.destination_id);
+        if (banner.destination_id === 'selfcare-quiz') return '🩺 Self-Care Quiz';
         return obFlow ? `🎯 ${obFlow.name}` : 'Unknown Flow';
       case 'watch':
         return 'Watch Page';
@@ -910,6 +911,9 @@ export function PromoBannerManager() {
                       {destinationType === 'onboarding' && [dearMeFlow, mePlusFlow].map(f => (
                         <SelectItem key={f.id} value={f.id}>🎯 {f.name}</SelectItem>
                       ))}
+                      {destinationType === 'onboarding' && (
+                        <SelectItem value="selfcare-quiz">🩺 Self-Care Quiz</SelectItem>
+                      )}
                       {destinationType === 'video_playlist' && videoPlaylists?.map(p => (
                         <SelectItem key={p.id} value={p.id}>🎬 {p.name}</SelectItem>
                       ))}
