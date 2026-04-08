@@ -292,7 +292,12 @@ function CategoriesManager() {
               {categories.map((cat) => (
                 <TableRow key={cat.id}>
                   <TableCell><DisplayIcon icon={cat.icon} size={28} /></TableCell>
-                  <TableCell className="font-medium">{cat.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <div>{cat.name}</div>
+                    {cat.description && (
+                      <div className="text-xs text-muted-foreground mt-0.5 max-w-[200px] truncate">{cat.description}</div>
+                    )}
+                  </TableCell>
                   <TableCell className="text-muted-foreground">{cat.slug}</TableCell>
                   <TableCell>
                     <div className={`w-6 h-6 rounded ${TASK_COLOR_CLASSES[cat.color as TaskColor] || 'bg-gray-200'}`} />
@@ -403,6 +408,14 @@ function CategoriesManager() {
                 placeholder="e.g. self-care, wellness"
               />
             </div>
+            <div>
+              <Label>Description</Label>
+              <textarea
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Brief description of this category..."
+              />
             <div className="flex items-center gap-2">
               <Switch
                 checked={formData.is_active}
