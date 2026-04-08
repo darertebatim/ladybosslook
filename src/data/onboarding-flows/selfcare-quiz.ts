@@ -8,6 +8,14 @@ export const selfcareQuizFlow: OnboardingFlow = {
   createdAt: '2026-04-07',
   steps: [
     {
+      id: 'sc-intro',
+      type: 'motivational',
+      illustrationLabel: 'selfcare-quiz',
+      title: "What's Missing?",
+      subtitle: "Our AI analyzes your lifestyle to find the perfect **self-care goals** just for you — in under a minute.",
+      buttonLabel: "Let's find out →",
+    },
+    {
       id: 'sc-hook',
       type: 'motivational',
       illustrationLabel: 'selfcare-quiz',
@@ -30,14 +38,6 @@ export const selfcareQuizFlow: OnboardingFlow = {
         { emoji: '📋', label: 'Productivity' },
       ],
     } as any,
-    {
-      id: 'sc-intro',
-      type: 'motivational',
-      illustrationLabel: 'selfcare-quiz',
-      title: "What's Missing?",
-      subtitle: "Our AI analyzes your lifestyle to find the perfect **self-care goals** just for you — in under a minute.",
-      buttonLabel: "Let's find out →",
-    },
     {
       id: 'sc-drain',
       type: 'single-select',
