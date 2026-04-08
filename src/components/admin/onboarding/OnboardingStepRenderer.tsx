@@ -28,6 +28,7 @@ function OptionEmoji({ emoji, size }: { emoji: string; size: number }) {
   return <FluentEmoji emoji={emoji} size={size} />;
 }
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
+import selfcareQuizHero from '@/assets/selfcare-quiz-hero.png';
 import appIcon from '@/assets/app-icon.png';
 import SealCheck from '@/components/app/SealCheck';
 import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
