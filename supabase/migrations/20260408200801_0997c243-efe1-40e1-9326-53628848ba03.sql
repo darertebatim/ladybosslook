@@ -1,0 +1,1 @@
+ALTER TABLE public.routine_categories ADD COLUMN description text;
