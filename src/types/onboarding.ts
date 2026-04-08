@@ -90,6 +90,7 @@ export interface OnboardingStep {
   afterItems?: string[];
   summaryBars?: { label: string; value: number; status: string }[];
   statBadges?: { label: string; value: string }[];
+  variants?: OnboardingOptionVariant[];
 }
 
 export type OnboardingAnswers = Record<string, string | string[]>;
