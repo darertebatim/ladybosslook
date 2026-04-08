@@ -61,6 +61,7 @@ interface RoutineCategory {
   task_display_order: number;
   is_active: boolean;
   tags: string[];
+  description: string | null;
 }
 
 // =====================================
@@ -149,6 +150,7 @@ function CategoriesManager() {
     task_display_order: 0,
     is_active: true,
     tags: [] as string[],
+    description: '',
   });
 
   const { data: categories, isLoading } = useQuery({
@@ -213,6 +215,7 @@ function CategoriesManager() {
       task_display_order: (categories?.length || 0) + 1,
       is_active: true,
       tags: [],
+      description: '',
     });
     setIsDialogOpen(true);
   };
@@ -228,6 +231,7 @@ function CategoriesManager() {
       task_display_order: cat.task_display_order ?? 0,
       is_active: cat.is_active,
       tags: cat.tags || [],
+      description: cat.description || '',
     });
     setIsDialogOpen(true);
   };
@@ -288,7 +292,12 @@ function CategoriesManager() {
               {categories.map((cat) => (
                 <TableRow key={cat.id}>
                   <TableCell><DisplayIcon icon={cat.icon} size={28} /></TableCell>
-                  <TableCell className="font-medium">{cat.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <div>{cat.name}</div>
+                    {cat.description && (
+                      <div className="text-xs text-muted-foreground mt-0.5 max-w-[200px] truncate">{cat.description}</div>
+                    )}
+                  </TableCell>
                   <TableCell className="text-muted-foreground">{cat.slug}</TableCell>
                   <TableCell>
                     <div className={`w-6 h-6 rounded ${TASK_COLOR_CLASSES[cat.color as TaskColor] || 'bg-gray-200'}`} />
@@ -397,6 +406,15 @@ function CategoriesManager() {
                 value={formData.tags.join(', ')}
                 onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) }))}
                 placeholder="e.g. self-care, wellness"
+              />
+            </div>
+            <div>
+              <Label>Description</Label>
+              <textarea
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Brief description of this category..."
               />
             </div>
             <div className="flex items-center gap-2">

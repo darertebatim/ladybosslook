@@ -1,0 +1,13 @@
+UPDATE routine_categories SET description = 'Daily personal care basics — brushing teeth, skincare, showering, and keeping your space fresh.' WHERE slug = 'hygiene';
+UPDATE routine_categories SET description = 'Nurturing relationships through compliments, check-ins, quality time, and meaningful conversations with loved ones.' WHERE slug = 'connection';
+UPDATE routine_categories SET description = 'Stress relief and nervous system regulation — breathing exercises, mindfulness, screen breaks, and peaceful moments.' WHERE slug = 'calm';
+UPDATE routine_categories SET description = 'Building self-compassion through affirmations, celebrating wins, self-acceptance, and treating yourself with gentleness.' WHERE slug = 'self-kindness';
+UPDATE routine_categories SET description = 'Shifting focus to the positive — appreciating small joys, expressing thanks, and recognizing what''s going well.' WHERE slug = 'gratitude';
+UPDATE routine_categories SET description = 'Getting your body moving — walks, stretches, dancing, and simple exercises to boost energy and mood.' WHERE slug = 'movement';
+UPDATE routine_categories SET description = 'Nourishing your body with intention — hydration, mindful eating, meal planning, and healthier food choices.' WHERE slug = 'nutrition';
+UPDATE routine_categories SET description = 'Getting things done with focus — goal setting, time management, decluttering, and building momentum on tasks.' WHERE slug = 'productivity';
+UPDATE routine_categories SET description = 'Being fully in the moment — reducing screen time, savoring experiences, and engaging in hobbies and creativity.' WHERE slug = 'Presence';
+UPDATE routine_categories SET description = 'Building a better sleep foundation — consistent schedule, wind-down rituals, light management, and sleep hygiene.' WHERE slug = 'sleep';
+UPDATE routine_categories SET description = 'Evening wind-down rituals — journaling, dimming lights, disconnecting from screens, and preparing for restful sleep.' WHERE slug = 'Night';
+UPDATE routine_categories SET description = 'The gentlest starting point — surviving the day, breathing, getting out of bed, and showing up for yourself.' WHERE slug = 'easy-win';
+UPDATE routine_categories SET description = 'Creating order in your space — making your bed, doing laundry, cleaning surfaces, and organizing your environment.' WHERE slug = 'TidyUp';
