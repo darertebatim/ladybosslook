@@ -97,6 +97,14 @@ export function OnboardingFlowCard({ flow, onPreview, isDefault, onSetDefault }:
               Preview <ArrowRight className="h-4 w-4 ml-1" />
             </Button>
             <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => { e.stopPropagation(); window.open(`/app/onboarding/${flow.id}`, '_blank'); }}
+              className="text-xs"
+            >
+              Open in App
+            </Button>
+            <Button
               variant="ghost"
               size="icon"
               className="h-8 w-8"
