@@ -819,30 +819,81 @@ function MotivationalScreen({ step, onNext }: Props) {
     );
   }
 
-  // Bottom-sheet layout when illustrationLabel is set (selfcare-quiz, etc.)
+  // Hero + Bottom Sheet layout when illustrationLabel is set (selfcare-quiz, etc.)
+  // Matches the Weekly Review "Hooray" design: 40% hero image, 60% white sheet
   if (step.illustrationLabel) {
+    // Helper to render subtitle with highlighted keywords
+    const renderSubtitle = (text: string) => {
+      // Highlight text wrapped in **bold**
+      const parts = text.split(/(\*\*[^*]+\*\*)/g);
+      return parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <span key={i} className="font-extrabold text-foreground">{part.slice(2, -2)}</span>;
+        }
+        return <span key={i}>{part}</span>;
+      });
+    };
+
     return (
-      <BottomSheetWrapper bgImage={step.image || meplusMascotBg}>
-        <FadeUp>
-          <h1 className="text-[24px] font-extrabold text-foreground text-center mb-2 leading-tight whitespace-pre-line">{step.title}</h1>
-        </FadeUp>
-        {step.subtitle && (
-          <FadeUp delay={0.08}>
-            <p className="text-[15px] text-muted-foreground leading-relaxed text-center mb-4 whitespace-pre-line">{step.subtitle}</p>
-          </FadeUp>
-        )}
-        {descMatch && (
-          <FadeUp delay={0.15}>
-            <p className="text-[15px] text-muted-foreground leading-relaxed text-center mb-4">
-              <span className="text-foreground font-extrabold text-2xl">{descMatch[1]}</span>{' '}
-              {descMatch[2]}
-            </p>
-          </FadeUp>
-        )}
-        <FadeUp delay={0.25} className="mt-auto">
-          <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
-        </FadeUp>
-      </BottomSheetWrapper>
+      <div className="h-full flex flex-col relative overflow-hidden">
+        {/* Hero image — 40% height */}
+        <div className="shrink-0 relative" style={{ height: '40%' }}>
+          <img
+            src={step.image || meplusMascotBg}
+            alt=""
+            className="w-full h-full object-cover"
+            style={{ objectPosition: 'center 35%' }}
+          />
+        </div>
+
+        {/* Bottom sheet — 60% */}
+        <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col">
+          <div className="px-6 pt-7 pb-5 flex flex-col flex-1">
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="text-center mb-4"
+            >
+              <h1 className="text-[32px] font-extrabold text-foreground leading-tight whitespace-pre-line">
+                {step.title}
+              </h1>
+            </motion.div>
+
+            {step.subtitle && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="text-center mb-6"
+              >
+                <p className="text-[16px] text-foreground/80 leading-relaxed whitespace-pre-line">
+                  {renderSubtitle(step.subtitle)}
+                </p>
+              </motion.div>
+            )}
+
+            {/* Button pinned at bottom */}
+            <div className="mt-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.25 }}
+              >
+                <button
+                  onClick={onNext}
+                  className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base flex items-center justify-center gap-3 active:scale-[0.98] transition-all shadow-lg"
+                >
+                  {step.buttonLabel || 'Continue'}
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </button>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
