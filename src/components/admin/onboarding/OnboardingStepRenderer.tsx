@@ -840,7 +840,7 @@ function MotivationalScreen({ step, onNext }: Props) {
         {/* Hero image — 40% height */}
         <div className="shrink-0 relative" style={{ height: step.id === 'sc-intro' ? '50%' : '40%' }}>
           <img
-            src={step.image || meplusMascotBg}
+            src={step.id === 'sc-intro' ? selfcareQuizHero : (step.image || meplusMascotBg)}
             alt=""
             className="w-full h-full object-cover"
             style={{ objectPosition: 'center 35%' }}
