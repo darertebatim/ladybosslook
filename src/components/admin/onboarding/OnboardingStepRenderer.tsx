@@ -22,6 +22,7 @@ import { WeekCelebrationStep } from '@/components/app/weekly-review/WeekCelebrat
 import { SelfCareDiagnosisStep } from '@/components/app/selfcare-quiz/SelfCareDiagnosisStep';
 import { SelfCareSuggestionsStep } from '@/components/app/selfcare-quiz/SelfCareSuggestionsStep';
 import { PersianFlag } from '@/components/ui/PersianFlag';
+import { computeTopCluster } from '@/utils/selfcare-scoring';
 
 function OptionEmoji({ emoji, size }: { emoji: string; size: number }) {
   if (emoji === 'flag:persian') return <PersianFlag size={size} />;
@@ -141,6 +142,8 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <SelfCareDiagnosisStep step={step} onNext={onNext} onAnswer={onAnswer} answers={answers} />;
     case 'selfcare-suggestions':
       return <SelfCareSuggestionsStep step={step} onNext={onNext} answers={answers} />;
+    case 'dynamic-single-select':
+      return <DynamicSingleSelectScreen step={step} onNext={onNext} onAnswer={onAnswer} answers={answers} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }
@@ -3819,5 +3822,51 @@ function RoutineReadyTeaserScreen({ step, onNext }: Props) {
         <NavyButton onClick={onNext}>{step.buttonLabel || 'See My Routine'}</NavyButton>
       </FadeUp>
     </ScreenWrapper>
+  );
+}
+
+function DynamicSingleSelectScreen({ step, onNext, onAnswer, answers }: Props) {
+  const cluster = useMemo(() => computeTopCluster(answers || {}), [answers]);
+  const variant = step.variants?.find(v => v.cluster === cluster) || step.variants?.[0];
+  
+  if (!variant) {
+    return <div className="flex items-center justify-center h-full text-sm text-muted-foreground">No variants configured</div>;
+  }
+
+  const handleSelect = (label: string) => {
+    onAnswer?.(step.id, label);
+    haptic.light();
+    setTimeout(onNext, 350);
+  };
+
+  return (
+    <div className="h-full flex flex-col relative overflow-hidden">
+      <div className="shrink-0 relative" style={{ height: '40%' }}>
+        <img src={meplusMascotBg} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
+      </div>
+      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-y-auto overscroll-contain">
+        <div className="px-5 pt-5 pb-5 flex flex-col flex-1" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
+          <FadeUp>
+            <h1 className="text-[22px] font-extrabold text-foreground mb-1">{variant.title}</h1>
+          </FadeUp>
+          <FadeUp delay={0.05}>
+            <p className="text-sm text-muted-foreground mb-5">Choose the one that resonates most</p>
+          </FadeUp>
+          <StaggerContainer className="space-y-2.5 flex-1" staggerDelay={0.08}>
+            {variant.options.map((opt) => (
+              <StaggerItem key={opt.label}>
+                <button
+                  onClick={() => handleSelect(opt.label)}
+                  className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl border border-border bg-card text-left active:scale-[0.98] transition-all hover:border-primary/30"
+                >
+                  {opt.emoji && <OptionEmoji emoji={opt.emoji} size={24} />}
+                  <span className="text-[15px] font-semibold text-foreground">{opt.label}</span>
+                </button>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        </div>
+      </div>
+    </div>
   );
 }

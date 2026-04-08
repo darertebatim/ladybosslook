@@ -7,6 +7,61 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// ─── Scoring Maps ──────────────────────────────────────────────
+
+const WEIGHING_MAP: Record<string, string[]> = {
+  "Stress that won't quit": ["calm", "sleep", "Evening"],
+  "Running on empty": ["sleep", "nutrition", "movement"],
+  "Overstimulated & unfocused": ["Presence", "calm", "productivity"],
+  "Feeling alone or disconnected": ["connection", "LovedOnes", "self-kindness"],
+  "Everything feels messy": ["TidyUp", "productivity", "hygiene"],
+};
+
+const NEGLECTING_MAP: Record<string, string[]> = {
+  "Sleep & rest": ["sleep", "Evening"],
+  "Water & nutrition": ["nutrition"],
+  "Moving your body": ["movement", "Exercise"],
+  "Skincare & grooming": ["hygiene"],
+  "Moments of stillness": ["calm", "Presence"],
+  "Connecting with someone": ["connection"],
+  "Tidying your space": ["TidyUp", "productivity"],
+  "Being kind to yourself": ["self-kindness", "gratitude"],
+  "Caring for loved ones": ["LovedOnes", "connection"],
+};
+
+const WIN_MAP: Record<string, string[]> = {
+  "A real morning routine": ["movement", "hygiene", "Evening", "easy-win"],
+  "A calmer, clearer mind": ["calm", "gratitude", "Presence"],
+  "Taking better care of my body": ["Exercise", "nutrition", "sleep"],
+  "Reconnecting with my people": ["connection", "LovedOnes", "self-kindness"],
+  "Just getting back on track": ["easy-win", "TidyUp", "productivity"],
+};
+
+const DEEPER_MAP: Record<string, string[]> = {
+  // Body
+  "Can't fall asleep / stay asleep": ["sleep", "Evening"],
+  "No energy to exercise": ["Exercise", "movement"],
+  "Eating poorly or skipping meals": ["nutrition"],
+  "Just feeling physically run down": ["sleep", "movement", "nutrition"],
+  // Mind
+  "A way to quiet racing thoughts": ["calm", "Presence"],
+  "Permission to rest without guilt": ["self-kindness", "calm"],
+  "More moments of gratitude": ["gratitude", "Presence"],
+  "Reconnecting with myself": ["self-kindness", "gratitude"],
+  // Environment
+  "My space is a mess": ["TidyUp"],
+  "I have no real routine": ["productivity", "Evening"],
+  "I keep skipping basic self-care": ["hygiene", "self-kindness"],
+  "My evenings are chaotic": ["Evening", "calm"],
+  // People
+  "Quality time with loved ones": ["LovedOnes", "connection"],
+  "Feeling seen and supported": ["connection", "self-kindness"],
+  "Making effort to stay in touch": ["connection"],
+  "Taking care of someone I love": ["LovedOnes"],
+};
+
+// ─── Handler ───────────────────────────────────────────────────
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -18,7 +73,6 @@ serve(async (req) => {
 
     if (!lovableApiKey) throw new Error("LOVABLE_API_KEY not configured");
 
-    // Auth: get user from token (optional — quiz works without login too)
     let userId: string | null = null;
     if (authHeader) {
       const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
@@ -30,63 +84,26 @@ serve(async (req) => {
     }
 
     const { answers } = await req.json();
-    // answers: { "sc-drain": "Stress & anxiety", "sc-morning": "Peaceful & slow", "sc-skipping": ["Getting enough sleep", ...] }
 
-    // Category mapping
-    const DRAIN_MAP: Record<string, string[]> = {
-      "Stress & anxiety": ["calm", "sleep", "Night"],
-      "Constant tiredness": ["sleep", "nutrition", "movement", "Night"],
-      "Screen overload": ["Presence", "calm", "productivity"],
-      "Feeling disconnected": ["connection", "self-kindness"],
-    };
-    const MORNING_MAP: Record<string, string[]> = {
-      "Peaceful & slow": ["calm", "gratitude", "Night"],
-      "Active & energized": ["Exercise", "movement"],
-      "Fresh & put-together": ["hygiene", "self-kindness"],
-      "Organized & productive": ["productivity", "TidyUp"],
-    };
-    const SKIP_MAP: Record<string, string[]> = {
-      "Getting enough sleep": ["sleep", "Night"],
-      "Drinking water": ["nutrition"],
-      "Moving your body": ["movement", "Exercise"],
-      "Skincare / grooming": ["hygiene"],
-      "A moment of silence": ["calm", "Presence"],
-      "Connecting with someone": ["connection"],
-      "Tidying your space": ["TidyUp", "productivity"],
-      "Doing something kind for yourself": ["self-kindness", "gratitude"],
-    };
-
-    const PROUD_MAP: Record<string, string[]> = {
-      "A real morning routine": ["movement", "hygiene", "Night"],
-      "Taking care of my mind": ["calm", "gratitude", "Presence"],
-      "Taking care of my body": ["Exercise", "nutrition", "sleep"],
-      "Reconnecting with people": ["connection", "TidyUp"],
-    };
-
-    // Score categories
+    // ─── Score categories ──────────────────────────────────────
     const scores: Record<string, number> = {};
     const addScore = (cats: string[], weight: number) => {
       for (const c of cats) scores[c] = (scores[c] || 0) + weight;
     };
 
-    const drainAnswer = answers?.["sc-drain"];
-    if (drainAnswer && DRAIN_MAP[drainAnswer]) addScore(DRAIN_MAP[drainAnswer], 2);
-
-    const morningAnswer = answers?.["sc-morning"];
-    if (morningAnswer && MORNING_MAP[morningAnswer]) addScore(MORNING_MAP[morningAnswer], 1);
-
-    const skippingAnswers: string[] = answers?.["sc-skipping"] || [];
-    for (const s of skippingAnswers) {
-      if (SKIP_MAP[s]) addScore(SKIP_MAP[s], 3);
-    }
+    const weighingAnswer = answers?.["sc-weighing"];
+    if (weighingAnswer && WEIGHING_MAP[weighingAnswer]) addScore(WEIGHING_MAP[weighingAnswer], 3);
 
     const neglectingAnswers: string[] = answers?.["sc-neglecting"] || [];
     for (const s of neglectingAnswers) {
-      if (SKIP_MAP[s]) addScore(SKIP_MAP[s], 3);
+      if (NEGLECTING_MAP[s]) addScore(NEGLECTING_MAP[s], 3);
     }
 
-    const proudAnswer = answers?.["sc-proud"];
-    if (proudAnswer && PROUD_MAP[proudAnswer]) addScore(PROUD_MAP[proudAnswer], 2);
+    const winAnswer = answers?.["sc-win"];
+    if (winAnswer && WIN_MAP[winAnswer]) addScore(WIN_MAP[winAnswer], 2);
+
+    const deeperAnswer = answers?.["sc-deeper"];
+    if (deeperAnswer && DEEPER_MAP[deeperAnswer]) addScore(DEEPER_MAP[deeperAnswer], 3);
 
     // Top gap categories
     const sortedGaps = Object.entries(scores)
@@ -96,10 +113,9 @@ serve(async (req) => {
 
     if (sortedGaps.length === 0) sortedGaps.push("calm", "sleep");
 
-    // Fetch self-care tagged categories to get their slugs
+    // ─── Fetch suggested tasks ─────────────────────────────────
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Fetch matching tasks from admin_task_bank
     const { data: tasks } = await adminClient
       .from("admin_task_bank")
       .select("id, title, emoji, category, description, color, repeat_pattern, time_period")
@@ -108,7 +124,6 @@ serve(async (req) => {
       .order("is_popular", { ascending: false })
       .limit(30);
 
-    // Pick top 5 unique tasks spread across gap categories
     const suggestedTasks: typeof tasks = [];
     const usedIds = new Set<string>();
     for (const gap of sortedGaps) {
@@ -121,7 +136,7 @@ serve(async (req) => {
       if (suggestedTasks.length >= 8) break;
     }
 
-    // Fetch previous quiz results for returning users
+    // ─── Previous results for returning users ──────────────────
     let prevResults: any[] | null = null;
     let completionContext = "";
     if (userId) {
@@ -133,7 +148,6 @@ serve(async (req) => {
         .limit(1);
       prevResults = data;
 
-      // Fetch task completion stats per gap category (last 30 days)
       try {
         const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
         const { data: completions } = await adminClient.rpc("get_selfcare_completion_stats" as any, {
@@ -145,11 +159,11 @@ serve(async (req) => {
           completionContext = `\nTask completion stats (last 30 days): ${JSON.stringify(completions)}`;
         }
       } catch {
-        // RPC may not exist yet, skip
+        // RPC may not exist yet
       }
     }
 
-    // Build AI prompt
+    // ─── AI prompt ─────────────────────────────────────────────
     const prevContext = prevResults?.[0]
       ? `\nPrevious quiz result (${prevResults[0].created_at}): gaps were [${prevResults[0].gap_categories?.join(", ")}]. Previous insight: "${prevResults[0].ai_insight}"`
       : "";
@@ -160,10 +174,10 @@ Write in the user's perspective. Be specific, not generic.
 Keep it to 2-3 sentences max.${prevContext ? "\nThis is a RETURNING user. Acknowledge their progress or patterns compared to last time." : ""}`;
 
     const userPrompt = `Based on this self-care diagnostic quiz:
-- Main drain: ${drainAnswer || "not specified"}
-- Ideal morning: ${morningAnswer || "not specified"}  
-- Skipping: ${skippingAnswers.join(", ") || "none selected"}
-- Haven't done in a while: ${neglectingAnswers.join(", ") || "none selected"}
+- What's weighing on them: ${weighingAnswer || "not specified"}
+- Neglecting: ${neglectingAnswers.join(", ") || "none selected"}
+- What would feel like a win: ${winAnswer || "not specified"}
+- Deeper struggle: ${deeperAnswer || "not specified"}
 - Top gap categories: ${sortedGaps.join(", ")}${prevContext}${completionContext}
 
 Write a personalized 2-3 sentence insight about what area of their life needs attention and why these specific habits matter. Don't list the categories — weave them naturally into the message.`;
@@ -202,7 +216,7 @@ Write a personalized 2-3 sentence insight about what area of their life needs at
     const aiData = await aiResponse.json();
     const aiInsight = aiData.choices?.[0]?.message?.content || "Take a moment to check in with yourself today. Small steps lead to big changes.";
 
-    // Save result (only if logged in)
+    // ─── Save result ───────────────────────────────────────────
     const suggestedTaskIds = suggestedTasks.map(t => t.id);
     if (userId) {
       await adminClient.from("selfcare_quiz_results").insert({
