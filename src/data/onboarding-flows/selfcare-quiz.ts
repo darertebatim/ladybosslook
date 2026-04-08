@@ -1,5 +1,4 @@
 import type { OnboardingFlow } from '@/types/onboarding';
-import selfcareQuizHero from '@/assets/selfcare-quiz-hero.png';
 
 export const selfcareQuizFlow: OnboardingFlow = {
   id: 'selfcare-quiz',
@@ -12,9 +11,8 @@ export const selfcareQuizFlow: OnboardingFlow = {
       id: 'sc-intro',
       type: 'motivational',
       illustrationLabel: 'selfcare-quiz',
-      image: selfcareQuizHero,
       title: "What's Missing?",
-      subtitle: "Our AI analyzes your lifestyle to find the perfect **self-care goals** just for you — in under a minute.",
+      subtitle: "Our AI analyzes your lifestyle to find the perfect **self-care goals** just for you — in under a minute.\n\n**Discover your Self-care Gaps in 1 min**",
       buttonLabel: "AI powered Analyze",
     },
     {
