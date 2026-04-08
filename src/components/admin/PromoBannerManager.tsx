@@ -319,16 +319,17 @@ export function PromoBannerManager() {
   // Create banner mutation
   const createMutation = useMutation({
     mutationFn: async () => {
-      const needsDestinationId = ['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist', 'audio_track', 'video_track'].includes(destinationType);
+      const isSelfcareQuiz = destinationType === 'onboarding' && destinationId === 'selfcare-quiz';
+      const needsDestinationId = !isSelfcareQuiz && ['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist', 'audio_track', 'video_track'].includes(destinationType);
       const needsCustomUrl = ['custom_url', 'external_url'].includes(destinationType);
-      if (needsDestinationId && !destinationId) {
+      if (!isSelfcareQuiz && ['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist', 'audio_track', 'video_track'].includes(destinationType) && !destinationId) {
         throw new Error(`Please select a ${destinationType.replace('_', ' ')} before saving`);
       }
       const { error } = await supabase.from('promo_banners').insert({
         cover_image_url: coverImageUrl,
         destination_type: destinationType,
         destination_id: needsDestinationId ? destinationId || null : null,
-        custom_url: needsCustomUrl ? customUrl : null,
+        custom_url: isSelfcareQuiz ? 'selfcare-quiz' : (needsCustomUrl ? customUrl : null),
         display_frequency: displayFrequency,
         aspect_ratio: aspectRatio,
         is_active: isActive,
@@ -367,16 +368,17 @@ export function PromoBannerManager() {
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!editingBanner) return;
-      const needsDestinationId = ['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist', 'audio_track', 'video_track'].includes(destinationType);
+      const isSelfcareQuiz = destinationType === 'onboarding' && destinationId === 'selfcare-quiz';
+      const needsDestinationId = !isSelfcareQuiz && ['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist', 'audio_track', 'video_track'].includes(destinationType);
       const needsCustomUrl = ['custom_url', 'external_url'].includes(destinationType);
-      if (needsDestinationId && !destinationId) {
+      if (!isSelfcareQuiz && ['playlist', 'tasks', 'routines_hub', 'breathe_exercise', 'onboarding', 'video_playlist', 'audio_track', 'video_track'].includes(destinationType) && !destinationId) {
         throw new Error(`Please select a ${destinationType.replace('_', ' ')} before saving`);
       }
       const { error } = await supabase.from('promo_banners').update({
         cover_image_url: coverImageUrl,
         destination_type: destinationType,
         destination_id: needsDestinationId ? destinationId || null : null,
-        custom_url: needsCustomUrl ? customUrl : null,
+        custom_url: isSelfcareQuiz ? 'selfcare-quiz' : (needsCustomUrl ? customUrl : null),
         display_frequency: displayFrequency,
         aspect_ratio: aspectRatio,
         is_active: isActive,
@@ -478,7 +480,7 @@ export function PromoBannerManager() {
     setEditingBanner(banner);
     setCoverImageUrl(banner.cover_image_url);
     setDestinationType(banner.destination_type);
-    setDestinationId(banner.destination_id || '');
+    setDestinationId(banner.destination_type === 'onboarding' && banner.custom_url === 'selfcare-quiz' ? 'selfcare-quiz' : (banner.destination_id || ''));
     setCustomUrl(banner.custom_url || '');
     setDisplayFrequency(banner.display_frequency);
     setAspectRatio(banner.aspect_ratio || '3:1');
@@ -556,8 +558,8 @@ export function PromoBannerManager() {
         return banner.custom_url || 'External URL';
       case 'onboarding':
         const onboardingFlows = [dearMeFlow, mePlusFlow];
+        if (banner.custom_url === 'selfcare-quiz') return '🩺 Self-Care Quiz';
         const obFlow = onboardingFlows.find(f => f.id === banner.destination_id);
-        if (banner.destination_id === 'selfcare-quiz') return '🩺 Self-Care Quiz';
         return obFlow ? `🎯 ${obFlow.name}` : 'Unknown Flow';
       case 'watch':
         return 'Watch Page';

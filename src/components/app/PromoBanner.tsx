@@ -409,7 +409,7 @@ export function PromoBanner({
         break;
       case 'rate': navigate('/app/rate'); break;
       case 'onboarding':
-        if (banner.destination_id === 'selfcare-quiz') {
+        if (banner.custom_url === 'selfcare-quiz') {
           navigate('/app/onboarding/selfcare-quiz');
         } else if (banner.destination_id) {
           navigate(`/app/onboarding/${banner.destination_id}`);
