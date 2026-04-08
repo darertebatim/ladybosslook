@@ -838,7 +838,7 @@ function MotivationalScreen({ step, onNext }: Props) {
     return (
       <div className="h-full flex flex-col relative overflow-hidden">
         {/* Hero image — 40% height */}
-        <div className="shrink-0 relative" style={{ height: step.id === 'sc-intro' ? '50%' : '40%' }}>
+        <div className="shrink-0 relative" style={{ height: step.id === 'sc-intro' ? '60%' : '40%' }}>
           <img
             src={step.id === 'sc-intro' ? selfcareQuizHero : (step.image || meplusMascotBg)}
             alt=""
