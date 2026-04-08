@@ -19,6 +19,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useTaskBankSelection } from '@/hooks/useTaskBankSelection';
+import { PromoBanner } from '@/components/app/PromoBanner';
 
 const PREVIEW_COUNT = 8;
 
@@ -279,6 +280,10 @@ export default function AppTasksBank() {
             </button>
           )}
 
+          {!isSearching && (
+            <PromoBanner location="tasks_bank_top" className="px-4 pt-4" carousel />
+          )}
+
           {!isSearching && sortedCategories.length > 0 && (
             <div className="mt-4">
               <ScrollArea className="w-full">
@@ -297,6 +302,10 @@ export default function AppTasksBank() {
                 <ScrollBar orientation="horizontal" className="invisible" />
               </ScrollArea>
             </div>
+          )}
+
+          {!isSearching && (
+            <PromoBanner location="tasks_bank_after_categories" className="px-4 pb-2" carousel />
           )}
 
           {isLoading && (
