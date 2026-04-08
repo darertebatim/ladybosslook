@@ -66,13 +66,22 @@ export const selfcareQuizFlow: OnboardingFlow = {
       id: 'sc-skipping',
       type: 'multi-select',
       illustrationLabel: 'selfcare-quiz',
-      title: 'Be honest... which of these have you been skipping?',
+      title: 'Be honest… which of these have you been skipping?',
       subtitle: 'Select all that apply',
       options: [
         { label: 'Getting enough sleep', emoji: '😴' },
         { label: 'Drinking water', emoji: '💧' },
         { label: 'Moving your body', emoji: '🚶' },
         { label: 'Skincare / grooming', emoji: '🧴' },
+      ],
+    },
+    {
+      id: 'sc-neglecting',
+      type: 'multi-select',
+      illustrationLabel: 'selfcare-quiz',
+      title: "Which of these haven't you done in a while?",
+      subtitle: 'Select all that apply',
+      options: [
         { label: 'A moment of silence', emoji: '🧘' },
         { label: 'Connecting with someone', emoji: '💬' },
         { label: 'Tidying your space', emoji: '🧹' },
