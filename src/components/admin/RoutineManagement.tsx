@@ -416,6 +416,7 @@ function CategoriesManager() {
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="Brief description of this category..."
               />
+            </div>
             <div className="flex items-center gap-2">
               <Switch
                 checked={formData.is_active}
