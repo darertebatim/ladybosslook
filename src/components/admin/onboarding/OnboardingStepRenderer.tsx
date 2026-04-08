@@ -3835,7 +3835,7 @@ function DynamicSingleSelectScreen({ step, onNext, onAnswer, answers }: Props) {
 
   const handleSelect = (label: string) => {
     onAnswer?.(step.id, label);
-    haptic('light');
+    haptic.light();
     setTimeout(onNext, 350);
   };
 
