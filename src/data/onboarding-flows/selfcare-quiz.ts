@@ -17,12 +17,17 @@ export const selfcareQuizFlow: OnboardingFlow = {
       badges: [
         { emoji: '😴', label: 'Sleep' },
         { emoji: '🧘', label: 'Calm' },
-        { emoji: '💪', label: 'Movement' },
+        { emoji: '🏃', label: 'Movement' },
+        { emoji: '💪', label: 'Exercise' },
         { emoji: '🧴', label: 'Hygiene' },
         { emoji: '🥗', label: 'Nutrition' },
         { emoji: '💬', label: 'Connection' },
         { emoji: '🧹', label: 'Tidy Up' },
         { emoji: '💚', label: 'Self-Kindness' },
+        { emoji: '🙏', label: 'Gratitude' },
+        { emoji: '🌙', label: 'Night' },
+        { emoji: '🧠', label: 'Presence' },
+        { emoji: '📋', label: 'Productivity' },
       ],
     } as any,
     {
