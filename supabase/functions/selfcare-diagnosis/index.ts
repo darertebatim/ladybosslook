@@ -80,6 +80,11 @@ serve(async (req) => {
       if (SKIP_MAP[s]) addScore(SKIP_MAP[s], 3);
     }
 
+    const neglectingAnswers: string[] = answers?.["sc-neglecting"] || [];
+    for (const s of neglectingAnswers) {
+      if (SKIP_MAP[s]) addScore(SKIP_MAP[s], 3);
+    }
+
     const proudAnswer = answers?.["sc-proud"];
     if (proudAnswer && PROUD_MAP[proudAnswer]) addScore(PROUD_MAP[proudAnswer], 2);
 
