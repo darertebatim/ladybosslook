@@ -558,8 +558,8 @@ export function PromoBannerManager() {
         return banner.custom_url || 'External URL';
       case 'onboarding':
         const onboardingFlows = [dearMeFlow, mePlusFlow];
+        if (banner.custom_url === 'selfcare-quiz') return '🩺 Self-Care Quiz';
         const obFlow = onboardingFlows.find(f => f.id === banner.destination_id);
-        if (banner.destination_id === 'selfcare-quiz') return '🩺 Self-Care Quiz';
         return obFlow ? `🎯 ${obFlow.name}` : 'Unknown Flow';
       case 'watch':
         return 'Watch Page';
