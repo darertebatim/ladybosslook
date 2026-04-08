@@ -1,0 +1,2 @@
+UPDATE routine_categories SET description = 'Your evening wind-down — preparing tomorrow''s outfit, tidying up, light stretching, and setting intentions for a peaceful night.' WHERE slug = 'Night';
+UPDATE routine_categories SET description = 'Optimizing your rest — consistent bedtime, limiting screens, creating a cozy sleep environment, and calming rituals before lights out.' WHERE slug = 'sleep';
