@@ -347,7 +347,7 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
   },
   tasksbank: {
     value: 'tasksbank',
-    label: 'Self-Care Habits',
+    label: 'Self-Care Goals',
     icon: Leaf,
     badgeText: 'Browse',
     color: 'green',
