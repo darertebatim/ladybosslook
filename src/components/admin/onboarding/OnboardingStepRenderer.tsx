@@ -865,11 +865,34 @@ function MotivationalScreen({ step, onNext }: Props) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
-                className="text-center mb-6"
+                className="text-center mb-4"
               >
-                <p className="text-[16px] text-foreground/80 leading-relaxed whitespace-pre-line">
+                <p className="text-[17px] text-foreground font-medium leading-relaxed whitespace-pre-line">
                   {renderSubtitle(step.subtitle)}
                 </p>
+              </motion.div>
+            )}
+
+            {/* Floating category badges (if step has them) */}
+            {(step as any).badges && (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="flex flex-wrap justify-center gap-2 mb-4"
+              >
+                {((step as any).badges as { emoji: string; label: string }[]).map((badge, i) => (
+                  <motion.span
+                    key={badge.label}
+                    initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ delay: 0.3 + i * 0.06, duration: 0.35, type: 'spring', stiffness: 200 }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#f5f0ff] border border-[#e8e0f0] text-[13px] font-semibold text-foreground shadow-sm"
+                  >
+                    <FluentEmoji emoji={badge.emoji} size={16} />
+                    {badge.label}
+                  </motion.span>
+                ))}
               </motion.div>
             )}
 
