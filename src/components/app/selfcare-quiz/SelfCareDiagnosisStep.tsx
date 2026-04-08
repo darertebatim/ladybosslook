@@ -4,6 +4,7 @@ import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { supabase } from '@/integrations/supabase/client';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { Loader2 } from 'lucide-react';
+import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 
 interface Props {
   step: OnboardingStep;
@@ -51,7 +52,6 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
         setInsight(data.ai_insight || '');
         setGapCategories(data.gap_categories || []);
 
-        // Store diagnosis results for the suggestions step
         if (onAnswer) {
           onAnswer('sc-diagnosis-data', JSON.stringify({
             gap_categories: data.gap_categories || [],
@@ -73,94 +73,102 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
   }, []);
 
   return (
-    <div className="h-full bg-white overflow-y-auto overscroll-contain">
-      <div className="flex flex-col min-h-full px-5 pt-6 pb-6" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
-        <AnimatePresence mode="wait">
-          {phase === 'loading' && (
-            <motion.div
-              key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 flex flex-col items-center justify-center gap-6"
-            >
-              <div className="relative">
-                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Loader2 className="w-10 h-10 text-primary animate-spin" />
-                </div>
-                <motion.div
-                  className="absolute -top-2 -right-2 text-2xl"
-                  animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.1, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  ✨
-                </motion.div>
-              </div>
-              <div className="text-center">
-                <p className="text-lg font-bold text-[#1a1f3d]">Analyzing your answers...</p>
-                <p className="text-sm text-muted-foreground mt-1">Finding your hidden gaps</p>
-              </div>
-            </motion.div>
-          )}
+    <div className="h-full flex flex-col relative overflow-hidden">
+      {/* Hero mascot header */}
+      <div className="shrink-0 relative" style={{ height: 200 }}>
+        <img src={meplusMascotBg} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
+      </div>
 
-          {phase === 'results' && (
-            <motion.div
-              key="results"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="flex-1 flex flex-col"
-            >
-              {error ? (
-                <div className="flex-1 flex items-center justify-center">
-                  <p className="text-muted-foreground">{error}</p>
-                </div>
-              ) : (
-                <>
-                  <h2 className="text-[22px] font-extrabold text-[#1a1f3d] mb-4">{step.title}</h2>
-
-                  {/* AI Insight */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-4 mb-5 border border-purple-100"
-                  >
-                    <p className="text-[15px] text-[#1a1f3d] leading-relaxed">{insight}</p>
-                  </motion.div>
-
-                  {/* Gap Categories */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.35 }}
-                    className="flex flex-wrap gap-2 mb-6"
-                  >
-                    {gapCategories.map((cat) => (
-                      <div
-                        key={cat}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-sm font-medium text-[#1a1f3d]"
-                      >
-                        <FluentEmoji emoji={CATEGORY_EMOJI[cat] || '📌'} size={16} />
-                        {cat}
-                      </div>
-                    ))}
-                  </motion.div>
-
-                  {/* Next button */}
-                  <div className="mt-auto pt-6">
-                    <button
-                      onClick={onNext}
-                      className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base active:scale-[0.98] transition-all"
-                    >
-                      {step.buttonLabel || 'Next'}
-                    </button>
+      {/* White bottom sheet */}
+      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-y-auto overscroll-contain">
+        <div className="px-5 pt-5 flex flex-col flex-1 min-h-0" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}>
+          <AnimatePresence mode="wait">
+            {phase === 'loading' && (
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex-1 flex flex-col items-center justify-center gap-6"
+              >
+                <div className="relative">
+                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Loader2 className="w-10 h-10 text-primary animate-spin" />
                   </div>
-                </>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+                  <motion.div
+                    className="absolute -top-2 -right-2 text-2xl"
+                    animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    ✨
+                  </motion.div>
+                </div>
+                <div className="text-center">
+                  <p className="text-lg font-bold text-foreground">Analyzing your answers...</p>
+                  <p className="text-sm text-muted-foreground mt-1">Finding your hidden gaps</p>
+                </div>
+              </motion.div>
+            )}
+
+            {phase === 'results' && (
+              <motion.div
+                key="results"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="flex-1 flex flex-col"
+              >
+                {error ? (
+                  <div className="flex-1 flex items-center justify-center">
+                    <p className="text-muted-foreground">{error}</p>
+                  </div>
+                ) : (
+                  <>
+                    <h2 className="text-[22px] font-extrabold text-foreground mb-4">{step.title}</h2>
+
+                    {/* AI Insight */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-4 mb-5 border border-purple-100"
+                    >
+                      <p className="text-[15px] text-foreground leading-relaxed">{insight}</p>
+                    </motion.div>
+
+                    {/* Gap Categories */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.35 }}
+                      className="flex flex-wrap gap-2 mb-6"
+                    >
+                      {gapCategories.map((cat) => (
+                        <div
+                          key={cat}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-sm font-medium text-foreground"
+                        >
+                          <FluentEmoji emoji={CATEGORY_EMOJI[cat] || '📌'} size={16} />
+                          {cat}
+                        </div>
+                      ))}
+                    </motion.div>
+
+                    {/* Next button pinned at bottom */}
+                    <div className="mt-auto pt-6">
+                      <button
+                        onClick={onNext}
+                        className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base active:scale-[0.98] transition-all"
+                      >
+                        {step.buttonLabel || 'Next'}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
 import { TaskTemplate, TaskColor } from '@/hooks/useTaskPlanner';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { RoutineBuilderSheet, BuilderTask } from '@/components/app/RoutineBuilderSheet';
+import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 
 interface SuggestedTask {
   id: string;
@@ -27,7 +28,6 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [showBuilder, setShowBuilder] = useState(false);
 
-  // Parse diagnosis data from answers
   const diagnosisData = useMemo(() => {
     try {
       const raw = answers?.['sc-diagnosis-data'];
@@ -38,7 +38,6 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
 
   const suggestedTasks: SuggestedTask[] = diagnosisData.suggested_tasks || [];
 
-  // Convert to TaskTemplate format for TaskTemplateCard
   const taskTemplates: TaskTemplate[] = useMemo(() => {
     return suggestedTasks.map((t) => ({
       id: t.id,
@@ -110,39 +109,47 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
   };
 
   return (
-    <div className="h-full bg-white overflow-y-auto overscroll-contain">
-      <div className="flex flex-col min-h-full px-5 pt-6 pb-6" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="flex-1 flex flex-col"
-        >
-          <h2 className="text-[22px] font-extrabold text-[#1a1f3d] mb-1">{step.title}</h2>
-          <p className="text-sm text-muted-foreground mb-5">Select the habits you want to add to your routine</p>
+    <div className="h-full flex flex-col relative overflow-hidden">
+      {/* Hero mascot header */}
+      <div className="shrink-0 relative" style={{ height: 140 }}>
+        <img src={meplusMascotBg} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
+      </div>
 
-          {/* Task cards */}
-          <div className="space-y-2.5 flex-1">
-            {taskTemplates.map((template, i) => (
-              <motion.div
-                key={template.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.08 }}
-              >
-                <TaskTemplateCard
-                  template={template}
-                  onAdd={() => handleToggleTask(template.id)}
-                  isSelected={selectedTasks.has(template.id)}
-                  selectable
-                />
-              </motion.div>
-            ))}
-          </div>
+      {/* White bottom sheet */}
+      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-y-auto overscroll-contain">
+        <div className="px-5 pt-5 flex flex-col flex-1 min-h-0" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="flex-1 flex flex-col"
+          >
+            <h2 className="text-[22px] font-extrabold text-foreground mb-1">{step.title}</h2>
+            <p className="text-sm text-muted-foreground mb-5">Select the habits you want to add to your routine</p>
 
-          {/* Spacer for fixed button */}
-          <div className="h-24" />
-        </motion.div>
+            {/* Task cards */}
+            <div className="space-y-2.5 flex-1">
+              {taskTemplates.map((template, i) => (
+                <motion.div
+                  key={template.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.08 }}
+                >
+                  <TaskTemplateCard
+                    template={template}
+                    onAdd={() => handleToggleTask(template.id)}
+                    isSelected={selectedTasks.has(template.id)}
+                    selectable
+                  />
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Spacer for fixed button */}
+            <div className="h-24" />
+          </motion.div>
+        </div>
       </div>
 
       {/* Fixed bottom button */}
