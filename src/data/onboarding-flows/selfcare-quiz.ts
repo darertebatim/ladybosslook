@@ -10,6 +10,7 @@ export const selfcareQuizFlow: OnboardingFlow = {
     {
       id: 'sc-hook',
       type: 'motivational',
+      illustrationLabel: 'selfcare-quiz',
       title: "Your problem isn't\nproductivity.",
       subtitle: "It's that one part of your life is quietly falling apart.",
       buttonLabel: "Tell me more →",
@@ -17,6 +18,7 @@ export const selfcareQuizFlow: OnboardingFlow = {
     {
       id: 'sc-intro',
       type: 'motivational',
+      illustrationLabel: 'selfcare-quiz',
       title: "What's Missing?",
       subtitle: "Our AI analyzes your lifestyle to find the perfect self-care habits just for you — in under a minute.",
       buttonLabel: "Let's find out →",
@@ -24,6 +26,7 @@ export const selfcareQuizFlow: OnboardingFlow = {
     {
       id: 'sc-drain',
       type: 'single-select',
+      illustrationLabel: 'selfcare-quiz',
       title: "What's draining you the most right now?",
       options: [
         { label: 'Stress & anxiety', emoji: '😰' },
@@ -35,6 +38,7 @@ export const selfcareQuizFlow: OnboardingFlow = {
     {
       id: 'sc-morning',
       type: 'single-select',
+      illustrationLabel: 'selfcare-quiz',
       title: 'Your perfect morning looks like...',
       options: [
         { label: 'Peaceful & slow', emoji: '☀️' },
@@ -46,6 +50,7 @@ export const selfcareQuizFlow: OnboardingFlow = {
     {
       id: 'sc-skipping',
       type: 'multi-select',
+      illustrationLabel: 'selfcare-quiz',
       title: 'Be honest... which of these have you been skipping?',
       subtitle: 'Select all that apply',
       options: [
@@ -62,6 +67,7 @@ export const selfcareQuizFlow: OnboardingFlow = {
     {
       id: 'sc-proud',
       type: 'single-select',
+      illustrationLabel: 'selfcare-quiz',
       title: 'What would make you proud this week?',
       options: [
         { label: 'A real morning routine', emoji: '🌅' },
@@ -73,12 +79,14 @@ export const selfcareQuizFlow: OnboardingFlow = {
     {
       id: 'sc-diagnosis',
       type: 'selfcare-diagnosis',
+      illustrationLabel: 'selfcare-quiz',
       title: 'Your Self-Care Diagnosis',
       buttonLabel: 'See Suggested Habits →',
     },
     {
       id: 'sc-suggestions',
       type: 'selfcare-suggestions',
+      illustrationLabel: 'selfcare-quiz',
       title: 'Suggested Habits for You',
       buttonLabel: 'Build My Routine',
     },

@@ -819,6 +819,33 @@ function MotivationalScreen({ step, onNext }: Props) {
     );
   }
 
+  // Bottom-sheet layout when illustrationLabel is set (selfcare-quiz, etc.)
+  if (step.illustrationLabel) {
+    return (
+      <BottomSheetWrapper bgImage={step.image || meplusMascotBg}>
+        <FadeUp>
+          <h1 className="text-[24px] font-extrabold text-foreground text-center mb-2 leading-tight whitespace-pre-line">{step.title}</h1>
+        </FadeUp>
+        {step.subtitle && (
+          <FadeUp delay={0.08}>
+            <p className="text-[15px] text-muted-foreground leading-relaxed text-center mb-4 whitespace-pre-line">{step.subtitle}</p>
+          </FadeUp>
+        )}
+        {descMatch && (
+          <FadeUp delay={0.15}>
+            <p className="text-[15px] text-muted-foreground leading-relaxed text-center mb-4">
+              <span className="text-foreground font-extrabold text-2xl">{descMatch[1]}</span>{' '}
+              {descMatch[2]}
+            </p>
+          </FadeUp>
+        )}
+        <FadeUp delay={0.25} className="mt-auto">
+          <NavyButton onClick={onNext}>{step.buttonLabel}</NavyButton>
+        </FadeUp>
+      </BottomSheetWrapper>
+    );
+  }
+
   return (
     <ScreenWrapper center>
       <FadeUp><h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-2 leading-tight whitespace-pre-line">{step.title}</h1></FadeUp>
