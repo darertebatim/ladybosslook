@@ -28,6 +28,7 @@ function OptionEmoji({ emoji, size }: { emoji: string; size: number }) {
   return <FluentEmoji emoji={emoji} size={size} />;
 }
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
+import selfcareQuizHero from '@/assets/selfcare-quiz-hero.png';
 import appIcon from '@/assets/app-icon.png';
 import SealCheck from '@/components/app/SealCheck';
 import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
@@ -839,7 +840,7 @@ function MotivationalScreen({ step, onNext }: Props) {
         {/* Hero image — 40% height */}
         <div className="shrink-0 relative" style={{ height: step.id === 'sc-intro' ? '50%' : '40%' }}>
           <img
-            src={step.image || meplusMascotBg}
+            src={step.id === 'sc-intro' ? selfcareQuizHero : (step.image || meplusMascotBg)}
             alt=""
             className="w-full h-full object-cover"
             style={{ objectPosition: 'center 35%' }}
