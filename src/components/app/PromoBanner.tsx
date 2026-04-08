@@ -426,9 +426,6 @@ export function PromoBanner({
       case 'video_track':
         if (banner.destination_id) navigate(`/app/watch/video/${banner.destination_id}`);
         break;
-      case 'selfcare_quiz':
-        navigate('/app/onboarding/selfcare-quiz');
-        break;
     }
   };
   
