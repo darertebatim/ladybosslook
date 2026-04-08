@@ -61,6 +61,7 @@ interface RoutineCategory {
   task_display_order: number;
   is_active: boolean;
   tags: string[];
+  description: string | null;
 }
 
 // =====================================
@@ -149,6 +150,7 @@ function CategoriesManager() {
     task_display_order: 0,
     is_active: true,
     tags: [] as string[],
+    description: '',
   });
 
   const { data: categories, isLoading } = useQuery({
@@ -213,6 +215,7 @@ function CategoriesManager() {
       task_display_order: (categories?.length || 0) + 1,
       is_active: true,
       tags: [],
+      description: '',
     });
     setIsDialogOpen(true);
   };
@@ -228,6 +231,7 @@ function CategoriesManager() {
       task_display_order: cat.task_display_order ?? 0,
       is_active: cat.is_active,
       tags: cat.tags || [],
+      description: cat.description || '',
     });
     setIsDialogOpen(true);
   };
