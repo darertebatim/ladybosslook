@@ -869,6 +869,7 @@ export function PromoBannerManager() {
                     <SelectItem value="routine_player">🎬 Routine Player</SelectItem>
                     <SelectItem value="audio_track">🎵 Audio Track (specific)</SelectItem>
                     <SelectItem value="video_track">📹 Video Track (specific)</SelectItem>
+                    <SelectItem value="selfcare_quiz">🩺 Self-Care Quiz</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
