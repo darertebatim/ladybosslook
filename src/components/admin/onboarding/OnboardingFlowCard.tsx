@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { OnboardingFlow } from '@/types/onboarding';
 import { Card, CardContent } from '@/components/ui/card';
 import { Smartphone, ArrowRight, Star, ChevronDown, ExternalLink } from 'lucide-react';
