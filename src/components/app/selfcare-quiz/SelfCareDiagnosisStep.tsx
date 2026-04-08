@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { supabase } from '@/integrations/supabase/client';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { computeGapCategories } from '@/utils/selfcare-scoring';
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 
 interface Props {
@@ -25,7 +26,9 @@ const CATEGORY_EMOJI: Record<string, string> = {
   gratitude: '🙏',
   productivity: '📋',
   TidyUp: '🧹',
-  Night: '🌙',
+  Evening: '🌙',
+  LovedOnes: '🥰',
+  'easy-win': '✨',
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -41,7 +44,9 @@ const CATEGORY_LABELS: Record<string, string> = {
   gratitude: 'Gratitude',
   productivity: 'Productivity',
   TidyUp: 'Tidy Up',
-  Night: 'Night Routine',
+  Evening: 'Evening',
+  LovedOnes: 'Loved Ones',
+  'easy-win': 'Easy Win',
 };
 
 const ALL_CATEGORIES = Object.keys(CATEGORY_EMOJI);
@@ -49,7 +54,7 @@ const DEFAULT_GAPS = ['calm', 'sleep', 'movement'];
 
 const STATUS_MESSAGES = [
   { title: 'Scanning your habits...', sub: 'Looking at your daily patterns' },
-  { title: 'Checking your balance...', sub: 'Comparing across 13 areas' },
+  { title: 'Checking your balance...', sub: `Comparing across ${ALL_CATEGORIES.length} areas` },
   { title: 'Finding hidden gaps...', sub: 'What you might be missing' },
   { title: 'Analyzing priorities...', sub: 'Ranking what matters most' },
   { title: 'Building your profile...', sub: 'Personalizing recommendations' },
@@ -57,68 +62,9 @@ const STATUS_MESSAGES = [
 ];
 
 const buildFallbackDiagnosis = (answers?: OnboardingAnswers) => {
-  const scores: Record<string, number> = {};
-  const addScore = (categories: string[], weight: number) => {
-    categories.forEach((category) => {
-      scores[category] = (scores[category] || 0) + weight;
-    });
-  };
-
-  const DRAIN_MAP: Record<string, string[]> = {
-    'Stress & anxiety': ['calm', 'sleep', 'Night'],
-    'Constant tiredness': ['sleep', 'nutrition', 'movement'],
-    'Screen overload': ['Presence', 'calm', 'productivity'],
-    'Feeling disconnected': ['connection', 'self-kindness'],
-  };
-
-  const MORNING_MAP: Record<string, string[]> = {
-    'Peaceful & slow': ['calm', 'gratitude'],
-    'Active & energized': ['Exercise', 'movement'],
-    'Fresh & put-together': ['hygiene', 'self-kindness'],
-    'Organized & productive': ['productivity', 'TidyUp'],
-  };
-
-  const SKIP_MAP: Record<string, string[]> = {
-    'Getting enough sleep': ['sleep', 'Night'],
-    'Drinking water': ['nutrition'],
-    'Moving your body': ['movement', 'Exercise'],
-    'Skincare / grooming': ['hygiene'],
-    'A moment of silence': ['calm', 'Presence'],
-    'Connecting with someone': ['connection'],
-    'Tidying your space': ['TidyUp', 'productivity'],
-    'Doing something kind for yourself': ['self-kindness', 'gratitude'],
-  };
-
-  const PROUD_MAP: Record<string, string[]> = {
-    'A real morning routine': ['movement', 'hygiene', 'Night'],
-    'Taking care of my mind': ['calm', 'gratitude', 'Presence'],
-    'Taking care of my body': ['Exercise', 'nutrition', 'sleep'],
-    'Reconnecting with people': ['connection', 'TidyUp'],
-  };
-
-  const drainAnswer = typeof answers?.['sc-drain'] === 'string' ? answers['sc-drain'] : null;
-  const morningAnswer = typeof answers?.['sc-morning'] === 'string' ? answers['sc-morning'] : null;
-  const proudAnswer = typeof answers?.['sc-proud'] === 'string' ? answers['sc-proud'] : null;
-  const skippingAnswers = Array.isArray(answers?.['sc-skipping']) ? answers['sc-skipping'] : [];
-  const neglectingAnswers = Array.isArray(answers?.['sc-neglecting']) ? answers['sc-neglecting'] : [];
-
-  if (drainAnswer && DRAIN_MAP[drainAnswer]) addScore(DRAIN_MAP[drainAnswer], 2);
-  if (morningAnswer && MORNING_MAP[morningAnswer]) addScore(MORNING_MAP[morningAnswer], 1);
-  if (proudAnswer && PROUD_MAP[proudAnswer]) addScore(PROUD_MAP[proudAnswer], 2);
-  skippingAnswers.forEach((answer) => {
-    if (SKIP_MAP[answer]) addScore(SKIP_MAP[answer], 3);
-  });
-  neglectingAnswers.forEach((answer) => {
-    if (SKIP_MAP[answer]) addScore(SKIP_MAP[answer], 3);
-  });
-
-  const gapCategories = Object.entries(scores)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3)
-    .map(([category]) => category);
-
+  const gapCategories = computeGapCategories(answers || {});
   return {
-    gap_categories: gapCategories.length > 0 ? gapCategories : DEFAULT_GAPS,
+    gap_categories: gapCategories,
     suggested_tasks: [],
     ai_insight:
       'You may be carrying more than you realize, and a few self-care areas are asking for your attention right now. Start small and steady — the right habits can help you feel more grounded, energized, and back in sync with yourself.',
@@ -133,11 +79,10 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
   const hasResolved = useRef(false);
 
   const diagnosisSeed = JSON.stringify({
-    drain: answers?.['sc-drain'] ?? null,
-    morning: answers?.['sc-morning'] ?? null,
-    skipping: answers?.['sc-skipping'] ?? [],
+    weighing: answers?.['sc-weighing'] ?? null,
     neglecting: answers?.['sc-neglecting'] ?? [],
-    proud: answers?.['sc-proud'] ?? null,
+    win: answers?.['sc-win'] ?? null,
+    deeper: answers?.['sc-deeper'] ?? null,
   });
 
   const [statusIdx, setStatusIdx] = useState(0);
