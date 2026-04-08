@@ -34,13 +34,13 @@ serve(async (req) => {
 
     // Category mapping
     const DRAIN_MAP: Record<string, string[]> = {
-      "Stress & anxiety": ["calm", "sleep"],
-      "Constant tiredness": ["sleep", "nutrition", "movement"],
-      "Screen overload": ["Presence", "calm"],
+      "Stress & anxiety": ["calm", "sleep", "Night"],
+      "Constant tiredness": ["sleep", "nutrition", "movement", "Night"],
+      "Screen overload": ["Presence", "calm", "productivity"],
       "Feeling disconnected": ["connection", "self-kindness"],
     };
     const MORNING_MAP: Record<string, string[]> = {
-      "Peaceful & slow": ["calm", "gratitude"],
+      "Peaceful & slow": ["calm", "gratitude", "Night"],
       "Active & energized": ["Exercise", "movement"],
       "Fresh & put-together": ["hygiene", "self-kindness"],
       "Organized & productive": ["productivity", "TidyUp"],
@@ -52,15 +52,15 @@ serve(async (req) => {
       "Skincare / grooming": ["hygiene"],
       "A moment of silence": ["calm", "Presence"],
       "Connecting with someone": ["connection"],
-      "Tidying your space": ["TidyUp"],
+      "Tidying your space": ["TidyUp", "productivity"],
       "Doing something kind for yourself": ["self-kindness", "gratitude"],
     };
 
     const PROUD_MAP: Record<string, string[]> = {
-      "A real morning routine": ["movement", "hygiene"],
-      "Taking care of my mind": ["calm", "gratitude"],
+      "A real morning routine": ["movement", "hygiene", "Night"],
+      "Taking care of my mind": ["calm", "gratitude", "Presence"],
       "Taking care of my body": ["Exercise", "nutrition", "sleep"],
-      "Reconnecting with people": ["connection"],
+      "Reconnecting with people": ["connection", "TidyUp"],
     };
 
     // Score categories
