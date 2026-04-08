@@ -130,8 +130,15 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
   const [insight, setInsight] = useState('');
   const [gapCategories, setGapCategories] = useState<string[]>([]);
   const [error, setError] = useState('');
-  const hasFetched = useRef(false);
   const hasResolved = useRef(false);
+
+  const diagnosisSeed = JSON.stringify({
+    drain: answers?.['sc-drain'] ?? null,
+    morning: answers?.['sc-morning'] ?? null,
+    skipping: answers?.['sc-skipping'] ?? [],
+    neglecting: answers?.['sc-neglecting'] ?? [],
+    proud: answers?.['sc-proud'] ?? null,
+  });
 
   const [statusIdx, setStatusIdx] = useState(0);
   const [scanIdx, setScanIdx] = useState(-1);
@@ -174,14 +181,14 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
   }, [phase]);
 
   useEffect(() => {
-    if (hasFetched.current) return;
-    hasFetched.current = true;
+    let cancelled = false;
+    hasResolved.current = false;
 
     const applyDiagnosis = (
       diagnosis: { gap_categories?: string[]; suggested_tasks?: unknown[]; ai_insight?: string },
       nextError = ''
     ) => {
-      if (hasResolved.current) return;
+      if (cancelled || hasResolved.current) return;
       hasResolved.current = true;
 
       const nextGaps = diagnosis.gap_categories || DEFAULT_GAPS;
@@ -220,7 +227,7 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
           body: { answers },
         });
 
-        if (hasResolved.current) return;
+        if (cancelled || hasResolved.current) return;
         if (fnError) throw fnError;
         if (data?.error) throw new Error(data.error);
 
@@ -235,10 +242,11 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
 
     const startTimer = window.setTimeout(fetchDiagnosis, 1200);
     return () => {
+      cancelled = true;
       window.clearTimeout(startTimer);
       window.clearTimeout(fallbackTimer);
     };
-  }, [answers, onAnswer]);
+  }, [answers, diagnosisSeed, onAnswer]);
 
   const currentStatus = STATUS_MESSAGES[statusIdx];
 
