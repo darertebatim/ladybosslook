@@ -229,13 +229,6 @@ export default function AppTasksBank() {
               </button>
             )}
             <button
-              onClick={() => navigate('/app/projects')}
-              className="p-2 rounded-full active:bg-muted/50 transition-colors"
-              aria-label="Task Drafts"
-            >
-              <StickyNote className="w-5 h-5 text-muted-foreground" />
-            </button>
-            <button
               onClick={() => setShowSearch(!showSearch)}
               className="p-2 rounded-full active:bg-muted/50 transition-colors"
             >
@@ -263,23 +256,7 @@ export default function AppTasksBank() {
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full">
         <div className="pb-safe w-full max-w-full">
 
-          {/* Self-Care Quiz Banner */}
-          {!isSearching && (
-            <button
-              onClick={() => navigate('/app/onboarding/selfcare-quiz')}
-              className="mx-4 mt-4 p-4 rounded-2xl bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100 flex items-center gap-3 active:scale-[0.98] transition-all"
-            >
-              <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
-                <FluentEmoji emoji="✨" size={22} />
-              </div>
-              <div className="text-left flex-1">
-                <p className="text-sm font-bold text-foreground">Discover your self-care gaps</p>
-                <p className="text-xs text-muted-foreground">Your personalized plan is one quiz away</p>
-              </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-            </button>
-          )}
-
+          {/* Promo Banner - Top */}
           {!isSearching && (
             <PromoBanner location="tasks_bank_top" className="px-4 pt-4" carousel />
           )}
