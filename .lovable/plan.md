@@ -1,98 +1,68 @@
 
 
-## "What's Missing?" Self-Care Diagnostic Quiz
+## UI Overhaul: Align Self-Care Quiz with Weekly Review Design
 
-A 5-screen onboarding-style flow that identifies users' neglected self-care areas through 3 natural questions, then uses AI to generate personalized task suggestions from the 15 self-care tagged categories.
+Bring the Weekly Review's polished "Hero + Bottom Sheet" layout, mascot backgrounds, and consistent button styling into the Self-Care Quiz.
 
-### Quiz Flow
+---
 
-```text
-Screen 1 — Hook (motivational)
-Screen 2 — "What's draining you?" (single-select)
-Screen 3 — "Your perfect morning" (single-select)  
-Screen 4 — "Be honest..." (multi-select of neglected habits)
-Screen 5 — AI Diagnosis + Task Suggestions (new step type)
-```
+### What Changes
 
-**Screen 1 — Hook**: "Your problem isn't productivity." → "It's that one part of your life is quietly falling apart." CTA: "Let's find out →"
+**1. Hook and Intro screens (motivational steps)**
+- Add `illustrationLabel: 'selfcare-quiz'` to both steps in `selfcare-quiz.ts` so the MotivationalScreen renders with the `BottomSheetWrapper` (mascot background + rounded white bottom sheet)
+- The existing MotivationalScreen code already supports `illustrationLabel` triggering the bottom-sheet layout, but it actually checks for `step.image`. We need to either add `image` pointing to `meplusMascotBg` or update the motivational renderer to handle this case. Simplest: add `image: meplusMascotBg` import path to the step data. Since step data is static, we'll use the `illustrationLabel` field and update the MotivationalScreen to use `meplusMascotBg` as fallback when `illustrationLabel` is set but no `image`.
 
-**Screen 2 — What's draining you?** (single-select, 4 options):
-- 😰 Stress & anxiety → calm, sleep
-- 😴 Constant tiredness → sleep, nutrition, movement
-- 📱 Screen overload → Presence, calm
-- 😔 Feeling disconnected → connection, self-kindness
+Actually, looking at the code more carefully: `MotivationalScreen` checks `step.image && !step.description` for full-screen mode, and `step.image && step.description?.includes('—')` for testimonial mode. The default fallback (line 822) uses `ScreenWrapper`. There is no `BottomSheetWrapper` path in MotivationalScreen.
 
-**Screen 3 — Your perfect morning** (single-select, 4 options):
-- ☀️ Peaceful & slow → calm, gratitude
-- 💪 Active & energized → Exercise, movement
-- 🧴 Fresh & put-together → hygiene, self-kindness
-- 📋 Organized & productive → productivity, TidyUp
+**Better approach**: Create a dedicated hook/intro layout directly in the selfcare quiz data by switching to a custom step type, OR simply make the motivational screen use `BottomSheetWrapper` when `illustrationLabel` is present (matching how SingleSelect/MultiSelect already work).
 
-**Screen 4 — "Be honest... which of these have you been skipping?"** (multi-select, 8 chips):
-- 😴 Getting enough sleep → sleep, Night
-- 💧 Drinking water → nutrition
-- 🚶 Moving your body → movement, Exercise
-- 🧴 Skincare / grooming → hygiene
-- 🧘 A moment of silence → calm, Presence
-- 💬 Connecting with someone → connection
-- 🧹 Tidying your space → TidyUp
-- 💕 Doing something kind for yourself → self-kindness, gratitude
+**2. Question screens (single-select, multi-select)**
+- Add `illustrationLabel: 'selfcare-quiz'` to all 4 question steps in `selfcare-quiz.ts`
+- This automatically triggers the `BottomSheetWrapper` layout in the existing `SingleSelectScreen` and `MultiSelectScreen` renderers (they check `hasBg = !!step.illustrationLabel`)
+- The mascot background will default to `meplusMascotBg`
 
-**Screen 5 — AI Diagnosis** (new type: `selfcare-diagnosis`):
-- 3-second "analyzing" animation
-- AI generates personalized 2-3 sentence insight based on: gap categories + (for returning users) previous quiz results and task completion stats in those categories
-- Shows top 2-3 gap categories with emoji
-- Displays 3-5 suggested task cards from `admin_task_bank` filtered by those categories
-- "Add to My Planner" action on each task
+**3. Diagnosis screen**
+- Refactor `SelfCareDiagnosisStep.tsx` to use hero + bottom sheet layout (like `WeekReportStep`)
+- Add mascot image at top (~180px), white rounded bottom sheet below
+- Move loading spinner and results into the bottom sheet area
+- Fix button to bottom with consistent navy styling
 
-### AI Context for Returning Users
+**4. Suggestions screen**
+- Refactor `SelfCareSuggestionsStep.tsx` to use hero + bottom sheet layout
+- Mascot header at top, white bottom sheet with task cards
+- Fixed bottom button with gradient fade (already has this, just needs hero header)
 
-When a user has taken the quiz before, the diagnosis edge function will also receive:
-- **Previous quiz answers** from `selfcare_quiz_results` table
-- **Task completion stats** per category (how many tasks completed in each gap category in the last 30 days) from `task_completions` joined with `user_tasks` → `admin_task_bank`
-- This lets AI say things like "Last time you were skipping sleep — looks like you've improved there! But connection is still a gap."
+**5. Consistent buttons**
+- All screens use the navy `bg-[#1a1f3d]` rounded-2xl button style (already the case for diagnosis/suggestions, and `NavyButton` handles question screens)
+- Ensure buttons are pinned to bottom with `mt-auto` pattern
 
-### Technical Plan
-
-**1. New DB table**: `selfcare_quiz_results`
-- `id` (uuid), `user_id` (uuid, FK profiles), `answers` (jsonb), `gap_categories` (text[]), `ai_insight` (text), `suggested_task_ids` (uuid[]), `created_at` (timestamptz)
-- RLS: users can read/insert their own rows
-
-**2. New edge function**: `selfcare-diagnosis`
-- Receives: quiz answers, user_id
-- Fetches from DB: previous quiz results, task completion counts per self-care category (last 30 days)
-- Calls Lovable AI Gateway (Gemini Flash) to generate personalized insight
-- Returns: gap categories, AI insight text, suggested task IDs from `admin_task_bank`
-- Saves result to `selfcare_quiz_results`
-
-**3. New flow file**: `src/data/onboarding-flows/selfcare-quiz.ts`
-- 5 steps using existing types (motivational, single-select, multi-select) + new `selfcare-diagnosis`
-- Each option's `description` field stores mapped category slugs
-
-**4. New step type + component**:
-- Add `'selfcare-diagnosis'` to `OnboardingStepType`
-- Create `src/components/app/selfcare-quiz/SelfCareDiagnosisStep.tsx`
-  - Reads answers from previous steps
-  - Calls `selfcare-diagnosis` edge function
-  - Shows loading → AI insight → category badges → task cards
-  - "Add to Planner" button per task (reuses existing task-add logic)
-
-**5. Wire it up**:
-- Register in `OnboardingStepRenderer.tsx` switch
-- Add to `allFlows` in `AppOnboarding.tsx`
-- Add to admin `Onboarding.tsx` for preview
-- Add entry banner in `AppTasksBank.tsx`: "Not sure where to start? Take the quiz ✨"
-
-### Files to Create
-- `supabase/migrations/...selfcare_quiz_results.sql`
-- `supabase/functions/selfcare-diagnosis/index.ts`
-- `src/data/onboarding-flows/selfcare-quiz.ts`
-- `src/components/app/selfcare-quiz/SelfCareDiagnosisStep.tsx`
+---
 
 ### Files to Modify
-- `src/types/onboarding.ts` — add `'selfcare-diagnosis'` step type
-- `src/components/admin/onboarding/OnboardingStepRenderer.tsx` — render new step
-- `src/pages/app/AppOnboarding.tsx` — register flow
-- `src/pages/admin/Onboarding.tsx` — register for preview
-- `src/pages/app/AppTasksBank.tsx` — add quiz entry banner
+
+1. **`src/data/onboarding-flows/selfcare-quiz.ts`**
+   - Add `illustrationLabel: 'selfcare-quiz'` to all question steps (sc-drain, sc-morning, sc-skipping, sc-proud)
+   - This triggers the BottomSheetWrapper in the existing renderers
+
+2. **`src/components/admin/onboarding/OnboardingStepRenderer.tsx`**
+   - Update `MotivationalScreen` to support `BottomSheetWrapper` when `step.illustrationLabel` is set (no image needed). Use `meplusMascotBg` as default background. This gives hook + intro the same mascot + bottom sheet look.
+
+3. **`src/components/app/selfcare-quiz/SelfCareDiagnosisStep.tsx`**
+   - Wrap in hero + bottom sheet layout: mascot image header (180px) with `meplusMascotBg`, white rounded bottom sheet below
+   - Loading state centered in bottom sheet
+   - Results (title, AI insight card, gap chips) in bottom sheet
+   - Button pinned at bottom with `mt-auto`
+
+4. **`src/components/app/selfcare-quiz/SelfCareSuggestionsStep.tsx`**
+   - Add mascot header area (smaller, ~140px since this page scrolls with task cards)
+   - White rounded bottom sheet with scrollable task list
+   - Keep existing fixed bottom button pattern
+
+---
+
+### Technical Notes
+- Reuses `meplusMascotBg` asset (already imported in OnboardingStepRenderer)
+- `BottomSheetWrapper` already exists in OnboardingStepRenderer and handles the hero+sheet pattern
+- Question screens already have the `hasBg` code path — just need the `illustrationLabel` flag
+- No new components needed, purely layout/styling alignment
 
