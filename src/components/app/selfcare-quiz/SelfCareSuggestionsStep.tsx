@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
@@ -24,6 +24,20 @@ interface Props {
   answers?: OnboardingAnswers;
 }
 
+const CATEGORY_EMOJI: Record<string, string> = {
+  calm: '🧘', sleep: '😴', nutrition: '🥗', movement: '🏃',
+  Exercise: '💪', hygiene: '🧴', Presence: '🧠', connection: '💬',
+  'self-kindness': '💚', gratitude: '🙏', productivity: '📋',
+  TidyUp: '🧹', Evening: '🌙', LovedOnes: '🥰', 'easy-win': '✨',
+};
+
+const CATEGORY_LABELS: Record<string, string> = {
+  calm: 'Calm', sleep: 'Sleep', nutrition: 'Nutrition', movement: 'Movement',
+  Exercise: 'Exercise', hygiene: 'Hygiene', Presence: 'Presence', connection: 'Connection',
+  'self-kindness': 'Self-Kindness', gratitude: 'Gratitude', productivity: 'Productivity',
+  TidyUp: 'Tidy Up', Evening: 'Evening', LovedOnes: 'Loved Ones', 'easy-win': 'Easy Win',
+};
+
 export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [showBuilder, setShowBuilder] = useState(false);
@@ -37,6 +51,7 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
   }, [answers]);
 
   const suggestedTasks: SuggestedTask[] = diagnosisData.suggested_tasks || [];
+  const gapCategories: string[] = diagnosisData.gap_categories || [];
 
   const taskTemplates: TaskTemplate[] = useMemo(() => {
     return suggestedTasks.map((t) => ({
@@ -65,6 +80,46 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
     }));
   }, [suggestedTasks]);
 
+  // Group tasks by category
+  const groupedTasks = useMemo(() => {
+    const groups: { category: string; tasks: TaskTemplate[] }[] = [];
+    const categoryOrder = gapCategories.length > 0 ? gapCategories : [];
+    const seen = new Set<string>();
+
+    // First add tasks in gap category order
+    for (const cat of categoryOrder) {
+      const catTasks = taskTemplates.filter(t => t.category === cat);
+      if (catTasks.length > 0) {
+        groups.push({ category: cat, tasks: catTasks });
+        seen.add(cat);
+      }
+    }
+
+    // Then any remaining categories
+    for (const t of taskTemplates) {
+      if (!seen.has(t.category)) {
+        const catTasks = taskTemplates.filter(tt => tt.category === t.category);
+        groups.push({ category: t.category, tasks: catTasks });
+        seen.add(t.category);
+      }
+    }
+
+    return groups;
+  }, [taskTemplates, gapCategories]);
+
+  // Pre-select popular/first tasks on mount
+  useEffect(() => {
+    if (taskTemplates.length === 0) return;
+    const preSelected = new Set<string>();
+    for (const group of groupedTasks) {
+      // Select first task from each category
+      if (group.tasks[0]) {
+        preSelected.add(group.tasks[0].id);
+      }
+    }
+    setSelectedTasks(preSelected);
+  }, [taskTemplates.length]); // only on first load
+
   const handleToggleTask = (taskId: string) => {
     setSelectedTasks(prev => {
       const next = new Set(prev);
@@ -74,7 +129,16 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
     });
   };
 
+  const handleSelectAll = () => {
+    if (selectedTasks.size === taskTemplates.length) {
+      setSelectedTasks(new Set());
+    } else {
+      setSelectedTasks(new Set(taskTemplates.map(t => t.id)));
+    }
+  };
+
   const selectionCount = selectedTasks.size;
+  const allSelected = selectionCount === taskTemplates.length && taskTemplates.length > 0;
 
   const getBuilderTasks = (): BuilderTask[] => {
     return taskTemplates
@@ -125,23 +189,58 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
             className="flex-1 flex flex-col"
           >
             <h2 className="text-[22px] font-extrabold text-foreground mb-1">Suggested Goals for You</h2>
-            <p className="text-sm font-semibold text-foreground mb-5">Select the Tasks you want to add to your routine</p>
+            
+            {/* Subtitle + Select All row */}
+            <div className="flex items-center justify-between mb-5">
+              <p className="text-sm font-semibold text-foreground">Select the Tasks you want to add</p>
+              <button
+                onClick={handleSelectAll}
+                className="text-xs font-bold text-primary px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 active:scale-95 transition-all shrink-0"
+              >
+                {allSelected ? 'Deselect All' : 'Select All'}
+              </button>
+            </div>
 
-            {/* Task cards */}
-            <div className="space-y-2.5 flex-1">
-              {taskTemplates.map((template, i) => (
+            {/* Grouped task cards */}
+            <div className="space-y-5 flex-1">
+              {groupedTasks.map((group, gi) => (
                 <motion.div
-                  key={template.id}
+                  key={group.category}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.08 }}
+                  transition={{ delay: gi * 0.1 }}
                 >
-                  <TaskTemplateCard
-                    template={template}
-                    onAdd={() => handleToggleTask(template.id)}
-                    isSelected={selectedTasks.has(template.id)}
-                    selectable
-                  />
+                  {/* Category header */}
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <span className="text-base">{CATEGORY_EMOJI[group.category] || '📌'}</span>
+                    <h3 className="text-[15px] font-bold text-foreground">
+                      {CATEGORY_LABELS[group.category] || group.category}
+                    </h3>
+                    {gapCategories.includes(group.category) && (
+                      <span className="text-[10px] font-semibold text-accent bg-accent/10 px-2 py-0.5 rounded-full">
+                        Recommended
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Tasks in this category */}
+                  <div className="space-y-2">
+                    {group.tasks.map((template, i) => (
+                      <motion.div
+                        key={template.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: gi * 0.1 + i * 0.05 }}
+                      >
+                        <TaskTemplateCard
+                          template={template}
+                          onAdd={() => handleToggleTask(template.id)}
+                          isSelected={selectedTasks.has(template.id)}
+                          selectable
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
                 </motion.div>
               ))}
             </div>
