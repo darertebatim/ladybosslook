@@ -5,6 +5,11 @@ import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
 import { TaskTemplate, TaskColor } from '@/hooks/useTaskPlanner';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { RoutineBuilderSheet, BuilderTask } from '@/components/app/RoutineBuilderSheet';
+import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 
 interface SuggestedTask {
@@ -41,6 +46,9 @@ const CATEGORY_LABELS: Record<string, string> = {
 export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [showBuilder, setShowBuilder] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const diagnosisData = useMemo(() => {
     try {
@@ -167,8 +175,93 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
     setShowBuilder(true);
   };
 
-  const handleBuilderComplete = (_title: string, _emoji: string, _color: string, _tasks: BuilderTask[]) => {
+  const handleBuilderComplete = async (title: string, emoji: string, color: string, tasks: BuilderTask[]) => {
     setShowBuilder(false);
+    if (!user) { onNext(); return; }
+    setIsSaving(true);
+    try {
+      // Create the routine in user_routines_bank
+      const { data: newRoutine, error: routineError } = await supabase
+        .from('user_routines_bank')
+        .insert({
+          user_id: user.id,
+          title,
+          emoji,
+          color,
+          is_active: true,
+          is_user_created: true,
+          category: null,
+        } as any)
+        .select('id, routine_id')
+        .single();
+
+      if (routineError) throw routineError;
+      const routineId = (newRoutine as any).routine_id;
+
+      // Get current max order index
+      const { data: existingTasks } = await supabase
+        .from('user_tasks')
+        .select('order_index')
+        .eq('user_id', user.id)
+        .order('order_index', { ascending: false })
+        .limit(1);
+      const startOrder = (existingTasks?.[0]?.order_index ?? -1) + 1;
+
+      const regularTasks = tasks.filter(t => !t.id.startsWith('__pro_task_routine_'));
+
+      if (regularTasks.length > 0) {
+        const userTasks = regularTasks.map((task: any, index: number) => ({
+          user_id: user.id,
+          title: task.title,
+          emoji: task.emoji || '📝',
+          color: task.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
+          repeat_pattern: task.repeat_pattern || 'daily',
+          repeat_days: task.repeat_days || null,
+          tag: title,
+          time_period: task.time_period || null,
+          linked_playlist_id: task.pro_link_type === 'playlist' ? task.pro_link_value : null,
+          pro_link_type: task.pro_link_type || null,
+          pro_link_value: task.pro_link_value || null,
+          is_active: true,
+          order_index: startOrder + index,
+          goal_enabled: task.goal_enabled || false,
+          goal_target: task.goal_target || null,
+          goal_type: task.goal_type || null,
+          goal_unit: task.goal_unit || null,
+          duration_minutes: task.duration_minutes || null,
+          source_routine_id: routineId,
+        }));
+        await supabase.from('user_tasks').insert(userTasks);
+      }
+
+      // Check for pro-task (routine launcher)
+      const hasProTask = tasks.some(t => t.id.startsWith('__pro_task_routine_'));
+      if (hasProTask) {
+        await supabase.from('user_tasks').insert({
+          user_id: user.id,
+          title,
+          emoji: '🎬',
+          color: 'mint',
+          repeat_pattern: 'daily',
+          tag: title,
+          pro_link_type: 'routine',
+          pro_link_value: routineId,
+          is_active: true,
+          order_index: startOrder + regularTasks.length,
+          source_routine_id: null,
+        });
+      }
+
+      toast.success('Routine created! 🎉');
+      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
+      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
+    } catch (err) {
+      console.error('Failed to create routine:', err);
+      toast.error('Failed to create routine');
+    } finally {
+      setIsSaving(false);
+    }
     onNext();
   };
 
