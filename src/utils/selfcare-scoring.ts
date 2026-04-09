@@ -54,11 +54,17 @@ export const DEEPER_MAP: Record<string, string[]> = {
 
 // Category → cluster mapping (exported for weekly review alignment)
 export const CLUSTER_MAP: Record<string, string> = {
+  // Body
   sleep: 'body', nutrition: 'body', movement: 'body', Exercise: 'body',
+  // Mind
   calm: 'mind', Presence: 'mind', gratitude: 'mind', 'self-kindness': 'mind',
+  // Environment
   TidyUp: 'environment', productivity: 'environment', hygiene: 'environment', Evening: 'environment',
+  'easy-win': 'environment',
+  // People
   connection: 'people', LovedOnes: 'people',
-  'easy-win': 'environment', // fallback cluster
+  // Extended admin categories
+  Empowered: 'mind', MoneyMindset: 'mind', CeoWellness: 'body',
 };
 
 export const CLUSTER_LABELS: Record<ClusterType, string> = {
