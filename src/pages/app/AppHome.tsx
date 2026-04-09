@@ -642,7 +642,7 @@ const AppHome = () => {
         { taskId: task.id, date: selectedDate, amount: 1 },
         {
           onSuccess: (result) => {
-            haptic.success();
+            haptic.successBurst();
             const unit = task.goal_unit || 'times';
             toast(`+1 ${unit}`, {
               description: `Progress: ${result.newProgress}/${task.goal_target}`,
@@ -701,7 +701,7 @@ const AppHome = () => {
       { taskId: goalInputTask.id, date: selectedDate, amount },
       {
         onSuccess: (result) => {
-          haptic.success();
+          haptic.successBurst();
           const unit = goalInputTask.goal_unit || 'times';
           toast(`+${amount} ${unit}`, {
             description: `Progress: ${result.newProgress}/${goalInputTask.goal_target}`,
@@ -722,7 +722,7 @@ const AppHome = () => {
       { taskId: timerTask.id, date: selectedDate, amount: secondsElapsed },
       {
         onSuccess: (result) => {
-          haptic.success();
+          haptic.successBurst();
           const mins = Math.floor(result.newProgress / 60);
           const goalMins = Math.floor((timerTask.goal_target || 0) / 60);
           toast(`Timer saved`, {
@@ -746,7 +746,7 @@ const AppHome = () => {
       { taskId: timerTask.id, date: selectedDate, amount: remainingSeconds },
       {
         onSuccess: () => {
-          haptic.success();
+          haptic.celebrate();
           toast(`Goal completed! 🎉`, { duration: 2000 });
         },
       }
@@ -769,11 +769,8 @@ const AppHome = () => {
   const deleteTask = useDeleteTask();
   const handleDeleteTask = useCallback((task: UserTask) => {
     setSelectedTask(null);
-    deleteTask.mutate(task.id, {
-      onSuccess: () => {
-        haptic.light();
-      }
-    });
+    haptic.deleteSweep();
+    deleteTask.mutate(task.id);
   }, [deleteTask]);
   
   const handleSkipTask = useCallback((task: UserTask) => {

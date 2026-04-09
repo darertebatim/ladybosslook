@@ -166,20 +166,19 @@ export const TaskCard = memo(function TaskCard({
       return;
     }
     
-    // Haptic feedback
-    haptic.light();
-
     // Animate
     setIsAnimating(true);
     setTimeout(() => setIsAnimating(false), 2500);
 
     if (isCompleted) {
+      haptic.light();
       uncompleteTask.mutate({ taskId: task.id, date });
     } else {
+      haptic.successBurst();
       playCompletionSound();
       const result = await completeTask.mutateAsync({ taskId: task.id, date });
       if (result.streakIncreased && onStreakIncrease) {
-        haptic.medium();
+        haptic.celebrate();
         onStreakIncrease();
       }
       if (result.unlockedStep && onStepUnlocked) {
@@ -212,8 +211,7 @@ export const TaskCard = memo(function TaskCard({
     
     // Small count goals: directly increment by 1 with animation
     if (isSmallCountGoal && onOpenGoalInput) {
-      // Medium haptic for satisfying feedback
-      haptic.medium();
+      haptic.successBurst();
       
       // Trigger floating +1 animation
       setShowFloatingPlus(true);
@@ -254,6 +252,7 @@ export const TaskCard = memo(function TaskCard({
   };
 
   const handleCardClick = () => {
+    haptic.doubleTap();
     // Always open task detail modal (for both regular and Pro tasks)
     if (onTap) {
       onTap(task);
