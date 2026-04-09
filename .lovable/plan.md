@@ -1,52 +1,33 @@
 
 
-# Fix: Align Weekly Review with Self-Care Quiz Categories
+# Fix: Complete the Category-Based Weekly Review Alignment
 
-## The Problem
-The selfcare quiz works with **14 specific categories** (calm, sleep, nutrition, movement, Exercise, hygiene, Presence, connection, self-kindness, gratitude, productivity, TidyUp, Evening, LovedOnes). The weekly review ignores these and maps everything to 4 broad clusters (body/mind/environment/people), then tries to find tasks by cluster. This loses all specificity and often returns nothing useful.
+## Problem
+Three issues remain:
 
-## The Fix
+1. **Broken suggestion engine**: `WeekTaskSuggestionsStep` reads flow step options from `(window as any).__selfcareWeeklyReviewSteps` — which is **never set anywhere**. So `resolveCategories()` always returns `[]`, meaning wins/struggles/focus answers produce zero category matches. The entire suggestion logic is dead.
 
-### 1. Rewrite the question options to map directly to selfcare categories
-**File: `src/data/onboarding-flows/selfcare-weekly-review.ts`**
+2. **Non-selfcare categories in CLUSTER_MAP**: `Empowered`, `MoneyMindset`, `CeoWellness` are still in the map — they should be removed so only the 14 self-care categories are tracked.
 
-Replace the current `wr-selfcare-wins` and `wr-struggled` options with ones that directly reference the 14 selfcare categories (using the `description` field as the category key, not the cluster).
+3. **Flow options already correct**: The `selfcare-weekly-review.ts` flow already has category slugs in `description` fields (e.g., `sleep`, `TidyUp`, `calm`). No changes needed there.
 
-For example:
-- "Slept well" -> description: `sleep` (not `body`)
-- "Practiced mindfulness" -> description: `calm` (not `mind`)
-- "Kept my space tidy" -> description: `TidyUp` (not `environment`)
+## Changes
 
-Also update `wr-focus-next` options to carry category keys.
-
-### 2. Rewrite the suggestion engine to use categories, not clusters
+### 1. Fix suggestion engine — import flow directly
 **File: `src/components/app/weekly-review/WeekTaskSuggestionsStep.tsx`**
 
-Remove the hardcoded `WINS_CLUSTER_MAP` and `STRUGGLED_CLUSTER_MAP`. Instead:
+- Import `selfcareWeeklyReviewFlow` from the flow definition file
+- Replace the broken `(window as any).__selfcareWeeklyReviewSteps` with `selfcareWeeklyReviewFlow.steps`
+- `resolveCategories` will now correctly look up the `description` (category slug) for each selected label
 
-- Read `wr-selfcare-wins` answers and extract their category from the option's `description` field (which now holds the actual category slug like `sleep`, `calm`, `TidyUp`)
-- Read `wr-struggled` answers the same way
-- Query `admin_task_bank` matching `category` directly against these slugs
-- For wins: suggest tasks from the same category to reinforce ("Keep going with Sleep")
-- For struggles: suggest tasks from that category as alternatives ("Help with Calm")
-- Keep gap-based (weak clusters from report), replacement, and expansion logic
+### 2. Remove non-selfcare categories from CLUSTER_MAP
+**File: `src/utils/selfcare-scoring.ts`**
 
-### 3. Remove old legacy `wr-felt-good` / `wr-focus` tag matching
-The old `wr-felt-good:X` and `wr-focus:X` tag-based matching is dead code in the selfcare flow. Remove it from the suggestion logic (or gate it behind a flow check).
+Remove line 67: `Empowered: 'mind', MoneyMindset: 'mind', CeoWellness: 'body'`
 
-### 4. Update `wr-focus-next` to carry category slugs
-Each focus option maps to a category so the suggestion engine can use it:
-- "Better sleep" -> `sleep`
-- "Calm my mind" -> `calm`
-- "Tidy my space" -> `TidyUp`
+Final map: only the 14 self-care categories + `easy-win`.
 
-### 5. Fix cluster breakdown to also use the 14 categories
-**File: `src/components/app/weekly-review/WeekReportStep.tsx`**
-
-The `CLUSTER_MAP` is missing some admin categories. Add any missing ones (Empowered, MoneyMindset, CeoWellness, etc.) to ensure all admin_task_bank categories map to a cluster. This ensures the report step's cluster breakdown covers all user tasks.
-
-## Files Modified
-- `src/data/onboarding-flows/selfcare-weekly-review.ts` — option descriptions become category slugs
-- `src/components/app/weekly-review/WeekTaskSuggestionsStep.tsx` — category-based matching replaces cluster-based
-- `src/utils/selfcare-scoring.ts` — expand CLUSTER_MAP with missing admin categories
+### Files
+- **Modify**: `src/components/app/weekly-review/WeekTaskSuggestionsStep.tsx` — fix the import
+- **Modify**: `src/utils/selfcare-scoring.ts` — remove 3 non-selfcare entries
 
