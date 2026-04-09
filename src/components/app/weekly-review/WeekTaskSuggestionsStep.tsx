@@ -141,69 +141,55 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
       seen.add(match.title);
     };
 
-    // Map selfcare-wins option labels → clusters for category-based matching
-    const WINS_CLUSTER_MAP: Record<string, ClusterType> = {
-      'Slept well': 'body', 'Moved my body': 'body', 'Ate nourishing food': 'body',
-      'Spent time in nature': 'body', 'Drank enough water': 'body',
-      'Practiced mindfulness': 'mind', 'Took breaks when needed': 'mind',
-      'Journaled or reflected': 'mind', 'Felt grateful': 'mind',
-      'Kept my space tidy': 'environment', 'Had an evening routine': 'environment',
-      'Stayed organized': 'environment', 'Took care of hygiene': 'environment',
-      'Connected with someone': 'people', 'Quality time with loved ones': 'people',
-      'Was kind to myself': 'people',
+    // Helper to resolve category slug from option description in the flow
+    // The selfcare-weekly-review flow stores category slugs (e.g. 'sleep', 'TidyUp')
+    // in each option's `description` field. We look up the selected label in the
+    // flow step options to retrieve the slug.
+    const flowSteps = (window as any).__selfcareWeeklyReviewSteps as undefined | any[];
+
+    const resolveCategories = (stepId: string, selectedLabels: string[]): string[] => {
+      // Try to find step options from the flow definition cached on window,
+      // or fall back to a simple lookup from the selfcare-weekly-review flow options
+      const stepDef = flowSteps?.find((s: any) => s.id === stepId);
+      if (!stepDef?.options) return [];
+      return selectedLabels
+        .map(label => {
+          const opt = stepDef.options.find((o: any) => o.label === label);
+          return opt?.description as string | undefined;
+        })
+        .filter((c): c is string => !!c);
     };
 
-    const STRUGGLED_CLUSTER_MAP: Record<string, ClusterType> = {
-      'Sleep & rest': 'body', 'Exercise or movement': 'body', 'Eating well': 'body',
-      'Quieting my mind': 'mind', 'Being present': 'mind', 'Managing stress': 'mind',
-      'Keeping things tidy': 'environment', 'Sticking to routines': 'environment',
-      'Evening wind-down': 'environment',
-      'Staying connected': 'people', 'Being kind to myself': 'people',
-      'Making time for others': 'people',
-    };
-
-    // 1a. Legacy wr-felt-good / wr-focus tag matches (old flow compat)
-    const feltGood = answers?.['wr-felt-good'];
-    if (Array.isArray(feltGood)) {
-      feltGood.forEach(answer => {
-        const match = wrTasks.find(t => t.tag === `wr-felt-good:${answer}`);
-        if (match) addTask(match, `You felt good about ${answer}`);
-      });
-    }
-
-    const focusNext = answers?.['wr-focus-next'];
-    if (Array.isArray(focusNext)) {
-      focusNext.forEach(answer => {
-        const match = wrTasks.find(t => t.tag === `wr-focus:${answer}`);
-        if (match) addTask(match, `You want to ${answer}`);
-      });
-    }
-
-    // 1b. New selfcare flow: use selfcare-wins to find tasks from winning clusters
+    // 1. Wins — suggest tasks from categories the user felt good about (reinforce)
     const selfcareWins = answers?.['wr-selfcare-wins'];
-    if (Array.isArray(selfcareWins) && tasks.length < 3) {
-      const winClusters = new Set(selfcareWins.map(w => WINS_CLUSTER_MAP[w]).filter(Boolean));
-      for (const cluster of winClusters) {
-        if (tasks.length >= 3) break;
-        const match = wrTasks.find(t => {
-          const tc = mapTaskToCluster(t.category);
-          return tc === cluster && !seen.has(t.title);
-        });
-        if (match) addTask(match, `Keep building on your ${CLUSTER_LABELS[cluster]} wins`, 'Keep going');
+    if (Array.isArray(selfcareWins)) {
+      const winCategories = resolveCategories('wr-selfcare-wins', selfcareWins);
+      for (const cat of winCategories) {
+        if (tasks.length >= 2) break;
+        const match = wrTasks.find(t => t.category === cat && !seen.has(t.title));
+        if (match) addTask(match, `Keep going with ${cat}`, 'Keep going');
       }
     }
 
-    // 1c. New selfcare flow: use struggled areas to suggest help
+    // 2. Struggles — suggest tasks from categories the user struggled with
     const struggled = answers?.['wr-struggled'];
-    if (Array.isArray(struggled) && tasks.length < 4) {
-      const struggleClusters = new Set(struggled.map(s => STRUGGLED_CLUSTER_MAP[s]).filter(Boolean));
-      for (const cluster of struggleClusters) {
+    if (Array.isArray(struggled)) {
+      const struggleCategories = resolveCategories('wr-struggled', struggled);
+      for (const cat of struggleCategories) {
         if (tasks.length >= 4) break;
-        const match = wrTasks.find(t => {
-          const tc = mapTaskToCluster(t.category);
-          return tc === cluster && !seen.has(t.title);
-        });
-        if (match) addTask(match, `This can help with ${CLUSTER_LABELS[cluster]} care`, 'Recommended');
+        const match = wrTasks.find(t => t.category === cat && !seen.has(t.title));
+        if (match) addTask(match, `This can help with ${cat}`, 'Recommended');
+      }
+    }
+
+    // 3. Focus-next — suggest tasks from categories the user wants to nurture
+    const focusNext = answers?.['wr-focus-next'];
+    if (Array.isArray(focusNext)) {
+      const focusCategories = resolveCategories('wr-focus-next', focusNext);
+      for (const cat of focusCategories) {
+        if (tasks.length >= 4) break;
+        const match = wrTasks.find(t => t.category === cat && !seen.has(t.title));
+        if (match) addTask(match, `You want to focus on ${cat}`, 'Your pick');
       }
     }
 
