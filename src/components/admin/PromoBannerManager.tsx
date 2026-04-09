@@ -23,8 +23,8 @@ type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools'
 const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
   { value: 'home_top', label: '🏠 Home - Above Tasks' },
   { value: 'home_rituals', label: '🏠 Home - After Routines' },
-  { value: 'explore', label: '🔍 Explore - Top' },
-  { value: 'explore_tools', label: '🔍 Explore - Under Tools' },
+  { value: 'explore', label: '🧰 Tools Page - Top' },
+  { value: 'explore_tools', label: '🧰 Tools Page - Under Tools' },
   { value: 'listen', label: '🎧 Listen Page' },
   { value: 'player', label: '▶️ Audio Player' },
   { value: 'programs', label: '📚 Programs Page' },
