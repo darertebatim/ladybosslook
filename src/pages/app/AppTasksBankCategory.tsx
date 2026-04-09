@@ -239,6 +239,9 @@ export default function AppTasksBankCategory() {
 
           {!tasksLoading && (
             <div className="px-4 pt-4 space-y-2.5">
+              {category?.description && (
+                <p className="text-sm text-muted-foreground pb-1">{category.description}</p>
+              )}
               {filteredTasks.map(task => (
                 <TaskTemplateCard
                   key={task.id}
