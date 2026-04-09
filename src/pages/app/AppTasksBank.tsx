@@ -325,11 +325,16 @@ export default function AppTasksBank() {
                   onClick={() => handleCategoryTap(cat.slug)}
                   className="w-full flex items-center justify-between px-4 mb-3 active:opacity-70 transition-opacity"
                 >
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-bold text-foreground">{cat.name}</h2>
-                    <span className="text-xs text-muted-foreground font-medium bg-muted/60 px-2 py-0.5 rounded-full">
-                      {tasks.length}
-                    </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg font-bold text-foreground">{cat.name}</h2>
+                      <span className="text-xs text-muted-foreground font-medium bg-muted/60 px-2 py-0.5 rounded-full">
+                        {tasks.length}
+                      </span>
+                    </div>
+                    {cat.description && (
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{cat.description}</p>
+                    )}
                   </div>
                   <div className="flex items-center gap-1 text-sm font-medium text-primary">
                     All
