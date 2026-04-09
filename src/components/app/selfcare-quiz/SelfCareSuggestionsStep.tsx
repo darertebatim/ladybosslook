@@ -7,8 +7,8 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { RoutinePreviewSheet, EditedTask, ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
 import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { useAuth } from '@/hooks/useAuth';
-import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import type { ProLinkType } from '@/lib/proTaskTypes';
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 
 interface SuggestedTask {
@@ -45,9 +45,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [showPreview, setShowPreview] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const { user } = useAuth();
-  const queryClient = useQueryClient();
   const addRoutinePlan = useAddRoutinePlan();
 
   const diagnosisData = useMemo(() => {
@@ -146,25 +144,25 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
   const allSelected = selectionCount === taskTemplates.length && taskTemplates.length > 0;
 
   // Convert selected tasks to RoutinePlanTask format for the preview sheet
-  const previewTasks: RoutinePlanTask[] = useMemo(() => {
+  const routineTasks: RoutinePlanTask[] = useMemo(() => {
     return taskTemplates
       .filter(t => selectedTasks.has(t.id))
       .map((t, i) => ({
         id: t.id,
+        plan_id: 'synthetic-selfcare-quiz',
         title: t.title,
-        emoji: t.emoji,
+        icon: t.emoji,
         color: t.color || ROUTINE_COLOR_CYCLE[i % ROUTINE_COLOR_CYCLE.length],
-        repeat_pattern: t.repeat_pattern || 'daily',
-        repeat_days: t.repeat_days || null,
+        task_order: i,
+        is_active: true,
+        created_at: new Date().toISOString(),
+        linked_playlist_id: t.linked_playlist_id || null,
+        pro_link_type: (t.pro_link_type as ProLinkType) || null,
+        pro_link_value: t.pro_link_value || null,
         goal_enabled: t.goal_enabled || false,
         goal_type: t.goal_type || null,
         goal_target: t.goal_target || null,
         goal_unit: t.goal_unit || null,
-        description: t.description || null,
-        time_period: t.time_period || null,
-        linked_playlist_id: t.linked_playlist_id || null,
-        pro_link_type: t.pro_link_type || null,
-        pro_link_value: t.pro_link_value || null,
       }));
   }, [taskTemplates, selectedTasks]);
 
@@ -173,36 +171,33 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
     setShowPreview(true);
   };
 
-  const handlePreviewSave = async (selectedIds: string[], editedTasks: EditedTask[]) => {
-    if (!user) { onNext(); return; }
-    setIsSaving(true);
+  const handleSave = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
+    if (!user) return;
     try {
-      const finalTasks = previewTasks
-        .filter(t => selectedIds.includes(t.id))
-        .map(t => {
-          const edited = editedTasks.find(e => e.id === t.id);
-          return edited ? { ...t, ...edited } : t;
-        });
-
       await addRoutinePlan.mutateAsync({
-        title: 'My Self-Care Routine',
-        emoji: '✨',
-        color: 'mint',
-        tasks: finalTasks,
+        planId: 'synthetic-selfcare-quiz',
+        selectedTaskIds,
+        editedTasks: editedTasks.map(t => ({
+          id: t.id,
+          title: t.title,
+          icon: t.icon,
+          color: t.color,
+          repeatPattern: t.repeatPattern,
+          scheduledTime: t.scheduledTime,
+          tag: t.tag,
+          linked_playlist_id: t.linked_playlist_id,
+          pro_link_type: t.pro_link_type,
+          pro_link_value: t.pro_link_value,
+        })),
+        syntheticTasks: routineTasks,
       });
-
       toast.success('Routine created! 🎉');
-      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
-      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
+      setShowPreview(false);
+      onNext();
     } catch (err) {
       console.error('Failed to create routine:', err);
       toast.error('Failed to create routine');
-    } finally {
-      setIsSaving(false);
-      setShowPreview(false);
     }
-    onNext();
   };
 
   return (
@@ -310,11 +305,11 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
       <RoutinePreviewSheet
         open={showPreview}
         onOpenChange={setShowPreview}
-        tasks={previewTasks}
+        tasks={routineTasks}
         routineTitle="My Self-Care Routine"
         routineColor="mint"
-        onSave={handlePreviewSave}
-        isSaving={isSaving}
+        onSave={handleSave}
+        isSaving={addRoutinePlan.isPending}
       />
     </div>
   );
