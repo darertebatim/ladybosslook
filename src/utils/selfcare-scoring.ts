@@ -52,14 +52,41 @@ export const DEEPER_MAP: Record<string, string[]> = {
   'Taking care of someone I love': ['LovedOnes'],
 };
 
-// Category → cluster mapping
-const CLUSTER_MAP: Record<string, string> = {
+// Category → cluster mapping (exported for weekly review alignment)
+export const CLUSTER_MAP: Record<string, string> = {
   sleep: 'body', nutrition: 'body', movement: 'body', Exercise: 'body',
   calm: 'mind', Presence: 'mind', gratitude: 'mind', 'self-kindness': 'mind',
   TidyUp: 'environment', productivity: 'environment', hygiene: 'environment', Evening: 'environment',
   connection: 'people', LovedOnes: 'people',
   'easy-win': 'environment', // fallback cluster
 };
+
+export const CLUSTER_LABELS: Record<ClusterType, string> = {
+  body: 'Body',
+  mind: 'Mind',
+  environment: 'Environment',
+  people: 'People',
+};
+
+export const CLUSTER_EMOJIS: Record<ClusterType, string> = {
+  body: '💪',
+  mind: '🧠',
+  environment: '🏠',
+  people: '💕',
+};
+
+/** Map a user_tasks.tag (or admin_task_bank.category) to a self-care cluster */
+export function mapTaskToCluster(tag: string | null | undefined): ClusterType | null {
+  if (!tag) return null;
+  // Direct match
+  if (CLUSTER_MAP[tag]) return CLUSTER_MAP[tag] as ClusterType;
+  // Lowercase match
+  const lower = tag.toLowerCase();
+  for (const [key, cluster] of Object.entries(CLUSTER_MAP)) {
+    if (key.toLowerCase() === lower) return cluster as ClusterType;
+  }
+  return null;
+}
 
 export type ClusterType = 'body' | 'mind' | 'environment' | 'people';
 
