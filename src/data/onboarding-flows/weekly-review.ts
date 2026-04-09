@@ -72,10 +72,17 @@ export const weeklyReviewFlow: OnboardingFlow = {
       buttonLabel: 'Continue',
     },
     {
+      id: 'wr-cleanup',
+      type: 'week-cleanup',
+      title: "These goals didn't stick this week",
+      subtitle: "It's okay — let's make room for what works better",
+      buttonLabel: 'Continue',
+    },
+    {
       id: 'wr-task-suggestions',
       type: 'week-task-suggestions',
       title: 'Great! How about trying some new goals this week?',
-      subtitle: 'We picked these based on your answers',
+      subtitle: 'Based on your self-care balance',
       buttonLabel: 'Add to My Routines',
       secondaryButtonLabel: 'Skip',
     },

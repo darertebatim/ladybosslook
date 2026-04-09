@@ -19,6 +19,7 @@ import { WeekReportStep } from '@/components/app/weekly-review/WeekReportStep';
 import { SatisfactionSliderStep } from '@/components/app/weekly-review/SatisfactionSliderStep';
 import { WeekTaskSuggestionsStep } from '@/components/app/weekly-review/WeekTaskSuggestionsStep';
 import { WeekCelebrationStep } from '@/components/app/weekly-review/WeekCelebrationStep';
+import { WeekCleanupStep } from '@/components/app/weekly-review/WeekCleanupStep';
 import { SelfCareDiagnosisStep } from '@/components/app/selfcare-quiz/SelfCareDiagnosisStep';
 import { SelfCareSuggestionsStep } from '@/components/app/selfcare-quiz/SelfCareSuggestionsStep';
 import { SelfCareYourWhyStep } from '@/components/app/selfcare-quiz/SelfCareYourWhyStep';
@@ -134,7 +135,9 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
     case 'routine-ready-teaser':
       return <RoutineReadyTeaserScreen step={step} onNext={onNext} />;
     case 'week-report':
-      return <WeekReportStep step={step} onNext={onNext} />;
+      return <WeekReportStep step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'week-cleanup':
+      return <WeekCleanupStep step={step} onNext={onNext} onAnswer={onAnswer} answers={answers} />;
     case 'satisfaction-slider':
       return <SatisfactionSliderStep step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'week-task-suggestions':
