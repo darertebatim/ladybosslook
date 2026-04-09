@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { X } from 'lucide-react';
 import onboardingBannerImg from '@/assets/onboarding-banner.png';
-import { isSpecialBannerDisabled } from '@/components/admin/SpecialBannersArchive';
+import { useSpecialBannerSettings } from '@/hooks/useSpecialBannerSettings';
 
 const ONBOARDING_COMPLETED_KEY = 'simora_onboarding_completed_me-plus-v1';
 const ONBOARDING_PROGRESS_KEY = 'simora_onboarding_progress_me-plus-v1';
@@ -13,7 +13,8 @@ const ONBOARDING_DISMISSED_KEY = 'simora_onboarding_banner_dismissed';
 export function OnboardingBanner() {
   const navigate = useNavigate();
   const isCompleted = localStorage.getItem(ONBOARDING_COMPLETED_KEY) === 'true';
-  const isAdminDisabled = isSpecialBannerDisabled('OnboardingBanner');
+  const { data: disabledMap = {} } = useSpecialBannerSettings();
+  const isAdminDisabled = disabledMap['OnboardingBanner'] === true;
   const [isDismissed, setIsDismissed] = useState(
     () => localStorage.getItem(ONBOARDING_DISMISSED_KEY) === 'true'
   );
