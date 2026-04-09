@@ -319,8 +319,11 @@ export default function AppTasksBank() {
             const tasks = tasksByCategory[cat.slug] || [];
             if (tasks.length === 0) return null;
 
-            return (
+             return (
               <div key={cat.slug} className="mt-6 first:mt-4">
+                {cat.description && (
+                  <p className="text-[11px] text-muted-foreground/70 px-4 mb-1.5 italic line-clamp-1">{cat.description}</p>
+                )}
                 <button
                   onClick={() => handleCategoryTap(cat.slug)}
                   className="w-full flex items-center justify-between px-4 mb-3 active:opacity-70 transition-opacity"
@@ -332,9 +335,6 @@ export default function AppTasksBank() {
                         {tasks.length}
                       </span>
                     </div>
-                    {cat.description && (
-                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{cat.description}</p>
-                    )}
                   </div>
                   <div className="flex items-center gap-1 text-sm font-medium text-primary">
                     All
