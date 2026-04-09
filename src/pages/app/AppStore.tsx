@@ -21,6 +21,7 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useRoutinesBank, useRoutineBankCategories, useFeaturedRoutinesBank } from '@/hooks/useRoutinesBank';
 import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
+import { SelfCareGoalsCategoryCard } from '@/components/app/SelfCareGoalsCategoryCard';
 import { useTaskTemplates } from '@/hooks/useTaskPlanner';
 
 const AppStore = () => {
