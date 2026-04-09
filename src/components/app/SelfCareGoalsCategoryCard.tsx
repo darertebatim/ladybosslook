@@ -73,8 +73,7 @@ export const SelfCareGoalsCategoryCard = memo(function SelfCareGoalsCategoryCard
       <div className="flex gap-3 p-2">
         {/* Emoji thumbnail */}
         <div className={cn(
-          'h-20 w-20 flex-shrink-0 rounded-xl overflow-hidden bg-gradient-to-br flex items-center justify-center',
-          gradient
+          'h-20 w-20 flex-shrink-0 rounded-xl overflow-hidden bg-white/80 flex items-center justify-center'
         )}>
           <FluentEmoji emoji={category.emoji || '✨'} size={36} className="opacity-80" />
         </div>
