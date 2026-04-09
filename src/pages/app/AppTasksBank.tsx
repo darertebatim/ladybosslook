@@ -332,9 +332,6 @@ export default function AppTasksBank() {
                         {tasks.length}
                       </span>
                     </div>
-                    {cat.description && (
-                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{cat.description}</p>
-                    )}
                   </div>
                   <div className="flex items-center gap-1 text-sm font-medium text-primary">
                     All
