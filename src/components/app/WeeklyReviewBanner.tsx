@@ -50,7 +50,7 @@ export function WeeklyReviewBanner({ onVisibilityChange }: { onVisibilityChange?
 
   const handleTap = () => {
     haptic.medium();
-    navigate('/app/onboarding/weekly-review');
+    navigate('/app/onboarding/selfcare-weekly-review');
   };
 
   return (
