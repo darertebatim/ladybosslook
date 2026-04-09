@@ -141,7 +141,28 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
       seen.add(match.title);
     };
 
-    // 1. Existing logic: wr-felt-good / wr-focus matches
+    // Map selfcare-wins option labels → clusters for category-based matching
+    const WINS_CLUSTER_MAP: Record<string, ClusterType> = {
+      'Slept well': 'body', 'Moved my body': 'body', 'Ate nourishing food': 'body',
+      'Spent time in nature': 'body', 'Drank enough water': 'body',
+      'Practiced mindfulness': 'mind', 'Took breaks when needed': 'mind',
+      'Journaled or reflected': 'mind', 'Felt grateful': 'mind',
+      'Kept my space tidy': 'environment', 'Had an evening routine': 'environment',
+      'Stayed organized': 'environment', 'Took care of hygiene': 'environment',
+      'Connected with someone': 'people', 'Quality time with loved ones': 'people',
+      'Was kind to myself': 'people',
+    };
+
+    const STRUGGLED_CLUSTER_MAP: Record<string, ClusterType> = {
+      'Sleep & rest': 'body', 'Exercise or movement': 'body', 'Eating well': 'body',
+      'Quieting my mind': 'mind', 'Being present': 'mind', 'Managing stress': 'mind',
+      'Keeping things tidy': 'environment', 'Sticking to routines': 'environment',
+      'Evening wind-down': 'environment',
+      'Staying connected': 'people', 'Being kind to myself': 'people',
+      'Making time for others': 'people',
+    };
+
+    // 1a. Legacy wr-felt-good / wr-focus tag matches (old flow compat)
     const feltGood = answers?.['wr-felt-good'];
     if (Array.isArray(feltGood)) {
       feltGood.forEach(answer => {
@@ -156,6 +177,34 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
         const match = wrTasks.find(t => t.tag === `wr-focus:${answer}`);
         if (match) addTask(match, `You want to ${answer}`);
       });
+    }
+
+    // 1b. New selfcare flow: use selfcare-wins to find tasks from winning clusters
+    const selfcareWins = answers?.['wr-selfcare-wins'];
+    if (Array.isArray(selfcareWins) && tasks.length < 3) {
+      const winClusters = new Set(selfcareWins.map(w => WINS_CLUSTER_MAP[w]).filter(Boolean));
+      for (const cluster of winClusters) {
+        if (tasks.length >= 3) break;
+        const match = wrTasks.find(t => {
+          const tc = mapTaskToCluster(t.category);
+          return tc === cluster && !seen.has(t.title);
+        });
+        if (match) addTask(match, `Keep building on your ${CLUSTER_LABELS[cluster]} wins`, 'Keep going');
+      }
+    }
+
+    // 1c. New selfcare flow: use struggled areas to suggest help
+    const struggled = answers?.['wr-struggled'];
+    if (Array.isArray(struggled) && tasks.length < 4) {
+      const struggleClusters = new Set(struggled.map(s => STRUGGLED_CLUSTER_MAP[s]).filter(Boolean));
+      for (const cluster of struggleClusters) {
+        if (tasks.length >= 4) break;
+        const match = wrTasks.find(t => {
+          const tc = mapTaskToCluster(t.category);
+          return tc === cluster && !seen.has(t.title);
+        });
+        if (match) addTask(match, `This can help with ${CLUSTER_LABELS[cluster]} care`, 'Recommended');
+      }
     }
 
     // 2. Gap-based: tasks from weak clusters
