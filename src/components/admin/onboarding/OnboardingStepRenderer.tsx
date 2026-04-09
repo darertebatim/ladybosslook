@@ -860,8 +860,8 @@ function MotivationalScreen({ step, onNext }: Props) {
         </div>
 
         {/* Bottom sheet — 60% */}
-        <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col">
-          <div className="px-6 pt-7 pb-5 flex flex-col flex-1">
+        <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-hidden">
+          <div className="px-6 pt-7 flex flex-col flex-1 overflow-y-auto overscroll-contain">
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -909,24 +909,27 @@ function MotivationalScreen({ step, onNext }: Props) {
               </motion.div>
             )}
 
-            {/* Button pinned at bottom */}
-            <div className="mt-auto">
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.25 }}
+            {/* Spacer for sticky button */}
+            <div className="h-24 shrink-0" />
+          </div>
+
+          {/* Button sticky at bottom */}
+          <div className="sticky bottom-0 left-0 right-0 px-6 pb-5 pt-3 bg-gradient-to-t from-white via-white to-white/0" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 20px), 20px)' }}>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.25 }}
+            >
+              <button
+                onClick={onNext}
+                className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base flex items-center justify-center gap-3 active:scale-[0.98] transition-all shadow-lg"
               >
-                <button
-                  onClick={onNext}
-                  className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base flex items-center justify-center gap-3 active:scale-[0.98] transition-all shadow-lg"
-                >
-                  {step.buttonLabel || 'Continue'}
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </button>
-              </motion.div>
-            </div>
+                {step.buttonLabel || 'Continue'}
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </button>
+            </motion.div>
           </div>
         </div>
       </div>

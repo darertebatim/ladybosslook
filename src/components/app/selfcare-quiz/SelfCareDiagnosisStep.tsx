@@ -207,8 +207,8 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
         <img src={meplusMascotBg} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
       </div>
 
-      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-y-auto overscroll-contain">
-        <div className="px-5 pt-5 flex flex-col flex-1 min-h-0" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}>
+      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-hidden">
+        <div className="px-5 pt-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
           <AnimatePresence mode="wait">
             {phase === 'loading' && (
               <motion.div
