@@ -429,18 +429,18 @@ function MultiSelectScreen({ step, onNext, onAnswer }: Props) {
           </FadeUp>
         ) : (
           <FadeUp delay={0.1}>
-            <div className="space-y-2 mb-4">
+            <div className={(step.options?.length || 0) > 6 ? "grid grid-cols-2 gap-2 mb-4" : "space-y-2 mb-4"}>
               {step.options?.map((opt, i) => (
                 <button
                   key={i}
                   onClick={() => toggle(i)}
-                  className={`w-full flex items-center gap-3 p-3.5 rounded-2xl border text-left transition-all active:scale-[0.98] ${
+                  className={`w-full flex items-center gap-2 p-3 rounded-2xl border text-left transition-all active:scale-[0.98] ${
                     selected.has(i) ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-white'
                   }`}
                 >
-                  {opt.emoji && <OptionEmoji emoji={opt.emoji} size={24} />}
-                  <span className="text-sm font-medium text-[#1a1f3d] flex-1">{opt.label}</span>
-                  {selected.has(i) && <SealCheck showParticles className="w-6 h-6 text-purple-500 animate-seal-pop" />}
+                  {opt.emoji && <OptionEmoji emoji={opt.emoji} size={(step.options?.length || 0) > 6 ? 20 : 24} />}
+                  <span className={`font-medium text-[#1a1f3d] flex-1 ${(step.options?.length || 0) > 6 ? 'text-xs leading-tight' : 'text-sm'}`}>{opt.label}</span>
+                  {selected.has(i) && <SealCheck showParticles className={`${(step.options?.length || 0) > 6 ? 'w-5 h-5' : 'w-6 h-6'} text-purple-500 animate-seal-pop`} />}
                 </button>
               ))}
             </div>
