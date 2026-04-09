@@ -31,7 +31,7 @@ export function SatisfactionSliderStep({ step, onNext, onAnswer }: Props) {
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
       {/* Hero — compact */}
-      <div className="shrink-0 relative" style={{ height: 180 }}>
+      <div className="shrink-0 relative" style={{ height: 140 }}>
         <img src={meplusMascotBg} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
       </div>
 
@@ -52,9 +52,9 @@ export function SatisfactionSliderStep({ step, onNext, onAnswer }: Props) {
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.3 }}
-            className="flex justify-center mb-4"
+            className="flex justify-center mb-2"
           >
-            <FluentEmoji emoji={selected !== null ? levels[selected].emoji : '🤔'} size={64} />
+            <FluentEmoji emoji={selected !== null ? levels[selected].emoji : '🤔'} size={48} />
           </motion.div>
 
           {/* Slider track */}
