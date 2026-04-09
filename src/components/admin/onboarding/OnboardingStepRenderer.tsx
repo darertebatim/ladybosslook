@@ -21,6 +21,9 @@ import { WeekTaskSuggestionsStep } from '@/components/app/weekly-review/WeekTask
 import { WeekCelebrationStep } from '@/components/app/weekly-review/WeekCelebrationStep';
 import { SelfCareDiagnosisStep } from '@/components/app/selfcare-quiz/SelfCareDiagnosisStep';
 import { SelfCareSuggestionsStep } from '@/components/app/selfcare-quiz/SelfCareSuggestionsStep';
+import { SelfCareYourWhyStep } from '@/components/app/selfcare-quiz/SelfCareYourWhyStep';
+import { SelfCareCommitmentStep } from '@/components/app/selfcare-quiz/SelfCareCommitmentStep';
+import { SelfCareReflectionStep } from '@/components/app/selfcare-quiz/SelfCareReflectionStep';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 import { computeTopCluster } from '@/utils/selfcare-scoring';
 
@@ -144,6 +147,12 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <SelfCareSuggestionsStep step={step} onNext={onNext} answers={answers} />;
     case 'dynamic-single-select':
       return <DynamicSingleSelectScreen step={step} onNext={onNext} onAnswer={onAnswer} answers={answers} />;
+    case 'selfcare-your-why':
+      return <SelfCareYourWhyStep step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'selfcare-commitment':
+      return <SelfCareCommitmentStep step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'selfcare-reflection':
+      return <SelfCareReflectionStep step={step} onNext={onNext} onAnswer={onAnswer} answers={answers} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }
