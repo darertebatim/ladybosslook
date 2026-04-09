@@ -137,7 +137,9 @@ export function WeekCleanupStep({ step, onNext, onAnswer, answers }: Props) {
                   <div className="flex-1 min-w-0">
                     <span className="text-sm font-semibold text-foreground block truncate">{task.title}</span>
                     <span className="text-[10px] text-muted-foreground">
-                      Skipped {task.skipCount}× this week
+                      {task.skipCount > 0 
+                        ? `Skipped ${task.skipCount}× this week`
+                        : 'Not done this week'}
                     </span>
                   </div>
                 </div>
