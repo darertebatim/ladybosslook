@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import weeklyReviewBanner from '@/assets/weekly-review-banner.png';
-import { isSpecialBannerDisabled } from '@/components/admin/SpecialBannersArchive';
+import { useSpecialBannerSettings } from '@/hooks/useSpecialBannerSettings';
 
 function getWeekNumber(d: Date): number {
   const oneJan = new Date(d.getFullYear(), 0, 1);
@@ -30,8 +30,9 @@ export function WeeklyReviewBanner({ onVisibilityChange }: { onVisibilityChange?
     } catch { return false; }
   });
   const [fading, setFading] = useState(false);
+  const { data: disabledMap = {} } = useSpecialBannerSettings();
 
-  const isShowing = !!user && isWeekend && !dismissed && !isSpecialBannerDisabled('WeeklyReviewBanner');
+  const isShowing = !!user && isWeekend && !dismissed && !disabledMap['WeeklyReviewBanner'];
 
   useEffect(() => {
     onVisibilityChange?.(isShowing);

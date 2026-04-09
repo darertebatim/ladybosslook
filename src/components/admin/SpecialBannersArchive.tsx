@@ -2,10 +2,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Info } from 'lucide-react';
-import { useState } from 'react';
 import moodBannerImg from '@/assets/mood-banner.png';
 import onboardingBannerImg from '@/assets/onboarding-banner.png';
 import weeklyReviewBannerImg from '@/assets/weekly-review-banner.png';
+import { useSpecialBannerSettings, useToggleSpecialBanner } from '@/hooks/useSpecialBannerSettings';
 
 interface SpecialBanner {
   name: string;
@@ -14,7 +14,6 @@ interface SpecialBanner {
   description: string;
   conditions: string[];
   coverImage?: string;
-  storageKey: string;
 }
 
 const specialBanners: SpecialBanner[] = [
@@ -24,7 +23,6 @@ const specialBanners: SpecialBanner[] = [
     location: 'Home (after Promo & Home banners)',
     description: 'Daily prompt encouraging users to log their mood. Uses a static 3:1 image banner. Tapping opens the mood logging screen.',
     coverImage: moodBannerImg,
-    storageKey: 'special_banner_disabled_MoodCheckInBanner',
     conditions: [
       'Hidden when Promo or Home banners are active',
       'Auto-hides after today\'s mood is logged',
@@ -38,7 +36,6 @@ const specialBanners: SpecialBanner[] = [
     location: 'Home (above My Tasks)',
     description: 'Guides new users through the 12-step onboarding flow. Uses a static 3:1 image banner with the Ladybosslook mascot.',
     coverImage: onboardingBannerImg,
-    storageKey: 'special_banner_disabled_OnboardingBanner',
     conditions: [
       'Shown only to users who haven\'t completed onboarding',
       'Dismissible via X button (stays hidden for session)',
@@ -52,7 +49,6 @@ const specialBanners: SpecialBanner[] = [
     location: 'Home (after Mood Check-In banner)',
     description: 'Weekend banner encouraging users to review their week and plan the next one. Uses a 3:1 cover image with mascot, "Plan your next week in 1 min!" text, and a "Let\'s go!" CTA.',
     coverImage: weeklyReviewBannerImg,
-    storageKey: 'special_banner_disabled_WeeklyReviewBanner',
     conditions: [
       'Shown only on weekends (Saturday & Sunday)',
       'Appears after Mood Check-In banner is dismissed',
@@ -63,23 +59,13 @@ const specialBanners: SpecialBanner[] = [
   },
 ];
 
-export function isSpecialBannerDisabled(component: string): boolean {
-  return localStorage.getItem(`special_banner_disabled_${component}`) === 'true';
-}
-
 export function SpecialBannersArchive() {
-  const [disabledMap, setDisabledMap] = useState<Record<string, boolean>>(() => {
-    const map: Record<string, boolean> = {};
-    specialBanners.forEach(b => {
-      map[b.component] = localStorage.getItem(b.storageKey) === 'true';
-    });
-    return map;
-  });
+  const { data: disabledMap = {} } = useSpecialBannerSettings();
+  const toggleMutation = useToggleSpecialBanner();
 
   const toggleBanner = (banner: SpecialBanner) => {
     const newValue = !disabledMap[banner.component];
-    localStorage.setItem(banner.storageKey, String(newValue));
-    setDisabledMap(prev => ({ ...prev, [banner.component]: newValue }));
+    toggleMutation.mutate({ component: banner.component, disabled: newValue });
   };
 
   return (
@@ -88,7 +74,7 @@ export function SpecialBannersArchive() {
         <Info className="h-4 w-4 mt-0.5 shrink-0" />
         <span>
           Special banners have custom logic built into the app (e.g. conditional visibility based on user state). 
-          Use the toggle to temporarily enable or disable each banner.
+          Use the toggle to enable or disable each banner across all devices.
         </span>
       </div>
 
