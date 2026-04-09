@@ -109,7 +109,7 @@ export function WeekCleanupStep({ step, onNext, onAnswer, answers }: Props) {
 
   return (
     <div className="h-full bg-white flex flex-col">
-      <div className="flex flex-col flex-1 px-5 pt-8 pb-5">
+      <div className="px-5 pt-8">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -121,8 +121,10 @@ export function WeekCleanupStep({ step, onNext, onAnswer, answers }: Props) {
             <p className="text-xs text-muted-foreground mt-1">{step.subtitle}</p>
           )}
         </motion.div>
+      </div>
 
-        <div className="space-y-3 flex-1 min-h-0 overflow-y-auto overscroll-contain">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-5">
+        <div className="space-y-3">
           <AnimatePresence>
             {skippedTasks.map((task, i) => (
               <motion.div
@@ -166,16 +168,16 @@ export function WeekCleanupStep({ step, onNext, onAnswer, answers }: Props) {
             ))}
           </AnimatePresence>
         </div>
+      </div>
 
-        <div className="mt-auto pt-3">
-          <button
-            onClick={handleContinue}
-            disabled={saving}
-            className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : step.buttonLabel || 'Continue'}
-          </button>
-        </div>
+      <div className="shrink-0 px-5 pb-5 pt-3 bg-white">
+        <button
+          onClick={handleContinue}
+          disabled={saving}
+          className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50"
+        >
+          {saving ? 'Saving...' : step.buttonLabel || 'Continue'}
+        </button>
       </div>
     </div>
   );

@@ -352,7 +352,7 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
 
   return (
     <div className="h-full bg-white flex flex-col">
-      <div className="flex flex-col flex-1 px-5 pt-8 pb-5">
+      <div className="flex flex-col flex-1 px-5 pt-8">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -419,21 +419,21 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
             ))}
           </AnimatePresence>
         </div>
+      </div>
 
-        <div className="mt-auto space-y-2 pt-2">
-          <button
-            onClick={() => setShowPreview(true)}
-            className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base active:scale-[0.98] transition-all"
-          >
-            {step.buttonLabel || 'Add to My Routines'}
-          </button>
-          <button
-            onClick={onNext}
-            className="w-full py-2 text-sm text-muted-foreground font-medium active:opacity-60"
-          >
-            {step.secondaryButtonLabel || 'Skip'}
-          </button>
-        </div>
+      <div className="shrink-0 px-5 pb-5 pt-2 bg-white space-y-2">
+        <button
+          onClick={() => setShowPreview(true)}
+          className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base active:scale-[0.98] transition-all"
+        >
+          {step.buttonLabel || 'Add to My Routines'}
+        </button>
+        <button
+          onClick={onNext}
+          className="w-full py-2 text-sm text-muted-foreground font-medium active:opacity-60"
+        >
+          {step.secondaryButtonLabel || 'Skip'}
+        </button>
       </div>
 
       <RoutinePreviewSheet

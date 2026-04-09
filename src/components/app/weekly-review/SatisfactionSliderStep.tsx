@@ -36,8 +36,8 @@ export function SatisfactionSliderStep({ step, onNext, onAnswer }: Props) {
       </div>
 
       {/* Bottom sheet */}
-      <div className={`flex-1 bg-gradient-to-b ${bgGradient} rounded-t-[28px] -mt-6 relative z-10 flex flex-col transition-all duration-500`}>
-        <div className="px-5 pt-5 pb-5 flex flex-col flex-1">
+      <div className={`flex-1 bg-gradient-to-b ${bgGradient} rounded-t-[28px] -mt-6 relative z-10 flex flex-col min-h-0 transition-all duration-500`}>
+        <div className="px-5 pt-5 flex-1 overflow-y-auto overscroll-contain">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -97,19 +97,18 @@ export function SatisfactionSliderStep({ step, onNext, onAnswer }: Props) {
               <p className="text-xs font-medium text-muted-foreground">{levels[selected].microcopy}</p>
             )}
           </motion.div>
+        </div>
 
-
-          <div className="mt-auto">
-            <button
-              onClick={onNext}
-              disabled={selected === null}
-              className={`w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base active:scale-[0.98] transition-all ${
-                selected === null ? 'opacity-40' : ''
-              }`}
-            >
-              {step.buttonLabel || 'Continue'}
-            </button>
-          </div>
+        <div className="shrink-0 px-5 pb-5 pt-2">
+          <button
+            onClick={onNext}
+            disabled={selected === null}
+            className={`w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base active:scale-[0.98] transition-all ${
+              selected === null ? 'opacity-40' : ''
+            }`}
+          >
+            {step.buttonLabel || 'Continue'}
+          </button>
         </div>
       </div>
     </div>

@@ -309,8 +309,8 @@ export function WeekReportStep({ step, onNext, onAnswer }: Props) {
       </div>
 
       {/* Bottom sheet — 65% */}
-      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col">
-        <div className="px-5 pt-5 pb-5 flex flex-col flex-1 overflow-y-auto overscroll-contain">
+      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col min-h-0">
+        <div className="px-5 pt-5 flex-1 overflow-y-auto overscroll-contain">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -405,19 +405,19 @@ export function WeekReportStep({ step, onNext, onAnswer }: Props) {
               )}
             </motion.div>
           )}
+        </div>
 
-          {/* Button pinned at bottom */}
-          <div className="mt-auto pt-2">
-            <button
-              onClick={onNext}
-              className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-3 active:scale-[0.98] transition-all"
-            >
-              {step.buttonLabel || 'Continue'}
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </button>
-          </div>
+        {/* Sticky button */}
+        <div className="shrink-0 px-5 pb-5 pt-2 bg-white">
+          <button
+            onClick={onNext}
+            className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-3 active:scale-[0.98] transition-all"
+          >
+            {step.buttonLabel || 'Continue'}
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
