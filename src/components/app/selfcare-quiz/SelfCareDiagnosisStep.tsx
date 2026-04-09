@@ -304,7 +304,7 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
                   <h2 className="text-[22px] font-extrabold text-foreground">
                     {CLUSTER_HEADLINES[topCluster]}
                   </h2>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-sm font-semibold text-foreground mt-1">
                     {CLUSTER_SUBTEXT[topCluster]}
                   </p>
                 </motion.div>
@@ -332,7 +332,7 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
                         <p className="font-bold text-[15px] text-foreground">
                           {CATEGORY_LABELS[cat] || cat}
                         </p>
-                        <p className="text-[13px] text-muted-foreground mt-0.5 leading-snug">
+                        <p className="text-[13px] text-foreground mt-0.5 leading-snug">
                           {CATEGORY_DESCRIPTIONS[cat] || "This area needs your attention."}
                         </p>
                       </div>
@@ -345,7 +345,7 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.6 }}
-                  className="mt-5 text-center text-sm text-muted-foreground"
+                  className="mt-5 text-center text-sm font-medium text-foreground"
                 >
                   Small changes here will make the biggest difference ✨
                 </motion.p>
@@ -355,7 +355,7 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
                     onClick={onNext}
                     className="w-full rounded-2xl bg-primary py-4 text-base font-bold text-primary-foreground transition-all active:scale-[0.98]"
                   >
-                    {step.buttonLabel || 'Next'}
+                    {step.buttonLabel || 'See Suggested Goals →'}
                   </button>
                 </div>
               </motion.div>
