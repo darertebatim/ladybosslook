@@ -219,21 +219,46 @@ export function WeekReportStep({ step, onNext, onAnswer }: Props) {
         weakest = activeClusters.reduce((a, b) => scores[a].rate < scores[b].rate ? a : b);
       }
 
-      // Skipped tasks (3+ skips)
+      // Skipped tasks (2+ skips) OR tasks with zero completions in 7 days
       const skipCounts: Record<string, number> = {};
       skips.forEach(s => { skipCounts[s.task_id] = (skipCounts[s.task_id] || 0) + 1; });
-      const frequentlySkipped: SkippedTaskInfo[] = Object.entries(skipCounts)
-        .filter(([, count]) => count >= 3)
-        .map(([taskId, count]) => {
+
+      // Also detect tasks with 0 completions this week
+      const completedTaskIds = new Set(completions.map(c => c.task_id));
+      const zeroDoneTasks = userTasks.filter(t => !completedTaskIds.has(t.id));
+
+      const frequentlySkipped: SkippedTaskInfo[] = [];
+      const seenIds = new Set<string>();
+
+      // Add tasks skipped 2+ times
+      Object.entries(skipCounts)
+        .filter(([, count]) => count >= 2)
+        .forEach(([taskId, count]) => {
           const task = taskMap.get(taskId);
-          return {
-            id: taskId,
-            title: task?.title || 'Unknown',
-            emoji: task?.emoji || '📋',
-            tag: task?.tag || null,
-            skipCount: count,
-          };
+          if (task) {
+            frequentlySkipped.push({
+              id: taskId,
+              title: task.title || 'Unknown',
+              emoji: task.emoji || '📋',
+              tag: task.tag || null,
+              skipCount: count,
+            });
+            seenIds.add(taskId);
+          }
         });
+
+      // Add tasks with zero completions (up to 5 total)
+      for (const task of zeroDoneTasks) {
+        if (seenIds.has(task.id) || frequentlySkipped.length >= 5) break;
+        frequentlySkipped.push({
+          id: task.id,
+          title: task.title || 'Unknown',
+          emoji: task.emoji || '📋',
+          tag: task.tag || null,
+          skipCount: skipCounts[task.id] || 0,
+        });
+        seenIds.add(task.id);
+      }
 
       setStats({ tasksCompleted, bestStreak, topHabit, topHabitEmoji, weeksCount, prevWeekTasks });
       setClusterScores(scores);
