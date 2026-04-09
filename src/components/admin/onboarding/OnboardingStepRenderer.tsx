@@ -19,6 +19,7 @@ import { WeekReportStep } from '@/components/app/weekly-review/WeekReportStep';
 import { SatisfactionSliderStep } from '@/components/app/weekly-review/SatisfactionSliderStep';
 import { WeekTaskSuggestionsStep } from '@/components/app/weekly-review/WeekTaskSuggestionsStep';
 import { WeekCelebrationStep } from '@/components/app/weekly-review/WeekCelebrationStep';
+import { WeekCleanupStep } from '@/components/app/weekly-review/WeekCleanupStep';
 import { SelfCareDiagnosisStep } from '@/components/app/selfcare-quiz/SelfCareDiagnosisStep';
 import { SelfCareSuggestionsStep } from '@/components/app/selfcare-quiz/SelfCareSuggestionsStep';
 import { SelfCareYourWhyStep } from '@/components/app/selfcare-quiz/SelfCareYourWhyStep';
