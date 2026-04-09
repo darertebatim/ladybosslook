@@ -294,13 +294,16 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
                 transition={{ duration: 0.4 }}
                 className="flex-1 flex flex-col"
               >
-                {/* Cluster headline */}
+                {/* Page title + Cluster headline */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
                   className="mb-1"
                 >
+                  <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">
+                    Self-Care Gap Results
+                  </p>
                   <h2 className="text-[22px] font-extrabold text-foreground">
                     {CLUSTER_HEADLINES[topCluster]}
                   </h2>

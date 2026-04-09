@@ -135,7 +135,7 @@ export const selfcareQuizFlow: OnboardingFlow = {
       type: 'selfcare-diagnosis',
       illustrationLabel: 'selfcare-quiz',
       title: 'Your Self-Care Diagnosis',
-      buttonLabel: 'See Suggested Habits →',
+      buttonLabel: 'See Suggested Goals →',
     },
     {
       id: 'sc-suggestions',
