@@ -207,8 +207,8 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
         <img src={meplusMascotBg} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
       </div>
 
-      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-y-auto overscroll-contain">
-        <div className="px-5 pt-5 flex flex-col flex-1 min-h-0" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}>
+      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-hidden">
+        <div className="px-5 pt-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
           <AnimatePresence mode="wait">
             {phase === 'loading' && (
               <motion.div
@@ -353,18 +353,24 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
                   Small changes here will make the biggest difference ✨
                 </motion.p>
 
-                <div className="mt-auto pt-6">
-                  <button
-                    onClick={onNext}
-                    className="w-full rounded-2xl bg-primary py-4 text-base font-bold text-primary-foreground transition-all active:scale-[0.98]"
-                  >
-                    {step.buttonLabel || 'See Suggested Goals →'}
-                  </button>
-                </div>
+                {/* Spacer for sticky button */}
+                <div className="h-24 shrink-0" />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
+
+        {/* Sticky bottom button — only show in results phase */}
+        {phase === 'results' && (
+          <div className="sticky bottom-0 left-0 right-0 px-5 pb-5 pt-3 bg-gradient-to-t from-white via-white to-white/0 z-20" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 20px), 20px)' }}>
+            <button
+              onClick={onNext}
+              className="w-full rounded-2xl bg-primary py-4 text-base font-bold text-primary-foreground transition-all active:scale-[0.98]"
+            >
+              {step.buttonLabel || 'See Suggested Goals →'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
