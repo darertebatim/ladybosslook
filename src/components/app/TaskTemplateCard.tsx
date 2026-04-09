@@ -49,7 +49,7 @@ export function TaskTemplateCard({ template, onAdd, isSelected, selectable, comp
         <FluentEmoji emoji={template.emoji || '📝'} size={32} className="shrink-0" />
         
         <div className="flex-1 min-w-0">
-          <p className={cn("font-medium text-black", compact ? "text-sm leading-tight" : "truncate")}>{template.title}</p>
+          <p className={cn("font-medium text-black", compact ? "text-sm leading-tight" : "text-sm leading-snug")}>{template.title}</p>
           {!compact && (
             <p className="text-xs text-black truncate">
               {template.category}
