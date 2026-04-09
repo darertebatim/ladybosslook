@@ -147,6 +147,22 @@ const AppStore = () => {
     return map;
   }, [routineCategories]);
 
+  const goalCategories = useMemo(() => {
+    if (!routineCategories || !taskTemplatesData) return [];
+    return routineCategories
+      .filter(c => (c.task_display_order ?? 0) > 0 && taskTemplatesData.some(t => t.category === c.slug))
+      .sort((a, b) => (a.task_display_order ?? 0) - (b.task_display_order ?? 0));
+  }, [routineCategories, taskTemplatesData]);
+
+  const taskCountByCategory = useMemo(() => {
+    if (!taskTemplatesData) return new Map<string, number>();
+    const map = new Map<string, number>();
+    for (const t of taskTemplatesData) {
+      map.set(t.category, (map.get(t.category) || 0) + 1);
+    }
+    return map;
+  }, [taskTemplatesData]);
+
   // Filter tools by search
   const filteredWellnessTools = useMemo(() => {
     if (!searchQuery.trim()) return wellnessTools;
