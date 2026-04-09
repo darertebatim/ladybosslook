@@ -126,6 +126,8 @@ export function PromoBanner({
       if (error) throw error;
       return data as PromoBannerData[];
     },
+    staleTime: 2 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
   });
 
   // Fetch user's enrollments for targeting
