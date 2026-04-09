@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { ProLinkType } from '@/lib/proTaskTypes';
+import { mapTaskToCluster, CLUSTER_LABELS, ClusterType } from '@/utils/selfcare-scoring';
 
 interface Props {
   step: OnboardingStep;
@@ -24,6 +25,7 @@ interface TaskSuggestion {
   difficulty?: string;
   timeEstimate?: string;
   reason?: string;
+  badge?: string;
   linked_playlist_id?: string | null;
   pro_link_type?: string | null;
   pro_link_value?: string | null;
@@ -43,6 +45,8 @@ const difficultyColors: Record<string, string> = {
   Medium: 'bg-orange-100 text-orange-700',
 };
 
+const MAX_ACTIVE_TASKS_FOR_EXPANSION = 12;
+
 export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
   const { user } = useAuth();
   const addRoutinePlan = useAddRoutinePlan();
@@ -52,18 +56,46 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
   const [revealedCount, setRevealedCount] = useState(0);
   const [showWhyIdx, setShowWhyIdx] = useState<number | null>(null);
 
+  // Parse downstream data from previous steps
+  const weakClusters = useMemo<ClusterType[]>(() => {
+    const raw = answers?.['wr-weak-clusters'];
+    if (Array.isArray(raw)) return raw as ClusterType[];
+    return [];
+  }, [answers]);
+
+  const replaceTasks = useMemo<{ id: string; title: string; cluster: string; tag: string | null }[]>(() => {
+    const raw = answers?.['wr-replace-tasks'];
+    if (!raw || typeof raw !== 'string') return [];
+    try { return JSON.parse(raw); } catch { return []; }
+  }, [answers]);
+
   // Fetch weekly review tasks from the task bank
   const { data: wrTasks } = useQuery({
     queryKey: ['wr-task-bank'],
     queryFn: async () => {
       const { data } = await supabase
         .from('admin_task_bank')
-        .select('id, title, emoji, color, tag, description, duration_minutes, linked_playlist_id, pro_link_type, pro_link_value')
-        .like('tag', 'wr-%')
+        .select('id, title, emoji, color, tag, category, description, duration_minutes, linked_playlist_id, pro_link_type, pro_link_value')
         .eq('is_active', true);
       return data || [];
     },
     staleTime: 1000 * 60 * 30,
+  });
+
+  // Fetch user's active tasks to detect untouched clusters
+  const { data: userActiveTasks } = useQuery({
+    queryKey: ['user-active-tasks-clusters', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data } = await supabase
+        .from('user_tasks')
+        .select('id, tag')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+      return data || [];
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5,
   });
 
   useEffect(() => {
@@ -90,26 +122,31 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
     const tasks: TaskSuggestion[] = [];
     const seen = new Set<string>();
 
+    const addTask = (match: typeof wrTasks[0], reason: string, badge?: string) => {
+      if (seen.has(match.title)) return;
+      const { difficulty, timeEstimate } = parseDifficulty(match.description);
+      tasks.push({
+        id: match.id,
+        emoji: match.emoji,
+        title: match.title,
+        color: match.color,
+        difficulty,
+        timeEstimate,
+        reason,
+        badge,
+        linked_playlist_id: match.linked_playlist_id,
+        pro_link_type: match.pro_link_type,
+        pro_link_value: match.pro_link_value,
+      });
+      seen.add(match.title);
+    };
+
+    // 1. Existing logic: wr-felt-good / wr-focus matches
     const feltGood = answers?.['wr-felt-good'];
     if (Array.isArray(feltGood)) {
       feltGood.forEach(answer => {
         const match = wrTasks.find(t => t.tag === `wr-felt-good:${answer}`);
-        if (match && !seen.has(match.title)) {
-          const { difficulty, timeEstimate } = parseDifficulty(match.description);
-          tasks.push({
-            id: match.id,
-            emoji: match.emoji,
-            title: match.title,
-            color: match.color,
-            difficulty,
-            timeEstimate,
-            reason: `You felt good about ${answer}`,
-            linked_playlist_id: match.linked_playlist_id,
-            pro_link_type: match.pro_link_type,
-            pro_link_value: match.pro_link_value,
-          });
-          seen.add(match.title);
-        }
+        if (match) addTask(match, `You felt good about ${answer}`);
       });
     }
 
@@ -117,27 +154,69 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
     if (Array.isArray(focusNext)) {
       focusNext.forEach(answer => {
         const match = wrTasks.find(t => t.tag === `wr-focus:${answer}`);
-        if (match && !seen.has(match.title)) {
-          const { difficulty, timeEstimate } = parseDifficulty(match.description);
-          tasks.push({
-            id: match.id,
-            emoji: match.emoji,
-            title: match.title,
-            color: match.color,
-            difficulty,
-            timeEstimate,
-            reason: `You want to ${answer}`,
-            linked_playlist_id: match.linked_playlist_id,
-            pro_link_type: match.pro_link_type,
-            pro_link_value: match.pro_link_value,
-          });
-          seen.add(match.title);
-        }
+        if (match) addTask(match, `You want to ${answer}`);
       });
     }
 
+    // 2. Gap-based: tasks from weak clusters
+    if (weakClusters.length > 0 && tasks.length < 4) {
+      // Get categories that map to the weak clusters
+      const gapTasks = wrTasks.filter(t => {
+        const cluster = mapTaskToCluster(t.category);
+        return cluster && weakClusters.includes(cluster) && !t.tag?.startsWith('wr-');
+      });
+      // Pick up to 2 gap tasks
+      for (const match of gapTasks.slice(0, 2)) {
+        if (tasks.length >= 4) break;
+        const cluster = mapTaskToCluster(match.category);
+        const label = cluster ? CLUSTER_LABELS[cluster] : 'this area';
+        addTask(match, `Your ${label} goals need attention`, 'Recommended');
+      }
+    }
+
+    // 3. Replacement suggestions
+    if (replaceTasks.length > 0 && tasks.length < 5) {
+      for (const rt of replaceTasks) {
+        if (tasks.length >= 5) break;
+        const alternatives = wrTasks.filter(t => {
+          const cluster = mapTaskToCluster(t.category);
+          return cluster === rt.cluster && !seen.has(t.title) && t.id !== rt.id;
+        });
+        if (alternatives.length > 0) {
+          addTask(alternatives[0], `Try this instead of "${rt.title}"`, 'Alternative');
+        }
+      }
+    }
+
+    // 4. Expansion: 1 task from untouched cluster
+    if (userActiveTasks && userActiveTasks.length < MAX_ACTIVE_TASKS_FOR_EXPANSION && tasks.length < 5) {
+      const coveredClusters = new Set<string>();
+      userActiveTasks.forEach(t => {
+        const c = mapTaskToCluster(t.tag);
+        if (c) coveredClusters.add(c);
+      });
+
+      const allClusters: ClusterType[] = ['body', 'mind', 'environment', 'people'];
+      const untouched = allClusters.filter(c => !coveredClusters.has(c));
+
+      if (untouched.length > 0) {
+        const targetCluster = untouched[0];
+        const expansionTask = wrTasks.find(t => {
+          const cluster = mapTaskToCluster(t.category);
+          return cluster === targetCluster && !seen.has(t.title);
+        });
+        if (expansionTask) {
+          addTask(
+            expansionTask,
+            `Expand into ${CLUSTER_LABELS[targetCluster]} care`,
+            '✨ New area'
+          );
+        }
+      }
+    }
+
+    // 5. Fallback defaults
     if (tasks.length === 0) {
-      // Use default tasks from bank
       const defaults = wrTasks.filter(t => t.tag === 'wr-default');
       defaults.forEach(match => {
         const { difficulty, timeEstimate } = parseDifficulty(match.description);
@@ -155,8 +234,8 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
       });
     }
 
-    return tasks.slice(0, 4);
-  }, [answers, wrTasks]);
+    return tasks.slice(0, 5);
+  }, [answers, wrTasks, weakClusters, replaceTasks, userActiveTasks]);
 
   useEffect(() => {
     if (loading) return;
@@ -233,7 +312,7 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
           >
             {loadingText}
           </motion.p>
-          <p className="text-sm text-muted-foreground mt-2">✨ Based on your weekly review</p>
+          <p className="text-sm text-muted-foreground mt-2">✨ Based on your self-care balance</p>
         </motion.div>
       </div>
     );
@@ -251,7 +330,7 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
           {step.subtitle && <p className="text-xs text-muted-foreground text-center mb-4">{step.subtitle}</p>}
         </motion.div>
 
-        <div className="space-y-2 flex-1 min-h-0">
+        <div className="space-y-2 flex-1 min-h-0 overflow-y-auto overscroll-contain">
           <AnimatePresence>
             {suggestions.map((task, i) => (
               i < revealedCount && (
@@ -265,6 +344,11 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
                   <div className="flex items-center gap-3">
                     <FluentEmoji emoji={task.emoji} size={24} />
                     <span className="flex-1 text-sm font-semibold text-foreground">{task.title}</span>
+                    {task.badge && (
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary shrink-0">
+                        {task.badge}
+                      </span>
+                    )}
                   </div>
                   <div className="flex items-center gap-2 mt-1.5 ml-9">
                     {task.timeEstimate && (
