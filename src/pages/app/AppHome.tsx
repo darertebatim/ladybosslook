@@ -642,7 +642,7 @@ const AppHome = () => {
         { taskId: task.id, date: selectedDate, amount: 1 },
         {
           onSuccess: (result) => {
-            haptic.success();
+            haptic.successBurst();
             const unit = task.goal_unit || 'times';
             toast(`+1 ${unit}`, {
               description: `Progress: ${result.newProgress}/${task.goal_target}`,
@@ -769,11 +769,8 @@ const AppHome = () => {
   const deleteTask = useDeleteTask();
   const handleDeleteTask = useCallback((task: UserTask) => {
     setSelectedTask(null);
-    deleteTask.mutate(task.id, {
-      onSuccess: () => {
-        haptic.light();
-      }
-    });
+    haptic.deleteSweep();
+    deleteTask.mutate(task.id);
   }, [deleteTask]);
   
   const handleSkipTask = useCallback((task: UserTask) => {

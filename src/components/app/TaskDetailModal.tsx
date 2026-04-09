@@ -137,7 +137,7 @@ export const TaskDetailModal = ({
 
   const handleToggleSubtask = async (subtaskId: string) => {
     const isSubCompleted = completedSubtaskIds.includes(subtaskId);
-    haptic.light();
+    haptic.selection();
     if (isSubCompleted) {
       uncompleteSubtask.mutate({ subtaskId, date });
     } else {
@@ -146,18 +146,18 @@ export const TaskDetailModal = ({
   };
 
   const handleToggleComplete = async () => {
-    haptic.light();
-
     // Routine launchers can be auto-complete via Routine Player sessions
     if (isRoutineLauncher && isRoutineComplete && !isCompleted) return;
 
     if (isCompleted) {
+      haptic.light();
       uncompleteTask.mutate({ taskId: task.id, date });
     } else {
+      haptic.successBurst();
       playCompletionSound();
       const result = await completeTask.mutateAsync({ taskId: task.id, date });
       if (result.streakIncreased && onStreakIncrease) {
-        haptic.medium();
+        haptic.celebrate();
         onStreakIncrease();
       }
       if (result.unlockedStep && onStepUnlocked) {
