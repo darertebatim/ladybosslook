@@ -124,9 +124,10 @@ export function WeekReportStep({ step, onNext, onAnswer }: Props) {
           .gte('skipped_date', weekAgoStr),
         supabase
           .from('user_tasks')
-          .select('id, title, emoji, tag')
+          .select('id, title, emoji, tag, repeat_pattern')
           .eq('user_id', user.id)
-          .eq('is_active', true),
+          .eq('is_active', true)
+          .neq('repeat_pattern', 'none'),
         supabase
           .from('profiles')
           .select('created_at')
