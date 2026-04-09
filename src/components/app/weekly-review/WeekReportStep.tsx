@@ -17,8 +17,8 @@ interface Props {
 interface WeekStats {
   tasksCompleted: number;
   bestStreak: number;
-  topHabit: string;
-  topHabitEmoji: string;
+  returnsThisWeek: number;
+  topHabits: { title: string; emoji: string; count: number }[];
   weeksCount: number;
   prevWeekTasks: number;
 }
@@ -86,8 +86,8 @@ export function WeekReportStep({ step, onNext, onAnswer }: Props) {
   const [stats, setStats] = useState<WeekStats>({
     tasksCompleted: 0,
     bestStreak: 0,
-    topHabit: 'Getting started',
-    topHabitEmoji: '🌟',
+    returnsThisWeek: 0,
+    topHabits: [],
     weeksCount: 1,
     prevWeekTasks: 0,
   });
@@ -110,8 +110,8 @@ export function WeekReportStep({ step, onNext, onAnswer }: Props) {
       const weekAgoStr = format(weekAgo, 'yyyy-MM-dd');
       const twoWeeksAgoStr = format(twoWeeksAgo, 'yyyy-MM-dd');
 
-      // Fetch completions, skips, and user tasks in parallel
-      const [completionsRes, skipsRes, tasksRes, profileRes] = await Promise.all([
+      // Fetch completions, skips, user tasks, profile, and returns in parallel
+      const [completionsRes, skipsRes, tasksRes, profileRes, returnsRes] = await Promise.all([
         supabase
           .from('task_completions')
           .select('task_id, completed_date')
@@ -133,6 +133,11 @@ export function WeekReportStep({ step, onNext, onAnswer }: Props) {
           .select('created_at')
           .eq('id', user.id)
           .single(),
+        supabase
+          .from('app_return_events')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .gte('created_at', weekAgo.toISOString()),
       ]);
 
       const allCompletions = completionsRes.data || [];
@@ -162,24 +167,23 @@ export function WeekReportStep({ step, onNext, onAnswer }: Props) {
         }
       }
 
-      // Top habit
+      // Top 3 habits
       const taskCounts: Record<string, number> = {};
       completions.forEach(c => { taskCounts[c.task_id] = (taskCounts[c.task_id] || 0) + 1; });
-      const topTaskId = Object.entries(taskCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
-      let topHabit = 'Getting started';
-      let topHabitEmoji = '🌟';
-      const topTask = topTaskId ? taskMap.get(topTaskId) : null;
-      if (topTask) {
-        topHabit = topTask.title;
-        topHabitEmoji = topTask.emoji || '🌟';
-      } else if (topTaskId) {
-        const { data: task } = await supabase
-          .from('user_tasks')
-          .select('title, emoji')
-          .eq('id', topTaskId)
-          .single();
-        if (task) { topHabit = task.title; topHabitEmoji = task.emoji; }
+      const sortedTasks = Object.entries(taskCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+      const topHabits: { title: string; emoji: string; count: number }[] = [];
+      for (const [taskId, count] of sortedTasks) {
+        const task = taskMap.get(taskId);
+        if (task) {
+          topHabits.push({ title: task.title, emoji: task.emoji || '🌟', count });
+        } else {
+          const { data: t } = await supabase.from('user_tasks').select('title, emoji').eq('id', taskId).single();
+          if (t) topHabits.push({ title: t.title, emoji: t.emoji || '🌟', count });
+        }
       }
+
+      // Returns this week
+      const returnsThisWeek = returnsRes.count || 0;
 
       // Weeks count
       const weeksCount = profileRes.data
@@ -261,7 +265,7 @@ export function WeekReportStep({ step, onNext, onAnswer }: Props) {
         seenIds.add(task.id);
       }
 
-      setStats({ tasksCompleted, bestStreak, topHabit, topHabitEmoji, weeksCount, prevWeekTasks });
+      setStats({ tasksCompleted, bestStreak, returnsThisWeek, topHabits, weeksCount, prevWeekTasks });
       setClusterScores(scores);
       setWeakestCluster(weakest);
       setLoaded(true);
@@ -286,7 +290,7 @@ export function WeekReportStep({ step, onNext, onAnswer }: Props) {
   const statCards = [
     { label: 'Tasks Done', displayValue: <AnimatedCounter value={stats.tasksCompleted} />, emoji: '✅', borderColor: 'border-primary/30', bgColor: 'bg-primary/5' },
     { label: 'Best Streak', displayValue: <><AnimatedCounter value={stats.bestStreak} /> days</>, emoji: '🔥', borderColor: 'border-secondary/40', bgColor: 'bg-secondary/10' },
-    { label: 'Top Habit', displayValue: stats.topHabit, emoji: stats.topHabitEmoji, borderColor: 'border-accent/40', bgColor: 'bg-accent/10' },
+    { label: 'Returns', displayValue: <><AnimatedCounter value={stats.returnsThisWeek} />×</>, emoji: '🚀', borderColor: 'border-accent/40', bgColor: 'bg-accent/10' },
   ];
 
   const activeClusterEntries = (Object.keys(clusterScores) as ClusterType[])
@@ -350,6 +354,28 @@ export function WeekReportStep({ step, onNext, onAnswer }: Props) {
               </motion.div>
             ))}
           </div>
+
+          {/* Top 3 Habits */}
+          {stats.topHabits.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={loaded ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.45, duration: 0.35 }}
+              className="mb-2"
+            >
+              <p className="text-[10px] font-bold text-muted-foreground text-center mb-1.5">Top Habits This Week</p>
+              <div className="space-y-1.5">
+                {stats.topHabits.map((habit, i) => (
+                  <div key={i} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-muted/40">
+                    <span className="text-xs font-bold text-muted-foreground w-4">{i + 1}.</span>
+                    <FluentEmoji emoji={habit.emoji} size={18} />
+                    <span className="flex-1 text-xs font-semibold text-foreground truncate">{habit.title}</span>
+                    <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">{habit.count}×</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
 
           {/* Cluster breakdown */}
           {activeClusterEntries.length > 0 && (
