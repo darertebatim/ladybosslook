@@ -415,6 +415,9 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
             return (
               <ShortcutSlot key={i} onTap={() => handleSlotTap(i)} onLongPress={() => handleLongPress(i)}>
                 <div className={cn("relative w-full rounded-2xl flex flex-col items-center justify-center bg-accent/60 px-1", hideLabels ? "aspect-square" : "aspect-[3/4]")}>
+                  {!hideLabels && shortcut.emoji && (
+                    <span className="text-[22px] leading-none mb-1">{shortcut.emoji}</span>
+                  )}
                   <span className="text-[11px] font-bold text-foreground leading-tight text-center line-clamp-3 w-full px-1">
                     {shortcut.value ? shortcut.label : (PRO_LINK_CONFIGS[shortcut.type]?.label || shortcut.label)}
                   </span>
