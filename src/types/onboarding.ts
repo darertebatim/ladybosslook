@@ -45,7 +45,10 @@ export type OnboardingStepType =
   | 'week-celebration'
   | 'selfcare-diagnosis'
   | 'selfcare-suggestions'
-  | 'dynamic-single-select';
+  | 'dynamic-single-select'
+  | 'selfcare-your-why'
+  | 'selfcare-commitment'
+  | 'selfcare-reflection';
 
 export interface OnboardingOptionVariant {
   cluster: string;
