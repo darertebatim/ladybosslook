@@ -135,7 +135,9 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
     case 'routine-ready-teaser':
       return <RoutineReadyTeaserScreen step={step} onNext={onNext} />;
     case 'week-report':
-      return <WeekReportStep step={step} onNext={onNext} />;
+      return <WeekReportStep step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'week-cleanup':
+      return <WeekCleanupStep step={step} onNext={onNext} onAnswer={onAnswer} answers={answers} />;
     case 'satisfaction-slider':
       return <SatisfactionSliderStep step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'week-task-suggestions':
