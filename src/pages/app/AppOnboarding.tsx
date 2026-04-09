@@ -11,7 +11,14 @@ import { weeklyReviewFlow } from '@/data/onboarding-flows/weekly-review';
 import { selfcareQuizFlow } from '@/data/onboarding-flows/selfcare-quiz';
 import { selfcareWeeklyReviewFlow } from '@/data/onboarding-flows/selfcare-weekly-review';
 import { useAuth } from '@/hooks/useAuth';
-
+import { useSubscription } from '@/hooks/useSubscription';
+import { supabase } from '@/integrations/supabase/client';
+import { getFluentEmojiUrl, getFluentEmojiUrlAlt, isEmoji } from '@/lib/fluentEmoji';
+import { AnimatePresence, motion } from 'framer-motion';
+import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
+import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
+import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
+import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
 const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow, quickStartV2Flow, weeklyReviewFlow, selfcareQuizFlow, selfcareWeeklyReviewFlow];
 
 function preloadImages(srcs: string[]) {
