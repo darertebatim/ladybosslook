@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { ProLinkType } from '@/lib/proTaskTypes';
 import { mapTaskToCluster, CLUSTER_LABELS, ClusterType } from '@/utils/selfcare-scoring';
+import { selfcareWeeklyReviewFlow } from '@/data/onboarding-flows/selfcare-weekly-review';
 
 interface Props {
   step: OnboardingStep;
@@ -145,16 +146,12 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
     // The selfcare-weekly-review flow stores category slugs (e.g. 'sleep', 'TidyUp')
     // in each option's `description` field. We look up the selected label in the
     // flow step options to retrieve the slug.
-    const flowSteps = (window as any).__selfcareWeeklyReviewSteps as undefined | any[];
-
     const resolveCategories = (stepId: string, selectedLabels: string[]): string[] => {
-      // Try to find step options from the flow definition cached on window,
-      // or fall back to a simple lookup from the selfcare-weekly-review flow options
-      const stepDef = flowSteps?.find((s: any) => s.id === stepId);
+      const stepDef = selfcareWeeklyReviewFlow.steps.find(s => s.id === stepId);
       if (!stepDef?.options) return [];
       return selectedLabels
         .map(label => {
-          const opt = stepDef.options.find((o: any) => o.label === label);
+          const opt = stepDef.options.find(o => o.label === label);
           return opt?.description as string | undefined;
         })
         .filter((c): c is string => !!c);

@@ -63,8 +63,6 @@ export const CLUSTER_MAP: Record<string, string> = {
   'easy-win': 'environment',
   // People
   connection: 'people', LovedOnes: 'people',
-  // Extended admin categories
-  Empowered: 'mind', MoneyMindset: 'mind', CeoWellness: 'body',
 };
 
 export const CLUSTER_LABELS: Record<ClusterType, string> = {
