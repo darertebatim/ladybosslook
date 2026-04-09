@@ -21,6 +21,7 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useRoutinesBank, useRoutineBankCategories, useFeaturedRoutinesBank } from '@/hooks/useRoutinesBank';
 import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
+import { SelfCareGoalsCategoryCard } from '@/components/app/SelfCareGoalsCategoryCard';
 import { useTaskTemplates } from '@/hooks/useTaskPlanner';
 
 const AppStore = () => {
@@ -145,6 +146,22 @@ const AppStore = () => {
     routineCategories?.forEach(c => map.set(c.slug, c.name));
     return map;
   }, [routineCategories]);
+
+  const goalCategories = useMemo(() => {
+    if (!routineCategories || !taskTemplatesData) return [];
+    return routineCategories
+      .filter(c => (c.task_display_order ?? 0) > 0 && taskTemplatesData.some(t => t.category === c.slug))
+      .sort((a, b) => (a.task_display_order ?? 0) - (b.task_display_order ?? 0));
+  }, [routineCategories, taskTemplatesData]);
+
+  const taskCountByCategory = useMemo(() => {
+    if (!taskTemplatesData) return new Map<string, number>();
+    const map = new Map<string, number>();
+    for (const t of taskTemplatesData) {
+      map.set(t.category, (map.get(t.category) || 0) + 1);
+    }
+    return map;
+  }, [taskTemplatesData]);
 
   // Filter tools by search
   const filteredWellnessTools = useMemo(() => {
@@ -323,6 +340,27 @@ const AppStore = () => {
                         className={`tour-tool-${tool.id}`}
                       />
                     ))}
+                </div>
+              </section>
+            )}
+            {/* Self-Care Goals Categories */}
+            {!searchQuery && goalCategories.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h2 className="text-sm font-semibold text-foreground">Self-Care Goals</h2>
+                  <Link to="/app/tasksbank" className="text-xs text-primary font-medium flex items-center gap-0.5">
+                    All <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4" style={{ WebkitOverflowScrolling: 'touch' }}>
+                  {goalCategories.map((cat) => (
+                    <div key={cat.slug} className="shrink-0 w-[85%] snap-start">
+                      <SelfCareGoalsCategoryCard
+                        category={cat}
+                        taskCount={taskCountByCategory.get(cat.slug)}
+                      />
+                    </div>
+                  ))}
                 </div>
               </section>
             )}
