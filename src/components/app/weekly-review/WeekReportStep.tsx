@@ -127,7 +127,7 @@ export function WeekReportStep({ step, onNext, onAnswer }: Props) {
           .select('id, title, emoji, tag, repeat_pattern')
           .eq('user_id', user.id)
           .eq('is_active', true)
-          .neq('repeat_pattern', 'none'),
+          .not('repeat_pattern', 'in', '("none","once")'),
         supabase
           .from('profiles')
           .select('created_at')
