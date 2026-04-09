@@ -160,14 +160,5 @@ export const selfcareQuizFlow: OnboardingFlow = {
       subtitle: 'How often do you want to show up for yourself?',
       buttonLabel: "I'm Ready →",
     },
-    {
-      id: 'sc-reflection',
-      type: 'selfcare-reflection',
-      illustrationLabel: 'selfcare-quiz',
-      title: 'Your Daily Reflection',
-      subtitle: 'A guided reflection matched to your needs',
-      buttonLabel: 'Add to My Routine',
-      secondaryButtonLabel: 'Skip for now',
-    },
   ],
 };
