@@ -148,7 +148,7 @@ export default function AppOnboarding() {
       if (flowId === 'weekly-review') {
         navigate('/app/home');
       } else if (flowId === 'selfcare-quiz') {
-        navigate('/app/tasksbank');
+        navigate('/app/home');
       } else {
         navigate('/auth?mode=signup');
       }

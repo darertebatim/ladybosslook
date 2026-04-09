@@ -4,12 +4,11 @@ import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
 import { TaskTemplate, TaskColor } from '@/hooks/useTaskPlanner';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { RoutineBuilderSheet, BuilderTask } from '@/components/app/RoutineBuilderSheet';
-import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
+import { RoutinePreviewSheet, EditedTask, ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
+import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
-import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import type { ProLinkType } from '@/lib/proTaskTypes';
 import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 
 interface SuggestedTask {
@@ -45,10 +44,9 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
-  const [showBuilder, setShowBuilder] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const { user } = useAuth();
-  const queryClient = useQueryClient();
+  const addRoutinePlan = useAddRoutinePlan();
 
   const diagnosisData = useMemo(() => {
     try {
@@ -94,7 +92,6 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
     const categoryOrder = gapCategories.length > 0 ? gapCategories : [];
     const seen = new Set<string>();
 
-    // First add tasks in gap category order
     for (const cat of categoryOrder) {
       const catTasks = taskTemplates.filter(t => t.category === cat);
       if (catTasks.length > 0) {
@@ -103,7 +100,6 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
       }
     }
 
-    // Then any remaining categories
     for (const t of taskTemplates) {
       if (!seen.has(t.category)) {
         const catTasks = taskTemplates.filter(tt => tt.category === t.category);
@@ -115,18 +111,17 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
     return groups;
   }, [taskTemplates, gapCategories]);
 
-  // Pre-select popular/first tasks on mount
+  // Pre-select first task from each category on mount
   useEffect(() => {
     if (taskTemplates.length === 0) return;
     const preSelected = new Set<string>();
     for (const group of groupedTasks) {
-      // Select first task from each category
       if (group.tasks[0]) {
         preSelected.add(group.tasks[0].id);
       }
     }
     setSelectedTasks(preSelected);
-  }, [taskTemplates.length]); // only on first load
+  }, [taskTemplates.length]);
 
   const handleToggleTask = (taskId: string) => {
     setSelectedTasks(prev => {
@@ -148,121 +143,61 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
   const selectionCount = selectedTasks.size;
   const allSelected = selectionCount === taskTemplates.length && taskTemplates.length > 0;
 
-  const getBuilderTasks = (): BuilderTask[] => {
+  // Convert selected tasks to RoutinePlanTask format for the preview sheet
+  const routineTasks: RoutinePlanTask[] = useMemo(() => {
     return taskTemplates
       .filter(t => selectedTasks.has(t.id))
-      .map((t) => ({
+      .map((t, i) => ({
         id: t.id,
+        plan_id: 'synthetic-selfcare-quiz',
         title: t.title,
-        emoji: t.emoji,
-        color: t.color,
-        repeat_pattern: t.repeat_pattern,
-        repeat_days: t.repeat_days,
-        goal_enabled: t.goal_enabled,
-        goal_type: t.goal_type,
-        goal_target: t.goal_target,
-        goal_unit: t.goal_unit,
-        description: t.description,
-        time_period: t.time_period,
-        linked_playlist_id: t.linked_playlist_id,
-        pro_link_type: t.pro_link_type,
-        pro_link_value: t.pro_link_value,
+        icon: t.emoji,
+        color: t.color || ROUTINE_COLOR_CYCLE[i % ROUTINE_COLOR_CYCLE.length],
+        task_order: i,
+        is_active: true,
+        created_at: new Date().toISOString(),
+        linked_playlist_id: t.linked_playlist_id || null,
+        pro_link_type: (t.pro_link_type as ProLinkType) || null,
+        pro_link_value: t.pro_link_value || null,
+        goal_enabled: t.goal_enabled || false,
+        goal_type: t.goal_type || null,
+        goal_target: t.goal_target || null,
+        goal_unit: t.goal_unit || null,
       }));
-  };
+  }, [taskTemplates, selectedTasks]);
 
   const handleBuildRoutine = () => {
     if (selectionCount === 0) return;
-    setShowBuilder(true);
+    setShowPreview(true);
   };
 
-  const handleBuilderComplete = async (title: string, emoji: string, color: string, tasks: BuilderTask[]) => {
-    setShowBuilder(false);
-    if (!user) { onNext(); return; }
-    setIsSaving(true);
+  const handleSave = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
+    if (!user) return;
     try {
-      // Create the routine in user_routines_bank
-      const { data: newRoutine, error: routineError } = await supabase
-        .from('user_routines_bank')
-        .insert({
-          user_id: user.id,
-          title,
-          emoji,
-          color,
-          is_active: true,
-          is_user_created: true,
-          category: null,
-        } as any)
-        .select('id, routine_id')
-        .single();
-
-      if (routineError) throw routineError;
-      const routineId = (newRoutine as any).routine_id;
-
-      // Get current max order index
-      const { data: existingTasks } = await supabase
-        .from('user_tasks')
-        .select('order_index')
-        .eq('user_id', user.id)
-        .order('order_index', { ascending: false })
-        .limit(1);
-      const startOrder = (existingTasks?.[0]?.order_index ?? -1) + 1;
-
-      const regularTasks = tasks.filter(t => !t.id.startsWith('__pro_task_routine_'));
-
-      if (regularTasks.length > 0) {
-        const userTasks = regularTasks.map((task: any, index: number) => ({
-          user_id: user.id,
-          title: task.title,
-          emoji: task.emoji || '📝',
-          color: task.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
-          repeat_pattern: task.repeat_pattern || 'daily',
-          repeat_days: task.repeat_days || null,
-          tag: title,
-          time_period: task.time_period || null,
-          linked_playlist_id: task.pro_link_type === 'playlist' ? task.pro_link_value : null,
-          pro_link_type: task.pro_link_type || null,
-          pro_link_value: task.pro_link_value || null,
-          is_active: true,
-          order_index: startOrder + index,
-          goal_enabled: task.goal_enabled || false,
-          goal_target: task.goal_target || null,
-          goal_type: task.goal_type || null,
-          goal_unit: task.goal_unit || null,
-          duration_minutes: task.duration_minutes || null,
-          source_routine_id: routineId,
-        }));
-        await supabase.from('user_tasks').insert(userTasks);
-      }
-
-      // Check for pro-task (routine launcher)
-      const hasProTask = tasks.some(t => t.id.startsWith('__pro_task_routine_'));
-      if (hasProTask) {
-        await supabase.from('user_tasks').insert({
-          user_id: user.id,
-          title,
-          emoji: '🎬',
-          color: 'mint',
-          repeat_pattern: 'daily',
-          tag: title,
-          pro_link_type: 'routine',
-          pro_link_value: routineId,
-          is_active: true,
-          order_index: startOrder + regularTasks.length,
-          source_routine_id: null,
-        });
-      }
-
+      await addRoutinePlan.mutateAsync({
+        planId: 'synthetic-selfcare-quiz',
+        selectedTaskIds,
+        editedTasks: editedTasks.map(t => ({
+          id: t.id,
+          title: t.title,
+          icon: t.icon,
+          color: t.color,
+          repeatPattern: t.repeatPattern,
+          scheduledTime: t.scheduledTime,
+          tag: t.tag,
+          linked_playlist_id: t.linked_playlist_id,
+          pro_link_type: t.pro_link_type,
+          pro_link_value: t.pro_link_value,
+        })),
+        syntheticTasks: routineTasks,
+      });
       toast.success('Routine created! 🎉');
-      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
-      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
+      setShowPreview(false);
+      onNext();
     } catch (err) {
       console.error('Failed to create routine:', err);
       toast.error('Failed to create routine');
-    } finally {
-      setIsSaving(false);
     }
-    onNext();
   };
 
   return (
@@ -367,14 +302,14 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
         )}
       </div>
 
-      <RoutineBuilderSheet
-        open={showBuilder}
-        onOpenChange={setShowBuilder}
-        onComplete={handleBuilderComplete}
-        initialTitle="My Self-Care Routine"
-        initialEmoji="✨"
-        initialColor="mint"
-        initialTasks={getBuilderTasks()}
+      <RoutinePreviewSheet
+        open={showPreview}
+        onOpenChange={setShowPreview}
+        tasks={routineTasks}
+        routineTitle="My Self-Care Routine"
+        routineColor="mint"
+        onSave={handleSave}
+        isSaving={addRoutinePlan.isPending}
       />
     </div>
   );
