@@ -84,6 +84,7 @@ export interface RoutineBankCategory {
   icon: string;
   emoji?: string;
   task_display_order?: number;
+  description?: string | null;
 }
 
 // Fetch categories directly from routine_categories table (admin-managed)
@@ -93,7 +94,7 @@ export function useRoutineBankCategories() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('routine_categories')
-        .select('slug, name, icon, color, display_order, task_display_order')
+        .select('slug, name, icon, color, display_order, task_display_order, description')
         .eq('is_active', true)
         .order('display_order', { ascending: true });
 
@@ -118,6 +119,7 @@ export function useRoutineBankCategories() {
         color: cat.color || 'purple',
         emoji: cat.icon,
         task_display_order: cat.task_display_order ?? 0,
+        description: (cat as any).description || null,
       })) as RoutineBankCategory[];
     },
     staleTime: 1000 * 60 * 5,
