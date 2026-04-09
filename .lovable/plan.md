@@ -1,43 +1,132 @@
 
 
-# Creative Haptic Effects for Home Page
+# Phase 1 Revised: Weekly Review aligned with Self-Care + Expansion + Cleanup
 
-## Problem
-Almost every interaction on the home page uses `haptic.light()` — the same flat, single pulse. This feels lifeless compared to apps like Apple Health, Things 3, or Todoist that use varied, satisfying haptic patterns.
+## Overview
+Transform Weekly Review from a generic task counter into a self-care coach that:
+1. Shows performance by cluster (Body/Mind/Environment/People)
+2. Detects weak areas from skipped/missed tasks
+3. Suggests better alternatives for struggled tasks
+4. Introduces one "expansion" task from an untouched cluster
+5. **New**: Offers to remove tasks the user consistently skips
 
-## Plan
+## Flow (updated from 6 to 8 steps)
 
-### 1. Add compound haptic patterns to `src/lib/haptics.ts`
+```text
+1. wr-report        — Stats + cluster breakdown (Body 80%, Mind 40%...)
+2. wr-satisfaction   — Satisfaction slider (unchanged)
+3. wr-felt-good      — Multi-select reflections (unchanged)
+4. wr-focus-next     — Multi-select focus picks (unchanged)
+5. wr-cleanup        — NEW: "These goals didn't stick" — offer to remove/replace skipped tasks
+6. wr-task-suggestions — Smart suggestions (gap-based + 1 expansion task)
+7. wr-celebration    — Done screen (unchanged)
+```
 
-Add new methods that chain multiple haptic pulses with tiny delays to create richer tactile signatures:
+Step 5 (old task-suggestions) becomes step 6, and the new cleanup step slots in at 5.
 
-- **`doubleTab`** — two quick light taps (for task detail open)
-- **`successBurst`** — medium + light + light rapid cascade (for task completion)
-- **`softRise`** — light → medium in quick succession (for opening add-task sheet)
-- **`deleteSweep`** — warning notification + heavy tap (for delete confirmation)
-- **`celebrate`** — success notification + medium + light cascade (for streak/badge moments)
-- **`tick`** — selection change (already exists, will use more)
+---
 
-### 2. Apply patterns across home page interactions
+## Technical Changes
 
-| Interaction | Current | New |
-|---|---|---|
-| **Task completion** (TaskCard checkbox) | `haptic.light()` | `haptic.successBurst()` |
-| **Task uncomplete** | `haptic.light()` | `haptic.light()` (keep subtle) |
-| **Task detail modal open** (handleTaskTap) | none | `haptic.doubleTab()` |
-| **Task detail modal close** | none | `haptic.light()` |
-| **Add task (sheet open)** | none currently | `haptic.softRise()` |
-| **Delete task** | `haptic.light()` | `haptic.deleteSweep()` |
-| **Skip task** | none | `haptic.medium()` |
-| **Streak increase** | `haptic.medium()` | `haptic.celebrate()` |
-| **Calendar date swipe** | `haptic.light()` | `haptic.selection()` |
-| **Tab switch (Routines/Tasks/One-time)** | `haptic.selection()` | keep as-is |
-| **Goal progress add (+1)** | `haptic.medium()` | `haptic.successBurst()` |
-| **Subtask toggle** (TaskDetailModal) | `haptic.light()` | `haptic.selection()` |
+### 1. Export cluster mapping utility
+**File: `src/utils/selfcare-scoring.ts`**
 
-### Files to modify
-- **`src/lib/haptics.ts`** — add `doubleTab`, `successBurst`, `softRise`, `deleteSweep`, `celebrate`
-- **`src/components/app/TaskCard.tsx`** — update completion, goal-add, and card-tap haptics
-- **`src/pages/app/AppHome.tsx`** — update delete, streak, add-task, and detail-open haptics
-- **`src/components/app/TaskDetailModal.tsx`** — update subtask toggle, complete, and close haptics
+- Export `CLUSTER_MAP` (currently private)
+- Add `mapTaskToCluster(tag: string): ClusterType | null` — maps user_tasks.tag values to body/mind/environment/people
+- Add `CLUSTER_LABELS` and `CLUSTER_EMOJIS` constants for display
+
+### 2. Enrich WeekReportStep with cluster breakdown
+**File: `src/components/app/weekly-review/WeekReportStep.tsx`**
+
+- Fetch `task_completions` joined with `user_tasks` (id, tag) for past 7 days
+- Fetch `task_skips` joined with `user_tasks` (id, tag) for past 7 days
+- Group by cluster using `mapTaskToCluster`
+- Calculate completion rate per cluster: `completed / (completed + skipped)`
+- Display 4 cluster pills below stat cards showing percentage
+- Highlight weakest cluster with a callout like "Your Mind goals need a little love"
+- Store `wr-weak-clusters` and `wr-skipped-tasks` in answers via `onAnswer` prop
+
+### 3. New "Cleanup" step — remove struggling tasks
+**New file: `src/components/app/weekly-review/WeekCleanupStep.tsx`**
+
+- Reads `wr-skipped-tasks` from answers (task IDs + titles of tasks skipped 3+ times in the past week)
+- Shows a list of these tasks with toggles: "Remove" / "Replace" / "Keep"
+- "Remove" marks the task as `is_active: false` in user_tasks
+- "Replace" flags the task for the suggestion step to find an alternative in the same cluster
+- "Keep" does nothing
+- If no tasks were skipped frequently, show a congratulatory message and auto-advance
+- Sticky bottom button: "Continue"
+
+### 4. Smarter suggestion engine with expansion
+**File: `src/components/app/weekly-review/WeekTaskSuggestionsStep.tsx`**
+
+Current logic kept (wr-felt-good/wr-focus tag matching) but enhanced:
+
+**Gap-based suggestions:**
+- Read `wr-weak-clusters` from answers
+- Query `admin_task_bank` where category matches weak cluster categories
+- Prioritize these in the suggestion list with reason: "Recommended — your [cluster] needs attention"
+
+**Replacement suggestions:**
+- Read tasks flagged for replacement from cleanup step
+- Find alternatives in `admin_task_bank` with the same category/cluster but different task
+- Label: "Try this instead of [old task]"
+
+**Expansion (1 task max):**
+- Query user's active `user_tasks` and map all tags to clusters
+- Find clusters with zero active tasks
+- Pick one easy task from `admin_task_bank` in the untouched cluster
+- Label: "Explore something new" with a distinct visual badge
+- Growth cap: only add 1 expansion task, and only if user's total active tasks are under a threshold (e.g., 12)
+
+**Final list:** up to 5 suggestions total (2-3 gap/replacement + 1 expansion + existing answer-based)
+
+### 5. Update flow definition
+**File: `src/data/onboarding-flows/weekly-review.ts`**
+
+- Add new step at position 5:
+  ```
+  { id: 'wr-cleanup', type: 'week-cleanup', title: "These goals didn't stick this week", subtitle: "It's okay — let's make room for what works better", buttonLabel: 'Continue' }
+  ```
+- Update wr-task-suggestions subtitle to "Based on your self-care balance"
+
+### 6. Register new step type
+**File: `src/types/onboarding.ts`** — add `'week-cleanup'` to `OnboardingStepType`
+**File: Step renderer** — add case for `week-cleanup` rendering `WeekCleanupStep`
+
+### 7. Wire onAnswer through WeekReportStep
+Currently `WeekReportStep` doesn't accept `onAnswer`. Add it so cluster data flows to subsequent steps via the existing answers mechanism.
+
+---
+
+## Data Flow
+
+```text
+WeekReportStep
+  ├─ completions + skips → cluster scores
+  ├─ answers['wr-weak-clusters'] = ['mind', 'people']
+  └─ answers['wr-skipped-tasks'] = [{id, title, tag, skipCount}]
+       │
+       ▼
+WeekCleanupStep (NEW)
+  ├─ shows frequently skipped tasks
+  ├─ user picks: remove / replace / keep
+  └─ answers['wr-replace-tasks'] = [{id, cluster}]
+       │
+       ▼
+WeekTaskSuggestionsStep
+  ├─ existing: wr-felt-good / wr-focus matches
+  ├─ gap-based: tasks from weak clusters
+  ├─ replacements: alternatives for removed tasks
+  └─ expansion: 1 easy task from untouched cluster
+```
+
+## Files Summary
+- **Modify**: `src/utils/selfcare-scoring.ts` — export CLUSTER_MAP, add helpers
+- **Modify**: `src/components/app/weekly-review/WeekReportStep.tsx` — cluster breakdown + onAnswer
+- **Create**: `src/components/app/weekly-review/WeekCleanupStep.tsx` — skip cleanup page
+- **Modify**: `src/components/app/weekly-review/WeekTaskSuggestionsStep.tsx` — gap + expansion logic
+- **Modify**: `src/data/onboarding-flows/weekly-review.ts` — add cleanup step
+- **Modify**: `src/types/onboarding.ts` — add step type
+- **Modify**: Step renderer — register new component
 
