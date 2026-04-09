@@ -124,8 +124,8 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
             transition={{ duration: 0.4 }}
             className="flex-1 flex flex-col"
           >
-            <h2 className="text-[22px] font-extrabold text-foreground mb-1">{step.title}</h2>
-            <p className="text-sm text-muted-foreground mb-5">Select the habits you want to add to your routine</p>
+            <h2 className="text-[22px] font-extrabold text-foreground mb-1">Suggested Goals for You</h2>
+            <p className="text-sm font-semibold text-foreground mb-5">Select the Tasks you want to add to your routine</p>
 
             {/* Task cards */}
             <div className="space-y-2.5 flex-1">
