@@ -308,6 +308,7 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
         tasks={routineTasks}
         routineTitle="My Self-Care Routine"
         routineColor="mint"
+        routineBankId="synthetic-selfcare-quiz"
         onSave={handleSave}
         isSaving={addRoutinePlan.isPending}
       />
