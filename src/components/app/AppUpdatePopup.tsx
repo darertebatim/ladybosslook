@@ -16,6 +16,7 @@ import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 
 const APP_STORE_URL = 'https://apps.apple.com/app/routine-ladybosslook/id6755076134';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.ladybosslook.academy';
 const DISMISSED_KEY = 'app_update_popup_dismissed_id';
 
 interface UpdatePopupConfig {
@@ -24,6 +25,7 @@ interface UpdatePopupConfig {
   description: string;
   buttonText: string;
   active: boolean;
+  platform?: 'ios' | 'android'; // required target platform
 }
 
 export function AppUpdatePopup() {
@@ -33,6 +35,11 @@ export function AppUpdatePopup() {
 
   useEffect(() => {
     if (!user) return;
+
+    // Only show on native platforms
+    if (!Capacitor.isNativePlatform()) return;
+
+    const currentPlatform = Capacitor.getPlatform(); // 'ios' | 'android'
 
     const checkPopup = async () => {
       const { data } = await supabase
@@ -46,6 +53,11 @@ export function AppUpdatePopup() {
       try {
         const parsed: UpdatePopupConfig = JSON.parse(data.value);
         if (!parsed.active) return;
+
+        // Platform gate: only show if popup targets this platform
+        if (parsed.platform && parsed.platform !== currentPlatform) return;
+        // If no platform is set (legacy), don't show — require explicit platform
+        if (!parsed.platform) return;
 
         // Check if already dismissed this specific popup
         const dismissedId = localStorage.getItem(DISMISSED_KEY);
@@ -65,14 +77,12 @@ export function AppUpdatePopup() {
     setOpen(false);
     if (config) localStorage.setItem(DISMISSED_KEY, config.id);
     
+    const storeUrl = config?.platform === 'android' ? PLAY_STORE_URL : APP_STORE_URL;
+    
     try {
-      if (Capacitor.isNativePlatform()) {
-        await Browser.open({ url: APP_STORE_URL });
-      } else {
-        window.open(APP_STORE_URL, '_blank');
-      }
+      await Browser.open({ url: storeUrl });
     } catch {
-      window.open(APP_STORE_URL, '_blank');
+      window.open(storeUrl, '_blank');
     }
   };
 
