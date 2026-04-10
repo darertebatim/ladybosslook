@@ -20,7 +20,7 @@ const WEIGHING_MAP: Record<string, string[]> = {
 const NEGLECTING_MAP: Record<string, string[]> = {
   "Sleep & rest": ["sleep", "Evening"],
   "Water & nutrition": ["nutrition"],
-  "Moving your body": ["movement", "Exercise"],
+  "Moving your body": ["movement"],
   "Skincare & grooming": ["hygiene"],
   "Moments of stillness": ["calm", "Presence"],
   "Connecting with someone": ["connection"],
@@ -32,14 +32,14 @@ const NEGLECTING_MAP: Record<string, string[]> = {
 const WIN_MAP: Record<string, string[]> = {
   "A real morning routine": ["movement", "hygiene", "Evening", "easy-win"],
   "A calmer, clearer mind": ["calm", "gratitude", "Presence"],
-  "Taking better care of my body": ["Exercise", "nutrition", "sleep"],
+  "Taking better care of my body": ["movement", "nutrition", "sleep"],
   "Reconnecting with my people": ["connection", "LovedOnes", "self-kindness"],
   "Just getting back on track": ["easy-win", "TidyUp", "productivity"],
 };
 
 const DEEPER_MAP: Record<string, string[]> = {
   "Can't fall asleep / stay asleep": ["sleep", "Evening"],
-  "No energy to exercise": ["Exercise", "movement"],
+  "No energy to exercise": ["movement"],
   "Eating poorly or skipping meals": ["nutrition"],
   "Just feeling physically run down": ["sleep", "movement", "nutrition"],
   "A way to quiet racing thoughts": ["calm", "Presence"],
@@ -59,7 +59,7 @@ const DEEPER_MAP: Record<string, string[]> = {
 // ─── Cluster mapping ──────────────────────────────────────────
 
 const CLUSTER_MAP: Record<string, string> = {
-  sleep: "body", nutrition: "body", movement: "body", Exercise: "body",
+  sleep: "body", nutrition: "body", movement: "body",
   calm: "mind", Presence: "mind", gratitude: "mind", "self-kindness": "mind",
   TidyUp: "environment", productivity: "environment", hygiene: "environment", Evening: "environment",
   connection: "people", LovedOnes: "people",
