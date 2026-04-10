@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -31,7 +32,7 @@ export function UpdateNotificationSender() {
   const [popupTitle, setPopupTitle] = useState('New Update Available! 🎉');
   const [popupDescription, setPopupDescription] = useState('A new version is ready with exciting features and improvements. Update now for the best experience!');
   const [popupButtonText, setPopupButtonText] = useState('Update Now');
-
+  const [popupPlatform, setPopupPlatform] = useState<'ios' | 'android'>('ios');
   // Fetch version distribution from push_subscriptions
   const { data: versionStats, isLoading: loadingStats } = useQuery({
     queryKey: ['push-version-stats'],
@@ -188,6 +189,7 @@ export function UpdateNotificationSender() {
         title: popupTitle,
         description: popupDescription,
         buttonText: popupButtonText,
+        platform: popupPlatform,
         active: true,
       };
       
@@ -460,8 +462,21 @@ export function UpdateNotificationSender() {
             <Input value={popupButtonText} onChange={(e) => setPopupButtonText(e.target.value)} />
           </div>
 
+          <div className="space-y-2">
+            <Label>Target Platform</Label>
+            <Select value={popupPlatform} onValueChange={(v) => setPopupPlatform(v as 'ios' | 'android')}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ios">🍎 iOS (App Store)</SelectItem>
+                <SelectItem value="android">🤖 Android (Play Store)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <p className="text-xs text-muted-foreground">
-            Links to: apps.apple.com/app/routine-ladybosslook/id6755076134
+            Links to: {popupPlatform === 'ios' ? 'App Store' : 'Google Play Store'} — only shown on {popupPlatform === 'ios' ? 'iOS' : 'Android'} devices
           </p>
 
           <div className="flex gap-2">
