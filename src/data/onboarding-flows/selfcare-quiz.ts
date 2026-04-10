@@ -26,7 +26,7 @@ export const selfcareQuizFlow: OnboardingFlow = {
         { emoji: '😴', label: 'Sleep' },
         { emoji: '🧘', label: 'Calm' },
         { emoji: '🏃', label: 'Movement' },
-        { emoji: '💪', label: 'Exercise' },
+        
         { emoji: '🧴', label: 'Hygiene' },
         { emoji: '🥗', label: 'Nutrition' },
         { emoji: '💬', label: 'Connection' },

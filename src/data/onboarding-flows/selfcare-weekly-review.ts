@@ -49,7 +49,7 @@ export const selfcareWeeklyReviewFlow: OnboardingFlow = {
         // Body cluster
         { label: 'Slept well', emoji: '😴', description: 'sleep' },
         { label: 'Moved my body', emoji: '🏃', description: 'movement' },
-        { label: 'Did a workout', emoji: '💪', description: 'Exercise' },
+        
         { label: 'Ate nourishing food', emoji: '🥗', description: 'nutrition' },
         // Mind cluster
         { label: 'Found moments of calm', emoji: '🧘', description: 'calm' },
@@ -77,7 +77,7 @@ export const selfcareWeeklyReviewFlow: OnboardingFlow = {
       options: [
         // Body
         { label: 'Sleep & rest', emoji: '😴', description: 'sleep' },
-        { label: 'Exercise or movement', emoji: '💪', description: 'Exercise' },
+        
         { label: 'Eating well', emoji: '🥗', description: 'nutrition' },
         // Mind
         { label: 'Quieting my mind', emoji: '🧠', description: 'calm' },
@@ -105,7 +105,7 @@ export const selfcareWeeklyReviewFlow: OnboardingFlow = {
         { label: 'Better sleep', emoji: '🌙', description: 'sleep' },
         { label: 'Nourish my body', emoji: '🥑', description: 'nutrition' },
         { label: 'Move more', emoji: '💪', description: 'movement' },
-        { label: 'Work out', emoji: '🏋️', description: 'Exercise' },
+        
         { label: 'Calm my mind', emoji: '🧠', description: 'calm' },
         { label: 'Be more present', emoji: '🌿', description: 'Presence' },
         { label: 'Practice gratitude', emoji: '🙏', description: 'gratitude' },
