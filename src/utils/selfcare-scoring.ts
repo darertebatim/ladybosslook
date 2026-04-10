@@ -12,7 +12,7 @@ export const WEIGHING_MAP: Record<string, string[]> = {
 export const NEGLECTING_MAP: Record<string, string[]> = {
   'Sleep & rest': ['sleep', 'Evening'],
   'Water & nutrition': ['nutrition'],
-  'Moving your body': ['movement', 'Exercise'],
+  'Moving your body': ['movement'],
   'Skincare & grooming': ['hygiene'],
   'Moments of stillness': ['calm', 'Presence'],
   'Connecting with someone': ['connection'],
@@ -24,7 +24,7 @@ export const NEGLECTING_MAP: Record<string, string[]> = {
 export const WIN_MAP: Record<string, string[]> = {
   'A real morning routine': ['movement', 'hygiene', 'Evening', 'easy-win'],
   'A calmer, clearer mind': ['calm', 'gratitude', 'Presence'],
-  'Taking better care of my body': ['Exercise', 'nutrition', 'sleep'],
+  'Taking better care of my body': ['movement', 'nutrition', 'sleep'],
   'Reconnecting with my people': ['connection', 'LovedOnes', 'self-kindness'],
   'Just getting back on track': ['easy-win', 'TidyUp', 'productivity'],
 };
@@ -32,7 +32,7 @@ export const WIN_MAP: Record<string, string[]> = {
 export const DEEPER_MAP: Record<string, string[]> = {
   // Body cluster
   'Can\'t fall asleep / stay asleep': ['sleep', 'Evening'],
-  'No energy to exercise': ['Exercise', 'movement'],
+  'No energy to exercise': ['movement'],
   'Eating poorly or skipping meals': ['nutrition'],
   'Just feeling physically run down': ['sleep', 'movement', 'nutrition'],
   // Mind cluster
@@ -55,7 +55,7 @@ export const DEEPER_MAP: Record<string, string[]> = {
 // Category → cluster mapping (exported for weekly review alignment)
 export const CLUSTER_MAP: Record<string, string> = {
   // Body
-  sleep: 'body', nutrition: 'body', movement: 'body', Exercise: 'body',
+  sleep: 'body', nutrition: 'body', movement: 'body',
   // Mind
   calm: 'mind', Presence: 'mind', gratitude: 'mind', 'self-kindness': 'mind',
   // Environment
