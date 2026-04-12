@@ -1126,18 +1126,16 @@ const AppHome = () => {
                 </div>
               ) : filteredTasks.length > 0 || (!isNewUser && taskFilter !== 'all') ? (
                 <div>
-                  {/* Shared animated 3-pill switcher */}
+                  {/* Shared animated 2-pill switcher */}
                   <div className="flex items-center justify-between mb-3">
                     <div className="relative inline-flex bg-muted rounded-full p-0.5">
                       <motion.div
                         className="absolute top-0.5 bottom-0.5 rounded-full bg-background shadow-sm"
                         animate={{ 
                           width: homeView === 'routines' ? btnRoutinesRef.current?.offsetWidth 
-                            : homeView === 'tasks' ? btnTasksRef.current?.offsetWidth 
-                            : btnOneTimeRef.current?.offsetWidth,
+                            : btnTasksRef.current?.offsetWidth,
                           x: homeView === 'routines' ? 0 
-                            : homeView === 'tasks' ? (btnRoutinesRef.current?.offsetWidth ?? 0)
-                            : (btnRoutinesRef.current?.offsetWidth ?? 0) + (btnTasksRef.current?.offsetWidth ?? 0)
+                            : (btnRoutinesRef.current?.offsetWidth ?? 0)
                         }}
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                       />
@@ -1160,16 +1158,6 @@ const AppHome = () => {
                         )}
                       >
                         <Zap className="h-3 w-3 fill-amber-400 text-amber-400 shrink-0" /> My Tasks
-                      </button>
-                      <button
-                        ref={btnOneTimeRef}
-                        onClick={() => { haptic.selection(); setHomeView('one-time'); setTaskFilter('one-time'); }}
-                        className={cn(
-                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors whitespace-nowrap",
-                          homeView === 'one-time' ? 'text-foreground' : 'text-muted-foreground'
-                        )}
-                      >
-                        To-Dos
                       </button>
                     </div>
                     <button
