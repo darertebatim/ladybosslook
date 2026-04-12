@@ -1464,6 +1464,7 @@ const AppHome = () => {
                 <OnboardingBanner />
                 <div id="tour-banner-slot" className="mt-4" />
                 <PromoBanner location="home_rituals" className="mt-4" />
+                <HomeBanner location="home_rituals" className="mt-4" />
               </>}
 
             </>}
