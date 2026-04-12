@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
@@ -25,20 +25,11 @@ export function SelfCareQuizBanner({ className, onVisibilityChange }: SelfCareQu
 
   const isVisible = !isCompleted && !isDismissed && !isAdminDisabled;
 
-  // Report visibility
-  useState(() => {
+  useEffect(() => {
     onVisibilityChange?.(isVisible);
-  });
+  }, [isVisible, onVisibilityChange]);
 
-  // Also update when visibility changes
-  if (!isVisible) {
-    // Ensure parent knows we're not visible
-    setTimeout(() => onVisibilityChange?.(false), 0);
-    return null;
-  }
-
-  // Ensure parent knows we're visible
-  setTimeout(() => onVisibilityChange?.(true), 0);
+  if (!isVisible) return null;
 
   const handleTap = () => {
     haptic.medium();
@@ -50,7 +41,6 @@ export function SelfCareQuizBanner({ className, onVisibilityChange }: SelfCareQu
     haptic.light();
     localStorage.setItem(SELFCARE_QUIZ_DISMISSED_KEY, 'true');
     setIsDismissed(true);
-    onVisibilityChange?.(false);
   };
 
   return (
