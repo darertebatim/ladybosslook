@@ -389,6 +389,9 @@ const AppStore = () => {
               <ToolShortcuts />
             )}
 
+            {/* Self-Care Quiz Banner - Under Tools */}
+            <SelfCareQuizBanner className="mb-2" />
+
             {/* Promo Banner - Under Tools */}
             <PromoBanner location="explore_tools" className="mb-2" />
 

@@ -282,7 +282,12 @@ export default function AppTasksBank() {
           )}
 
           {!isSearching && (
-            <PromoBanner location="tasks_bank_after_categories" className="px-4 pb-2" carousel />
+            <>
+              <div className="px-4 pb-2">
+                <SelfCareQuizBanner />
+              </div>
+              <PromoBanner location="tasks_bank_after_categories" className="px-4 pb-2" carousel />
+            </>
           )}
 
           {isLoading && (
