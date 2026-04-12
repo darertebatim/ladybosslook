@@ -15,9 +15,9 @@ export const quickStartV2Flow: OnboardingFlow = {
       id: 'qs2-welcome',
       type: 'welcome',
       title: 'Welcome to Ladybosslook!',
-      subtitle: 'Your self-care journey starts here.',
+      subtitle: 'Your day, back in your hands.',
       image: cheerfulBird,
-      statHighlight: 'Your **FREE** Self-Care App',
+      statHighlight: 'Your **FREE** Routine Planner',
       secondaryButtonLabel: 'Already a member? Sign in.',
       statBadges: [
         { label: 'High-Rated App', value: '4.9' },
