@@ -74,8 +74,8 @@ export const GoldStreakLostBanner = ({
         {/* Message */}
         <p className="text-white/90 text-sm mb-6 leading-relaxed">
           {hasShieldsRemaining
-            ? <>You didn't complete all tasks yesterday. Use a <span className="font-semibold text-white">Recovery Shield</span> to restore your {previousGoldStreak}-day gold streak.</>
-            : "You missed completing all tasks. But today is a fresh chance for gold!"
+            ? <>You didn't complete 3 tasks yesterday. Use a <span className="font-semibold text-white">Recovery Shield</span> to restore your {previousGoldStreak}-day gold streak.</>
+            : "You missed completing 3 tasks. But today is a fresh chance for gold!"
           }
         </p>
 

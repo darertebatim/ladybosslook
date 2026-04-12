@@ -103,7 +103,7 @@ export const RecoverySuccessBanner = ({
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">🏅</span>
-                  <span>Every 100% day earns a gold badge</span>
+                  <span>Complete 3 tasks to earn a gold badge</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">⚡</span>
