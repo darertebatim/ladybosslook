@@ -407,10 +407,10 @@ export function BoxBannerManager() {
   const isSaving = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <Card className="border-primary/20">
-      <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-t-lg flex flex-row items-center justify-between">
+    <Card className="border-[#D94B2B]/20">
+      <CardHeader className="bg-gradient-to-r from-[#D94B2B]/5 to-[#F5A623]/10 rounded-t-lg flex flex-row items-center justify-between">
         <div>
-          <CardTitle className="flex items-center gap-2 text-primary">
+          <CardTitle className="flex items-center gap-2 text-[#D94B2B]">
             <Megaphone className="h-5 w-5" />
             Box Banners
           </CardTitle>
@@ -420,22 +420,22 @@ export function BoxBannerManager() {
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openCreateDialog} className="bg-primary hover:bg-primary/90">
+            <Button onClick={openCreateDialog} className="bg-[#D94B2B] hover:bg-[#A63520]">
               <Plus className="h-4 w-4 mr-2" />
               New Box Banner
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-primary">
+              <DialogTitle className="text-[#D94B2B]">
                 {editingBanner ? 'Edit Box Banner' : 'Create New Box Banner'}
               </DialogTitle>
             </DialogHeader>
 
             <div className="space-y-5 py-4">
               {/* Content Section */}
-              <div className="space-y-4 p-4 border border-primary/10 rounded-lg bg-primary/5">
-                <h4 className="text-sm font-semibold text-primary flex items-center gap-2">
+              <div className="space-y-4 p-4 border border-[#D94B2B]/10 rounded-lg bg-[#D94B2B]/5">
+                <h4 className="text-sm font-semibold text-[#D94B2B] flex items-center gap-2">
                   <Megaphone className="h-4 w-4" /> Content
                 </h4>
 
@@ -462,7 +462,7 @@ export function BoxBannerManager() {
 
                 <div className="space-y-2">
                   <Label htmlFor="videoUrl" className="flex items-center gap-2">
-                    <Video className="h-4 w-4 text-primary" /> Video URL
+                    <Video className="h-4 w-4 text-[#D94B2B]" /> Video URL
                   </Label>
                   <Input id="videoUrl" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="YouTube, Vimeo, or direct MP4 link" />
                   {detectedVideoType && (
@@ -480,8 +480,8 @@ export function BoxBannerManager() {
               </div>
 
               {/* Destination Section */}
-              <div className="space-y-4 p-4 border border-primary/10 rounded-lg bg-primary/5">
-                <h4 className="text-sm font-semibold text-primary flex items-center gap-2">
+              <div className="space-y-4 p-4 border border-[#D94B2B]/10 rounded-lg bg-[#D94B2B]/5">
+                <h4 className="text-sm font-semibold text-[#D94B2B] flex items-center gap-2">
                   <MapPin className="h-4 w-4" /> Destination
                 </h4>
 
@@ -555,8 +555,8 @@ export function BoxBannerManager() {
               </div>
 
               {/* Display Section */}
-              <div className="space-y-4 p-4 border border-primary/10 rounded-lg bg-primary/5">
-                <h4 className="text-sm font-semibold text-primary flex items-center gap-2">
+              <div className="space-y-4 p-4 border border-[#D94B2B]/10 rounded-lg bg-[#D94B2B]/5">
+                <h4 className="text-sm font-semibold text-[#D94B2B] flex items-center gap-2">
                   <MapPin className="h-4 w-4" /> Display Settings
                 </h4>
 
@@ -645,7 +645,7 @@ export function BoxBannerManager() {
               {/* Actions */}
               <div className="flex justify-end gap-2 pt-4 border-t">
                 <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-                <Button onClick={handleSave} disabled={isSaving} className="bg-primary hover:bg-primary/90">
+                <Button onClick={handleSave} disabled={isSaving} className="bg-[#D94B2B] hover:bg-[#A63520]">
                   {isSaving ? 'Saving...' : editingBanner ? 'Update' : 'Create'}
                 </Button>
               </div>
@@ -668,7 +668,7 @@ export function BoxBannerManager() {
                   key={banner.id}
                   className={`flex items-center justify-between p-4 border rounded-lg transition-all ${
                     banner.is_active
-                      ? 'bg-card border-primary/20 hover:border-primary/40'
+                      ? 'bg-card border-[#D94B2B]/20 hover:border-[#D94B2B]/40'
                       : 'bg-muted/30 opacity-60 border-muted'
                   }`}
                 >
@@ -676,16 +676,16 @@ export function BoxBannerManager() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-semibold truncate">{banner.title}</span>
                       {banner.is_active ? (
-                        <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px]">Active</Badge>
+                        <Badge className="bg-[#D94B2B]/10 text-[#D94B2B] border-[#D94B2B]/20 text-[10px]">Active</Badge>
                       ) : (
                         <Badge variant="secondary" className="text-[10px]">Inactive</Badge>
                       )}
                       {bannerVideoType && (
-                        <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">
+                        <Badge variant="outline" className="text-[10px] border-[#D94B2B]/30 text-[#D94B2B]">
                           {getVideoPlatformLabel(bannerVideoType)}
                         </Badge>
                       )}
-                      {banner.button_url && <Link className="h-3.5 w-3.5 text-primary/60" />}
+                      {banner.button_url && <Link className="h-3.5 w-3.5 text-[#F5A623]" />}
                     </div>
                     {banner.description && (
                       <p className="text-sm text-muted-foreground truncate">{banner.description}</p>
@@ -718,11 +718,11 @@ export function BoxBannerManager() {
                       size="icon"
                       onClick={() => toggleActiveMutation.mutate({ id: banner.id, is_active: !banner.is_active })}
                       title={banner.is_active ? 'Deactivate' : 'Activate'}
-                      className="hover:text-primary"
+                      className="hover:text-[#D94B2B]"
                     >
                       {banner.is_active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => openEditDialog(banner)} className="hover:text-primary">
+                    <Button variant="ghost" size="icon" onClick={() => openEditDialog(banner)} className="hover:text-[#D94B2B]">
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button
