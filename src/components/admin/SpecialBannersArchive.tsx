@@ -5,6 +5,7 @@ import { Info } from 'lucide-react';
 import moodBannerImg from '@/assets/mood-banner.png';
 import onboardingBannerImg from '@/assets/onboarding-banner.png';
 import weeklyReviewBannerImg from '@/assets/weekly-review-banner.png';
+import selfcareQuizBannerImg from '@/assets/selfcare-quiz-banner.jpg';
 import { useSpecialBannerSettings, useToggleSpecialBanner } from '@/hooks/useSpecialBannerSettings';
 
 interface SpecialBanner {
@@ -17,6 +18,20 @@ interface SpecialBanner {
 }
 
 const specialBanners: SpecialBanner[] = [
+  {
+    name: 'Self-Care Quiz',
+    component: 'SelfCareQuizBanner',
+    location: 'Home (above Tasks), Home (after Routines), Tools Page (under Tools), Programs Page, Tasks Bank (under Categories)',
+    description: 'Promotes the "What\'s Missing?" self-care diagnostic quiz. Uses a static 3:1 image banner. Tapping opens the self-care quiz onboarding flow.',
+    coverImage: selfcareQuizBannerImg,
+    conditions: [
+      'Shown only to users who haven\'t completed the self-care quiz',
+      'First special banner new users see (before Mood Check-In)',
+      'Dismissible via X button (stays hidden for session)',
+      'Tapping navigates to /app/onboarding/selfcare-quiz',
+      'Auto-hides after self-care quiz is completed',
+    ],
+  },
   {
     name: 'Mood Check-In',
     component: 'MoodCheckInBanner',
