@@ -1049,7 +1049,7 @@ const AppHome = () => {
               <>
                 <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
                 <div className="tour-banner">
-                  <HomeBanner onVisibilityChange={setHasHomeBanner} />
+                  <HomeBanner location="home_top" onVisibilityChange={setHasHomeBanner} />
                 </div>
               </>
             )}
