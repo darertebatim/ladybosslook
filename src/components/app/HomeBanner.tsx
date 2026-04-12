@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { X, Play, Megaphone, ExternalLink } from 'lucide-react';
+import { X, Play, Megaphone, ExternalLink, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { smartOpenUrl } from '@/lib/navigation-utils';
 import { detectVideoType, extractYouTubeId } from '@/lib/videoUtils';
@@ -32,6 +32,8 @@ interface HomeBannerData {
   background_color: string | null;
   target_below_version: string | null;
   display_location: string[] | null;
+  destination_type: string | null;
+  destination_id: string | null;
 }
 
 const DISMISSED_BANNERS_KEY = 'dismissedBannerIds';
@@ -42,14 +44,77 @@ interface HomeBannerProps {
   className?: string;
 }
 
+function resolveDestinationUrl(banner: HomeBannerData): string | null {
+  // If explicit button_url is set, use that
+  if (banner.button_url) return banner.button_url;
+  
+  // Otherwise resolve from destination_type/destination_id
+  const { destination_type, destination_id } = banner;
+  if (!destination_type || destination_type === 'custom_url') return null;
+
+  switch (destination_type) {
+    case 'routine':
+    case 'routines_hub':
+      return destination_id ? `/app/routines/${destination_id}` : '/app/routines';
+    case 'playlist':
+      return destination_id ? `/app/player/playlist/${destination_id}` : null;
+    case 'journal': return '/app/reflections';
+    case 'programs': return '/app/programs';
+    case 'breathe': return '/app/breathe';
+    case 'water': return '/app/water';
+    case 'channels': return '/app/channels';
+    case 'home': return '/app/home';
+    case 'inspire': return '/app/routines';
+    case 'tasks':
+      return destination_id ? `/app/home/new?template=${destination_id}` : '/app/home';
+    case 'tasks_bank': return '/app/tasks-bank';
+    case 'breathe_exercise':
+      return destination_id ? `/app/breathe/${destination_id}` : '/app/breathe';
+    case 'external_url': return null;
+    case 'emotion':
+    case 'mood': return '/app/mood';
+    case 'period': return '/app/period';
+    case 'chat': return '/app/chat';
+    case 'profile': return '/app/profile';
+    case 'planner': return '/app/planner';
+    case 'rate': return '/app/rate';
+    case 'onboarding':
+      if (destination_id === 'selfcare-quiz') return '/app/onboarding/selfcare-quiz';
+      return destination_id ? `/app/onboarding/${destination_id}` : null;
+    case 'watch': return '/app/watch';
+    case 'video_playlist':
+      return destination_id ? `/app/watch/playlist/${destination_id}` : '/app/watch';
+    case 'routine_player': return '/app/routineplayer';
+    case 'audio_track':
+      return destination_id ? `/app/player/${destination_id}` : null;
+    case 'video_track':
+      return destination_id ? `/app/watch/video/${destination_id}` : null;
+    default: return null;
+  }
+}
+
+function getDestinationLabel(type: string | null): string {
+  if (!type) return 'Open';
+  const labels: Record<string, string> = {
+    routine: 'View Routine', routines_hub: 'View Routines', playlist: 'Listen Now',
+    journal: 'Open Journal', programs: 'View Programs', breathe: 'Start Breathing',
+    water: 'Track Water', channels: 'View Channels', home: 'Go Home',
+    inspire: 'Get Inspired', tasks: 'View Tasks', tasks_bank: 'Browse Tasks',
+    breathe_exercise: 'Start Exercise', emotion: 'Log Mood', mood: 'Check Mood',
+    period: 'Track Period', chat: 'Open Chat', profile: 'View Profile',
+    planner: 'Open Planner', onboarding: 'Start', watch: 'Watch Now',
+    video_playlist: 'Watch Now', routine_player: 'Play Routine',
+    audio_track: 'Listen Now', video_track: 'Watch Now', rate: 'Rate Us',
+  };
+  return labels[type] || 'Open';
+}
+
 export function HomeBanner({ location = 'home_top', onVisibilityChange, className }: HomeBannerProps) {
   const [banners, setBanners] = useState<HomeBannerData[]>([]);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(() => {
     try {
       const saved = localStorage.getItem(DISMISSED_BANNERS_KEY);
-      if (saved) {
-        return new Set(JSON.parse(saved));
-      }
+      if (saved) return new Set(JSON.parse(saved));
     } catch (e) {
       console.error('Error reading dismissed banners:', e);
     }
@@ -60,13 +125,13 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
 
   useEffect(() => {
     fetchBanners();
-  }, []);
+  }, [location]);
 
   const fetchBanners = async () => {
     try {
       const { data, error } = await supabase
         .from('home_banners')
-        .select('id, title, description, button_text, button_url, video_url, background_color, target_below_version, display_location')
+        .select('id, title, description, button_text, button_url, video_url, background_color, target_below_version, display_location, destination_type, destination_id')
         .eq('is_active', true)
         .or('starts_at.is.null,starts_at.lte.now()')
         .or('ends_at.is.null,ends_at.gte.now()')
@@ -80,12 +145,12 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
         ...d,
         target_below_version: (d as any).target_below_version ?? null,
         display_location: (d as any).display_location ?? null,
+        destination_type: (d as any).destination_type ?? null,
+        destination_id: (d as any).destination_id ?? null,
       })).filter((banner) => {
-        // Version filter
         if (banner.target_below_version) {
           if (!isVersionLessThan(currentVersion, banner.target_below_version)) return false;
         }
-        // Location filter: if display_location is set, banner must include this location
         if (banner.display_location && banner.display_location.length > 0) {
           if (!banner.display_location.includes(location)) return false;
         }
@@ -97,11 +162,6 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
       console.error('Error fetching banners:', error);
     }
   };
-
-  // Re-filter when location changes
-  useEffect(() => {
-    fetchBanners();
-  }, [location]);
 
   const handleDismiss = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -116,8 +176,9 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
     });
   };
 
-  const handleButtonClick = (url: string) => {
-    smartOpenUrl(url, navigate);
+  const handleBannerClick = (banner: HomeBannerData) => {
+    const url = resolveDestinationUrl(banner);
+    if (url) smartOpenUrl(url, navigate);
   };
 
   const visibleBanners = banners.filter(b => !dismissedIds.has(b.id));
@@ -132,11 +193,15 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
     <div className={className || "px-4 py-2 space-y-3"}>
       {visibleBanners.map((banner) => {
         const videoType = banner.video_url ? detectVideoType(banner.video_url) : null;
+        const destinationUrl = resolveDestinationUrl(banner);
+        const hasDestination = !!destinationUrl;
+        const buttonLabel = banner.button_text || getDestinationLabel(banner.destination_type);
 
         return (
           <div
             key={banner.id}
-            className="relative bg-white dark:bg-card rounded-2xl shadow-sm border border-border/50 overflow-hidden"
+            className={`relative bg-white dark:bg-card rounded-2xl shadow-sm border border-border/50 overflow-hidden ${hasDestination && !banner.video_url ? 'active:scale-[0.98] transition-transform cursor-pointer' : ''}`}
+            onClick={hasDestination && !banner.video_url ? () => handleBannerClick(banner) : undefined}
           >
             {/* Dismiss button */}
             <button
@@ -147,7 +212,7 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
               <X className="h-4 w-4 text-white" />
             </button>
 
-            {/* Video Thumbnail - tap to open player */}
+            {/* Video Thumbnail */}
             {banner.video_url && videoType && (
               <>
                 <button
@@ -193,18 +258,26 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
                     <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{banner.description}</p>
                   )}
                 </div>
+                {hasDestination && !banner.video_url && !banner.button_text && (
+                  <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-2" />
+                )}
               </div>
 
-              {/* Button */}
-              {banner.button_text && banner.button_url && (
+              {/* Button - show when explicit button_text is set, or when destination exists */}
+              {hasDestination && (banner.button_text || banner.video_url) && (
                 <Button
                   size="sm"
                   className="mt-3 w-full bg-violet-600 hover:bg-violet-700"
-                  onClick={() => handleButtonClick(banner.button_url!)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleBannerClick(banner);
+                  }}
                 >
-                  {banner.button_text}
-                  {banner.button_url.startsWith('http') && (
+                  {buttonLabel}
+                  {destinationUrl?.startsWith('http') ? (
                     <ExternalLink className="h-3 w-3 ml-1" />
+                  ) : (
+                    <ChevronRight className="h-3 w-3 ml-1" />
                   )}
                 </Button>
               )}
