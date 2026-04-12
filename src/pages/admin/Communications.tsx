@@ -3,7 +3,6 @@ import { AnnouncementCreator } from '@/components/admin/AnnouncementCreator';
 import { BroadcastHistory } from '@/components/admin/BroadcastHistory';
 import { PushNotificationSender } from '@/components/admin/PushNotificationSender';
 import { PushNotificationsHistory } from '@/components/admin/PushNotificationsHistory';
-import { HomeBannerManager } from '@/components/admin/HomeBannerManager';
 import { MailchimpTagManager } from '@/components/admin/MailchimpTagManager';
 import { EmailGenerator } from '@/components/admin/EmailGenerator';
 import { UpdateNotificationSender } from '@/components/admin/UpdateNotificationSender';
