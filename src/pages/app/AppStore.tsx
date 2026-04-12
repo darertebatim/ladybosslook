@@ -12,6 +12,7 @@ import { ToolCard } from '@/components/app/ToolCard';
 import { Input } from '@/components/ui/input';
 import { wellnessTools, audioTools, getVisibleComingSoon } from '@/lib/toolsConfig';
 import { PromoBanner } from '@/components/app/PromoBanner';
+import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
 import { ExploreTour, TourHelpButton } from '@/components/app/tour';
 import { useReflections, type Reflection } from '@/hooks/useReflections';
 import { useBreathingExercises, type BreathingExercise } from '@/hooks/useBreathingExercises';

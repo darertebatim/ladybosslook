@@ -20,6 +20,7 @@ import { toast } from '@/hooks/use-toast';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useTaskBankSelection } from '@/hooks/useTaskBankSelection';
 import { PromoBanner } from '@/components/app/PromoBanner';
+import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
 
 const PREVIEW_COUNT = 8;
 
