@@ -3792,7 +3792,7 @@ function RoutineReadyTeaserScreen({ step, onNext }: Props) {
         </FadeUp>
 
         <FadeUp delay={0.1}>
-          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-2">{step.title}</h1>
+          <h1 className="text-2xl font-extrabold text-[#1a1f3d] text-center mb-2 whitespace-pre-line">{step.title}</h1>
         </FadeUp>
         <FadeUp delay={0.15}>
           <p className="text-sm text-[#1a1f3d] text-center mb-6 max-w-[280px] mx-auto font-medium">{step.subtitle}</p>
