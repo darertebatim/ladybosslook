@@ -258,8 +258,8 @@ export function BadgeCelebration({
           <div className="flex-1 min-w-0">
             <p className="text-white font-semibold text-base">
               {type === 'silver' 
-                ? 'Celebrate hitting 50% progress!' 
-                : 'Almost there! Gold Badge next!'
+                ? '2 tasks done — Silver Badge!' 
+                : 'Almost there! One more for Gold!'
               }
             </p>
             {type === 'silver' ? (
@@ -270,7 +270,7 @@ export function BadgeCelebration({
                   <div 
                     className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500"
                     style={{ 
-                      width: totalCount > 0 ? `${(completedCount / totalCount) * 100}%` : '90%',
+                      width: `${Math.min((completedCount / 3) * 100, 100)}%`,
                       background: 'repeating-linear-gradient(45deg, #FCD34D, #FCD34D 10px, #FBBF24 10px, #FBBF24 20px)'
                     }}
                   />
