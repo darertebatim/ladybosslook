@@ -346,24 +346,14 @@ const AppStore = () => {
                 </div>
               </section>
             )}
-            {/* Self-Care Goals Categories */}
-            {!searchQuery && goalCategories.length > 0 && (
+            {/* Self-Care Goals */}
+            {!searchQuery && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
                   <h2 className="text-sm font-semibold text-foreground">Self-Care Goals</h2>
                   <Link to="/app/tasksbank" className="text-xs text-primary font-medium flex items-center gap-0.5">
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
-                </div>
-                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4" style={{ WebkitOverflowScrolling: 'touch' }}>
-                  {goalCategories.map((cat) => (
-                    <div key={cat.slug} className="shrink-0 w-[85%] snap-start">
-                      <SelfCareGoalsCategoryCard
-                        category={cat}
-                        taskCount={taskCountByCategory.get(cat.slug)}
-                      />
-                    </div>
-                  ))}
                 </div>
               </section>
             )}
