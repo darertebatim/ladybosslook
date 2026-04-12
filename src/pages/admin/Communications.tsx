@@ -3,7 +3,6 @@ import { AnnouncementCreator } from '@/components/admin/AnnouncementCreator';
 import { BroadcastHistory } from '@/components/admin/BroadcastHistory';
 import { PushNotificationSender } from '@/components/admin/PushNotificationSender';
 import { PushNotificationsHistory } from '@/components/admin/PushNotificationsHistory';
-import { HomeBannerManager } from '@/components/admin/HomeBannerManager';
 import { MailchimpTagManager } from '@/components/admin/MailchimpTagManager';
 import { EmailGenerator } from '@/components/admin/EmailGenerator';
 import { UpdateNotificationSender } from '@/components/admin/UpdateNotificationSender';
@@ -13,16 +12,15 @@ export default function Communications() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Communications</h2>
-        <p className="text-muted-foreground">Manage broadcasts, push notifications, banners, and Mailchimp</p>
+        <p className="text-muted-foreground">Manage broadcasts, push notifications, and Mailchimp</p>
       </div>
 
       <Tabs defaultValue="updates">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="updates">Updates</TabsTrigger>
           <TabsTrigger value="broadcasts">Broadcasts</TabsTrigger>
           <TabsTrigger value="push">Push Only</TabsTrigger>
           <TabsTrigger value="email-gen">Email Gen</TabsTrigger>
-          <TabsTrigger value="banners">Banners</TabsTrigger>
           <TabsTrigger value="mailchimp">Mailchimp</TabsTrigger>
         </TabsList>
 
@@ -42,10 +40,6 @@ export default function Communications() {
 
         <TabsContent value="email-gen" className="space-y-6">
           <EmailGenerator />
-        </TabsContent>
-
-        <TabsContent value="banners" className="space-y-6">
-          <HomeBannerManager />
         </TabsContent>
 
         <TabsContent value="mailchimp" className="space-y-6">

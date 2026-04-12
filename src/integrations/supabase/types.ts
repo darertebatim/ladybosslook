@@ -1763,15 +1763,28 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           description: string | null
+          destination_id: string | null
+          destination_type: string | null
+          display_delay_seconds: number | null
+          display_frequency: string | null
+          display_location: string[] | null
           ends_at: string | null
+          exclude_playlists: string[] | null
+          exclude_programs: string[] | null
+          exclude_tools: string[] | null
           icon: string | null
           id: string
+          include_playlists: string[] | null
+          include_programs: string[] | null
+          include_tools: string[] | null
+          include_update_status: string[] | null
           is_active: boolean | null
           priority: number | null
           starts_at: string | null
           target_below_version: string | null
           target_languages: string[] | null
           target_timezones: string[] | null
+          target_type: string | null
           title: string
           updated_at: string | null
           video_url: string | null
@@ -1783,15 +1796,28 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          destination_id?: string | null
+          destination_type?: string | null
+          display_delay_seconds?: number | null
+          display_frequency?: string | null
+          display_location?: string[] | null
           ends_at?: string | null
+          exclude_playlists?: string[] | null
+          exclude_programs?: string[] | null
+          exclude_tools?: string[] | null
           icon?: string | null
           id?: string
+          include_playlists?: string[] | null
+          include_programs?: string[] | null
+          include_tools?: string[] | null
+          include_update_status?: string[] | null
           is_active?: boolean | null
           priority?: number | null
           starts_at?: string | null
           target_below_version?: string | null
           target_languages?: string[] | null
           target_timezones?: string[] | null
+          target_type?: string | null
           title: string
           updated_at?: string | null
           video_url?: string | null
@@ -1803,15 +1829,28 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          destination_id?: string | null
+          destination_type?: string | null
+          display_delay_seconds?: number | null
+          display_frequency?: string | null
+          display_location?: string[] | null
           ends_at?: string | null
+          exclude_playlists?: string[] | null
+          exclude_programs?: string[] | null
+          exclude_tools?: string[] | null
           icon?: string | null
           id?: string
+          include_playlists?: string[] | null
+          include_programs?: string[] | null
+          include_tools?: string[] | null
+          include_update_status?: string[] | null
           is_active?: boolean | null
           priority?: number | null
           starts_at?: string | null
           target_below_version?: string | null
           target_languages?: string[] | null
           target_timezones?: string[] | null
+          target_type?: string | null
           title?: string
           updated_at?: string | null
           video_url?: string | null
