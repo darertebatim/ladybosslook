@@ -249,8 +249,8 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
             {/* Content */}
             <div className="p-4">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center flex-shrink-0">
-                  <Megaphone className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+                <div className="w-10 h-10 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <Megaphone className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0 pr-6">
                   <h3 className="font-semibold text-foreground">{banner.title}</h3>
@@ -267,7 +267,7 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
               {hasDestination && (banner.button_text || banner.video_url) && (
                 <Button
                   size="sm"
-                  className="mt-3 w-full bg-violet-600 hover:bg-violet-700"
+                  className="mt-3 w-full bg-primary hover:bg-primary/90"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleBannerClick(banner);
