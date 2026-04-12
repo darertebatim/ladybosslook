@@ -48,6 +48,7 @@ import { hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/ap
 import { MoodCheckInBanner } from '@/components/mood/MoodCheckInBanner';
 import { OnboardingBanner } from '@/components/app/OnboardingBanner';
 import { WeeklyReviewBanner } from '@/components/app/WeeklyReviewBanner';
+import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { useAutoAssignDefaultRoutine } from '@/hooks/useAutoAssignDefaultRoutine';
@@ -109,6 +110,7 @@ const AppHome = () => {
   const [showNotificationFlow, setShowNotificationFlow] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showActionLimit, setShowActionLimit] = useState(false);
+  const [hasSelfCareQuizBanner, setHasSelfCareQuizBanner] = useState(false);
   const [hasPromoBanner, setHasPromoBanner] = useState(false);
   const [hasHomeBanner, setHasHomeBanner] = useState(false);
   const [hasMoodBanner, setHasMoodBanner] = useState(false);
@@ -1039,20 +1041,27 @@ const AppHome = () => {
             {/* Notification Banner - prompts users to enable notifications */}
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
 
-            {/* Promo & Home Banners — shown first */}
-            <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
-            <div className="tour-banner">
-              <HomeBanner onVisibilityChange={setHasHomeBanner} />
-            </div>
+            {/* Self-Care Quiz Banner — highest priority, shown before everything */}
+            <SelfCareQuizBanner className="mb-2" onVisibilityChange={setHasSelfCareQuizBanner} />
+
+            {/* Promo & Home Banners — shown after self-care quiz is dismissed/completed */}
+            {!hasSelfCareQuizBanner && (
+              <>
+                <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
+                <div className="tour-banner">
+                  <HomeBanner onVisibilityChange={setHasHomeBanner} />
+                </div>
+              </>
+            )}
 
             {/* Mood Check-in Banner — only after all promo/home banners are dismissed */}
-            {!hasPromoBanner && !hasHomeBanner && <MoodCheckInBanner onVisibilityChange={setHasMoodBanner} />}
+            {!hasSelfCareQuizBanner && !hasPromoBanner && !hasHomeBanner && <MoodCheckInBanner onVisibilityChange={setHasMoodBanner} />}
 
             {/* Weekly Review Banner — shows when mood banner is dismissed, on weekends */}
-            {!hasPromoBanner && !hasHomeBanner && !hasMoodBanner && <WeeklyReviewBanner onVisibilityChange={setHasWeeklyBanner} />}
+            {!hasSelfCareQuizBanner && !hasPromoBanner && !hasHomeBanner && !hasMoodBanner && <WeeklyReviewBanner onVisibilityChange={setHasWeeklyBanner} />}
 
             {/* My Shortcuts — only when no banners are visible */}
-            {!hasPromoBanner && !hasHomeBanner && !hasMoodBanner && !hasWeeklyBanner && (
+            {!hasSelfCareQuizBanner && !hasPromoBanner && !hasHomeBanner && !hasMoodBanner && !hasWeeklyBanner && (
               <div className="mb-3">
                 <ToolShortcuts hideWhenEmpty hideLabels />
               </div>
@@ -1451,6 +1460,7 @@ const AppHome = () => {
 
               {/* Tour Banner & Promo - always visible regardless of routine cards */}
               {taskFilter === 'all' && <>
+                <SelfCareQuizBanner className="mt-4" />
                 <OnboardingBanner />
                 <div id="tour-banner-slot" className="mt-4" />
                 <PromoBanner location="home_rituals" className="mt-4" />

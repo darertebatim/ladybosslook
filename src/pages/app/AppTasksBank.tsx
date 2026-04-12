@@ -20,6 +20,7 @@ import { toast } from '@/hooks/use-toast';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useTaskBankSelection } from '@/hooks/useTaskBankSelection';
 import { PromoBanner } from '@/components/app/PromoBanner';
+import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
 
 const PREVIEW_COUNT = 8;
 
@@ -282,7 +283,12 @@ export default function AppTasksBank() {
           )}
 
           {!isSearching && (
-            <PromoBanner location="tasks_bank_after_categories" className="px-4 pb-2" carousel />
+            <>
+              <div className="px-4 pb-2">
+                <SelfCareQuizBanner />
+              </div>
+              <PromoBanner location="tasks_bank_after_categories" className="px-4 pb-2" carousel />
+            </>
           )}
 
           {isLoading && (
