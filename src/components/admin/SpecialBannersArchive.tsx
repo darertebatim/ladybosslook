@@ -5,6 +5,7 @@ import { Info } from 'lucide-react';
 import moodBannerImg from '@/assets/mood-banner.png';
 import onboardingBannerImg from '@/assets/onboarding-banner.png';
 import weeklyReviewBannerImg from '@/assets/weekly-review-banner.png';
+import selfcareQuizBannerImg from '@/assets/selfcare-quiz-banner.jpg';
 import { useSpecialBannerSettings, useToggleSpecialBanner } from '@/hooks/useSpecialBannerSettings';
 
 interface SpecialBanner {
