@@ -139,7 +139,7 @@ export const quickStartV2Flow: OnboardingFlow = {
     {
       id: 'qs2-routine-ready',
       type: 'routine-ready-teaser',
-      title: 'Your Routine is Ready ✨',
+      title: 'Your Self-Care Planner is Ready ✨',
       subtitle: 'We shaped this routine around what matters to you — ready when you are.',
       buttonLabel: 'See My Routine',
     },
