@@ -8,6 +8,8 @@ import { detectVideoType, extractYouTubeId } from '@/lib/videoUtils';
 import { BUILD_INFO } from '@/lib/buildInfo';
 import { AppVideoPlayer } from '@/components/app/AppVideoPlayer';
 
+type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch' | 'video_player' | 'routines_top' | 'routines_after_categories' | 'routine_player' | 'tasks_bank_top' | 'tasks_bank_after_categories';
+
 function isVersionLessThan(v1: string, v2: string): boolean {
   const parts1 = v1.split('.').map(p => parseInt(p, 10) || 0);
   const parts2 = v2.split('.').map(p => parseInt(p, 10) || 0);
@@ -29,11 +31,18 @@ interface HomeBannerData {
   video_url: string | null;
   background_color: string | null;
   target_below_version: string | null;
+  display_location: string[] | null;
 }
 
 const DISMISSED_BANNERS_KEY = 'dismissedBannerIds';
 
-export function HomeBanner({ onVisibilityChange }: { onVisibilityChange?: (visible: boolean) => void } = {}) {
+interface HomeBannerProps {
+  location?: DisplayLocation;
+  onVisibilityChange?: (visible: boolean) => void;
+  className?: string;
+}
+
+export function HomeBanner({ location = 'home_top', onVisibilityChange, className }: HomeBannerProps) {
   const [banners, setBanners] = useState<HomeBannerData[]>([]);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(() => {
     try {
@@ -57,20 +66,30 @@ export function HomeBanner({ onVisibilityChange }: { onVisibilityChange?: (visib
     try {
       const { data, error } = await supabase
         .from('home_banners')
-        .select('id, title, description, button_text, button_url, video_url, background_color, target_below_version')
+        .select('id, title, description, button_text, button_url, video_url, background_color, target_below_version, display_location')
         .eq('is_active', true)
         .or('starts_at.is.null,starts_at.lte.now()')
         .or('ends_at.is.null,ends_at.gte.now()')
         .order('priority', { ascending: false })
-        .limit(3);
+        .limit(10);
 
       if (error) throw error;
 
-      // Filter out banners that target a specific version if user is already on that version or above
       const currentVersion = BUILD_INFO.version;
-      const filtered = (data || []).map(d => ({ ...d, target_below_version: (d as any).target_below_version ?? null })).filter((banner) => {
-        if (!banner.target_below_version) return true; // No version filter = show to all
-        return isVersionLessThan(currentVersion, banner.target_below_version);
+      const filtered = (data || []).map(d => ({
+        ...d,
+        target_below_version: (d as any).target_below_version ?? null,
+        display_location: (d as any).display_location ?? null,
+      })).filter((banner) => {
+        // Version filter
+        if (banner.target_below_version) {
+          if (!isVersionLessThan(currentVersion, banner.target_below_version)) return false;
+        }
+        // Location filter: if display_location is set, banner must include this location
+        if (banner.display_location && banner.display_location.length > 0) {
+          if (!banner.display_location.includes(location)) return false;
+        }
+        return true;
       });
 
       setBanners(filtered);
@@ -78,6 +97,11 @@ export function HomeBanner({ onVisibilityChange }: { onVisibilityChange?: (visib
       console.error('Error fetching banners:', error);
     }
   };
+
+  // Re-filter when location changes
+  useEffect(() => {
+    fetchBanners();
+  }, [location]);
 
   const handleDismiss = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -105,7 +129,7 @@ export function HomeBanner({ onVisibilityChange }: { onVisibilityChange?: (visib
   if (visibleBanners.length === 0) return null;
 
   return (
-    <div className="px-4 py-2 space-y-3">
+    <div className={className || "px-4 py-2 space-y-3"}>
       {visibleBanners.map((banner) => {
         const videoType = banner.video_url ? detectVideoType(banner.video_url) : null;
 
