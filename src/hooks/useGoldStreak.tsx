@@ -167,7 +167,7 @@ export const useGoldDatesThisWeek = () => {
           return false;
         }).length;
 
-        if (completedCount >= tasksForDay.length) {
+        if (completedCount >= 3) {
           goldDates.push(date);
         }
       }

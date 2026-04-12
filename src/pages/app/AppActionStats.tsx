@@ -155,7 +155,7 @@ const AppActionStats = () => {
             </div>
             <h3 className="text-lg font-bold text-foreground mb-2">Progress Badge</h3>
             <p className="text-sm text-foreground leading-snug">
-              Complete at least one task for Bronze. Reach 50% for Silver. Finish all tasks to claim Gold.
+              Complete at least one task for Bronze. Reach 2 tasks for Silver. Finish 3 tasks to claim Gold.
             </p>
           </div>
 
