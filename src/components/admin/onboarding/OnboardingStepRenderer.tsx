@@ -280,9 +280,9 @@ function WelcomeScreen({ step, onNext }: Props) {
           <FadeUp delay={0.2} className="relative z-10">
             <div className="flex items-center justify-center gap-3 mb-4">
               <img src={appIcon} alt="Ladybosslook" className="w-14 h-14 rounded-2xl shadow-lg" />
-              <p className="text-[15px] text-[#1a1f3d] font-medium leading-snug">
-                Your <span className="font-extrabold text-orange-500">FREE</span><br />Routine Planner
-              </p>
+              <p className="text-[15px] text-[#1a1f3d] font-medium leading-snug"
+                 dangerouslySetInnerHTML={{ __html: (step.statHighlight || '').replace(/\*\*(.*?)\*\*/g, '<span class="font-extrabold text-orange-500">$1</span>').replace('\n', '<br />') }}
+              />
             </div>
           </FadeUp>
         )}
