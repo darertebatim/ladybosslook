@@ -260,8 +260,10 @@ export default function AppTasksBank() {
 
           {/* Promo Banner - Top */}
           {!isSearching && (
-            <PromoBanner location="tasks_bank_top" className="px-4 pt-4" carousel />
-            <HomeBanner location="tasks_bank_top" className="px-4 pt-4" />
+            <>
+              <PromoBanner location="tasks_bank_top" className="px-4 pt-4" carousel />
+              <HomeBanner location="tasks_bank_top" className="px-4 pt-4" />
+            </>
           )}
 
           {!isSearching && sortedCategories.length > 0 && (
