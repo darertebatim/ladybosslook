@@ -26,7 +26,7 @@ const specialBanners: SpecialBanner[] = [
     coverImage: selfcareQuizBannerImg,
     conditions: [
       'Shown only to users who haven\'t completed the self-care quiz',
-      'First special banner new users see (before Mood Check-In)',
+      'First special banner new users see (before Promo Banners & Mood Check-In)',
       'Dismissible via X button (stays hidden for session)',
       'Tapping navigates to /app/onboarding/selfcare-quiz',
       'Auto-hides after self-care quiz is completed',
