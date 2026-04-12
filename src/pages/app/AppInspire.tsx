@@ -15,6 +15,7 @@ import {
 } from '@/hooks/useRoutinesBank';
 import { RoutinesTour, TourHelpButton } from '@/components/app/tour';
 import { PromoBanner } from '@/components/app/PromoBanner';
+import { HomeBanner } from '@/components/app/HomeBanner';
 import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 import { useScrollRestore } from '@/hooks/useScrollRestore';
 import { useRoutineFavorites } from '@/hooks/useRoutineFavorites';
@@ -174,6 +175,7 @@ export default function AppInspire() {
           <>
           {/* Promo Banner - Top */}
           <PromoBanner location="routines_top" className="px-4 pt-3" carousel />
+          <HomeBanner location="routines_top" className="px-4 pt-3" />
 
           {/* Categories - quick nav */}
           {categories && categories.length > 0 && (
@@ -272,6 +274,7 @@ export default function AppInspire() {
 
           {/* Promo Banner - Under Categories */}
           <PromoBanner location="routines_after_categories" className="px-4 pb-2" carousel />
+          <HomeBanner location="routines_after_categories" className="px-4 pb-2" />
 
           {isLoading ? (
             <div className="flex items-center justify-center py-12">

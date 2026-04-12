@@ -22,6 +22,7 @@ import heroStormVideo from "@/assets/watch-hero-storm.mp4";
 import { WatchCategoryPill } from "@/components/video/WatchCategoryPill";
 import { useUserPreferredLanguage, preferredLanguageSorter } from "@/hooks/useUserPreferredLanguage";
 import { PromoBanner } from "@/components/app/PromoBanner";
+import { HomeBanner } from "@/components/app/HomeBanner";
 
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
@@ -329,6 +330,7 @@ export default function AppWatch() {
         <div className="p-4 pb-safe space-y-6">
           {/* Promo Banner - Watch Page */}
           <PromoBanner location="watch" className="" />
+          <HomeBanner location="watch" className="" />
 
           {/* Continue Watching */}
           {progressFilter === 'all' && selectedCategory === 'all' && !searchQuery && continueWatching.length > 0 && (

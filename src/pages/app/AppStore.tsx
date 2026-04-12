@@ -12,6 +12,7 @@ import { ToolCard } from '@/components/app/ToolCard';
 import { Input } from '@/components/ui/input';
 import { wellnessTools, audioTools, getVisibleComingSoon } from '@/lib/toolsConfig';
 import { PromoBanner } from '@/components/app/PromoBanner';
+import { HomeBanner } from '@/components/app/HomeBanner';
 import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
 import { ExploreTour, TourHelpButton } from '@/components/app/tour';
 import { useReflections, type Reflection } from '@/hooks/useReflections';
@@ -314,6 +315,7 @@ const AppStore = () => {
           <>
             {/* Promo Banner - Explore Page */}
             <PromoBanner location="explore" className="mb-2" />
+            <HomeBanner location="explore" className="mb-2" />
 
             {/* Tools Section */}
             {(!searchQuery || filteredWellnessTools.length > 0 || filteredAudioTools.length > 0) && (
@@ -395,6 +397,7 @@ const AppStore = () => {
 
             {/* Promo Banner - Under Tools */}
             <PromoBanner location="explore_tools" className="mb-2" />
+            <HomeBanner location="explore_tools" className="mb-2" />
 
             {/* Programs Section */}
             {(!searchQuery || hasProgramMatches) && allBrowsePrograms.length > 0 && (

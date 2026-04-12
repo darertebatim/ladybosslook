@@ -11,6 +11,7 @@ import { PlayerSkeleton } from "@/components/app/skeletons";
 import { CategoryCircle } from "@/components/app/CategoryCircle";
 import { cn } from "@/lib/utils";
 import { PromoBanner } from "@/components/app/PromoBanner";
+import { HomeBanner } from "@/components/app/HomeBanner";
 import { PlayerTour, TourHelpButton } from "@/components/app/tour";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -461,6 +462,7 @@ export default function AppPlayer() {
             
             {/* Promo Banner - Listen Page (under heading) */}
             <PromoBanner location="listen" className="mb-2" />
+            <HomeBanner location="listen" className="mb-2" />
             
             {renderPlaylistGrid(filteredPlaylists)}
 
