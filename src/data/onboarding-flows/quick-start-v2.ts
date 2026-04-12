@@ -36,7 +36,7 @@ export const quickStartV2Flow: OnboardingFlow = {
       options: [
         { label: 'Stress & overthinking', emoji: '😮‍💨' },
         { label: 'Procrastination & low motivation', emoji: '🫠' },
-        { label: 'No daily structure or routine', emoji: '🌀' },
+        { label: 'No self-care routine', emoji: '🌀' },
         { label: 'ADHD / scattered focus', emoji: '🧠' },
         { label: 'Emotional ups & downs', emoji: '💔' },
       ],
