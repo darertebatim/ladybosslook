@@ -1049,7 +1049,7 @@ const AppHome = () => {
               <>
                 <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
                 <div className="tour-banner">
-                  <HomeBanner onVisibilityChange={setHasHomeBanner} />
+                  <HomeBanner location="home_top" onVisibilityChange={setHasHomeBanner} />
                 </div>
               </>
             )}
@@ -1464,6 +1464,7 @@ const AppHome = () => {
                 <OnboardingBanner />
                 <div id="tour-banner-slot" className="mt-4" />
                 <PromoBanner location="home_rituals" className="mt-4" />
+                <HomeBanner location="home_rituals" className="mt-4" />
               </>}
 
             </>}
