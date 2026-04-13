@@ -150,15 +150,15 @@ export default function DeleteAccount() {
   return (
     <>
       <SEOHead
-        title="Delete Account | Ladybosslook"
-        description="Request deletion of your Ladybosslook account and all associated data."
+        title="Delete Account | Rilo"
+        description="Request deletion of your Rilo account and all associated data."
       />
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="text-center mb-8">
-            <img src={appIcon} alt="Ladybosslook" className="h-16 w-16 mx-auto mb-3 rounded-2xl shadow-md" />
-            <h1 className="text-xl font-bold">Ladybosslook</h1>
+            <img src={appIcon} alt="Rilo" className="h-16 w-16 mx-auto mb-3 rounded-2xl shadow-md" />
+            <h1 className="text-xl font-bold">Rilo</h1>
             <p className="text-sm text-muted-foreground">Account Management</p>
           </div>
 

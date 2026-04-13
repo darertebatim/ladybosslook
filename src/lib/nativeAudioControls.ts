@@ -67,7 +67,7 @@ export async function nativeAudioPrepare(opts: {
       await plugin.changeMetadata({
         audioId: AUDIO_ID,
         friendlyTitle: opts.title,
-        artistName: opts.artist || 'Ladybosslook',
+        artistName: opts.artist || 'Rilo',
         albumTitle: opts.album || '',
         artworkSource: opts.artworkUrl || '',
       });
@@ -82,7 +82,7 @@ export async function nativeAudioPrepare(opts: {
       audioId: AUDIO_ID,
       audioSource: opts.source,
       friendlyTitle: opts.title,
-      artistName: opts.artist || 'Ladybosslook',
+      artistName: opts.artist || 'Rilo',
       albumTitle: opts.album || '',
       artworkSource: opts.artworkUrl || '',
       useForNotification: true,
@@ -240,7 +240,7 @@ export async function nativeAudioChangeMetadata(opts: {
     await plugin.changeMetadata({
       audioId: AUDIO_ID,
       friendlyTitle: opts.title,
-      artistName: opts.artist || 'Ladybosslook',
+      artistName: opts.artist || 'Rilo',
       albumTitle: opts.album || '',
       artworkSource: opts.artworkUrl || '',
     });

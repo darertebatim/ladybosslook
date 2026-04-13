@@ -59,7 +59,7 @@ async function notifyPlaylistSubscribers(playlistId: string, trackTitle: string)
     }
 
     if (playlist.requires_subscription) {
-      // Also get subscription users (Ladybosslook+)
+      // Also get subscription users (Simora Plus)
       const { data: subs } = await supabase
         .from('user_subscriptions' as any)
         .select('user_id')

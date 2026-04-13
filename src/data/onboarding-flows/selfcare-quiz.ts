@@ -4,7 +4,7 @@ export const selfcareQuizFlow: OnboardingFlow = {
   id: 'selfcare-quiz',
   name: "What's Missing?",
   description: 'A quick diagnostic to find your neglected self-care areas',
-  appName: 'Ladybosslook',
+  appName: 'Rilo',
   createdAt: '2026-04-07',
   steps: [
     {

@@ -40,7 +40,7 @@ const AppMarketing = () => {
   return (
     <>
       <SEOHead 
-        title="Ladybosslook Academy - Empower Your Journey"
+        title="Rilo - Empower Your Journey"
         description="Transform your life with expert-led courses in personal development, leadership, and confidence building designed for women."
       />
       
@@ -146,7 +146,7 @@ const AppMarketing = () => {
         {/* Footer */}
         <div className="border-t border-border py-8">
           <div className="container mx-auto px-4 text-center text-muted-foreground">
-            <p>&copy; 2025 Ladybosslook Academy. All rights reserved.</p>
+            <p>&copy; 2025 Rilo. All rights reserved.</p>
           </div>
         </div>
       </div>

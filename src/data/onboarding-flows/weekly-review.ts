@@ -4,7 +4,7 @@ export const weeklyReviewFlow: OnboardingFlow = {
   id: 'weekly-review',
   name: 'Weekly Review',
   description: 'Weekend flow to review last week and plan the next one',
-  appName: 'Ladybosslook',
+  appName: 'Rilo',
   createdAt: '2026-04-04',
   steps: [
     {

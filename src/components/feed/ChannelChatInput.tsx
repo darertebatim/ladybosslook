@@ -94,7 +94,7 @@ export function ChannelChatInput({ channelId, replyTo, onCancelReply, onKeyboard
 
   const canSend = content.trim().length > 0 && !createPost.isPending;
 
-  const replyToName = replyTo?.display_name || replyTo?.author?.full_name || 'Ladybosslook';
+  const replyToName = replyTo?.display_name || replyTo?.author?.full_name || 'Rilo';
 
   return (
     <div 

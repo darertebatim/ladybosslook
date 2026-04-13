@@ -29,15 +29,15 @@ export default function BrandDesign() {
     <div className="p-6 max-w-5xl space-y-10">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Brand & Design System</h1>
-        <p className="text-muted-foreground text-sm mt-1">The definitive source for all Ladybosslook color palettes and design tokens</p>
+        <p className="text-muted-foreground text-sm mt-1">The definitive source for all Rilo color palettes and design tokens</p>
       </div>
 
       {/* Logo */}
       <Section title="App Icon & Logo">
         <div className="flex items-center gap-6">
-          <img src={appIcon} alt="Ladybosslook app icon" className="w-24 h-24 rounded-2xl shadow-md" />
+          <img src={appIcon} alt="Rilo app icon" className="w-24 h-24 rounded-2xl shadow-md" />
           <div>
-            <p className="font-semibold text-foreground">Ladybosslook</p>
+            <p className="font-semibold text-foreground">Rilo</p>
             <p className="text-sm text-muted-foreground">Phoenix icon — warm coral, gold, and magenta gradient</p>
           </div>
         </div>

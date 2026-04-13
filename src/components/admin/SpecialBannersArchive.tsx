@@ -46,10 +46,10 @@ const specialBanners: SpecialBanner[] = [
     ],
   },
   {
-    name: 'Ladybosslook Onboarding',
+    name: 'Rilo Onboarding',
     component: 'OnboardingBanner',
     location: 'Home (above My Tasks)',
-    description: 'Guides new users through the 12-step onboarding flow. Uses a static 3:1 image banner with the Ladybosslook mascot.',
+    description: 'Guides new users through the 12-step onboarding flow. Uses a static 3:1 image banner with the Rilo mascot.',
     coverImage: onboardingBannerImg,
     conditions: [
       'Shown only to users who haven\'t completed onboarding',

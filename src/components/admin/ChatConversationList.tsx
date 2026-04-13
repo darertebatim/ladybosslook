@@ -29,7 +29,7 @@ interface ChatConversationListProps {
 
 // Friendly labels for program slugs
 const PROGRAM_LABELS: Record<string, string> = {
-  'simora-plus': 'Ladybosslook+',
+  'simora-plus': 'Simora Plus',
 };
 
 function getProgramLabel(slug: string): string {

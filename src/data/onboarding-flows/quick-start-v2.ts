@@ -7,14 +7,14 @@ export const quickStartV2Flow: OnboardingFlow = {
   id: 'quick-start-v2',
   name: 'Quick Start Onboarding V2',
   description: 'Copy of Quick Start — Fast onboarding focused on getting users into the app quickly',
-  appName: 'Ladybosslook',
+  appName: 'Rilo',
   createdAt: '2026-04-05',
   steps: [
     // 1 — Welcome / Promise
     {
       id: 'qs2-welcome',
       type: 'welcome',
-      title: 'Welcome to Ladybosslook!',
+      title: 'Welcome to Rilo!',
       subtitle: 'Your day, back in your hands.',
       image: cheerfulBird,
       statHighlight: 'Your **FREE**\nSelf-Care App',

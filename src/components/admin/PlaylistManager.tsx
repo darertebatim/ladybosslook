@@ -253,7 +253,7 @@ const PlaylistForm = ({
         checked={formData.requires_subscription}
         onCheckedChange={(checked) => setFormData({ ...formData, requires_subscription: checked })}
       />
-      <Label htmlFor="playlist_requires_subscription">Requires Ladybosslook+ (Plus plan)</Label>
+      <Label htmlFor="playlist_requires_subscription">Requires Simora Plus (Plus plan)</Label>
     </div>
 
     <div className="flex items-center space-x-2">

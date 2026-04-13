@@ -273,7 +273,7 @@ export function AdminChannelChat() {
     if (post.post_type === 'discussion') {
       return post.author?.full_name || 'Unknown';
     }
-    return post.display_name || 'Ladybosslook';
+    return post.display_name || 'Rilo';
   };
 
   // Helper to get avatar
@@ -477,7 +477,7 @@ export function AdminChannelChat() {
               <Input
                 value={editForm.display_name}
                 onChange={(e) => setEditForm({ ...editForm, display_name: e.target.value })}
-                placeholder="e.g., Ladybosslook, The Team..."
+                placeholder="e.g., Rilo, The Team..."
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
