@@ -1884,6 +1884,11 @@ function WelcomeAboardScreen({ step, onNext }: Props) {
         await Notification.requestPermission();
       } catch { /* ignore */ }
     }
+    // Also request local notification permission (required on Android 13+)
+    try {
+      const { LocalNotifications } = await import('@capacitor/local-notifications');
+      await LocalNotifications.requestPermissions();
+    } catch { /* ignore */ }
     onNext();
   };
 
