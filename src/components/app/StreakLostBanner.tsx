@@ -112,14 +112,14 @@ export const StreakLostBanner = ({
         ) : !isSubscribed ? (
           <>
             <p className="text-white/80 text-xs mb-3">
-              No shields left. Unlock more with <span className="font-semibold text-white">Ladybosslook+</span>.
+              No shields left. Unlock more with <span className="font-semibold text-white">Simora Plus</span>.
             </p>
             <Button
               onClick={() => { haptic.light(); onDismiss(); onSubscribe?.(); }}
               className="w-full bg-white text-red-600 font-semibold py-3 rounded-xl mb-2"
             >
               <Sparkles className="h-4 w-4 mr-1" />
-              Get Ladybosslook+
+              Get Simora Plus
             </Button>
             <Button
               onClick={() => { haptic.light(); onDismiss(); }}

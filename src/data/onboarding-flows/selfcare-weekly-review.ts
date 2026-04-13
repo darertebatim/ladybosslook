@@ -4,7 +4,7 @@ export const selfcareWeeklyReviewFlow: OnboardingFlow = {
   id: 'selfcare-weekly-review',
   name: 'Self-Care Weekly Review',
   description: 'Weekend flow aligned with the 14 self-care categories to review, clean up, and expand routines',
-  appName: 'Ladybosslook',
+  appName: 'Rilo',
   createdAt: '2026-04-09',
   steps: [
     // 1. Performance report with cluster breakdown

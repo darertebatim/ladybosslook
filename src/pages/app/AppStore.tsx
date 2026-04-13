@@ -250,7 +250,7 @@ const AppStore = () => {
   return (
     <div className="h-full overflow-hidden flex flex-col bg-background">
       <SEOHead 
-        title="Explore - Ladybosslook"
+        title="Explore - Rilo"
         description="Explore tools, audio experiences, and educational programs"
       />
 

@@ -407,7 +407,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
       if (name === 'NotAllowedError' || name === 'SecurityError') {
         setError(
           iosNative
-            ? "Microphone permission is off. Go to iPhone Settings → Ladybosslook → Microphone and enable it, then reopen the app."
+            ? "Microphone permission is off. Go to iPhone Settings → Rilo → Microphone and enable it, then reopen the app."
             : "Microphone permission denied. Please allow microphone access."
         );
         return;

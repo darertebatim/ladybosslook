@@ -51,7 +51,7 @@ export function AICoachHeader({ mode, setMode, onClear }: Props) {
             <div className="absolute inset-0 rounded-full bg-white/20 animate-ping" style={{ animationDuration: '3s' }} />
             </div>
             <div>
-              <h1 className="text-base font-bold text-white tracking-tight">Ladybosslook AI</h1>
+              <h1 className="text-base font-bold text-white tracking-tight">Rilo AI</h1>
               <p className="text-[10px] text-white/70 font-medium">{MODES.find(m => m.id === mode)?.label} Mode</p>
             </div>
           </div>

@@ -44,7 +44,7 @@ export default function AppMoodHistory() {
   return (
     <>
       <SEOHead 
-        title="Mood History | Ladybosslook"
+        title="Mood History | Rilo"
         description="View your mood tracking history"
       />
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20">

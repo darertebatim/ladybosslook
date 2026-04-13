@@ -10,8 +10,8 @@ const AppSupport = () => {
   return (
     <>
       <SEOHead 
-        title="App Support - Ladybosslook Academy"
-        description="Get help and support for the Ladybosslook Academy mobile app. Contact our support team for assistance."
+        title="App Support - Rilo Academy"
+        description="Get help and support for the Rilo Academy mobile app. Contact our support team for assistance."
       />
       
       <div className="min-h-screen bg-background">
@@ -21,7 +21,7 @@ const AppSupport = () => {
               App Support
             </h1>
             <p className="text-xl text-muted-foreground mb-12">
-              We're here to help you get the most out of Ladybosslook Academy
+              We're here to help you get the most out of Rilo Academy
             </p>
 
             <div className="space-y-6">

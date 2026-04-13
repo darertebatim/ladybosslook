@@ -279,7 +279,7 @@ function WelcomeScreen({ step, onNext }: Props) {
         {step.statHighlight && (
           <FadeUp delay={0.2} className="relative z-10">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <img src={appIcon} alt="Ladybosslook" className="w-14 h-14 rounded-2xl shadow-lg" />
+              <img src={appIcon} alt="Rilo" className="w-14 h-14 rounded-2xl shadow-lg" />
               <p className="text-[15px] text-[#1a1f3d] font-medium leading-snug"
                  dangerouslySetInnerHTML={{ __html: (step.statHighlight || '').replace(/\*\*(.*?)\*\*/g, '<span class="font-extrabold text-orange-500">$1</span>').replace('\n', '<br />') }}
               />
@@ -1144,7 +1144,7 @@ function LoadingTestimonialsScreen({ step, onNext }: Props) {
         <p className="text-base font-bold text-purple-500 text-center mb-1">
           Millions of users
         </p>
-        <p className="text-sm font-semibold text-[#1a1f3d] text-center">have chosen Ladybosslook</p>
+        <p className="text-sm font-semibold text-[#1a1f3d] text-center">have chosen Rilo</p>
       </div>
 
       {/* Scrolling testimonials */}
@@ -1780,7 +1780,7 @@ function ScienceBackedScreen({ step, onNext }: Props) {
                 </div>
                 <p className="text-sm text-gray-600 leading-relaxed">
                   <span className="text-[#1a1f3d] font-extrabold text-xl">96%</span>{' '}
-                  of Ladybosslook users have accomplished at least one goal and built healthy habits.
+                  of Rilo users have accomplished at least one goal and built healthy habits.
                 </p>
               </div>
             </div>
@@ -2083,7 +2083,7 @@ function ADHDInfoScreen({ step, onNext }: Props) {
         <IllustrationPlaceholder label={step.illustrationLabel || 'Brain comparison'} className="h-40 mb-3" />
       )}
       <div className="bg-gray-50 rounded-2xl p-4 mb-4">
-        <p className="text-sm font-bold text-[#1a1f3d] mb-3"><span className="bg-[#e8e4ff] px-1.5 py-0.5 rounded font-extrabold">Ladybosslook</span> can help ADHD:</p>
+        <p className="text-sm font-bold text-[#1a1f3d] mb-3"><span className="bg-[#e8e4ff] px-1.5 py-0.5 rounded font-extrabold">Rilo</span> can help ADHD:</p>
         <ul className="space-y-2">
           {step.options?.map((opt, i) => (
             <li key={i} className="flex items-start gap-2 text-sm text-[#1a1f3d]">

@@ -344,7 +344,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       const prepared = await nativeAudioPrepare({
         source: track.fileUrl,
         title: track.title,
-        artist: track.playlistName || 'Ladybosslook',
+        artist: track.playlistName || 'Rilo',
         album: track.playlistName || '',
         artworkUrl: track.coverImageUrl || '',
       });

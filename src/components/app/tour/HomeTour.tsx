@@ -38,7 +38,7 @@ export function HomeTour({
     const baseSteps: TourStep[] = [
       {
         id: 'welcome',
-        title: 'Welcome to Ladybosslook ✨',
+        title: 'Welcome to Rilo ✨',
         description: 'Hi there! This is your Home. Everything starts here.',
         target: '.tour-nav-home',
         position: 'top',

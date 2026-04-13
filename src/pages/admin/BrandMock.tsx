@@ -165,7 +165,7 @@ export default function BrandMock() {
               <div className="flex items-center gap-3">
                 <motion.img
                   src={appIcon}
-                  alt="Ladybosslook"
+                  alt="Rilo"
                   className="w-10 h-10 rounded-xl shadow-md"
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -467,7 +467,7 @@ export default function BrandMock() {
               className="text-xl font-bold"
               style={{ color: fg }}
             >
-              Explore Ladybosslook
+              Explore Rilo
             </motion.h1>
 
             {/* Search Bar */}

@@ -41,7 +41,7 @@ export const FeedMessage = memo(function FeedMessage({
   const isVoiceMessage = post.post_type === 'voice_message' || post.audio_url;
   
   // Check if this is a system/admin-panel message (announcements, system posts, etc.)
-  // These should always show as "Ladybosslook" on the left, never as current user
+  // These should always show as "Rilo" on the left, never as current user
   const isSystemMessage = post.is_system || post.post_type !== 'discussion';
   
   // Only treat as current user's message if it's a discussion post they authored
@@ -50,9 +50,9 @@ export const FeedMessage = memo(function FeedMessage({
   // Can delete if: current user's message, is a discussion, and is the last message
   const canDelete = isCurrentUser && post.post_type === 'discussion' && isLastMessage;
   
-  // System messages show as "Ladybosslook", otherwise use author info
+  // System messages show as "Rilo", otherwise use author info
   const senderName = isSystemMessage 
-    ? 'Ladybosslook' 
+    ? 'Rilo' 
     : (post.display_name || post.author?.full_name || 'User');
   
   // Detect Persian text for proper font and direction
@@ -138,7 +138,7 @@ export const FeedMessage = memo(function FeedMessage({
               style={{ '--tw-ring-color': accentColor } as React.CSSProperties}
             >
               {isSystemMessage ? (
-                <AvatarImage src={appIcon} alt="Ladybosslook" />
+                <AvatarImage src={appIcon} alt="Rilo" />
               ) : (
                 <AvatarImage src={post.author?.avatar_url || undefined} />
               )}
@@ -173,9 +173,9 @@ export const FeedMessage = memo(function FeedMessage({
               className="w-full text-left mb-2 pl-2 border-l-2 border-foreground/30 rounded-sm text-xs active:scale-[0.98] active:bg-black/5 transition-transform py-1 -ml-1 pr-1"
             >
               <div className="font-medium truncate text-foreground/80">
-                {/* Show "Ladybosslook" for system messages, otherwise show author name */}
+                {/* Show "Rilo" for system messages, otherwise show author name */}
                 {(replyToPost.is_system || replyToPost.post_type !== 'discussion')
-                  ? 'Ladybosslook'
+                  ? 'Rilo'
                   : (replyToPost.display_name || replyToPost.author?.full_name || 'User')}
               </div>
               <div className="truncate text-foreground/60">

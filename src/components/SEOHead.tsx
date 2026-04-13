@@ -10,7 +10,7 @@ interface SEOHeadProps {
 }
 
 export const SEOHead = ({
-  title = "Ladybosslook",
+  title = "Rilo",
   description = "",
   image = "",
   url = typeof window !== 'undefined' ? window.location.href : '',

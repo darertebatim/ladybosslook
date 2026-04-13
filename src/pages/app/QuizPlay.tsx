@@ -111,7 +111,7 @@ export default function QuizPlay() {
 
   async function shareResult() {
     if (!matchedResult || !quiz) return;
-    const text = `I got "${matchedResult.title}" on the ${quiz.title} quiz! Try it yourself on Ladybosslook ✨`;
+    const text = `I got "${matchedResult.title}" on the ${quiz.title} quiz! Try it yourself on Rilo ✨`;
     try {
       if (navigator.share) {
         await navigator.share({ title: quiz.title, text, url: `https://ladybosslook.lovable.app/app/quiz/${slug}` });

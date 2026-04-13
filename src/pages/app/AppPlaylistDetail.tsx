@@ -321,7 +321,7 @@ export default function AppPlaylistDetail() {
 
   const displayMode = (playlist as any)?.display_mode || 'tracks';
   // Free playlists require activation (playlist_saves)
-  // requires_subscription playlists require Ladybosslook+ subscription
+  // requires_subscription playlists require Simora Plus subscription
   // Regular paid playlists require enrollment
   const hasAccess = playlist?.is_free 
     ? !!playlistSave 
@@ -799,7 +799,7 @@ export default function AppPlaylistDetail() {
             <div className="flex items-center gap-2 p-4 bg-amber-900/30 rounded-lg">
               <Crown className="h-5 w-5 text-amber-400" />
               <p className="text-sm text-white">
-                This content is part of <strong>Ladybosslook+</strong>. Subscribe to unlock.
+                This content is part of <strong>Simora Plus</strong>. Subscribe to unlock.
               </p>
             </div>
             <Button 
@@ -808,7 +808,7 @@ export default function AppPlaylistDetail() {
               onClick={() => setShowPaywall(true)}
             >
               <Sparkles className="h-4 w-4" />
-              Unlock with Ladybosslook+
+              Unlock with Simora Plus
             </Button>
           </div>
         )}

@@ -24,10 +24,10 @@ export function BrandedSplash({ className }: BrandedSplashProps) {
       
       {/* Brand name */}
       <h1 className="text-2xl font-bold text-foreground mb-2 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-200">
-        Ladybosslook
+        Rilo Self-Care & Routines
       </h1>
       <p className="text-sm text-muted-foreground animate-in fade-in duration-700 delay-300">
-        by ladybosslook
+        by Rilo
       </p>
       
       {/* Loading indicator */}

@@ -49,7 +49,7 @@ export function OnboardingBanner() {
       </div>
       <img
         src={onboardingBannerImg}
-        alt="Start your Ladybosslook onboarding"
+        alt="Start your Rilo onboarding"
         className="w-full h-auto block"
       />
     </button>
