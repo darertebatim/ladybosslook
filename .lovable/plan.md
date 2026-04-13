@@ -1,55 +1,62 @@
 
 
-## Plan: Move Home Banners to /admin/banners as "Box Banners" tab with redesign
+# Rebrand: Ladybosslook → Rilo
 
-### What's happening
-The `HomeBannerManager` currently lives under `/admin/communications` (Banners tab). You want to:
-1. Move it to `/admin/banners` as a third tab called **"Box Banners"**
-2. Redesign it with the same rich features that Promo Banners have (destinations, display locations, audience targeting, display frequency, conditions)
-3. Apply brand colors (Phoenix Coral, Luxe Gold, Soft Rose palette)
+## Summary
 
-### Changes
+Rename the app from "Ladybosslook" to "Rilo" across all user-facing UI. Subscription plan names stay as **Simora Plus** (unchanged in App Store). Legal pages (Terms, Privacy) and contact emails (`@ladybosslook.com`) are left untouched for now since those depend on domain/legal updates.
 
-**1. Update `src/pages/admin/Banners.tsx`**
-- Add a third tab: "Box Banners"
-- Import and render the redesigned `BoxBannerManager` component
+## What changes
 
-**2. Create `src/components/admin/BoxBannerManager.tsx`** (replaces HomeBannerManager)
-- Redesign the UI using brand colors (coral primary, gold accents, rose backgrounds)
-- Migrate from raw `useEffect`/`useState` fetching to `useQuery`/`useMutation` (React Query) like PromoBannerManager
-- Add all Promo Banner features to the form:
-  - **Destination type & ID** (routine, playlist, onboarding, custom URL, etc.) -- same options as PromoBannerManager
-  - **Display locations** (multi-select checkboxes for home_top, explore, programs, etc.)
-  - **Display frequency** (once, daily, weekly, forever)
-  - **Audience targeting** via `PromoAudienceSelector` (all, include/exclude programs, languages, timezones, update status)
-  - **Scheduling** (starts_at, ends_at)
-  - **Priority**
-- Keep existing Home Banner fields: title, description, button text, button URL, video URL
-- Banner list cards get a branded look: coral/gold accents, better info display showing destinations, locations, and targeting summary
+### 1. Core branding files
+| File | Change |
+|------|--------|
+| `index.html` | `<title>Rilo</title>`, `apple-mobile-web-app-title`, `meta author` |
+| `src/components/SEOHead.tsx` | Default title `"Rilo"` |
+| `src/components/app/BrandedSplash.tsx` | "Rilo Self-Care & Routines" as h1, update tagline |
 
-**3. Update `src/pages/admin/Communications.tsx`**
-- Remove the "Banners" tab and `HomeBannerManager` import
-- Change grid from 6 to 5 columns
+### 2. SEO page titles (~10 files)
+Replace "Ladybosslook" in SEOHead `title` props:
+- `AppMood.tsx` → "Mood Check-in | Rilo"
+- `AppMoodHistory.tsx` → "Mood History | Rilo"
+- `AppStore.tsx` → "Explore - Rilo"
+- `AppBrowsePrograms.tsx` → "Academy Programs - Rilo"
+- `AppProfile.tsx` → "Profile - Rilo"
+- `AppSupport.tsx` → "App Support - Rilo"
+- `AppMarketing.tsx` → "Rilo - Empower Your Journey"
+- `DeleteAccount.tsx` → "Delete Account | Rilo"
 
-**4. Database consideration**
-- The `home_banners` table currently lacks columns for `destination_type`, `display_location`, `display_frequency`, `target_type`, etc.
-- We'll need a migration to add these columns to the `home_banners` table so Box Banners can store the new fields
-- Existing banners will keep working with sensible defaults (destination_type='custom_url', display_frequency='forever', display_location=['home_top'])
+### 3. Subscription / paywall labels (~8 files)
+Replace "Ladybosslook+" with **"Simora Plus"**:
+- `SubscriptionManagement.tsx` — plan labels
+- `PaywallMascot.tsx`, `PaywallMascotV2.tsx`, `PaywallBold.tsx`, `PaywallVIP.tsx`
+- `PlusGateSheet.tsx`
+- `StreakLostBanner.tsx`
+- `ChatConversationList.tsx` program label
+- `PlaylistManager.tsx`, `VideoPlaylistManager.tsx` admin labels
+- `AppWater.tsx`, `AppPeriod.tsx` — gated feature messages
+- `AppPlaylistDetail.tsx`
 
-### Technical details
+### 4. Onboarding flows (~5 files)
+- `quick-start.ts`, `quick-start-v2.ts` — "Welcome to Rilo!"
+- `me-plus.ts` — all "Ladybosslook" mentions → "Rilo", "Ladybosslook+" → "Simora Plus"
+- `selfcare-quiz.ts`, `selfcare-weekly-review.ts`, `weekly-review.ts` — `appName: 'Rilo'`
 
-New columns for `home_banners` table:
-- `destination_type text default 'custom_url'`
-- `destination_id text`
-- `display_frequency text default 'forever'`
-- `display_location text[] default '{home_top}'`
-- `target_type text default 'all'`
-- `include_programs text[] default '{}'`
-- `exclude_programs text[] default '{}'`
-- `target_languages text[] default '{}'`
-- `target_timezones text[] default '{}'`
-- `include_update_status text[] default '{}'`
-- `display_delay_seconds integer default 0`
+### 5. In-app copy
+- `HomeTour.tsx` — "Welcome to Rilo ✨"
+- `ChatInput.tsx` — settings instruction text
+- `QuizPlay.tsx` — share text → "Rilo"
+- `ProjectCompletionCelebration.tsx` — share hashtag
+- `AppTaskCreate.tsx` — comment reference
 
-Brand styling: Cards use `border-primary/20` accents, headers with coral gradient backgrounds, gold badge highlights for active status, rose-tinted muted backgrounds.
+### 6. Not changing (intentionally)
+- **Legal pages** (`SMSTerms.tsx`) — requires legal review
+- **Email addresses** (`@ladybosslook.com`, `@simora.app`) — domain-dependent
+- **Telegram links** (`t.me/ladybosslook`) — social handle change needed first
+- **App Store URLs** — still point to "simora-ladybosslook"
+- **Supabase edge functions** — email sender names need separate update
+- **Internal technical identifiers** (product IDs, slugs like `simora-plus`)
+
+## Approach
+Straightforward find-and-replace across ~25 files. Each file gets a targeted edit — no structural changes. After merging, run `npx cap sync` to update native Android/iOS metadata.
 
