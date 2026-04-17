@@ -151,6 +151,8 @@ export default function AppOnboarding() {
       localStorage.setItem('simora_onboarding_language', typeof answer === 'string' ? answer : answer[0] || '');
     }
 
+    if (flowId) Analytics.onboardingAnswered(flowId, stepId);
+
     // Persist answer to Supabase
     if (user && flowId) {
       supabase.from('onboarding_answers').insert({
@@ -172,6 +174,10 @@ export default function AppOnboarding() {
     } else {
       localStorage.setItem(completedKey, 'true');
       localStorage.removeItem(progressKey);
+      if (flowId) {
+        Analytics.onboardingCompleted(flowId, flow.steps.length);
+        if (flowId === 'selfcare-quiz') Analytics.quizCompleted(flowId);
+      }
       // Weekly review goes back to home; onboarding flows go to signup
       if (flowId === 'weekly-review') {
         navigate('/app/home');
@@ -181,7 +187,7 @@ export default function AppOnboarding() {
         navigate('/auth?mode=signup');
       }
     }
-  }, [currentStep, flow, completedKey, progressKey, navigate]);
+  }, [currentStep, flow, flowId, completedKey, progressKey, navigate]);
 
   const goBack = useCallback(() => {
     setDirection(-1);
@@ -193,6 +199,7 @@ export default function AppOnboarding() {
   }, [currentStep, navigate]);
 
   const handleClose = () => {
+    if (flowId) Analytics.onboardingSkipped(flowId, currentStep);
     navigate('/app/home');
   };
 
