@@ -25,7 +25,12 @@ export async function initFirebaseAnalytics(): Promise<void> {
 
   initPromise = (async () => {
     try {
-      const { FirebaseAnalytics } = await import('@capacitor-firebase/analytics');
+      // Dynamic import via variable name prevents Vite/Rollup from
+      // analyzing the package's web entry (which has a broken build in v8.x).
+      // The plugin is only loaded on native platforms anyway.
+      const pkg = '@capacitor-firebase/analytics';
+      const mod: any = await import(/* @vite-ignore */ pkg);
+      const FirebaseAnalytics = mod.FirebaseAnalytics;
       await FirebaseAnalytics.setEnabled({ enabled: true });
       isInitialized = true;
       console.log('[FirebaseAnalytics] ✅ Initialized');
