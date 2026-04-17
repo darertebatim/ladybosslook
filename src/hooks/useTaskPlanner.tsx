@@ -951,6 +951,12 @@ export const useCompleteTask = () => {
       // Check if this unlocks next project step
       const stepResult = await checkAndUnlockNextProjectStep(user.id, taskId, dateStr);
 
+      // Fire analytics (non-blocking)
+      try {
+        const { Analytics } = await import('@/lib/firebaseAnalytics');
+        Analytics.taskCompleted(taskId);
+      } catch { /* ignore */ }
+
       return { completion: data, streakIncreased: streakResult.increased, unlockedStep: stepResult };
     },
     onSuccess: (result, variables) => {

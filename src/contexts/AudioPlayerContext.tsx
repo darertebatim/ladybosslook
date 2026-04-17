@@ -324,6 +324,13 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   }, [currentTrack, user?.id, isPlaying, currentTime, duration]);
 
   const playTrack = useCallback(async (track: TrackInfo, startPosition?: number) => {
+    // Fire analytics — audio_played (fires once per track switch, not on resume)
+    if (currentTrack?.id !== track.id) {
+      import('@/lib/firebaseAnalytics').then(({ Analytics }) => {
+        Analytics.audioPlayed(track.id, track.playlistName);
+      }).catch(() => {});
+    }
+
     // ===== NATIVE PATH =====
     if (useNative.current) {
     // If same track, just resume

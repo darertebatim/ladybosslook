@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { startOfDay, differenceInDays } from 'date-fns';
 import type { Valence } from '@/lib/emotionData';
+import { Analytics } from '@/lib/firebaseAnalytics';
 
 export interface EmotionLog {
   id: string;
@@ -89,8 +90,9 @@ export const useEmotionLogs = () => {
       if (error) throw error;
       return data as EmotionLog;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['emotion-logs', user?.id] });
+      try { Analytics.moodLogged(data.emotion); } catch { /* ignore */ }
     },
     onError: (error) => {
       console.error('Failed to save emotion log:', error);

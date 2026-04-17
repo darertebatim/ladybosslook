@@ -185,6 +185,12 @@ export function useRoutinePlayer() {
       
       if (data) setSessionId(data.id);
     }
+
+    // Fire analytics — routine started
+    try {
+      const { Analytics } = await import('@/lib/firebaseAnalytics');
+      Analytics.routineStarted(cfg.routineId);
+    } catch { /* ignore */ }
   }, [user]);
 
   /** @deprecated Breathing intro removed */
@@ -296,6 +302,13 @@ export function useRoutinePlayer() {
     }).eq('id', sessionId).then(() => {});
 
     const fullyCompleted = !!config && config.tasks.length > 0 && completed === config.tasks.length;
+
+    // Fire analytics — routine completed (only if fully completed)
+    if (fullyCompleted && config) {
+      import('@/lib/firebaseAnalytics').then(({ Analytics }) => {
+        Analytics.routineCompleted(config.routineId, totalSeconds);
+      }).catch(() => {});
+    }
     if (!fullyCompleted || !config || !user) return;
 
     const syncRoutineProTaskCompletion = async () => {

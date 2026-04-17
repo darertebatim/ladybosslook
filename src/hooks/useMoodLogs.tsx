@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { format, startOfMonth, endOfMonth, startOfDay, endOfDay } from 'date-fns';
 import { toast } from 'sonner';
+import { Analytics } from '@/lib/firebaseAnalytics';
 
 export interface MoodLog {
   id: string;
@@ -67,10 +68,11 @@ export function useCreateMoodLog() {
         created_at: data.created_at,
       };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['mood-logs'] });
       queryClient.invalidateQueries({ queryKey: ['mood-logs-month'] });
       queryClient.invalidateQueries({ queryKey: ['today-mood'] });
+      try { Analytics.moodLogged(data.mood); } catch { /* ignore */ }
     },
     onError: (error) => {
       console.error('Failed to log mood:', error);
