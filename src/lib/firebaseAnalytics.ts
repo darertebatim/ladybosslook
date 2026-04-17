@@ -1,132 +1,62 @@
-import { Capacitor } from '@capacitor/core';
-
 /**
- * Firebase Analytics wrapper for iOS/Android.
- * No-op on web. Safe to call before init (events are dropped silently).
+ * ⚠️ Legacy module name — kept for backward compatibility.
  *
- * Tracks user behavior, retention, activation, and monetization events.
+ * Firebase Analytics has been removed. All events now route to AppsFlyer.
+ * This file is a thin shim so the dozens of existing call sites keep working
+ * unchanged. New code should import from `@/lib/appsflyer` directly.
  */
+import { logAppsFlyerEvent, setAppsFlyerUserId } from './appsflyer';
 
-let isInitialized = false;
-let initPromise: Promise<void> | null = null;
-
-/**
- * Initialize Firebase Analytics. Call once at app startup.
- * Native config comes from GoogleService-Info.plist (iOS) / google-services.json (Android).
- */
+// Backwards-compatible no-op init (AppsFlyer is initialized in main.tsx).
 export async function initFirebaseAnalytics(): Promise<void> {
-  if (!Capacitor.isNativePlatform()) {
-    console.log('[FirebaseAnalytics] Skipping init on web platform');
-    return;
-  }
-
-  if (isInitialized) return;
-  if (initPromise) return initPromise;
-
-  initPromise = (async () => {
-    try {
-      // Dynamic import via variable name prevents Vite/Rollup from
-      // analyzing the package's web entry (which has a broken build in v8.x).
-      // The plugin is only loaded on native platforms anyway.
-      const pkg = '@capacitor-firebase/analytics';
-      const mod: any = await import(/* @vite-ignore */ pkg);
-      const FirebaseAnalytics = mod.FirebaseAnalytics;
-      await FirebaseAnalytics.setEnabled({ enabled: true });
-      isInitialized = true;
-      console.log('[FirebaseAnalytics] ✅ Initialized');
-    } catch (error) {
-      console.warn('[FirebaseAnalytics] Init failed:', error);
-    }
-  })();
-
-  return initPromise;
+  // no-op
 }
 
 /**
- * Log a custom analytics event.
- * Event names should be snake_case, ≤40 chars. Param values: strings ≤100 chars or numbers.
+ * Log a custom analytics event. Forwards to AppsFlyer.
+ * AppsFlyer accepts arbitrary key/value JSON in eventValue.
  */
 export async function logEvent(
   name: string,
   params: Record<string, string | number | boolean> = {}
 ): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return;
-
-  try {
-    if (!isInitialized) await initFirebaseAnalytics();
-    if (!isInitialized) return;
-
-    const { FirebaseAnalytics } = await import('@capacitor-firebase/analytics');
-    await FirebaseAnalytics.logEvent({ name, params });
-  } catch (error) {
-    console.warn('[FirebaseAnalytics] logEvent failed:', name, error);
-  }
+  await logAppsFlyerEvent(name, params);
 }
 
 /**
  * Link analytics events to a specific user (Supabase UUID).
- * Call after sign-in / sign-up.
+ * Forwards to AppsFlyer customer user id.
  */
 export async function setAnalyticsUserId(userId: string | null): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return;
-
-  try {
-    if (!isInitialized) await initFirebaseAnalytics();
-    if (!isInitialized) return;
-
-    const { FirebaseAnalytics } = await import('@capacitor-firebase/analytics');
-    await FirebaseAnalytics.setUserId({ userId });
-  } catch (error) {
-    console.warn('[FirebaseAnalytics] setUserId failed:', error);
-  }
+  if (!userId) return;
+  await setAppsFlyerUserId(userId);
 }
 
 /**
- * Set a sticky user property (e.g. is_subscribed, language, age_group).
- * Property names must be ≤24 chars; values ≤36 chars.
+ * Sticky user properties — forwarded as a single AppsFlyer event so they
+ * still surface in dashboards. AppsFlyer doesn't have a 1:1 "user property"
+ * primitive like Firebase, so we emit `user_property_set` events instead.
  */
 export async function setUserProperty(
   key: string,
   value: string | null
 ): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return;
-
-  try {
-    if (!isInitialized) await initFirebaseAnalytics();
-    if (!isInitialized) return;
-
-    const { FirebaseAnalytics } = await import('@capacitor-firebase/analytics');
-    await FirebaseAnalytics.setUserProperty({ key, value });
-  } catch (error) {
-    console.warn('[FirebaseAnalytics] setUserProperty failed:', key, error);
-  }
+  if (value == null) return;
+  await logAppsFlyerEvent('user_property_set', { key, value });
 }
 
 /**
- * Log a screen view event (auto-fired on route change via useFirebaseScreenTracking).
+ * Screen view event — forwarded to AppsFlyer as a custom event.
  */
 export async function logScreenView(screenName: string, screenClass?: string): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return;
-
-  try {
-    if (!isInitialized) await initFirebaseAnalytics();
-    if (!isInitialized) return;
-
-    const { FirebaseAnalytics } = await import('@capacitor-firebase/analytics');
-    await FirebaseAnalytics.logEvent({
-      name: 'screen_view',
-      params: {
-        screen_name: screenName,
-        screen_class: screenClass || screenName,
-      },
-    });
-  } catch (error) {
-    console.warn('[FirebaseAnalytics] logScreenView failed:', error);
-  }
+  await logAppsFlyerEvent('screen_view', {
+    screen_name: screenName,
+    screen_class: screenClass || screenName,
+  });
 }
 
 // ─────────────────────────────────────────────────────────────
-// Pre-defined event helpers (typed, consistent naming)
+// Pre-defined event helpers (forwarded to AppsFlyer)
 // ─────────────────────────────────────────────────────────────
 
 export const Analytics = {
@@ -134,6 +64,7 @@ export const Analytics = {
   appFirstOpen: () => logEvent('app_first_open'),
   appOpen: () => logEvent('app_open'),
 
+  // Onboarding
   onboardingStarted: (flowId: string) =>
     logEvent('onboarding_started', { flow_id: flowId }),
   onboardingStepViewed: (flowId: string, stepId: string, stepIndex: number) =>
@@ -149,13 +80,15 @@ export const Analytics = {
   onboardingSkipped: (flowId: string, stepIndex: number) =>
     logEvent('onboarding_skipped', { flow_id: flowId, step_index: stepIndex }),
 
+  // Auth
   signupStarted: (method: string) =>
     logEvent('signup_started', { method }),
   signupCompleted: (method: string) =>
-    logEvent('sign_up', { method }), // GA4 standard event name
+    logEvent('af_complete_registration', { af_registration_method: method }),
   loginCompleted: (method: string) =>
-    logEvent('login', { method }), // GA4 standard event name
+    logEvent('af_login', { method }),
 
+  // Quiz
   quizStarted: (quizId: string) =>
     logEvent('quiz_started', { quiz_id: quizId }),
   quizCompleted: (quizId: string, resultKey?: string) =>
@@ -163,6 +96,16 @@ export const Analytics = {
       quiz_id: quizId,
       ...(resultKey ? { result_key: resultKey } : {}),
     }),
+
+  // Self-Care Quiz specific (richer breakdown)
+  selfcareQuizAnswer: (stepId: string, cluster: string, answer: string) =>
+    logEvent('selfcare_quiz_answer', { step_id: stepId, cluster, answer }),
+  selfcareQuizDiagnosisViewed: (topCluster: string) =>
+    logEvent('selfcare_quiz_diagnosis_viewed', { top_cluster: topCluster }),
+  selfcareQuizSuggestionsViewed: (count: number) =>
+    logEvent('selfcare_quiz_suggestions_viewed', { suggestion_count: count }),
+  selfcareQuizCommitment: (frequency: string) =>
+    logEvent('selfcare_quiz_commitment', { frequency }),
 
   // 🔁 Retention / Daily engagement
   routineStarted: (routineId: string) =>
@@ -206,20 +149,18 @@ export const Analytics = {
     logEvent('paywall_dismissed', { variant_id: variantId }),
 
   trialStarted: (productId: string) =>
-    logEvent('trial_started', { product_id: productId }),
+    logEvent('af_start_trial', { product_id: productId }),
   subscriptionStarted: (productId: string, revenue: number, currency: string) =>
-    logEvent('purchase', {
-      // GA4 standard purchase event
-      transaction_id: `${productId}_${Date.now()}`,
-      value: revenue,
-      currency,
-      items_product_id: productId,
+    logEvent('af_subscribe', {
+      af_revenue: revenue,
+      af_currency: currency,
+      product_id: productId,
     }),
   subscriptionCancelled: (productId: string) =>
     logEvent('subscription_cancelled', { product_id: productId }),
 };
 
-// Sticky user property setters
+// Sticky user property setters — forwarded as user_property_set events
 export const UserProperties = {
   setSubscribed: (isSubscribed: boolean) =>
     setUserProperty('is_subscribed', isSubscribed ? 'true' : 'false'),
