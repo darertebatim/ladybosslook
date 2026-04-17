@@ -127,7 +127,15 @@ export default function AppOnboarding() {
   useEffect(() => {
     if (!flow || !flowId) return;
     const step = flow.steps[currentStep];
-    if (step) Analytics.onboardingStepViewed(flowId, step.id, currentStep);
+    if (!step) return;
+    Analytics.onboardingStepViewed(flowId, step.id, currentStep);
+
+    // Self-care quiz milestone events
+    if (flowId === 'selfcare-quiz') {
+      if (step.id === 'sc-diagnosis') Analytics.selfcareQuizDiagnosisViewed('mixed');
+      else if (step.id === 'sc-suggestions') Analytics.selfcareQuizSuggestionsViewed(0);
+      else if (step.id === 'sc-commitment') Analytics.selfcareQuizCommitment('viewed');
+    }
   }, [currentStep, flow, flowId]);
 
   // Save progress
