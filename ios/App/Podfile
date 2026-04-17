@@ -37,7 +37,10 @@ end
 
 target 'App' do
   capacitor_pods
-  # Add your Pods here
+  # Force Firebase to build as modules so CapacitorFirebaseAnalytics can `import FirebaseCore` in Swift
+  pod 'FirebaseCore', :modular_headers => true
+  pod 'FirebaseCoreInternal', :modular_headers => true
+  pod 'GoogleUtilities', :modular_headers => true
 end
 
 post_install do |installer|
