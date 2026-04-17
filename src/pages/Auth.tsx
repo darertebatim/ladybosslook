@@ -13,6 +13,7 @@ import { ArrowLeft, Mail } from 'lucide-react';
 import appIcon from '@/assets/app-icon.png';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { Capacitor } from '@capacitor/core';
+import { Analytics } from '@/lib/firebaseAnalytics';
 
 
 export default function Auth() {
@@ -94,6 +95,7 @@ export default function Auth() {
           setShowEmailForm(false);
         }
       } else {
+        if (!isLogin) Analytics.signupStarted('email');
         const { error } = isLogin 
           ? await signIn(email, password)
           : await signUp(email, password);
@@ -105,10 +107,13 @@ export default function Auth() {
             description: error.message,
           });
         } else if (!isLogin) {
+          Analytics.signupCompleted('email');
           toast({
             title: "Check your email",
             description: "We've sent you a confirmation link.",
           });
+        } else {
+          Analytics.loginCompleted('email');
         }
       }
     } finally {
