@@ -6,6 +6,7 @@ import { Capacitor } from '@capacitor/core';
 import { initializePushNotificationHandlers, clearBadge } from './lib/pushNotifications';
 import { logBuildInfo } from './lib/buildInfo';
 import { initAppsFlyer } from './lib/appsflyer';
+import { initFirebaseAnalytics, Analytics } from './lib/firebaseAnalytics';
 
 // Global error handler to catch any uncaught errors
 window.onerror = (message, source, lineno, colno, error) => {
@@ -67,6 +68,22 @@ async function initializeNative() {
     await initAppsFlyer();
   } catch (e) {
     console.warn('[Main] AppsFlyer init failed:', e);
+  }
+
+  // Firebase Analytics
+  try {
+    await initFirebaseAnalytics();
+    // Track first-ever launch (cohort baseline)
+    try {
+      const FIRST_OPEN_KEY = 'rilo_app_first_open_logged';
+      if (!localStorage.getItem(FIRST_OPEN_KEY)) {
+        Analytics.appFirstOpen();
+        localStorage.setItem(FIRST_OPEN_KEY, '1');
+      }
+      Analytics.appOpen();
+    } catch { /* ignore */ }
+  } catch (e) {
+    console.warn('[Main] Firebase Analytics init failed:', e);
   }
 
   // Pre-warm native audio plugin so first play is instant
