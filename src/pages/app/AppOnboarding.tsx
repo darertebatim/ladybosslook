@@ -153,6 +153,19 @@ export default function AppOnboarding() {
 
     if (flowId) Analytics.onboardingAnswered(flowId, stepId);
 
+    // Self-care quiz: emit a richer event with the actual answer payload
+    if (flowId === 'selfcare-quiz') {
+      const answerStr = Array.isArray(answer) ? answer.join('|') : String(answer);
+      // Heuristic cluster tag based on step id
+      const cluster =
+        stepId === 'sc-deeper' ? 'deeper'
+        : stepId === 'sc-neglecting' ? 'neglecting'
+        : stepId === 'sc-weighing' ? 'weighing'
+        : stepId === 'sc-win' ? 'win'
+        : 'other';
+      Analytics.selfcareQuizAnswer(stepId, cluster, answerStr.slice(0, 100));
+    }
+
     // Persist answer to Supabase
     if (user && flowId) {
       supabase.from('onboarding_answers').insert({
