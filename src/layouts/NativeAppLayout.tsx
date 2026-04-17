@@ -26,6 +26,7 @@ import { useKeyboard } from '@/hooks/useKeyboard';
 
 import { useOnboardingProfileSync } from '@/hooks/useOnboardingProfileSync';
 import { useRoutePreloader } from '@/hooks/useRoutePreloader';
+import { useFirebaseScreenTracking } from '@/hooks/useFirebaseScreenTracking';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
@@ -67,6 +68,9 @@ const NativeAppLayout = () => {
 
   // Prefetch secondary page chunks after user settles on a tab
   useRoutePreloader();
+
+  // Auto-track screen_view for every route change (Firebase Analytics)
+  useFirebaseScreenTracking();
 
   // Defer non-critical hooks — mount DeferredLayoutHooks after 5s delay
   const [deferredReady, setDeferredReady] = useState(false);
