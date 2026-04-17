@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, ArrowRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaywallProgramData } from './PaywallClassic';
+import { usePaywallTracking } from '@/hooks/usePaywallTracking';
 
 interface PaywallLimitedOfferProps {
   program: PaywallProgramData;
@@ -47,6 +48,7 @@ function CountdownTimer() {
 }
 
 export function PaywallLimitedOffer({ program, onPurchase, onRestore, onClose, preview }: PaywallLimitedOfferProps) {
+  usePaywallTracking('limited_offer');
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual-offer' | 'annual-original'>('annual-offer');
   const [isPurchasing, setIsPurchasing] = useState(false);
 

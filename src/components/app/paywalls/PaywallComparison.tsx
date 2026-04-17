@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Minus, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaywallProgramData } from './PaywallClassic';
+import { usePaywallTracking } from '@/hooks/usePaywallTracking';
 
 interface PaywallComparisonProps {
   program: PaywallProgramData;
@@ -23,6 +24,7 @@ const comparisonFeatures = [
 ];
 
 export function PaywallComparison({ program, onPurchase, onRestore, onClose, preview }: PaywallComparisonProps) {
+  usePaywallTracking('comparison');
   const [isPurchasing, setIsPurchasing] = useState(false);
 
   const monthlyPrice = program.price_amount / 100;

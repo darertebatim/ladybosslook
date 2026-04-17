@@ -12,6 +12,7 @@ import emojiMedal from '@/assets/emoji-medal-3d.png';
 import emojiBooks from '@/assets/emoji-books-3d.png';
 import emojiHug from '@/assets/emoji-hug-3d.png';
 import emojiBulb from '@/assets/emoji-bulb-3d.png';
+import { usePaywallTracking } from '@/hooks/usePaywallTracking';
 
 interface PaywallMascotV2Props {
   program: PaywallProgramData;
@@ -43,6 +44,7 @@ const MONTHLY_ORIGINAL = 12.99;
 const MONTHLY_DISCOUNT = Math.round((1 - MONTHLY_PRICE / MONTHLY_ORIGINAL) * 100);
 
 export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, preview }: PaywallMascotV2Props) {
+  usePaywallTracking('mascot_v2');
   const [page, setPage] = useState<1 | 2 | 3>(1);
   const [selectedPlan, setSelectedPlan] = useState<'annual' | 'monthly'>('annual');
   const [isPurchasing, setIsPurchasing] = useState(false);
