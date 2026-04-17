@@ -19,6 +19,7 @@ import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
 import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
 import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
 import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
+import { Analytics } from '@/lib/firebaseAnalytics';
 const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow, quickStartV2Flow, weeklyReviewFlow, selfcareQuizFlow, selfcareWeeklyReviewFlow];
 
 function preloadImages(srcs: string[]) {
@@ -93,14 +94,41 @@ export default function AppOnboarding() {
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
   const [direction, setDirection] = useState(1); // 1 = forward, -1 = back
 
-  // Preload images on mount
+  // Preload images on mount + fire onboarding_started (once per flow)
   useEffect(() => {
     if (!flow) return;
     const stepImages = flow.steps.map(s => s.image).filter(Boolean) as string[];
     const extraImages = [meplusMascotBg, meplusPaywall2, meplusPaywall3, meplusCommunityFooter];
     const emojiUrls = collectEmojiUrls(flow);
     preloadImages([...stepImages, ...extraImages, ...emojiUrls]);
-  }, [flow]);
+
+    if (flowId) {
+      const startedKey = `rilo_onboarding_started_${flowId}`;
+      try {
+        if (!sessionStorage.getItem(startedKey)) {
+          Analytics.onboardingStarted(flowId);
+          sessionStorage.setItem(startedKey, '1');
+        }
+      } catch { /* ignore */ }
+      // Fire quiz_started for the self-care quiz flow
+      if (flowId === 'selfcare-quiz') {
+        try {
+          const quizKey = `rilo_quiz_started_${flowId}`;
+          if (!sessionStorage.getItem(quizKey)) {
+            Analytics.quizStarted(flowId);
+            sessionStorage.setItem(quizKey, '1');
+          }
+        } catch { /* ignore */ }
+      }
+    }
+  }, [flow, flowId]);
+
+  // Fire step_viewed on every step change
+  useEffect(() => {
+    if (!flow || !flowId) return;
+    const step = flow.steps[currentStep];
+    if (step) Analytics.onboardingStepViewed(flowId, step.id, currentStep);
+  }, [currentStep, flow, flowId]);
 
   // Save progress
   useEffect(() => {
