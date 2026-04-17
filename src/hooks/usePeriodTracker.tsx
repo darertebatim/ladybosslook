@@ -206,10 +206,15 @@ export function useLogPeriodDay() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['period-logs'] });
       queryClient.invalidateQueries({ queryKey: ['period-logs-all'] });
       autoCompletePeriod();
+      try {
+        import('@/lib/firebaseAnalytics').then(({ Analytics }) => {
+          Analytics.periodLogged(data?.is_period_day ? 'period' : 'no-period');
+        });
+      } catch { /* ignore */ }
     },
   });
 }

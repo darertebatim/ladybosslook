@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns';
 import { useAutoCompleteProTask } from './useAutoCompleteProTask';
+import { logEvent } from '@/lib/firebaseAnalytics';
 
 interface SaveSessionParams {
   durationSeconds: number;
@@ -32,10 +33,17 @@ export const useSaveFocusSession = () => {
       });
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['focus-sessions'] });
       // Auto-complete any focus_timer pro tasks
       autoCompleteFocusTimer();
+      try {
+        logEvent('focus_session_completed', {
+          duration_seconds: variables.durationSeconds,
+          session_type: variables.sessionType,
+          completed: variables.completed,
+        });
+      } catch { /* ignore */ }
     },
   });
 };
