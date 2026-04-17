@@ -6,6 +6,7 @@ import { Check, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaywallProgramData } from './PaywallClassic';
 import appIcon from '@/assets/app-icon.png';
+import { usePaywallTracking } from '@/hooks/usePaywallTracking';
 
 interface PaywallGradientProps {
   program: PaywallProgramData;
@@ -16,6 +17,7 @@ interface PaywallGradientProps {
 }
 
 export function PaywallGradient({ program, onPurchase, onRestore, onClose, preview }: PaywallGradientProps) {
+  usePaywallTracking('gradient');
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>('annual');
   const [isPurchasing, setIsPurchasing] = useState(false);
 

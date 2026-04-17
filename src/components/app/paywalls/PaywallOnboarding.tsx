@@ -5,6 +5,7 @@ import type { PaywallProgramData } from './PaywallClassic';
 import meplusPaywall1 from '@/assets/onboarding/meplus-32-beforeafter.png';
 import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
 import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
+import { usePaywallTracking } from '@/hooks/usePaywallTracking';
 
 interface PaywallProps {
   program: PaywallProgramData;
@@ -17,6 +18,7 @@ interface PaywallProps {
 const images = [meplusPaywall1, meplusPaywall2, meplusPaywall3];
 
 export function PaywallOnboarding({ program, onPurchase, onRestore, onClose, preview }: PaywallProps) {
+  usePaywallTracking('onboarding');
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>('annual');
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [currentImg, setCurrentImg] = useState(0);

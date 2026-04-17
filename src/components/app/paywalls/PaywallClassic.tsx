@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, Loader2, Crown, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { usePaywallTracking } from '@/hooks/usePaywallTracking';
 
 export interface PaywallProgramData {
   title: string;
@@ -26,6 +27,7 @@ interface PaywallProps {
 }
 
 export function PaywallClassic({ program, onPurchase, onRestore, onClose, preview }: PaywallProps) {
+  usePaywallTracking('classic');
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>('annual');
   const [isPurchasing, setIsPurchasing] = useState(false);
 

@@ -7,6 +7,7 @@ import { useHybridNotificationScheduler } from '@/hooks/useHybridNotificationSch
 import { useProgramEventNotificationScheduler } from '@/hooks/useProgramEventNotificationScheduler';
 import { useSmartActionNudges } from '@/hooks/useSmartActionNudges';
 import { usePeriodNotifications } from '@/hooks/usePeriodNotifications';
+import { useFirebaseUserSync } from '@/hooks/useFirebaseUserSync';
 
 /**
  * Ensure local notification permission is granted on Android 13+.
@@ -37,6 +38,7 @@ export const DeferredLayoutHooks = ({ userId }: { userId: string | undefined }) 
   useEnsureLocalNotificationPermission();
   useAppInstallTracking(userId);
   useAppsFlyerTracking(userId);
+  useFirebaseUserSync(userId);
   useLocalNotificationScheduler(userId);
   useSmartActionNudges(userId);
   usePeriodNotifications(userId);

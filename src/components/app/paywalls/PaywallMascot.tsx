@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import type { PaywallProgramData } from './PaywallClassic';
 import appIcon from '@/assets/app-icon.png';
 import mascotImage from '@/assets/mascot-paywall.png';
+import { usePaywallTracking } from '@/hooks/usePaywallTracking';
 
 interface PaywallMascotProps {
   program: PaywallProgramData;
@@ -17,6 +18,7 @@ interface PaywallMascotProps {
 }
 
 export function PaywallMascot({ program, onPurchase, onRestore, onClose, preview }: PaywallMascotProps) {
+  usePaywallTracking('mascot');
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>('annual');
   const [isPurchasing, setIsPurchasing] = useState(false);
 

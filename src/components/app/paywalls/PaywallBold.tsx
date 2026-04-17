@@ -6,6 +6,7 @@ import { Check, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaywallProgramData } from './PaywallClassic';
 import appIcon from '@/assets/app-icon.png';
+import { usePaywallTracking } from '@/hooks/usePaywallTracking';
 
 interface PaywallBoldProps {
   program: PaywallProgramData;
@@ -16,6 +17,7 @@ interface PaywallBoldProps {
 }
 
 export function PaywallBold({ program, onPurchase, onRestore, onClose, preview }: PaywallBoldProps) {
+  usePaywallTracking('bold');
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>('annual');
   const [isPurchasing, setIsPurchasing] = useState(false);
 

@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Star, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaywallProgramData } from './PaywallClassic';
+import { usePaywallTracking } from '@/hooks/usePaywallTracking';
 
 interface PaywallMinimalProps {
   program: PaywallProgramData;
@@ -15,6 +16,7 @@ interface PaywallMinimalProps {
 }
 
 export function PaywallMinimal({ program, onPurchase, onRestore, onClose, preview }: PaywallMinimalProps) {
+  usePaywallTracking('minimal');
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>('annual');
   const [isPurchasing, setIsPurchasing] = useState(false);
 
