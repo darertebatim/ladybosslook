@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@capacitor-community/in-app-review": "^8.0.0",
-    "@capacitor-firebase/analytics": "6.3.1",
+    "@capacitor-firebase/analytics": "8.2.0",
     "@capacitor/action-sheet": "^8.0.0",
     "@capacitor/android": "^8.0.1",
     "@capacitor/app": "^8.0.0",
