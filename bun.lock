@@ -6,7 +6,7 @@
       "name": "vite_react_shadcn_ts",
       "dependencies": {
         "@capacitor-community/in-app-review": "^8.0.0",
-        "@capacitor-firebase/analytics": "6.3.1",
+        "@capacitor-firebase/analytics": "7.3.0",
         "@capacitor/action-sheet": "^8.0.0",
         "@capacitor/android": "^8.0.1",
         "@capacitor/app": "^8.0.0",
@@ -138,7 +138,7 @@
 
     "@capacitor-community/in-app-review": ["@capacitor-community/in-app-review@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-AYpEkIjdv27WGS3hnlc7xAQ1BhaBvD2svgQBfHF4P2Olw1N6a7MSCOQC6O4SuxmdBdJ2fM6uFeo1jyNjKLtIPw=="],
 
-    "@capacitor-firebase/analytics": ["@capacitor-firebase/analytics@6.3.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor-firebase/analytics/-/analytics-6.3.1.tgz", { "peerDependencies": { "@capacitor/core": "^6.0.0", "firebase": "^10.9.0 || ^11.0.0" }, "optionalPeers": ["firebase"] }, "sha512-0XNCHzUgaOg2HILwtChUYlDtWhuoCorzMbulNXHBlqyA1eYTtyKLjyD8t7xBfvzSCqb/2xXjGXX1jClUAY91HQ=="],
+    "@capacitor-firebase/analytics": ["@capacitor-firebase/analytics@7.3.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor-firebase/analytics/-/analytics-7.3.0.tgz", { "peerDependencies": { "@capacitor/core": ">=7.0.0", "firebase": "^11.2.0" }, "optionalPeers": ["firebase"] }, "sha512-+yeeaZO3O320OPOgIJRb206ZxwhxMiFRdpbHxlB/C84HlN7vRXubWRxrLVo1US12jkSsjNzk6FGNQhOmgJ6jmA=="],
 
     "@capacitor/action-sheet": ["@capacitor/action-sheet@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-6NYSv9EeaPiInu+/4AfuvSlJEaH+F7J6UmAejVdPW8YHF+Qinc/DKYkMvqMx+8MXVKIptCA0Zwz8JnabuNCl2Q=="],
 
