@@ -18,7 +18,7 @@ interface StreakGoalSelectionProps {
   isUpgrade?: boolean;
 }
 
-const GOALS = [7, 14, 30, 50, 90, 180, 270, 365] as const;
+const GOALS = [7, 14, 30, 50] as const;
 type GoalValue = typeof GOALS[number];
 
 const MULTIPLIERS: Record<GoalValue, { multiplier: string; text: string }> = {
@@ -26,10 +26,6 @@ const MULTIPLIERS: Record<GoalValue, { multiplier: string; text: string }> = {
   14: { multiplier: '5x', text: "You'll be 5x as likely to achieve a healthier lifestyle!" },
   30: { multiplier: '7x', text: "You'll be 7x as likely to achieve a healthier lifestyle!" },
   50: { multiplier: '9x', text: "You'll be 9x as likely to achieve a healthier lifestyle!" },
-  90: { multiplier: '12x', text: "You'll be 12x as likely to achieve a healthier lifestyle!" },
-  180: { multiplier: '15x', text: "You'll be 15x as likely to achieve a healthier lifestyle!" },
-  270: { multiplier: '18x', text: "You'll be 18x as likely to achieve a healthier lifestyle!" },
-  365: { multiplier: '20x', text: "You'll be 20x as likely to be a master of your habits — for life!" },
 };
 
 /**
