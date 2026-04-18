@@ -49,6 +49,7 @@ import { AppUpdateBanner } from '@/components/app/AppUpdateBanner';
 import { BadgeCelebration, BadgeCelebrationLevel } from '@/components/app/BadgeCelebration';
 import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
 import { StreakGoalSelection, StreakGoalValue } from '@/components/app/StreakGoalSelection';
+import { StreakGoalSelectionAdvanced } from '@/components/app/StreakGoalSelectionAdvanced';
 import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation';
 import { ActionLimitSheet, resetActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 import { StreakLostBanner } from '@/components/app/StreakLostBanner';
@@ -92,6 +93,7 @@ export default function AppTest() {
   const [badgeCelebrationType, setBadgeCelebrationType] = useState<BadgeCelebrationLevel | null>(null);
   const [showGoldStreakCelebration, setShowGoldStreakCelebration] = useState(false);
   const [showStreakGoalSelection, setShowStreakGoalSelection] = useState(false);
+  const [showStreakGoalSelectionAdvanced, setShowStreakGoalSelectionAdvanced] = useState(false);
   const [showGoalConfirmation, setShowGoalConfirmation] = useState(false);
   const [confirmedGoal, setConfirmedGoal] = useState<7 | 14 | 30 | 50 | 90 | 180 | 270 | 365>(7);
   const [showStreakLostBanner, setShowStreakLostBanner] = useState(false);
@@ -197,6 +199,10 @@ export default function AppTest() {
                 <Button onClick={() => setShowStreakGoalSelection(true)} className="w-full justify-start" variant="outline">
                   <Flame className="h-4 w-4 mr-2" />
                   Streak Goal Selection
+                </Button>
+                <Button onClick={() => setShowStreakGoalSelectionAdvanced(true)} className="w-full justify-start" variant="outline">
+                  <Flame className="h-4 w-4 mr-2" />
+                  Streak Goal Selection — Advanced (90/180/270/365)
                 </Button>
               </CardContent>
             </Card>
@@ -499,6 +505,10 @@ export default function AppTest() {
             <Button onClick={() => setShowStreakGoalSelection(true)} variant="outline">
               <Flame className="h-4 w-4 mr-2" />
               Streak Goal Selection
+            </Button>
+            <Button onClick={() => setShowStreakGoalSelectionAdvanced(true)} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              Streak Goal — Advanced
             </Button>
             <Button onClick={() => { setConfirmedGoal(14); setShowGoalConfirmation(true); }} variant="outline">
               <Flame className="h-4 w-4 mr-2" />
