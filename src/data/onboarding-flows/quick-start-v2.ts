@@ -28,9 +28,9 @@ export const quickStartV2Flow: OnboardingFlow = {
     // 2 — Pain points question
     {
       id: 'qs2-pain-points',
-      type: 'multi-select',
+      type: 'single-select',
       title: 'What do you struggle\nwith most?',
-      subtitle: 'Pick all that apply — no judgment here.',
+      subtitle: 'Pick the one that fits best.',
       image: mascotPlanner,
       illustrationLabel: 'Mascot asking',
       options: [
@@ -45,9 +45,9 @@ export const quickStartV2Flow: OnboardingFlow = {
     // 3 — Feature interest question
     {
       id: 'qs2-feature-interest',
-      type: 'multi-select',
+      type: 'single-select',
       title: 'What sounds most\nhelpful to you?',
-      subtitle: 'We\'ll personalize your experience.',
+      subtitle: 'Pick the one you want most.',
       image: mascotPlanner,
       illustrationLabel: 'Mascot features',
       options: [
