@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { StreakGoalSelection } from '@/components/app/StreakGoalSelection';
+import { StreakGoalSelectionAdvanced } from '@/components/app/StreakGoalSelectionAdvanced';
 import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
 import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation';
 import { StreakRecoveryPrompt } from '@/components/app/StreakRecoveryPrompt';
@@ -222,23 +223,42 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         }}
       />
 
-      <StreakGoalSelection
-        open={showGoalSelection}
-        onClose={() => setShowGoalSelection(false)}
-        onSelectGoal={(goal) => {
-          setStreakGoal.mutate(goal, {
-            onSuccess: () => {
-              setShowGoalSelection(false);
-              setIsStreakUpgrade(false);
-              setConfirmedGoal(goal);
-              setShowGoalConfirmation(true);
-            },
-          });
-        }}
-        isLoading={setStreakGoal.isPending}
-        minGoal={isStreakUpgrade ? (streak?.streak_goal || 0) : 0}
-        isUpgrade={isStreakUpgrade}
-      />
+      {isStreakUpgrade && (streak?.streak_goal || 0) >= 50 ? (
+        <StreakGoalSelectionAdvanced
+          open={showGoalSelection}
+          onClose={() => setShowGoalSelection(false)}
+          onSelectGoal={(goal) => {
+            setStreakGoal.mutate(goal, {
+              onSuccess: () => {
+                setShowGoalSelection(false);
+                setIsStreakUpgrade(false);
+                setConfirmedGoal(goal);
+                setShowGoalConfirmation(true);
+              },
+            });
+          }}
+          isLoading={setStreakGoal.isPending}
+          minGoal={streak?.streak_goal || 50}
+        />
+      ) : (
+        <StreakGoalSelection
+          open={showGoalSelection}
+          onClose={() => setShowGoalSelection(false)}
+          onSelectGoal={(goal) => {
+            setStreakGoal.mutate(goal, {
+              onSuccess: () => {
+                setShowGoalSelection(false);
+                setIsStreakUpgrade(false);
+                setConfirmedGoal(goal);
+                setShowGoalConfirmation(true);
+              },
+            });
+          }}
+          isLoading={setStreakGoal.isPending}
+          minGoal={isStreakUpgrade ? (streak?.streak_goal || 0) : 0}
+          isUpgrade={isStreakUpgrade}
+        />
+      )}
 
       <StreakGoalConfirmation
         open={showGoalConfirmation}
