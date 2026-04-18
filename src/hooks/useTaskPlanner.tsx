@@ -1684,7 +1684,7 @@ export const useSetStreakGoal = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (goal: 7 | 14 | 30 | 50) => {
+    mutationFn: async (goal: 7 | 14 | 30 | 50 | 90 | 180 | 270 | 365) => {
       if (!user?.id) throw new Error('Not authenticated');
 
       const { error } = await supabase
