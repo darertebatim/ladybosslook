@@ -93,26 +93,7 @@ export const quickStartV2Flow: OnboardingFlow = {
         { label: 'Spanish', emoji: '🇪🇸' },
       ],
     },
-    // 7 — Age group
-    {
-      id: 'qs2-age-group',
-      type: 'single-select',
-      title: 'What is your age group?',
-      subtitle: 'I recommend routines for your age.',
-      image: mascotPlanner,
-      illustrationLabel: 'Mascot with clipboard',
-      options: [
-        { label: '14 years or under' },
-        { label: '15 ~ 19' },
-        { label: '20 ~ 24' },
-        { label: '25 ~ 29' },
-        { label: '30 ~ 34' },
-        { label: '35 ~ 39' },
-        { label: '40 ~ 44' },
-        { label: '45+' },
-      ],
-    },
-    // 8 — Gender
+    // 7 — Gender
     {
       id: 'qs2-gender',
       type: 'single-select',
