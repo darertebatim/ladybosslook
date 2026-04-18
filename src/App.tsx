@@ -436,6 +436,7 @@ const App = () => (
                       <Route path="documents" element={<ProtectedRoute requiredPage="system"><Documents /></ProtectedRoute>} />
                       <Route path="read" element={<ProtectedRoute requiredPage="tools"><ReadingManager /></ProtectedRoute>} />
                       <Route path="quizzes" element={<ProtectedRoute requiredPage="tools"><QuizzesAdmin /></ProtectedRoute>} />
+                      <Route path="analytics" element={<ProtectedRoute requiredPage="overview"><AnalyticsAdmin /></ProtectedRoute>} />
                     </Route>
                   )}
                   
