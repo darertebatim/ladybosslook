@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 
 const menuItems = [
   { title: 'Overview', url: '/admin', icon: LayoutDashboard, end: true, pageSlug: 'overview' },
+  { title: 'Analytics', url: '/admin/analytics', icon: BarChart3, pageSlug: 'overview' },
   { title: 'Users', url: '/admin/users', icon: Users, pageSlug: 'users' },
   { title: 'Enrollment', url: '/admin/enrollment', icon: GraduationCap, pageSlug: 'enrollment' },
   { title: 'Audio', url: '/admin/audio', icon: Music, pageSlug: 'audio' },
