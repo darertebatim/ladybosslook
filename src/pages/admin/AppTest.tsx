@@ -93,7 +93,7 @@ export default function AppTest() {
   const [showGoldStreakCelebration, setShowGoldStreakCelebration] = useState(false);
   const [showStreakGoalSelection, setShowStreakGoalSelection] = useState(false);
   const [showGoalConfirmation, setShowGoalConfirmation] = useState(false);
-  const [confirmedGoal, setConfirmedGoal] = useState<7 | 14 | 30 | 50>(7);
+  const [confirmedGoal, setConfirmedGoal] = useState<7 | 14 | 30 | 50 | 90 | 180 | 270 | 365>(7);
   const [showStreakLostBanner, setShowStreakLostBanner] = useState(false);
   const [showGoldStreakLostBanner, setShowGoldStreakLostBanner] = useState(false);
   const [showStreakLostNoShields, setShowStreakLostNoShields] = useState(false);
