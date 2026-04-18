@@ -167,9 +167,10 @@ const AppStore = () => {
 
   // Filter tools by search
   const filteredWellnessTools = useMemo(() => {
-    if (!searchQuery.trim()) return wellnessTools;
+    const visible = wellnessTools.filter(t => !t.hidden);
+    if (!searchQuery.trim()) return visible;
     const query = searchQuery.toLowerCase();
-    return wellnessTools.filter(t => 
+    return visible.filter(t => 
       t.name.toLowerCase().includes(query) ||
       t.description.toLowerCase().includes(query)
     );

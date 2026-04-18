@@ -71,6 +71,7 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-amber-600',
     route: '/app/projects',
     description: 'Organize task projects',
+    hidden: true,
   },
   {
     id: 'focus-timer',
