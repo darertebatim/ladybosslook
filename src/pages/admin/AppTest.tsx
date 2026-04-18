@@ -407,6 +407,16 @@ export default function AppTest() {
             setShowGoalConfirmation(true);
           }}
         />
+        <StreakGoalSelectionAdvanced
+          open={showStreakGoalSelectionAdvanced}
+          onClose={() => setShowStreakGoalSelectionAdvanced(false)}
+          onSelectGoal={(goal) => {
+            setShowStreakGoalSelectionAdvanced(false);
+            setConfirmedGoal(goal);
+            setShowGoalConfirmation(true);
+          }}
+          minGoal={50}
+        />
         <StreakGoalConfirmation
           open={showGoalConfirmation}
           goal={confirmedGoal}
@@ -1121,6 +1131,17 @@ export default function AppTest() {
           setConfirmedGoal(goal);
           setShowGoalConfirmation(true);
         }}
+      />
+
+      <StreakGoalSelectionAdvanced
+        open={showStreakGoalSelectionAdvanced}
+        onClose={() => setShowStreakGoalSelectionAdvanced(false)}
+        onSelectGoal={(goal) => {
+          setShowStreakGoalSelectionAdvanced(false);
+          setConfirmedGoal(goal);
+          setShowGoalConfirmation(true);
+        }}
+        minGoal={50}
       />
 
       <ActionLimitSheet
