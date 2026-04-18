@@ -124,6 +124,7 @@ const Banners = lazy(() => import("@/pages/admin/Banners"));
 const Documents = lazy(() => import("@/pages/admin/Documents"));
 const ReadingManager = lazy(() => import("@/pages/admin/ReadingManager"));
 const QuizzesAdmin = lazy(() => import("@/pages/admin/Quizzes"));
+const AnalyticsAdmin = lazy(() => import("@/pages/admin/Analytics"));
 const AppRead = lazy(() => import("@/pages/app/AppRead"));
 const AppReadDetail = lazy(() => import("@/pages/app/AppReadDetail"));
 const AppReadReader = lazy(() => import("@/pages/app/AppReadReader"));
@@ -435,6 +436,7 @@ const App = () => (
                       <Route path="documents" element={<ProtectedRoute requiredPage="system"><Documents /></ProtectedRoute>} />
                       <Route path="read" element={<ProtectedRoute requiredPage="tools"><ReadingManager /></ProtectedRoute>} />
                       <Route path="quizzes" element={<ProtectedRoute requiredPage="tools"><QuizzesAdmin /></ProtectedRoute>} />
+                      <Route path="analytics" element={<ProtectedRoute requiredPage="overview"><AnalyticsAdmin /></ProtectedRoute>} />
                     </Route>
                   )}
                   
