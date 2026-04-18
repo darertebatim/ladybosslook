@@ -527,7 +527,7 @@ function SingleSelectScreen({ step, onNext, onAnswer }: Props) {
   const hasBg = !!step.illustrationLabel;
 
   if (hasBg) {
-    const useGrid = (step.options?.length || 0) > 4;
+    const useGrid = !step.singleColumn && (step.options?.length || 0) > 4;
     return (
       <BottomSheetWrapper bgImage={step.image || meplusMascotBg}>
         <FadeUp>

@@ -33,6 +33,7 @@ export const quickStartV2Flow: OnboardingFlow = {
       subtitle: 'Pick the one that fits best.',
       image: mascotPlanner,
       illustrationLabel: 'Mascot asking',
+      singleColumn: true,
       options: [
         { label: 'Stress & overthinking', emoji: '😮‍💨' },
         { label: 'Procrastination & low motivation', emoji: '🫠' },
@@ -50,6 +51,7 @@ export const quickStartV2Flow: OnboardingFlow = {
       subtitle: 'Pick the one you want most.',
       image: mascotPlanner,
       illustrationLabel: 'Mascot features',
+      singleColumn: true,
       options: [
         { label: 'Daily routines & habits', emoji: '📋' },
         { label: 'Guided audio & meditation', emoji: '🎧' },

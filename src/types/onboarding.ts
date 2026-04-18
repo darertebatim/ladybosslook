@@ -95,6 +95,7 @@ export interface OnboardingStep {
   summaryBars?: { label: string; value: number; status: string }[];
   statBadges?: { label: string; value: string }[];
   variants?: OnboardingOptionVariant[];
+  singleColumn?: boolean;
 }
 
 export type OnboardingAnswers = Record<string, string | string[]>;
