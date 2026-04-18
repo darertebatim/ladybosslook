@@ -16,6 +16,7 @@ import { EarnedBadgesCard } from '@/components/app/EarnedBadgesCard';
 import { PresenceProfileCard } from '@/components/app/PresenceProfileCard';
 import { SubscriptionCard } from '@/components/app/SubscriptionManagement';
 import { StreakGoalSelection, StreakGoalValue } from '@/components/app/StreakGoalSelection';
+import { StreakGoalSelectionAdvanced } from '@/components/app/StreakGoalSelectionAdvanced';
 import { BackButton } from '@/components/app/BackButton';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
@@ -371,22 +372,40 @@ const AppPresence = () => {
       </div>
 
       {/* Streak Goal Selection for Level Up */}
-      <StreakGoalSelection
-        open={showGoalSelection}
-        onClose={() => setShowGoalSelection(false)}
-        onSelectGoal={(goal) => {
-          setStreakGoal.mutate(goal, {
-            onSuccess: () => {
-              setShowGoalSelection(false);
-              setConfirmedGoal(goal);
-              setShowGoalConfirmation(true);
-            },
-          });
-        }}
-        isLoading={setStreakGoal.isPending}
-        minGoal={streak?.streak_goal || 0}
-        isUpgrade={true}
-      />
+      {(streak?.streak_goal || 0) >= 50 ? (
+        <StreakGoalSelectionAdvanced
+          open={showGoalSelection}
+          onClose={() => setShowGoalSelection(false)}
+          onSelectGoal={(goal) => {
+            setStreakGoal.mutate(goal, {
+              onSuccess: () => {
+                setShowGoalSelection(false);
+                setConfirmedGoal(goal);
+                setShowGoalConfirmation(true);
+              },
+            });
+          }}
+          isLoading={setStreakGoal.isPending}
+          minGoal={streak?.streak_goal || 50}
+        />
+      ) : (
+        <StreakGoalSelection
+          open={showGoalSelection}
+          onClose={() => setShowGoalSelection(false)}
+          onSelectGoal={(goal) => {
+            setStreakGoal.mutate(goal, {
+              onSuccess: () => {
+                setShowGoalSelection(false);
+                setConfirmedGoal(goal);
+                setShowGoalConfirmation(true);
+              },
+            });
+          }}
+          isLoading={setStreakGoal.isPending}
+          minGoal={streak?.streak_goal || 0}
+          isUpgrade={true}
+        />
+      )}
 
       <StreakGoalConfirmation
         open={showGoalConfirmation}
