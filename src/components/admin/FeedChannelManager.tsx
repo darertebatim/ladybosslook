@@ -403,6 +403,7 @@ export function FeedChannelManager() {
 
               <Button
                 disabled={createChannel.isPending || updateChannel.isPending}
+                onClick={handleSubmit}
                 className="w-full"
               >
                 {(createChannel.isPending || updateChannel.isPending) && (
