@@ -613,6 +613,11 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
                 size="icon"
                 disabled={createPost.isPending || (!content.trim() && !audioBlob)}
                 className="shrink-0 h-10 w-10 rounded-full"
+                onClick={(e) => {
+                  // Fallback in case form submit is intercepted by a portal/popover
+                  e.preventDefault();
+                  handleSubmit(e as any);
+                }}
               >
                 {createPost.isPending ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
