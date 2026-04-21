@@ -136,6 +136,7 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
         timeEstimate,
         reason,
         badge,
+        category: match.category,
         linked_playlist_id: match.linked_playlist_id,
         pro_link_type: match.pro_link_type,
         pro_link_value: match.pro_link_value,
