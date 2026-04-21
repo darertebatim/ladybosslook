@@ -315,6 +315,9 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
           pro_link_value: t.pro_link_value,
         })),
         syntheticTasks: routineTasks,
+        syntheticPlanTitle: 'My Weekly Reset',
+        syntheticPlanIcon: '🔄',
+        syntheticPlanCategoryName: 'My Weekly Reset',
       });
       toast.success('Routine added to your planner!');
       setShowPreview(false);

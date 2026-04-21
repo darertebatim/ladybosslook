@@ -350,6 +350,9 @@ export function useAddRoutinePlan() {
       selectedTaskIds, 
       editedTasks,
       syntheticTasks,
+      syntheticPlanTitle,
+      syntheticPlanIcon,
+      syntheticPlanCategoryName,
     }: { 
       planId: string; 
       selectedTaskIds?: string[]; 
@@ -366,6 +369,9 @@ export function useAddRoutinePlan() {
         pro_link_value?: string | null;
       }[];
       syntheticTasks?: RoutinePlanTask[];
+      syntheticPlanTitle?: string;
+      syntheticPlanIcon?: string;
+      syntheticPlanCategoryName?: string;
     }) => {
       if (!user) throw new Error('Must be logged in');
 
@@ -384,11 +390,16 @@ export function useAddRoutinePlan() {
         tasks = selectedTaskIds 
           ? syntheticTasks.filter(t => selectedTaskIds.includes(t.id))
           : syntheticTasks;
-        // Extract title from first task's tag or title
-        if (tasks.length > 0) {
-          planTitle = tasks[0].title;
-          planIcon = tasks[0].icon || '✨';
-        }
+        // Prefer caller-provided routine title/icon/category for the bunch
+        // (so all tasks share a sensible category/tag instead of inheriting
+        // the first task's title).
+        if (syntheticPlanTitle) planTitle = syntheticPlanTitle;
+        else if (tasks.length > 0) planTitle = tasks[0].title;
+
+        if (syntheticPlanIcon) planIcon = syntheticPlanIcon;
+        else if (tasks.length > 0) planIcon = tasks[0].icon || '✨';
+
+        if (syntheticPlanCategoryName) planCategoryName = syntheticPlanCategoryName;
       } else {
         // Get plan details from database (including schedule_type)
         const { data: plan, error: planError } = await supabase
