@@ -311,7 +311,7 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
         open={showPreview}
         onOpenChange={setShowPreview}
         tasks={routineTasks}
-        routineTitle="My Self-Care Routine"
+        routineTitle="Self-Care Gap Plan"
         routineColor="mint"
         routineBankId="synthetic-selfcare-quiz"
         onSave={handleSave}
