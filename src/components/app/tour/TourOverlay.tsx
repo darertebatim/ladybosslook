@@ -360,7 +360,7 @@ export function TourOverlay({
       <div
         ref={tooltipRef}
         className={cn(
-          "absolute bg-card rounded-2xl shadow-2xl border border-border/50",
+          "absolute bg-card rounded-2xl shadow-2xl border border-border/50 pointer-events-auto",
           "animate-in fade-in-0 zoom-in-95 duration-200",
           // Mobile-first padding
           "p-4 sm:p-5"
