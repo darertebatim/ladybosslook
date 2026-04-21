@@ -162,20 +162,8 @@ export function HomeTour({
     }
   }, [onTourReady, handleStartTour]);
 
-  // The banner element
-  const bannerElement = (
-    <TourBanner
-      isFirstOpen={isFirstOpen}
-      forceShow={forceShow}
-      onStartTour={handleStartTour}
-    />
-  );
-
   return (
     <>
-      {/* Banner - rendered via portal if target exists */}
-      {portalTarget ? createPortal(bannerElement, portalTarget) : null}
-
       {/* Actual tour overlay */}
       <TourOverlay
         isActive={tour.isActive}
