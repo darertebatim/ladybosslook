@@ -27,6 +27,7 @@ interface TaskSuggestion {
   timeEstimate?: string;
   reason?: string;
   badge?: string;
+  category?: string | null;
   linked_playlist_id?: string | null;
   pro_link_type?: string | null;
   pro_link_value?: string | null;
