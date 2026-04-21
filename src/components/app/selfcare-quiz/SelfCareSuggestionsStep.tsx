@@ -159,6 +159,8 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
         linked_playlist_id: t.linked_playlist_id || null,
         pro_link_type: (t.pro_link_type as ProLinkType) || null,
         pro_link_value: t.pro_link_value || null,
+        // Use the task's own category from the task bank as its tag (like FAB-added tasks)
+        tag: t.category || null,
         goal_enabled: t.goal_enabled || false,
         goal_type: t.goal_type || null,
         goal_target: t.goal_target || null,
