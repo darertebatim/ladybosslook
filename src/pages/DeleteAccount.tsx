@@ -158,8 +158,13 @@ export default function DeleteAccount() {
           {/* Logo */}
           <div className="text-center mb-8">
             <img src={appIcon} alt="Rilo" className="h-16 w-16 mx-auto mb-3 rounded-2xl shadow-md" />
-            <h1 className="text-xl font-bold">Rilo</h1>
-            <p className="text-sm text-muted-foreground">Account Management</p>
+            <h1 className="text-xl font-bold">Rilo Self-Care & Routines</h1>
+            <p className="text-sm text-muted-foreground">
+              Account Management • by Ladybosslook LLC
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Developer: Ali Lotfi
+            </p>
           </div>
 
           {step === 'success' ? (
