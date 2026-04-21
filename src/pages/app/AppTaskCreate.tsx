@@ -988,6 +988,11 @@ const AppTaskCreate = ({
       return;
     }
 
+    const effectiveScheduledTime = scheduledTime || (reminderEnabled ? reminderTime : null);
+    const effectiveReminderOffset = reminderEnabled
+      ? getReminderOffsetMinutes(scheduledTime, reminderTime)
+      : 0;
+
     // Page mode - save to database
     const taskData = {
       title: title.trim(),
@@ -995,12 +1000,12 @@ const AppTaskCreate = ({
       emoji: icon,
       color,
       scheduled_date: format(scheduledDate, 'yyyy-MM-dd'),
-      scheduled_time: scheduledTime,
-      time_period: timePeriod,
+      scheduled_time: effectiveScheduledTime,
+      time_period: effectiveScheduledTime ? null : timePeriod,
       repeat_pattern: (repeatEnabled ? repeatPattern : 'none') as RepeatPattern,
       repeat_days: repeatDays,
       reminder_enabled: reminderEnabled,
-      reminder_offset: 0,
+      reminder_offset: effectiveReminderOffset,
       is_urgent: isUrgent,
       tag,
       subtasks: subtasks.filter(s => s.trim()),
