@@ -505,9 +505,9 @@ export function useAddRoutinePlan() {
             repeat_days: repeatDays,
             scheduled_date: scheduledDate,
             scheduled_time: edited?.scheduledTime || null,
-            // For pro-linked tasks, use 'pro' as category; otherwise group all routine tasks under the routine's category or title
-            // Priority: edited tag > planCategoryName > planTitle (individual task.tag is ignored to keep routine actions grouped)
-            tag: proLinkType ? 'pro' : (edited?.tag ?? planCategoryName ?? planTitle),
+            // Tag priority: edited tag > task's own tag (from task bank's category) > plan category > plan title
+            // For pro-linked tasks, always use 'pro'
+            tag: proLinkType ? 'pro' : (edited?.tag ?? task.tag ?? planCategoryName ?? planTitle),
             linked_playlist_id: proLinkType === 'playlist' ? proLinkValue : null,
             pro_link_type: proLinkType,
             pro_link_value: proLinkValue,
