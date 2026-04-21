@@ -27,6 +27,7 @@ interface TaskSuggestion {
   timeEstimate?: string;
   reason?: string;
   badge?: string;
+  category?: string | null;
   linked_playlist_id?: string | null;
   pro_link_type?: string | null;
   pro_link_value?: string | null;
@@ -135,6 +136,7 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
         timeEstimate,
         reason,
         badge,
+        category: match.category,
         linked_playlist_id: match.linked_playlist_id,
         pro_link_type: match.pro_link_type,
         pro_link_value: match.pro_link_value,
@@ -259,6 +261,7 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
           color: match.color,
           difficulty,
           timeEstimate,
+          category: match.category,
           linked_playlist_id: match.linked_playlist_id,
           pro_link_type: match.pro_link_type,
           pro_link_value: match.pro_link_value,
@@ -293,6 +296,8 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
       linked_playlist_id: task.linked_playlist_id || null,
       pro_link_type: (task.pro_link_type as ProLinkType) || null,
       pro_link_value: task.pro_link_value || null,
+      // Use the task's own category from the task bank as its tag (like FAB-added tasks)
+      tag: task.category || null,
     }));
   }, [suggestions]);
 
