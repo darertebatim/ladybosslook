@@ -39,6 +39,38 @@ serve(async (req) => {
   }
 
   try {
+
+    // --- Admin auth check ---
+    {
+      const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const _supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const _anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+      const _serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      const _authClient = (await import('https://esm.sh/@supabase/supabase-js@2')).createClient(
+        _supabaseUrl, _anonKey,
+        { global: { headers: { Authorization: authHeader } }, auth: { persistSession: false } }
+      );
+      const { data: { user: _user }, error: _authErr } = await _authClient.auth.getUser();
+      if (_authErr || !_user) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const _adminClient = (await import('https://esm.sh/@supabase/supabase-js@2')).createClient(_supabaseUrl, _serviceKey);
+      const { data: _roleData } = await _adminClient
+        .from('user_roles').select('role').eq('user_id', _user.id).eq('role', 'admin').maybeSingle();
+      if (!_roleData) {
+        return new Response(JSON.stringify({ error: 'Admin access required' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+    // --- End admin auth check ---
     const { round_id, email_type, custom_context } = await req.json();
 
     if (!round_id || !email_type) {
