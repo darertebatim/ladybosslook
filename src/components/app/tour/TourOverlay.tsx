@@ -163,6 +163,22 @@ export function TourOverlay({
       return;
     }
 
+    // A) If a step targets a specific element but it doesn't exist in the DOM,
+    // auto-skip the step (or complete the tour if it was the last one).
+    // This prevents the overlay from getting "stuck" on empty Home states
+    // where suggested routines, banners, etc. haven't rendered.
+    const initialEl = document.querySelector(currentStep.target);
+    if (!initialEl) {
+      const skipTimer = setTimeout(() => {
+        if (isLastStep) {
+          onComplete();
+        } else {
+          onNext();
+        }
+      }, 50);
+      return () => clearTimeout(skipTimer);
+    }
+
     let targetElement: Element | null = null;
     let originalZIndex: string | null = null;
     let originalPosition: string | null = null;
