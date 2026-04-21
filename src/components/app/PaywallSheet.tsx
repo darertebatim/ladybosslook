@@ -57,14 +57,18 @@ export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
         .eq('slug', SIMORA_PLUS_SLUG)
         .maybeSingle() as any);
       if (error || !data) return null;
+      // Use Android product IDs when on Android (Play Store uses different ID format)
+      const isAndroid = Capacitor.getPlatform() === 'android';
+      const monthlyId = isAndroid && data.android_product_id ? data.android_product_id : data.ios_product_id;
+      const annualId = isAndroid && data.annual_android_product_id ? data.annual_android_product_id : data.annual_ios_product_id;
       return {
         title: data.title,
         cover_image_url: data.cover_image_url,
         price_amount: data.price_amount,
         annual_price_amount: data.annual_price_amount,
         original_price: data.original_price,
-        ios_product_id: data.ios_product_id,
-        annual_ios_product_id: data.annual_ios_product_id,
+        ios_product_id: monthlyId,
+        annual_ios_product_id: annualId,
         features: Array.isArray(data.features) ? data.features : [],
         trial_days: data.trial_days,
       } as PaywallProgramData;
