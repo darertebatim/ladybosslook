@@ -311,9 +311,12 @@ export function TourOverlay({
   const isCenter = currentStep.position === 'center' || !currentStep.target;
 
   return (
-    <div className="fixed inset-0 z-[99999] pointer-events-auto">
+    // C) Wrapper is pointer-events-none so non-tour UI (e.g. the FAB) stays
+    // interactive even if a tour step's target is missing. The tooltip below
+    // re-enables pointer events for itself.
+    <div className="fixed inset-0 z-[99999] pointer-events-none">
       {/* Backdrop with spotlight cutout */}
-      <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 99999 }}>
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 99999 }}>
         <defs>
           <mask id="spotlight-mask">
             <rect x="0" y="0" width="100%" height="100%" fill="white" />
