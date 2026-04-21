@@ -267,7 +267,7 @@ export function TourOverlay({
       setSpotlightRect(null);
       setTooltipStyle(calculateTooltipPosition(null, 'center', tooltipRef.current));
     }
-  }, [isActive, currentStep, calculateTooltipPosition]);
+  }, [isActive, currentStep, calculateTooltipPosition, isLastStep, onNext, onComplete]);
 
   // Handle keyboard navigation
   useEffect(() => {
