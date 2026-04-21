@@ -131,7 +131,8 @@ export default function AppTasksBankCategory() {
             repeat_pattern: edited?.repeatPattern || task.repeat_pattern || 'daily',
             repeat_days: task.repeat_days || null,
             scheduled_time: edited?.scheduledTime || null,
-            tag: edited?.tag ?? builderResult.title,
+            // Use the admin task bank's category as the tag (like FAB-added tasks)
+            tag: edited?.tag ?? task.category ?? builderResult.title,
             time_period: task.time_period || null,
             linked_playlist_id: (edited?.pro_link_type || task.pro_link_type) === 'playlist' ? (edited?.pro_link_value || task.pro_link_value) : null,
             pro_link_type: edited?.pro_link_type || task.pro_link_type || null,
