@@ -1105,6 +1105,16 @@ const AppTaskCreate = ({
     return `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
   };
 
+  const getReminderOffsetMinutes = (eventTime: string | null, notifyTime: string): number => {
+    if (!eventTime) return 0;
+
+    const [eventHours, eventMinutes] = eventTime.split(':').map(Number);
+    const [notifyHours, notifyMinutes] = notifyTime.split(':').map(Number);
+    const diff = eventHours * 60 + eventMinutes - (notifyHours * 60 + notifyMinutes);
+
+    return diff >= 0 ? diff : 0;
+  };
+
   const getRepeatSummary = () => {
     if (!repeatEnabled) return 'No repeat';
     
