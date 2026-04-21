@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Crown, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Capacitor } from '@capacitor/core';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PurchaseCelebration } from '@/components/app/PurchaseCelebration';
@@ -12,6 +13,8 @@ interface IAPPlanPickerProps {
     slug?: string;
     ios_product_id?: string | null;
     annual_ios_product_id?: string | null;
+    android_product_id?: string | null;
+    annual_android_product_id?: string | null;
     price_amount: number;
     annual_price_amount?: number | null;
     title: string;
@@ -42,9 +45,10 @@ export function IAPPlanPicker({ program }: IAPPlanPickerProps) {
   };
 
   const onSubscribe = async () => {
-    const productId = selectedPlan === 'annual' 
-      ? program.annual_ios_product_id 
-      : program.ios_product_id;
+    const isAndroid = Capacitor.getPlatform() === 'android';
+    const productId = selectedPlan === 'annual'
+      ? (isAndroid && program.annual_android_product_id ? program.annual_android_product_id : program.annual_ios_product_id)
+      : (isAndroid && program.android_product_id ? program.android_product_id : program.ios_product_id);
     
     if (!productId) return;
     await handlePurchase(productId, selectedPlan);
