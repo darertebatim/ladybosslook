@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Rilo SelfCare</string>
+    <string name="title_activity_main">Rilo SelfCare</string>
+    <string name="package_name">com.ladybosslook.academy</string>
+    <string name="custom_url_scheme">com.ladybosslook.academy</string>
+</resources>
