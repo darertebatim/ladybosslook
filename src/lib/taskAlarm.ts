@@ -106,17 +106,27 @@ function generateNotificationId(taskId: string, dateStr: string): number {
 async function ensureNotificationPermission(): Promise<boolean> {
   try {
     const permission = await LocalNotifications.checkPermissions();
+    let hasDisplayPermission = false;
     
     if (permission.display === 'granted') {
-      return true;
-    }
-    
-    if (permission.display === 'prompt' || permission.display === 'prompt-with-rationale') {
+      hasDisplayPermission = true;
+    } else if (permission.display === 'prompt' || permission.display === 'prompt-with-rationale') {
       const result = await LocalNotifications.requestPermissions();
-      return result.display === 'granted';
+      hasDisplayPermission = result.display === 'granted';
+    }
+
+    if (!hasDisplayPermission) return false;
+
+    if (Capacitor.getPlatform() === 'android') {
+      const exactSetting = await LocalNotifications.checkExactNotificationSetting();
+      if (exactSetting.exact_alarm !== 'granted') {
+        console.warn('[TaskAlarm] Exact alarm permission is not granted; opening Android exact alarm settings');
+        await LocalNotifications.changeExactNotificationSetting();
+        return false;
+      }
     }
     
-    return false;
+    return true;
   } catch (error) {
     console.error('[TaskAlarm] Permission check failed:', error);
     return false;
