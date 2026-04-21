@@ -539,7 +539,11 @@ const AppHome = () => {
       const newCarryForward = carryForwardTasks.filter(t => !existingIds.has(t.id) && !skippedTaskIds.has(t.id));
       result = [...result, ...newCarryForward];
     }
-    
+
+    // Hide Routine Player pro-tasks from "My Tasks" — they appear as their own
+    // Routine Player cards above the list, so showing them again is redundant.
+    result = result.filter(t => t.pro_link_type !== 'routine');
+
     if (taskFilter === 'all') return result;
     if (taskFilter === 'one-time') return result.filter(t => t.repeat_pattern === 'none');
     if (taskFilter === 'unlinked') return result.filter(t => !t.source_routine_id);
