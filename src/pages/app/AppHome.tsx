@@ -1151,7 +1151,7 @@ const AppHome = () => {
                           homeView === 'routines' ? 'text-foreground' : 'text-muted-foreground'
                         )}
                       >
-                        Routine Players
+                        My Routines
                       </button>
                       <button
                         ref={btnTasksRef}
