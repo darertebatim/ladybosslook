@@ -282,7 +282,7 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
       {/* Fixed bottom button */}
       <div
         className="fixed left-0 right-0 bottom-0 z-40 px-5 pb-5 pt-3 bg-gradient-to-t from-white via-white to-white/0"
-        style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 20px), 20px)' }}
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)' }}
       >
         {selectionCount > 0 ? (
           <button

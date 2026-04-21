@@ -194,7 +194,7 @@ function IllustrationPlaceholder({ label, className = '' }: { label: string; cla
 function ScreenWrapper({ children, bg = 'bg-white', center = false }: { children: React.ReactNode; bg?: string; center?: boolean }) {
   return (
     <div className={`h-full ${bg} overflow-y-auto overscroll-contain`}>
-      <div className={`flex flex-col min-h-full px-5 pt-4 pb-6 ${center ? 'justify-center' : ''}`} style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
+      <div className={`flex flex-col min-h-full px-5 pt-4 pb-6 ${center ? 'justify-center' : ''}`} style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)' }}>
         {children}
       </div>
     </div>
@@ -259,7 +259,7 @@ function WelcomeScreen({ step, onNext }: Props) {
       )}
 
       {/* Bottom sheet with rounded top */}
-      <div className="absolute inset-x-0 bottom-0 h-[58%] bg-white rounded-t-[28px] flex flex-col items-center px-6 pb-5 pt-7 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 20px)' }}>
+      <div className="absolute inset-x-0 bottom-0 h-[58%] bg-white rounded-t-[28px] flex flex-col items-center px-6 pb-5 pt-7 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] overflow-hidden" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)' }}>
         {/* Sparkles scattered in the white space */}
         <div className="absolute top-6 left-8 text-amber-300/60 animate-pulse" style={{ animationDelay: '0s', animationDuration: '2.5s' }}>✦</div>
         <div className="absolute top-10 right-12 text-purple-300/50 animate-pulse text-xs" style={{ animationDelay: '0.8s', animationDuration: '3s' }}>✦</div>
@@ -505,7 +505,7 @@ function BottomSheetWrapper({ children, bgImage, headerHeight = 200 }: { childre
       </div>
       {/* White bottom sheet */}
       <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-y-auto overscroll-contain">
-        <div className="px-5 pt-5 flex flex-col flex-1 min-h-0" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}>
+        <div className="px-5 pt-5 flex flex-col flex-1 min-h-0" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)' }}>
           {children}
         </div>
       </div>
@@ -917,7 +917,7 @@ function MotivationalScreen({ step, onNext }: Props) {
           </div>
 
           {/* Button sticky at bottom */}
-          <div className="sticky bottom-0 left-0 right-0 px-6 pb-5 pt-3 bg-gradient-to-t from-white via-white to-white/0" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 20px), 20px)' }}>
+          <div className="sticky bottom-0 left-0 right-0 px-6 pb-5 pt-3 bg-gradient-to-t from-white via-white to-white/0" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)' }}>
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -3865,7 +3865,7 @@ function DynamicSingleSelectScreen({ step, onNext, onAnswer, answers }: Props) {
         <img src={meplusMascotBg} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
       </div>
       <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-y-auto overscroll-contain">
-        <div className="px-5 pt-5 pb-5 flex flex-col flex-1" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
+        <div className="px-5 pt-5 pb-5 flex flex-col flex-1" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)' }}>
           <FadeUp>
             <h1 className="text-[22px] font-extrabold text-foreground mb-1">{variant.title}</h1>
           </FadeUp>

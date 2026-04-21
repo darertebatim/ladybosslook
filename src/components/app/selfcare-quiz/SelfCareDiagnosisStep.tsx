@@ -362,7 +362,7 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
 
         {/* Sticky bottom button — only show in results phase */}
         {phase === 'results' && (
-          <div className="sticky bottom-0 left-0 right-0 px-5 pb-5 pt-3 bg-gradient-to-t from-white via-white to-white/0 z-20" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 20px), 20px)' }}>
+          <div className="sticky bottom-0 left-0 right-0 px-5 pb-5 pt-3 bg-gradient-to-t from-white via-white to-white/0 z-20" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)' }}>
             <button
               onClick={onNext}
               className="w-full rounded-2xl bg-primary py-4 text-base font-bold text-primary-foreground transition-all active:scale-[0.98]"
