@@ -33,6 +33,11 @@ function useEnsureLocalNotificationPermission() {
         // No-op on iOS. Safe to call on every launch — Android dedupes by id.
         if (Capacitor.getPlatform() === 'android') {
           try {
+            const exactSetting = await LocalNotifications.checkExactNotificationSetting();
+            if (exactSetting.exact_alarm !== 'granted') {
+              console.warn('[LocalNotifications] Android exact alarm permission is not granted');
+            }
+
             await LocalNotifications.createChannel({
               id: 'task-reminders',
               name: 'Task Reminders',
