@@ -12,6 +12,9 @@ import { useFirebaseUserSync } from '@/hooks/useFirebaseUserSync';
 /**
  * Ensure local notification permission is granted on Android 13+.
  * Runs once at startup as a safety net (in case onboarding was skipped).
+ * Also creates a high-importance Android notification channel for task
+ * reminders so OEMs (Xiaomi/Huawei/Samsung) don't suppress them and so
+ * users get a heads-up popup with sound.
  */
 function useEnsureLocalNotificationPermission() {
   useEffect(() => {
@@ -24,6 +27,26 @@ function useEnsureLocalNotificationPermission() {
         if (status.display !== 'granted') {
           await LocalNotifications.requestPermissions();
           console.log('[LocalNotifications] Permission requested at startup');
+        }
+
+        // Android only: create the high-importance channel used by task reminders.
+        // No-op on iOS. Safe to call on every launch — Android dedupes by id.
+        if (Capacitor.getPlatform() === 'android') {
+          try {
+            await LocalNotifications.createChannel({
+              id: 'task-reminders',
+              name: 'Task Reminders',
+              description: 'Reminders for your scheduled tasks and routines',
+              importance: 5, // HIGH = heads-up popup + sound
+              visibility: 1, // PUBLIC = show on lock screen
+              sound: 'default',
+              vibration: true,
+              lights: true,
+            });
+            console.log('[LocalNotifications] Android channel "task-reminders" ready');
+          } catch (err) {
+            console.warn('[LocalNotifications] Failed to create Android channel:', err);
+          }
         }
       } catch { /* ignore on web */ }
     })();
