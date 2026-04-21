@@ -238,7 +238,10 @@ export const PeriodOnboarding = () => {
       </div>
 
       {/* Step indicator */}
-      <div className="relative z-10 flex items-center justify-center gap-2 pb-8">
+      <div
+        className="relative z-10 flex items-center justify-center gap-2"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)' }}
+      >
         <div className={`w-2 h-2 rounded-full transition-colors ${step === 'welcome' ? 'bg-pink-500' : 'bg-pink-200'}`} />
         <div className={`w-2 h-2 rounded-full transition-colors ${step === 'last_period' ? 'bg-pink-500' : 'bg-pink-200'}`} />
         <div className={`w-2 h-2 rounded-full transition-colors ${step === 'cycle_length' ? 'bg-pink-500' : 'bg-pink-200'}`} />
