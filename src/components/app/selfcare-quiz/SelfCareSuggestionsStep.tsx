@@ -190,6 +190,9 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
           pro_link_value: t.pro_link_value,
         })),
         syntheticTasks: routineTasks,
+        syntheticPlanTitle: 'My Self-Care Routine',
+        syntheticPlanIcon: '🌿',
+        syntheticPlanCategoryName: 'My Self-Care Routine',
       });
       toast.success('Routine created! 🎉');
       setShowPreview(false);
