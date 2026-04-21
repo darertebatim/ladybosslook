@@ -467,6 +467,29 @@ export function useAddRoutinePlan() {
 
       const startOrderIndex = 0;
 
+      // For synthetic plans, create a real user_routines_bank row first so the
+      // routine shows up in "My Routines" and the Routine Player — exactly like
+      // a manually-created routine from the Routine Builder.
+      let syntheticRoutineId: string | null = null;
+      if (isSyntheticPlan && tasks && tasks.length > 0) {
+        const { data: newRoutine, error: routineError } = await supabase
+          .from('user_routines_bank')
+          .insert({
+            user_id: user.id,
+            title: planTitle,
+            emoji: planIcon,
+            color: 'mint',
+            is_active: true,
+            is_user_created: true,
+            category: null,
+          } as any)
+          .select('id, routine_id')
+          .single();
+
+        if (routineError) throw routineError;
+        syntheticRoutineId = (newRoutine as any).routine_id;
+      }
+
       // Create individual tasks for each routine plan task
       const today = new Date();
       if (tasks && tasks.length > 0) {
@@ -514,7 +537,7 @@ export function useAddRoutinePlan() {
             is_active: true,
             order_index: startOrderIndex + index,
             repeat_end_date: planEndDate,
-            source_routine_id: isSyntheticPlan ? null : planId,
+            source_routine_id: isSyntheticPlan ? syntheticRoutineId : planId,
           };
         });
 
