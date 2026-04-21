@@ -163,6 +163,22 @@ export function TourOverlay({
       return;
     }
 
+    // A) If a step targets a specific element but it doesn't exist in the DOM,
+    // auto-skip the step (or complete the tour if it was the last one).
+    // This prevents the overlay from getting "stuck" on empty Home states
+    // where suggested routines, banners, etc. haven't rendered.
+    const initialEl = document.querySelector(currentStep.target);
+    if (!initialEl) {
+      const skipTimer = setTimeout(() => {
+        if (isLastStep) {
+          onComplete();
+        } else {
+          onNext();
+        }
+      }, 50);
+      return () => clearTimeout(skipTimer);
+    }
+
     let targetElement: Element | null = null;
     let originalZIndex: string | null = null;
     let originalPosition: string | null = null;
@@ -251,7 +267,7 @@ export function TourOverlay({
       setSpotlightRect(null);
       setTooltipStyle(calculateTooltipPosition(null, 'center', tooltipRef.current));
     }
-  }, [isActive, currentStep, calculateTooltipPosition]);
+  }, [isActive, currentStep, calculateTooltipPosition, isLastStep, onNext, onComplete]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -295,9 +311,12 @@ export function TourOverlay({
   const isCenter = currentStep.position === 'center' || !currentStep.target;
 
   return (
-    <div className="fixed inset-0 z-[99999] pointer-events-auto">
+    // C) Wrapper is pointer-events-none so non-tour UI (e.g. the FAB) stays
+    // interactive even if a tour step's target is missing. The tooltip below
+    // re-enables pointer events for itself.
+    <div className="fixed inset-0 z-[99999] pointer-events-none">
       {/* Backdrop with spotlight cutout */}
-      <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 99999 }}>
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 99999 }}>
         <defs>
           <mask id="spotlight-mask">
             <rect x="0" y="0" width="100%" height="100%" fill="white" />
@@ -341,7 +360,7 @@ export function TourOverlay({
       <div
         ref={tooltipRef}
         className={cn(
-          "absolute bg-card rounded-2xl shadow-2xl border border-border/50",
+          "absolute bg-card rounded-2xl shadow-2xl border border-border/50 pointer-events-auto",
           "animate-in fade-in-0 zoom-in-95 duration-200",
           // Mobile-first padding
           "p-4 sm:p-5"
