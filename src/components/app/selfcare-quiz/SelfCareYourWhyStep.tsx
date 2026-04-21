@@ -39,7 +39,7 @@ export function SelfCareYourWhyStep({ step, onNext, onAnswer }: Props) {
       </div>
 
       {/* Bottom sheet */}
-      <div className="flex-1 flex flex-col px-5 pb-6 -mt-6 relative z-10" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
+      <div className="flex-1 flex flex-col px-5 pb-6 -mt-6 relative z-10" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)' }}>
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
