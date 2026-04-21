@@ -350,6 +350,9 @@ export function useAddRoutinePlan() {
       selectedTaskIds, 
       editedTasks,
       syntheticTasks,
+      syntheticPlanTitle,
+      syntheticPlanIcon,
+      syntheticPlanCategoryName,
     }: { 
       planId: string; 
       selectedTaskIds?: string[]; 
@@ -366,6 +369,9 @@ export function useAddRoutinePlan() {
         pro_link_value?: string | null;
       }[];
       syntheticTasks?: RoutinePlanTask[];
+      syntheticPlanTitle?: string;
+      syntheticPlanIcon?: string;
+      syntheticPlanCategoryName?: string;
     }) => {
       if (!user) throw new Error('Must be logged in');
 
