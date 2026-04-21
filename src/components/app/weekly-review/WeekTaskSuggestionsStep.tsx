@@ -296,6 +296,8 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
       linked_playlist_id: task.linked_playlist_id || null,
       pro_link_type: (task.pro_link_type as ProLinkType) || null,
       pro_link_value: task.pro_link_value || null,
+      // Use the task's own category from the task bank as its tag (like FAB-added tasks)
+      tag: task.category || null,
     }));
   }, [suggestions]);
 
