@@ -80,6 +80,25 @@ export async function scheduleTaskReminder(task: TaskNotificationInput): Promise
   }
   
   try {
+    const permission = await LocalNotifications.checkPermissions();
+    const displayPermission = permission.display === 'granted'
+      ? permission
+      : await LocalNotifications.requestPermissions();
+
+    if (displayPermission.display !== 'granted') {
+      console.log('[LocalNotifications] Display permission denied, skipping task reminder');
+      return { success: false, error: 'Notification permission denied' };
+    }
+
+    if (Capacitor.getPlatform() === 'android') {
+      const exactSetting = await LocalNotifications.checkExactNotificationSetting();
+      if (exactSetting.exact_alarm !== 'granted') {
+        console.warn('[LocalNotifications] Exact alarm permission is not granted; opening Android exact alarm settings');
+        await LocalNotifications.changeExactNotificationSetting();
+        return { success: false, error: 'Exact alarm permission required' };
+      }
+    }
+
     const notificationTime = calculateNotificationTime(
       task.scheduledDate,
       task.scheduledTime,
