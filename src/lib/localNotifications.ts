@@ -96,7 +96,8 @@ export async function scheduleTaskReminder(task: TaskNotificationInput): Promise
     const url = getNotificationUrl(task.proLinkType, task.proLinkValue);
     
     // Determine schedule based on repeat pattern
-    let schedule: any = { at: notificationTime };
+    // allowWhileIdle ensures Android delivers the notification even in Doze mode
+    let schedule: any = { at: notificationTime, allowWhileIdle: true };
     
     // For repeating tasks, use native repeat functionality
     if (task.repeatPattern === 'daily') {
@@ -106,6 +107,7 @@ export async function scheduleTaskReminder(task: TaskNotificationInput): Promise
           minute: notificationTime.getMinutes(),
         } as ScheduleOn,
         repeats: true,
+        allowWhileIdle: true,
       };
     } else if (task.repeatPattern === 'weekly' && task.scheduledDate) {
       // Weekly - same day of week
@@ -117,6 +119,7 @@ export async function scheduleTaskReminder(task: TaskNotificationInput): Promise
           minute: notificationTime.getMinutes(),
         } as ScheduleOn,
         repeats: true,
+        allowWhileIdle: true,
       };
     }
     // For other patterns (none, monthly, weekend, custom), use one-time scheduling
@@ -129,6 +132,9 @@ export async function scheduleTaskReminder(task: TaskNotificationInput): Promise
         body: formatOffsetText(task.reminderOffset),
         schedule,
         sound: 'default',
+        // Android: assign to high-importance channel so OEMs (Xiaomi/Huawei/Samsung)
+        // don't suppress the notification and the heads-up + sound is guaranteed.
+        channelId: 'task-reminders',
         extra: {
           taskId: task.taskId,
           url,
