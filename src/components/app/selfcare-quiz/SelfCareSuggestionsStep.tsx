@@ -192,9 +192,9 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
           pro_link_value: t.pro_link_value,
         })),
         syntheticTasks: routineTasks,
-        syntheticPlanTitle: 'My Self-Care Routine',
+        syntheticPlanTitle: 'Self-Care Gap Plan',
         syntheticPlanIcon: '🌿',
-        syntheticPlanCategoryName: 'My Self-Care Routine',
+        syntheticPlanCategoryName: 'Self-Care Gap Plan',
       });
       toast.success('Routine created! 🎉');
       setShowPreview(false);
@@ -311,7 +311,7 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
         open={showPreview}
         onOpenChange={setShowPreview}
         tasks={routineTasks}
-        routineTitle="My Self-Care Routine"
+        routineTitle="Self-Care Gap Plan"
         routineColor="mint"
         routineBankId="synthetic-selfcare-quiz"
         onSave={handleSave}
