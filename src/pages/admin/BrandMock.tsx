@@ -351,110 +351,109 @@ export default function BrandMock() {
 
           {/* ─── iOS 26 Liquid Glass Nav Bar ─── */}
           <div className="absolute bottom-0 left-0 right-0">
-            {/* Outer glass container */}
-            <div
-              className="mx-3 mb-3 rounded-[28px] px-2 py-2"
-              style={{
-                background: darkMode
-                  ? 'linear-gradient(180deg, rgba(60,40,25,0.55) 0%, rgba(40,25,15,0.65) 100%)'
-                  : 'linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,248,243,0.72) 100%)',
-                backdropFilter: 'blur(40px) saturate(1.8)',
-                WebkitBackdropFilter: 'blur(40px) saturate(1.8)',
-                border: darkMode
-                  ? '0.5px solid rgba(255,200,160,0.18)'
-                  : '0.5px solid rgba(255,255,255,0.65)',
-                boxShadow: darkMode
-                  ? '0 -4px 30px rgba(0,0,0,0.35), inset 0 0.5px 0 rgba(255,200,160,0.12)'
-                  : '0 -4px 30px rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.04), inset 0 0.5px 0 rgba(255,255,255,0.8)',
-              }}
-            >
-              <div className="grid grid-cols-6 items-center">
-                {[
-                  { icon: Home, label: 'Home', active: true },
-                  { icon: Compass, label: 'Explore', active: false },
-                  { icon: CalendarPlus, label: 'Routines', active: false },
-                  { icon: Music, label: 'Listen', active: false },
-                  { icon: Users, label: 'Chats', active: false, badge: 3 },
-                  { icon: Plus, label: 'Add', active: false, isFab: true },
-                ].map((item, i) => (
-                  <motion.div
-                    key={item.label}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 + i * 0.04 }}
-                    className="flex flex-col items-center gap-0.5 relative"
-                  >
-                    {item.isFab ? (
-                      /* FAB — liquid glass plus button */
-                      <div
-                        className="w-11 h-11 rounded-2xl flex items-center justify-center relative -mt-0.5"
-                        style={{
-                          background: `linear-gradient(135deg, ${O.primary}, ${O.primaryD})`,
-                          boxShadow: `0 6px 18px -2px ${O.primary}66, 0 2px 6px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.25)`,
-                        }}
-                      >
-                        <Plus className="w-5 h-5 text-white" strokeWidth={2.5} />
-                        {/* Glass shine */}
-                        <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
-                          <div
-                            className="absolute top-0 left-0 right-0 h-[45%] rounded-t-2xl"
-                            style={{
-                              background: 'linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 100%)',
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        {/* Active background pill — glass highlight */}
-                        {item.active && (
-                          <motion.div
-                            layoutId="nav-active"
-                            className="absolute -top-0.5 w-10 h-10 rounded-2xl"
-                            style={{
-                              background: darkMode
-                                ? 'rgba(235,94,51,0.15)'
-                                : 'rgba(235,94,51,0.10)',
-                              border: `0.5px solid ${O.primary}25`,
-                              boxShadow: `0 0 12px ${O.primary}15`,
-                            }}
-                          />
-                        )}
-                        <div className="relative w-10 h-10 flex items-center justify-center">
-                          <item.icon
-                            className="w-[22px] h-[22px] transition-all"
-                            style={{
-                              color: item.active ? O.primary : fgMuted,
-                              strokeWidth: item.active ? 2.2 : 1.6,
-                            }}
-                          />
-                          {/* Badge */}
-                          {item.badge && (
-                            <div
-                              className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full flex items-center justify-center px-1"
-                              style={{
-                                background: O.accent,
-                                boxShadow: `0 1px 4px ${O.accent}66`,
-                              }}
-                            >
-                              <span className="text-[9px] font-bold text-white">{item.badge}</span>
-                            </div>
-                          )}
-                        </div>
-                        <span
-                          className="text-[10px] leading-tight"
+            {/* iOS 26 — separated nav pill + detached FAB */}
+            <div className="mx-3 mb-3 flex items-end gap-2">
+              {/* Main nav pill (4 items) */}
+              <div
+                className="flex-1 rounded-[28px] px-2 py-2"
+                style={{
+                  background: darkMode
+                    ? 'linear-gradient(180deg, rgba(60,40,25,0.55) 0%, rgba(40,25,15,0.65) 100%)'
+                    : 'linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,248,243,0.72) 100%)',
+                  backdropFilter: 'blur(40px) saturate(1.8)',
+                  WebkitBackdropFilter: 'blur(40px) saturate(1.8)',
+                  border: darkMode
+                    ? '0.5px solid rgba(255,200,160,0.18)'
+                    : '0.5px solid rgba(255,255,255,0.65)',
+                  boxShadow: darkMode
+                    ? '0 -4px 30px rgba(0,0,0,0.35), inset 0 0.5px 0 rgba(255,200,160,0.12)'
+                    : '0 -4px 30px rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.04), inset 0 0.5px 0 rgba(255,255,255,0.8)',
+                }}
+              >
+                <div className="grid grid-cols-4 items-center">
+                  {[
+                    { icon: Home, label: 'Home', active: true },
+                    { icon: Compass, label: 'Explore', active: false },
+                    { icon: Music, label: 'Listen', active: false },
+                    { icon: Users, label: 'Chats', active: false, badge: 3 },
+                  ].map((item, i) => (
+                    <motion.div
+                      key={item.label}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 + i * 0.04 }}
+                      className="flex flex-col items-center gap-0.5 relative"
+                    >
+                      {item.active && (
+                        <motion.div
+                          layoutId="nav-active"
+                          className="absolute -top-0.5 w-10 h-10 rounded-2xl"
+                          style={{
+                            background: darkMode ? 'rgba(235,94,51,0.15)' : 'rgba(235,94,51,0.10)',
+                            border: `0.5px solid ${O.primary}25`,
+                            boxShadow: `0 0 12px ${O.primary}15`,
+                          }}
+                        />
+                      )}
+                      <div className="relative w-10 h-10 flex items-center justify-center">
+                        <item.icon
+                          className="w-[22px] h-[22px] transition-all"
                           style={{
                             color: item.active ? O.primary : fgMuted,
-                            fontWeight: item.active ? 600 : 400,
+                            strokeWidth: item.active ? 2.2 : 1.6,
                           }}
-                        >
-                          {item.label}
-                        </span>
-                      </>
-                    )}
-                  </motion.div>
-                ))}
+                        />
+                        {item.badge && (
+                          <div
+                            className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full flex items-center justify-center px-1"
+                            style={{
+                              background: O.accent,
+                              boxShadow: `0 1px 4px ${O.accent}66`,
+                            }}
+                          >
+                            <span className="text-[9px] font-bold text-white">{item.badge}</span>
+                          </div>
+                        )}
+                      </div>
+                      <span
+                        className="text-[10px] leading-tight"
+                        style={{
+                          color: item.active ? O.primary : fgMuted,
+                          fontWeight: item.active ? 600 : 400,
+                        }}
+                      >
+                        {item.label}
+                      </span>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
+
+              {/* Detached FAB — separate liquid-glass circle */}
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.7, type: 'spring', stiffness: 300 }}
+                className="shrink-0 w-[60px] h-[60px] rounded-full flex items-center justify-center relative"
+                style={{
+                  background: `linear-gradient(135deg, ${O.primary}, ${O.primaryD})`,
+                  boxShadow: `0 8px 24px -4px ${O.primary}80, 0 3px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.28)`,
+                  border: darkMode
+                    ? '0.5px solid rgba(255,200,160,0.25)'
+                    : '0.5px solid rgba(255,255,255,0.7)',
+                }}
+              >
+                <Plus className="w-6 h-6 text-white relative z-10" strokeWidth={2.5} />
+                {/* Glass shine */}
+                <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+                  <div
+                    className="absolute top-0 left-0 right-0 h-[50%] rounded-t-full"
+                    style={{
+                      background: 'linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 100%)',
+                    }}
+                  />
+                </div>
+              </motion.button>
             </div>
           </div>
 
