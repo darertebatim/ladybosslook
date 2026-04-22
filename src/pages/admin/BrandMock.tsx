@@ -55,19 +55,16 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
     transition={{ delay: 0.15 + index * 0.06 }}
     className="rounded-3xl overflow-hidden"
     style={{
-      background: darkMode ? '#241710' : '#FFFFFF',
+      background: darkMode ? task.darkColor : task.color,
       boxShadow: darkMode
-        ? '0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.25)'
-        : '0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06)',
+        ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)'
+        : '0 2px 10px rgba(0,0,0,0.08)',
     }}
   >
-    <div className="flex items-center gap-3 pl-2.5 pr-3 py-2.5">
-      {/* Colored emoji circle (left accent) */}
-      <div
-        className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
-        style={{ background: darkMode ? task.darkColor : task.color }}
-      >
-        <FluentEmoji emoji={task.emoji} size={26} />
+    <div className="flex items-center gap-2 pl-3 pr-4 py-3">
+      {/* 3D Fluent Emoji */}
+      <div className="w-10 h-10 flex items-center justify-center shrink-0">
+        <FluentEmoji emoji={task.emoji} size={32} />
       </div>
 
       {/* Content */}
@@ -91,12 +88,13 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
         </p>
       </div>
 
-      {/* Completion button — colored circle accent on right */}
-      <div className="w-10 h-10 flex items-center justify-center shrink-0">
+      {/* Completion button */}
+      <div className="w-9 h-9 flex items-center justify-center shrink-0">
         {task.done ? (
           /* SealCheck-style teal checkmark */
           <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
             <circle cx="18" cy="18" r="15" fill="#2DD4BF" />
+            {/* Seal points */}
             {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
               <circle
                 key={angle}
@@ -109,13 +107,7 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
             <path d="M12 18.5L16 22.5L24.5 14" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         ) : (
-          <span
-            className="w-9 h-9 rounded-full border-2"
-            style={{
-              background: darkMode ? task.darkColor : task.color,
-              borderColor: darkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)',
-            }}
-          />
+          <span className="w-9 h-9 rounded-full border-2 bg-transparent" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.4)' : '#000000' }} />
         )}
       </div>
     </div>
