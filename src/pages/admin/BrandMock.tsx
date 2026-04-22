@@ -61,7 +61,7 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
         : '0 2px 10px rgba(0,0,0,0.08)',
     }}
   >
-    <div className="flex items-center gap-2 pl-3 pr-4 py-3">
+    <div className="flex items-center gap-2 pl-3 pr-4 py-5">
       {/* 3D Fluent Emoji */}
       <div className="w-10 h-10 flex items-center justify-center shrink-0">
         <FluentEmoji emoji={task.emoji} size={32} />
