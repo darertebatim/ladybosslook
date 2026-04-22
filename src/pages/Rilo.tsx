@@ -20,8 +20,9 @@ import {
   Leaf,
   RefreshCw,
 } from 'lucide-react';
-import heroMockup from '@/assets/rilo-hero-mockup.png';
-import featuresTrio from '@/assets/rilo-features-trio.png';
+import heroScreenshot from '@/assets/rilo-screenshot-quiz-intro.png';
+import quizStepScreenshot from '@/assets/rilo-screenshot-quiz-step.png';
+import quizStep2Screenshot from '@/assets/rilo-screenshot-quiz-step2.png';
 
 const APP_STORE_URL = 'https://apps.apple.com/app/rilo-self-care-routines/id6755076134';
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.ladybosslook.academy';
@@ -245,9 +246,9 @@ const Rilo = () => {
           <div className="relative mx-auto w-full max-w-md">
             <div className="absolute -inset-6 -z-10 rounded-[3rem] bg-[hsl(150,30%,85%)]/40 blur-2xl" />
             <img
-              src={heroMockup}
-              alt="Rilo self-care app shown on iPhone with daily routine planner"
-              className="w-full rounded-[2.5rem] shadow-2xl"
+              src={heroScreenshot}
+              alt="Rilo Self-Care Quiz screen — Discover your self-care gaps in 1 minute"
+              className="w-full rounded-[2.5rem] shadow-2xl ring-1 ring-[hsl(35,30%,88%)]"
               loading="eager"
             />
           </div>
@@ -471,12 +472,20 @@ const Rilo = () => {
           </div>
 
           <div className="mt-14 flex flex-col-reverse items-start gap-12 md:flex-row md:items-center">
-            <img
-              src={featuresTrio}
-              alt="Rilo features shown on three iPhones — Routine Player, Breathe, and Reflections"
-              className="w-full max-w-md rounded-[2rem] shadow-xl md:w-1/2"
-              loading="lazy"
-            />
+            <div className="relative flex w-full justify-center gap-4 md:w-1/2">
+              <img
+                src={quizStepScreenshot}
+                alt="Self-Care Quiz — What do you struggle with most?"
+                className="w-1/2 max-w-[220px] -rotate-3 rounded-[1.75rem] shadow-xl ring-1 ring-[hsl(35,30%,88%)]"
+                loading="lazy"
+              />
+              <img
+                src={quizStep2Screenshot}
+                alt="Self-Care Quiz — What sounds most helpful to you?"
+                className="w-1/2 max-w-[220px] rotate-3 rounded-[1.75rem] shadow-xl ring-1 ring-[hsl(35,30%,88%)]"
+                loading="lazy"
+              />
+            </div>
             <p className="text-lg leading-relaxed text-[hsl(20,10%,35%)] md:w-1/2">
               Rilo brings together your routines, breathing, journaling, focus, mood, audio, reading, and
               community. No tab-hopping. Just one calm space — patiently introducing each tool when you&apos;re
