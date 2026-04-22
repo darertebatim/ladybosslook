@@ -173,6 +173,7 @@ const SendTestEmail = lazy(() => import("@/pages/SendTestEmail"));
 const AppSupport = lazy(() => import("@/pages/AppSupport"));
 const AppMarketing = lazy(() => import("@/pages/AppMarketing"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
+const Rilo = lazy(() => import("@/pages/Rilo"));
 
 // Eagerly imported (small, always needed)
 import CalendarRedirect from "@/components/CalendarRedirect";
@@ -401,6 +402,7 @@ const App = () => (
                   <Route path="/" element={<Index />} />
                   <Route path="/programs" element={<Programs />} />
                   <Route path="/about" element={<About />} />
+                  <Route path="/rilo" element={<Rilo />} />
                   <Route path="/landing" element={<Landing />} />
                   <Route path="/asac" element={<AssertLanding />} />
                   <Route path="/auth" element={<Auth />} />
