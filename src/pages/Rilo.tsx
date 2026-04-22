@@ -20,8 +20,9 @@ import {
   Leaf,
   RefreshCw,
 } from 'lucide-react';
-import heroMockup from '@/assets/rilo-hero-mockup.png';
-import featuresTrio from '@/assets/rilo-features-trio.png';
+import heroScreenshot from '@/assets/rilo-screenshot-quiz-intro.png';
+import quizStepScreenshot from '@/assets/rilo-screenshot-quiz-step.png';
+import quizStep2Screenshot from '@/assets/rilo-screenshot-quiz-step2.png';
 
 const APP_STORE_URL = 'https://apps.apple.com/app/rilo-self-care-routines/id6755076134';
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.ladybosslook.academy';
