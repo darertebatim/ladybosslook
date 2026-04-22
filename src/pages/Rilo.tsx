@@ -27,6 +27,54 @@ import quizStep2Screenshot from '@/assets/rilo-screenshot-quiz-step2.png';
 const APP_STORE_URL = 'https://apps.apple.com/app/rilo-self-care-routines/id6755076134';
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.ladybosslook.academy';
 
+/**
+ * iPhone-style mockup frame. Wraps an app screenshot in a device bezel
+ * with side buttons, dynamic island, and an inner shadow.
+ */
+function PhoneFrame({
+  src,
+  alt,
+  className = '',
+  eager = false,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  eager?: boolean;
+}) {
+  return (
+    <div
+      className={`relative aspect-[9/19.5] rounded-[2.75rem] bg-[hsl(20,8%,12%)] p-[10px] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.45),0_8px_20px_-8px_rgba(0,0,0,0.25)] ring-1 ring-black/20 ${className}`}
+    >
+      {/* Side buttons */}
+      <span className="absolute left-[-3px] top-[18%] h-[42px] w-[3px] rounded-l-sm bg-[hsl(20,8%,18%)]" aria-hidden />
+      <span className="absolute left-[-3px] top-[28%] h-[68px] w-[3px] rounded-l-sm bg-[hsl(20,8%,18%)]" aria-hidden />
+      <span className="absolute left-[-3px] top-[36%] h-[68px] w-[3px] rounded-l-sm bg-[hsl(20,8%,18%)]" aria-hidden />
+      <span className="absolute right-[-3px] top-[24%] h-[100px] w-[3px] rounded-r-sm bg-[hsl(20,8%,18%)]" aria-hidden />
+
+      {/* Screen */}
+      <div className="relative h-full w-full overflow-hidden rounded-[2.1rem] bg-black">
+        <img
+          src={src}
+          alt={alt}
+          className="h-full w-full object-cover object-top"
+          loading={eager ? 'eager' : 'lazy'}
+        />
+        {/* Dynamic Island */}
+        <div
+          className="pointer-events-none absolute left-1/2 top-2 z-10 h-[22px] w-[88px] -translate-x-1/2 rounded-full bg-black"
+          aria-hidden
+        />
+        {/* Subtle inner highlight */}
+        <div
+          className="pointer-events-none absolute inset-0 rounded-[2.1rem] ring-1 ring-inset ring-white/5"
+          aria-hidden
+        />
+      </div>
+    </div>
+  );
+}
+
 const faqs = [
   {
     q: 'Is Rilo free to use?',
@@ -245,11 +293,11 @@ const Rilo = () => {
           </div>
           <div className="relative mx-auto w-full max-w-md">
             <div className="absolute -inset-6 -z-10 rounded-[3rem] bg-[hsl(150,30%,85%)]/40 blur-2xl" />
-            <img
+            <PhoneFrame
               src={heroScreenshot}
               alt="Rilo Self-Care Quiz screen — Discover your self-care gaps in 1 minute"
-              className="w-full rounded-[2.5rem] shadow-2xl ring-1 ring-[hsl(35,30%,88%)]"
-              loading="eager"
+              className="mx-auto w-full max-w-[320px]"
+              eager
             />
           </div>
         </div>
@@ -472,18 +520,16 @@ const Rilo = () => {
           </div>
 
           <div className="mt-14 flex flex-col-reverse items-start gap-12 md:flex-row md:items-center">
-            <div className="relative flex w-full justify-center gap-4 md:w-1/2">
-              <img
+            <div className="relative flex w-full items-end justify-center gap-6 md:w-1/2">
+              <PhoneFrame
                 src={quizStepScreenshot}
                 alt="Self-Care Quiz — What do you struggle with most?"
-                className="w-1/2 max-w-[220px] -rotate-3 rounded-[1.75rem] shadow-xl ring-1 ring-[hsl(35,30%,88%)]"
-                loading="lazy"
+                className="w-[44%] max-w-[200px] -rotate-3"
               />
-              <img
+              <PhoneFrame
                 src={quizStep2Screenshot}
                 alt="Self-Care Quiz — What sounds most helpful to you?"
-                className="w-1/2 max-w-[220px] rotate-3 rounded-[1.75rem] shadow-xl ring-1 ring-[hsl(35,30%,88%)]"
-                loading="lazy"
+                className="w-[44%] max-w-[200px] rotate-3"
               />
             </div>
             <p className="text-lg leading-relaxed text-[hsl(20,10%,35%)] md:w-1/2">
