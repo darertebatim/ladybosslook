@@ -1,23 +1,158 @@
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
-import { Apple, Play, Heart, Wind, BookOpen, Timer, Headphones, MessageCircle, Sparkles, ArrowRight, Smile, Calendar } from 'lucide-react';
+import {
+  Apple,
+  Play,
+  Sparkles,
+  ArrowRight,
+  Heart,
+  Wind,
+  BookOpen,
+  Timer,
+  Headphones,
+  MessageCircle,
+  Smile,
+  Calendar,
+  ListChecks,
+  Target,
+  CheckCircle2,
+  Flame,
+  GraduationCap,
+  Leaf,
+  RefreshCw,
+} from 'lucide-react';
 import heroMockup from '@/assets/rilo-hero-mockup.png';
 import featuresTrio from '@/assets/rilo-features-trio.png';
 
 const APP_STORE_URL = 'https://apps.apple.com/app/rilo';
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=app.lovable.rilo';
 
+const faqs = [
+  {
+    q: 'Is Rilo free to use?',
+    a: 'Yes. The Self-Care Quiz, daily planner, routine templates, mood check-in, reflections, reading library, and community chats are all free. Simora Plus unlocks unlimited routines and tasks, AI Agents, Fasting, Period, Projects, and premium audio.',
+  },
+  {
+    q: 'What is the Self-Care Quiz?',
+    a: 'A 1-minute diagnostic that maps where you are across 14 self-care areas — sleep, calm, nutrition, connection, movement, and more. You get a personal diagnosis and a ready-to-launch routine in one tap.',
+  },
+  {
+    q: 'Does Rilo work offline?',
+    a: 'Yes. Your planner, routines, journal, and previously played audio work offline. Streaming content needs a connection, but the app is built native-first with persistent caching.',
+  },
+  {
+    q: 'How much is Simora Plus?',
+    a: 'Simora Plus is the optional premium tier. Pricing varies by region and is shown clearly in the app before any purchase. You can start with the free tier and upgrade anytime.',
+  },
+  {
+    q: 'What languages does Rilo support?',
+    a: 'Rilo supports English and Persian (Farsi) across the interface, reflections journal prompts, and parts of the audio library. More languages are on the roadmap.',
+  },
+];
+
+const tools = [
+  {
+    icon: Play,
+    name: 'Routine Player',
+    text: 'Guided, timer-aware playback of your daily routines. Background-safe so it keeps going when your screen locks — perfect for morning rituals, focus blocks, and evening wind-downs.',
+  },
+  {
+    icon: Calendar,
+    name: 'Routine Templates',
+    text: 'A library of ready-made rituals — Daily Reset, Morning Calm, Sleep Wind-Down, Focus Sprint, and more. Adopt one in a tap, then customize at your pace.',
+  },
+  {
+    icon: Target,
+    name: 'Self-Care Goals',
+    text: 'Pick the areas that matter to you right now: sleep, calm, nutrition, movement, hygiene, connection, kindness, gratitude. Goals quietly shape what your planner suggests.',
+  },
+  {
+    icon: Wind,
+    name: 'Breathe',
+    text: 'Immersive breathing exercises with full-screen visuals. Box breathing, 4-7-8, calm-down, energize — drop into one whenever the day needs a soft reset.',
+  },
+  {
+    icon: BookOpen,
+    name: 'Reflections Journal',
+    text: 'A bilingual journal (English & Farsi) with guided prompts and free writing. Capture mood, gratitude, and end-of-day notes — privately, or share with your coach.',
+  },
+  {
+    icon: Timer,
+    name: 'Focus Timer',
+    text: 'Pomodoro and free timer modes with background-safe wall-clock sync. Logs your focus sessions automatically and feeds your weekly review.',
+  },
+  {
+    icon: Smile,
+    name: 'Mood Check-in & Emotions',
+    text: 'A quick daily mood log, plus a deeper Emotions tracker to name what you actually feel. Patterns surface gently over time — no judgment, just clarity.',
+  },
+  {
+    icon: Headphones,
+    name: 'Listen',
+    text: 'A streaming library of guided meditations, soundscapes, sleep stories, and audio classes. Pick a playlist for the moment you\'re in.',
+  },
+  {
+    icon: BookOpen,
+    name: 'Read & Learn',
+    text: 'Free micro-lessons and stories — including the Ladyboss series. Short enough for a coffee break, deep enough to leave a mark.',
+  },
+  {
+    icon: MessageCircle,
+    name: 'Community Chats',
+    text: 'Telegram-style channels where women share progress, ask questions, and cheer each other on. You\'re not doing this alone.',
+  },
+  {
+    icon: GraduationCap,
+    name: 'Online Classes & Programs',
+    text: 'Live and self-paced courses delivered inside the app — with session schedules, drip content, and program-specific community channels.',
+  },
+];
+
+const StoreBadges = ({ size = 'default' as 'default' | 'sm' }) => (
+  <div className="flex flex-wrap gap-3">
+    <a
+      href={APP_STORE_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`inline-flex items-center gap-2 rounded-2xl bg-[hsl(20,15%,15%)] px-5 text-white shadow-sm transition hover:scale-[1.02] ${
+        size === 'sm' ? 'h-11 text-sm' : 'h-14 text-base'
+      }`}
+      aria-label="Download Rilo on the App Store"
+    >
+      <Apple className="h-5 w-5" aria-hidden />
+      <span className="flex flex-col leading-tight text-left">
+        <span className="text-[10px] opacity-80">Download on the</span>
+        <span className="font-semibold">App Store</span>
+      </span>
+    </a>
+    <a
+      href={PLAY_STORE_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`inline-flex items-center gap-2 rounded-2xl bg-[hsl(20,15%,15%)] px-5 text-white shadow-sm transition hover:scale-[1.02] ${
+        size === 'sm' ? 'h-11 text-sm' : 'h-14 text-base'
+      }`}
+      aria-label="Get Rilo on Google Play"
+    >
+      <Play className="h-5 w-5" aria-hidden />
+      <span className="flex flex-col leading-tight text-left">
+        <span className="text-[10px] opacity-80">Get it on</span>
+        <span className="font-semibold">Google Play</span>
+      </span>
+    </a>
+  </div>
+);
+
 const Rilo = () => {
-  const pageTitle = 'Rilo — Self-Care & Routines for Real Life';
+  const pageTitle = 'Rilo — Self-Care Tracker & Routine Planner';
   const pageDescription =
-    'Rilo is a gentle self-care companion that helps you rebuild self-trust through small daily rituals — even when life doesn\'t follow a schedule. Free on iOS and Android.';
+    "Take the 1-minute Self-Care Quiz and get your personal plan. Rilo helps you take better care of yourself — starting today. Free on iOS and Android.";
   const pageUrl = 'https://ladybosslook.com/rilo';
   const ogImage = 'https://ladybosslook.com/rilo-og.jpg';
 
-  const jsonLd = {
+  const softwareLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Rilo — Self-Care & Routines',
+    name: 'Rilo — Self-Care Tracker & Routine Planner',
     operatingSystem: 'iOS, Android',
     applicationCategory: 'HealthApplication',
     description: pageDescription,
@@ -41,6 +176,7 @@ const Rilo = () => {
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
         <link rel="canonical" href={pageUrl} />
+        <meta name="robots" content="index, follow" />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
         <meta property="og:image" content={ogImage} />
@@ -50,406 +186,492 @@ const Rilo = () => {
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={pageDescription} />
         <meta name="twitter:image" content={ogImage} />
-        <meta name="robots" content="index, follow" />
-        <meta name="theme-color" content="#F8F1E6" />
-        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+        <script type="application/ld+json">{JSON.stringify(softwareLd)}</script>
         <script type="application/ld+json">{JSON.stringify(faqLd)}</script>
       </Helmet>
 
-      {/* Top Nav */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-[hsl(35,40%,97%)]/80 border-b border-[hsl(30,20%,90%)]">
-        <nav className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link to="/rilo" className="flex items-center gap-2 font-semibold text-lg tracking-tight">
-            <span className="w-8 h-8 rounded-2xl bg-gradient-to-br from-[hsl(15,70%,75%)] to-[hsl(140,30%,70%)] flex items-center justify-center text-white">
-              <Heart className="w-4 h-4" fill="currentColor" />
+      {/* Sticky nav */}
+      <header className="sticky top-0 z-40 border-b border-[hsl(35,30%,88%)] bg-[hsl(35,40%,97%)]/85 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
+          <a href="#top" className="flex items-center gap-2">
+            <span className="grid h-9 w-9 place-items-center rounded-2xl bg-[hsl(150,30%,80%)]">
+              <Leaf className="h-5 w-5 text-[hsl(150,40%,25%)]" aria-hidden />
             </span>
-            Rilo
-          </Link>
-          <div className="hidden md:flex items-center gap-8 text-sm text-[hsl(20,15%,35%)]">
-            <a href="#what" className="active:opacity-70">What it is</a>
-            <a href="#features" className="active:opacity-70">Features</a>
-            <a href="#outcome" className="active:opacity-70">Outcome</a>
-            <a href="#faq" className="active:opacity-70">FAQ</a>
-          </div>
+            <span className="text-lg font-semibold tracking-tight">Rilo</span>
+          </a>
+          <nav className="hidden items-center gap-7 text-sm text-[hsl(20,10%,40%)] md:flex">
+            <a href="#quiz" className="hover:text-[hsl(20,15%,15%)]">Quiz</a>
+            <a href="#journey" className="hover:text-[hsl(20,15%,15%)]">Journey</a>
+            <a href="#tools" className="hover:text-[hsl(20,15%,15%)]">Tools</a>
+            <a href="#plus" className="hover:text-[hsl(20,15%,15%)]">Plus</a>
+            <a href="#faq" className="hover:text-[hsl(20,15%,15%)]">FAQ</a>
+          </nav>
           <a
             href={APP_STORE_URL}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(20,15%,15%)] text-white text-sm font-medium active:scale-95 transition-transform"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[hsl(20,15%,15%)] px-4 text-sm font-medium text-white transition hover:scale-[1.02]"
           >
-            Download
-            <ArrowRight className="w-4 h-4" />
+            Take the Quiz
+            <ArrowRight className="h-4 w-4" aria-hidden />
           </a>
-        </nav>
+        </div>
       </header>
 
-      {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[hsl(25,55%,92%)] via-[hsl(35,40%,97%)] to-[hsl(35,40%,97%)]" />
-        <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[hsl(15,70%,80%)]/40 blur-3xl -z-10" />
-        <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-[hsl(140,30%,75%)]/30 blur-3xl -z-10" />
-
-        <div className="max-w-6xl mx-auto px-6 pt-16 pb-20 lg:pt-24 lg:pb-32 grid lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/70 border border-[hsl(30,20%,88%)] text-xs font-medium text-[hsl(20,15%,35%)]">
-              <Sparkles className="w-3.5 h-3.5 text-[hsl(15,70%,55%)]" />
-              A strength companion, not a habit tracker
-            </div>
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold leading-[1.05] tracking-tight">
-              Your strength, even when life{' '}
-              <span className="italic text-[hsl(15,55%,45%)]">doesn't follow</span> a schedule.
+      {/* Hero */}
+      <section id="top" className="relative overflow-hidden">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[hsl(35,55%,94%)] via-[hsl(35,40%,97%)] to-[hsl(35,40%,97%)]" />
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-16 md:grid-cols-2 md:py-24">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs font-medium text-[hsl(150,40%,25%)] ring-1 ring-[hsl(150,30%,80%)]">
+              <Sparkles className="h-3.5 w-3.5" aria-hidden />
+              Rilo — Self-Care Tracker & Routine Planner
+            </span>
+            <h1 className="mt-5 text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
+              Let me guess…<br />
+              <span className="text-[hsl(15,55%,45%)]">you&apos;ve stopped taking care of yourself.</span>
             </h1>
-            <p className="text-lg text-[hsl(20,15%,35%)] leading-relaxed max-w-xl">
-              Rilo helps you rebuild self-trust through small, gentle rituals — designed for new
-              parents, caregivers, and anyone whose routines collapsed under real life.
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-[hsl(20,10%,35%)]">
+              Take the 1-minute quiz and get your personal self-care plan.
+              Take better care of yourself — starting today.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <a
-                href={APP_STORE_URL}
-                className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-[hsl(20,15%,15%)] text-white active:scale-95 transition-transform"
-              >
-                <Apple className="w-6 h-6" />
-                <div className="text-left leading-tight">
-                  <div className="text-[10px] opacity-80">Download on the</div>
-                  <div className="text-sm font-semibold">App Store</div>
-                </div>
-              </a>
-              <a
-                href={PLAY_STORE_URL}
-                className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-[hsl(20,15%,15%)] text-white active:scale-95 transition-transform"
-              >
-                <Play className="w-6 h-6" />
-                <div className="text-left leading-tight">
-                  <div className="text-[10px] opacity-80">Get it on</div>
-                  <div className="text-sm font-semibold">Google Play</div>
-                </div>
-              </a>
+            <div className="mt-8">
+              <StoreBadges />
             </div>
-            <div className="flex items-center gap-6 pt-2 text-sm text-[hsl(20,15%,40%)]">
-              <div>
-                <div className="font-semibold text-[hsl(20,15%,15%)]">Free</div>
-                <div className="text-xs">to start</div>
-              </div>
-              <div className="w-px h-8 bg-[hsl(30,20%,85%)]" />
-              <div>
-                <div className="font-semibold text-[hsl(20,15%,15%)]">iOS & Android</div>
-                <div className="text-xs">native apps</div>
-              </div>
-              <div className="w-px h-8 bg-[hsl(30,20%,85%)]" />
-              <div>
-                <div className="font-semibold text-[hsl(20,15%,15%)]">No streaks</div>
-                <div className="text-xs">no pressure</div>
-              </div>
-            </div>
+            <p className="mt-4 text-sm text-[hsl(20,10%,45%)]">
+              Free to start · No account needed for the quiz · iOS & Android
+            </p>
           </div>
-
-          <div className="relative">
+          <div className="relative mx-auto w-full max-w-md">
+            <div className="absolute -inset-6 -z-10 rounded-[3rem] bg-[hsl(150,30%,85%)]/40 blur-2xl" />
             <img
               src={heroMockup}
-              alt="Rilo self-care app showing daily rituals and mood check-in on iPhone"
-              width={1024}
-              height={1024}
-              className="w-full max-w-md mx-auto drop-shadow-2xl"
+              alt="Rilo self-care app shown on iPhone with daily routine planner"
+              className="w-full rounded-[2.5rem] shadow-2xl"
+              loading="eager"
             />
           </div>
         </div>
       </section>
 
-      {/* THE PROBLEM */}
-      <section className="py-20 lg:py-28">
-        <div className="max-w-3xl mx-auto px-6 text-center space-y-6">
-          <p className="text-sm uppercase tracking-[0.2em] text-[hsl(15,55%,45%)] font-medium">Why Rilo exists</p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight">
-            Routines break.{' '}
-            <span className="text-[hsl(20,15%,40%)]">That doesn't mean you did.</span>
-          </h2>
-          <p className="text-lg text-[hsl(20,15%,35%)] leading-relaxed">
-            Most apps believe strength comes from consistency. We believe strength comes from staying with
-            yourself — even when consistency breaks. Pausing isn't weakness. Returning isn't failure.
-            <span className="block mt-3 font-medium text-[hsl(20,15%,15%)]">Returning is strength.</span>
-          </p>
+      {/* Quiz — hero feature */}
+      <section id="quiz" className="border-t border-[hsl(35,30%,88%)] bg-white">
+        <div className="mx-auto max-w-6xl px-5 py-20 md:py-24">
+          <div className="grid items-center gap-12 md:grid-cols-2">
+            <div>
+              <span className="text-sm font-medium uppercase tracking-widest text-[hsl(15,55%,45%)]">
+                The Self-Care Quiz
+              </span>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
+                Start with what&apos;s missing.
+              </h2>
+              <p className="mt-5 text-lg leading-relaxed text-[hsl(20,10%,35%)]">
+                Four gentle questions. One minute. Rilo maps where you are across <strong>14 self-care
+                areas</strong> — sleep, calm, nutrition, hygiene, movement, connection, kindness,
+                gratitude, presence, and more.
+              </p>
+              <p className="mt-3 text-lg leading-relaxed text-[hsl(20,10%,35%)]">
+                You finish with a personal diagnosis, suggested goals, and a routine you can launch in one tap.
+              </p>
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                {[
+                  { icon: Sparkles, label: '1-minute quiz' },
+                  { icon: Target, label: 'Personal goals' },
+                  { icon: ListChecks, label: 'Ready routine' },
+                  { icon: Heart, label: 'No pressure' },
+                ].map((b) => (
+                  <div
+                    key={b.label}
+                    className="flex items-center gap-3 rounded-2xl bg-[hsl(35,55%,96%)] px-4 py-3 ring-1 ring-[hsl(35,30%,88%)]"
+                  >
+                    <b.icon className="h-4 w-4 text-[hsl(15,55%,45%)]" aria-hidden />
+                    <span className="text-sm font-medium">{b.label}</span>
+                  </div>
+                ))}
+              </div>
+              <a
+                href={APP_STORE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-[hsl(15,55%,45%)] px-6 text-sm font-semibold text-white transition hover:scale-[1.02]"
+              >
+                Take the Self-Care Quiz
+                <ArrowRight className="h-4 w-4" aria-hidden />
+              </a>
+            </div>
+            <div className="relative">
+              <div className="absolute -inset-8 -z-10 rounded-[3rem] bg-gradient-to-br from-[hsl(15,70%,90%)] to-[hsl(150,30%,88%)] blur-2xl" />
+              <div className="rounded-[2rem] bg-[hsl(35,55%,96%)] p-6 shadow-xl ring-1 ring-[hsl(35,30%,88%)]">
+                <div className="rounded-2xl bg-white p-6 shadow-sm">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-[hsl(15,55%,45%)]">
+                    Question 2 of 4
+                  </p>
+                  <h3 className="mt-2 text-xl font-semibold">
+                    Be honest… which of these have you been neglecting?
+                  </h3>
+                  <div className="mt-5 space-y-2">
+                    {[
+                      { e: '😴', t: 'Sleep & rest' },
+                      { e: '💧', t: 'Water & nutrition' },
+                      { e: '🧘', t: 'Moments of stillness', sel: true },
+                      { e: '💬', t: 'Connecting with someone' },
+                      { e: '🧴', t: 'Skincare & grooming', sel: true },
+                    ].map((o) => (
+                      <div
+                        key={o.t}
+                        className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-sm ${
+                          o.sel
+                            ? 'border-[hsl(15,55%,45%)] bg-[hsl(15,70%,96%)] font-medium'
+                            : 'border-[hsl(35,30%,90%)] bg-white'
+                        }`}
+                      >
+                        <span className="text-base">{o.e}</span>
+                        <span>{o.t}</span>
+                        {o.sel && (
+                          <CheckCircle2 className="ml-auto h-4 w-4 text-[hsl(15,55%,45%)]" aria-hidden />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* WHAT RILO IS */}
-      <section id="what" className="py-20 lg:py-24 bg-white/60">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-            <p className="text-sm uppercase tracking-[0.2em] text-[hsl(15,55%,45%)] font-medium">What Rilo is</p>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight">
-              Three quiet pillars to help you stay with yourself.
+      {/* Three pillars */}
+      <section id="journey" className="border-t border-[hsl(35,30%,88%)]">
+        <div className="mx-auto max-w-6xl px-5 py-20 md:py-24">
+          <div className="max-w-2xl">
+            <span className="text-sm font-medium uppercase tracking-widest text-[hsl(15,55%,45%)]">
+              Your Self-Care Journey
+            </span>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
+              Plan. Practice. Reflect.
             </h2>
+            <p className="mt-4 text-lg text-[hsl(20,10%,35%)]">
+              A complete loop built around how self-care actually works — not a checklist that punishes you
+              when life gets messy.
+            </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {pillars.map((p) => (
-              <div
-                key={p.title}
-                className="p-8 rounded-3xl bg-white border border-[hsl(30,20%,90%)] space-y-4"
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {[
+              {
+                tag: 'Plan',
+                title: 'Know what you need.',
+                body: 'Take the Self-Care Quiz, set your personal goals, and pick a routine template that fits your life right now.',
+                icon: Target,
+              },
+              {
+                tag: 'Practice',
+                title: 'Show up, gently.',
+                body: 'Use the Routine Player, breathe, journal, listen, focus, and read — small daily acts that compound.',
+                icon: Sparkles,
+              },
+              {
+                tag: 'Reflect',
+                title: 'See your patterns.',
+                body: 'Mood check-ins, weekly self-care reviews, and Presence streaks show you what\'s working — and what to change.',
+                icon: RefreshCw,
+              },
+            ].map((p) => (
+              <article
+                key={p.tag}
+                className="rounded-3xl bg-white p-7 shadow-sm ring-1 ring-[hsl(35,30%,88%)]"
               >
-                <div
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center"
-                  style={{ backgroundColor: p.bg }}
-                >
-                  <p.icon className="w-6 h-6" style={{ color: p.color }} />
+                <div className="flex items-center gap-3">
+                  <span className="grid h-10 w-10 place-items-center rounded-2xl bg-[hsl(150,30%,90%)]">
+                    <p.icon className="h-5 w-5 text-[hsl(150,40%,25%)]" aria-hidden />
+                  </span>
+                  <span className="text-xs font-semibold uppercase tracking-widest text-[hsl(15,55%,45%)]">
+                    {p.tag}
+                  </span>
                 </div>
-                <h3 className="font-display text-xl font-semibold">{p.title}</h3>
-                <p className="text-[hsl(20,15%,40%)] leading-relaxed">{p.desc}</p>
-              </div>
+                <h3 className="mt-5 text-xl font-semibold">{p.title}</h3>
+                <p className="mt-2 text-[hsl(20,10%,40%)]">{p.body}</p>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* FEATURE SHOWCASE */}
-      <section id="features" className="py-20 lg:py-28">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-12 space-y-4">
-            <p className="text-sm uppercase tracking-[0.2em] text-[hsl(15,55%,45%)] font-medium">Features</p>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight">
+      {/* Weekly Review */}
+      <section className="border-t border-[hsl(35,30%,88%)] bg-[hsl(150,25%,96%)]">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-20 md:grid-cols-5 md:py-24">
+          <div className="md:col-span-2">
+            <div className="rounded-3xl bg-white p-6 shadow-xl ring-1 ring-[hsl(150,20%,85%)]">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[hsl(150,40%,25%)]">
+                Weekly Self-Care Review
+              </p>
+              <h3 className="mt-2 text-lg font-semibold">Your balance this week</h3>
+              <div className="mt-5 space-y-4">
+                {[
+                  { label: 'Body', pct: 78, color: 'hsl(15,55%,55%)' },
+                  { label: 'Mind', pct: 64, color: 'hsl(280,40%,55%)' },
+                  { label: 'Environment', pct: 42, color: 'hsl(35,70%,55%)' },
+                  { label: 'People', pct: 56, color: 'hsl(150,40%,40%)' },
+                ].map((b) => (
+                  <div key={b.label}>
+                    <div className="mb-1 flex justify-between text-sm">
+                      <span className="font-medium">{b.label}</span>
+                      <span className="text-[hsl(20,10%,45%)]">{b.pct}%</span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-[hsl(150,20%,92%)]">
+                      <div
+                        className="h-full rounded-full"
+                        style={{ width: `${b.pct}%`, background: b.color }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 rounded-2xl bg-[hsl(35,55%,96%)] p-4 text-sm">
+                <p className="font-medium">💡 Suggestion for next week</p>
+                <p className="mt-1 text-[hsl(20,10%,40%)]">
+                  Add one tidy-up moment to your evenings — your Environment score has been quiet.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="md:col-span-3">
+            <span className="text-sm font-medium uppercase tracking-widest text-[hsl(150,40%,25%)]">
+              Weekly Review
+            </span>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
+              A gentle check-in every week.
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-[hsl(20,10%,35%)]">
+              Once a week, Rilo invites you to pause. Not to judge — to notice. You see your
+              <strong> Self-Care Balance</strong> across <strong>Body · Mind · Environment · People</strong>,
+              your top 3 habits, your returns to the app, and a satisfaction slider that asks how the week
+              actually felt.
+            </p>
+            <p className="mt-3 text-lg leading-relaxed text-[hsl(20,10%,35%)]">
+              Then it offers small, specific suggestions — what to drop, what to try next — so the next
+              week starts with intention, not guilt.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Tools */}
+      <section id="tools" className="border-t border-[hsl(35,30%,88%)]">
+        <div className="mx-auto max-w-6xl px-5 py-20 md:py-24">
+          <div className="max-w-2xl">
+            <span className="text-sm font-medium uppercase tracking-widest text-[hsl(15,55%,45%)]">
+              Everything in one place
+            </span>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
               Tools that meet you where you are.
             </h2>
+            <p className="mt-4 text-lg text-[hsl(20,10%,35%)]">
+              Each tool is small enough to use in a spare minute, and deep enough to grow with you.
+            </p>
           </div>
 
-          <img
-            src={featuresTrio}
-            alt="Three Rilo screens: breathing exercise, journal, and routine player"
-            width={1600}
-            height={900}
-            loading="lazy"
-            className="w-full max-w-4xl mx-auto mb-16"
-          />
+          <div className="mt-14 flex flex-col-reverse items-start gap-12 md:flex-row md:items-center">
+            <img
+              src={featuresTrio}
+              alt="Rilo features shown on three iPhones — Routine Player, Breathe, and Reflections"
+              className="w-full max-w-md rounded-[2rem] shadow-xl md:w-1/2"
+              loading="lazy"
+            />
+            <p className="text-lg leading-relaxed text-[hsl(20,10%,35%)] md:w-1/2">
+              Rilo brings together your routines, breathing, journaling, focus, mood, audio, reading, and
+              community. No tab-hopping. Just one calm space — patiently introducing each tool when you&apos;re
+              ready for it.
+            </p>
+          </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {features.map((f) => (
-              <div
-                key={f.title}
-                className="p-6 rounded-3xl bg-white border border-[hsl(30,20%,90%)]"
+          <div className="mt-16 grid gap-6 md:grid-cols-2">
+            {tools.map((t) => (
+              <article
+                key={t.name}
+                className="flex gap-4 rounded-3xl bg-white p-6 ring-1 ring-[hsl(35,30%,88%)]"
               >
-                <div
-                  className="w-10 h-10 rounded-xl mb-4 flex items-center justify-center"
-                  style={{ backgroundColor: f.bg }}
-                >
-                  <f.icon className="w-5 h-5" style={{ color: f.color }} />
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[hsl(35,55%,94%)]">
+                  <t.icon className="h-5 w-5 text-[hsl(15,55%,45%)]" aria-hidden />
+                </span>
+                <div>
+                  <h3 className="text-lg font-semibold">{t.name}</h3>
+                  <p className="mt-1.5 text-[hsl(20,10%,40%)]">{t.text}</p>
                 </div>
-                <h3 className="font-semibold text-base mb-1.5">{f.title}</h3>
-                <p className="text-sm text-[hsl(20,15%,42%)] leading-relaxed">{f.desc}</p>
-              </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 30-DAY OUTCOME */}
-      <section
-        id="outcome"
-        className="py-20 lg:py-28 bg-gradient-to-br from-[hsl(140,25%,90%)] via-[hsl(35,40%,95%)] to-[hsl(15,50%,92%)]"
-      >
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-14 space-y-4">
-            <p className="text-sm uppercase tracking-[0.2em] text-[hsl(15,55%,45%)] font-medium">Your 30 days with Rilo</p>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight">
-              A month from now, you'll feel different.
+      {/* Free vs Plus */}
+      <section id="plus" className="border-t border-[hsl(35,30%,88%)] bg-white">
+        <div className="mx-auto max-w-6xl px-5 py-20 md:py-24">
+          <div className="max-w-2xl">
+            <span className="text-sm font-medium uppercase tracking-widest text-[hsl(15,55%,45%)]">
+              Free & Simora Plus
+            </span>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
+              Most of Rilo is free.
             </h2>
+            <p className="mt-4 text-lg text-[hsl(20,10%,35%)]">
+              The full self-care loop works on the free plan. Simora Plus exists for people who want more
+              depth, more tools, and unlimited routines.
+            </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {outcomes.map((o, i) => (
-              <div key={o.title} className="p-8 rounded-3xl bg-white/70 backdrop-blur border border-white">
-                <div className="text-5xl font-display text-[hsl(15,55%,45%)] mb-4 font-light">0{i + 1}</div>
-                <h3 className="font-display text-xl font-semibold mb-2">{o.title}</h3>
-                <p className="text-[hsl(20,15%,40%)] leading-relaxed">{o.desc}</p>
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            <article className="rounded-3xl bg-[hsl(35,55%,96%)] p-8 ring-1 ring-[hsl(35,30%,88%)]">
+              <p className="text-sm font-semibold uppercase tracking-widest text-[hsl(20,10%,45%)]">Free</p>
+              <h3 className="mt-2 text-2xl font-semibold">The full self-care loop</h3>
+              <ul className="mt-5 space-y-3 text-[hsl(20,10%,30%)]">
+                {[
+                  'Self-Care Quiz & personal plan',
+                  'Daily planner & routine templates',
+                  'Mood check-in & emotions',
+                  'Reflections journal (EN & Farsi)',
+                  'Read & Learn library',
+                  'Community chats',
+                  'Weekly self-care review',
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-3">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[hsl(150,40%,40%)]" aria-hidden />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </article>
+            <article className="rounded-3xl bg-gradient-to-br from-[hsl(20,15%,15%)] to-[hsl(20,20%,25%)] p-8 text-white ring-1 ring-black/10">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-[hsl(45,90%,70%)]" aria-hidden />
+                <p className="text-sm font-semibold uppercase tracking-widest text-[hsl(45,90%,70%)]">
+                  Simora Plus
+                </p>
               </div>
-            ))}
+              <h3 className="mt-2 text-2xl font-semibold">Go deeper, without limits</h3>
+              <ul className="mt-5 space-y-3 text-white/85">
+                {[
+                  'Unlimited routines & tasks',
+                  'AI Agents — coach, assistant, companion',
+                  'Fasting tracker',
+                  'Period tracker',
+                  'Projects (mobile project manager)',
+                  'Premium audio & guided programs',
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-3">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[hsl(45,90%,70%)]" aria-hidden />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-6 text-sm text-white/60">
+                Pricing shown in-app and varies by region. Cancel anytime.
+              </p>
+            </article>
           </div>
         </div>
       </section>
 
-      {/* WHO IT'S FOR */}
-      <section className="py-20 lg:py-24">
-        <div className="max-w-4xl mx-auto px-6 text-center space-y-10">
-          <div className="space-y-4">
-            <p className="text-sm uppercase tracking-[0.2em] text-[hsl(15,55%,45%)] font-medium">Who it's for</p>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight">
-              Built for lives that can't be controlled.
+      {/* Streaks & Presence */}
+      <section className="border-t border-[hsl(35,30%,88%)]">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-20 md:grid-cols-2 md:py-24">
+          <div>
+            <span className="text-sm font-medium uppercase tracking-widest text-[hsl(15,55%,45%)]">
+              Streaks & Presence
+            </span>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
+              Small wins, every day.
             </h2>
+            <p className="mt-5 text-lg leading-relaxed text-[hsl(20,10%,35%)]">
+              Finish 1 task for <strong>Bronze</strong>, 2 for <strong>Silver</strong>, 3 for{' '}
+              <strong>Gold</strong>. Streaks build slowly, recovery shields catch you on hard days, and
+              Presence shows your real engagement — focus time, returns, tasks done — across the whole week.
+            </p>
+            <p className="mt-3 text-lg leading-relaxed text-[hsl(20,10%,35%)]">
+              No streak shame. Just gentle momentum.
+            </p>
           </div>
-          <div className="flex flex-wrap justify-center gap-3">
-            {audiences.map((a) => (
-              <span
-                key={a}
-                className="px-5 py-2.5 rounded-full bg-white border border-[hsl(30,20%,90%)] text-sm font-medium text-[hsl(20,15%,25%)]"
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              { label: 'Bronze', emoji: '🥉', bg: 'hsl(25,60%,90%)' },
+              { label: 'Silver', emoji: '🥈', bg: 'hsl(220,15%,90%)' },
+              { label: 'Gold', emoji: '🥇', bg: 'hsl(45,80%,88%)' },
+            ].map((b) => (
+              <div
+                key={b.label}
+                className="flex flex-col items-center justify-center rounded-3xl p-6 text-center shadow-sm ring-1 ring-[hsl(35,30%,88%)]"
+                style={{ background: b.bg }}
               >
-                {a}
-              </span>
+                <span className="text-4xl">{b.emoji}</span>
+                <p className="mt-3 text-sm font-semibold">{b.label}</p>
+              </div>
             ))}
+            <div className="col-span-3 flex items-center gap-3 rounded-3xl bg-white p-5 ring-1 ring-[hsl(35,30%,88%)]">
+              <Flame className="h-5 w-5 text-[hsl(15,55%,45%)]" aria-hidden />
+              <p className="text-sm">
+                <strong>Recovery shields</strong> protect your streak when life gets in the way.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="py-20 lg:py-28 bg-white/60">
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="text-center mb-14 space-y-4">
-            <p className="text-sm uppercase tracking-[0.2em] text-[hsl(15,55%,45%)] font-medium">FAQ</p>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight">
-              Common questions.
-            </h2>
-          </div>
-          <div className="space-y-3">
+      <section id="faq" className="border-t border-[hsl(35,30%,88%)] bg-white">
+        <div className="mx-auto max-w-3xl px-5 py-20 md:py-24">
+          <span className="text-sm font-medium uppercase tracking-widest text-[hsl(15,55%,45%)]">
+            FAQ
+          </span>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
+            Honest answers.
+          </h2>
+          <div className="mt-10 divide-y divide-[hsl(35,30%,88%)]">
             {faqs.map((f) => (
-              <details
-                key={f.q}
-                className="group p-6 rounded-2xl bg-white border border-[hsl(30,20%,90%)]"
-              >
-                <summary className="flex items-center justify-between cursor-pointer font-semibold text-base list-none">
+              <details key={f.q} className="group py-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between text-lg font-medium">
                   {f.q}
-                  <ArrowRight className="w-4 h-4 transition-transform group-open:rotate-90" />
+                  <span className="ml-4 text-[hsl(20,10%,45%)] transition group-open:rotate-45">+</span>
                 </summary>
-                <p className="mt-4 text-[hsl(20,15%,40%)] leading-relaxed">{f.a}</p>
+                <p className="mt-3 leading-relaxed text-[hsl(20,10%,40%)]">{f.a}</p>
               </details>
             ))}
           </div>
         </div>
       </section>
 
-      {/* FINAL CTA */}
-      <section className="py-24 lg:py-32 relative overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[hsl(15,70%,85%)] via-[hsl(25,55%,90%)] to-[hsl(140,30%,85%)]" />
-        <div className="max-w-3xl mx-auto px-6 text-center space-y-8">
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold leading-[1.05] tracking-tight">
-            Start gently.
+      {/* Final CTA */}
+      <section className="border-t border-[hsl(35,30%,88%)] bg-gradient-to-b from-[hsl(35,55%,94%)] to-[hsl(15,55%,90%)]">
+        <div className="mx-auto max-w-3xl px-5 py-20 text-center md:py-28">
+          <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
+            Take the 1-minute quiz. Get your plan.
           </h2>
-          <p className="text-lg text-[hsl(20,15%,30%)] max-w-xl mx-auto">
-            Free to download. No streaks. No guilt. Just a quiet companion to help you return to yourself.
+          <p className="mx-auto mt-5 max-w-xl text-lg text-[hsl(20,10%,35%)]">
+            Take better care of yourself — starting today.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a
-              href={APP_STORE_URL}
-              className="inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-[hsl(20,15%,15%)] text-white active:scale-95 transition-transform"
-            >
-              <Apple className="w-6 h-6" />
-              <div className="text-left leading-tight">
-                <div className="text-[10px] opacity-80">Download on the</div>
-                <div className="text-sm font-semibold">App Store</div>
-              </div>
-            </a>
-            <a
-              href={PLAY_STORE_URL}
-              className="inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-[hsl(20,15%,15%)] text-white active:scale-95 transition-transform"
-            >
-              <Play className="w-6 h-6" />
-              <div className="text-left leading-tight">
-                <div className="text-[10px] opacity-80">Get it on</div>
-                <div className="text-sm font-semibold">Google Play</div>
-              </div>
-            </a>
+          <div className="mt-10 flex justify-center">
+            <StoreBadges />
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[hsl(30,20%,88%)] py-10 bg-[hsl(35,40%,97%)]">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[hsl(20,15%,40%)]">
+      <footer className="border-t border-[hsl(35,30%,88%)] bg-[hsl(35,40%,97%)]">
+        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-5 py-10 text-sm text-[hsl(20,10%,45%)] md:flex-row md:items-center">
           <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-lg bg-gradient-to-br from-[hsl(15,70%,75%)] to-[hsl(140,30%,70%)] flex items-center justify-center text-white">
-              <Heart className="w-3 h-3" fill="currentColor" />
+            <span className="grid h-8 w-8 place-items-center rounded-xl bg-[hsl(150,30%,80%)]">
+              <Leaf className="h-4 w-4 text-[hsl(150,40%,25%)]" aria-hidden />
             </span>
-            <span>© {new Date().getFullYear()} Rilo. Showing up counts.</span>
+            <span className="font-semibold text-[hsl(20,15%,15%)]">Rilo</span>
+            <span>· Self-Care Tracker & Routine Planner</span>
           </div>
-          <div className="flex items-center gap-6">
-            <Link to="/privacy" className="active:opacity-70">Privacy</Link>
-            <Link to="/delete-account" className="active:opacity-70">Delete account</Link>
-            <Link to="/appsupport" className="active:opacity-70">Support</Link>
+          <div className="flex flex-wrap gap-5">
+            <a href="/privacy" className="hover:text-[hsl(20,15%,15%)]">Privacy</a>
+            <a href="/terms" className="hover:text-[hsl(20,15%,15%)]">Terms</a>
+            <a href="/delete-account" className="hover:text-[hsl(20,15%,15%)]">Delete account</a>
+            <a href="mailto:hello@ladybosslook.com" className="hover:text-[hsl(20,15%,15%)]">Contact</a>
           </div>
         </div>
       </footer>
     </div>
   );
 };
-
-const pillars = [
-  {
-    icon: Sparkles,
-    title: 'Rituals, not tasks',
-    desc: 'Light, doable actions that honor where you are today. No streaks. No guilt. Just gentle invitations to show up.',
-    color: 'hsl(15,55%,45%)',
-    bg: 'hsl(15,70%,92%)',
-  },
-  {
-    icon: Heart,
-    title: 'Tools that calm',
-    desc: 'Breathe, journal, check in with your mood, fast, focus. A library of self-care tools always within reach.',
-    color: 'hsl(140,40%,35%)',
-    bg: 'hsl(140,30%,90%)',
-  },
-  {
-    icon: MessageCircle,
-    title: 'Companionship',
-    desc: 'Programs, audio, community chats, and a gentle AI companion. Guidance without the pressure to perform.',
-    color: 'hsl(280,40%,45%)',
-    bg: 'hsl(280,40%,93%)',
-  },
-];
-
-const features = [
-  { icon: Sparkles, title: 'Daily Rituals', desc: 'Build small, repeatable rituals that fit your real life.', color: 'hsl(15,55%,45%)', bg: 'hsl(15,70%,93%)' },
-  { icon: Smile, title: 'Mood Check-in', desc: 'Name what you feel without being ruled by it.', color: 'hsl(45,70%,40%)', bg: 'hsl(45,80%,93%)' },
-  { icon: Wind, title: 'Breathing', desc: 'Guided exercises to regulate, not react.', color: 'hsl(190,50%,40%)', bg: 'hsl(190,50%,93%)' },
-  { icon: BookOpen, title: 'Journal', desc: 'Free-form reflections and guided prompts.', color: 'hsl(330,40%,45%)', bg: 'hsl(330,40%,94%)' },
-  { icon: Timer, title: 'Focus Timer', desc: 'Pomodoro and gentle focus sessions.', color: 'hsl(20,15%,30%)', bg: 'hsl(30,15%,93%)' },
-  { icon: Headphones, title: 'Audio Library', desc: 'Stories, lessons, and calming audio for any moment.', color: 'hsl(140,40%,35%)', bg: 'hsl(140,30%,92%)' },
-  { icon: Calendar, title: 'Programs', desc: 'Multi-day journeys you can follow at your own pace.', color: 'hsl(220,40%,45%)', bg: 'hsl(220,40%,94%)' },
-  { icon: MessageCircle, title: 'Community Chats', desc: 'Connect with others who are also returning to themselves.', color: 'hsl(280,40%,45%)', bg: 'hsl(280,40%,94%)' },
-  { icon: Heart, title: 'Reflections', desc: 'Weekly reviews that celebrate showing up.', color: 'hsl(15,55%,45%)', bg: 'hsl(15,70%,94%)' },
-];
-
-const outcomes = [
-  {
-    title: 'You\'ll trust yourself again',
-    desc: '"When I say I\'ll show up, I usually do." Self-trust comes back, one small ritual at a time.',
-  },
-  {
-    title: 'You\'ll regulate, not react',
-    desc: 'Pause before spiraling. Name emotions without being ruled by them.',
-  },
-  {
-    title: 'You\'ll see yourself differently',
-    desc: 'As someone who shows up — even imperfectly, even after absence.',
-  },
-];
-
-const audiences = [
-  'New parents',
-  'Caregivers',
-  'People in transition',
-  'Anyone rebuilding self-trust',
-  'Recovering perfectionists',
-  'Burnout recovery',
-  'Returning after a pause',
-];
-
-const faqs = [
-  {
-    q: 'Is Rilo free?',
-    a: 'Yes. Rilo is free to download and use. A premium plan called Simora Plus unlocks deeper tools like Fasting, Period tracking, AI Agents, and Projects.',
-  },
-  {
-    q: 'How is Rilo different from a habit tracker?',
-    a: 'Habit trackers measure consistency and punish you for breaks. Rilo is a strength companion — it helps you return to yourself, not maintain a streak. There are no streaks, no guilt, no missed-day penalties.',
-  },
-  {
-    q: 'What\'s included in the free version?',
-    a: 'Daily rituals, mood check-ins, breathing exercises, journaling, focus timer, audio library, community chats, and access to free programs.',
-  },
-  {
-    q: 'Is Rilo available on iOS and Android?',
-    a: 'Yes. Rilo is a native app available on both the App Store and Google Play.',
-  },
-  {
-    q: 'Who is Rilo for?',
-    a: 'Rilo is built for new parents, caregivers, people in transition, and anyone whose routines collapsed under real life — and who wants to rebuild self-trust without pressure.',
-  },
-  {
-    q: 'Does Rilo replace therapy or medical care?',
-    a: 'No. Rilo is a self-care companion. It supports your wellbeing but is not a substitute for professional mental health care.',
-  },
-];
 
 export default Rilo;
