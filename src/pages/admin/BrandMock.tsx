@@ -48,71 +48,89 @@ const TOOL_SHORTCUTS = [
   { emoji: '💜', label: 'Mood' },
 ];
 
-const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: number; darkMode?: boolean }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 12 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: 0.15 + index * 0.06 }}
-    className="rounded-3xl overflow-hidden"
-    style={{
-      background: darkMode ? task.darkColor : task.color,
-      boxShadow: darkMode
-        ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)'
-        : '0 2px 10px rgba(0,0,0,0.08)',
-    }}
-  >
-    <div className="flex items-center gap-2 pl-3 pr-4 py-3">
-      {/* 3D Fluent Emoji */}
-      <div className="w-10 h-10 flex items-center justify-center shrink-0">
-        <FluentEmoji emoji={task.emoji} size={32} />
+const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: number; darkMode?: boolean }) => {
+  const wingColor = darkMode ? task.darkColor : task.color;
+  const bodyBg = darkMode ? '#2A1A10' : '#FFFFFF';
+  const subtleText = darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.55)';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.15 + index * 0.06 }}
+      className="rounded-3xl overflow-hidden flex items-stretch"
+      style={{
+        background: bodyBg,
+        boxShadow: darkMode
+          ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)'
+          : '0 2px 10px rgba(0,0,0,0.08)',
+      }}
+    >
+      {/* ─── Left wing — colored zone around emoji ─── */}
+      <div
+        className="flex items-center justify-center shrink-0 px-3 py-3"
+        style={{
+          background: wingColor,
+          borderTopLeftRadius: '1.5rem',
+          borderBottomLeftRadius: '1.5rem',
+        }}
+      >
+        <div className="w-10 h-10 flex items-center justify-center">
+          <FluentEmoji emoji={task.emoji} size={32} />
+        </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        {/* Subtitle line */}
+      {/* ─── Body — colorless ─── */}
+      <div className="flex-1 min-w-0 px-3 py-3 flex flex-col justify-center">
         <div className="flex items-center gap-1.5">
-          <span className="text-[11px]" style={{ color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.6)' }}>{task.time}</span>
-          <span className="text-[11px]" style={{ color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.6)' }}>•</span>
-          <span className="text-[11px]" style={{ color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.6)' }}>{task.repeat}</span>
+          <span className="text-[11px]" style={{ color: subtleText }}>{task.time}</span>
+          <span className="text-[11px]" style={{ color: subtleText }}>•</span>
+          <span className="text-[11px]" style={{ color: subtleText }}>{task.repeat}</span>
           {task.goal && (
             <>
-              <span className="text-[11px]" style={{ color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.6)' }}>•</span>
-              <span className="text-[11px] font-medium" style={{ color: darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.6)' }}>{task.goal}</span>
+              <span className="text-[11px]" style={{ color: subtleText }}>•</span>
+              <span className="text-[11px] font-medium" style={{ color: subtleText }}>{task.goal}</span>
             </>
           )}
         </div>
-        {/* Title */}
         <p className={`text-[15px] font-semibold leading-tight ${task.done ? 'line-through' : ''}`}
           style={{ color: darkMode ? '#FAFAFA' : '#000000' }}>
           {task.title}
         </p>
       </div>
 
-      {/* Completion button */}
-      <div className="w-9 h-9 flex items-center justify-center shrink-0">
-        {task.done ? (
-          /* SealCheck-style teal checkmark */
-          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-            <circle cx="18" cy="18" r="15" fill="#2DD4BF" />
-            {/* Seal points */}
-            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
-              <circle
-                key={angle}
-                cx={18 + 16 * Math.cos((angle * Math.PI) / 180)}
-                cy={18 + 16 * Math.sin((angle * Math.PI) / 180)}
-                r="3.5"
-                fill="#2DD4BF"
-              />
-            ))}
-            <path d="M12 18.5L16 22.5L24.5 14" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        ) : (
-          <span className="w-9 h-9 rounded-full border-2 bg-transparent" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.4)' : '#000000' }} />
-        )}
+      {/* ─── Right wing — colored zone around completion circle ─── */}
+      <div
+        className="flex items-center justify-center shrink-0 px-3 py-3"
+        style={{
+          background: wingColor,
+          borderTopRightRadius: '1.5rem',
+          borderBottomRightRadius: '1.5rem',
+        }}
+      >
+        <div className="w-9 h-9 flex items-center justify-center">
+          {task.done ? (
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+              <circle cx="18" cy="18" r="15" fill="#2DD4BF" />
+              {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
+                <circle
+                  key={angle}
+                  cx={18 + 16 * Math.cos((angle * Math.PI) / 180)}
+                  cy={18 + 16 * Math.sin((angle * Math.PI) / 180)}
+                  r="3.5"
+                  fill="#2DD4BF"
+                />
+              ))}
+              <path d="M12 18.5L16 22.5L24.5 14" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          ) : (
+            <span className="w-9 h-9 rounded-full border-2 bg-transparent" style={{ borderColor: darkMode ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.7)' }} />
+          )}
+        </div>
       </div>
-    </div>
-  </motion.div>
-);
+    </motion.div>
+  );
+};
 
 export default function BrandMock() {
   const [darkMode, setDarkMode] = useState(false);
