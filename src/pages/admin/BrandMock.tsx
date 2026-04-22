@@ -57,8 +57,8 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
     style={{
       background: darkMode ? '#241710' : '#FFFFFF',
       boxShadow: darkMode
-        ? '0 2px 12px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04)'
-        : '0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04)',
+        ? '0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.25)'
+        : '0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06)',
     }}
   >
     <div className="flex items-center gap-3 pl-2.5 pr-3 py-2.5">
