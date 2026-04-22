@@ -739,22 +739,21 @@ export default function BrandMock() {
                   { icon: CalendarPlus, label: 'Routines', active: false },
                   { icon: Music, label: 'Listen', active: false },
                   { icon: Users, label: 'Chats', active: false },
-                  { icon: Flame, label: 'streak', active: false, isStreak: true },
+                  { icon: Plus, label: 'Add', active: false, isFab: true },
                 ].map((item, i) => (
                   <div key={item.label} className="flex flex-col items-center gap-0.5 relative">
-                    {item.isStreak ? (
+                    {item.isFab ? (
                       <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center gap-0.5 relative"
+                        className="w-11 h-11 rounded-2xl flex items-center justify-center relative -mt-0.5"
                         style={{
-                          background: `linear-gradient(135deg, ${O.primary}DD, ${O.primaryD}EE)`,
-                          boxShadow: `0 2px 12px ${O.primary}44, inset 0 1px 0 rgba(255,255,255,0.2)`,
+                          background: `linear-gradient(135deg, ${O.primary}, ${O.primaryD})`,
+                          boxShadow: `0 6px 18px -2px ${O.primary}66, 0 2px 6px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.25)`,
                         }}
                       >
-                        <Flame className="w-3.5 h-3.5 text-white" />
-                        <span className="text-[11px] font-bold text-white">12</span>
-                        <div className="absolute inset-0 rounded-xl overflow-hidden">
-                          <div className="absolute top-0 left-0 right-0 h-[45%] rounded-t-xl"
-                            style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%)' }} />
+                        <Plus className="w-5 h-5 text-white" strokeWidth={2.5} />
+                        <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+                          <div className="absolute top-0 left-0 right-0 h-[45%] rounded-t-2xl"
+                            style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 100%)' }} />
                         </div>
                       </div>
                     ) : (
