@@ -458,31 +458,6 @@ export default function BrandMock() {
             </div>
           </div>
 
-          {/* ─── FAB ─── */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.6, type: 'spring', stiffness: 200 }}
-            className="absolute bottom-[88px] right-5 w-14 h-14 rounded-full flex items-center justify-center cursor-pointer"
-            style={{
-              background: darkMode
-                ? `linear-gradient(135deg, ${O.primary}EE, ${O.primaryD}FF)`
-                : `linear-gradient(135deg, ${O.primary}, ${O.primaryD})`,
-              backdropFilter: 'blur(12px)',
-              boxShadow: `0 8px 24px -4px ${O.primary}55, 0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)`,
-            }}
-          >
-            <Plus className="w-6 h-6 text-white" />
-            {/* Glass shine on FAB */}
-            <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
-              <div
-                className="absolute top-0 left-0 right-0 h-[40%] rounded-t-full"
-                style={{
-                  background: 'linear-gradient(180deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 100%)',
-                }}
-              />
-            </div>
-          </motion.div>
         </div>
       </div>
 
