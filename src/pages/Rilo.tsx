@@ -293,11 +293,11 @@ const Rilo = () => {
           </div>
           <div className="relative mx-auto w-full max-w-md">
             <div className="absolute -inset-6 -z-10 rounded-[3rem] bg-[hsl(150,30%,85%)]/40 blur-2xl" />
-            <img
+            <PhoneFrame
               src={heroScreenshot}
               alt="Rilo Self-Care Quiz screen — Discover your self-care gaps in 1 minute"
-              className="w-full rounded-[2.5rem] shadow-2xl ring-1 ring-[hsl(35,30%,88%)]"
-              loading="eager"
+              className="mx-auto w-full max-w-[320px]"
+              eager
             />
           </div>
         </div>
@@ -520,18 +520,16 @@ const Rilo = () => {
           </div>
 
           <div className="mt-14 flex flex-col-reverse items-start gap-12 md:flex-row md:items-center">
-            <div className="relative flex w-full justify-center gap-4 md:w-1/2">
-              <img
+            <div className="relative flex w-full items-end justify-center gap-6 md:w-1/2">
+              <PhoneFrame
                 src={quizStepScreenshot}
                 alt="Self-Care Quiz — What do you struggle with most?"
-                className="w-1/2 max-w-[220px] -rotate-3 rounded-[1.75rem] shadow-xl ring-1 ring-[hsl(35,30%,88%)]"
-                loading="lazy"
+                className="w-[44%] max-w-[200px] -rotate-3"
               />
-              <img
+              <PhoneFrame
                 src={quizStep2Screenshot}
                 alt="Self-Care Quiz — What sounds most helpful to you?"
-                className="w-1/2 max-w-[220px] rotate-3 rounded-[1.75rem] shadow-xl ring-1 ring-[hsl(35,30%,88%)]"
-                loading="lazy"
+                className="w-[44%] max-w-[200px] rotate-3"
               />
             </div>
             <p className="text-lg leading-relaxed text-[hsl(20,10%,35%)] md:w-1/2">
