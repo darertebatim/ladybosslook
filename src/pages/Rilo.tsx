@@ -23,8 +23,8 @@ import {
 import heroMockup from '@/assets/rilo-hero-mockup.png';
 import featuresTrio from '@/assets/rilo-features-trio.png';
 
-const APP_STORE_URL = 'https://apps.apple.com/app/rilo';
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=app.lovable.rilo';
+const APP_STORE_URL = 'https://apps.apple.com/app/rilo-self-care-routines/id6755076134';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.ladybosslook.academy';
 
 const faqs = [
   {
