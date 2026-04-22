@@ -532,7 +532,7 @@ const Rilo = () => {
               <PhoneFrame
                 src={quizStep2Screenshot}
                 alt="Self-Care Quiz — What sounds most helpful to you?"
-                className="w-[44%] max-w-[200px] rotate-3"
+                className="w-[40%] max-w-[160px] rotate-3"
               />
             </div>
             <p className="text-lg leading-relaxed text-[hsl(20,10%,35%)] md:w-1/2">
