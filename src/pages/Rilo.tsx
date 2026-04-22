@@ -23,6 +23,7 @@ import {
 import heroScreenshot from '@/assets/rilo-screenshot-quiz-intro.png';
 import quizStepScreenshot from '@/assets/rilo-screenshot-quiz-step.png';
 import quizStep2Screenshot from '@/assets/rilo-screenshot-quiz-step2.png';
+import appIcon from '@/assets/rilo-app-icon.png';
 
 const APP_STORE_URL = 'https://apps.apple.com/app/rilo-self-care-routines/id6755076134';
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.ladybosslook.academy';
@@ -205,6 +206,7 @@ const Rilo = () => {
     operatingSystem: 'iOS, Android',
     applicationCategory: 'HealthApplication',
     description: pageDescription,
+    image: `https://ladybosslook.com${appIcon}`,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.8', ratingCount: '1240' },
   };
@@ -243,9 +245,11 @@ const Rilo = () => {
       <header className="sticky top-0 z-40 border-b border-[hsl(35,30%,88%)] bg-[hsl(35,40%,97%)]/85 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
           <a href="#top" className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-2xl bg-[hsl(150,30%,80%)]">
-              <Leaf className="h-5 w-5 text-[hsl(150,40%,25%)]" aria-hidden />
-            </span>
+            <img
+              src={appIcon}
+              alt="Rilo app icon"
+              className="h-9 w-9 rounded-[0.65rem] shadow-sm ring-1 ring-black/5"
+            />
             <span className="text-lg font-semibold tracking-tight">Rilo</span>
           </a>
           <nav className="hidden items-center gap-7 text-sm text-[hsl(20,10%,40%)] md:flex">
@@ -711,9 +715,11 @@ const Rilo = () => {
       <footer className="border-t border-[hsl(35,30%,88%)] bg-[hsl(35,40%,97%)]">
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-5 py-10 text-sm text-[hsl(20,10%,45%)] md:flex-row md:items-center">
           <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-xl bg-[hsl(150,30%,80%)]">
-              <Leaf className="h-4 w-4 text-[hsl(150,40%,25%)]" aria-hidden />
-            </span>
+            <img
+              src={appIcon}
+              alt="Rilo app icon"
+              className="h-8 w-8 rounded-[0.55rem] shadow-sm ring-1 ring-black/5"
+            />
             <span className="font-semibold text-[hsl(20,15%,15%)]">Rilo</span>
             <span>· Self-Care Tracker & Routine Planner</span>
           </div>
