@@ -61,10 +61,10 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
         : '0 2px 10px rgba(0,0,0,0.08)',
     }}
   >
-    <div className="flex items-center gap-2 pl-3 pr-4 py-3">
+    <div className="flex items-center gap-3 pl-3.5 pr-4 py-5">
       {/* 3D Fluent Emoji */}
-      <div className="w-10 h-10 flex items-center justify-center shrink-0">
-        <FluentEmoji emoji={task.emoji} size={32} />
+      <div className="w-12 h-12 flex items-center justify-center shrink-0">
+        <FluentEmoji emoji={task.emoji} size={40} />
       </div>
 
       {/* Content */}
@@ -82,7 +82,7 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
           )}
         </div>
         {/* Title */}
-        <p className={`text-[15px] font-semibold leading-tight ${task.done ? 'line-through' : ''}`}
+        <p className={`text-[17px] font-semibold leading-tight mt-0.5 ${task.done ? 'line-through' : ''}`}
           style={{ color: darkMode ? '#FAFAFA' : '#000000' }}>
           {task.title}
         </p>
