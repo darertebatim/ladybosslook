@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Flame, Calendar, Headphones, BookOpen, Heart, Sparkles, ChevronRight, Check, Sun, Moon, Droplets, Wind, Home, Compass, CalendarPlus, Music, Users } from 'lucide-react';
+import { Plus, Flame, Calendar, Headphones, BookOpen, Heart, Sparkles, ChevronRight, Check, Sun, Moon, Droplets, Wind, Home, Compass, CalendarPlus, Music, Users, Menu, Headset, Star, Zap, Settings2, Search } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import appIcon from '@/assets/app-icon.png';
 
@@ -41,11 +41,11 @@ const TASKS = [
   { emoji: '✍️', title: 'Journal Entry', time: '🌙 9:00 PM', repeat: 'Daily', done: false, color: O.pink, darkColor: O.pinkDark },
 ];
 
-const QUICK_TOOLS = [
-  { icon: Headphones, label: 'Listen' },
-  { icon: BookOpen, label: 'Journal' },
-  { icon: Wind, label: 'Breathe' },
-  { icon: Heart, label: 'Mood' },
+const TOOL_SHORTCUTS = [
+  { emoji: '📖', label: 'Journal' },
+  { emoji: '🌬️', label: 'Breathe' },
+  { emoji: '💧', label: 'Water' },
+  { emoji: '💜', label: 'Mood' },
 ];
 
 const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: number; darkMode?: boolean }) => (
