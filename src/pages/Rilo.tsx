@@ -17,7 +17,6 @@ import {
   CheckCircle2,
   Flame,
   GraduationCap,
-  Leaf,
   RefreshCw,
 } from 'lucide-react';
 import heroScreenshot from '@/assets/rilo-screenshot-quiz-intro.png';
