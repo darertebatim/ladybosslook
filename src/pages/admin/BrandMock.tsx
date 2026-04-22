@@ -160,117 +160,72 @@ export default function BrandMock() {
           </div>
 
           {/* ─── Header ─── */}
-          <div className="px-5 pt-2 pb-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <motion.img
-                  src={appIcon}
-                  alt="Rilo"
-                  className="w-10 h-10 rounded-xl shadow-md"
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                />
-                <div>
-                  <p className="text-xs" style={{ color: fgMuted }}>Good morning ☀️</p>
-                  <p className="text-lg font-bold" style={{ color: fg }}>Sarah</p>
-                </div>
+          {/* ─── Glass Header (matches AppHome) ─── */}
+          <div
+            className="px-4 pt-1 pb-2 rounded-b-2xl mx-0"
+            style={{
+              background: darkMode ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.35)',
+              backdropFilter: 'blur(20px)',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
+            }}
+          >
+            {/* Title row: menu + support / center date / streak */}
+            <div className="grid grid-cols-[auto_1fr_auto] items-center h-9">
+              <div className="flex items-center gap-1">
+                <button className="p-1.5 -ml-1" style={{ color: fg }}>
+                  <Menu className="w-[18px] h-[18px]" />
+                </button>
+                <button className="p-1.5" style={{ color: fg }}>
+                  <Headset className="w-[18px] h-[18px]" />
+                </button>
               </div>
-              <motion.div
+              <div className="flex justify-center">
+                <h1 className="text-[15px] font-bold flex items-center gap-1" style={{ color: fg }}>
+                  Today
+                  <Star className="w-2.5 h-2.5" fill="#EF4444" stroke="#EF4444" />
+                </h1>
+              </div>
+              <motion.button
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring' }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-                style={{ background: darkMode ? '#3D2A1A' : O.peach, boxShadow: darkMode ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)' : '0 2px 10px rgba(0,0,0,0.08)' }}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full shadow-sm"
+                style={{
+                  background: `linear-gradient(135deg, ${O.primaryL}, ${O.primary})`,
+                  color: '#fff',
+                }}
               >
-                <Flame className="w-4 h-4" style={{ color: O.primary }} />
-                <span className="text-sm font-bold" style={{ color: O.primary }}>12</span>
-              </motion.div>
+                <Flame className="w-3.5 h-3.5 fill-current" />
+                <span className="text-[13px] font-bold">12</span>
+              </motion.button>
             </div>
 
-            {/* ─── Hero Card ─── */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="rounded-3xl p-5 relative overflow-hidden"
-              style={{
-                background: `linear-gradient(135deg, ${O.primary} 0%, ${O.primaryL} 100%)`,
-                boxShadow: darkMode ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)' : '0 2px 10px rgba(0,0,0,0.08)',
-              }}
-            >
-              <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20"
-                style={{ background: 'white' }} />
-              <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full opacity-10"
-                style={{ background: 'white' }} />
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-4 h-4 text-white/80" />
-                  <span className="text-white/80 text-xs font-medium">Today's Intention</span>
-                </div>
-                <p className="text-white font-bold text-base leading-snug">
-                  "I choose to show up fully for myself today"
-                </p>
-                <div className="flex items-center gap-3 mt-4">
-                  <div className="flex -space-x-1">
-                    {['🧘', '📖', '🏃‍♀️'].map((e, i) => (
-                      <span key={i} className="w-6 h-6 rounded-full flex items-center justify-center text-xs"
-                        style={{ background: 'rgba(255,255,255,0.25)', border: '1px solid rgba(255,255,255,0.4)' }}>
-                        {e}
-                      </span>
-                    ))}
-                  </div>
-                  <span className="text-white/70 text-xs">5 actions planned</span>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-
-          {/* ─── Quick Tools ─── */}
-          <div className="px-5 pb-3">
-            <div className="flex gap-3">
-              {QUICK_TOOLS.map((tool, i) => (
-                <motion.div
-                  key={tool.label}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + i * 0.05 }}
-                  className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl cursor-pointer"
-                  style={{ background: darkMode ? '#3D2A1A' : '#FFE6C9', boxShadow: darkMode ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)' : '0 2px 10px rgba(0,0,0,0.08)' }}
-                >
-                  <tool.icon className="w-5 h-5" style={{ color: O.primary }} />
-                  <span className="text-[10px] font-medium" style={{ color: fgMuted }}>{tool.label}</span>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          {/* ─── Week Strip ─── */}
-          <div className="px-5 py-3">
-            <div className="flex gap-1.5 justify-between">
-              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => {
-                const isToday = i === 2;
+            {/* Compact week strip */}
+            <div className="flex gap-1 justify-between mt-1.5 pb-0.5">
+              {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => {
+                const isTodayDay = i === 2;
                 const isPast = i < 2;
                 return (
                   <motion.div
-                    key={day}
-                    initial={{ opacity: 0, scale: 0.8 }}
+                    key={i}
+                    initial={{ opacity: 0, scale: 0.85 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.1 + i * 0.03 }}
-                    className="flex flex-col items-center gap-1 flex-1"
+                    transition={{ delay: 0.05 + i * 0.025 }}
+                    className="flex flex-col items-center gap-0.5 flex-1"
                   >
-                    <span className="text-[10px] font-medium" style={{ color: fgMuted }}>{day}</span>
+                    <span className="text-[9px] font-medium" style={{ color: fgMuted }}>{day}</span>
                     <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all"
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold"
                       style={{
-                        background: isToday ? O.primary : 'transparent',
-                        color: isToday ? '#fff' : isPast ? O.fgMuted : fg,
-                        border: isToday ? 'none' : `1.5px solid ${border}`,
+                        background: isTodayDay ? O.primary : 'transparent',
+                        color: isTodayDay ? '#fff' : isPast ? O.fgMuted : fg,
+                        border: isTodayDay ? 'none' : `1.5px solid ${border}`,
                       }}
                     >
                       {12 + i}
                     </div>
                     {isPast && (
-                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: O.success }} />
+                      <div className="w-1 h-1 rounded-full" style={{ background: O.success }} />
                     )}
                   </motion.div>
                 );
@@ -278,19 +233,116 @@ export default function BrandMock() {
             </div>
           </div>
 
-          {/* ─── Tasks ─── */}
-          <div className="px-5 pb-4">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-semibold" style={{ color: fg }}>Today's Actions</p>
-              <span className="text-xs font-medium px-2 py-0.5 rounded-full"
-                style={{ background: darkMode ? '#3D2A1A' : O.peach, color: O.primary, boxShadow: darkMode ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)' : '0 2px 10px rgba(0,0,0,0.08)' }}>
-                2/5
-              </span>
+          {/* ─── Self-Care Quiz Banner ─── */}
+          <div className="px-4 pt-3">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="rounded-3xl p-3.5 relative overflow-hidden"
+              style={{
+                background: `linear-gradient(135deg, ${O.primary} 0%, ${O.primaryL} 100%)`,
+                boxShadow: '0 4px 14px rgba(235,94,51,0.25)',
+              }}
+            >
+              <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full opacity-20" style={{ background: '#fff' }} />
+              <div className="relative z-10 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: 'rgba(255,255,255,0.25)' }}>
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-[13px] font-bold leading-tight">What's missing in your self-care?</p>
+                  <p className="text-white/80 text-[10px] mt-0.5">Take the 2-min Self-Care Quiz</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-white/90 shrink-0" />
+              </div>
+            </motion.div>
+          </div>
+
+          {/* ─── Tool Shortcuts (My Shortcuts) ─── */}
+          <div className="px-4 pt-3">
+            <div className="grid grid-cols-4 gap-2">
+              {TOOL_SHORTCUTS.map((tool, i) => (
+                <motion.div
+                  key={tool.label}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 + i * 0.04 }}
+                  className="flex flex-col items-center gap-1 py-2 rounded-2xl"
+                  style={{
+                    background: darkMode ? O.peachDark : O.peach,
+                    boxShadow: darkMode
+                      ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)'
+                      : '0 2px 10px rgba(0,0,0,0.06)',
+                  }}
+                >
+                  <FluentEmoji emoji={tool.emoji} size={24} />
+                  <span className="text-[9px] font-medium" style={{ color: darkMode ? '#E0CFB8' : '#6B4D33' }}>
+                    {tool.label}
+                  </span>
+                  <div className="w-1 h-1 rounded-full mt-0.5" style={{ background: i < 2 ? O.success : 'transparent' }} />
+                </motion.div>
+              ))}
             </div>
-            <div className="space-y-2.5">
+          </div>
+
+          {/* ─── 2-Pill Switcher (Routines / Tasks) ─── */}
+          <div className="px-4 pt-4 pb-2">
+            <div className="flex items-center justify-between">
+              <div className="relative inline-flex rounded-full p-0.5" style={{ background: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' }}>
+                <button
+                  className="relative z-10 px-3 py-1 rounded-full text-[11px] font-semibold"
+                  style={{ color: fgMuted }}
+                >
+                  My Routines
+                </button>
+                <button
+                  className="relative z-10 px-3 py-1 rounded-full text-[11px] font-semibold flex items-center gap-1"
+                  style={{
+                    background: darkMode ? '#1A0F08' : '#fff',
+                    color: fg,
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                  }}
+                >
+                  <Zap className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+                  My Tasks
+                </button>
+              </div>
+              <div className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                style={{ background: darkMode ? O.peachDark : O.peach, color: O.primary }}>
+                2/5
+              </div>
+            </div>
+          </div>
+
+          {/* ─── Tasks ─── */}
+          <div className="px-4 pb-4">
+            <div className="space-y-2">
               {TASKS.map((task, i) => (
                 <TaskCard key={task.title} task={task} index={i} darkMode={darkMode} />
               ))}
+            </div>
+
+            {/* Manage / Browse footer buttons */}
+            <div className="flex gap-2 mt-3">
+              <div className="flex-1 rounded-3xl py-2 px-3 flex items-center justify-center gap-1.5 text-[11px] font-semibold"
+                style={{
+                  background: darkMode ? '#2A1A10' : '#fff',
+                  border: `1.5px solid ${O.primary}40`,
+                  color: fg,
+                }}>
+                <Settings2 className="w-3 h-3" style={{ color: O.primary }} />
+                Manage Routines
+              </div>
+              <div className="flex-1 rounded-3xl py-2 px-3 flex items-center justify-center gap-1.5 text-[11px] font-semibold"
+                style={{
+                  background: darkMode ? '#2A1A10' : '#fff',
+                  border: `1.5px solid ${O.primary}40`,
+                  color: fg,
+                }}>
+                <Search className="w-3 h-3" style={{ color: O.primary }} />
+                Browse Library
+              </div>
             </div>
           </div>
 
