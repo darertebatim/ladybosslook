@@ -294,12 +294,12 @@ const Rilo = () => {
               Free to start · No account needed for the quiz · iOS & Android
             </p>
           </div>
-          <div className="relative mx-auto w-full max-w-md">
+          <div className="relative mx-auto w-full max-w-sm">
             <div className="absolute -inset-6 -z-10 rounded-[3rem] bg-[hsl(150,30%,85%)]/40 blur-2xl" />
             <PhoneFrame
               src={heroScreenshot}
               alt="Rilo Self-Care Quiz screen — Discover your self-care gaps in 1 minute"
-              className="mx-auto w-full max-w-[320px]"
+              className="mx-auto w-full max-w-[240px]"
               eager
             />
           </div>
@@ -527,12 +527,12 @@ const Rilo = () => {
               <PhoneFrame
                 src={quizStepScreenshot}
                 alt="Self-Care Quiz — What do you struggle with most?"
-                className="w-[44%] max-w-[200px] -rotate-3"
+                className="w-[40%] max-w-[160px] -rotate-3"
               />
               <PhoneFrame
                 src={quizStep2Screenshot}
                 alt="Self-Care Quiz — What sounds most helpful to you?"
-                className="w-[44%] max-w-[200px] rotate-3"
+                className="w-[40%] max-w-[160px] rotate-3"
               />
             </div>
             <p className="text-lg leading-relaxed text-[hsl(20,10%,35%)] md:w-1/2">
