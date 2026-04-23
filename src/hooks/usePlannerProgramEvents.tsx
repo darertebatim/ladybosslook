@@ -5,10 +5,10 @@ import { format, isSameDay, isWithinInterval, startOfDay, endOfDay } from 'date-
 
 export interface ProgramEvent {
   id: string;
-  type: 'session' | 'module' | 'track' | 'enrollment' | 'round_update';
+  type: 'session' | 'module' | 'track' | 'enrollment' | 'round_update' | 'playlist_save' | 'playlist_update';
   title: string;
-  programSlug: string;
-  programTitle: string;
+  programSlug?: string;
+  programTitle?: string;
   roundId?: string; // For navigating to reminder settings
   time?: string; // For sessions OR module release time
   isCompleted: boolean;
@@ -19,6 +19,10 @@ export interface ProgramEvent {
   trackId?: string;
   playlistId?: string;
   sessionNumber?: number;
+  // Playlist-event-specific
+  audioId?: string;
+  audioTitle?: string;
+  coverImageUrl?: string;
 }
 
 interface PlannerProgramCompletion {
@@ -188,8 +192,42 @@ export function useProgramEventsForDate(date: Date) {
         });
       }
 
+      // Process playlist save events (one-time card on day user activated playlist)
+      for (const ps of (data.playlist_saves || [])) {
+        events.push({
+          id: ps.id,
+          type: 'playlist_save',
+          title: ps.title,
+          isCompleted: ps.isCompleted || false,
+          playlistId: ps.playlistId,
+          coverImageUrl: ps.coverImageUrl,
+        });
+      }
+
+      // Process playlist update events (new audio added to a playlist user has access to)
+      for (const pu of (data.playlist_updates || [])) {
+        events.push({
+          id: pu.id,
+          type: 'playlist_update',
+          title: pu.title,
+          isCompleted: false,
+          playlistId: pu.playlistId,
+          audioId: pu.audioId,
+          audioTitle: pu.audioTitle,
+          coverImageUrl: pu.coverImageUrl,
+        });
+      }
+
       // Sort: enrollments first, then sessions, then by time
-      const typePriority: Record<string, number> = { enrollment: 0, round_update: 0.5, session: 1, module: 2, track: 3 };
+      const typePriority: Record<string, number> = {
+        enrollment: 0,
+        round_update: 0.5,
+        playlist_save: 0.6,
+        playlist_update: 0.7,
+        session: 1,
+        module: 2,
+        track: 3,
+      };
       events.sort((a, b) => {
         const pa = typePriority[a.type] ?? 9;
         const pb = typePriority[b.type] ?? 9;
