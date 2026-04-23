@@ -85,31 +85,37 @@ export function ActiveRoundsCarousel({
         </Link>
       </button>
 
-      {/* Carousel - collapsible */}
+      {/* Horizontal scroll - collapsible */}
       <div className={`overflow-hidden transition-all duration-200 ease-out ${isCollapsed ? 'max-h-0 opacity-0' : 'max-h-[140px] opacity-100'}`}>
-        <Carousel opts={{
-        align: 'start',
-        loop: false
-      }} className="w-full">
-          <CarouselContent className="-ml-3 py-2">
-            {activeRounds.map((enrollment, index) => {
+        <div
+          className="flex gap-3 overflow-x-auto scrollbar-hide py-2 px-1 -mx-1"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
+          {activeRounds.map((enrollment, index) => {
             const roundId = enrollment.program_rounds?.id;
             const isEnrollmentUnseen = unseenEnrollments.has(enrollment.id);
             const isRoundUnseen = roundId ? unseenRounds.has(roundId) : false;
             const hasNotification = isEnrollmentUnseen || isRoundUnseen;
-            return <CarouselItem key={enrollment.id} className="pl-3 basis-auto">
-                  <CompactRoundCard enrollment={enrollment} colorIndex={index} nextSessionDate={roundId ? (nextSessionMap instanceof Map ? nextSessionMap.get(roundId) : nextSessionMap[roundId]) ?? null : null} isUnseen={hasNotification} onView={() => {
-                if (isEnrollmentUnseen && markEnrollmentViewed) {
-                  markEnrollmentViewed(enrollment.id);
-                }
-                if (isRoundUnseen && roundId && markRoundViewed) {
-                  markRoundViewed(roundId);
-                }
-              }} />
-                </CarouselItem>;
+            return (
+              <div key={enrollment.id} className="shrink-0">
+                <CompactRoundCard
+                  enrollment={enrollment}
+                  colorIndex={index}
+                  nextSessionDate={roundId ? (nextSessionMap instanceof Map ? nextSessionMap.get(roundId) : nextSessionMap[roundId]) ?? null : null}
+                  isUnseen={hasNotification}
+                  onView={() => {
+                    if (isEnrollmentUnseen && markEnrollmentViewed) {
+                      markEnrollmentViewed(enrollment.id);
+                    }
+                    if (isRoundUnseen && roundId && markRoundViewed) {
+                      markRoundViewed(roundId);
+                    }
+                  }}
+                />
+              </div>
+            );
           })}
-          </CarouselContent>
-        </Carousel>
+        </div>
       </div>
     </div>;
 }
