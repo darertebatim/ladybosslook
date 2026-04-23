@@ -142,6 +142,19 @@ export function InstructorWelcomeSheet() {
                 </div>
               </div>
             )}
+            {instructor.default_playlist_ids?.length > 0 && (
+              <div className="flex items-start gap-3">
+                <span className="text-xl">🎧</span>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">
+                    {instructor.default_playlist_ids.length} playlist{instructor.default_playlist_ids.length > 1 ? 's' : ''} unlocked
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Available now in your audio library.
+                  </p>
+                </div>
+              </div>
+            )}
             {instructor.plus_trial_days > 0 && (
               <div className="flex items-start gap-3">
                 <span className="text-xl">✨</span>
