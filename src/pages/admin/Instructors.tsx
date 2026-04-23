@@ -9,8 +9,14 @@ import { Switch } from '@/components/ui/switch';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Copy, Pencil, Trash2, Link2 } from 'lucide-react';
+import { Plus, Copy, Pencil, Trash2, Search, X, GraduationCap, ListMusic, Sparkles, Gift } from 'lucide-react';
 import { buildInstructorOneLink } from '@/lib/appsflyer';
+import { ImageUploader } from '@/components/admin/ImageUploader';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 
 interface Instructor {
   id: string;
@@ -20,14 +26,10 @@ interface Instructor {
   bio: string | null;
   default_program_slug: string | null;
   default_routine_ids: string[];
+  default_playlist_ids: string[];
   plus_trial_days: number;
   is_active: boolean;
   created_at: string;
-}
-
-interface ReferralStat {
-  instructor_id: string;
-  count: number;
 }
 
 const emptyForm = {
@@ -36,7 +38,8 @@ const emptyForm = {
   photo_url: '',
   bio: '',
   default_program_slug: '',
-  default_routine_ids: '', // comma-separated UUIDs
+  default_routine_ids: [] as string[],
+  default_playlist_ids: [] as string[],
   plus_trial_days: 7,
   is_active: true,
 };
