@@ -7,6 +7,8 @@ import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider'
 interface BackButtonProps {
   /** Fallback navigation path if no history state. If not provided, uses browser history */
   to?: string;
+  /** Replace current history entry instead of pushing a new one */
+  replace?: boolean;
   /** Text to show next to the icon (default: "Back") */
   label?: string;
   /** Whether to show the label (default: true) */
@@ -24,6 +26,7 @@ interface BackButtonProps {
  */
 export function BackButton({ 
   to, 
+  replace = false,
   label = 'Back',
   showLabel = true,
   onClick, 
@@ -51,9 +54,9 @@ export function BackButton({
     }
     
     if (from) {
-      navigate(from);
+      navigate(from, { replace });
     } else if (to) {
-      navigate(to);
+      navigate(to, { replace });
     } else {
       navigate(-1);
     }
