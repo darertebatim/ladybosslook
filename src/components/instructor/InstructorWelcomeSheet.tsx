@@ -13,6 +13,7 @@ interface InstructorData {
   bio: string | null;
   default_program_slug: string | null;
   default_routine_ids: string[];
+  default_playlist_ids: string[];
   plus_trial_days: number;
 }
 
@@ -45,7 +46,7 @@ export function InstructorWelcomeSheet() {
 
         const { data: ins } = await supabase
           .from('instructors')
-          .select('id, slug, display_name, photo_url, bio, default_program_slug, default_routine_ids, plus_trial_days')
+          .select('id, slug, display_name, photo_url, bio, default_program_slug, default_routine_ids, default_playlist_ids, plus_trial_days')
           .eq('id', referral.instructor_id)
           .maybeSingle();
 
@@ -55,7 +56,8 @@ export function InstructorWelcomeSheet() {
         setReferralId(referral.id);
         const count =
           (insData.default_program_slug ? 1 : 0) +
-          (insData.default_routine_ids?.length || 0);
+          (insData.default_routine_ids?.length || 0) +
+          (insData.default_playlist_ids?.length || 0);
         setUnlockedCount(count);
         setOpen(true);
       } catch (err) {
