@@ -68,9 +68,8 @@ function clearPendingSlug() {
 export async function applyInstructorSetup(
   userId: string,
   instructor: PendingInstructor,
-): Promise<{ ok: boolean; granted: { program: boolean; routines: number; trial: boolean } }> {
-  const granted = { program: false, routines: 0, playlists: 0, trial: false } as
-    { program: boolean; routines: number; playlists: number; trial: boolean };
+): Promise<{ ok: boolean; granted: { program: boolean; routines: number; playlists: number; trial: boolean } }> {
+  const granted = { program: false, routines: 0, playlists: 0, trial: false };
 
   try {
     // 1. Create referral record (unique constraint prevents duplicate per instructor)
