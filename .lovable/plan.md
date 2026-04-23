@@ -1,30 +1,64 @@
+## Post-Reflection Celebration Sheet
 
+Replace the green "Reflection saved/completed ✨" toast with a 4-card bottom sheet suggesting next steps — mirroring the post mood check-in UX.
 
-## Remove Gold Streak Recovery
+### What the user will see
 
-Keep daily streak recovery as-is, but stop offering the recovery shield for broken **gold** streaks. When a user breaks their gold streak, no prompt appears — the gold streak simply resets.
+After saving any reflection (free-form OR structured), a sheet slides up from the bottom with:
 
-### Changes
+- **Header**
+  - Notebook emoji (📓) in a soft circle
+  - Small line: *"Nice work — you reflected today."*
+  - Bold title: *"Keep the momentum going"*
+- **2×2 cards** (white cards on a soft pastel background, illustrated)
+  1. **Academy** → /app/academy 
+  2. **Listen** → `/app/player`
+  3. **Focus Timer** → `/app/timer`
+  4. **My Presence** → `/app/presence`
+- **Bottom button** — solid white pill with black text: **"Back to Home Planner"** (or **"Continue Routine ▶"** if a routine player is active)
 
-**1. `src/pages/app/AppHome.tsx`**
-- Remove the `useEffect` block (around lines 365–393) that detects a broken gold streak and triggers `setShowGoldRecoveryPrompt(true)`.
-- Remove the `showGoldRecoveryPrompt` / `setShowGoldRecoveryPrompt` state (line 164).
-- Remove the related props passed into `<HomeCelebrations />` (`showGoldRecoveryPrompt`, `setShowGoldRecoveryPrompt`, `previousGoldStreak`).
-- Keep `showRecoverySuccess` only for the `'streak'` case — narrow its type to `'streak' | null`.
+Tapping any card haptic-taps and navigates. Dismissing the sheet returns to the routine player if active, otherwise goes back to `/app/reflections`.
 
-**2. `src/components/app/HomeCelebrations.tsx`**
-- Remove the import and rendered `<GoldStreakLostBanner />` block (around lines 23, 355–375).
-- Remove the corresponding props from the `HomeCelebrationsProps` interface (`showGoldRecoveryPrompt`, `setShowGoldRecoveryPrompt`, `previousGoldStreak`) and from the destructure.
-- Simplify `<RecoverySuccessBanner />` so it always renders the day-streak variant (drop the `=== 'gold'` branches).
+### Technical changes
 
-**3. `src/components/app/GoldStreakLostBanner.tsx`**
-- Delete the file (no longer used in production).
+**1. New component: `src/components/reflection/ReflectionCelebrationSheet.tsx**`
 
-**4. `src/pages/admin/AppTest.tsx`** (admin preview page)
-- Remove the `GoldStreakLostBanner` import, the two `<GoldStreakLostBanner />` preview blocks, the related state (`showGoldStreakLostBanner`, `showGoldLostNoShields`), and their trigger buttons. This keeps the admin test page consistent so it doesn't reference a deleted component.
+- Modeled directly on `MoodCelebrationSheet.tsx`.
+- Props: `open`, `onOpenChange`, `onDone`.
+- Uses `Sheet` primitive (`side="bottom"`, rounded top, soft pastel background to differentiate from mood sheet).
+- Card → route mapping:
+  - Academy → `/app/courses`
+  - Listen → `/app/player`
+  - Focus Timer → `/app/timer`
+  - Presence → `/app/presence`
+- Integrates with `useRoutinePlayerContext` exactly like `MoodCelebrationSheet` so an active routine player resumes correctly when sheet is dismissed.
+- Wrapped in `OverlayPortal` so it escapes scroll containers.
+
+**2. `src/pages/app/AppFreeFormReflection.tsx**`
+
+- Remove `toast.success('Reflection saved ✨')` and the immediate `navigate/goBack` from `onSuccess`.
+- Add local state `const [showCelebration, setShowCelebration] = useState(false)`.
+- On success: still invalidate queries + `autoCompleteJournal()`, then `setShowCelebration(true)`.
+- Render `<ReflectionCelebrationSheet>` at the bottom of the JSX. Its `onDone` triggers existing routine-player-aware navigation (`/app/home` + maximize, or `goBack()`).
+
+**3. `src/pages/app/AppReflectionFlow.tsx**`
+
+- Same change applied to BOTH completion branches (`handleSaveSinglePage` and the `isLast` branch in `handleNext`):
+  - Remove the toast.
+  - Trigger `setShowCelebration(true)` after `autoCompleteReflection`.
+- Render the same `<ReflectionCelebrationSheet>` once at the page root.
+
+**4. Asset generation**
+
+- Generate 4 small flat-illustration cards (~512×512 PNG) consistent with existing `mood-card-*.png` style:
+  - `reflection-card-academy.png` (graduation cap / open book with bookmark)
+  - `reflection-card-listen.png` (headphones / sound waves)
+  - `reflection-card-timer.png` (stopwatch)
+  - `reflection-card-presence.png` (calendar with check / streak)
 
 ### What stays unchanged
-- `StreakRecoveryPrompt` (daily streak shield) and `useRecoverStreak` hook remain fully functional.
-- Gold streak tracking, gold celebrations (`GoldStreakCelebration`), and gold badges continue working — only the *recovery offer* for gold is removed.
-- Shield quota (1 free / 3 Plus) is still consumed only by daily-streak recovery.
 
+- `useReflections` admin toasts ("Reflection created/updated/deleted") — admin CRUD, untouched.
+- Auto-completion of pro-tasks (`autoCompleteJournal`, `autoCompleteReflection`) still runs before the sheet appears.
+- Routine-player resume logic preserved end-to-end.
+- `MoodCelebrationSheet` is untouched.
