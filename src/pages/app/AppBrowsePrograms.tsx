@@ -5,7 +5,6 @@ import { usePrograms } from '@/hooks/usePrograms';
 import { useEnrollments } from '@/hooks/useAppData';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
 import { SEOHead } from '@/components/SEOHead';
 import { Input } from '@/components/ui/input';
 import { WatchCategoryPill } from '@/components/video/WatchCategoryPill';
@@ -145,27 +144,6 @@ const AppBrowsePrograms = () => {
   const location = useLocation();
   const { programs, isLoading } = usePrograms();
   const { data: enrollments = [] } = useEnrollments();
-  const { user } = useAuth();
-
-  // Slugs of programs the user has an ACTIVE round enrollment for
-  const { data: activeRoundSlugs = [] } = useQuery({
-    queryKey: ['active-round-slugs', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return [] as string[];
-      const { data, error } = await supabase
-        .from('course_enrollments')
-        .select('program_slug')
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .not('round_id', 'is', null) as any;
-      if (error) throw error;
-      return ((data || []) as { program_slug: string | null }[])
-        .map(e => e.program_slug)
-        .filter(Boolean) as string[];
-    },
-    enabled: !!user?.id,
-  });
-  const activeRoundSet = useMemo(() => new Set(activeRoundSlugs), [activeRoundSlugs]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [selectedType, setSelectedType] = useState('all');
@@ -284,14 +262,8 @@ const AppBrowsePrograms = () => {
   }, [allPrograms, searchQuery, selectedType, preferredLanguage, userLang]);
 
   const enrolledPrograms = useMemo(() => {
-    const list = filtered.filter((p: any) => isEnrolled(p.slug));
-    // Surface programs with an active round first
-    return [...list].sort((a: any, b: any) => {
-      const aActive = activeRoundSet.has(a.slug) ? 1 : 0;
-      const bActive = activeRoundSet.has(b.slug) ? 1 : 0;
-      return bActive - aActive;
-    });
-  }, [filtered, enrollments, activeRoundSet]);
+    return filtered.filter((p: any) => isEnrolled(p.slug));
+  }, [filtered, enrollments]);
 
   const notEnrolledPrograms = useMemo(() => {
     return filtered.filter((p: any) => !isEnrolled(p.slug));
