@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { addRoutineToUserPlanner } from '@/hooks/useRoutinesBank';
 import {
@@ -270,21 +271,25 @@ export async function applyInstructorSetup(
  * Different instructors stack — the unique constraint is per (user_id, instructor_id).
  */
 export function useInstructorOnboarding(userId: string | undefined) {
-  const ran = useRef(false);
+  const queryClient = useQueryClient();
+  const attempts = useRef(0);
   const [pendingInvite, setPendingInvite] = useState<PendingInstructor | null>(null);
 
   useEffect(() => {
-    if (!userId || ran.current) return;
-    ran.current = true;
+    if (!userId) return;
+    attempts.current = 0;
+    let cancelled = false;
+    let timer: number | null = null;
 
-    const run = async () => {
+    const run = async (): Promise<boolean> => {
+      attempts.current += 1;
       let pending = readPendingSlug();
       let autoApply = false;
 
       // Fallback: admin assigned an instructor on the profile directly
       if (!pending) {
         const serverSlug = await readServerAssignedInstructorSlug(userId);
-        if (!serverSlug) return;
+        if (!serverSlug) return attempts.current >= 5;
         pending = { slug: serverSlug, source: 'url', raw: { source: 'admin_assignment' } };
         autoApply = true; // skip the invite modal — admin already decided
       }
@@ -301,7 +306,7 @@ export function useInstructorOnboarding(userId: string | undefined) {
         if (lookupErr || !instructor) {
           console.warn('[InstructorOnboarding] Instructor not found:', pending.slug);
           clearPendingSlug();
-          return;
+          return true;
         }
 
         // Already applied by this specific instructor? bail (stacking allowed for others).
@@ -314,7 +319,7 @@ export function useInstructorOnboarding(userId: string | undefined) {
 
         if (existing) {
           clearPendingSlug();
-          return;
+          return true;
         }
 
         const ins = instructor as any;
@@ -338,19 +343,42 @@ export function useInstructorOnboarding(userId: string | undefined) {
           const result = await applyInstructorSetup(userId, invite);
           if (result.ok) {
             console.log('[InstructorOnboarding] Auto-applied admin-assigned instructor', invite.slug, result.granted);
+            clearPendingSlug();
+            queryClient.invalidateQueries({ queryKey: ['user-subscriptions'] });
+            queryClient.invalidateQueries({ queryKey: ['user-enrollment-slugs'] });
+            queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
+            queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+            queryClient.invalidateQueries({ queryKey: ['user-routines-bank'] });
+            queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
+            queryClient.invalidateQueries({ queryKey: ['home-data', userId] });
+            return true;
           }
+          return attempts.current >= 5;
         } else {
           setPendingInvite(invite);
+          return true;
         }
       } catch (err) {
         console.warn('[InstructorOnboarding] Detect error:', err);
+        return attempts.current >= 5;
       }
     };
 
-    // Defer slightly so the profile row from handle_new_user trigger exists.
-    const timer = setTimeout(run, 1500);
-    return () => clearTimeout(timer);
-  }, [userId]);
+    const schedule = (delay: number) => {
+      timer = window.setTimeout(async () => {
+        if (cancelled) return;
+        const done = await run();
+        if (!done && !cancelled) schedule(2500);
+      }, delay);
+    };
+
+    // Defer slightly so auth/profile state settles, then retry a few times.
+    schedule(1500);
+    return () => {
+      cancelled = true;
+      if (timer != null) window.clearTimeout(timer);
+    };
+  }, [userId, queryClient]);
 
   const accept = useCallback(async () => {
     if (!userId || !pendingInvite) return;
