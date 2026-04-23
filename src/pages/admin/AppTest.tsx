@@ -1272,6 +1272,80 @@ export default function AppTest() {
 
       {/* Language Preference Popup */}
       <LanguagePreferencePopup open={showLanguagePopup} onClose={() => setShowLanguagePopup(false)} />
+
+      {/* Instructor Referral Previews */}
+      {(() => {
+        const scenarios = {
+          full: {
+            displayName: 'Sarah Johnson',
+            photoUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
+            bio: 'Certified wellness coach helping women build sustainable self-care habits.',
+            defaultProgramSlug: 'mindful-mornings',
+            defaultRoutineIdsCount: 3,
+            defaultPlaylistIdsCount: 2,
+            plusTrialDays: 14,
+          },
+          minimal: {
+            displayName: 'Emma Williams',
+            photoUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop',
+            bio: null,
+            defaultProgramSlug: null,
+            defaultRoutineIdsCount: 0,
+            defaultPlaylistIdsCount: 0,
+            plusTrialDays: 7,
+          },
+          noPhoto: {
+            displayName: 'Coach Mary',
+            photoUrl: null,
+            bio: 'Your accountability partner.',
+            defaultProgramSlug: 'reset-90',
+            defaultRoutineIdsCount: 1,
+            defaultPlaylistIdsCount: 0,
+            plusTrialDays: 0,
+          },
+        } as const;
+        const s = scenarios[instructorPerksScenario];
+        return (
+          <>
+            <Dialog open={showInstructorInvite} onOpenChange={setShowInstructorInvite}>
+              <DialogContent className="rounded-3xl border-0 p-0 max-w-sm overflow-hidden">
+                <InstructorInviteContent
+                  displayName={s.displayName}
+                  photoUrl={s.photoUrl}
+                  defaultProgramSlug={s.defaultProgramSlug}
+                  defaultRoutineIdsCount={s.defaultRoutineIdsCount}
+                  defaultPlaylistIdsCount={s.defaultPlaylistIdsCount}
+                  plusTrialDays={s.plusTrialDays}
+                  onAccept={() => {
+                    setShowInstructorInvite(false);
+                    toast.success(`Welcome from ${s.displayName}! 🎉`);
+                    setTimeout(() => setShowInstructorWelcome(true), 400);
+                  }}
+                  onDecline={() => setShowInstructorInvite(false)}
+                />
+              </DialogContent>
+            </Dialog>
+
+            <Sheet open={showInstructorWelcome} onOpenChange={setShowInstructorWelcome}>
+              <SheetContent
+                side="bottom"
+                className="rounded-t-3xl border-t-0 px-6 pt-8 pb-10 max-h-[88vh]"
+              >
+                <InstructorWelcomeContent
+                  displayName={s.displayName}
+                  photoUrl={s.photoUrl}
+                  bio={s.bio}
+                  defaultProgramSlug={s.defaultProgramSlug}
+                  defaultRoutineIdsCount={s.defaultRoutineIdsCount}
+                  defaultPlaylistIdsCount={s.defaultPlaylistIdsCount}
+                  plusTrialDays={s.plusTrialDays}
+                  onDismiss={() => setShowInstructorWelcome(false)}
+                />
+              </SheetContent>
+            </Sheet>
+          </>
+        );
+      })()}
     </div>
   );
 }
