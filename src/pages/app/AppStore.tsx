@@ -45,6 +45,10 @@ const AppStore = () => {
   const { data: enrollments = [] } = useEnrollments();
   const invalidateAllEnrollmentData = useInvalidateAllEnrollmentData();
 
+  // Active rounds data for "My Programs" carousel (mirrors Home page logic)
+  const homeDataQuery = useNewHomeData();
+  const { activeRounds = [], nextSessionMap = {} } = homeDataQuery as any;
+
   const isEnrolled = (slug: string) => {
     return enrollments.includes(slug);
   };
