@@ -376,6 +376,16 @@ export default function Instructors() {
                 onChange={(ids) => setForm({ ...form, default_playlist_ids: ids })}
               />
 
+              {/* Chat channels */}
+              <MultiPicker
+                icon={<MessageCircle className="h-4 w-4" />}
+                label="Auto-join chat channels"
+                placeholder="Search channels…"
+                items={channels.map((c) => ({ id: c.id, label: c.name, image: c.cover_image_url }))}
+                selected={form.default_channel_ids}
+                onChange={(ids) => setForm({ ...form, default_channel_ids: ids })}
+              />
+
               {/* Trial */}
               <div className="rounded-lg border p-3 bg-amber-50/50 dark:bg-amber-950/10">
                 <Label className="flex items-center justify-between">
