@@ -284,8 +284,14 @@ const AppBrowsePrograms = () => {
   }, [allPrograms, searchQuery, selectedType, preferredLanguage, userLang]);
 
   const enrolledPrograms = useMemo(() => {
-    return filtered.filter((p: any) => isEnrolled(p.slug));
-  }, [filtered, enrollments]);
+    const list = filtered.filter((p: any) => isEnrolled(p.slug));
+    // Surface programs with an active round first
+    return [...list].sort((a: any, b: any) => {
+      const aActive = activeRoundSet.has(a.slug) ? 1 : 0;
+      const bActive = activeRoundSet.has(b.slug) ? 1 : 0;
+      return bActive - aActive;
+    });
+  }, [filtered, enrollments, activeRoundSet]);
 
   const notEnrolledPrograms = useMemo(() => {
     return filtered.filter((p: any) => !isEnrolled(p.slug));
