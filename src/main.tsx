@@ -6,6 +6,7 @@ import { Capacitor } from '@capacitor/core';
 import { initializePushNotificationHandlers, clearBadge } from './lib/pushNotifications';
 import { logBuildInfo } from './lib/buildInfo';
 import { initAppsFlyer, logAppsFlyerEvent } from './lib/appsflyer';
+import { captureInstructorFromUrl } from './hooks/useInstructorOnboarding';
 
 // Global error handler to catch any uncaught errors
 window.onerror = (message, source, lineno, colno, error) => {
@@ -14,6 +15,9 @@ window.onerror = (message, source, lineno, colno, error) => {
 
 // Log build info immediately on app start
 logBuildInfo();
+
+// Capture ?instructor=slug from the URL before anything else (web fallback for AppsFlyer)
+try { captureInstructorFromUrl(); } catch { /* ignore */ }
 
 /**
  * Hardened native initialization - uses dynamic imports and availability checks

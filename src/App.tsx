@@ -125,6 +125,7 @@ const Documents = lazy(() => import("@/pages/admin/Documents"));
 const ReadingManager = lazy(() => import("@/pages/admin/ReadingManager"));
 const QuizzesAdmin = lazy(() => import("@/pages/admin/Quizzes"));
 const AnalyticsAdmin = lazy(() => import("@/pages/admin/Analytics"));
+const InstructorsAdmin = lazy(() => import("@/pages/admin/Instructors"));
 const AppRead = lazy(() => import("@/pages/app/AppRead"));
 const AppReadDetail = lazy(() => import("@/pages/app/AppReadDetail"));
 const AppReadReader = lazy(() => import("@/pages/app/AppReadReader"));
@@ -414,6 +415,7 @@ const App = () => (
                       <Route index element={<ProtectedRoute requiredPage="overview"><Overview /></ProtectedRoute>} />
                       <Route path="users" element={<ProtectedRoute requiredPage="users"><Users /></ProtectedRoute>} />
                       <Route path="enrollment" element={<ProtectedRoute requiredPage="enrollment"><Enrollment /></ProtectedRoute>} />
+                      <Route path="instructors" element={<ProtectedRoute requiredPage="users"><InstructorsAdmin /></ProtectedRoute>} />
                       <Route path="audio" element={<ProtectedRoute requiredPage="audio"><Audio /></ProtectedRoute>} />
                       <Route path="video" element={<ProtectedRoute requiredPage="audio"><VideoAdmin /></ProtectedRoute>} />
                       <Route path="channels" element={<ProtectedRoute requiredPage="community"><Community /></ProtectedRoute>} />
