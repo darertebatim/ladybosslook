@@ -338,7 +338,7 @@ export function useUserAddedBankRoutines() {
       const { data, error } = await supabase
         .from('user_routines_bank')
         .select('routine_id, completed_at')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .eq('is_active', true);
 
       if (error) throw error;
@@ -361,7 +361,7 @@ export function useCompletedRoutines() {
       const { data, error } = await supabase
         .from('user_routines_bank')
         .select('routine_id')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .not('completed_at', 'is', null);
 
       if (error) throw error;
@@ -398,7 +398,7 @@ export function useAddRoutineFromBank() {
       }[];
     }) => {
       if (!user) throw new Error('Must be logged in');
-      return addRoutineToUserPlanner(user.id, routineId, { selectedTaskIds, editedTasks });
+      return addRoutineToUserPlanner(userId, routineId, { selectedTaskIds, editedTasks });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
@@ -513,7 +513,7 @@ export async function addRoutineToUserPlanner(
       const { data: existingTasks } = await supabase
         .from('user_tasks')
         .select('order_index')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('order_index', { ascending: false })
         .limit(1);
 
@@ -620,7 +620,7 @@ export async function addRoutineToUserPlanner(
           }
 
           return {
-            user_id: user.id,
+            user_id: userId,
             title: edited?.title || task.title,
             emoji: edited?.icon || task.emoji || routine.emoji || '✨',
             color: edited?.color || bankTask?.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
@@ -665,7 +665,7 @@ export async function addRoutineToUserPlanner(
         const { error: proError } = await supabase
           .from('user_tasks')
           .insert({
-            user_id: user.id,
+            user_id: userId,
             title: proTaskEdited?.title || routine.title,
             emoji: proTaskEdited?.icon || '🎬',
             color: proTaskEdited?.color || 'mint',
@@ -690,7 +690,7 @@ export async function addRoutineToUserPlanner(
         const { data: existingEnrollment } = await supabase
           .from('course_enrollments')
           .select('id')
-          .eq('user_id', user.id)
+          .eq('user_id', userId)
           .eq('program_slug', programSlug)
           .eq('status', 'active')
           .maybeSingle();
@@ -729,7 +729,7 @@ export async function addRoutineToUserPlanner(
           const { error: enrollError } = await supabase
             .from('course_enrollments')
             .insert({
-              user_id: user.id,
+              user_id: userId,
               program_slug: programSlug,
               course_name: programInfo?.title || programSlug,
               round_id: roundId,
@@ -746,7 +746,7 @@ export async function addRoutineToUserPlanner(
       const { error: trackError } = await supabase
         .from('user_routines_bank')
         .upsert({
-          user_id: user.id,
+          user_id: userId,
           routine_id: routineId,
           is_active: true,
           title: routine.title,
