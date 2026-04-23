@@ -88,6 +88,27 @@ export function useChannels() {
         .order('sort_order', { ascending: true });
       
       if (error) throw error;
+      let channels = (data as (FeedChannel & { target_instructor_ids?: string[] | null })[]) || [];
+
+      // Instructor-scoped channels: only visible to users referred by listed instructors.
+      if (user?.id) {
+        const restricted = channels.filter(c => Array.isArray(c.target_instructor_ids) && c.target_instructor_ids.length > 0);
+        if (restricted.length > 0) {
+          const { data: refs } = await supabase
+            .from('instructor_referrals')
+            .select('instructor_id')
+            .eq('user_id', user.id);
+          const userInstructorIds = new Set((refs || []).map((r: any) => r.instructor_id));
+          channels = channels.filter(c => {
+            const ids = c.target_instructor_ids || [];
+            if (ids.length === 0) return true;
+            return ids.some(id => userInstructorIds.has(id));
+          });
+        }
+      } else {
+        // Logged-out users never see instructor-scoped channels
+        channels = channels.filter(c => !c.target_instructor_ids || c.target_instructor_ids.length === 0);
+      }
 
       // Filter out channels the user is excluded from
       if (user?.id) {
@@ -98,11 +119,11 @@ export function useChannels() {
 
         if (exclusions && exclusions.length > 0) {
           const excludedIds = new Set(exclusions.map(e => e.channel_id));
-          return (data as FeedChannel[]).filter(ch => !excludedIds.has(ch.id));
+          return channels.filter(ch => !excludedIds.has(ch.id)) as FeedChannel[];
         }
       }
 
-      return data as FeedChannel[];
+      return channels as FeedChannel[];
     },
   });
 }
