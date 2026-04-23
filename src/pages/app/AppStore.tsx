@@ -49,6 +49,15 @@ const AppStore = () => {
   const homeDataQuery = useNewHomeData();
   const { activeRounds = [], nextSessionMap = {} } = homeDataQuery as any;
 
+  // Map program slug → cover image for active rounds
+  const programImageMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    programs.forEach(p => {
+      if (p.slug && p.image) map[p.slug] = p.image;
+    });
+    return map;
+  }, [programs]);
+
   const isEnrolled = (slug: string) => {
     return enrollments.includes(slug);
   };
