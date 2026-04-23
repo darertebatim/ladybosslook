@@ -72,6 +72,7 @@ export function FeedChannelManager() {
   const [targetTimezones, setTargetTimezones] = useState<string[]>([]);
   const [includeUpdateStatus, setIncludeUpdateStatus] = useState<string[]>([]);
   const [targetInstructorIds, setTargetInstructorIds] = useState<string[]>([]);
+  const [audiencePresetId, setAudiencePresetId] = useState<string | null>(null);
 
   const { data: channels, isLoading } = useQuery({
     queryKey: ['admin-feed-channels'],
@@ -115,6 +116,7 @@ export function FeedChannelManager() {
         target_timezones: targetTimezones,
         include_update_status: includeUpdateStatus,
         target_instructor_ids: targetInstructorIds,
+        audience_preset_id: audiencePresetId,
       });
       if (error) throw error;
     },
@@ -187,6 +189,7 @@ export function FeedChannelManager() {
     setTargetTimezones([]);
     setIncludeUpdateStatus([]);
     setTargetInstructorIds([]);
+    setAudiencePresetId(null);
   };
 
   const openEditDialog = (channel: Channel) => {
@@ -228,6 +231,7 @@ export function FeedChannelManager() {
     setTargetTimezones(channel.target_timezones || []);
     setIncludeUpdateStatus(channel.include_update_status || []);
     setTargetInstructorIds(channel.target_instructor_ids || []);
+    setAudiencePresetId((channel as any).audience_preset_id || null);
     setIsDialogOpen(true);
   };
 
@@ -252,6 +256,7 @@ export function FeedChannelManager() {
       target_timezones: targetTimezones,
       include_update_status: includeUpdateStatus,
       target_instructor_ids: targetInstructorIds,
+      audience_preset_id: audiencePresetId,
     };
 
     if (editingChannel) {
@@ -407,6 +412,8 @@ export function FeedChannelManager() {
                 setIncludeUpdateStatus={setIncludeUpdateStatus}
                 targetInstructorIds={targetInstructorIds}
                 setTargetInstructorIds={setTargetInstructorIds}
+                presetId={audiencePresetId}
+                setPresetId={setAudiencePresetId}
               />
 
               <Button

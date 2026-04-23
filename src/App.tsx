@@ -121,6 +121,7 @@ const BrandDesign = lazy(() => import("@/pages/admin/BrandDesign"));
 const BrandMock = lazy(() => import("@/pages/admin/BrandMock"));
 const Onboarding = lazy(() => import("@/pages/admin/Onboarding"));
 const Banners = lazy(() => import("@/pages/admin/Banners"));
+const AudienceLibrary = lazy(() => import("@/pages/admin/AudienceLibrary"));
 const Documents = lazy(() => import("@/pages/admin/Documents"));
 const ReadingManager = lazy(() => import("@/pages/admin/ReadingManager"));
 const QuizzesAdmin = lazy(() => import("@/pages/admin/Quizzes"));
@@ -436,6 +437,7 @@ const App = () => (
                       <Route path="onboarding" element={<ProtectedRoute requiredPage="tools"><Onboarding /></ProtectedRoute>} />
                       
                       <Route path="banners" element={<ProtectedRoute requiredPage="communications"><Banners /></ProtectedRoute>} />
+                      <Route path="audiences" element={<ProtectedRoute requiredPage="communications"><AudienceLibrary /></ProtectedRoute>} />
                       <Route path="app" element={<ProtectedRoute requiredPage="system"><AppTest /></ProtectedRoute>} />
                       <Route path="documents" element={<ProtectedRoute requiredPage="system"><Documents /></ProtectedRoute>} />
                       <Route path="read" element={<ProtectedRoute requiredPage="tools"><ReadingManager /></ProtectedRoute>} />
