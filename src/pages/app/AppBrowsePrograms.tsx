@@ -5,6 +5,7 @@ import { usePrograms } from '@/hooks/usePrograms';
 import { useEnrollments } from '@/hooks/useAppData';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { SEOHead } from '@/components/SEOHead';
 import { Input } from '@/components/ui/input';
 import { WatchCategoryPill } from '@/components/video/WatchCategoryPill';
