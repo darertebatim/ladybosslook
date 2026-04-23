@@ -1,20 +1,19 @@
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, Sparkles, GraduationCap } from 'lucide-react';
+import { Sparkles, GraduationCap } from 'lucide-react';
 import { format, isToday } from 'date-fns';
 import { Link } from 'react-router-dom';
-import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
 import { CachedImage } from '@/components/ui/CachedImage';
 import { cn } from '@/lib/utils';
 
-// Task palette cycle for program cards
-const PROGRAM_CARD_COLOR_CYCLE: TaskColor[] = [
-  'lavender',
-  'sky',
-  'mint',
-  'peach',
-  'pink',
-  'lime',
-  'yellow',
+// Mirrors FeaturedRoutineCard `colorBackgrounds` palette
+const PROGRAM_CARD_BACKGROUNDS: string[] = [
+  'bg-purple-50 border-purple-200/60',
+  'bg-sky-50 border-sky-200/60',
+  'bg-teal-50 border-teal-200/60',
+  'bg-orange-50 border-orange-200/60',
+  'bg-pink-50 border-pink-200/60',
+  'bg-lime-50 border-lime-200/60',
+  'bg-amber-50 border-amber-200/60',
 ];
 
 interface CompactRoundCardProps {
@@ -42,13 +41,7 @@ export function CompactRoundCard({
   const displayDate = nextSessionDate || round.first_session_date;
   const isSessionToday = displayDate && isToday(new Date(displayDate));
 
-  const paletteColor = PROGRAM_CARD_COLOR_CYCLE[colorIndex % PROGRAM_CARD_COLOR_CYCLE.length];
-  const paletteClass = TASK_COLOR_CLASSES[paletteColor];
-
-  // Get first sentence of important_message
-  const importantNote = round.important_message
-    ? round.important_message.split(/[.!?]/)[0]?.trim()
-    : null;
+  const paletteClass = PROGRAM_CARD_BACKGROUNDS[colorIndex % PROGRAM_CARD_BACKGROUNDS.length];
 
   // Get video thumbnail
   let thumbnailUrl = programImage || '';
@@ -72,7 +65,7 @@ export function CompactRoundCard({
       className="block"
     >
       <div className={cn(
-        "relative w-[280px] rounded-2xl overflow-hidden shadow-sm transition-transform active:scale-[0.98] border border-border/60",
+        "relative w-[280px] rounded-2xl overflow-hidden shadow-sm transition-transform active:scale-[0.98] border",
         paletteClass,
         isUnseen && "ring-2 ring-primary ring-offset-2"
       )}>
@@ -96,18 +89,8 @@ export function CompactRoundCard({
 
           {/* Content */}
           <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-            {/* Round subtitle */}
-            {round.round_name && (
-              <p className="text-[11px] text-foreground/80 truncate">{round.round_name}</p>
-            )}
-
-            {/* Title */}
-            <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
-              {enrollment.course_name}
-            </h3>
-
-            {/* Status badges + next session */}
-            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+            {/* Badges + round name (above title) */}
+            <div className="flex items-center gap-1.5 flex-wrap">
               {isUnseen && (
                 <Badge className="bg-primary text-primary-foreground rounded-full text-[10px] px-1.5 py-0 h-4 gap-0.5 border-0">
                   <Sparkles className="h-2.5 w-2.5" />
@@ -124,6 +107,18 @@ export function CompactRoundCard({
               >
                 {round.status}
               </Badge>
+              {round.round_name && (
+                <span className="text-[11px] text-foreground/80 truncate">{round.round_name}</span>
+              )}
+            </div>
+
+            {/* Title */}
+            <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
+              {enrollment.course_name}
+            </h3>
+
+            {/* Next session */}
+            <div className="flex items-center gap-1.5 flex-wrap">
               {displayDate && (
                 <span className={cn(
                   "text-[10px] font-medium truncate",
@@ -137,14 +132,6 @@ export function CompactRoundCard({
                 </span>
               )}
             </div>
-
-            {/* Important note (if exists) */}
-            {importantNote && (
-              <div className="flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400">
-                <AlertCircle className="h-2.5 w-2.5 flex-shrink-0" />
-                <span className="line-clamp-1">{importantNote}</span>
-              </div>
-            )}
           </div>
         </div>
       </div>
