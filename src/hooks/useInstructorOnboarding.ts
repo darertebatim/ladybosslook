@@ -211,7 +211,7 @@ export function useInstructorOnboarding(userId: string | undefined) {
         // Look up instructor
         const { data: instructor, error: lookupErr } = await supabase
           .from('instructors')
-          .select('id, slug, display_name, photo_url, bio, default_program_slug, default_routine_ids, plus_trial_days')
+          .select('id, slug, display_name, photo_url, bio, default_program_slug, default_routine_ids, default_playlist_ids, plus_trial_days')
           .eq('slug', pending.slug)
           .eq('is_active', true)
           .maybeSingle();
@@ -244,6 +244,7 @@ export function useInstructorOnboarding(userId: string | undefined) {
           bio: ins.bio,
           default_program_slug: ins.default_program_slug,
           default_routine_ids: ins.default_routine_ids || [],
+          default_playlist_ids: ins.default_playlist_ids || [],
           plus_trial_days: ins.plus_trial_days || 0,
           source: pending.source,
           rawAttribution: pending.raw,
