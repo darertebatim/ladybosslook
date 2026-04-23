@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGoBack } from '@/hooks/useGoBack';
 import { useReflectionPages, useReflections, useSaveReflectionResponse } from '@/hooks/useReflections';
@@ -28,14 +28,13 @@ export default function AppReflectionFlow() {
   const hasActivePlayer = routinePlayer?.isActive && routinePlayer?.isMinimized;
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  // Per-page bullet answers, keyed by page id
+  const [answersByPage, setAnswersByPage] = useState<Record<string, string[]>>({});
   const [showCelebration, setShowCelebration] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [showReview, setShowReview] = useState(false);
 
-  // Free-form style state for single-page reflections
-  const [lines, setLines] = useState<string[]>(['']);
-  const lineRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const justAddedLine = useRef(false);
+  // Single-page bullet answers
+  const [singleLines, setSingleLines] = useState<string[]>(['']);
 
   const reflection = reflections?.find(r => r.id === reflectionId);
 
@@ -66,68 +65,38 @@ export default function AppReflectionFlow() {
     setShufflePageIndex(next);
   }, [pages, shufflePageIndex]);
 
-  const currentAnswer = answers[page?.id || ''] || '';
   const activePage = isSinglePage ? displayedPage : page;
   const { className: contentBilingualClassName, direction: contentDirection } = useBilingualText(activePage?.content || '');
   const { className: descBilingualClassName, direction: descDirection } = useBilingualText(activePage?.description || '');
-  const { className: answerBilingualClassName, direction: answerDirection } = useBilingualText(currentAnswer);
   const { className: titleBiClass, direction: titleDir } = useBilingualText(reflection?.title || '');
 
-  // Auto-focus textarea on question pages (multi-page)
-  useEffect(() => {
-    if (!isSinglePage && page?.type === 'question') {
-      setTimeout(() => textareaRef.current?.focus(), 200);
-    }
-  }, [currentIndex, page?.type, isSinglePage]);
+  // Get/set bullet lines for current multi-page question
+  const currentLines = useMemo(() => {
+    if (!page) return [''];
+    return answersByPage[page.id] || [''];
+  }, [page, answersByPage]);
 
-  // Focus first line on single-page
-  useEffect(() => {
-    if (isSinglePage) {
-      setTimeout(() => lineRefs.current[0]?.focus(), 200);
-    }
-  }, [isSinglePage]);
+  const setCurrentLines = useCallback((next: string[]) => {
+    if (!page) return;
+    setAnswersByPage((prev) => ({ ...prev, [page.id]: next }));
+  }, [page]);
 
-  // Focus newly added line
-  useEffect(() => {
-    if (justAddedLine.current) {
-      const lastRef = lineRefs.current[lines.length - 1];
-      lastRef?.focus();
-      justAddedLine.current = false;
-    }
-  }, [lines.length]);
-
-  const handleLineChange = useCallback((index: number, value: string) => {
-    setLines(prev => {
-      const next = [...prev];
-      next[index] = value;
-      return next;
-    });
-  }, []);
-
-  const handleLineKeyDown = useCallback((index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      setLines(prev => {
-        const next = [...prev];
-        next.splice(index + 1, 0, '');
-        return next;
-      });
-      justAddedLine.current = true;
-    } else if (e.key === 'Backspace' && lines[index] === '' && index > 0) {
-      e.preventDefault();
-      setLines(prev => {
-        const next = [...prev];
-        next.splice(index, 1);
-        return next;
-      });
-      setTimeout(() => lineRefs.current[index - 1]?.focus(), 0);
-    }
-  }, [lines]);
+  // Build review items from collected answers (skip info pages with no answer)
+  const reviewItems: ReviewItem[] = useMemo(() => {
+    if (!pages) return [];
+    return pages
+      .filter((p) => p.type === 'question')
+      .map((p) => ({
+        question: p.content || '',
+        answer: (answersByPage[p.id] || []).filter((l) => l.trim()).join('\n'),
+      }))
+      .filter((it) => it.answer.trim().length > 0 || true); // keep all questions, even empty
+  }, [pages, answersByPage]);
 
   const handleSaveSinglePage = async () => {
     const savePage = displayedPage || page;
     if (!savePage || !reflectionId) return;
-    const content = lines.filter(l => l.trim()).join('\n');
+    const content = singleLines.filter((l) => l.trim()).join('\n');
     try {
       await saveResponse.mutateAsync({
         reflectionId,
@@ -138,6 +107,7 @@ export default function AppReflectionFlow() {
       if (reflectionId) {
         await autoCompleteReflection(reflectionId);
       }
+      // Single-page: skip review sheet, go straight to celebration
       setShowCelebration(true);
     } catch (error) {
       console.error('Failed to save reflection response:', error);
@@ -150,10 +120,11 @@ export default function AppReflectionFlow() {
 
     try {
       if (page.type === 'question') {
+        const responseText = (answersByPage[page.id] || []).filter((l) => l.trim()).join('\n');
         await saveResponse.mutateAsync({
           reflectionId,
           pageId: page.id,
-          responseText: answers[page.id] || '',
+          responseText,
           isCompleted: isLast,
         });
       } else if (isLast) {
@@ -168,7 +139,8 @@ export default function AppReflectionFlow() {
         if (reflectionId) {
           await autoCompleteReflection(reflectionId);
         }
-        setShowCelebration(true);
+        // Multi-page: show review sheet first; user taps Continue → celebration
+        setShowReview(true);
       } else {
         setCurrentIndex((i) => i + 1);
       }
