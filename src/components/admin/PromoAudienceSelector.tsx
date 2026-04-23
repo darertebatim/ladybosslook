@@ -132,6 +132,19 @@ export function PromoAudienceSelector({
     },
   });
 
+  // Fetch instructors for instructor-scoped targeting
+  const { data: instructors } = useQuery({
+    queryKey: ['instructors-for-targeting'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('instructors')
+        .select('id, display_name, slug, is_active')
+        .order('display_name');
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const toggleItem = (
     list: string[],
     setList: (items: string[]) => void,
