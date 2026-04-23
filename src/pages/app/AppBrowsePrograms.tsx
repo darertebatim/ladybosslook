@@ -145,6 +145,27 @@ const AppBrowsePrograms = () => {
   const location = useLocation();
   const { programs, isLoading } = usePrograms();
   const { data: enrollments = [] } = useEnrollments();
+  const { user } = useAuth();
+
+  // Slugs of programs the user has an ACTIVE round enrollment for
+  const { data: activeRoundSlugs = [] } = useQuery({
+    queryKey: ['active-round-slugs', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [] as string[];
+      const { data, error } = await supabase
+        .from('course_enrollments')
+        .select('program_slug')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .not('round_id', 'is', null) as any;
+      if (error) throw error;
+      return ((data || []) as { program_slug: string | null }[])
+        .map(e => e.program_slug)
+        .filter(Boolean) as string[];
+    },
+    enabled: !!user?.id,
+  });
+  const activeRoundSet = useMemo(() => new Set(activeRoundSlugs), [activeRoundSlugs]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [selectedType, setSelectedType] = useState('all');
