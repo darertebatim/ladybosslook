@@ -25,6 +25,8 @@ import { useRoutinesBank, useRoutineBankCategories, useFeaturedRoutinesBank } fr
 import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 import { SelfCareGoalsCategoryCard } from '@/components/app/SelfCareGoalsCategoryCard';
 import { useTaskTemplates } from '@/hooks/useTaskPlanner';
+import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
+import { useNewHomeData } from '@/hooks/useNewHomeData';
 
 const AppStore = () => {
   const navigate = useNavigate();
@@ -42,6 +44,10 @@ const AppStore = () => {
 
   const { data: enrollments = [] } = useEnrollments();
   const invalidateAllEnrollmentData = useInvalidateAllEnrollmentData();
+
+  // Active rounds data for "My Programs" carousel (mirrors Home page logic)
+  const homeDataQuery = useNewHomeData();
+  const { activeRounds = [], nextSessionMap = {} } = homeDataQuery as any;
 
   const isEnrolled = (slug: string) => {
     return enrollments.includes(slug);
@@ -376,6 +382,11 @@ const AppStore = () => {
                   ))}
                 </div>
               </section>
+            )}
+
+            {/* My Programs (active rounds) — only shown for users with active enrollments */}
+            {!searchQuery && (
+              <ActiveRoundsCarousel activeRounds={activeRounds} nextSessionMap={nextSessionMap} />
             )}
 
             {/* My Shortcuts - right after tools */}
