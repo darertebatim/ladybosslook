@@ -88,7 +88,7 @@ export function ActiveRoundsCarousel({
       {/* Horizontal scroll - collapsible */}
       <div className={`overflow-hidden transition-all duration-200 ease-out ${isCollapsed ? 'max-h-0 opacity-0' : 'max-h-[140px] opacity-100'}`}>
         <div
-          className="flex gap-3 overflow-x-auto scrollbar-hide py-2 px-1 -mx-1"
+          className="flex gap-3 overflow-x-auto scrollbar-hide py-2 pl-1 pr-4"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {activeRounds.map((enrollment, index) => {
