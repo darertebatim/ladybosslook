@@ -92,7 +92,7 @@ export function useInstructorOnboarding(userId: string | undefined) {
           instructor_id: instructor.id,
           attribution_source: attribution ? 'appsflyer' : 'url',
           raw_attribution: attribution?.raw ?? { source: 'url_param', slug },
-        });
+        } as any);
         if (refErr) {
           console.warn('[InstructorOnboarding] Failed to record referral:', refErr.message);
           return; // don't mark processed — let it retry next session
