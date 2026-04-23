@@ -6,6 +6,7 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { RoutineBankCard } from '@/components/app/RoutineBankCard';
+import { BackButton } from '@/components/app/BackButton';
 import {
   useRoutineBankCategories,
   useRoutinesBank,
@@ -106,9 +107,10 @@ export default function AppInspire() {
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center justify-between px-4 pt-3 pb-2">
-          <div className="flex items-center gap-2">
-            <CalendarPlus className="w-6 h-6 text-primary" />
-            <h1 className="text-xl font-bold text-foreground">Routines Templates</h1>
+          <div className="flex items-center gap-1 min-w-0">
+            <BackButton to="/app/home" showLabel={false} className="-ml-2" />
+            <CalendarPlus className="w-6 h-6 text-primary shrink-0" />
+            <h1 className="text-xl font-bold text-foreground truncate">Routines Templates</h1>
           </div>
           <div className="flex items-center gap-1">
             {startTour && <TourHelpButton onClick={startTour} />}
