@@ -74,6 +74,9 @@ interface PromoAudienceSelectorProps {
   setIncludeUpdateStatus: (statuses: string[]) => void;
   targetInstructorIds?: string[];
   setTargetInstructorIds?: (ids: string[]) => void;
+  /** Optional: preset linkage. When provided, a saved-audience picker is shown. */
+  presetId?: string | null;
+  setPresetId?: (id: string | null) => void;
 }
 
 export function PromoAudienceSelector({
@@ -99,6 +102,8 @@ export function PromoAudienceSelector({
   setIncludeUpdateStatus,
   targetInstructorIds = [],
   setTargetInstructorIds,
+  presetId,
+  setPresetId,
 }: PromoAudienceSelectorProps) {
   const UPDATE_STATUS_OPTIONS = [
     { slug: 'latest', label: '🆕 Last Update', description: 'Users on the latest app version' },
