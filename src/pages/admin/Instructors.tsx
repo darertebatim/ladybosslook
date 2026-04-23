@@ -123,19 +123,43 @@ export default function Instructors() {
       default_program_slug: form.default_program_slug.trim() || null,
       default_routine_ids: form.default_routine_ids,
       default_playlist_ids: form.default_playlist_ids,
+      default_channel_ids: form.default_channel_ids,
       plus_trial_days: Number(form.plus_trial_days) || 0,
       is_active: form.is_active,
     };
 
-    const { error } = editing
-      ? await supabase.from('instructors').update(payload as any).eq('id', editing.id)
-      : await supabase.from('instructors').insert(payload as any);
+    const { data: savedRow, error } = editing
+      ? await supabase.from('instructors').update(payload as any).eq('id', editing.id).select('id').maybeSingle()
+      : await supabase.from('instructors').insert(payload as any).select('id').maybeSingle();
 
     setSaving(false);
     if (error) {
       toast({ title: 'Save failed', description: error.message, variant: 'destructive' });
       return;
     }
+
+    // Backfill: ensure all already-referred users can SEE the linked channels
+    // by removing any existing exclusions for those channels.
+    const instructorId = editing?.id || (savedRow as any)?.id;
+    if (instructorId && form.default_channel_ids.length > 0) {
+      try {
+        const { data: refs } = await supabase
+          .from('instructor_referrals')
+          .select('user_id')
+          .eq('instructor_id', instructorId);
+        const userIds = (refs || []).map((r: any) => r.user_id);
+        if (userIds.length > 0) {
+          await supabase
+            .from('feed_channel_exclusions')
+            .delete()
+            .in('user_id', userIds)
+            .in('channel_id', form.default_channel_ids);
+        }
+      } catch (err) {
+        console.warn('[Instructors] Channel backfill failed:', err);
+      }
+    }
+
     toast({ title: editing ? 'Instructor updated' : 'Instructor created' });
     setOpen(false);
     load();
