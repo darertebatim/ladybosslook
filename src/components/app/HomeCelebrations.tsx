@@ -20,7 +20,6 @@ import { ActionLimitSheet } from '@/components/app/ActionLimitSheet';
 import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { TaskDetailModal } from '@/components/app/TaskDetailModal';
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
-import { GoldStreakLostBanner } from '@/components/app/GoldStreakLostBanner';
 import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
 import { useSubscription } from '@/hooks/useSubscription';
 import type { UserTask, TaskTemplate } from '@/hooks/useTaskPlanner';
@@ -109,13 +108,10 @@ interface HomeCelebrationsProps {
   showRecoveryPrompt: boolean;
   setShowRecoveryPrompt: (v: boolean) => void;
   recoverStreak: any;
-  
-  // Gold recovery
-  showGoldRecoveryPrompt: boolean;
-  setShowGoldRecoveryPrompt: (v: boolean) => void;
-  showRecoverySuccess: 'streak' | 'gold' | null;
-  setShowRecoverySuccess: (v: 'streak' | 'gold' | null) => void;
-  previousGoldStreak: number;
+
+  // Recovery success
+  showRecoverySuccess: 'streak' | null;
+  setShowRecoverySuccess: (v: 'streak' | null) => void;
 
   // Notification
   userId?: string;
@@ -162,8 +158,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     skipTask, setSkipTask, goalInputTask, setGoalInputTask, onGoalInputConfirm,
     timerTask, setTimerTask, onTimerSaveProgress, onTimerMarkComplete,
     showRecoveryPrompt, setShowRecoveryPrompt, recoverStreak,
-    showGoldRecoveryPrompt, setShowGoldRecoveryPrompt,
-    showRecoverySuccess, setShowRecoverySuccess, previousGoldStreak,
+    showRecoverySuccess, setShowRecoverySuccess,
     userId, showNotificationFlow, setShowNotificationFlow,
     challengeDayCelebration, closeChallengeDayCelebration, showChallengeDayCelebration,
     stepCelebration, onCloseStepCelebration,
@@ -352,32 +347,10 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         isLoading={recoverStreak.isPending}
       />
 
-      <GoldStreakLostBanner
-        open={showGoldRecoveryPrompt}
-        previousGoldStreak={previousGoldStreak}
-        hasShieldsRemaining={((streak as any)?.streak_recovery_count || 0) < 3}
-        shieldsLeft={3 - ((streak as any)?.streak_recovery_count || 0)}
-        isSubscribed={isSubscribed}
-        onRecover={() => {
-          recoverStreak.mutate({ previousStreak: previousGoldStreak, type: 'gold' }, {
-            onSuccess: () => {
-              setShowGoldRecoveryPrompt(false);
-              setShowRecoverySuccess('gold');
-            },
-          });
-        }}
-        onDismiss={() => setShowGoldRecoveryPrompt(false)}
-        onSubscribe={() => {
-          setShowGoldRecoveryPrompt(false);
-          setShowPaywall(true);
-        }}
-        isLoading={recoverStreak.isPending}
-      />
-
       <RecoverySuccessBanner
         open={showRecoverySuccess !== null}
-        restoredStreak={showRecoverySuccess === 'gold' ? previousGoldStreak : (streak?.longest_streak || 0)}
-        type={showRecoverySuccess || 'streak'}
+        restoredStreak={streak?.longest_streak || 0}
+        type="streak"
         onClose={() => setShowRecoverySuccess(null)}
       />
 
