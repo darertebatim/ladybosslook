@@ -8,6 +8,8 @@ import { useProgramEventNotificationScheduler } from '@/hooks/useProgramEventNot
 import { useSmartActionNudges } from '@/hooks/useSmartActionNudges';
 import { usePeriodNotifications } from '@/hooks/usePeriodNotifications';
 import { useFirebaseUserSync } from '@/hooks/useFirebaseUserSync';
+import { useInstructorOnboarding } from '@/hooks/useInstructorOnboarding';
+import { InstructorWelcomeSheet } from '@/components/instructor/InstructorWelcomeSheet';
 
 /**
  * Ensure local notification permission is granted on Android 13+.
@@ -66,12 +68,13 @@ export const DeferredLayoutHooks = ({ userId }: { userId: string | undefined }) 
   useEnsureLocalNotificationPermission();
   useAppInstallTracking(userId);
   useAppsFlyerTracking(userId);
+  useInstructorOnboarding(userId);
   useFirebaseUserSync(userId);
   useLocalNotificationScheduler(userId);
   useSmartActionNudges(userId);
   usePeriodNotifications(userId);
   useHybridNotificationScheduler(userId);
   useProgramEventNotificationScheduler();
-  
-  return null;
+
+  return <InstructorWelcomeSheet />;
 };

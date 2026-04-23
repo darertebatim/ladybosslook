@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, GraduationCap, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft, Sparkles, Palette, FlaskConical, Smartphone, Image, Video, FileText, BookOpen, Brain, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Users, GraduationCap, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft, Sparkles, Palette, FlaskConical, Smartphone, Image, Video, FileText, BookOpen, Brain, BarChart3, UserPlus } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +13,7 @@ const menuItems = [
   { title: 'Analytics', url: '/admin/analytics', icon: BarChart3, pageSlug: 'overview' },
   { title: 'Users', url: '/admin/users', icon: Users, pageSlug: 'users' },
   { title: 'Enrollment', url: '/admin/enrollment', icon: GraduationCap, pageSlug: 'enrollment' },
+  { title: 'Instructors', url: '/admin/instructors', icon: UserPlus, pageSlug: 'users' },
   { title: 'Audio', url: '/admin/audio', icon: Music, pageSlug: 'audio' },
   { title: 'Video', url: '/admin/video', icon: Video, pageSlug: 'audio' },
   { title: 'Channels', url: '/admin/channels', icon: Newspaper, pageSlug: 'community' },
