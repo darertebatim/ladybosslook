@@ -2,19 +2,33 @@ import { Badge } from '@/components/ui/badge';
 import { AlertCircle, ChevronRight, Sparkles } from 'lucide-react';
 import { format, isToday } from 'date-fns';
 import { Link } from 'react-router-dom';
+import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
+
+// Task palette cycle for program cards
+const PROGRAM_CARD_COLOR_CYCLE: TaskColor[] = [
+  'lavender',
+  'sky',
+  'mint',
+  'peach',
+  'pink',
+  'lime',
+  'yellow',
+];
 
 interface CompactRoundCardProps {
   enrollment: any;
   nextSessionDate?: string | null;
   isUnseen?: boolean;
   onView?: () => void;
+  colorIndex?: number;
 }
 
 export function CompactRoundCard({ 
   enrollment, 
   nextSessionDate,
   isUnseen,
-  onView 
+  onView,
+  colorIndex = 0,
 }: CompactRoundCardProps) {
   const round = enrollment.program_rounds;
   if (!round) return null;
@@ -23,6 +37,9 @@ export function CompactRoundCard({
   const isUpcoming = round.status === 'upcoming';
   const displayDate = nextSessionDate || round.first_session_date;
   const isSessionToday = displayDate && isToday(new Date(displayDate));
+
+  const paletteColor = PROGRAM_CARD_COLOR_CYCLE[colorIndex % PROGRAM_CARD_COLOR_CYCLE.length];
+  const paletteClass = TASK_COLOR_CLASSES[paletteColor];
 
   // Get first sentence of important_message
   const importantNote = round.important_message
@@ -50,11 +67,7 @@ export function CompactRoundCard({
       onClick={onView}
       className="block"
     >
-      <div className={`relative w-[260px] h-[88px] rounded-xl overflow-hidden shadow-sm transition-transform active:scale-[0.98] ring-1 ring-border/60 ${
-        isActive 
-          ? 'bg-violet-50 dark:bg-violet-950/30' 
-          : 'bg-muted/50 dark:bg-muted/30'
-      } ${isUnseen ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
+      <div className={`relative w-[260px] h-[88px] rounded-xl overflow-hidden shadow-sm transition-transform active:scale-[0.98] ring-1 ring-border/60 ${paletteClass} ${isUnseen ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
         {/* Content */}
         <div className="absolute inset-0 p-2.5 flex flex-col justify-end">
           {/* Course name with badges inline */}

@@ -87,19 +87,19 @@ export function ActiveRoundsCarousel({
       </button>
 
       {/* Carousel - collapsible */}
-      <div className={`overflow-hidden transition-all duration-200 ease-out ${isCollapsed ? 'max-h-0 opacity-0' : 'max-h-[120px] opacity-100'}`}>
+      <div className={`overflow-hidden transition-all duration-200 ease-out ${isCollapsed ? 'max-h-0 opacity-0' : 'max-h-[140px] opacity-100'}`}>
         <Carousel opts={{
         align: 'start',
         loop: false
       }} className="w-full">
-          <CarouselContent className="-ml-3">
-            {activeRounds.map(enrollment => {
+          <CarouselContent className="-ml-3 py-2">
+            {activeRounds.map((enrollment, index) => {
             const roundId = enrollment.program_rounds?.id;
             const isEnrollmentUnseen = unseenEnrollments.has(enrollment.id);
             const isRoundUnseen = roundId ? unseenRounds.has(roundId) : false;
             const hasNotification = isEnrollmentUnseen || isRoundUnseen;
             return <CarouselItem key={enrollment.id} className="pl-3 basis-auto">
-                  <CompactRoundCard enrollment={enrollment} nextSessionDate={roundId ? (nextSessionMap instanceof Map ? nextSessionMap.get(roundId) : nextSessionMap[roundId]) ?? null : null} isUnseen={hasNotification} onView={() => {
+                  <CompactRoundCard enrollment={enrollment} colorIndex={index} nextSessionDate={roundId ? (nextSessionMap instanceof Map ? nextSessionMap.get(roundId) : nextSessionMap[roundId]) ?? null : null} isUnseen={hasNotification} onView={() => {
                 if (isEnrollmentUnseen && markEnrollmentViewed) {
                   markEnrollmentViewed(enrollment.id);
                 }
