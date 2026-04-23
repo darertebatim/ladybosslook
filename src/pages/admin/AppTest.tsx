@@ -881,15 +881,7 @@ export default function AppTest() {
         </CardContent>
       </Card>
 
-      {/* App Store Review */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Star className="h-5 w-5 text-yellow-500" />
-            App Store Review
-          </CardTitle>
       {/* Instructor Referral Flow */}
-      </Card>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
