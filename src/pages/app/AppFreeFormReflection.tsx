@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 import { Lightbulb } from 'lucide-react';
 import { JournalPromptMarquee } from '@/components/app/JournalPromptMarquee';
 import { MoodSelector } from '@/components/app/MoodSelector';
+import { ReflectionCelebrationSheet } from '@/components/reflection/ReflectionCelebrationSheet';
 
 const BULLET_COLOR = 'hsl(var(--muted-foreground) / 0.4)';
 
@@ -67,6 +68,7 @@ export default function AppFreeFormReflection() {
   const [lines, setLines] = useState<string[]>(['']);
   const [mood, setMood] = useState<string | null>(searchParams.get('mood') || null);
   const [showPrompts, setShowPrompts] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const lineRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
   const justAddedLine = useRef(false);
@@ -121,13 +123,7 @@ export default function AppFreeFormReflection() {
       queryClient.invalidateQueries({ queryKey: ['reflection-notes'] });
       queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
       await autoCompleteJournal();
-      toast.success('Reflection saved ✨');
-      if (hasActivePlayer) {
-        navigate('/app/home');
-        routinePlayer!.maximize();
-      } else {
-        goBack();
-      }
+      setShowCelebration(true);
     },
     onError: (e: any) => toast.error(e.message || 'Failed to save'),
   });
