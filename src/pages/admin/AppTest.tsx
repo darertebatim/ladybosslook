@@ -62,6 +62,10 @@ import { PlusGateSheet } from '@/components/app/PlusGateSheet';
 import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebration';
 import { ProjectCompletionCelebration } from '@/components/app/ProjectCompletionCelebration';
 import { LanguagePreferencePopup } from '@/components/app/LanguagePreferencePopup';
+import { InstructorInviteContent } from '@/components/instructor/InstructorInviteModal';
+import { InstructorWelcomeContent } from '@/components/instructor/InstructorWelcomeSheet';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
