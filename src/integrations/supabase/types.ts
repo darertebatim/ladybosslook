@@ -1857,6 +1857,86 @@ export type Database = {
         }
         Relationships: []
       }
+      instructor_referrals: {
+        Row: {
+          attribution_source: string
+          created_at: string
+          id: string
+          instructor_id: string
+          raw_attribution: Json | null
+          user_id: string
+          welcome_shown_at: string | null
+        }
+        Insert: {
+          attribution_source?: string
+          created_at?: string
+          id?: string
+          instructor_id: string
+          raw_attribution?: Json | null
+          user_id: string
+          welcome_shown_at?: string | null
+        }
+        Update: {
+          attribution_source?: string
+          created_at?: string
+          id?: string
+          instructor_id?: string
+          raw_attribution?: Json | null
+          user_id?: string
+          welcome_shown_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instructor_referrals_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "instructors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      instructors: {
+        Row: {
+          bio: string | null
+          created_at: string
+          default_program_slug: string | null
+          default_routine_ids: string[]
+          display_name: string
+          id: string
+          is_active: boolean
+          photo_url: string | null
+          plus_trial_days: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          default_program_slug?: string | null
+          default_routine_ids?: string[]
+          display_name: string
+          id?: string
+          is_active?: boolean
+          photo_url?: string | null
+          plus_trial_days?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          default_program_slug?: string | null
+          default_routine_ids?: string[]
+          display_name?: string
+          id?: string
+          is_active?: boolean
+          photo_url?: string | null
+          plus_trial_days?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       journal_entries: {
         Row: {
           content: string
@@ -2451,6 +2531,7 @@ export type Database = {
           phone: string | null
           preferred_language: string | null
           referral_source: string | null
+          referred_by_instructor_id: string | null
           relationship_status: string | null
           return_count: number | null
           social_instagram: string | null
@@ -2479,6 +2560,7 @@ export type Database = {
           phone?: string | null
           preferred_language?: string | null
           referral_source?: string | null
+          referred_by_instructor_id?: string | null
           relationship_status?: string | null
           return_count?: number | null
           social_instagram?: string | null
@@ -2507,6 +2589,7 @@ export type Database = {
           phone?: string | null
           preferred_language?: string | null
           referral_source?: string | null
+          referred_by_instructor_id?: string | null
           relationship_status?: string | null
           return_count?: number | null
           social_instagram?: string | null
@@ -2517,7 +2600,15 @@ export type Database = {
           total_active_days?: number | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_instructor_id_fkey"
+            columns: ["referred_by_instructor_id"]
+            isOneToOne: false
+            referencedRelation: "instructors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       program_auto_enrollment: {
         Row: {
