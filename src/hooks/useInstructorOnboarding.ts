@@ -16,6 +16,7 @@ export interface PendingInstructor {
   bio: string | null;
   default_program_slug: string | null;
   default_routine_ids: string[];
+  default_playlist_ids: string[];
   plus_trial_days: number;
   source: 'appsflyer' | 'url';
   rawAttribution: Record<string, unknown> | null;
