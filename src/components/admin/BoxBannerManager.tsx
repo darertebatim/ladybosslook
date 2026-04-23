@@ -69,6 +69,7 @@ interface BoxBanner {
   target_languages: string[] | null;
   target_timezones: string[] | null;
   include_update_status: string[] | null;
+  target_instructor_ids: string[] | null;
   display_delay_seconds: number | null;
 }
 
@@ -107,6 +108,7 @@ export function BoxBannerManager() {
   const [targetLanguages, setTargetLanguages] = useState<string[]>([]);
   const [targetTimezones, setTargetTimezones] = useState<string[]>([]);
   const [includeUpdateStatus, setIncludeUpdateStatus] = useState<string[]>([]);
+  const [targetInstructorIds, setTargetInstructorIds] = useState<string[]>([]);
 
   // Fetch banners
   const { data: banners, isLoading } = useQuery({

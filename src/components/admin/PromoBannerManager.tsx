@@ -61,6 +61,7 @@ interface PromoBanner {
   target_languages: string[];
   target_timezones: string[];
   include_update_status: string[];
+  target_instructor_ids: string[];
   display_location: string[];
   target_playlist_ids: string[];
   target_audio_ids: string[];
@@ -109,6 +110,7 @@ export function PromoBannerManager() {
   const [targetLanguages, setTargetLanguages] = useState<string[]>([]);
   const [targetTimezones, setTargetTimezones] = useState<string[]>([]);
   const [includeUpdateStatus, setIncludeUpdateStatus] = useState<string[]>([]);
+  const [targetInstructorIds, setTargetInstructorIds] = useState<string[]>([]);
 
   // Fetch banners
   const { data: banners, isLoading } = useQuery({

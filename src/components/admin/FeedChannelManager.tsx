@@ -37,6 +37,7 @@ interface Channel {
   target_languages: string[];
   target_timezones: string[];
   include_update_status: string[];
+  target_instructor_ids: string[];
 }
 
 // Helper functions for cover storage
@@ -70,6 +71,7 @@ export function FeedChannelManager() {
   const [targetLanguages, setTargetLanguages] = useState<string[]>([]);
   const [targetTimezones, setTargetTimezones] = useState<string[]>([]);
   const [includeUpdateStatus, setIncludeUpdateStatus] = useState<string[]>([]);
+  const [targetInstructorIds, setTargetInstructorIds] = useState<string[]>([]);
 
   const { data: channels, isLoading } = useQuery({
     queryKey: ['admin-feed-channels'],
