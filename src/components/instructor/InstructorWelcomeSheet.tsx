@@ -14,6 +14,7 @@ interface InstructorData {
   default_program_slug: string | null;
   default_routine_ids: string[];
   default_playlist_ids: string[];
+  default_channel_ids: string[];
   plus_trial_days: number;
 }
 
@@ -29,6 +30,7 @@ export interface InstructorWelcomePreviewProps {
   defaultProgramSlug?: string | null;
   defaultRoutineIdsCount?: number;
   defaultPlaylistIdsCount?: number;
+  defaultChannelIdsCount?: number;
   plusTrialDays?: number;
   onDismiss?: () => void;
 }
@@ -44,11 +46,12 @@ export function InstructorWelcomeContent({
   defaultProgramSlug,
   defaultRoutineIdsCount = 0,
   defaultPlaylistIdsCount = 0,
+  defaultChannelIdsCount = 0,
   plusTrialDays = 0,
   onDismiss,
 }: InstructorWelcomePreviewProps) {
   const unlockedCount =
-    (defaultProgramSlug ? 1 : 0) + defaultRoutineIdsCount + defaultPlaylistIdsCount;
+    (defaultProgramSlug ? 1 : 0) + defaultRoutineIdsCount + defaultPlaylistIdsCount + defaultChannelIdsCount;
 
   return (
     <div className="flex flex-col items-center text-center -mx-6 -mt-8 -mb-10">
@@ -113,6 +116,19 @@ export function InstructorWelcomeContent({
               </p>
               <p className="text-xs text-foreground/65">
                 Available now in your audio library.
+              </p>
+            </div>
+          </div>
+        )}
+        {defaultChannelIdsCount > 0 && (
+          <div className="flex items-start gap-3">
+            <span className="text-xl">💬</span>
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                Joined {defaultChannelIdsCount} community channel{defaultChannelIdsCount > 1 ? 's' : ''}
+              </p>
+              <p className="text-xs text-foreground/65">
+                Find them in your Chats tab.
               </p>
             </div>
           </div>
