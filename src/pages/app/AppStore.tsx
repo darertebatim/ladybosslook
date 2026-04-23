@@ -25,6 +25,8 @@ import { useRoutinesBank, useRoutineBankCategories, useFeaturedRoutinesBank } fr
 import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 import { SelfCareGoalsCategoryCard } from '@/components/app/SelfCareGoalsCategoryCard';
 import { useTaskTemplates } from '@/hooks/useTaskPlanner';
+import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
+import { useNewHomeData } from '@/hooks/useNewHomeData';
 
 const AppStore = () => {
   const navigate = useNavigate();
