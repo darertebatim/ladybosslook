@@ -161,8 +161,7 @@ const AppHome = () => {
   const setStreakGoal = useSetStreakGoal();
   const recoverStreak = useRecoverStreak();
   const [showRecoveryPrompt, setShowRecoveryPrompt] = useState(false);
-  const [showGoldRecoveryPrompt, setShowGoldRecoveryPrompt] = useState(false);
-  const [showRecoverySuccess, setShowRecoverySuccess] = useState<'streak' | 'gold' | null>(null);
+  const [showRecoverySuccess, setShowRecoverySuccess] = useState<'streak' | null>(null);
 
 
   // Gold streak celebration state - use localStorage to prevent re-showing on navigation
@@ -362,35 +361,6 @@ const AppHome = () => {
     sessionStorage.setItem(shownKey, 'true');
     setTimeout(() => setShowRecoveryPrompt(true), 1200);
   }, [streak]);
-
-  // Auto-show gold streak recovery prompt when gold streak is broken
-  useEffect(() => {
-    if (!goldStreakData) return;
-    if (!streak) return;
-    if (!goldStreakData.lastGoldDate) return;
-    // Gold streak must have been > 0
-    const goldStreak = goldStreakData.currentGoldStreak;
-    if (goldStreak <= 0 && goldStreakData.longestGoldStreak <= 0) return;
-    
-    // Check if last gold date is before yesterday (streak is broken)
-    const today = format(new Date(), 'yyyy-MM-dd');
-    const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
-    const lastGold = goldStreakData.lastGoldDate;
-    
-    // If last gold was today or yesterday, streak is still alive
-    if (lastGold === today || lastGold === yesterday) return;
-    
-    // Streak is broken — the DB still has old current_gold_streak value
-    const previousGold = goldStreak > 0 ? goldStreak : goldStreakData.longestGoldStreak;
-    if (previousGold <= 0) return;
-    
-    const recoveryCount = (streak as any).streak_recovery_count || 0;
-    if (recoveryCount >= 3) return;
-    const shownKey = 'simora_gold_recovery_prompt_shown';
-    if (sessionStorage.getItem(shownKey) === 'true') return;
-    sessionStorage.setItem(shownKey, 'true');
-    setTimeout(() => setShowGoldRecoveryPrompt(true), 1500);
-  }, [goldStreakData, streak]);
 
   // Featured routines for promo banners (only dismiss on tap/close, not on adoption)
   const {
@@ -1613,11 +1583,8 @@ const AppHome = () => {
           showRecoveryPrompt={showRecoveryPrompt}
           setShowRecoveryPrompt={setShowRecoveryPrompt}
           recoverStreak={recoverStreak}
-          showGoldRecoveryPrompt={showGoldRecoveryPrompt}
-          setShowGoldRecoveryPrompt={setShowGoldRecoveryPrompt}
           showRecoverySuccess={showRecoverySuccess}
           setShowRecoverySuccess={setShowRecoverySuccess}
-          previousGoldStreak={goldStreakData?.longestGoldStreak || goldStreakData?.currentGoldStreak || 0}
           userId={user?.id}
           showNotificationFlow={showNotificationFlow}
           setShowNotificationFlow={setShowNotificationFlow}
