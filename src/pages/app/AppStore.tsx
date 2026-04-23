@@ -395,7 +395,7 @@ const AppStore = () => {
 
             {/* My Programs (active rounds) — only shown for users with active enrollments */}
             {!searchQuery && (
-              <ActiveRoundsCarousel activeRounds={activeRounds} nextSessionMap={nextSessionMap} />
+              <ActiveRoundsCarousel activeRounds={activeRounds} nextSessionMap={nextSessionMap} programImageMap={programImageMap} />
             )}
 
             {/* My Shortcuts - right after tools */}
