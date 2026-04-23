@@ -8,6 +8,65 @@ import { Capacitor } from '@capacitor/core';
 const APPSFLYER_DEV_KEY = 'HmUqSP98nbh7uNctZxS48M';
 const APPLE_APP_ID = '6755076134';
 
+/**
+ * OneLink configuration for instructor referral links.
+ * Generate URLs like: https://ladyboss.onelink.me/lt6v?af_sub1=<instructorSlug>&deep_link_value=<instructorSlug>
+ */
+export const ONELINK_TEMPLATE_ID = 'lt6v';
+export const ONELINK_SUBDOMAIN = 'ladyboss.onelink.me';
+export const ONELINK_BASE_URL = `https://${ONELINK_SUBDOMAIN}/${ONELINK_TEMPLATE_ID}`;
+
+/**
+ * Build a OneLink URL for a specific instructor.
+ * The follower clicks this → goes to the App Store → on first launch, AppsFlyer
+ * surfaces the `af_sub1` value so we can auto-enroll them in the instructor's setup.
+ */
+export function buildInstructorOneLink(instructorSlug: string): string {
+  const params = new URLSearchParams({
+    af_sub1: instructorSlug,
+    deep_link_value: instructorSlug,
+    af_xp: 'custom',
+    pid: 'instructor_referral',
+    c: instructorSlug,
+  });
+  return `${ONELINK_BASE_URL}?${params.toString()}`;
+}
+
+const ATTRIBUTION_STORAGE_KEY = 'rilo_appsflyer_attribution';
+const ATTRIBUTION_PROCESSED_KEY = 'rilo_appsflyer_attribution_processed';
+
+export interface AppsFlyerAttribution {
+  instructorSlug?: string;
+  raw: Record<string, unknown>;
+  capturedAt: string;
+}
+
+/**
+ * Read previously captured attribution (set by the conversion data listener).
+ */
+export function getStoredAttribution(): AppsFlyerAttribution | null {
+  try {
+    const raw = localStorage.getItem(ATTRIBUTION_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as AppsFlyerAttribution) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function markAttributionProcessed(): void {
+  try {
+    localStorage.setItem(ATTRIBUTION_PROCESSED_KEY, '1');
+  } catch {/* ignore */}
+}
+
+export function isAttributionProcessed(): boolean {
+  try {
+    return localStorage.getItem(ATTRIBUTION_PROCESSED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 let isInitialized = false;
 
 /**
@@ -41,6 +100,52 @@ export async function initAppsFlyer(): Promise<void> {
 
     isInitialized = true;
     console.log('[AppsFlyer] ✅ SDK initialized successfully');
+
+    // Listen for conversion data (first install attribution).
+    // Fires once per fresh install with `af_sub1` / `deep_link_value` from the OneLink.
+    try {
+      const { AFConstants } = await import('appsflyer-capacitor-plugin');
+      AppsFlyer.addListener(AFConstants.CONVERSION_CALLBACK, (event: any) => {
+        try {
+          const data = (event?.callbackName === 'onConversionDataSuccess' ? event?.data : event?.data) || {};
+          const instructorSlug =
+            (data?.af_sub1 as string | undefined) ||
+            (data?.deep_link_value as string | undefined) ||
+            (data?.c as string | undefined);
+          const payload: AppsFlyerAttribution = {
+            instructorSlug: instructorSlug ? String(instructorSlug).trim().toLowerCase() : undefined,
+            raw: data as Record<string, unknown>,
+            capturedAt: new Date().toISOString(),
+          };
+          localStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(payload));
+          console.log('[AppsFlyer] Conversion data captured:', payload);
+        } catch (err) {
+          console.warn('[AppsFlyer] Conversion data parse failed:', err);
+        }
+      });
+
+      AppsFlyer.addListener(AFConstants.UDL_CALLBACK, (event: any) => {
+        try {
+          const data = event?.deepLink || event?.data || {};
+          const instructorSlug =
+            (data?.deep_link_value as string | undefined) ||
+            (data?.af_sub1 as string | undefined);
+          if (instructorSlug) {
+            const payload: AppsFlyerAttribution = {
+              instructorSlug: String(instructorSlug).trim().toLowerCase(),
+              raw: data as Record<string, unknown>,
+              capturedAt: new Date().toISOString(),
+            };
+            localStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(payload));
+            console.log('[AppsFlyer] Deep link captured:', payload);
+          }
+        } catch (err) {
+          console.warn('[AppsFlyer] Deep link parse failed:', err);
+        }
+      });
+    } catch (err) {
+      console.warn('[AppsFlyer] Failed to register conversion listener:', err);
+    }
   } catch (error) {
     console.warn('[AppsFlyer] SDK init failed:', error);
   }
