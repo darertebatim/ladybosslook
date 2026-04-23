@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGoBack } from '@/hooks/useGoBack';
 import { useReflectionPages, useReflections, useSaveReflectionResponse } from '@/hooks/useReflections';
@@ -11,19 +11,8 @@ import { cn } from '@/lib/utils';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { format } from 'date-fns';
 import { ReflectionCelebrationSheet } from '@/components/reflection/ReflectionCelebrationSheet';
-
-const BULLET_COLORS = [
-  'hsl(142, 50%, 78%)',
-  'hsl(20, 70%, 78%)',
-  'hsl(262, 60%, 68%)',
-  'hsl(200, 60%, 72%)',
-  'hsl(45, 70%, 72%)',
-  'hsl(340, 55%, 75%)',
-];
-
-function getBulletColor(index: number) {
-  return BULLET_COLORS[index % BULLET_COLORS.length];
-}
+import { BulletAnswerInput } from '@/components/reflection/BulletAnswerInput';
+import { ReflectionReviewSheet, type ReviewItem } from '@/components/reflection/ReflectionReviewSheet';
 
 export default function AppReflectionFlow() {
   const { reflectionId } = useParams<{ reflectionId: string }>();
@@ -39,14 +28,13 @@ export default function AppReflectionFlow() {
   const hasActivePlayer = routinePlayer?.isActive && routinePlayer?.isMinimized;
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  // Per-page bullet answers, keyed by page id
+  const [answersByPage, setAnswersByPage] = useState<Record<string, string[]>>({});
   const [showCelebration, setShowCelebration] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [showReview, setShowReview] = useState(false);
 
-  // Free-form style state for single-page reflections
-  const [lines, setLines] = useState<string[]>(['']);
-  const lineRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const justAddedLine = useRef(false);
+  // Single-page bullet answers
+  const [singleLines, setSingleLines] = useState<string[]>(['']);
 
   const reflection = reflections?.find(r => r.id === reflectionId);
 
@@ -77,68 +65,38 @@ export default function AppReflectionFlow() {
     setShufflePageIndex(next);
   }, [pages, shufflePageIndex]);
 
-  const currentAnswer = answers[page?.id || ''] || '';
   const activePage = isSinglePage ? displayedPage : page;
   const { className: contentBilingualClassName, direction: contentDirection } = useBilingualText(activePage?.content || '');
   const { className: descBilingualClassName, direction: descDirection } = useBilingualText(activePage?.description || '');
-  const { className: answerBilingualClassName, direction: answerDirection } = useBilingualText(currentAnswer);
   const { className: titleBiClass, direction: titleDir } = useBilingualText(reflection?.title || '');
 
-  // Auto-focus textarea on question pages (multi-page)
-  useEffect(() => {
-    if (!isSinglePage && page?.type === 'question') {
-      setTimeout(() => textareaRef.current?.focus(), 200);
-    }
-  }, [currentIndex, page?.type, isSinglePage]);
+  // Get/set bullet lines for current multi-page question
+  const currentLines = useMemo(() => {
+    if (!page) return [''];
+    return answersByPage[page.id] || [''];
+  }, [page, answersByPage]);
 
-  // Focus first line on single-page
-  useEffect(() => {
-    if (isSinglePage) {
-      setTimeout(() => lineRefs.current[0]?.focus(), 200);
-    }
-  }, [isSinglePage]);
+  const setCurrentLines = useCallback((next: string[]) => {
+    if (!page) return;
+    setAnswersByPage((prev) => ({ ...prev, [page.id]: next }));
+  }, [page]);
 
-  // Focus newly added line
-  useEffect(() => {
-    if (justAddedLine.current) {
-      const lastRef = lineRefs.current[lines.length - 1];
-      lastRef?.focus();
-      justAddedLine.current = false;
-    }
-  }, [lines.length]);
-
-  const handleLineChange = useCallback((index: number, value: string) => {
-    setLines(prev => {
-      const next = [...prev];
-      next[index] = value;
-      return next;
-    });
-  }, []);
-
-  const handleLineKeyDown = useCallback((index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      setLines(prev => {
-        const next = [...prev];
-        next.splice(index + 1, 0, '');
-        return next;
-      });
-      justAddedLine.current = true;
-    } else if (e.key === 'Backspace' && lines[index] === '' && index > 0) {
-      e.preventDefault();
-      setLines(prev => {
-        const next = [...prev];
-        next.splice(index, 1);
-        return next;
-      });
-      setTimeout(() => lineRefs.current[index - 1]?.focus(), 0);
-    }
-  }, [lines]);
+  // Build review items from collected answers (skip info pages with no answer)
+  const reviewItems: ReviewItem[] = useMemo(() => {
+    if (!pages) return [];
+    return pages
+      .filter((p) => p.type === 'question')
+      .map((p) => ({
+        question: p.content || '',
+        answer: (answersByPage[p.id] || []).filter((l) => l.trim()).join('\n'),
+      }))
+      .filter((it) => it.answer.trim().length > 0 || true); // keep all questions, even empty
+  }, [pages, answersByPage]);
 
   const handleSaveSinglePage = async () => {
     const savePage = displayedPage || page;
     if (!savePage || !reflectionId) return;
-    const content = lines.filter(l => l.trim()).join('\n');
+    const content = singleLines.filter((l) => l.trim()).join('\n');
     try {
       await saveResponse.mutateAsync({
         reflectionId,
@@ -149,6 +107,7 @@ export default function AppReflectionFlow() {
       if (reflectionId) {
         await autoCompleteReflection(reflectionId);
       }
+      // Single-page: skip review sheet, go straight to celebration
       setShowCelebration(true);
     } catch (error) {
       console.error('Failed to save reflection response:', error);
@@ -161,10 +120,11 @@ export default function AppReflectionFlow() {
 
     try {
       if (page.type === 'question') {
+        const responseText = (answersByPage[page.id] || []).filter((l) => l.trim()).join('\n');
         await saveResponse.mutateAsync({
           reflectionId,
           pageId: page.id,
-          responseText: answers[page.id] || '',
+          responseText,
           isCompleted: isLast,
         });
       } else if (isLast) {
@@ -179,7 +139,8 @@ export default function AppReflectionFlow() {
         if (reflectionId) {
           await autoCompleteReflection(reflectionId);
         }
-        setShowCelebration(true);
+        // Multi-page: show review sheet first; user taps Continue → celebration
+        setShowReview(true);
       } else {
         setCurrentIndex((i) => i + 1);
       }
@@ -229,7 +190,7 @@ export default function AppReflectionFlow() {
           </button>
           <button
             onClick={handleSaveSinglePage}
-            disabled={saveResponse.isPending || lines.every(l => !l.trim())}
+            disabled={saveResponse.isPending || singleLines.every((l) => !l.trim())}
             className="px-5 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold active:scale-95 transition-transform disabled:opacity-40"
           >
             Done
@@ -260,27 +221,13 @@ export default function AppReflectionFlow() {
           </h1>
 
           {/* Bullet entries */}
-          <div className="mt-4 space-y-1.5">
-            {lines.map((line, idx) => (
-              <div key={idx} className="flex items-start gap-3">
-                <div
-                  className="w-3 h-3 rounded-sm mt-[5px] shrink-0 transition-colors"
-                  style={{
-                    backgroundColor: line.trim()
-                      ? getBulletColor(idx)
-                      : 'hsl(var(--muted-foreground) / 0.25)',
-                  }}
-                />
-                <input
-                  ref={(el) => { lineRefs.current[idx] = el; }}
-                  value={line}
-                  onChange={(e) => handleLineChange(idx, e.target.value)}
-                  onKeyDown={(e) => handleLineKeyDown(idx, e)}
-                  placeholder={idx === 0 ? (displayedPage?.description || 'Write your thoughts…') : ''}
-                  className="flex-1 bg-transparent border-0 outline-none text-base placeholder:text-muted-foreground/40"
-                />
-              </div>
-            ))}
+          <div className="mt-4">
+            <BulletAnswerInput
+              lines={singleLines}
+              onLinesChange={setSingleLines}
+              placeholder={displayedPage?.description || 'Write your thoughts…'}
+              autoFocus
+            />
           </div>
         </div>
 
@@ -322,17 +269,15 @@ export default function AppReflectionFlow() {
         )}
 
         {page?.type === 'question' && (
-          <textarea
-            ref={textareaRef}
-            value={answers[page.id] || ''}
-            onChange={(e) => setAnswers((prev) => ({ ...prev, [page.id]: e.target.value }))}
-            placeholder="Type your answer…"
-            className={cn(
-              "mt-6 w-full bg-transparent border-0 border-b-2 border-muted-foreground/20 focus:border-primary outline-none resize-none text-base min-h-[120px] placeholder:text-muted-foreground/50 transition-colors",
-              answerBilingualClassName
-            )}
-            dir={answerDirection}
-          />
+          <div className="mt-6">
+            <BulletAnswerInput
+              key={page.id}
+              lines={currentLines}
+              onLinesChange={setCurrentLines}
+              placeholder="Write your thoughts…"
+              autoFocus
+            />
+          </div>
         )}
       </div>
 
@@ -354,6 +299,17 @@ export default function AppReflectionFlow() {
         open={showCelebration}
         onOpenChange={setShowCelebration}
         onDone={() => goBack()}
+      />
+
+      <ReflectionReviewSheet
+        open={showReview}
+        onOpenChange={setShowReview}
+        title={reflection?.title || 'Your reflection'}
+        items={reviewItems}
+        onContinue={() => {
+          setShowReview(false);
+          setShowCelebration(true);
+        }}
       />
     </div>
   );
