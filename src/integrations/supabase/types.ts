@@ -539,6 +539,69 @@ export type Database = {
         }
         Relationships: []
       }
+      audience_presets: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          emoji: string
+          exclude_playlists: string[]
+          exclude_programs: string[]
+          exclude_tools: string[]
+          id: string
+          include_playlists: string[]
+          include_programs: string[]
+          include_tools: string[]
+          include_update_status: string[]
+          name: string
+          target_instructor_ids: string[]
+          target_languages: string[]
+          target_timezones: string[]
+          target_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          emoji?: string
+          exclude_playlists?: string[]
+          exclude_programs?: string[]
+          exclude_tools?: string[]
+          id?: string
+          include_playlists?: string[]
+          include_programs?: string[]
+          include_tools?: string[]
+          include_update_status?: string[]
+          name: string
+          target_instructor_ids?: string[]
+          target_languages?: string[]
+          target_timezones?: string[]
+          target_type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          emoji?: string
+          exclude_playlists?: string[]
+          exclude_programs?: string[]
+          exclude_tools?: string[]
+          id?: string
+          include_playlists?: string[]
+          include_programs?: string[]
+          include_tools?: string[]
+          include_update_status?: string[]
+          name?: string
+          target_instructor_ids?: string[]
+          target_languages?: string[]
+          target_timezones?: string[]
+          target_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       audio_bookmarks: {
         Row: {
           audio_id: string
@@ -1357,6 +1420,7 @@ export type Database = {
         Row: {
           allow_comments: boolean
           allow_reactions: boolean
+          audience_preset_id: string | null
           cover_image_url: string | null
           created_at: string
           exclude_playlists: string[]
@@ -1382,6 +1446,7 @@ export type Database = {
         Insert: {
           allow_comments?: boolean
           allow_reactions?: boolean
+          audience_preset_id?: string | null
           cover_image_url?: string | null
           created_at?: string
           exclude_playlists?: string[]
@@ -1407,6 +1472,7 @@ export type Database = {
         Update: {
           allow_comments?: boolean
           allow_reactions?: boolean
+          audience_preset_id?: string | null
           cover_image_url?: string | null
           created_at?: string
           exclude_playlists?: string[]
@@ -1430,6 +1496,13 @@ export type Database = {
           type?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "feed_channels_audience_preset_id_fkey"
+            columns: ["audience_preset_id"]
+            isOneToOne: false
+            referencedRelation: "audience_presets"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "feed_channels_round_id_fkey"
             columns: ["round_id"]
@@ -1760,6 +1833,7 @@ export type Database = {
       }
       home_banners: {
         Row: {
+          audience_preset_id: string | null
           background_color: string | null
           button_text: string | null
           button_url: string | null
@@ -1794,6 +1868,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          audience_preset_id?: string | null
           background_color?: string | null
           button_text?: string | null
           button_url?: string | null
@@ -1828,6 +1903,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          audience_preset_id?: string | null
           background_color?: string | null
           button_text?: string | null
           button_url?: string | null
@@ -1861,7 +1937,15 @@ export type Database = {
           updated_at?: string | null
           video_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "home_banners_audience_preset_id_fkey"
+            columns: ["audience_preset_id"]
+            isOneToOne: false
+            referencedRelation: "audience_presets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       instructor_referrals: {
         Row: {
@@ -3006,6 +3090,7 @@ export type Database = {
       promo_banners: {
         Row: {
           aspect_ratio: string
+          audience_preset_id: string | null
           cover_image_url: string
           created_at: string
           custom_url: string | null
@@ -3037,6 +3122,7 @@ export type Database = {
         }
         Insert: {
           aspect_ratio?: string
+          audience_preset_id?: string | null
           cover_image_url: string
           created_at?: string
           custom_url?: string | null
@@ -3068,6 +3154,7 @@ export type Database = {
         }
         Update: {
           aspect_ratio?: string
+          audience_preset_id?: string | null
           cover_image_url?: string
           created_at?: string
           custom_url?: string | null
@@ -3097,7 +3184,15 @@ export type Database = {
           target_video_ids?: string[] | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "promo_banners_audience_preset_id_fkey"
+            columns: ["audience_preset_id"]
+            isOneToOne: false
+            referencedRelation: "audience_presets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       push_notification_logs: {
         Row: {
