@@ -1,0 +1,1 @@
+ALTER TABLE public.instructors ADD COLUMN IF NOT EXISTS default_playlist_ids uuid[] NOT NULL DEFAULT '{}'::uuid[];

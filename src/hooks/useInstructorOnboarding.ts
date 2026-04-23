@@ -16,6 +16,7 @@ export interface PendingInstructor {
   bio: string | null;
   default_program_slug: string | null;
   default_routine_ids: string[];
+  default_playlist_ids: string[];
   plus_trial_days: number;
   source: 'appsflyer' | 'url';
   rawAttribution: Record<string, unknown> | null;
@@ -67,8 +68,8 @@ function clearPendingSlug() {
 export async function applyInstructorSetup(
   userId: string,
   instructor: PendingInstructor,
-): Promise<{ ok: boolean; granted: { program: boolean; routines: number; trial: boolean } }> {
-  const granted = { program: false, routines: 0, trial: false };
+): Promise<{ ok: boolean; granted: { program: boolean; routines: number; playlists: number; trial: boolean } }> {
+  const granted = { program: false, routines: 0, playlists: 0, trial: false };
 
   try {
     // 1. Create referral record (unique constraint prevents duplicate per instructor)
@@ -146,7 +147,29 @@ export async function applyInstructorSetup(
       }
     }
 
-    // 5. Grant Plus trial — ONE TIME ONLY across all instructors
+    // 5. Unlock default audio playlists (free access via playlist_saves)
+    const playlistIds = instructor.default_playlist_ids || [];
+    for (const playlistId of playlistIds) {
+      try {
+        const { data: alreadySaved } = await supabase
+          .from('playlist_saves' as any)
+          .select('id')
+          .eq('user_id', userId)
+          .eq('playlist_id', playlistId)
+          .maybeSingle();
+        if (alreadySaved) continue;
+
+        await supabase.from('playlist_saves' as any).insert({
+          user_id: userId,
+          playlist_id: playlistId,
+        });
+        granted.playlists += 1;
+      } catch (err) {
+        console.warn('[InstructorOnboarding] Failed to unlock playlist', playlistId, err);
+      }
+    }
+
+    // 6. Grant Plus trial — ONE TIME ONLY across all instructors
     if (instructor.plus_trial_days > 0) {
       const { data: profile } = await supabase
         .from('profiles')
@@ -210,7 +233,7 @@ export function useInstructorOnboarding(userId: string | undefined) {
         // Look up instructor
         const { data: instructor, error: lookupErr } = await supabase
           .from('instructors')
-          .select('id, slug, display_name, photo_url, bio, default_program_slug, default_routine_ids, plus_trial_days')
+          .select('id, slug, display_name, photo_url, bio, default_program_slug, default_routine_ids, default_playlist_ids, plus_trial_days')
           .eq('slug', pending.slug)
           .eq('is_active', true)
           .maybeSingle();
@@ -243,6 +266,7 @@ export function useInstructorOnboarding(userId: string | undefined) {
           bio: ins.bio,
           default_program_slug: ins.default_program_slug,
           default_routine_ids: ins.default_routine_ids || [],
+          default_playlist_ids: ins.default_playlist_ids || [],
           plus_trial_days: ins.plus_trial_days || 0,
           source: pending.source,
           rawAttribution: pending.raw,

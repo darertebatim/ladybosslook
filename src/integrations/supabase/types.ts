@@ -1899,6 +1899,7 @@ export type Database = {
         Row: {
           bio: string | null
           created_at: string
+          default_playlist_ids: string[]
           default_program_slug: string | null
           default_routine_ids: string[]
           display_name: string
@@ -1912,6 +1913,7 @@ export type Database = {
         Insert: {
           bio?: string | null
           created_at?: string
+          default_playlist_ids?: string[]
           default_program_slug?: string | null
           default_routine_ids?: string[]
           display_name: string
@@ -1925,6 +1927,7 @@ export type Database = {
         Update: {
           bio?: string | null
           created_at?: string
+          default_playlist_ids?: string[]
           default_program_slug?: string | null
           default_routine_ids?: string[]
           display_name?: string
