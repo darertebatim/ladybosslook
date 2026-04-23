@@ -192,7 +192,7 @@ export function InstructorWelcomeSheet() {
 
         const { data: ins } = await supabase
           .from('instructors')
-          .select('id, slug, display_name, photo_url, bio, default_program_slug, default_routine_ids, default_playlist_ids, plus_trial_days')
+          .select('id, slug, display_name, photo_url, bio, default_program_slug, default_routine_ids, default_playlist_ids, default_channel_ids, plus_trial_days')
           .eq('id', referral.instructor_id)
           .maybeSingle();
 
@@ -239,6 +239,7 @@ export function InstructorWelcomeSheet() {
           defaultProgramSlug={instructor.default_program_slug}
           defaultRoutineIdsCount={instructor.default_routine_ids?.length || 0}
           defaultPlaylistIdsCount={instructor.default_playlist_ids?.length || 0}
+          defaultChannelIdsCount={instructor.default_channel_ids?.length || 0}
           plusTrialDays={instructor.plus_trial_days}
           onDismiss={dismiss}
         />
