@@ -260,6 +260,16 @@ export function PromoBanner({
       if (!shouldShowBanner(banner) || dismissedIds.has(banner.id)) {
         return false;
       }
+
+      // Instructor-scoped targeting (applies to ALL target_types).
+      // If banner has target_instructor_ids set, only users referred by one
+      // of those instructors should see it.
+      const instructorIds = banner.target_instructor_ids || [];
+      if (instructorIds.length > 0) {
+        if (!userInstructorIds || userInstructorIds.length === 0) return false;
+        const match = instructorIds.some(id => userInstructorIds.includes(id));
+        if (!match) return false;
+      }
       
       // Check display delay (for player/video_player locations — skip for full-screen overlays, they use page-time delay)
       if (banner.aspect_ratio !== 'full' && (banner.display_delay_seconds || 0) > 0 && playbackSeconds < banner.display_delay_seconds) {
@@ -376,7 +386,7 @@ export function PromoBanner({
       
       return true;
     });
-  }, [banners, dismissedIds, location, currentPlaylistId, currentAudioId, currentVideoId, playbackSeconds, userEnrollments, userPlaylists, userTools, userProfile]);
+  }, [banners, dismissedIds, location, currentPlaylistId, currentAudioId, currentVideoId, playbackSeconds, userEnrollments, userPlaylists, userTools, userProfile, userInstructorIds]);
 
   const handleDismiss = (e: React.MouseEvent, banner: PromoBannerData) => {
     e.stopPropagation();
