@@ -1,8 +1,10 @@
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, ChevronRight, Sparkles } from 'lucide-react';
+import { AlertCircle, Sparkles, GraduationCap } from 'lucide-react';
 import { format, isToday } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
+import { CachedImage } from '@/components/ui/CachedImage';
+import { cn } from '@/lib/utils';
 
 // Task palette cycle for program cards
 const PROGRAM_CARD_COLOR_CYCLE: TaskColor[] = [
@@ -21,6 +23,7 @@ interface CompactRoundCardProps {
   isUnseen?: boolean;
   onView?: () => void;
   colorIndex?: number;
+  programImage?: string | null;
 }
 
 export function CompactRoundCard({ 
@@ -29,6 +32,7 @@ export function CompactRoundCard({
   isUnseen,
   onView,
   colorIndex = 0,
+  programImage,
 }: CompactRoundCardProps) {
   const round = enrollment.program_rounds;
   if (!round) return null;
@@ -47,8 +51,8 @@ export function CompactRoundCard({
     : null;
 
   // Get video thumbnail
-  let thumbnailUrl = '';
-  if (round.video_url) {
+  let thumbnailUrl = programImage || '';
+  if (!thumbnailUrl && round.video_url) {
     if (round.video_url.includes('youtube.com/watch')) {
       const videoId = round.video_url.split('v=')[1]?.split('&')[0];
       thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
@@ -67,60 +71,81 @@ export function CompactRoundCard({
       onClick={onView}
       className="block"
     >
-      <div className={`relative w-[260px] h-[88px] rounded-xl overflow-hidden shadow-sm transition-transform active:scale-[0.98] ring-1 ring-border/60 ${paletteClass} ${isUnseen ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
-        {/* Content */}
-        <div className="absolute inset-0 p-2.5 flex flex-col justify-end">
-          {/* Course name with badges inline */}
-          <div className="flex items-center gap-1.5 mb-0.5">
-            {isUnseen && (
-              <Badge className="bg-primary text-primary-foreground text-[9px] px-1 py-0 h-4">
-                <Sparkles className="h-2 w-2 mr-0.5" />
-                New
-              </Badge>
+      <div className={cn(
+        "relative w-[280px] rounded-2xl overflow-hidden shadow-sm transition-transform active:scale-[0.98] border border-border/60",
+        paletteClass,
+        isUnseen && "ring-2 ring-primary ring-offset-2"
+      )}>
+        <div className="flex gap-3 p-2">
+          {/* Square thumbnail */}
+          <div className="relative h-20 w-20 flex-shrink-0 rounded-xl overflow-hidden bg-background/40">
+            {thumbnailUrl ? (
+              <CachedImage
+                src={thumbnailUrl}
+                alt={enrollment.course_name}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-foreground/5">
+                <GraduationCap className="h-8 w-8 text-foreground/40" />
+              </div>
             )}
-            <Badge 
-              className={`text-[9px] px-1 py-0 h-4 ${
-                isActive 
-                  ? 'bg-green-500 text-white' 
-                  : 'bg-muted-foreground/20 text-muted-foreground'
-              }`}
-            >
-              {round.status}
-            </Badge>
-            <h3 className="text-foreground font-semibold text-[12px] line-clamp-1 flex-1">
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+            {/* Round subtitle */}
+            {round.round_name && (
+              <p className="text-[11px] text-foreground/80 truncate">{round.round_name}</p>
+            )}
+
+            {/* Title */}
+            <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
               {enrollment.course_name}
             </h3>
-          </div>
-          
-          {/* Round name + View schedule link */}
-          <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-            <span className="truncate">{round.round_name}</span>
-            <span>•</span>
-            <span className="flex items-center whitespace-nowrap text-primary">
-              View schedule
-              <ChevronRight className="h-3 w-3" />
-            </span>
-          </div>
-          
-          {/* Next session info */}
-          {displayDate && (
-            <p className={`text-[10px] ${isSessionToday ? 'text-green-600 dark:text-green-400 font-medium' : 'text-muted-foreground'}`}>
-              {isSessionToday 
-                ? `Next: Today at ${format(new Date(displayDate), 'h:mm a')}`
-                : isUpcoming 
-                  ? `Starts: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
-                  : `Next: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
-              }
-            </p>
-          )}
-          
-          {/* Important note (if exists) */}
-          {importantNote && (
-            <div className="flex items-center gap-1 text-[9px] text-amber-600 dark:text-amber-400">
-              <AlertCircle className="h-2 w-2 flex-shrink-0" />
-              <span className="line-clamp-1">{importantNote}</span>
+
+            {/* Status badges + next session */}
+            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+              {isUnseen && (
+                <Badge className="bg-primary text-primary-foreground rounded-full text-[10px] px-1.5 py-0 h-4 gap-0.5 border-0">
+                  <Sparkles className="h-2.5 w-2.5" />
+                  New
+                </Badge>
+              )}
+              <Badge
+                className={cn(
+                  "rounded-full text-[10px] px-1.5 py-0 h-4 border-0 capitalize",
+                  isActive
+                    ? 'bg-emerald-500 text-white hover:bg-emerald-500'
+                    : 'bg-foreground/10 text-foreground/70 hover:bg-foreground/10'
+                )}
+              >
+                {round.status}
+              </Badge>
+              {displayDate && (
+                <span className={cn(
+                  "text-[10px] font-medium truncate",
+                  isSessionToday ? 'text-emerald-700 dark:text-emerald-400' : 'text-foreground/70'
+                )}>
+                  {isSessionToday
+                    ? `Today · ${format(new Date(displayDate), 'h:mm a')}`
+                    : isUpcoming
+                      ? `${format(new Date(displayDate), 'MMM d')}`
+                      : `${format(new Date(displayDate), 'MMM d · h:mm a')}`}
+                </span>
+              )}
             </div>
-          )}
+
+            {/* Important note (if exists) */}
+            {importantNote && (
+              <div className="flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-400">
+                <AlertCircle className="h-2.5 w-2.5 flex-shrink-0" />
+                <span className="line-clamp-1">{importantNote}</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </Link>
