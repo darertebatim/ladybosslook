@@ -56,6 +56,42 @@ function readPendingSlug(): { slug: string; source: 'appsflyer' | 'url'; raw: Re
   return null;
 }
 
+/**
+ * Server-side admin assignment fallback. If an admin sets
+ * profiles.referred_by_instructor_id directly (no URL/AppsFlyer),
+ * we still want the full setup to run on the user's next app open.
+ */
+async function readServerAssignedInstructorSlug(userId: string): Promise<string | null> {
+  try {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('referred_by_instructor_id')
+      .eq('id', userId)
+      .maybeSingle();
+    const instructorId = (profile as any)?.referred_by_instructor_id;
+    if (!instructorId) return null;
+
+    // Only auto-trigger if no referral row yet for this instructor
+    const { data: existing } = await supabase
+      .from('instructor_referrals')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('instructor_id', instructorId)
+      .maybeSingle();
+    if (existing) return null;
+
+    const { data: ins } = await supabase
+      .from('instructors')
+      .select('slug')
+      .eq('id', instructorId)
+      .eq('is_active', true)
+      .maybeSingle();
+    return (ins as any)?.slug ?? null;
+  } catch {
+    return null;
+  }
+}
+
 function clearPendingSlug() {
   try { localStorage.removeItem(URL_INSTRUCTOR_KEY); } catch {/* ignore */}
   markAttributionProcessed();
