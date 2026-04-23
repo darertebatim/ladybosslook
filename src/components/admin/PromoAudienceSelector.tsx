@@ -370,6 +370,33 @@ export function PromoAudienceSelector({
             </div>
           </div>
 
+          {/* Instructor Section */}
+          {setTargetInstructorIds && (
+            <div className="space-y-3">
+              <Label className="text-xs text-muted-foreground uppercase tracking-wider">
+                Instructor Audience
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Show only to users who were referred by one of these instructors (empty = all users).
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {instructors?.map((inst) => (
+                  <Badge
+                    key={inst.id}
+                    variant={targetInstructorIds.includes(inst.id) ? 'default' : 'outline'}
+                    className={`cursor-pointer hover:bg-primary/10 ${!inst.is_active ? 'opacity-60' : ''}`}
+                    onClick={() => toggleItem(targetInstructorIds, setTargetInstructorIds, inst.id)}
+                  >
+                    👩‍🏫 {inst.display_name}
+                  </Badge>
+                ))}
+                {!instructors?.length && (
+                  <span className="text-xs text-muted-foreground italic">No instructors yet</span>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="space-y-3">
             <Label className="text-xs text-muted-foreground uppercase tracking-wider">
               Preferred Language (Second Language)
