@@ -1373,6 +1373,7 @@ export type Database = {
           round_id: string | null
           slug: string
           sort_order: number
+          target_instructor_ids: string[]
           target_languages: string[]
           target_timezones: string[]
           target_type: string
@@ -1397,6 +1398,7 @@ export type Database = {
           round_id?: string | null
           slug: string
           sort_order?: number
+          target_instructor_ids?: string[]
           target_languages?: string[]
           target_timezones?: string[]
           target_type?: string
@@ -1421,6 +1423,7 @@ export type Database = {
           round_id?: string | null
           slug?: string
           sort_order?: number
+          target_instructor_ids?: string[]
           target_languages?: string[]
           target_timezones?: string[]
           target_type?: string
@@ -1899,6 +1902,7 @@ export type Database = {
         Row: {
           bio: string | null
           created_at: string
+          default_channel_ids: string[]
           default_playlist_ids: string[]
           default_program_slug: string | null
           default_routine_ids: string[]
@@ -1913,6 +1917,7 @@ export type Database = {
         Insert: {
           bio?: string | null
           created_at?: string
+          default_channel_ids?: string[]
           default_playlist_ids?: string[]
           default_program_slug?: string | null
           default_routine_ids?: string[]
@@ -1927,6 +1932,7 @@ export type Database = {
         Update: {
           bio?: string | null
           created_at?: string
+          default_channel_ids?: string[]
           default_playlist_ids?: string[]
           default_program_slug?: string | null
           default_routine_ids?: string[]
