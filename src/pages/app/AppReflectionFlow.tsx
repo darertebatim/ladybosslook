@@ -10,6 +10,7 @@ import { useBilingualText } from '@/components/ui/BilingualText';
 import { cn } from '@/lib/utils';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { format } from 'date-fns';
+import { ReflectionCelebrationSheet } from '@/components/reflection/ReflectionCelebrationSheet';
 
 const BULLET_COLORS = [
   'hsl(142, 50%, 78%)',
@@ -39,6 +40,7 @@ export default function AppReflectionFlow() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [showCelebration, setShowCelebration] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Free-form style state for single-page reflections
@@ -144,16 +146,10 @@ export default function AppReflectionFlow() {
         responseText: content,
         isCompleted: true,
       });
-      toast.success('Reflection completed ✨');
       if (reflectionId) {
         await autoCompleteReflection(reflectionId);
       }
-      if (hasActivePlayer) {
-        navigate('/app/home');
-        routinePlayer!.maximize();
-      } else {
-        goBack();
-      }
+      setShowCelebration(true);
     } catch (error) {
       console.error('Failed to save reflection response:', error);
       toast.error('Failed to save. Please try again.');
@@ -180,16 +176,10 @@ export default function AppReflectionFlow() {
       }
 
       if (isLast) {
-        toast.success('Reflection completed ✨');
         if (reflectionId) {
           await autoCompleteReflection(reflectionId);
         }
-        if (hasActivePlayer) {
-          navigate('/app/home');
-          routinePlayer!.maximize();
-        } else {
-          goBack();
-        }
+        setShowCelebration(true);
       } else {
         setCurrentIndex((i) => i + 1);
       }
@@ -293,6 +283,12 @@ export default function AppReflectionFlow() {
             ))}
           </div>
         </div>
+
+        <ReflectionCelebrationSheet
+          open={showCelebration}
+          onOpenChange={setShowCelebration}
+          onDone={() => goBack()}
+        />
       </div>
     );
   }
@@ -353,6 +349,12 @@ export default function AppReflectionFlow() {
           {isLast ? <Check className="h-6 w-6" /> : <ArrowRight className="h-6 w-6" />}
         </button>
       </div>
+
+      <ReflectionCelebrationSheet
+        open={showCelebration}
+        onOpenChange={setShowCelebration}
+        onDone={() => goBack()}
+      />
     </div>
   );
 }
