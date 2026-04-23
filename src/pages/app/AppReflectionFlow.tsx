@@ -349,6 +349,12 @@ export default function AppReflectionFlow() {
           {isLast ? <Check className="h-6 w-6" /> : <ArrowRight className="h-6 w-6" />}
         </button>
       </div>
+
+      <ReflectionCelebrationSheet
+        open={showCelebration}
+        onOpenChange={setShowCelebration}
+        onDone={() => goBack()}
+      />
     </div>
   );
 }
