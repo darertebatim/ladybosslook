@@ -56,6 +56,42 @@ function readPendingSlug(): { slug: string; source: 'appsflyer' | 'url'; raw: Re
   return null;
 }
 
+/**
+ * Server-side admin assignment fallback. If an admin sets
+ * profiles.referred_by_instructor_id directly (no URL/AppsFlyer),
+ * we still want the full setup to run on the user's next app open.
+ */
+async function readServerAssignedInstructorSlug(userId: string): Promise<string | null> {
+  try {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('referred_by_instructor_id')
+      .eq('id', userId)
+      .maybeSingle();
+    const instructorId = (profile as any)?.referred_by_instructor_id;
+    if (!instructorId) return null;
+
+    // Only auto-trigger if no referral row yet for this instructor
+    const { data: existing } = await supabase
+      .from('instructor_referrals')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('instructor_id', instructorId)
+      .maybeSingle();
+    if (existing) return null;
+
+    const { data: ins } = await supabase
+      .from('instructors')
+      .select('slug')
+      .eq('id', instructorId)
+      .eq('is_active', true)
+      .maybeSingle();
+    return (ins as any)?.slug ?? null;
+  } catch {
+    return null;
+  }
+}
+
 function clearPendingSlug() {
   try { localStorage.removeItem(URL_INSTRUCTOR_KEY); } catch {/* ignore */}
   markAttributionProcessed();
@@ -242,8 +278,16 @@ export function useInstructorOnboarding(userId: string | undefined) {
     ran.current = true;
 
     const run = async () => {
-      const pending = readPendingSlug();
-      if (!pending) return;
+      let pending = readPendingSlug();
+      let autoApply = false;
+
+      // Fallback: admin assigned an instructor on the profile directly
+      if (!pending) {
+        const serverSlug = await readServerAssignedInstructorSlug(userId);
+        if (!serverSlug) return;
+        pending = { slug: serverSlug, source: 'url', raw: { source: 'admin_assignment' } };
+        autoApply = true; // skip the invite modal — admin already decided
+      }
 
       try {
         // Look up instructor
@@ -274,7 +318,7 @@ export function useInstructorOnboarding(userId: string | undefined) {
         }
 
         const ins = instructor as any;
-        setPendingInvite({
+        const invite: PendingInstructor = {
           id: ins.id,
           slug: ins.slug,
           display_name: ins.display_name,
@@ -287,7 +331,17 @@ export function useInstructorOnboarding(userId: string | undefined) {
           plus_trial_days: ins.plus_trial_days || 0,
           source: pending.source,
           rawAttribution: pending.raw,
-        });
+        };
+
+        if (autoApply) {
+          // Server-assigned: silently apply full setup, no modal
+          const result = await applyInstructorSetup(userId, invite);
+          if (result.ok) {
+            console.log('[InstructorOnboarding] Auto-applied admin-assigned instructor', invite.slug, result.granted);
+          }
+        } else {
+          setPendingInvite(invite);
+        }
       } catch (err) {
         console.warn('[InstructorOnboarding] Detect error:', err);
       }
