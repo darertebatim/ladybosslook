@@ -28,6 +28,7 @@ interface PromoBannerData {
   exclude_tools: string[];
   target_languages: string[];
   target_timezones: string[];
+  target_instructor_ids: string[];
   display_location: string[];
   target_playlist_ids: string[];
   target_audio_ids: string[];
@@ -229,6 +230,22 @@ export function PromoBanner({
         .maybeSingle();
       if (error) throw error;
       return data;
+    },
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Fetch user's instructor referrals for instructor-scoped targeting
+  const { data: userInstructorIds } = useQuery({
+    queryKey: ['user-instructor-refs-for-promo', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase
+        .from('instructor_referrals')
+        .select('instructor_id')
+        .eq('user_id', user.id);
+      if (error) return [];
+      return (data || []).map((r: any) => r.instructor_id);
     },
     enabled: !!user?.id,
     staleTime: 5 * 60 * 1000,
