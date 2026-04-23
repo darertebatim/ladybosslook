@@ -444,7 +444,8 @@ export function PromoAudienceSelector({
             includePlaylists.length > 0 || excludePlaylists.length > 0 ||
             includeTools.length > 0 || excludeTools.length > 0 ||
             includeUpdateStatus.length > 0 ||
-            targetLanguages.length > 0 || targetTimezones.length > 0) && (
+            targetLanguages.length > 0 || targetTimezones.length > 0 ||
+            targetInstructorIds.length > 0) && (
             <div className="text-xs text-muted-foreground bg-background p-2 rounded border">
               <strong>Summary:</strong>
               {includePrograms.length > 0 && <span className="text-green-600"> +{includePrograms.length} programs</span>}
@@ -456,6 +457,7 @@ export function PromoAudienceSelector({
               {includeUpdateStatus.length > 0 && <span className="text-green-600"> 📱 {includeUpdateStatus.join(', ')}</span>}
               {targetLanguages.length > 0 && <span className="text-blue-600"> 🌐 {targetLanguages.length} languages</span>}
               {targetTimezones.length > 0 && <span className="text-blue-600"> 🕐 {targetTimezones.length} timezone groups</span>}
+              {targetInstructorIds.length > 0 && <span className="text-purple-600"> 👩‍🏫 {targetInstructorIds.length} instructors</span>}
             </div>
           )}
         </div>
