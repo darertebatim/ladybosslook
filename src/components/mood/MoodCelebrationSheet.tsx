@@ -11,7 +11,7 @@ import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider'
 
 import journalImg from '@/assets/mood-card-journal.png';
 import breathingImg from '@/assets/mood-card-breathing.png';
-import emotionImg from '@/assets/mood-card-emotion.png';
+import reflectImg from '@/assets/mood-card-reflect.png';
 import talkImg from '@/assets/mood-card-talk.png';
 
 interface MoodData {
@@ -75,9 +75,9 @@ const ACTIONS = [
     route: `/app/breathe?exercise=${CALM_BREATHING_ID}`,
   },
   {
-    label: 'Name My Emotion',
-    image: emotionImg,
-    route: '/app/emotion?step=select',
+    label: 'Choose a Reflection',
+    image: reflectImg,
+    route: '/app/reflections',
   },
   {
     label: 'Talk it Out',
