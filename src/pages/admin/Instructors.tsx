@@ -53,12 +53,19 @@ export default function Instructors() {
   const [editing, setEditing] = useState<Instructor | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [programs, setPrograms] = useState<{ slug: string; title: string }[]>([]);
+  const [routines, setRoutines] = useState<{ id: string; title: string; emoji: string | null }[]>([]);
+  const [playlists, setPlaylists] = useState<{ id: string; name: string; cover_image_url: string | null }[]>([]);
+  const [search, setSearch] = useState('');
 
   const load = async () => {
     setLoading(true);
-    const [{ data: rows }, { data: refs }] = await Promise.all([
+    const [{ data: rows }, { data: refs }, { data: progs }, { data: rts }, { data: pls }] = await Promise.all([
       supabase.from('instructors').select('*').order('created_at', { ascending: false }),
       supabase.from('instructor_referrals').select('instructor_id'),
+      supabase.from('program_catalog' as any).select('slug, title').eq('is_active', true).order('title'),
+      supabase.from('routines_bank').select('id, title, emoji').eq('is_active', true).order('title'),
+      supabase.from('audio_playlists').select('id, name, cover_image_url').eq('is_hidden', false).order('name'),
     ]);
     setInstructors((rows as Instructor[]) || []);
     const counts: Record<string, number> = {};
@@ -66,6 +73,9 @@ export default function Instructors() {
       counts[r.instructor_id] = (counts[r.instructor_id] || 0) + 1;
     });
     setStats(counts);
+    setPrograms((progs as any) || []);
+    setRoutines((rts as any) || []);
+    setPlaylists((pls as any) || []);
     setLoading(false);
   };
 
@@ -85,7 +95,8 @@ export default function Instructors() {
       photo_url: ins.photo_url || '',
       bio: ins.bio || '',
       default_program_slug: ins.default_program_slug || '',
-      default_routine_ids: (ins.default_routine_ids || []).join(', '),
+      default_routine_ids: ins.default_routine_ids || [],
+      default_playlist_ids: ins.default_playlist_ids || [],
       plus_trial_days: ins.plus_trial_days,
       is_active: ins.is_active,
     });
@@ -98,24 +109,21 @@ export default function Instructors() {
       return;
     }
     setSaving(true);
-    const routineIds = form.default_routine_ids
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
     const payload = {
       slug: form.slug.trim().toLowerCase(),
       display_name: form.display_name.trim(),
       photo_url: form.photo_url.trim() || null,
       bio: form.bio.trim() || null,
       default_program_slug: form.default_program_slug.trim() || null,
-      default_routine_ids: routineIds,
+      default_routine_ids: form.default_routine_ids,
+      default_playlist_ids: form.default_playlist_ids,
       plus_trial_days: Number(form.plus_trial_days) || 0,
       is_active: form.is_active,
     };
 
     const { error } = editing
-      ? await supabase.from('instructors').update(payload).eq('id', editing.id)
-      : await supabase.from('instructors').insert(payload);
+      ? await supabase.from('instructors').update(payload as any).eq('id', editing.id)
+      : await supabase.from('instructors').insert(payload as any);
 
     setSaving(false);
     if (error) {
