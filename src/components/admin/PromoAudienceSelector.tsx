@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Users, Plus, Minus } from 'lucide-react';
+import { AudiencePresetPicker } from './AudiencePresetPicker';
 
 export type TargetType = 'all' | 'enrolled' | 'custom';
 
