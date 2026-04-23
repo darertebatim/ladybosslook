@@ -245,8 +245,8 @@ export default function Instructors() {
                   <ImageUploader
                     value={form.photo_url}
                     onChange={(url) => setForm({ ...form, photo_url: url })}
-                    bucket="avatars"
-                    folder="instructors"
+                    bucket="instructor-photos"
+                    folder="profiles"
                     label="Profile photo"
                     placeholder="Upload or paste image URL"
                     previewHeight="h-0"
