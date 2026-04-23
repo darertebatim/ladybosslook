@@ -888,6 +888,68 @@ export default function AppTest() {
             <Star className="h-5 w-5 text-yellow-500" />
             App Store Review
           </CardTitle>
+      {/* Instructor Referral Flow */}
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            Instructor Referral Flow
+          </CardTitle>
+          <CardDescription>
+            Messages users see when they open the app via an instructor's OneLink (e.g. <code>?instructor=sarah</code>).
+            The Invite Modal shows for existing logged-in users who need to confirm; the Welcome Sheet shows once after the invite is accepted (or for fresh installs).
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-xs font-semibold text-muted-foreground mr-1">Scenario:</span>
+            <Button
+              variant={instructorPerksScenario === 'full' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setInstructorPerksScenario('full')}
+            >
+              Full perks
+            </Button>
+            <Button
+              variant={instructorPerksScenario === 'minimal' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setInstructorPerksScenario('minimal')}
+            >
+              Trial only
+            </Button>
+            <Button
+              variant={instructorPerksScenario === 'noPhoto' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setInstructorPerksScenario('noPhoto')}
+            >
+              No photo
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setShowInstructorInvite(true)} variant="outline">
+              <Sparkles className="h-4 w-4 mr-2" />
+              1. Invite Confirmation Modal
+            </Button>
+            <Button onClick={() => setShowInstructorWelcome(true)} variant="outline">
+              <Sparkles className="h-4 w-4 mr-2" />
+              2. Welcome Sheet (after accept)
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            <strong>Flow:</strong> Existing user taps OneLink → Invite Modal → accepts → Welcome Sheet.
+            New install: AppsFlyer attribution → onboarding completes → Welcome Sheet.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* App Store Review (continued) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Star className="h-5 w-5 text-yellow-500" />
+            App Store Review
+          </CardTitle>
           <CardDescription>
             Test the native App Store review prompt (iOS only)
           </CardDescription>
