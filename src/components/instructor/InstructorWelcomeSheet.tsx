@@ -51,16 +51,17 @@ export function InstructorWelcomeContent({
     (defaultProgramSlug ? 1 : 0) + defaultRoutineIdsCount + defaultPlaylistIdsCount;
 
   return (
-    <div className="flex flex-col items-center text-center">
+    <div className="flex flex-col items-center text-center -mx-6 -mt-8 -mb-10">
+    <div className="w-full bg-gradient-to-b from-primary/20 via-accent/20 to-background px-6 pt-8 pb-4 flex flex-col items-center">
       {photoUrl ? (
         <img
           src={photoUrl}
           alt={displayName}
-          className="h-24 w-24 rounded-full object-cover ring-4 ring-primary/20"
+          className="h-24 w-24 rounded-full object-cover ring-4 ring-primary/40 shadow-xl shadow-primary/20"
         />
       ) : (
-        <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center ring-4 ring-primary/20">
-          <Sparkles className="h-10 w-10 text-primary" />
+        <div className="h-24 w-24 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center ring-4 ring-primary/30 shadow-xl shadow-primary/20">
+          <Sparkles className="h-10 w-10 text-primary-foreground" />
         </div>
       )}
 
@@ -69,11 +70,14 @@ export function InstructorWelcomeContent({
       </h2>
 
       {bio && (
-        <p className="mt-2 text-sm text-muted-foreground max-w-sm">{bio}</p>
+        <p className="mt-2 text-sm text-foreground/70 max-w-sm">{bio}</p>
       )}
+    </div>
 
-      <div className="mt-6 w-full rounded-2xl bg-secondary/40 p-5 space-y-3 text-left">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+    <div className="w-full px-6 pb-10 flex flex-col items-center">
+
+      <div className="mt-6 w-full rounded-2xl bg-gradient-to-br from-accent/40 via-secondary/20 to-primary/15 p-5 space-y-3 text-left border border-primary/10 shadow-sm">
+        <p className="text-xs font-semibold uppercase tracking-wide text-primary">
           {displayName} picked this for you
         </p>
         {defaultProgramSlug && (
@@ -81,7 +85,7 @@ export function InstructorWelcomeContent({
             <span className="text-xl">🎓</span>
             <div>
               <p className="text-sm font-semibold text-foreground">Program enrolled</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-foreground/65">
                 Your course is unlocked and waiting for you.
               </p>
             </div>
@@ -94,7 +98,7 @@ export function InstructorWelcomeContent({
               <p className="text-sm font-semibold text-foreground">
                 {defaultRoutineIdsCount} routine{defaultRoutineIdsCount > 1 ? 's' : ''} added
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-foreground/65">
                 Hand-picked for your home planner.
               </p>
             </div>
@@ -107,7 +111,7 @@ export function InstructorWelcomeContent({
               <p className="text-sm font-semibold text-foreground">
                 {defaultPlaylistIdsCount} playlist{defaultPlaylistIdsCount > 1 ? 's' : ''} unlocked
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-foreground/65">
                 Available now in your audio library.
               </p>
             </div>
@@ -120,14 +124,14 @@ export function InstructorWelcomeContent({
               <p className="text-sm font-semibold text-foreground">
                 {plusTrialDays}-day Simora Plus trial
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-foreground/65">
                 Unlock all premium features on us.
               </p>
             </div>
           </div>
         )}
         {unlockedCount === 0 && plusTrialDays === 0 && (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-foreground/70">
             You're now part of {displayName}'s community.
           </p>
         )}
@@ -135,10 +139,11 @@ export function InstructorWelcomeContent({
 
       <Button
         onClick={onDismiss}
-        className="mt-6 w-full h-12 rounded-2xl text-base font-semibold"
+        className="mt-6 w-full h-12 rounded-2xl text-base font-semibold bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-primary-foreground shadow-md shadow-primary/30"
       >
         Let's get started
       </Button>
+    </div>
     </div>
   );
 }
