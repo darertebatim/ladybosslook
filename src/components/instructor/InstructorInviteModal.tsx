@@ -64,35 +64,35 @@ export function InstructorInviteContent({
 
   return (
     <>
-      <div className="bg-gradient-to-br from-primary/10 via-background to-accent/10 px-6 pt-8 pb-6">
+      <div className="bg-gradient-to-br from-primary/20 via-secondary/15 to-accent/30 px-6 pt-8 pb-6">
         <div className="flex flex-col items-center text-center">
           {photoUrl ? (
             <img
               src={photoUrl}
               alt={displayName}
-              className="h-20 w-20 rounded-full object-cover ring-4 ring-primary/20"
+              className="h-20 w-20 rounded-full object-cover ring-4 ring-primary/40 shadow-lg shadow-primary/20"
             />
           ) : (
-            <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center ring-4 ring-primary/20">
-              <Sparkles className="h-9 w-9 text-primary" />
+            <div className="h-20 w-20 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center ring-4 ring-primary/30 shadow-lg shadow-primary/20">
+              <Sparkles className="h-9 w-9 text-primary-foreground" />
             </div>
           )}
-          <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+          <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow-sm">
             <Gift className="h-3.5 w-3.5" />
             You've been invited
           </div>
           <h2 className="mt-3 text-xl font-bold text-foreground">
             {displayName} is inviting you
           </h2>
-          <p className="mt-1.5 text-sm text-muted-foreground">
+          <p className="mt-1.5 text-sm text-foreground/70">
             Accept their gifts to unlock the items below.
           </p>
         </div>
       </div>
 
-      <div className="px-6 pb-6 space-y-4">
+      <div className="px-6 pb-6 pt-4 space-y-4 bg-gradient-to-b from-accent/20 to-background">
         {perks.length > 0 && (
-          <div className="rounded-2xl bg-secondary/40 p-4 space-y-2.5">
+          <div className="rounded-2xl bg-gradient-to-br from-accent/40 to-secondary/30 p-4 space-y-2.5 border border-primary/10">
             {perks.map((p) => (
               <div key={p.label} className="flex items-center gap-3">
                 <span className="text-xl">{p.icon}</span>
@@ -106,7 +106,7 @@ export function InstructorInviteContent({
           <Button
             onClick={onAccept}
             disabled={busy}
-            className="h-12 rounded-2xl text-base font-semibold"
+            className="h-12 rounded-2xl text-base font-semibold bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-primary-foreground shadow-md shadow-primary/30"
           >
             {busy ? 'Applying…' : 'Accept gifts'}
           </Button>
@@ -114,7 +114,7 @@ export function InstructorInviteContent({
             onClick={onDecline}
             disabled={busy}
             variant="ghost"
-            className="h-11 rounded-2xl text-sm font-medium text-muted-foreground"
+            className="h-11 rounded-2xl text-sm font-medium text-foreground/60 hover:text-primary hover:bg-accent/30"
           >
             No thanks
           </Button>
