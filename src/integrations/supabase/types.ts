@@ -1785,6 +1785,7 @@ export type Database = {
           priority: number | null
           starts_at: string | null
           target_below_version: string | null
+          target_instructor_ids: string[]
           target_languages: string[] | null
           target_timezones: string[] | null
           target_type: string | null
@@ -1818,6 +1819,7 @@ export type Database = {
           priority?: number | null
           starts_at?: string | null
           target_below_version?: string | null
+          target_instructor_ids?: string[]
           target_languages?: string[] | null
           target_timezones?: string[] | null
           target_type?: string | null
@@ -1851,6 +1853,7 @@ export type Database = {
           priority?: number | null
           starts_at?: string | null
           target_below_version?: string | null
+          target_instructor_ids?: string[]
           target_languages?: string[] | null
           target_timezones?: string[] | null
           target_type?: string | null
@@ -3024,6 +3027,7 @@ export type Database = {
           priority: number
           starts_at: string | null
           target_audio_ids: string[] | null
+          target_instructor_ids: string[]
           target_languages: string[] | null
           target_playlist_ids: string[] | null
           target_timezones: string[] | null
@@ -3054,6 +3058,7 @@ export type Database = {
           priority?: number
           starts_at?: string | null
           target_audio_ids?: string[] | null
+          target_instructor_ids?: string[]
           target_languages?: string[] | null
           target_playlist_ids?: string[] | null
           target_timezones?: string[] | null
@@ -3084,6 +3089,7 @@ export type Database = {
           priority?: number
           starts_at?: string | null
           target_audio_ids?: string[] | null
+          target_instructor_ids?: string[]
           target_languages?: string[] | null
           target_playlist_ids?: string[] | null
           target_timezones?: string[] | null

@@ -28,6 +28,7 @@ interface PromoBannerData {
   exclude_tools: string[];
   target_languages: string[];
   target_timezones: string[];
+  target_instructor_ids: string[];
   display_location: string[];
   target_playlist_ids: string[];
   target_audio_ids: string[];
@@ -234,6 +235,22 @@ export function PromoBanner({
     staleTime: 5 * 60 * 1000,
   });
 
+  // Fetch user's instructor referrals for instructor-scoped targeting
+  const { data: userInstructorIds } = useQuery({
+    queryKey: ['user-instructor-refs-for-promo', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase
+        .from('instructor_referrals')
+        .select('instructor_id')
+        .eq('user_id', user.id);
+      if (error) return [];
+      return (data || []).map((r: any) => r.instructor_id);
+    },
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+  });
+
   // Filter banners based on location and targeting
   const eligibleBanners = useMemo(() => {
     if (!banners) return [];
@@ -242,6 +259,16 @@ export function PromoBanner({
       // Always check dismiss status first
       if (!shouldShowBanner(banner) || dismissedIds.has(banner.id)) {
         return false;
+      }
+
+      // Instructor-scoped targeting (applies to ALL target_types).
+      // If banner has target_instructor_ids set, only users referred by one
+      // of those instructors should see it.
+      const instructorIds = banner.target_instructor_ids || [];
+      if (instructorIds.length > 0) {
+        if (!userInstructorIds || userInstructorIds.length === 0) return false;
+        const match = instructorIds.some(id => userInstructorIds.includes(id));
+        if (!match) return false;
       }
       
       // Check display delay (for player/video_player locations — skip for full-screen overlays, they use page-time delay)
@@ -359,7 +386,7 @@ export function PromoBanner({
       
       return true;
     });
-  }, [banners, dismissedIds, location, currentPlaylistId, currentAudioId, currentVideoId, playbackSeconds, userEnrollments, userPlaylists, userTools, userProfile]);
+  }, [banners, dismissedIds, location, currentPlaylistId, currentAudioId, currentVideoId, playbackSeconds, userEnrollments, userPlaylists, userTools, userProfile, userInstructorIds]);
 
   const handleDismiss = (e: React.MouseEvent, banner: PromoBannerData) => {
     e.stopPropagation();

@@ -71,6 +71,8 @@ interface PromoAudienceSelectorProps {
   setTargetTimezones: (tzs: string[]) => void;
   includeUpdateStatus: string[];
   setIncludeUpdateStatus: (statuses: string[]) => void;
+  targetInstructorIds?: string[];
+  setTargetInstructorIds?: (ids: string[]) => void;
 }
 
 export function PromoAudienceSelector({
@@ -94,6 +96,8 @@ export function PromoAudienceSelector({
   setTargetTimezones,
   includeUpdateStatus,
   setIncludeUpdateStatus,
+  targetInstructorIds = [],
+  setTargetInstructorIds,
 }: PromoAudienceSelectorProps) {
   const UPDATE_STATUS_OPTIONS = [
     { slug: 'latest', label: '🆕 Last Update', description: 'Users on the latest app version' },
@@ -123,6 +127,19 @@ export function PromoAudienceSelector({
         .select('id, name')
         .eq('is_hidden', false)
         .order('name');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch instructors for instructor-scoped targeting
+  const { data: instructors } = useQuery({
+    queryKey: ['instructors-for-targeting'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('instructors')
+        .select('id, display_name, slug, is_active')
+        .order('display_name');
       if (error) throw error;
       return data;
     },
@@ -353,6 +370,33 @@ export function PromoAudienceSelector({
             </div>
           </div>
 
+          {/* Instructor Section */}
+          {setTargetInstructorIds && (
+            <div className="space-y-3">
+              <Label className="text-xs text-muted-foreground uppercase tracking-wider">
+                Instructor Audience
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Show only to users who were referred by one of these instructors (empty = all users).
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {instructors?.map((inst) => (
+                  <Badge
+                    key={inst.id}
+                    variant={targetInstructorIds.includes(inst.id) ? 'default' : 'outline'}
+                    className={`cursor-pointer hover:bg-primary/10 ${!inst.is_active ? 'opacity-60' : ''}`}
+                    onClick={() => toggleItem(targetInstructorIds, setTargetInstructorIds, inst.id)}
+                  >
+                    👩‍🏫 {inst.display_name}
+                  </Badge>
+                ))}
+                {!instructors?.length && (
+                  <span className="text-xs text-muted-foreground italic">No instructors yet</span>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="space-y-3">
             <Label className="text-xs text-muted-foreground uppercase tracking-wider">
               Preferred Language (Second Language)
@@ -400,7 +444,8 @@ export function PromoAudienceSelector({
             includePlaylists.length > 0 || excludePlaylists.length > 0 ||
             includeTools.length > 0 || excludeTools.length > 0 ||
             includeUpdateStatus.length > 0 ||
-            targetLanguages.length > 0 || targetTimezones.length > 0) && (
+            targetLanguages.length > 0 || targetTimezones.length > 0 ||
+            targetInstructorIds.length > 0) && (
             <div className="text-xs text-muted-foreground bg-background p-2 rounded border">
               <strong>Summary:</strong>
               {includePrograms.length > 0 && <span className="text-green-600"> +{includePrograms.length} programs</span>}
@@ -412,6 +457,7 @@ export function PromoAudienceSelector({
               {includeUpdateStatus.length > 0 && <span className="text-green-600"> 📱 {includeUpdateStatus.join(', ')}</span>}
               {targetLanguages.length > 0 && <span className="text-blue-600"> 🌐 {targetLanguages.length} languages</span>}
               {targetTimezones.length > 0 && <span className="text-blue-600"> 🕐 {targetTimezones.length} timezone groups</span>}
+              {targetInstructorIds.length > 0 && <span className="text-purple-600"> 👩‍🏫 {targetInstructorIds.length} instructors</span>}
             </div>
           )}
         </div>

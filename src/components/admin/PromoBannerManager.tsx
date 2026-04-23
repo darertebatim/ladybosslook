@@ -61,6 +61,7 @@ interface PromoBanner {
   target_languages: string[];
   target_timezones: string[];
   include_update_status: string[];
+  target_instructor_ids: string[];
   display_location: string[];
   target_playlist_ids: string[];
   target_audio_ids: string[];
@@ -109,6 +110,7 @@ export function PromoBannerManager() {
   const [targetLanguages, setTargetLanguages] = useState<string[]>([]);
   const [targetTimezones, setTargetTimezones] = useState<string[]>([]);
   const [includeUpdateStatus, setIncludeUpdateStatus] = useState<string[]>([]);
+  const [targetInstructorIds, setTargetInstructorIds] = useState<string[]>([]);
 
   // Fetch banners
   const { data: banners, isLoading } = useQuery({
@@ -346,6 +348,7 @@ export function PromoBannerManager() {
         target_languages: targetLanguages,
         target_timezones: targetTimezones,
         include_update_status: includeUpdateStatus,
+        target_instructor_ids: targetInstructorIds,
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
@@ -396,6 +399,7 @@ export function PromoBannerManager() {
         target_languages: targetLanguages,
         target_timezones: targetTimezones,
         include_update_status: includeUpdateStatus,
+        target_instructor_ids: targetInstructorIds,
         display_location: displayLocations,
         target_playlist_ids: targetPlaylistIds,
         target_audio_ids: targetAudioIds,
@@ -472,6 +476,7 @@ export function PromoBannerManager() {
     setTargetLanguages([]);
     setTargetTimezones([]);
     setIncludeUpdateStatus([]);
+    setTargetInstructorIds([]);
     // Reset location
     setDisplayLocations(['home_top']);
     setTargetPlaylistIds([]);
@@ -503,6 +508,7 @@ export function PromoBannerManager() {
     setTargetLanguages((banner as any).target_languages || []);
     setTargetTimezones((banner as any).target_timezones || []);
     setIncludeUpdateStatus((banner as any).include_update_status || []);
+    setTargetInstructorIds((banner as any).target_instructor_ids || []);
     // Load location
     setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
     setTargetPlaylistIds(banner.target_playlist_ids || []);
@@ -1031,6 +1037,8 @@ export function PromoBannerManager() {
                 setTargetTimezones={setTargetTimezones}
                 includeUpdateStatus={includeUpdateStatus}
                 setIncludeUpdateStatus={setIncludeUpdateStatus}
+                targetInstructorIds={targetInstructorIds}
+                setTargetInstructorIds={setTargetInstructorIds}
               />
 
               {/* Active Toggle */}
@@ -1141,6 +1149,7 @@ export function PromoBannerManager() {
                       setTargetLanguages((banner as any).target_languages || []);
                       setTargetTimezones((banner as any).target_timezones || []);
                       setIncludeUpdateStatus((banner as any).include_update_status || []);
+                      setTargetInstructorIds((banner as any).target_instructor_ids || []);
                       setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
                       setTargetPlaylistIds(banner.target_playlist_ids || []);
                       setTargetAudioIds(banner.target_audio_ids || []);

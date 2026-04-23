@@ -131,7 +131,7 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
     try {
       const { data, error } = await supabase
         .from('home_banners')
-        .select('id, title, description, button_text, button_url, video_url, background_color, target_below_version, display_location, destination_type, destination_id')
+        .select('id, title, description, button_text, button_url, video_url, background_color, target_below_version, display_location, destination_type, destination_id, target_instructor_ids')
         .eq('is_active', true)
         .or('starts_at.is.null,starts_at.lte.now()')
         .or('ends_at.is.null,ends_at.gte.now()')
@@ -139,6 +139,20 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
         .limit(10);
 
       if (error) throw error;
+
+      // If any banner is instructor-scoped, fetch user's referrals once
+      const restricted = (data || []).filter((d: any) => Array.isArray(d.target_instructor_ids) && d.target_instructor_ids.length > 0);
+      let userInstructorIds: string[] = [];
+      if (restricted.length > 0) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: refs } = await supabase
+            .from('instructor_referrals')
+            .select('instructor_id')
+            .eq('user_id', user.id);
+          userInstructorIds = (refs || []).map((r: any) => r.instructor_id);
+        }
+      }
 
       const currentVersion = BUILD_INFO.version;
       const filtered = (data || []).map(d => ({
@@ -153,6 +167,10 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
         }
         if (banner.display_location && banner.display_location.length > 0) {
           if (!banner.display_location.includes(location)) return false;
+        }
+        const instIds: string[] = (banner as any).target_instructor_ids || [];
+        if (instIds.length > 0) {
+          if (!instIds.some(id => userInstructorIds.includes(id))) return false;
         }
         return true;
       });

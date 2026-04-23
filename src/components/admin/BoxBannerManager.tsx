@@ -69,6 +69,7 @@ interface BoxBanner {
   target_languages: string[] | null;
   target_timezones: string[] | null;
   include_update_status: string[] | null;
+  target_instructor_ids: string[] | null;
   display_delay_seconds: number | null;
 }
 
@@ -107,6 +108,7 @@ export function BoxBannerManager() {
   const [targetLanguages, setTargetLanguages] = useState<string[]>([]);
   const [targetTimezones, setTargetTimezones] = useState<string[]>([]);
   const [includeUpdateStatus, setIncludeUpdateStatus] = useState<string[]>([]);
+  const [targetInstructorIds, setTargetInstructorIds] = useState<string[]>([]);
 
   // Fetch banners
   const { data: banners, isLoading } = useQuery({
@@ -213,6 +215,7 @@ export function BoxBannerManager() {
     setTargetLanguages([]);
     setTargetTimezones([]);
     setIncludeUpdateStatus([]);
+    setTargetInstructorIds([]);
   };
 
   const openCreateDialog = () => {
@@ -247,6 +250,7 @@ export function BoxBannerManager() {
     setTargetLanguages(banner.target_languages || []);
     setTargetTimezones(banner.target_timezones || []);
     setIncludeUpdateStatus(banner.include_update_status || []);
+    setTargetInstructorIds((banner as any).target_instructor_ids || []);
     setDialogOpen(true);
   };
 
@@ -278,6 +282,7 @@ export function BoxBannerManager() {
         target_languages: targetLanguages,
         target_timezones: targetTimezones,
         include_update_status: includeUpdateStatus,
+        target_instructor_ids: targetInstructorIds,
         display_delay_seconds: displayDelaySeconds,
       });
       if (error) throw error;
@@ -320,6 +325,7 @@ export function BoxBannerManager() {
         target_languages: targetLanguages,
         target_timezones: targetTimezones,
         include_update_status: includeUpdateStatus,
+        target_instructor_ids: targetInstructorIds,
         display_delay_seconds: displayDelaySeconds,
       }).eq('id', editingBanner.id);
       if (error) throw error;
@@ -640,6 +646,8 @@ export function BoxBannerManager() {
                 setTargetTimezones={setTargetTimezones}
                 includeUpdateStatus={includeUpdateStatus}
                 setIncludeUpdateStatus={setIncludeUpdateStatus}
+                targetInstructorIds={targetInstructorIds}
+                setTargetInstructorIds={setTargetInstructorIds}
               />
 
               {/* Actions */}

@@ -37,6 +37,7 @@ interface Channel {
   target_languages: string[];
   target_timezones: string[];
   include_update_status: string[];
+  target_instructor_ids: string[];
 }
 
 // Helper functions for cover storage
@@ -70,6 +71,7 @@ export function FeedChannelManager() {
   const [targetLanguages, setTargetLanguages] = useState<string[]>([]);
   const [targetTimezones, setTargetTimezones] = useState<string[]>([]);
   const [includeUpdateStatus, setIncludeUpdateStatus] = useState<string[]>([]);
+  const [targetInstructorIds, setTargetInstructorIds] = useState<string[]>([]);
 
   const { data: channels, isLoading } = useQuery({
     queryKey: ['admin-feed-channels'],
@@ -112,6 +114,7 @@ export function FeedChannelManager() {
         target_languages: targetLanguages,
         target_timezones: targetTimezones,
         include_update_status: includeUpdateStatus,
+        target_instructor_ids: targetInstructorIds,
       });
       if (error) throw error;
     },
@@ -183,6 +186,7 @@ export function FeedChannelManager() {
     setTargetLanguages([]);
     setTargetTimezones([]);
     setIncludeUpdateStatus([]);
+    setTargetInstructorIds([]);
   };
 
   const openEditDialog = (channel: Channel) => {
@@ -223,6 +227,7 @@ export function FeedChannelManager() {
     setTargetLanguages(channel.target_languages || []);
     setTargetTimezones(channel.target_timezones || []);
     setIncludeUpdateStatus(channel.include_update_status || []);
+    setTargetInstructorIds(channel.target_instructor_ids || []);
     setIsDialogOpen(true);
   };
 
@@ -246,6 +251,7 @@ export function FeedChannelManager() {
       target_languages: targetLanguages,
       target_timezones: targetTimezones,
       include_update_status: includeUpdateStatus,
+      target_instructor_ids: targetInstructorIds,
     };
 
     if (editingChannel) {
@@ -399,6 +405,8 @@ export function FeedChannelManager() {
                 setTargetTimezones={setTargetTimezones}
                 includeUpdateStatus={includeUpdateStatus}
                 setIncludeUpdateStatus={setIncludeUpdateStatus}
+                targetInstructorIds={targetInstructorIds}
+                setTargetInstructorIds={setTargetInstructorIds}
               />
 
               <Button
