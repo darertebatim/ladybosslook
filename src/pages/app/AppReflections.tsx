@@ -50,7 +50,14 @@ export default function AppReflections() {
   const availableCategories = useMemo(() => {
     if (!reflections) return [];
     const cats = new Set(reflections.map(r => r.category).filter(Boolean));
-    return REFLECTION_CATEGORIES.filter(c => cats.has(c.value));
+    const present = REFLECTION_CATEGORIES.filter(c => cats.has(c.value));
+    // Pin Morning then Night to the front; keep the rest in their original order.
+    const priority = ['morning', 'night'];
+    const pinned = priority
+      .map(v => present.find(c => c.value === v))
+      .filter((c): c is typeof present[number] => Boolean(c));
+    const rest = present.filter(c => !priority.includes(c.value));
+    return [...pinned, ...rest];
   }, [reflections]);
 
   return (
@@ -136,16 +143,6 @@ export default function AppReflections() {
       {/* Category pills */}
       <div className="px-4 mt-6">
         <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
-          <button
-            onClick={() => setSelectedCategory(null)}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-              selectedCategory === null
-                ? 'bg-foreground text-background'
-                : 'bg-muted text-muted-foreground'
-            }`}
-          >
-            All
-          </button>
           {availableCategories.map((cat) => (
             <button
               key={cat.value}
@@ -159,6 +156,16 @@ export default function AppReflections() {
               <FluentEmoji emoji={cat.emoji} size={14} /> {cat.label}
             </button>
           ))}
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0 transition-colors ${
+              selectedCategory === null
+                ? 'bg-foreground text-background'
+                : 'bg-muted text-muted-foreground'
+            }`}
+          >
+            All
+          </button>
         </div>
 
         {isLoading ? (
