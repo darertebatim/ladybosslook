@@ -199,9 +199,9 @@ export function MoodCelebrationSheet({
         <Button
           variant="ghost"
           onClick={handleDone}
-          className="w-full h-10 rounded-full text-foreground/40 hover:bg-foreground/5 text-sm"
+          className="w-full h-11 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
         >
-          {hasActivePlayer ? 'Continue Routine ▶' : 'Back to Home'}
+          {hasActivePlayer ? 'Continue Routine ▶' : 'Back to Home Planner'}
         </Button>
       </SheetContent>
     </Sheet>
