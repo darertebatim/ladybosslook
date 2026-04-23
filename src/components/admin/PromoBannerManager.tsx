@@ -111,6 +111,7 @@ export function PromoBannerManager() {
   const [targetTimezones, setTargetTimezones] = useState<string[]>([]);
   const [includeUpdateStatus, setIncludeUpdateStatus] = useState<string[]>([]);
   const [targetInstructorIds, setTargetInstructorIds] = useState<string[]>([]);
+  const [audiencePresetId, setAudiencePresetId] = useState<string | null>(null);
 
   // Fetch banners
   const { data: banners, isLoading } = useQuery({
@@ -354,6 +355,7 @@ export function PromoBannerManager() {
         target_audio_ids: targetAudioIds,
         target_video_ids: targetVideoIds,
         display_delay_seconds: displayDelaySeconds,
+        audience_preset_id: audiencePresetId,
       });
       if (error) throw error;
     },
@@ -405,6 +407,7 @@ export function PromoBannerManager() {
         target_audio_ids: targetAudioIds,
         target_video_ids: targetVideoIds,
         display_delay_seconds: displayDelaySeconds,
+        audience_preset_id: audiencePresetId,
       }).eq('id', editingBanner.id);
       if (error) throw error;
     },
@@ -477,6 +480,7 @@ export function PromoBannerManager() {
     setTargetTimezones([]);
     setIncludeUpdateStatus([]);
     setTargetInstructorIds([]);
+    setAudiencePresetId(null);
     // Reset location
     setDisplayLocations(['home_top']);
     setTargetPlaylistIds([]);
@@ -509,6 +513,7 @@ export function PromoBannerManager() {
     setTargetTimezones((banner as any).target_timezones || []);
     setIncludeUpdateStatus((banner as any).include_update_status || []);
     setTargetInstructorIds((banner as any).target_instructor_ids || []);
+    setAudiencePresetId((banner as any).audience_preset_id || null);
     // Load location
     setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
     setTargetPlaylistIds(banner.target_playlist_ids || []);
@@ -1039,6 +1044,8 @@ export function PromoBannerManager() {
                 setIncludeUpdateStatus={setIncludeUpdateStatus}
                 targetInstructorIds={targetInstructorIds}
                 setTargetInstructorIds={setTargetInstructorIds}
+                presetId={audiencePresetId}
+                setPresetId={setAudiencePresetId}
               />
 
               {/* Active Toggle */}
@@ -1150,6 +1157,7 @@ export function PromoBannerManager() {
                       setTargetTimezones((banner as any).target_timezones || []);
                       setIncludeUpdateStatus((banner as any).include_update_status || []);
                       setTargetInstructorIds((banner as any).target_instructor_ids || []);
+                      setAudiencePresetId((banner as any).audience_preset_id || null);
                       setDisplayLocations((banner.display_location as DisplayLocation[]) || ['home_top']);
                       setTargetPlaylistIds(banner.target_playlist_ids || []);
                       setTargetAudioIds(banner.target_audio_ids || []);
