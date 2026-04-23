@@ -109,6 +109,7 @@ export function BoxBannerManager() {
   const [targetTimezones, setTargetTimezones] = useState<string[]>([]);
   const [includeUpdateStatus, setIncludeUpdateStatus] = useState<string[]>([]);
   const [targetInstructorIds, setTargetInstructorIds] = useState<string[]>([]);
+  const [audiencePresetId, setAudiencePresetId] = useState<string | null>(null);
 
   // Fetch banners
   const { data: banners, isLoading } = useQuery({
@@ -216,6 +217,7 @@ export function BoxBannerManager() {
     setTargetTimezones([]);
     setIncludeUpdateStatus([]);
     setTargetInstructorIds([]);
+    setAudiencePresetId(null);
   };
 
   const openCreateDialog = () => {
@@ -251,6 +253,7 @@ export function BoxBannerManager() {
     setTargetTimezones(banner.target_timezones || []);
     setIncludeUpdateStatus(banner.include_update_status || []);
     setTargetInstructorIds((banner as any).target_instructor_ids || []);
+    setAudiencePresetId((banner as any).audience_preset_id || null);
     setDialogOpen(true);
   };
 
@@ -284,6 +287,7 @@ export function BoxBannerManager() {
         include_update_status: includeUpdateStatus,
         target_instructor_ids: targetInstructorIds,
         display_delay_seconds: displayDelaySeconds,
+        audience_preset_id: audiencePresetId,
       });
       if (error) throw error;
     },
@@ -327,6 +331,7 @@ export function BoxBannerManager() {
         include_update_status: includeUpdateStatus,
         target_instructor_ids: targetInstructorIds,
         display_delay_seconds: displayDelaySeconds,
+        audience_preset_id: audiencePresetId,
       }).eq('id', editingBanner.id);
       if (error) throw error;
     },
@@ -648,6 +653,8 @@ export function BoxBannerManager() {
                 setIncludeUpdateStatus={setIncludeUpdateStatus}
                 targetInstructorIds={targetInstructorIds}
                 setTargetInstructorIds={setTargetInstructorIds}
+                presetId={audiencePresetId}
+                setPresetId={setAudiencePresetId}
               />
 
               {/* Actions */}
