@@ -2408,6 +2408,30 @@ export type Database = {
           },
         ]
       }
+      playlist_update_notification_reads: {
+        Row: {
+          audio_id: string
+          id: string
+          playlist_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          audio_id: string
+          id?: string
+          playlist_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          audio_id?: string
+          id?: string
+          playlist_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pn_config: {
         Row: {
           body: string

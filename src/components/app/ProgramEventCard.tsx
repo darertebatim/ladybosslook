@@ -63,6 +63,22 @@ const EVENT_STYLES = {
     badge: 'Changes in Program',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
+  playlist_save: {
+    bgColor: 'bg-[#FFE4D6]',
+    borderColor: 'border-[#F0C4A8]',
+    settingsBg: 'bg-[#F8D2BC]',
+    emoji: '🎧',
+    badge: 'New Playlist',
+    badgeClass: 'bg-secondary text-secondary-foreground',
+  },
+  playlist_update: {
+    bgColor: 'bg-[#FFEDD5]',
+    borderColor: 'border-[#F0D4A8]',
+    settingsBg: 'bg-[#F8DCBC]',
+    emoji: '🆕',
+    badge: 'New Audio',
+    badgeClass: 'bg-secondary text-secondary-foreground',
+  },
 };
 
 export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
@@ -128,7 +144,10 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
 
   const isEnrollment = event.type === 'enrollment';
   const isRoundUpdate = event.type === 'round_update';
-  const isSpecialCard = isRoundUpdate;
+  const isPlaylistSave = event.type === 'playlist_save';
+  const isPlaylistUpdate = event.type === 'playlist_update';
+  const isSpecialCard = isRoundUpdate || isPlaylistUpdate;
+  const isPlaylistEvent = isPlaylistSave || isPlaylistUpdate;
 
   const handleCardClick = async () => {
     haptic.light();
@@ -149,9 +168,26 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
       }
     }
 
+    // Mark playlist_update as read on tap
+    if (isPlaylistUpdate && event.playlistId && event.audioId) {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.from('playlist_update_notification_reads').insert({
+            user_id: user.id,
+            playlist_id: event.playlistId,
+            audio_id: event.audioId,
+          });
+        }
+      } catch (err) {
+        console.error('Failed to mark playlist update as read:', err);
+      }
+    }
+
     // Auto-complete on tap (for completable event types)
-    if (!event.isCompleted && !isFutureDate && event.type !== 'round_update') {
-      const eventType = event.type as 'session' | 'module' | 'track' | 'enrollment';
+    if (!event.isCompleted && !isFutureDate && !isSpecialCard) {
+      const eventType = event.type as 'session' | 'module' | 'track' | 'enrollment' | 'playlist_save';
       completeProgramEvent.mutate({ eventType, eventId: event.id, date });
     }
 
@@ -163,6 +199,12 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
         navigate(`/app/course/${event.programSlug}`, { state: { from: location.pathname } });
         break;
       case 'track':
+        if (event.playlistId) {
+          navigate(`/app/player/playlist/${event.playlistId}`, { state: { from: location.pathname } });
+        }
+        break;
+      case 'playlist_save':
+      case 'playlist_update':
         if (event.playlistId) {
           navigate(`/app/player/playlist/${event.playlistId}`, { state: { from: location.pathname } });
         }
@@ -210,12 +252,14 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
               </span>
               
               {/* Settings icon */}
-              <button
-                onClick={handleSettingsClick}
-                className={cn("p-1 rounded-full transition-colors", style.settingsBg)}
-              >
-                <Settings2 className="h-3 w-3 text-black" />
-              </button>
+              {!isPlaylistEvent && (
+                <button
+                  onClick={handleSettingsClick}
+                  className={cn("p-1 rounded-full transition-colors", style.settingsBg)}
+                >
+                  <Settings2 className="h-3 w-3 text-black" />
+                </button>
+              )}
               
               {/* External link indicator for today's sessions */}
               {event.type === 'session' && isToday(date) && event.meetingLink && (
@@ -228,13 +272,15 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
               'text-black text-[15px] font-semibold leading-tight transition-all truncate',
               event.isCompleted && 'line-through'
             )}>
-              {event.title}
+              {isPlaylistUpdate && event.audioTitle ? event.audioTitle : event.title}
             </p>
             
             {/* Subtitle */}
             <p className="text-[11px] text-black truncate">
               {isEnrollment ? 'Tap to explore your program →' :
                isRoundUpdate ? 'Tap to see changes →' :
+               isPlaylistSave ? 'Tap to start listening →' :
+               isPlaylistUpdate ? `New in ${event.title} • Tap to listen →` :
                event.type === 'session' ? 'Tap to join your session →' :
                event.type === 'track' ? 'Tap to listen →' :
                event.type === 'module' ? 'Tap to view module →' :
