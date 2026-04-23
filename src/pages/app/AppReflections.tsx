@@ -50,7 +50,14 @@ export default function AppReflections() {
   const availableCategories = useMemo(() => {
     if (!reflections) return [];
     const cats = new Set(reflections.map(r => r.category).filter(Boolean));
-    return REFLECTION_CATEGORIES.filter(c => cats.has(c.value));
+    const present = REFLECTION_CATEGORIES.filter(c => cats.has(c.value));
+    // Pin Morning then Night to the front; keep the rest in their original order.
+    const priority = ['morning', 'night'];
+    const pinned = priority
+      .map(v => present.find(c => c.value === v))
+      .filter((c): c is typeof present[number] => Boolean(c));
+    const rest = present.filter(c => !priority.includes(c.value));
+    return [...pinned, ...rest];
   }, [reflections]);
 
   return (
