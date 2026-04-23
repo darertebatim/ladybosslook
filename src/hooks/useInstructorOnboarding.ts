@@ -69,7 +69,8 @@ export async function applyInstructorSetup(
   userId: string,
   instructor: PendingInstructor,
 ): Promise<{ ok: boolean; granted: { program: boolean; routines: number; trial: boolean } }> {
-  const granted = { program: false, routines: 0, trial: false };
+  const granted = { program: false, routines: 0, playlists: 0, trial: false } as
+    { program: boolean; routines: number; playlists: number; trial: boolean };
 
   try {
     // 1. Create referral record (unique constraint prevents duplicate per instructor)
@@ -147,7 +148,29 @@ export async function applyInstructorSetup(
       }
     }
 
-    // 5. Grant Plus trial — ONE TIME ONLY across all instructors
+    // 5. Unlock default audio playlists (free access via playlist_saves)
+    const playlistIds = instructor.default_playlist_ids || [];
+    for (const playlistId of playlistIds) {
+      try {
+        const { data: alreadySaved } = await supabase
+          .from('playlist_saves' as any)
+          .select('id')
+          .eq('user_id', userId)
+          .eq('playlist_id', playlistId)
+          .maybeSingle();
+        if (alreadySaved) continue;
+
+        await supabase.from('playlist_saves' as any).insert({
+          user_id: userId,
+          playlist_id: playlistId,
+        });
+        granted.playlists += 1;
+      } catch (err) {
+        console.warn('[InstructorOnboarding] Failed to unlock playlist', playlistId, err);
+      }
+    }
+
+    // 6. Grant Plus trial — ONE TIME ONLY across all instructors
     if (instructor.plus_trial_days > 0) {
       const { data: profile } = await supabase
         .from('profiles')
