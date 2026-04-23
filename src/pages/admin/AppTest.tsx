@@ -114,6 +114,10 @@ export default function AppTest() {
   const [testUnreadCount, setTestUnreadCount] = useState(1);
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
   const [showLanguagePopup, setShowLanguagePopup] = useState(false);
+  // Instructor referral previews
+  const [showInstructorInvite, setShowInstructorInvite] = useState(false);
+  const [showInstructorWelcome, setShowInstructorWelcome] = useState(false);
+  const [instructorPerksScenario, setInstructorPerksScenario] = useState<'full' | 'minimal' | 'noPhoto'>('full');
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
     return (
