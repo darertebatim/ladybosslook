@@ -198,6 +198,7 @@ export default function Instructors() {
                     <div className="text-xs text-muted-foreground mt-2 space-y-0.5">
                       {ins.default_program_slug && <div>Program: <span className="font-mono">{ins.default_program_slug}</span></div>}
                       {ins.default_routine_ids?.length > 0 && <div>{ins.default_routine_ids.length} routine(s) auto-added</div>}
+                      {ins.default_playlist_ids?.length > 0 && <div>{ins.default_playlist_ids.length} playlist(s) unlocked</div>}
                       {ins.plus_trial_days > 0 && <div>{ins.plus_trial_days}-day Plus trial</div>}
                     </div>
                     <div className="mt-3 flex items-center gap-2 flex-wrap">
