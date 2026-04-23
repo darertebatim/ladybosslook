@@ -72,6 +72,7 @@ export function FeedChannelManager() {
   const [targetTimezones, setTargetTimezones] = useState<string[]>([]);
   const [includeUpdateStatus, setIncludeUpdateStatus] = useState<string[]>([]);
   const [targetInstructorIds, setTargetInstructorIds] = useState<string[]>([]);
+  const [audiencePresetId, setAudiencePresetId] = useState<string | null>(null);
 
   const { data: channels, isLoading } = useQuery({
     queryKey: ['admin-feed-channels'],
