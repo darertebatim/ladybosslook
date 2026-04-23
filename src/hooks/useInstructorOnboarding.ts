@@ -18,6 +18,7 @@ export interface PendingInstructor {
   default_program_slug: string | null;
   default_routine_ids: string[];
   default_playlist_ids: string[];
+  default_channel_ids: string[];
   plus_trial_days: number;
   source: 'appsflyer' | 'url';
   rawAttribution: Record<string, unknown> | null;
@@ -69,8 +70,8 @@ function clearPendingSlug() {
 export async function applyInstructorSetup(
   userId: string,
   instructor: PendingInstructor,
-): Promise<{ ok: boolean; granted: { program: boolean; routines: number; playlists: number; trial: boolean } }> {
-  const granted = { program: false, routines: 0, playlists: 0, trial: false };
+): Promise<{ ok: boolean; granted: { program: boolean; routines: number; playlists: number; channels: number; trial: boolean } }> {
+  const granted = { program: false, routines: 0, playlists: 0, channels: 0, trial: false };
 
   try {
     // 1. Create referral record (unique constraint prevents duplicate per instructor)
@@ -168,6 +169,22 @@ export async function applyInstructorSetup(
       }
     }
 
+    // 5b. Auto-join chat channels — channels are visible by default; we just
+    // ensure the user is NOT in feed_channel_exclusions so the channel shows up.
+    const channelIds = instructor.default_channel_ids || [];
+    if (channelIds.length > 0) {
+      try {
+        const { error: chErr } = await supabase
+          .from('feed_channel_exclusions')
+          .delete()
+          .eq('user_id', userId)
+          .in('channel_id', channelIds);
+        if (!chErr) granted.channels = channelIds.length;
+      } catch (err) {
+        console.warn('[InstructorOnboarding] Failed to auto-join channels', err);
+      }
+    }
+
     // 6. Grant Plus trial — ONE TIME ONLY across all instructors
     if (instructor.plus_trial_days > 0) {
       const { data: profile } = await supabase
@@ -232,7 +249,7 @@ export function useInstructorOnboarding(userId: string | undefined) {
         // Look up instructor
         const { data: instructor, error: lookupErr } = await supabase
           .from('instructors')
-          .select('id, slug, display_name, photo_url, bio, default_program_slug, default_routine_ids, default_playlist_ids, plus_trial_days')
+          .select('id, slug, display_name, photo_url, bio, default_program_slug, default_routine_ids, default_playlist_ids, default_channel_ids, plus_trial_days')
           .eq('slug', pending.slug)
           .eq('is_active', true)
           .maybeSingle();
@@ -266,6 +283,7 @@ export function useInstructorOnboarding(userId: string | undefined) {
           default_program_slug: ins.default_program_slug,
           default_routine_ids: ins.default_routine_ids || [],
           default_playlist_ids: ins.default_playlist_ids || [],
+          default_channel_ids: ins.default_channel_ids || [],
           plus_trial_days: ins.plus_trial_days || 0,
           source: pending.source,
           rawAttribution: pending.raw,

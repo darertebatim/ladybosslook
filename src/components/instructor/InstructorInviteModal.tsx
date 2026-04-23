@@ -18,6 +18,7 @@ export interface InstructorInvitePreviewProps {
   defaultProgramSlug?: string | null;
   defaultRoutineIdsCount?: number;
   defaultPlaylistIdsCount?: number;
+  defaultChannelIdsCount?: number;
   plusTrialDays?: number;
   busy?: boolean;
   onAccept?: () => void;
@@ -34,6 +35,7 @@ export function InstructorInviteContent({
   defaultProgramSlug,
   defaultRoutineIdsCount = 0,
   defaultPlaylistIdsCount = 0,
+  defaultChannelIdsCount = 0,
   plusTrialDays = 0,
   busy = false,
   onAccept,
@@ -53,6 +55,12 @@ export function InstructorInviteContent({
     perks.push({
       icon: '🎧',
       label: `${defaultPlaylistIdsCount} unlocked playlist${defaultPlaylistIdsCount > 1 ? 's' : ''}`,
+    });
+  }
+  if (defaultChannelIdsCount > 0) {
+    perks.push({
+      icon: '💬',
+      label: `Joined ${defaultChannelIdsCount} community channel${defaultChannelIdsCount > 1 ? 's' : ''}`,
     });
   }
   if (plusTrialDays > 0) {
@@ -166,6 +174,7 @@ export function InstructorInviteModal() {
           defaultProgramSlug={pendingInvite.default_program_slug}
           defaultRoutineIdsCount={pendingInvite.default_routine_ids?.length || 0}
           defaultPlaylistIdsCount={pendingInvite.default_playlist_ids?.length || 0}
+          defaultChannelIdsCount={pendingInvite.default_channel_ids?.length || 0}
           plusTrialDays={pendingInvite.plus_trial_days}
           busy={busy}
           onAccept={handleAccept}

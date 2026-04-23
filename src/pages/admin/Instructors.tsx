@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Copy, Pencil, Trash2, Search, X, GraduationCap, ListMusic, Sparkles, Gift } from 'lucide-react';
+import { Plus, Copy, Pencil, Trash2, Search, X, GraduationCap, ListMusic, Sparkles, Gift, MessageCircle } from 'lucide-react';
 import { buildInstructorOneLink } from '@/lib/appsflyer';
 import { ImageUploader } from '@/components/admin/ImageUploader';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -27,6 +27,7 @@ interface Instructor {
   default_program_slug: string | null;
   default_routine_ids: string[];
   default_playlist_ids: string[];
+  default_channel_ids: string[];
   plus_trial_days: number;
   is_active: boolean;
   created_at: string;
@@ -40,6 +41,7 @@ const emptyForm = {
   default_program_slug: '',
   default_routine_ids: [] as string[],
   default_playlist_ids: [] as string[],
+  default_channel_ids: [] as string[],
   plus_trial_days: 7,
   is_active: true,
 };
@@ -56,16 +58,18 @@ export default function Instructors() {
   const [programs, setPrograms] = useState<{ slug: string; title: string }[]>([]);
   const [routines, setRoutines] = useState<{ id: string; title: string; emoji: string | null }[]>([]);
   const [playlists, setPlaylists] = useState<{ id: string; name: string; cover_image_url: string | null }[]>([]);
+  const [channels, setChannels] = useState<{ id: string; name: string; cover_image_url: string | null }[]>([]);
   const [search, setSearch] = useState('');
 
   const load = async () => {
     setLoading(true);
-    const [{ data: rows }, { data: refs }, { data: progs }, { data: rts }, { data: pls }] = await Promise.all([
+    const [{ data: rows }, { data: refs }, { data: progs }, { data: rts }, { data: pls }, { data: chs }] = await Promise.all([
       supabase.from('instructors').select('*').order('created_at', { ascending: false }),
       supabase.from('instructor_referrals').select('instructor_id'),
       supabase.from('program_catalog' as any).select('slug, title').eq('is_active', true).order('title'),
       supabase.from('routines_bank').select('id, title, emoji').eq('is_active', true).order('title'),
       supabase.from('audio_playlists').select('id, name, cover_image_url').eq('is_hidden', false).order('name'),
+      supabase.from('feed_channels').select('id, name, cover_image_url').eq('is_archived', false).order('name'),
     ]);
     setInstructors((rows as Instructor[]) || []);
     const counts: Record<string, number> = {};
@@ -76,6 +80,7 @@ export default function Instructors() {
     setPrograms((progs as any) || []);
     setRoutines((rts as any) || []);
     setPlaylists((pls as any) || []);
+    setChannels((chs as any) || []);
     setLoading(false);
   };
 
@@ -97,6 +102,7 @@ export default function Instructors() {
       default_program_slug: ins.default_program_slug || '',
       default_routine_ids: ins.default_routine_ids || [],
       default_playlist_ids: ins.default_playlist_ids || [],
+      default_channel_ids: ins.default_channel_ids || [],
       plus_trial_days: ins.plus_trial_days,
       is_active: ins.is_active,
     });
@@ -117,19 +123,43 @@ export default function Instructors() {
       default_program_slug: form.default_program_slug.trim() || null,
       default_routine_ids: form.default_routine_ids,
       default_playlist_ids: form.default_playlist_ids,
+      default_channel_ids: form.default_channel_ids,
       plus_trial_days: Number(form.plus_trial_days) || 0,
       is_active: form.is_active,
     };
 
-    const { error } = editing
-      ? await supabase.from('instructors').update(payload as any).eq('id', editing.id)
-      : await supabase.from('instructors').insert(payload as any);
+    const { data: savedRow, error } = editing
+      ? await supabase.from('instructors').update(payload as any).eq('id', editing.id).select('id').maybeSingle()
+      : await supabase.from('instructors').insert(payload as any).select('id').maybeSingle();
 
     setSaving(false);
     if (error) {
       toast({ title: 'Save failed', description: error.message, variant: 'destructive' });
       return;
     }
+
+    // Backfill: ensure all already-referred users can SEE the linked channels
+    // by removing any existing exclusions for those channels.
+    const instructorId = editing?.id || (savedRow as any)?.id;
+    if (instructorId && form.default_channel_ids.length > 0) {
+      try {
+        const { data: refs } = await supabase
+          .from('instructor_referrals')
+          .select('user_id')
+          .eq('instructor_id', instructorId);
+        const userIds = (refs || []).map((r: any) => r.user_id);
+        if (userIds.length > 0) {
+          await supabase
+            .from('feed_channel_exclusions')
+            .delete()
+            .in('user_id', userIds)
+            .in('channel_id', form.default_channel_ids);
+        }
+      } catch (err) {
+        console.warn('[Instructors] Channel backfill failed:', err);
+      }
+    }
+
     toast({ title: editing ? 'Instructor updated' : 'Instructor created' });
     setOpen(false);
     load();
@@ -199,6 +229,7 @@ export default function Instructors() {
                       {ins.default_program_slug && <div>Program: <span className="font-mono">{ins.default_program_slug}</span></div>}
                       {ins.default_routine_ids?.length > 0 && <div>{ins.default_routine_ids.length} routine(s) auto-added</div>}
                       {ins.default_playlist_ids?.length > 0 && <div>{ins.default_playlist_ids.length} playlist(s) unlocked</div>}
+                      {ins.default_channel_ids?.length > 0 && <div>{ins.default_channel_ids.length} chat channel(s) auto-joined</div>}
                       {ins.plus_trial_days > 0 && <div>{ins.plus_trial_days}-day Plus trial</div>}
                     </div>
                     <div className="mt-3 flex items-center gap-2 flex-wrap">
@@ -343,6 +374,16 @@ export default function Instructors() {
                 items={playlists.map((p) => ({ id: p.id, label: p.name, image: p.cover_image_url }))}
                 selected={form.default_playlist_ids}
                 onChange={(ids) => setForm({ ...form, default_playlist_ids: ids })}
+              />
+
+              {/* Chat channels */}
+              <MultiPicker
+                icon={<MessageCircle className="h-4 w-4" />}
+                label="Auto-join chat channels"
+                placeholder="Search channels…"
+                items={channels.map((c) => ({ id: c.id, label: c.name, image: c.cover_image_url }))}
+                selected={form.default_channel_ids}
+                onChange={(ids) => setForm({ ...form, default_channel_ids: ids })}
               />
 
               {/* Trial */}
