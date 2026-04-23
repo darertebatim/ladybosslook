@@ -2,19 +2,33 @@ import { Badge } from '@/components/ui/badge';
 import { AlertCircle, ChevronRight, Sparkles } from 'lucide-react';
 import { format, isToday } from 'date-fns';
 import { Link } from 'react-router-dom';
+import { TASK_COLOR_CLASSES, type TaskColor } from '@/hooks/useTaskPlanner';
+
+// Task palette cycle for program cards
+const PROGRAM_CARD_COLOR_CYCLE: TaskColor[] = [
+  'lavender',
+  'sky',
+  'mint',
+  'peach',
+  'pink',
+  'lime',
+  'yellow',
+];
 
 interface CompactRoundCardProps {
   enrollment: any;
   nextSessionDate?: string | null;
   isUnseen?: boolean;
   onView?: () => void;
+  colorIndex?: number;
 }
 
 export function CompactRoundCard({ 
   enrollment, 
   nextSessionDate,
   isUnseen,
-  onView 
+  onView,
+  colorIndex = 0,
 }: CompactRoundCardProps) {
   const round = enrollment.program_rounds;
   if (!round) return null;
@@ -23,6 +37,9 @@ export function CompactRoundCard({
   const isUpcoming = round.status === 'upcoming';
   const displayDate = nextSessionDate || round.first_session_date;
   const isSessionToday = displayDate && isToday(new Date(displayDate));
+
+  const paletteColor = PROGRAM_CARD_COLOR_CYCLE[colorIndex % PROGRAM_CARD_COLOR_CYCLE.length];
+  const paletteClass = TASK_COLOR_CLASSES[paletteColor];
 
   // Get first sentence of important_message
   const importantNote = round.important_message
