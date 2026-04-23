@@ -176,16 +176,10 @@ export default function AppReflectionFlow() {
       }
 
       if (isLast) {
-        toast.success('Reflection completed ✨');
         if (reflectionId) {
           await autoCompleteReflection(reflectionId);
         }
-        if (hasActivePlayer) {
-          navigate('/app/home');
-          routinePlayer!.maximize();
-        } else {
-          goBack();
-        }
+        setShowCelebration(true);
       } else {
         setCurrentIndex((i) => i + 1);
       }
