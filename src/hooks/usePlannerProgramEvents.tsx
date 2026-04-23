@@ -256,7 +256,7 @@ export function useCompleteProgramEvent() {
       eventId, 
       date 
     }: { 
-      eventType: 'session' | 'module' | 'track' | 'enrollment'; 
+      eventType: 'session' | 'module' | 'track' | 'enrollment' | 'playlist_save'; 
       eventId: string; 
       date: Date;
     }) => {
@@ -292,7 +292,7 @@ export function useUncompleteProgramEvent() {
       eventId, 
       date 
     }: { 
-      eventType: 'session' | 'module' | 'track' | 'enrollment'; 
+      eventType: 'session' | 'module' | 'track' | 'enrollment' | 'playlist_save'; 
       eventId: string; 
       date: Date;
     }) => {
