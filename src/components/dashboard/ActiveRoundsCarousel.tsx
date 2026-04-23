@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { ChevronRight, ChevronDown, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { CompactRoundCard } from './CompactRoundCard';
 import { useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { haptic } from '@/lib/haptics';
