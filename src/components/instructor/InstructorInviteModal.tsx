@@ -51,6 +51,12 @@ export function InstructorInviteModal() {
       label: `${pendingInvite.default_routine_ids.length} hand-picked routine${pendingInvite.default_routine_ids.length > 1 ? 's' : ''}`,
     });
   }
+  if (pendingInvite.default_playlist_ids?.length > 0) {
+    perks.push({
+      icon: '🎧',
+      label: `${pendingInvite.default_playlist_ids.length} unlocked playlist${pendingInvite.default_playlist_ids.length > 1 ? 's' : ''}`,
+    });
+  }
   if (pendingInvite.plus_trial_days > 0) {
     perks.push({
       icon: '✨',
