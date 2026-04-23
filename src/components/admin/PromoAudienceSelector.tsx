@@ -71,6 +71,8 @@ interface PromoAudienceSelectorProps {
   setTargetTimezones: (tzs: string[]) => void;
   includeUpdateStatus: string[];
   setIncludeUpdateStatus: (statuses: string[]) => void;
+  targetInstructorIds?: string[];
+  setTargetInstructorIds?: (ids: string[]) => void;
 }
 
 export function PromoAudienceSelector({
@@ -94,6 +96,8 @@ export function PromoAudienceSelector({
   setTargetTimezones,
   includeUpdateStatus,
   setIncludeUpdateStatus,
+  targetInstructorIds = [],
+  setTargetInstructorIds,
 }: PromoAudienceSelectorProps) {
   const UPDATE_STATUS_OPTIONS = [
     { slug: 'latest', label: '🆕 Last Update', description: 'Users on the latest app version' },
