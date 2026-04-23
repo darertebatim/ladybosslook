@@ -58,16 +58,18 @@ export default function Instructors() {
   const [programs, setPrograms] = useState<{ slug: string; title: string }[]>([]);
   const [routines, setRoutines] = useState<{ id: string; title: string; emoji: string | null }[]>([]);
   const [playlists, setPlaylists] = useState<{ id: string; name: string; cover_image_url: string | null }[]>([]);
+  const [channels, setChannels] = useState<{ id: string; name: string; cover_image_url: string | null }[]>([]);
   const [search, setSearch] = useState('');
 
   const load = async () => {
     setLoading(true);
-    const [{ data: rows }, { data: refs }, { data: progs }, { data: rts }, { data: pls }] = await Promise.all([
+    const [{ data: rows }, { data: refs }, { data: progs }, { data: rts }, { data: pls }, { data: chs }] = await Promise.all([
       supabase.from('instructors').select('*').order('created_at', { ascending: false }),
       supabase.from('instructor_referrals').select('instructor_id'),
       supabase.from('program_catalog' as any).select('slug, title').eq('is_active', true).order('title'),
       supabase.from('routines_bank').select('id, title, emoji').eq('is_active', true).order('title'),
       supabase.from('audio_playlists').select('id, name, cover_image_url').eq('is_hidden', false).order('name'),
+      supabase.from('feed_channels').select('id, name, cover_image_url').eq('is_archived', false).order('name'),
     ]);
     setInstructors((rows as Instructor[]) || []);
     const counts: Record<string, number> = {};
@@ -78,6 +80,7 @@ export default function Instructors() {
     setPrograms((progs as any) || []);
     setRoutines((rts as any) || []);
     setPlaylists((pls as any) || []);
+    setChannels((chs as any) || []);
     setLoading(false);
   };
 
@@ -99,6 +102,7 @@ export default function Instructors() {
       default_program_slug: ins.default_program_slug || '',
       default_routine_ids: ins.default_routine_ids || [],
       default_playlist_ids: ins.default_playlist_ids || [],
+      default_channel_ids: ins.default_channel_ids || [],
       plus_trial_days: ins.plus_trial_days,
       is_active: ins.is_active,
     });
