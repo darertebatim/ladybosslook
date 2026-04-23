@@ -11,19 +11,8 @@ import { cn } from '@/lib/utils';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { format } from 'date-fns';
 import { ReflectionCelebrationSheet } from '@/components/reflection/ReflectionCelebrationSheet';
-
-const BULLET_COLORS = [
-  'hsl(142, 50%, 78%)',
-  'hsl(20, 70%, 78%)',
-  'hsl(262, 60%, 68%)',
-  'hsl(200, 60%, 72%)',
-  'hsl(45, 70%, 72%)',
-  'hsl(340, 55%, 75%)',
-];
-
-function getBulletColor(index: number) {
-  return BULLET_COLORS[index % BULLET_COLORS.length];
-}
+import { BulletAnswerInput } from '@/components/reflection/BulletAnswerInput';
+import { ReflectionReviewSheet, type ReviewItem } from '@/components/reflection/ReflectionReviewSheet';
 
 export default function AppReflectionFlow() {
   const { reflectionId } = useParams<{ reflectionId: string }>();
