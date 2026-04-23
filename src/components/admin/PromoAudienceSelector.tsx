@@ -191,6 +191,45 @@ export function PromoAudienceSelector({
         <Label className="text-sm font-medium">Target Audience</Label>
       </div>
 
+      {/* Saved-audience picker (single source of truth) */}
+      {setPresetId && (
+        <AudiencePresetPicker
+          presetId={presetId ?? null}
+          current={{
+            target_type: targetType,
+            include_programs: includePrograms,
+            exclude_programs: excludePrograms,
+            include_playlists: includePlaylists,
+            exclude_playlists: excludePlaylists,
+            include_tools: includeTools,
+            exclude_tools: excludeTools,
+            target_languages: targetLanguages,
+            target_timezones: targetTimezones,
+            include_update_status: includeUpdateStatus,
+            target_instructor_ids: targetInstructorIds,
+          }}
+          onApplyPreset={(preset) => {
+            if (!preset) {
+              setPresetId(null);
+              return;
+            }
+            // Hydrate every field from the preset
+            setTargetType((preset.target_type as TargetType) ?? 'all');
+            setIncludePrograms(preset.include_programs ?? []);
+            setExcludePrograms(preset.exclude_programs ?? []);
+            setIncludePlaylists(preset.include_playlists ?? []);
+            setExcludePlaylists(preset.exclude_playlists ?? []);
+            setIncludeTools(preset.include_tools ?? []);
+            setExcludeTools(preset.exclude_tools ?? []);
+            setTargetLanguages(preset.target_languages ?? []);
+            setTargetTimezones(preset.target_timezones ?? []);
+            setIncludeUpdateStatus(preset.include_update_status ?? []);
+            setTargetInstructorIds?.(preset.target_instructor_ids ?? []);
+            setPresetId(preset.id);
+          }}
+        />
+      )}
+
       {/* Target Type */}
       <div className="space-y-2">
         <Select value={targetType} onValueChange={(v) => setTargetType(v as TargetType)}>
