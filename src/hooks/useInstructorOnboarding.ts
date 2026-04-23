@@ -18,6 +18,7 @@ export interface PendingInstructor {
   default_program_slug: string | null;
   default_routine_ids: string[];
   default_playlist_ids: string[];
+  default_channel_ids: string[];
   plus_trial_days: number;
   source: 'appsflyer' | 'url';
   rawAttribution: Record<string, unknown> | null;
@@ -69,8 +70,8 @@ function clearPendingSlug() {
 export async function applyInstructorSetup(
   userId: string,
   instructor: PendingInstructor,
-): Promise<{ ok: boolean; granted: { program: boolean; routines: number; playlists: number; trial: boolean } }> {
-  const granted = { program: false, routines: 0, playlists: 0, trial: false };
+): Promise<{ ok: boolean; granted: { program: boolean; routines: number; playlists: number; channels: number; trial: boolean } }> {
+  const granted = { program: false, routines: 0, playlists: 0, channels: 0, trial: false };
 
   try {
     // 1. Create referral record (unique constraint prevents duplicate per instructor)
@@ -165,6 +166,22 @@ export async function applyInstructorSetup(
         granted.playlists += 1;
       } catch (err) {
         console.warn('[InstructorOnboarding] Failed to unlock playlist', playlistId, err);
+      }
+    }
+
+    // 5b. Auto-join chat channels — channels are visible by default; we just
+    // ensure the user is NOT in feed_channel_exclusions so the channel shows up.
+    const channelIds = instructor.default_channel_ids || [];
+    if (channelIds.length > 0) {
+      try {
+        const { error: chErr } = await supabase
+          .from('feed_channel_exclusions')
+          .delete()
+          .eq('user_id', userId)
+          .in('channel_id', channelIds);
+        if (!chErr) granted.channels = channelIds.length;
+      } catch (err) {
+        console.warn('[InstructorOnboarding] Failed to auto-join channels', err);
       }
     }
 
