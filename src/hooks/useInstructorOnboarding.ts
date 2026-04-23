@@ -278,8 +278,16 @@ export function useInstructorOnboarding(userId: string | undefined) {
     ran.current = true;
 
     const run = async () => {
-      const pending = readPendingSlug();
-      if (!pending) return;
+      let pending = readPendingSlug();
+      let autoApply = false;
+
+      // Fallback: admin assigned an instructor on the profile directly
+      if (!pending) {
+        const serverSlug = await readServerAssignedInstructorSlug(userId);
+        if (!serverSlug) return;
+        pending = { slug: serverSlug, source: 'url', raw: { source: 'admin_assignment' } };
+        autoApply = true; // skip the invite modal — admin already decided
+      }
 
       try {
         // Look up instructor
@@ -310,7 +318,7 @@ export function useInstructorOnboarding(userId: string | undefined) {
         }
 
         const ins = instructor as any;
-        setPendingInvite({
+        const invite: PendingInstructor = {
           id: ins.id,
           slug: ins.slug,
           display_name: ins.display_name,
@@ -323,7 +331,17 @@ export function useInstructorOnboarding(userId: string | undefined) {
           plus_trial_days: ins.plus_trial_days || 0,
           source: pending.source,
           rawAttribution: pending.raw,
-        });
+        };
+
+        if (autoApply) {
+          // Server-assigned: silently apply full setup, no modal
+          const result = await applyInstructorSetup(userId, invite);
+          if (result.ok) {
+            console.log('[InstructorOnboarding] Auto-applied admin-assigned instructor', invite.slug, result.granted);
+          }
+        } else {
+          setPendingInvite(invite);
+        }
       } catch (err) {
         console.warn('[InstructorOnboarding] Detect error:', err);
       }
