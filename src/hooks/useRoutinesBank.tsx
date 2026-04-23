@@ -766,12 +766,4 @@ export async function addRoutineToUserPlanner(
       }
 
       return { success: true, taskCount: tasks.length };
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['user-routines-bank'] });
-      queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
-    },
-  });
 }
