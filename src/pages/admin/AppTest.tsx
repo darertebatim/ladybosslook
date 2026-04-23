@@ -62,6 +62,10 @@ import { PlusGateSheet } from '@/components/app/PlusGateSheet';
 import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebration';
 import { ProjectCompletionCelebration } from '@/components/app/ProjectCompletionCelebration';
 import { LanguagePreferencePopup } from '@/components/app/LanguagePreferencePopup';
+import { InstructorInviteContent } from '@/components/instructor/InstructorInviteModal';
+import { InstructorWelcomeContent } from '@/components/instructor/InstructorWelcomeSheet';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
@@ -110,6 +114,10 @@ export default function AppTest() {
   const [testUnreadCount, setTestUnreadCount] = useState(1);
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
   const [showLanguagePopup, setShowLanguagePopup] = useState(false);
+  // Instructor referral previews
+  const [showInstructorInvite, setShowInstructorInvite] = useState(false);
+  const [showInstructorWelcome, setShowInstructorWelcome] = useState(false);
+  const [instructorPerksScenario, setInstructorPerksScenario] = useState<'full' | 'minimal' | 'noPhoto'>('full');
   // iOS Preview Mode renders the test content in a simulated iOS environment
   if (showIOSPreview) {
     return (
@@ -873,7 +881,61 @@ export default function AppTest() {
         </CardContent>
       </Card>
 
-      {/* App Store Review */}
+      {/* Instructor Referral Flow */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            Instructor Referral Flow
+          </CardTitle>
+          <CardDescription>
+            Messages users see when they open the app via an instructor's OneLink (e.g. <code>?instructor=sarah</code>).
+            The Invite Modal shows for existing logged-in users who need to confirm; the Welcome Sheet shows once after the invite is accepted (or for fresh installs).
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-xs font-semibold text-muted-foreground mr-1">Scenario:</span>
+            <Button
+              variant={instructorPerksScenario === 'full' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setInstructorPerksScenario('full')}
+            >
+              Full perks
+            </Button>
+            <Button
+              variant={instructorPerksScenario === 'minimal' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setInstructorPerksScenario('minimal')}
+            >
+              Trial only
+            </Button>
+            <Button
+              variant={instructorPerksScenario === 'noPhoto' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setInstructorPerksScenario('noPhoto')}
+            >
+              No photo
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setShowInstructorInvite(true)} variant="outline">
+              <Sparkles className="h-4 w-4 mr-2" />
+              1. Invite Confirmation Modal
+            </Button>
+            <Button onClick={() => setShowInstructorWelcome(true)} variant="outline">
+              <Sparkles className="h-4 w-4 mr-2" />
+              2. Welcome Sheet (after accept)
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            <strong>Flow:</strong> Existing user taps OneLink → Invite Modal → accepts → Welcome Sheet.
+            New install: AppsFlyer attribution → onboarding completes → Welcome Sheet.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* App Store Review (continued) */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -1210,6 +1272,80 @@ export default function AppTest() {
 
       {/* Language Preference Popup */}
       <LanguagePreferencePopup open={showLanguagePopup} onClose={() => setShowLanguagePopup(false)} />
+
+      {/* Instructor Referral Previews */}
+      {(() => {
+        const scenarios = {
+          full: {
+            displayName: 'Sarah Johnson',
+            photoUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
+            bio: 'Certified wellness coach helping women build sustainable self-care habits.',
+            defaultProgramSlug: 'mindful-mornings',
+            defaultRoutineIdsCount: 3,
+            defaultPlaylistIdsCount: 2,
+            plusTrialDays: 14,
+          },
+          minimal: {
+            displayName: 'Emma Williams',
+            photoUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop',
+            bio: null,
+            defaultProgramSlug: null,
+            defaultRoutineIdsCount: 0,
+            defaultPlaylistIdsCount: 0,
+            plusTrialDays: 7,
+          },
+          noPhoto: {
+            displayName: 'Coach Mary',
+            photoUrl: null,
+            bio: 'Your accountability partner.',
+            defaultProgramSlug: 'reset-90',
+            defaultRoutineIdsCount: 1,
+            defaultPlaylistIdsCount: 0,
+            plusTrialDays: 0,
+          },
+        } as const;
+        const s = scenarios[instructorPerksScenario];
+        return (
+          <>
+            <Dialog open={showInstructorInvite} onOpenChange={setShowInstructorInvite}>
+              <DialogContent className="rounded-3xl border-0 p-0 max-w-sm overflow-hidden">
+                <InstructorInviteContent
+                  displayName={s.displayName}
+                  photoUrl={s.photoUrl}
+                  defaultProgramSlug={s.defaultProgramSlug}
+                  defaultRoutineIdsCount={s.defaultRoutineIdsCount}
+                  defaultPlaylistIdsCount={s.defaultPlaylistIdsCount}
+                  plusTrialDays={s.plusTrialDays}
+                  onAccept={() => {
+                    setShowInstructorInvite(false);
+                    toast.success(`Welcome from ${s.displayName}! 🎉`);
+                    setTimeout(() => setShowInstructorWelcome(true), 400);
+                  }}
+                  onDecline={() => setShowInstructorInvite(false)}
+                />
+              </DialogContent>
+            </Dialog>
+
+            <Sheet open={showInstructorWelcome} onOpenChange={setShowInstructorWelcome}>
+              <SheetContent
+                side="bottom"
+                className="rounded-t-3xl border-t-0 px-6 pt-8 pb-10 max-h-[88vh]"
+              >
+                <InstructorWelcomeContent
+                  displayName={s.displayName}
+                  photoUrl={s.photoUrl}
+                  bio={s.bio}
+                  defaultProgramSlug={s.defaultProgramSlug}
+                  defaultRoutineIdsCount={s.defaultRoutineIdsCount}
+                  defaultPlaylistIdsCount={s.defaultPlaylistIdsCount}
+                  plusTrialDays={s.plusTrialDays}
+                  onDismiss={() => setShowInstructorWelcome(false)}
+                />
+              </SheetContent>
+            </Sheet>
+          </>
+        );
+      })()}
     </div>
   );
 }
