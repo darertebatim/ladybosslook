@@ -2529,6 +2529,8 @@ export type Database = {
           notification_preferences: Json | null
           occupation: string | null
           phone: string | null
+          plus_trial_granted_at: string | null
+          plus_trial_granted_by_instructor_id: string | null
           preferred_language: string | null
           referral_source: string | null
           referred_by_instructor_id: string | null
@@ -2558,6 +2560,8 @@ export type Database = {
           notification_preferences?: Json | null
           occupation?: string | null
           phone?: string | null
+          plus_trial_granted_at?: string | null
+          plus_trial_granted_by_instructor_id?: string | null
           preferred_language?: string | null
           referral_source?: string | null
           referred_by_instructor_id?: string | null
@@ -2587,6 +2591,8 @@ export type Database = {
           notification_preferences?: Json | null
           occupation?: string | null
           phone?: string | null
+          plus_trial_granted_at?: string | null
+          plus_trial_granted_by_instructor_id?: string | null
           preferred_language?: string | null
           referral_source?: string | null
           referred_by_instructor_id?: string | null
@@ -2601,6 +2607,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "profiles_plus_trial_granted_by_instructor_id_fkey"
+            columns: ["plus_trial_granted_by_instructor_id"]
+            isOneToOne: false
+            referencedRelation: "instructors"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "profiles_referred_by_instructor_id_fkey"
             columns: ["referred_by_instructor_id"]
