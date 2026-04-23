@@ -261,6 +261,12 @@ export default function AppFreeFormReflection() {
           <MoodSelector value={mood} onChange={(m) => setMood(m)} showHeader={false} />
         </div>
       </div>
+
+      <ReflectionCelebrationSheet
+        open={showCelebration}
+        onOpenChange={setShowCelebration}
+        onDone={() => goBack()}
+      />
     </div>
   );
 }

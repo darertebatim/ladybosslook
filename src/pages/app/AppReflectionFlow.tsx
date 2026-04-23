@@ -283,6 +283,12 @@ export default function AppReflectionFlow() {
             ))}
           </div>
         </div>
+
+        <ReflectionCelebrationSheet
+          open={showCelebration}
+          onOpenChange={setShowCelebration}
+          onDone={() => goBack()}
+        />
       </div>
     );
   }
