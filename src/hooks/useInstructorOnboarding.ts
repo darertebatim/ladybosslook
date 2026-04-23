@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { addRoutineToUserPlanner } from '@/hooks/useRoutinesBank';
 import {
   getStoredAttribution,
   isAttributionProcessed,
@@ -136,11 +137,9 @@ export async function applyInstructorSetup(
           .maybeSingle();
         if (alreadyAdded) continue;
 
-        await supabase.from('user_routines_bank').insert({
-          user_id: userId,
-          routine_id: routineId,
-          added_at: new Date().toISOString(),
-        } as any);
+        // Use the same flow as "Add to my routines" so the routine shows up
+        // in the Routine Player AND its tasks land in the Planner immediately.
+        await addRoutineToUserPlanner(userId, routineId);
         granted.routines += 1;
       } catch (err) {
         console.warn('[InstructorOnboarding] Failed to add routine', routineId, err);

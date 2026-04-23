@@ -398,8 +398,45 @@ export function useAddRoutineFromBank() {
       }[];
     }) => {
       if (!user) throw new Error('Must be logged in');
+      return addRoutineToUserPlanner(user.id, routineId, { selectedTaskIds, editedTasks });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['user-routines-bank'] });
+      queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
+    },
+  });
+}
 
-      // Get routine details
+/**
+ * Standalone version of "add routine from bank" that can be called outside
+ * React (e.g. from instructor onboarding). Mirrors the mutation in
+ * useAddRoutineFromBank — creates user_tasks, the pro-task launcher,
+ * auto-enrolls in linked program if applicable, and tracks the routine
+ * in user_routines_bank so it shows up in My Routines and the Routine Player.
+ */
+export async function addRoutineToUserPlanner(
+  userId: string,
+  routineId: string,
+  opts: {
+    selectedTaskIds?: string[];
+    editedTasks?: {
+      id: string;
+      title?: string;
+      icon?: string;
+      color?: string;
+      repeatPattern?: string;
+      scheduledTime?: string | null;
+      tag?: string | null;
+      pro_link_type?: string | null;
+      pro_link_value?: string | null;
+    }[];
+  } = {},
+): Promise<{ success: boolean; taskCount: number }> {
+  const { selectedTaskIds, editedTasks } = opts;
+
+  // Get routine details
       const { data: routine, error: routineError } = await supabase
         .from('routines_bank')
         .select('*')
@@ -476,7 +513,7 @@ export function useAddRoutineFromBank() {
       const { data: existingTasks } = await supabase
         .from('user_tasks')
         .select('order_index')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('order_index', { ascending: false })
         .limit(1);
 
@@ -583,7 +620,7 @@ export function useAddRoutineFromBank() {
           }
 
           return {
-            user_id: user.id,
+            user_id: userId,
             title: edited?.title || task.title,
             emoji: edited?.icon || task.emoji || routine.emoji || '✨',
             color: edited?.color || bankTask?.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
@@ -628,7 +665,7 @@ export function useAddRoutineFromBank() {
         const { error: proError } = await supabase
           .from('user_tasks')
           .insert({
-            user_id: user.id,
+            user_id: userId,
             title: proTaskEdited?.title || routine.title,
             emoji: proTaskEdited?.icon || '🎬',
             color: proTaskEdited?.color || 'mint',
@@ -653,7 +690,7 @@ export function useAddRoutineFromBank() {
         const { data: existingEnrollment } = await supabase
           .from('course_enrollments')
           .select('id')
-          .eq('user_id', user.id)
+          .eq('user_id', userId)
           .eq('program_slug', programSlug)
           .eq('status', 'active')
           .maybeSingle();
@@ -692,7 +729,7 @@ export function useAddRoutineFromBank() {
           const { error: enrollError } = await supabase
             .from('course_enrollments')
             .insert({
-              user_id: user.id,
+              user_id: userId,
               program_slug: programSlug,
               course_name: programInfo?.title || programSlug,
               round_id: roundId,
@@ -709,7 +746,7 @@ export function useAddRoutineFromBank() {
       const { error: trackError } = await supabase
         .from('user_routines_bank')
         .upsert({
-          user_id: user.id,
+          user_id: userId,
           routine_id: routineId,
           is_active: true,
           title: routine.title,
@@ -729,12 +766,4 @@ export function useAddRoutineFromBank() {
       }
 
       return { success: true, taskCount: tasks.length };
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['user-routines-bank'] });
-      queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
-    },
-  });
 }
