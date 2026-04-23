@@ -190,7 +190,7 @@ export default function AppReflectionFlow() {
           </button>
           <button
             onClick={handleSaveSinglePage}
-            disabled={saveResponse.isPending || lines.every(l => !l.trim())}
+            disabled={saveResponse.isPending || singleLines.every((l) => !l.trim())}
             className="px-5 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold active:scale-95 transition-transform disabled:opacity-40"
           >
             Done
@@ -221,27 +221,13 @@ export default function AppReflectionFlow() {
           </h1>
 
           {/* Bullet entries */}
-          <div className="mt-4 space-y-1.5">
-            {lines.map((line, idx) => (
-              <div key={idx} className="flex items-start gap-3">
-                <div
-                  className="w-3 h-3 rounded-sm mt-[5px] shrink-0 transition-colors"
-                  style={{
-                    backgroundColor: line.trim()
-                      ? getBulletColor(idx)
-                      : 'hsl(var(--muted-foreground) / 0.25)',
-                  }}
-                />
-                <input
-                  ref={(el) => { lineRefs.current[idx] = el; }}
-                  value={line}
-                  onChange={(e) => handleLineChange(idx, e.target.value)}
-                  onKeyDown={(e) => handleLineKeyDown(idx, e)}
-                  placeholder={idx === 0 ? (displayedPage?.description || 'Write your thoughts…') : ''}
-                  className="flex-1 bg-transparent border-0 outline-none text-base placeholder:text-muted-foreground/40"
-                />
-              </div>
-            ))}
+          <div className="mt-4">
+            <BulletAnswerInput
+              lines={singleLines}
+              onLinesChange={setSingleLines}
+              placeholder={displayedPage?.description || 'Write your thoughts…'}
+              autoFocus
+            />
           </div>
         </div>
 
@@ -283,17 +269,15 @@ export default function AppReflectionFlow() {
         )}
 
         {page?.type === 'question' && (
-          <textarea
-            ref={textareaRef}
-            value={answers[page.id] || ''}
-            onChange={(e) => setAnswers((prev) => ({ ...prev, [page.id]: e.target.value }))}
-            placeholder="Type your answer…"
-            className={cn(
-              "mt-6 w-full bg-transparent border-0 border-b-2 border-muted-foreground/20 focus:border-primary outline-none resize-none text-base min-h-[120px] placeholder:text-muted-foreground/50 transition-colors",
-              answerBilingualClassName
-            )}
-            dir={answerDirection}
-          />
+          <div className="mt-6">
+            <BulletAnswerInput
+              key={page.id}
+              lines={currentLines}
+              onLinesChange={setCurrentLines}
+              placeholder="Write your thoughts…"
+              autoFocus
+            />
+          </div>
         )}
       </div>
 
@@ -315,6 +299,17 @@ export default function AppReflectionFlow() {
         open={showCelebration}
         onOpenChange={setShowCelebration}
         onDone={() => goBack()}
+      />
+
+      <ReflectionReviewSheet
+        open={showReview}
+        onOpenChange={setShowReview}
+        title={reflection?.title || 'Your reflection'}
+        items={reviewItems}
+        onContinue={() => {
+          setShowReview(false);
+          setShowCelebration(true);
+        }}
       />
     </div>
   );
