@@ -9,12 +9,14 @@ import { haptic } from '@/lib/haptics';
 interface ActiveRoundsCarouselProps {
   activeRounds: any[];
   nextSessionMap: Record<string, string> | Map<string, string>;
+  programImageMap?: Record<string, string>;
 }
 const COLLAPSED_KEY = 'programsCarouselCollapsed';
 
 export function ActiveRoundsCarousel({
   activeRounds,
-  nextSessionMap
+  nextSessionMap,
+  programImageMap = {}
 }: ActiveRoundsCarouselProps) {
   // Get unseen content from context (already tracks new/updated programs)
   let unseenEnrollments = new Set<string>();
@@ -102,6 +104,7 @@ export function ActiveRoundsCarousel({
                   enrollment={enrollment}
                   colorIndex={index}
                   nextSessionDate={roundId ? (nextSessionMap instanceof Map ? nextSessionMap.get(roundId) : nextSessionMap[roundId]) ?? null : null}
+                  programImage={programImageMap[enrollment.program_slug] || null}
                   isUnseen={hasNotification}
                   onView={() => {
                     if (isEnrollmentUnseen && markEnrollmentViewed) {
