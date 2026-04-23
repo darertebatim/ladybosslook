@@ -60,9 +60,6 @@ const MOOD_CONFIG: Record<string, MoodData> = {
   },
 };
 
-// Calm Breathing exercise ID
-const CALM_BREATHING_ID = '00218ce1-be10-4670-8644-cfdb7fe94c20';
-
 const ACTIONS = [
   {
     label: 'Write in Journal',
@@ -70,9 +67,9 @@ const ACTIONS = [
     routeKey: 'journal',
   },
   {
-    label: 'Calm Breathing',
+    label: 'Breathe',
     image: breathingImg,
-    route: `/app/breathe?exercise=${CALM_BREATHING_ID}`,
+    route: '/app/breathe',
   },
   {
     label: 'Choose a Reflection',
