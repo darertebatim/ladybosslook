@@ -53,7 +53,6 @@ import { StreakGoalSelectionAdvanced } from '@/components/app/StreakGoalSelectio
 import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation';
 import { ActionLimitSheet, resetActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 import { StreakLostBanner } from '@/components/app/StreakLostBanner';
-import { GoldStreakLostBanner } from '@/components/app/GoldStreakLostBanner';
 import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
 import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
@@ -97,10 +96,8 @@ export default function AppTest() {
   const [showGoalConfirmation, setShowGoalConfirmation] = useState(false);
   const [confirmedGoal, setConfirmedGoal] = useState<7 | 14 | 30 | 50 | 90 | 180 | 270 | 365>(7);
   const [showStreakLostBanner, setShowStreakLostBanner] = useState(false);
-  const [showGoldStreakLostBanner, setShowGoldStreakLostBanner] = useState(false);
   const [showStreakLostNoShields, setShowStreakLostNoShields] = useState(false);
-  const [showGoldLostNoShields, setShowGoldLostNoShields] = useState(false);
-  const [showRecoverySuccess, setShowRecoverySuccess] = useState<'streak' | 'gold' | null>(null);
+  const [showRecoverySuccess, setShowRecoverySuccess] = useState<'streak' | null>(null);
   const [showStreakGoalCompletion, setShowStreakGoalCompletion] = useState(false);
   const [showChallengeSummary, setShowChallengeSummary] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -617,25 +614,13 @@ export default function AppTest() {
               <Flame className="h-4 w-4 mr-2" />
               Streak Lost Banner
             </Button>
-            <Button onClick={() => setShowGoldStreakLostBanner(!showGoldStreakLostBanner)} variant="outline">
-              <Crown className="h-4 w-4 mr-2" />
-              Gold Streak Lost Banner
-            </Button>
             <Button onClick={() => setShowRecoverySuccess('streak')} variant="outline">
               <Shield className="h-4 w-4 mr-2" />
               Recovery Success (Streak)
             </Button>
-            <Button onClick={() => setShowRecoverySuccess('gold')} variant="outline">
-              <Shield className="h-4 w-4 mr-2" />
-              Recovery Success (Gold)
-            </Button>
             <Button onClick={() => setShowStreakLostNoShields(true)} variant="outline">
               <Flame className="h-4 w-4 mr-2" />
               No Shields (Free User)
-            </Button>
-            <Button onClick={() => setShowGoldLostNoShields(true)} variant="outline">
-              <Crown className="h-4 w-4 mr-2" />
-              No Shields (Plus User)
             </Button>
           </div>
           <StreakLostBanner
@@ -647,15 +632,6 @@ export default function AppTest() {
             onRecover={() => { setShowStreakLostBanner(false); setShowRecoverySuccess('streak'); }}
             onDismiss={() => setShowStreakLostBanner(false)}
           />
-          <GoldStreakLostBanner
-            open={showGoldStreakLostBanner}
-            previousGoldStreak={5}
-            hasShieldsRemaining={true}
-            shieldsLeft={2}
-            isSubscribed={false}
-            onRecover={() => { setShowGoldStreakLostBanner(false); setShowRecoverySuccess('gold'); }}
-            onDismiss={() => setShowGoldStreakLostBanner(false)}
-          />
           <StreakLostBanner
             open={showStreakLostNoShields}
             previousStreak={12}
@@ -666,19 +642,10 @@ export default function AppTest() {
             onDismiss={() => setShowStreakLostNoShields(false)}
             onSubscribe={() => { setShowStreakLostNoShields(false); setShowPaywall(true); }}
           />
-          <GoldStreakLostBanner
-            open={showGoldLostNoShields}
-            previousGoldStreak={5}
-            hasShieldsRemaining={false}
-            shieldsLeft={0}
-            isSubscribed={true}
-            onRecover={() => {}}
-            onDismiss={() => setShowGoldLostNoShields(false)}
-          />
           <RecoverySuccessBanner
             open={showRecoverySuccess !== null}
-            restoredStreak={showRecoverySuccess === 'gold' ? 5 : 12}
-            type={showRecoverySuccess || 'streak'}
+            restoredStreak={12}
+            type="streak"
             onClose={() => setShowRecoverySuccess(null)}
           />
           <StreakGoalCompletionCelebration
