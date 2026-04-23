@@ -49,6 +49,7 @@ export function ReflectionCelebrationSheet({
       routinePlayer!.maximize();
       return;
     }
+    navigate('/app/home');
     onDone();
   };
 
