@@ -252,12 +252,14 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
               </span>
               
               {/* Settings icon */}
-              <button
-                onClick={handleSettingsClick}
-                className={cn("p-1 rounded-full transition-colors", style.settingsBg)}
-              >
-                <Settings2 className="h-3 w-3 text-black" />
-              </button>
+              {!isPlaylistEvent && (
+                <button
+                  onClick={handleSettingsClick}
+                  className={cn("p-1 rounded-full transition-colors", style.settingsBg)}
+                >
+                  <Settings2 className="h-3 w-3 text-black" />
+                </button>
+              )}
               
               {/* External link indicator for today's sessions */}
               {event.type === 'session' && isToday(date) && event.meetingLink && (
