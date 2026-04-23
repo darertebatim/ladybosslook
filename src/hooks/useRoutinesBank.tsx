@@ -361,7 +361,7 @@ export function useCompletedRoutines() {
       const { data, error } = await supabase
         .from('user_routines_bank')
         .select('routine_id')
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .not('completed_at', 'is', null);
 
       if (error) throw error;
@@ -398,7 +398,7 @@ export function useAddRoutineFromBank() {
       }[];
     }) => {
       if (!user) throw new Error('Must be logged in');
-      return addRoutineToUserPlanner(userId, routineId, { selectedTaskIds, editedTasks });
+      return addRoutineToUserPlanner(user.id, routineId, { selectedTaskIds, editedTasks });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
