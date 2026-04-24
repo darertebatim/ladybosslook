@@ -87,6 +87,62 @@ export async function initAppsFlyer(): Promise<void> {
   try {
     const { AppsFlyer } = await import('appsflyer-capacitor-plugin');
 
+    // CRITICAL: Register listeners BEFORE startSDK so the very first
+    // deep link / conversion event isn't missed.
+    try {
+      const { AFConstants } = await import('appsflyer-capacitor-plugin');
+
+      AppsFlyer.addListener(AFConstants.CONVERSION_CALLBACK, (event: any) => {
+        console.log('[AppsFlyer] 🔔 Conversion callback fired:', JSON.stringify(event));
+        try {
+          const data = event?.data || {};
+          const instructorSlug =
+            (data?.af_sub1 as string | undefined) ||
+            (data?.deep_link_value as string | undefined) ||
+            (data?.c as string | undefined);
+          const payload: AppsFlyerAttribution = {
+            instructorSlug: instructorSlug ? String(instructorSlug).trim().toLowerCase() : undefined,
+            raw: data as Record<string, unknown>,
+            capturedAt: new Date().toISOString(),
+          };
+          localStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(payload));
+          console.log('[AppsFlyer] ✅ Conversion data captured. Slug:', payload.instructorSlug ?? '(none)');
+        } catch (err) {
+          console.warn('[AppsFlyer] Conversion data parse failed:', err);
+        }
+      });
+
+      AppsFlyer.addListener(AFConstants.UDL_CALLBACK, (event: any) => {
+        console.log('[AppsFlyer] 🔗 UDL callback fired:', JSON.stringify(event));
+        try {
+          const data = event?.deepLink || event?.data || event || {};
+          const instructorSlug =
+            (data?.deep_link_value as string | undefined) ||
+            (data?.af_sub1 as string | undefined) ||
+            (data?.c as string | undefined);
+          if (instructorSlug) {
+            const payload: AppsFlyerAttribution = {
+              instructorSlug: String(instructorSlug).trim().toLowerCase(),
+              raw: data as Record<string, unknown>,
+              capturedAt: new Date().toISOString(),
+            };
+            // Also clear the "processed" flag so the modal can re-trigger for a new instructor on re-engagement
+            try { localStorage.removeItem(ATTRIBUTION_PROCESSED_KEY); } catch {/* ignore */}
+            localStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(payload));
+            console.log('[AppsFlyer] ✅ Deep link captured. Slug:', payload.instructorSlug);
+          } else {
+            console.log('[AppsFlyer] UDL fired but no instructor slug found in payload');
+          }
+        } catch (err) {
+          console.warn('[AppsFlyer] Deep link parse failed:', err);
+        }
+      });
+
+      console.log('[AppsFlyer] Listeners registered (pre-start)');
+    } catch (err) {
+      console.warn('[AppsFlyer] Failed to register conversion listener:', err);
+    }
+
     await AppsFlyer.initSDK({
       devKey: APPSFLYER_DEV_KEY,
       isDebug: false,
@@ -100,52 +156,6 @@ export async function initAppsFlyer(): Promise<void> {
 
     isInitialized = true;
     console.log('[AppsFlyer] ✅ SDK initialized successfully');
-
-    // Listen for conversion data (first install attribution).
-    // Fires once per fresh install with `af_sub1` / `deep_link_value` from the OneLink.
-    try {
-      const { AFConstants } = await import('appsflyer-capacitor-plugin');
-      AppsFlyer.addListener(AFConstants.CONVERSION_CALLBACK, (event: any) => {
-        try {
-          const data = (event?.callbackName === 'onConversionDataSuccess' ? event?.data : event?.data) || {};
-          const instructorSlug =
-            (data?.af_sub1 as string | undefined) ||
-            (data?.deep_link_value as string | undefined) ||
-            (data?.c as string | undefined);
-          const payload: AppsFlyerAttribution = {
-            instructorSlug: instructorSlug ? String(instructorSlug).trim().toLowerCase() : undefined,
-            raw: data as Record<string, unknown>,
-            capturedAt: new Date().toISOString(),
-          };
-          localStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(payload));
-          console.log('[AppsFlyer] Conversion data captured:', payload);
-        } catch (err) {
-          console.warn('[AppsFlyer] Conversion data parse failed:', err);
-        }
-      });
-
-      AppsFlyer.addListener(AFConstants.UDL_CALLBACK, (event: any) => {
-        try {
-          const data = event?.deepLink || event?.data || {};
-          const instructorSlug =
-            (data?.deep_link_value as string | undefined) ||
-            (data?.af_sub1 as string | undefined);
-          if (instructorSlug) {
-            const payload: AppsFlyerAttribution = {
-              instructorSlug: String(instructorSlug).trim().toLowerCase(),
-              raw: data as Record<string, unknown>,
-              capturedAt: new Date().toISOString(),
-            };
-            localStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(payload));
-            console.log('[AppsFlyer] Deep link captured:', payload);
-          }
-        } catch (err) {
-          console.warn('[AppsFlyer] Deep link parse failed:', err);
-        }
-      });
-    } catch (err) {
-      console.warn('[AppsFlyer] Failed to register conversion listener:', err);
-    }
   } catch (error) {
     console.warn('[AppsFlyer] SDK init failed:', error);
   }
