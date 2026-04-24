@@ -34,7 +34,7 @@ async function requireAuthUser(req: Request) {
   return { user: data.user } as const;
 }
 
-async function requireAdmin(userId: string, supabaseAdmin: ReturnType<typeof createClient>) {
+async function requireAdmin(userId: string, supabaseAdmin: any) {
   const { data, error } = await supabaseAdmin
     .from('user_roles')
     .select('role')
@@ -47,7 +47,7 @@ async function requireAdmin(userId: string, supabaseAdmin: ReturnType<typeof cre
 }
 
 async function mustDelete(
-  supabaseAdmin: ReturnType<typeof createClient>,
+  supabaseAdmin: any,
   table: string,
   column: string,
   value: string
@@ -57,7 +57,7 @@ async function mustDelete(
 }
 
 async function mustDeleteIn(
-  supabaseAdmin: ReturnType<typeof createClient>,
+  supabaseAdmin: any,
   table: string,
   column: string,
   values: string[]
