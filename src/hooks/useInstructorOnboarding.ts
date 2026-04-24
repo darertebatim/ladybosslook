@@ -5,6 +5,7 @@ import {
   getStoredAttribution,
   isAttributionProcessed,
   markAttributionProcessed,
+  APPSFLYER_ATTRIBUTION_EVENT,
 } from '@/lib/appsflyer';
 
 const URL_INSTRUCTOR_KEY = 'rilo_instructor_slug_pending';
@@ -255,9 +256,22 @@ export function useInstructorOnboarding(userId: string | undefined) {
 
     // Defer slightly so auth/profile state settles, then retry a few times.
     schedule(1500);
+
+    // Re-trigger when AppsFlyer captures a NEW deep link after initial mount
+    // (e.g. user already in the app taps a OneLink, or returns from the App Store).
+    const onAttributionCaptured = () => {
+      if (cancelled) return;
+      console.log('[InstructorOnboarding] 🔄 Attribution event received — re-running detection');
+      attempts.current = 0;
+      if (timer != null) window.clearTimeout(timer);
+      schedule(200);
+    };
+    window.addEventListener(APPSFLYER_ATTRIBUTION_EVENT, onAttributionCaptured);
+
     return () => {
       cancelled = true;
       if (timer != null) window.clearTimeout(timer);
+      window.removeEventListener(APPSFLYER_ATTRIBUTION_EVENT, onAttributionCaptured);
     };
   }, [userId, queryClient]);
 
