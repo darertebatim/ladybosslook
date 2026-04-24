@@ -98,7 +98,7 @@ RULES:
     if (!jsonMatch) return null;
 
     return JSON.parse(jsonMatch[0]);
-  } catch (error) {
+  } catch (error: any) {
     console.error('AI generation failed:', error);
     return null;
   }
@@ -341,7 +341,7 @@ serve(async (req) => {
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error:", error);
     return new Response(
       JSON.stringify({ error: error.message || "Failed to generate plan" }),

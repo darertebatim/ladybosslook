@@ -267,7 +267,7 @@ Return ONLY valid JSON in this exact format:
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generating routine plan:', error);
     return new Response(
       JSON.stringify({ error: error.message || 'Failed to generate routine plan' }),

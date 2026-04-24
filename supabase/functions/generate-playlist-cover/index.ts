@@ -233,7 +233,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generating playlist cover:', error);
     return new Response(
       JSON.stringify({ error: error.message || 'Failed to generate playlist cover' }),

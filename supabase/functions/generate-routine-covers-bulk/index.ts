@@ -114,7 +114,7 @@ Style requirements (CRITICAL - follow these exactly):
     console.log('Cover generated and saved for:', plan.title, publicUrl);
     return { planId: plan.id, success: true, coverUrl: publicUrl };
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generating cover for plan:', plan.id, error);
     return { planId: plan.id, success: false, error: error.message };
   }
@@ -226,7 +226,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in bulk cover generation:', error);
     return new Response(
       JSON.stringify({ error: error.message || 'Failed to generate covers' }),
