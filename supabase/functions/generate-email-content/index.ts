@@ -242,7 +242,7 @@ Generate both English and Farsi versions of this email. Remember to include the 
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('[GENERATE-EMAIL] Error:', error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),

@@ -269,7 +269,7 @@ Deno.serve(async (req) => {
 
     console.log(`[DripFollowup] Complete: Sent ${sentCount}`);
     return new Response(JSON.stringify({ success: true, sent: sentCount, followups: toSend.length }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[DripFollowup] Error:', error);
     return new Response(JSON.stringify({ error: String(error) }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }

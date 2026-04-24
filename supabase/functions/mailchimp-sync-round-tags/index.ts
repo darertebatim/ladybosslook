@@ -245,7 +245,7 @@ serve(async (req) => {
         results.tagged++;
         logStep("Tags added", { email, tagsAdded: tagsToAdd });
 
-      } catch (error) {
+      } catch (error: any) {
         logStep("Error processing user", { email, error: String(error) });
         results.failed++;
       }
@@ -263,7 +263,7 @@ serve(async (req) => {
       status: 200,
     });
 
-  } catch (error) {
+  } catch (error: any) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep('ERROR', { message: errorMessage });
     return new Response(JSON.stringify({ 

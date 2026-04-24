@@ -136,7 +136,7 @@ const handler = async (req: Request): Promise<Response> => {
             error: errorData.detail || errorData.title
           });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(`✗ Error updating ${order.email}:`, error);
         results.push({
           email: order.email,
@@ -161,7 +161,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in fix-mailchimp-amounts:", error);
     return new Response(
       JSON.stringify({ 

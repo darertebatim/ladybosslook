@@ -147,7 +147,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("[RC Webhook] Error:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
@@ -202,7 +202,7 @@ async function ensureEnrollment(supabase: any, userId: string, programSlug: stri
     } else {
       console.log("[RC Webhook] ✓ Created enrollment for:", programSlug);
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("[RC Webhook] Enrollment creation failed:", error);
   }
 }

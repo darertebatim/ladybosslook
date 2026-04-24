@@ -138,7 +138,7 @@ async function sendToApns(
     const errorBody = await response.text();
     console.error(`[MomentumKeeper] APNs error for ${deviceToken.substring(0, 20)}...:`, response.status, errorBody);
     return { success: false, error: `APNs ${response.status}: ${errorBody}`, shouldRemove: response.status === 410 || response.status === 400 };
-  } catch (error) {
+  } catch (error: any) {
     return { success: false, error: String(error) };
   }
 }
@@ -294,7 +294,7 @@ Deno.serve(async (req) => {
     console.log(`[MomentumKeeper] Complete: Sent ${sentCount}, Skipped ${skipCount}`);
     
     return new Response(JSON.stringify({ success: true, sent: sentCount, skipped: skipCount, checked: inactiveUsers.length }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[MomentumKeeper] Error:', error);
     return new Response(JSON.stringify({ error: String(error) }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }

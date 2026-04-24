@@ -210,7 +210,7 @@ Deno.serve(async (req) => {
     console.log(`[reset-user-data] ✓ Complete reset done for user: ${targetUserId}`);
 
     return json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[reset-user-data] Unexpected error:', error);
     const message = error instanceof Error ? error.message : 'An unexpected error occurred';
     return json({ error: message }, 500);

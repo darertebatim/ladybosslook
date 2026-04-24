@@ -65,7 +65,7 @@ async function getLatestAppStoreVersion(): Promise<{ version: string; storeUrl: 
       version: result.version,
       storeUrl: result.trackViewUrl || `https://apps.apple.com/app/simora-ladybosslook/id${result.trackId}`,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('[check-app-version] Error fetching from iTunes:', error);
     return null;
   }
@@ -167,7 +167,7 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('[check-app-version] Unexpected error:', error);
     return new Response(
       JSON.stringify({

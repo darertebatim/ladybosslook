@@ -125,7 +125,7 @@ Return ONLY the text, nothing else.`;
       JSON.stringify({ text: generatedText }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error:", error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),

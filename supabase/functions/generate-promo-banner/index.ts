@@ -145,7 +145,7 @@ Important: Make the text readable and prominent on the banner.`;
       JSON.stringify({ imageData }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generating banner:', error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),

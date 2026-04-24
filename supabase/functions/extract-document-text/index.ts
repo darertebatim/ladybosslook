@@ -43,7 +43,7 @@ async function extractDocxText(file: File): Promise<string | null> {
 
     const fallbackParts = Array.from(normalizedXml.matchAll(/<w:t(?:\s+[^>]*)?>([\s\S]*?)<\/w:t>/g)).map((m) => decodeXmlEntities(m[1]).trim()).filter(Boolean);
     return fallbackParts.length > 0 ? fallbackParts.join("\n") : null;
-  } catch (error) {
+  } catch (error: any) {
     console.error("DOCX extraction error:", error);
     return null;
   }

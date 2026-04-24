@@ -177,7 +177,7 @@ Requirements:
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generating program cover:', error);
     return new Response(JSON.stringify({ 
       error: error instanceof Error ? error.message : 'Failed to generate cover' 

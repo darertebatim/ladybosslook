@@ -117,7 +117,7 @@ async function sendToApns(
     
     const shouldRemove = response.status === 410 || response.status === 400;
     return { success: false, error: `APNs ${response.status}: ${errorBody}`, shouldRemove };
-  } catch (error) {
+  } catch (error: any) {
     console.error(`[Task Summary] Failed to send to ${deviceToken.substring(0, 20)}...:`, error);
     return { success: false, error: String(error) };
   }
@@ -488,7 +488,7 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('[Task Summary] Error:', error);
     return new Response(
       JSON.stringify({ error: String(error) }),

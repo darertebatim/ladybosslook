@@ -102,7 +102,7 @@ async function sendToApns(
     const errorBody = await response.text();
     console.error(`[Feed Post PN] APNs error for ${deviceToken}:`, response.status, errorBody);
     return { success: false, error: `APNs ${response.status}: ${errorBody}` };
-  } catch (error) {
+  } catch (error: any) {
     console.error(`[Feed Post PN] Failed to send to ${deviceToken}:`, error);
     return { success: false, error: String(error) };
   }
@@ -296,7 +296,7 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('[Feed Post PN] Error:', error);
     return new Response(
       JSON.stringify({ error: String(error) }),

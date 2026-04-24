@@ -334,7 +334,7 @@ Deno.serve(async (req) => {
 
     console.log(`[StreakChallenge] Complete: Sent ${sentCount}, Skipped ${skipCount}`);
     return new Response(JSON.stringify({ success: true, sent: sentCount, skipped: skipCount, total: streaks.length }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[StreakChallenge] Error:', error);
     return new Response(JSON.stringify({ error: String(error) }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }

@@ -139,7 +139,7 @@ serve(async (req) => {
           mailchimpResponse: updateData
         });
 
-      } catch (error) {
+      } catch (error: any) {
         logStep(`Error updating ${update.email}`, error);
         results.push({
           email: update.email,
@@ -160,7 +160,7 @@ serve(async (req) => {
       status: 200,
     });
 
-  } catch (error) {
+  } catch (error: any) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep('ERROR in update-mailchimp-cities', { message: errorMessage });
     return new Response(JSON.stringify({ 

@@ -126,7 +126,7 @@ async function retryWithBackoff<T>(
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       return await operation();
-    } catch (error) {
+    } catch (error: any) {
       if (attempt === maxRetries) {
         throw error;
       }

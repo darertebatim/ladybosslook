@@ -214,7 +214,7 @@ serve(async (req) => {
           results.errors.push(`${email}: ${await tagResponse.text()}`);
         }
 
-      } catch (error) {
+      } catch (error: any) {
         results.failed++;
         results.errors.push(`${email}: ${(error as Error).message}`);
       }
@@ -230,7 +230,7 @@ serve(async (req) => {
       status: 200,
     });
 
-  } catch (error) {
+  } catch (error: any) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep('ERROR', { message: errorMessage });
     return new Response(JSON.stringify({ 

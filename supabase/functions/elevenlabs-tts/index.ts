@@ -67,7 +67,7 @@ serve(async (req) => {
         'Content-Type': 'audio/mpeg',
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('TTS error:', error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
