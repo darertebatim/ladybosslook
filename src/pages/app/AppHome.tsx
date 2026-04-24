@@ -51,7 +51,6 @@ import { WeeklyReviewBanner } from '@/components/app/WeeklyReviewBanner';
 import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useKeyboard } from '@/hooks/useKeyboard';
-import { useAutoAssignDefaultRoutine } from '@/hooks/useAutoAssignDefaultRoutine';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
@@ -69,7 +68,6 @@ const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
 const AppHome = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  useAutoAssignDefaultRoutine();
   const { scrollRef: homeScrollRef } = useScrollRestore('home_scroll', { autoSave: true });
   const {
     user

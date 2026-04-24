@@ -5543,6 +5543,10 @@ export type Database = {
         Args: { course_name: string }
         Returns: string
       }
+      provision_daily_reset_for_user: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
