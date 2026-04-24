@@ -191,7 +191,7 @@ Deno.serve(async (req) => {
     let totalFailed = 0;
     
     for (const post of posts) {
-      const channel = post.feed_channels;
+      const channel: any = (post as any).feed_channels;
       if (!channel) continue;
       
       // Get users who should receive this notification
