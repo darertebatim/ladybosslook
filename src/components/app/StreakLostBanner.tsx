@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Flame, Shield, X, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
+import { StreakLostPushPrompt } from '@/components/app/StreakLostPushPrompt';
+import { useAuth } from '@/hooks/useAuth';
+import { usePushPermission } from '@/hooks/usePushPermission';
 
 interface StreakLostBannerProps {
   open: boolean;
@@ -33,14 +36,33 @@ export const StreakLostBanner = ({
   isLoading,
 }: StreakLostBannerProps) => {
   const [isAnimating] = useState(true);
+  const [showPushPrompt, setShowPushPrompt] = useState(false);
+  const { user } = useAuth();
+  const { needsAttention } = usePushPermission();
+
+  // Chain push prompt after the streak-lost modal closes (only if PN missing
+  // and user hasn't been asked about this in the last 7 days).
+  const handleDismissChain = () => {
+    onDismiss();
+    if (!user?.id || !needsAttention) return;
+    const lastShown = localStorage.getItem('streakLostPushPromptShown');
+    if (lastShown) {
+      const days = (Date.now() - parseInt(lastShown)) / (1000 * 60 * 60 * 24);
+      if (days < 7) return;
+    }
+    localStorage.setItem('streakLostPushPromptShown', Date.now().toString());
+    // Slight delay so the close animation completes first
+    setTimeout(() => setShowPushPrompt(true), 350);
+  };
 
   if (!open) return null;
 
   return (
+    <>
     <OverlayPortal>
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-      onClick={() => { haptic.light(); onDismiss(); }}
+      onClick={() => { haptic.light(); handleDismissChain(); }}
     >
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
@@ -52,7 +74,7 @@ export const StreakLostBanner = ({
         onClick={(e) => e.stopPropagation()}
       >
         <button
-          onClick={() => { haptic.light(); onDismiss(); }}
+          onClick={() => { haptic.light(); handleDismissChain(); }}
           className="absolute top-4 right-4 text-white/60 transition-colors"
         >
           <X className="h-5 w-5" />
@@ -102,7 +124,7 @@ export const StreakLostBanner = ({
               {shieldsLeft} shield{shieldsLeft !== 1 ? 's' : ''} remaining
             </p>
             <Button
-              onClick={() => { haptic.light(); onDismiss(); }}
+              onClick={() => { haptic.light(); handleDismissChain(); }}
               variant="ghost"
               className="w-full text-white bg-white/15 text-xs font-medium rounded-xl"
             >
@@ -115,14 +137,14 @@ export const StreakLostBanner = ({
               No shields left. Unlock more with <span className="font-semibold text-white">Simora Plus</span>.
             </p>
             <Button
-              onClick={() => { haptic.light(); onDismiss(); onSubscribe?.(); }}
+              onClick={() => { haptic.light(); handleDismissChain(); onSubscribe?.(); }}
               className="w-full bg-white text-red-600 font-semibold py-3 rounded-xl mb-2"
             >
               <Sparkles className="h-4 w-4 mr-1" />
               Get Simora Plus
             </Button>
             <Button
-              onClick={() => { haptic.light(); onDismiss(); }}
+              onClick={() => { haptic.light(); handleDismissChain(); }}
               variant="ghost"
               className="w-full text-white bg-white/15 text-xs font-medium rounded-xl"
             >
@@ -135,7 +157,7 @@ export const StreakLostBanner = ({
               All recovery shields have been used. Time for a fresh start.
             </p>
             <Button
-              onClick={() => { haptic.light(); onDismiss(); }}
+              onClick={() => { haptic.light(); handleDismissChain(); }}
               className="w-full bg-white text-red-600 font-semibold py-3 rounded-xl"
             >
               Start Fresh
@@ -145,5 +167,14 @@ export const StreakLostBanner = ({
       </div>
     </div>
     </OverlayPortal>
+    {user?.id && (
+      <StreakLostPushPrompt
+        userId={user.id}
+        open={showPushPrompt}
+        onClose={() => setShowPushPrompt(false)}
+        lostStreak={previousStreak}
+      />
+    )}
+    </>
   );
 };

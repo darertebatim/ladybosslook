@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { PushPermissionDot } from '@/components/app/PushPermissionDot';
 interface NavItem {
   id: string;
   name: string;
@@ -94,10 +95,11 @@ export function HomeMenu({ onStartTour }: HomeMenuProps) {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <button 
-          className="p-2 -ml-2 text-foreground hover:text-foreground transition-colors"
+          className="relative p-2 -ml-2 text-foreground hover:text-foreground transition-colors"
           onClick={() => haptic.light()}
         >
           <Menu className="h-5 w-5" />
+          <PushPermissionDot className="top-1.5 right-1.5" />
         </button>
       </SheetTrigger>
       <SheetContent side="left" className="w-[260px] p-0 overflow-y-auto" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
