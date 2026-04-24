@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Bell, X, ChevronRight } from 'lucide-react';
+import { Bell, X, ChevronRight, Leaf, Sparkles } from 'lucide-react';
 import { checkPermissionStatus } from '@/lib/pushNotifications';
 import { shouldShowPushUI } from '@/hooks/usePushNotificationFlow';
 
@@ -100,39 +100,54 @@ export function NotificationBanner({ onEnableClick, forceShow }: NotificationBan
 
   return (
     <div className="mx-4 mb-4">
-      <div className="relative bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-2xl border border-primary/20 overflow-hidden">
+      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-rose-100 via-pink-100 to-amber-100 dark:from-rose-950/40 dark:via-pink-950/30 dark:to-amber-950/40 border border-rose-200/60 shadow-sm">
+        {/* Soft decorative blob */}
+        <div className="pointer-events-none absolute -top-8 -right-6 w-24 h-24 rounded-full bg-amber-300/40 blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-8 -left-6 w-20 h-20 rounded-full bg-rose-300/40 blur-2xl" />
+
         {/* Dismiss button */}
         <button
           onClick={handleDismiss}
-          className="absolute top-2 right-2 p-1.5 rounded-full hover:bg-background/50 transition-colors z-10"
+          className="absolute top-2 right-2 p-1.5 rounded-full hover:bg-background/60 transition-colors z-10"
+          aria-label="Dismiss"
         >
-          <X className="h-4 w-4 text-muted-foreground" />
+          <X className="h-4 w-4 text-black/60" />
         </button>
 
         <button 
           onClick={onEnableClick}
-          className="w-full flex items-center gap-4 p-4 pr-10 text-left"
+          className="relative w-full flex items-center gap-4 p-4 pr-10 text-left"
         >
           {/* Icon */}
-          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-            <Bell className="h-6 w-6 text-primary" />
+          <div className="relative shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-400 via-pink-400 to-amber-400 flex items-center justify-center shadow-md ring-2 ring-background/60">
+              <Bell className="h-5 w-5 text-white" />
+            </div>
+            <div className="absolute -top-1 -right-1">
+              <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+            </div>
+            <div className="absolute -bottom-1 -left-1">
+              <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shadow-sm">
+                <Leaf className="h-2.5 w-2.5 text-emerald-600" />
+              </div>
+            </div>
           </div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm text-foreground">
-              {isPreEnrolled ? '🌿 A soft nudge for your day' : 'Protect your daily ritual 🔥'}
+            <p className="font-semibold text-sm text-black">
+              {isPreEnrolled ? 'Stay close to your self-care 🌿' : 'A gentle nudge for your day'}
             </p>
-            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+            <p className="text-[12px] text-black mt-0.5 line-clamp-1 font-medium">
               {isPreEnrolled 
-                ? 'Routines, streak & check-in reminders'
-                : 'Streak, routines & mood check-in nudges'
+                ? 'Routine, mood & streak reminders'
+                : 'Routine, mood check-in & streak reminders'
               }
             </p>
           </div>
 
           {/* Arrow */}
-          <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
+          <ChevronRight className="h-5 w-5 text-black/70 shrink-0" />
         </button>
       </div>
     </div>
