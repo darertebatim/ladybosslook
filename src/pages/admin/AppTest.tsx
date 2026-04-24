@@ -812,9 +812,9 @@ export default function AppTest() {
           <div>
             <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">Home banner (live preview)</p>
             <div className="bg-muted/30 rounded-lg p-2 -mx-2">
-              <NotificationBanner onEnableClick={() => toast.info('Banner clicked — opens onboarding flow')} />
+              <NotificationBanner forceShow onEnableClick={() => toast.info('Banner clicked — opens onboarding flow')} />
               <p className="text-[11px] text-muted-foreground px-4 italic">
-                Note: only renders on native or with <code>?debugPush=true</code> & permission ≠ granted.
+                Forced on for preview. In-app, only renders on native or with <code>?debugPush=true</code> when permission ≠ granted.
               </p>
             </div>
           </div>

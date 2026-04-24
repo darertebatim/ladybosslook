@@ -5,17 +5,23 @@ import { shouldShowPushUI } from '@/hooks/usePushNotificationFlow';
 
 interface NotificationBannerProps {
   onEnableClick: () => void;
+  /** Bypass all gating (debug/native/dismissal/permission) for admin previews */
+  forceShow?: boolean;
 }
 
 /**
  * Persistent banner on home page for users who haven't enabled notifications
  * Reappears daily after dismissal
  */
-export function NotificationBanner({ onEnableClick }: NotificationBannerProps) {
+export function NotificationBanner({ onEnableClick, forceShow }: NotificationBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isPreEnrolled, setIsPreEnrolled] = useState(false);
 
   const checkVisibility = useCallback(async () => {
+    if (forceShow) {
+      setIsVisible(true);
+      return;
+    }
     // Only show on native OR debug mode
     if (!shouldShowPushUI()) {
       setIsVisible(false);
@@ -56,7 +62,7 @@ export function NotificationBanner({ onEnableClick }: NotificationBannerProps) {
     }
 
     setIsVisible(true);
-  }, []);
+  }, [forceShow]);
 
   // Check on mount
   useEffect(() => {
