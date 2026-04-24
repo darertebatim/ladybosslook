@@ -1182,6 +1182,27 @@ export default function AppTest() {
         onClose={() => setShowCourseNotificationPrompt(false)}
       />
 
+      <TaskCompletionPushNudge
+        userId="test-user-id"
+        open={showTaskCompletionNudge}
+        onClose={() => setShowTaskCompletionNudge(false)}
+        streakDay={3}
+      />
+
+      <StreakLostPushPrompt
+        userId="test-user-id"
+        open={showStreakLostPushPrompt}
+        onClose={() => setShowStreakLostPushPrompt(false)}
+        lostStreak={12}
+      />
+
+      <ReturningUserPushSheet
+        userId="test-user-id"
+        open={showReturningUserSheet}
+        onClose={() => setShowReturningUserSheet(false)}
+        consecutiveDays={4}
+      />
+
       <BadgeCelebration
         type={badgeCelebrationType}
         onClose={() => setBadgeCelebrationType(null)}
