@@ -115,12 +115,12 @@ export function NotificationBanner({ onEnableClick }: NotificationBannerProps) {
           {/* Content */}
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm text-foreground">
-              {isPreEnrolled ? '🔔 Don\'t miss your classes!' : 'Enable Notifications'}
+              {isPreEnrolled ? '🌿 A soft nudge for your day' : 'Protect your daily ritual 🔥'}
             </p>
             <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
               {isPreEnrolled 
-                ? 'Get reminders for live sessions & updates'
-                : 'Stay updated with reminders & announcements'
+                ? 'Routines, streak & check-in reminders'
+                : 'Streak, routines & mood check-in nudges'
               }
             </p>
           </div>

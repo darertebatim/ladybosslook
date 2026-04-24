@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, MessageCircle, Calendar, Sparkles, Settings, X } from 'lucide-react';
+import { Bell, Flame, Sparkles, Settings, MessageCircle, Heart, Sunrise } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { subscribeToPushNotifications, requestNotificationPermission } from '@/lib/pushNotifications';
 import { toast } from 'sonner';
@@ -90,8 +90,9 @@ export function PushNotificationOnboarding({
 
   return (
     <div 
-      className="fixed inset-0 flex flex-col justify-end"
+      className="fixed inset-0 flex flex-col justify-end z-40"
       data-pn-onboarding="true"
+      style={{ paddingBottom: 'calc(64px + env(safe-area-inset-bottom))' }}
     >
       {/* Dimmed overlay */}
       <div 
@@ -102,7 +103,7 @@ export function PushNotificationOnboarding({
       {/* Half-page sheet */}
       <div 
         className="relative bg-background rounded-t-3xl shadow-2xl animate-slide-up"
-        style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}
+        style={{ paddingBottom: '20px' }}
       >
         {/* Hero Section with app icon */}
         <div className="relative flex flex-col items-center pt-6 pb-4 px-6">
@@ -123,12 +124,12 @@ export function PushNotificationOnboarding({
 
           {/* Title & Description */}
           <h1 className="text-2xl font-bold text-center mb-2">
-            {isPreEnrolled ? 'Welcome Back! 🎉' : 'Stay in the Loop'}
+            {isPreEnrolled ? 'Welcome back 🌿' : 'Your daily ritual, gently guided'}
           </h1>
           <p className="text-muted-foreground text-center text-sm leading-relaxed max-w-xs">
             {isPreEnrolled 
-              ? 'Enable notifications so you never miss class sessions or important updates.'
-              : 'Get notified about class reminders, new content, and important updates.'
+              ? 'A soft nudge so your routines, streak, and check-ins stay part of your day.'
+              : 'A soft nudge for your routines, streak, and daily check-in — only when it matters.'
             }
           </p>
         </div>
@@ -136,32 +137,32 @@ export function PushNotificationOnboarding({
         {/* Feature Cards */}
         <div className="px-6 space-y-2 mb-6">
           <div className="flex items-center gap-3 bg-muted/50 rounded-xl p-3">
-            <div className="w-9 h-9 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
-              <Calendar className="h-4 w-4 text-blue-500" />
+            <div className="w-9 h-9 rounded-full bg-orange-500/10 flex items-center justify-center shrink-0">
+              <Flame className="h-4 w-4 text-orange-500" />
             </div>
             <div>
-              <p className="font-medium text-sm">Class Reminders</p>
-              <p className="text-xs text-muted-foreground">Never miss a live session</p>
+              <p className="font-medium text-sm">Protect your streak</p>
+              <p className="text-xs text-muted-foreground">A nudge before your day slips by</p>
             </div>
           </div>
           
           <div className="flex items-center gap-3 bg-muted/50 rounded-xl p-3">
-            <div className="w-9 h-9 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
-              <MessageCircle className="h-4 w-4 text-green-500" />
+            <div className="w-9 h-9 rounded-full bg-rose-500/10 flex items-center justify-center shrink-0">
+              <Heart className="h-4 w-4 text-rose-500" />
             </div>
             <div>
-              <p className="font-medium text-sm">Support Replies</p>
-              <p className="text-xs text-muted-foreground">Know when Razie responds</p>
+              <p className="font-medium text-sm">Mood & reflection</p>
+              <p className="text-xs text-muted-foreground">Daily check-in reminders</p>
             </div>
           </div>
           
           <div className="flex items-center gap-3 bg-muted/50 rounded-xl p-3">
-            <div className="w-9 h-9 rounded-full bg-purple-500/10 flex items-center justify-center shrink-0">
-              <Sparkles className="h-4 w-4 text-purple-500" />
+            <div className="w-9 h-9 rounded-full bg-amber-500/10 flex items-center justify-center shrink-0">
+              <Sunrise className="h-4 w-4 text-amber-500" />
             </div>
             <div>
-              <p className="font-medium text-sm">New Content</p>
-              <p className="text-xs text-muted-foreground">Fresh courses & announcements</p>
+              <p className="font-medium text-sm">Your morning ritual</p>
+              <p className="text-xs text-muted-foreground">Start the day with intention</p>
             </div>
           </div>
         </div>

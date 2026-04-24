@@ -45,6 +45,11 @@ import { TrackCompletionCelebration } from '@/components/audio/TrackCompletionCe
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
 import { PushNotificationPrompt } from '@/components/app/PushNotificationPrompt';
 import { CourseNotificationPrompt } from '@/components/app/CourseNotificationPrompt';
+import { NotificationBanner } from '@/components/app/NotificationBanner';
+import { TaskCompletionPushNudge } from '@/components/app/TaskCompletionPushNudge';
+import { StreakLostPushPrompt } from '@/components/app/StreakLostPushPrompt';
+import { ReturningUserPushSheet } from '@/components/app/ReturningUserPushSheet';
+import { PushPermissionDot } from '@/components/app/PushPermissionDot';
 import { AppUpdateBanner } from '@/components/app/AppUpdateBanner';
 import { BadgeCelebration, BadgeCelebrationLevel } from '@/components/app/BadgeCelebration';
 import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
@@ -89,6 +94,9 @@ export default function AppTest() {
   const [showPushOnboarding, setShowPushOnboarding] = useState(false);
   const [showPushPrompt, setShowPushPrompt] = useState(false);
   const [showCourseNotificationPrompt, setShowCourseNotificationPrompt] = useState(false);
+  const [showTaskCompletionNudge, setShowTaskCompletionNudge] = useState(false);
+  const [showStreakLostPushPrompt, setShowStreakLostPushPrompt] = useState(false);
+  const [showReturningUserSheet, setShowReturningUserSheet] = useState(false);
   const [showActionLimit, setShowActionLimit] = useState(false);
   const [showPlusGate, setShowPlusGate] = useState(false);
   
@@ -796,10 +804,36 @@ export default function AppTest() {
             Push Notification Prompts
           </CardTitle>
           <CardDescription>
-            Test notification permission request flows
+            Preview every push-permission touchpoint across the app
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
+          {/* Live Home Banner Preview */}
+          <div>
+            <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">Home banner (live preview)</p>
+            <div className="bg-muted/30 rounded-lg p-2 -mx-2">
+              <NotificationBanner onEnableClick={() => toast.info('Banner clicked — opens onboarding flow')} />
+              <p className="text-[11px] text-muted-foreground px-4 italic">
+                Note: only renders on native or with <code>?debugPush=true</code> & permission ≠ granted.
+              </p>
+            </div>
+          </div>
+
+          {/* Profile red dot demo */}
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Red dot (forced on):</p>
+            <div className="relative inline-flex">
+              <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
+                <Users className="h-5 w-5" />
+              </div>
+              <PushPermissionDot forceShow />
+            </div>
+            <p className="text-[11px] text-muted-foreground">Drop &lt;PushPermissionDot /&gt; inside any relative-positioned icon.</p>
+          </div>
+
+          <Separator />
+
+          {/* Modal previews */}
           <div className="flex flex-wrap gap-2">
             <Button onClick={() => setShowPushOnboarding(true)} variant="outline">
               <Bell className="h-4 w-4 mr-2" />
@@ -812,6 +846,18 @@ export default function AppTest() {
             <Button onClick={() => setShowCourseNotificationPrompt(true)} variant="outline">
               <Bell className="h-4 w-4 mr-2" />
               Course Notification Prompt
+            </Button>
+            <Button onClick={() => setShowTaskCompletionNudge(true)} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              Task Completion Nudge (NEW)
+            </Button>
+            <Button onClick={() => setShowStreakLostPushPrompt(true)} variant="outline">
+              <Shield className="h-4 w-4 mr-2" />
+              Streak Lost Recovery (NEW)
+            </Button>
+            <Button onClick={() => setShowReturningUserSheet(true)} variant="outline">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Returning User Sheet (NEW)
             </Button>
           </div>
         </CardContent>
@@ -1134,6 +1180,27 @@ export default function AppTest() {
         programTitle="Assertiveness Training"
         open={showCourseNotificationPrompt}
         onClose={() => setShowCourseNotificationPrompt(false)}
+      />
+
+      <TaskCompletionPushNudge
+        userId="test-user-id"
+        open={showTaskCompletionNudge}
+        onClose={() => setShowTaskCompletionNudge(false)}
+        streakDay={3}
+      />
+
+      <StreakLostPushPrompt
+        userId="test-user-id"
+        open={showStreakLostPushPrompt}
+        onClose={() => setShowStreakLostPushPrompt(false)}
+        lostStreak={12}
+      />
+
+      <ReturningUserPushSheet
+        userId="test-user-id"
+        open={showReturningUserSheet}
+        onClose={() => setShowReturningUserSheet(false)}
+        consecutiveDays={4}
       />
 
       <BadgeCelebration
