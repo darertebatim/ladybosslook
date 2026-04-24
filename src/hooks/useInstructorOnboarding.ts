@@ -5,6 +5,7 @@ import {
   getStoredAttribution,
   isAttributionProcessed,
   markAttributionProcessed,
+  APPSFLYER_ATTRIBUTION_EVENT,
 } from '@/lib/appsflyer';
 
 const URL_INSTRUCTOR_KEY = 'rilo_instructor_slug_pending';
