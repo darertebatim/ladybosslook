@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
 
       if (!reminderType) continue;
 
-      const round = session.program_rounds;
+      const round: any = (session as any).program_rounds;
       if (!round) continue;
 
       console.log(`Processing ${reminderType} reminder for session "${session.title}" (Round: ${round.round_name})`);
