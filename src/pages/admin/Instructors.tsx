@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Copy, Pencil, Trash2, Search, X, GraduationCap, ListMusic, Sparkles, Gift, MessageCircle } from 'lucide-react';
 import { buildInstructorOneLink } from '@/lib/appsflyer';
 import { ImageUploader } from '@/components/admin/ImageUploader';
+import { InstructorPackagesManager } from '@/components/admin/InstructorPackagesManager';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
@@ -238,6 +239,14 @@ export default function Instructors() {
                         <Copy className="h-3.5 w-3.5 mr-1" /> Copy
                       </Button>
                     </div>
+                    <InstructorPackagesManager
+                      instructorId={ins.id}
+                      instructorSlug={ins.slug}
+                      programs={programs}
+                      routines={routines}
+                      playlists={playlists}
+                      channels={channels}
+                    />
                   </div>
                   <div className="flex flex-col gap-2">
                     <Button size="sm" variant="ghost" onClick={() => openEdit(ins)}>

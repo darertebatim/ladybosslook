@@ -20,6 +20,9 @@ export interface InstructorInvitePreviewProps {
   defaultPlaylistIdsCount?: number;
   defaultChannelIdsCount?: number;
   plusTrialDays?: number;
+  packageName?: string | null;
+  packageDescription?: string | null;
+  packageCoverUrl?: string | null;
   busy?: boolean;
   onAccept?: () => void;
   onDecline?: () => void;
@@ -37,6 +40,9 @@ export function InstructorInviteContent({
   defaultPlaylistIdsCount = 0,
   defaultChannelIdsCount = 0,
   plusTrialDays = 0,
+  packageName,
+  packageDescription,
+  packageCoverUrl,
   busy = false,
   onAccept,
   onDecline,
@@ -74,7 +80,13 @@ export function InstructorInviteContent({
     <>
       <div className="bg-gradient-to-br from-primary/20 via-secondary/15 to-accent/30 px-6 pt-8 pb-6">
         <div className="flex flex-col items-center text-center">
-          {photoUrl ? (
+          {packageCoverUrl ? (
+            <img
+              src={packageCoverUrl}
+              alt={packageName || displayName}
+              className="h-24 w-24 rounded-2xl object-cover ring-4 ring-primary/40 shadow-lg shadow-primary/20"
+            />
+          ) : photoUrl ? (
             <img
               src={photoUrl}
               alt={displayName}
@@ -90,11 +102,18 @@ export function InstructorInviteContent({
             You've been invited
           </div>
           <h2 className="mt-3 text-xl font-bold text-foreground">
-            {displayName} is inviting you
+            {packageName ? packageName : `${displayName} is inviting you`}
           </h2>
           <p className="mt-1.5 text-sm text-foreground/70">
-            Accept their gifts to unlock the items below.
+            {packageName
+              ? `From ${displayName}`
+              : 'Accept their gifts to unlock the items below.'}
           </p>
+          {packageDescription && (
+            <p className="mt-2 text-sm text-foreground/80 max-w-xs">
+              {packageDescription}
+            </p>
+          )}
         </div>
       </div>
 
@@ -176,6 +195,9 @@ export function InstructorInviteModal() {
           defaultPlaylistIdsCount={pendingInvite.default_playlist_ids?.length || 0}
           defaultChannelIdsCount={pendingInvite.default_channel_ids?.length || 0}
           plusTrialDays={pendingInvite.plus_trial_days}
+          packageName={pendingInvite.package?.name ?? null}
+          packageDescription={pendingInvite.package?.description ?? null}
+          packageCoverUrl={pendingInvite.package?.cover_image_url ?? null}
           busy={busy}
           onAccept={handleAccept}
           onDecline={decline}

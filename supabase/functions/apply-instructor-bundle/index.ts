@@ -8,6 +8,7 @@ const corsHeaders = {
 
 interface RequestBody {
   instructor_slug: string;
+  package_slug?: string;
   attribution_source?: 'appsflyer' | 'url' | 'admin_assignment';
   raw_attribution?: Record<string, unknown> | null;
 }
@@ -54,26 +55,82 @@ Deno.serve(async (req) => {
       return json({ error: 'Invalid JSON' }, 400);
     }
     const slug = (body.instructor_slug || '').trim().toLowerCase();
-    if (!slug) return json({ error: 'instructor_slug required' }, 400);
+    const pkgSlug = (body.package_slug || '').trim().toLowerCase() || null;
+    if (!slug && !pkgSlug) return json({ error: 'instructor_slug or package_slug required' }, 400);
     const source = body.attribution_source ?? 'url';
-    const rawAttribution = body.raw_attribution ?? { source, slug };
+    const rawAttribution = body.raw_attribution ?? { source, slug, package_slug: pkgSlug };
 
     // Service-role client for privileged work
     const admin = createClient(supabaseUrl, serviceRoleKey);
 
-    // 1. Lookup instructor
-    const { data: instructor, error: insErr } = await admin
-      .from('instructors')
-      .select('id, slug, display_name, default_program_slug, default_routine_ids, default_playlist_ids, default_channel_ids, plus_trial_days')
-      .eq('slug', slug)
-      .eq('is_active', true)
-      .maybeSingle();
+    // 1. Lookup package (if provided) → resolves instructor too
+    //    Otherwise lookup instructor by slug and use the legacy default bundle.
+    let instructor:
+      | {
+          id: string;
+          slug: string;
+          display_name: string;
+        }
+      | null = null;
+    let pkg:
+      | {
+          id: string;
+          slug: string;
+          name: string;
+          default_program_slug: string | null;
+          default_routine_ids: string[];
+          default_playlist_ids: string[];
+          default_channel_ids: string[];
+          plus_trial_days: number;
+        }
+      | null = null;
 
-    if (insErr) {
-      return json({ error: 'Lookup failed', detail: insErr.message }, 500);
-    }
-    if (!instructor) {
-      return json({ error: 'Instructor not found' }, 404);
+    if (pkgSlug) {
+      const { data: pkgRow, error: pkgErr } = await admin
+        .from('instructor_packages')
+        .select('id, slug, name, default_program_slug, default_routine_ids, default_playlist_ids, default_channel_ids, plus_trial_days, is_active, instructor_id, instructors:instructor_id ( id, slug, display_name, is_active )')
+        .eq('slug', pkgSlug)
+        .eq('is_active', true)
+        .maybeSingle();
+      if (pkgErr) return json({ error: 'Package lookup failed', detail: pkgErr.message }, 500);
+      if (!pkgRow) return json({ error: 'Package not found' }, 404);
+      const ins = (pkgRow as any).instructors;
+      if (!ins?.is_active) return json({ error: 'Instructor inactive' }, 404);
+      instructor = { id: ins.id, slug: ins.slug, display_name: ins.display_name };
+      pkg = {
+        id: (pkgRow as any).id,
+        slug: (pkgRow as any).slug,
+        name: (pkgRow as any).name,
+        default_program_slug: (pkgRow as any).default_program_slug,
+        default_routine_ids: (pkgRow as any).default_routine_ids || [],
+        default_playlist_ids: (pkgRow as any).default_playlist_ids || [],
+        default_channel_ids: (pkgRow as any).default_channel_ids || [],
+        plus_trial_days: (pkgRow as any).plus_trial_days || 0,
+      };
+    } else {
+      const { data: insRow, error: insErr } = await admin
+        .from('instructors')
+        .select('id, slug, display_name, default_program_slug, default_routine_ids, default_playlist_ids, default_channel_ids, plus_trial_days')
+        .eq('slug', slug)
+        .eq('is_active', true)
+        .maybeSingle();
+      if (insErr) return json({ error: 'Lookup failed', detail: insErr.message }, 500);
+      if (!insRow) return json({ error: 'Instructor not found' }, 404);
+      instructor = {
+        id: (insRow as any).id,
+        slug: (insRow as any).slug,
+        display_name: (insRow as any).display_name,
+      };
+      pkg = {
+        id: '',
+        slug: '',
+        name: '',
+        default_program_slug: (insRow as any).default_program_slug,
+        default_routine_ids: (insRow as any).default_routine_ids || [],
+        default_playlist_ids: (insRow as any).default_playlist_ids || [],
+        default_channel_ids: (insRow as any).default_channel_ids || [],
+        plus_trial_days: (insRow as any).plus_trial_days || 0,
+      };
     }
 
     const granted: Granted = {
@@ -84,13 +141,17 @@ Deno.serve(async (req) => {
       trial: false,
     };
 
-    // 2. Create referral row (unique per user+instructor → idempotent)
-    const { error: refErr } = await admin.from('instructor_referrals').insert({
+    // 2. Create referral row.
+    //    - With package: unique per (user, instructor, package) — different packages from same instructor stack.
+    //    - Without package: unique per (user, instructor) (legacy idempotency).
+    const referralPayload: Record<string, unknown> = {
       user_id: userId,
       instructor_id: instructor.id,
       attribution_source: source,
       raw_attribution: rawAttribution,
-    });
+    };
+    if (pkg.id) referralPayload.package_id = pkg.id;
+    const { error: refErr } = await admin.from('instructor_referrals').insert(referralPayload);
     if (refErr) {
       const code = (refErr as { code?: string }).code;
       if (code === '23505') {
@@ -106,25 +167,25 @@ Deno.serve(async (req) => {
       .eq('id', userId);
 
     // 4. Auto-enroll in default program
-    if (instructor.default_program_slug) {
+    if (pkg.default_program_slug) {
       const { data: existingEnroll } = await admin
         .from('course_enrollments')
         .select('id')
         .eq('user_id', userId)
-        .eq('program_slug', instructor.default_program_slug)
+        .eq('program_slug', pkg.default_program_slug)
         .maybeSingle();
 
       if (!existingEnroll) {
         const { data: catalog } = await admin
           .from('program_catalog')
           .select('title')
-          .eq('slug', instructor.default_program_slug)
+          .eq('slug', pkg.default_program_slug)
           .maybeSingle();
-        const courseName = catalog?.title || instructor.default_program_slug;
+        const courseName = catalog?.title || pkg.default_program_slug;
 
         const { error: enrollErr } = await admin.from('course_enrollments').insert({
           user_id: userId,
-          program_slug: instructor.default_program_slug,
+          program_slug: pkg.default_program_slug,
           course_name: courseName,
           status: 'active',
         });
@@ -134,7 +195,7 @@ Deno.serve(async (req) => {
     }
 
     // 5. Add default routines (uses provision_routine_for_user RPC)
-    const routineIds: string[] = instructor.default_routine_ids || [];
+    const routineIds: string[] = pkg.default_routine_ids || [];
     for (const routineId of routineIds) {
       const { data: result, error: rpcErr } = await admin.rpc('provision_routine_for_user', {
         p_user_id: userId,
@@ -149,7 +210,7 @@ Deno.serve(async (req) => {
     }
 
     // 6. Unlock default playlists via playlist_saves
-    const playlistIds: string[] = instructor.default_playlist_ids || [];
+    const playlistIds: string[] = pkg.default_playlist_ids || [];
     for (const playlistId of playlistIds) {
       const { data: alreadySaved } = await admin
         .from('playlist_saves')
@@ -168,7 +229,7 @@ Deno.serve(async (req) => {
     }
 
     // 7. Auto-join chat channels (remove from exclusions)
-    const channelIds: string[] = instructor.default_channel_ids || [];
+    const channelIds: string[] = pkg.default_channel_ids || [];
     if (channelIds.length > 0) {
       const { error: chErr } = await admin
         .from('feed_channel_exclusions')
@@ -179,7 +240,7 @@ Deno.serve(async (req) => {
     }
 
     // 8. Plus trial — ONE TIME across all instructors
-    if ((instructor.plus_trial_days || 0) > 0) {
+    if ((pkg.plus_trial_days || 0) > 0) {
       const { data: profile } = await admin
         .from('profiles')
         .select('plus_trial_granted_at')
@@ -188,7 +249,7 @@ Deno.serve(async (req) => {
 
       if (!profile?.plus_trial_granted_at) {
         const expiresAt = new Date(
-          Date.now() + instructor.plus_trial_days * 24 * 60 * 60 * 1000,
+          Date.now() + pkg.plus_trial_days * 24 * 60 * 60 * 1000,
         ).toISOString();
 
         const { error: subErr } = await admin.from('user_subscriptions').insert({
@@ -196,7 +257,9 @@ Deno.serve(async (req) => {
           program_slug: 'simora-plus',
           status: 'active',
           platform: 'instructor_trial',
-          product_id: `instructor_trial_${instructor.slug}`,
+          product_id: pkg.slug
+            ? `instructor_trial_${instructor.slug}_${pkg.slug}`
+            : `instructor_trial_${instructor.slug}`,
           expires_at: expiresAt,
         });
         if (!subErr) {
@@ -212,7 +275,10 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log(`[apply-instructor-bundle] ✅ ${slug} → user ${userId}`, granted);
+    console.log(
+      `[apply-instructor-bundle] ✅ ${instructor.slug}${pkg.slug ? '/' + pkg.slug : ''} → user ${userId}`,
+      granted,
+    );
 
     return json({
       ok: true,
@@ -221,6 +287,7 @@ Deno.serve(async (req) => {
         slug: instructor.slug,
         display_name: instructor.display_name,
       },
+      package: pkg.id ? { id: pkg.id, slug: pkg.slug, name: pkg.name } : null,
       granted,
     });
   } catch (err: any) {

@@ -32,6 +32,25 @@ export function buildInstructorOneLink(instructorSlug: string): string {
   return `${ONELINK_BASE_URL}?${params.toString()}`;
 }
 
+/**
+ * Build a OneLink URL for a specific instructor PACKAGE.
+ * Carries both the package slug (in af_sub2/deep_link_sub1) and the parent
+ * instructor slug (in af_sub1) so the modal can fall back gracefully if a
+ * package is removed.
+ */
+export function buildPackageOneLink(instructorSlug: string, packageSlug: string): string {
+  const params = new URLSearchParams({
+    af_sub1: instructorSlug,
+    af_sub2: packageSlug,
+    deep_link_value: instructorSlug,
+    deep_link_sub1: packageSlug,
+    af_xp: 'custom',
+    pid: 'instructor_referral',
+    c: `${instructorSlug}__${packageSlug}`,
+  });
+  return `${ONELINK_BASE_URL}?${params.toString()}`;
+}
+
 const ATTRIBUTION_STORAGE_KEY = 'rilo_appsflyer_attribution';
 const ATTRIBUTION_PROCESSED_KEY = 'rilo_appsflyer_attribution_processed';
 
@@ -50,6 +69,7 @@ function dispatchAttributionEvent(slug: string) {
 
 export interface AppsFlyerAttribution {
   instructorSlug?: string;
+  packageSlug?: string;
   raw: Record<string, unknown>;
   capturedAt: string;
 }
@@ -113,13 +133,17 @@ export async function initAppsFlyer(): Promise<void> {
             (data?.af_sub1 as string | undefined) ||
             (data?.deep_link_value as string | undefined) ||
             (data?.c as string | undefined);
+          const packageSlug =
+            (data?.af_sub2 as string | undefined) ||
+            (data?.deep_link_sub1 as string | undefined);
           const payload: AppsFlyerAttribution = {
             instructorSlug: instructorSlug ? String(instructorSlug).trim().toLowerCase() : undefined,
+            packageSlug: packageSlug ? String(packageSlug).trim().toLowerCase() : undefined,
             raw: data as Record<string, unknown>,
             capturedAt: new Date().toISOString(),
           };
           localStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(payload));
-          console.log('[AppsFlyer] ✅ Conversion data captured. Slug:', payload.instructorSlug ?? '(none)');
+          console.log('[AppsFlyer] ✅ Conversion data captured. Slug:', payload.instructorSlug ?? '(none)', 'Package:', payload.packageSlug ?? '(none)');
           if (payload.instructorSlug) dispatchAttributionEvent(payload.instructorSlug);
         } catch (err) {
           console.warn('[AppsFlyer] Conversion data parse failed:', err);
@@ -134,16 +158,20 @@ export async function initAppsFlyer(): Promise<void> {
             (data?.deep_link_value as string | undefined) ||
             (data?.af_sub1 as string | undefined) ||
             (data?.c as string | undefined);
+          const packageSlug =
+            (data?.deep_link_sub1 as string | undefined) ||
+            (data?.af_sub2 as string | undefined);
           if (instructorSlug) {
             const payload: AppsFlyerAttribution = {
               instructorSlug: String(instructorSlug).trim().toLowerCase(),
+              packageSlug: packageSlug ? String(packageSlug).trim().toLowerCase() : undefined,
               raw: data as Record<string, unknown>,
               capturedAt: new Date().toISOString(),
             };
             // Also clear the "processed" flag so the modal can re-trigger for a new instructor on re-engagement
             try { localStorage.removeItem(ATTRIBUTION_PROCESSED_KEY); } catch {/* ignore */}
             localStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(payload));
-            console.log('[AppsFlyer] ✅ Deep link captured. Slug:', payload.instructorSlug);
+            console.log('[AppsFlyer] ✅ Deep link captured. Slug:', payload.instructorSlug, 'Package:', payload.packageSlug ?? '(none)');
             dispatchAttributionEvent(payload.instructorSlug);
           } else {
             console.log('[AppsFlyer] UDL fired but no instructor slug found in payload');
