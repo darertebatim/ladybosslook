@@ -77,10 +77,10 @@ export function PushNotificationPrompt({ userId, open, onClose }: PushNotificati
           </div>
           
           <AlertDialogTitle className="text-center text-xl font-semibold leading-tight">
-            Stay in the Loop
+            Keep your ritual alive
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center text-sm text-muted-foreground mt-2 leading-relaxed">
-            Get notified about new courses, class reminders, and exclusive updates.
+            A gentle nudge to keep your streak, routines, and check-ins on track.
           </AlertDialogDescription>
         </AlertDialogHeader>
         
@@ -89,15 +89,15 @@ export function PushNotificationPrompt({ userId, open, onClose }: PushNotificati
           <div className="flex flex-col gap-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-              <span>New course announcements</span>
+              <span>Streak protection reminders</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-              <span>Live session reminders</span>
+              <span>Routine & task nudges</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-              <span>Support chat replies</span>
+              <span>Daily mood check-in</span>
             </div>
           </div>
         </div>
