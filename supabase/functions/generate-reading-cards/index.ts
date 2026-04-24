@@ -168,7 +168,7 @@ ${doc.extracted_text.substring(0, 15000)}`,
     return new Response(JSON.stringify({ success: true, count: cardsToInsert.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (e) {
+  } catch (e: any) {
     console.error("Error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },

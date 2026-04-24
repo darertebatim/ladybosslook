@@ -179,7 +179,7 @@ serve(async (req) => {
               .eq("id", sub.id);
           }
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error(`[UpdatePush] Error sending to ${sub.user_id}:`, err);
         failCount++;
       }
@@ -208,7 +208,7 @@ serve(async (req) => {
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("[UpdatePush] Error:", error);
     return new Response(
       JSON.stringify({ error: error.message }),

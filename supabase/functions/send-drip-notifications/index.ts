@@ -188,8 +188,10 @@ Deno.serve(async (req) => {
 
       // Send notifications and create feed posts for each unlocked track
       for (const track of unlockedTracks) {
-        const trackTitle = track.audio_content?.title || 'New Content';
-        const playlistName = round.audio_playlists?.name || round.round_name;
+        const audioContent: any = (track as any).audio_content;
+        const audioPlaylists: any = (round as any).audio_playlists;
+        const trackTitle = audioContent?.title || 'New Content';
+        const playlistName = audioPlaylists?.name || (round as any).round_name;
 
         // Create a feed post for this drip unlock (if round has a channel)
         try {
@@ -217,8 +219,8 @@ Deno.serve(async (req) => {
               content: `"${trackTitle}" is now available. Tap to listen!`,
               action_type: 'play_audio',
               action_data: { 
-                playlistId: round.audio_playlist_id, 
-                audioId: track.audio_content?.id,
+                playlistId: (round as any).audio_playlist_id, 
+                audioId: audioContent?.id,
                 label: 'Listen Now'
               },
               is_system: true,
@@ -226,7 +228,7 @@ Deno.serve(async (req) => {
             });
             console.log(`Created feed post for track "${trackTitle}" in round channel`);
           }
-        } catch (feedErr) {
+        } catch (feedErr: any) {
           console.error('Error creating feed post:', feedErr);
           // Don't fail the whole function if feed post creation fails
         }
@@ -241,8 +243,8 @@ Deno.serve(async (req) => {
                 body: `"${trackTitle}" is now available in ${playlistName}`,
                 data: {
                   type: 'drip_unlock',
-                  playlist_id: round.audio_playlist_id,
-                  track_id: track.audio_content?.id,
+                  playlist_id: (round as any).audio_playlist_id,
+                  track_id: audioContent?.id,
                 },
               },
             });
@@ -253,7 +255,7 @@ Deno.serve(async (req) => {
               notificationsSent++;
               console.log(`Sent notification to user ${sub.user_id} for track "${trackTitle}"`);
             }
-          } catch (err) {
+          } catch (err: any) {
             console.error(`Error sending push to user ${sub.user_id}:`, err);
           }
         }
@@ -292,7 +294,7 @@ Deno.serve(async (req) => {
         status: 200 
       }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in send-drip-notifications:', error);
     return new Response(
       JSON.stringify({ error: error.message }),

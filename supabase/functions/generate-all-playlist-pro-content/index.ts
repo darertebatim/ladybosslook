@@ -253,7 +253,7 @@ Return JSON:
               }
             }
           }
-        } catch (aiError) {
+        } catch (aiError: any) {
           console.error(`AI generation failed for ${playlist.name}:`, aiError);
           // Continue with default values
         }
@@ -463,7 +463,7 @@ Return JSON:
         results.routinesCreated++;
         existingRoutineTitles.add(playlist.name.toLowerCase());
 
-      } catch (error) {
+      } catch (error: any) {
         results.errors.push(`Processing "${playlist.name}": ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }
@@ -479,7 +479,7 @@ Return JSON:
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in generate-all-playlist-pro-content:", error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : "Failed to generate content" }),

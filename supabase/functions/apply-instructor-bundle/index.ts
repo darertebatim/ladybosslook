@@ -223,7 +223,7 @@ Deno.serve(async (req) => {
       },
       granted,
     });
-  } catch (err) {
+  } catch (err: any) {
     console.error('[apply-instructor-bundle] Error:', err);
     return json({ error: 'Internal error', detail: String(err) }, 500);
   }

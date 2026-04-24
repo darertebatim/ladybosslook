@@ -272,7 +272,7 @@ Return ONLY a valid JSON array:
       } else {
         throw new Error("No JSON array found in response");
       }
-    } catch (parseError) {
+    } catch (parseError: any) {
       console.error("Failed to parse AI response:", content);
       throw new Error("Failed to parse AI response as JSON");
     }
@@ -335,7 +335,7 @@ Return ONLY a valid JSON array:
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error generating templates:", error);
     return new Response(JSON.stringify({ 
       error: error instanceof Error ? error.message : "Failed to generate templates" 

@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
           console.log(`Successfully synced: ${file.name}`);
           results.synced++;
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error(`Error processing ${file.name}:`, err);
         results.errors.push(`${file.name}: ${err.message}`);
       }
@@ -128,7 +128,7 @@ Deno.serve(async (req) => {
         status: 200,
       }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Sync error:', error);
     return new Response(
       JSON.stringify({

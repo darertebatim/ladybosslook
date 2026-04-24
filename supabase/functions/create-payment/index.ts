@@ -231,7 +231,7 @@ serve(async (req) => {
             priceId = price.id;
             logStep("Created new recurring Stripe price", { priceId, productId: existingPrice.product });
           }
-        } catch (priceError) {
+        } catch (priceError: any) {
           logStep("Error retrieving stored price, creating new one", { error: priceError });
           // Fallback: create new price with product_data
           const price = await stripe.prices.create({
@@ -394,7 +394,7 @@ serve(async (req) => {
       status: 200,
     });
 
-  } catch (error) {
+  } catch (error: any) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR in create-payment", { message: errorMessage });
     return new Response(JSON.stringify({ error: errorMessage }), {

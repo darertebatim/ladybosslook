@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
               .eq('id', sub.id);
           }
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error(`Error sending to ${sub.id}:`, err);
         failed++;
       }
@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
       JSON.stringify({ success: true, sent, failed, total: subscriptions.length }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in sync-pn-config:', error);
     return new Response(
       JSON.stringify({ error: error.message }),

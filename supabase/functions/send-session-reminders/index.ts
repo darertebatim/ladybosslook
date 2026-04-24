@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
 
       if (!reminderType) continue;
 
-      const round = session.program_rounds;
+      const round: any = (session as any).program_rounds;
       if (!round) continue;
 
       console.log(`Processing ${reminderType} reminder for session "${session.title}" (Round: ${round.round_name})`);
@@ -202,7 +202,7 @@ Deno.serve(async (req) => {
             if (!pushError) {
               notificationsSent++;
             }
-          } catch (err) {
+          } catch (err: any) {
             console.error(`Error sending push to user ${sub.user_id}:`, err);
           }
         }
@@ -223,7 +223,7 @@ Deno.serve(async (req) => {
         status: 200 
       }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in send-session-reminders:', error);
     return new Response(
       JSON.stringify({ error: error.message }),

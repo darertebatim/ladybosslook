@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.56.0';
-import { Resend } from "npm:resend@2.0.0";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 import { create } from 'https://deno.land/x/djwt@v3.0.2/mod.ts';
 
 const corsHeaders = {
@@ -303,6 +303,7 @@ const handler = async (req: Request): Promise<Response> => {
           }
           conversation = newConv;
         }
+        if (!conversation) continue;
 
         const { error: msgError } = await supabase
           .from('chat_messages')
@@ -330,7 +331,7 @@ const handler = async (req: Request): Promise<Response> => {
 
         messagesSent++;
         conversationsToNotify.push({ conversationId: conversation.id, userId });
-      } catch (err) {
+      } catch (err: any) {
         console.error(`❌ Error processing user ${userId}:`, err);
       }
     }
@@ -380,7 +381,7 @@ const handler = async (req: Request): Promise<Response> => {
                   failedSubscriptions.push(subscription.id);
                 }
               }
-            } catch (err) {
+            } catch (err: any) {
               console.error('❌ Push error:', err);
               failedSubscriptions.push(subscription.id);
             }
@@ -394,7 +395,7 @@ const handler = async (req: Request): Promise<Response> => {
           }
 
           console.log(`✅ Push notifications sent: ${pushSent}`);
-        } catch (err) {
+        } catch (err: any) {
           console.error('❌ Error sending push notifications:', err);
         }
       }
@@ -430,7 +431,7 @@ const handler = async (req: Request): Promise<Response> => {
               emailsSent++;
               console.log(`✅ Email sent to ${profile.email}`);
             }
-          } catch (err) {
+          } catch (err: any) {
             console.error(`❌ Email error for ${profile.email}:`, err);
           }
         }

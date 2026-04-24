@@ -174,7 +174,7 @@ Example format:
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generating categories:', error);
     return new Response(
       JSON.stringify({ error: error.message || 'Failed to generate categories' }),

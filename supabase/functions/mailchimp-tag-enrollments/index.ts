@@ -272,7 +272,7 @@ serve(async (req) => {
         } else {
           failed++;
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error(`Error processing ${email}:`, err);
         failed++;
       }
@@ -295,7 +295,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('[mailchimp-tag-enrollments] Error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),

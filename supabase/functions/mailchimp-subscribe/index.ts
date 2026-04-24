@@ -126,7 +126,7 @@ async function retryWithBackoff<T>(
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       return await operation();
-    } catch (error) {
+    } catch (error: any) {
       if (attempt === maxRetries) {
         throw error;
       }
@@ -316,7 +316,7 @@ const handler = async (req: Request): Promise<Response> => {
           formSubmissionId = formData?.id;
         console.log(`Form submission stored with ID: ${formSubmissionId}`);
         }
-      } catch (backupError) {
+      } catch (backupError: any) {
         console.error("Backup storage failed:", backupError);
         // Continue with Mailchimp even if backup fails
       }
@@ -441,7 +441,7 @@ const handler = async (req: Request): Promise<Response> => {
           console.log("Final PHONE field:", smsData.merge_fields.PHONE);
           console.log("Final SMSPHONE field:", smsData.merge_fields.SMSPHONE);
         }
-      } catch (smsError) {
+      } catch (smsError: any) {
         console.error("STEP 2 failed - SMS phone update error:", smsError);
       }
     }
@@ -470,18 +470,18 @@ const handler = async (req: Request): Promise<Response> => {
           try {
             const tagsData = await tagsResponse.json();
             console.log("Tags added successfully with data:", tagsData);
-          } catch (parseError) {
+          } catch (parseError: any) {
             console.log("Tags added successfully (empty response body)");
           }
         } else {
           try {
             const tagsData = await tagsResponse.json();
             console.error("Error adding tags:", tagsData);
-          } catch (parseError) {
+          } catch (parseError: any) {
             console.error("Error adding tags - status:", tagsResponse.status, "Unable to parse response");
           }
         }
-      } catch (tagError) {
+      } catch (tagError: any) {
         console.error("Error adding tags:", tagError);
       }
     }
@@ -499,7 +499,7 @@ const handler = async (req: Request): Promise<Response> => {
               mailchimp_success: false 
             })
             .eq('id', formSubmissionId);
-        } catch (updateError) {
+        } catch (updateError: any) {
           console.error("Error updating form submission:", updateError);
         }
       }
@@ -519,7 +519,7 @@ const handler = async (req: Request): Promise<Response> => {
                 mailchimp_error: "Member updated"
               })
               .eq('id', formSubmissionId);
-          } catch (updateError) {
+          } catch (updateError: any) {
             console.error("Error updating form submission:", updateError);
           }
         }
@@ -568,7 +568,7 @@ const handler = async (req: Request): Promise<Response> => {
             mailchimp_error: null
           })
           .eq('id', formSubmissionId);
-      } catch (updateError) {
+      } catch (updateError: any) {
         console.error("Error updating form submission:", updateError);
       }
     }
@@ -605,7 +605,7 @@ const handler = async (req: Request): Promise<Response> => {
             mailchimp_success: false
           })
           .eq('id', formSubmissionId);
-      } catch (updateError) {
+      } catch (updateError: any) {
         console.error("Error updating form submission with error:", updateError);
       }
     }

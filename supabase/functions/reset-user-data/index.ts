@@ -34,7 +34,7 @@ async function requireAuthUser(req: Request) {
   return { user: data.user } as const;
 }
 
-async function requireAdmin(userId: string, supabaseAdmin: ReturnType<typeof createClient>) {
+async function requireAdmin(userId: string, supabaseAdmin: any) {
   const { data, error } = await supabaseAdmin
     .from('user_roles')
     .select('role')
@@ -47,7 +47,7 @@ async function requireAdmin(userId: string, supabaseAdmin: ReturnType<typeof cre
 }
 
 async function mustDelete(
-  supabaseAdmin: ReturnType<typeof createClient>,
+  supabaseAdmin: any,
   table: string,
   column: string,
   value: string
@@ -57,7 +57,7 @@ async function mustDelete(
 }
 
 async function mustDeleteIn(
-  supabaseAdmin: ReturnType<typeof createClient>,
+  supabaseAdmin: any,
   table: string,
   column: string,
   values: string[]
@@ -177,7 +177,7 @@ Deno.serve(async (req) => {
     for (const table of tablesToWipe) {
       try {
         await mustDelete(supabaseAdmin, table, 'user_id', targetUserId);
-      } catch (e) {
+      } catch (e: any) {
         // Log but continue - some tables may not have data
         console.warn(`[reset-user-data] Warning on ${table}:`, (e as Error).message);
       }
@@ -210,7 +210,7 @@ Deno.serve(async (req) => {
     console.log(`[reset-user-data] ✓ Complete reset done for user: ${targetUserId}`);
 
     return json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[reset-user-data] Unexpected error:', error);
     const message = error instanceof Error ? error.message : 'An unexpected error occurred';
     return json({ error: message }, 500);

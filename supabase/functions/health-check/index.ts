@@ -34,7 +34,7 @@ const handler = async (req: Request): Promise<Response> => {
         
         dbLatency = Date.now() - dbStartTime;
         dbHealthy = !error;
-      } catch (dbError) {
+      } catch (dbError: any) {
         console.error("Database health check failed:", dbError);
         dbLatency = Date.now() - dbStartTime;
       }
@@ -61,7 +61,7 @@ const handler = async (req: Request): Promise<Response> => {
         
         mailchimpLatency = Date.now() - mailchimpStartTime;
         mailchimpHealthy = response.ok;
-      } catch (mailchimpError) {
+      } catch (mailchimpError: any) {
         console.error("Mailchimp health check failed:", mailchimpError);
         mailchimpLatency = Date.now() - mailchimpStartTime;
       }

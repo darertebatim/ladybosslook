@@ -58,7 +58,7 @@ async function sendToApns(
     const err = await response.text();
     console.error(`[DripFollowup] APNs error:`, response.status, err);
     return { success: false, shouldRemove: response.status === 410 || response.status === 400 };
-  } catch (e) {
+  } catch (e: any) {
     console.error('[DripFollowup] Send failed:', e);
     return { success: false };
   }
@@ -269,7 +269,7 @@ Deno.serve(async (req) => {
 
     console.log(`[DripFollowup] Complete: Sent ${sentCount}`);
     return new Response(JSON.stringify({ success: true, sent: sentCount, followups: toSend.length }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[DripFollowup] Error:', error);
     return new Response(JSON.stringify({ error: String(error) }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }

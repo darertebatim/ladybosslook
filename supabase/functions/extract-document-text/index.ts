@@ -43,7 +43,7 @@ async function extractDocxText(file: File): Promise<string | null> {
 
     const fallbackParts = Array.from(normalizedXml.matchAll(/<w:t(?:\s+[^>]*)?>([\s\S]*?)<\/w:t>/g)).map((m) => decodeXmlEntities(m[1]).trim()).filter(Boolean);
     return fallbackParts.length > 0 ? fallbackParts.join("\n") : null;
-  } catch (error) {
+  } catch (error: any) {
     console.error("DOCX extraction error:", error);
     return null;
   }
@@ -260,7 +260,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({ text: extractedText }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (e) {
+  } catch (e: any) {
     console.error("extract-document-text error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
       status: 500,
