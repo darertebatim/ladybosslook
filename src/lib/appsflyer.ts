@@ -120,6 +120,7 @@ export async function initAppsFlyer(): Promise<void> {
           };
           localStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(payload));
           console.log('[AppsFlyer] ✅ Conversion data captured. Slug:', payload.instructorSlug ?? '(none)');
+          if (payload.instructorSlug) dispatchAttributionEvent(payload.instructorSlug);
         } catch (err) {
           console.warn('[AppsFlyer] Conversion data parse failed:', err);
         }
@@ -143,6 +144,7 @@ export async function initAppsFlyer(): Promise<void> {
             try { localStorage.removeItem(ATTRIBUTION_PROCESSED_KEY); } catch {/* ignore */}
             localStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(payload));
             console.log('[AppsFlyer] ✅ Deep link captured. Slug:', payload.instructorSlug);
+            dispatchAttributionEvent(payload.instructorSlug);
           } else {
             console.log('[AppsFlyer] UDL fired but no instructor slug found in payload');
           }
