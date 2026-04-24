@@ -303,6 +303,7 @@ const handler = async (req: Request): Promise<Response> => {
           }
           conversation = newConv;
         }
+        if (!conversation) continue;
 
         const { error: msgError } = await supabase
           .from('chat_messages')
