@@ -35,6 +35,19 @@ export function buildInstructorOneLink(instructorSlug: string): string {
 const ATTRIBUTION_STORAGE_KEY = 'rilo_appsflyer_attribution';
 const ATTRIBUTION_PROCESSED_KEY = 'rilo_appsflyer_attribution_processed';
 
+/**
+ * Custom event fired in-page whenever AppsFlyer captures a new instructor slug
+ * (via UDL or conversion callback). Lets React hooks react immediately to a
+ * deep link tap that arrives AFTER initial mount.
+ */
+export const APPSFLYER_ATTRIBUTION_EVENT = 'appsflyer:attribution-captured';
+
+function dispatchAttributionEvent(slug: string) {
+  try {
+    window.dispatchEvent(new CustomEvent(APPSFLYER_ATTRIBUTION_EVENT, { detail: { slug } }));
+  } catch {/* ignore */}
+}
+
 export interface AppsFlyerAttribution {
   instructorSlug?: string;
   raw: Record<string, unknown>;
