@@ -32,6 +32,25 @@ export function buildInstructorOneLink(instructorSlug: string): string {
   return `${ONELINK_BASE_URL}?${params.toString()}`;
 }
 
+/**
+ * Build a OneLink URL for a specific instructor PACKAGE.
+ * Carries both the package slug (in af_sub2/deep_link_sub1) and the parent
+ * instructor slug (in af_sub1) so the modal can fall back gracefully if a
+ * package is removed.
+ */
+export function buildPackageOneLink(instructorSlug: string, packageSlug: string): string {
+  const params = new URLSearchParams({
+    af_sub1: instructorSlug,
+    af_sub2: packageSlug,
+    deep_link_value: instructorSlug,
+    deep_link_sub1: packageSlug,
+    af_xp: 'custom',
+    pid: 'instructor_referral',
+    c: `${instructorSlug}__${packageSlug}`,
+  });
+  return `${ONELINK_BASE_URL}?${params.toString()}`;
+}
+
 const ATTRIBUTION_STORAGE_KEY = 'rilo_appsflyer_attribution';
 const ATTRIBUTION_PROCESSED_KEY = 'rilo_appsflyer_attribution_processed';
 
