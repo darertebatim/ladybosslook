@@ -757,6 +757,14 @@ const AppHome = () => {
   const handleTaskTap = useCallback((task: UserTask) => {
     setSelectedTask(task);
   }, []);
+
+  useEffect(() => {
+    if (tasksLoading || tasks.length > 0) return;
+    if (showFirstCoachMark) setShowFirstCoachMark(false);
+    if (showTapCoachMark) setShowTapCoachMark(false);
+    if (showAddCoachMark) setShowAddCoachMark(false);
+    tapCoachMarkTriggeredRef.current = false;
+  }, [tasksLoading, tasks.length, showFirstCoachMark, showTapCoachMark, showAddCoachMark]);
   
   // Auto-show first coach mark ("mark off your first task") after 3s for brand new users
   useEffect(() => {
@@ -883,7 +891,7 @@ const AppHome = () => {
               ) : (
                 <h1 className="text-lg font-bold text-foreground flex items-center gap-1">
                   {isToday(selectedDate) ? 'Today' : format(selectedDate, 'MMM d')}
-                  <Star className="h-3 w-3 text-red-500 fill-red-500" />
+                  <Star className="h-3 w-3 text-warning fill-warning" />
                 </h1>
               )}
             </div>
@@ -1084,22 +1092,8 @@ const AppHome = () => {
               )}
 
 
-              {/* Personal Actions Section - hide empty state when welcome card is shown */}
-              {!isNewUser && filteredTasks.length === 0 && taskFilter === 'all' && programEvents.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-4xl mb-3">✨</div>
-                  <p className="text-muted-foreground mb-2">
-                    Your day is open
-                  </p>
-                  <p className="text-xs text-muted-foreground/70 mb-4">
-                    One small task is enough
-                  </p>
-                  <button onClick={() => setShowQuickStart(true)} className="text-violet-600 font-medium">
-                    Add your first task
-                  </button>
-                </div>
-              ) : filteredTasks.length > 0 || (!isNewUser && taskFilter !== 'all') ? (
-                <div>
+              {/* Personal Actions Section */}
+              <div>
                   {/* Shared animated 2-pill switcher */}
                   <div className="flex items-center justify-between mb-3">
                     <div className="relative inline-flex bg-muted rounded-full p-0.5">
@@ -1370,21 +1364,6 @@ const AppHome = () => {
                   )}
                   {/* Onboarding banner moved below routine section */}
                 </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 px-6 animate-fade-in">
-                  <img 
-                    src={emptyPlannerImg} 
-                    alt="Peaceful day" 
-                    className="w-32 h-32 mb-5 opacity-90"
-                  />
-                  <p className="text-lg font-semibold text-foreground mb-1">
-                    Your day is clear ✨
-                  </p>
-                  <p className="text-sm text-muted-foreground text-center max-w-[240px]">
-                    One small action is enough. Tap + to add something meaningful.
-                  </p>
-                </div>
-              )}
 
               {/* Popular Routine Suggestions - only show routines user hasn't added */}
               {suggestedRoutines.length > 0 && taskFilter === 'all' && <div className="tour-suggested-routine mt-6">
