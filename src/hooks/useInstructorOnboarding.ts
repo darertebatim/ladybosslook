@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { addRoutineToUserPlanner } from '@/hooks/useRoutinesBank';
 import {
   getStoredAttribution,
   isAttributionProcessed,
@@ -101,161 +100,43 @@ function clearPendingSlug() {
 /**
  * Apply an instructor's setup to a user (enroll in program, add routines, tag profile,
  * grant Plus trial if eligible, create referral record).
- * Idempotent per (user, instructor): unique constraint on instructor_referrals
- * prevents double-application by the same instructor; different instructors stack.
+ *
+ * All work runs server-side via the `apply-instructor-bundle` edge function.
+ * Idempotent per (user, instructor): the edge function relies on the unique
+ * constraint on `instructor_referrals` to prevent double-application by the
+ * same instructor; different instructors stack.
  */
 export async function applyInstructorSetup(
-  userId: string,
+  _userId: string,
   instructor: PendingInstructor,
 ): Promise<{ ok: boolean; granted: { program: boolean; routines: number; playlists: number; channels: number; trial: boolean } }> {
-  const granted = { program: false, routines: 0, playlists: 0, channels: 0, trial: false };
-
+  const empty = { program: false, routines: 0, playlists: 0, channels: 0, trial: false };
   try {
-    // 1. Create referral record (unique constraint prevents duplicate per instructor)
-    const { error: refErr } = await supabase.from('instructor_referrals').insert({
-      user_id: userId,
-      instructor_id: instructor.id,
-      attribution_source: instructor.source,
-      raw_attribution: instructor.rawAttribution ?? { source: instructor.source, slug: instructor.slug },
-    } as any);
+    const { data, error } = await supabase.functions.invoke('apply-instructor-bundle', {
+      body: {
+        instructor_slug: instructor.slug,
+        attribution_source: instructor.source,
+        raw_attribution:
+          instructor.rawAttribution ?? { source: instructor.source, slug: instructor.slug },
+      },
+    });
 
-    if (refErr) {
-      // 23505 = unique violation → already applied by this instructor; treat as success
-      const code = (refErr as any).code;
-      if (code !== '23505') {
-        console.warn('[InstructorOnboarding] Failed to record referral:', refErr.message);
-        return { ok: false, granted };
-      }
-      console.log('[InstructorOnboarding] Already applied by', instructor.slug, '— skipping');
-      return { ok: true, granted };
+    if (error) {
+      console.warn('[InstructorOnboarding] Edge function error:', error.message);
+      return { ok: false, granted: empty };
     }
 
-    // 2. Tag profile (latest instructor wins for the tag column)
-    await supabase
-      .from('profiles')
-      .update({ referred_by_instructor_id: instructor.id } as any)
-      .eq('id', userId);
-
-    // 3. Auto-enroll in default program
-    if (instructor.default_program_slug) {
-      const { data: existingEnroll } = await supabase
-        .from('course_enrollments')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('program_slug', instructor.default_program_slug)
-        .maybeSingle();
-
-      if (!existingEnroll) {
-        const { data: catalog } = await supabase
-          .from('program_catalog' as any)
-          .select('title')
-          .eq('slug', instructor.default_program_slug)
-          .maybeSingle();
-        const courseName = (catalog as any)?.title || instructor.default_program_slug;
-
-        await supabase.from('course_enrollments').insert({
-          user_id: userId,
-          program_slug: instructor.default_program_slug,
-          course_name: courseName,
-          status: 'active',
-        });
-        granted.program = true;
-      }
+    const result = data as { ok?: boolean; granted?: typeof empty; already_applied?: boolean } | null;
+    if (!result?.ok) {
+      return { ok: false, granted: empty };
     }
 
-    // 4. Add default routines to user's bank
-    const routineIds = instructor.default_routine_ids || [];
-    for (const routineId of routineIds) {
-      try {
-        const { data: alreadyAdded } = await supabase
-          .from('user_routines_bank')
-          .select('id')
-          .eq('user_id', userId)
-          .eq('routine_id', routineId)
-          .maybeSingle();
-        if (alreadyAdded) continue;
-
-        // Use the same flow as "Add to my routines" so the routine shows up
-        // in the Routine Player AND its tasks land in the Planner immediately.
-        await addRoutineToUserPlanner(userId, routineId);
-        granted.routines += 1;
-      } catch (err) {
-        console.warn('[InstructorOnboarding] Failed to add routine', routineId, err);
-      }
-    }
-
-    // 5. Unlock default audio playlists (free access via playlist_saves)
-    const playlistIds = instructor.default_playlist_ids || [];
-    for (const playlistId of playlistIds) {
-      try {
-        const { data: alreadySaved } = await supabase
-          .from('playlist_saves' as any)
-          .select('id')
-          .eq('user_id', userId)
-          .eq('playlist_id', playlistId)
-          .maybeSingle();
-        if (alreadySaved) continue;
-
-        await supabase.from('playlist_saves' as any).insert({
-          user_id: userId,
-          playlist_id: playlistId,
-        });
-        granted.playlists += 1;
-      } catch (err) {
-        console.warn('[InstructorOnboarding] Failed to unlock playlist', playlistId, err);
-      }
-    }
-
-    // 5b. Auto-join chat channels — channels are visible by default; we just
-    // ensure the user is NOT in feed_channel_exclusions so the channel shows up.
-    const channelIds = instructor.default_channel_ids || [];
-    if (channelIds.length > 0) {
-      try {
-        const { error: chErr } = await supabase
-          .from('feed_channel_exclusions')
-          .delete()
-          .eq('user_id', userId)
-          .in('channel_id', channelIds);
-        if (!chErr) granted.channels = channelIds.length;
-      } catch (err) {
-        console.warn('[InstructorOnboarding] Failed to auto-join channels', err);
-      }
-    }
-
-    // 6. Grant Plus trial — ONE TIME ONLY across all instructors
-    if (instructor.plus_trial_days > 0) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('plus_trial_granted_at')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (!(profile as any)?.plus_trial_granted_at) {
-        const expiresAt = new Date(Date.now() + instructor.plus_trial_days * 24 * 60 * 60 * 1000).toISOString();
-        await supabase.from('user_subscriptions').insert({
-          user_id: userId,
-          program_slug: 'simora-plus',
-          status: 'active',
-          platform: 'instructor_trial',
-          product_id: `instructor_trial_${instructor.slug}`,
-          expires_at: expiresAt,
-        } as any);
-        await supabase
-          .from('profiles')
-          .update({
-            plus_trial_granted_at: new Date().toISOString(),
-            plus_trial_granted_by_instructor_id: instructor.id,
-          } as any)
-          .eq('id', userId);
-        granted.trial = true;
-      }
-    }
-
+    const granted = result.granted ?? empty;
     console.log('[InstructorOnboarding] ✅ Applied setup from', instructor.slug, granted);
     return { ok: true, granted };
   } catch (err) {
     console.warn('[InstructorOnboarding] Unexpected error:', err);
-    return { ok: false, granted };
+    return { ok: false, granted: empty };
   }
 }
 
