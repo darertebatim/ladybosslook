@@ -9,6 +9,7 @@ import {
 } from '@/lib/appsflyer';
 
 const URL_INSTRUCTOR_KEY = 'rilo_instructor_slug_pending';
+const URL_PACKAGE_KEY = 'rilo_instructor_package_pending';
 
 export interface PendingInstructor {
   id: string;
@@ -21,6 +22,14 @@ export interface PendingInstructor {
   default_playlist_ids: string[];
   default_channel_ids: string[];
   plus_trial_days: number;
+  /** When set, this invite represents a specific package, not the instructor's default bundle. */
+  package?: {
+    id: string;
+    slug: string;
+    name: string;
+    description: string | null;
+    cover_image_url: string | null;
+  } | null;
   source: 'appsflyer' | 'url';
   rawAttribution: Record<string, unknown> | null;
 }
@@ -37,22 +46,39 @@ export function captureInstructorFromUrl(): void {
   try {
     const params = new URLSearchParams(window.location.search);
     const slug = params.get('instructor') || params.get('ref');
+    const pkg = params.get('package') || params.get('pkg');
     if (slug) {
       localStorage.setItem(URL_INSTRUCTOR_KEY, slug.trim().toLowerCase());
+    }
+    if (pkg) {
+      localStorage.setItem(URL_PACKAGE_KEY, pkg.trim().toLowerCase());
     }
   } catch {/* ignore */}
 }
 
-function readPendingSlug(): { slug: string; source: 'appsflyer' | 'url'; raw: Record<string, unknown> | null } | null {
+function readPendingSlug(): {
+  slug: string;
+  packageSlug: string | null;
+  source: 'appsflyer' | 'url';
+  raw: Record<string, unknown> | null;
+} | null {
   try {
     const fromUrl = localStorage.getItem(URL_INSTRUCTOR_KEY);
-    if (fromUrl) return { slug: fromUrl, source: 'url', raw: null };
+    if (fromUrl) {
+      const pkg = localStorage.getItem(URL_PACKAGE_KEY);
+      return { slug: fromUrl, packageSlug: pkg || null, source: 'url', raw: null };
+    }
   } catch {/* ignore */}
 
   if (isAttributionProcessed()) return null;
   const attribution = getStoredAttribution();
   if (attribution?.instructorSlug) {
-    return { slug: attribution.instructorSlug, source: 'appsflyer', raw: attribution.raw };
+    return {
+      slug: attribution.instructorSlug,
+      packageSlug: attribution.packageSlug ?? null,
+      source: 'appsflyer',
+      raw: attribution.raw,
+    };
   }
   return null;
 }
@@ -95,6 +121,7 @@ async function readServerAssignedInstructorSlug(userId: string): Promise<string 
 
 function clearPendingSlug() {
   try { localStorage.removeItem(URL_INSTRUCTOR_KEY); } catch {/* ignore */}
+  try { localStorage.removeItem(URL_PACKAGE_KEY); } catch {/* ignore */}
   markAttributionProcessed();
 }
 
@@ -116,9 +143,14 @@ export async function applyInstructorSetup(
     const { data, error } = await supabase.functions.invoke('apply-instructor-bundle', {
       body: {
         instructor_slug: instructor.slug,
+        package_slug: instructor.package?.slug ?? null,
         attribution_source: instructor.source,
         raw_attribution:
-          instructor.rawAttribution ?? { source: instructor.source, slug: instructor.slug },
+          instructor.rawAttribution ?? {
+            source: instructor.source,
+            slug: instructor.slug,
+            package_slug: instructor.package?.slug ?? null,
+          },
       },
     });
 
@@ -172,7 +204,12 @@ export function useInstructorOnboarding(userId: string | undefined) {
       if (!pending) {
         const serverSlug = await readServerAssignedInstructorSlug(userId);
         if (!serverSlug) return attempts.current >= 5;
-        pending = { slug: serverSlug, source: 'url', raw: { source: 'admin_assignment' } };
+        pending = {
+          slug: serverSlug,
+          packageSlug: null,
+          source: 'url',
+          raw: { source: 'admin_assignment' },
+        };
         autoApply = true; // skip the invite modal — admin already decided
       }
 
@@ -191,20 +228,54 @@ export function useInstructorOnboarding(userId: string | undefined) {
           return true;
         }
 
-        // Already applied by this specific instructor? bail (stacking allowed for others).
-        const { data: existing } = await supabase
+        const ins = instructor as any;
+
+        // Look up package (if specified). Package gifts override instructor defaults.
+        let pkg: PendingInstructor['package'] = null;
+        if (pending.packageSlug) {
+          const { data: pkgRow } = await supabase
+            .from('instructor_packages')
+            .select('id, slug, name, description, cover_image_url, default_program_slug, default_routine_ids, default_playlist_ids, default_channel_ids, plus_trial_days, instructor_id, is_active')
+            .eq('slug', pending.packageSlug)
+            .eq('is_active', true)
+            .maybeSingle();
+          const p = pkgRow as any;
+          if (p && p.instructor_id === ins.id) {
+            pkg = {
+              id: p.id,
+              slug: p.slug,
+              name: p.name,
+              description: p.description,
+              cover_image_url: p.cover_image_url,
+            };
+            // Override gifts with package values
+            ins.default_program_slug = p.default_program_slug;
+            ins.default_routine_ids = p.default_routine_ids || [];
+            ins.default_playlist_ids = p.default_playlist_ids || [];
+            ins.default_channel_ids = p.default_channel_ids || [];
+            ins.plus_trial_days = p.plus_trial_days || 0;
+          } else {
+            console.warn('[InstructorOnboarding] Package not found or mismatch:', pending.packageSlug);
+          }
+        }
+
+        // Already applied? Check the right scope: per-package if package, else per-instructor.
+        let existingQuery = supabase
           .from('instructor_referrals')
           .select('id')
           .eq('user_id', userId)
-          .eq('instructor_id', (instructor as any).id)
-          .maybeSingle();
-
+          .eq('instructor_id', ins.id);
+        if (pkg) {
+          existingQuery = existingQuery.eq('package_id', pkg.id);
+        } else {
+          existingQuery = existingQuery.is('package_id', null);
+        }
+        const { data: existing } = await existingQuery.maybeSingle();
         if (existing) {
           clearPendingSlug();
           return true;
         }
 
-        const ins = instructor as any;
         const invite: PendingInstructor = {
           id: ins.id,
           slug: ins.slug,
@@ -216,6 +287,7 @@ export function useInstructorOnboarding(userId: string | undefined) {
           default_playlist_ids: ins.default_playlist_ids || [],
           default_channel_ids: ins.default_channel_ids || [],
           plus_trial_days: ins.plus_trial_days || 0,
+          package: pkg,
           source: pending.source,
           rawAttribution: pending.raw,
         };
