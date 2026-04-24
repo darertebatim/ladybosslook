@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
@@ -21,6 +21,9 @@ import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
 import { TaskDetailModal } from '@/components/app/TaskDetailModal';
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
 import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
+import { ReturningUserPushSheet } from '@/components/app/ReturningUserPushSheet';
+import { TaskCompletionPushNudge } from '@/components/app/TaskCompletionPushNudge';
+import { usePushPermission } from '@/hooks/usePushPermission';
 import { useSubscription } from '@/hooks/useSubscription';
 import type { UserTask, TaskTemplate } from '@/hooks/useTaskPlanner';
 import type { BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
@@ -170,6 +173,41 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const goldCelebrationShownKey = `simora_gold_celebration_shown_${todayStr}`;
+
+  // ---- Push-notification re-engagement triggers ----
+  const { needsAttention } = usePushPermission();
+  const [showReturningSheet, setShowReturningSheet] = useState(false);
+  const [taskNudge, setTaskNudge] = useState<{ open: boolean; streakDay?: number; streakGoal?: number }>({ open: false });
+
+  // Returning-user sheet: streak >= 3 and not asked in last 5 days
+  useEffect(() => {
+    if (!userId || !needsAttention) return;
+    const currentStreak = streak?.current_streak ?? streak?.currentStreak ?? 0;
+    if (currentStreak < 3) return;
+    const last = localStorage.getItem('returningUserPushDismissed');
+    if (last) {
+      const days = (Date.now() - parseInt(last)) / (1000 * 60 * 60 * 24);
+      if (days < 5) return;
+    }
+    const t = setTimeout(() => setShowReturningSheet(true), 4000);
+    return () => clearTimeout(t);
+  }, [userId, needsAttention, streak]);
+
+  // Listen for global "request push nudge" event fired after task completion / streak goal set
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if (!userId || !needsAttention) return;
+      const last = localStorage.getItem('taskCompletionNudgeDismissed');
+      if (last) {
+        const hours = (Date.now() - parseInt(last)) / (1000 * 60 * 60);
+        if (hours < 48) return;
+      }
+      const detail = (e as CustomEvent).detail || {};
+      setTaskNudge({ open: true, streakDay: detail.streakDay, streakGoal: detail.streakGoal });
+    };
+    window.addEventListener('requestPushNudge', handler);
+    return () => window.removeEventListener('requestPushNudge', handler);
+  }, [userId, needsAttention]);
 
   return (
     <OverlayPortal>
@@ -380,6 +418,24 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         totalTasks={projectCompletion?.totalTasks || 0}
         badgeImageUrl={projectCompletion?.badgeImageUrl}
       />
+
+      {userId && (
+        <>
+          <ReturningUserPushSheet
+            userId={userId}
+            open={showReturningSheet}
+            onClose={() => setShowReturningSheet(false)}
+            consecutiveDays={streak?.current_streak ?? streak?.currentStreak ?? 3}
+          />
+          <TaskCompletionPushNudge
+            userId={userId}
+            open={taskNudge.open}
+            onClose={() => setTaskNudge({ open: false })}
+            streakDay={taskNudge.streakDay}
+            streakGoal={taskNudge.streakGoal}
+          />
+        </>
+      )}
     </OverlayPortal>
   );
 });
