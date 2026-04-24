@@ -1947,12 +1947,75 @@ export type Database = {
           },
         ]
       }
+      instructor_packages: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string
+          default_channel_ids: string[]
+          default_playlist_ids: string[]
+          default_program_slug: string | null
+          default_routine_ids: string[]
+          description: string | null
+          id: string
+          instructor_id: string
+          is_active: boolean
+          name: string
+          plus_trial_days: number
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string
+          default_channel_ids?: string[]
+          default_playlist_ids?: string[]
+          default_program_slug?: string | null
+          default_routine_ids?: string[]
+          description?: string | null
+          id?: string
+          instructor_id: string
+          is_active?: boolean
+          name: string
+          plus_trial_days?: number
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string
+          default_channel_ids?: string[]
+          default_playlist_ids?: string[]
+          default_program_slug?: string | null
+          default_routine_ids?: string[]
+          description?: string | null
+          id?: string
+          instructor_id?: string
+          is_active?: boolean
+          name?: string
+          plus_trial_days?: number
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instructor_packages_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "instructors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       instructor_referrals: {
         Row: {
           attribution_source: string
           created_at: string
           id: string
           instructor_id: string
+          package_id: string | null
           raw_attribution: Json | null
           user_id: string
           welcome_shown_at: string | null
@@ -1962,6 +2025,7 @@ export type Database = {
           created_at?: string
           id?: string
           instructor_id: string
+          package_id?: string | null
           raw_attribution?: Json | null
           user_id: string
           welcome_shown_at?: string | null
@@ -1971,6 +2035,7 @@ export type Database = {
           created_at?: string
           id?: string
           instructor_id?: string
+          package_id?: string | null
           raw_attribution?: Json | null
           user_id?: string
           welcome_shown_at?: string | null
@@ -1981,6 +2046,13 @@ export type Database = {
             columns: ["instructor_id"]
             isOneToOne: false
             referencedRelation: "instructors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "instructor_referrals_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "instructor_packages"
             referencedColumns: ["id"]
           },
         ]
