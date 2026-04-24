@@ -804,10 +804,36 @@ export default function AppTest() {
             Push Notification Prompts
           </CardTitle>
           <CardDescription>
-            Test notification permission request flows
+            Preview every push-permission touchpoint across the app
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
+          {/* Live Home Banner Preview */}
+          <div>
+            <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">Home banner (live preview)</p>
+            <div className="bg-muted/30 rounded-lg p-2 -mx-2">
+              <NotificationBanner onEnableClick={() => toast.info('Banner clicked — opens onboarding flow')} />
+              <p className="text-[11px] text-muted-foreground px-4 italic">
+                Note: only renders on native or with <code>?debugPush=true</code> & permission ≠ granted.
+              </p>
+            </div>
+          </div>
+
+          {/* Profile red dot demo */}
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Red dot (forced on):</p>
+            <div className="relative inline-flex">
+              <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
+                <Users className="h-5 w-5" />
+              </div>
+              <PushPermissionDot forceShow />
+            </div>
+            <p className="text-[11px] text-muted-foreground">Drop &lt;PushPermissionDot /&gt; inside any relative-positioned icon.</p>
+          </div>
+
+          <Separator />
+
+          {/* Modal previews */}
           <div className="flex flex-wrap gap-2">
             <Button onClick={() => setShowPushOnboarding(true)} variant="outline">
               <Bell className="h-4 w-4 mr-2" />
@@ -820,6 +846,18 @@ export default function AppTest() {
             <Button onClick={() => setShowCourseNotificationPrompt(true)} variant="outline">
               <Bell className="h-4 w-4 mr-2" />
               Course Notification Prompt
+            </Button>
+            <Button onClick={() => setShowTaskCompletionNudge(true)} variant="outline">
+              <Flame className="h-4 w-4 mr-2" />
+              Task Completion Nudge (NEW)
+            </Button>
+            <Button onClick={() => setShowStreakLostPushPrompt(true)} variant="outline">
+              <Shield className="h-4 w-4 mr-2" />
+              Streak Lost Recovery (NEW)
+            </Button>
+            <Button onClick={() => setShowReturningUserSheet(true)} variant="outline">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Returning User Sheet (NEW)
             </Button>
           </div>
         </CardContent>
