@@ -45,6 +45,11 @@ import { TrackCompletionCelebration } from '@/components/audio/TrackCompletionCe
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
 import { PushNotificationPrompt } from '@/components/app/PushNotificationPrompt';
 import { CourseNotificationPrompt } from '@/components/app/CourseNotificationPrompt';
+import { NotificationBanner } from '@/components/app/NotificationBanner';
+import { TaskCompletionPushNudge } from '@/components/app/TaskCompletionPushNudge';
+import { StreakLostPushPrompt } from '@/components/app/StreakLostPushPrompt';
+import { ReturningUserPushSheet } from '@/components/app/ReturningUserPushSheet';
+import { PushPermissionDot } from '@/components/app/PushPermissionDot';
 import { AppUpdateBanner } from '@/components/app/AppUpdateBanner';
 import { BadgeCelebration, BadgeCelebrationLevel } from '@/components/app/BadgeCelebration';
 import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
@@ -89,6 +94,9 @@ export default function AppTest() {
   const [showPushOnboarding, setShowPushOnboarding] = useState(false);
   const [showPushPrompt, setShowPushPrompt] = useState(false);
   const [showCourseNotificationPrompt, setShowCourseNotificationPrompt] = useState(false);
+  const [showTaskCompletionNudge, setShowTaskCompletionNudge] = useState(false);
+  const [showStreakLostPushPrompt, setShowStreakLostPushPrompt] = useState(false);
+  const [showReturningUserSheet, setShowReturningUserSheet] = useState(false);
   const [showActionLimit, setShowActionLimit] = useState(false);
   const [showPlusGate, setShowPlusGate] = useState(false);
   
