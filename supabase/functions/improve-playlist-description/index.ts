@@ -54,7 +54,7 @@ serve(async (req) => {
       throw new Error('Playlist name is required');
     }
 
-    const categoryContext = {
+    const categoryContext = ({
       audiobook: 'an audiobook/audio content experience',
       podcast: 'a podcast series',
       course_supplement: 'educational course audio materials',
@@ -62,7 +62,7 @@ serve(async (req) => {
       workout: 'an energizing workout audio collection',
       soundscape: 'an immersive ambient soundscape',
       affirmations: 'an empowering affirmations collection',
-    }[category] || 'audio content';
+    } as Record<string, string>)[category] || 'audio content';
 
     const prompt = `Write a short description for "${playlistName}" (${categoryContext}).
 
@@ -143,7 +143,7 @@ Return ONLY the description, nothing else.`;
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error improving description:', error);
     return new Response(
       JSON.stringify({ error: error.message || 'Failed to improve description' }),
