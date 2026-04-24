@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, Flame, Sparkles, Settings, MessageCircle, Heart, Sunrise } from 'lucide-react';
+import { Bell, Flame, Sparkles, Settings, MessageCircle, Heart, Sunrise, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { subscribeToPushNotifications, requestNotificationPermission } from '@/lib/pushNotifications';
 import { toast } from 'sonner';
@@ -96,73 +96,83 @@ export function PushNotificationOnboarding({
     >
       {/* Dimmed overlay */}
       <div 
-        className="absolute inset-0 bg-black/40"
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={handleSkip}
       />
       
-      {/* Half-page sheet */}
+      {/* Half-page sheet with warm self-care gradient */}
       <div 
-        className="relative bg-background rounded-t-3xl shadow-2xl animate-slide-up"
+        className="relative rounded-t-3xl shadow-2xl animate-slide-up overflow-hidden bg-gradient-to-b from-rose-50 via-amber-50 to-background dark:from-rose-950/40 dark:via-amber-950/30 dark:to-background"
         style={{ paddingBottom: '20px' }}
       >
+        {/* Soft decorative blobs */}
+        <div className="pointer-events-none absolute -top-10 -left-10 w-40 h-40 rounded-full bg-rose-300/30 blur-3xl" />
+        <div className="pointer-events-none absolute top-10 -right-12 w-44 h-44 rounded-full bg-amber-300/30 blur-3xl" />
+
         {/* Hero Section with app icon */}
-        <div className="relative flex flex-col items-center pt-6 pb-4 px-6">
+        <div className="relative flex flex-col items-center pt-7 pb-5 px-6">
           {/* Animated icon */}
           <div className="relative mb-4">
-            <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-xl overflow-hidden">
+            <div className="w-24 h-24 rounded-[28px] bg-gradient-to-br from-rose-400 via-pink-400 to-amber-400 flex items-center justify-center shadow-2xl overflow-hidden ring-4 ring-background/60">
               <img src={appIcon} alt="App Icon" className="w-full h-full object-cover" />
             </div>
             {/* Bell badge */}
-            <div className="absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-background shadow-lg flex items-center justify-center border-4 border-background">
-              <Bell className="h-5 w-5 text-primary animate-pulse" />
+            <div className="absolute -bottom-1.5 -right-1.5 w-11 h-11 rounded-full bg-background shadow-lg flex items-center justify-center border-4 border-background">
+              <Bell className="h-5 w-5 text-rose-500 animate-pulse" />
+            </div>
+            {/* Leaf accent */}
+            <div className="absolute -top-3 -left-3">
+              <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center shadow-sm">
+                <Leaf className="h-4 w-4 text-emerald-600" />
+              </div>
             </div>
             {/* Sparkles */}
-            <div className="absolute -top-2 -right-2 animate-pulse">
+            <div className="absolute -top-1 -right-2 animate-pulse">
               <Sparkles className="h-5 w-5 text-amber-400" />
             </div>
           </div>
 
           {/* Title & Description */}
-          <h1 className="text-2xl font-bold text-center mb-2">
-            {isPreEnrolled ? 'Welcome back 🌿' : 'Your daily ritual, gently guided'}
+          <h1 className="text-[26px] leading-tight font-bold text-center mb-2 bg-gradient-to-br from-rose-600 via-pink-600 to-amber-600 bg-clip-text text-transparent">
+            {isPreEnrolled ? 'Welcome back to your self-care 🌿' : 'Your self-care, gently on track'}
           </h1>
-          <p className="text-muted-foreground text-center text-sm leading-relaxed max-w-xs">
+          <p className="text-muted-foreground text-center text-[13.5px] leading-relaxed max-w-[280px]">
             {isPreEnrolled 
-              ? 'A soft nudge so your routines, streak, and check-ins stay part of your day.'
-              : 'A soft nudge for your routines, streak, and daily check-in — only when it matters.'
+              ? 'Kind reminders so your routines and self-care moments stay part of every day.'
+              : 'Soft, never spammy — reminders for your routines, mood check-ins, and self-care goals.'
             }
           </p>
         </div>
 
         {/* Feature Cards */}
-        <div className="px-6 space-y-2 mb-6">
-          <div className="flex items-center gap-3 bg-muted/50 rounded-xl p-3">
-            <div className="w-9 h-9 rounded-full bg-orange-500/10 flex items-center justify-center shrink-0">
-              <Flame className="h-4 w-4 text-orange-500" />
+        <div className="relative px-6 space-y-2 mb-6">
+          <div className="flex items-center gap-3 bg-background/70 backdrop-blur-sm border border-border/40 rounded-2xl p-3 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
+              <Leaf className="h-4 w-4 text-emerald-600" />
             </div>
             <div>
-              <p className="font-medium text-sm">Protect your streak</p>
-              <p className="text-xs text-muted-foreground">A nudge before your day slips by</p>
+              <p className="font-semibold text-[13.5px]">Stay on your routines</p>
+              <p className="text-[11.5px] text-muted-foreground">Morning, evening & focus reminders</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-3 bg-muted/50 rounded-xl p-3">
-            <div className="w-9 h-9 rounded-full bg-rose-500/10 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3 bg-background/70 backdrop-blur-sm border border-border/40 rounded-2xl p-3 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
               <Heart className="h-4 w-4 text-rose-500" />
             </div>
             <div>
-              <p className="font-medium text-sm">Mood & reflection</p>
-              <p className="text-xs text-muted-foreground">Daily check-in reminders</p>
+              <p className="font-semibold text-[13.5px]">Mood & reflection</p>
+              <p className="text-[11.5px] text-muted-foreground">A daily check-in to feel seen</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-3 bg-muted/50 rounded-xl p-3">
-            <div className="w-9 h-9 rounded-full bg-amber-500/10 flex items-center justify-center shrink-0">
-              <Sunrise className="h-4 w-4 text-amber-500" />
+          <div className="flex items-center gap-3 bg-background/70 backdrop-blur-sm border border-border/40 rounded-2xl p-3 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+              <Flame className="h-4 w-4 text-orange-500" />
             </div>
             <div>
-              <p className="font-medium text-sm">Your morning ritual</p>
-              <p className="text-xs text-muted-foreground">Start the day with intention</p>
+              <p className="font-semibold text-[13.5px]">Protect your streak</p>
+              <p className="text-[11.5px] text-muted-foreground">A soft nudge before the day slips by</p>
             </div>
           </div>
         </div>
@@ -201,17 +211,17 @@ export function PushNotificationOnboarding({
               <Button
                 onClick={handleEnable}
                 disabled={isEnabling}
-                className="w-full h-13 rounded-2xl text-base font-semibold"
+                className="w-full h-13 rounded-2xl text-base font-semibold bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 hover:opacity-95 text-white shadow-lg shadow-rose-500/25 border-0"
               >
                 {isEnabling ? (
                   <span className="flex items-center gap-2">
-                    <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                    Enabling...
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Enabling…
                   </span>
                 ) : (
                   <>
                     <Bell className="mr-2 h-5 w-5" />
-                    Enable Notifications
+                    Yes, gently remind me
                   </>
                 )}
               </Button>
@@ -219,7 +229,7 @@ export function PushNotificationOnboarding({
                 onClick={handleSkip}
                 className="w-full text-center text-muted-foreground text-sm py-2"
               >
-                {isPreEnrolled ? "I'll do this later" : 'Maybe later'}
+                {isPreEnrolled ? 'Maybe another day' : 'Not right now'}
               </button>
             </div>
           )}
