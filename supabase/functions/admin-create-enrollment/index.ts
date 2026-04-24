@@ -86,7 +86,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Admin ${user.id} ${createUserOnly ? 'creating user' : 'creating enrollment'} for ${email}${courseName ? ` in ${courseName}` : ''}`);
 
-    let userId: string;
+    let userId: string = '';
 
     // Try to find existing user by email
     // We'll attempt to list users with email filter to be more efficient
