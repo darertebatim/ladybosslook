@@ -883,7 +883,7 @@ const AppHome = () => {
               ) : (
                 <h1 className="text-lg font-bold text-foreground flex items-center gap-1">
                   {isToday(selectedDate) ? 'Today' : format(selectedDate, 'MMM d')}
-                  <Star className="h-3 w-3 text-red-500 fill-red-500" />
+                  <Star className="h-3 w-3 text-warning fill-warning" />
                 </h1>
               )}
             </div>
@@ -1084,21 +1084,8 @@ const AppHome = () => {
               )}
 
 
-              {/* Personal Actions Section - hide empty state when welcome card is shown */}
-              {!isNewUser && filteredTasks.length === 0 && taskFilter === 'all' && programEvents.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-4xl mb-3">✨</div>
-                  <p className="text-muted-foreground mb-2">
-                    Your day is open
-                  </p>
-                  <p className="text-xs text-muted-foreground/70 mb-4">
-                    One small task is enough
-                  </p>
-                  <button onClick={() => setShowQuickStart(true)} className="text-violet-600 font-medium">
-                    Add your first task
-                  </button>
-                </div>
-              ) : filteredTasks.length > 0 || (!isNewUser && taskFilter !== 'all') ? (
+              {/* Personal Actions Section */}
+              {filteredTasks.length > 0 || taskFilter !== 'all' || programEvents.length === 0 ? (
                 <div>
                   {/* Shared animated 2-pill switcher */}
                   <div className="flex items-center justify-between mb-3">
@@ -1383,6 +1370,9 @@ const AppHome = () => {
                   <p className="text-sm text-muted-foreground text-center max-w-[240px]">
                     One small action is enough. Tap + to add something meaningful.
                   </p>
+                  <div className="hidden">
+                    <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenTaskSheet={handleOpenTaskSheet} />
+                  </div>
                 </div>
               )}
 
