@@ -5547,6 +5547,10 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      provision_routine_for_user: {
+        Args: { p_routine_id: string; p_user_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "user"
