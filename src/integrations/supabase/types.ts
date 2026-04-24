@@ -5528,6 +5528,10 @@ export type Database = {
         Args: { p_date_str: string; p_user_id: string }
         Returns: Json
       }
+      has_channel_access: {
+        Args: { _channel_id: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
