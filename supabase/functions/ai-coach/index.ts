@@ -209,7 +209,7 @@ serve(async (req) => {
             if (done) break;
             controller.enqueue(value);
           }
-        } catch (e) {
+        } catch (e: any) {
           console.error("Stream read error:", e);
         }
 
@@ -220,7 +220,7 @@ serve(async (req) => {
             const followUpEvent = `data: ${JSON.stringify({ suggested_followups: followUps })}\n\n`;
             controller.enqueue(new TextEncoder().encode(followUpEvent));
           }
-        } catch (e) {
+        } catch (e: any) {
           console.error("Follow-up generation error:", e);
         }
 
@@ -231,7 +231,7 @@ serve(async (req) => {
     return new Response(combinedStream, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
-  } catch (e) {
+  } catch (e: any) {
     console.error("ai-coach error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
       status: 500,
@@ -642,7 +642,7 @@ async function executeToolAction(supabase: any, userId: string, fnName: string, 
       default:
         return { success: false, error: `Unknown tool: ${fnName}` };
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error(`Tool error (${fnName}):`, e);
     return { success: false, error: e instanceof Error ? e.message : "Unknown error" };
   }

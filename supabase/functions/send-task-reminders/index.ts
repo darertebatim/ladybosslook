@@ -316,7 +316,7 @@ Deno.serve(async (req) => {
           shouldNotify = true;
           console.log(`[Task Reminder] Task "${task.title}" due for user ${task.user_id} (tz: ${userTimezone})`);
         }
-      } catch (e) {
+      } catch (e: any) {
         console.error(`[Task Reminder] Invalid timezone for user ${task.user_id}: ${userTimezone}`);
       }
       

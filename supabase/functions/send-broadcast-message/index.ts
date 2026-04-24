@@ -330,7 +330,7 @@ const handler = async (req: Request): Promise<Response> => {
 
         messagesSent++;
         conversationsToNotify.push({ conversationId: conversation.id, userId });
-      } catch (err) {
+      } catch (err: any) {
         console.error(`❌ Error processing user ${userId}:`, err);
       }
     }
@@ -380,7 +380,7 @@ const handler = async (req: Request): Promise<Response> => {
                   failedSubscriptions.push(subscription.id);
                 }
               }
-            } catch (err) {
+            } catch (err: any) {
               console.error('❌ Push error:', err);
               failedSubscriptions.push(subscription.id);
             }
@@ -394,7 +394,7 @@ const handler = async (req: Request): Promise<Response> => {
           }
 
           console.log(`✅ Push notifications sent: ${pushSent}`);
-        } catch (err) {
+        } catch (err: any) {
           console.error('❌ Error sending push notifications:', err);
         }
       }
@@ -430,7 +430,7 @@ const handler = async (req: Request): Promise<Response> => {
               emailsSent++;
               console.log(`✅ Email sent to ${profile.email}`);
             }
-          } catch (err) {
+          } catch (err: any) {
             console.error(`❌ Email error for ${profile.email}:`, err);
           }
         }

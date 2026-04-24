@@ -272,7 +272,7 @@ serve(async (req) => {
         } else {
           failed++;
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error(`Error processing ${email}:`, err);
         failed++;
       }

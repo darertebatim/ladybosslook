@@ -272,7 +272,7 @@ Return ONLY a valid JSON array:
       } else {
         throw new Error("No JSON array found in response");
       }
-    } catch (parseError) {
+    } catch (parseError: any) {
       console.error("Failed to parse AI response:", content);
       throw new Error("Failed to parse AI response as JSON");
     }

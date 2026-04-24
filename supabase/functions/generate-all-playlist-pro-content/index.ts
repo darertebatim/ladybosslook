@@ -253,7 +253,7 @@ Return JSON:
               }
             }
           }
-        } catch (aiError) {
+        } catch (aiError: any) {
           console.error(`AI generation failed for ${playlist.name}:`, aiError);
           // Continue with default values
         }

@@ -92,7 +92,7 @@ const handler = async (req: Request): Promise<Response> => {
     try {
       requestBody = JSON.parse(rawBody);
       console.log(`📋 [${requestId}] Parsed request body:`, JSON.stringify(requestBody, null, 2));
-    } catch (parseError) {
+    } catch (parseError: any) {
       console.error(`❌ [${requestId}] Failed to parse JSON:`, parseError);
       throw new Error('Invalid JSON in request body');
     }

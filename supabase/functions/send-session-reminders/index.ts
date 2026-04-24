@@ -202,7 +202,7 @@ Deno.serve(async (req) => {
             if (!pushError) {
               notificationsSent++;
             }
-          } catch (err) {
+          } catch (err: any) {
             console.error(`Error sending push to user ${sub.user_id}:`, err);
           }
         }

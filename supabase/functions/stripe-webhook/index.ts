@@ -172,7 +172,7 @@ async function triggerMailchimpSubscription(supabase: any, orderData: any, progr
     } else {
       console.log('[WEBHOOK] Mailchimp subscription triggered successfully');
     }
-  } catch (mailchimpError) {
+  } catch (mailchimpError: any) {
     console.error('[WEBHOOK] Mailchimp subscription failed:', mailchimpError);
     // Don't fail the webhook if Mailchimp fails
   }
@@ -219,7 +219,7 @@ serve(async (req) => {
         // For testing without signature verification
         event = JSON.parse(body);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('[WEBHOOK] Signature verification failed:', err.message);
       return new Response(JSON.stringify({ error: 'Invalid signature' }), {
         status: 400,
@@ -510,7 +510,7 @@ serve(async (req) => {
             cancel_at: cancelAt,
           });
           console.log('[WEBHOOK] Auto-cancellation set successfully for subscription:', subscription.id);
-        } catch (err) {
+        } catch (err: any) {
           console.error('[WEBHOOK] Error setting auto-cancellation:', err.message);
         }
       }

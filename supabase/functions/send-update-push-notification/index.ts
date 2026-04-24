@@ -179,7 +179,7 @@ serve(async (req) => {
               .eq("id", sub.id);
           }
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error(`[UpdatePush] Error sending to ${sub.user_id}:`, err);
         failCount++;
       }

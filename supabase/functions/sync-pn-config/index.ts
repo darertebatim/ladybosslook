@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
               .eq('id', sub.id);
           }
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error(`Error sending to ${sub.id}:`, err);
         failed++;
       }

@@ -228,7 +228,7 @@ Deno.serve(async (req) => {
             });
             console.log(`Created feed post for track "${trackTitle}" in round channel`);
           }
-        } catch (feedErr) {
+        } catch (feedErr: any) {
           console.error('Error creating feed post:', feedErr);
           // Don't fail the whole function if feed post creation fails
         }
@@ -255,7 +255,7 @@ Deno.serve(async (req) => {
               notificationsSent++;
               console.log(`Sent notification to user ${sub.user_id} for track "${trackTitle}"`);
             }
-          } catch (err) {
+          } catch (err: any) {
             console.error(`Error sending push to user ${sub.user_id}:`, err);
           }
         }

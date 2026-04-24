@@ -177,7 +177,7 @@ Deno.serve(async (req) => {
     for (const table of tablesToWipe) {
       try {
         await mustDelete(supabaseAdmin, table, 'user_id', targetUserId);
-      } catch (e) {
+      } catch (e: any) {
         // Log but continue - some tables may not have data
         console.warn(`[reset-user-data] Warning on ${table}:`, (e as Error).message);
       }

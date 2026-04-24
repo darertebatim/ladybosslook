@@ -226,7 +226,7 @@ Generate both English and Farsi versions of this email. Remember to include the 
       // Remove markdown code blocks if present
       const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
       parsed = JSON.parse(jsonStr);
-    } catch (parseError) {
+    } catch (parseError: any) {
       console.error('[GENERATE-EMAIL] Failed to parse AI response:', content);
       throw new Error('Failed to parse AI response');
     }

@@ -76,7 +76,7 @@ async function sendToApns(
     const err = await response.text();
     console.error(`[StreakChallenge] APNs error:`, response.status, err);
     return { success: false, shouldRemove: response.status === 410 || response.status === 400 };
-  } catch (e) {
+  } catch (e: any) {
     console.error('[StreakChallenge] Send failed:', e);
     return { success: false };
   }

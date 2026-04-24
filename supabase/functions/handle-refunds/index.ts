@@ -117,12 +117,12 @@ serve(async (req) => {
                 );
                 console.log(`[HANDLE-REFUNDS] Removed Mailchimp tag for ${order.email}`);
               }
-            } catch (mailchimpError) {
+            } catch (mailchimpError: any) {
               console.error('[HANDLE-REFUNDS] Mailchimp error:', mailchimpError);
             }
           }
         }
-      } catch (stripeError) {
+      } catch (stripeError: any) {
         console.error(`[HANDLE-REFUNDS] Error checking order ${order.id}:`, stripeError);
       }
     }

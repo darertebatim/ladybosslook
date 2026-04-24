@@ -115,7 +115,7 @@ serve(async (req) => {
           if (sessionWithItems.line_items?.data[0]?.description) {
             productName = sessionWithItems.line_items.data[0].description;
           }
-        } catch (e) {
+        } catch (e: any) {
           logStep('Could not fetch line items', { error: e.message });
         }
       }

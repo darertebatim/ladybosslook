@@ -195,7 +195,7 @@ Deno.serve(async (req) => {
           usersToNotify.push(userId);
           console.log(`[Weekly Summary] User ${userId} in ${timezone} - it's Monday 9 AM for them`);
         }
-      } catch (e) {
+      } catch (e: any) {
         console.error(`[Weekly Summary] Invalid timezone for user ${userId}:`, timezone);
       }
     }
