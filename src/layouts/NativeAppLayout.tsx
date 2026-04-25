@@ -186,6 +186,8 @@ const NativeAppLayout = () => {
 
   return (
     <div className="flex flex-col h-[100dvh] bg-background app-theme font-farsi">
+      {/* Offline / sync status pill */}
+      <OfflineStatusBar />
       {/* Main Content */}
       <main 
         data-scroll-container="true"
