@@ -938,6 +938,37 @@ export const useCompleteTask = () => {
       if (!user?.id) throw new Error('Not authenticated');
 
       const dateStr = format(date, 'yyyy-MM-dd');
+      const payload: CompleteTaskPayload = { userId: user.id, taskId, dateStr };
+
+      // Optimistic cache update — UI flips instantly even before the write
+      // is confirmed. Reconciled by the invalidation in onSuccess once the
+      // network write (or queue drain) finishes.
+      const completionsKey = ['planner-completions', user.id, dateStr];
+      queryClient.setQueryData(completionsKey, (prev: any) => {
+        const base = prev ?? { tasks: [], subtasks: [] };
+        const already = (base.tasks ?? []).some((t: any) => t.task_id === taskId);
+        if (already) return base;
+        return {
+          ...base,
+          tasks: [
+            ...(base.tasks ?? []),
+            {
+              id: `optimistic-${taskId}-${dateStr}`,
+              task_id: taskId,
+              user_id: user.id,
+              completed_date: dateStr,
+              created_at: new Date().toISOString(),
+              goal_progress: null,
+            },
+          ],
+        };
+      });
+
+      // Offline path: enqueue and return — UI already reflects success.
+      if (!getIsOnline()) {
+        await enqueueMutation(TASK_EXECUTOR_TYPES.COMPLETE_TASK, payload);
+        return { completion: null, streakIncreased: false, unlockedStep: null, queued: true };
+      }
 
       // Insert completion
       const { data, error } = await supabase
@@ -950,7 +981,15 @@ export const useCompleteTask = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        // Network-shaped failure → enqueue for later, don't surface error.
+        const msg = (error.message || '').toLowerCase();
+        if (msg.includes('failed to fetch') || msg.includes('networkerror') || msg.includes('load failed')) {
+          await enqueueMutation(TASK_EXECUTOR_TYPES.COMPLETE_TASK, payload);
+          return { completion: null, streakIncreased: false, unlockedStep: null, queued: true };
+        }
+        throw error;
+      }
 
       // Update streak
       const streakResult = await updateStreak(user.id, dateStr);
@@ -1007,6 +1046,22 @@ export const useUncompleteTask = () => {
       if (!user?.id) throw new Error('Not authenticated');
 
       const dateStr = format(date, 'yyyy-MM-dd');
+      const payload: UncompleteTaskPayload = { userId: user.id, taskId, dateStr };
+
+      // Optimistic cache update
+      const completionsKey = ['planner-completions', user.id, dateStr];
+      queryClient.setQueryData(completionsKey, (prev: any) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          tasks: (prev.tasks ?? []).filter((t: any) => t.task_id !== taskId),
+        };
+      });
+
+      if (!getIsOnline()) {
+        await enqueueMutation(TASK_EXECUTOR_TYPES.UNCOMPLETE_TASK, payload);
+        return;
+      }
 
       const { error } = await supabase
         .from('task_completions')
@@ -1015,7 +1070,14 @@ export const useUncompleteTask = () => {
         .eq('user_id', user.id)
         .eq('completed_date', dateStr);
 
-      if (error) throw error;
+      if (error) {
+        const msg = (error.message || '').toLowerCase();
+        if (msg.includes('failed to fetch') || msg.includes('networkerror') || msg.includes('load failed')) {
+          await enqueueMutation(TASK_EXECUTOR_TYPES.UNCOMPLETE_TASK, payload);
+          return;
+        }
+        throw error;
+      }
     },
     onSuccess: (_, variables) => {
       const dateStr = format(variables.date, 'yyyy-MM-dd');
@@ -1043,6 +1105,32 @@ export const useCompleteSubtask = () => {
       if (!user?.id) throw new Error('Not authenticated');
 
       const dateStr = format(date, 'yyyy-MM-dd');
+      const payload: CompleteSubtaskPayload = { userId: user.id, subtaskId, dateStr };
+
+      const completionsKey = ['planner-completions', user.id, dateStr];
+      queryClient.setQueryData(completionsKey, (prev: any) => {
+        const base = prev ?? { tasks: [], subtasks: [] };
+        const already = (base.subtasks ?? []).some((s: any) => s.subtask_id === subtaskId);
+        if (already) return base;
+        return {
+          ...base,
+          subtasks: [
+            ...(base.subtasks ?? []),
+            {
+              id: `optimistic-${subtaskId}-${dateStr}`,
+              subtask_id: subtaskId,
+              user_id: user.id,
+              completed_date: dateStr,
+              created_at: new Date().toISOString(),
+            },
+          ],
+        };
+      });
+
+      if (!getIsOnline()) {
+        await enqueueMutation(TASK_EXECUTOR_TYPES.COMPLETE_SUBTASK, payload);
+        return null;
+      }
 
       const { data, error } = await supabase
         .from('subtask_completions')
@@ -1054,7 +1142,14 @@ export const useCompleteSubtask = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        const msg = (error.message || '').toLowerCase();
+        if (msg.includes('failed to fetch') || msg.includes('networkerror') || msg.includes('load failed')) {
+          await enqueueMutation(TASK_EXECUTOR_TYPES.COMPLETE_SUBTASK, payload);
+          return null;
+        }
+        throw error;
+      }
       return data;
     },
     onSuccess: (_, variables) => {
@@ -1080,6 +1175,21 @@ export const useUncompleteSubtask = () => {
       if (!user?.id) throw new Error('Not authenticated');
 
       const dateStr = format(date, 'yyyy-MM-dd');
+      const payload: UncompleteSubtaskPayload = { userId: user.id, subtaskId, dateStr };
+
+      const completionsKey = ['planner-completions', user.id, dateStr];
+      queryClient.setQueryData(completionsKey, (prev: any) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          subtasks: (prev.subtasks ?? []).filter((s: any) => s.subtask_id !== subtaskId),
+        };
+      });
+
+      if (!getIsOnline()) {
+        await enqueueMutation(TASK_EXECUTOR_TYPES.UNCOMPLETE_SUBTASK, payload);
+        return;
+      }
 
       const { error } = await supabase
         .from('subtask_completions')
@@ -1088,7 +1198,14 @@ export const useUncompleteSubtask = () => {
         .eq('user_id', user.id)
         .eq('completed_date', dateStr);
 
-      if (error) throw error;
+      if (error) {
+        const msg = (error.message || '').toLowerCase();
+        if (msg.includes('failed to fetch') || msg.includes('networkerror') || msg.includes('load failed')) {
+          await enqueueMutation(TASK_EXECUTOR_TYPES.UNCOMPLETE_SUBTASK, payload);
+          return;
+        }
+        throw error;
+      }
     },
     onSuccess: (_, variables) => {
       const dateStr = format(variables.date, 'yyyy-MM-dd');
