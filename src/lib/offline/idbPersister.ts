@@ -21,6 +21,11 @@ export const OFFLINE_QUERY_PREFIXES = [
   // Planner & tasks
   'planner-all-tasks',
   'planner-tasks',
+  'planner-completions',
+  'planner-subtasks',
+  'planner-streak',
+  'planner-completed-dates',
+  'carry-forward-completions',
   'today-tasks',
   'task-completions',
   'user-tasks',
@@ -29,7 +34,12 @@ export const OFFLINE_QUERY_PREFIXES = [
 
   // Routines
   'routines-bank',
+  'routines-bank-popular',
+  'routines-bank-featured',
+  'routine-bank-detail',
   'user-routines',
+  'user-routines-bank',
+  'completed-routines',
   'routine-categories',
   'routine-progress',
   'user-routine-progress',
