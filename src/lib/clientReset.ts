@@ -1,4 +1,5 @@
 import { getLocalDateStr } from '@/lib/localDate';
+import { clearOfflineQueryCache } from '@/lib/offline/idbPersister';
 
 /**
  * Central utility for clearing all client-side localStorage flags.
@@ -102,6 +103,8 @@ export function fullClientReset(): void {
 
   // 3. Clear React Query persisted cache
   localStorage.removeItem('lb-query-cache-v4');
+  // Also clear the IndexedDB-backed offline cache
+  void clearOfflineQueryCache();
 
   // 4. Set flags to force tour banner/popup and new-user experience
   localStorage.setItem('simora_tours_just_reset', 'true');
