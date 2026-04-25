@@ -4,9 +4,8 @@ import { Share2, X } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
-import { Share } from '@capacitor/share';
-import { Capacitor } from '@capacitor/core';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
+import { useShareContent } from '@/hooks/useShareContent';
 
 interface ProjectCompletionCelebrationProps {
   open: boolean;
@@ -68,19 +67,6 @@ export const ProjectCompletionCelebration = ({
   }, [open]);
 
   if (!open) return null;
-
-  const handleShare = async () => {
-    haptic.light();
-    const text = `🎯 I just completed the "${projectTitle}" project! ${totalTasks} tasks across ${totalSteps} steps. #SelfGrowth #RoutineLadyboss\nDownload the app: https://apps.apple.com/app/id6755076134`;
-
-    if (Capacitor.isNativePlatform()) {
-      try {
-        await Share.share({ title: 'Project Complete!', text, dialogTitle: 'Share your achievement' });
-      } catch { /* cancelled */ }
-    } else {
-      try { await navigator.clipboard.writeText(text); haptic.success(); } catch { /* no clipboard */ }
-    }
-  };
 
   const stats = [
     { label: 'Steps Done', value: totalSteps, icon: '📋' },
