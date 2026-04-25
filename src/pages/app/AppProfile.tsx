@@ -756,6 +756,7 @@ const AppProfile = () => {
         </Collapsible>
 
         {/* Settings Button */}
+        <SyncStatusCard />
         <button
           onClick={() => navigate('/app/settings')}
           className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors"
