@@ -26,6 +26,8 @@ export default function AppReflectionNotes() {
   const { data: notes, isLoading } = useQuery({
     queryKey: ['reflection-notes', user?.id],
     enabled: !!user?.id,
+    staleTime: 0,
+    refetchOnMount: 'always',
     queryFn: async () => {
       const result: NoteItem[] = [];
 
