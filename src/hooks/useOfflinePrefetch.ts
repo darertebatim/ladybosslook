@@ -51,12 +51,25 @@ async function prefetchOfflineCritical(
     queryClient.prefetchQuery({
       queryKey: ['planner-completions', userId, today],
       queryFn: async () => {
-        const { data } = await supabase
-          .from('task_completions')
-          .select('*')
-          .eq('user_id', userId)
-          .eq('completed_date', today);
-        return data ?? [];
+        // Must match the shape produced by useCompletionsForDate
+        // ({ tasks, subtasks }) — otherwise consumers that read
+        // `data.tasks.map(...)` will crash on rehydrate.
+        const [tasksRes, subtasksRes] = await Promise.all([
+          supabase
+            .from('task_completions')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('completed_date', today),
+          supabase
+            .from('subtask_completions')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('completed_date', today),
+        ]);
+        return {
+          tasks: tasksRes.data ?? [],
+          subtasks: subtasksRes.data ?? [],
+        };
       },
       staleTime: 60_000,
     }),
