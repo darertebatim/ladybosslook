@@ -1,64 +1,151 @@
-## Post-Reflection Celebration Sheet
+## Goal
+Convert every share action in the app from "→ App Store dead link" to "→ AppsFlyer OneLink" so:
+1. Android friends can also install
+2. We get per-surface analytics (which screens drive installs)
+3. We add share buttons where they're currently missing (celebration moments + content pages)
 
-Replace the green "Reflection saved/completed ✨" toast with a 4-card bottom sheet suggesting next steps — mirroring the post mood check-in UX.
+**No referral system. No rewards. No new tables.** Just trackable links + a few new buttons.
 
-### What the user will see
+---
 
-After saving any reflection (free-form OR structured), a sheet slides up from the bottom with:
+## Step 1 — Add `buildShareOneLink` helper
 
-- **Header**
-  - Notebook emoji (📓) in a soft circle
-  - Small line: *"Nice work — you reflected today."*
-  - Bold title: *"Keep the momentum going"*
-- **2×2 cards** (white cards on a soft pastel background, illustrated)
-  1. **Academy** → /app/academy 
-  2. **Listen** → `/app/player`
-  3. **Focus Timer** → `/app/timer`
-  4. **My Presence** → `/app/presence`
-- **Bottom button** — solid white pill with black text: **"Back to Home Planner"** (or **"Continue Routine ▶"** if a routine player is active)
+**File:** `src/lib/appsflyer.ts`
 
-Tapping any card haptic-taps and navigates. Dismissing the sheet returns to the routine player if active, otherwise goes back to `/app/reflections`.
+Add a third helper next to the existing `buildInstructorOneLink` / `buildPackageOneLink`:
 
-### Technical changes
+```ts
+export function buildShareOneLink(
+  source: string,           // e.g. 'routine_completion', 'audio_player', 'gold_streak'
+  contentId?: string,       // optional: routine slug, audio id, story id
+  contentTitle?: string,    // optional: human-readable title
+): string {
+  const params = new URLSearchParams({
+    af_xp: 'custom',
+    pid: 'user_share',
+    c: source,
+  });
+  if (contentId) params.set('af_sub1', contentId);
+  if (contentTitle) params.set('af_sub2', contentTitle.substring(0, 40));
+  return `${ONELINK_BASE_URL}?${params.toString()}`;
+}
+```
 
-**1. New component: `src/components/reflection/ReflectionCelebrationSheet.tsx**`
+`pid=user_share` keeps organic-user shares clearly separated from `instructor_referral` traffic in AppsFlyer dashboard.
 
-- Modeled directly on `MoodCelebrationSheet.tsx`.
-- Props: `open`, `onOpenChange`, `onDone`.
-- Uses `Sheet` primitive (`side="bottom"`, rounded top, soft pastel background to differentiate from mood sheet).
-- Card → route mapping:
-  - Academy → `/app/courses`
-  - Listen → `/app/player`
-  - Focus Timer → `/app/timer`
-  - Presence → `/app/presence`
-- Integrates with `useRoutinePlayerContext` exactly like `MoodCelebrationSheet` so an active routine player resumes correctly when sheet is dismissed.
-- Wrapped in `OverlayPortal` so it escapes scroll containers.
+---
 
-**2. `src/pages/app/AppFreeFormReflection.tsx**`
+## Step 2 — Update `useShareContent` hook to use OneLinks
 
-- Remove `toast.success('Reflection saved ✨')` and the immediate `navigate/goBack` from `onSuccess`.
-- Add local state `const [showCelebration, setShowCelebration] = useState(false)`.
-- On success: still invalidate queries + `autoCompleteJournal()`, then `setShowCelebration(true)`.
-- Render `<ReflectionCelebrationSheet>` at the bottom of the JSX. Its `onDone` triggers existing routine-player-aware navigation (`/app/home` + maximize, or `goBack()`).
+**File:** `src/hooks/useShareContent.ts`
 
-**3. `src/pages/app/AppReflectionFlow.tsx**`
+- Remove the hardcoded `APP_STORE_URL` constant.
+- Add `source: string` and optional `contentId?: string` to `UseShareContentOptions`.
+- Build the share URL via `buildShareOneLink(source, contentId, title)`.
+- Add `logAppsFlyerEvent('af_share', { source, content_id: contentId })` call when share is triggered, so AppsFlyer can correlate share-intent → install.
+- Everything else stays (image sharing, IG share, clipboard fallback).
 
-- Same change applied to BOTH completion branches (`handleSaveSinglePage` and the `isLast` branch in `handleNext`):
-  - Remove the toast.
-  - Trigger `setShowCelebration(true)` after `autoCompleteReflection`.
-- Render the same `<ReflectionCelebrationSheet>` once at the page root.
+---
 
-**4. Asset generation**
+## Step 3 — Update existing share call sites to pass a `source`
 
-- Generate 4 small flat-illustration cards (~512×512 PNG) consistent with existing `mood-card-*.png` style:
-  - `reflection-card-academy.png` (graduation cap / open book with bookmark)
-  - `reflection-card-listen.png` (headphones / sound waves)
-  - `reflection-card-timer.png` (stopwatch)
-  - `reflection-card-presence.png` (calendar with check / streak)
+One-line update in each — just add the `source` prop. Suggested source names:
 
-### What stays unchanged
+| File | source |
+|---|---|
+| `src/pages/app/AppAudioPlayer.tsx` | `audio_player` |
+| `src/pages/app/AppPlaylistDetail.tsx` | `audio_playlist` |
+| `src/pages/app/AppVideoPlaylistDetail.tsx` | `video_playlist` |
+| `src/components/app/RoutinePlayerSummary.tsx` | `routine_summary` |
+| `src/pages/app/AppJournalEntry.tsx` | `journal_entry` |
+| `src/pages/app/AppReflectionNoteDetail.tsx` | `reflection_note` |
+| `src/pages/app/AppFreeFormNoteDetail.tsx` | `free_note` |
+| `src/pages/app/AppInspireDetail.tsx` | `inspire_story` |
+| `src/pages/app/AppFeedPost.tsx` | `feed_post` |
+| `src/pages/app/QuizPlay.tsx` | `quiz_result` |
 
-- `useReflections` admin toasts ("Reflection created/updated/deleted") — admin CRUD, untouched.
-- Auto-completion of pro-tasks (`autoCompleteJournal`, `autoCompleteReflection`) still runs before the sheet appears.
-- Routine-player resume logic preserved end-to-end.
-- `MoodCelebrationSheet` is untouched.
+---
+
+## Step 4 — Refactor 2 components that currently bypass the hook
+
+These call `@capacitor/share` directly with hardcoded App Store URLs. Switch them to `useShareContent`:
+
+- `src/components/app/ChallengeCompleteSummary.tsx` → source `challenge_complete`
+- `src/components/app/ProjectCompletionCelebration.tsx` → source `project_complete`
+
+Removes duplicate share logic; gives them OneLink + image-share support too.
+
+---
+
+## Step 5 — Add share buttons to missing high-emotion moments (Tier A)
+
+Small `Share2` icon button in each, wired to `useShareContent`:
+
+### `src/components/app/RoutineCompletionCelebration.tsx`
+The big ✓ screen shown right after a routine ends. Add a small "Share" pill below the title.
+- source: `routine_completion`
+- text: `Just finished my "${routineTitle}" routine on Rilo ✨`
+
+### `src/components/app/GoldStreakCelebration.tsx`
+Top-right share icon on the gold streak modal.
+- source: `gold_streak`
+- text: `🥇 Gold streak day on Rilo! Building my self-care routine.`
+
+### `src/components/app/BadgeCelebration.tsx`
+Share icon next to the badge.
+- source: `badge_earned`
+- text: `Just earned the "${badgeName}" badge on Rilo 🏆`
+
+---
+
+## Step 6 — Add share buttons to missing content pages (Tier B)
+
+Header share icon (matches existing pattern in audio/playlist screens):
+
+### `src/pages/app/AppReadDetail.tsx`
+- source: `read_story`
+- text: `Reading "${title}" on Rilo — loved this 📖`
+
+### `src/pages/app/AppCourseDetail.tsx`
+- source: `course_detail`
+- text: `Check out "${courseName}" on Rilo`
+
+### `src/pages/app/AppBreathe.tsx`
+- source: `breathe_tool`
+- text: `My favorite calm-down tool on Rilo 🌬️`
+
+---
+
+## Step 7 — Verify
+
+1. Open any share button → confirm URL format is `https://ladyboss.onelink.me/lt6v?pid=user_share&c=<source>...`
+2. Open URL on iOS → should resolve to App Store
+3. Open URL on Android → should resolve to Play Store
+4. Check AppsFlyer dashboard → `af_share` events grouped by `c` (source) should appear
+
+---
+
+## Files touched (~13 total)
+
+**Modified:**
+- `src/lib/appsflyer.ts` (add helper)
+- `src/hooks/useShareContent.ts` (use OneLink + log event)
+- 10 existing call sites (1-line `source` prop addition)
+- 2 components that bypass the hook (refactor to use hook)
+
+**Light additions to existing components:**
+- `RoutineCompletionCelebration.tsx`, `GoldStreakCelebration.tsx`, `BadgeCelebration.tsx`
+- `AppReadDetail.tsx`, `AppCourseDetail.tsx`, `AppBreathe.tsx`
+
+**No new files. No DB changes. No new dependencies.**
+
+---
+
+## Out of scope (intentionally)
+
+- ❌ Per-user referral codes / rewards / Plus trials → that's a separate feature
+- ❌ Branded canvas-generated share cards → can be added later if you want
+- ❌ Custom domain (`share.ladybosslook.com`) → onelink.me works fine for now
+- ❌ New "Invite Friends" hub in Settings → separate decision
+
+These can all be layered on later without touching this work.
