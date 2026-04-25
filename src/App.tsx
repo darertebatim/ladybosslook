@@ -242,10 +242,18 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 3 * 60 * 1000, // 3 minutes - data considered fresh
-      gcTime: 15 * 60 * 1000, // 15 minutes - keep in cache longer
+      // Keep in memory long enough for the persister to write to IndexedDB
+      // and for tab/route changes to reuse data instead of refetching.
+      gcTime: 7 * 24 * 60 * 60 * 1000, // 7 days
       retry: 1, // Only retry once on failure
       refetchOnWindowFocus: false, // Don't refetch on tab focus
-      refetchOnMount: 'always', // Refetch only if stale
+      // Refetch in the background when stale, but show cached data immediately
+      // so screens render instantly offline. Was 'always' which caused full
+      // spinners every navigation.
+      refetchOnMount: true,
+      // Don't auto-refetch on reconnect — the offline queue handles writes,
+      // and screens already mark themselves stale so they refetch on next mount.
+      refetchOnReconnect: 'always',
     },
   },
 });
