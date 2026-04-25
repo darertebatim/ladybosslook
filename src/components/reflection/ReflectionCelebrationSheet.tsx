@@ -45,12 +45,11 @@ export function ReflectionCelebrationSheet({
     haptic.light();
     onOpenChange(false);
     if (hasActivePlayer) {
-      navigate('/app/home');
+      navigate('/app/home', { replace: true });
       routinePlayer!.maximize();
       return;
     }
-    navigate('/app/home');
-    onDone();
+    navigate('/app/home', { replace: true });
   };
 
   return (
@@ -59,8 +58,9 @@ export function ReflectionCelebrationSheet({
       onOpenChange={(isOpen) => {
         if (!isOpen) {
           handleDone();
+        } else {
+          onOpenChange(isOpen);
         }
-        onOpenChange(isOpen);
       }}
     >
       <SheetContent
