@@ -1,21 +1,35 @@
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
-
-const APP_STORE_URL = 'https://apps.apple.com/app/id6755076134';
+import { buildShareOneLink, logAppsFlyerEvent } from '@/lib/appsflyer';
 
 interface UseShareContentOptions {
   title: string;
   text: string;
   imageUrl?: string | null;
+  /**
+   * Tracking source — appears as `c=<source>` in AppsFlyer.
+   * Examples: 'audio_player', 'routine_completion', 'gold_streak'.
+   */
+  source: string;
+  /** Optional content identifier (routine slug, audio id, story id) */
+  contentId?: string;
 }
 
-export function useShareContent({ title, text, imageUrl }: UseShareContentOptions) {
+export function useShareContent({ title, text, imageUrl, source, contentId }: UseShareContentOptions) {
   const [isSharing, setIsSharing] = useState(false);
 
-  const fullText = `${text}\nDownload the app: ${APP_STORE_URL}`;
+  const shareUrl = buildShareOneLink(source, contentId, title);
+  const fullText = `${text}\nGet the app: ${shareUrl}`;
+
+  const trackShareIntent = () => {
+    try {
+      logAppsFlyerEvent('af_share', { source, content_id: contentId ?? '' });
+    } catch { /* ignore */ }
+  };
 
   const handleShare = useCallback(async () => {
     setIsSharing(true);
+    trackShareIntent();
     try {
       // Try sharing with image
       if (imageUrl && navigator.canShare) {
@@ -39,7 +53,7 @@ export function useShareContent({ title, text, imageUrl }: UseShareContentOption
 
       // Fallback: text + url only
       if (navigator.share) {
-        await navigator.share({ title, text: fullText, url: APP_STORE_URL });
+        await navigator.share({ title, text: fullText, url: shareUrl });
         return;
       }
 
@@ -57,7 +71,7 @@ export function useShareContent({ title, text, imageUrl }: UseShareContentOption
     } finally {
       setIsSharing(false);
     }
-  }, [title, fullText, imageUrl]);
+  }, [title, fullText, imageUrl, shareUrl, source, contentId]);
 
   const handleShareInstagram = useCallback(async () => {
     if (!imageUrl) {

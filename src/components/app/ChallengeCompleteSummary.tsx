@@ -4,8 +4,7 @@ import { Share2, X } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
-import { Share } from '@capacitor/share';
-import { Capacitor } from '@capacitor/core';
+import { useShareContent } from '@/hooks/useShareContent';
 
 interface ChallengeCompleteSummaryProps {
   open: boolean;
@@ -69,29 +68,13 @@ export const ChallengeCompleteSummary = ({
   const badgeLabel = streakGoal >= 50 ? 'Legend' : streakGoal >= 30 ? 'Master' : streakGoal >= 14 ? 'Warrior' : 'Champion';
   const badgeEmoji = streakGoal >= 50 ? '👑' : streakGoal >= 30 ? '🔥' : streakGoal >= 14 ? '⚔️' : '🏆';
 
-  const handleShare = async () => {
-    haptic.light();
-    const text = `${badgeEmoji} I just completed a ${streakGoal}-day streak challenge! ${totalActions} tasks done across ${perfectDays} perfect days. #SelfGrowth #RoutineLadyboss\nDownload the app: https://apps.apple.com/app/id6755076134`;
-
-    if (Capacitor.isNativePlatform()) {
-      try {
-        await Share.share({
-          title: 'Challenge Complete!',
-          text,
-          dialogTitle: 'Share your achievement',
-        });
-      } catch {
-        // User cancelled share
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(text);
-        haptic.success();
-      } catch {
-        // Clipboard not available
-      }
-    }
-  };
+  const { handleShare: triggerShare } = useShareContent({
+    title: 'Challenge Complete!',
+    text: `${badgeEmoji} I just completed a ${streakGoal}-day streak challenge! ${totalActions} tasks done across ${perfectDays} perfect days. #SelfGrowth`,
+    source: 'challenge_complete',
+    contentId: `${streakGoal}d`,
+  });
+  const handleShare = () => { haptic.light(); triggerShare(); };
 
   const stats = [
     { label: 'Days Completed', value: streakGoal, icon: '🔥' },

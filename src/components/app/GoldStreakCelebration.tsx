@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { format, addDays, startOfWeek, isSameDay, isBefore, startOfDay } from 'date-fns';
-import { Crown, Sparkles } from 'lucide-react';
+import { Crown, Sparkles, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
+import { useShareContent } from '@/hooks/useShareContent';
 
 import coinGold from '@/assets/coin-gold.png';
 
@@ -36,6 +37,13 @@ export const GoldStreakCelebration = ({
   goldDatesThisWeek,
 }: GoldStreakCelebrationProps) => {
   const [isAnimating, setIsAnimating] = useState(false);
+
+  const { handleShare } = useShareContent({
+    title: 'Gold Streak',
+    text: `🥇 ${currentGoldStreak}-day Gold streak on Rilo! Building my self-care routine one day at a time.`,
+    source: 'gold_streak',
+    contentId: `${currentGoldStreak}d`,
+  });
 
   // Generate week days for display
   const weekDays = useMemo(() => {
@@ -135,6 +143,16 @@ export const GoldStreakCelebration = ({
       <Sparkles className="absolute top-36 right-8 w-4 h-4 text-yellow-300/50 animate-pulse delay-100" />
       <Crown className="absolute top-52 left-6 w-4 h-4 text-amber-500/40 animate-pulse delay-200" />
       <Sparkles className="absolute top-64 right-12 w-3 h-3 text-amber-300/50 animate-pulse delay-300" />
+
+      {/* Share button */}
+      <button
+        onClick={(e) => { e.stopPropagation(); haptic.light(); handleShare(); }}
+        className="absolute right-4 z-20 w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center active:scale-95 transition-transform"
+        style={{ top: 'calc(env(safe-area-inset-top, 12px) + 12px)' }}
+        aria-label="Share gold streak"
+      >
+        <Share2 className="w-4 h-4 text-amber-200" />
+      </button>
 
       {/* Content */}
       <div 

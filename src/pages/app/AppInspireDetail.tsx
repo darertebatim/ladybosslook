@@ -164,6 +164,8 @@ export default function AppInspireDetail() {
     title: routine?.title || 'Routine',
     text: `Hey! Join me in the '${routine?.title || 'Routine'}' routine on Routine Ladyboss 💫`,
     imageUrl: routine?.cover_image_url,
+    source: 'inspire_routine',
+    contentId: routine?.id,
   });
 
   const handleAddClick = () => {

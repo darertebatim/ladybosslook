@@ -149,6 +149,8 @@ export default function AppFeedPost() {
     title: post?.title || 'Post',
     text: `💬 Check out this post on Routine Ladyboss 💫`,
     imageUrl: post?.image_url,
+    source: 'feed_post',
+    contentId: post?.id,
   });
 
   // Mark post as read
