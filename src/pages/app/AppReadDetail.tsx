@@ -1,9 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useReadingContentById, useContentSections, useReadingUserProgress } from '@/hooks/useReading';
-import { ArrowLeft, Clock, BookOpen, Layers } from 'lucide-react';
+import { ArrowLeft, Clock, BookOpen, Layers, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { Badge } from '@/components/ui/badge';
+import { useShareContent } from '@/hooks/useShareContent';
+import { haptic } from '@/lib/haptics';
 
 
 export default function AppReadDetail() {
@@ -12,6 +14,14 @@ export default function AppReadDetail() {
   const { data: content, isLoading } = useReadingContentById(id || null);
   const { data: sections = [] } = useContentSections(id || null);
   const { data: progress = [] } = useReadingUserProgress();
+
+  const { handleShare } = useShareContent({
+    title: content?.title || 'Read on Rilo',
+    text: `📖 Reading "${content?.title || 'this story'}" on Rilo — loved this.`,
+    imageUrl: content?.cover_url,
+    source: 'read_story',
+    contentId: id,
+  });
 
   const prog = progress.find(p => p.content_id === id);
   const isCompleted = prog?.completed;
@@ -44,6 +54,15 @@ export default function AppReadDetail() {
           style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
         >
           <ArrowLeft className="h-5 w-5 text-black" />
+        </button>
+
+        <button
+          onClick={() => { haptic.light(); handleShare(); }}
+          className="absolute right-4 z-10 bg-white/70 backdrop-blur-sm rounded-full p-2 active:scale-95 transition-transform"
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
+          aria-label="Share story"
+        >
+          <Share2 className="h-5 w-5 text-black" />
         </button>
 
         {hasCoverImage ? (
