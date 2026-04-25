@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { nativeGoogleSignIn, nativeAppleSignIn } from '@/lib/nativeSocialAuth';
+import { getIsOnline } from '@/hooks/useNetworkStatus';
 
 interface AuthContextType {
   user: User | null;
@@ -95,6 +96,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Set up auth state listener FIRST (must be synchronous callback)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        // When offline, Supabase fails to refresh the access token and emits
+        // SIGNED_OUT — which would log the user out and strand them on the
+        // sign-in screen with no network. Ignore it so the persisted session
+        // stays in place; the next online cold start will refresh normally.
+        if (event === 'SIGNED_OUT' && !session && !getIsOnline()) {
+          console.warn('[Auth] Ignoring SIGNED_OUT while offline — keeping cached session');
+          return;
+        }
+
         setSession(session);
         setUser(session?.user ?? null);
         
