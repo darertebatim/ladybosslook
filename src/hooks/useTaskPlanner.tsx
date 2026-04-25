@@ -217,11 +217,19 @@ export const TASK_COLOR_CLASSES: Record<TaskColor, string> = {
  */
 export const useAllActiveTasks = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   return useQuery({
     queryKey: ['planner-all-tasks', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
+
+      // Offline: don't hit the network — return whatever the IDB cache
+      // already rehydrated so the planner doesn't blank out.
+      if (!getIsOnline()) {
+        const cached = queryClient.getQueryData<UserTask[]>(['planner-all-tasks', user.id]);
+        return cached ?? [];
+      }
 
       const { data: tasks, error } = await supabase
         .from('user_tasks')
@@ -233,10 +241,16 @@ export const useAllActiveTasks = () => {
         .eq('is_active', true)
         .order('order_index', { ascending: true });
 
-      if (error) throw error;
+      // Transient refetch failure → keep cached list rather than wiping it.
+      if (error) {
+        const cached = queryClient.getQueryData<UserTask[]>(['planner-all-tasks', user.id]);
+        if (cached) return cached;
+        throw error;
+      }
       return tasks as UserTask[];
     },
     enabled: !!user?.id,
+    placeholderData: keepPreviousData,
     staleTime: 1000 * 60 * 5, // 5 minutes - tasks rarely change
     // No gcTime override — inherit the 7-day default so the IndexedDB
     // persister can rehydrate this query offline after app restart.
