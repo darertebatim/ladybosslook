@@ -15,12 +15,21 @@ import { enqueueMutation } from '@/lib/offline/offlineMutationQueue';
 
 function isNetworkError(err: unknown): boolean {
   const msg = (err instanceof Error ? err.message : String(err ?? '')).toLowerCase();
+  // Supabase / PostgREST sometimes returns errors with a "code" field too —
+  // treat the generic ones that mean "couldn't reach the server" as network.
+  const code = (err as { code?: string } | null | undefined)?.code?.toString?.().toLowerCase?.() ?? '';
   return (
     msg.includes('failed to fetch') ||
     msg.includes('networkerror') ||
     msg.includes('load failed') ||
     msg.includes('network request failed') ||
-    msg.includes('timeout')
+    msg.includes('timeout') ||
+    msg.includes('aborted') ||
+    msg.includes('fetch failed') ||
+    code === 'pgrst000' ||
+    code === 'enotfound' ||
+    code === 'econnreset' ||
+    code === 'etimedout'
   );
 }
 
