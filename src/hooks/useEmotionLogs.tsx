@@ -5,6 +5,12 @@ import { toast } from 'sonner';
 import { startOfDay, differenceInDays } from 'date-fns';
 import type { Valence } from '@/lib/emotionData';
 import { Analytics } from '@/lib/firebaseAnalytics';
+import { runWithOfflineFallback } from '@/lib/offline/runWithOfflineFallback';
+import {
+  WELLNESS_EXECUTOR_TYPES,
+  type CreateEmotionLogPayload,
+  type DeleteEmotionLogPayload,
+} from '@/lib/offline/executors/wellnessExecutors';
 
 export interface EmotionLog {
   id: string;
@@ -74,21 +80,51 @@ export const useEmotionLogs = () => {
     mutationFn: async (input: CreateEmotionLogInput) => {
       if (!user?.id) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
-        .from('emotion_logs')
-        .insert({
-          user_id: user.id,
-          valence: input.valence,
-          category: input.category,
-          emotion: input.emotion,
-          contexts: input.contexts,
-          notes: input.notes || null,
-        })
-        .select()
-        .single();
+      const clientId = crypto.randomUUID();
+      const nowIso = new Date().toISOString();
 
-      if (error) throw error;
-      return data as EmotionLog;
+      const payload: CreateEmotionLogPayload = {
+        clientId,
+        userId: user.id,
+        category: input.category,
+        emotion: input.emotion,
+        valence: input.valence,
+        contexts: input.contexts,
+        notes: input.notes || null,
+      };
+
+      const result = await runWithOfflineFallback({
+        type: WELLNESS_EXECUTOR_TYPES.CREATE_EMOTION_LOG,
+        payload,
+        fastPath: async () => {
+          const { data, error } = await supabase
+            .from('emotion_logs')
+            .insert({
+              id: clientId,
+              user_id: user.id,
+              valence: input.valence,
+              category: input.category,
+              emotion: input.emotion,
+              contexts: input.contexts,
+              notes: input.notes || null,
+            })
+            .select()
+            .single();
+          if (error) throw error;
+          return data as EmotionLog;
+        },
+      });
+
+      return (result.data ?? {
+        id: clientId,
+        user_id: user.id,
+        valence: input.valence,
+        category: input.category,
+        emotion: input.emotion,
+        contexts: input.contexts,
+        notes: input.notes || null,
+        created_at: nowIso,
+      }) as EmotionLog;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['emotion-logs', user?.id] });
@@ -105,13 +141,20 @@ export const useEmotionLogs = () => {
     mutationFn: async (logId: string) => {
       if (!user?.id) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('emotion_logs')
-        .delete()
-        .eq('id', logId)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
+      const payload: DeleteEmotionLogPayload = { userId: user.id, logId };
+      await runWithOfflineFallback({
+        type: WELLNESS_EXECUTOR_TYPES.DELETE_EMOTION_LOG,
+        payload,
+        fastPath: async () => {
+          const { error } = await supabase
+            .from('emotion_logs')
+            .delete()
+            .eq('id', logId)
+            .eq('user_id', user.id);
+          if (error) throw error;
+          return null;
+        },
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['emotion-logs', user?.id] });
