@@ -225,10 +225,13 @@ export const useAllActiveTasks = () => {
       if (!user?.id) return [];
 
       // Offline: don't hit the network — return whatever the IDB cache
-      // already rehydrated so the planner doesn't blank out.
+      // already rehydrated so the planner doesn't blank out. If the cache
+      // hasn't rehydrated yet, throw so React Query keeps prior data and
+      // doesn't commit an empty list (which would hide all tasks).
       if (!getIsOnline()) {
         const cached = queryClient.getQueryData<UserTask[]>(['planner-all-tasks', user.id]);
-        return cached ?? [];
+        if (cached && cached.length > 0) return cached;
+        throw new Error('offline-no-cache');
       }
 
       const { data: tasks, error } = await supabase
@@ -252,6 +255,10 @@ export const useAllActiveTasks = () => {
     enabled: !!user?.id,
     placeholderData: keepPreviousData,
     staleTime: 1000 * 60 * 5, // 5 minutes - tasks rarely change
+    // Don't auto-retry while offline — we already returned cached data via
+    // placeholderData; retries just spam errors without changing anything.
+    retry: (failureCount, err) =>
+      err instanceof Error && err.message === 'offline-no-cache' ? false : failureCount < 1,
     // No gcTime override — inherit the 7-day default so the IndexedDB
     // persister can rehydrate this query offline after app restart.
   });
@@ -408,7 +415,10 @@ export const useCompletionsForDate = (date: Date) => {
           tasks: TaskCompletion[];
           subtasks: SubtaskCompletion[];
         }>(['planner-completions', user.id, dateStr]);
-        return cached ?? { tasks: [], subtasks: [] };
+        if (cached) return cached;
+        // Same logic as planner-all-tasks: don't commit an empty result that
+        // would mark every task as un-completed before rehydrate finishes.
+        throw new Error('offline-no-cache');
       }
 
       const [tasksResult, subtasksResult] = await Promise.all([
@@ -454,6 +464,8 @@ export const useCompletionsForDate = (date: Date) => {
     // by a stale rehydrate).
     staleTime: 0,
     refetchOnMount: 'always',
+    retry: (failureCount, err) =>
+      err instanceof Error && err.message === 'offline-no-cache' ? false : failureCount < 1,
   });
 };
 

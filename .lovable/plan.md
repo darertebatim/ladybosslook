@@ -1,151 +1,82 @@
-## Goal
-Convert every share action in the app from "→ App Store dead link" to "→ AppsFlyer OneLink" so:
-1. Android friends can also install
-2. We get per-surface analytics (which screens drive installs)
-3. We add share buttons where they're currently missing (celebration moments + content pages)
+## What’s going wrong
 
-**No referral system. No rewards. No new tables.** Just trackable links + a few new buttons.
+I found likely root causes for all 3 issues, and they are deeper than just “add more offline code.”
 
----
+1. **Reflections not saving offline**
+   - The free-form reflection screen queues the reflection row correctly.
+   - But after saving, it always calls `autoCompleteJournal()`.
+   - `autoCompleteJournal()` still does live Supabase reads/writes only, with no offline fallback.
+   - So the reflection row may queue, but the follow-up completion flow can hang/fail and block the “Done” experience.
+   - The 4-card celebration sheet is probably **not** the root cause. It opens only after `onSuccess`; the fragile part is the forced pro-task auto-complete call before that flow settles.
 
-## Step 1 — Add `buildShareOneLink` helper
+2. **Tasks getting hidden offline**
+   - The main task list is partly protected, but not fully.
+   - `useAllActiveTasks()` and `useCompletionsForDate()` already use cached data offline.
+   - However, Home also depends on other task-related queries that still return live-only structures, especially:
+     - `useCarryForwardTasks()`
+     - `useSkipsForDate()`
+   - Those return `Set` objects and do not have offline-safe cached fallbacks.
+   - This project memory explicitly warns that persisted data must use plain objects/arrays, not `Map`/`Set`, because app restoration can corrupt behavior.
+   - When these queries fail or rehydrate poorly offline, the Home filter pipeline can evaluate as empty and make tasks disappear.
 
-**File:** `src/lib/appsflyer.ts`
+3. **Emoji turning into question marks offline**
+   - `FluentEmoji` always tries to load emoji images from a CDN.
+   - Offline, image loading fails, so it falls back to native text emoji.
+   - But the app font stack is basically `Inter`, without explicit emoji fonts in the CSS runtime stack.
+   - On iPhone/native webview, that can render fallback glyphs badly or as question-mark boxes for some emojis.
+   - So this is not a data bug; it is a fallback rendering bug.
 
-Add a third helper next to the existing `buildInstructorOneLink` / `buildPackageOneLink`:
+## Plan
 
-```ts
-export function buildShareOneLink(
-  source: string,           // e.g. 'routine_completion', 'audio_player', 'gold_streak'
-  contentId?: string,       // optional: routine slug, audio id, story id
-  contentTitle?: string,    // optional: human-readable title
-): string {
-  const params = new URLSearchParams({
-    af_xp: 'custom',
-    pid: 'user_share',
-    c: source,
-  });
-  if (contentId) params.set('af_sub1', contentId);
-  if (contentTitle) params.set('af_sub2', contentTitle.substring(0, 40));
-  return `${ONELINK_BASE_URL}?${params.toString()}`;
-}
-```
+### Phase A — Make offline reflection save truly self-contained
+- Update the free-form reflection save flow so the reflection record itself is the success path.
+- Decouple offline reflection save from `autoCompleteJournal()` so the note can finish and show success even without internet.
+- If a journal-linked task needs completion, queue that as a separate offline-safe follow-up instead of blocking save.
+- Ensure Reflection Notes immediately show an optimistic local item after offline save.
 
-`pid=user_share` keeps organic-user shares clearly separated from `instructor_referral` traffic in AppsFlyer dashboard.
+### Phase B — Remove unstable offline task filters
+- Refactor `useCarryForwardTasks()` and `useSkipsForDate()` to be offline-safe.
+- Replace persisted `Set`-shaped query results with plain arrays/objects at the query layer, then convert to `Set` only in-memory where needed.
+- Add the same cached-offline fallback pattern already used in `useAllActiveTasks()` and `useCompletionsForDate()`.
+- Audit Home task filtering so if secondary queries fail offline, the base task list still renders instead of collapsing to empty.
 
----
+### Phase C — Fix emoji fallback for offline/native
+- Change `FluentEmoji` so offline/native fallback is deterministic.
+- Prefer native emoji immediately when offline instead of attempting dead CDN loads first.
+- Add an emoji-capable fallback font stack for native emoji rendering.
+- Keep CDN 3D emoji when online, but guarantee clean native emoji when offline.
 
-## Step 2 — Update `useShareContent` hook to use OneLinks
+### Phase D — QA the full offline path end-to-end
+- Verify this sequence specifically:
+  1. open app online
+  2. warm data
+  3. go offline
+  4. complete task
+  5. save reflection
+  6. background app
+  7. reopen offline
+  8. confirm tasks still visible, reflection still visible, emoji still intact
+- Then reconnect and confirm queued writes sync without changing the visible offline state.
 
-**File:** `src/hooks/useShareContent.ts`
+## Technical details
 
-- Remove the hardcoded `APP_STORE_URL` constant.
-- Add `source: string` and optional `contentId?: string` to `UseShareContentOptions`.
-- Build the share URL via `buildShareOneLink(source, contentId, title)`.
-- Add `logAppsFlyerEvent('af_share', { source, content_id: contentId })` call when share is triggered, so AppsFlyer can correlate share-intent → install.
-- Everything else stays (image sharing, IG share, clipboard fallback).
+Files most likely to change:
+- `src/pages/app/AppFreeFormReflection.tsx`
+- `src/hooks/useAutoCompleteProTask.tsx`
+- `src/hooks/useTaskPlanner.tsx`
+- `src/pages/app/AppHome.tsx`
+- `src/components/ui/FluentEmoji.tsx`
+- `src/lib/fluentEmoji.ts`
+- `src/index.css`
+- possibly `src/lib/offline/executors/taskCompletionExecutors.ts`
 
----
+Key implementation decisions:
+- Do not persist `Set` or `Map` in React Query offline cache.
+- Reflection save must not depend on a second online-only mutation.
+- Emoji fallback should branch on offline state before network image load.
 
-## Step 3 — Update existing share call sites to pass a `source`
-
-One-line update in each — just add the `source` prop. Suggested source names:
-
-| File | source |
-|---|---|
-| `src/pages/app/AppAudioPlayer.tsx` | `audio_player` |
-| `src/pages/app/AppPlaylistDetail.tsx` | `audio_playlist` |
-| `src/pages/app/AppVideoPlaylistDetail.tsx` | `video_playlist` |
-| `src/components/app/RoutinePlayerSummary.tsx` | `routine_summary` |
-| `src/pages/app/AppJournalEntry.tsx` | `journal_entry` |
-| `src/pages/app/AppReflectionNoteDetail.tsx` | `reflection_note` |
-| `src/pages/app/AppFreeFormNoteDetail.tsx` | `free_note` |
-| `src/pages/app/AppInspireDetail.tsx` | `inspire_story` |
-| `src/pages/app/AppFeedPost.tsx` | `feed_post` |
-| `src/pages/app/QuizPlay.tsx` | `quiz_result` |
-
----
-
-## Step 4 — Refactor 2 components that currently bypass the hook
-
-These call `@capacitor/share` directly with hardcoded App Store URLs. Switch them to `useShareContent`:
-
-- `src/components/app/ChallengeCompleteSummary.tsx` → source `challenge_complete`
-- `src/components/app/ProjectCompletionCelebration.tsx` → source `project_complete`
-
-Removes duplicate share logic; gives them OneLink + image-share support too.
-
----
-
-## Step 5 — Add share buttons to missing high-emotion moments (Tier A)
-
-Small `Share2` icon button in each, wired to `useShareContent`:
-
-### `src/components/app/RoutineCompletionCelebration.tsx`
-The big ✓ screen shown right after a routine ends. Add a small "Share" pill below the title.
-- source: `routine_completion`
-- text: `Just finished my "${routineTitle}" routine on Rilo ✨`
-
-### `src/components/app/GoldStreakCelebration.tsx`
-Top-right share icon on the gold streak modal.
-- source: `gold_streak`
-- text: `🥇 Gold streak day on Rilo! Building my self-care routine.`
-
-### `src/components/app/BadgeCelebration.tsx`
-Share icon next to the badge.
-- source: `badge_earned`
-- text: `Just earned the "${badgeName}" badge on Rilo 🏆`
-
----
-
-## Step 6 — Add share buttons to missing content pages (Tier B)
-
-Header share icon (matches existing pattern in audio/playlist screens):
-
-### `src/pages/app/AppReadDetail.tsx`
-- source: `read_story`
-- text: `Reading "${title}" on Rilo — loved this 📖`
-
-### `src/pages/app/AppCourseDetail.tsx`
-- source: `course_detail`
-- text: `Check out "${courseName}" on Rilo`
-
-### `src/pages/app/AppBreathe.tsx`
-- source: `breathe_tool`
-- text: `My favorite calm-down tool on Rilo 🌬️`
-
----
-
-## Step 7 — Verify
-
-1. Open any share button → confirm URL format is `https://ladyboss.onelink.me/lt6v?pid=user_share&c=<source>...`
-2. Open URL on iOS → should resolve to App Store
-3. Open URL on Android → should resolve to Play Store
-4. Check AppsFlyer dashboard → `af_share` events grouped by `c` (source) should appear
-
----
-
-## Files touched (~13 total)
-
-**Modified:**
-- `src/lib/appsflyer.ts` (add helper)
-- `src/hooks/useShareContent.ts` (use OneLink + log event)
-- 10 existing call sites (1-line `source` prop addition)
-- 2 components that bypass the hook (refactor to use hook)
-
-**Light additions to existing components:**
-- `RoutineCompletionCelebration.tsx`, `GoldStreakCelebration.tsx`, `BadgeCelebration.tsx`
-- `AppReadDetail.tsx`, `AppCourseDetail.tsx`, `AppBreathe.tsx`
-
-**No new files. No DB changes. No new dependencies.**
-
----
-
-## Out of scope (intentionally)
-
-- ❌ Per-user referral codes / rewards / Plus trials → that's a separate feature
-- ❌ Branded canvas-generated share cards → can be added later if you want
-- ❌ Custom domain (`share.ladybosslook.com`) → onelink.me works fine for now
-- ❌ New "Invite Friends" hub in Settings → separate decision
-
-These can all be layered on later without touching this work.
+## Expected outcome
+- Offline reflection notes save and close reliably.
+- Task list no longer disappears after offline use or offline relaunch.
+- Emoji no longer degrade into question marks when offline.
+- The celebration sheet can remain, but it will no longer be in the critical path for saving.
