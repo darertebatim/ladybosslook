@@ -23,6 +23,7 @@ import { useNotificationCleanup } from '@/hooks/useNotificationCleanup';
 import { DeferredLayoutHooks } from '@/components/app/DeferredLayoutHooks';
 import { AppUpdatePopup } from '@/components/app/AppUpdatePopup';
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { OfflineStatusBar } from '@/components/app/OfflineStatusBar';
 
 import { useOnboardingProfileSync } from '@/hooks/useOnboardingProfileSync';
 import { useRoutePreloader } from '@/hooks/useRoutePreloader';
@@ -185,6 +186,8 @@ const NativeAppLayout = () => {
 
   return (
     <div className="flex flex-col h-[100dvh] bg-background app-theme font-farsi">
+      {/* Offline / sync status pill */}
+      <OfflineStatusBar />
       {/* Main Content */}
       <main 
         data-scroll-container="true"

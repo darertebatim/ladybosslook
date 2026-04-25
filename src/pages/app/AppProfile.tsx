@@ -25,6 +25,7 @@ import { format, startOfMonth } from 'date-fns';
 import { useJournalEntries, JournalEntry } from '@/hooks/useJournal';
 import { cn } from '@/lib/utils';
 import { SubscriptionCard } from '@/components/app/SubscriptionManagement';
+import { SyncStatusCard } from '@/components/app/SyncStatusCard';
 
 // Stats Pill Component
 const StatPill = ({ label, value, icon: Icon }: { label: string; value: number | string; icon?: React.ComponentType<{ className?: string }> }) => (
@@ -755,6 +756,7 @@ const AppProfile = () => {
         </Collapsible>
 
         {/* Settings Button */}
+        <SyncStatusCard />
         <button
           onClick={() => navigate('/app/settings')}
           className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors"

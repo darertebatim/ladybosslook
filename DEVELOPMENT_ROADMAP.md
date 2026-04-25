@@ -562,6 +562,7 @@ interface WidgetData {
 - **v1.0.2** - PWA removal initiated
 - **v1.0.3** - PWA infrastructure fully removed
 - **v1.0.4** - Native push notifications (IN PROGRESS)
+- **v1.0.5** - Offline-first foundation (Phases 1–6 complete: read offline, write offline with queue, resilience hardening, offline indicator, retry sync card, fasting offline writes)
 
 ---
 
