@@ -889,8 +889,8 @@ const AppHome = () => {
               ) : (
                 <h1 className="text-lg font-bold text-foreground flex items-center gap-1">
                   {isToday(selectedDate) ? 'Today' : format(selectedDate, 'MMM d')}
-                  {/* Build marker — green = offline-fix build is live */}
-                  <Star className="h-3 w-3 fill-emerald-500 text-emerald-500" />
+                  {/* Build marker */}
+                  <Star className="h-3 w-3 fill-red-500 text-red-500" />
                 </h1>
               )}
             </div>
