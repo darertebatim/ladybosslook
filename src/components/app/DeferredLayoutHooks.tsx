@@ -13,49 +13,44 @@ import { InstructorWelcomeSheet } from '@/components/instructor/InstructorWelcom
 import { InstructorInviteModal } from '@/components/instructor/InstructorInviteModal';
 
 /**
- * Ensure local notification permission is granted on Android 13+.
- * Runs once at startup as a safety net (in case onboarding was skipped).
- * Also creates a high-importance Android notification channel for task
- * reminders so OEMs (Xiaomi/Huawei/Samsung) don't suppress them and so
- * users get a heads-up popup with sound.
+ * Set up the Android notification channel for task reminders so OEMs
+ * (Xiaomi/Huawei/Samsung) don't suppress them and so users get a heads-up
+ * popup with sound.
+ *
+ * IMPORTANT: We intentionally do NOT call `requestPermissions()` at startup.
+ * On iOS, local-notification and push-notification permission is shared, so
+ * calling it here would auto-fire the iOS system permission dialog before
+ * the user taps our in-app banner — that was a real bug. Permission is now
+ * requested only on explicit user action (push onboarding, settings toggle,
+ * or the first time we actually need to schedule a notification).
  */
-function useEnsureLocalNotificationPermission() {
+function useEnsureLocalNotificationChannel() {
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
+    if (Capacitor.getPlatform() !== 'android') return;
 
     (async () => {
       try {
         const { LocalNotifications } = await import('@capacitor/local-notifications');
-        const status = await LocalNotifications.checkPermissions();
-        if (status.display !== 'granted') {
-          await LocalNotifications.requestPermissions();
-          console.log('[LocalNotifications] Permission requested at startup');
-        }
 
-        // Android only: create the high-importance channel used by task reminders.
-        // No-op on iOS. Safe to call on every launch — Android dedupes by id.
-        if (Capacitor.getPlatform() === 'android') {
-          try {
-            const exactSetting = await LocalNotifications.checkExactNotificationSetting();
-            if (exactSetting.exact_alarm !== 'granted') {
-              console.warn('[LocalNotifications] Android exact alarm permission is not granted');
-            }
-
-            await LocalNotifications.createChannel({
-              id: 'task-reminders',
-              name: 'Task Reminders',
-              description: 'Reminders for your scheduled tasks and routines',
-              importance: 5, // HIGH = heads-up popup + sound
-              visibility: 1, // PUBLIC = show on lock screen
-              sound: 'default',
-              vibration: true,
-              lights: true,
-            });
-            console.log('[LocalNotifications] Android channel "task-reminders" ready');
-          } catch (err) {
-            console.warn('[LocalNotifications] Failed to create Android channel:', err);
+        try {
+          const exactSetting = await LocalNotifications.checkExactNotificationSetting();
+          if (exactSetting.exact_alarm !== 'granted') {
+            console.warn('[LocalNotifications] Android exact alarm permission is not granted');
           }
-        }
+        } catch { /* checkExactNotificationSetting unsupported on older Android */ }
+
+        await LocalNotifications.createChannel({
+          id: 'task-reminders',
+          name: 'Task Reminders',
+          description: 'Reminders for your scheduled tasks and routines',
+          importance: 5, // HIGH = heads-up popup + sound
+          visibility: 1, // PUBLIC = show on lock screen
+          sound: 'default',
+          vibration: true,
+          lights: true,
+        });
+        console.log('[LocalNotifications] Android channel "task-reminders" ready');
       } catch { /* ignore on web */ }
     })();
   }, []);
@@ -66,7 +61,7 @@ function useEnsureLocalNotificationPermission() {
  * Contains non-critical background hooks (install tracking, notification schedulers, etc.)
  */
 export const DeferredLayoutHooks = ({ userId }: { userId: string | undefined }) => {
-  useEnsureLocalNotificationPermission();
+  useEnsureLocalNotificationChannel();
   useAppInstallTracking(userId);
   useAppsFlyerTracking(userId);
   useFirebaseUserSync(userId);
