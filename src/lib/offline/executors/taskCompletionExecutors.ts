@@ -12,7 +12,8 @@
 import { supabase } from '@/integrations/supabase/client';
 import { registerExecutor } from '@/lib/offline/offlineMutationQueue';
 import { updatePresence } from '@/hooks/useUserPresence';
-import { updateStreak, checkAndUnlockNextProjectStep } from '@/hooks/useTaskPlanner';
+import { updateStreak } from '@/hooks/useTaskPlanner';
+import { checkAndUnlockNextProjectStep } from '@/hooks/useProjectStepUnlock';
 
 // ---------------------------------------------------------------------------
 // Payload shapes (kept tiny + JSON-safe so they survive IDB serialisation)
