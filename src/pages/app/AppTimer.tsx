@@ -15,6 +15,7 @@ import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreview
 import { toast } from 'sonner';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { FocusStatsScreen } from '@/components/app/FocusStatsScreen';
+import { FocusShareButton } from '@/components/app/FocusShareButton';
 import { useSaveFocusSession } from '@/hooks/useFocusSessions';
 import { scheduleFocusTimerNotification, cancelFocusTimerNotification } from '@/lib/routineTaskNotification';
 
