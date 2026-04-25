@@ -47,7 +47,7 @@ export function SyncStatusCard() {
         <div className="flex items-start gap-3">
           <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center shrink-0">
             {failed > 0 ? (
-              <AlertTriangle className="h-4 w-4 text-amber-500" />
+              <AlertTriangle className="h-4 w-4 text-destructive" />
             ) : !isOnline ? (
               <CloudOff className="h-4 w-4 text-muted-foreground" />
             ) : (
