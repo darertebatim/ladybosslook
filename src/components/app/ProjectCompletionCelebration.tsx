@@ -31,6 +31,15 @@ export const ProjectCompletionCelebration = ({
   const [showBadge, setShowBadge] = useState(false);
   const [showStats, setShowStats] = useState(false);
 
+  const { handleShare: triggerShare } = useShareContent({
+    title: 'Project Complete!',
+    text: `🎯 I just completed the "${projectTitle}" project! ${totalTasks} tasks across ${totalSteps} steps. #SelfGrowth`,
+    source: 'project_complete',
+    contentId: projectTitle,
+    imageUrl: badgeImageUrl,
+  });
+  const handleShare = () => { haptic.light(); triggerShare(); };
+
   useEffect(() => {
     if (!open) {
       setShowBadge(false);
