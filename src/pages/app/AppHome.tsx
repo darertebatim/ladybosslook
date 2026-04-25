@@ -555,12 +555,12 @@ const AppHome = () => {
 
   // Completed task IDs for this date
   const completedTaskIds = useMemo(() => {
-    return new Set(completions?.tasks.map(c => c.task_id) || []);
+    return new Set(completions?.tasks?.map(c => c.task_id) ?? []);
   }, [completions]);
 
   // Completed subtask IDs for this date
   const completedSubtaskIds = useMemo(() => {
-    return completions?.subtasks.map(c => c.subtask_id) || [];
+    return completions?.subtasks?.map(c => c.subtask_id) ?? [];
   }, [completions]);
 
   // Goal progress map for this date

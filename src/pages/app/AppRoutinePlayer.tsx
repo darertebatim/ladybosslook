@@ -940,11 +940,11 @@ export default function AppRoutinePlayer() {
   const addGoalProgress = useAddGoalProgress();
 
   const plannerCompletedTaskIds = useMemo(() => {
-    return new Set(plannerCompletions?.tasks.map(c => c.task_id) || []);
+    return new Set(plannerCompletions?.tasks?.map(c => c.task_id) ?? []);
   }, [plannerCompletions]);
 
   const plannerCompletedSubtaskIds = useMemo(() => {
-    return plannerCompletions?.subtasks.map(c => c.subtask_id) || [];
+    return plannerCompletions?.subtasks?.map(c => c.subtask_id) ?? [];
   }, [plannerCompletions]);
 
   const plannerGoalProgressMap = useMemo(() => {
