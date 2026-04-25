@@ -21,7 +21,7 @@ const specialBanners: SpecialBanner[] = [
   {
     name: 'Self-Care Quiz',
     component: 'SelfCareQuizBanner',
-    location: 'Home (above Tasks), Home (after Routines), Tools Page (under Tools), Programs Page, Tasks Bank (under Categories)',
+    location: 'Home (above Tasks), Tools Page (under Tools), Programs Page, Tasks Bank (under Categories)',
     description: 'Promotes the "What\'s Missing?" self-care diagnostic quiz. Uses a static 3:1 image banner. Tapping opens the self-care quiz onboarding flow.',
     coverImage: selfcareQuizBannerImg,
     conditions: [
