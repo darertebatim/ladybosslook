@@ -379,11 +379,23 @@ export const useSubtasks = (taskId: string | undefined) => {
 export const useCompletionsForDate = (date: Date) => {
   const { user } = useAuth();
   const dateStr = format(date, 'yyyy-MM-dd');
+  const queryClient = useQueryClient();
 
   return useQuery({
     queryKey: ['planner-completions', user?.id, dateStr],
     queryFn: async () => {
       if (!user?.id) return { tasks: [], subtasks: [] };
+
+      // Offline: don't hit the network. Return whatever's currently cached
+      // (which already includes optimistic updates from completeTask /
+      // uncompleteTask) so the UI doesn't blink back to the unchecked state.
+      if (!getIsOnline()) {
+        const cached = queryClient.getQueryData<{
+          tasks: TaskCompletion[];
+          subtasks: SubtaskCompletion[];
+        }>(['planner-completions', user.id, dateStr]);
+        return cached ?? { tasks: [], subtasks: [] };
+      }
 
       const [tasksResult, subtasksResult] = await Promise.all([
         supabase
@@ -398,8 +410,18 @@ export const useCompletionsForDate = (date: Date) => {
           .eq('completed_date', dateStr),
       ]);
 
-      if (tasksResult.error) throw tasksResult.error;
-      if (subtasksResult.error) throw subtasksResult.error;
+      // If a refetch fails (transient network), keep the cached data so the
+      // UI doesn't drop optimistic updates. React Query will retry on the
+      // next focus / reconnect.
+      if (tasksResult.error || subtasksResult.error) {
+        const cached = queryClient.getQueryData<{
+          tasks: TaskCompletion[];
+          subtasks: SubtaskCompletion[];
+        }>(['planner-completions', user.id, dateStr]);
+        if (cached) return cached;
+        if (tasksResult.error) throw tasksResult.error;
+        if (subtasksResult.error) throw subtasksResult.error;
+      }
 
       return {
         tasks: tasksResult.data as TaskCompletion[],
@@ -407,6 +429,9 @@ export const useCompletionsForDate = (date: Date) => {
       };
     },
     enabled: !!user?.id,
+    // Keep showing the previous data while React Query refetches in the
+    // background — prevents the "task untoggles itself" flash.
+    placeholderData: keepPreviousData,
     // Always refetch on mount so the UI reconciles with the server after
     // app cold-start. Cached data still renders instantly via the IDB
     // persister; this just guarantees the UI catches up if the persisted
