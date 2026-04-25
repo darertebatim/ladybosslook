@@ -4,6 +4,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { haptic } from '@/lib/haptics';
 import { getCurrentZone, FASTING_PROTOCOLS, type FastingZone } from '@/lib/fastingZones';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
+import { runWithOfflineFallback } from '@/lib/offline/runWithOfflineFallback';
+import { WELLNESS_EXECUTOR_TYPES } from '@/lib/offline/executors/wellnessExecutors';
+
+function genClientId(): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
 
 interface FastingSession {
   id: string;
