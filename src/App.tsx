@@ -3,7 +3,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/hooks/useAuth";
@@ -21,6 +20,9 @@ import { AppProvidersLayout } from "@/layouts/AppProvidersLayout";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { idbPersister, shouldDehydrateOfflineQuery, clearOfflineQueryCache } from "@/lib/offline/idbPersister";
+import { initOfflineMutationQueue, onMutationFailure } from "@/lib/offline/offlineMutationQueue";
+import { toast } from "sonner";
 
 // Page loading fallback - minimal for fast render
 const PageLoader = () => (
@@ -240,58 +242,40 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 3 * 60 * 1000, // 3 minutes - data considered fresh
-      gcTime: 15 * 60 * 1000, // 15 minutes - keep in cache longer
+      // Keep in memory long enough for the persister to write to IndexedDB
+      // and for tab/route changes to reuse data instead of refetching.
+      gcTime: 7 * 24 * 60 * 60 * 1000, // 7 days
       retry: 1, // Only retry once on failure
       refetchOnWindowFocus: false, // Don't refetch on tab focus
-      refetchOnMount: 'always', // Refetch only if stale
+      // Refetch in the background when stale, but show cached data immediately
+      // so screens render instantly offline. Was 'always' which caused full
+      // spinners every navigation.
+      refetchOnMount: true,
+      // Don't auto-refetch on reconnect — the offline queue handles writes,
+      // and screens already mark themselves stale so they refetch on next mount.
+      refetchOnReconnect: 'always',
     },
   },
 });
 
-// Persist React Query cache to localStorage — survives app restarts
-// Only keys matching these prefixes are stored (avoids storing real-time / sensitive data)
-const PERSIST_QUERY_KEYS = [
-  'player-data',
-  'routines-bank',
-  'routine-categories',
-  'new-home-data',
-  'courses-data',
-  'planner-all-tasks',
-];
+// Offline cache + mutation queue (Phase 1+2 of offline-first architecture).
+// Cache lives in IndexedDB via `idbPersister` (allowlist of keys defined in
+// src/lib/offline/idbPersister.ts). Mutations queued via offlineMutationQueue
+// are wired in Phase 4 — initialised here so the drain loop is always ready.
+initOfflineMutationQueue();
 
-const localStoragePersister = createSyncStoragePersister({
-  storage: window.localStorage,
-  key: 'lb-query-cache-v4',
-  // Only persist queries whose key starts with one of the allowed prefixes
-  serialize: (client) => {
-    const filtered = {
-      ...client,
-      clientState: {
-        ...client.clientState,
-        queries: client.clientState.queries.filter((q) =>
-          PERSIST_QUERY_KEYS.some((prefix) =>
-            Array.isArray(q.queryKey)
-              ? String(q.queryKey[0]).startsWith(prefix)
-              : String(q.queryKey).startsWith(prefix)
-          )
-        ),
-      },
-    };
-    return JSON.stringify(filtered);
-  },
-  deserialize: (cachedString) => {
-    try {
-      const parsed = JSON.parse(cachedString);
-      // Safety: clear cache if it somehow contains data that will crash on access
-      // (e.g., Map objects serialized as empty objects)
-      return parsed;
-    } catch (e) {
-      console.error('[Cache] Failed to deserialize cache, clearing:', e);
-      window.localStorage.removeItem('lb-query-cache-v4');
-      return { timestamp: 0, buster: '', clientState: { mutations: [], queries: [] } };
-    }
-  },
-});
+// Surface a single toast when a mutation has exhausted retries. Per product
+// decision ("Only show when something fails") this is the *only* offline
+// signal the user normally sees.
+if (typeof window !== 'undefined') {
+  onMutationFailure((m) => {
+    toast.error("Couldn't sync your last change", {
+      description: 'Tap to retry — your other changes are safe.',
+      duration: 8000,
+    });
+    console.warn('[Offline] mutation failed permanently:', m);
+  });
+}
 
 // Native App Router - Registers deep linking navigation callback and refreshes tokens
 const NativeAppRedirect = () => {
@@ -371,24 +355,23 @@ const CourseRedirect = () => {
   return <Navigate to={`/app/myprograms/${slug}${roundId ? `/${roundId}` : ''}`} replace state={location.state} />;
 };
 
-// Clear old cache key to prevent crash on app update
+// Clear old cache key to prevent crash on app update.
+// Also clear v4 — superseded by IndexedDB cache (rilo-query-cache-v1).
 try { window.localStorage.removeItem('lb-query-cache-v1'); } catch {}
 try { window.localStorage.removeItem('lb-query-cache-v2'); } catch {}
 try { window.localStorage.removeItem('lb-query-cache-v3'); } catch {}
+try { window.localStorage.removeItem('lb-query-cache-v4'); } catch {}
 
 const App = () => (
   <PersistQueryClientProvider
     client={queryClient}
     persistOptions={{
-      persister: localStoragePersister,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      persister: idbPersister,
+      // Keep cached data usable for 7 days offline. Stale data still shows
+      // immediately while a background refetch runs when online.
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       dehydrateOptions: {
-        shouldDehydrateQuery: (query) =>
-          PERSIST_QUERY_KEYS.some((prefix) =>
-            Array.isArray(query.queryKey)
-              ? String(query.queryKey[0]).startsWith(prefix)
-              : String(query.queryKey).startsWith(prefix)
-          ),
+        shouldDehydrateQuery: shouldDehydrateOfflineQuery,
       },
     }}
   >

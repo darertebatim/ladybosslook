@@ -8,6 +8,7 @@ import { useProgramEventNotificationScheduler } from '@/hooks/useProgramEventNot
 import { useSmartActionNudges } from '@/hooks/useSmartActionNudges';
 import { usePeriodNotifications } from '@/hooks/usePeriodNotifications';
 import { useFirebaseUserSync } from '@/hooks/useFirebaseUserSync';
+import { useOfflinePrefetch } from '@/hooks/useOfflinePrefetch';
 import { InstructorWelcomeSheet } from '@/components/instructor/InstructorWelcomeSheet';
 import { InstructorInviteModal } from '@/components/instructor/InstructorInviteModal';
 
@@ -69,6 +70,7 @@ export const DeferredLayoutHooks = ({ userId }: { userId: string | undefined }) 
   useAppInstallTracking(userId);
   useAppsFlyerTracking(userId);
   useFirebaseUserSync(userId);
+  useOfflinePrefetch(userId);
   useLocalNotificationScheduler(userId);
   useSmartActionNudges(userId);
   usePeriodNotifications(userId);
