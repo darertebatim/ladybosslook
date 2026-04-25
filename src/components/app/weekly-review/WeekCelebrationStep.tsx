@@ -4,6 +4,9 @@ import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import confetti from 'canvas-confetti';
 import celebrationImg from '@/assets/weekly-review-celebration.png';
 import { scheduleMidWeekReminder, cancelMidWeekReminder, isMidWeekReminderEnabled } from '@/lib/midWeekReminder';
+import { Share2 } from 'lucide-react';
+import { useShareContent } from '@/hooks/useShareContent';
+import { haptic } from '@/lib/haptics';
 
 interface Props {
   step: OnboardingStep;
@@ -23,6 +26,14 @@ export function WeekCelebrationStep({ step, onNext, answers }: Props) {
     const last = items.pop();
     return `You'll focus on ${items.map(i => i.toLowerCase()).join(', ')} & ${last?.toLowerCase()} this week`;
   }, [answers]);
+
+  const { handleShare } = useShareContent({
+    title: 'My Weekly Review on Rilo',
+    text: summary
+      ? `📅 Just finished my weekly review on Rilo. ${summary}.`
+      : `📅 Just finished my weekly review on Rilo — planning intentional habits for the week ahead.`,
+    source: 'weekly_review',
+  });
 
   useEffect(() => {
     if (firedRef.current) return;
@@ -116,12 +127,21 @@ export function WeekCelebrationStep({ step, onNext, answers }: Props) {
             transition={{ delay: 0.9, duration: 0.4 }}
             className="mt-auto"
           >
-            <button
-              onClick={onNext}
-              className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base active:scale-[0.98] transition-all"
-            >
-              {step.buttonLabel || 'Done'}
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => { haptic.light(); handleShare(); }}
+                className="px-5 py-4 rounded-2xl bg-muted text-foreground font-semibold text-sm active:scale-[0.98] transition-all flex items-center gap-2"
+                aria-label="Share weekly review"
+              >
+                <Share2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={onNext}
+                className="flex-1 py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base active:scale-[0.98] transition-all"
+              >
+                {step.buttonLabel || 'Done'}
+              </button>
+            </div>
           </motion.div>
         </div>
       </div>

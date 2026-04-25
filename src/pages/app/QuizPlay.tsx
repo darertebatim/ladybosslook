@@ -6,6 +6,9 @@ import { Progress } from '@/components/ui/progress';
 import { ChevronLeft, Share2, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { buildShareOneLink, logAppsFlyerEvent } from '@/lib/appsflyer';
+import { haptic } from '@/lib/haptics';
+import { toast } from 'sonner';
 
 interface QuizOption { label: string; emoji?: string; score?: number; }
 interface Question { id: string; question_text: string; type: string; options: QuizOption[]; sort_order: number; }
@@ -111,14 +114,24 @@ export default function QuizPlay() {
 
   async function shareResult() {
     if (!matchedResult || !quiz) return;
-    const text = `I got "${matchedResult.title}" on the ${quiz.title} quiz! Try it yourself on Rilo ✨`;
+    haptic.light();
+    const shareUrl = buildShareOneLink('quiz_result', quiz.slug, matchedResult.title);
+    const fullText = `I got "${matchedResult.title}" on the ${quiz.title} quiz! Try it yourself on Rilo ✨\nGet the app: ${shareUrl}`;
+    try { logAppsFlyerEvent('af_share', { source: 'quiz_result', content_id: quiz.slug }); } catch { /* ignore */ }
     try {
       if (navigator.share) {
-        await navigator.share({ title: quiz.title, text, url: `https://ladybosslook.lovable.app/app/quiz/${slug}` });
+        await navigator.share({ title: quiz.title, text: fullText, url: shareUrl });
       } else {
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(fullText);
+        toast.success('Link copied to clipboard!');
       }
-    } catch {}
+    } catch (err: any) {
+      if (err?.name === 'AbortError') return;
+      try {
+        await navigator.clipboard.writeText(fullText);
+        toast.success('Link copied to clipboard!');
+      } catch { /* ignore */ }
+    }
   }
 
   function retake() {
