@@ -4,6 +4,11 @@ import { useAuth } from './useAuth';
 import { format, startOfMonth, endOfMonth, startOfDay, endOfDay } from 'date-fns';
 import { toast } from 'sonner';
 import { Analytics } from '@/lib/firebaseAnalytics';
+import { runWithOfflineFallback } from '@/lib/offline/runWithOfflineFallback';
+import {
+  WELLNESS_EXECUTOR_TYPES,
+  type CreateEmotionLogPayload,
+} from '@/lib/offline/executors/wellnessExecutors';
 
 export interface MoodLog {
   id: string;
@@ -47,26 +52,56 @@ export function useCreateMoodLog() {
     mutationFn: async ({ mood, content }: CreateMoodLogInput): Promise<MoodLog> => {
       if (!user?.id) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
-        .from('emotion_logs')
-        .insert({
-          user_id: user.id,
-          category: 'mood_checkin',
-          emotion: mood,
-          valence: MOOD_VALENCE_MAP[mood] ?? 'neutral',
-          notes: content ?? null,
-        })
-        .select('id, emotion, notes, created_at')
-        .single();
+      const clientId = crypto.randomUUID();
+      const nowIso = new Date().toISOString();
+      const valence = MOOD_VALENCE_MAP[mood] ?? 'neutral';
 
-      if (error) throw error;
-
-      return {
-        id: data.id,
-        mood: data.emotion,
-        content: data.notes || toDefaultMoodContent(data.emotion),
-        created_at: data.created_at,
+      const payload: CreateEmotionLogPayload = {
+        clientId,
+        userId: user.id,
+        category: 'mood_checkin',
+        emotion: mood,
+        valence,
+        contexts: [],
+        notes: content ?? null,
       };
+
+      const result = await runWithOfflineFallback({
+        type: WELLNESS_EXECUTOR_TYPES.CREATE_EMOTION_LOG,
+        payload,
+        fastPath: async () => {
+          const { data, error } = await supabase
+            .from('emotion_logs')
+            .insert({
+              id: clientId,
+              user_id: user.id,
+              category: 'mood_checkin',
+              emotion: mood,
+              valence,
+              notes: content ?? null,
+            })
+            .select('id, emotion, notes, created_at')
+            .single();
+          if (error) throw error;
+          return data;
+        },
+      });
+
+      // Whether we wrote directly or queued, return a usable MoodLog so the
+      // UI can render the new check-in immediately.
+      return result.data
+        ? {
+            id: result.data.id,
+            mood: result.data.emotion,
+            content: result.data.notes || toDefaultMoodContent(result.data.emotion),
+            created_at: result.data.created_at,
+          }
+        : {
+            id: clientId,
+            mood,
+            content: content || toDefaultMoodContent(mood),
+            created_at: nowIso,
+          };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['mood-logs'] });

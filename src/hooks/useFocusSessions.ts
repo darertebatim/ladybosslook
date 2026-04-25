@@ -4,6 +4,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns';
 import { useAutoCompleteProTask } from './useAutoCompleteProTask';
 import { logEvent } from '@/lib/firebaseAnalytics';
+import { runWithOfflineFallback } from '@/lib/offline/runWithOfflineFallback';
+import {
+  WELLNESS_EXECUTOR_TYPES,
+  type SaveFocusSessionPayload,
+} from '@/lib/offline/executors/wellnessExecutors';
 
 interface SaveSessionParams {
   durationSeconds: number;
@@ -22,16 +27,37 @@ export const useSaveFocusSession = () => {
   return useMutation({
     mutationFn: async (params: SaveSessionParams) => {
       if (!user) throw new Error('Not authenticated');
-      const { error } = await supabase.from('focus_sessions').insert({
-        user_id: user.id,
-        duration_seconds: params.durationSeconds,
-        session_type: params.sessionType,
+      const clientId = crypto.randomUUID();
+      const startedAtIso = (params.startedAt || new Date()).toISOString();
+      const payload: SaveFocusSessionPayload = {
+        clientId,
+        userId: user.id,
+        durationSeconds: params.durationSeconds,
+        sessionType: params.sessionType,
         theme: params.theme || null,
-        pomodoro_rounds: params.pomodoroRounds || null,
+        pomodoroRounds: params.pomodoroRounds || null,
         completed: params.completed,
-        started_at: (params.startedAt || new Date()).toISOString(),
+        startedAt: startedAtIso,
+      };
+
+      await runWithOfflineFallback({
+        type: WELLNESS_EXECUTOR_TYPES.SAVE_FOCUS_SESSION,
+        payload,
+        fastPath: async () => {
+          const { error } = await supabase.from('focus_sessions').insert({
+            id: clientId,
+            user_id: user.id,
+            duration_seconds: params.durationSeconds,
+            session_type: params.sessionType,
+            theme: params.theme || null,
+            pomodoro_rounds: params.pomodoroRounds || null,
+            completed: params.completed,
+            started_at: startedAtIso,
+          });
+          if (error) throw error;
+          return null;
+        },
       });
-      if (error) throw error;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['focus-sessions'] });

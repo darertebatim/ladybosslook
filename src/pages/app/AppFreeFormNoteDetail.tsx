@@ -15,6 +15,12 @@ import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useShareContent } from '@/hooks/useShareContent';
+import { runWithOfflineFallback } from '@/lib/offline/runWithOfflineFallback';
+import {
+  WELLNESS_EXECUTOR_TYPES,
+  type UpdateReflectionPayload,
+  type DeleteReflectionPayload,
+} from '@/lib/offline/executors/wellnessExecutors';
 
 export default function AppFreeFormNoteDetail() {
   const { noteId } = useParams<{ noteId: string }>();
@@ -51,11 +57,26 @@ export default function AppFreeFormNoteDetail() {
 
   const updateMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from('free_form_reflections' as any)
-        .update({ title: editTitle.trim(), content: editContent.trim() } as any)
-        .eq('id', noteId!);
-      if (error) throw error;
+      if (!user?.id || !noteId) throw new Error('Not authenticated');
+      const payload: UpdateReflectionPayload = {
+        userId: user.id,
+        id: noteId,
+        title: editTitle.trim(),
+        content: editContent.trim(),
+      };
+      await runWithOfflineFallback({
+        type: WELLNESS_EXECUTOR_TYPES.UPDATE_REFLECTION,
+        payload,
+        fastPath: async () => {
+          const { error } = await supabase
+            .from('free_form_reflections' as any)
+            .update({ title: editTitle.trim(), content: editContent.trim() } as any)
+            .eq('id', noteId)
+            .eq('user_id', user.id);
+          if (error) throw error;
+          return null;
+        },
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['free-form-note', noteId] });
@@ -68,11 +89,21 @@ export default function AppFreeFormNoteDetail() {
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from('free_form_reflections' as any)
-        .delete()
-        .eq('id', noteId!);
-      if (error) throw error;
+      if (!user?.id || !noteId) throw new Error('Not authenticated');
+      const payload: DeleteReflectionPayload = { userId: user.id, id: noteId };
+      await runWithOfflineFallback({
+        type: WELLNESS_EXECUTOR_TYPES.DELETE_REFLECTION,
+        payload,
+        fastPath: async () => {
+          const { error } = await supabase
+            .from('free_form_reflections' as any)
+            .delete()
+            .eq('id', noteId)
+            .eq('user_id', user.id);
+          if (error) throw error;
+          return null;
+        },
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reflection-notes'] });

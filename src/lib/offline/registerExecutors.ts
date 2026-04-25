@@ -9,6 +9,7 @@
  * `executors/`, export a `register*Executors()` fn, and call it from here.
  */
 import { registerTaskExecutors } from './executors/taskCompletionExecutors';
+import { registerWellnessExecutors } from './executors/wellnessExecutors';
 
 let registered = false;
 
@@ -16,4 +17,5 @@ export function registerAllOfflineExecutors(): void {
   if (registered) return;
   registered = true;
   registerTaskExecutors();
+  registerWellnessExecutors();
 }
