@@ -238,7 +238,8 @@ export const useAllActiveTasks = () => {
     },
     enabled: !!user?.id,
     staleTime: 1000 * 60 * 5, // 5 minutes - tasks rarely change
-    gcTime: 1000 * 60 * 30, // Keep in cache for 30 min
+    // No gcTime override — inherit the 7-day default so the IndexedDB
+    // persister can rehydrate this query offline after app restart.
   });
 };
 
