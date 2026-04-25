@@ -21,7 +21,8 @@ import { AdminLayout } from "@/layouts/AdminLayout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { idbPersister, shouldDehydrateOfflineQuery, clearOfflineQueryCache } from "@/lib/offline/idbPersister";
-import { initOfflineMutationQueue, onMutationFailure } from "@/lib/offline/offlineMutationQueue";
+import { initOfflineMutationQueue, onMutationFailure, retryFailedMutations } from "@/lib/offline/offlineMutationQueue";
+import { registerAllOfflineExecutors } from "@/lib/offline/registerExecutors";
 import { toast } from "sonner";
 
 // Page loading fallback - minimal for fast render
@@ -261,7 +262,9 @@ const queryClient = new QueryClient({
 // Offline cache + mutation queue (Phase 1+2 of offline-first architecture).
 // Cache lives in IndexedDB via `idbPersister` (allowlist of keys defined in
 // src/lib/offline/idbPersister.ts). Mutations queued via offlineMutationQueue
-// are wired in Phase 4 — initialised here so the drain loop is always ready.
+// have their executors registered up-front so the drain loop can run any
+// queued writes left over from a previous session as soon as we go online.
+registerAllOfflineExecutors();
 initOfflineMutationQueue();
 
 // Surface a single toast when a mutation has exhausted retries. Per product
@@ -270,8 +273,12 @@ initOfflineMutationQueue();
 if (typeof window !== 'undefined') {
   onMutationFailure((m) => {
     toast.error("Couldn't sync your last change", {
-      description: 'Tap to retry — your other changes are safe.',
+      description: 'Your other changes are safe.',
       duration: 8000,
+      action: {
+        label: 'Retry',
+        onClick: () => { void retryFailedMutations(); },
+      },
     });
     console.warn('[Offline] mutation failed permanently:', m);
   });
