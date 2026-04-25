@@ -20,31 +20,49 @@ import { toast } from 'sonner';
 export function OfflineStatusBar() {
   const { isOnline } = useNetworkStatus();
   const [pendingCount, setPendingCount] = useState(0);
-  const prevPendingRef = useRef(0);
-  const wasOfflineRef = useRef(!isOnline);
+  const prevQueueRef = useRef<QueuedMutation[]>([]);
+  const isOnlineRef = useRef(isOnline);
 
-  // Track queue size for "syncing N…" pill + "Synced N" toast on drain.
+  // Mirror isOnline so the queue-change listener (with a stale closure)
+  // can read the freshest value without re-subscribing on every flip.
+  useEffect(() => {
+    isOnlineRef.current = isOnline;
+  }, [isOnline]);
+
+  // Track queue for "syncing N…" pill + a "Synced N" toast on real drain.
+  // Only fire the toast when items truly *succeeded* (i.e. they are gone
+  // from the queue), not when they merely transitioned to `failed`.
   useEffect(() => {
     const unsub = onQueueChange((q: QueuedMutation[]) => {
+      const prev = prevQueueRef.current;
       const pending = q.filter((m) => m.status !== 'failed').length;
-      const prev = prevPendingRef.current;
-      // Toast only when we drop to 0 from >0 AND we are online
-      if (prev > 0 && pending === 0 && isOnlineRef.current) {
-        toast.success(`Synced ${prev} change${prev === 1 ? '' : 's'}`, { duration: 2200 });
+      const prevPending = prev.filter((m) => m.status !== 'failed').length;
+
+      // Detect real successes: items that were in the previous snapshot but
+      // are no longer in the new snapshot at all (they got removed after the
+      // server confirmed the write).
+      const newIds = new Set(q.map((m) => m.id));
+      const successfullyDrained = prev.filter(
+        (m) => m.status !== 'failed' && !newIds.has(m.id),
+      ).length;
+
+      if (
+        successfullyDrained > 0 &&
+        pending === 0 &&
+        prevPending > 0 &&
+        isOnlineRef.current
+      ) {
+        toast.success(
+          `Synced ${successfullyDrained} change${successfullyDrained === 1 ? '' : 's'}`,
+          { duration: 2200 },
+        );
       }
-      prevPendingRef.current = pending;
+
+      prevQueueRef.current = q;
       setPendingCount(pending);
     });
     return unsub;
   }, []);
-
-  // Mirror isOnline into a ref so the queue listener (which has stale closure)
-  // can read fresh value without re-subscribing.
-  const isOnlineRef = useRef(isOnline);
-  useEffect(() => {
-    isOnlineRef.current = isOnline;
-    if (!isOnline) wasOfflineRef.current = true;
-  }, [isOnline]);
 
   // Decide what to render
   const showOffline = !isOnline;
