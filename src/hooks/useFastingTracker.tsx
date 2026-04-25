@@ -216,85 +216,134 @@ export function useFastingTracker() {
   const startFast = useCallback(async () => {
     if (!user) return;
     haptic.medium();
-    const { data, error } = await supabase
-      .from('fasting_sessions' as any)
-      .insert({
-        user_id: user.id,
-        protocol: state.selectedProtocol,
-        fasting_hours: state.selectedFastingHours,
-        started_at: new Date().toISOString(),
-      } as any)
-      .select()
-      .single();
+    const clientId = genClientId();
+    const startedAt = new Date().toISOString();
+    const optimistic: FastingSession = {
+      id: clientId,
+      protocol: state.selectedProtocol,
+      fasting_hours: state.selectedFastingHours,
+      started_at: startedAt,
+      ended_at: null,
+      created_at: startedAt,
+    };
+    // Optimistic UI
+    setState(prev => ({
+      ...prev,
+      activeSession: optimistic,
+      mode: 'fasting',
+      eatingElapsedSeconds: 0,
+      eatingTotalSeconds: 0,
+      eatingEndTime: null,
+      lastEndedSession: null,
+    }));
 
-    if (!error && data) {
-      setState(prev => ({
-        ...prev,
-        activeSession: data as any,
-        mode: 'fasting',
-        eatingElapsedSeconds: 0,
-        eatingTotalSeconds: 0,
-        eatingEndTime: null,
-        lastEndedSession: null,
-      }));
-    }
+    await runWithOfflineFallback({
+      type: WELLNESS_EXECUTOR_TYPES.START_FASTING_SESSION,
+      payload: {
+        clientId,
+        userId: user.id,
+        protocol: state.selectedProtocol,
+        fastingHours: state.selectedFastingHours,
+        startedAt,
+      },
+      fastPath: async () => {
+        const { error } = await supabase
+          .from('fasting_sessions' as any)
+          .insert({
+            id: clientId,
+            user_id: user.id,
+            protocol: state.selectedProtocol,
+            fasting_hours: state.selectedFastingHours,
+            started_at: startedAt,
+          } as any);
+        if (error && (error as any).code !== '23505') throw error;
+      },
+    });
   }, [user, state.selectedProtocol, state.selectedFastingHours]);
 
   const endFast = useCallback(async () => {
     if (!user || !state.activeSession) return;
     haptic.success();
     const endedAt = new Date().toISOString();
-    const { error } = await supabase
-      .from('fasting_sessions' as any)
-      .update({ ended_at: endedAt } as any)
-      .eq('id', state.activeSession.id);
+    const ended = { ...state.activeSession, ended_at: endedAt };
+    const eating = computeEatingWindow(ended);
 
-    if (!error) {
-      const ended = { ...state.activeSession, ended_at: endedAt };
-      
-      // Compute eating window for the just-ended session
-      const eating = computeEatingWindow(ended);
-      
-      setState(prev => ({
-        ...prev,
-        activeSession: null,
-        elapsedSeconds: 0,
-        progress: 0,
-        currentZone: getCurrentZone(0),
-        pastSessions: [ended, ...prev.pastSessions],
-        mode: eating.mode,
-        eatingElapsedSeconds: eating.eatingElapsed,
-        eatingTotalSeconds: eating.eatingTotal,
-        eatingEndTime: eating.eatingEnd,
-        lastEndedSession: eating.mode === 'eating' ? ended : null,
-      }));
-      return ended;
-    }
-    return null;
+    // Optimistic UI immediately
+    setState(prev => ({
+      ...prev,
+      activeSession: null,
+      elapsedSeconds: 0,
+      progress: 0,
+      currentZone: getCurrentZone(0),
+      pastSessions: [ended, ...prev.pastSessions],
+      mode: eating.mode,
+      eatingElapsedSeconds: eating.eatingElapsed,
+      eatingTotalSeconds: eating.eatingTotal,
+      eatingEndTime: eating.eatingEnd,
+      lastEndedSession: eating.mode === 'eating' ? ended : null,
+    }));
+
+    await runWithOfflineFallback({
+      type: WELLNESS_EXECUTOR_TYPES.END_FASTING_SESSION,
+      payload: {
+        userId: user.id,
+        sessionId: state.activeSession.id,
+        endedAt,
+      },
+      fastPath: async () => {
+        const { error } = await supabase
+          .from('fasting_sessions' as any)
+          .update({ ended_at: endedAt } as any)
+          .eq('id', state.activeSession!.id);
+        if (error) throw error;
+      },
+    });
+    return ended;
   }, [user, state.activeSession, computeEatingWindow]);
 
   const deleteFast = useCallback(async (sessionId: string) => {
     if (!user) return;
-    await supabase.from('fasting_sessions' as any).delete().eq('id', sessionId);
     setState(prev => ({
       ...prev,
       pastSessions: prev.pastSessions.filter(s => s.id !== sessionId),
     }));
+    await runWithOfflineFallback({
+      type: WELLNESS_EXECUTOR_TYPES.DELETE_FASTING_SESSION,
+      payload: { userId: user.id, sessionId },
+      fastPath: async () => {
+        const { error } = await supabase
+          .from('fasting_sessions' as any)
+          .delete()
+          .eq('id', sessionId);
+        if (error) throw error;
+      },
+    });
   }, [user]);
 
   const updateActiveSession = useCallback(async (updates: { started_at?: string; fasting_hours?: number }) => {
     if (!user || !state.activeSession) return;
-    const { error } = await supabase
-      .from('fasting_sessions' as any)
-      .update(updates as any)
-      .eq('id', state.activeSession.id);
-    if (!error) {
-      haptic.success();
-      setState(prev => ({
-        ...prev,
-        activeSession: prev.activeSession ? { ...prev.activeSession, ...updates } : null,
-      }));
-    }
+    haptic.success();
+    const sessionId = state.activeSession.id;
+    setState(prev => ({
+      ...prev,
+      activeSession: prev.activeSession ? { ...prev.activeSession, ...updates } : null,
+    }));
+    await runWithOfflineFallback({
+      type: WELLNESS_EXECUTOR_TYPES.UPDATE_FASTING_SESSION,
+      payload: {
+        userId: user.id,
+        sessionId,
+        startedAt: updates.started_at,
+        fastingHours: updates.fasting_hours,
+      },
+      fastPath: async () => {
+        const { error } = await supabase
+          .from('fasting_sessions' as any)
+          .update(updates as any)
+          .eq('id', sessionId);
+        if (error) throw error;
+      },
+    });
   }, [user, state.activeSession]);
 
   const setProtocol = useCallback(async (protocolId: string) => {
