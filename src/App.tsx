@@ -3,7 +3,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/hooks/useAuth";
@@ -21,6 +20,9 @@ import { AppProvidersLayout } from "@/layouts/AppProvidersLayout";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { idbPersister, shouldDehydrateOfflineQuery, clearOfflineQueryCache } from "@/lib/offline/idbPersister";
+import { initOfflineMutationQueue, onMutationFailure } from "@/lib/offline/offlineMutationQueue";
+import { toast } from "sonner";
 
 // Page loading fallback - minimal for fast render
 const PageLoader = () => (
