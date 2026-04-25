@@ -67,6 +67,10 @@ export function useReflections() {
       if (error) throw error;
       return data as unknown as Reflection[];
     },
+    // Always refetch on mount so a stale/empty IDB snapshot doesn't keep
+    // the page blank when the user is back online.
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 }
 

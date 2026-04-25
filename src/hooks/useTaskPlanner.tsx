@@ -407,7 +407,14 @@ export const useCompletionsForDate = (date: Date) => {
       };
     },
     enabled: !!user?.id,
-    staleTime: 1000 * 30, // 30 seconds - completions change more often
+    // Always refetch on mount so the UI reconciles with the server after
+    // app cold-start. Cached data still renders instantly via the IDB
+    // persister; this just guarantees the UI catches up if the persisted
+    // snapshot was older than the actual server state (e.g. after writes
+    // from another device, or after our optimistic update was overwritten
+    // by a stale rehydrate).
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 };
 
