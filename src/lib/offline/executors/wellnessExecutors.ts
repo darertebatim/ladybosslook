@@ -72,6 +72,32 @@ export interface SaveBreathingSessionPayload {
   durationSeconds: number;
 }
 
+export interface StartFastingSessionPayload {
+  clientId: string;
+  userId: string;
+  protocol: string;
+  fastingHours: number;
+  startedAt: string; // ISO
+}
+
+export interface EndFastingSessionPayload {
+  userId: string;
+  sessionId: string;
+  endedAt: string; // ISO
+}
+
+export interface UpdateFastingSessionPayload {
+  userId: string;
+  sessionId: string;
+  startedAt?: string;
+  fastingHours?: number;
+}
+
+export interface DeleteFastingSessionPayload {
+  userId: string;
+  sessionId: string;
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -168,6 +194,50 @@ async function execSaveBreathingSession(p: SaveBreathingSessionPayload): Promise
   if (error && !isDuplicate(error)) throw error;
 }
 
+async function execStartFastingSession(p: StartFastingSessionPayload): Promise<void> {
+  const { error } = await supabase
+    .from('fasting_sessions' as any)
+    .insert({
+      id: p.clientId,
+      user_id: p.userId,
+      protocol: p.protocol,
+      fasting_hours: p.fastingHours,
+      started_at: p.startedAt,
+    } as any);
+  if (error && !isDuplicate(error)) throw error;
+}
+
+async function execEndFastingSession(p: EndFastingSessionPayload): Promise<void> {
+  const { error } = await supabase
+    .from('fasting_sessions' as any)
+    .update({ ended_at: p.endedAt } as any)
+    .eq('id', p.sessionId)
+    .eq('user_id', p.userId);
+  if (error) throw error;
+}
+
+async function execUpdateFastingSession(p: UpdateFastingSessionPayload): Promise<void> {
+  const updates: Record<string, unknown> = {};
+  if (p.startedAt) updates.started_at = p.startedAt;
+  if (typeof p.fastingHours === 'number') updates.fasting_hours = p.fastingHours;
+  if (Object.keys(updates).length === 0) return;
+  const { error } = await supabase
+    .from('fasting_sessions' as any)
+    .update(updates as any)
+    .eq('id', p.sessionId)
+    .eq('user_id', p.userId);
+  if (error) throw error;
+}
+
+async function execDeleteFastingSession(p: DeleteFastingSessionPayload): Promise<void> {
+  const { error } = await supabase
+    .from('fasting_sessions' as any)
+    .delete()
+    .eq('id', p.sessionId)
+    .eq('user_id', p.userId);
+  if (error) throw error;
+}
+
 // ---------------------------------------------------------------------------
 // Type keys + registration
 // ---------------------------------------------------------------------------
@@ -180,6 +250,10 @@ export const WELLNESS_EXECUTOR_TYPES = {
   DELETE_REFLECTION: 'reflection.delete',
   SAVE_FOCUS_SESSION: 'focus.save',
   SAVE_BREATHING_SESSION: 'breathing.save',
+  START_FASTING_SESSION: 'fasting.start',
+  END_FASTING_SESSION: 'fasting.end',
+  UPDATE_FASTING_SESSION: 'fasting.update',
+  DELETE_FASTING_SESSION: 'fasting.delete',
 } as const;
 
 export function registerWellnessExecutors(): void {
@@ -190,4 +264,8 @@ export function registerWellnessExecutors(): void {
   registerExecutor<DeleteReflectionPayload>(WELLNESS_EXECUTOR_TYPES.DELETE_REFLECTION, execDeleteReflection);
   registerExecutor<SaveFocusSessionPayload>(WELLNESS_EXECUTOR_TYPES.SAVE_FOCUS_SESSION, execSaveFocusSession);
   registerExecutor<SaveBreathingSessionPayload>(WELLNESS_EXECUTOR_TYPES.SAVE_BREATHING_SESSION, execSaveBreathingSession);
+  registerExecutor<StartFastingSessionPayload>(WELLNESS_EXECUTOR_TYPES.START_FASTING_SESSION, execStartFastingSession);
+  registerExecutor<EndFastingSessionPayload>(WELLNESS_EXECUTOR_TYPES.END_FASTING_SESSION, execEndFastingSession);
+  registerExecutor<UpdateFastingSessionPayload>(WELLNESS_EXECUTOR_TYPES.UPDATE_FASTING_SESSION, execUpdateFastingSession);
+  registerExecutor<DeleteFastingSessionPayload>(WELLNESS_EXECUTOR_TYPES.DELETE_FASTING_SESSION, execDeleteFastingSession);
 }
