@@ -78,8 +78,11 @@ export function OfflineStatusBar() {
 
   return (
     <div
-      className="fixed left-0 right-0 z-[60] flex justify-center pointer-events-none"
-      style={{ top: 'calc(env(safe-area-inset-top, 0px) + 6px)' }}
+      className="fixed left-0 right-0 z-[55] flex justify-center pointer-events-none"
+      // Sit just above the bottom tab bar (≈48px content + safe-area) so it
+      // never collides with page headers (Home, Profile, etc.) which already
+      // own the top of the viewport.
+      style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 64px)' }}
       aria-live="polite"
     >
       <div
