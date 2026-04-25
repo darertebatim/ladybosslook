@@ -347,24 +347,23 @@ const CourseRedirect = () => {
   return <Navigate to={`/app/myprograms/${slug}${roundId ? `/${roundId}` : ''}`} replace state={location.state} />;
 };
 
-// Clear old cache key to prevent crash on app update
+// Clear old cache key to prevent crash on app update.
+// Also clear v4 — superseded by IndexedDB cache (rilo-query-cache-v1).
 try { window.localStorage.removeItem('lb-query-cache-v1'); } catch {}
 try { window.localStorage.removeItem('lb-query-cache-v2'); } catch {}
 try { window.localStorage.removeItem('lb-query-cache-v3'); } catch {}
+try { window.localStorage.removeItem('lb-query-cache-v4'); } catch {}
 
 const App = () => (
   <PersistQueryClientProvider
     client={queryClient}
     persistOptions={{
-      persister: localStoragePersister,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      persister: idbPersister,
+      // Keep cached data usable for 7 days offline. Stale data still shows
+      // immediately while a background refetch runs when online.
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       dehydrateOptions: {
-        shouldDehydrateQuery: (query) =>
-          PERSIST_QUERY_KEYS.some((prefix) =>
-            Array.isArray(query.queryKey)
-              ? String(query.queryKey[0]).startsWith(prefix)
-              : String(query.queryKey).startsWith(prefix)
-          ),
+        shouldDehydrateQuery: shouldDehydrateOfflineQuery,
       },
     }}
   >
