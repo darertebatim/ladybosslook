@@ -51,6 +51,27 @@ export function buildPackageOneLink(instructorSlug: string, packageSlug: string)
   return `${ONELINK_BASE_URL}?${params.toString()}`;
 }
 
+/**
+ * Build a OneLink URL for in-app user sharing.
+ * `pid=user_share` segments organic-user shares away from instructor referrals
+ * in the AppsFlyer dashboard. `c=<source>` reveals which surface drove the install
+ * (routine_completion, audio_player, gold_streak, etc).
+ */
+export function buildShareOneLink(
+  source: string,
+  contentId?: string,
+  contentTitle?: string,
+): string {
+  const params = new URLSearchParams({
+    af_xp: 'custom',
+    pid: 'user_share',
+    c: source,
+  });
+  if (contentId) params.set('af_sub1', contentId);
+  if (contentTitle) params.set('af_sub2', contentTitle.substring(0, 40));
+  return `${ONELINK_BASE_URL}?${params.toString()}`;
+}
+
 const ATTRIBUTION_STORAGE_KEY = 'rilo_appsflyer_attribution';
 const ATTRIBUTION_PROCESSED_KEY = 'rilo_appsflyer_attribution_processed';
 
