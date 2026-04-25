@@ -205,6 +205,13 @@ class ChunkLoadErrorBoundary extends React.Component<
 
     if (!isChunkLoadError) return;
 
+    // If the device is offline, do NOT auto-reload — the reload will fail and
+    // leave the user staring at a white screen. Show the friendly fallback UI
+    // instead so they can tap Reload once they're back online.
+    if (typeof navigator !== "undefined" && navigator.onLine === false) {
+      return;
+    }
+
     // Avoid infinite reload loops.
     const key = "__chunk_reload_ts__";
     const last = Number(sessionStorage.getItem(key) || "0");
@@ -218,15 +225,26 @@ class ChunkLoadErrorBoundary extends React.Component<
   render() {
     if (!this.state.error) return this.props.children;
 
+    const isOffline = typeof navigator !== "undefined" && navigator.onLine === false;
+
     return (
       <div className="flex items-center justify-center min-h-screen bg-background p-6">
         <div className="max-w-md w-full space-y-3 text-center">
-          <h1 className="text-xl font-semibold">App needs a refresh</h1>
+          <h1 className="text-xl font-semibold">
+            {isOffline ? "You're offline" : "App needs a refresh"}
+          </h1>
           <p className="text-sm text-muted-foreground">
-            We couldn’t load a required file (usually after an update). Please reload.
+            {isOffline
+              ? "We couldn't load part of the app while offline. Reconnect and tap Reload."
+              : "We couldn't load a required file (usually after an update). Please reload."}
           </p>
           <div className="flex justify-center">
-            <Button onClick={() => window.location.reload()}>
+            <Button
+              onClick={() => {
+                this.setState({ error: null });
+                window.location.reload();
+              }}
+            >
               Reload
             </Button>
           </div>
