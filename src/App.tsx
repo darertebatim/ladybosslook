@@ -250,50 +250,24 @@ const queryClient = new QueryClient({
   },
 });
 
-// Persist React Query cache to localStorage — survives app restarts
-// Only keys matching these prefixes are stored (avoids storing real-time / sensitive data)
-const PERSIST_QUERY_KEYS = [
-  'player-data',
-  'routines-bank',
-  'routine-categories',
-  'new-home-data',
-  'courses-data',
-  'planner-all-tasks',
-];
+// Offline cache + mutation queue (Phase 1+2 of offline-first architecture).
+// Cache lives in IndexedDB via `idbPersister` (allowlist of keys defined in
+// src/lib/offline/idbPersister.ts). Mutations queued via offlineMutationQueue
+// are wired in Phase 4 — initialised here so the drain loop is always ready.
+initOfflineMutationQueue();
 
-const localStoragePersister = createSyncStoragePersister({
-  storage: window.localStorage,
-  key: 'lb-query-cache-v4',
-  // Only persist queries whose key starts with one of the allowed prefixes
-  serialize: (client) => {
-    const filtered = {
-      ...client,
-      clientState: {
-        ...client.clientState,
-        queries: client.clientState.queries.filter((q) =>
-          PERSIST_QUERY_KEYS.some((prefix) =>
-            Array.isArray(q.queryKey)
-              ? String(q.queryKey[0]).startsWith(prefix)
-              : String(q.queryKey).startsWith(prefix)
-          )
-        ),
-      },
-    };
-    return JSON.stringify(filtered);
-  },
-  deserialize: (cachedString) => {
-    try {
-      const parsed = JSON.parse(cachedString);
-      // Safety: clear cache if it somehow contains data that will crash on access
-      // (e.g., Map objects serialized as empty objects)
-      return parsed;
-    } catch (e) {
-      console.error('[Cache] Failed to deserialize cache, clearing:', e);
-      window.localStorage.removeItem('lb-query-cache-v4');
-      return { timestamp: 0, buster: '', clientState: { mutations: [], queries: [] } };
-    }
-  },
-});
+// Surface a single toast when a mutation has exhausted retries. Per product
+// decision ("Only show when something fails") this is the *only* offline
+// signal the user normally sees.
+if (typeof window !== 'undefined') {
+  onMutationFailure((m) => {
+    toast.error("Couldn't sync your last change", {
+      description: 'Tap to retry — your other changes are safe.',
+      duration: 8000,
+    });
+    console.warn('[Offline] mutation failed permanently:', m);
+  });
+}
 
 // Native App Router - Registers deep linking navigation callback and refreshes tokens
 const NativeAppRedirect = () => {
