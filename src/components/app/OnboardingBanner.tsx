@@ -13,12 +13,15 @@ const ONBOARDING_DISMISSED_KEY = 'simora_onboarding_banner_dismissed';
 export function OnboardingBanner() {
   const navigate = useNavigate();
   const isCompleted = localStorage.getItem(ONBOARDING_COMPLETED_KEY) === 'true';
-  const { data: disabledMap = {} } = useSpecialBannerSettings();
-  const isAdminDisabled = disabledMap['OnboardingBanner'] === true;
+  const { data: disabledMap, isLoading } = useSpecialBannerSettings();
+  const isAdminDisabled = disabledMap?.['OnboardingBanner'] === true;
   const [isDismissed, setIsDismissed] = useState(
     () => localStorage.getItem(ONBOARDING_DISMISSED_KEY) === 'true'
   );
 
+  // Wait until the admin disabled-flag has loaded so we don't briefly
+  // render a banner that's been turned off.
+  if (isLoading) return null;
   if (isCompleted || isDismissed || isAdminDisabled) return null;
 
   const handleTap = () => {

@@ -17,13 +17,15 @@ interface SelfCareQuizBannerProps {
 export function SelfCareQuizBanner({ className, onVisibilityChange }: SelfCareQuizBannerProps) {
   const navigate = useNavigate();
   const isCompleted = localStorage.getItem(SELFCARE_QUIZ_COMPLETED_KEY) === 'true';
-  const { data: disabledMap = {} } = useSpecialBannerSettings();
-  const isAdminDisabled = disabledMap['SelfCareQuizBanner'] === true;
+  const { data: disabledMap, isLoading } = useSpecialBannerSettings();
+  const isAdminDisabled = disabledMap?.['SelfCareQuizBanner'] === true;
   const [isDismissed, setIsDismissed] = useState(
     () => localStorage.getItem(SELFCARE_QUIZ_DISMISSED_KEY) === 'true'
   );
 
-  const isVisible = !isCompleted && !isDismissed && !isAdminDisabled;
+  // Hide while we're still resolving the admin disable flag — prevents a
+  // flash of a banner the admin has switched off.
+  const isVisible = !isLoading && !isCompleted && !isDismissed && !isAdminDisabled;
 
   useEffect(() => {
     onVisibilityChange?.(isVisible);
