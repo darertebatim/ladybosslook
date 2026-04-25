@@ -127,6 +127,7 @@ export default function AppFreeFormReflection() {
         content: contentForSave,
         mood: mood || null,
       };
+      const nowIso = new Date().toISOString();
       await runWithOfflineFallback({
         type: WELLNESS_EXECUTOR_TYPES.CREATE_REFLECTION,
         payload,
@@ -144,12 +145,62 @@ export default function AppFreeFormReflection() {
           return null;
         },
       });
+
+      // Optimistically inject this note into all reflection-notes caches so it
+      // appears in the list instantly — even fully offline. The list query
+      // re-reads from the cache via placeholderData, so any mutation here is
+      // reflected on next render.
+      const optimisticNote = {
+        id: clientId,
+        type: 'free' as const,
+        title: finalTitle,
+        cover: null,
+        completed_at: nowIso,
+        preview: contentForSave || null,
+        mood: mood || null,
+      };
+      queryClient.setQueriesData<any[]>({ queryKey: ['reflection-notes'] }, (prev) => {
+        if (!Array.isArray(prev)) return [optimisticNote];
+        // Avoid duplicates if we somehow saved twice
+        if (prev.some((n) => n.id === clientId)) return prev;
+        return [optimisticNote, ...prev];
+      });
+      queryClient.setQueriesData<any[]>({ queryKey: ['journal-entries'] }, (prev) => {
+        if (!Array.isArray(prev)) return prev;
+        if (prev.some((n: any) => n.id === clientId)) return prev;
+        return [
+          {
+            id: clientId,
+            user_id: user.id,
+            title: finalTitle,
+            content: contentForSave,
+            mood: mood || null,
+            shared_with_admin: null,
+            shared_at: null,
+            created_at: nowIso,
+            updated_at: nowIso,
+          },
+          ...prev,
+        ];
+      });
     },
-    onSuccess: async () => {
+    onSuccess: () => {
+      // Show celebration immediately — saving the note is the success path.
+      setShowCelebration(true);
+
+      // Fire-and-forget: refresh from server when online, and try to mark any
+      // linked "journal" pro-task as complete. Neither of these can block
+      // the success UI (critical for offline mode where they would hang).
       queryClient.invalidateQueries({ queryKey: ['reflection-notes'] });
       queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
-      await autoCompleteJournal();
-      setShowCelebration(true);
+      void (async () => {
+        try {
+          await autoCompleteJournal();
+        } catch (err) {
+          // Non-fatal: pro-task completion will catch up next time we're online.
+          console.warn('[Reflection] autoCompleteJournal deferred:', err);
+        }
+      })();
     },
     onError: (e: any) => toast.error(e.message || 'Failed to save'),
   });
