@@ -265,6 +265,7 @@ export function useFastingTracker() {
     if (!user || !state.activeSession) return;
     haptic.success();
     const endedAt = new Date().toISOString();
+    const sessionId = state.activeSession.id;
     const ended = { ...state.activeSession, ended_at: endedAt };
     const eating = computeEatingWindow(ended);
 
@@ -287,14 +288,14 @@ export function useFastingTracker() {
       type: WELLNESS_EXECUTOR_TYPES.END_FASTING_SESSION,
       payload: {
         userId: user.id,
-        sessionId: state.activeSession.id,
+        sessionId,
         endedAt,
       },
       fastPath: async () => {
         const { error } = await supabase
           .from('fasting_sessions' as any)
           .update({ ended_at: endedAt } as any)
-          .eq('id', state.activeSession!.id);
+          .eq('id', sessionId);
         if (error) throw error;
       },
     });
