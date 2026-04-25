@@ -25,6 +25,7 @@ import { format, startOfMonth } from 'date-fns';
 import { useJournalEntries, JournalEntry } from '@/hooks/useJournal';
 import { cn } from '@/lib/utils';
 import { SubscriptionCard } from '@/components/app/SubscriptionManagement';
+import { SyncStatusCard } from '@/components/app/SyncStatusCard';
 
 // Stats Pill Component
 const StatPill = ({ label, value, icon: Icon }: { label: string; value: number | string; icon?: React.ComponentType<{ className?: string }> }) => (
