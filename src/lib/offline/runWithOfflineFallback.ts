@@ -45,17 +45,31 @@ export async function runWithOfflineFallback<TPayload, TData>(opts: {
   payload: TPayload;
   /** The direct write — only called when online. */
   fastPath: () => Promise<TData>;
+  /** Safety timeout in ms before treating the call as offline. Default 8s. */
+  timeoutMs?: number;
 }): Promise<OfflineFallbackResult<TData>> {
   if (!getIsOnline()) {
     await enqueueMutation(opts.type, opts.payload);
     return { queued: true, data: null };
   }
 
+  const timeoutMs = opts.timeoutMs ?? 8000;
+
   try {
-    const data = await opts.fastPath();
+    // Race the write against a timeout — on iOS in airplane mode the
+    // network plugin can briefly still report "online" and supabase-js
+    // can hang without throwing. After timeoutMs we treat it as offline
+    // and queue, so the UI doesn't get stuck on a pending button.
+    const data = await Promise.race<TData>([
+      opts.fastPath(),
+      new Promise<TData>((_, reject) =>
+        setTimeout(() => reject(new Error('offline-fallback-timeout')), timeoutMs)
+      ),
+    ]);
     return { queued: false, data };
   } catch (err) {
-    if (isNetworkError(err)) {
+    const timedOut = err instanceof Error && err.message === 'offline-fallback-timeout';
+    if (timedOut || isNetworkError(err)) {
       await enqueueMutation(opts.type, opts.payload);
       return { queued: true, data: null };
     }
