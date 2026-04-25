@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Wind, BarChart3 } from 'lucide-react';
+import { Wind, BarChart3, Share2 } from 'lucide-react';
 import { SEOHead } from '@/components/SEOHead';
 import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
 import { 
@@ -20,6 +20,7 @@ import { useRoutinePlan, useAddRoutinePlan } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
+import { useShareContent } from '@/hooks/useShareContent';
 
 export default function AppBreathe() {
   const navigate = useNavigate();
@@ -35,6 +36,12 @@ export default function AppBreathe() {
   const { data: existingTask } = useExistingProTask('breathe', null, true);
   const addRoutinePlan = useAddRoutinePlan();
   const isAdded = !!(existingTask || justAdded);
+
+  const { handleShare } = useShareContent({
+    title: 'Breathe on Rilo',
+    text: `🌬️ My favorite calm-down tool — guided breathing exercises on Rilo.`,
+    source: 'breathe_tool',
+  });
 
   const FALLBACK_BREATHING_TASKS: RoutinePlanTask[] = useMemo(() => [{
     id: 'breathe-task-1',
@@ -150,6 +157,13 @@ export default function AppBreathe() {
                 className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
               >
                 <BarChart3 className="h-4 w-4 text-foreground" />
+              </button>
+              <button
+                onClick={() => { haptic.light(); handleShare(); }}
+                className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
+                aria-label="Share breathe"
+              >
+                <Share2 className="h-4 w-4 text-foreground" />
               </button>
               {startTour && <TourHelpButton onClick={startTour} />}
             </div>
