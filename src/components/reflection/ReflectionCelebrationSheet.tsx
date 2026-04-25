@@ -5,6 +5,8 @@ import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
+import { Share2 } from 'lucide-react';
+import { useShareContent } from '@/hooks/useShareContent';
 
 import academyImg from '@/assets/reflection-card-academy.png';
 import listenImg from '@/assets/reflection-card-listen.png';
@@ -30,6 +32,12 @@ export function ReflectionCelebrationSheet({
   onDone,
 }: ReflectionCelebrationSheetProps) {
   const navigate = useNavigate();
+
+  const { handleShare } = useShareContent({
+    title: 'I just reflected on Rilo 💭',
+    text: 'Took a moment to reflect today. Small habits, big momentum.',
+    source: 'reflection_complete',
+  });
 
   let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
   try { routinePlayer = useRoutinePlayerContext(); } catch { /* provider not available */ }
@@ -112,13 +120,23 @@ export function ReflectionCelebrationSheet({
         </div>
 
         {/* Bottom CTA */}
-        <Button
-          variant="ghost"
-          onClick={handleDone}
-          className="w-full h-11 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
-        >
-          {hasActivePlayer ? 'Continue Routine ▶' : 'Back to Home Planner'}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            onClick={() => { haptic.light(); handleShare(); }}
+            className="h-11 px-4 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
+            aria-label="Share reflection"
+          >
+            <Share2 className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={handleDone}
+            className="flex-1 h-11 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
+          >
+            {hasActivePlayer ? 'Continue Routine ▶' : 'Back to Home Planner'}
+          </Button>
+        </div>
       </SheetContent>
     </Sheet>
   );
