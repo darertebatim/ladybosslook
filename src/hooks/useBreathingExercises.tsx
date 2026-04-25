@@ -1,6 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { runWithOfflineFallback } from '@/lib/offline/runWithOfflineFallback';
+import {
+  WELLNESS_EXECUTOR_TYPES,
+  type SaveBreathingSessionPayload,
+} from '@/lib/offline/executors/wellnessExecutors';
 
 export interface BreathingExercise {
   id: string;
@@ -135,19 +140,41 @@ export function useSaveBreathingSession() {
   return useMutation({
     mutationFn: async ({ exerciseId, durationSeconds }: { exerciseId: string; durationSeconds: number }) => {
       if (!user) throw new Error('Not authenticated');
-      
-      const { data, error } = await supabase
-        .from('breathing_sessions')
-        .insert({
-          user_id: user.id,
-          exercise_id: exerciseId,
-          duration_seconds: durationSeconds,
-        })
-        .select()
-        .single();
 
-      if (error) throw error;
-      return data;
+      const clientId = crypto.randomUUID();
+      const payload: SaveBreathingSessionPayload = {
+        clientId,
+        userId: user.id,
+        exerciseId,
+        durationSeconds,
+      };
+
+      const result = await runWithOfflineFallback({
+        type: WELLNESS_EXECUTOR_TYPES.SAVE_BREATHING_SESSION,
+        payload,
+        fastPath: async () => {
+          const { data, error } = await supabase
+            .from('breathing_sessions')
+            .insert({
+              id: clientId,
+              user_id: user.id,
+              exercise_id: exerciseId,
+              duration_seconds: durationSeconds,
+            })
+            .select()
+            .single();
+          if (error) throw error;
+          return data;
+        },
+      });
+
+      return result.data ?? {
+        id: clientId,
+        user_id: user.id,
+        exercise_id: exerciseId,
+        duration_seconds: durationSeconds,
+        completed_at: new Date().toISOString(),
+      };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['breathing-sessions'] });
