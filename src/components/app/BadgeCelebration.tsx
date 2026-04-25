@@ -3,8 +3,9 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
-import { Sparkles, Trophy } from 'lucide-react';
+import { Sparkles, Trophy, Share2 } from 'lucide-react';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
+import { useShareContent } from '@/hooks/useShareContent';
 
 import coinGold from '@/assets/coin-gold.png';
 import coinSilver from '@/assets/coin-silver.png';
@@ -77,6 +78,12 @@ export function BadgeCelebration({
   const badgeRef = useRef<HTMLImageElement>(null);
 
   const [actionMessage, setActionMessage] = useState('');
+
+  const { handleShare } = useShareContent({
+    title: 'Gold Day on Rilo',
+    text: `🥇 Just earned my Gold badge on Rilo — every task done today!`,
+    source: 'badge_gold',
+  });
 
   useEffect(() => {
     if (type) {
@@ -354,6 +361,15 @@ export function BadgeCelebration({
         >
           Collect my Gold Badge
         </Button>
+
+        {/* Share button */}
+        <button
+          onClick={() => { haptic.light(); handleShare(); }}
+          className="w-full mt-3 text-white/80 hover:text-white font-medium text-sm flex items-center justify-center gap-2 py-2"
+        >
+          <Share2 className="w-4 h-4" />
+          Share with friends
+        </button>
       </div>
     </div>
     </OverlayPortal>
