@@ -113,6 +113,8 @@ export default function AppPlaylistDetail() {
     title: playlist?.name || 'Playlist',
     text: `🎵 Check out the '${playlist?.name || 'this'}' playlist on Routine Ladyboss 💫`,
     imageUrl: playlist?.cover_image_url,
+    source: 'audio_playlist',
+    contentId: playlistId,
   });
 
   // Fetch tracks in playlist

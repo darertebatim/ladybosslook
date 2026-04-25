@@ -30,6 +30,8 @@ export default function AppFreeFormNoteDetail() {
   const { handleShare } = useShareContent({
     title: 'Reflection',
     text: `🪞 I just reflected on Routine Ladyboss 💫`,
+    source: 'free_note',
+    contentId: noteId,
   });
 
   const { data, isLoading } = useQuery({

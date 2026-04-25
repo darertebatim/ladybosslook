@@ -69,6 +69,7 @@ const AppJournalEntry = () => {
   const { handleShare } = useShareContent({
     title: 'Journal Entry',
     text: `📝 I just journaled on Routine Ladyboss — try it! 💫`,
+    source: 'journal_entry',
   });
 
   // Load existing entry data

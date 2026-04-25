@@ -27,6 +27,8 @@ export default function AppReflectionNoteDetail() {
   const { handleShare } = useShareContent({
     title: 'Reflection',
     text: `🪞 I just reflected on Routine Ladyboss 💫`,
+    source: 'reflection_note',
+    contentId: reflectionId,
   });
 
   const { data, isLoading } = useQuery({

@@ -93,6 +93,8 @@ export default function AppAudioPlayer() {
     title: audio?.title || 'Audio',
     text: `🎧 I'm listening to '${audio?.title || 'something great'}' on Routine Ladyboss 💫`,
     imageUrl: audio?.cover_image_url,
+    source: 'audio_player',
+    contentId: audioId,
   });
 
   // Fetch playlist info for current audio

@@ -57,6 +57,7 @@ export const RoutinePlayerSummary = memo(function RoutinePlayerSummary({
   const { handleShare } = useShareContent({
     title: routineTitle,
     text: `Just completed my "${routineTitle}" focus routine! ${completedCount}/${taskResults.length} tasks done in ${formatDuration(totalActualSeconds)} 🎯`,
+    source: 'routine_summary',
   });
 
   return (

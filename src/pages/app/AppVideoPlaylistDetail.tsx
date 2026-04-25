@@ -82,6 +82,8 @@ export default function AppVideoPlaylistDetail() {
     title: playlist?.name || 'Video Playlist',
     text: `🎬 Check out '${playlist?.name || 'this playlist'}' on Routine Ladyboss 💫`,
     imageUrl: playlist?.cover_image_url,
+    source: 'video_playlist',
+    contentId: playlist?.id,
   });
 
   const syntheticPlaylistTask: RoutinePlanTask | null = playlist ? {
