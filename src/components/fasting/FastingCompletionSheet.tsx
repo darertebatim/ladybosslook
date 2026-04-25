@@ -2,6 +2,9 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Button } from '@/components/ui/button';
 import { getCurrentZone } from '@/lib/fastingZones';
 import { format } from 'date-fns';
+import { Share2 } from 'lucide-react';
+import { useShareContent } from '@/hooks/useShareContent';
+import { haptic } from '@/lib/haptics';
 
 interface CompletedSession {
   id: string;
@@ -28,11 +31,19 @@ function formatDuration(startedAt: string, endedAt: string): string {
 }
 
 export function FastingCompletionSheet({ open, onOpenChange, session, onSave, onDelete }: FastingCompletionSheetProps) {
-  if (!session) return null;
-
-  const durationMs = new Date(session.ended_at).getTime() - new Date(session.started_at).getTime();
+  const durationMs = session ? new Date(session.ended_at).getTime() - new Date(session.started_at).getTime() : 0;
   const elapsedHours = durationMs / 3600000;
   const zone = getCurrentZone(elapsedHours);
+  const durationLabel = session ? formatDuration(session.started_at, session.ended_at) : '';
+
+  const { handleShare } = useShareContent({
+    title: `Completed a ${durationLabel} fast on Rilo`,
+    text: `🥗 Just completed a ${durationLabel} fast — reached ${zone.name} zone. Tracking my fasts on Rilo!`,
+    source: 'fasting_complete',
+    contentId: durationLabel,
+  });
+
+  if (!session) return null;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -71,6 +82,14 @@ export function FastingCompletionSheet({ open, onOpenChange, session, onSave, on
             }}
           >
             Delete
+          </Button>
+          <Button
+            variant="outline"
+            className="rounded-xl px-4"
+            onClick={() => { haptic.light(); handleShare(); }}
+            aria-label="Share fast"
+          >
+            <Share2 className="w-4 h-4" />
           </Button>
           <Button
             className="flex-1 rounded-xl"

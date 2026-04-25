@@ -8,6 +8,8 @@ import {
   SheetContent,
 } from '@/components/ui/sheet';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
+import { Share2 } from 'lucide-react';
+import { useShareContent } from '@/hooks/useShareContent';
 
 import journalImg from '@/assets/mood-card-journal.png';
 import breathingImg from '@/assets/mood-card-breathing.png';
@@ -101,6 +103,13 @@ export function MoodCelebrationSheet({
   const navigate = useNavigate();
   const moodData = mood ? MOOD_CONFIG[mood] : null;
 
+  const { handleShare } = useShareContent({
+    title: 'Mood check-in on Rilo',
+    text: moodData ? `Just checked in: feeling ${moodData.label.toLowerCase()} today. Track your mood with me on Rilo 💛` : 'I just checked in my mood on Rilo 💛',
+    source: 'mood_checkin',
+    contentId: mood ?? undefined,
+  });
+
   let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void; completeTask: () => void } | null = null;
   try { routinePlayer = useRoutinePlayerContext(); } catch { /* provider not available */ }
   const hasActivePlayer = routinePlayer?.isActive && routinePlayer?.isMinimized;
@@ -192,14 +201,24 @@ export function MoodCelebrationSheet({
           ))}
         </div>
 
-        {/* Maybe later */}
-        <Button
-          variant="ghost"
-          onClick={handleDone}
-          className="w-full h-11 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
-        >
-          {hasActivePlayer ? 'Continue Routine ▶' : 'Back to Home Planner'}
-        </Button>
+        {/* Maybe later + Share */}
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            onClick={() => { haptic.light(); handleShare(); }}
+            className="h-11 px-4 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
+            aria-label="Share mood check-in"
+          >
+            <Share2 className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={handleDone}
+            className="flex-1 h-11 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
+          >
+            {hasActivePlayer ? 'Continue Routine ▶' : 'Back to Home Planner'}
+          </Button>
+        </div>
       </SheetContent>
     </Sheet>
   );

@@ -4,10 +4,11 @@ import { useAppReview } from '@/hooks/useAppReview';
 import { Button } from '@/components/ui/button';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
-import { Flame } from 'lucide-react';
+import { Flame, Share2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { SoftReviewPrompt } from './SoftReviewPrompt';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
+import { useShareContent } from '@/hooks/useShareContent';
 import streakFlameImg from '@/assets/streak-flame-3d.png';
 
 interface StreakCelebrationProps {
@@ -41,6 +42,13 @@ export const StreakCelebration = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false);
   const [showReviewPrompt, setShowReviewPrompt] = useState(false);
+
+  const { handleShare } = useShareContent({
+    title: `${currentStreak}-day streak on Rilo 🔥`,
+    text: `🔥 ${currentStreak}-day streak on Rilo! Building habits one day at a time.`,
+    source: 'streak_milestone',
+    contentId: `${currentStreak}d`,
+  });
 
   const handleClose = async () => {
     onClose();
@@ -207,12 +215,21 @@ export const StreakCelebration = ({
           </div>
 
           {/* CTA */}
-          <Button
-            onClick={handleClose}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl text-base"
-          >
-            I'm committed
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={(e) => { e.stopPropagation(); haptic.light(); handleShare(); }}
+              className="px-4 bg-white/10 hover:bg-white/20 text-white font-semibold py-3 rounded-xl text-base"
+              aria-label="Share streak"
+            >
+              <Share2 className="w-5 h-5" />
+            </Button>
+            <Button
+              onClick={handleClose}
+              className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl text-base"
+            >
+              I'm committed
+            </Button>
+          </div>
         </div>
       </div>
 

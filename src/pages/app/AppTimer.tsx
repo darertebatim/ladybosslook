@@ -15,6 +15,7 @@ import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreview
 import { toast } from 'sonner';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { FocusStatsScreen } from '@/components/app/FocusStatsScreen';
+import { FocusShareButton } from '@/components/app/FocusShareButton';
 import { useSaveFocusSession } from '@/hooks/useFocusSessions';
 import { scheduleFocusTimerNotification, cancelFocusTimerNotification } from '@/lib/routineTaskNotification';
 
@@ -1363,12 +1364,15 @@ export default function AppTimer() {
             ? `Celebrate your progress—${totalFocusMin} minutes of focus completed`
             : 'Celebrate your progress!'}
         </p>
-        <button
-          onClick={() => { haptic.success(); setScreen('setup'); }}
-          className="w-full max-w-xs h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
-        >
-          I'm doing great!
-        </button>
+        <div className="w-full max-w-xs flex flex-col gap-3">
+          <button
+            onClick={() => { haptic.success(); setScreen('setup'); }}
+            className="w-full h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
+          >
+            I'm doing great!
+          </button>
+          <FocusShareButton minutes={totalFocusMin} mode={activeTab} />
+        </div>
       </motion.div>
     );
   }
