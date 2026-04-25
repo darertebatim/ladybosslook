@@ -14,6 +14,11 @@ import { Lightbulb } from 'lucide-react';
 import { JournalPromptMarquee } from '@/components/app/JournalPromptMarquee';
 import { MoodSelector } from '@/components/app/MoodSelector';
 import { ReflectionCelebrationSheet } from '@/components/reflection/ReflectionCelebrationSheet';
+import { runWithOfflineFallback } from '@/lib/offline/runWithOfflineFallback';
+import {
+  WELLNESS_EXECUTOR_TYPES,
+  type CreateReflectionPayload,
+} from '@/lib/offline/executors/wellnessExecutors';
 
 const BULLET_COLOR = 'hsl(var(--muted-foreground) / 0.4)';
 
@@ -114,10 +119,31 @@ export default function AppFreeFormReflection() {
       if (!user?.id) throw new Error('Not authenticated');
       if (!title.trim() && !contentForSave) throw new Error('Please write something');
       const finalTitle = title.trim() || `Reflection`;
-      const { error } = await supabase
-        .from('free_form_reflections' as any)
-        .insert({ user_id: user.id, title: finalTitle, content: contentForSave, mood: mood || null } as any);
-      if (error) throw error;
+      const clientId = crypto.randomUUID();
+      const payload: CreateReflectionPayload = {
+        clientId,
+        userId: user.id,
+        title: finalTitle,
+        content: contentForSave,
+        mood: mood || null,
+      };
+      await runWithOfflineFallback({
+        type: WELLNESS_EXECUTOR_TYPES.CREATE_REFLECTION,
+        payload,
+        fastPath: async () => {
+          const { error } = await supabase
+            .from('free_form_reflections' as any)
+            .insert({
+              id: clientId,
+              user_id: user.id,
+              title: finalTitle,
+              content: contentForSave,
+              mood: mood || null,
+            } as any);
+          if (error) throw error;
+          return null;
+        },
+      });
     },
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['reflection-notes'] });
