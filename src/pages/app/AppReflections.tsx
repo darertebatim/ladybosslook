@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGoBack } from '@/hooks/useGoBack';
 import { useReflections, Reflection, REFLECTION_CATEGORIES } from '@/hooks/useReflections';
-import { ArrowLeft, BookOpen, Crown } from 'lucide-react';
+import { ArrowLeft, BookOpen, Crown, Share2 } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AddedToRoutineButton } from '@/components/app/AddedToRoutineButton';
@@ -13,6 +13,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
+import { useShareContent } from '@/hooks/useShareContent';
 
 const SYNTHETIC_REFLECTION_TASK: RoutinePlanTask = {
   id: 'synthetic-reflection-task',
@@ -42,6 +43,12 @@ export default function AppReflections() {
   const [justAdded, setJustAdded] = useState(false);
   const isPageAdded = !!existingPageTask || justAdded;
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const { handleShare } = useShareContent({
+    title: 'Reflections Journal on Rilo',
+    text: 'I journal daily on Rilo to find ways to be happier & healthier. Try it with me 💭',
+    source: 'reflections_hub',
+  });
 
   const featured = reflections?.filter((r) => r.is_featured) || [];
   const all = reflections || [];
@@ -73,6 +80,13 @@ export default function AppReflections() {
           </button>
           <h1 className="text-lg font-semibold">Reflections Journal</h1>
           <div className="flex items-center gap-1">
+            <button
+              onClick={() => { haptic.light(); handleShare(); }}
+              className="p-2 active:scale-95 transition-transform"
+              aria-label="Share Reflections"
+            >
+              <Share2 className="h-5 w-5 text-muted-foreground" />
+            </button>
             <AddedToRoutineButton
               isAdded={isPageAdded}
               onAddClick={() => {
