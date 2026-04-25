@@ -10,6 +10,15 @@ import { getTimePeriodSortOrder, TimePeriod } from '@/lib/taskScheduling';
 import { updatePresence } from '@/hooks/useUserPresence';
 import { checkAndUnlockNextProjectStep } from '@/hooks/useProjectStepUnlock';
 import type { ProLinkType } from '@/lib/proTaskTypes';
+import { getIsOnline } from '@/hooks/useNetworkStatus';
+import { enqueueMutation } from '@/lib/offline/offlineMutationQueue';
+import {
+  TASK_EXECUTOR_TYPES,
+  type CompleteTaskPayload,
+  type UncompleteTaskPayload,
+  type CompleteSubtaskPayload,
+  type UncompleteSubtaskPayload,
+} from '@/lib/offline/executors/taskCompletionExecutors';
 
 // ============================================
 // TYPES
