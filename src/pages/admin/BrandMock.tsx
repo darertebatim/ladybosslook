@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Flame, Calendar, Headphones, BookOpen, Heart, Sparkles, ChevronRight, Check, Sun, Moon, Droplets, Wind, Home, Compass, CalendarPlus, Music, Users, Menu, Headset, Star, Zap, Settings2, Search } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import appIcon from '@/assets/app-icon.png';
+import selfcareQuizBannerImg from '@/assets/selfcare-quiz-banner.jpg';
 
 // ─── Orange Palette Tokens (inline for isolated mock) ───
 const O = {
@@ -325,6 +326,15 @@ export default function BrandMock() {
 
           {/* ─── Tasks ─── */}
           <div className="px-4 pb-4">
+            {/* Self-Care Quiz Special Banner Preview */}
+            <div className="mb-3">
+              <img
+                src={selfcareQuizBannerImg}
+                alt="Self-Care Quiz banner preview"
+                className="w-full h-auto rounded-2xl"
+                style={{ aspectRatio: '3/1', objectFit: 'cover' }}
+              />
+            </div>
             <div className="space-y-2">
               {TASKS.map((task, i) => (
                 <TaskCard key={task.title} task={task} index={i} darkMode={darkMode} />
