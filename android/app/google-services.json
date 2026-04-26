@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "945736365946",
+    "project_id": "gen-lang-client-0911896172",
+    "storage_bucket": "gen-lang-client-0911896172.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:945736365946:android:0d9038ed906e91a0bc48c3",
+        "android_client_info": {
+          "package_name": "com.ladybosslook.academy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "945736365946-uujja8vpsaair9e3fa5j9hmri9djvogm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ladybosslook.academy",
+            "certificate_hash": "e67b6bef901c9c28685b10e966bf0906ac2795da"
+          }
+        },
+        {
+          "client_id": "945736365946-79h9fsgo6uedji5tq5qsmpa55m88rg7e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA--x_Mcw8UGOH809N-hJwdhkb0hMS0qBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "945736365946-79h9fsgo6uedji5tq5qsmpa55m88rg7e.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "945736365946-auuab5v8310rvlpol3uh226p088nj1n5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ladybosslook.academy",
+                "app_store_id": "6755076134"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
