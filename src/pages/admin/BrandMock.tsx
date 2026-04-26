@@ -325,30 +325,6 @@ export default function BrandMock() {
 
           {/* ─── Tasks ─── */}
           <div className="px-4 pb-4">
-            {/* Self-Care Quiz banner (repeated above tasks for visibility) */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.18 }}
-              className="rounded-3xl p-3.5 relative overflow-hidden mb-3"
-              style={{
-                background: `linear-gradient(135deg, ${O.primary} 0%, ${O.primaryL} 100%)`,
-                boxShadow: '0 4px 14px rgba(235,94,51,0.25)',
-              }}
-            >
-              <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full opacity-20" style={{ background: '#fff' }} />
-              <div className="relative z-10 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: 'rgba(255,255,255,0.25)' }}>
-                  <Sparkles className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white text-[13px] font-bold leading-tight">What's missing in your self-care?</p>
-                  <p className="text-white/80 text-[10px] mt-0.5">Take the 2-min Self-Care Quiz</p>
-                </div>
-                <ChevronRight className="w-4 h-4 text-white/90 shrink-0" />
-              </div>
-            </motion.div>
-
             <div className="space-y-2">
               {TASKS.map((task, i) => (
                 <TaskCard key={task.title} task={task} index={i} darkMode={darkMode} />
