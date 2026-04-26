@@ -55,10 +55,10 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
     transition={{ delay: 0.15 + index * 0.06 }}
     className="rounded-3xl overflow-hidden"
     style={{
-      background: darkMode ? O.peachDark : O.peach,
-      boxShadow: darkMode
-        ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)'
-        : '0 2px 10px rgba(0,0,0,0.08)',
+      background: 'transparent',
+      borderBottom: darkMode
+        ? '1px solid rgba(255,255,255,0.06)'
+        : '1px solid rgba(0,0,0,0.05)',
     }}
   >
     <div className="flex items-center gap-2 pl-3 pr-4 py-5">
