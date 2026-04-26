@@ -42,10 +42,10 @@ const TASKS = [
 ];
 
 const TOOL_SHORTCUTS = [
-  { emoji: '📖', label: 'Journal' },
-  { emoji: '🌬️', label: 'Breathe' },
-  { emoji: '💧', label: 'Water' },
-  { emoji: '💜', label: 'Mood' },
+  { emoji: '📖', label: 'Journal', color: O.lavender, darkColor: O.lavenderDark },
+  { emoji: '🌬️', label: 'Breathe', color: O.mint,     darkColor: O.mintDark },
+  { emoji: '💧', label: 'Water',   color: O.peach,    darkColor: O.peachDark },
+  { emoji: '💜', label: 'Mood',    color: O.pink,     darkColor: O.pinkDark },
 ];
 
 const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: number; darkMode?: boolean }) => (
@@ -271,15 +271,20 @@ export default function BrandMock() {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 + i * 0.04 }}
-                  className="flex flex-col items-center gap-1 py-2 rounded-2xl"
+                  className="flex flex-col items-center gap-1 py-2.5 rounded-2xl"
                   style={{
-                    background: darkMode ? O.peachDark : O.peach,
+                    background: darkMode ? '#1F140B' : '#FFFDFB',
                     boxShadow: darkMode
-                      ? '0 2px 12px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05)'
-                      : '0 2px 10px rgba(0,0,0,0.06)',
+                      ? '0 1px 2px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.35)'
+                      : '0 1px 2px rgba(60,30,10,0.06), 0 6px 18px rgba(60,30,10,0.08)',
                   }}
                 >
-                  <FluentEmoji emoji={tool.emoji} size={24} />
+                  <div
+                    className="w-9 h-9 rounded-full flex items-center justify-center"
+                    style={{ background: darkMode ? tool.darkColor : tool.color }}
+                  >
+                    <FluentEmoji emoji={tool.emoji} size={22} />
+                  </div>
                   <span className="text-[9px] font-medium" style={{ color: darkMode ? '#E0CFB8' : '#6B4D33' }}>
                     {tool.label}
                   </span>
