@@ -316,9 +316,23 @@ export default function BrandMock() {
                   My Tasks
                 </button>
               </div>
-              <div className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                style={{ background: darkMode ? O.peachDark : O.peach, color: O.primary }}>
-                2/5
+              <div className="flex items-center gap-2">
+                <div className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                  style={{ background: darkMode ? O.peachDark : O.peach, color: O.primary }}>
+                  2/5
+                </div>
+                <button
+                  className="w-6 h-6 rounded-full flex items-center justify-center"
+                  style={{
+                    background: O.primary,
+                    boxShadow: darkMode
+                      ? '0 1px 2px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.35)'
+                      : '0 1px 2px rgba(60,30,10,0.06), 0 4px 10px rgba(60,30,10,0.12)',
+                  }}
+                  aria-label="Add task"
+                >
+                  <Plus className="w-3.5 h-3.5" style={{ color: '#fff' }} strokeWidth={2.5} />
+                </button>
               </div>
             </div>
           </div>
@@ -335,18 +349,22 @@ export default function BrandMock() {
             <div className="flex gap-2 mt-3">
               <div className="flex-1 rounded-3xl py-2 px-3 flex items-center justify-center gap-1.5 text-[11px] font-semibold"
                 style={{
-                  background: darkMode ? '#2A1A10' : '#fff',
-                  border: `1.5px solid ${O.primary}40`,
+                  background: darkMode ? '#1F140B' : '#FFFDFB',
                   color: fg,
+                  boxShadow: darkMode
+                    ? '0 1px 2px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.35)'
+                    : '0 1px 2px rgba(60,30,10,0.06), 0 6px 18px rgba(60,30,10,0.08)',
                 }}>
                 <Settings2 className="w-3 h-3" style={{ color: O.primary }} />
                 Manage Routines
               </div>
               <div className="flex-1 rounded-3xl py-2 px-3 flex items-center justify-center gap-1.5 text-[11px] font-semibold"
                 style={{
-                  background: darkMode ? '#2A1A10' : '#fff',
-                  border: `1.5px solid ${O.primary}40`,
+                  background: darkMode ? '#1F140B' : '#FFFDFB',
                   color: fg,
+                  boxShadow: darkMode
+                    ? '0 1px 2px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.35)'
+                    : '0 1px 2px rgba(60,30,10,0.06), 0 6px 18px rgba(60,30,10,0.08)',
                 }}>
                 <Search className="w-3 h-3" style={{ color: O.primary }} />
                 Browse Library
