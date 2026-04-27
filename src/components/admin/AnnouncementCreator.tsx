@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { Badge } from '@/components/ui/badge';
+import { AudiencePresetPicker, EMPTY_AUDIENCE, type AudiencePayload } from './AudiencePresetPicker';
 
 interface Program {
   id: string;
@@ -57,6 +58,8 @@ export function AnnouncementCreator() {
   const [excludedUsers, setExcludedUsers] = useState<{ id: string; name: string; email: string }[]>([]);
   const [excludedPrograms, setExcludedPrograms] = useState<string[]>([]);
   const [showExclude, setShowExclude] = useState(false);
+  const [audience, setAudience] = useState<AudiencePayload>(EMPTY_AUDIENCE);
+  const [audiencePresetId, setAudiencePresetId] = useState<string | null>(null);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -192,6 +195,8 @@ export function AnnouncementCreator() {
           linkText: linkText.trim() || undefined,
           excludeUserIds: excludedUsers.length > 0 ? excludedUsers.map(u => u.id) : undefined,
           excludeProgramSlugs: excludedPrograms.length > 0 ? excludedPrograms : undefined,
+          audience: audiencePresetId ? audience : undefined,
+          audiencePresetId: audiencePresetId ?? undefined,
         }
       });
 
@@ -220,6 +225,8 @@ export function AnnouncementCreator() {
       setExcludedUsers([]);
       setExcludedPrograms([]);
       setShowExclude(false);
+      setAudience(EMPTY_AUDIENCE);
+      setAudiencePresetId(null);
       
     } catch (error: any) {
       toast({ title: "Error", description: error.message || "Failed to send broadcast", variant: "destructive" });
@@ -377,6 +384,33 @@ export function AnnouncementCreator() {
             </div>
           )}
         </div>
+
+        {/* Saved Audience filter (intersects with the simple selector above) */}
+        <AudiencePresetPicker
+          current={audience}
+          presetId={audiencePresetId}
+          onApplyPreset={(preset) => {
+            if (!preset) {
+              setAudience(EMPTY_AUDIENCE);
+              setAudiencePresetId(null);
+              return;
+            }
+            setAudience({
+              target_type: preset.target_type,
+              include_programs: preset.include_programs ?? [],
+              exclude_programs: preset.exclude_programs ?? [],
+              include_playlists: preset.include_playlists ?? [],
+              exclude_playlists: preset.exclude_playlists ?? [],
+              include_tools: preset.include_tools ?? [],
+              exclude_tools: preset.exclude_tools ?? [],
+              target_languages: preset.target_languages ?? [],
+              target_timezones: preset.target_timezones ?? [],
+              include_update_status: preset.include_update_status ?? [],
+              target_instructor_ids: preset.target_instructor_ids ?? [],
+            });
+            setAudiencePresetId(preset.id);
+          }}
+        />
 
         {/* Exclusion Section */}
         <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
