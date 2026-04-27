@@ -25,6 +25,7 @@ import { ReturningUserPushSheet } from '@/components/app/ReturningUserPushSheet'
 import { TaskCompletionPushNudge } from '@/components/app/TaskCompletionPushNudge';
 import { usePushPermission } from '@/hooks/usePushPermission';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useAppReview } from '@/hooks/useAppReview';
 import type { UserTask, TaskTemplate } from '@/hooks/useTaskPlanner';
 import type { BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 
