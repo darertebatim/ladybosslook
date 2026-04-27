@@ -49,6 +49,29 @@ async function resolveAudienceUserIds(
   audience: AudienceFilter | null | undefined,
 ): Promise<Set<string> | null> {
   if (!audience) return null;
+  // Paginated SELECT helper — works around Supabase's default 1000-row cap so a
+  // language/timezone/program filter doesn't silently truncate matched users.
+  async function pagedIds(
+    table: string,
+    column: string,
+    builder: (q: any) => any,
+  ): Promise<Set<string>> {
+    const out = new Set<string>();
+    const PAGE = 1000;
+    let from = 0;
+    while (true) {
+      const q = supabase.from(table).select(column).range(from, from + PAGE - 1);
+      const { data, error } = await builder(q);
+      if (error || !data) break;
+      for (const r of data) {
+        const id = r[column];
+        if (id) out.add(id);
+      }
+      if (data.length < PAGE) break;
+      from += PAGE;
+    }
+    return out;
+  }
   const hasAnyRule =
     (audience.target_type && audience.target_type !== 'all') ||
     (audience.include_programs?.length ?? 0) > 0 ||
@@ -91,73 +114,57 @@ async function resolveAudienceUserIds(
 
   // include_programs (must be in at least one)
   if ((audience.include_programs?.length ?? 0) > 0) {
-    const { data } = await supabase
-      .from('course_enrollments')
-      .select('user_id')
-      .in('program_slug', audience.include_programs!)
-      .eq('status', 'active');
-    const allowed = new Set((data ?? []).map((r: any) => r.user_id));
+    const allowed = await pagedIds('course_enrollments', 'user_id', (q) =>
+      q.in('program_slug', audience.include_programs!).eq('status', 'active'),
+    );
     candidates = new Set([...candidates].filter((id) => allowed.has(id)));
   }
 
   // exclude_programs (must NOT be in any)
   if ((audience.exclude_programs?.length ?? 0) > 0) {
-    const { data } = await supabase
-      .from('course_enrollments')
-      .select('user_id')
-      .in('program_slug', audience.exclude_programs!)
-      .eq('status', 'active');
-    const blocked = new Set((data ?? []).map((r: any) => r.user_id));
+    const blocked = await pagedIds('course_enrollments', 'user_id', (q) =>
+      q.in('program_slug', audience.exclude_programs!).eq('status', 'active'),
+    );
     candidates = new Set([...candidates].filter((id) => !blocked.has(id)));
   }
 
   // include_playlists (saved-or-enrolled-via-program)
   if ((audience.include_playlists?.length ?? 0) > 0) {
-    const { data } = await supabase
-      .from('playlist_saves')
-      .select('user_id')
-      .in('playlist_id', audience.include_playlists!);
-    const allowed = new Set((data ?? []).map((r: any) => r.user_id));
+    const allowed = await pagedIds('playlist_saves', 'user_id', (q) =>
+      q.in('playlist_id', audience.include_playlists!),
+    );
     candidates = new Set([...candidates].filter((id) => allowed.has(id)));
   }
 
   // exclude_playlists
   if ((audience.exclude_playlists?.length ?? 0) > 0) {
-    const { data } = await supabase
-      .from('playlist_saves')
-      .select('user_id')
-      .in('playlist_id', audience.exclude_playlists!);
-    const blocked = new Set((data ?? []).map((r: any) => r.user_id));
+    const blocked = await pagedIds('playlist_saves', 'user_id', (q) =>
+      q.in('playlist_id', audience.exclude_playlists!),
+    );
     candidates = new Set([...candidates].filter((id) => !blocked.has(id)));
   }
 
   // target_languages (profiles.preferred_language)
   if ((audience.target_languages?.length ?? 0) > 0) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('id')
-      .in('preferred_language', audience.target_languages!);
-    const allowed = new Set((data ?? []).map((r: any) => r.id));
+    const allowed = await pagedIds('profiles', 'id', (q) =>
+      q.in('preferred_language', audience.target_languages!),
+    );
     candidates = new Set([...candidates].filter((id) => allowed.has(id)));
   }
 
   // target_timezones (profiles.timezone)
   if ((audience.target_timezones?.length ?? 0) > 0) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('id')
-      .in('timezone', audience.target_timezones!);
-    const allowed = new Set((data ?? []).map((r: any) => r.id));
+    const allowed = await pagedIds('profiles', 'id', (q) =>
+      q.in('timezone', audience.target_timezones!),
+    );
     candidates = new Set([...candidates].filter((id) => allowed.has(id)));
   }
 
   // target_instructor_ids (referrals)
   if ((audience.target_instructor_ids?.length ?? 0) > 0) {
-    const { data } = await supabase
-      .from('instructor_referrals')
-      .select('user_id')
-      .in('instructor_id', audience.target_instructor_ids!);
-    const allowed = new Set((data ?? []).map((r: any) => r.user_id));
+    const allowed = await pagedIds('instructor_referrals', 'user_id', (q) =>
+      q.in('instructor_id', audience.target_instructor_ids!),
+    );
     candidates = new Set([...candidates].filter((id) => allowed.has(id)));
   }
 

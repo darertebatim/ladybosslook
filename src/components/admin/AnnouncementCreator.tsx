@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
-import { Megaphone, Bell, Mail, MessageCircle, Link as LinkIcon, X, UserMinus, Search } from 'lucide-react';
+import { Megaphone, Bell, Mail, MessageCircle, Link as LinkIcon, X, UserMinus, Search, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -60,6 +60,7 @@ export function AnnouncementCreator() {
   const [showExclude, setShowExclude] = useState(false);
   const [audience, setAudience] = useState<AudiencePayload>(EMPTY_AUDIENCE);
   const [audiencePresetId, setAudiencePresetId] = useState<string | null>(null);
+  const [previewing, setPreviewing] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -518,10 +519,56 @@ export function AnnouncementCreator() {
           </div>
         </div>
 
-        <Button onClick={handleSubmit} disabled={loading} className="w-full">
-          <Megaphone className="mr-2 h-4 w-4" />
-          {loading ? 'Sending...' : 'Send Broadcast'}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={previewing}
+            onClick={async () => {
+              setPreviewing(true);
+              try {
+                const { data, error } = await supabase.functions.invoke(
+                  'preview-audience-recipients',
+                  {
+                    body: {
+                      channel: sendPush ? 'push' : 'broadcast',
+                      audience: audiencePresetId ? audience : null,
+                      targetCourse: null,
+                      targetRoundId: null,
+                    },
+                  },
+                );
+                if (error) throw error;
+                const users = data?.matched_users ?? 0;
+                const total = data?.devices_total;
+                const ios = data?.devices_ios ?? 0;
+                const android = data?.devices_android ?? 0;
+                toast({
+                  title: `${users} user${users === 1 ? '' : 's'} match`,
+                  description:
+                    total === null || total === undefined
+                      ? data?.note ?? 'No audience filter applied.'
+                      : `${total} push device${total === 1 ? '' : 's'} (iOS: ${ios}, Android: ${android})`,
+                });
+              } catch (err: any) {
+                toast({
+                  title: 'Preview failed',
+                  description: err?.message ?? 'Unknown error',
+                  variant: 'destructive',
+                });
+              } finally {
+                setPreviewing(false);
+              }
+            }}
+          >
+            <Eye className="mr-2 h-4 w-4" />
+            {previewing ? 'Counting…' : 'Preview recipients'}
+          </Button>
+          <Button onClick={handleSubmit} disabled={loading} className="flex-1">
+            <Megaphone className="mr-2 h-4 w-4" />
+            {loading ? 'Sending...' : 'Send Broadcast'}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
