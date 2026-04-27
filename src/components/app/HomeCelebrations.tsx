@@ -79,7 +79,7 @@ interface HomeCelebrationsProps {
   closeBadgeCelebration: () => void;
   badgeCompletedCount: number;
   badgeTotalCount: number;
-  maybeRequestReview: () => void;
+  maybeRequestReview: (trigger?: string) => void;
 
   // Gold streak
   showGoldStreakCelebration: boolean;
@@ -304,7 +304,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         onClose={() => {
           const wassilver = badgeCelebrationType === 'silver';
           closeBadgeCelebration();
-          if (wassilver) maybeRequestReview();
+          if (wassilver) maybeRequestReview('silver_badge');
         }}
         onCollectGold={closeBadgeCelebration}
         onGoldCollected={() => {
