@@ -96,53 +96,69 @@ Deno.serve(async (req) => {
   try {
     // Get current version from request body
     let currentVersion = '1.0.0';
-    
+    let platform: 'ios' | 'android' = 'ios';
+
     try {
       const body = await req.json();
       if (body.currentVersion) {
         currentVersion = body.currentVersion;
       }
+      if (body.platform === 'android' || body.platform === 'ios') {
+        platform = body.platform;
+      }
     } catch {
       // Body parsing failed, use default
     }
 
-    console.log('[check-app-version] Current version:', currentVersion);
+    console.log('[check-app-version] Current version:', currentVersion, 'platform:', platform);
 
     // Check for admin override in database first
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    const settingKey = platform === 'android' ? 'latest_android_version' : 'latest_ios_version';
     const { data: overrideData } = await supabase
       .from('app_settings')
       .select('value')
-      .eq('key', 'latest_ios_version')
+      .eq('key', settingKey)
       .maybeSingle();
 
     let latestVersion: string | null = null;
-    let storeUrl = 'https://apps.apple.com/app/simora-ladybosslook/id6755076134';
+    let storeUrl = platform === 'android'
+      ? 'https://play.google.com/store/apps/details?id=com.ladybosslook.academy'
+      : 'https://apps.apple.com/app/simora-ladybosslook/id6755076134';
 
     if (overrideData?.value) {
       console.log('[check-app-version] Using admin override:', overrideData.value);
       latestVersion = overrideData.value;
-    } else {
+    } else if (platform === 'ios') {
       // Fetch from App Store
       const appStoreResult = await getLatestAppStoreVersion();
       if (appStoreResult) {
         latestVersion = appStoreResult.version;
         storeUrl = appStoreResult.storeUrl;
       }
+    } else {
+      console.log('[check-app-version] Android requested but no admin override set');
     }
 
     if (!latestVersion) {
       return new Response(
         JSON.stringify({
-          success: false,
-          error: 'Unable to determine latest version',
+          success: true,
+          currentVersion,
+          platform,
+          latestVersion: null,
+          updateAvailable: false,
+          storeUrl,
+          note: platform === 'android'
+            ? 'No latest_android_version set in app_settings'
+            : 'Unable to determine latest version',
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200, // Return 200 to not break the app
+          status: 200,
         }
       );
     }
@@ -151,6 +167,7 @@ Deno.serve(async (req) => {
 
     console.log('[check-app-version] Result:', {
       currentVersion,
+      platform,
       latestVersion,
       updateAvailable,
     });
@@ -159,6 +176,7 @@ Deno.serve(async (req) => {
       JSON.stringify({
         success: true,
         currentVersion,
+        platform,
         latestVersion,
         updateAvailable,
         storeUrl,
