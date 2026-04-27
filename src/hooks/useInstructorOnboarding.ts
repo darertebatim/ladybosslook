@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
   getStoredAttribution,
@@ -10,6 +10,35 @@ import {
 
 const URL_INSTRUCTOR_KEY = 'rilo_instructor_slug_pending';
 const URL_PACKAGE_KEY = 'rilo_instructor_package_pending';
+
+/**
+ * Invalidate every React Query cache that the instructor bundle could
+ * affect, so the planner / course / routines / playlists / chats /
+ * subscription UI all reflect the new data within ~1s — without needing
+ * the user to reopen the app.
+ */
+export function invalidateInstructorBundleCaches(queryClient: QueryClient) {
+  const keys = [
+    ['new-home-data'],
+    ['home-data'],
+    ['planner-all-tasks'],
+    ['user-tasks'],
+    ['user-routines-bank'],
+    ['user-routines'],
+    ['routines-bank'],
+    ['user-enrollment-slugs'],
+    ['course-enrollments'],
+    ['program-enrollments'],
+    ['enrollments'],
+    ['user-subscriptions'],
+    ['subscription'],
+    ['playlist-saves'],
+    ['feed-channels'],
+    ['channels'],
+    ['profile'],
+  ];
+  keys.forEach((key) => queryClient.invalidateQueries({ queryKey: key }));
+}
 
 export interface PendingInstructor {
   id: string;
@@ -324,13 +353,7 @@ export function useInstructorOnboarding(userId: string | undefined) {
           if (result.ok) {
             console.log('[InstructorOnboarding] Auto-applied admin-assigned instructor', invite.slug, result.granted);
             clearPendingSlug();
-            queryClient.invalidateQueries({ queryKey: ['user-subscriptions'] });
-            queryClient.invalidateQueries({ queryKey: ['user-enrollment-slugs'] });
-            queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
-            queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
-            queryClient.invalidateQueries({ queryKey: ['user-routines-bank'] });
-            queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
-            queryClient.invalidateQueries({ queryKey: ['home-data', userId] });
+            invalidateInstructorBundleCaches(queryClient);
             return true;
           }
           return attempts.current >= 5;
@@ -379,9 +402,10 @@ export function useInstructorOnboarding(userId: string | undefined) {
     if (result.ok) {
       clearPendingSlug();
       setPendingInvite(null);
+      invalidateInstructorBundleCaches(queryClient);
     }
     return result;
-  }, [userId, pendingInvite]);
+  }, [userId, pendingInvite, queryClient]);
 
   const decline = useCallback(() => {
     clearPendingSlug();
