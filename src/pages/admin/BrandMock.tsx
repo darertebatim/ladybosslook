@@ -120,7 +120,7 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
 export default function BrandMock() {
   const [darkMode, setDarkMode] = useState(false);
 
-  const bg = darkMode ? '#1A0F08' : O.bg;
+  const bg = darkMode ? '#1A0F08' : '#FFFFFF';
   const cardBg = darkMode ? '#2A1A10' : O.card;
   const fg = darkMode ? '#FFF4ED' : O.fg;
   const fgMuted = darkMode ? '#BFA08A' : O.fgMuted;
