@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Bell, Send, Beaker, Radio, AlertTriangle } from 'lucide-react';
+import { Bell, Send, Beaker, Radio, AlertTriangle, Eye } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { AudiencePresetPicker, EMPTY_AUDIENCE, type AudiencePayload } from './AudiencePresetPicker';
 
@@ -48,6 +48,7 @@ function NotificationForm({ environment }: NotificationFormProps) {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [audience, setAudience] = useState<AudiencePayload>(EMPTY_AUDIENCE);
   const [audiencePresetId, setAudiencePresetId] = useState<string | null>(null);
+  const [previewing, setPreviewing] = useState(false);
   const { toast } = useToast();
   
   // Character limits
@@ -102,6 +103,51 @@ function NotificationForm({ environment }: NotificationFormProps) {
   useEffect(() => {
     setTargetRoundId('all-rounds');
   }, [targetCourse]);
+
+  const handlePreviewRecipients = async () => {
+    setPreviewing(true);
+    try {
+      const courseSlug =
+        targetType === 'course' && targetCourse
+          ? programs.find((p) => p.id === targetCourse)?.slug ?? null
+          : null;
+      const roundId =
+        targetType === 'course' && targetRoundId && targetRoundId !== 'all-rounds'
+          ? targetRoundId
+          : null;
+      const { data, error } = await supabase.functions.invoke(
+        'preview-audience-recipients',
+        {
+          body: {
+            channel: 'push',
+            audience: audiencePresetId ? audience : null,
+            targetCourse: courseSlug,
+            targetRoundId: roundId,
+          },
+        },
+      );
+      if (error) throw error;
+      const users = data?.matched_users ?? 0;
+      const total = data?.devices_total;
+      const ios = data?.devices_ios ?? 0;
+      const android = data?.devices_android ?? 0;
+      toast({
+        title: `${users} user${users === 1 ? '' : 's'} match`,
+        description:
+          total === null || total === undefined
+            ? data?.note ?? 'No filter applied — would target all users.'
+            : `${total} device${total === 1 ? '' : 's'} (iOS: ${ios}, Android: ${android})`,
+      });
+    } catch (err: any) {
+      toast({
+        title: 'Preview failed',
+        description: err?.message ?? 'Unknown error',
+        variant: 'destructive',
+      });
+    } finally {
+      setPreviewing(false);
+    }
+  };
 
   const handleSend = async () => {
     if (!title || !message) {
@@ -434,11 +480,21 @@ function NotificationForm({ environment }: NotificationFormProps) {
         </div>
       </div>
 
-      {/* Send Button */}
+      {/* Preview + Send */}
+      <div className="flex gap-2">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={handlePreviewRecipients}
+        disabled={previewing}
+      >
+        <Eye className="mr-2 h-4 w-4" />
+        {previewing ? 'Counting…' : 'Preview recipients'}
+      </Button>
       <Button 
         onClick={handleSend} 
         disabled={isLoading || !title || !message}
-        className="w-full"
+        className="flex-1"
         variant={isDevelopment ? "outline" : "default"}
       >
         <Send className="mr-2 h-4 w-4" />
@@ -449,6 +505,7 @@ function NotificationForm({ environment }: NotificationFormProps) {
             : 'Send Production Notification'
         }
       </Button>
+      </div>
     </div>
   );
 }
