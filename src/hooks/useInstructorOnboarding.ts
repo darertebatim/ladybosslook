@@ -76,9 +76,23 @@ function readPendingSlug(): {
 } | null {
   try {
     const fromUrl = localStorage.getItem(URL_INSTRUCTOR_KEY);
+    // If AppsFlyer captured a more specific attribution (with a package)
+    // for the SAME instructor, prefer it — URL-only legacy entries from a
+    // previous visit shouldn't drown out a fresh deep-link tap.
     if (fromUrl) {
-      const pkg = localStorage.getItem(URL_PACKAGE_KEY);
-      return { slug: fromUrl, packageSlug: pkg || null, source: 'url', raw: null };
+      const urlPkg = localStorage.getItem(URL_PACKAGE_KEY);
+      if (!urlPkg && !isAttributionProcessed()) {
+        const af = getStoredAttribution();
+        if (af?.instructorSlug === fromUrl && af.packageSlug) {
+          return {
+            slug: af.instructorSlug,
+            packageSlug: af.packageSlug,
+            source: 'appsflyer',
+            raw: af.raw,
+          };
+        }
+      }
+      return { slug: fromUrl, packageSlug: urlPkg || null, source: 'url', raw: null };
     }
   } catch {/* ignore */}
 
