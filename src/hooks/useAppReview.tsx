@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { requestAppReview, canRequestReview } from '@/lib/appReview';
 
 // Milestone thresholds for triggering review
@@ -46,8 +47,26 @@ export function useAppReview() {
     return canRequestReview();
   }, []);
 
+  /**
+   * Android-only secondary trigger. Google's In-App Review API is silently
+   * throttled, so we add an extra prompt point on Android (e.g. gold badge)
+   * to maximize the chance the OS actually displays the dialog. iOS already
+   * gets a prompt at the silver badge / streak milestone, so we skip it here
+   * to avoid burning Apple's strict 3-per-365-days quota.
+   */
+  const maybeRequestReviewAndroidOnly = useCallback(
+    async (trigger?: string): Promise<boolean> => {
+      if (Capacitor.getPlatform() !== 'android') return false;
+      if (!canRequestReview()) return false;
+      await new Promise(resolve => setTimeout(resolve, 500));
+      return requestAppReview(trigger);
+    },
+    []
+  );
+
   return {
     maybeRequestReview,
+    maybeRequestReviewAndroidOnly,
     shouldShowForStreak,
     shouldShowForCourseCompletion,
     canRequestReview,

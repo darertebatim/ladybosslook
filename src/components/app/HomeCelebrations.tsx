@@ -25,6 +25,7 @@ import { ReturningUserPushSheet } from '@/components/app/ReturningUserPushSheet'
 import { TaskCompletionPushNudge } from '@/components/app/TaskCompletionPushNudge';
 import { usePushPermission } from '@/hooks/usePushPermission';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useAppReview } from '@/hooks/useAppReview';
 import type { UserTask, TaskTemplate } from '@/hooks/useTaskPlanner';
 import type { BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 
@@ -167,6 +168,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     stepCelebration, onCloseStepCelebration,
     projectCompletion, onCloseProjectCompletion,
   } = props;
+  const { maybeRequestReviewAndroidOnly } = useAppReview();
 
   const { hasAccessToProgram } = useSubscription();
   const isSubscribed = hasAccessToProgram('any');
@@ -313,6 +315,8 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
           updateGoldStreak.mutate(undefined, {
             onSuccess: () => setShowGoldStreakCelebration(true),
           });
+          // Android-only secondary review trigger (silent no-op on iOS/web).
+          maybeRequestReviewAndroidOnly('gold_badge_android');
         }}
         completedCount={badgeCompletedCount}
         totalCount={badgeTotalCount}
