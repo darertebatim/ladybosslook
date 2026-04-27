@@ -44,6 +44,12 @@ export function ChatConversationList({
 }: ChatConversationListProps) {
   const [search, setSearch] = useState("");
   const [selectedProgram, setSelectedProgram] = useState<string>("all");
+  const [unreadOnly, setUnreadOnly] = useState(false);
+
+  const totalUnread = useMemo(
+    () => conversations.filter(c => c.unread_count_admin > 0).length,
+    [conversations]
+  );
 
   // Collect all unique program slugs across conversations
   const allPrograms = useMemo(() => {
@@ -59,7 +65,8 @@ export function ChatConversationList({
       conv.profiles?.full_name?.toLowerCase().includes(search.toLowerCase()) ||
       conv.profiles?.email?.toLowerCase().includes(search.toLowerCase());
     const matchesProgram = selectedProgram === "all" || conv.programs?.includes(selectedProgram);
-    return matchesSearch && matchesProgram;
+    const matchesUnread = !unreadOnly || conv.unread_count_admin > 0;
+    return matchesSearch && matchesProgram && matchesUnread;
   });
 
   return (
@@ -84,6 +91,18 @@ export function ChatConversationList({
               onClick={() => setSelectedProgram("all")}
             >
               All ({conversations.length})
+            </Badge>
+            <Badge
+              variant={unreadOnly ? "default" : "outline"}
+              className={cn(
+                "cursor-pointer text-xs shrink-0",
+                unreadOnly
+                  ? "bg-red-500 text-white border-transparent hover:bg-red-600"
+                  : totalUnread > 0 && "border-red-500 text-red-600"
+              )}
+              onClick={() => setUnreadOnly(v => !v)}
+            >
+              Unread ({totalUnread})
             </Badge>
             {allPrograms.map(slug => {
               const count = conversations.filter(c => c.programs?.includes(slug)).length;
@@ -117,27 +136,47 @@ export function ChatConversationList({
               key={conv.id}
               onClick={() => onSelect(conv)}
               className={cn(
-                "w-full p-3 text-left border-b hover:bg-muted/50 transition-colors",
-                selectedId === conv.id && "bg-muted"
+                "w-full p-3 text-left border-b hover:bg-muted/50 transition-colors relative",
+                selectedId === conv.id && "bg-muted",
+                conv.unread_count_admin > 0 && "bg-red-500/5"
               )}
             >
+              {conv.unread_count_admin > 0 && (
+                <span
+                  aria-hidden
+                  className="absolute left-0 top-0 bottom-0 w-1 bg-red-500"
+                />
+              )}
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium truncate">
+                    <span className={cn(
+                      "truncate",
+                      conv.unread_count_admin > 0 ? "font-semibold" : "font-medium"
+                    )}>
                       {conv.profiles?.full_name || 'Unknown User'}
                     </span>
                     {conv.unread_count_admin > 0 && (
-                      <Badge variant="default" className="h-5 min-w-5 flex items-center justify-center rounded-full">
-                        {conv.unread_count_admin}
-                      </Badge>
+                      <>
+                        <Badge className="h-5 px-1.5 flex items-center justify-center rounded-full bg-red-500 text-white border-transparent hover:bg-red-500 text-[10px] font-bold uppercase tracking-wide">
+                          Unread
+                        </Badge>
+                        <Badge className="h-5 min-w-5 px-1.5 flex items-center justify-center rounded-full bg-red-500 text-white border-transparent hover:bg-red-500">
+                          {conv.unread_count_admin}
+                        </Badge>
+                      </>
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground truncate">
                     {conv.profiles?.email}
                   </p>
                   {conv.last_message && (
-                    <p className="text-sm text-muted-foreground truncate mt-1">
+                    <p className={cn(
+                      "text-sm truncate mt-1",
+                      conv.unread_count_admin > 0
+                        ? "text-foreground font-medium"
+                        : "text-muted-foreground"
+                    )}>
                       {conv.last_message}
                     </p>
                   )}
