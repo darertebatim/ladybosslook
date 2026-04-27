@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Bell, Send, Beaker, Radio, AlertTriangle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import { AudiencePresetPicker, EMPTY_AUDIENCE, type AudiencePayload } from './AudiencePresetPicker';
 
 interface Program {
   id: string;
@@ -45,6 +46,8 @@ function NotificationForm({ environment }: NotificationFormProps) {
   const [isUrgent, setIsUrgent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [programs, setPrograms] = useState<Program[]>([]);
+  const [audience, setAudience] = useState<AudiencePayload>(EMPTY_AUDIENCE);
+  const [audiencePresetId, setAudiencePresetId] = useState<string | null>(null);
   const { toast } = useToast();
   
   // Character limits
@@ -162,6 +165,12 @@ function NotificationForm({ environment }: NotificationFormProps) {
         payload.targetUserEmail = targetUserEmail.trim();
       }
 
+      // Attach Saved Audience filter (intersected server-side)
+      if (audiencePresetId) {
+        payload.audience = audience;
+        payload.audiencePresetId = audiencePresetId;
+      }
+
       const { data, error } = await supabase.functions.invoke('send-push-notification', {
         body: payload,
       });
@@ -184,6 +193,8 @@ function NotificationForm({ environment }: NotificationFormProps) {
       setTargetRoundId('all-rounds');
       setTargetUserEmail('');
       setIsUrgent(false);
+      setAudience(EMPTY_AUDIENCE);
+      setAudiencePresetId(null);
     } catch (error: any) {
       console.error('Error sending push notification:', error);
       toast({
@@ -343,6 +354,35 @@ function NotificationForm({ environment }: NotificationFormProps) {
             placeholder="user@example.com"
           />
         </div>
+      )}
+
+      {/* Saved Audience (narrows further) */}
+      {targetType !== 'user' && (
+        <AudiencePresetPicker
+          current={audience}
+          presetId={audiencePresetId}
+          onApplyPreset={(preset) => {
+            if (!preset) {
+              setAudience(EMPTY_AUDIENCE);
+              setAudiencePresetId(null);
+              return;
+            }
+            setAudience({
+              target_type: preset.target_type,
+              include_programs: preset.include_programs ?? [],
+              exclude_programs: preset.exclude_programs ?? [],
+              include_playlists: preset.include_playlists ?? [],
+              exclude_playlists: preset.exclude_playlists ?? [],
+              include_tools: preset.include_tools ?? [],
+              exclude_tools: preset.exclude_tools ?? [],
+              target_languages: preset.target_languages ?? [],
+              target_timezones: preset.target_timezones ?? [],
+              include_update_status: preset.include_update_status ?? [],
+              target_instructor_ids: preset.target_instructor_ids ?? [],
+            });
+            setAudiencePresetId(preset.id);
+          }}
+        />
       )}
 
       {/* Urgent Toggle */}
