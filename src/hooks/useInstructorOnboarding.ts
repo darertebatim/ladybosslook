@@ -45,8 +45,20 @@ export interface PendingInstructor {
 export function captureInstructorFromUrl(): void {
   try {
     const params = new URLSearchParams(window.location.search);
-    const slug = params.get('instructor') || params.get('ref');
-    const pkg = params.get('package') || params.get('pkg');
+    // Accept both our own short params (?instructor=, ?package=) and the
+    // AppsFlyer OneLink params (af_sub1 / af_sub2 / deep_link_value /
+    // deep_link_sub1) so that web-fallback redirects from a OneLink also
+    // carry the package selection through to the bundle apply step.
+    const slug =
+      params.get('instructor') ||
+      params.get('ref') ||
+      params.get('af_sub1') ||
+      params.get('deep_link_value');
+    const pkg =
+      params.get('package') ||
+      params.get('pkg') ||
+      params.get('af_sub2') ||
+      params.get('deep_link_sub1');
     if (slug) {
       localStorage.setItem(URL_INSTRUCTOR_KEY, slug.trim().toLowerCase());
     }
