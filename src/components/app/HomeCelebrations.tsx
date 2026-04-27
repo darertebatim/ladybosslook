@@ -79,7 +79,7 @@ interface HomeCelebrationsProps {
   closeBadgeCelebration: () => void;
   badgeCompletedCount: number;
   badgeTotalCount: number;
-  maybeRequestReview: () => void;
+  maybeRequestReview: (trigger?: string) => void;
 
   // Gold streak
   showGoldStreakCelebration: boolean;
