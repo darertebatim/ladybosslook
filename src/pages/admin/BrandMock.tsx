@@ -22,7 +22,11 @@ const O = {
   pink:     '#FFE0F5',
   pinkMid:  '#FFC2EA',
   lavender: '#F0E3FF',
+  lavenderMid:'#DEC1FF',
   mint:     '#E2F9F0',
+  mintMid:  '#C3F1E1',
+  limeMid:  '#C9F588',
+  skyMid:   '#B9D6FF',
   border:   '#F5DCC8',
   success:  '#22C55E',
   // Dark mode task card colors — deep jewel-toned variants
@@ -31,6 +35,8 @@ const O = {
   lavenderDark: '#2A1F3A',
   yellowDark:   '#3A3010',
   pinkDark:     '#3A1A2A',
+  skyDark:      '#1A2638',
+  limeDark:     '#1E3020',
 };
 
 const TASKS = [
