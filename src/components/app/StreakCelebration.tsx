@@ -63,7 +63,7 @@ export const StreakCelebration = ({
 
   const handleAcceptReview = async () => {
     setShowReviewPrompt(false);
-    await maybeRequestReview();
+    await maybeRequestReview('streak_celebration');
   };
 
   const handleDeclineReview = () => {
