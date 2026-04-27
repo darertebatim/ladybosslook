@@ -71,7 +71,7 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
       {/* 3D Fluent Emoji in colored circle */}
       <div
         className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-        style={{ background: darkMode ? task.darkColor : task.color }}
+        style={{ background: darkMode ? (task.done ? task.completedDarkColor : task.darkColor) : (task.done ? task.completedColor : task.color) }}
       >
         <FluentEmoji emoji={task.emoji} size={26} />
       </div>
