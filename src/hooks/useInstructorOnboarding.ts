@@ -45,8 +45,20 @@ export interface PendingInstructor {
 export function captureInstructorFromUrl(): void {
   try {
     const params = new URLSearchParams(window.location.search);
-    const slug = params.get('instructor') || params.get('ref');
-    const pkg = params.get('package') || params.get('pkg');
+    // Accept both our own short params (?instructor=, ?package=) and the
+    // AppsFlyer OneLink params (af_sub1 / af_sub2 / deep_link_value /
+    // deep_link_sub1) so that web-fallback redirects from a OneLink also
+    // carry the package selection through to the bundle apply step.
+    const slug =
+      params.get('instructor') ||
+      params.get('ref') ||
+      params.get('af_sub1') ||
+      params.get('deep_link_value');
+    const pkg =
+      params.get('package') ||
+      params.get('pkg') ||
+      params.get('af_sub2') ||
+      params.get('deep_link_sub1');
     if (slug) {
       localStorage.setItem(URL_INSTRUCTOR_KEY, slug.trim().toLowerCase());
     }
@@ -64,9 +76,23 @@ function readPendingSlug(): {
 } | null {
   try {
     const fromUrl = localStorage.getItem(URL_INSTRUCTOR_KEY);
+    // If AppsFlyer captured a more specific attribution (with a package)
+    // for the SAME instructor, prefer it — URL-only legacy entries from a
+    // previous visit shouldn't drown out a fresh deep-link tap.
     if (fromUrl) {
-      const pkg = localStorage.getItem(URL_PACKAGE_KEY);
-      return { slug: fromUrl, packageSlug: pkg || null, source: 'url', raw: null };
+      const urlPkg = localStorage.getItem(URL_PACKAGE_KEY);
+      if (!urlPkg && !isAttributionProcessed()) {
+        const af = getStoredAttribution();
+        if (af?.instructorSlug === fromUrl && af.packageSlug) {
+          return {
+            slug: af.instructorSlug,
+            packageSlug: af.packageSlug,
+            source: 'appsflyer',
+            raw: af.raw,
+          };
+        }
+      }
+      return { slug: fromUrl, packageSlug: urlPkg || null, source: 'url', raw: null };
     }
   } catch {/* ignore */}
 
