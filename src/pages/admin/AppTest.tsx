@@ -280,18 +280,32 @@ export default function AppTest() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">⭐ App Review</CardTitle>
+                <CardDescription className="text-xs">
+                  Works on iOS (App Store) and Android (Play Store internal/production builds).
+                </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-2">
                 <Button 
                   onClick={async () => {
-                    const success = await forceRequestReview();
-                    toast(success ? 'Review prompted!' : 'Requires native iOS');
+                    const success = await forceRequestReview('admin_test_ios');
+                    toast(success ? '✓ iOS review prompted' : 'Requires native iOS build');
                   }} 
                   className="w-full"
                   variant="outline"
                 >
                   <Star className="h-4 w-4 mr-2" />
-                  Request App Review
+                  Test iOS Review
+                </Button>
+                <Button 
+                  onClick={async () => {
+                    const success = await forceRequestReview('admin_test_android');
+                    toast(success ? '✓ Android review prompted' : 'Requires Play Store build (internal track or production)');
+                  }} 
+                  className="w-full"
+                  variant="outline"
+                >
+                  <Star className="h-4 w-4 mr-2" />
+                  Test Android Review
                 </Button>
               </CardContent>
             </Card>
