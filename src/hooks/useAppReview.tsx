@@ -20,7 +20,7 @@ export function useAppReview() {
    * Request a review if conditions are met
    * Returns true if review was requested
    */
-  const maybeRequestReview = useCallback(async (): Promise<boolean> => {
+  const maybeRequestReview = useCallback(async (trigger?: string): Promise<boolean> => {
     if (!canRequestReview()) {
       return false;
     }
@@ -28,7 +28,7 @@ export function useAppReview() {
     // Small delay to let any UI animations complete
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    return requestAppReview();
+    return requestAppReview(trigger);
   }, []);
 
   /**
