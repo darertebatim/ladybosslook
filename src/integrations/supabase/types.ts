@@ -482,6 +482,42 @@ export type Database = {
         }
         Relationships: []
       }
+      app_review_prompts: {
+        Row: {
+          app_version: string | null
+          created_at: string
+          error_message: string | null
+          forced: boolean
+          id: string
+          platform: string
+          success: boolean
+          trigger_source: string | null
+          user_id: string | null
+        }
+        Insert: {
+          app_version?: string | null
+          created_at?: string
+          error_message?: string | null
+          forced?: boolean
+          id?: string
+          platform: string
+          success?: boolean
+          trigger_source?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          app_version?: string | null
+          created_at?: string
+          error_message?: string | null
+          forced?: boolean
+          id?: string
+          platform?: string
+          success?: boolean
+          trigger_source?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           created_at: string

@@ -280,18 +280,32 @@ export default function AppTest() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">⭐ App Review</CardTitle>
+                <CardDescription className="text-xs">
+                  Works on iOS (App Store) and Android (Play Store internal/production builds).
+                </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-2">
                 <Button 
                   onClick={async () => {
-                    const success = await forceRequestReview();
-                    toast(success ? 'Review prompted!' : 'Requires native iOS');
+                    const success = await forceRequestReview('admin_test_ios');
+                    toast(success ? '✓ iOS review prompted' : 'Requires native iOS build');
                   }} 
                   className="w-full"
                   variant="outline"
                 >
                   <Star className="h-4 w-4 mr-2" />
-                  Request App Review
+                  Test iOS Review
+                </Button>
+                <Button 
+                  onClick={async () => {
+                    const success = await forceRequestReview('admin_test_android');
+                    toast(success ? '✓ Android review prompted' : 'Requires Play Store build (internal track or production)');
+                  }} 
+                  className="w-full"
+                  variant="outline"
+                >
+                  <Star className="h-4 w-4 mr-2" />
+                  Test Android Review
                 </Button>
               </CardContent>
             </Card>
@@ -989,27 +1003,39 @@ export default function AppTest() {
             App Store Review
           </CardTitle>
           <CardDescription>
-            Test the native App Store review prompt (iOS only)
+            Test the native review prompt on iOS (App Store) and Android (Play Store).
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button 
-            onClick={async () => {
-              const success = await forceRequestReview();
-              if (success) {
-                toast.success('Review prompt triggered');
-              } else {
-                toast.error('Review prompt failed - requires native iOS');
-              }
-            }} 
-            variant="outline"
-          >
-            <Star className="h-4 w-4 mr-2" />
-            Request App Review
-          </Button>
-          <p className="text-xs text-muted-foreground mt-3">
-            Note: Only works on native iOS. In development, the dialog shows but reviews can't be submitted.
-            iOS limits to 3 prompts per year per user.
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <Button 
+              onClick={async () => {
+                const success = await forceRequestReview('admin_test_ios');
+                if (success) toast.success('iOS review prompt triggered');
+                else toast.error('Requires native iOS build');
+              }} 
+              variant="outline"
+            >
+              <Star className="h-4 w-4 mr-2" />
+              Test iOS Review
+            </Button>
+            <Button 
+              onClick={async () => {
+                const success = await forceRequestReview('admin_test_android');
+                if (success) toast.success('Android review prompt triggered');
+                else toast.error('Requires Play Store build (internal/production)');
+              }} 
+              variant="outline"
+            >
+              <Star className="h-4 w-4 mr-2" />
+              Test Android Review
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            <strong>iOS:</strong> max 3 prompts per 365 days per user (Apple-throttled).
+            <br />
+            <strong>Android:</strong> Google's In-App Review API silently no-ops on debug builds —
+            real dialog only appears via Play Store internal track or production.
           </p>
         </CardContent>
       </Card>
