@@ -3366,6 +3366,7 @@ export type Database = {
           endpoint: string
           id: string
           p256dh_key: string
+          platform: string | null
           user_id: string
         }
         Insert: {
@@ -3375,6 +3376,7 @@ export type Database = {
           endpoint: string
           id?: string
           p256dh_key: string
+          platform?: string | null
           user_id: string
         }
         Update: {
@@ -3384,6 +3386,7 @@ export type Database = {
           endpoint?: string
           id?: string
           p256dh_key?: string
+          platform?: string | null
           user_id?: string
         }
         Relationships: []
