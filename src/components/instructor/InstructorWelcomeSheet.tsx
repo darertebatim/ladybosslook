@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
@@ -172,6 +173,7 @@ export function InstructorWelcomeContent({
  */
 export function InstructorWelcomeSheet() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [instructor, setInstructor] = useState<InstructorData | null>(null);
   const [referralId, setReferralId] = useState<string | null>(null);
@@ -182,13 +184,18 @@ export function InstructorWelcomeSheet() {
 
     const load = async () => {
       try {
-        const { data: referral } = await supabase
+        // Pick the most recent unshown referral (a user can stack
+        // multiple instructors / packages over time).
+        const { data: referrals } = await supabase
           .from('instructor_referrals')
-          .select('id, welcome_shown_at, instructor_id')
+          .select('id, welcome_shown_at, instructor_id, package_id, created_at')
           .eq('user_id', user.id)
-          .maybeSingle();
+          .is('welcome_shown_at', null)
+          .order('created_at', { ascending: false })
+          .limit(1);
 
-        if (cancelled || !referral || referral.welcome_shown_at) return;
+        const referral = referrals?.[0];
+        if (cancelled || !referral) return;
 
         const { data: ins } = await supabase
           .from('instructors')
@@ -197,7 +204,41 @@ export function InstructorWelcomeSheet() {
           .maybeSingle();
 
         if (cancelled || !ins) return;
-        const insData = ins as InstructorData;
+        let insData = ins as InstructorData;
+
+        // If this referral is for a specific package, override the
+        // instructor defaults so the welcome banner reflects what was
+        // actually granted.
+        if (referral.package_id) {
+          const { data: pkg } = await supabase
+            .from('instructor_packages')
+            .select('default_program_slug, default_routine_ids, default_playlist_ids, default_channel_ids, plus_trial_days, name')
+            .eq('id', referral.package_id)
+            .maybeSingle();
+          if (pkg) {
+            insData = {
+              ...insData,
+              default_program_slug: (pkg as any).default_program_slug,
+              default_routine_ids: (pkg as any).default_routine_ids || [],
+              default_playlist_ids: (pkg as any).default_playlist_ids || [],
+              default_channel_ids: (pkg as any).default_channel_ids || [],
+              plus_trial_days: (pkg as any).plus_trial_days || 0,
+            };
+          }
+        }
+
+        // Wait for the planner / course / routines caches to refetch so
+        // when the user dismisses the sheet, the home screen is already
+        // showing the new content. Best-effort — never block the banner
+        // for more than ~2s.
+        try {
+          await Promise.race([
+            queryClient.refetchQueries({ type: 'active' }),
+            new Promise((resolve) => setTimeout(resolve, 2000)),
+          ]);
+        } catch {/* ignore */}
+
+        if (cancelled) return;
         setInstructor(insData);
         setReferralId(referral.id);
         setOpen(true);
@@ -212,7 +253,7 @@ export function InstructorWelcomeSheet() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [user]);
+  }, [user, queryClient]);
 
   const dismiss = async () => {
     setOpen(false);
