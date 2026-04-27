@@ -20,6 +20,197 @@ interface BroadcastRequest {
   linkText?: string;
   excludeUserIds?: string[];
   excludeProgramSlugs?: string[];
+  /** Optional saved-audience filter (mirrors banners/feed-channels). When set,
+   * we intersect `targetUserIds` with users who satisfy the audience rules. */
+  audience?: AudienceFilter | null;
+  audiencePresetId?: string | null;
+}
+
+interface AudienceFilter {
+  target_type?: 'all' | 'enrolled' | 'custom';
+  include_programs?: string[];
+  exclude_programs?: string[];
+  include_playlists?: string[];
+  exclude_playlists?: string[];
+  include_tools?: string[];
+  exclude_tools?: string[];
+  target_languages?: string[];
+  target_timezones?: string[];
+  include_update_status?: string[]; // 'latest' | 'previous'
+  target_instructor_ids?: string[];
+}
+
+/**
+ * Resolve a saved-audience filter to a Set of user_ids.
+ * Returns `null` when the filter is empty/no-op (caller should treat as "no filter").
+ */
+async function resolveAudienceUserIds(
+  supabase: any,
+  audience: AudienceFilter | null | undefined,
+): Promise<Set<string> | null> {
+  if (!audience) return null;
+  const hasAnyRule =
+    (audience.target_type && audience.target_type !== 'all') ||
+    (audience.include_programs?.length ?? 0) > 0 ||
+    (audience.exclude_programs?.length ?? 0) > 0 ||
+    (audience.include_playlists?.length ?? 0) > 0 ||
+    (audience.exclude_playlists?.length ?? 0) > 0 ||
+    (audience.include_tools?.length ?? 0) > 0 ||
+    (audience.exclude_tools?.length ?? 0) > 0 ||
+    (audience.target_languages?.length ?? 0) > 0 ||
+    (audience.target_timezones?.length ?? 0) > 0 ||
+    (audience.include_update_status?.length ?? 0) > 0 ||
+    (audience.target_instructor_ids?.length ?? 0) > 0;
+  if (!hasAnyRule) return null;
+
+  // Start from "all profiles", then narrow.
+  let candidates: Set<string>;
+
+  if (audience.target_type === 'enrolled') {
+    const { data } = await supabase
+      .from('course_enrollments')
+      .select('user_id')
+      .eq('status', 'active');
+    candidates = new Set((data ?? []).map((r: any) => r.user_id));
+  } else {
+    // start from the union of profiles (paginate to bypass 1000-row default)
+    candidates = new Set();
+    const PAGE = 1000;
+    let from = 0;
+    while (true) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .range(from, from + PAGE - 1);
+      if (error) break;
+      for (const r of data ?? []) candidates.add(r.id);
+      if (!data || data.length < PAGE) break;
+      from += PAGE;
+    }
+  }
+
+  // include_programs (must be in at least one)
+  if ((audience.include_programs?.length ?? 0) > 0) {
+    const { data } = await supabase
+      .from('course_enrollments')
+      .select('user_id')
+      .in('program_slug', audience.include_programs!)
+      .eq('status', 'active');
+    const allowed = new Set((data ?? []).map((r: any) => r.user_id));
+    candidates = new Set([...candidates].filter((id) => allowed.has(id)));
+  }
+
+  // exclude_programs (must NOT be in any)
+  if ((audience.exclude_programs?.length ?? 0) > 0) {
+    const { data } = await supabase
+      .from('course_enrollments')
+      .select('user_id')
+      .in('program_slug', audience.exclude_programs!)
+      .eq('status', 'active');
+    const blocked = new Set((data ?? []).map((r: any) => r.user_id));
+    candidates = new Set([...candidates].filter((id) => !blocked.has(id)));
+  }
+
+  // include_playlists (saved-or-enrolled-via-program)
+  if ((audience.include_playlists?.length ?? 0) > 0) {
+    const { data } = await supabase
+      .from('playlist_saves')
+      .select('user_id')
+      .in('playlist_id', audience.include_playlists!);
+    const allowed = new Set((data ?? []).map((r: any) => r.user_id));
+    candidates = new Set([...candidates].filter((id) => allowed.has(id)));
+  }
+
+  // exclude_playlists
+  if ((audience.exclude_playlists?.length ?? 0) > 0) {
+    const { data } = await supabase
+      .from('playlist_saves')
+      .select('user_id')
+      .in('playlist_id', audience.exclude_playlists!);
+    const blocked = new Set((data ?? []).map((r: any) => r.user_id));
+    candidates = new Set([...candidates].filter((id) => !blocked.has(id)));
+  }
+
+  // target_languages (profiles.preferred_language)
+  if ((audience.target_languages?.length ?? 0) > 0) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('id')
+      .in('preferred_language', audience.target_languages!);
+    const allowed = new Set((data ?? []).map((r: any) => r.id));
+    candidates = new Set([...candidates].filter((id) => allowed.has(id)));
+  }
+
+  // target_timezones (profiles.timezone)
+  if ((audience.target_timezones?.length ?? 0) > 0) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('id')
+      .in('timezone', audience.target_timezones!);
+    const allowed = new Set((data ?? []).map((r: any) => r.id));
+    candidates = new Set([...candidates].filter((id) => allowed.has(id)));
+  }
+
+  // target_instructor_ids (referrals)
+  if ((audience.target_instructor_ids?.length ?? 0) > 0) {
+    const { data } = await supabase
+      .from('instructor_referrals')
+      .select('user_id')
+      .in('instructor_id', audience.target_instructor_ids!);
+    const allowed = new Set((data ?? []).map((r: any) => r.user_id));
+    candidates = new Set([...candidates].filter((id) => allowed.has(id)));
+  }
+
+  // include_update_status: 'latest' | 'previous' based on app_installations + app_settings
+  if ((audience.include_update_status?.length ?? 0) > 0) {
+    const wantLatest = audience.include_update_status!.includes('latest');
+    const wantPrev = audience.include_update_status!.includes('previous');
+    if (!(wantLatest && wantPrev)) {
+      const { data: settings } = await supabase
+        .from('app_settings')
+        .select('key,value')
+        .in('key', ['latest_ios_version', 'latest_android_version']);
+      const latestIos = settings?.find((s: any) => s.key === 'latest_ios_version')?.value ?? null;
+      const latestAndroid = settings?.find((s: any) => s.key === 'latest_android_version')?.value ?? null;
+
+      // Pull latest install row per user (paged)
+      const userToInstall = new Map<string, { app_version: string | null; platform: string | null }>();
+      let from = 0;
+      const PAGE = 1000;
+      while (true) {
+        const { data, error } = await supabase
+          .from('app_installations')
+          .select('user_id, app_version, platform, last_seen_at')
+          .order('last_seen_at', { ascending: false })
+          .range(from, from + PAGE - 1);
+        if (error || !data) break;
+        for (const r of data) {
+          if (!userToInstall.has(r.user_id)) {
+            userToInstall.set(r.user_id, { app_version: r.app_version, platform: r.platform });
+          }
+        }
+        if (data.length < PAGE) break;
+        from += PAGE;
+      }
+
+      candidates = new Set(
+        [...candidates].filter((id) => {
+          const inst = userToInstall.get(id);
+          if (!inst) return wantPrev; // unknown ≈ not on latest
+          const latest =
+            inst.platform === 'ios' ? latestIos :
+            inst.platform === 'android' ? latestAndroid : null;
+          const isLatest = !!latest && inst.app_version === latest;
+          return isLatest ? wantLatest : wantPrev;
+        }),
+      );
+    }
+  }
+
+  // include_tools / exclude_tools — no first-class "tool usage" table; skip
+  // server-side. (PromoBanner evaluates client-side from local activity.)
+
+  return candidates;
 }
 
 // Helper function to convert PEM format to ArrayBuffer
