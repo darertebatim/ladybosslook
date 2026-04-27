@@ -22,7 +22,11 @@ const O = {
   pink:     '#FFE0F5',
   pinkMid:  '#FFC2EA',
   lavender: '#F0E3FF',
+  lavenderMid:'#DEC1FF',
   mint:     '#E2F9F0',
+  mintMid:  '#C3F1E1',
+  limeMid:  '#C9F588',
+  skyMid:   '#B9D6FF',
   border:   '#F5DCC8',
   success:  '#22C55E',
   // Dark mode task card colors — deep jewel-toned variants
@@ -31,14 +35,16 @@ const O = {
   lavenderDark: '#2A1F3A',
   yellowDark:   '#3A3010',
   pinkDark:     '#3A1A2A',
+  skyDark:      '#1A2638',
+  limeDark:     '#1E3020',
 };
 
 const TASKS = [
-  { emoji: '🧘', title: 'Morning Meditation', time: '🌅 7:00 AM', repeat: 'Daily', done: true, color: O.peach, darkColor: O.peachDark },
-  { emoji: '💧', title: 'Drink Water', time: '☀️ 8:00 AM', repeat: 'Daily', done: true, color: O.mint, darkColor: O.mintDark, goal: '6/8 cups' },
-  { emoji: '📖', title: 'Read 20 Pages', time: '☀️ 9:30 AM', repeat: 'Weekdays', done: false, color: O.lavender, darkColor: O.lavenderDark },
-  { emoji: '🏃‍♀️', title: 'Evening Run', time: '🌆 6:00 PM', repeat: 'Weekly', done: false, color: O.yellow, darkColor: O.yellowDark, goal: '0/30 min' },
-  { emoji: '✍️', title: 'Journal Entry', time: '🌙 9:00 PM', repeat: 'Daily', done: false, color: O.pink, darkColor: O.pinkDark },
+  { emoji: '🧘', title: 'Morning Meditation', time: '🌅 7:00 AM', repeat: 'Daily', done: true, color: O.peach, darkColor: O.peachDark, completedColor: O.peachMid, completedDarkColor: O.peachDark },
+  { emoji: '💧', title: 'Drink Water', time: '☀️ 8:00 AM', repeat: 'Daily', done: true, color: O.mint, darkColor: O.mintDark, completedColor: O.mintMid, completedDarkColor: O.mintDark, goal: '6/8 cups' },
+  { emoji: '📖', title: 'Read 20 Pages', time: '☀️ 9:30 AM', repeat: 'Weekdays', done: false, color: O.lavender, darkColor: O.lavenderDark, completedColor: O.lavenderMid, completedDarkColor: O.lavenderDark },
+  { emoji: '🏃‍♀️', title: 'Evening Run', time: '🌆 6:00 PM', repeat: 'Weekly', done: false, color: O.yellow, darkColor: O.yellowDark, completedColor: O.yellowMid, completedDarkColor: O.yellowDark, goal: '0/30 min' },
+  { emoji: '✍️', title: 'Journal Entry', time: '🌙 9:00 PM', repeat: 'Daily', done: false, color: O.pink, darkColor: O.pinkDark, completedColor: O.pinkMid, completedDarkColor: O.pinkDark },
 ];
 
 const TOOL_SHORTCUTS = [
@@ -65,7 +71,7 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
       {/* 3D Fluent Emoji in colored circle */}
       <div
         className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-        style={{ background: darkMode ? task.darkColor : task.color }}
+        style={{ background: darkMode ? (task.done ? task.completedDarkColor : task.darkColor) : (task.done ? task.completedColor : task.color) }}
       >
         <FluentEmoji emoji={task.emoji} size={26} />
       </div>
