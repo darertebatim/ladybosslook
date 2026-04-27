@@ -310,6 +310,7 @@ export async function subscribeToPushNotifications(userId: string): Promise<{ su
               p256dh_key: getNativePlatformMarker(),
               auth_key: getNativePlatformMarker(),
               app_version: appVersion,
+              platform: Capacitor.getPlatform(),
             },
             {
               onConflict: 'user_id,endpoint',
@@ -446,6 +447,7 @@ export async function refreshDeviceToken(userId: string): Promise<void> {
             p256dh_key: getNativePlatformMarker(),
             auth_key: getNativePlatformMarker(),
             app_version: appVersion,
+            platform: Capacitor.getPlatform(),
           },
           { onConflict: 'user_id,endpoint' }
         );

@@ -42,10 +42,15 @@ export function AppUpdatePopup() {
     const currentPlatform = Capacitor.getPlatform(); // 'ios' | 'android'
 
     const checkPopup = async () => {
+      // Read both legacy (iOS) and new Android-specific popup keys.
+      // Pick the one whose platform matches this device.
+      const settingKey =
+        currentPlatform === 'android' ? 'app_update_popup_android' : 'app_update_popup';
+
       const { data } = await supabase
         .from('app_settings')
         .select('value')
-        .eq('key', 'app_update_popup')
+        .eq('key', settingKey)
         .maybeSingle();
 
       if (!data?.value) return;
