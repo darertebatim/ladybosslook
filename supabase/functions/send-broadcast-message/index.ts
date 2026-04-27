@@ -323,9 +323,9 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { title, content, targetType, targetCourse, targetRoundId, sendPush, sendEmail, linkUrl, linkText, excludeUserIds, excludeProgramSlugs }: BroadcastRequest = await req.json();
+    const { title, content, targetType, targetCourse, targetRoundId, sendPush, sendEmail, linkUrl, linkText, excludeUserIds, excludeProgramSlugs, audience, audiencePresetId }: BroadcastRequest = await req.json();
 
-    console.log('📢 Broadcast request:', { title, targetType, targetCourse, targetRoundId, sendPush, sendEmail, linkUrl, excludeUserIds: excludeUserIds?.length, excludeProgramSlugs });
+    console.log('📢 Broadcast request:', { title, targetType, targetCourse, targetRoundId, sendPush, sendEmail, linkUrl, excludeUserIds: excludeUserIds?.length, excludeProgramSlugs, audiencePresetId });
 
     if (!title || !content) {
       return new Response(
@@ -443,6 +443,14 @@ const handler = async (req: Request): Promise<Response> => {
         targetUserIds = targetUserIds.filter(id => !excludeSet.has(id));
         console.log(`🚫 Excluded ${before - targetUserIds.length} users from ${excludeProgramSlugs.length} program(s)`);
       }
+    }
+
+    // Step 2c: Apply Saved Audience filter (intersection)
+    const audienceSet = await resolveAudienceUserIds(supabase, audience);
+    if (audienceSet) {
+      const before = targetUserIds.length;
+      targetUserIds = targetUserIds.filter((id) => audienceSet.has(id));
+      console.log(`🎯 Saved Audience narrowed ${before} → ${targetUserIds.length}`);
     }
 
     console.log(`📊 Found ${targetUserIds.length} target users after exclusions`);
