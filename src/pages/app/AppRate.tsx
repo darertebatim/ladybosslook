@@ -27,7 +27,7 @@ export default function AppRate() {
 
   const handleAccept = async () => {
     setShowPrompt(false);
-    await maybeRequestReview();
+    await maybeRequestReview('app_rate_page');
     navigate(-1);
   };
 
