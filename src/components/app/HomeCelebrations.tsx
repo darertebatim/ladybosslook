@@ -315,6 +315,8 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
           updateGoldStreak.mutate(undefined, {
             onSuccess: () => setShowGoldStreakCelebration(true),
           });
+          // Android-only secondary review trigger (silent no-op on iOS/web).
+          maybeRequestReviewAndroidOnly('gold_badge_android');
         }}
         completedCount={badgeCompletedCount}
         totalCount={badgeTotalCount}
