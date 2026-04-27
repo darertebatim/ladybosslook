@@ -385,6 +385,33 @@ export function AnnouncementCreator() {
           )}
         </div>
 
+        {/* Saved Audience filter (intersects with the simple selector above) */}
+        <AudiencePresetPicker
+          current={audience}
+          presetId={audiencePresetId}
+          onApplyPreset={(preset) => {
+            if (!preset) {
+              setAudience(EMPTY_AUDIENCE);
+              setAudiencePresetId(null);
+              return;
+            }
+            setAudience({
+              target_type: preset.target_type,
+              include_programs: preset.include_programs ?? [],
+              exclude_programs: preset.exclude_programs ?? [],
+              include_playlists: preset.include_playlists ?? [],
+              exclude_playlists: preset.exclude_playlists ?? [],
+              include_tools: preset.include_tools ?? [],
+              exclude_tools: preset.exclude_tools ?? [],
+              target_languages: preset.target_languages ?? [],
+              target_timezones: preset.target_timezones ?? [],
+              include_update_status: preset.include_update_status ?? [],
+              target_instructor_ids: preset.target_instructor_ids ?? [],
+            });
+            setAudiencePresetId(preset.id);
+          }}
+        />
+
         {/* Exclusion Section */}
         <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
           <div className="flex items-center justify-between">
