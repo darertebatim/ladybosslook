@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { Badge } from '@/components/ui/badge';
+import { AudiencePresetPicker, EMPTY_AUDIENCE, type AudiencePayload } from './AudiencePresetPicker';
 
 interface Program {
   id: string;
@@ -57,6 +58,8 @@ export function AnnouncementCreator() {
   const [excludedUsers, setExcludedUsers] = useState<{ id: string; name: string; email: string }[]>([]);
   const [excludedPrograms, setExcludedPrograms] = useState<string[]>([]);
   const [showExclude, setShowExclude] = useState(false);
+  const [audience, setAudience] = useState<AudiencePayload>(EMPTY_AUDIENCE);
+  const [audiencePresetId, setAudiencePresetId] = useState<string | null>(null);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -192,6 +195,8 @@ export function AnnouncementCreator() {
           linkText: linkText.trim() || undefined,
           excludeUserIds: excludedUsers.length > 0 ? excludedUsers.map(u => u.id) : undefined,
           excludeProgramSlugs: excludedPrograms.length > 0 ? excludedPrograms : undefined,
+          audience: audiencePresetId ? audience : undefined,
+          audiencePresetId: audiencePresetId ?? undefined,
         }
       });
 
@@ -220,6 +225,8 @@ export function AnnouncementCreator() {
       setExcludedUsers([]);
       setExcludedPrograms([]);
       setShowExclude(false);
+      setAudience(EMPTY_AUDIENCE);
+      setAudiencePresetId(null);
       
     } catch (error: any) {
       toast({ title: "Error", description: error.message || "Failed to send broadcast", variant: "destructive" });
