@@ -337,7 +337,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const requestBody: PushNotificationRequest = await req.json();
-    const { userIds, targetCourse, targetRoundId, targetUserEmail, title, icon, badge, environment, isUrgent } = requestBody;
+    const { userIds, targetCourse, targetRoundId, targetUserEmail, title, icon, badge, environment, isUrgent, audience, audiencePresetId } = requestBody;
     const body = requestBody.body || requestBody.message || '';
     const url = requestBody.url || requestBody.destinationUrl || '';
 
@@ -425,6 +425,20 @@ const handler = async (req: Request): Promise<Response> => {
       if (enrollments && enrollments.length > 0) {
         query = query.in('user_id', enrollments.map(e => e.user_id));
       }
+    }
+
+    // Saved Audience filter — narrow recipients further (intersection)
+    const audienceSet = await resolveAudienceUserIds(supabase, audience);
+    if (audienceSet) {
+      const allowed = [...audienceSet];
+      console.log(`🎯 Saved Audience (preset ${audiencePresetId ?? 'inline'}) → ${allowed.length} users`);
+      if (allowed.length === 0) {
+        return new Response(
+          JSON.stringify({ message: 'No users match the saved audience', sent: 0, failed: 0 }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+        );
+      }
+      query = query.in('user_id', allowed);
     }
 
     const { data: subscriptions, error: fetchError } = await query;
