@@ -168,6 +168,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     stepCelebration, onCloseStepCelebration,
     projectCompletion, onCloseProjectCompletion,
   } = props;
+  const { maybeRequestReviewAndroidOnly } = useAppReview();
 
   const { hasAccessToProgram } = useSubscription();
   const isSubscribed = hasAccessToProgram('any');
