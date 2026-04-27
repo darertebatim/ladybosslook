@@ -304,7 +304,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         onClose={() => {
           const wassilver = badgeCelebrationType === 'silver';
           closeBadgeCelebration();
-          if (wassilver) maybeRequestReview();
+          if (wassilver) maybeRequestReview('silver_badge');
         }}
         onCollectGold={closeBadgeCelebration}
         onGoldCollected={() => {
