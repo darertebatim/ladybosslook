@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, ChevronRight, X } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 
 const TOUR_PROMPT_KEY = 'simora_tour_prompt_shown';
 const TOUR_PROMPT_DISMISSED_KEY = 'simora_tour_prompt_dismissed_at';
@@ -131,48 +133,72 @@ export function TourBanner({ isFirstOpen, onStartTour, forceShow = false }: Tour
     setIsVisible(false);
   };
 
-  if (!isVisible) return null;
-
   return (
-    <div className="relative mb-4 overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
-      <button
-        onClick={handleDismiss}
-        className="absolute right-3 top-3 z-10 rounded-full bg-muted/80 p-1.5 text-muted-foreground active:scale-95"
-        aria-label="Dismiss"
+    <Sheet open={isVisible} onOpenChange={(v) => { if (!v) handleDismiss(); }}>
+      <SheetContent
+        side="bottom"
+        className="rounded-t-3xl border-t-0 px-6 pt-8 pb-10 max-h-[88vh]"
       >
-        <X className="h-4 w-4" />
-      </button>
+        <div className="flex flex-col items-center text-center -mx-6 -mt-8 -mb-10">
+          <div className="w-full bg-gradient-to-b from-primary/20 via-accent/20 to-background px-6 pt-8 pb-4 flex flex-col items-center">
+            <div className="h-24 w-24 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center ring-4 ring-primary/30 shadow-xl shadow-primary/20">
+              <Sparkles className="h-10 w-10 text-primary-foreground" />
+            </div>
 
-      <div className="flex items-start gap-3 p-4 pr-12">
-        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-primary">
-          <Sparkles className="h-5 w-5" />
-        </div>
+            <h2 className="mt-5 text-2xl font-bold text-foreground">
+              Welcome to Rilo!
+            </h2>
 
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-foreground">New here?</p>
-          <p className="mt-1 text-sm leading-5 text-muted-foreground">
-            Start a quick Home tour and I’ll point out the main parts before you explore.
-          </p>
+            <p className="mt-2 text-sm text-foreground/70 max-w-sm">
+              Let me give you a quick tour of your Home — I'll point out the main parts so you feel right at ease.
+            </p>
+          </div>
 
-          <div className="mt-3 flex items-center gap-2">
-            <button
+          <div className="w-full px-6 pb-10 flex flex-col items-center">
+            <div className="mt-6 w-full rounded-2xl bg-gradient-to-br from-accent/40 via-secondary/20 to-primary/15 p-5 space-y-3 text-left border border-primary/10 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                What you'll discover
+              </p>
+              <div className="flex items-start gap-3">
+                <span className="text-xl">📋</span>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Your daily planner</p>
+                  <p className="text-xs text-foreground/65">Routines and tasks built for your day.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-xl">✨</span>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Self-care shortcuts</p>
+                  <p className="text-xs text-foreground/65">Quick access to mood, breathe, and more.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-xl">🏆</span>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Streaks & badges</p>
+                  <p className="text-xs text-foreground/65">Celebrate your daily wins.</p>
+                </div>
+              </div>
+            </div>
+
+            <Button
               onClick={handleStartTour}
-              className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground active:scale-[0.98]"
+              className="mt-6 w-full h-12 rounded-2xl text-base font-semibold bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-primary-foreground shadow-md shadow-primary/30"
             >
               Show me around
-              <ChevronRight className="h-4 w-4" />
-            </button>
+            </Button>
 
             <button
               onClick={handleDismiss}
-              className="inline-flex min-h-10 items-center rounded-xl bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground active:scale-[0.98]"
+              className="mt-3 text-sm font-medium text-muted-foreground active:scale-[0.98]"
             >
               Maybe later
             </button>
           </div>
         </div>
-      </div>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 }
 
