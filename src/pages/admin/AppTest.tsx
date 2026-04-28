@@ -5,6 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { useToast } from '@/hooks/use-toast';
 import { forceRequestReview } from '@/lib/appReview';
+import { openIOSReviewPage, openAndroidReviewPage } from '@/hooks/useAppReview';
 import { 
   Bell, 
   Trophy, 
@@ -306,6 +307,30 @@ export default function AppTest() {
                 >
                   <Star className="h-4 w-4 mr-2" />
                   Test Android Review
+                </Button>
+                <Separator className="my-1" />
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Soft-link (always works)</p>
+                <Button
+                  onClick={async () => {
+                    await openIOSReviewPage('admin_test_ios_softlink');
+                    toast('✓ Opened App Store review page');
+                  }}
+                  className="w-full"
+                  variant="outline"
+                >
+                  <Star className="h-4 w-4 mr-2" />
+                  Open iOS Review Page
+                </Button>
+                <Button
+                  onClick={async () => {
+                    await openAndroidReviewPage('admin_test_android_softlink');
+                    toast('✓ Opened Play Store review page');
+                  }}
+                  className="w-full"
+                  variant="outline"
+                >
+                  <Star className="h-4 w-4 mr-2" />
+                  Open Android Review Page
                 </Button>
               </CardContent>
             </Card>
@@ -1031,11 +1056,35 @@ export default function AppTest() {
               Test Android Review
             </Button>
           </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              onClick={async () => {
+                await openIOSReviewPage('admin_test_ios_softlink');
+                toast.success('Opened App Store review page');
+              }}
+              variant="default"
+            >
+              <Star className="h-4 w-4 mr-2" />
+              Open iOS Review Page (soft-link)
+            </Button>
+            <Button
+              onClick={async () => {
+                await openAndroidReviewPage('admin_test_android_softlink');
+                toast.success('Opened Play Store review page');
+              }}
+              variant="default"
+            >
+              <Star className="h-4 w-4 mr-2" />
+              Open Android Review Page (soft-link)
+            </Button>
+          </div>
           <p className="text-xs text-muted-foreground">
             <strong>iOS:</strong> max 3 prompts per 365 days per user (Apple-throttled).
             <br />
             <strong>Android:</strong> Google's In-App Review API silently no-ops on debug builds —
             real dialog only appears via Play Store internal track or production.
+            <br />
+            <strong>Soft-link buttons</strong> bypass all quotas — they open the store review page directly and always work.
           </p>
         </CardContent>
       </Card>
