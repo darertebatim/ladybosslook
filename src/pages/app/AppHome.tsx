@@ -151,6 +151,19 @@ const AppHome = () => {
   
   // Third coach mark: "Tap + to add" - shown after user closes task detail from tap coach mark
   const [showAddCoachMark, setShowAddCoachMark] = useState(false);
+
+  // Bundled spotlight tour: intro popup + sequenced 3 spotlights
+  const SPOTLIGHT_TOUR_KEY = 'simora_spotlight_tour_done';
+  const [showSpotlightIntro, setShowSpotlightIntro] = useState(false);
+  const spotlightTourActiveRef = useRef(false);
+
+  const scrollHomeToTop = useCallback(() => {
+    try {
+      homeScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch {
+      if (homeScrollRef.current) homeScrollRef.current.scrollTop = 0;
+    }
+  }, [homeScrollRef]);
   
   // Streak goal selection state
   const [showGoalSelection, setShowGoalSelection] = useState(false);
