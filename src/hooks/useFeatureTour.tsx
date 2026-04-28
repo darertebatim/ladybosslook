@@ -29,6 +29,8 @@ export interface TourStep {
   onComplete?: () => void;
   // Auto-advance after delay (ms)
   autoAdvance?: number;
+  // Custom label for the primary advance button (e.g. "Show me around")
+  ctaLabel?: string;
 }
 
 interface UseFeatureTourOptions {

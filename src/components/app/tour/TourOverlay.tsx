@@ -482,7 +482,7 @@ export function TourOverlay({
               onClick={handleNext}
               className="h-9 px-4 active:scale-95"
             >
-              {isLastStep ? "Got it!" : "Next"}
+              {currentStep.ctaLabel ?? (isLastStep ? "Got it!" : "Next")}
               {!isLastStep && <ChevronRight className="h-4 w-4 ml-1" />}
             </Button>
           </div>
