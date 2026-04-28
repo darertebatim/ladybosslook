@@ -274,7 +274,7 @@ export default function System() {
                 Reset Feature Tours
               </CardTitle>
               <CardDescription>
-                Clears all tour completion flags so the welcome banner and spotlight overlays appear again on next visit. Useful for previewing the new opt-in tour intro.
+                Clears all tour flags AND the 3 first-action coach marks on Home (mark a task → tap to manage → tap + to add). Refresh Home after clicking.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -282,7 +282,7 @@ export default function System() {
                 variant="secondary"
                 onClick={() => {
                   resetAllToursFlags();
-                  toast.success('All tours reset — visit /app/home to see the welcome banner & spotlights');
+                  toast.success('Tours + coach marks reset — refresh /app/home to see the 3 small spotlights');
                 }}
               >
                 Reset All Tours
