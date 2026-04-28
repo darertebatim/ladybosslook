@@ -215,7 +215,11 @@ export async function initAppsFlyer(): Promise<void> {
     await AppsFlyer.initSDK({
       devKey: APPSFLYER_DEV_KEY,
       isDebug: false,
-      ...(isIOS ? { appID: APPLE_APP_ID } : {}),
+      // On Android, appID must be the package name (not the iOS App Store ID).
+      // Passing the iOS numeric ID on Android causes a 404 from AppsFlyer's
+      // attribution server and the SDK silently falls back to "Organic" for
+      // every install — breaking OneLink deep links.
+      appID: isIOS ? APPLE_APP_ID : 'com.ladybosslook.academy',
       registerOnDeepLink: true,
       registerConversionListener: true,
       waitForATTUserAuthorization: 10, // iOS-only; ignored on Android
