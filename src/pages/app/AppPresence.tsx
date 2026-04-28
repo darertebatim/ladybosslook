@@ -26,6 +26,7 @@ import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation'
 import { StreakCalendar, ActionCalendar } from '@/components/app/PresenceCalendar';
 import { MoodCalendar } from '@/components/mood/MoodCalendar';
 import { ChevronRight as ChevronRightIcon } from 'lucide-react';
+import { SelfCareBalanceCard } from '@/components/app/SelfCareBalanceCard';
 
 const AppPresence = () => {
   const navigate = useNavigate();
@@ -212,6 +213,9 @@ const AppPresence = () => {
             {/* Earned Challenge Badges */}
             <EarnedBadgesCard />
             
+            {/* Self-Care Balance (last 7 days) */}
+            <SelfCareBalanceCard />
+
             {/* All-Time Activity Stats */}
             <section className="bg-white rounded-2xl p-4 shadow-sm">
               <h3 className="text-sm font-semibold text-orange-900/60 mb-3">
