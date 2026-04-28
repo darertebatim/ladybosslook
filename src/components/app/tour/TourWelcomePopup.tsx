@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Sparkles } from 'lucide-react';
+import { AlarmClock } from 'lucide-react';
 import tourWelcomeImage from '@/assets/tour-welcome.png';
 
 const TOUR_PROMPT_KEY = 'simora_tour_prompt_shown';
@@ -146,9 +146,9 @@ export function TourWelcomePopup({
         <div className="px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4 flex flex-col gap-3">
           <Button 
             onClick={handleStartTour}
-            className="w-full h-12 rounded-2xl bg-foreground hover:bg-foreground/90 text-background font-semibold text-base gap-2"
+            className="w-full h-12 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-base gap-2"
           >
-            <Sparkles className="h-5 w-5" />
+            <AlarmClock className="h-5 w-5" />
             Let's Go
           </Button>
           

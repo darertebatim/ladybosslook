@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay, subDays } from 'date-fns';
-import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, Headset, ArrowLeft, Heart, Zap, Settings2, Search, Play } from 'lucide-react';
+import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, Headset, ArrowLeft, Heart, Zap, Settings2, Search, Play, AlarmClock } from 'lucide-react';
 
 import AppTaskCreate from '@/pages/app/AppTaskCreate';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -933,8 +933,7 @@ const AppHome = () => {
               ) : (
                 <h1 className="text-lg font-bold text-foreground flex items-center gap-1">
                   {isToday(selectedDate) ? 'Today' : format(selectedDate, 'MMM d')}
-                  {/* Build marker */}
-                  <Star className="h-3 w-3 fill-red-500 text-red-500" />
+                  <AlarmClock className="h-4 w-4 text-red-500" />
                 </h1>
               )}
             </div>
