@@ -27,10 +27,34 @@ export function HomeTour({
   const [userWantsTour, setUserWantsTour] = useState(false);
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
 
-  // Find portal target after mount
+  // Find portal target after mount.
+  // The slot lives inside conditionally-rendered planner content (only when
+  // taskFilter === 'all' AND data has loaded), so it may not exist on first
+  // render. Watch the DOM until it appears, and stop watching once found.
   useEffect(() => {
-    const target = document.getElementById(bannerPortalId);
-    setPortalTarget(target);
+    const tryFind = () => {
+      const target = document.getElementById(bannerPortalId);
+      if (target) {
+        setPortalTarget(target);
+        return true;
+      }
+      return false;
+    };
+
+    if (tryFind()) return;
+
+    const observer = new MutationObserver(() => {
+      if (tryFind()) observer.disconnect();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Safety stop after 15s so we don't observe forever.
+    const stopTimer = setTimeout(() => observer.disconnect(), 15000);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(stopTimer);
+    };
   }, [bannerPortalId]);
 
   // Build steps dynamically based on available content
