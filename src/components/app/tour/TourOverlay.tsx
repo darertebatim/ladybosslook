@@ -183,6 +183,40 @@ export function TourOverlay({
     let originalZIndex: string | null = null;
     let originalPosition: string | null = null;
 
+    // Walk up to find the nearest scrollable ancestor (handles
+    // NativeAppLayout's inner scroll container so iOS scrolls the
+    // right element instead of leaving the spotlight off-screen).
+    const findScrollableParent = (el: HTMLElement | null): HTMLElement | null => {
+      let parent = el?.parentElement ?? null;
+      while (parent) {
+        const style = window.getComputedStyle(parent);
+        const canScroll =
+          /(auto|scroll)/.test(style.overflowY) &&
+          parent.scrollHeight > parent.clientHeight;
+        if (canScroll) return parent;
+        parent = parent.parentElement;
+      }
+      return null;
+    };
+
+    const scrollTargetIntoView = (element: Element) => {
+      if (!(element instanceof HTMLElement)) return;
+      const scrollParent = findScrollableParent(element);
+      if (scrollParent) {
+        const elRect = element.getBoundingClientRect();
+        const parentRect = scrollParent.getBoundingClientRect();
+        const preferredOffset = Math.max(80, parentRect.height * 0.3);
+        const targetTop =
+          scrollParent.scrollTop + (elRect.top - parentRect.top) - preferredOffset;
+        scrollParent.scrollTo({
+          top: Math.max(0, targetTop),
+          behavior: 'smooth',
+        });
+      } else {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    };
+
     const updatePosition = () => {
       const element = document.querySelector(currentStep.target!);
       if (!element) {
@@ -216,6 +250,24 @@ export function TourOverlay({
       const rect = element.getBoundingClientRect();
       const spotlightPadding = 8;
 
+      // Fallback: if the target is still off-screen after scroll attempts,
+      // hide the spotlight and show the tooltip centered so the user
+      // never sees just a black layer.
+      const vh = window.innerHeight || 0;
+      const vw = window.innerWidth || 0;
+      const isOffscreen =
+        rect.bottom < 0 ||
+        rect.top > vh ||
+        rect.right < 0 ||
+        rect.left > vw ||
+        rect.width === 0 ||
+        rect.height === 0;
+      if (isOffscreen) {
+        setSpotlightRect(null);
+        setTooltipStyle(calculateTooltipPosition(null, 'center', tooltipRef.current));
+        return;
+      }
+
       // If the target is very tall (like a long list/card), highlight only the header/top area
       // to avoid an oversized spotlight that can feel “stuck”.
       const viewportHeight = window.innerHeight || 0;
@@ -241,18 +293,24 @@ export function TourOverlay({
     // Scroll element into view first, then update position
     const element = document.querySelector(currentStep.target!);
     if (element) {
-      // Scroll the element into view with padding
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
-      // Wait for scroll to complete before calculating positions
-      const scrollTimer = setTimeout(updatePosition, 400);
+      // Scroll the element into view (handles inner scroll containers on iOS)
+      scrollTargetIntoView(element);
+
+      // Multi-pass position updates: scroll animations on iOS can take
+      // 300-500ms; recompute the spotlight rect at several intervals so
+      // it lands on the target instead of off-screen.
+      const scrollTimer1 = setTimeout(updatePosition, 100);
+      const scrollTimer2 = setTimeout(updatePosition, 400);
+      const scrollTimer3 = setTimeout(updatePosition, 700);
       
       // Recalculate on scroll/resize
       window.addEventListener('scroll', updatePosition, true);
       window.addEventListener('resize', updatePosition);
       
       return () => {
-        clearTimeout(scrollTimer);
+        clearTimeout(scrollTimer1);
+        clearTimeout(scrollTimer2);
+        clearTimeout(scrollTimer3);
         window.removeEventListener('scroll', updatePosition, true);
         window.removeEventListener('resize', updatePosition);
         
