@@ -29,6 +29,8 @@ export interface TourStep {
   onComplete?: () => void;
   // Auto-advance after delay (ms)
   autoAdvance?: number;
+  // Custom label for the primary advance button (e.g. "Show me around")
+  ctaLabel?: string;
 }
 
 interface UseFeatureTourOptions {
@@ -185,3 +187,24 @@ export const resetAllTours = () => {
   const features: TourFeature[] = ['home', 'rituals', 'breathe', 'journal', 'player', 'period', 'programs', 'round', 'explore', 'playlist', 'action-sheet'];
   features.forEach(f => localStorage.removeItem(getTourKey(f)));
 };
+
+/**
+ * Prepend a friendly welcome step to a tour so users get an opt-in
+ * intro card before any spotlight overlay appears. Pair with
+ * `triggerOnMount: true` for a polished first-run experience.
+ */
+export const withWelcomeStep = (
+  steps: TourStep[],
+  opts?: { title?: string; description?: string; ctaLabel?: string }
+): TourStep[] => [
+  {
+    id: 'tour-welcome',
+    title: opts?.title ?? 'Welcome to Rilo ✨',
+    description:
+      opts?.description ??
+      "Want a quick 30-second tour? We'll walk you through the key spots so nothing feels like a mystery.",
+    position: 'center',
+    ctaLabel: opts?.ctaLabel ?? 'Show me around',
+  },
+  ...steps,
+];
