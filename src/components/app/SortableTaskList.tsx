@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils';
 import { UserTask, useReorderTasks, useCreateTask, useTaskTemplates, TaskTemplate, TASK_COLORS, TASK_COLOR_CLASSES } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { Dialog, DialogContent, DialogPortal } from '@/components/ui/dialog';
+import { useZIndex } from '@/contexts/ZStackContext';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
@@ -326,6 +327,12 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
   const [title, setTitle] = useState('');
   const [showIdeas, setShowIdeas] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
+
+  // Stacking: Radix DialogOverlay sits at parentZ. Suggestions render in a
+  // sibling DialogPortal and would otherwise fall behind the overlay, so we
+  // explicitly hoist them above it.
+  const parentZ = useZIndex();
+  const suggestionsZ = parentZ + 1;
   
   // Quick shortcut states
   const TIME_OPTIONS = ['Anytime', 'Morning', 'Afternoon', 'Evening', 'Bedtime'] as const;
@@ -696,7 +703,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
             <div
               ref={suggestionsLayerRef}
               className="fixed left-[50%] -translate-x-1/2 w-[calc(100%-32px)] max-w-[calc(100%-32px)] flex flex-col gap-2.5 pointer-events-auto"
-              style={{ top: suggestionsTop }}
+              style={{ top: suggestionsTop, zIndex: suggestionsZ }}
             >
               {/* Category pills */}
               <ScrollArea className="w-full shrink-0">
