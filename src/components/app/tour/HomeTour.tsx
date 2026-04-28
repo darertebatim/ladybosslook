@@ -27,34 +27,10 @@ export function HomeTour({
   const [userWantsTour, setUserWantsTour] = useState(false);
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
 
-  // Find portal target after mount.
-  // The slot lives inside conditionally-rendered planner content (only when
-  // taskFilter === 'all' AND data has loaded), so it may not exist on first
-  // render. Watch the DOM until it appears, and stop watching once found.
+  // Find portal target after mount
   useEffect(() => {
-    const tryFind = () => {
-      const target = document.getElementById(bannerPortalId);
-      if (target) {
-        setPortalTarget(target);
-        return true;
-      }
-      return false;
-    };
-
-    if (tryFind()) return;
-
-    const observer = new MutationObserver(() => {
-      if (tryFind()) observer.disconnect();
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    // Safety stop after 15s so we don't observe forever.
-    const stopTimer = setTimeout(() => observer.disconnect(), 15000);
-
-    return () => {
-      observer.disconnect();
-      clearTimeout(stopTimer);
-    };
+    const target = document.getElementById(bannerPortalId);
+    setPortalTarget(target);
   }, [bannerPortalId]);
 
   // Build steps dynamically based on available content
@@ -170,28 +146,9 @@ export function HomeTour({
   // Handle user clicking banner to start tour
   const handleStartTour = useCallback(() => {
     setUserWantsTour(true);
-    // Reset every scrollable container to the top so the first spotlight
-    // (and any subsequent task-list targets) are not hidden behind
-    // already-scrolled content. Without this users see the dark backdrop
-    // with the highlight off-screen.
-    try {
-      window.scrollTo({ top: 0, behavior: 'auto' });
-      document.querySelectorAll<HTMLElement>('*').forEach((el) => {
-        const style = window.getComputedStyle(el);
-        if (
-          /(auto|scroll)/.test(style.overflowY) &&
-          el.scrollHeight > el.clientHeight &&
-          el.scrollTop > 0
-        ) {
-          el.scrollTo({ top: 0, behavior: 'auto' });
-        }
-      });
-    } catch {
-      /* noop */
-    }
     setTimeout(() => {
       tour.forceStartTour();
-    }, 250);
+    }, 100);
   }, [tour.forceStartTour]);
 
   // Track if we've already called onTourReady to prevent infinite loops
@@ -207,18 +164,6 @@ export function HomeTour({
 
   return (
     <>
-      {/* Intro banner — rendered into the planner slot via portal
-          so the user gets an opt-in card BEFORE any spotlight appears. */}
-      {portalTarget &&
-        createPortal(
-          <TourBanner
-            isFirstOpen={isFirstOpen}
-            forceShow={forceShow}
-            onStartTour={handleStartTour}
-          />,
-          portalTarget
-        )}
-
       {/* Actual tour overlay */}
       <TourOverlay
         isActive={tour.isActive}

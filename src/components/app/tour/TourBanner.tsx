@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Sparkles } from 'lucide-react';
+import { X } from 'lucide-react';
+import tourBannerImage from '@/assets/tour-banner.png';
 import { supabase } from '@/integrations/supabase/client';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
 
 const TOUR_PROMPT_KEY = 'simora_tour_prompt_shown';
 const TOUR_PROMPT_DISMISSED_KEY = 'simora_tour_prompt_dismissed_at';
@@ -133,72 +132,33 @@ export function TourBanner({ isFirstOpen, onStartTour, forceShow = false }: Tour
     setIsVisible(false);
   };
 
+  if (!isVisible) return null;
+
   return (
-    <Sheet open={isVisible} onOpenChange={(v) => { if (!v) handleDismiss(); }}>
-      <SheetContent
-        side="bottom"
-        className="rounded-t-3xl border-t-0 px-6 pt-8 pb-10 max-h-[88vh]"
+    <div className="relative mb-4 rounded-2xl overflow-hidden shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+      {/* Dismiss button */}
+      <button
+        onClick={handleDismiss}
+        className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-black/20 hover:bg-black/30 transition-colors"
+        aria-label="Dismiss"
       >
-        <div className="flex flex-col items-center text-center -mx-6 -mt-8 -mb-10">
-          <div className="w-full bg-gradient-to-b from-primary/20 via-accent/20 to-background px-6 pt-8 pb-4 flex flex-col items-center">
-            <div className="h-24 w-24 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center ring-4 ring-primary/30 shadow-xl shadow-primary/20">
-              <Sparkles className="h-10 w-10 text-primary-foreground" />
-            </div>
+        <X className="h-4 w-4 text-white" />
+      </button>
 
-            <h2 className="mt-5 text-2xl font-bold text-foreground">
-              Welcome to Rilo!
-            </h2>
-
-            <p className="mt-2 text-sm text-foreground/70 max-w-sm">
-              Let me give you a quick tour of your Home — I'll point out the main parts so you feel right at ease.
-            </p>
-          </div>
-
-          <div className="w-full px-6 pb-10 flex flex-col items-center">
-            <div className="mt-6 w-full rounded-2xl bg-gradient-to-br from-accent/40 via-secondary/20 to-primary/15 p-5 space-y-3 text-left border border-primary/10 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-                What you'll discover
-              </p>
-              <div className="flex items-start gap-3">
-                <span className="text-xl">📋</span>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Your daily planner</p>
-                  <p className="text-xs text-foreground/65">Routines and tasks built for your day.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-xl">✨</span>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Self-care shortcuts</p>
-                  <p className="text-xs text-foreground/65">Quick access to mood, breathe, and more.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-xl">🏆</span>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Streaks & badges</p>
-                  <p className="text-xs text-foreground/65">Celebrate your daily wins.</p>
-                </div>
-              </div>
-            </div>
-
-            <Button
-              onClick={handleStartTour}
-              className="mt-6 w-full h-12 rounded-2xl text-base font-semibold bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-primary-foreground shadow-md shadow-primary/30"
-            >
-              Show me around
-            </Button>
-
-            <button
-              onClick={handleDismiss}
-              className="mt-3 text-sm font-medium text-muted-foreground active:scale-[0.98]"
-            >
-              Maybe later
-            </button>
-          </div>
-        </div>
-      </SheetContent>
-    </Sheet>
+      {/* Banner image - clickable */}
+      <button
+        onClick={handleStartTour}
+        className="w-full block active:opacity-90 transition-opacity"
+      >
+        <img
+          src={tourBannerImage}
+          alt="Take a Tour of the App"
+          className="w-full h-auto object-cover"
+          style={{ aspectRatio: '3 / 1' }}
+          loading="eager"
+        />
+      </button>
+    </div>
   );
 }
 

@@ -14,7 +14,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BUILD_INFO, getDisplayBuildInfo } from '@/lib/buildInfo';
 import { format } from 'date-fns';
-import { resetAllTours as resetAllToursFlags } from '@/lib/clientReset';
 
 // Build Info Card Component
 function BuildInfoCard() {
@@ -266,29 +265,6 @@ export default function System() {
           
           {/* Build Info Card */}
           <BuildInfoCard />
-          {/* Reset Feature Tours */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <RotateCcw className="h-5 w-5" />
-                Reset Feature Tours
-              </CardTitle>
-              <CardDescription>
-                Clears all tour flags AND the 3 first-action coach marks on Home (mark a task → tap to manage → tap + to add). Refresh Home after clicking.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  resetAllToursFlags();
-                  toast.success('Tours + coach marks reset — refresh /app/home to see the 3 small spotlights');
-                }}
-              >
-                Reset All Tours
-              </Button>
-            </CardContent>
-          </Card>
           {/* Enroll in All Programs */}
           <Card>
             <CardHeader>
