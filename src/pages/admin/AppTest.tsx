@@ -28,6 +28,7 @@ import {
   RefreshCw,
   MessageCircle,
   Globe,
+  Heart,
 } from 'lucide-react';
 import {
   AlertDialog,
