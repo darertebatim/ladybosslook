@@ -703,7 +703,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
             <div
               ref={suggestionsLayerRef}
               className="fixed left-[50%] -translate-x-1/2 w-[calc(100%-32px)] max-w-[calc(100%-32px)] flex flex-col gap-2.5 pointer-events-auto"
-              style={{ top: suggestionsTop }}
+              style={{ top: suggestionsTop, zIndex: suggestionsZ }}
             >
               {/* Category pills */}
               <ScrollArea className="w-full shrink-0">
