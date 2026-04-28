@@ -12,6 +12,47 @@ const IOS_APP_ID = '6755076134';
 const IOS_REVIEW_URL_NATIVE = `itms-apps://itunes.apple.com/app/id${IOS_APP_ID}?action=write-review`;
 const IOS_REVIEW_URL_WEB = `https://apps.apple.com/app/id${IOS_APP_ID}?action=write-review`;
 
+// Android Play Store package + direct review deep links
+const ANDROID_PACKAGE = 'com.ladybosslook.academy';
+const ANDROID_REVIEW_URL_NATIVE = `market://details?id=${ANDROID_PACKAGE}&showAllReviews=true`;
+const ANDROID_REVIEW_URL_WEB = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}&showAllReviews=true`;
+
+/**
+ * Open the Google Play Store directly to the app's review section.
+ * Used as a fallback when the native In-App Review API silently no-ops.
+ */
+export async function openAndroidReviewPage(trigger?: string): Promise<boolean> {
+  try {
+    const url = Capacitor.isNativePlatform() ? ANDROID_REVIEW_URL_NATIVE : ANDROID_REVIEW_URL_WEB;
+    window.open(url, '_blank');
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        let appVersion: string | undefined;
+        try {
+          if (Capacitor.isNativePlatform()) {
+            const info = await App.getInfo();
+            appVersion = info.version;
+          }
+        } catch {}
+        await supabase.from('app_review_prompts').insert({
+          user_id: user.id,
+          platform: Capacitor.getPlatform() === 'android' ? 'android' : 'web',
+          trigger_source: trigger ?? 'android_softlink',
+          success: true,
+          forced: false,
+          app_version: appVersion ?? null,
+          error_message: 'softlink',
+        });
+      }
+    } catch {}
+    return true;
+  } catch (e) {
+    console.warn('[Review] Failed to open Android review URL', e);
+    return false;
+  }
+}
+
 /**
  * Open the iOS App Store directly to the "Write a Review" page.
  * Bypasses Apple's 3/365 native quota since it's a regular link.
@@ -121,10 +162,24 @@ export function useAppReview() {
     []
   );
 
+  /**
+   * Android-only soft-link review. Opens the Play Store review page directly.
+   * Use this as a guaranteed fallback when you want a 100% reliable open
+   * (vs. the throttled native In-App Review API).
+   */
+  const openAndroidReviewSoftLink = useCallback(
+    async (trigger?: string): Promise<boolean> => {
+      if (Capacitor.getPlatform() !== 'android') return false;
+      return openAndroidReviewPage(trigger);
+    },
+    []
+  );
+
   return {
     maybeRequestReview,
     maybeRequestReviewAndroidOnly,
     openIOSReviewSoftLink,
+    openAndroidReviewSoftLink,
     shouldShowForStreak,
     shouldShowForCourseCompletion,
     canRequestReview,
