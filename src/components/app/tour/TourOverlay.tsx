@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { TourStep, setGlobalTourActive } from '@/hooks/useFeatureTour';
-import { X, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, AlarmClock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
@@ -378,8 +378,8 @@ export function TourOverlay({
 
         {/* Action indicator */}
         {currentStep.action && (
-          <div className="flex items-center gap-1.5 text-xs text-primary font-medium mb-2">
-            <Sparkles className="h-3 w-3" />
+          <div className="flex items-center gap-1.5 text-xs text-indigo-600 font-medium mb-2">
+            <AlarmClock className="h-3 w-3" />
             {currentStep.action === 'tap' && 'Try tapping'}
             {currentStep.action === 'swipe' && 'Try swiping'}
             {currentStep.action === 'look' && 'Take a look'}
