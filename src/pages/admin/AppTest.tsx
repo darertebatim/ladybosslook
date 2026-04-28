@@ -1080,6 +1080,15 @@ export default function AppTest() {
               Open Android Review Page (soft-link)
             </Button>
           </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              onClick={() => setShowSoftReviewPrompt(true)}
+              variant="secondary"
+            >
+              <Heart className="h-4 w-4 mr-2" />
+              Preview Soft Review Popup
+            </Button>
+          </div>
           <p className="text-xs text-muted-foreground">
             <strong>iOS:</strong> max 3 prompts per 365 days per user (Apple-throttled).
             <br />
