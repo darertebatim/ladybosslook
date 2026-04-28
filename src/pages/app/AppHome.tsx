@@ -1476,6 +1476,7 @@ const AppHome = () => {
             localStorage.setItem('simora_first_action_celebrated', 'true');
             localStorage.setItem('simora_tap_coach_shown', 'true');
             localStorage.setItem('simora_add_coach_shown', 'true');
+            localStorage.removeItem('simora_force_new_user');
           }}
         />
 
