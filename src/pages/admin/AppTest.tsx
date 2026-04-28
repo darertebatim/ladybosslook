@@ -1427,6 +1427,16 @@ export default function AppTest() {
       {/* Language Preference Popup */}
       <LanguagePreferencePopup open={showLanguagePopup} onClose={() => setShowLanguagePopup(false)} />
 
+      {/* Soft Review Prompt (preview) */}
+      <SoftReviewPrompt
+        isOpen={showSoftReviewPrompt}
+        onClose={() => setShowSoftReviewPrompt(false)}
+        onAccept={() => {
+          setShowSoftReviewPrompt(false);
+          toast.success('Accepted — would open store review page');
+        }}
+      />
+
       {/* Instructor Referral Previews */}
       {(() => {
         const scenarios = {
