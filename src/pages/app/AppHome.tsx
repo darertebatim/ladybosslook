@@ -1447,6 +1447,28 @@ const AppHome = () => {
           <div style={{ height: isKeyboardOpen ? '24px' : '120px' }} />
         </div>
 
+        {/* Bundled spotlight intro popup (Dear Me-style) */}
+        <HomeSpotlightIntro
+          isOpen={showSpotlightIntro}
+          onStart={() => {
+            setShowSpotlightIntro(false);
+            spotlightTourActiveRef.current = true;
+            scrollHomeToTop();
+            setTimeout(() => {
+              setShowFirstCoachMark(true);
+            }, 500);
+          }}
+          onSkip={() => {
+            setShowSpotlightIntro(false);
+            spotlightTourActiveRef.current = false;
+            // Mark all sub-flags so nothing else fires
+            localStorage.setItem(SPOTLIGHT_TOUR_KEY, 'true');
+            localStorage.setItem('simora_first_action_celebrated', 'true');
+            localStorage.setItem('simora_tap_coach_shown', 'true');
+            localStorage.setItem('simora_add_coach_shown', 'true');
+          }}
+        />
+
         {/* + Button Coach Mark Spotlight */}
         {showAddCoachMark && (() => {
           const el = document.querySelector('.coach-add-btn');
