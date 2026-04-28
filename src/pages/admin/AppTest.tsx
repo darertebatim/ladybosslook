@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useToast } from '@/hooks/use-toast';
 import { forceRequestReview } from '@/lib/appReview';
 import { openIOSReviewPage, openAndroidReviewPage } from '@/hooks/useAppReview';
+import { SoftReviewPrompt } from '@/components/app/SoftReviewPrompt';
 import { 
   Bell, 
   Trophy, 
@@ -27,6 +28,7 @@ import {
   RefreshCw,
   MessageCircle,
   Globe,
+  Heart,
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -100,6 +102,7 @@ export default function AppTest() {
   const [showReturningUserSheet, setShowReturningUserSheet] = useState(false);
   const [showActionLimit, setShowActionLimit] = useState(false);
   const [showPlusGate, setShowPlusGate] = useState(false);
+  const [showSoftReviewPrompt, setShowSoftReviewPrompt] = useState(false);
   
   // Badge celebration states
   const [badgeCelebrationType, setBadgeCelebrationType] = useState<BadgeCelebrationLevel | null>(null);
@@ -1078,6 +1081,15 @@ export default function AppTest() {
               Open Android Review Page (soft-link)
             </Button>
           </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              onClick={() => setShowSoftReviewPrompt(true)}
+              variant="secondary"
+            >
+              <Heart className="h-4 w-4 mr-2" />
+              Preview Soft Review Popup
+            </Button>
+          </div>
           <p className="text-xs text-muted-foreground">
             <strong>iOS:</strong> max 3 prompts per 365 days per user (Apple-throttled).
             <br />
@@ -1414,6 +1426,16 @@ export default function AppTest() {
 
       {/* Language Preference Popup */}
       <LanguagePreferencePopup open={showLanguagePopup} onClose={() => setShowLanguagePopup(false)} />
+
+      {/* Soft Review Prompt (preview) */}
+      <SoftReviewPrompt
+        isOpen={showSoftReviewPrompt}
+        onClose={() => setShowSoftReviewPrompt(false)}
+        onAccept={() => {
+          setShowSoftReviewPrompt(false);
+          toast.success('Accepted — would open store review page');
+        }}
+      />
 
       {/* Instructor Referral Previews */}
       {(() => {
