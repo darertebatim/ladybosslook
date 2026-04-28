@@ -164,6 +164,18 @@ export function HomeTour({
 
   return (
     <>
+      {/* Intro banner — rendered into the planner slot via portal
+          so the user gets an opt-in card BEFORE any spotlight appears. */}
+      {portalTarget &&
+        createPortal(
+          <TourBanner
+            isFirstOpen={isFirstOpen}
+            forceShow={forceShow}
+            onStartTour={handleStartTour}
+          />,
+          portalTarget
+        )}
+
       {/* Actual tour overlay */}
       <TourOverlay
         isActive={tour.isActive}
