@@ -11,7 +11,7 @@ import { useAppReview } from '@/hooks/useAppReview';
  */
 export default function AppRate() {
   const navigate = useNavigate();
-  const { maybeRequestReview } = useAppReview();
+  const { openIOSReviewSoftLink, maybeRequestReviewAndroidOnly } = useAppReview();
   const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
@@ -19,15 +19,22 @@ export default function AppRate() {
       // Show the soft review prompt on native
       setShowPrompt(true);
     } else {
-      // On web, open App Store link directly
-      window.open('https://apps.apple.com/app/simora-ladybosslook/id6755076134', '_blank');
+      // On web, open App Store "write review" link directly
+      window.open('https://apps.apple.com/app/id6755076134?action=write-review', '_blank');
       navigate(-1);
     }
   }, [navigate]);
 
   const handleAccept = async () => {
     setShowPrompt(false);
-    await maybeRequestReview('app_rate_page');
+    const platform = Capacitor.getPlatform();
+    if (platform === 'ios') {
+      // iOS: open App Store review page directly (no quota)
+      await openIOSReviewSoftLink('app_rate_page_ios');
+    } else if (platform === 'android') {
+      // Android: try native In-App Review API
+      await maybeRequestReviewAndroidOnly('app_rate_page_android');
+    }
     navigate(-1);
   };
 
