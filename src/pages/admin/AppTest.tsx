@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useToast } from '@/hooks/use-toast';
 import { forceRequestReview } from '@/lib/appReview';
 import { openIOSReviewPage, openAndroidReviewPage } from '@/hooks/useAppReview';
+import { SoftReviewPrompt } from '@/components/app/SoftReviewPrompt';
 import { 
   Bell, 
   Trophy, 
