@@ -207,13 +207,18 @@ export async function initAppsFlyer(): Promise<void> {
       console.warn('[AppsFlyer] Failed to register conversion listener:', err);
     }
 
+    // appID must ONLY be set for iOS (App Store numeric ID).
+    // Passing the iOS ID on Android triggers a 404 from AppsFlyer's
+    // attribution server and the SDK silently falls back to "Organic"
+    // for every install — breaking OneLink deep links.
+    const isIOS = Capacitor.getPlatform() === 'ios';
     await AppsFlyer.initSDK({
       devKey: APPSFLYER_DEV_KEY,
       isDebug: false,
-      appID: APPLE_APP_ID, // Required for iOS
+      ...(isIOS ? { appID: APPLE_APP_ID } : {}),
       registerOnDeepLink: true,
       registerConversionListener: true,
-      waitForATTUserAuthorization: 10, // Wait up to 10s for ATT prompt on iOS
+      waitForATTUserAuthorization: 10, // iOS-only; ignored on Android
     });
 
     await AppsFlyer.startSDK();
