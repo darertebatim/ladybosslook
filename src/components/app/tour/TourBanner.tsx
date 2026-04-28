@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
-import tourBannerImage from '@/assets/tour-banner.png';
+import { Sparkles, ChevronRight, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 const TOUR_PROMPT_KEY = 'simora_tour_prompt_shown';
@@ -135,29 +134,44 @@ export function TourBanner({ isFirstOpen, onStartTour, forceShow = false }: Tour
   if (!isVisible) return null;
 
   return (
-    <div className="relative mb-4 rounded-2xl overflow-hidden shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
-      {/* Dismiss button */}
+    <div className="relative mb-4 overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
       <button
         onClick={handleDismiss}
-        className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-black/20 hover:bg-black/30 transition-colors"
+        className="absolute right-3 top-3 z-10 rounded-full bg-muted/80 p-1.5 text-muted-foreground active:scale-95"
         aria-label="Dismiss"
       >
-        <X className="h-4 w-4 text-white" />
+        <X className="h-4 w-4" />
       </button>
 
-      {/* Banner image - clickable */}
-      <button
-        onClick={handleStartTour}
-        className="w-full block active:opacity-90 transition-opacity"
-      >
-        <img
-          src={tourBannerImage}
-          alt="Take a Tour of the App"
-          className="w-full h-auto object-cover"
-          style={{ aspectRatio: '3 / 1' }}
-          loading="eager"
-        />
-      </button>
+      <div className="flex items-start gap-3 p-4 pr-12">
+        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-primary">
+          <Sparkles className="h-5 w-5" />
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-foreground">New here?</p>
+          <p className="mt-1 text-sm leading-5 text-muted-foreground">
+            Start a quick Home tour and I’ll point out the main parts before you explore.
+          </p>
+
+          <div className="mt-3 flex items-center gap-2">
+            <button
+              onClick={handleStartTour}
+              className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground active:scale-[0.98]"
+            >
+              Show me around
+              <ChevronRight className="h-4 w-4" />
+            </button>
+
+            <button
+              onClick={handleDismiss}
+              className="inline-flex min-h-10 items-center rounded-xl bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground active:scale-[0.98]"
+            >
+              Maybe later
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
