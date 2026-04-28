@@ -58,11 +58,25 @@ export function resetAllTours(): void {
   // Tour welcome popup flags - so it re-appears
   localStorage.removeItem('simora_tour_prompt_shown');
   localStorage.removeItem('simora_tour_prompt_dismissed_at');
-  
-  // Set a flag to force tour popup to show immediately
+
+  // First-action coach marks (the 3 small spotlights on Home:
+  //   1) "mark off your first task"
+  //   2) "tap to manage"
+  //   3) "tap + to add")
+  localStorage.removeItem('simora_first_action_celebrated');
+  localStorage.removeItem('simora_tap_coach_shown');
+  localStorage.removeItem('simora_welcome_card_dismissed');
+  localStorage.removeItem('simora_welcome_card_action_added');
+
+  // Force the home page to treat this session as a brand-new user so the
+  // first-action coach marks fire again even if the server still shows
+  // historical completions.
+  localStorage.setItem('simora_force_new_user', 'true');
+
+  // Set a flag to force tour popup to show immediately (opt-in banner)
   localStorage.setItem('simora_tours_just_reset', 'true');
-  
-  console.log('[clientReset] All tours reset');
+
+  console.log('[clientReset] All tours + first-action coach marks reset');
 }
 
 /**
