@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { useResetPlannerData } from '@/hooks/useTaskPlanner';
-import { RotateCcw, UserCheck, Loader2, Smartphone, Copy, Check, RefreshCw, Download, Sparkles } from 'lucide-react';
+import { RotateCcw, UserCheck, Loader2, Smartphone, Copy, Check, RefreshCw, Download, Sparkles, AlarmClock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BUILD_INFO, getDisplayBuildInfo } from '@/lib/buildInfo';
@@ -337,7 +337,7 @@ export default function System() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5" />
+                <AlarmClock className="h-5 w-5" />
                 Reset Home Spotlight Tour
               </CardTitle>
               <CardDescription>
@@ -358,7 +358,7 @@ export default function System() {
                   toast.success('Spotlight tour reset — open /app/home to test');
                 }}
               >
-                <Sparkles className="h-4 w-4 mr-2" />
+                <AlarmClock className="h-4 w-4 mr-2" />
                 Reset Spotlight Tour
               </Button>
             </CardContent>

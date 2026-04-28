@@ -1,4 +1,4 @@
-import { Sparkles } from 'lucide-react';
+import { AlarmClock } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 
@@ -42,8 +42,8 @@ export function HomeSpotlightIntro({ isOpen, onStart, onSkip }: HomeSpotlightInt
         style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}
       >
         <div className="px-6 pt-7 pb-4 text-center">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-amber-200/70 mb-4">
-            <Sparkles className="w-7 h-7 text-amber-600" />
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-100 mb-4">
+            <AlarmClock className="w-7 h-7 text-indigo-600" />
           </div>
 
           <h2 className="text-2xl font-bold mb-2">
