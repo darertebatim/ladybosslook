@@ -11,7 +11,7 @@ import { useAppReview } from '@/hooks/useAppReview';
  */
 export default function AppRate() {
   const navigate = useNavigate();
-  const { openIOSReviewSoftLink, maybeRequestReviewAndroidOnly } = useAppReview();
+  const { openIOSReviewSoftLink, openAndroidReviewSoftLink, maybeRequestReviewAndroidOnly } = useAppReview();
   const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
@@ -32,8 +32,12 @@ export default function AppRate() {
       // iOS: open App Store review page directly (no quota)
       await openIOSReviewSoftLink('app_rate_page_ios');
     } else if (platform === 'android') {
-      // Android: try native In-App Review API
-      await maybeRequestReviewAndroidOnly('app_rate_page_android');
+      // Android: try native In-App Review API first; if it returns false
+      // (cooldown, plugin unavailable, or system-throttled), open Play Store directly.
+      const opened = await maybeRequestReviewAndroidOnly('app_rate_page_android');
+      if (!opened) {
+        await openAndroidReviewSoftLink('app_rate_page_android_softlink');
+      }
     }
     navigate(-1);
   };
