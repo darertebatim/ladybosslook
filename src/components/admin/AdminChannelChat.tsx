@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Loader2, MoreVertical, Pin, PinOff, Pencil, Trash2 } from 'lucide-react';
+import { Loader2, MoreVertical, Pin, PinOff, Pencil, Trash2, Eye } from 'lucide-react';
 import { format, isToday, isYesterday, differenceInMinutes } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -135,6 +135,31 @@ export function AdminChannelChat() {
       return data as Post[];
     },
     enabled: !!selectedChannelId,
+  });
+
+  // Fetch read-counts (how many users saw each post) for the selected channel
+  const { data: readCounts } = useQuery({
+    queryKey: ['admin-channel-post-reads', selectedChannelId, posts?.length ?? 0],
+    queryFn: async () => {
+      if (!posts || posts.length === 0) return {} as Record<string, number>;
+      const ids = posts.map((p) => p.id);
+      const counts: Record<string, number> = {};
+      // page in chunks to stay well under the .in() limit
+      const CHUNK = 200;
+      for (let i = 0; i < ids.length; i += CHUNK) {
+        const slice = ids.slice(i, i + CHUNK);
+        const { data, error } = await supabase
+          .from('feed_post_reads')
+          .select('post_id')
+          .in('post_id', slice);
+        if (error) throw error;
+        for (const r of data ?? []) {
+          counts[r.post_id] = (counts[r.post_id] ?? 0) + 1;
+        }
+      }
+      return counts;
+    },
+    enabled: !!selectedChannelId && !!posts && posts.length > 0,
   });
 
   // Scroll to bottom when posts change
@@ -395,6 +420,12 @@ export function AdminChannelChat() {
                               className="mt-2 rounded-lg max-h-48 object-cover"
                             />
                           )}
+
+                        {/* Seen-by counter */}
+                        <div className="mt-1.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+                          <Eye className="h-3 w-3" />
+                          <span>Seen by {readCounts?.[post.id] ?? 0}</span>
+                        </div>
 
                           {/* Actions menu - always visible for admin */}
                           <div className="absolute -right-1 -top-1 opacity-0 group-hover:opacity-100 transition-opacity">
