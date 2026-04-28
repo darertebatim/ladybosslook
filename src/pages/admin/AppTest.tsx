@@ -101,6 +101,7 @@ export default function AppTest() {
   const [showReturningUserSheet, setShowReturningUserSheet] = useState(false);
   const [showActionLimit, setShowActionLimit] = useState(false);
   const [showPlusGate, setShowPlusGate] = useState(false);
+  const [showSoftReviewPrompt, setShowSoftReviewPrompt] = useState(false);
   
   // Badge celebration states
   const [badgeCelebrationType, setBadgeCelebrationType] = useState<BadgeCelebrationLevel | null>(null);
