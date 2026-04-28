@@ -327,6 +327,12 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
   const [title, setTitle] = useState('');
   const [showIdeas, setShowIdeas] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
+
+  // Stacking: Radix DialogOverlay sits at parentZ. Suggestions render in a
+  // sibling DialogPortal and would otherwise fall behind the overlay, so we
+  // explicitly hoist them above it.
+  const parentZ = useZIndex();
+  const suggestionsZ = parentZ + 1;
   
   // Quick shortcut states
   const TIME_OPTIONS = ['Anytime', 'Morning', 'Afternoon', 'Evening', 'Bedtime'] as const;
