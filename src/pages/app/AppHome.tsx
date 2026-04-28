@@ -857,6 +857,7 @@ const AppHome = () => {
           // Tour complete after the final spotlight is shown
           localStorage.setItem(SPOTLIGHT_TOUR_KEY, 'true');
           spotlightTourActiveRef.current = false;
+          localStorage.removeItem('simora_force_new_user');
         }, 450);
       }, 1500);
       return () => clearTimeout(t);
