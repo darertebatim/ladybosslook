@@ -51,6 +51,7 @@ import { WeeklyReviewBanner } from '@/components/app/WeeklyReviewBanner';
 import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { HomeSpotlightIntro } from '@/components/app/home/HomeSpotlightIntro';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
@@ -150,6 +151,19 @@ const AppHome = () => {
   
   // Third coach mark: "Tap + to add" - shown after user closes task detail from tap coach mark
   const [showAddCoachMark, setShowAddCoachMark] = useState(false);
+
+  // Bundled spotlight tour: intro popup + sequenced 3 spotlights
+  const SPOTLIGHT_TOUR_KEY = 'simora_spotlight_tour_done';
+  const [showSpotlightIntro, setShowSpotlightIntro] = useState(false);
+  const spotlightTourActiveRef = useRef(false);
+
+  const scrollHomeToTop = useCallback(() => {
+    try {
+      homeScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch {
+      if (homeScrollRef.current) homeScrollRef.current.scrollTop = 0;
+    }
+  }, [homeScrollRef]);
   
   // Streak goal selection state
   const [showGoalSelection, setShowGoalSelection] = useState(false);
@@ -764,23 +778,27 @@ const AppHome = () => {
     tapCoachMarkTriggeredRef.current = false;
   }, [tasksLoading, tasks.length, showFirstCoachMark, showTapCoachMark, showAddCoachMark]);
   
-  // Auto-show first coach mark ("mark off your first task") after 3s for brand new users
+  // Show the bundled spotlight intro popup once for brand-new users.
+  // The 3 spotlights now only fire after the user taps "Show me" in the intro,
+  // so they never start while the user is mid-scroll.
   useEffect(() => {
     if (
-      localStorage.getItem('simora_first_action_celebrated') !== 'true' &&
-      !tasksLoading &&
-      tasks.length > 0 &&
-      completedTaskIds.size === 0 &&
-      totalCompletions === 0 &&
-      !showFirstCoachMark &&
-      !showStreakModal
+      localStorage.getItem(SPOTLIGHT_TOUR_KEY) === 'true' ||
+      localStorage.getItem('simora_first_action_celebrated') === 'true' ||
+      homeDataLoading ||
+      tasksLoading ||
+      tasks.length === 0 ||
+      completedTaskIds.size > 0 ||
+      totalCompletions > 0 ||
+      showStreakModal ||
+      showSpotlightIntro ||
+      spotlightTourActiveRef.current
     ) {
-      const t = setTimeout(() => {
-        setShowFirstCoachMark(true);
-      }, 3000);
-      return () => clearTimeout(t);
+      return;
     }
-  }, [tasksLoading, tasks.length, completedTaskIds.size, totalCompletions, showFirstCoachMark, showStreakModal]);
+    const t = setTimeout(() => setShowSpotlightIntro(true), 1000);
+    return () => clearTimeout(t);
+  }, [homeDataLoading, tasksLoading, tasks.length, completedTaskIds.size, totalCompletions, showStreakModal, showSpotlightIntro]);
 
   // Dismiss first coach mark when user completes a task
   useEffect(() => {
@@ -789,36 +807,52 @@ const AppHome = () => {
     }
   }, [showFirstCoachMark, completedTaskIds.size]);
 
-  // Auto-show tap coach mark for new users after 5 seconds (only after first coach mark is done)
+  // Step 2 of the bundled tour: when the first task is completed during the tour,
+  // wait for the celebration to settle, scroll to top, then show the tap spotlight.
   useEffect(() => {
     if (
-      localStorage.getItem('simora_tap_coach_shown') !== 'true' &&
-      localStorage.getItem('simora_first_action_celebrated') === 'true' &&
-      !tasksLoading &&
-      tasks.length > 0 &&
-      !showTapCoachMark &&
-      !showFirstCoachMark &&
-      !showStreakModal
+      !spotlightTourActiveRef.current ||
+      localStorage.getItem('simora_tap_coach_shown') === 'true' ||
+      tasksLoading ||
+      tasks.length === 0 ||
+      completedTaskIds.size === 0 ||
+      showTapCoachMark ||
+      showStreakModal
     ) {
-      const t = setTimeout(() => {
+      return;
+    }
+    const t = setTimeout(() => {
+      scrollHomeToTop();
+      setTimeout(() => {
         setShowTapCoachMark(true);
         localStorage.setItem('simora_tap_coach_shown', 'true');
-      }, 5000);
-      return () => clearTimeout(t);
-    }
-  }, [tasksLoading, tasks.length, showTapCoachMark, showFirstCoachMark, showStreakModal]);
+      }, 450);
+    }, 1200);
+    return () => clearTimeout(t);
+  }, [tasksLoading, tasks.length, completedTaskIds.size, showTapCoachMark, showStreakModal, scrollHomeToTop]);
 
-  // When task detail sheet closes after the tap coach mark, show + button spotlight after 2s
+  // Step 3 of the bundled tour: when the task detail sheet closes after the tap
+  // coach mark, scroll to top and show the + button spotlight.
   useEffect(() => {
-    if (!selectedTask && tapCoachMarkTriggeredRef.current && localStorage.getItem('simora_add_coach_shown') !== 'true') {
+    if (
+      !selectedTask &&
+      tapCoachMarkTriggeredRef.current &&
+      localStorage.getItem('simora_add_coach_shown') !== 'true'
+    ) {
       tapCoachMarkTriggeredRef.current = false;
       const t = setTimeout(() => {
-        setShowAddCoachMark(true);
-        localStorage.setItem('simora_add_coach_shown', 'true');
-      }, 2000);
+        scrollHomeToTop();
+        setTimeout(() => {
+          setShowAddCoachMark(true);
+          localStorage.setItem('simora_add_coach_shown', 'true');
+          // Tour complete after the final spotlight is shown
+          localStorage.setItem(SPOTLIGHT_TOUR_KEY, 'true');
+          spotlightTourActiveRef.current = false;
+        }, 450);
+      }, 1500);
       return () => clearTimeout(t);
     }
-  }, [selectedTask]);
+  }, [selectedTask, scrollHomeToTop]);
   const handleDateSelect = useCallback((date: Date) => {
     setSelectedDate(date);
     setShowCalendar(false);
@@ -1412,6 +1446,28 @@ const AppHome = () => {
           {/* Extra padding for bottom nav */}
           <div style={{ height: isKeyboardOpen ? '24px' : '120px' }} />
         </div>
+
+        {/* Bundled spotlight intro popup (Dear Me-style) */}
+        <HomeSpotlightIntro
+          isOpen={showSpotlightIntro}
+          onStart={() => {
+            setShowSpotlightIntro(false);
+            spotlightTourActiveRef.current = true;
+            scrollHomeToTop();
+            setTimeout(() => {
+              setShowFirstCoachMark(true);
+            }, 500);
+          }}
+          onSkip={() => {
+            setShowSpotlightIntro(false);
+            spotlightTourActiveRef.current = false;
+            // Mark all sub-flags so nothing else fires
+            localStorage.setItem(SPOTLIGHT_TOUR_KEY, 'true');
+            localStorage.setItem('simora_first_action_celebrated', 'true');
+            localStorage.setItem('simora_tap_coach_shown', 'true');
+            localStorage.setItem('simora_add_coach_shown', 'true');
+          }}
+        />
 
         {/* + Button Coach Mark Spotlight */}
         {showAddCoachMark && (() => {

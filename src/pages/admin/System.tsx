@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { useResetPlannerData } from '@/hooks/useTaskPlanner';
-import { RotateCcw, UserCheck, Loader2, Smartphone, Copy, Check, RefreshCw, Download } from 'lucide-react';
+import { RotateCcw, UserCheck, Loader2, Smartphone, Copy, Check, RefreshCw, Download, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BUILD_INFO, getDisplayBuildInfo } from '@/lib/buildInfo';
@@ -330,6 +330,37 @@ export default function System() {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
+            </CardContent>
+          </Card>
+
+          {/* Reset Home Spotlight Tour */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5" />
+                Reset Home Spotlight Tour
+              </CardTitle>
+              <CardDescription>
+                Clears the new-user spotlight flags so the intro popup and the
+                3-step spotlight sequence (complete a task → tap a task → add a
+                task) play again on the next visit to /app/home.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  localStorage.removeItem('simora_spotlight_tour_done');
+                  localStorage.removeItem('simora_first_action_celebrated');
+                  localStorage.removeItem('simora_tap_coach_shown');
+                  localStorage.removeItem('simora_add_coach_shown');
+                  localStorage.setItem('simora_force_new_user', 'true');
+                  toast.success('Spotlight tour reset — open /app/home to test');
+                }}
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Reset Spotlight Tour
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
