@@ -146,9 +146,28 @@ export function HomeTour({
   // Handle user clicking banner to start tour
   const handleStartTour = useCallback(() => {
     setUserWantsTour(true);
+    // Reset every scrollable container to the top so the first spotlight
+    // (and any subsequent task-list targets) are not hidden behind
+    // already-scrolled content. Without this users see the dark backdrop
+    // with the highlight off-screen.
+    try {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      document.querySelectorAll<HTMLElement>('*').forEach((el) => {
+        const style = window.getComputedStyle(el);
+        if (
+          /(auto|scroll)/.test(style.overflowY) &&
+          el.scrollHeight > el.clientHeight &&
+          el.scrollTop > 0
+        ) {
+          el.scrollTo({ top: 0, behavior: 'auto' });
+        }
+      });
+    } catch {
+      /* noop */
+    }
     setTimeout(() => {
       tour.forceStartTour();
-    }, 100);
+    }, 250);
   }, [tour.forceStartTour]);
 
   // Track if we've already called onTourReady to prevent infinite loops
@@ -164,6 +183,18 @@ export function HomeTour({
 
   return (
     <>
+      {/* Intro banner — rendered into the planner slot via portal
+          so the user gets an opt-in card BEFORE any spotlight appears. */}
+      {portalTarget &&
+        createPortal(
+          <TourBanner
+            isFirstOpen={isFirstOpen}
+            forceShow={forceShow}
+            onStartTour={handleStartTour}
+          />,
+          portalTarget
+        )}
+
       {/* Actual tour overlay */}
       <TourOverlay
         isActive={tour.isActive}
