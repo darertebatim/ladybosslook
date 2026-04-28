@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils';
 import { UserTask, useReorderTasks, useCreateTask, useTaskTemplates, TaskTemplate, TASK_COLORS, TASK_COLOR_CLASSES } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { Dialog, DialogContent, DialogPortal } from '@/components/ui/dialog';
+import { useZIndex } from '@/contexts/ZStackContext';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { TaskCard } from './TaskCard';
 import { haptic } from '@/lib/haptics';
