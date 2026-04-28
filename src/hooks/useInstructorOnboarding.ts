@@ -22,6 +22,12 @@ export function invalidateInstructorBundleCaches(queryClient: QueryClient) {
     ['new-home-data'],
     ['home-data'],
     ['planner-all-tasks'],
+    ['planner-program-events'],
+    ['planner-program-event-dates'],
+    ['programs'],
+    ['program-rounds'],
+    ['program-sessions'],
+    ['user-program-progress'],
     ['user-tasks'],
     ['user-routines-bank'],
     ['user-routines'],
@@ -37,7 +43,12 @@ export function invalidateInstructorBundleCaches(queryClient: QueryClient) {
     ['channels'],
     ['profile'],
   ];
-  keys.forEach((key) => queryClient.invalidateQueries({ queryKey: key }));
+  // Use refetchQueries (not just invalidate) so iOS picks up new data
+  // immediately, even when no component is currently subscribed/focused.
+  keys.forEach((key) => {
+    queryClient.invalidateQueries({ queryKey: key });
+    queryClient.refetchQueries({ queryKey: key, type: 'active' });
+  });
 }
 
 export interface PendingInstructor {
