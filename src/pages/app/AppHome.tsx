@@ -782,19 +782,28 @@ const AppHome = () => {
   // The 3 spotlights now only fire after the user taps "Show me" in the intro,
   // so they never start while the user is mid-scroll.
   useEffect(() => {
+    const forced = localStorage.getItem('simora_force_new_user') === 'true';
     if (
       localStorage.getItem(SPOTLIGHT_TOUR_KEY) === 'true' ||
-      localStorage.getItem('simora_first_action_celebrated') === 'true' ||
       homeDataLoading ||
       tasksLoading ||
       tasks.length === 0 ||
-      completedTaskIds.size > 0 ||
-      totalCompletions > 0 ||
       showStreakModal ||
       showSpotlightIntro ||
       spotlightTourActiveRef.current
     ) {
       return;
+    }
+    // For real new users, only show when there are no completions yet.
+    // For admin testing, `simora_force_new_user` bypasses these checks.
+    if (!forced) {
+      if (
+        localStorage.getItem('simora_first_action_celebrated') === 'true' ||
+        completedTaskIds.size > 0 ||
+        totalCompletions > 0
+      ) {
+        return;
+      }
     }
     const t = setTimeout(() => setShowSpotlightIntro(true), 1000);
     return () => clearTimeout(t);
@@ -848,6 +857,7 @@ const AppHome = () => {
           // Tour complete after the final spotlight is shown
           localStorage.setItem(SPOTLIGHT_TOUR_KEY, 'true');
           spotlightTourActiveRef.current = false;
+          localStorage.removeItem('simora_force_new_user');
         }, 450);
       }, 1500);
       return () => clearTimeout(t);
@@ -1466,6 +1476,7 @@ const AppHome = () => {
             localStorage.setItem('simora_first_action_celebrated', 'true');
             localStorage.setItem('simora_tap_coach_shown', 'true');
             localStorage.setItem('simora_add_coach_shown', 'true');
+            localStorage.removeItem('simora_force_new_user');
           }}
         />
 
