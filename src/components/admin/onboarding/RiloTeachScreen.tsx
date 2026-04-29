@@ -9,8 +9,9 @@ interface Props {
 }
 
 /**
- * Custom 3-screen "What is Rilo?" teach flow.
- * Variant is encoded in `step.illustrationLabel`: 'planner' | 'routine' | 'suggest'.
+ * Custom "What is Rilo?" teach flow screens.
+ * Variant is encoded in `step.illustrationLabel`:
+ *   'planner' | 'routine' | 'task-details' | 'tools-hub' | 'suggest'
  * No inputs, no questions — single tap to advance.
  */
 export function RiloTeachScreen({ step, onNext }: Props) {
@@ -27,6 +28,8 @@ export function RiloTeachScreen({ step, onNext }: Props) {
       <div className="flex-1 flex items-center justify-center px-6 pt-6 pb-4">
         {variant === 'planner' && <PlannerVisual />}
         {variant === 'routine' && <RoutineVisual />}
+        {variant === 'task-details' && <TaskDetailsVisual />}
+        {variant === 'tools-hub' && <ToolsHubVisual />}
         {variant === 'suggest' && <SuggestVisual />}
       </div>
 
@@ -204,6 +207,128 @@ function SuggestVisual() {
         >
           <span>🔄</span> Swap any task
         </motion.div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Visual 3 (A): Task with rich details inside ---------- */
+function TaskDetailsVisual() {
+  const chips = [
+    { emoji: '🌬️', label: 'Breathe', bg: '#D7E9FF', fg: '#1E5BB8' },
+    { emoji: '🎧', label: 'Listen', bg: '#F0E3FF', fg: '#6A2FB8' },
+    { emoji: '✏️', label: 'Reflect', bg: '#E0FBB8', fg: '#3E7A1E' },
+    { emoji: '⏱️', label: 'Timer', bg: '#FFE6C9', fg: '#B8590E' },
+  ];
+  return (
+    <div className="w-full max-w-[300px] mx-auto">
+      <div className="relative bg-white rounded-3xl shadow-[0_20px_60px_-20px_rgba(26,31,61,0.25)] p-5 border border-black/5">
+        {/* The task header */}
+        <div className="flex items-center gap-3 rounded-2xl px-3.5 py-3 bg-[#FFD6A5]">
+          <span className="text-[22px]">🧘</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] font-semibold text-[#1a1f3d]/60">8:00 · 5 min</p>
+            <p className="text-[14px] font-bold text-[#1a1f3d] truncate">Morning stretch</p>
+          </div>
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.3 }}
+            className="w-7 h-7 rounded-full border-2 border-[#1a1f3d]/20"
+          />
+        </div>
+
+        {/* Divider hint that it expands */}
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, duration: 0.3 }}
+          className="flex items-center gap-2 mt-4 mb-3"
+        >
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#1a1f3d]/50">Inside this task</span>
+          <div className="flex-1 h-px bg-[#1a1f3d]/10" />
+        </motion.div>
+
+        {/* Action chips */}
+        <div className="grid grid-cols-2 gap-2">
+          {chips.map((c, i) => (
+            <motion.div
+              key={c.label}
+              initial={{ opacity: 0, scale: 0.85, y: 6 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ delay: 0.45 + i * 0.08, duration: 0.3 }}
+              className="flex items-center gap-2 rounded-2xl px-3 py-2.5"
+              style={{ background: c.bg }}
+            >
+              <span className="text-[18px]">{c.emoji}</span>
+              <span className="text-[13px] font-semibold" style={{ color: c.fg }}>{c.label}</span>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Note row */}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.85, duration: 0.3 }}
+          className="mt-2 flex items-center gap-2 rounded-2xl px-3 py-2.5 bg-[#F4F2EF]"
+        >
+          <span className="text-[16px]">📝</span>
+          <span className="text-[12px] text-[#1a1f3d]/70 italic truncate">Add a quick note…</span>
+        </motion.div>
+
+        {/* Tap hint */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.0, duration: 0.4, type: 'spring' }}
+          className="absolute -right-2 -top-2 px-3 py-1.5 rounded-full bg-[#1a1f3d] text-white text-[11px] font-bold shadow-lg flex items-center gap-1"
+        >
+          <span>👆</span> Tap to open
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Visual 4 (B): All-in-one tools hub ---------- */
+function ToolsHubVisual() {
+  const tools = [
+    { emoji: '😊', label: 'Mood', bg: '#FFF492' },
+    { emoji: '🌬️', label: 'Breathe', bg: '#D7E9FF' },
+    { emoji: '✏️', label: 'Journal', bg: '#E0FBB8' },
+    { emoji: '💧', label: 'Water', bg: '#D7E9FF' },
+    { emoji: '❤️', label: 'Period', bg: '#FFE0F5' },
+    { emoji: '⏳', label: 'Fasting', bg: '#FFE6C9' },
+    { emoji: '🎧', label: 'Listen', bg: '#F0E3FF' },
+    { emoji: '⏱️', label: 'Timer', bg: '#F0E3FF' },
+    { emoji: '💜', label: 'Emotions', bg: '#F0E3FF' },
+  ];
+  return (
+    <div className="w-full max-w-[300px] mx-auto">
+      <div className="bg-white rounded-3xl shadow-[0_20px_60px_-20px_rgba(26,31,61,0.25)] p-5 border border-black/5">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#1a1f3d]/50">Your toolbox</p>
+            <p className="text-[16px] font-bold text-[#1a1f3d]">All in one app</p>
+          </div>
+          <span className="text-[20px]">🧰</span>
+        </div>
+        <div className="grid grid-cols-3 gap-2.5">
+          {tools.map((t, i) => (
+            <motion.div
+              key={t.label}
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.15 + i * 0.06, duration: 0.3, type: 'spring', stiffness: 220 }}
+              className="flex flex-col items-center justify-center gap-1 rounded-2xl py-3"
+              style={{ background: t.bg }}
+            >
+              <span className="text-[22px]">{t.emoji}</span>
+              <span className="text-[10px] font-semibold text-[#1a1f3d]">{t.label}</span>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </div>
   );

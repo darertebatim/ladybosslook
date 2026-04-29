@@ -22,6 +22,22 @@ export const whatIsRiloFlow: OnboardingFlow = {
       buttonLabel: 'Next',
     },
     {
+      id: 'wir-task-details',
+      type: 'rilo-teach',
+      illustrationLabel: 'task-details',
+      title: 'Tap any task. There’s more inside.',
+      subtitle: 'Breathing, audio, journaling — built into every task.',
+      buttonLabel: 'Next',
+    },
+    {
+      id: 'wir-tools-hub',
+      type: 'rilo-teach',
+      illustrationLabel: 'tools-hub',
+      title: 'Mood, breathe, journal, fast — all in one place.',
+      subtitle: 'No more app-hopping for self-care.',
+      buttonLabel: 'Next',
+    },
+    {
       id: 'wir-suggest',
       type: 'rilo-teach',
       illustrationLabel: 'suggest',
