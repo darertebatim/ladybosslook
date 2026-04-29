@@ -253,23 +253,35 @@ export default function AppOnboarding() {
 
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col">
-      {/* Navigation bar — hidden on paywall + AI screens (they have their own controls) */}
-      {step.type !== 'paywall' && step.type !== 'rilo-week-plans' && (
-        <div className="shrink-0 px-4 py-2 flex items-center z-20 bg-white" style={{ paddingTop: 'env(safe-area-inset-top, 44px)' }}>
-          <button onClick={goBack} className="mr-2 active:opacity-60 p-1">
-            <ChevronLeft className="h-5 w-5 text-[#1a1f3d]" />
-          </button>
-          {/* Slim progress bar */}
-          <div className="flex-1 h-[3px] bg-black/10 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-[#1a1f3d] rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
+      {/* Navigation bar — hidden on paywall steps (they have their own controls).
+          On AI screens (rilo-week-plans) we show only the back button — no progress bar, no top Skip. */}
+      {step.type !== 'paywall' && (
+        step.type === 'rilo-week-plans' ? (
+          <div
+            className="absolute left-0 top-0 z-30 px-4 py-2 flex items-center"
+            style={{ paddingTop: 'env(safe-area-inset-top, 44px)' }}
+          >
+            <button onClick={goBack} className="active:opacity-60 p-1">
+              <ChevronLeft className="h-5 w-5 text-[#1a1f3d]" />
+            </button>
           </div>
-          <button onClick={handleClose} className="ml-2 active:opacity-60 p-1 text-xs text-[#1a1f3d] font-medium">
-            Skip
-          </button>
-        </div>
+        ) : (
+          <div className="shrink-0 px-4 py-2 flex items-center z-20 bg-white" style={{ paddingTop: 'env(safe-area-inset-top, 44px)' }}>
+            <button onClick={goBack} className="mr-2 active:opacity-60 p-1">
+              <ChevronLeft className="h-5 w-5 text-[#1a1f3d]" />
+            </button>
+            {/* Slim progress bar */}
+            <div className="flex-1 h-[3px] bg-black/10 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#1a1f3d] rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <button onClick={handleClose} className="ml-2 active:opacity-60 p-1 text-xs text-[#1a1f3d] font-medium">
+              Skip
+            </button>
+          </div>
+        )
       )}
 
       {/* Step content - full screen with slide transition */}
