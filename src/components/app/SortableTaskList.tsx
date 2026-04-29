@@ -126,6 +126,8 @@ interface SortableTaskListProps {
   hideQuickAdd?: boolean;
   defaultRepeatOverride?: 'Daily' | 'No' | 'Weekly';
   onOpenTaskSheet?: (params: { editTaskId?: string; createParams?: Record<string, string> }) => void;
+  /** When set, only this task is highlighted; others are dimmed and non-interactive. */
+  coachHighlightTaskId?: string | null;
 }
 
 export const SortableTaskList = ({
@@ -143,6 +145,7 @@ export const SortableTaskList = ({
   hideQuickAdd = false,
   defaultRepeatOverride,
   onOpenTaskSheet,
+  coachHighlightTaskId,
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
@@ -252,6 +255,13 @@ export const SortableTaskList = ({
       onOpenTimer={onOpenTimer}
       onOpenWaterTracking={onOpenWaterTracking}
       isDragging={activeId === task.id}
+      coachHighlight={
+        coachHighlightTaskId
+          ? coachHighlightTaskId === task.id
+            ? 'on'
+            : 'off'
+          : null
+      }
     />
   );
 
