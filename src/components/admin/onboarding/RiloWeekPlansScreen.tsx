@@ -498,14 +498,15 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
               >
                 <PulsingOrb />
                 <motion.h2
-                  key={stage}
+                  key={`dlg-${dialogueIdx}`}
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.4 }}
                   className="mt-10 text-[24px] font-bold text-[#1a1f3d]"
                   style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
                 >
-                  {stage === 'building' ? 'Building your tasks…' : 'Matching the right titles…'}
+                  {LOADING_DIALOGUES[dialogueIdx]}
                 </motion.h2>
               </motion.div>
             )}
