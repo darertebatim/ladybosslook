@@ -138,14 +138,14 @@ export function RiloBuildingPlanScreen({ step, onNext, answers }: Props) {
     }, 500 + 800 + chips.length * 220);
     const t3 = setTimeout(() => {
       onNext();
-    }, 500 + 800 + chips.length * 220 + 900);
+    }, 500 + 800 + chips.length * 220 + 1400);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [chips.length]);
 
   const handleTap = () => {
     haptic.light();
@@ -186,7 +186,47 @@ export function RiloBuildingPlanScreen({ step, onNext, answers }: Props) {
             </span>
           </div>
 
-          {/* Three rows; each shows a faint slot then the chip "clicks" in */}
+          {/* Existing routine player tasks (already provisioned via Daily Reset) */}
+          {existingTasks.length > 0 && (
+            <div className="px-3 pt-3 pb-1 space-y-1.5">
+              <div className="px-1 text-[9px] font-bold uppercase tracking-wider text-black/40">
+                Already in your routine
+              </div>
+              {existingTasks.map((t, i) => (
+                <motion.div
+                  key={`ex-${t.title}-${i}`}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.35, delay: 0.15 + i * 0.06 }}
+                  className="h-9 flex items-center gap-2 px-3 rounded-xl bg-black/[0.03] border border-black/5"
+                >
+                  <span
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ background: t.color }}
+                  />
+                  <img
+                    src={getFluentEmojiUrl(t.emoji)}
+                    alt=""
+                    className="w-4 h-4 shrink-0"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                  <span className="text-[12px] font-semibold text-black/70 truncate">
+                    {t.title}
+                  </span>
+                  <span className="ml-auto text-[10px] text-black/30">✓</span>
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {/* Three rows for new picks; each shows a faint slot then the chip "clicks" in */}
+          {existingTasks.length > 0 && (
+            <div className="px-4 pt-2 pb-1 text-[9px] font-bold uppercase tracking-wider text-[#A0123F]">
+              + Adding now
+            </div>
+          )}
           <div className="px-3 py-3 space-y-2 min-h-[180px]">
             {chips.map((c, i) => {
               const dropDelay = i * 0.22;
