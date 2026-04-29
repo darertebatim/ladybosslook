@@ -174,7 +174,10 @@ export function RiloPickTasksScreen({ step, onNext, onAnswer }: Props) {
       </div>
 
       {/* Sticky bottom CTAs */}
-      <div className="shrink-0 px-6 pb-8 pt-3 bg-white border-t border-black/5 space-y-2.5">
+      <div
+        className="shrink-0 px-6 pt-3 bg-white border-t border-black/5 space-y-2.5"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}
+      >
         <button
           onClick={handleSuggest}
           className="w-full h-12 rounded-full border-2 border-[#1a1f3d] bg-white flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
