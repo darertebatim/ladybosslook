@@ -50,7 +50,9 @@ export type OnboardingStepType =
   | 'selfcare-commitment'
   | 'selfcare-reflection'
   | 'week-cleanup'
-  | 'rilo-teach';
+  | 'rilo-teach'
+  | 'rilo-pick-tasks'
+  | 'rilo-week-plans';
 
 export interface OnboardingOptionVariant {
   cluster: string;
@@ -97,6 +99,10 @@ export interface OnboardingStep {
   statBadges?: { label: string; value: string }[];
   variants?: OnboardingOptionVariant[];
   singleColumn?: boolean;
+  /** For 'rilo-pick-tasks' steps: which time bucket this picker represents */
+  bucket?: 'morning' | 'afternoon' | 'evening';
+  /** For 'rilo-pick-tasks' steps: pre-defined task suggestions (label + emoji) */
+  pickerTasks?: { label: string; emoji: string }[];
 }
 
 export type OnboardingAnswers = Record<string, string | string[]>;
