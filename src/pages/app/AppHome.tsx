@@ -809,39 +809,8 @@ const AppHome = () => {
     return () => clearTimeout(t);
   }, [homeDataLoading, tasksLoading, tasks.length, completedTaskIds.size, totalCompletions, showStreakModal, showSpotlightIntro]);
 
-  // Dismiss first coach mark when user completes a task
-  useEffect(() => {
-    if (showFirstCoachMark && completedTaskIds.size > 0) {
-      setShowFirstCoachMark(false);
-    }
-  }, [showFirstCoachMark, completedTaskIds.size]);
-
-  // Step 2 of the bundled tour: when the first task is completed during the tour,
-  // wait for the celebration to settle, scroll to top, then show the tap spotlight.
-  useEffect(() => {
-    if (
-      !spotlightTourActiveRef.current ||
-      localStorage.getItem('simora_tap_coach_shown') === 'true' ||
-      tasksLoading ||
-      tasks.length === 0 ||
-      completedTaskIds.size === 0 ||
-      showTapCoachMark ||
-      showStreakModal
-    ) {
-      return;
-    }
-    const t = setTimeout(() => {
-      scrollHomeToTop();
-      setTimeout(() => {
-        setShowTapCoachMark(true);
-        localStorage.setItem('simora_tap_coach_shown', 'true');
-      }, 450);
-    }, 1200);
-    return () => clearTimeout(t);
-  }, [tasksLoading, tasks.length, completedTaskIds.size, showTapCoachMark, showStreakModal, scrollHomeToTop]);
-
-  // Step 3 of the bundled tour: when the task detail sheet closes after the tap
-  // coach mark, scroll to top and show the + button spotlight.
+  // Step 2 of the bundled tour: when the user opens & closes a task detail,
+  // wait a beat then show the "+ add a new task" spotlight.
   useEffect(() => {
     if (
       !selectedTask &&
@@ -854,15 +823,45 @@ const AppHome = () => {
         setTimeout(() => {
           setShowAddCoachMark(true);
           localStorage.setItem('simora_add_coach_shown', 'true');
-          // Tour complete after the final spotlight is shown
-          localStorage.setItem(SPOTLIGHT_TOUR_KEY, 'true');
-          spotlightTourActiveRef.current = false;
-          localStorage.removeItem('simora_force_new_user');
         }, 450);
-      }, 1500);
+      }, 900);
       return () => clearTimeout(t);
     }
   }, [selectedTask, scrollHomeToTop]);
+
+  // Step 3 of the bundled tour: once the + add coach mark has been seen and
+  // dismissed, surface the "complete a task" spotlight as the natural finale.
+  useEffect(() => {
+    if (
+      !spotlightTourActiveRef.current ||
+      localStorage.getItem('simora_add_coach_shown') !== 'true' ||
+      localStorage.getItem('simora_first_action_celebrated') === 'true' ||
+      showAddCoachMark ||
+      showFirstCoachMark ||
+      tasksLoading ||
+      tasks.length === 0 ||
+      completedTaskIds.size > 0 ||
+      showStreakModal
+    ) {
+      return;
+    }
+    const t = setTimeout(() => {
+      scrollHomeToTop();
+      setTimeout(() => setShowFirstCoachMark(true), 400);
+    }, 600);
+    return () => clearTimeout(t);
+  }, [showAddCoachMark, showFirstCoachMark, tasksLoading, tasks.length, completedTaskIds.size, showStreakModal, scrollHomeToTop]);
+
+  // Finale: dismiss "complete a task" spotlight when the user actually does it,
+  // and mark the whole bundled tour complete.
+  useEffect(() => {
+    if (showFirstCoachMark && completedTaskIds.size > 0) {
+      setShowFirstCoachMark(false);
+      localStorage.setItem(SPOTLIGHT_TOUR_KEY, 'true');
+      spotlightTourActiveRef.current = false;
+      localStorage.removeItem('simora_force_new_user');
+    }
+  }, [showFirstCoachMark, completedTaskIds.size]);
   const handleDateSelect = useCallback((date: Date) => {
     setSelectedDate(date);
     setShowCalendar(false);
