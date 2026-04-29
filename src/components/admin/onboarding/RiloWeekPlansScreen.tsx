@@ -589,7 +589,7 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
                         >
                           {isSelected && <Check className="h-4 w-4 text-white" strokeWidth={3} />}
                         </div>
-                      </button>
+                      </motion.button>
                     );
                   })}
                 </div>
