@@ -76,11 +76,12 @@ export function RiloTeachScreen({ step, onNext }: Props) {
         isSuggest
           ? 'bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]'
           : isPlanner
-          ? 'bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F4ECFF]'
+          ? 'bg-gradient-to-b from-[#FFF4DC] via-[#FFE0E6] to-[#FBD4E2]'
           : 'bg-gradient-to-b from-[#FFF7F0] to-white'
       }`}
     >
-      {(isSuggest || isPlanner) && <SuggestAmbientGlow />}
+      {isSuggest && <SuggestAmbientGlow />}
+      {isPlanner && <PlannerAmbientGlow />}
       {/* Visual area */}
       <div className="flex-1 flex items-center justify-center px-6 pt-6 pb-4 relative z-10">
         {variant === 'planner' && <PlannerVisual />}
@@ -126,7 +127,11 @@ export function RiloTeachScreen({ step, onNext }: Props) {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: isPlanner ? 1.65 : 0.18 }}
-            className="mt-3 text-[15px] leading-snug text-[#1a1f3d]/70 text-center"
+            className={`mt-3 leading-snug text-center ${
+              isPlanner
+                ? 'text-[20px] font-bold text-black'
+                : 'text-[15px] text-[#1a1f3d]/70'
+            }`}
           >
             {step.subtitle}
           </motion.p>
@@ -188,20 +193,43 @@ export function RiloTeachScreen({ step, onNext }: Props) {
 
 /* ---------- Ambient background sparkles for the suggest screen ---------- */
 function SuggestAmbientGlow() {
+  return <AmbientGlowBase palette="suggest" />;
+}
+
+/* ---------- Ambient glow tinted with the Rilo app-icon palette ---------- */
+function PlannerAmbientGlow() {
+  return <AmbientGlowBase palette="planner" />;
+}
+
+function AmbientGlowBase({ palette }: { palette: 'suggest' | 'planner' }) {
+  const colors =
+    palette === 'planner'
+      ? {
+          a: '#FFD36E', // golden yellow from icon
+          b: '#F8B4C6', // soft pink
+          c: '#E84A6F', // crimson/magenta from icon
+          sparkle: '#A0123F',
+        }
+      : {
+          a: '#FFD6A5',
+          b: '#CDE7FF',
+          c: '#E5D6FF',
+          sparkle: '#1a1f3d',
+        };
   const sparkles = Array.from({ length: 14 });
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
       <div
         className="absolute -top-24 left-1/2 -translate-x-1/2 w-[420px] h-[420px] rounded-full blur-3xl opacity-60"
-        style={{ background: 'radial-gradient(circle, #FFD6A5 0%, transparent 70%)' }}
+        style={{ background: `radial-gradient(circle, ${colors.a} 0%, transparent 70%)` }}
       />
       <div
         className="absolute top-1/3 -right-20 w-[260px] h-[260px] rounded-full blur-3xl opacity-50"
-        style={{ background: 'radial-gradient(circle, #CDE7FF 0%, transparent 70%)' }}
+        style={{ background: `radial-gradient(circle, ${colors.b} 0%, transparent 70%)` }}
       />
       <div
         className="absolute bottom-10 -left-16 w-[300px] h-[300px] rounded-full blur-3xl opacity-50"
-        style={{ background: 'radial-gradient(circle, #E5D6FF 0%, transparent 70%)' }}
+        style={{ background: `radial-gradient(circle, ${colors.c} 0%, transparent 70%)` }}
       />
       {sparkles.map((_, i) => {
         const left = (i * 37) % 100;
@@ -213,8 +241,8 @@ function SuggestAmbientGlow() {
             initial={{ opacity: 0, scale: 0.4 }}
             animate={{ opacity: [0, 0.9, 0], scale: [0.4, 1, 0.4] }}
             transition={{ duration: 2.2, delay, repeat: Infinity, repeatDelay: 1.5 }}
-            className="absolute text-[10px] text-[#1a1f3d]/60"
-            style={{ left: `${left}%`, top: `${top}%` }}
+            className="absolute text-[10px]"
+            style={{ left: `${left}%`, top: `${top}%`, color: colors.sparkle, opacity: 0.6 }}
           >
             ✨
           </motion.span>
