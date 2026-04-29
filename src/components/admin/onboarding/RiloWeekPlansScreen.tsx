@@ -517,22 +517,43 @@ function PulsingOrb() {
   );
 }
 
-// ── Fake "AI" extraction (UI placeholder until real model is wired) ──
-function fakeExtract(raw: string): ExtractedTask[] {
-  // Split by commas / "and" / newlines / sentence terminators.
-  const pieces = raw
-    .split(/[,\n;]|(?:\s+and\s+)|(?:\.\s+)/i)
-    .map((p) => p.trim())
-    .filter((p) => p.length >= 2);
-
-  // If nothing parseable, fall back to a single test task so the UI still has content.
-  const list = pieces.length === 0 ? [raw.trim() || 'Test Task'] : pieces;
-
-  const EMOJIS = ['📝', '✅', '💜', '📚', '🏡', '🍳', '💪', '☕', '🛒'];
-  return list.slice(0, 8).map((label, i) => ({
-    id: `t-${i}-${label.slice(0, 8)}`,
-    label: label.charAt(0).toUpperCase() + label.slice(1),
-    emoji: EMOJIS[i % EMOJIS.length],
-    kind: 'To-do',
-  }));
+// ── Pretty schedule label for the picker row (Tiimo-style) ──
+function describeSchedule(t: ExtractedTask): string {
+  const fmtTime = (hhmm?: string) => {
+    if (!hhmm) return '';
+    const [h, m] = hhmm.split(':').map(Number);
+    if (Number.isNaN(h)) return '';
+    const hr12 = ((h + 11) % 12) + 1;
+    const ampm = h < 12 ? 'AM' : 'PM';
+    return m ? `${hr12}:${String(m).padStart(2, '0')} ${ampm}` : `${hr12}:00 ${ampm}`;
+  };
+  const fmtDur = (mins?: number) => {
+    if (!mins) return '';
+    if (mins % 60 === 0) return ` · ${mins / 60}h`;
+    return ` · ${mins}m`;
+  };
+  if (t.kind === 'event') {
+    let when = '';
+    if (t.date) {
+      try {
+        const d = new Date(t.date + 'T00:00:00');
+        when = d.toLocaleDateString(undefined, {
+          weekday: 'long',
+          month: 'short',
+          day: 'numeric',
+        });
+      } catch {
+        when = t.date;
+      }
+    }
+    const time = t.time ? ` at ${fmtTime(t.time)}` : '';
+    return `${when}${time}${fmtDur(t.duration_minutes)}`.trim() || 'Event';
+  }
+  if (t.kind === 'recurring') {
+    const label =
+      t.recurrence === 'weekdays' ? 'Weekdays' : t.recurrence === 'weekly' ? 'Weekly' : 'Daily';
+    const time = t.time ? ` at ${fmtTime(t.time)}` : '';
+    return `${label}${time}${fmtDur(t.duration_minutes)}`;
+  }
+  return 'To-do';
 }
