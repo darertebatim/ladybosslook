@@ -8,6 +8,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { getLocalDateStr } from '@/lib/localDate';
 import { toast } from 'sonner';
+import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
+
+// Brand round-robin pastel palette (matches user task bank)
+const BRAND_TASK_COLORS = [
+  '#FFE0F5', // pink
+  '#FFE6C9', // peach
+  '#FFF492', // yellow
+  '#E2F9F0', // lime
+  '#D7E9FF', // sky
+  '#E0FBB8', // mint
+  '#F0E3FF', // lavender
+];
 
 interface Props {
   step: OnboardingStep;
