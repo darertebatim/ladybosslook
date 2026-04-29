@@ -8,6 +8,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { getLocalDateStr } from '@/lib/localDate';
 import { toast } from 'sonner';
+import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
+
+// Brand round-robin pastel palette (matches user task bank)
+const BRAND_TASK_COLORS = [
+  '#FFE0F5', // pink
+  '#FFE6C9', // peach
+  '#FFF492', // yellow
+  '#E2F9F0', // lime
+  '#D7E9FF', // sky
+  '#E0FBB8', // mint
+  '#F0E3FF', // lavender
+];
 
 interface Props {
   step: OnboardingStep;
@@ -468,8 +480,9 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
                   Pick tasks for your plan
                 </h2>
                 <div className="flex-1 overflow-y-auto space-y-2.5 pb-32 -mx-1 px-1">
-                  {tasks.map((task) => {
+                  {tasks.map((task, idx) => {
                     const isSelected = selectedIds.has(task.id);
+                    const chipBg = BRAND_TASK_COLORS[idx % BRAND_TASK_COLORS.length];
                     return (
                       <button
                         key={task.id}
@@ -482,9 +495,26 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
                         {/* Emoji chip */}
                         <div
                           className="h-11 w-11 rounded-xl flex items-center justify-center shrink-0"
-                          style={{ background: 'rgba(0,0,0,0.05)' }}
+                          style={{ background: chipBg }}
                         >
-                          <span className="text-[22px] leading-none">{task.emoji}</span>
+                          <img
+                            src={getFluentEmojiUrl(task.emoji)}
+                            alt={task.emoji}
+                            width={26}
+                            height={26}
+                            className="select-none pointer-events-none"
+                            onError={(e) => {
+                              const img = e.currentTarget;
+                              img.style.display = 'none';
+                              const parent = img.parentElement;
+                              if (parent && !parent.querySelector('.fallback-emoji')) {
+                                const span = document.createElement('span');
+                                span.className = 'fallback-emoji text-[22px] leading-none';
+                                span.textContent = task.emoji;
+                                parent.appendChild(span);
+                              }
+                            }}
+                          />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[15px] font-bold text-[#1a1f3d] truncate">
