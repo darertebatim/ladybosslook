@@ -52,7 +52,8 @@ export type OnboardingStepType =
   | 'week-cleanup'
   | 'rilo-teach'
   | 'rilo-pick-tasks'
-  | 'rilo-week-plans';
+  | 'rilo-week-plans'
+  | 'rilo-building-plan';
 
 export interface OnboardingOptionVariant {
   cluster: string;
