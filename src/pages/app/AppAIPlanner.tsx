@@ -61,6 +61,7 @@ export default function AppAIPlanner() {
   const { user } = useAuth();
 
   const [stage, setStage] = useState<Stage>('input');
+  const [isClosing, setIsClosing] = useState(false);
   const [text, setText] = useState('');
   const [tasks, setTasks] = useState<ExtractedTask[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -286,8 +287,9 @@ export default function AppAIPlanner() {
     }
 
     setStage('success');
-    // After the green banner shows, send the user to Home to see their new tasks.
-    setTimeout(() => navigate('/app/home'), 1500);
+    // After the green banner shows, slide the sheet down then navigate Home.
+    setTimeout(() => setIsClosing(true), 1200);
+    setTimeout(() => navigate('/app/home'), 1700);
   };
 
   const selectedCount = selectedIds.size;
@@ -295,7 +297,7 @@ export default function AppAIPlanner() {
   return (
     <motion.div
       initial={{ y: '100%' }}
-      animate={{ y: 0 }}
+      animate={{ y: isClosing ? '100%' : 0 }}
       exit={{ y: '100%' }}
       transition={{ type: 'spring', stiffness: 320, damping: 32, mass: 0.9 }}
       className="fixed inset-0 w-full flex flex-col overflow-hidden z-[10001]"
