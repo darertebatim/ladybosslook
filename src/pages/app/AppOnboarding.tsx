@@ -205,6 +205,8 @@ export default function AppOnboarding() {
         navigate('/app/home');
       } else if (flowId === 'selfcare-quiz') {
         navigate('/app/home');
+      } else if (flowId === 'what-is-rilo') {
+        navigate('/app/home');
       } else {
         navigate('/auth?mode=signup');
       }
