@@ -220,7 +220,7 @@ export default function AppOnboarding() {
         navigate('/auth?mode=signup');
       }
     }
-  }, [currentStep, flow, flowId, completedKey, progressKey, navigate]);
+  }, [currentStep, flow, flowId, completedKey, progressKey, navigate, user, answers]);
 
   const goBack = useCallback(() => {
     setDirection(-1);
