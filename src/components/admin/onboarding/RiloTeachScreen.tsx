@@ -333,7 +333,6 @@ function TaskDetailsVisual() {
 }
 
 /* ---------- Visual 4 (B): "5 apps in one" — outcome orbit ---------- */
-function ToolsHubVisual() {
 /* ---------- Visual 4 (B): "8 apps in one" — outcome cascade ---------- */
 function ToolsHubVisual() {
   // Each card = a real outcome people download a separate paid app for.
