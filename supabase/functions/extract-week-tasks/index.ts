@@ -9,22 +9,26 @@ const corsHeaders = {
 };
 
 const SYSTEM_PROMPT = `You are a calendar/task extractor for a self-care planner app called Rilo.
-The user will type a free-form description of their plans for this week.
-Your job: split it into concrete, atomic tasks the user can put on a planner.
+The user types a free-form description of things they want to do this week.
+ALWAYS extract at least one task — never return an empty list when the user
+text mentions any activity, plan, errand, appointment, or habit.
+Always call the emit_tasks function exactly once.
 
 RULES:
-- Output 1–8 tasks. Never more than 8.
+- Output between 1 and 8 tasks. If unsure, err on the side of including a task as a "todo".
 - Each task title is 1–4 words, Title Case, no trailing punctuation.
-- Pick a single relevant emoji (no flags, no skin-tone).
+- Pick a single relevant emoji (no flags, no skin-tone modifiers).
 - Classify each task as one of:
-  * "event"  — a one-time scheduled thing with a date and (usually) a time. Examples: "meeting tomorrow at 6", "dentist Friday".
-  * "recurring" — happens repeatedly (daily / weekdays / weekly). Examples: "every morning pick up baby", "go to gym".
-  * "todo" — anything else, no specific schedule. Examples: "buy groceries", "eat healthy".
-- Resolve relative dates ("tomorrow", "Friday", "next Monday") using TODAY (provided) and the user's timezone.
-- Times: convert to 24-hour HH:MM. If user says "around 6" with no AM/PM context, prefer the most likely (evening for meetings, morning for routines).
-- Duration defaults: meetings 60, gym 60, pick up / drop off 30, otherwise omit.
-- For "recurring", set recurrence to one of: "daily", "weekdays", "weekly".
-- Never invent tasks the user did not mention.`;
+  * "event"     — a one-time scheduled thing with a date and (usually) a time. Examples: "meeting tomorrow at 6", "dentist Friday at 3pm", "project deadline next Monday".
+  * "recurring" — happens repeatedly. Examples: "every morning pick up baby", "go to gym", "yoga every Tuesday and Thursday", "read 30 min before bed daily".
+  * "todo"      — anything else, no specific schedule. Examples: "buy groceries", "call mom this Sunday" (if no time), "pick up dry cleaning sometime this week".
+- Resolve relative dates ("today", "tomorrow", "Friday", "this Sunday", "next Monday") using TODAY (provided) and the user's timezone. "this <weekday>" = the next occurrence in the current week. "next <weekday>" = the one after that.
+- Times: convert to 24-hour HH:MM. If user says "around 6" with no AM/PM context, infer from activity (meetings/dinner → 18:00, morning routines → 06:00–08:00).
+- Duration defaults (only when not specified): meetings 60, gym/yoga 60, pick up/drop off 30, walk 30, meditate 10, read 30. Otherwise omit duration_minutes.
+- recurrence values: "daily", "weekdays" (Mon–Fri only — use this if the user says "not weekends", "weekdays only", or names Mon–Fri), or "weekly" (specific day(s) of the week).
+- If the user says something happens twice/three times a day, emit one task per occurrence with appropriate times.
+- Never invent activities the user did not mention. But DO split compound sentences into separate tasks (e.g. "go to gym and eat healthy" = 2 tasks).
+- If the user's text is empty or has no extractable activity, return a single todo titled with the first few words of their input.`;
 
 const TOOL_SCHEMA = {
   type: 'function',
@@ -92,6 +96,7 @@ ${text.trim()}`;
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: userMsg },
         ],
+        temperature: 0.2,
         tools: [TOOL_SCHEMA],
         tool_choice: { type: 'function', function: { name: 'emit_tasks' } },
       }),
