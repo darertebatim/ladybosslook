@@ -49,7 +49,8 @@ export type OnboardingStepType =
   | 'selfcare-your-why'
   | 'selfcare-commitment'
   | 'selfcare-reflection'
-  | 'week-cleanup';
+  | 'week-cleanup'
+  | 'rilo-teach';
 
 export interface OnboardingOptionVariant {
   cluster: string;
