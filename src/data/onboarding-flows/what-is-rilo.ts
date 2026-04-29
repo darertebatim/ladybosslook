@@ -42,8 +42,8 @@ export const whatIsRiloFlow: OnboardingFlow = {
       id: 'wir-suggest',
       type: 'rilo-teach',
       illustrationLabel: 'suggest',
-      title: "We'll suggest your first one.",
-      subtitle: 'You can swap anything.',
+      title: "We'll suggest\nyour first Routine",
+      subtitle: '',
       buttonLabel: "Let's set it up",
     },
     {
