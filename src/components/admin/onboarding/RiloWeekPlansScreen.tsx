@@ -36,6 +36,18 @@ const HINTS: { emoji: string; label: string }[] = [
 
 type Stage = 'input' | 'building' | 'matching' | 'picker' | 'success';
 
+// Rotating loading dialogues — shown one after another while the AI works.
+// Total minimum dwell time ≈ 5 × 750ms = 3.75s so it feels powerful, not casual.
+const LOADING_DIALOGUES = [
+  'Reading your plans…',
+  'Picking the right times…',
+  'Building your tasks…',
+  'Matching the right titles…',
+  'Fine-tuning the colors…',
+];
+const DIALOGUE_INTERVAL_MS = 750;
+const MIN_LOADING_MS = LOADING_DIALOGUES.length * DIALOGUE_INTERVAL_MS;
+
 type TaskKind = 'event' | 'recurring' | 'todo';
 
 interface ExtractedTask {
