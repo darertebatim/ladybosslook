@@ -530,13 +530,22 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
                   {tasks.map((task, idx) => {
                     const isSelected = selectedIds.has(task.id);
                     const chipBg = BRAND_TASK_COLORS[idx % BRAND_TASK_COLORS.length];
+                    const visible = idx < revealedCount;
                     return (
-                      <button
+                      <motion.button
                         key={task.id}
+                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                        animate={
+                          visible
+                            ? { opacity: 1, y: 0, scale: 1 }
+                            : { opacity: 0, y: 10, scale: 0.98 }
+                        }
+                        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                         onClick={() => toggleSelect(task.id)}
                         className={cn(
                           'w-full flex items-center gap-3 rounded-2xl border bg-white px-3 py-2.5 text-left active:scale-[0.99] transition-all',
                           isSelected ? 'border-black/10' : 'border-black/5 opacity-60',
+                          !visible && 'pointer-events-none',
                         )}
                       >
                         {/* Emoji chip */}
