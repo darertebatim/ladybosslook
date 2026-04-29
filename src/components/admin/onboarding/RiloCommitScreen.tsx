@@ -284,25 +284,66 @@ export function RiloCommitScreen({ step, onNext }: Props) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, y: 60, scale: 1.04 }}
             transition={{ duration: 0.4 }}
-            className="absolute inset-0 flex flex-col items-center justify-start pt-32"
+            className="absolute inset-0 flex flex-col items-center justify-start"
           >
-            <div className="relative w-full h-[280px]">
+            {/* Soft radial wash that warms up behind the celebration */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background:
+                  'radial-gradient(120% 70% at 50% 30%, #FFF1E6 0%, #FFE4F0 35%, #F1E6FF 65%, #FFFFFF 100%)',
+              }}
+            />
+
+            {/* Expanding glow rings */}
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={`ring-${i}`}
+                initial={{ scale: 0.2, opacity: 0.55 }}
+                animate={{ scale: 2.6, opacity: 0 }}
+                transition={{ duration: 1.6, delay: 0.05 + i * 0.25, ease: 'easeOut' }}
+                className="absolute pointer-events-none rounded-full"
+                style={{
+                  top: '34%',
+                  left: '50%',
+                  width: 240,
+                  height: 240,
+                  marginLeft: -120,
+                  marginTop: -120,
+                  border: '2px solid rgba(169,138,240,0.55)',
+                }}
+              />
+            ))}
+
+            {/* Bubble fountain */}
+            <div className="relative w-full" style={{ height: '58%', marginTop: '8%' }}>
               {bubbles.map((b, i) => (
                 <motion.div
                   key={i}
-                  initial={{ scale: 0, opacity: 0, x: 0, y: 40 }}
+                  initial={{
+                    opacity: 0,
+                    scale: 0.2,
+                    x: b.fromX,
+                    y: b.fromY,
+                    rotate: b.rotate,
+                  }}
                   animate={{
-                    scale: 1,
-                    opacity: 1,
+                    opacity: [0, 1, 1, 1],
+                    scale: [0.2, 1.15, 1, 1],
                     x: 0,
-                    y: 0,
+                    y: [b.fromY, -8, 0, 0],
+                    rotate: [b.rotate, b.rotate * 0.3, 0, 0],
                   }}
                   transition={{
-                    duration: 0.55,
+                    duration: 1.1,
                     delay: b.delay,
-                    ease: [0.34, 1.56, 0.64, 1],
+                    ease: [0.18, 0.9, 0.34, 1.15],
+                    times: [0, 0.55, 0.78, 1],
                   }}
-                  className="absolute rounded-full flex items-center justify-center shadow-md"
+                  className="absolute rounded-full flex items-center justify-center shadow-[0_8px_22px_-8px_rgba(0,0,0,0.25)]"
                   style={{
                     left: `${b.left}%`,
                     top: `${b.top}%`,
@@ -312,19 +353,104 @@ export function RiloCommitScreen({ step, onNext }: Props) {
                     transform: 'translate(-50%, -50%)',
                   }}
                 >
-                  <FluentEmoji emoji={b.emoji} size={b.size * 0.62} />
+                  {/* Inner gentle floating loop after landing */}
+                  <motion.div
+                    animate={{ y: [0, -4, 0, 4, 0] }}
+                    transition={{
+                      duration: 2.2,
+                      delay: b.delay + 1.0,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                    className="flex items-center justify-center"
+                  >
+                    <FluentEmoji emoji={b.emoji} size={b.size * 0.62} />
+                  </motion.div>
                 </motion.div>
               ))}
+
+              {/* Sparkle accents */}
+              {['✨', '⭐', '💫', '✨', '⭐'].map((s, i) => {
+                const positions = [
+                  { left: '18%', top: '20%' },
+                  { left: '78%', top: '15%' },
+                  { left: '12%', top: '60%' },
+                  { left: '85%', top: '55%' },
+                  { left: '50%', top: '8%' },
+                ];
+                return (
+                  <motion.div
+                    key={`sp-${i}`}
+                    initial={{ opacity: 0, scale: 0.4, rotate: -30 }}
+                    animate={{
+                      opacity: [0, 1, 1, 0.6],
+                      scale: [0.4, 1.2, 1, 1.1],
+                      rotate: [-30, 10, 0, -10],
+                    }}
+                    transition={{
+                      duration: 1.6,
+                      delay: 0.6 + i * 0.12,
+                      ease: 'easeOut',
+                      repeat: Infinity,
+                      repeatType: 'reverse',
+                    }}
+                    className="absolute text-[22px]"
+                    style={positions[i]}
+                  >
+                    {s}
+                  </motion.div>
+                );
+              })}
             </div>
-            <motion.h2
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="text-[40px] leading-[1.05] font-bold text-black mt-2 px-7 text-center"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+
+            {/* Headline */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1.0 }}
+              className="relative px-7 text-center"
             >
-              You've got this!
-            </motion.h2>
+              <motion.h2
+                initial={{ scale: 0.6, y: 30, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                transition={{
+                  duration: 0.7,
+                  delay: 1.0,
+                  type: 'spring',
+                  stiffness: 220,
+                  damping: 16,
+                }}
+                className="text-[44px] leading-[1.05] font-bold text-center"
+                style={{
+                  fontFamily: 'Georgia, "Times New Roman", serif',
+                  background:
+                    'linear-gradient(90deg, #1a1f3d 0%, #6B43D1 50%, #1a1f3d 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                You've got this!
+              </motion.h2>
+              <motion.div
+                initial={{ scaleX: 0, opacity: 0 }}
+                animate={{ scaleX: 1, opacity: 1 }}
+                transition={{ duration: 0.55, delay: 1.55, ease: 'easeOut' }}
+                className="mx-auto mt-3 h-[3px] w-[120px] rounded-full origin-center"
+                style={{
+                  background:
+                    'linear-gradient(90deg, transparent 0%, #A98AF0 50%, transparent 100%)',
+                }}
+              />
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 1.7 }}
+                className="mt-3 text-[15px] text-[#1a1f3d]/60 font-medium"
+              >
+                Taking you to your day…
+              </motion.p>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
