@@ -708,7 +708,11 @@ function describeSchedule(t: ExtractedTask): string {
   }
   if (t.kind === 'recurring') {
     const label =
-      t.recurrence === 'weekdays' ? 'Weekdays' : t.recurrence === 'weekly' ? 'Weekly' : 'Daily';
+      t.recurrence === 'weekdays'
+        ? 'M · T · W · T · F'
+        : t.recurrence === 'weekly'
+          ? 'Weekly'
+          : 'Every day';
     const time = t.time ? ` at ${fmtTime(t.time)}` : '';
     return `${label}${time}${fmtDur(t.duration_minutes)}`;
   }
