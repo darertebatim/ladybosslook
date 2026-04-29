@@ -332,45 +332,176 @@ function TaskDetailsVisual() {
   );
 }
 
-/* ---------- Visual 4 (B): All-in-one tools hub ---------- */
+/* ---------- Visual 4 (B): "5 apps in one" — outcome orbit ---------- */
 function ToolsHubVisual() {
-  const tools = [
-    { emoji: '😊', label: 'Mood', bg: '#FFF492' },
-    { emoji: '🌬️', label: 'Breathe', bg: '#D7E9FF' },
-    { emoji: '✏️', label: 'Journal', bg: '#E0FBB8' },
-    { emoji: '💧', label: 'Water', bg: '#D7E9FF' },
-    { emoji: '❤️', label: 'Period', bg: '#FFE0F5' },
-    { emoji: '⏳', label: 'Fasting', bg: '#FFE6C9' },
-    { emoji: '🎧', label: 'Listen', bg: '#F0E3FF' },
-    { emoji: '⏱️', label: 'Timer', bg: '#F0E3FF' },
-    { emoji: '💜', label: 'Emotions', bg: '#F0E3FF' },
+  // Each card = an outcome people download separate apps for.
+  // Positioned around a central Rilo badge. Bobbing motion adds life.
+  const cards = [
+    {
+      emoji: '🧘',
+      title: 'Calmer mind',
+      sub: 'Meditations & breathing',
+      replaces: 'instead of Calm',
+      bg: '#E5D6FF',
+      fg: '#5B2BB8',
+      // grid placement
+      style: { top: '0%', left: '0%' },
+      rotate: -6,
+      delay: 0.15,
+    },
+    {
+      emoji: '💪',
+      title: 'Stronger body',
+      sub: 'Workouts & movement',
+      replaces: 'instead of Nike',
+      bg: '#FFD9E5',
+      fg: '#B8295C',
+      style: { top: '4%', right: '0%' },
+      rotate: 5,
+      delay: 0.28,
+    },
+    {
+      emoji: '🌙',
+      title: 'Better sleep',
+      sub: 'Soundscapes & wind-down',
+      replaces: 'instead of Headspace',
+      bg: '#CDE7FF',
+      fg: '#1E5BB8',
+      style: { bottom: '8%', left: '-2%' },
+      rotate: -8,
+      delay: 0.41,
+    },
+    {
+      emoji: '✏️',
+      title: 'Clearer thoughts',
+      sub: 'Journal & reflection',
+      replaces: 'instead of Stoic',
+      bg: '#E0FBB8',
+      fg: '#3E7A1E',
+      style: { bottom: '4%', right: '-2%' },
+      rotate: 7,
+      delay: 0.54,
+    },
+    {
+      emoji: '💼',
+      title: 'Focused work',
+      sub: 'Goals & deep work',
+      replaces: 'instead of Notion',
+      bg: '#FFE6C9',
+      fg: '#B8590E',
+      style: { top: '46%', left: '50%', transform: 'translate(-50%, -50%)' },
+      rotate: -3,
+      delay: 0.67,
+    },
   ];
+
   return (
-    <div className="w-full max-w-[300px] mx-auto">
-      <div className="bg-white rounded-3xl shadow-[0_20px_60px_-20px_rgba(26,31,61,0.25)] p-5 border border-black/5">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#1a1f3d]/50">Your toolbox</p>
-            <p className="text-[16px] font-bold text-[#1a1f3d]">All in one app</p>
-          </div>
-          <span className="text-[20px]">🧰</span>
-        </div>
-        <div className="grid grid-cols-3 gap-2.5">
-          {tools.map((t, i) => (
-            <motion.div
-              key={t.label}
-              initial={{ opacity: 0, scale: 0.6 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.15 + i * 0.06, duration: 0.3, type: 'spring', stiffness: 220 }}
-              className="flex flex-col items-center justify-center gap-1 rounded-2xl py-3"
-              style={{ background: t.bg }}
+    <div className="w-full max-w-[320px] mx-auto">
+      {/* Outcome orbit */}
+      <div className="relative w-full aspect-[1/1.05]">
+        {/* Soft radial glow */}
+        <div
+          className="absolute inset-0 rounded-full blur-2xl opacity-60"
+          style={{
+            background:
+              'radial-gradient(circle at 50% 50%, #FFE6C9 0%, #FFD6E8 35%, transparent 70%)',
+          }}
+        />
+
+        {/* Cards */}
+        {cards.map((c, i) => (
+          <motion.div
+            key={c.title}
+            initial={{ opacity: 0, scale: 0.6, rotate: 0, y: 20 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              rotate: c.rotate,
+              y: [0, -4, 0],
+            }}
+            transition={{
+              opacity: { delay: c.delay, duration: 0.4 },
+              scale: { delay: c.delay, duration: 0.45, type: 'spring', stiffness: 180 },
+              rotate: { delay: c.delay, duration: 0.45 },
+              y: {
+                delay: c.delay + 0.6,
+                duration: 3 + i * 0.3,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              },
+            }}
+            className="absolute w-[44%] rounded-2xl bg-white shadow-[0_12px_30px_-10px_rgba(26,31,61,0.25)] border border-black/5 p-2.5"
+            style={c.style as React.CSSProperties}
+          >
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-[20px] mb-1.5"
+              style={{ background: c.bg }}
             >
-              <span className="text-[22px]">{t.emoji}</span>
-              <span className="text-[10px] font-semibold text-[#1a1f3d]">{t.label}</span>
-            </motion.div>
+              {c.emoji}
+            </div>
+            <p className="text-[12px] font-bold text-[#1a1f3d] leading-tight">{c.title}</p>
+            <p className="text-[9.5px] text-[#1a1f3d]/55 mt-0.5 leading-tight">{c.sub}</p>
+            <p
+              className="text-[8.5px] font-semibold mt-1 italic"
+              style={{ color: c.fg }}
+            >
+              {c.replaces}
+            </p>
+          </motion.div>
+        ))}
+
+        {/* Connecting dotted lines from center outward (subtle) */}
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none opacity-25"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+        >
+          {[
+            { x: 22, y: 18 },
+            { x: 78, y: 20 },
+            { x: 18, y: 80 },
+            { x: 82, y: 78 },
+          ].map((p, i) => (
+            <motion.line
+              key={i}
+              x1="50"
+              y1="50"
+              x2={p.x}
+              y2={p.y}
+              stroke="#1a1f3d"
+              strokeWidth="0.4"
+              strokeDasharray="1 2"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ delay: 0.9 + i * 0.1, duration: 0.6 }}
+            />
           ))}
-        </div>
+        </svg>
       </div>
+
+      {/* Tagline strip below */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.1, duration: 0.4 }}
+        className="mt-2 flex items-center justify-center gap-2"
+      >
+        <span className="text-[12px] text-[#1a1f3d]/40 line-through">Calm</span>
+        <span className="text-[12px] text-[#1a1f3d]/40 line-through">Headspace</span>
+        <span className="text-[12px] text-[#1a1f3d]/40 line-through">Stoic</span>
+        <span className="text-[14px] font-bold text-[#1a1f3d]">→ Rilo</span>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 1.25, duration: 0.4, type: 'spring' }}
+        className="mt-2 flex items-center justify-center"
+      >
+        <div className="px-3 py-1 rounded-full bg-[#1a1f3d] text-white text-[11px] font-bold flex items-center gap-1.5">
+          <span>🎁</span> 5 apps. One Rilo. Free.
+        </div>
+      </motion.div>
     </div>
   );
 }
