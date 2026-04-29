@@ -12,15 +12,17 @@ interface Props {
   answers?: OnboardingAnswers;
 }
 
+const BUCKET_IDS = ['wir-pick-morning', 'wir-pick-afternoon', 'wir-pick-evening'] as const;
+const PALETTE = ['#FFB347', '#F08AB5', '#8A5CF0']; // morning, midday, evening
+
 /**
  * Reassurance screen shown after the 3 task pickers, before the AI step.
- * Picks 3 representative chips from what the user just selected and
- * animates them folding down into a small planner card — making it
- * visceral that "we got your answers and put them in your routine."
- * Auto-advances after the animation; tap to skip.
+ * Renders 3 chips picked from the user's selections (one per bucket when
+ * possible). Chips fly in from above, then slide down and "click" into the
+ * planner card's rows. Auto-advances after the animation completes.
  */
 export function RiloBuildingPlanScreen({ step, onNext, answers }: Props) {
-  // Build a label -> emoji lookup from the picker steps in this flow
+  // Build label -> emoji lookup from the picker step definitions
   const labelEmoji = useMemo(() => {
     const map: Record<string, string> = {};
     for (const s of whatIsRiloFlow.steps as any[]) {
@@ -31,62 +33,56 @@ export function RiloBuildingPlanScreen({ step, onNext, answers }: Props) {
     return map;
   }, []);
 
-  // Pick 3 reps: one from morning, midday/afternoon, evening if possible
+  // Pick exactly 3 chips: prefer one per bucket; pad from any bucket; then fallbacks
   const chips = useMemo(() => {
     const picks: { label: string; emoji: string; color: string }[] = [];
-    const palette = ['#FFB347', '#F08AB5', '#8A5CF0']; // sun, midday, dusk
-    const bucketIds = ['wir-pick-morning', 'wir-pick-afternoon', 'wir-pick-evening'];
-    bucketIds.forEach((id, i) => {
+    BUCKET_IDS.forEach((id, i) => {
       const a = answers?.[id];
       const arr = Array.isArray(a) ? a : a ? [a] : [];
       if (arr.length > 0) {
         const label = arr[0];
-        picks.push({ label, emoji: labelEmoji[label] || '✨', color: palette[i] });
+        picks.push({ label, emoji: labelEmoji[label] || '✨', color: PALETTE[i] });
       }
     });
-    // Pad to 3 with any other answers if we came up short
     if (picks.length < 3) {
-      const leftover: string[] = [];
-      bucketIds.forEach((id) => {
+      const leftover: { label: string; bucketIdx: number }[] = [];
+      BUCKET_IDS.forEach((id, i) => {
         const a = answers?.[id];
         const arr = Array.isArray(a) ? a : a ? [a] : [];
-        arr.slice(1).forEach((l) => leftover.push(l));
+        arr.slice(1).forEach((l) => leftover.push({ label: l, bucketIdx: i }));
       });
       while (picks.length < 3 && leftover.length > 0) {
-        const label = leftover.shift()!;
-        picks.push({
-          label,
-          emoji: labelEmoji[label] || '✨',
-          color: palette[picks.length] || '#8A5CF0',
-        });
+        const l = leftover.shift()!;
+        picks.push({ label: l.label, emoji: labelEmoji[l.label] || '✨', color: PALETTE[l.bucketIdx] });
       }
     }
-    // Final fallback so the screen is never empty
-    while (picks.length < 3) {
-      const fallbacks = [
-        { label: 'Morning routine', emoji: '🌅', color: '#FFB347' },
-        { label: 'Midday reset', emoji: '🥗', color: '#F08AB5' },
-        { label: 'Wind down', emoji: '🌙', color: '#8A5CF0' },
-      ];
-      picks.push(fallbacks[picks.length]);
-    }
+    const fallbacks = [
+      { label: 'Morning routine', emoji: '🌅', color: PALETTE[0] },
+      { label: 'Midday reset', emoji: '🥗', color: PALETTE[1] },
+      { label: 'Wind down', emoji: '🌙', color: PALETTE[2] },
+    ];
+    while (picks.length < 3) picks.push(fallbacks[picks.length]);
     return picks.slice(0, 3);
   }, [answers, labelEmoji]);
 
-  const [phase, setPhase] = useState<'chips' | 'fold' | 'planner' | 'done'>('chips');
+  // Phases: 0 = card rises, 1 = chips drop into rows one-by-one, 2 = settled
+  const [phase, setPhase] = useState<0 | 1 | 2>(0);
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase('fold'), 900);
+    const t1 = setTimeout(() => setPhase(1), 500);
     const t2 = setTimeout(() => {
       haptic.light();
-      setPhase('planner');
-    }, 1700);
-    const t3 = setTimeout(() => setPhase('done'), 2500);
+      setPhase(2);
+    }, 500 + 800 + chips.length * 220);
+    const t3 = setTimeout(() => {
+      onNext();
+    }, 500 + 800 + chips.length * 220 + 900);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleTap = () => {
@@ -113,105 +109,75 @@ export function RiloBuildingPlanScreen({ step, onNext, answers }: Props) {
 
       {/* Visual stage */}
       <div className="flex-1 flex items-center justify-center px-6 relative z-10">
-        <div className="relative w-[280px] h-[340px] flex items-center justify-center">
-          {/* Floating chips that fold down into the card */}
-          {chips.map((c, i) => {
-            const startX = (i - 1) * 90; // -90, 0, 90
-            const startY = -90;
-            const targetY = 60 + i * 44; // row inside the card
-            const isFolding = phase !== 'chips';
-            return (
-              <motion.div
-                key={c.label + i}
-                initial={{ opacity: 0, y: startY - 20, x: startX, scale: 0.8 }}
-                animate={
-                  isFolding
-                    ? {
-                        opacity: 1,
-                        x: 0,
-                        y: targetY,
-                        scale: 0.78,
-                      }
-                    : { opacity: 1, y: startY, x: startX, scale: 1 }
-                }
-                transition={{
-                  duration: isFolding ? 0.7 : 0.45,
-                  delay: isFolding ? i * 0.12 : i * 0.15,
-                  ease: [0.65, 0, 0.35, 1],
-                }}
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 px-3 py-2 rounded-full bg-white shadow-[0_8px_20px_-6px_rgba(0,0,0,0.18)] border"
-                style={{ borderColor: `${c.color}55` }}
-              >
-                <span
-                  className="w-2 h-2 rounded-full"
-                  style={{ background: c.color }}
-                />
-                <img
-                  src={getFluentEmojiUrl(c.emoji)}
-                  alt=""
-                  className="w-4 h-4"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-                <span className="text-[12px] font-semibold text-black whitespace-nowrap max-w-[140px] truncate">
-                  {c.label}
-                </span>
-              </motion.div>
-            );
-          })}
+        <motion.div
+          initial={{ opacity: 0, y: 60, scale: 0.94 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          className="relative w-[280px] rounded-[24px] bg-white shadow-[0_24px_50px_-18px_rgba(232,74,111,0.45)] border border-black/5 overflow-hidden"
+        >
+          {/* Card header */}
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-black/5">
+            <img src={riloAppIcon} alt="Rilo" className="w-6 h-6 rounded-[7px]" />
+            <span className="text-[13px] font-bold text-black">Today</span>
+            <span className="ml-auto text-[10px] font-semibold text-black/40 uppercase tracking-wider">
+              Building…
+            </span>
+          </div>
 
-          {/* Planner card that rises to catch the chips */}
+          {/* Three rows; each shows a faint slot then the chip "clicks" in */}
+          <div className="px-3 py-3 space-y-2 min-h-[180px]">
+            {chips.map((c, i) => {
+              const dropDelay = i * 0.22;
+              const dropped = phase >= 1;
+              return (
+                <div
+                  key={c.label + i}
+                  className="relative h-11 rounded-xl bg-black/5 overflow-visible"
+                >
+                  <motion.div
+                    initial={{ opacity: 0, y: -90, scale: 0.85 }}
+                    animate={
+                      dropped
+                        ? { opacity: 1, y: 0, scale: 1 }
+                        : { opacity: 0, y: -90, scale: 0.85 }
+                    }
+                    transition={{
+                      duration: 0.55,
+                      delay: dropDelay,
+                      ease: [0.34, 1.56, 0.64, 1], // overshoot for "click"
+                    }}
+                    className="absolute inset-0 flex items-center gap-2 px-3 rounded-xl bg-white shadow-[0_4px_12px_-4px_rgba(0,0,0,0.18)] border"
+                    style={{ borderColor: `${c.color}66` }}
+                  >
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shrink-0"
+                      style={{ background: c.color }}
+                    />
+                    <img
+                      src={getFluentEmojiUrl(c.emoji)}
+                      alt=""
+                      className="w-5 h-5 shrink-0"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                    <span className="text-[13px] font-semibold text-black truncate">
+                      {c.label}
+                    </span>
+                  </motion.div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Progress shimmer */}
           <motion.div
-            initial={{ opacity: 0, y: 80, scale: 0.92 }}
-            animate={
-              phase === 'chips'
-                ? { opacity: 0, y: 80, scale: 0.92 }
-                : { opacity: 1, y: 0, scale: 1 }
-            }
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-x-0 top-6 mx-auto w-[260px] h-[300px] rounded-[24px] bg-white shadow-[0_24px_50px_-18px_rgba(232,74,111,0.45)] border border-black/5 overflow-hidden"
-          >
-            {/* Card header */}
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-black/5">
-              <img
-                src={riloAppIcon}
-                alt="Rilo"
-                className="w-6 h-6 rounded-[7px]"
-              />
-              <span className="text-[12px] font-bold text-black">
-                Today
-              </span>
-              <span className="ml-auto text-[10px] font-semibold text-black/40 uppercase tracking-wider">
-                Building…
-              </span>
-            </div>
-            {/* Three empty rows where the chips will land — rendered as faint lines */}
-            <div className="px-4 pt-3 space-y-3">
-              {[0, 1, 2].map((i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: phase === 'planner' || phase === 'done' ? 0.08 : 0 }}
-                  transition={{ delay: 0.2 + i * 0.1 }}
-                  className="h-9 rounded-xl bg-black"
-                />
-              ))}
-            </div>
-
-            {/* Subtle progress shimmer at the bottom of the card */}
-            <motion.div
-              initial={{ x: '-100%' }}
-              animate={{ x: phase !== 'chips' ? '100%' : '-100%' }}
-              transition={{
-                duration: 1.4,
-                repeat: Infinity,
-                ease: 'linear',
-              }}
-              className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#E84A6F] to-transparent"
-            />
-          </motion.div>
-        </div>
+            initial={{ x: '-100%' }}
+            animate={{ x: '100%' }}
+            transition={{ duration: 1.4, repeat: Infinity, ease: 'linear' }}
+            className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#E84A6F] to-transparent"
+          />
+        </motion.div>
       </div>
 
       {/* Copy */}
