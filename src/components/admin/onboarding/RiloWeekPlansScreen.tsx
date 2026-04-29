@@ -384,7 +384,12 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
                   key={h.label}
                   className="flex items-center gap-2 text-[15px] text-[#1a1f3d]"
                 >
-                  <span className="text-base leading-none">{h.emoji}</span>
+                  <img
+                    src={getFluentEmojiUrl(h.emoji)}
+                    alt=""
+                    className="h-[18px] w-[18px] shrink-0"
+                    loading="lazy"
+                  />
                   <span className="font-medium">{h.label}</span>
                 </li>
               ))}
