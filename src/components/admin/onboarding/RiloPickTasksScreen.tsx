@@ -61,8 +61,13 @@ export function RiloPickTasksScreen({ step, onNext, onAnswer }: Props) {
 
   const handleSuggest = () => {
     haptic.medium();
-    // Pick the first 4 tasks as a friendly default
-    const suggested = tasks.slice(0, 4).map((t) => t.label);
+    // Pick 4 random tasks (Fisher–Yates shuffle on a copy)
+    const pool = [...tasks];
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    const suggested = pool.slice(0, Math.min(4, pool.length)).map((t) => t.label);
     setPicked(new Set(suggested));
   };
 
