@@ -1456,15 +1456,16 @@ const AppHome = () => {
           <div style={{ height: isKeyboardOpen ? '24px' : '120px' }} />
         </div>
 
-        {/* Bundled spotlight intro popup (Dear Me-style) */}
+        {/* Bundled spotlight intro popup (Rilo-style) */}
         <HomeSpotlightIntro
           isOpen={showSpotlightIntro}
           onStart={() => {
             setShowSpotlightIntro(false);
             spotlightTourActiveRef.current = true;
             scrollHomeToTop();
+            // New order: 1) tap a task → 2) tap + to add → 3) complete a task
             setTimeout(() => {
-              setShowFirstCoachMark(true);
+              setShowTapCoachMark(true);
             }, 500);
           }}
           onSkip={() => {
