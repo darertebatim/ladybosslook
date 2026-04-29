@@ -253,8 +253,8 @@ export default function AppOnboarding() {
 
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col">
-      {/* Navigation bar — hidden on paywall steps (they have their own controls) */}
-      {step.type !== 'paywall' && (
+      {/* Navigation bar — hidden on paywall + AI screens (they have their own controls) */}
+      {step.type !== 'paywall' && step.type !== 'rilo-week-plans' && (
         <div className="shrink-0 px-4 py-2 flex items-center z-20 bg-white" style={{ paddingTop: 'env(safe-area-inset-top, 44px)' }}>
           <button onClick={goBack} className="mr-2 active:opacity-60 p-1">
             <ChevronLeft className="h-5 w-5 text-[#1a1f3d]" />
