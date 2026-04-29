@@ -142,7 +142,7 @@ export function RiloTeachScreen({ step, onNext }: Props) {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: isPlanner ? 1.5 : 0.1 }}
-          className="text-[26px] leading-[1.2] font-bold text-[#1a1f3d] text-center"
+          className="text-[26px] leading-[1.2] font-bold text-[#1a1f3d] text-center whitespace-pre-line"
         >
           {step.title}
         </motion.h1>
