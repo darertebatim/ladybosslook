@@ -386,7 +386,7 @@ function PlannerVisual() {
             <p className="text-[11px] font-semibold uppercase tracking-wider text-[#1a1f3d]/50">
               Today
             </p>
-            <p className="text-[18px] font-bold text-[#1a1f3d]">Wed, Apr 29</p>
+            <p className="text-[18px] font-bold text-[#1a1f3d]">{formatTodayLabel()}</p>
           </motion.div>
           {/* Reserved spot for the R-mark to land into (visual placeholder, real R is the floating one above) */}
           <div className="w-9 h-9 rounded-full bg-transparent" />
